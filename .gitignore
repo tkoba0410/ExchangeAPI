@@ -1,0 +1,79 @@
+# ===============================
+# Visual Studio / .NET Core
+# ===============================
+
+# ビルド出力
+bin/
+obj/
+out/
+[Bb]uild/
+
+# Visual Studio の一時ファイル
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# リストアされるパッケージ
+packages/
+*.nupkg
+
+# .NET Core global.json
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Publish 出力
+*.publishsettings
+*.pubxml
+*.pubxml.user
+
+# Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+# ASP.NET 一時ファイル
+App_Data/
+
+# IIS Express
+iisexpress/
+*.vspscc
+
+# Logs
+*.log
+
+# ===============================
+# ツール・ワークスペース関連
+# ===============================
+
+# dotenv
+*.env
+*.env.*
+
+# VSCode
+.vscode/
+.history/
+
+# OneDrive / Dropbox などの余計なメタデータ
+*.lnk
+Desktop.ini
+Thumbs.db
+
+# ===============================
+# Markdown / ドキュメント
+# ===============================
+
+# 特に md ファイルは Git 管理するので除外なし
+# ただし一時ファイル系は除外
+
+# Markdown preview caches
+*.md.cache
+*.tmp
+
+# ===============================
+# その他（必要に応じて）
+# ===============================
+
+# OS依存
+.DS_Store

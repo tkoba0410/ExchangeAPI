@@ -1,7 +1,7 @@
 ---
 doc_id: 0120-OVR-INTR
 title: Project Overview
-version: 1.1.0
+version: 1.1.1
 status: Draft
 date: 2025-05-05
 confidentiality: Public
@@ -129,6 +129,8 @@ Stage1 における HTTP / 例外ポリシーは次に限定する。
 - API エラーおよび内部エラーは `ExchangeApiException` で通知する。
 - Result 型など高度なエラーモデル拡張は **Stage1 の対象外** とする。
 
+このポリシーは REQ（NFR-2/3）および SPC（6・7 章）と整合するよう維持する。
+
 ## 付録A. 開発手法（SCD）— 規範要約（正典）
 
 - **要求ID**：`{Layer}-{Type}{Seq}`（例: `TRN-R001`）。一意／欠番再利用 **禁止 (MUST NOT)**。  
@@ -163,6 +165,7 @@ Stage1 における HTTP / 例外ポリシーは次に限定する。
 
 | 版 | 日付 | 内容 |
 |----|------|------|
+| v1.1.1 | 2025-05-05 | Stage1 HTTP/例外ポリシーの整合先（REQ/SPC）を明示し、版情報を更新。 |
 | v1.1.0 | 2025-05-05 | Stage1 縮退構造の明記、依存ルール参照先の統一、通信/例外ポリシーの Stage1 固定化、章番号の更新を実施。 |
 | v1.0.0 | 2025-10-10 | 初版。0830/0800を参照対象として統一し、各々が standards 群との差異を明示する方針を採用。 |
 

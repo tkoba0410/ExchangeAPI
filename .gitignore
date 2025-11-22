@@ -54,6 +54,8 @@ iisexpress/
 # VSCode
 .vscode/
 .history/
+*.code-workspace
+
 
 # OneDrive / Dropbox などの余計なメタデータ
 *.lnk

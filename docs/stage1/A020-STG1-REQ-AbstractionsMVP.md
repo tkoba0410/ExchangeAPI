@@ -44,7 +44,14 @@ Stage 1 の目的は、Exchange API Library の基盤となる **最小限の Ab
 
 ---
 
-## 4. 機能要求（Functional Requirements, FR）
+## 4. レイヤ構造と依存ルール（Stage1 縮退モデル）
+
+- 正典は **4 層構造（Abstractions → Adapters → Protocol → Transport）** だが、Stage1 では **Protocol / Transport を使用しない縮退版として Abstractions / Adapter / Raw の 3 層のみを採用**する。bitFlyer Public REST `getticker` のみを扱うため、共通 Protocol や高機能 Transport を導入しない。
+- レイヤ間の依存方向および禁止ルールの正典は `A030-STG1-ARC-MinimalArchitecture.md` に定義される。
+
+---
+
+## 5. 機能要求（Functional Requirements, FR）
 
 ### FR-1: Ticker 取得 API（Abstractions）
 - **FR-1-1**: `IExchangeClient` を定義する。
@@ -89,7 +96,7 @@ Stage 1 の目的は、Exchange API Library の基盤となる **最小限の Ab
 
 ---
 
-## 5. 非機能要求（Non-functional Requirements, NFR）
+## 6. 非機能要求（Non-functional Requirements, NFR）
 
 ### NFR-0: ログ／メトリクス（Stage1 の基本方針）
 - **NFR-0-1:** Abstractions 層はログ・メトリクスの責務を持たない（MUST）。
@@ -113,7 +120,7 @@ Stage 1 の目的は、Exchange API Library の基盤となる **最小限の Ab
 
 ---
 
-## 6. 対象外の正式宣言（Non-goals）
+## 7. 対象外の正式宣言（Non-goals）
 以下は Stage 1 の対象外であり、本 REQ による実装義務を負わない。
 - 認証付き API（Balance / Order など）
 - WebSocket（Board / Executions）
@@ -125,7 +132,7 @@ Stage 1 の目的は、Exchange API Library の基盤となる **最小限の Ab
 
 ---
 
-## 7. Stage 1 完了条件（Definition of Done, DoD）
+## 8. Stage 1 完了条件（Definition of Done, DoD）
 Stage 1 は以下を満たしたとき完了とする：
 
 ### DoD-1: Abstractions 実装
@@ -151,7 +158,15 @@ Stage 1 は以下を満たしたとき完了とする：
 
 ---
 
-## 8. 関連文書（Reference Documents）
+## 9. 関連文書（Reference Documents）
 - `0120-OVR-INTR-ProjectOverview.md`
 - `Stage1-spec-full`（詳細仕様）
 - `0800-STD-DOC0-DocumentPolicy.md`
+
+---
+
+## 改訂履歴
+
+| 版 | 日付 | 内容 |
+|----|------|------|
+| v1.1.0 | 2025-05-05 | Stage1 縮退構造の明記、依存ルール参照の統一、章番号の更新を実施。 |

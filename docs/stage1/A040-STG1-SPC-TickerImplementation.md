@@ -47,6 +47,8 @@ Raw Model (BitflyerTickerRaw)
 
 依存方向は必ず一方向（逆依存禁止）。
 
+正典は **4 層構造（Abstractions → Adapters → Protocol → Transport）** であるが、Stage1 のスコープは bitFlyer Public REST `getticker` のみに限定されるため、Protocol / Transport は導入せず、**Abstractions / Adapter / Raw の 3 層のみを実装する縮退構造**を採用する。
+
 ---
 
 # 4. Abstractions 仕様（最小）
@@ -72,12 +74,21 @@ Task<Ticker> GetTickerAsync(string symbol, CancellationToken ct = default)
 
 # 5. Adapter 仕様（bitFlyer）
 ## 5.1 Raw モデル
-bitFlyer `GET /v1/getticker` のレスポンスを欠損なく保持するクラスを定義する。
-- ProductCode
-- BestBid / BestAsk
-- LastTradedPrice
-- Timestamp
-- Size / Depth / Volume 系など全フィールド
+bitFlyer `GET /v1/getticker` のレスポンスを欠損なく保持するクラスを定義する。フィールドは bitFlyer 公式ドキュメント（https://lightning.bitflyer.com/docs?lang=ja#get-ticker）に準拠し、少なくとも以下を含める。
+- `product_code`
+- `timestamp`
+- `tick_id`
+- `best_bid`
+- `best_ask`
+- `best_bid_size`
+- `best_ask_size`
+- `total_bid_depth`
+- `total_ask_depth`
+- `ltp`
+- `volume`
+- `volume_by_product`
+
+公式レスポンスに追加のフィールドが将来追加された場合は、Raw モデルに安全に拡張してよい。
 
 ## 5.2 Raw API
 ```
@@ -99,21 +110,18 @@ Task<BitflyerTickerRaw> GetTickerRawAsync(string productCode, CancellationToken 
 ---
 
 # 6. 例外ポリシー（Stage1 縮退版）
-- **入力エラー**：ArgumentException
-- **ネットワークエラー**：HttpRequestException
-- **API レベルエラー**：ExchangeApiException（1 クラスに集約）
-- **パース不能／内部エラー**：ExchangeApiException または一般 Exception
+- **入力エラー**：`ArgumentException` 系を使用する。
+- **API / 内部エラー**：`ExchangeApiException` を用いる。
 
-Stage1 は例外ベースでシンプルに扱い、Result 型は採用しない。
+Stage1 は例外ベースでシンプルに扱い、Result 型などのエラーモデル拡張は対象外とする。
 
 ---
 
 # 7. HTTP / Transport ポリシー（最小）
-- HttpClient は DI から供給、使い捨て禁止
-- タイムアウトは 5〜10 秒を推奨
-- CancellationToken は SendAsync に伝播
-- User-Agent を明示（形式は自由）
-- 未知フィールドは無視してパース
+- `HttpClient` は DI から供給し、使い捨てしない。
+- タイムアウトは 5〜10 秒を推奨とする。
+- `CancellationToken` は `SendAsync` に伝播する。
+- `User-Agent` を明示的に設定する。
 
 ---
 
@@ -149,12 +157,7 @@ src/
 ---
 
 # 11. 依存禁止ルール（MUST）
-Stage1 における層の依存方向と禁止事項を明確にする。
-- Abstractions **MUST NOT** 依存 → Adapter / Raw
-- Adapter **MUST NOT** 依存 → 利用側アプリケーション
-- Raw **MUST NOT** 依存 → Abstractions
-
-依存方向は常に `Abstractions ← Adapter ← Raw` の一方向のみ。
+レイヤ間の依存方向および禁止ルールの正典は `A030-STG1-ARC-MinimalArchitecture.md` に定義される。
 
 ---
 
@@ -187,4 +190,12 @@ Stage1 における層の依存方向と禁止事項を明確にする。
 
 これらを追加しても Stage1 の 3 層構造はそのまま維持される。
 本書は、Stage を考慮しない包括的な文書群を **Stage1 専用の最小構成**に縮退したものである。設計原則を壊さず、今後の Stage2+ の拡張にも耐える「薄いが揺らぎのない基盤」となる。
+
+---
+
+# 14. 改訂履歴
+
+| 版 | 日付 | 内容 |
+|----|------|------|
+| v1.1.0 | 2025-05-05 | Stage1 の縮退構造と依存ルール参照の明文化、Raw フィールドの公式化、通信/例外ポリシーの整理を実施。 |
 

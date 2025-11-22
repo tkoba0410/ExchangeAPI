@@ -1,15 +1,15 @@
 ---
 doc_id: 0120-OVR-INTR
 title: Project Overview
-version: 1.0.0
+version: 1.1.0
 status: Draft
-date: 2025-10-10
+date: 2025-05-05
 confidentiality: Public
 ---
 
 # [OVR-INTR] プロジェクト概要
 
-## 0. 文書の位置づけ（正典）
+## 1. 文書の位置づけ（正典）
 
 - 正典の対象範囲：本書は次の **規範領域** を包含し、相互の矛盾時は本書が優先する。  
   1) **アーキテクチャ規範**（4層と依存方向／層責務）  
@@ -21,20 +21,20 @@ confidentiality: Public
 - 本書に反する過去・他文書の記述は **破棄/修正** する（整合性維持の責任は各文書にある）。
 - 文書の優先順位（基本）：**OVR-INTR** ＞ **STD/REQ** ＞ **ARC** ＞ **IMP** ＞ **TST** ＞ **OPS**  
   ※ **SEC（禁則/法令順守）**は常に優先される。
-- Exchange API Library の **4層構造（Abstractions → Adapters → Protocol → Transport）** を正とし、
-  依存方向はこの順の一方向とする。 
+- Exchange API Library の **4層構造（Abstractions → Adapters → Protocol → Transport）** を正とするが、Stage1 では **Protocol / Transport を利用しない縮退版として Abstractions / Adapter / Raw の 3 層のみを採用**する。縮退の理由は、スコープが bitFlyer Public REST `getticker` のみに限定され、共通 Protocol や高機能 Transport を導入しないためである。
   層名は **“Adapters”（複数形）** を用いる。ドメイン判断（戦略/意思決定）は **対象外**。
+- レイヤ間の依存方向および禁止ルールの正典は `A030-STG1-ARC-MinimalArchitecture.md` に定義される。
 - 変更管理：すべて **Pull Request 経由（MUST）**／少なくとも 1 名承認。  
   本書の意味変更は **ADR 必須 + SemVer 版上げ**。変更後は **0900-OVR-COMP** を再生成する。
 
-## 1. 目的
+## 2. 目的
 
 本書は **Exchange API Library** の全体像を提示し、利用者・開発者・関係者が共通認識を持てるようにする。  
 背景・狙い・基本構成を示し、以降の系統文書（REQ / ARC / IMP 等）への導入を担う。
 
 ---
 
-## 2. 範囲
+## 3. 範囲
 
 本書が対象とする範囲と対象外を明確化する。  
 
@@ -50,7 +50,7 @@ confidentiality: Public
 
 ---
 
-## 3. 背景
+## 4. 背景
 
 取引所ごとに REST/WS の仕様が大きく異なることにより、次の課題が生じる：  
 
@@ -62,7 +62,7 @@ confidentiality: Public
 
 ---
 
-## 4. プロジェクトの目的
+## 5. プロジェクトの目的
 
 - 取引所 API を **共通インターフェースで統一的に利用可能** とする  
 - ドメイン判断（業務ポリシー/戦略/意思決定）は **ライブラリへ持ち込まない**  
@@ -74,7 +74,7 @@ confidentiality: Public
 
 ---
 
-## 5. 基本構造（NuGet パッケージ）
+## 6. 基本構造（NuGet パッケージ）
 
 本ライブラリは、次の **4 層構造** と対応パッケージを基本とする。
 
@@ -103,15 +103,31 @@ HTTP/WS の通信基盤と **Policy/Pipeline** を提供する。
 
 ※ 旧「Rest.Extension」に相当する機能は、本層のポリシーとして統合する。  
 
-> 依存方向は **Abstractions → Adapters → Protocol → Transport** の一方向とし、横断参照や循環依存を禁止する。
+> レイヤ間の依存方向および禁止ルールの正典は `A030-STG1-ARC-MinimalArchitecture.md` に定義される。
+
+Stage1 では上記 4 層正典を縮退させ、**Abstractions / Adapter / Raw の 3 層構造のみを実際に使用**する。bitFlyer Public REST `getticker` のみを扱うため、共通 Protocol や Transport の導入は次フェーズ以降に委ねる。
 
 ---
 
-## 6. 想定利用者
+## 7. 想定利用者
 
 - **OSS 利用者**：統一的な Exchange API 呼び出しを必要とする外部開発者
 - **プロジェクト開発者**：ライブラリの設計・実装・運用を担うメンバー
 - **ステークホルダー**：金融システムや商用サービスでの適用を検討する関係者
+
+---
+
+## 8. Stage1 の通信・例外ポリシー（縮退版）
+
+Stage1 における HTTP / 例外ポリシーは次に限定する。
+
+- `HttpClient` は DI から供給し、使い捨てしない。
+- タイムアウトは 5〜10 秒を推奨とする。
+- `CancellationToken` は `SendAsync` に伝播する。
+- `User-Agent` を明示的に設定する。
+- 入力エラーは `ArgumentException` 系を使用する。
+- API エラーおよび内部エラーは `ExchangeApiException` で通知する。
+- Result 型など高度なエラーモデル拡張は **Stage1 の対象外** とする。
 
 ## 付録A. 開発手法（SCD）— 規範要約（正典）
 
@@ -147,5 +163,6 @@ HTTP/WS の通信基盤と **Policy/Pipeline** を提供する。
 
 | 版 | 日付 | 内容 |
 |----|------|------|
+| v1.1.0 | 2025-05-05 | Stage1 縮退構造の明記、依存ルール参照先の統一、通信/例外ポリシーの Stage1 固定化、章番号の更新を実施。 |
 | v1.0.0 | 2025-10-10 | 初版。0830/0800を参照対象として統一し、各々が standards 群との差異を明示する方針を採用。 |
 

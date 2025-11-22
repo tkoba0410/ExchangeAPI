@@ -1,0 +1,123 @@
+root = true
+
+###########################################################
+# 共通設定（全ファイル）
+###########################################################
+[*]
+charset = utf-8-bom
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+###########################################################
+# C# / VB ファイル共通
+###########################################################
+[*.{cs,csx,cake,vb,vbx}]
+indent_style = space
+indent_size = 4
+
+###########################################################
+# C# コードスタイル（Microsoft 推奨寄せ）
+###########################################################
+[*.cs]
+
+# using の並び: System 系を先頭、グルーピング
+dotnet_sort_system_directives_first = true:suggestion
+dotnet_separate_import_directive_groups = true:suggestion
+
+# 型の書き方（組み込み型は int / string などを使う）
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+
+# アクセス修飾子は基本つける
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+
+# this. / Me. は基本つけない
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# null 関連の書き方
+dotnet_style_null_propagation = true:suggestion        # ?. 使用
+dotnet_style_coalesce_expression = true:suggestion     # ?? 使用
+
+# using / import の未使用削除
+dotnet_remove_unnecessary_imports = true:suggestion
+
+# var のルール（Microsoft 推奨）
+#   - 型が明らかなときは var
+#   - そうでないときは明示型
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# 波かっこは基本つける（1行でも）
+csharp_prefer_braces = true:suggestion
+
+# 式形式メンバー（=>）の使い方
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+csharp_style_expression_bodied_indexers = when_on_single_line:suggestion
+csharp_style_expression_bodied_operators = when_on_single_line:suggestion
+
+# パターンマッチング／is 式の推奨
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_style_inlined_variable_declaration = true:suggestion
+
+# nullable / null 許容参照型前提で書いていく場合のトーン（参考）
+# （プロジェクト側では <Nullable>enable</Nullable> を推奨）
+# ここでは細かすぎるので個別ルールは最小限にとどめる
+
+# フィールド／メンバーの命名規則（一般的な .NET Core スタイル）
+#   - public / internal / protected: PascalCase
+#   - private / local: camelCase
+#   - private field: _camelCase
+
+# 名前スタイル定義
+dotnet_naming_rule.public_members_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.public_members_should_be_pascal_case.symbols = public_symbols
+dotnet_naming_rule.public_members_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_rule.private_fields_should_be_camel_case_with_underscore.severity = suggestion
+dotnet_naming_rule.private_fields_should_be_camel_case_with_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case_with_underscore.style = camel_case_underscore_style
+
+dotnet_naming_rule.local_variables_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.local_variables_should_be_camel_case.symbols = local_variables
+dotnet_naming_rule.local_variables_should_be_camel_case.style = camel_case_style
+
+# シンボルセット
+dotnet_naming_symbols.public_symbols.applicable_kinds = property,method,field,event
+dotnet_naming_symbols.public_symbols.applicable_accessibilities = public,protected,protected_internal
+dotnet_naming_symbols.public_symbols.required_modifiers =
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.required_modifiers =
+
+dotnet_naming_symbols.local_variables.applicable_kinds = local
+dotnet_naming_symbols.local_variables.applicable_accessibilities =
+dotnet_naming_symbols.local_variables.required_modifiers =
+
+# 名前スタイル
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+dotnet_naming_style.pascal_case_style.required_prefix =
+dotnet_naming_style.pascal_case_style.required_suffix =
+
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+dotnet_naming_style.camel_case_style.required_prefix =
+dotnet_naming_style.camel_case_style.required_suffix =
+
+dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
+dotnet_naming_style.camel_case_underscore_style.required_prefix = _
+dotnet_naming_style.camel_case_underscore_style.required_suffix =
+
+###########################################################
+# プロジェクトファイル(.csprojなど)
+###########################################################
+[*.{csproj,props,targets}]
+indent_style = space
+indent_size = 2
+charset = utf-8-bom

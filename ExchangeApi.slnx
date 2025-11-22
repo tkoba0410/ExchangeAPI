@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ExchangeApi.Abstractions/ExchangeApi.Abstractions.csproj" Id="e52c4d02-8b24-4a52-a8db-c45424c76c6d" />
+    <Project Path="src/ExchangeApi.Bitflyer/ExchangeApi.Bitflyer.csproj" Id="3df8201a-e515-4cd5-a230-6f8f7977d2b5" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ExchangeApi.Abstractions.Tests/ExchangeApi.Abstractions.Tests.csproj" Id="07da83c2-6daf-49f2-a52d-6d756c03cc59" />
+    <Project Path="tests/ExchangeApi.Bitflyer.Tests/ExchangeApi.Bitflyer.Tests.csproj" Id="04bb6be0-7f66-4c4c-ac1a-a6ca7b33036e" />
+  </Folder>
+</Solution>

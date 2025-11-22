@@ -256,10 +256,6 @@ Stage 1 におけるログ・メトリクスの方針は以下の通りとする
 
 * `GetTickerAsync(string symbol, CancellationToken ct)`：指定したシンボルの現在価格を取得する。
 
-### DTOs（データ構造）
-
-* Ticker: Symbol, Price.
-
 ## 4. 対象外（Stage 1 では扱わないもの）
 
 * 認証付き REST
@@ -447,23 +443,29 @@ Stage 1 における bitFlyer Adapter の HTTP クライアントおよびトラ
 * 文字コードは UTF-8 前提とする。
 * パース不能な場合は `ExchangeApiException` で通知する。
 
-## 6. 実装方針
+### 5.8 API 呼び出し補助方針（User-Agent / CancellationToken / SymbolMap）
 
-* Authenticated REST
-* WebSocket
-* Rate limiting
-* Multi-exchange
+Stage 1 において、API 呼び出し時の補助的な共通方針を以下の通り定める。
 
-## 5. 実装方針
+#### 5.8.1 User-Agent ヘッダー
 
-* Simple Adapter for bitFlyer.
-* Direct HTTP inside adapter.
-* Extract common parts later.
+* bitFlyer Public API への HTTP リクエストには、明示的な `User-Agent` ヘッダーを付与することを推奨する。
+* 形式の一例：`ExchangeApiClient/1.0 (bitflyer; dotnet)` のように、ライブラリ名とバージョンを含める。
+* バージョン番号はアセンブリバージョン等から取得してもよいし、固定文字列でもよい（Stage 1 の範囲では厳密な形式は規定しない）。
+* 取引所の利用規約に反する表現を含めないこと。
 
-## 6. テスト方針
+#### 5.8.2 CancellationToken の伝播
 
-* Basic console test.
-* Error cases minimal。
+* `IExchangeClient.GetTickerAsync` および `IBitflyerPublicApi.GetTickerRawAsync` で受け取った `CancellationToken` は、HTTP 呼び出し（`HttpClient.SendAsync` など）に必ず伝播させる。
+* キャンセルが要求された場合、.NET の標準挙動に従い `TaskCanceledException` または `OperationCanceledException` がスローされることを許容する。
+* Stage 1 では、ユーザー起因のキャンセルとネットワーク障害等によるタイムアウトを厳密に区別しない。必要に応じてログや外側のレイヤーで区別する。
+
+#### 5.8.3 symbol ↔ product_code 変換ポリシー
+
+* `symbol`（例: `"BTC/JPY"`）と bitFlyer の `product_code`（例: `"BTC_JPY"`）の対応関係は、bitFlyer Adapter 層内部の静的なマッピングテーブルで管理する。
+* Stage 1 では、少なくとも `"BTC/JPY"` ↔ `"BTC_JPY"` の対応を持つこと。
+* マッピングテーブルに存在しない `symbol` が指定された場合は、`ArgumentException` をスローする。
+* Stage 2 以降で銘柄や取引所が増えた場合に、構成ファイルや設定オブジェクトにマッピングを移すことを許容するが、Stage 1 では簡潔さを優先し、コード内の静的テーブルでよい。
 
 ## 7. ファイル構成・開発環境（案）
 

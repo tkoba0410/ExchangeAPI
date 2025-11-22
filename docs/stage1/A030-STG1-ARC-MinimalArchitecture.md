@@ -7,8 +7,10 @@ Stage 1 最小アーキテクチャ構成（ARC）
 
 このドキュメントは、Exchange API Library の **Stage 1 に必要な最小アーキテクチャ構造（ARC）** を定義する。
 
-Stage 1 では、Public REST（bitFlyer Ticker）のみを対象とするため、複雑なアーキテクチャは不要。  
+Stage 1 では、Public REST（bitFlyer Ticker）のみを対象とするため、複雑なアーキテクチャは不要。
 本書では、**Abstractions / Adapter / Raw の 3 層構造** と、**依存関係ルール**、**プロジェクト構成**のみを明文化する。
+
+正典は **4 層構造（Abstractions → Adapters → Protocol → Transport）** であるが、Stage1 では Protocol / Transport を利用しない **縮退版の 3 層（Abstractions / Adapter / Raw）** のみを採用する。対象が bitFlyer Public REST `getticker` のみに限定され、共通 Protocol や高機能 Transport を導入しないためである。
 
 Stage 2 以降で拡張されるが、本 ARC は Stage 1 の範囲で揺らがない“正典”を提供する。
 
@@ -63,9 +65,6 @@ Stage 1 は次の 3 層で構成される：
   - Adapter からのみ参照される
   - Abstractions の詳細を知らない（純粋な取引所仕様の写像）
   - Stage1 では **物理プロジェクトとして分けず、Adapter プロジェクト内の論理レイヤ** として実装する。
-- 特徴：
-  - Adapter からのみ参照される
-  - Abstractions の詳細を知らない（純粋な取引所仕様の写像）
 
 ---
 
@@ -153,8 +152,16 @@ project-root/
 ---
 
 ## 6. 結論
-本 ARC 文書は、Stage 1 における **最小で揺らぎのないアーキテクチャ正典** を定義するものであり、  
+本 ARC 文書は、Stage 1 における **最小で揺らぎのないアーキテクチャ正典** を定義するものであり、
 Spec と REQ を結ぶ“骨格”として設計された。
 
 Stage 1 の範囲ではこの構造で十分であり、Stage 2 以降もこの構造を前提に拡張できる。
+
+---
+
+## 改訂履歴
+
+| 版 | 日付 | 内容 |
+|----|------|------|
+| v1.1.0 | 2025-05-05 | Stage1 縮退構造の位置づけを 4 層正典との関係で明記し、重複表現を整理。 |
 

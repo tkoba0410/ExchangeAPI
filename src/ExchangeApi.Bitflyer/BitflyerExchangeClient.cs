@@ -1,9 +1,4 @@
-using System;
-using System.Globalization;
-using System.Threading;
-using System.Threading.Tasks;
-using ExchangeApi.Abstractions;
-using ExchangeApi.Abstractions.Models;
+﻿using System.Globalization;
 using ExchangeApi.Bitflyer.Models;
 
 namespace ExchangeApi.Bitflyer

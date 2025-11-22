@@ -1,6 +1,4 @@
-using System.Threading;
-using System.Threading.Tasks;
-using ExchangeApi.Bitflyer.Models;
+﻿using ExchangeApi.Bitflyer.Models;
 
 namespace ExchangeApi.Bitflyer
 {

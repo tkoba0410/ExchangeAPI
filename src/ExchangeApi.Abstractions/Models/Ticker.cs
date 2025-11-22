@@ -1,6 +1,4 @@
-using System;
-
-namespace ExchangeApi.Abstractions.Models
+﻿namespace ExchangeApi.Abstractions.Models
 {
     /// <summary>
     /// 現在価格情報（Ticker）。

@@ -1,6 +1,4 @@
-using System;
-
-namespace ExchangeApi.Abstractions
+﻿namespace ExchangeApi.Abstractions
 {
     /// <summary>
     /// Exchange API 呼び出し時のエラーを表す例外。

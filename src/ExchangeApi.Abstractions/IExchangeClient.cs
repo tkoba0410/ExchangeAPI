@@ -1,7 +1,4 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using ExchangeApi.Abstractions.Models;
+﻿using ExchangeApi.Abstractions.Models;
 
 namespace ExchangeApi.Abstractions
 {

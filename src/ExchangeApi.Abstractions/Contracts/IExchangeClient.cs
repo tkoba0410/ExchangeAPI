@@ -1,4 +1,8 @@
-﻿namespace ExchangeApi.Abstractions.Contracts;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using ExchangeApi.Abstractions.Dtos;
+
+namespace ExchangeApi.Abstractions.Contracts;
 
 public interface IExchangeClient
 {

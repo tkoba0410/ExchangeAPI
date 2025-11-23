@@ -1,11 +1,12 @@
 using System;
 using System.Threading.Tasks;
-using ExchangeApi.Abstractions;
-using ExchangeApi.Abstractions.Models;
+using ExchangeApi.Abstractions.Dtos;
+using ExchangeApi.Abstractions.Errors;
 using ExchangeApi.Bitflyer;
 using ExchangeApi.Bitflyer.Models;
 using ExchangeApi.Bitflyer.Tests.Fakes;
 using Xunit;
+
 
 namespace ExchangeApi.Bitflyer.Tests
 {
@@ -39,12 +40,12 @@ namespace ExchangeApi.Bitflyer.Tests
 
             // Assert
             Assert.Equal(Symbols.BtcJpy, ticker.Symbol);
-            Assert.Equal(raw.BestBid, ticker.BestBid);
-            Assert.Equal(raw.BestAsk, ticker.BestAsk);
+            Assert.Equal(raw.BestBid, ticker.BestBidPrice);
+            Assert.Equal(raw.BestAsk, ticker.BestAskPrice);
             Assert.Equal(raw.LastTradedPrice, ticker.LastTradedPrice);
 
-            Assert.Equal(DateTimeKind.Utc, ticker.TimestampUtc.Kind);
-            Assert.Equal(new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc), ticker.TimestampUtc);
+            Assert.Equal(DateTimeKind.Utc, ticker.Timestamp.Kind);
+            Assert.Equal(new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc), ticker.Timestamp);
         }
         [Fact]
         public async Task GetTickerAsync_UnsupportedSymbol_ThrowsArgumentException()

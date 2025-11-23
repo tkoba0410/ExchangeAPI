@@ -1,5 +1,5 @@
 using System;
-using ExchangeApi.Abstractions;
+using ExchangeApi.Abstractions.Errors;
 using Xunit;
 
 namespace ExchangeApi.Abstractions.Tests

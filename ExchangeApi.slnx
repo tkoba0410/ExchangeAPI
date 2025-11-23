@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ExchangeApi.Abstractions/ExchangeApi.Abstractions.csproj" />
+    <Project Path="src/ExchangeApi.Bitflyer/ExchangeApi.Bitflyer.csproj" />
+    <Project Path="src/ExchangeApi.Infrastructure/ExchangeApi.Infrastructure.csproj" />
+    <Project Path="src/ExchangeApi.Orchestration/ExchangeApi.Orchestration.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ExchangeApi.Abstractions.Tests/ExchangeApi.Abstractions.Tests.csproj" />
+    <Project Path="tests/ExchangeApi.Bitflyer.Tests/ExchangeApi.Bitflyer.Tests.csproj" />
+    <Project Path="tests/ExchangeApi.Infrastructure.Tests/ExchangeApi.Infrastructure.Tests.csproj" />
+    <Project Path="tests/ExchangeApi.Orchestration.Tests/ExchangeApi.Orchestration.Tests.csproj" />
+  </Folder>
+</Solution>

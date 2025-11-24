@@ -47,8 +47,9 @@ namespace ExchangeApi.Bitflyer.Tests
             Assert.Equal(DateTimeKind.Utc, ticker.Timestamp.Kind);
             Assert.Equal(new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc), ticker.Timestamp);
         }
+
         [Fact]
-        public async Task GetTickerAsync_UnsupportedSymbol_ThrowsArgumentException()
+        public async Task GetTickerAsync_UnsupportedSymbol_ThrowsSymbolNotSupportedException()
         {
             // Arrange
             var raw = new BitflyerTickerRaw
@@ -71,11 +72,12 @@ namespace ExchangeApi.Bitflyer.Tests
             var client = new BitflyerExchangeClient(fakeApi);
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await Assert.ThrowsAsync<SymbolNotSupportedException>(async () =>
             {
                 await client.GetTickerAsync("ETH/JPY");
             });
         }
+
         [Fact]
         public async Task GetTickerAsync_InvalidTimestamp_ThrowsExchangeApiException()
         {

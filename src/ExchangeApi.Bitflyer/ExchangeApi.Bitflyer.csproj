@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ExchangeApi.Abstractions\ExchangeApi.Abstractions.csproj" />
+    <ProjectReference Include="..\ExchangeApi.Infrastructure\ExchangeApi.Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

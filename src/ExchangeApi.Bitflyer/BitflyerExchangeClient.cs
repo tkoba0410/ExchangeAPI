@@ -18,21 +18,28 @@ public sealed class BitflyerExchangeClient : IExchangeClient
     private readonly IBitflyerPublicApi _publicApi;
 
     /// <summary>
-    /// 取引所 ID（"bitFlyer" で固定）。
+    /// 取引所 ID（"bitFlyer" 固定）。
     /// </summary>
     public string ExchangeId { get; }
 
     /// <summary>
     /// アカウント ID。
-    /// Stage1 ではシングルアカウント想定のため、"default" 固定。
+    /// Stage1 ではシングルアカウント想定のため "default" 固定。
     /// </summary>
     public string AccountId { get; }
 
+    /// <summary>
+    /// 既定の exchangeId/accountId でクライアントを作成する。
+    /// </summary>
     public BitflyerExchangeClient(IBitflyerPublicApi publicApi)
         : this(publicApi, exchangeId: "bitFlyer", accountId: "default")
     {
     }
 
+    /// <summary>
+    /// exchangeId / accountId を明示指定してクライアントを作成する。
+    /// 将来のマルチ取引所・マルチアカウント対応を見据えたコンストラクタ。
+    /// </summary>
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
         string exchangeId,
@@ -43,6 +50,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         AccountId  = accountId  ?? throw new ArgumentNullException(nameof(accountId));
     }
 
+    /// <inheritdoc />
     public async Task<Ticker> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default)
@@ -52,14 +60,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
             throw new ArgumentException("symbol must not be null or whitespace.", nameof(symbol));
         }
 
-        // Stage1 では BTC/JPY のみサポート
-        if (!string.Equals(symbol, Symbols.BtcJpy, StringComparison.Ordinal))
-        {
-            throw new ArgumentException(
-                $"Unsupported symbol: {symbol}. Only {Symbols.BtcJpy} is supported in Stage1.",
-                nameof(symbol));
-        }
-
+        // Stage1 では BTC/JPY のみサポート（詳細チェックは MapSymbolToProductCode に集約）
         var productCode = MapSymbolToProductCode(symbol);
 
         BitflyerTickerRaw raw;
@@ -69,7 +70,12 @@ public sealed class BitflyerExchangeClient : IExchangeClient
                 .GetTickerRawAsync(productCode, cancellationToken)
                 .ConfigureAwait(false);
         }
-        catch (Exception ex) when (ex is not ExchangeApiException && ex is not ArgumentException)
+        catch (ExchangeApiException)
+        {
+            // すでに ExchangeApiException としてラップされているものはそのまま流す
+            throw;
+        }
+        catch (Exception ex)
         {
             // 下位の通信エラーなどを ExchangeApiException にラップ
             throw new ExchangeApiException("Failed to call bitFlyer getticker API.", ex);
@@ -86,10 +92,13 @@ public sealed class BitflyerExchangeClient : IExchangeClient
             return "BTC_JPY";
         }
 
-        // ここに来るのは想定外（上で弾いている）が念のため
-        throw new ArgumentException($"Unsupported symbol: {symbol}.", nameof(symbol));
+        // Stage1 では BTC/JPY 以外はサポートしない
+        throw new SymbolNotSupportedException(symbol);
     }
 
+    /// <summary>
+    /// bitFlyer 生レスポンスから共通 Ticker DTO へマッピングする。
+    /// </summary>
     private static Ticker MapToTicker(string symbol, BitflyerTickerRaw raw)
     {
         if (raw is null)
@@ -97,7 +106,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
             throw new ExchangeApiException("bitFlyer ticker response was null.");
         }
 
-        // timestamp は Raw では string なので、ここで UTC に正規化
+        // timestamp は string なので、ここで UTC に正規化
         if (!DateTimeOffset.TryParse(
                 raw.Timestamp,
                 CultureInfo.InvariantCulture,
@@ -110,8 +119,9 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
         var timestampUtc = dto.UtcDateTime;
 
-        // Ticker のコンストラクタに合わせてマッピング
-        // Volume は bitFlyer の ticker には無いので null とする（必要になったら Raw に項目追加）
+        // Volume は Stage1 では未利用なので null のままにしておく。
+        // 必要になったタイミングで BitflyerTickerRaw に対応プロパティを追加し、
+        // ここでマッピングする。
         return new Ticker(
             symbol,
             raw.BestBid,

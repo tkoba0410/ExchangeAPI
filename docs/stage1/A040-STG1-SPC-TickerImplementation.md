@@ -77,7 +77,7 @@ public sealed record Ticker(
     decimal BestBid,
     decimal BestAsk,
     decimal LastTradedPrice,
-    DateTime TimestampUtc);
+    DateTimeOffset Timestamp);
 ```
 
 * `Symbol`
@@ -89,7 +89,7 @@ public sealed record Ticker(
 * `LastTradedPrice`
 
   * 最終約定価格。
-* `TimestampUtc`
+* `Timestamp`
 
   * UTC に正規化された日時（`DateTimeKind.Utc` 推奨）。
 
@@ -112,7 +112,7 @@ public interface IBitflyerPublicApi
   * 形式: `"BTC_JPY"`（bitFlyer 仕様に準拠）。
 * 戻り値
 
-  * `BitflyerTickerRaw`（bitFlyer の `GET /v1/getticker` レスポンスの写像）。
+  * `BitflyerTickerRaw`（bitFlyer の `GET /v1/ticker` レスポンスの写像）。
 
 ### 3.4 REST / HTTP インターフェース（Infrastructure）
 
@@ -147,11 +147,11 @@ public interface IHttpTransport
    * 特定取引所に固有のフィールド名や状態を直接持たない。
 2. **Stage1 では 5 フィールドのみ**
 
-   * `Symbol`, `BestBid`, `BestAsk`, `LastTradedPrice`, `TimestampUtc`。
+   * `Symbol`, `BestBid`, `BestAsk`, `LastTradedPrice`, `Timestamp`。
 3. **値の整合性**
 
    * `Symbol` は引数 `symbol` と同一であること。
-   * `TimestampUtc` は bitFlyer の `timestamp` を UTC に正規化した値とする。
+   * `Timestamp` は bitFlyer の `timestamp` を UTC に正規化した値とする。
 
 将来 Stage2 で複数取引所や追加情報が必要になった場合、
 必要に応じて DTO の拡張を検討するが、Stage1 では最小構成とする。
@@ -179,7 +179,7 @@ public interface IHttpTransport
 `BitflyerTickerRaw` は少なくとも次のフィールドを含む。
 
 * `product_code`: string
-* `timestamp`: string（ISO8601）
+* `timestamp`: DateTimeOffset
 * `tick_id`: long
 * `best_bid`: decimal
 * `best_ask`: decimal
@@ -199,7 +199,7 @@ public interface IHttpTransport
 public sealed class BitflyerTickerRaw
 {
     public string ProductCode { get; init; } = default!;
-    public DateTime Timestamp { get; init; };
+    public DateTimeOffset Timestamp { get; init; };
     public long TickId { get; init; };
     public decimal BestBid { get; init; };
     public decimal BestAsk { get; init; };
@@ -213,7 +213,7 @@ public sealed class BitflyerTickerRaw
 }
 ```
 
-* `Timestamp` は JSON の `timestamp` を DateTime にパースした値とする（UTC）。
+* `Timestamp` は JSON の `timestamp` を DateTimeOffset にパースした値とする（UTC）。
 * プロパティ名は C# の慣習に合わせて PascalCase を用いる。
 
 ---
@@ -236,7 +236,7 @@ public sealed class BitflyerTickerRaw
 * `Ticker.LastTradedPrice`
 
   * `BitflyerTickerRaw.LastTradedPrice` を設定する（`ltp`）。
-* `Ticker.TimestampUtc`
+* `Ticker.Timestamp`
 
   * `BitflyerTickerRaw.Timestamp` を UTC 正規化して設定する。
 
@@ -324,7 +324,7 @@ Console.WriteLine($"Symbol: {ticker.Symbol}");
 Console.WriteLine($"BestBid: {ticker.BestBid}");
 Console.WriteLine($"BestAsk: {ticker.BestAsk}");
 Console.WriteLine($"LastTradedPrice: {ticker.LastTradedPrice}");
-Console.WriteLine($"TimestampUtc: {ticker.TimestampUtc:O}");
+Console.WriteLine($"Timestamp: {ticker.Timestamp:O}");
 ```
 
 * 上記コードが問題なく動作し、Ticker 情報が取得できることが Stage1 のゴールのひとつである。

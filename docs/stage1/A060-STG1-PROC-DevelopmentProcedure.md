@@ -83,7 +83,7 @@ public sealed record Ticker(
     decimal BestBid,
     decimal BestAsk,
     decimal LastTradedPrice,
-    DateTime TimestampUtc);
+    DateTimeOffset Timestamp);
 ```
 
 ### 1-3. `Symbols` を作成

@@ -85,25 +85,25 @@ public sealed class Ticker
     public decimal BestBid { get; }
     public decimal BestAsk { get; }
     public decimal LastTradedPrice { get; }
-    public DateTime TimestampUtc { get; }
+    public DateTimeOffset Timestamp { get; }
 
     public Ticker(
         string symbol,
         decimal bestBid,
         decimal bestAsk,
         decimal lastTradedPrice,
-        DateTime timestampUtc)
+        DateTimeOffset timestamp)
     {
         Symbol = symbol;
         BestBid = bestBid;
         BestAsk = bestAsk;
         LastTradedPrice = lastTradedPrice;
-        TimestampUtc = timestampUtc;
+        Timestamp = timestamp;
     }
 }
 ```
 
-* 時刻は UTC に正規化し `TimestampUtc` として扱う。
+* 時刻は UTC に正規化し `Timestamp` として扱う。
 * 数値は金額・価格を扱うため `decimal` を用いる。
 
 ### 3.4 シンボル定数（使い勝手のための定義）
@@ -276,7 +276,7 @@ public sealed class BitflyerTickerRaw
 {
     public string ProductCode { get; set; } = default!;
     public string State { get; set; } = default!;
-    public DateTime Timestamp { get; set; };
+    public DateTimeOffset Timestamp { get; set; };
     public long TickId { get; set; };
     public decimal BestBid { get; set; };
     public decimal BestAsk { get; set; };
@@ -302,7 +302,7 @@ public sealed class BitflyerTickerRaw
   * `ProductCode ("BTC_JPY")` → `Symbol ("BTC/JPY")`
   * `BestBid` / `BestAsk` → `Ticker.BestBid` / `Ticker.BestAsk`
   * `LastTradedPrice` → `Ticker.LastTradedPrice`
-  * `Timestamp` → `Ticker.TimestampUtc`（UTC へ正規化）
+  * `Timestamp` → `Ticker.Timestamp`（UTC へ正規化）
 * Volume や Size 系の値は Stage 1 では `Ticker` には載せないが、Raw モデル側で保持しておくことで、Stage 2 以降に DTO を拡張しやすくする。
 
 ### 5.3 「すべてを拾う」方針の位置づけ

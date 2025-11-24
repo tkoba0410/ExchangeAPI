@@ -118,7 +118,7 @@ Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken =
   * `decimal BestBid`
   * `decimal BestAsk`
   * `decimal LastTradedPrice`
-  * `DateTime TimestampUtc` （UTC）
+  * `DateTimeOffset Timestamp` （UTC）
 
 * **FR-2-2**: Stage1 の `Ticker` は取引所固有フィールド（例: `tick_id`, `state`, `volume`）を含めてはならない（MUST NOT）。
   これらは Raw モデル側で保持し、将来必要に応じて Abstractions に追加する。

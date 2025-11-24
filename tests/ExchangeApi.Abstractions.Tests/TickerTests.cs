@@ -10,29 +10,46 @@ public class TickerTests
     public void Constructor_SetsPropertiesCorrectly()
     {
         // Arrange
-        var symbol         = "BTC/JPY";
-        var bestBidPrice   = 5_000_000m;
-        var bestAskPrice   = 5_001_000m;
-        decimal? lastPrice = 5_000_500m;
-        decimal? volume    = 1.2345m;
-        var timestamp      = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var symbol = "BTC/JPY";
+        var bestBid = 5_000_000m;
+        var bestAsk = 5_001_000m;
+        var lastPrice = 5_000_500m;
+        var timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero); // UTC
 
         // Act
         var ticker = new Ticker(
             symbol,
-            bestBidPrice,
-            bestAskPrice,
+            bestBid,
+            bestAsk,
             lastPrice,
-            volume,
             timestamp);
 
         // Assert
-        Assert.Equal(symbol,       ticker.Symbol);
-        Assert.Equal(bestBidPrice, ticker.BestBidPrice);
-        Assert.Equal(bestAskPrice, ticker.BestAskPrice);
-        Assert.Equal(lastPrice,    ticker.LastTradedPrice);
-        Assert.Equal(volume,       ticker.Volume);
-        Assert.Equal(timestamp,    ticker.Timestamp);
+        Assert.Equal(symbol, ticker.Symbol);
+        Assert.Equal(bestBid, ticker.BestBid);
+        Assert.Equal(bestAsk, ticker.BestAsk);
+        Assert.Equal(lastPrice, ticker.LastTradedPrice);
+        Assert.Equal(timestamp, ticker.Timestamp);
+    }
+
+    [Fact]
+    public void WithExpression_CreatesModifiedInstance()
+    {
+        // Arrange
+        var original = new Ticker(
+            "BTC/JPY",
+            5_000_000m,
+            5_001_000m,
+            5_000_500m,
+            new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
+
+        // Act
+        var modified = original with { BestBid = 4_999_000m };
+
+        // Assert
+        Assert.Equal(5_000_000m, original.BestBid);
+        Assert.Equal(4_999_000m, modified.BestBid);
+        Assert.NotSame(original, modified);
     }
 
     [Fact]
@@ -44,15 +61,14 @@ public class TickerTests
             5_000_000m,
             5_001_000m,
             5_000_500m,
-            1.2345m,
-            new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         // Act
-        var modified = original with { BestBidPrice = 4_999_000m };
+        var modified = original with { BestBid = 4_999_000m };
 
         // Assert
-        Assert.Equal(5_000_000m, original.BestBidPrice);
-        Assert.Equal(4_999_000m, modified.BestBidPrice);
+        Assert.Equal(5_000_000m, original.BestBid);
+        Assert.Equal(4_999_000m, modified.BestBid);
         Assert.NotSame(original, modified);
     }
 }

@@ -47,7 +47,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
     {
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
         ExchangeId = exchangeId ?? throw new ArgumentNullException(nameof(exchangeId));
-        AccountId  = accountId  ?? throw new ArgumentNullException(nameof(accountId));
+        AccountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
 
     /// <inheritdoc />
@@ -106,28 +106,13 @@ public sealed class BitflyerExchangeClient : IExchangeClient
             throw new ExchangeApiException("bitFlyer ticker response was null.");
         }
 
-        // timestamp は string なので、ここで UTC に正規化
-        if (!DateTimeOffset.TryParse(
-                raw.Timestamp,
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
-                out var dto))
-        {
-            throw new ExchangeApiException(
-                $"Failed to parse bitFlyer timestamp: '{raw.Timestamp}'.");
-        }
-
-        var timestampUtc = dto.UtcDateTime;
-
-        // Volume は Stage1 では未利用なので null のままにしておく。
-        // 必要になったタイミングで BitflyerTickerRaw に対応プロパティを追加し、
-        // ここでマッピングする。
+        // Stage1 の Ticker は Volume 等を含まない最小構成とする。
+        // 取引所固有の情報が必要になった場合は Raw モデル側から参照する。
         return new Ticker(
             symbol,
             raw.BestBid,
             raw.BestAsk,
             raw.LastTradedPrice,
-            Volume: null,
-            timestampUtc);
+            raw.Timestamp);
     }
 }

@@ -2,23 +2,20 @@
 
 /// <summary>
 /// 取引所共通フォーマットのティッカー情報。
+/// Stage1 では最小限の情報のみを提供する。
 /// </summary>
 /// <param name="Symbol">シンボル (例: "BTC/JPY")。</param>
-/// <param name="BestBidPrice">最良買い気配価格。</param>
-/// <param name="BestAskPrice">最良売り気配価格。</param>
+/// <param name="BestBid">最良買い気配価格。</param>
+/// <param name="BestAsk">最良売り気配価格。</param>
 /// <param name="LastTradedPrice">
-/// 直近約定価格。取引所のレスポンスに無い場合は null。
-/// </param>
-/// <param name="Volume">
-/// 24時間出来高などの代表的なボリューム情報。取引所の仕様により null の場合がある。
+/// 直近約定価格。取引所のレスポンスに無い場合は例外として扱う。
 /// </param>
 /// <param name="Timestamp">
-/// ティッカーの発生時刻（UTC 推奨）。取引所のタイムスタンプを正規化したもの。
+/// ティッカーの発生時刻（UTC）。取引所のタイムスタンプを UTC に正規化したもの。
 /// </param>
 public sealed record Ticker(
     string Symbol,
-    decimal BestBidPrice,
-    decimal BestAskPrice,
-    decimal? LastTradedPrice,
-    decimal? Volume,
-    DateTime Timestamp);
+    decimal BestBid,
+    decimal BestAsk,
+    decimal LastTradedPrice,
+    DateTimeOffset Timestamp);

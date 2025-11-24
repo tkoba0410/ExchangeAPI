@@ -13,7 +13,7 @@ namespace ExchangeApi.Bitflyer.Models
 
         // 公式レスポンスでは ISO8601 文字列のため string で保持する
         [JsonPropertyName("timestamp")]
-        public string Timestamp { get; init; } = string.Empty;
+        public DateTimeOffset Timestamp { get; init; } 
 
         [JsonPropertyName("tick_id")]
         public long TickId { get; init; }

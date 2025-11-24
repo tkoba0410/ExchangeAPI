@@ -3,24 +3,43 @@ using System.Text.Json.Serialization;
 namespace ExchangeApi.Bitflyer.Models
 {
     /// <summary>
-    /// bitFlyer Public REST GET /v1/getticker の Raw レスポンス。
-    /// 取引所仕様を欠損なく保持するためのモデル。
+    /// bitFlyer Public REST API の <c>GET /v1/ticker</c> レスポンスを
+    /// ほぼそのまま写像した Raw モデル。
+    /// 
+    /// - ExchangeApi.Abstractions の Ticker とは 1:1 ではなく、
+    ///   取引所固有のフィールドもすべて保持するための内部用 DTO
+    /// - Stage1 では Bitflyer アダプタ内でのみ使用し、外部には公開しない
     /// </summary>
     public sealed class BitflyerTickerRaw
     {
+        /// <summary>
+        /// プロダクトコード。
+        /// 例: <c>BTC_JPY</c>。
+        /// </summary>
         [JsonPropertyName("product_code")]
         public string ProductCode { get; init; } = string.Empty;
 
-        // 公式レスポンスでは ISO8601 文字列のため string で保持する
+        /// <summary>
+        /// ティッカーの発生時刻。
+        /// bitFlyer のレスポンスでは ISO8601 文字列だが、
+        /// ここでは DateTimeOffset としてパース済みで保持する。
+        /// 通常は UTC (Z) を表す。
+        /// </summary>
         [JsonPropertyName("timestamp")]
-        public DateTimeOffset Timestamp { get; init; } 
+        public DateTimeOffset Timestamp { get; init; }
 
         [JsonPropertyName("tick_id")]
         public long TickId { get; init; }
-
+        /// <summary>
+        /// 最良買い気配価格。
+        /// JSON フィールド <c>best_bid</c> に対応。
+        /// </summary>
         [JsonPropertyName("best_bid")]
         public decimal BestBid { get; init; }
-
+        /// <summary>
+        /// 最良売り気配価格。
+        /// JSON フィールド <c>best_ask</c> に対応。
+        /// </summary>
         [JsonPropertyName("best_ask")]
         public decimal BestAsk { get; init; }
 
@@ -36,13 +55,22 @@ namespace ExchangeApi.Bitflyer.Models
         [JsonPropertyName("total_ask_depth")]
         public decimal TotalAskDepth { get; init; }
 
-        // last traded price
+        /// <summary>
+        /// 直近約定価格 (Last Traded Price)。
+        /// JSON フィールド <c>ltp</c> に対応。
+        /// </summary>
         [JsonPropertyName("ltp")]
         public decimal LastTradedPrice { get; init; }
-
+        /// <summary>
+        /// 24 時間出来高。
+        /// JSON フィールド <c>volume</c> に対応。
+        /// </summary>
         [JsonPropertyName("volume")]
         public decimal Volume { get; init; }
-
+        /// <summary>
+        /// プロダクトごとの 24 時間出来高。
+        /// JSON フィールド <c>volume_by_product</c> に対応。
+        /// </summary>
         [JsonPropertyName("volume_by_product")]
         public decimal VolumeByProduct { get; init; }
     }

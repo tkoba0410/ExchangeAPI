@@ -14,7 +14,8 @@ public interface IRestClient
     /// JSON レスポンスを <typeparamref name="TResponse"/> にデシリアライズする。
     /// </summary>
     /// <typeparam name="TResponse">レスポンス JSON をマッピングする型。</typeparam>
-    /// <param name="relativePath">ベース URL からの相対パス（クエリ文字列含む）。</param>
+    /// <param name="path">ベース URL からの相対パス。</param>
+    /// <param name="query">クエリ文字列含む。</param>
     /// <param name="cancellationToken">キャンセル トークン。</param>
     /// <returns>デシリアライズされたレスポンス。</returns>
     Task<TResponse> GetAsync<TResponse>(

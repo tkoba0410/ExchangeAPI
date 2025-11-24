@@ -11,7 +11,7 @@
 /// 直近約定価格。取引所のレスポンスに無い場合は例外として扱う。
 /// </param>
 /// <param name="Timestamp">
-/// ティッカーの発生時刻（UTC）。取引所のタイムスタンプを UTC に正規化したもの。
+/// ティッカーの発生時刻（UTC）。取引所のタイムスタンプ。
 /// </param>
 public sealed record Ticker(
     string Symbol,

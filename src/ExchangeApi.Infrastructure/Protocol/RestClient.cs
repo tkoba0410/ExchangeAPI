@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,12 +14,16 @@ namespace ExchangeApi.Infrastructure.Protocol;
 /// </summary>
 public class RestClient : IRestClient
 {
+    private static readonly ProductInfoHeaderValue DefaultUserAgent =
+    new("ExchangeApi", "1.0");
+    private static readonly MediaTypeWithQualityHeaderValue JsonMediaType =
+        new("application/json");
     private readonly Uri _baseUri;
     private readonly IHttpTransport _transport;
 
     public RestClient(Uri baseUri, IHttpTransport transport)
     {
-        _baseUri   = baseUri ?? throw new ArgumentNullException(nameof(baseUri));
+        _baseUri = baseUri ?? throw new ArgumentNullException(nameof(baseUri));
         _transport = transport ?? throw new ArgumentNullException(nameof(transport));
     }
 
@@ -36,9 +41,15 @@ public class RestClient : IRestClient
 
         using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
-        // （User-Agent / Accept をここで設定してもよい：P2 の話なので後回しでもOK）
-        // request.Headers.UserAgent.ParseAdd("ExchangeApi/1.0");
-        // request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        if (!request.Headers.UserAgent.Any())
+        {
+            request.Headers.UserAgent.Add(DefaultUserAgent);
+        }
+
+        if (!request.Headers.Accept.Any())
+        {
+            request.Headers.Accept.Add(JsonMediaType);
+        }
 
         using var response = await _transport.SendAsync(request, cancellationToken).ConfigureAwait(false);
 

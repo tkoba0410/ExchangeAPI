@@ -4,30 +4,30 @@ using ExchangeApi.Abstractions.Dtos;
 
 namespace ExchangeApi.Abstractions.Contracts;
 
+/// <summary>
+/// 取引所共通インターフェース。
+/// Stage1 では Ticker 取得のみを対象とする。
+/// 
+/// ExchangeId / AccountId は Stage2 以降（Multi-Exchange / Multi-Account）で使用される
+/// 拡張用プロパティであり、Stage1 では利用しない。
+/// </summary>
 public interface IExchangeClient
 {
     /// <summary>
-    /// 取引所を一意に識別する ID。
-    /// 例: "bitflyer", "binance", "bybit" など。
+    /// 取引所識別子。
+    /// Stage1 では使用されないが、Stage2（複数取引所対応）に備えて保持する。
     /// </summary>
     string ExchangeId { get; }
 
     /// <summary>
-    /// 同一取引所内でのアカウント識別子。
-    /// 例: "primary", "bot1" など。
-    /// 単一アカウント運用の場合は "default" 等の固定値でもよい。
+    /// アカウント識別子。
+    /// Stage1 では使用されないが、Stage2（複数アカウント対応）に備えて保持する。
     /// </summary>
     string AccountId { get; }
 
     /// <summary>
-    /// 指定シンボルのティッカー情報を取得する。
-    /// Stage1 では主に BTC/JPY を対象とする。
+    /// 現在の Ticker を取得する（Stage1 の主要 API）。
     /// </summary>
-    /// <param name="symbol">
-    /// 共通シンボル表記。例: <c>Symbols.BtcJpy</c> (= "BTC/JPY")。
-    /// </param>
-    /// <param name="cancellationToken">キャンセル用トークン。</param>
-    /// <returns>取得したティッカー。</returns>
     Task<Ticker> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default);

@@ -1,170 +1,279 @@
-# 0310-ARC-STG1-MinimalArchitecture
-Stage 1 最小アーキテクチャ構成（ARC）
+---
+
+doc_id: A030-STG1-ARC-MinimalArchitecture
+title: Stage1 最小アーキテクチャ構成（ARC）
+version: 2.0.0
+status: Draft
+stage: Stage1
+-------------
+
+# A030-STG1-ARC-MinimalArchitecture
+
+Stage1 最小アーキテクチャ構成（Architecture Specification）
+
+本書は Exchange API Library における **Stage1（bitFlyer Public REST / Ticker）** の
+アーキテクチャ構成を定義する。A010（OVR）および A020（REQ）で定めた目的・要求に従い、
+ソリューション構成・依存方向・責務分割を明文化する。
+
+Stage1 の対象は「bitFlyer Public REST `GET /v1/getticker` による Ticker 取得」のみであり、
+ここで定義する構造は **今後 Stage2 での拡張（認証 / WebSocket / 複数取引所 / Transport/Protocol 強化）を前提にした最小構成**である。
 
 ---
 
 ## 1. 目的（Purpose）
 
-このドキュメントは、Exchange API Library の **Stage 1 に必要な最小アーキテクチャ構造（ARC）** を定義する。
+* Stage1 に必要な **最小限のアーキテクチャ構造**を定義する。
+* コードとドキュメントの間で **依存方向と責務が常に一致するようにする**。
+* 将来の Stage2 において、Stage1 の構造を壊さずに拡張できるようにする。
 
-Stage 1 では、Public REST（bitFlyer Ticker）のみを対象とするため、複雑なアーキテクチャは不要。
-本書では、**Abstractions / Adapter / Raw の 3 層構造** と、**依存関係ルール**、**プロジェクト構成**のみを明文化する。
-
-正典は **4 層構造（Abstractions → Adapters → Protocol → Transport）** であるが、Stage1 では Protocol / Transport を利用しない **縮退版の 3 層（Abstractions / Adapter / Raw）** のみを採用する。対象が bitFlyer Public REST `getticker` のみに限定され、共通 Protocol や高機能 Transport を導入しないためである。
-
-Stage 2 以降で拡張されるが、本 ARC は Stage 1 の範囲で揺らがない“正典”を提供する。
+本書は「どのプロジェクトが何を担当し、どこに依存できるか」を定める。
 
 ---
 
-## 2. レイヤ構造（Layered Architecture）
+## 2. スコープ（Scope）
 
-Stage 1 は次の 3 層で構成される：
+### 2.1 対象
 
-```
-+---------------------------+
-|      Abstractions 層      |
-| (IExchangeClient, DTOs)   |
-+---------------------------+
-            ↑ 依存
-+---------------------------+
-|       Adapter 層          |
-| (BitflyerExchangeClient)  |
-+---------------------------+
-            ↑ 依存
-+---------------------------+
-|       Raw モデル層        |
-| (BitflyerTickerRaw)       |
-+---------------------------+
-```
+* Stage1 のプロジェクト構成
 
-### 2.1 Abstractions 層
-- 役割：取引所に依存しない **共通 API と DTO** を提供する。
-- 主な構成：
-  - `IExchangeClient`
-  - `Ticker` DTO
-  - `Symbols` 定数
-- 特徴：
-  - **依存先なし（最上位）**
-  - Adapter や Raw を知らない
+  * `ExchangeApi.Abstractions`
+  * `ExchangeApi.Infrastructure`
+  * `ExchangeApi.Bitflyer`
+* これらの依存関係および責務
+* Raw モデル（bitFlyer 固有モデル）の扱い
 
-### 2.2 Adapter 層
-- 役割：bitFlyer Public REST を呼び出し、Raw モデルを一般化 DTO に変換する。
-- 主な構成：
-  - `BitflyerExchangeClient`
-  - `IBitflyerPublicApi`
-- 特徴：
-  - Abstractions に依存して DTO を返す
-  - Raw モデルを内部で利用
-  - Stage1 では `HttpClient` を含む Transport の詳細は Adapter 層（`IBitflyerPublicApi` 実装）の内部実装とし、Abstractions からは見えない。
+### 2.2 対象外（Stage2 以降で扱う）
 
-### 2.3 Raw モデル層
-- 役割：bitFlyer のレスポンス JSON を **欠損なく保持する取引所固有モデル**。
-- 主な構成：
-  - `BitflyerTickerRaw`
-- 特徴：
-  - Adapter からのみ参照される
-  - Abstractions の詳細を知らない（純粋な取引所仕様の写像）
-  - Stage1 では **物理プロジェクトとして分けず、Adapter プロジェクト内の論理レイヤ** として実装する。
+* 認証 REST（Balance / Order / Position）
+* WebSocket（Board / Executions / Streaming Ticker）
+* 複数取引所（Binance / Bybit 等）の具体的アーキテクチャ
+* 高度な Transport / Protocol（Retry / RateLimit / CircuitBreaker / 署名生成 等）
+* Orchestration 層（複数取引所・複数アカウントの束ね層）の詳細設計
 
 ---
 
-## 3. 依存関係ルール（Dependency Rules）
+## 3. 基本構造（Boundary + Technical Modules）
 
-Stage 1 の依存方向は厳格に次の形を守る：
+Stage1 のアーキテクチャは、**契約境界（Boundary）** と **技術モジュール（Technical Modules）** の
+2 種類のコンポーネントで構成される。
 
+### 3.1 全体構造
+
+```text
+                ┌─────────────────────────┐
+                │  Boundary / Abstractions │
+                │  (Interfaces + DTOs)      │
+                └────────────▲──────────────┘
+                             │
+              ┌──────────────┼───────────────┐
+              │              │               │
+┌──────────────┴──────┐ ┌──────┴────────┐ ┌───────────────┴───────┐
+│ Adapter (bitFlyer)   │ │ Protocol (REST) │ │ Transport (HTTP Client) │
+└──────────────────────┘ └────────────────┘ └──────────────────────────┘
+                        （ExchangeApi.Infrastructure 内）
 ```
-Abstractions   ←   Adapter   ←   Raw
-```
 
-### 3.1 許可される依存
-- Adapter → Abstractions
-- Adapter → Raw
+* **Boundary / Abstractions**
 
-### 3.2 許可されない依存
-- Abstractions → Adapter（禁止）
-- Abstractions → Raw（禁止）
-- Raw → Abstractions（禁止）
-- Raw → Adapter（禁止）
+  * 取引所非依存のインターフェース・DTO・例外を定義する。
+  * 他プロジェクトに依存しない。
+* **Adapter (bitFlyer)**
 
-### 3.3 理由（Rationale）
-- 将来の Stage2〜StageN で複数取引所を扱う際も、Abstractions が不変でいられるため。
-- 新規取引所を追加しても Raw と Adapter を追加するだけでよく、**OCP（拡張開放）** を満たすため。
-- Stage 1 の時点で設計の揺らぎを防ぐため。
+  * Abstractions を実装し、bitFlyer API とやりとりする。
+  * Raw モデルから Ticker へのマッピングを行う。
+* **Protocol (REST)** / **Transport (HTTP)**
 
-OVR / REQ / SPC は本節を依存方向・禁止ルールの正典として参照し、各文書での重複列挙を行わない。
+  * REST 呼び出しと HTTP 通信を担う技術モジュール。
+  * Stage1 では GET + JSON デシリアライズの最小機能のみを提供する。
+
+Raw モデル（`BitflyerTickerRaw`）は bitFlyer Adapter 内部の構造として扱い、外部には公開しない。
 
 ---
 
 ## 4. プロジェクト構成（Project Structure）
 
-Stage 1 では **2 プロジェクト構成** を採用する。  
-最小であるが、将来拡張にも耐えられる。
+Stage1 では、ソリューションは少なくとも次のプロジェクトを含むものとする。
 
-```
-project-root/
-  src/
-    ExchangeApi.Abstractions/
-      ExchangeApi.Abstractions.csproj
-      IExchangeClient.cs
-      Models/
-        Ticker.cs
-      Symbols.cs
+```text
+src/
+  ExchangeApi.Abstractions/
+  ExchangeApi.Infrastructure/
+  ExchangeApi.Bitflyer/
 
-    ExchangeApi.Bitflyer/
-      ExchangeApi.Bitflyer.csproj
-      IBitflyerPublicApi.cs
-      Models/
-        BitflyerTickerRaw.cs
-      BitflyerExchangeClient.cs
-
-  tests/
-    ExchangeApi.Abstractions.Tests/
-    ExchangeApi.Bitflyer.Tests/
-
-  docs/
-    0120-OVR-INTR-ProjectOverview.md
-    0210-REQ-STG1-AbstractionsMVP.md
-    0310-ARC-STG1-MinimalArchitecture.md
-    Stage1-spec-full.md
+tests/
+  ExchangeApi.Abstractions.Tests/
+  ExchangeApi.Infrastructure.Tests/
+  ExchangeApi.Bitflyer.Tests/
 ```
 
-### 4.1 この構成のメリット
-- Abstractions と Adapter の分離が明確で可視化される
-- bitFlyer Adapter を別の取引所（例: `ExchangeApi.Binance`, `ExchangeApi.Bybit`）に横展開しやすい
-- テスト単位が明確（Abstractions / Adapter で分断可能）
-- 依存方向を IDE 上で容易に確認できる
+### 4.1 ExchangeApi.Abstractions（Boundary）
 
-### 4.2 テストプロジェクトの依存ルール
-- `ExchangeApi.Abstractions.Tests` は **Abstractions プロジェクトのみ** に依存することを推奨する。
-- `ExchangeApi.Bitflyer.Tests` は Abstractions および Bitflyer Adapter（Raw を含む）に依存してよい。
-- テストプロジェクトは本番コードの依存ルールを破ってもよいが、**Abstractions のテストは Abstractions のみを対象にする** 方針を基本とし、レイヤ間の責務分離を保つ。
+* 役割：取引所非依存の契約境界を定義する。
+* 主な内容：
+
+  * `IExchangeClient`（インターフェース）
+  * `Ticker` DTO
+  * `Symbols` 定数（`BTC/JPY` 等）
+  * 共通例外型（`ExchangeApiException` / `SymbolNotSupportedException` 等）
+* 特徴：
+
+  * 他のプロジェクトに依存しない（依存先ゼロ）。
+  * HTTP / JSON / 認証などの技術的関心事を含まない。
+
+### 4.2 ExchangeApi.Infrastructure（Protocol + Transport）
+
+* 役割：REST 通信および HTTP 通信の技術モジュールを提供する。
+* 主な内容：
+
+  * Protocol
+
+    * `IRestClient` / `RestClient`
+  * Transport
+
+    * `IHttpTransport` / `HttpTransport`
+* 特徴：
+
+  * Abstractions に依存してもよい（例：例外型の再利用）。
+  * Adapter 側から利用されるが、取引所固有ロジックは持たない。
+  * Stage1 では GET + JSON デシリアライズの最小機能に限定する。
+
+### 4.3 ExchangeApi.Bitflyer（Adapter）
+
+* 役割：bitFlyer Public REST API を呼び出し、Raw モデルを Ticker に変換する。
+* 主な内容：
+
+  * `BitflyerExchangeClient`（`IExchangeClient` 実装）
+  * `IBitflyerPublicApi` / `BitflyerPublicApi`
+  * Raw モデル `BitflyerTickerRaw`
+  * symbol ↔ product_code 変換ロジック
+* 特徴：
+
+  * Abstractions / Infrastructure の両方に依存してよい。
+  * Raw モデルはこのプロジェクト内部専用。
 
 ---
 
-## 5. Stage2 以降への拡張ポイント（参考）
-※ Stage 1 の責務ではないが、アーキテクチャ保全のために記載
+## 5. 依存関係ルール（Dependency Rules）
 
-- Adapter 下に **PrivateAPI（認証）層** を追加可能
-- Raw モデルは Board / Balance / Order などを段階的に拡張可能
-- Transport 層（HttpClient ラッパ）を導入可能
-- Abstractions は DTO とインターフェースを増やすだけで対応
+Stage1〜Stage2 を通じて、次の依存方向ルールを **不変の正典** とする。
 
-これらの拡張は、Stage 1 の 3 層構造と依存ルールを崩さずに実現できる。
+### 5.1 プロジェクト間依存
+
+```text
+ExchangeApi.Abstractions      ←  ExchangeApi.Infrastructure
+            ▲                 ←  ExchangeApi.Bitflyer
+            │
+        （上位）
+```
+
+* `ExchangeApi.Abstractions`
+
+  * 他プロジェクトに依存してはならない（MUST NOT）。
+* `ExchangeApi.Infrastructure`
+
+  * `ExchangeApi.Abstractions` に依存してよい（MUST）。
+  * `ExchangeApi.Bitflyer` に依存してはならない（MUST NOT）。
+* `ExchangeApi.Bitflyer`
+
+  * `ExchangeApi.Abstractions` および `ExchangeApi.Infrastructure` に依存してよい（MUST）。
+
+### 5.2 Raw モデルの依存
+
+* Raw モデル（`BitflyerTickerRaw`）は `ExchangeApi.Bitflyer` 内部の型とし、
+  他プロジェクトから参照されてはならない（MUST NOT）。
+* Raw モデルは Abstractions への依存を持ってはならない（MUST NOT）。
+
+### 5.3 コードレベルの依存
+
+* `IExchangeClient` と `Ticker` は `ExchangeApi.Abstractions` にのみ定義する（MUST）。
+* Adapter 実装（`BitflyerExchangeClient`）は、ビジネスロジック層やアプリケーション層に依存しない（SHOULD）。
 
 ---
 
-## 6. 結論
-本 ARC 文書は、Stage 1 における **最小で揺らぎのないアーキテクチャ正典** を定義するものであり、
-Spec と REQ を結ぶ“骨格”として設計された。
+## 6. レイヤ構造（論理レイヤ）
 
-Stage 1 の範囲ではこの構造で十分であり、Stage 2 以降もこの構造を前提に拡張できる。
+Stage1 の論理レイヤは、次の 3 段階で理解できる。
+
+```text
++---------------------------+
+| Boundary / Abstractions   |
+| (IExchangeClient, Ticker) |
++---------------------------+
+            ▲
+            │
++---------------------------+
+| Adapter (bitFlyer)        |
+| - BitflyerExchangeClient  |
+| - IBitflyerPublicApi      |
++---------------------------+
+            ▲
+            │
++---------------------------+
+| Technical Modules         |
+| - RestClient              |
+| - HttpTransport           |
++---------------------------+
+```
+
+* 「層」というよりも、上位に Boundary があり、
+  下位に Adapter / Technical Modules がぶら下がる構造である。
+* Adapter は bitFlyer 固有の API 仕様を扱い、Technical Modules は HTTP/REST を汎用的に扱う。
 
 ---
 
-## 改訂履歴
+## 7. 責務分割（Responsibilities）
 
-| 版 | 日付 | 内容 |
-|----|------|------|
-| v1.1.1 | 2025-05-05 | 依存方向の正典が本節に一元化されることを明示し、改訂履歴を更新。 |
-| v1.1.0 | 2025-05-05 | Stage1 縮退構造の位置づけを 4 層正典との関係で明記し、重複表現を整理。 |
+### 7.1 Abstractions
 
+* 取引所非依存の IExchangeClient 契約を提供する。
+* 共通 DTO（Ticker）および共通例外を提供する。
+* 取引所固有の仕様は一切含まない。
+
+### 7.2 Infrastructure
+
+* HTTP 通信（HttpClient ラップ）を提供する。
+* REST 通信の共通パターン（リクエスト生成・レスポンス処理）を提供する。
+* Adapter から利用されるが、取引所固有ロジックを持たない。
+
+### 7.3 Bitflyer Adapter
+
+* `IBitflyerPublicApi` を通じて bitFlyer Public REST `getticker` を呼び出す。
+* `BitflyerTickerRaw` にレスポンスをマッピングする。
+* `BitflyerTickerRaw` から Abstractions の `Ticker` へマッピングする。
+* `"BTC/JPY"` ↔ `"BTC_JPY"` の変換を行う。
+
+---
+
+## 8. Stage2 への拡張ポイント（参考）
+
+Stage2 以降での拡張は、次の方針で行う。
+
+* `ExchangeApi.Infrastructure` において Transport / Protocol を強化する。
+
+  * Retry / RateLimit / CircuitBreaker
+  * 認証付き REST（署名 / timestamp / nonce 等）
+* `ExchangeApi.Bitflyer` において Private API / WebSocket / Board などの Adapter を段階的に追加する。
+* 新規取引所（`ExchangeApi.Binance` 等）は、Bitflyer と同じパターンで Adapter プロジェクトを追加する。
+* Boundary（Abstractions）は、必要に応じて DTO / インターフェースを拡張するが、
+  Stage1 の基本構造（IExchangeClient / Ticker）の互換性を保つ。
+
+---
+
+## 9. アーキテクチャ DoD（Architecture Definition of Done）
+
+Stage1 におけるアーキテクチャが完了したとみなす条件：
+
+1. プロジェクト構成が `Abstractions` / `Infrastructure` / `Bitflyer` の 3 つに分離されている。
+2. 依存方向が本書のルールに従っている（逆依存が存在しない）。
+3. `IExchangeClient` / `Ticker` / `Symbols` が Abstractions に定義されている。
+4. `BitflyerExchangeClient` / `IBitflyerPublicApi` / `BitflyerTickerRaw` が Bitflyer に存在する。
+5. REST 通信が `IRestClient` / `IHttpTransport` を介して行われている。
+6. REQ / SPC / DEV / PROC との間でアーキテクチャ上の矛盾がない。
+
+---
+
+## 10. 改訂履歴
+
+| 版     | 日付         | 内容                                                                           |
+| ----- | ---------- | ---------------------------------------------------------------------------- |
+| 2.0.0 | 2025-11-XX | Stage1 実装と Stage2 方針に合わせて全面改訂。Boundary + Technical Modules に基づく最小アーキテクチャを定義。 |

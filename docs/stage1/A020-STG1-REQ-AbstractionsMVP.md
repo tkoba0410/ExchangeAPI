@@ -1,175 +1,216 @@
-# 0210-REQ-STG1-AbstractionsMVP（完成版）
-Stage 1 要求仕様書 / Exchange API Library
+---
+
+doc_id: A020-STG1-REQ-AbstractionsMVP
+title: Stage1 要求仕様書（Abstractions + bitFlyer Ticker）
+version: 2.0.0
+status: Draft
+stage: Stage1
+-------------
+
+# A020-STG1-REQ-AbstractionsMVP
+
+Stage1 要求仕様書 / Exchange API Library
+
+本書は Exchange API Library における **Stage1（bitFlyer Public REST / Ticker）** の
+要求仕様を定義する。A010-STG1-OVR-Overview で定義された目的・構造にもとづき、
+実装およびテストが満たすべき条件を明文化する。
 
 ---
 
 ## 1. 目的（Purpose）
 
-Stage 1 の目的は、Exchange API Library の基盤となる **最小限の Abstractions と bitFlyer Public REST（Ticker）の取得機能**を実現し、将来の Stage（認証 / WebSocket / Board / Multi-Exchange）へ拡張可能な構造を確立することである。
+Stage1 の目的は、Exchange API Library の基盤となる **取引所非依存の Abstractions** と
+**bitFlyer Public REST `GET /v1/getticker` による Ticker 取得機能** を、最小限の構成で
+提供することである。
 
-本 Stage は **MVP（Minimum Viable Product）** とし、利用者が「単一取引所・単一シンボルの現在価格を取得できる」状態を最終成果物とする。
+本 Stage の完成により、利用者は次を満たすことができる：
+
+* 単一取引所（bitFlyer）・単一シンボル（BTC/JPY）の Ticker を取得できる
+* 将来の Stage2（認証 API・WebSocket・複数取引所・Transport/Protocol 拡張）へ
+  破綻なく拡張できる
 
 ---
 
 ## 2. スコープ（Scope）
 
-### 2.1 Stage 1 で扱う機能（In Scope）
-- bitFlyer Public REST `GET /v1/getticker` を利用した **現在価格（Ticker）の取得**
-- Abstractions 層の最小定義：
-  - `IExchangeClient`
-  - `Ticker` DTO
-  - `Symbols`（例えば `BTC/JPY`）
-- bitFlyer 専用 Adapter（Raw モデル＋マッピング）の最小実装
-- symbol → product_code の変換ロジック（`BTC/JPY` ↔ `BTC_JPY`）
+### 2.1 対象（In Scope）
 
-### 2.2 Stage 1 の対象外（Out of Scope）
-以下は Stage 2 以降で扱う。
-- 認証 REST API（残高取得／注文系）
-- WebSocket（リアルタイム価格・板情報）
-- Board / OrderBook / Balance / Position / Order DTO
-- 複数取引所対応（Binance, Bybit 等）
-- Rate limit 制御 / Retry / Circuit breaker
-- Result 型（`Result<T>` / `ErrorOr<T>` 等）によるエラー表現
-- OpenTelemetry / 高度なログ／メトリクス
+* Boundary / Abstractions の最小定義
+
+  * `IExchangeClient`
+  * `Ticker` DTO
+  * `Symbols`（`BTC/JPY` 定数）
+* bitFlyer Adapter
+
+  * `BitflyerExchangeClient`（IExchangeClient 実装）
+  * `IBitflyerPublicApi` + 実装
+  * Raw モデル `BitflyerTickerRaw`
+* REST 呼び出し用の最小技術モジュール
+
+  * `IRestClient` / `RestClient`
+  * `IHttpTransport` / `HttpTransport`
+* symbol ↔ product_code（`BTC/JPY` ↔ `BTC_JPY`）の静的変換
+
+### 2.2 対象外（Out of Scope）
+
+以下は Stage1 の要求から明示的に除外し、Stage2 で扱う。
+
+* 認証 REST API（Balance / Order / Position 等）
+* WebSocket（Board / Executions / Realtime Ticker）
+* 複数取引所（Binance / Bybit など）
+* Transport 拡張（Retry / RateLimit / CircuitBreaker 等）
+* Protocol 拡張（署名生成・timestamp/nonce 等）
+* Result 型や高度なエラー表現
+* OpenTelemetry など高度なロギング／メトリクス
 
 ---
 
 ## 3. 用語定義（Terminology）
 
-- **Exchange**：暗号資産取引所。本 Stage では bitFlyer のみ。
-- **Abstractions**：取引所非依存のインターフェースと DTO を提供する層。
-- **Adapter**：取引所固有 API と Abstractions の間をマッピングする層。
-- **Raw モデル**：取引所の JSON レスポンスを可能な限り欠損なく保持するデータ構造。
-- **Ticker**：現在価格情報（best bid / best ask / last traded price など）。
+* **Exchange**: 暗号資産取引所。本 Stage では bitFlyer のみ対象。
+* **Boundary / Abstractions**: 取引所非依存のインターフェース・DTO・例外を定義する部分。
+* **Adapter**: 取引所固有 API と Abstractions の間をマッピングする実装。
+* **Technical Modules**: REST 通信や JSON シリアライズなどの技術的関心事を担うモジュール。
+* **Raw モデル**: 取引所レスポンス JSON を欠損なく保持するデータ構造。
+* **Ticker**: 現在価格情報（BestBid / BestAsk / LastTradedPrice / Timestamp）をまとめた DTO。
 
 ---
 
-## 4. レイヤ構造と依存ルール（Stage1 縮退モデル）
+## 4. 構造と依存ルール（Structural Requirements）
 
-- 正典は **4 層構造（Abstractions → Adapters → Protocol → Transport）** だが、Stage1 では **Protocol / Transport を使用しない縮退版として Abstractions / Adapter / Raw の 3 層のみを採用**する。bitFlyer Public REST `getticker` のみを扱うため、共通 Protocol や高機能 Transport を導入しない。
-- レイヤ間の依存方向および禁止ルールの正典は `A030-STG1-ARC-MinimalArchitecture.md` に定義される。
+### 4.1 プロジェクト構成
+
+Stage1 におけるプロジェクトは最低限以下を含むものとする。
+
+* `ExchangeApi.Abstractions`  … Boundary（依存先なし）
+* `ExchangeApi.Infrastructure` … REST 向け Technical Modules
+* `ExchangeApi.Bitflyer`       … bitFlyer Adapter
+
+### 4.2 依存方向（MUST）
+
+* `ExchangeApi.Abstractions` は他プロジェクトに依存してはならない（MUST NOT）。
+* `ExchangeApi.Infrastructure` は `ExchangeApi.Abstractions` へ依存してよい（MUST）。
+* `ExchangeApi.Bitflyer` は `ExchangeApi.Abstractions` と `ExchangeApi.Infrastructure` に依存してよい（MUST）。
+* Raw モデル（`BitflyerTickerRaw`）は `ExchangeApi.Bitflyer` 内部の型であり、他プロジェクトから参照しない（MUST）。
 
 ---
 
 ## 5. 機能要求（Functional Requirements, FR）
 
-### FR-1: Ticker 取得 API（Abstractions）
-- **FR-1-1**: `IExchangeClient` を定義する。
-- **FR-1-2**: 次のメソッドを必ず提供する：
-  ```csharp
-  Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken = default);
-  ```
-- **FR-1-3**: `symbol` の形式は `"BASE/QUOTE"`（大文字＋スラッシュ）を正とする。
-- **FR-1-4**: Stage 1 で必須対応は **BTC/JPY のみ** とする。
+### FR-1: `IExchangeClient` インターフェース
+
+* **FR-1-1**: `IExchangeClient` インターフェースを Abstractions に定義しなければならない（MUST）。
+* **FR-1-2**: `IExchangeClient` は次のメソッドを公開しなければならない（MUST）。
+
+```csharp
+Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken = default);
+```
+
+* **FR-1-3**: `symbol` は "BASE/QUOTE" 形式の大文字文字列で表現しなければならない（MUST）。
+
+  * Stage1 で必須対応とするのは `"BTC/JPY"` のみとする。
 
 ### FR-2: Ticker DTO（共通データ構造）
-- **FR-2-1**: Ticker DTO は次のプロパティを持つ：
-  - `string Symbol`
-  - `decimal BestBid`
-  - `decimal BestAsk`
-  - `decimal LastTradedPrice`
-  - `DateTime TimestampUtc`（UTC）
-- **FR-2-2**: Ticker DTO は Abstractions プロジェクトに配置し、取引所固有フィールドを持たないこと。
-- REQ補足（Spec と整合）：bitFlyer の Raw レスポンスに含まれる `state`, `tick_id`, `volume` などの取引所固有フィールドは Stage1 の Ticker DTO に含めない。
-  これらは Raw モデル側に保持し、将来の拡張に備える。Abstractions 層は一般化された最小限の情報のみ公開する。
+
+* **FR-2-1**: `Ticker` DTO は Abstractions に属し、少なくとも次のプロパティを持たなければならない（MUST）。
+
+  * `string Symbol`
+  * `decimal BestBid`
+  * `decimal BestAsk`
+  * `decimal LastTradedPrice`
+  * `DateTime TimestampUtc` （UTC）
+
+* **FR-2-2**: Stage1 の `Ticker` は取引所固有フィールド（例: `tick_id`, `state`, `volume`）を含めてはならない（MUST NOT）。
+  これらは Raw モデル側で保持し、将来必要に応じて Abstractions に追加する。
 
 ### FR-3: Symbols（共通定数）
-- **FR-3-1**: `BTC/JPY` を示す定数を Abstractions に定義する。
-  - 例：`public const string BtcJpy = "BTC/JPY";`
 
-### FR-4: bitFlyer Raw モデル（Adapter 内部）
-- **FR-4-1**: bitFlyer の `GET /v1/getticker` のレスポンスを漏れなく保持する Raw モデルを定義する。
-- **FR-4-2**: フィールド名・型は bitFlyer の API に忠実であること。
-- **FR-4-3**: Raw モデルは **Adapter 内部専用** とする。
+* **FR-3-1**: Abstractions に `Symbols` などのクラスを定義し、`BTC/JPY` を表す定数を定義しなければならない（MUST）。
 
-### FR-5: bitFlyer 公開 API インターフェース（Raw API）
-- **FR-5-1**: `IBitflyerPublicApi` を定義する。
-- **FR-5-2**: 次のメソッドを提供する：
-  ```csharp
-  Task<BitflyerTickerRaw> GetTickerRawAsync(string productCode, CancellationToken cancellationToken = default);
-  ```
+  * 例：`public const string BtcJpy = "BTC/JPY";`
 
-### FR-6: bitFlyer ExchangeClient（一般化マッピング）
-- **FR-6-1**: `BitflyerExchangeClient` は `IExchangeClient` を実装する。
-- **FR-6-2**: `symbol` ↔ `product_code` の変換を行う。
-- **FR-6-3**: Raw モデルから一般化 Ticker へのマッピングを行う。
+### FR-4: bitFlyer Raw モデル
+
+* **FR-4-1**: bitFlyer の `GET /v1/getticker` レスポンスを欠損なく保持する `BitflyerTickerRaw` を定義しなければならない（MUST）。
+* **FR-4-2**: `BitflyerTickerRaw` のフィールド名・型は bitFlyer 公式仕様に合わせること（SHOULD）。
+* **FR-4-3**: `BitflyerTickerRaw` は `ExchangeApi.Bitflyer` プロジェクト内に配置し、外部に公開しない（MUST）。
+
+### FR-5: bitFlyer 公開 API インターフェース
+
+* **FR-5-1**: bitFlyer の Public REST を呼び出すためのインターフェース `IBitflyerPublicApi` を定義しなければならない（MUST）。
+* **FR-5-2**: `IBitflyerPublicApi` は次のメソッドを公開しなければならない（MUST）。
+
+```csharp
+Task<BitflyerTickerRaw> GetTickerRawAsync(string productCode, CancellationToken cancellationToken = default);
+```
+
+* **FR-5-3**: `productCode` は "BTC_JPY" のような取引所仕様の表現形式とする（SHOULD）。
+
+### FR-6: bitFlyer ExchangeClient 実装
+
+* **FR-6-1**: `BitflyerExchangeClient` は `IExchangeClient` を実装しなければならない（MUST）。
+* **FR-6-2**: `BitflyerExchangeClient.GetTickerAsync` は、`symbol` ↔ `productCode` の変換と `Raw → Ticker` のマッピングを担わなければならない（MUST）。
+* **FR-6-3**: 対応していない `symbol` が渡された場合、`SymbolNotSupportedException` などの適切な例外をスローしなければならない（MUST）。
+
+### FR-7: symbol ↔ product_code 変換
+
+* **FR-7-1**: 少なくとも `BTC/JPY` と `BTC_JPY` を相互変換できるロジックを持たなければならない（MUST）。
+* **FR-7-2**: Stage1 時点では `BTC/JPY` のみ必須とし、その他のシンボルは未対応でもよい（MAY）。
 
 ---
 
 ## 6. 非機能要求（Non-functional Requirements, NFR）
 
-### NFR-0: ログ／メトリクス（Stage1 の基本方針）
-- **NFR-0-1:** Abstractions 層はログ・メトリクスの責務を持たない（MUST）。
-- **NFR-0-2:** Adapter 層はログ出力フック（ILogger など）を後から注入可能な構造であるべきだが、Stage1 では実装を必須としない（MAY）。
-- **NFR-0-3:** OpenTelemetry 等のメトリクス連携は Stage2 以降の対象とする（OUT OF SCOPE）。
-
 ### NFR-1: スレッドセーフティ
-- **NFR-1-1**: `IExchangeClient` の実装は、同一インスタンスを複数スレッドから利用可能な設計とする（推奨）。
+
+* **NFR-1-1**: `IExchangeClient` の実装は、単一インスタンスを複数スレッドから利用可能であることが望ましい（SHOULD）。
 
 ### NFR-2: HTTP / Transport 方針
-- **NFR-2-1**: `HttpClient` は外部注入（DI）を推奨し、内部で使い捨てしない。
-- **NFR-2-2**: `CancellationToken` は `SendAsync` に伝播すること。
-- **NFR-2-3**: JSON パースエラー／Content-Type 不一致時は許容範囲で処理し、それ以外は例外とする。
-- **NFR-2-4**: `User-Agent` を明示的に設定する。
-- **NFR-2-5**: タイムアウトは適切な値（5〜10 秒）を推奨とする。
+
+* **NFR-2-1**: REST 通信は `IRestClient` / `IHttpTransport` を通じて行い、直接 `HttpClient` に依存してはならない（MUST NOT）。
+* **NFR-2-2**: `HttpClient` は DI から供給し、使い捨てしない構成にする（SHOULD）。
+* **NFR-2-3**: `CancellationToken` は HTTP 送信まで確実に伝播しなければならない（MUST）。
+* **NFR-2-4**: `User-Agent` は明示的に設定することが望ましい（SHOULD）。
 
 ### NFR-3: 例外ポリシー
-- **NFR-3-1**: Stage 1 は **例外ベース** のエラー通知とする。
-- **NFR-3-2**: 入力エラーは `ArgumentException` 系を使用する。
-- **NFR-3-3**: API エラーは `ExchangeApiException` を用いて通知する。
 
-NFR-2/3 は OVR 8 章および SPC 6・7 章と整合し、Stage1 共通ポリシーを維持する。
+* **NFR-3-1**: Stage1 は例外ベースのエラー通知とし、Result 型などの高度な表現は採用しない（MUST）。
+* **NFR-3-2**: 入力エラー（無効な `symbol` 等）は `ArgumentException` 系または `SymbolNotSupportedException` で通知しなければならない（MUST）。
+* **NFR-3-3**: HTTP ステータスエラー・JSON パースエラー等の API 失敗は `ExchangeApiException` で通知しなければならない（MUST）。
 
----
+### NFR-4: ログ／メトリクス
 
-## 7. 対象外の正式宣言（Non-goals）
-以下は Stage 1 の対象外であり、本 REQ による実装義務を負わない。
-- 認証付き API（Balance / Order など）
-- WebSocket（Board / Executions）
-- 複数シンボルの対応
-- Multi-exchange（Binance / Bybit）
-- 複雑なエラーモデル・Result 型導入
-- Retry / Circuit breaker など高機能 Transport
-- 高度なログ基盤（OpenTelemetry, Structured logging）
+* **NFR-4-1**: Stage1 では高度なログ／メトリクス基盤は要求しない（MAY）。
+* **NFR-4-2**: 今後の拡張に備え、`ILogger` などを注入可能な形にしておくことが望ましい（SHOULD）。
 
 ---
 
-## 8. Stage 1 完了条件（Definition of Done, DoD）
-Stage 1 は以下を満たしたとき完了とする：
+## 7. Stage1 完了条件（Definition of Done, DoD）
 
-### DoD-1: Abstractions 実装
-- `IExchangeClient`
-- `Ticker`
-- `Symbols`
+Stage1 は次の条件を満たしたとき完了とみなす。
 
-### DoD-2: bitFlyer Adapter 実装
-- Raw モデル（BitflyerTickerRaw）
-- Raw API（IBitflyerPublicApi）
-- ExchangeClient マッピング（BitflyerExchangeClient）
+### DoD-1: Abstractions
 
-### DoD-3: 動作確認
-- 実 API または HTTP モックを利用し、`GetTickerAsync(Symbols.BtcJpy)` が成功すること。
+* `IExchangeClient` / `Ticker` / `Symbols` が実装されている。
 
-### DoD-4: エラー検証
-- 無効 symbol に対して例外が発生すること。
+### DoD-2: bitFlyer Adapter
 
-### DoD-5: ドキュメント
-- 本 REQ
-- Stage1 SPEC
-- README に Stage1 の使用例が記載
+* `BitflyerTickerRaw` / `IBitflyerPublicApi` / `BitflyerExchangeClient` が実装されている。
+* `GetTickerAsync("BTC/JPY")` が成功し、bitFlyer 実 API または HTTP モックを用いたテストが存在する。
+
+### DoD-3: エラー動作
+
+* 未対応 `symbol` に対して例外が発生するテストが存在する。
+
+### DoD-4: ドキュメント
+
+* A010（OVR）と本書（REQ）、ARC/SPC/DEV/PROC が Stage1 の内容に整合している。
+* README に `GetTickerAsync("BTC/JPY")` の使用例が掲載されている。
 
 ---
 
-## 9. 関連文書（Reference Documents）
-- `0120-OVR-INTR-ProjectOverview.md`
-- `Stage1-spec-full`（詳細仕様）
-- `0800-STD-DOC0-DocumentPolicy.md`
+## 8. 改訂履歴
 
----
-
-## 改訂履歴
-
-| 版 | 日付 | 内容 |
-|----|------|------|
-| v1.1.1 | 2025-05-05 | HTTP/例外ポリシーが OVR/SPC と整合することを明示し、改訂履歴を更新。 |
-| v1.1.0 | 2025-05-05 | Stage1 縮退構造の明記、依存ルール参照の統一、章番号の更新を実施。 |
+| 版     | 日付         | 内容                                                                         |
+| ----- | ---------- | -------------------------------------------------------------------------- |
+| 2.0.0 | 2025-11-XX | Stage1 実装に合わせて全面改訂。Abstractions / bitFlyer / Infrastructure を前提とした要求仕様を定義。 |

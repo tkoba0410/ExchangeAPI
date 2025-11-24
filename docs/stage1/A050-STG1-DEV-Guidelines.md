@@ -1,152 +1,213 @@
-# A050-STG1-DEV-Guidelines（Stage1 軽量開発方針）
+---
 
-Stage1 における開発を「作業者のとっかかりが良い／成果が見えやすい／重くならない」形で進めるために、既存の OVR / REQ / ARC / SPC を維持しつつも、それらの運用負荷を最小化するための **軽量ガイドライン** を定める。
+doc_id: A050-STG1-DEV-Guidelines
+title: Stage1 開発ガイドライン（DEV）
+version: 2.0.0
+status: Draft
+stage: Stage1
+-------------
 
-本ガイドラインは Stage1 のみを対象とし、Stage2 以降で必要に応じて強化される。
+# A050-STG1-DEV-Guidelines
+
+Stage1 開発ガイドライン（Development Guidelines）
+
+本書は、Exchange API Library **Stage1（bitFlyer Public REST / Ticker）** の開発を円滑に進めるための
+ガイドラインを定義する。A010（OVR）・A020（REQ）・A030（ARC）・A040（SPC）で定義された
+目的・要求・構造・仕様に従い、**実装者が迷わず手を動かせるための最小ルール**をまとめる。
+
+Stage1 は軽量フェーズであり、将来 Stage2（認証 / WebSocket / 複数取引所 / Transport & Protocol 拡張）へ
+スムーズに移行できるよう、必要最小限の規律に限定する。
 
 ---
 
-# 1. 目的
-- Stage1 を **開発者が迷わず着手できる軽量フェーズ** にする。
-- 「動作するものを早く作る」ことを最優先し、ドキュメント整合や厳格な標準は後回しにする。
-- OVR / REQ / ARC / SPC の正典内容は保ちつつ、**運用負荷となる部分を一時的に緩和**する。
+# 1. 目的（Purpose）
+
+* Stage1 の開発を **軽く・速く・明確に** 進める。
+* 主要文書（OVR/REQ/ARC/SPC）で定義された構造と矛盾しない範囲で、
+  実装ストレスを極力減らす。
+* 必要最小限のルールのみ残し、その他は Stage2 で段階的に強化する。
 
 ---
 
-# 2. 適用範囲
-- Stage1（bitFlyer Public REST `getticker` のみ）。
-- Abstractions / Adapter / Raw の 3 層。
-- Stage2 以降では本ガイドラインは段階的に無効化される。
+# 2. 適用範囲（Scope）
+
+本ガイドラインが適用されるのは次の範囲である。
+
+* Stage1 の開発（bitFlyer Ticker のみ）
+* プロジェクト：`ExchangeApi.Abstractions` / `ExchangeApi.Infrastructure` / `ExchangeApi.Bitflyer`
+* テスト：各プロジェクトの単体テスト
+
+Stage2 移行時には、本ガイドラインは一部または全体が強化される。
 
 ---
 
-# 3. 軽量化の基本方針（Core Principles）
+# 3. 開発の基本方針（Core Principles）
 
-## 3.1 実装優先（Implementation First）
-- ドキュメント整合よりも **まずコードを動かすことを優先**する。
-- Ticker が取得できる状態を最速で作る。
+## 3.1 実装と構造の一貫性（Boundary + Modules）
 
-## 3.2 PR 必須ルールの緩和
-- 初期実装〜試作段階は **PR 不要／個人ブランチでの自由な作業を許可**する。
-- まとまった段階で PR 化し、レビューを行う。
+* Abstractions（Boundary）は不変の中心であり、Stage1 でも最優先で守る。
+* bitFlyer Adapter と Infrastructure は **Boundary を汚染しない**。
+* 取引所固有モデル（Raw）は Adapter 内に閉じ込める。
 
-## 3.3 Conformance / ADR / キーワード遵守の緩和
-- RFC2119（MUST/SHOULD）や Conformance Matrix、ADR の必須適用は Stage1 では免除。
-- 重大な設計変更時のみ ADR を作成する。
+## 3.2 重すぎない開発運用
 
-## 3.4 ドキュメント整合チェックの後回し
-- OVR ⇔ REQ ⇔ ARC ⇔ SPC の **整合性チェックは Stage1 完了前の最終段階でまとめて実施**する。
-- 作業序盤では整合ズレが生じてもよい。
+* 複雑な設計プロセスは Stage1 では不要。
+* REQ/ARC/SPC の整合は **実装後にまとめて確認してよい**（SHOULD）。
+* コードレビューは柔軟に行うが、Stage1 の範囲では厳密な規律を要求しない。
+
+## 3.3 小さなステップで進める
+
+* 実装タスクは「数分〜十数分」で終わる粒度に分割する（SHOULD）。
+* 1 ステップずつ動作確認を挟むことで、迷走を防ぐ。
+
+## 3.4 仕様が正・コードが従う
+
+* A020（REQ）/ A040（SPC）で定義した Ticker 仕様が正であり、
+  コードが仕様に追いついていない場合はコード側を修正する（MUST）。
 
 ---
 
-# 4. Stage1 で「必ず守る」最小ルール
-Stage1 が軽量であっても、以下 **5 点だけは揺らがせない**。
+# 4. Stage1 で必ず守る最小ルール（MUST）
 
-## 4.1 依存方向（Abstractions ← Adapter ← Raw）
-- この依存ルールのみは正典として維持する。
+## 4.1 依存方向（ARC の正典）
+
+```
+Abstractions  ←  Infrastructure  ←  Bitflyer Adapter
+```
+
+* Abstractions へ逆依存してはならない（MUST NOT）。
+* Raw モデルは `ExchangeApi.Bitflyer` 内部に閉じ込める。
 
 ## 4.2 Abstractions の最小構成
-- `IExchangeClient`
-- `Ticker`
-- `Symbols`
 
-## 4.3 bitFlyer Raw API / Raw モデル
-- `IBitflyerPublicApi`
-- `BitflyerTickerRaw`
+* `IExchangeClient`
+* `Ticker`（A020 / A040 の仕様）
+* `Symbols`
 
-## 4.4 symbol ↔ product_code 変換
-- "BTC/JPY" ↔ "BTC_JPY"
+## 4.3 REST / HTTP 実装の分離
 
-## 4.5 Ticker の正常取得（Stage1 DoD）
-- `GetTickerAsync("BTC/JPY")` が成功すること。
+* bitFlyer Adapter は `HttpClient` に直接触れない（MUST）。
+* HTTP 通信は `IRestClient` / `IHttpTransport` のみ使用する（MUST）。
 
----
+## 4.4 Ticker 正常取得（Stage1 DoD）
 
-# 5. Stage1 で「守らなくてよい」項目
-以下は Stage1 では OFF とする。
-
-## 5.1 ドキュメント番号規則の完全遵守
-- 形式揺れは許容。整備は Stage1 終盤でまとめて行う。
-
-## 5.2 0900-OVR-COMP の整合性ゼロ要求
-- Stage1 では必須にしない。
-
-## 5.3 Transport / Protocol の設計
-- Stage1 のスコープ外。議論不要。
-
-## 5.4 高度なログ・メトリクス
-- OTel や構造化ログなどは不要。
-
-## 5.5 厳密な TDD 運用
-- テストは書くが、手順としての TDD は強制しない。
+* `GetTickerAsync("BTC/JPY")` が正常に動作すること（MUST）。
+* Raw → Ticker マッピングが A040 の規則に従うこと（MUST）。
 
 ---
 
-# 6. 作業者のとっかかり改善ガイド
-Stage1 に新規参加する作業者が最速で成果を出すためのガイド。
+# 5. Stage1 で守らなくてよいもの（不要 / 後回し）
 
-## 6.1 最初の 30 分でやること
-1. `IExchangeClient` を見て役割を把握
-2. `BitflyerTickerRaw` のフィールドを確認
-3. `BitflyerExchangeClient` の雛形を作成
-4. HTTP モックテストまたは実通信テストを書いて動かす
+Stage1 は「まず動くものを作る」フェーズであり、以下は求めない。
 
-→ これで「Ticker が取れた」成果がすぐ見える。
+## 5.1 厳格な設計プロセス（ADR / Conformance）
 
-## 6.2 小さなステップで進める
-- 1 ステップ = 数分で終わる粒度に分解（Raw モデル作成／API 呼び出し／マッピングなど）。
-- 大きい単位の作業は禁止。細粒度を常に維持する。
+* ADR（Architecture Decision Record）作成は不要（MAY）。
+* REQ ⇔ ARC ⇔ SPC の完全な相互リンクは Stage1 では後回し（SHOULD）。
 
----
+## 5.2 高度な Transport / Protocol
 
-# 7. Stage1 の完了条件（軽量版）
-- `GetTickerAsync("BTC/JPY")` が正常動作
-- 無効 symbol で例外発生
-- Raw → Ticker のマッピングが正しい
-- README に使用例がある
+* Retry / RateLimit / CircuitBreaker などの Transport 拡張は不要（MAY）。
+* 認証（署名生成等）は Stage2 対象のため不要（MUST NOT）。
 
-ドキュメント整合は最後にまとめて実施すればよい。
+## 5.3 高度なロギング
+
+* OpenTelemetry、構造化ログ、詳細メトリクスは不要（MAY）。
+
+## 5.4 TDD の厳密運用
+
+* 「常にテスト先行」は Stage1 では要求しない（MAY）。
+  ただしテストを書くこと自体は必須（SHOULD）。
 
 ---
 
-# 8. Stage2 でこのガイドラインはどう変わるか
-- PR 必須ルールが復活する
-- Conformance Matrix が必要になる
-- ドキュメント整合を常時保つ
-- Transport / Protocol が正式導入される
+# 6. 開発者向けガイド（How to Start）
+
+Stage1 の実装をスムーズに進めるため、次の順番で作業を行うことを推奨する。
+
+## Step 1: Abstractions を作る（最初に Boundary）
+
+* `IExchangeClient`
+* `Ticker` DTO
+* `Symbols`
+
+→ Boundary が固まることで、Adapter / Infrastructure の設計が明確になる。
+
+## Step 2: bitFlyer Raw モデルを作る
+
+* `BitflyerTickerRaw` を bitFlyer JSON のフィールドに合わせて定義する。
+* 公式 API の JSON をそのまま写す。
+
+## Step 3: Public API（IBitflyerPublicApi）を作る
+
+* `GetTickerRawAsync("BTC_JPY")` を定義。
+* `IRestClient` を使って REST 通信を行う。
+
+## Step 4: ExchangeClient 実装（BitflyerExchangeClient）
+
+* `symbol` 検証
+* `BTC/JPY` → `BTC_JPY` 変換
+* `GetTickerRawAsync` 呼び出し
+* Raw → Ticker マッピング
+* 例外処理
+
+## Step 5: テスト
+
+* Abstractions.Tests（DTO / symbol 検証）
+* Bitflyer.Tests（Raw → Ticker / 実通信 or モック）
+* Infrastructure.Tests（RestClient / HttpTransport）
 
 ---
 
-# 10. 仕様変更と追加に関する方針（Stage1 Adaptive Change Policy）
+# 7. コード品質の最小基準（Minimal Quality Standards）
 
-Stage1 では「実装速度」と「成果の早期可視化」を最優先とするため、仕様の途中変更・追加を自由に行ってよいものとする。
-ただし、変更した内容・理由を最低限の形式で記録することを必須とする。
+## 7.1 スレッドセーフティ
 
-## 10.1 記録方法（Lightweight Change Notes）
-各ドキュメントまたは共通 CHANGELOG.md に、次の形式で記録する。
+* `BitflyerExchangeClient` はステートレスとし、複数スレッドで安全に利用できる構造が望ましい（SHOULD）。
 
-- 日付
-- 変更内容（1〜2行でよい）
-- 変更理由（なぜそうしたか）
+## 7.2 例外処理
 
-例：
-- 2025-11-22: Raw → Ticker mapping の timestamp を UTC 固定に変更（理由：SPC と統一のため）
+* 例外は `ArgumentException` / `SymbolNotSupportedException` / `ExchangeApiException` のいずれかを使う（MUST）。
+* HTTP / JSON 失敗は Transport / Protocol 側で検出し、`ExchangeApiException` に包む（MUST）。
 
-## 10.2 ADR の扱い（軽量版）
-重大な設計変更のみ ADR として記録するが、Stage1 では簡易形式とする。
-1 行で概要と理由を書き、必要に応じて詳細を後から追加してよい。
+## 7.3 ログ（任意）
 
-## 10.3 変更歓迎の原則
-Stage1 は「考えながら作る」フェーズであるため、仕様確定を待たずに開発を進めてよい。
-仕様の揺れは許容し、Stage2 移行時に統合・整理を行う。
+* Stage1 では最低限で良い（MAY）。
+* `ILogger` を受け取れる設計にしておくと Stage2 で役立つ（SHOULD）。
 
 ---
 
-# 9. まとめ
-- Stage1 を **軽量で進めやすいフェーズ** として扱うための実践的ガイドライン。
-- 正典文書は保持しつつ、運用負荷を意図的に下げる。
-- とっかかりの良い作業順序と、最小限の拘束だけを残す。
+# 8. Stage1 の終了条件（Definition of Done）
+
+Stage1 の開発は次が満たされた時点で完了とする。
+
+1. `GetTickerAsync("BTC/JPY")` が正常に動作する。
+2. Raw → Ticker マッピングが A040（SPC）に一致する。
+3. 依存方向（ARC）が守られている。
+4. Infrastructure が REST/HTTP の最小実装を提供している。
+5. README に使用例が掲載されている。
+6. A010 / A020 / A030 / A040 と矛盾がない。
 
 ---
 
+# 9. Stage2 への移行（Next Steps）
+
+Stage2 では次の強化が行われる。
+
+* Transport の高度化（Retry / RateLimit / CircuitBreaker）
+* Protocol の正式導入（署名生成 / timestamp / nonce）
+* 認証 REST（Balance / Order / Position）
+* WebSocket（Streaming Ticker / Board / Executions）
+* 複数取引所（Binance / Bybit 等）の Adapter を追加
+* Orchestration 層の本格実装
+
+Stage1 で整備した Boundary・Infrastructure・Adapter の構造は、
+Stage2 のこれら拡張を破綻なく受け入れる基盤となる。
+
+---
+
+# 10. 改訂履歴
+
+| 版     | 日付         | 内容                                                           |
+| ----- | ---------- | ------------------------------------------------------------ |
+| 2.0.0 | 2025-11-XX | Stage1 新設計方針（Boundary + Modules）に合わせて全面改訂。開発者向け最小ガイドラインを再構成。 |

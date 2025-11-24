@@ -12,16 +12,16 @@ namespace ExchangeApi.Bitflyer;
 /// </summary>
 public sealed class BitflyerPublicApi : IBitflyerPublicApi
 {
-    private readonly IRestClient _rest;
+    private readonly IRestClient _restClient;
 
     /// <summary>
     /// bitFlyer API のベース URL。
     /// </summary>
     private static readonly Uri BaseUri = new("https://api.bitflyer.com/");
 
-    public BitflyerPublicApi(IRestClient rest)
+    public BitflyerPublicApi(IRestClient restClient)
     {
-        _rest = rest ?? throw new ArgumentNullException(nameof(rest));
+        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
     /// <summary>
@@ -32,13 +32,20 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(productCode))
-        {
-            throw new ArgumentException("productCode must not be null or whitespace.", nameof(productCode));
-        }
+            throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        // bitFlyer の ticker エンドポイント
-        var relativePath = $"v1/ticker?product_code={productCode}";
+        const string path = "/v1/ticker";
 
-        return _rest.GetAsync<BitflyerTickerRaw>(relativePath, cancellationToken);
+        IReadOnlyDictionary<string, string?> query =
+            new Dictionary<string, string?>(StringComparer.Ordinal)
+            {
+                ["product_code"] = productCode,
+            };
+
+        return _restClient.GetAsync<BitflyerTickerRaw>(
+            path,
+            query,
+            cancellationToken);
     }
+
 }

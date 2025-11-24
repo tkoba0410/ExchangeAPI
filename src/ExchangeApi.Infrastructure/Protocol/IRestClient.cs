@@ -18,6 +18,7 @@ public interface IRestClient
     /// <param name="cancellationToken">キャンセル トークン。</param>
     /// <returns>デシリアライズされたレスポンス。</returns>
     Task<TResponse> GetAsync<TResponse>(
-        string relativePath,
+        string path,
+        IReadOnlyDictionary<string, string?>? query = null,
         CancellationToken cancellationToken = default);
 }

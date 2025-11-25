@@ -41,13 +41,21 @@ Stage2 では、bitFlyer Private API を用いた最初の読み取り処理と�
 
 ### REQ-203: Private GET を実行するための基盤（Infrastructure）
 - `IRestClient` に以下のメソッドを要求する。
-  - `Task<T> GetAsync<T>(string path, object? query = null, CancellationToken ct = default)`
+  - `Task<T> GetAsync<T>(string path, IReadOnlyDictionary<string, string?>? query = null, CancellationToken ct = default)`
+  - クエリはキー/値の辞書で渡す。値が null のものは除外される。
+  - 同一キーに異なる値が指定された場合は例外（ArgumentException）とする。
+  呼び出し例（クエリ不要の場合は null または空辞書でよい）:
+  ```csharp
+  var balances = await rest.GetAsync<IReadOnlyList<BalanceResponse>>(
+      "/v1/me/getbalance",
+      new Dictionary<string, string?>());
+  ```
 - `IRequestSigner` は bitFlyer 認証仕様に従い、以下のヘッダを付与できること。
   - `ACCESS-KEY`
   - `ACCESS-TIMESTAMP`
   - `ACCESS-SIGN`
   - `Content-Type: application/json`
-- HTTP 4xx/5xx の場合は `ExchangeApiException` を発生させる（エラー処理レベル E1）。
+- HTTP 4xx/5xx の場合は `ExchangeApiException` を発生させる（エラー処理レベル E1）。`HttpRequestException` は StatusCode/URI を含めてラップする。
 
 ### REQ-204: Raw API 実装（bitFlyer）
 - `/v1/me/getbalance` を呼び出すメソッドを定義する。

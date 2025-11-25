@@ -19,11 +19,16 @@ namespace ExchangeApi.Infrastructure.Protocol
             new("application/json");
         private readonly Uri _baseUri;
         private readonly IHttpTransport _transport;
+        private readonly JsonSerializerOptions _serializerOptions;
 
-        public RestClient(Uri baseUri, IHttpTransport transport)
+        public RestClient(
+            Uri baseUri,
+            IHttpTransport transport,
+            JsonSerializerOptions? serializerOptions = null)
         {
             _baseUri = baseUri ?? throw new ArgumentNullException(nameof(baseUri));
             _transport = transport ?? throw new ArgumentNullException(nameof(transport));
+            _serializerOptions = serializerOptions ?? new JsonSerializerOptions(JsonSerializerDefaults.Web);
         }
 
         public async Task<TResponse> GetAsync<TResponse>(
@@ -56,9 +61,11 @@ namespace ExchangeApi.Infrastructure.Protocol
                     .SendAsync(request, cancellationToken)
                     .ConfigureAwait(false);
 
-                var content = await response.Content
-                    .ReadAsStringAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                var content = response.Content is null
+                    ? string.Empty
+                    : await response.Content
+                        .ReadAsStringAsync(cancellationToken)
+                        .ConfigureAwait(false);
 
                 // ★ HTTP ステータス異常 → ExchangeApiException（E1）
                 if (!response.IsSuccessStatusCode)
@@ -72,7 +79,7 @@ namespace ExchangeApi.Infrastructure.Protocol
 
                 try
                 {
-                    var result = JsonSerializer.Deserialize<TResponse>(content);
+                    var result = JsonSerializer.Deserialize<TResponse>(content, _serializerOptions);
 
                     if (result is null)
                     {
@@ -97,11 +104,13 @@ namespace ExchangeApi.Infrastructure.Protocol
             }
             catch (HttpRequestException ex)
             {
-                // ★ 通信エラー → ExchangeApiException
+                // 通信エラー → ExchangeApiException に詳細を引き継ぐ
                 throw new ExchangeApiException(
-                    "HTTP request failed.",
+                    $"HTTP request failed for '{requestUri}'.",
+                    statusCode: ex.StatusCode,
                     innerException: ex);
             }
+
             catch (TaskCanceledException ex)
             {
                 // ★ タイムアウト or キャンセル → ExchangeApiException
@@ -112,21 +121,52 @@ namespace ExchangeApi.Infrastructure.Protocol
         }
         private Uri BuildUri(string path, IReadOnlyDictionary<string, string?>? query)
         {
-            // path が "/v1/ticker" でも "v1/ticker" でも動くようにしておく
-            var uriBuilder = new UriBuilder(new Uri(_baseUri, path));
+            var combined = new Dictionary<string, string>(StringComparer.Ordinal);
 
+            // ベース + path
+            var baseUri = new Uri(_baseUri, path);
+            var builder = new UriBuilder(baseUri);
+
+            // 既存クエリを先に取り込む
+            if (!string.IsNullOrWhiteSpace(builder.Query))
+            {
+                var pairs = builder.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var pair in pairs)
+                {
+                    var kv = pair.Split('=', 2);
+                    var key = Uri.UnescapeDataString(kv[0]);
+                    var value = kv.Length > 1 ? Uri.UnescapeDataString(kv[1]) : string.Empty;
+                    combined[key] = value;
+                }
+            }
+
+            // 引数のqueryをマージ（重複は例外）
             if (query is { Count: > 0 })
+            {
+                foreach (var kv in query.Where(kv => kv.Value is not null))
+                {
+                    if (combined.TryGetValue(kv.Key, out var existing) && existing != kv.Value)
+                    {
+                        throw new ArgumentException($"Duplicate query parameter '{kv.Key}'.");
+                    }
+                    combined[kv.Key] = kv.Value!;
+                }
+            }
+
+            if (combined.Count > 0)
             {
                 var queryString = string.Join(
                     "&",
-                    query
-                        .Where(kv => kv.Value is not null)
-                        .Select(kv => $"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(kv.Value!)}"));
-
-                uriBuilder.Query = queryString;
+                    combined.Select(kv => $"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(kv.Value)}"));
+                builder.Query = queryString;
+            }
+            else
+            {
+                builder.Query = string.Empty;
             }
 
-            return uriBuilder.Uri;
+            return builder.Uri;
         }
+
     }
 }

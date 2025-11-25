@@ -1,0 +1,5 @@
+BuildUriが元のクエリを潰す: RestClient.BuildUriでpathに既存クエリが入っていても、query引数を渡すとそのクエリで上書きされ、元のクエリが消えます（src/ExchangeApi.Infrastructure/Protocol/RestClient.cs (lines 113-127)）。パスに必須クエリを含める利用形態では漏れます。既存クエリとマージするか、二重指定を検知するなどの処理が必要です。
+204/ContentなしレスポンスでNull参照: response.Content.ReadAsStringAsync(...)を無条件に呼ぶため、NoContentやContent=nullのレスポンスだとNullReferenceになります（src/ExchangeApi.Infrastructure/Protocol/RestClient.cs (line 59)）。response.Contentがnullでも空文字扱いにするなどのガードが必要です。
+エラー詳細の欠落: HttpRequestException捕捉時にStatusCodeやRequestUriなどの情報を捨ててしまっており、ExchangeApiExceptionに引き継がれていません（src/ExchangeApi.Infrastructure/Protocol/RestClient.cs (lines 98-104)）。トラブルシュート時の手掛かりが減るので、ステータスコード/URIをメッセージやプロパティに渡す方がよいです。
+JSONデシリアライズ設定が固定: JsonSerializer.Deserialize<TResponse>(content)をデフォルトオプションで呼んでおり、命名ポリシーや数値ハンドリングの調整余地がありません（src/ExchangeApi.Infrastructure/Protocol/RestClient.cs (lines 73-90)）。APIごとのケース差異（camel/snakeや大文字小文字無視、特定の数値書式）が出た際に拡張しづらいので、JsonSerializerOptionsを注入可能にする/少なくともJsonSerializerDefaults.Webを使うなどの検討をお勧めします。
+テスト未整備: READMEではRestClientTests（path+query→URI構築）に言及されていますが、tests/ExchangeApi.Infrastructure.Tests配下にテストコードが見当たりません。URI組み立てやエラーハンドリング（HTTPエラー、空ボディ、JSON例外など）の回帰を防ぐため、ユニットテストの追加が必要です。

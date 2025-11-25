@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace ExchangeApi.Bitflyer.Models
 {
     /// <summary>
-    /// bitFlyer Public REST API の <c>GET /v1/ticker</c> レスポンスを
+    /// bitFlyer Public REST API の <c>GET /v1/getticker</c> レスポンスを
     /// ほぼそのまま写像した Raw モデル。
     /// 
     /// - ExchangeApi.Abstractions の Ticker とは 1:1 ではなく、

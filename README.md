@@ -1,7 +1,7 @@
 # ExchangeApi
 
 ExchangeApi は、複数の暗号資産取引所向けに統一インターフェースを提供する C#/.NET ライブラリです。  
-Stage1 では **bitFlyer Public REST API /v1/ticker による Ticker 取得** のみに対応します。
+Stage1 では **bitFlyer Public REST API /v1/getticker による Ticker 取得** のみに対応します。
 
 - 統一 DTO（Ticker）
 - 抽象クライアント（IExchangeClient）
@@ -101,7 +101,7 @@ Console.WriteLine($"Time: {ticker.Timestamp:O}");
 ## 🎯 Stage1 の仕様（概要）
 
 - サポート取引所：bitFlyer（Public）
-- サポート API：`GET /v1/ticker`
+- サポート API：`GET /v1/getticker`
 - サポートシンボル：`BTC/JPY`
 - DTO：`Ticker`
   - `Symbol`  

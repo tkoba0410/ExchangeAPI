@@ -43,12 +43,14 @@ public static class BitflyerClientFactory
         // 生の HTTP トランスポート
         IHttpTransport baseTransport = new HttpTransport(httpClient, disposeHttpClient: true);
 
-        // 署名用の時計
+        // 既存: clockはそのまま
         IExchangeClock clock = new SystemClock();
 
-        // Private API 向け署名付きトランスポート
-        IHttpTransport signingTransport =
-            new BitflyerSigningTransport(baseTransport, apiKey, apiSecret, clock);
+        // signerを作る
+        IRequestSigner signer = new BitflyerRequestSigner(apiKey, apiSecret, clock);
+
+        // signing transportにsignerを渡す
+        IHttpTransport signingTransport = new BitflyerSigningTransport(baseTransport, signer);
 
         // 署名付き REST クライアント（Public/Private 共通で利用）
         IRestClient restClient = new RestClient(BitflyerApiBaseUri, signingTransport);

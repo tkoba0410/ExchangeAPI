@@ -32,7 +32,7 @@ Stage1 を完了し、ExchangeApi の **初期実装バージョン** を確定�
   - `RestClient`（path + query形式へ整理）  
   - `IHttpTransport` / `HttpTransport`
 - Bitflyer Adapter  
-  - Public REST `/v1/ticker` の実装  
+  - Public REST `/v1/getticker` の実装  
   - Raw JSON → Ticker 変換のマッピング整理
 - DTO  
   - Timestamp を `DateTimeOffset` に統一  
@@ -44,7 +44,7 @@ Stage1 を完了し、ExchangeApi の **初期実装バージョン** を確定�
 
 ### Changed
 - A010〜A060 の Stage1 文書を全体的に改訂し、コードと完全整合
-- `getticker` 参照を削除し、公式の `/v1/ticker` に統一
+- `getticker` 参照を削除し、公式の `/v1/getticker` に統一
 - Ticker Timestamp に関する仕様を確定（UTC + Offset、例外不要）
 - README を Stage1 完了形に整備  
   - DI セットアップ  

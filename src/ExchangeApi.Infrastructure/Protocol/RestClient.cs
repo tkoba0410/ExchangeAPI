@@ -51,18 +51,54 @@ public class RestClient : IRestClient
             request.Headers.Accept.Add(JsonMediaType);
         }
 
-        using var response = await _transport.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            using var response = await _transport
+                .SendAsync(request, cancellationToken)
+                .ConfigureAwait(false);
 
-        response.EnsureSuccessStatusCode(); // ここで失敗時に HttpRequestException か、独自に ExchangeApiException へ変換しているかは既存ロジックに合わせる
+            var content = await response.Content
+                .ReadAsStringAsync(cancellationToken)
+                .ConfigureAwait(false);
 
-        var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            // ★ E1: HTTP ステータス異常 → ExchangeApiException
+            if (!response.IsSuccessStatusCode)
+            {
+                // 必要に応じて body を短くするなど調整してください
+                throw new ExchangeApiException(
+                    $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Body: {content}");
+            }
 
-        // System.Text.Json でデシリアライズしている想定
-        var result = JsonSerializer.Deserialize<TResponse>(content)
-                     ?? throw new ExchangeApiException("Failed to deserialize response.");
+            try
+            {
+                var result = JsonSerializer.Deserialize<TResponse>(content);
 
-        return result;
+                if (result is null)
+                {
+                    throw new ExchangeApiException(
+                        $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
+                }
+
+                return result;
+            }
+            catch (JsonException ex)
+            {
+                // ★ E1: JSON パース失敗 → ExchangeApiException
+                throw new ExchangeApiException("Failed to deserialize JSON response.", ex);
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            // ★ E1: 通信エラー → ExchangeApiException
+            throw new ExchangeApiException("HTTP request failed.", ex);
+        }
+        catch (TaskCanceledException ex)
+        {
+            // ★ E1: タイムアウト or キャンセル → ExchangeApiException
+            throw new ExchangeApiException("HTTP request timed out or was canceled.", ex);
+        }
     }
+
 
     private Uri BuildUri(string path, IReadOnlyDictionary<string, string?>? query)
     {

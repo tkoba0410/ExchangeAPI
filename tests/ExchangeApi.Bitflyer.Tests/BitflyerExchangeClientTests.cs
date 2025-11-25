@@ -70,11 +70,12 @@ namespace ExchangeApi.Bitflyer.Tests
             var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<SymbolNotSupportedException>(async () =>
-            {
-                await client.GetTickerAsync("ETH/JPY");
-            });
+            var ex = await Assert.ThrowsAsync<ExchangeApiException>(async () =>
+                await client.GetTickerAsync("ETH/JPY"));
+
+            Assert.IsType<SymbolNotSupportedException>(ex.InnerException);
+
+
         }
     }
 }

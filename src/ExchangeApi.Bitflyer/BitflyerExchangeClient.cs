@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Abstractions.Contracts;
@@ -11,27 +12,25 @@ namespace ExchangeApi.Bitflyer;
 
 /// <summary>
 /// bitFlyer 用の IExchangeClient 実装。
-/// Stage1 では BTC/JPY の Ticker 取得のみをサポートする。
+/// Stage1 では Public GET（ticker）、Stage2 では Private GET（getbalance）をサポートする。
 /// </summary>
 public sealed class BitflyerExchangeClient : IExchangeClient
 {
     private readonly IBitflyerPublicApi _publicApi;
     private readonly IBitflyerPrivateApi _privateApi;
+    private readonly string _exchangeId;
+    private readonly string _accountId;
 
     /// <summary>
-    /// 取引所 ID（"bitFlyer" 固定）。
+    /// 取引所 ID（例: "bitFlyer"）。
     /// </summary>
-    public string ExchangeId { get; }
+    public string ExchangeId => _exchangeId;
 
     /// <summary>
-    /// アカウント ID。
-    /// Stage1 ではシングルアカウント想定のため "default" 固定。
+    /// アカウント ID。Stage1/2 時点では固定 "default"。
     /// </summary>
-    public string AccountId { get; }
+    public string AccountId => _accountId;
 
-    /// <summary>
-    /// 既定の exchangeId/accountId でクライアントを作成する。
-    /// </summary>
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
         IBitflyerPrivateApi privateApi)
@@ -39,10 +38,6 @@ public sealed class BitflyerExchangeClient : IExchangeClient
     {
     }
 
-    /// <summary>
-    /// exchangeId / accountId を明示指定してクライアントを作成する。
-    /// 将来のマルチ取引所・マルチアカウント対応を見据えたコンストラクタ。
-    /// </summary>
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
         IBitflyerPrivateApi privateApi,
@@ -51,91 +46,135 @@ public sealed class BitflyerExchangeClient : IExchangeClient
     {
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
-        ExchangeId = exchangeId ?? throw new ArgumentNullException(nameof(exchangeId));
-        AccountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
+        _exchangeId = exchangeId ?? throw new ArgumentNullException(nameof(exchangeId));
+        _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
 
-    /// <inheritdoc />
+    #region IExchangeMarketClient (ticker)
+
+    /// <summary>
+    /// 指定されたシンボルのティッカーを取得する。
+    /// </summary>
     public async Task<Ticker> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(symbol))
-        {
-            throw new ArgumentException("symbol must not be null or whitespace.", nameof(symbol));
-        }
-
-        // Stage1 では BTC/JPY のみサポート（詳細チェックは MapSymbolToProductCode に集約）
-        var productCode = MapSymbolToProductCode(symbol);
-
-        BitflyerTickerRaw raw;
         try
         {
-            raw = await _publicApi
+            // シンボル→bitFlyer product_code 変換
+            var productCode = MapSymbolToProductCode(symbol);
+
+            var rawTicker = await _publicApi
                 .GetTickerRawAsync(productCode, cancellationToken)
                 .ConfigureAwait(false);
+
+            return MapToTicker(symbol, rawTicker);
+        }
+        catch (SymbolNotSupportedException ex)
+        {
+            // ドメインエラー：サポートしていないシンボル
+            throw new ExchangeApiException(
+                message: $"Symbol '{ex.Symbol}' is not supported by bitFlyer.",
+                exchangeId: _exchangeId,
+                operation: "GetTicker",
+                statusCode: null,
+                innerException: ex);
         }
         catch (ExchangeApiException)
         {
-            // すでに ExchangeApiException としてラップされているものはそのまま流す
+            // RestClient / Transport 層からの E1 例外はそのまま伝播
             throw;
         }
         catch (Exception ex)
         {
-            // 下位の通信エラーなどを ExchangeApiException にラップ
-            throw new ExchangeApiException("Failed to call bitFlyer getticker API.", ex);
+            // 予期しない例外は Adapter 層で文脈付き ExchangeApiException に統一
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer getticker API.",
+                exchangeId: _exchangeId,
+                operation: "GetTicker",
+                statusCode: null,
+                innerException: ex);
         }
-
-        return MapToTicker(symbol, raw);
     }
 
+    #endregion
+
+    #region IExchangeAccountClient (balances)
+
+    /// <summary>
+    /// 口座残高一覧を取得する。
+    /// Stage2 では /v1/me/getbalance のみを対象とする。
+    /// </summary>
     public async Task<IReadOnlyList<Balance>> GetBalancesAsync(
-            CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)
     {
-        var rawBalances = await _privateApi
-            .GetBalancesAsync(cancellationToken)
-            .ConfigureAwait(false);
+        try
+        {
+            var rawBalances = await _privateApi
+                .GetBalancesAsync(cancellationToken)
+                .ConfigureAwait(false);
 
-        // DTO → ドメイン変換
-        var result = rawBalances
-            .Select(b => new Balance(
-                b.CurrencyCode,
-                b.Amount,
-                b.Available))
-            .ToArray();
+            var result = rawBalances
+                .Select(b => new Balance(
+                    b.CurrencyCode,
+                    b.Amount,
+                    b.Available))
+                .ToArray();
 
-        return result;
+            return result;
+        }
+        catch (ExchangeApiException)
+        {
+            // RestClient / Transport 層からの E1 例外はそのまま
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // 予期しない例外は文脈付きにラップ
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer getbalance API.",
+                exchangeId: _exchangeId,
+                operation: "GetBalances",
+                statusCode: null,
+                innerException: ex);
+        }
     }
 
+    #endregion
+
+    #region private mapping helpers
+
+    /// <summary>
+    /// 抽象シンボル（例: BTC/JPY）を bitFlyer の product_code にマップする。
+    /// Stage1/2 時点では BTC/JPY のみサポート。
+    /// </summary>
     private static string MapSymbolToProductCode(string symbol)
     {
-        // Stage1 ではシンプルな静的マッピングのみ
+        // Stage1/2 ではシンプルな静的マッピングのみ
         if (string.Equals(symbol, Symbols.BtcJpy, StringComparison.Ordinal))
         {
             return "BTC_JPY";
         }
 
-        // Stage1 では BTC/JPY 以外はサポートしない
+        // Stage1/2 では BTC/JPY 以外はサポートしない
         throw new SymbolNotSupportedException(symbol);
     }
 
     /// <summary>
-    /// bitFlyer 生レスポンスから共通 Ticker DTO へマッピングする。
+    /// bitFlyer の Raw ティッカーを抽象層の Ticker に変換する。
     /// </summary>
     private static Ticker MapToTicker(string symbol, BitflyerTickerRaw raw)
     {
-        if (raw is null)
-        {
-            throw new ExchangeApiException("bitFlyer ticker response was null.");
-        }
+        // ここは既存の実装に合わせて調整してください。
+        // 例：Bid/Ask/Last/BestBidSize/BestAskSize/Volume 等のマッピング。
 
-        // Stage1 の Ticker は Volume 等を含まない最小構成とする。
-        // 取引所固有の情報が必要になった場合は Raw モデル側から参照する。
         return new Ticker(
-            symbol,
-            raw.BestBid,
-            raw.BestAsk,
-            raw.LastTradedPrice,
-            raw.Timestamp);
+            Symbol: symbol,
+            BestBid: raw.BestBid,
+            BestAsk: raw.BestAsk,
+            LastTradedPrice: raw.LastTradedPrice,
+            Timestamp: raw.Timestamp);
     }
+
+    #endregion
 }

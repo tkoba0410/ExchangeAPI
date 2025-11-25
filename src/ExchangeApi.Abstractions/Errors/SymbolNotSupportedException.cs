@@ -3,7 +3,7 @@ namespace ExchangeApi.Abstractions.Errors;
 /// <summary>
 /// クライアントがサポートしていないシンボルが指定されたときの例外。
 /// </summary>
-public sealed class SymbolNotSupportedException : ExchangeApiException
+public class SymbolNotSupportedException : ExchangeApiException
 {
     public string Symbol { get; }
 

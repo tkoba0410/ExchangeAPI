@@ -16,6 +16,7 @@ namespace ExchangeApi.Bitflyer;
 public sealed class BitflyerExchangeClient : IExchangeClient
 {
     private readonly IBitflyerPublicApi _publicApi;
+    private readonly IBitflyerPrivateApi _privateApi;
 
     /// <summary>
     /// 取引所 ID（"bitFlyer" 固定）。
@@ -31,8 +32,10 @@ public sealed class BitflyerExchangeClient : IExchangeClient
     /// <summary>
     /// 既定の exchangeId/accountId でクライアントを作成する。
     /// </summary>
-    public BitflyerExchangeClient(IBitflyerPublicApi publicApi)
-        : this(publicApi, exchangeId: "bitFlyer", accountId: "default")
+    public BitflyerExchangeClient(
+        IBitflyerPublicApi publicApi,
+        IBitflyerPrivateApi privateApi)
+        : this(publicApi, privateApi, exchangeId: "bitFlyer", accountId: "default")
     {
     }
 
@@ -42,10 +45,12 @@ public sealed class BitflyerExchangeClient : IExchangeClient
     /// </summary>
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
+        IBitflyerPrivateApi privateApi,
         string exchangeId,
         string accountId)
     {
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
+        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
         ExchangeId = exchangeId ?? throw new ArgumentNullException(nameof(exchangeId));
         AccountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
@@ -82,6 +87,24 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         }
 
         return MapToTicker(symbol, raw);
+    }
+
+    public async Task<IReadOnlyList<Balance>> GetBalancesAsync(
+            CancellationToken cancellationToken = default)
+    {
+        var rawBalances = await _privateApi
+            .GetBalancesAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // DTO → ドメイン変換
+        var result = rawBalances
+            .Select(b => new Balance(
+                b.CurrencyCode,
+                b.Amount,
+                b.Available))
+            .ToArray();
+
+        return result;
     }
 
     private static string MapSymbolToProductCode(string symbol)

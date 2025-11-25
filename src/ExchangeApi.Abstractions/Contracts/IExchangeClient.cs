@@ -11,7 +11,7 @@ namespace ExchangeApi.Abstractions.Contracts;
 /// ExchangeId / AccountId は Stage2 以降（Multi-Exchange / Multi-Account）で使用される
 /// 拡張用プロパティであり、Stage1 では利用しない。
 /// </summary>
-public interface IExchangeClient
+public interface IExchangeClient : IExchangeAccountClient
 {
     /// <summary>
     /// 取引所識別子。

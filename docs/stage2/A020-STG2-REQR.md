@@ -83,10 +83,12 @@ Stage2 では、bitFlyer Private API を用いた最初の読み取り処理と�
   - `HttpClient`
   - `SystemClock`
   - `BitflyerRequestSigner`
-  - `RestClient`
-  - `BitflyerRawApiClient`
+  - `RestClient`（BitflyerSigningTransport経由）
+  - `BitflyerPublicApi`
+  - `BitflyerPrivateApi`
   - `BitflyerExchangeClient`
 - 戻り値は `IExchangeClient` とする。
+
 
 ### REQ-208: 手動検証
 - API キーおよびシークレットを設定した環境で、`client.GetBalancesAsync()` を実行し、

@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using ExchangeApi.Abstractions.Contracts;
+using ExchangeApi.Abstractions.Dtos;
 using ExchangeApi.Infrastructure.Protocol;
 using ExchangeApi.Infrastructure.Time;
 using ExchangeApi.Infrastructure.Transport;
@@ -8,20 +9,16 @@ using ExchangeApi.Infrastructure.Transport;
 namespace ExchangeApi.Bitflyer;
 
 /// <summary>
-/// bitFlyer 向けの IExchangeClient を組み立てるファクトリ。
-/// HttpClient → HttpTransport → BitflyerSigningTransport → RestClient →
-/// BitflyerPublicApi / BitflyerPrivateApi → BitflyerExchangeClient
-/// という依存グラフをここで構築する。
+/// Factory for constructing bitFlyer IExchangeClient instances.
+/// HttpClient -> HttpTransport -> BitflyerSigningTransport -> RestClient -> BitflyerPublicApi/BitflyerPrivateApi -> BitflyerExchangeClient.
 /// </summary>
 public static class BitflyerClientFactory
 {
     private static readonly Uri BitflyerApiBaseUri = new("https://api.bitflyer.com");
 
     /// <summary>
-    /// bitFlyer 用の IExchangeClient を作成する。
+    /// Create bitFlyer client with explicit API key/secret supplied by the caller.
     /// </summary>
-    /// <param name="apiKey">bitFlyer API キー。</param>
-    /// <param name="apiSecret">bitFlyer API シークレット。</param>
     public static IExchangeClient Create(string apiKey, string apiSecret)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
@@ -34,32 +31,38 @@ public static class BitflyerClientFactory
             throw new ArgumentException("API secret is required.", nameof(apiSecret));
         }
 
-        // HttpClient は base URI のみ設定して Transport に渡す。
         var httpClient = new HttpClient
         {
             BaseAddress = BitflyerApiBaseUri,
         };
 
-        // 生の HTTP トランスポート
         IHttpTransport baseTransport = new HttpTransport(httpClient, disposeHttpClient: true);
 
-        // 既存: clockはそのまま
         IExchangeClock clock = new SystemClock();
 
-        // signerを作る
         IRequestSigner signer = new BitflyerRequestSigner(apiKey, apiSecret, clock);
 
-        // signing transportにsignerを渡す
         IHttpTransport signingTransport = new BitflyerSigningTransport(baseTransport, signer);
 
-        // 署名付き REST クライアント（Public/Private 共通で利用）
         IRestClient restClient = new RestClient(BitflyerApiBaseUri, signingTransport);
 
-        // Raw API（Public / Private）
         var publicApi = new BitflyerPublicApi(restClient);
         var privateApi = new BitflyerPrivateApi(restClient);
 
-        // Adapter（IExchangeClient 実装）
         return new BitflyerExchangeClient(publicApi, privateApi);
+    }
+
+    /// <summary>
+    /// Create bitFlyer client using a credential provider to retrieve API key/secret.
+    /// </summary>
+    public static IExchangeClient Create(IApiCredentialProvider provider, string exchangeId, string accountId)
+    {
+        if (provider is null)
+        {
+            throw new ArgumentNullException(nameof(provider));
+        }
+
+        var credentials = provider.Get(exchangeId, accountId);
+        return Create(credentials.ApiKey, credentials.ApiSecret);
     }
 }

@@ -162,7 +162,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
             {
                 ProductCode = request.ProductCode,
                 Side = request.Side == OrderSide.Buy ? "BUY" : "SELL",
-                ChildOrderType = MapOrderType(request.OrderType),
+                ChildOrderType = MapOrderType(request.OrderType, request.Price),
                 Size = request.Size,
                 Price = request.Price,
                 TriggerPrice = request.TriggerPrice,
@@ -397,13 +397,13 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         throw new SymbolNotSupportedException(symbol);
     }
 
-    private static string MapOrderType(OrderType orderType)
+    private static string MapOrderType(OrderType orderType, decimal? price)
     {
         return orderType switch
         {
             OrderType.Market => "MARKET",
             OrderType.Limit => "LIMIT",
-            OrderType.Stop => "STOP",
+            OrderType.Stop => price is null ? "STOP" : "STOP_LIMIT",
             _ => "MARKET",
         };
     }
@@ -476,7 +476,11 @@ public sealed class BitflyerExchangeClient : IExchangeClient
                 {
                     throw new ArgumentException("Stop order requires TriggerPrice.", nameof(request));
                 }
-                // price is optional（成行ストップ相当）。指定時はストップリミットとして扱う。
+                if (request.Price is not null && request.Price <= 0)
+                {
+                    throw new ArgumentException("Stop order Price must be greater than zero when specified.", nameof(request));
+                }
+                // price is optional: null -> STOP (market), specified -> STOP_LIMIT
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(request.OrderType), request.OrderType, "Unsupported order type.");
@@ -513,7 +517,11 @@ public sealed class BitflyerExchangeClient : IExchangeClient
             return normalizedCode switch
             {
                 "INSUFFICIENT_FUNDS" => ExchangeErrorCategory.Balance,
+                "NO_POSITION" => ExchangeErrorCategory.Balance,
                 "INVALID_ORDER" or "INVALID_PRODUCT" or "PRODUCT_NOT_FOUND" => ExchangeErrorCategory.Request,
+                "LIMIT_OVER" or "ORDER_NOT_ACCEPTABLE" => ExchangeErrorCategory.Request,
+                "INVALID_REQUEST" => ExchangeErrorCategory.Request,
+                "PARAM_ERROR" => ExchangeErrorCategory.Request,
                 "AUTHENTICATION_ERROR" or "PERMISSION_DENIED" => ExchangeErrorCategory.Auth,
                 "TOO_MANY_REQUESTS" => ExchangeErrorCategory.RateLimit,
                 "SERVICE_UNAVAILABLE" or "INTERNAL_ERROR" => ExchangeErrorCategory.Server,

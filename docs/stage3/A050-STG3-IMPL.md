@@ -71,6 +71,29 @@ Task<TResponse> PostAsync<TRequest, TResponse>(string path, TRequest body, Cance
 - HTTP ステータス 200–299 以外は `ExchangeApiException` に変換する。
 - JSON 変換中の例外はそのままドメイン外エラーとして `ExchangeApiException` にラップする。
 
+#### 4.1.1 署名対象文字列の生成
+```
+var json = JsonSerializer.Serialize(body);
+var prehash = timestamp + "POST" + path + json;
+var signature = HMAC_SHA256(secret, prehash);
+```
+- `json` は **送信する実体と完全一致** させる（改行・空白・プロパティ順序も含む）。
+- `timestamp` は clock から一度だけ取得し、署名・ヘッダに同じ値を使う。
+
+#### 4.1.2 POST 時に付与するヘッダ
+| Header | 値 |
+|--------|------|
+| `ACCESS-KEY` | API key |
+| `ACCESS-TIMESTAMP` | clock から取得した timestamp |
+| `ACCESS-SIGN` | prehash を HMAC-SHA256 した値 |
+| `Content-Type` | `application/json` |
+| `Accept` | `application/json` |
+
+#### 4.1.3 エラー処理とシリアライズ
+- 200–299 以外は `ExchangeApiException`（ステータスを保持）に統一。
+- ネットワーク例外（Timeout/DNS など）も `ExchangeApiException` にラップする。
+- decimal は `JsonSerializer` に任せ、手動の文字列化はしない（桁ぶれ防止）。
+
 ### 4.2 IRequestSigner（POST 対応）
 署名対象：
 ```
@@ -224,4 +247,3 @@ public static class BitflyerClientFactory
 - POST body のフィールドが増えるため、DTO の拡張または派生モデルが必要。
 
 ### 9.2 キャンセル API（`/v1/me/cancelchild
-

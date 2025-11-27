@@ -18,6 +18,12 @@ Stage4 時点での bitFlyer API 対応状況、抽象インターフェース�
 | /v1/me/getparentorders | GET | Stage5+ | 未実装 | 親注文一覧 |
 | /v1/me/getparentorder | GET | Stage5+ | 未実装 | 親注文詳細 |
 | WebSocket (ticker/board/executions) | WS | Stage6 | 未実装 | リアルタイム系 |
+| /v1/me/sendparentorder | POST | Stage5+ | 未実装 | IFD/OCO/IFDOCO など複合注文 |
+| /v1/me/cancelparentorder | POST | Stage5+ | 未実装 | 親注文キャンセル |
+| /v1/me/getboardstate | GET | Stage5+ | 未実装 | 相場状態 |
+| /v1/gethealth | GET | Stage5+ | 未実装 | システムヘルス（Public） |
+| /v1/getboard | GET | Stage1? | 未実装 | 板情報（Public） |
+| /v1/me/getpermissions | GET | Stage5+ | 未実装 | APIキー権限確認 |
 
 ## 2. 抽象インターフェース対応表
 | 抽象インターフェース | bitFlyer API | DTO/Mapping | 実装状況 |
@@ -34,6 +40,12 @@ Stage4 時点での bitFlyer API 対応状況、抽象インターフェース�
 | GetParentOrdersAsync（仮） | /v1/me/getparentorders | 未設計 | 未実装 |
 | GetParentOrderAsync（仮） | /v1/me/getparentorder | 未設計 | 未実装 |
 | SubscribeTicker/Board/Executions（仮） | WS | 未設計 | 未実装 |
+| SendParentOrderAsync（仮） | /v1/me/sendparentorder | 未設計 | 未実装 |
+| CancelParentOrderAsync（仮） | /v1/me/cancelparentorder | 未設計 | 未実装 |
+| GetBoardStateAsync（仮） | /v1/me/getboardstate | 未設計 | 未実装 |
+| GetHealthAsync（仮） | /v1/gethealth | 未設計 | 未実装 |
+| GetBoardAsync（仮） | /v1/getboard | 未設計 | 未実装 |
+| GetPermissionsAsync（仮） | /v1/me/getpermissions | 未設計 | 未実装 |
 
 ## 3. bitFlyer 固有エラーコード表（ドラフト）
 | error_code | カテゴリ | リトライ可否 | 実装状況 | 備考 |

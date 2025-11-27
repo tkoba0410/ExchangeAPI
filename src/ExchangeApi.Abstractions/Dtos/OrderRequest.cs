@@ -8,6 +8,7 @@ public sealed record OrderRequest(
     OrderSide Side,
     OrderType OrderType,
     decimal Size,
+    string? ClientOrderId = null,
     decimal? Price = null,
     decimal? TriggerPrice = null,
     int? MinuteToExpire = null,

@@ -13,6 +13,7 @@
 | CancelOrderAsync | Private POST | POST /v1/me/cancelchildorder | BitflyerCancelChildOrderRequest | Stage4 | 済 |
 | CancelAllOrdersAsync | Private POST | POST /v1/me/cancelallchildorders | BitflyerCancelAllChildOrdersRequest | Stage4 | 済 |
 | SubscribeTicker/Board/Executions（仮） | WS | WS (ticker/board/executions) | 未設計 | Stage6 | 未 |
+| OrderId マッピング（補助） | N/A | InMemoryOrderIdMapper (optional) | local ↔ server ID を保持 | N/A | 任意 |
 
 備考:
 - 親注文系・入出金系・履歴系は現時点では抽象に含めない。必要になれば追加する。

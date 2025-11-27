@@ -174,7 +174,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
                 .SendChildOrderAsync(dto, cancellationToken)
                 .ConfigureAwait(false);
 
-            return new OrderResult(response.ChildOrderAcceptanceId);
+            return new OrderResult(response.ChildOrderAcceptanceId, request.ClientOrderId);
         }
         catch (ExchangeApiException ex)
         {

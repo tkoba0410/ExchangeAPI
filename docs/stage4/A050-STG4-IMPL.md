@@ -7,7 +7,7 @@
 - 注文バリデーションの組み合わせルール（ドラフト）  
   - MARKET: 必須=product_code, side, size / 禁止=price, trigger_price / minute_to_expire・time_in_force は任意（未指定=デフォルト）  
   - LIMIT: 必須=product_code, side, size, price / trigger_price 禁止 / minute_to_expire/time_in_force 任意  
-  - STOP: 必須=product_code, side, size, trigger_price / price は任意（未指定なら成行相当か要確認）/ minute_to_expire/time_in_force 任意  
+  - STOP: 必須=product_code, side, size, trigger_price / price 任意（未指定→STOP 成行、指定→STOP_LIMIT）/ minute_to_expire/time_in_force 任意  
   - 共通: price>0, trigger_price>0, size>0。未指定フィールドは送信しない。デフォルト time_in_force は GTC 前提。
 
 ## 2. Infrastructure

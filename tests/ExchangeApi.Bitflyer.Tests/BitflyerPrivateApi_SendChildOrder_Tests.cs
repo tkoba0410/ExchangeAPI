@@ -1,0 +1,50 @@
+using System.Threading;
+using System.Threading.Tasks;
+using ExchangeApi.Bitflyer;
+using ExchangeApi.Bitflyer.Models;
+using ExchangeApi.Infrastructure.Protocol;
+using Xunit;
+
+namespace ExchangeApi.Bitflyer.Tests;
+
+public sealed class BitflyerPrivateApi_SendChildOrder_Tests
+{
+    [Fact]
+    public async Task SendChildOrderAsync_CallsRestClientPostWithCorrectPath()
+    {
+        var fakeRest = new FakeRestClient();
+        var api = new BitflyerPrivateApi(fakeRest);
+
+        var request = new BitflyerSendChildOrderRequest
+        {
+            ProductCode = "BTC_JPY",
+            ChildOrderType = "MARKET",
+            Side = "BUY",
+            Size = 0.01m,
+        };
+
+        await api.SendChildOrderAsync(request, CancellationToken.None);
+
+        Assert.Equal("/v1/me/sendchildorder", fakeRest.LastPath);
+        Assert.Equal(request, fakeRest.LastBody);
+    }
+
+    private sealed class FakeRestClient : IRestClient
+    {
+        public string? LastPath { get; private set; }
+        public object? LastBody { get; private set; }
+
+        public Task<TResponse> GetAsync<TResponse>(string path, IReadOnlyDictionary<string, string?>? query = null, CancellationToken cancellationToken = default)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<TResponse> PostAsync<TRequest, TResponse>(string path, TRequest body, CancellationToken cancellationToken = default)
+        {
+            LastPath = path;
+            LastBody = body;
+            return Task.FromResult(default(TResponse)!);
+        }
+    }
+}
+

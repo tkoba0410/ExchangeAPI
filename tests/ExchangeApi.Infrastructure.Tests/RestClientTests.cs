@@ -175,6 +175,42 @@ public sealed class RestClientTests
         Assert.Contains("\"value\":\"req\"", transport.LastRequestContent);
     }
 
+    [Fact]
+    public async Task PostAsync_HttpErrorStatus_IsWrappedWithStatusCode()
+    {
+        var transport = new FakeTransport
+        {
+            ResponseFactory = () => new HttpResponseMessage(HttpStatusCode.BadRequest)
+            {
+                Content = new StringContent("bad", Encoding.UTF8, "application/json")
+            }
+        };
+        var rest = new RestClient(new Uri("https://example.com"), transport);
+
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
+            rest.PostAsync<TestDto, TestDto>("/api", new TestDto("x")));
+
+        Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
+    }
+
+    [Fact]
+    public async Task PostAsync_InvalidJson_ThrowsExchangeApiException()
+    {
+        var transport = new FakeTransport
+        {
+            ResponseFactory = () => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("not json", Encoding.UTF8, "application/json")
+            }
+        };
+        var rest = new RestClient(new Uri("https://example.com"), transport);
+
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
+            rest.PostAsync<TestDto, TestDto>("/api", new TestDto("x")));
+
+        Assert.IsType<JsonException>(ex.InnerException);
+    }
+
 
 
 

@@ -60,6 +60,7 @@ Stage3 の主要観点をレイヤ別に整理する。
    - 404 → `ExchangeApiException`
    - 500 → `ExchangeApiException`
    - StatusCode が例外オブジェクトに保持されている
+   - `HttpRequestException` / `TaskCanceledException` も `ExchangeApiException` にラップされる
 
 5. **通信エラーの扱い**
    - タイムアウト / DNS エラー → `ExchangeApiException` に包む
@@ -71,6 +72,7 @@ Stage3 の主要観点をレイヤ別に整理する。
 2. **POST body に DTO が正しく反映されること**
 3. **REST の戻り値が DTO（BitflyerSendChildOrderResponse）として返ること**
 4. **例外を握りつぶさず、そのまま伝播すること**
+5. **通信・HTTP 例外が `ExchangeApiException` として上がること**
 
 ---
 
@@ -80,6 +82,7 @@ Stage3 の主要観点をレイヤ別に整理する。
 3. **OrderType.Market → "MARKET" が正しい**
 4. **decimal の Size がそのままマップされること**
 5. **child_order_acceptance_id → OrderId がそのまま変換されること**
+6. **例外発生時にマッピングで値が欠落しないこと（例外はそのまま返る）**
 
 ---
 
@@ -88,6 +91,7 @@ Stage3 の主要観点をレイヤ別に整理する。
 2. **DTO → Domain 変換を正しく行うこと**
 3. **例外が来たらそのまま呼び出し元に返すこと（例外変換なし）**
 4. **Domain → DTO の変換も正確であること**
+5. **child_order_acceptance_id が空/Null の場合の扱いが仕様どおりであること（例外かそのまま返すかを確認）**
 
 ---
 
@@ -181,4 +185,3 @@ Stage3 の主要観点をレイヤ別に整理する。
 - E2（bitFlyer 独自エラー分類）に備え、DTO 形式の理解は進めておくと良い。
 
 Stage3 テスト観点は、今後の Trading API 全体の自動テスト設計にそのまま流用できるように構成している。
-

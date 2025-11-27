@@ -32,6 +32,39 @@ namespace ExchangeApi.Infrastructure.Protocol
             _serializerOptions = serializerOptions ?? new JsonSerializerOptions(JsonSerializerDefaults.Web);
         }
 
+        private static string? TryParseErrorCode(string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return null;
+            }
+
+            try
+            {
+                using var doc = JsonDocument.Parse(content);
+                var root = doc.RootElement;
+
+                if (root.ValueKind == JsonValueKind.Object)
+                {
+                    if (root.TryGetProperty("error_message", out var msg) && msg.ValueKind == JsonValueKind.String)
+                    {
+                        return msg.GetString();
+                    }
+
+                    if (root.TryGetProperty("error_code", out var code) && code.ValueKind == JsonValueKind.String)
+                    {
+                        return code.GetString();
+                    }
+                }
+            }
+            catch (JsonException)
+            {
+                // ignore parse failures; return null
+            }
+
+            return null;
+        }
+
         public async Task<TResponse> GetAsync<TResponse>(
                     string path,
                     IReadOnlyDictionary<string, string?>? query = null,
@@ -71,11 +104,14 @@ namespace ExchangeApi.Infrastructure.Protocol
                 // ★ HTTP ステータス異常 → ExchangeApiException（E1）
                 if (!response.IsSuccessStatusCode)
                 {
+                    var errorCode = TryParseErrorCode(content);
+
                     throw new ExchangeApiException(
                         $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Body: {content}",
                         exchangeId: null,
                         operation: null,
-                        statusCode: response.StatusCode);
+                        statusCode: response.StatusCode,
+                        exchangeErrorCode: errorCode);
                 }
 
                 try
@@ -161,11 +197,14 @@ namespace ExchangeApi.Infrastructure.Protocol
 
                 if (!response.IsSuccessStatusCode)
                 {
+                    var errorCode = TryParseErrorCode(content);
+
                     throw new ExchangeApiException(
                         $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Body: {content}",
                         exchangeId: null,
                         operation: null,
-                        statusCode: response.StatusCode);
+                        statusCode: response.StatusCode,
+                        exchangeErrorCode: errorCode);
                 }
 
                 try

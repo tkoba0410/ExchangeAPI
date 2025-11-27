@@ -154,6 +154,8 @@ public sealed class BitflyerExchangeClient : IExchangeClient
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
+        ValidateOrderRequest(request);
+
         try
         {
             var dto = new BitflyerSendChildOrderRequest
@@ -174,9 +176,9 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
             return new OrderResult(response.ChildOrderAcceptanceId);
         }
-        catch (ExchangeApiException)
+        catch (ExchangeApiException ex)
         {
-            throw;
+            throw EnrichBitflyerException(ex, "SendOrder");
         }
         catch (Exception ex)
         {
@@ -218,9 +220,9 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
             return new CancelResult(true);
         }
-        catch (ExchangeApiException)
+        catch (ExchangeApiException ex)
         {
-            throw;
+            throw EnrichBitflyerException(ex, "CancelOrder");
         }
         catch (Exception ex)
         {
@@ -255,9 +257,9 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
             return new CancelResult(true);
         }
-        catch (ExchangeApiException)
+        catch (ExchangeApiException ex)
         {
-            throw;
+            throw EnrichBitflyerException(ex, "CancelAllOrders");
         }
         catch (Exception ex)
         {
@@ -292,9 +294,9 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
             return mapped;
         }
-        catch (ExchangeApiException)
+        catch (ExchangeApiException ex)
         {
-            throw;
+            throw EnrichBitflyerException(ex, "GetPositions");
         }
         catch (Exception ex)
         {
@@ -330,9 +332,9 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
             return mapped;
         }
-        catch (ExchangeApiException)
+        catch (ExchangeApiException ex)
         {
-            throw;
+            throw EnrichBitflyerException(ex, "GetExecutions");
         }
         catch (Exception ex)
         {
@@ -360,9 +362,9 @@ public sealed class BitflyerExchangeClient : IExchangeClient
                 RequireCollateral: raw.RequireCollateral,
                 KeepRate: raw.KeepRate);
         }
-        catch (ExchangeApiException)
+        catch (ExchangeApiException ex)
         {
-            throw;
+            throw EnrichBitflyerException(ex, "GetCollateral");
         }
         catch (Exception ex)
         {
@@ -422,6 +424,114 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         return string.Equals(side, "BUY", StringComparison.OrdinalIgnoreCase)
             ? OrderSide.Buy
             : OrderSide.Sell;
+    }
+
+    private static void ValidateOrderRequest(OrderRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.ProductCode))
+        {
+            throw new ArgumentException("ProductCode is required.", nameof(request));
+        }
+
+        if (request.Size <= 0)
+        {
+            throw new ArgumentException("Size must be greater than zero.", nameof(request));
+        }
+
+        if (request.MinuteToExpire is { } mte && mte <= 0)
+        {
+            throw new ArgumentException("MinuteToExpire must be positive when specified.", nameof(request));
+        }
+
+        if (request.Price is { } price && price <= 0)
+        {
+            throw new ArgumentException("Price must be greater than zero when specified.", nameof(request));
+        }
+
+        if (request.TriggerPrice is { } tp && tp <= 0)
+        {
+            throw new ArgumentException("TriggerPrice must be greater than zero when specified.", nameof(request));
+        }
+
+        switch (request.OrderType)
+        {
+            case OrderType.Market:
+                if (request.Price is not null || request.TriggerPrice is not null)
+                {
+                    throw new ArgumentException("Market order must not specify Price or TriggerPrice.", nameof(request));
+                }
+                break;
+            case OrderType.Limit:
+                if (request.Price is null)
+                {
+                    throw new ArgumentException("Limit order requires Price.", nameof(request));
+                }
+                if (request.TriggerPrice is not null)
+                {
+                    throw new ArgumentException("Limit order must not specify TriggerPrice.", nameof(request));
+                }
+                break;
+            case OrderType.Stop:
+                if (request.TriggerPrice is null)
+                {
+                    throw new ArgumentException("Stop order requires TriggerPrice.", nameof(request));
+                }
+                // price is optional（成行ストップ相当）。指定時はストップリミットとして扱う。
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(request.OrderType), request.OrderType, "Unsupported order type.");
+        }
+    }
+
+    private ExchangeApiException EnrichBitflyerException(ExchangeApiException ex, string operation)
+    {
+        if (ex.ExchangeId == _exchangeId && ex.Operation == operation)
+        {
+            return ex;
+        }
+
+        var category = MapErrorCategory(ex.StatusCode, ex.ExchangeErrorCode);
+
+        return new ExchangeApiException(
+            message: ex.Message,
+            exchangeId: _exchangeId,
+            operation: operation,
+            statusCode: ex.StatusCode,
+            exchangeErrorCode: ex.ExchangeErrorCode,
+            errorCategory: category,
+            innerException: ex);
+    }
+
+    private static ExchangeErrorCategory? MapErrorCategory(System.Net.HttpStatusCode? statusCode, string? exchangeCode)
+    {
+        var normalizedCode = string.IsNullOrWhiteSpace(exchangeCode)
+            ? null
+            : exchangeCode.Trim().ToUpperInvariant();
+
+        if (normalizedCode is not null)
+        {
+            return normalizedCode switch
+            {
+                "INSUFFICIENT_FUNDS" => ExchangeErrorCategory.Balance,
+                "INVALID_ORDER" or "INVALID_PRODUCT" or "PRODUCT_NOT_FOUND" => ExchangeErrorCategory.Request,
+                "AUTHENTICATION_ERROR" or "PERMISSION_DENIED" => ExchangeErrorCategory.Auth,
+                "TOO_MANY_REQUESTS" => ExchangeErrorCategory.RateLimit,
+                "SERVICE_UNAVAILABLE" or "INTERNAL_ERROR" => ExchangeErrorCategory.Server,
+                "TIMEOUT" => ExchangeErrorCategory.Network,
+                _ => ExchangeErrorCategory.Unknown,
+            };
+        }
+
+        if (statusCode is null) return null;
+
+        return statusCode.Value switch
+        {
+            System.Net.HttpStatusCode.BadRequest => ExchangeErrorCategory.Request,
+            System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden => ExchangeErrorCategory.Auth,
+            (System.Net.HttpStatusCode)429 => ExchangeErrorCategory.RateLimit,
+            System.Net.HttpStatusCode.InternalServerError or System.Net.HttpStatusCode.ServiceUnavailable => ExchangeErrorCategory.Server,
+            _ => ExchangeErrorCategory.Unknown,
+        };
     }
 
     /// <summary>

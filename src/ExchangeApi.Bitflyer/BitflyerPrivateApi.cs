@@ -84,6 +84,29 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi, IBitflyerPrivateTr
             cancellationToken);
     }
 
+    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
+        string productCode,
+        string? childOrderState = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        const string path = "/v1/me/getchildorders";
+        var query = new Dictionary<string, string?>
+        {
+            ["product_code"] = productCode,
+            ["child_order_state"] = childOrderState,
+        };
+
+        return _restClient.GetAsync<IReadOnlyList<BitflyerChildOrderResponse>>(
+            path,
+            query,
+            cancellationToken);
+    }
+
     public Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(
         BitflyerSendChildOrderRequest request,
         CancellationToken cancellationToken = default)

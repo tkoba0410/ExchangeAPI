@@ -13,17 +13,20 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     private readonly IReadOnlyList<BitflyerPositionResponse> _positions;
     private readonly IReadOnlyList<BitflyerExecutionResponse> _executions;
     private readonly BitflyerCollateralResponse _collateral;
+    private readonly IReadOnlyList<BitflyerChildOrderResponse> _childOrders;
 
     public FakeBitflyerPrivateApi(
         IReadOnlyList<BitflyerBalanceResponse> response,
         IReadOnlyList<BitflyerPositionResponse>? positions = null,
         IReadOnlyList<BitflyerExecutionResponse>? executions = null,
-        BitflyerCollateralResponse? collateral = null)
+        BitflyerCollateralResponse? collateral = null,
+        IReadOnlyList<BitflyerChildOrderResponse>? childOrders = null)
     {
         _response = response;
         _positions = positions ?? Array.Empty<BitflyerPositionResponse>();
         _executions = executions ?? Array.Empty<BitflyerExecutionResponse>();
         _collateral = collateral ?? new BitflyerCollateralResponse();
+        _childOrders = childOrders ?? Array.Empty<BitflyerChildOrderResponse>();
     }
 
     public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(
@@ -38,4 +41,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
 
     public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default)
         => Task.FromResult(_collateral);
+
+    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(string productCode, string? childOrderState = null, CancellationToken cancellationToken = default)
+        => Task.FromResult(_childOrders);
 }

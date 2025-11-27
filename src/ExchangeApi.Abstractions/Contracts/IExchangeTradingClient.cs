@@ -29,12 +29,17 @@ public interface IExchangeTradingClient
     /// <summary>
     /// 建玉一覧を取得する。
     /// </summary>
-    Task<IReadOnlyList<Position>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Position>> ListPositionsAsync(string productCode, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 約定履歴を取得する。
     /// </summary>
-    Task<IReadOnlyList<Execution>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Execution>> ListExecutionsAsync(string productCode, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// オープンな子注文一覧を取得する。
+    /// </summary>
+    Task<IReadOnlyList<OpenOrder>> ListOpenOrdersAsync(string productCode, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 証拠金情報を取得する。

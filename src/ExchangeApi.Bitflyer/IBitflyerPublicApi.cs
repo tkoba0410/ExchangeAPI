@@ -20,5 +20,12 @@ namespace ExchangeApi.Bitflyer
         Task<BitflyerTickerRaw> GetTickerRawAsync(
             string productCode,
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// 板情報の Raw レスポンスを取得します。
+        /// </summary>
+        Task<BitflyerBoardRaw> GetBoardRawAsync(
+            string productCode,
+            CancellationToken cancellationToken = default);
     }
 }

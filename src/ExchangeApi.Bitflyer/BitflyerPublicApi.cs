@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Bitflyer.Models;
@@ -43,6 +44,30 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
             };
 
         return _restClient.GetAsync<BitflyerTickerRaw>(
+            path,
+            query,
+            cancellationToken);
+    }
+
+    /// <summary>
+    /// 生の板情報 JSON を取得し、<see cref="BitflyerBoardRaw"/> にデシリアライズして返す。
+    /// </summary>
+    public Task<BitflyerBoardRaw> GetBoardRawAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+            throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
+
+        const string path = "/v1/getboard";
+
+        IReadOnlyDictionary<string, string?> query =
+            new Dictionary<string, string?>(StringComparer.Ordinal)
+            {
+                ["product_code"] = productCode,
+            };
+
+        return _restClient.GetAsync<BitflyerBoardRaw>(
             path,
             query,
             cancellationToken);

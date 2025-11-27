@@ -103,6 +103,54 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
     #endregion
 
+    #region IExchangeMarketClient (board)
+
+    /// <summary>
+    /// 指定されたシンボルの板情報を取得する。
+    /// </summary>
+    public async Task<Board> GetBoardAsync(
+        string symbol,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var productCode = MapSymbolToProductCode(symbol);
+
+            var rawBoard = await _publicApi
+                .GetBoardRawAsync(productCode, cancellationToken)
+                .ConfigureAwait(false);
+
+            var bids = rawBoard.Bids.Select(b => new BoardEntry(b.Price, b.Size)).ToArray();
+            var asks = rawBoard.Asks.Select(a => new BoardEntry(a.Price, a.Size)).ToArray();
+
+            return new Board(rawBoard.MidPrice, bids, asks);
+        }
+        catch (SymbolNotSupportedException ex)
+        {
+            throw new ExchangeApiException(
+                message: $"Symbol '{ex.Symbol}' is not supported by bitFlyer.",
+                exchangeId: _exchangeId,
+                operation: "GetBoard",
+                statusCode: null,
+                innerException: ex);
+        }
+        catch (ExchangeApiException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer getboard API.",
+                exchangeId: _exchangeId,
+                operation: "GetBoard",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
+    #endregion
+
     #region IExchangeAccountClient (balances)
 
     /// <summary>
@@ -272,7 +320,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         }
     }
 
-    public async Task<IReadOnlyList<Position>> GetPositionsAsync(
+    public async Task<IReadOnlyList<Position>> ListPositionsAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
@@ -296,20 +344,20 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         }
         catch (ExchangeApiException ex)
         {
-            throw EnrichBitflyerException(ex, "GetPositions");
+            throw EnrichBitflyerException(ex, "ListPositions");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getpositions API.",
                 exchangeId: _exchangeId,
-                operation: "GetPositions",
+                operation: "ListPositions",
                 statusCode: null,
                 innerException: ex);
         }
     }
 
-    public async Task<IReadOnlyList<Execution>> GetExecutionsAsync(
+    public async Task<IReadOnlyList<Execution>> ListExecutionsAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
@@ -334,14 +382,58 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         }
         catch (ExchangeApiException ex)
         {
-            throw EnrichBitflyerException(ex, "GetExecutions");
+            throw EnrichBitflyerException(ex, "ListExecutions");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getexecutions API.",
                 exchangeId: _exchangeId,
-                operation: "GetExecutions",
+                operation: "ListExecutions",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
+    public async Task<IReadOnlyList<OpenOrder>> ListOpenOrdersAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        try
+        {
+            var rawOrders = await _privateAccountApi
+                .GetChildOrdersAsync(productCode, childOrderState: "ACTIVE", cancellationToken)
+                .ConfigureAwait(false);
+
+            var mapped = rawOrders.Select(o => new OpenOrder(
+                ProductCode: o.ProductCode,
+                OrderId: o.ChildOrderId,
+                OrderAcceptanceId: o.ChildOrderAcceptanceId,
+                Side: MapSide(o.Side),
+                OrderType: MapOrderTypeFromExchange(o.ChildOrderType),
+                Size: o.Size,
+                OutstandingSize: o.OutstandingSize,
+                ExecutedSize: o.ExecutedSize,
+                Price: o.Price == 0 ? null : o.Price,
+                ClientOrderId: null)).ToArray();
+
+            return mapped;
+        }
+        catch (ExchangeApiException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer getchildorders API.",
+                exchangeId: _exchangeId,
+                operation: "GetOpenOrders",
                 statusCode: null,
                 innerException: ex);
         }
@@ -405,6 +497,17 @@ public sealed class BitflyerExchangeClient : IExchangeClient
             OrderType.Limit => "LIMIT",
             OrderType.Stop => price is null ? "STOP" : "STOP_LIMIT",
             _ => "MARKET",
+        };
+    }
+
+    private static OrderType MapOrderTypeFromExchange(string childOrderType)
+    {
+        return childOrderType.ToUpperInvariant() switch
+        {
+            "LIMIT" => OrderType.Limit,
+            "MARKET" => OrderType.Market,
+            "STOP" or "STOP_LIMIT" => OrderType.Stop,
+            _ => OrderType.Market,
         };
     }
 

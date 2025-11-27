@@ -268,7 +268,7 @@ public sealed record ApiCredentials(string ApiKey, string ApiSecret);
 ---
 
 ## 9. 今後の拡張を見据えた注意点
-- `GetBalanceAsync` のパターンをそのまま `GetCollateralAsync` / `GetPositionsAsync` に転用できるよう、
+- `GetBalanceAsync` のパターンをそのまま `GetCollateralAsync` / `ListPositionsAsync` に転用できるよう、
   命名・構造・責務分担を意識して実装する。
 - 現時点のエラー処理（E1）は暫定であり、Stage3 以降で E2 以上に拡張する可能性があることを念頭に置く。
 - Abstractions / Infrastructure / Bitflyer の境界を崩さないようにし、

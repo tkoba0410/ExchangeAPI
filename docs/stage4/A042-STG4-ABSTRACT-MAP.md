@@ -4,11 +4,13 @@
 
 | 抽象インターフェース / メソッド | 区分 | 対応 bitFlyer API | DTO/Mapping | ステージ | 実装状況 |
 | --- | --- | --- | --- | --- | --- |
+| GetBoardAsync | Public | GET /v1/getboard | BitflyerBoardRaw → Board | Stage1 | 済 |
 | GetTickerAsync | Public | GET /v1/getticker | BitflyerTickerRaw → Ticker | Stage1 | 済 |
 | GetBalancesAsync | Private GET | GET /v1/me/getbalance | BitflyerBalanceResponse → Balance | Stage2 | 済 |
 | GetCollateralAsync | Private GET | GET /v1/me/getcollateral | BitflyerCollateralResponse → Collateral | Stage4 | 済 |
-| GetPositionsAsync | Private GET | GET /v1/me/getpositions | BitflyerPositionResponse → Position | Stage4 | 済 |
-| GetExecutionsAsync | Private GET | GET /v1/me/getexecutions | BitflyerExecutionResponse → Execution | Stage4 | 済 |
+| ListPositionsAsync | Private GET | GET /v1/me/getpositions | BitflyerPositionResponse → Position | Stage4 | 済 |
+| ListExecutionsAsync | Private GET | GET /v1/me/getexecutions | BitflyerExecutionResponse → Execution | Stage4 | 済 |
+| ListOpenOrdersAsync | Private GET | GET /v1/me/getchildorders?child_order_state=ACTIVE | BitflyerChildOrderResponse → OpenOrder | Stage4 | 済 |
 | PlaceOrderAsync | Private POST | POST /v1/me/sendchildorder / （STOP系で親注文を使う場合は sendparentorder） | OrderRequest → BitflyerSendChildOrderRequest（親注文は未設計） | Stage3/4 | 子注文: 済（MARKET/LIMIT/STOP/STOP_LIMIT） / 親注文: 未 |
 | CancelOrderAsync | Private POST | POST /v1/me/cancelchildorder | BitflyerCancelChildOrderRequest | Stage4 | 済 |
 | CancelAllOrdersAsync | Private POST | POST /v1/me/cancelallchildorders | BitflyerCancelAllChildOrdersRequest | Stage4 | 済 |

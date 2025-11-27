@@ -24,4 +24,9 @@ public interface IBitflyerPrivateApi
 
     Task<BitflyerCollateralResponse> GetCollateralAsync(
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
+        string productCode,
+        string? childOrderState = null,
+        CancellationToken cancellationToken = default);
 }

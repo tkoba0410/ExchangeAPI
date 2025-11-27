@@ -105,7 +105,7 @@ Abstractions 層は **取引所固有の仕様を一切含まず、純粋なド�
 #### ■ 役割ベースのインターフェース
 - `IBitflyerPrivateApi`（Account 系）
   - `GetBalancesAsync()`（Stage2）
-  - 将来：`GetCollateralAsync()`, `GetPositionsAsync()`
+  - 将来：`GetCollateralAsync()`, `ListPositionsAsync()`
 
 - `IBitflyerPrivateTradingApi`（Trading 系）
   - `SendChildOrderAsync()`（Stage3）

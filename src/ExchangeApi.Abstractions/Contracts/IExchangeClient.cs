@@ -28,4 +28,11 @@ public interface IExchangeClient : IExchangeAccountClient, IExchangeTradingClien
     Task<Ticker> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 板情報を取得する。
+    /// </summary>
+    Task<Board> GetBoardAsync(
+        string symbol,
+        CancellationToken cancellationToken = default);
 }

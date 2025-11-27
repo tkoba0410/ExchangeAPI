@@ -34,7 +34,8 @@ namespace ExchangeApi.Bitflyer.Tests
 
             var fakeApi = new FakeBitflyerPublicApi(raw);
             var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
-            var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi);
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             // Act
             var ticker = await client.GetTickerAsync(Symbols.BtcJpy);
@@ -68,7 +69,8 @@ namespace ExchangeApi.Bitflyer.Tests
 
             var fakeApi = new FakeBitflyerPublicApi(raw);
             var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
-            var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi);
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             var ex = await Assert.ThrowsAsync<ExchangeApiException>(async () =>
                 await client.GetTickerAsync("ETH/JPY"));

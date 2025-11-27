@@ -31,11 +31,11 @@ ExchangeApi.Orchestration（Credential Provider）
    └─ Provider 実装（Environment / Windows / Composite など）
 
 ExchangeApi.Bitflyer (Private API)
-   ├─ IBitflyerPrivateAccountApi（Stage2/今後：balance, collateral, positions）
-   ├─ IBitflyerPrivateTradingApi（Stage3：sendchildorder）
+   ├─ IBitflyerPrivateApi（Account 系: balance など）
+   ├─ IBitflyerPrivateTradingApi（Trading 系: sendchildorder）
    ├─ DTO: BitflyerBalanceResponse（既存）
    ├─ DTO: BitflyerSendChildOrderRequest / Response（Stage3）
-   └─ BitflyerPrivateApi（Account + Trading の両方を実装）
+   └─ BitflyerPrivateApi（Account + Trading の両方を単一クラスで実装）
 
 ExchangeApi.Bitflyer (Adapter)
    └─ BitflyerExchangeClient : IExchangeClient
@@ -103,11 +103,11 @@ Abstractions 層は **取引所固有の仕様を一切含まず、純粋なド�
 
 ### 3.4 ExchangeApi.Bitflyer.Private（Private API 層）
 #### ■ 役割ベースのインターフェース
-- `IBitflyerPrivateAccountApi`
+- `IBitflyerPrivateApi`（Account 系）
   - `GetBalancesAsync()`（Stage2）
   - 将来：`GetCollateralAsync()`, `GetPositionsAsync()`
 
-- `IBitflyerPrivateTradingApi`
+- `IBitflyerPrivateTradingApi`（Trading 系）
   - `SendChildOrderAsync()`（Stage3）
   - 将来：`CancelChildOrderAsync()` など
 
@@ -117,7 +117,7 @@ Abstractions 層は **取引所固有の仕様を一切含まず、純粋なド�
 - Stage3 の `BitflyerSendChildOrderResponse`
 
 #### ■ BitflyerPrivateApi（実装クラス）
-- Account と Trading の両インターフェースを実装
+- Account (`IBitflyerPrivateApi`) と Trading (`IBitflyerPrivateTradingApi`) の両インターフェースを単一クラスで実装
 - RestClient の GET / POST を呼び出すだけに徹し、**変換ロジックや例外処理ロジックは持たない**
 - Private API 層は「bitFlyer の HTTP API を忠実に呼び出すこと」だけが責務
 
@@ -173,4 +173,3 @@ Stage3 で Trading 縦スライスを確立したことで、以下の拡張が�
 
 Stage3 は「最小の MARKET 注文が end-to-end で通る Trading 基盤を確立するステージ」であり、
 以降の Trading API 拡張のすべての雛形となる。
-

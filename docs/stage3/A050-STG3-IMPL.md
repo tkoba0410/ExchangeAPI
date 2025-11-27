@@ -210,18 +210,20 @@ public static class BitflyerClientFactory
         IExchangeClock clock = new SystemClock();
         IRequestSigner signer = new BitflyerRequestSigner(apiKey, apiSecret, clock);
 
-        IRestClient rest = new RestClient(BitflyerApiBaseUri, httpClient, signer);
+        IHttpTransport baseTransport = new HttpTransport(httpClient, disposeHttpClient: true);
+        IHttpTransport signingTransport = new BitflyerSigningTransport(baseTransport, signer);
+        IRestClient rest = new RestClient(BitflyerApiBaseUri, signingTransport);
 
         var privateApi = new BitflyerPrivateApi(rest);
         var publicApi = new BitflyerPublicApi(rest);
 
-        return new BitflyerExchangeClient(publicApi, privateApi);
+        return new BitflyerExchangeClient(publicApi, privateApi, privateApi);
     }
 }
 ```
 ポイント：
 - Stage2 の構成をほぼそのまま流用。
-- RestClient が GET/POST を両対応すれば PrivateApi は拡張不要。
+- HttpTransport → SigningTransport → RestClient の経路で署名を適用し、RestClient は送受信 + JSON に専念させる。
 - public/private の両 API に同じ RestClient を使う（署名は signer が判断）。
 
 ---

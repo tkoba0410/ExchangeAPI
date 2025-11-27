@@ -6,12 +6,9 @@ namespace ExchangeApi.Abstractions.Contracts;
 
 /// <summary>
 /// 取引所共通インターフェース。
-/// Stage1 では Ticker 取得のみを対象とする。
-/// 
-/// ExchangeId / AccountId は Stage2 以降（Multi-Exchange / Multi-Account）で使用される
-/// 拡張用プロパティであり、Stage1 では利用しない。
+/// Stage1: Ticker、Stage2: 残高、Stage3: 発注（MARKET）。
 /// </summary>
-public interface IExchangeClient : IExchangeAccountClient
+public interface IExchangeClient : IExchangeAccountClient, IExchangeTradingClient
 {
     /// <summary>
     /// 取引所識別子。

@@ -17,7 +17,8 @@ namespace ExchangeApi.Bitflyer;
 public sealed class BitflyerExchangeClient : IExchangeClient
 {
     private readonly IBitflyerPublicApi _publicApi;
-    private readonly IBitflyerPrivateApi _privateApi;
+    private readonly IBitflyerPrivateApi _privateAccountApi;
+    private readonly IBitflyerPrivateTradingApi _privateTradingApi;
     private readonly string _exchangeId;
     private readonly string _accountId;
 
@@ -33,19 +34,22 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
-        IBitflyerPrivateApi privateApi)
-        : this(publicApi, privateApi, exchangeId: "bitFlyer", accountId: "default")
+        IBitflyerPrivateApi privateAccountApi,
+        IBitflyerPrivateTradingApi privateTradingApi)
+        : this(publicApi, privateAccountApi, privateTradingApi, exchangeId: "bitFlyer", accountId: "default")
     {
     }
 
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
-        IBitflyerPrivateApi privateApi,
+        IBitflyerPrivateApi privateAccountApi,
+        IBitflyerPrivateTradingApi privateTradingApi,
         string exchangeId,
         string accountId)
     {
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
-        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
+        _privateAccountApi = privateAccountApi ?? throw new ArgumentNullException(nameof(privateAccountApi));
+        _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
         _exchangeId = exchangeId ?? throw new ArgumentNullException(nameof(exchangeId));
         _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
@@ -110,7 +114,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
     {
         try
         {
-            var rawBalances = await _privateApi
+            var rawBalances = await _privateAccountApi
                 .GetBalancesAsync(cancellationToken)
                 .ConfigureAwait(false);
 
@@ -135,6 +139,47 @@ public sealed class BitflyerExchangeClient : IExchangeClient
                 message: "Failed to call bitFlyer getbalance API.",
                 exchangeId: _exchangeId,
                 operation: "GetBalances",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
+    #endregion
+
+    #region IExchangeTradingClient (send order)
+
+    public async Task<OrderResult> SendOrderAsync(
+        OrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        try
+        {
+            var dto = new BitflyerSendChildOrderRequest
+            {
+                ProductCode = request.ProductCode,
+                Side = request.Side == OrderSide.Buy ? "BUY" : "SELL",
+                ChildOrderType = "MARKET",
+                Size = request.Size,
+            };
+
+            var response = await _privateTradingApi
+                .SendChildOrderAsync(dto, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new OrderResult(response.ChildOrderAcceptanceId);
+        }
+        catch (ExchangeApiException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer sendchildorder API.",
+                exchangeId: _exchangeId,
+                operation: "SendOrder",
                 statusCode: null,
                 innerException: ex);
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -114,6 +115,90 @@ namespace ExchangeApi.Infrastructure.Protocol
             catch (TaskCanceledException ex)
             {
                 // ★ タイムアウト or キャンセル → ExchangeApiException
+                throw new ExchangeApiException(
+                    "HTTP request timed out or was canceled.",
+                    innerException: ex);
+            }
+        }
+
+        public async Task<TResponse> PostAsync<TRequest, TResponse>(
+            string path,
+            TRequest body,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path must not be null or whitespace.", nameof(path));
+            }
+
+            var requestUri = BuildUri(path, query: null);
+            var json = JsonSerializer.Serialize(body, _serializerOptions);
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+            };
+
+            if (!request.Headers.UserAgent.Any())
+            {
+                request.Headers.UserAgent.Add(DefaultUserAgent);
+            }
+
+            if (!request.Headers.Accept.Any())
+            {
+                request.Headers.Accept.Add(JsonMediaType);
+            }
+
+            try
+            {
+                using var response = await _transport
+                    .SendAsync(request, cancellationToken)
+                    .ConfigureAwait(false);
+
+                var content = response.Content is null
+                    ? string.Empty
+                    : await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new ExchangeApiException(
+                        $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Body: {content}",
+                        exchangeId: null,
+                        operation: null,
+                        statusCode: response.StatusCode);
+                }
+
+                try
+                {
+                    var result = JsonSerializer.Deserialize<TResponse>(content, _serializerOptions);
+                    if (result is null)
+                    {
+                        throw new ExchangeApiException(
+                            $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
+                    }
+
+                    return result;
+                }
+                catch (JsonException ex)
+                {
+                    throw new ExchangeApiException(
+                        "Failed to deserialize JSON response.",
+                        innerException: ex);
+                }
+            }
+            catch (ExchangeApiException)
+            {
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new ExchangeApiException(
+                    $"HTTP request failed for '{requestUri}'.",
+                    statusCode: ex.StatusCode,
+                    innerException: ex);
+            }
+            catch (TaskCanceledException ex)
+            {
                 throw new ExchangeApiException(
                     "HTTP request timed out or was canceled.",
                     innerException: ex);

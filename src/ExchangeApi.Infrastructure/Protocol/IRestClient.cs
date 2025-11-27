@@ -22,4 +22,13 @@ public interface IRestClient
         string path,
         IReadOnlyDictionary<string, string?>? query = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 指定されたパスに対して HTTP POST を実行し、
+    /// JSON レスポンスを <typeparamref name="TResponse"/> にデシリアライズする。
+    /// </summary>
+    Task<TResponse> PostAsync<TRequest, TResponse>(
+        string path,
+        TRequest body,
+        CancellationToken cancellationToken = default);
 }

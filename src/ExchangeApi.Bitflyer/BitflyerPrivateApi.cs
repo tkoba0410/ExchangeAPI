@@ -10,7 +10,7 @@ namespace ExchangeApi.Bitflyer;
 /// <summary>
 /// bitFlyer Private REST API の実装。
 /// </summary>
-public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
+public sealed class BitflyerPrivateApi : IBitflyerPrivateApi, IBitflyerPrivateTradingApi
 {
     private readonly IRestClient _restClient;
 
@@ -28,6 +28,20 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         return _restClient.GetAsync<IReadOnlyList<BitflyerBalanceResponse>>(
             path,
             query: null,
+            cancellationToken);
+    }
+
+    public Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(
+        BitflyerSendChildOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        const string path = "/v1/me/sendchildorder";
+
+        return _restClient.PostAsync<BitflyerSendChildOrderRequest, BitflyerSendChildOrderResponse>(
+            path,
+            request,
             cancellationToken);
     }
 }

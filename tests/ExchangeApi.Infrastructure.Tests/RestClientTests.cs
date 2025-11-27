@@ -160,6 +160,56 @@ public sealed class RestClientTests
         Assert.IsType<JsonException>(ex.InnerException);
     }
 
+    [Fact]
+    public async Task PostAsync_SerializesBodyAndUsesPostMethod()
+    {
+        var transport = new FakeTransport();
+        var rest = new RestClient(new Uri("https://example.com"), transport);
+
+        var body = new TestDto("req");
+
+        var result = await rest.PostAsync<TestDto, TestDto>("/api", body);
+
+        Assert.Equal("ok", result.Value);
+        Assert.Equal(HttpMethod.Post, transport.LastRequest!.Method);
+        Assert.Contains("\"value\":\"req\"", transport.LastRequestContent);
+    }
+
+    [Fact]
+    public async Task PostAsync_HttpErrorStatus_IsWrappedWithStatusCode()
+    {
+        var transport = new FakeTransport
+        {
+            ResponseFactory = () => new HttpResponseMessage(HttpStatusCode.BadRequest)
+            {
+                Content = new StringContent("bad", Encoding.UTF8, "application/json")
+            }
+        };
+        var rest = new RestClient(new Uri("https://example.com"), transport);
+
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
+            rest.PostAsync<TestDto, TestDto>("/api", new TestDto("x")));
+
+        Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
+    }
+
+    [Fact]
+    public async Task PostAsync_InvalidJson_ThrowsExchangeApiException()
+    {
+        var transport = new FakeTransport
+        {
+            ResponseFactory = () => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("not json", Encoding.UTF8, "application/json")
+            }
+        };
+        var rest = new RestClient(new Uri("https://example.com"), transport);
+
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
+            rest.PostAsync<TestDto, TestDto>("/api", new TestDto("x")));
+
+        Assert.IsType<JsonException>(ex.InnerException);
+    }
 
 
 
@@ -197,11 +247,15 @@ public sealed class RestClientTests
     private sealed class FakeTransport : IHttpTransport
     {
         public HttpRequestMessage? LastRequest { get; private set; }
+        public string LastRequestContent { get; private set; } = string.Empty;
         public Func<HttpResponseMessage>? ResponseFactory { get; set; }
 
         public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
             LastRequest = request;
+            LastRequestContent = request.Content is null
+                ? string.Empty
+                : request.Content.ReadAsStringAsync(cancellationToken).GetAwaiter().GetResult();
             var response = ResponseFactory?.Invoke()
                 ?? new HttpResponseMessage(HttpStatusCode.OK)
                 {

@@ -1,0 +1,12 @@
+using System.Text.Json.Serialization;
+
+namespace ExchangeApi.Bitflyer.Models;
+
+/// <summary>
+/// /v1/me/sendchildorder のレスポンス DTO。
+/// </summary>
+public sealed class BitflyerSendChildOrderResponse
+{
+    [JsonPropertyName("child_order_acceptance_id")] public string ChildOrderAcceptanceId { get; init; } = string.Empty;
+}
+

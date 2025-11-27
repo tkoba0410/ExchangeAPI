@@ -160,6 +160,21 @@ public sealed class RestClientTests
         Assert.IsType<JsonException>(ex.InnerException);
     }
 
+    [Fact]
+    public async Task PostAsync_SerializesBodyAndUsesPostMethod()
+    {
+        var transport = new FakeTransport();
+        var rest = new RestClient(new Uri("https://example.com"), transport);
+
+        var body = new TestDto("req");
+
+        var result = await rest.PostAsync<TestDto, TestDto>("/api", body);
+
+        Assert.Equal("ok", result.Value);
+        Assert.Equal(HttpMethod.Post, transport.LastRequest!.Method);
+        var sentBody = await transport.LastRequest!.Content!.ReadAsStringAsync();
+        Assert.Contains("\"Value\":\"req\"", sentBody);
+    }
 
 
 

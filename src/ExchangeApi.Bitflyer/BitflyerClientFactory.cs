@@ -49,7 +49,7 @@ public static class BitflyerClientFactory
         var publicApi = new BitflyerPublicApi(restClient);
         var privateApi = new BitflyerPrivateApi(restClient);
 
-        return new BitflyerExchangeClient(publicApi, privateApi);
+        return new BitflyerExchangeClient(publicApi, privateApi, privateApi);
     }
 
     /// <summary>

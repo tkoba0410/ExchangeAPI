@@ -6,7 +6,7 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Board | GetBoardAsync | Public | HTTP | GET | /v1/getboard | Stage1 | 済 |
 | Ticker | GetTickerAsync | Public | HTTP | GET | /v1/getticker | Stage1 | 済 |
-| Candlestick[] | ListCandlesticksAsync | Public | HTTP | GET | bitbank（参考） `/v1/candlestick/{pair}/{timescale}` | Stage5 | 未実装 |
+| Candlestick[] | ListCandlesticksAsync | Public | HTTP | GET | bitbank（参考） `/v1/candlestick/{pair}/{timescale}` ※bitFlyerは公式OHLCVなし（未サポート時は例外で通知） | Stage5 | 未実装 |
 | Balance[] | GetBalancesAsync | Private | HTTP | GET | /v1/me/getbalance | Stage2 | 済 |
 | Collateral | GetCollateralAsync | Private | HTTP | GET | /v1/me/getcollateral | Stage4 | 済 |
 | Position[] | ListPositionsAsync | Private | HTTP | GET | /v1/me/getpositions | Stage4 | 済 |

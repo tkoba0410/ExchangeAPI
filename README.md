@@ -1,24 +1,24 @@
 # ExchangeApi
 
 ExchangeApi は、複数の暗号資産取引所向けに統一インターフェースを提供する C#/.NET ライブラリです。  
-Stage1 では **bitFlyer Public REST API /v1/getticker による Ticker 取得** のみに対応します。
+Stage4 時点で **bitFlyer の Public/Private REST** に対応し、以下を提供します。
 
-- 統一 DTO（Ticker）
-- 抽象クライアント（IExchangeClient）
-- REST/Transport 分離
-- 取引所ごとの Adapter 実装（Stage1 は bitFlyer）
+- Ticker/Board
+- 残高・証拠金
+- 発注（MARKET/LIMIT/STOP/STOP_LIMIT）、キャンセル/全キャンセル
+- オープン注文・約定・ポジション一覧
 
-この構造により、Stage2 以降の拡張（Private REST / 認証 / WebSocket / 複数取引所統合）が容易になります。
+詳しい使い方は Quick Start / Entry Guide を参照してください。
 
 ---
 
-## 🏗 プロジェクト構成（Stage1）
+## 🏗 プロジェクト構成（Stage4 時点）
 
 ```
 ExchangeApi.Abstractions      ← 仕様（Boundary）
 ExchangeApi.Infrastructure    ← REST / HTTP Transport（共通）
-ExchangeApi.Bitflyer          ← bitFlyer Adapter（Raw → Ticker）
-ExchangeApi.Orchestration     ← Stage2 で実装予定（現状は空）
+ExchangeApi.Bitflyer          ← bitFlyer Adapter（Raw → DTO マッピング）
+ExchangeApi.Orchestration     ← 将来の複数取引所統合用（最小構成）
 ```
 
 依存方向は必ず以下を守ります：
@@ -30,6 +30,8 @@ Abstractions  ←  Infrastructure  ←  Bitflyer
 ---
 
 ## 📦 インストール（ローカル）
+
+前提: .NET 10 以降がインストールされていること。
 
 リポジトリを clone します：
 
@@ -98,22 +100,13 @@ Console.WriteLine($"Time: {ticker.Timestamp:O}");
 
 ---
 
-## 🎯 Stage1 の仕様（概要）
+## 🎯 Stage4 の概要
 
-- サポート取引所：bitFlyer（Public）
-- サポート API：`GET /v1/getticker`
-- サポートシンボル：`BTC/JPY`
-- DTO：`Ticker`
-  - `Symbol`  
-  - `BestBid`  
-  - `BestAsk`  
-  - `LastTradedPrice`  
-  - `Timestamp` (`DateTimeOffset`)
-- 例外ポリシー  
-  - 未対応シンボル → `SymbolNotSupportedException`  
-  - REST/HTTP エラー → `ExchangeApiException`
-
-詳細は `/docs/A020`（要求）および `/docs/A040`（実装仕様）を参照してください。
+- 取引所: bitFlyer
+- Public: `GET /v1/getticker`, `GET /v1/getboard`
+- Private: 残高/証拠金/ポジション/約定/オープン注文、`sendchildorder`, `cancelchildorder`, `cancelallchildorders`
+- DTO: `Ticker`, `Board`, `Balance`, `Collateral`, `Position`, `Execution`, `OpenOrder`, `OrderRequest/Result`
+- 例外: `SymbolNotSupportedException`（シンボル未対応）、`ExchangeApiException`（HTTP/取引所エラー）
 
 ---
 
@@ -134,17 +127,12 @@ tests/
 
 ---
 
-## 🧱 Stage2 への拡張予定
-
-Stage1 の構造は、次の拡張を前提に設計されています：
-
-- 私設 REST API（認証）
-- WebSocket Ticker / Board
-- 複数取引所の Orchestration 層
-- マーケットデータ統合
-- リトライ・レート制限・メトリクス（OpenTelemetry）
-
-これらは Stage2 文書（S2xx 系）で定義予定です。
+## 🔗 参考ドキュメント
+- Quick Start: `docs/quickstart.md`
+- Entry Guide: `docs/entry-guide.md`
+- 抽象 API 対応表: `docs/stage4/A042-STG4-ABSTRACT-MAP.md`
+- DTO マッピング（Ticker 例）: `docs/stage4/DTO-Ticker-MAP.md`
+- Stage 概要: `docs/STAGES-OVERVIEW.md`
 
 ---
 

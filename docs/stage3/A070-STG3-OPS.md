@@ -75,6 +75,7 @@ var order = new OrderRequest(
 var result = await client.SendOrderAsync(order);
 Console.WriteLine($"OrderId: {result.OrderId}");
 ```
+- **検証は必ず小額で実施**し、本番とテスト口座を `exchangeId` / `accountId` で切り替えられる運用にする。
 
 ---
 
@@ -168,6 +169,7 @@ Stage3 の POST は署名差異が起きやすい。以下を確認する。
 - 本番口座とテスト口座を `exchangeId` / `accountId` で切り替えられるよう運用設計
 - CredentialProvider の動作ログを DEBUG で確認できると便利
 - 事前に GetBalancesAsync で残高を確認してから注文する習慣を持つと安全
+- 初回検証は必ず少額で行い、注文後に bitFlyer 管理画面で結果を確認する
 
 ---
 

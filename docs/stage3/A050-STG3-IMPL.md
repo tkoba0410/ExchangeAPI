@@ -193,7 +193,7 @@ public async Task<OrderResult> SendOrderAsync(OrderRequest request, Cancellation
 注意点：
 - Adapter は **DTO ⇄ Domain の変換のみ** を担当し、POST の構造や署名には関与しない。
 - `ConfigureAwait(false)` はライブラリとして推奨（UI スレッドを意識しないため）。
-- 値の検証（size <= 0 とか）は Stage3 では行わない（将来拡張）。
+- 入力バリデーション（size > 0 等）は Stage3 では行わず、呼び出し側または将来ステージで扱う方針とする（ドキュメントとコードで一致させて迷いを防ぐ）。
 
 ---
 
@@ -228,11 +228,12 @@ public static class BitflyerClientFactory
 
 ---
 
-## 8. ログ / デバッグ方針（Stage3）
+## 8. ログ / タイムアウト / デバッグ方針（Stage3）
 
 ### 8.1 基本方針
 - ログは **RestClient** に集約する（Adapter や PrivateApi に残さない）。
-- 機密情報（API キー・署名・body）を直接ログに出さない。
+- 機密情報（API キー・署名・body）はログに出さない。必要な場合はマスクする。
+- タイムアウトは HttpClient/Transport 層に設定し、`ExchangeApiException` へ統一的に変換する。
 
 ### 8.2 最低限ログ出すと便利な情報（実装者向け）
 - 呼び出しパス（`/v1/me/sendchildorder`）

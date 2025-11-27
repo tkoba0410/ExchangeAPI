@@ -12,5 +12,12 @@ public interface IBitflyerPrivateTradingApi
     Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(
         BitflyerSendChildOrderRequest request,
         CancellationToken cancellationToken = default);
-}
 
+    Task<BitflyerEmptyResponse> CancelChildOrderAsync(
+        BitflyerCancelChildOrderRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(
+        BitflyerCancelAllChildOrdersRequest request,
+        CancellationToken cancellationToken = default);
+}

@@ -6,7 +6,7 @@ namespace ExchangeApi.Abstractions.Contracts;
 
 /// <summary>
 /// 取引所共通インターフェース。
-/// Stage1: Ticker、Stage2: 残高、Stage3: 発注（MARKET）。
+/// Stage1: Ticker、Stage2: 残高、Stage3: 発注（MARKET）、Stage4: 注文拡張/キャンセル/ポジション系。
 /// </summary>
 public interface IExchangeClient : IExchangeAccountClient, IExchangeTradingClient
 {

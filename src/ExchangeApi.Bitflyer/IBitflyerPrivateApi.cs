@@ -13,4 +13,15 @@ public interface IBitflyerPrivateApi
 {
     Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(
+        string productCode,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(
+        string productCode,
+        CancellationToken cancellationToken = default);
+
+    Task<BitflyerCollateralResponse> GetCollateralAsync(
+        CancellationToken cancellationToken = default);
 }

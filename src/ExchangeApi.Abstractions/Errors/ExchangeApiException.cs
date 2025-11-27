@@ -26,6 +26,16 @@ public class ExchangeApiException : Exception
     public HttpStatusCode? StatusCode { get; }
 
     /// <summary>
+    /// 取引所が返す固有コード（存在する場合）。
+    /// </summary>
+    public string? ExchangeErrorCode { get; }
+
+    /// <summary>
+    /// 固有コードのカテゴリ。
+    /// </summary>
+    public ExchangeErrorCategory? ErrorCategory { get; }
+
+    /// <summary>
     /// 共通のコンストラクタ。
     /// </summary>
     public ExchangeApiException(
@@ -33,19 +43,23 @@ public class ExchangeApiException : Exception
         string? exchangeId = null,
         string? operation = null,
         HttpStatusCode? statusCode = null,
+        string? exchangeErrorCode = null,
+        ExchangeErrorCategory? errorCategory = null,
         Exception? innerException = null)
         : base(message, innerException)
     {
         ExchangeId = exchangeId;
         Operation = operation;
         StatusCode = statusCode;
+        ExchangeErrorCode = exchangeErrorCode;
+        ErrorCategory = errorCategory;
     }
 
     /// <summary>
     /// 従来互換用のコンストラクタ（メッセージのみ）。
     /// </summary>
     public ExchangeApiException(string message)
-        : this(message, null, null, null, null)
+        : this(message, null, null, null, null, null, null)
     {
     }
 
@@ -53,7 +67,7 @@ public class ExchangeApiException : Exception
     /// 従来互換用のコンストラクタ（メッセージ + 内部例外）。
     /// </summary>
     public ExchangeApiException(string message, Exception innerException)
-        : this(message, null, null, null, innerException)
+        : this(message, null, null, null, null, null, innerException)
     {
     }
 }

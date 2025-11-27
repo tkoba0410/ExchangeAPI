@@ -7,5 +7,6 @@ namespace ExchangeApi.Abstractions.Dtos;
 public enum OrderType
 {
     Market,
+    Limit,
+    Stop,
 }
-

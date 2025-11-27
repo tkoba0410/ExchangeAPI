@@ -160,8 +160,12 @@ public sealed class BitflyerExchangeClient : IExchangeClient
             {
                 ProductCode = request.ProductCode,
                 Side = request.Side == OrderSide.Buy ? "BUY" : "SELL",
-                ChildOrderType = "MARKET",
+                ChildOrderType = MapOrderType(request.OrderType),
                 Size = request.Size,
+                Price = request.Price,
+                TriggerPrice = request.TriggerPrice,
+                MinuteToExpire = request.MinuteToExpire,
+                TimeInForce = MapTimeInForce(request.TimeInForce),
             };
 
             var response = await _privateTradingApi
@@ -185,6 +189,192 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         }
     }
 
+    public async Task<CancelResult> CancelOrderAsync(
+        string productCode,
+        string childOrderAcceptanceId,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        if (string.IsNullOrWhiteSpace(childOrderAcceptanceId))
+        {
+            throw new ArgumentException("childOrderAcceptanceId is required.", nameof(childOrderAcceptanceId));
+        }
+
+        try
+        {
+            var dto = new BitflyerCancelChildOrderRequest
+            {
+                ProductCode = productCode,
+                ChildOrderAcceptanceId = childOrderAcceptanceId,
+            };
+
+            _ = await _privateTradingApi
+                .CancelChildOrderAsync(dto, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new CancelResult(true);
+        }
+        catch (ExchangeApiException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer cancelchildorder API.",
+                exchangeId: _exchangeId,
+                operation: "CancelOrder",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
+    public async Task<CancelResult> CancelAllOrdersAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        try
+        {
+            var dto = new BitflyerCancelAllChildOrdersRequest
+            {
+                ProductCode = productCode,
+            };
+
+            _ = await _privateTradingApi
+                .CancelAllChildOrdersAsync(dto, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new CancelResult(true);
+        }
+        catch (ExchangeApiException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer cancelallchildorders API.",
+                exchangeId: _exchangeId,
+                operation: "CancelAllOrders",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
+    public async Task<IReadOnlyList<Position>> GetPositionsAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var raw = await _privateAccountApi
+                .GetPositionsAsync(productCode, cancellationToken)
+                .ConfigureAwait(false);
+
+            var mapped = raw
+                .Select(p => new Position(
+                    ProductCode: p.ProductCode,
+                    Side: MapSide(p.Side),
+                    Size: p.Size,
+                    Price: p.Price,
+                    OpenDate: p.OpenDate,
+                    Pnl: p.Pnl))
+                .ToArray();
+
+            return mapped;
+        }
+        catch (ExchangeApiException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer getpositions API.",
+                exchangeId: _exchangeId,
+                operation: "GetPositions",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
+    public async Task<IReadOnlyList<Execution>> GetExecutionsAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var raw = await _privateAccountApi
+                .GetExecutionsAsync(productCode, cancellationToken)
+                .ConfigureAwait(false);
+
+            var mapped = raw
+                .Select(e => new Execution(
+                    ProductCode: e.ProductCode,
+                    Id: e.Id,
+                    Side: MapSide(e.Side),
+                    Price: e.Price,
+                    Size: e.Size,
+                    ExecutedAt: e.ExecDate,
+                    ChildOrderAcceptanceId: e.ChildOrderAcceptanceId))
+                .ToArray();
+
+            return mapped;
+        }
+        catch (ExchangeApiException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer getexecutions API.",
+                exchangeId: _exchangeId,
+                operation: "GetExecutions",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
+    public async Task<Collateral> GetCollateralAsync(
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var raw = await _privateAccountApi
+                .GetCollateralAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            return new Collateral(
+                Amount: raw.Collateral,
+                OpenPositionPnl: raw.OpenPositionPnl,
+                RequireCollateral: raw.RequireCollateral,
+                KeepRate: raw.KeepRate);
+        }
+        catch (ExchangeApiException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer getcollateral API.",
+                exchangeId: _exchangeId,
+                operation: "GetCollateral",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
     #endregion
 
     #region private mapping helpers
@@ -203,6 +393,35 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
         // Stage1/2 では BTC/JPY 以外はサポートしない
         throw new SymbolNotSupportedException(symbol);
+    }
+
+    private static string MapOrderType(OrderType orderType)
+    {
+        return orderType switch
+        {
+            OrderType.Market => "MARKET",
+            OrderType.Limit => "LIMIT",
+            OrderType.Stop => "STOP",
+            _ => "MARKET",
+        };
+    }
+
+    private static string? MapTimeInForce(TimeInForce? tif)
+    {
+        return tif switch
+        {
+            TimeInForce.Gtc => "GTC",
+            TimeInForce.Ioc => "IOC",
+            TimeInForce.Fok => "FOK",
+            _ => null,
+        };
+    }
+
+    private static OrderSide MapSide(string side)
+    {
+        return string.Equals(side, "BUY", StringComparison.OrdinalIgnoreCase)
+            ? OrderSide.Buy
+            : OrderSide.Sell;
     }
 
     /// <summary>

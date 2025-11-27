@@ -19,12 +19,12 @@ Stage2（get balance）は、bitFlyer Private API の最初の実装ステージ
   - HttpClient / 署名 / JSON / 例外処理を管理する技術レイヤ。
   - bitFlyer 固有の API パスや DTO を知らない。
 
-- **Bitflyer.Raw**
+- **Bitflyer.Private**
   - bitFlyer 固有のパス・レスポンス構造を扱う層。
-  - `/v1/me/getbalance` の呼び出しと、`BalanceResponse` の定義に専念する。
+  - `/v1/me/getbalance` の呼び出しと、`BitflyerBalanceResponse` の定義に専念する。
 
 - **Bitflyer.Adapter (ExchangeClient)**
-  - Raw DTO → ドメインの変換と、`IExchangeAccountClient` 実装に徹する。
+  - Private API DTO → ドメインの変換と、`IExchangeAccountClient` 実装に徹する。
 
 ### 2.2 「Private GET テンプレート」として実装する
 - get balance の実装は、今後の以下 API のテンプレートとなることを意識する：
@@ -105,89 +105,87 @@ public sealed class ExchangeApiException : Exception
     }
 }
 ```
-- エラー判定のロジックは RestClient に集約し、Raw / Adapter 層での HTTP 判定は行わない。
+- エラー判定のロジックは RestClient に集約し、Private API / Adapter 層での HTTP 判定は行わない。
 
 ---
 
-## 5. Bitflyer.Raw 実装ノート
+## 5. Bitflyer Private API 実装ノート
 
 ### 5.1 DTO 定義
 ```csharp
-public sealed class BalanceResponse
+public sealed class BitflyerBalanceResponse
 {
-    public string CurrencyCode { get; set; } = string.Empty;
-    public decimal Amount { get; set; }
-    public decimal Available { get; set; }
+    [JsonPropertyName("currency_code")]
+    public string CurrencyCode { get; init; } = string.Empty;
+
+    [JsonPropertyName("amount")]
+    public decimal Amount { get; init; }
+
+    [JsonPropertyName("available")]
+    public decimal Available { get; init; }
 }
 ```
-- プロパティ名は C# の命名規約に合わせてパスカルケースで定義し、
-  JSON 属性名（`currency_code`）とのマッピングは `JsonPropertyName` 属性などで行う（必要に応じて）。
+- JSON 属性名は `JsonPropertyName` で指定し、bitFlyer の生レスポンスを忠実に表現する。
 
-### 5.2 IBitflyerRawApiClient / 実装
+### 5.2 IBitflyerPrivateApi / 実装
 ```csharp
-public interface IBitflyerRawApiClient
+public interface IBitflyerPrivateApi
 {
-    Task<IReadOnlyList<BalanceResponse>> GetBalanceAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken ct = default);
 }
 
-public sealed class BitflyerRawApiClient : IBitflyerRawApiClient
+public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
 {
-    private readonly IRestClient _rest;
+    private readonly IRestClient _restClient;
 
-    public BitflyerRawApiClient(IRestClient rest)
+    public BitflyerPrivateApi(IRestClient restClient)
     {
-        _rest = rest;
+        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<IReadOnlyList<BalanceResponse>> GetBalanceAsync(CancellationToken ct = default)
-        => _rest.GetAsync<IReadOnlyList<BalanceResponse>>("/v1/me/getbalance", null, ct);
+    public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken ct = default)
+    {
+        return _restClient.GetAsync<IReadOnlyList<BitflyerBalanceResponse>>(
+            "/v1/me/getbalance",
+            query: null,
+            ct);
+    }
 }
 ```
 
-- Raw 層は **パスと DTO の管理に特化**し、例外処理は RestClient に委譲する。
+- Private API 層は **API パスと DTO の管理に専念**し、署名や例外処理は RestClient へ委譲する。
 
 ---
 
 ## 6. Bitflyer.Adapter 実装ノート
 
-### 6.1 Mapper
-```csharp
-public static class BitflyerDtoMapper
-{
-    public static Balance ToBalance(BalanceResponse dto)
-        => new(
-            dto.CurrencyCode,
-            dto.Amount,
-            dto.Available
-        );
-}
-```
-- 変換処理は単純に値を移すだけに留める。
-- 将来、通貨コードの正規化やフィルタリングが必要になった場合でも、
-  まずは別メソッドとして追加し、既存の `ToBalance` は後方互換性を保つ。
-
-### 6.2 BitflyerExchangeClient
+### 6.1 BitflyerExchangeClient
 ```csharp
 public sealed class BitflyerExchangeClient : IExchangeClient
 {
-    private readonly IBitflyerRawApiClient _raw;
+    private readonly IBitflyerPublicApi _publicApi;
+    private readonly IBitflyerPrivateApi _privateApi;
 
-    public BitflyerExchangeClient(IBitflyerRawApiClient raw)
+    public BitflyerExchangeClient(IBitflyerPublicApi publicApi, IBitflyerPrivateApi privateApi)
     {
-        _raw = raw;
+        _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
+        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
     }
 
     public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken ct = default)
     {
-        var dtoList = await _raw.GetBalanceAsync(ct).ConfigureAwait(false);
-        return dtoList.Select(BitflyerDtoMapper.ToBalance).ToList();
+        var rawBalances = await _privateApi.GetBalancesAsync(ct).ConfigureAwait(false);
+        return rawBalances
+            .Select(dto => new Balance(dto.CurrencyCode, dto.Amount, dto.Available))
+            .ToArray();
     }
 
     // 他のメソッドは Stage3 以降に実装
 }
 ```
 
-- Stage2 の時点では、他の `IExchangeClient` メソッドは `NotImplementedException` または TODO として差し支えない。
+- 変換は `BitflyerExchangeClient` 内で完結し、特別な Mapper クラスは不要。
+- Stage2 の時点では、他の `IExchangeClient` メソッドは `NotImplementedException` または TODO でよい。
 - `ConfigureAwait(false)` の使用は、ライブラリとしての利用を想定して推奨する。
 
 ---
@@ -205,25 +203,55 @@ public static class BitflyerClientFactory
         if (string.IsNullOrWhiteSpace(apiSecret))
             throw new ArgumentException("API secret is required.", nameof(apiSecret));
 
-        var httpClient = new HttpClient
-        {
-            BaseAddress = new Uri("https://api.bitflyer.com")
-        };
+        var httpClient = new HttpClient { BaseAddress = BitflyerApiBaseUri };
+        IHttpTransport baseTransport = new HttpTransport(httpClient, disposeHttpClient: true);
 
         IExchangeClock clock = new SystemClock();
         IRequestSigner signer = new BitflyerRequestSigner(apiKey, apiSecret, clock);
-        IRestClient rest = new RestClient(httpClient, signer);
+        IHttpTransport signingTransport = new BitflyerSigningTransport(baseTransport, signer);
 
-        IBitflyerRawApiClient raw = new BitflyerRawApiClient(rest);
-        return new BitflyerExchangeClient(raw);
+        IRestClient restClient = new RestClient(BitflyerApiBaseUri, signingTransport);
+        var publicApi = new BitflyerPublicApi(restClient);
+        var privateApi = new BitflyerPrivateApi(restClient);
+
+        return new BitflyerExchangeClient(publicApi, privateApi);
     }
 }
 ```
 
-- Stage2 時点では、HttpClient のライフサイクルは単純な new でよいが、
-  将来的には `IHttpClientFactory` の利用や DI への移行を検討する。
-- Factory は「すぐに使える IExchangeClient を返す」ことに特化し、
-  ロジックは持たない。
+- Stage2 時点では、1つの `HttpClient` と `HttpTransport` の組み合わせで十分。
+- Factory は「すぐに使える IExchangeClient を返す」ことに特化し、鍵の取得処理は持たない。
+- `Create(apiKey, apiSecret)` は **鍵を入力として受け取るだけ** に徹し、取得は `IApiCredentialProvider` に委譲する。
+
+### 7.2 IApiCredentialProvider の利用
+```csharp
+public interface IApiCredentialProvider
+{
+    ApiCredentials Get(string exchangeId, string accountId);
+}
+
+public sealed record ApiCredentials(string ApiKey, string ApiSecret);
+```
+- Factory には `Create(IApiCredentialProvider provider, string exchangeId, string accountId)` オーバーロードを追加し、`provider` から取得したキーを `Create(apiKey, apiSecret)` に委譲する。
+- `provider` が `null` の場合は `ArgumentNullException`、取得結果のキー/シークレットが空の場合は `ArgumentException` として扱う。
+- Factory が鍵をキャッシュする必要はない。呼び出しごとに Provider から取得しても差し支えない。
+
+### 7.3 Credential Provider 実装例
+- `EnvironmentVariableApiCredentialProvider`
+  - 変数名は `<EXCHANGE>_<ACCOUNT>_API_KEY` / `<EXCHANGE>_<ACCOUNT>_API_SECRET` を推奨（例: `BITFLYER_DEFAULT_API_KEY`）。
+  - `exchangeId` / `accountId` から変数名を組み立て、未設定時は `InvalidOperationException` などで通知する。
+- `WindowsCredentialManagerApiCredentialProvider`
+  - 汎用資格情報に `exchangeId/accountId/api_key|api_secret` のような名称で保存し、`CredRead` で取得する。
+  - Windows 標準 UI では平文表示できないが、同一ユーザーであれば API 経由で読み出せる点に留意し、最小権限で運用する。
+- `CompositeCredentialProvider`
+  - 複数の Provider（環境変数 → Windows → CI シークレットなど）を順番に試し、最初に有効な `ApiCredentials` を返す。
+  - フォールバック構成により、運用の移行やローテーション時に段階的な切り替えが可能。
+
+### 7.4 資格情報のガイドライン
+- API キー/シークレットは Git 管理下のファイルに保存しない。環境変数・資格情報マネージャー・CI シークレットなどの安全なストアを利用する。
+- 平文キーをログ / 例外 / UI / クリップボードに出さない。必要最小限のオンメモリ利用に留め、利用後は早期にスコープ外へ追い出す。
+- 鍵の取得責務は Orchestration 層に集約し、RestClient / Signer / Private API 層には渡さない。
+- 多取引所・多アカウントを考慮し、`provider.Get("bitflyer", "default")` のように `exchangeId` / `accountId` を指定できる API 形態を維持する。
 
 ---
 
@@ -243,4 +271,3 @@ public static class BitflyerClientFactory
 - 現時点のエラー処理（E1）は暫定であり、Stage3 以降で E2 以上に拡張する可能性があることを念頭に置く。
 - Abstractions / Infrastructure / Bitflyer の境界を崩さないようにし、
   取引所追加時にも同じ構造を踏襲できるようにする。
-

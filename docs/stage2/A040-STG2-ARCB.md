@@ -1,15 +1,15 @@
-# A040-STG2-ARCB bitFlyer Raw API → 抽象層マッピング（get balance）
+# A040-STG2-ARCB bitFlyer Private API → 抽象層マッピング（get balance）
 
 ## 1. 本文書の目的
 Stage2 では、bitFlyer Private API の最初のエンドポイントとして
 **`/v1/me/getbalance` を抽象インターフェースまでマッピングする仕様**を確立する。
 
-本ドキュメントは、Raw API（bitFlyer 固有形式）からドメインモデル（抽象層）への
+本ドキュメントは、bitFlyer Private API（固有形式）からドメインモデル（抽象層）への
 **対応表・値変換仕様・例外扱い**を明確にし、後続の Private API 実装のテンプレートとすることを目的とする。
 
 ---
 
-## 2. API 定義（bitFlyer Raw）
+## 2. API 定義（bitFlyer Private）
 ### 2.1 エンドポイント
 - **HTTP Method**: GET
 - **Path**: `/v1/me/getbalance`
@@ -35,9 +35,9 @@ Stage2 では、bitFlyer Private API の最初のエンドポイントとして
 ]
 ```
 
-### 2.3 DTO（Raw 層で扱う型）
+### 2.3 DTO（Private 層で扱う型）
 ```csharp
-public sealed class BalanceResponse
+public sealed class BitflyerBalanceResponse
 {
     public string CurrencyCode { get; set; } = string.Empty;
     public decimal Amount { get; set; }
@@ -65,9 +65,9 @@ Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken ct = default);
 
 ---
 
-## 4. API マッピング表（Raw → Domain）
+## 4. API マッピング表（Private → Domain）
 
-| Raw フィールド             | Domain フィールド | 変換仕様 | 注意点 |
+| Private フィールド        | Domain フィールド | 変換仕様 | 注意点 |
 |---------------------------|-------------------|----------|--------|
 | `currency_code` (string)  | `Currency`        | 文字列をそのまま渡す | bitFlyer 固有のコード体系に依存（例: "JPY", "BTC"）。抽象層では解釈しない。 |
 | `amount` (decimal)        | `Amount`          | そのままマップ        | 小数精度はそのまま保持する。 |
@@ -77,34 +77,16 @@ Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken ct = default);
 
 ---
 
-## 5. 変換ロジック（Mapper）
-
-```csharp
-public static class BitflyerDtoMapper
-{
-    public static Balance ToBalance(BalanceResponse dto)
-        => new(
-            dto.CurrencyCode,
-            dto.Amount,
-            dto.Available
-        );
-}
-```
-
-**責務の原則**：
-- 変換は純粋関数であること（例外・ロジックを持たない）。
-- bitFlyer の値を可能な限りそのままドメインへ渡す。
-- 追加加工（例: 通貨コードの正規化）は Stage3 以降に検討する。
-
----
-
-## 6. IExchangeClient 実装における流れ
+## 5. IExchangeClient 実装における流れ
 
 ```csharp
 public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken ct)
 {
-    var dtoList = await _raw.GetBalanceAsync(ct);
-    return dtoList.Select(BitflyerDtoMapper.ToBalance).ToList();
+    var dtoList = await _privateApi.GetBalancesAsync(ct);
+    return dtoList.Select(dto => new Balance(
+        dto.CurrencyCode,
+        dto.Amount,
+        dto.Available)).ToList();
 }
 ```
 
@@ -112,15 +94,13 @@ public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken ct)
 ```
 BitflyerExchangeClient
    ↓ calls
-IBitflyerRawApiClient.GetBalanceAsync
+IBitflyerPrivateApi.GetBalancesAsync
    ↓ calls
 RestClient.GetAsync("/v1/me/getbalance")
    ↓
 HTTP GET + 署名
    ↓
-JSON → BalanceResponse[]
-   ↓
-Mapper
+JSON → BitflyerBalanceResponse[]
    ↓
 Balance[]（ドメインモデル）
 ```
@@ -149,7 +129,7 @@ bitFlyer 固有のエラーコードの解釈は **Stage3 以降に検討**す�
 ---
 
 ## 9. Stage2 完了条件（マッピング観点）
-- Raw → Domain の対応が本書通りに実装されている。
+- Private → Domain の対応が本書通りに実装されている。
 - DTO → Domain 変換が正しく行われている。
 - `/v1/me/getbalance` を通した実データ取得で、JPY と BTC の値が問題なく `Balance` モデルにマッピングされる。
 
@@ -157,4 +137,3 @@ bitFlyer 固有のエラーコードの解釈は **Stage3 以降に検討**す�
 
 本ドキュメントは、Stage3 以降で追加される Private GET（collateral, positions）が
 同じ設計パターンで進められるようにするための基礎仕様となる。
-

@@ -22,13 +22,13 @@ Stage2 は、**「bitFlyer Private API 呼び出しのテンプレートを確�
   - `IRequestSigner`（bitFlyer 用署名インターフェース）
   - `IRestClient` / `RestClient`（署名付き GET + JSON + E1 エラー処理）
   - `ExchangeApiException`（HTTP エラー共通例外）
-- Bitflyer.Raw
-  - `/v1/me/getbalance` に対応する `BalanceResponse` DTO
-  - `IBitflyerRawApiClient.GetBalanceAsync`
-  - `BitflyerRawApiClient` 実装（RestClient 経由で呼び出し）
+- Bitflyer.Private
+  - `/v1/me/getbalance` に対応する `BitflyerBalanceResponse` DTO
+  - `IBitflyerPrivateApi.GetBalancesAsync`
+  - `BitflyerPrivateApi` 実装（RestClient 経由で呼び出し）
 - Bitflyer.Adapter
-  - `BitflyerDtoMapper.ToBalance(BalanceResponse → Balance)`
   - `BitflyerExchangeClient.GetBalancesAsync` の実装
+  - DTO → Domain 変換（`BitflyerExchangeClient` 内に実装）
 - Factory
   - `BitflyerClientFactory.Create(apiKey, apiSecret)` により `IExchangeClient` を組み立て、
     `GetBalancesAsync` が実口座から値を取得できる状態にする
@@ -54,7 +54,7 @@ Stage2 は、**「bitFlyer Private API 呼び出しのテンプレートを確�
 - **A010-STG2-OVER**：Stage2 ゴール定義（get balance）
 - **A020-STG2-REQR**：要件定義（get balance）
 - **A030-STG2-ARCL**：レイヤ構成（Abstractions / Infrastructure / Bitflyer）
-- **A040-STG2-ARCB**：bitFlyer Raw API → 抽象層マッピング（get balance）
+- **A040-STG2-ARCB**：bitFlyer Private API → 抽象層マッピング（get balance）
 - **A050-STG2-IMPL**：実装ノート（レイヤ別の実装ポイント）
 - **A060-STG2-TSTP**：テスト観点・代表ケース
 - **A070-STG2-OPS**：動作確認・運用メモ（Factory + GetBalancesAsync）
@@ -69,10 +69,9 @@ Stage2 は、**「bitFlyer Private API 呼び出しのテンプレートを確�
   - `IRestClient` / `RestClient`
   - `ExchangeApiException`
 - `ExchangeApi.Bitflyer`
-  - DTO: `BalanceResponse`
-  - Raw API: `IBitflyerRawApiClient`, `BitflyerRawApiClient`
-  - Mapper: `BitflyerDtoMapper`
-  - Adapter: `BitflyerExchangeClient.GetBalancesAsync`
+  - DTO: `BitflyerBalanceResponse`
+  - Private API: `IBitflyerPrivateApi`, `BitflyerPrivateApi`
+  - Adapter: `BitflyerExchangeClient.GetBalancesAsync`（DTO → Balance 変換を内包）
   - Factory: `BitflyerClientFactory.Create`
 
 ---
@@ -87,7 +86,7 @@ Stage2 は、以下の条件を満たした時点で「完了」とみなす。
 
 2. **実装面**
    - `IExchangeAccountClient.GetBalancesAsync` が実装されている。
-   - `/v1/me/getbalance` の呼び出しが、RestClient → Raw API → Mapper → Adapter の流れで一貫して動作する。
+   - `/v1/me/getbalance` の呼び出しが、RestClient → Private API → Adapter の流れで一貫して動作する。
    - HTTP エラーが `ExchangeApiException` として扱われる（E1 レベル）。
 
 3. **動作確認面**
@@ -97,9 +96,9 @@ Stage2 は、以下の条件を満たした時点で「完了」とみなす。
 
 4. **テスト面**
    - RestClient / Signer の基本的なユニットテスト（署名・エラー処理）が存在する。
-   - Mapper（BalanceResponse → Balance）のテストが存在する。
+   - DTO → Balance 変換のテストが存在する。
    - BitflyerExchangeClient.GetBalancesAsync のテストが存在し、
-     Raw API をモックした形で DTO → Domain の流れが検証されている。
+     Private API をモックした形で DTO → Domain の流れが検証されている。
 
 ---
 
@@ -126,4 +125,3 @@ Stage3 では、Stage2 で確立した構造とテンプレートを用いて、
 
 本ドキュメントは、Stage2 を「FIX」とみなすための最終サマリとして位置づけ、
 後続ステージの設計・実装のリファレンスとする。
-

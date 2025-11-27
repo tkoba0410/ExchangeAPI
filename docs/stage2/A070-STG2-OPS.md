@@ -19,28 +19,51 @@ Stage3 以降（collateral / positions / executions / orders）に共通で使�
 ## 3. 動作確認手順（最短で必要なもの）
 
 ### Step 1. API キーとシークレットを準備
-一般的には環境変数に設定することを推奨：
+運用では **環境変数・資格情報マネージャー等のプロバイダ** に保存し、ソースコードや設定ファイルに直書きしない。
 
-#### Windows（PowerShell）
+- 推奨命名規則：`<EXCHANGE>_<ACCOUNT>_API_KEY` / `<EXCHANGE>_<ACCOUNT>_API_SECRET`
+  - 例：`BITFLYER_DEFAULT_API_KEY`, `BITFLYER_DEFAULT_API_SECRET`
+- 複数口座を切り替える場合は `ACCOUNT` 部分を `DEFAULT`, `TRADING`, `BACKTEST` などに分ける。
+
+#### Windows（PowerShell）で環境変数を登録
 ```powershell
-setx BF_API_KEY "your_api_key"
-setx BF_API_SECRET "your_api_secret"
+setx BITFLYER_DEFAULT_API_KEY "your_api_key"
+setx BITFLYER_DEFAULT_API_SECRET "your_api_secret"
 ```
 
 #### Linux / macOS（bash）
 ```bash
-export BF_API_KEY="your_api_key"
-export BF_API_SECRET="your_api_secret"
+export BITFLYER_DEFAULT_API_KEY="your_api_key"
+export BITFLYER_DEFAULT_API_SECRET="your_api_secret"
 ```
+
+#### Windows 資格情報マネージャーを利用する場合
+- 汎用資格情報として `bitflyer/default/api_key` / `bitflyer/default/api_secret` などの名称で登録し、`WindowsCredentialManagerApiCredentialProvider` から読み出す。
+- `cmdkey /generic:bitflyer/default/api_key /user:unused /pass:your_api_key` などで登録できる。
 
 > セキュリティ上、APIキーをソースコードに直書きしない。
 
 ---
 
 ### Step 2. Factory を使って `IExchangeClient` を生成
+`IApiCredentialProvider` を使うと複数環境での運用切り替えが容易になる。
+
 ```csharp
-var apiKey = Environment.GetEnvironmentVariable("BF_API_KEY")!;
-var apiSecret = Environment.GetEnvironmentVariable("BF_API_SECRET")!;
+var provider = new CompositeCredentialProvider(new IApiCredentialProvider[]
+{
+    new EnvironmentVariableApiCredentialProvider(),
+    new WindowsCredentialManagerApiCredentialProvider(),
+});
+
+// exchangeId/accountId でキーを選択
+var client = BitflyerClientFactory.Create(provider, "bitflyer", "default");
+```
+
+環境変数を直接読む簡易手順が必要な場合のみ、従来どおり文字列を取得して `Create(apiKey, apiSecret)` に渡す。
+
+```csharp
+var apiKey = Environment.GetEnvironmentVariable("BITFLYER_DEFAULT_API_KEY")!;
+var apiSecret = Environment.GetEnvironmentVariable("BITFLYER_DEFAULT_API_SECRET")!;
 
 var client = BitflyerClientFactory.Create(apiKey, apiSecret);
 ```
@@ -107,11 +130,12 @@ Currency: BTC, Amount: 0.xxxx, Available: 0.xxxx
 ## 5. 運用上の留意点（Stage2 時点）
 
 ### 5.1 API Key の取り扱い
-- API Key / Secret は Git 管理しない
-- config.json / appsettings.json に書く場合は `.user` ファイルに分離する
-- ログにキーを出力しない
-
-- デフォルトのプロバイダーはライブラリ内に持たない。どのプロバイダーを使うか（環境変数/CIシークレット/資格情報マネージャなど）は呼び出し側で明示する。
+- API Key / Secret は Git 管理しない。必要な場合でも `.user` ファイルやシークレットストアに分離する。
+- ログ / 例外 / UI / クリップボードに平文の鍵を出力しない。オンメモリで最小限だけ扱う。
+- `IApiCredentialProvider` の実装（環境変数 / Windows 資格情報マネージャー / CI シークレットなど）を呼び出し側で明示的に選択し、ライブラリにデフォルト実装を埋め込まない。
+- 環境変数を使う場合は `<EXCHANGE>_<ACCOUNT>_API_KEY` など一貫した命名を守り、`exchangeId` / `accountId` で参照できるようにする。
+- 複数プロバイダを組み合わせる場合は `CompositeCredentialProvider` を使い、順序付きフォールバックで移行やローテーションを容易にする。
+- Windows 資格情報マネージャーを利用する環境では、登録済みの資格情報名（`bitflyer/default/api_key` 等）と `accountId` の対応表を運用ドキュメントに残す。
 ### 5.2 呼び出し頻度の上限
 `/v1/me/getbalance` は軽量 API だが、bitFlyer の Private API にはレート制限がある：
 - Private API: 1 秒間に約 2 回程度が上限
@@ -158,4 +182,3 @@ Stage2 の OPS 文書は、以下の発展にもそのまま利用できる：
 
 Stage2 は「最初の Private GET の動作確認テンプレート確立」が主目的であり、
 本書は今後の API 導入時のベースラインとして再利用する。
-

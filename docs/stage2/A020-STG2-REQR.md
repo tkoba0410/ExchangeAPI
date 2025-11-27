@@ -46,7 +46,7 @@ Stage2 では、bitFlyer Private API を用いた最初の読み取り処理と�
   - 同一キーに異なる値が指定された場合は例外（ArgumentException）とする。
   呼び出し例（クエリ不要の場合は null または空辞書でよい）:
   ```csharp
-  var balances = await rest.GetAsync<IReadOnlyList<BalanceResponse>>(
+  var balances = await rest.GetAsync<IReadOnlyList<BitflyerBalanceResponse>>(
       "/v1/me/getbalance",
       new Dictionary<string, string?>());
   ```
@@ -57,24 +57,23 @@ Stage2 では、bitFlyer Private API を用いた最初の読み取り処理と�
   - `Content-Type: application/json`
 - HTTP 4xx/5xx の場合は `ExchangeApiException` を発生させる（エラー処理レベル E1）。`HttpRequestException` は StatusCode/URI を含めてラップする。
 
-### REQ-204: Raw API 実装（bitFlyer）
+### REQ-204: Private API 実装（bitFlyer）
 - `/v1/me/getbalance` を呼び出すメソッドを定義する。
-  - `Task<IReadOnlyList<BalanceResponse>> GetBalanceAsync(CancellationToken ct = default)`
-- `BalanceResponse` は以下のフィールドを持つ。
+  - `Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken ct = default)`
+- `BitflyerBalanceResponse` は以下のフィールドを持つ。
   - `CurrencyCode`（string）
   - `Amount`（decimal）
   - `Available`（decimal）
 - JSON デシリアライズにより bitFlyer のレスポンスを正しく扱えること。
 
 ### REQ-205: DTO → ドメイン変換
-- `BalanceResponse` を `Balance` に変換する Mapper を実装する。
-  - `Balance ToBalance(BalanceResponse dto)`
-- 型変換は例外を発生させず、bitFlyer のフィールドを忠実にマッピングする。
+- `BitflyerBalanceResponse` を `Balance` に変換するロジックを実装する（`BitflyerExchangeClient` 内で可）。
+  - 型変換は例外を発生させず、bitFlyer のフィールドを忠実にマッピングする。
 
 ### REQ-206: Adapter（IExchangeClient）実装
 - `BitflyerExchangeClient.GetBalancesAsync` は以下を満たすこと。
-  1. `_raw.GetBalanceAsync(ct)` を呼び出す。
-  2. 各 `BalanceResponse` を `Balance` に変換する。
+  1. `_privateApi.GetBalancesAsync(ct)` を呼び出す。
+  2. 各 `BitflyerBalanceResponse` を `Balance` に変換する。
   3. `IReadOnlyList<Balance>` として返す。
 - 他の Private API に対応するメソッドは未実装（`NotImplementedException`）でよい。
 
@@ -88,27 +87,42 @@ Stage2 では、bitFlyer Private API を用いた最初の読み取り処理と�
   - `BitflyerPrivateApi`
   - `BitflyerExchangeClient`
 - 戻り値は `IExchangeClient` とする。
+- API key / secret は呼び出し側で取得し、Factory では null / 空チェックのみ行う。
+- `Create(IApiCredentialProvider provider, string exchangeId, string accountId)` オーバーロードを提供し、`provider` が返すキーで `IExchangeClient` を生成できること。`provider == null` の場合は `ArgumentNullException`。
 
 
 ### REQ-208: 手動検証
 - API キーおよびシークレットを設定した環境で、`client.GetBalancesAsync()` を実行し、
   - JPY 残高
   - BTC 残高
- などがドメインモデルとして取得できることを確認する。
+  などがドメインモデルとして取得できることを確認する。
+
+### REQ-209: API 資格情報プロバイダ
+- `IApiCredentialProvider` インターフェースを追加し、`ApiCredentials Get(string exchangeId, string accountId)` で `(ApiKey, ApiSecret)` を提供できること。
+- `ApiCredentials` は `ApiKey` / `ApiSecret` を保持するイミュータブル DTO であること。
+- クライアント組み立て時にプロバイダから資格情報を取得し、そのまま `BitflyerClientFactory.Create(apiKey, apiSecret)` に渡す構成をデフォルトとする。
+- RestClient / Signer / Private API クラスは資格情報の取得責務を持たず、「渡された鍵を使うだけ」に徹する。
+- プロバイダの実装（環境変数・資格情報マネージャーなど）は呼び出し側で差し替え可能とし、ライブラリにデフォルト実装を内蔵しない。
 
 ---
 
 ## 4. 非機能要件
 
 ### NFR-201: 安全性
-- Private API の扱いであるため、API キー・シークレットは環境変数または設定ファイル（.json / .user）を用いて管理する。
-- キーはログに出力しないこと。
+- Private API の扱いであるため、API キー・シークレットは環境変数・資格情報マネージャー・シークレットストアなどで管理し、Git 管理下のファイルに残さない。
+- キーはログや例外メッセージに出力しないこと。必要に応じてマスクした形でのみ扱う。
+- 平文をディスクや UI に表示せず、オンメモリで最小限に扱うこと。
+- 多取引所 / 多アカウント運用を想定し、資格情報は `<EXCHANGE>_<ACCOUNT>_API_KEY` など一貫した命名規則で管理できること。
 
-### NFR-202: 保守性
-- Raw API とドメイン変換を分離し、Mapper を介して疎結合を維持すること。
+### NFR-202: 運用切り替え容易性
+- 認証情報の取得手段を `IApiCredentialProvider` の差し替えだけで切り替えられるようにする（環境変数 / Windows 資格情報マネージャー / CI シークレット等）。
+- プロバイダは複数実装を組み合わせられるようにし、フォールバック（Composite）構成で移行やローテーションを容易にする。
+
+### NFR-203: 保守性
+- Private API 層とドメイン変換を分離し、責務を明確にすること。
 - `GetBalancesAsync` は例外に依存しない純粋なデータ変換を行う。
 
-### NFR-203: 再利用性
+### NFR-204: 再利用性
 - `IRestClient`, `IRequestSigner`, `SystemClock` は bitFlyer に依存しない形で定義し、
   将来的に他取引所アダプタからも利用できるようにする。
 
@@ -123,7 +137,7 @@ Stage2 では、bitFlyer Private API を用いた最初の読み取り処理と�
 ---
 
 ## 6. 完了条件（Definition of Done）
-- `GetBalancesAsync` が抽象層 → Raw API → HTTP 呼び出し → 実データ取得まで一貫して動作する。
+- `GetBalancesAsync` が抽象層 → Private API → HTTP 呼び出し → 実データ取得まで一貫して動作する。
 - DTO → ドメイン変換の正確性が確認されている。
 - API キーを設定した環境で、実口座残高を取得できることを手動で検証している。
 - Stage2 OVER（A010）と本書（A020）が整合し、リポジトリに反映されている。

@@ -51,33 +51,30 @@ Stage2 では、Stage1 で整備した設計・インターフェースとレイ
      - `ExchangeApiException`
        - REST 呼び出しにおけるエラー情報を保持する共通例外クラス。
 
-4. **bitFlyer Raw API 層（ExchangeApi.Bitflyer）**
-   - `/v1/me/getbalance` に対応する DTO およびクライアントを実装する。
-     - `BalanceResponse`
+4. **bitFlyer Private API 層（ExchangeApi.Bitflyer）**
+   - `/v1/me/getbalance` に対応する DTO と REST 呼び出しを実装する。
+     - `BitflyerBalanceResponse`
        - `CurrencyCode`（string）
        - `Amount`（decimal）
        - `Available`（decimal）
-     - `IBitflyerRawApiClient`
-       - `Task<IReadOnlyList<BalanceResponse>> GetBalanceAsync(CancellationToken ct = default);`
-     - `BitflyerRawApiClient : IBitflyerRawApiClient`
-       - 内部で `IRestClient.GetAsync<IReadOnlyList<BalanceResponse>>("/v1/me/getbalance", ...)` を呼び出す。
+     - `IBitflyerPrivateApi`
+       - `Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken ct = default);`
+     - `BitflyerPrivateApi : IBitflyerPrivateApi`
+       - 内部で `IRestClient.GetAsync<IReadOnlyList<BitflyerBalanceResponse>>("/v1/me/getbalance", ...)` を呼び出す。
 
 5. **Bitflyer Adapter 層（ExchangeApi.Bitflyer）**
-   - DTO → ドメイン変換および `IExchangeAccountClient` 実装を行う。
-     - `BitflyerDtoMapper`
-       - `Balance ToBalance(BalanceResponse dto)`
+   - DTO → ドメイン変換と `IExchangeAccountClient` 実装を担う。
      - `BitflyerExchangeClient : IExchangeClient`
-       - コンストラクタで `IBitflyerRawApiClient` を受け取る。
+       - コンストラクタで `IBitflyerPublicApi` と `IBitflyerPrivateApi` を受け取る。
        - `GetBalancesAsync` の実装:
-         1. `_raw.GetBalanceAsync(ct)` を呼び出す。
-         2. 各要素を `BitflyerDtoMapper.ToBalance` で変換する。
-         3. `IReadOnlyList<Balance>` として返す。
+         1. `_privateApi.GetBalancesAsync(ct)` を呼び出す。
+         2. 取得した `BitflyerBalanceResponse` をそのまま `Balance` に変換して返す（専用 Mapper は不要）。
        - その他のメソッド（発注・キャンセル等）は Stage2 時点では `NotImplementedException` または TODO として残してよい。
 
 6. **組み立て（Factory）**
    - `BitflyerClientFactory` に、Balance を取得可能な最小構成を用意する。
      - `IExchangeClient BitflyerClientFactory.Create(string apiKey, string apiSecret)`
-       - `HttpClient` → `RestClient` → `BitflyerRawApiClient` → `BitflyerExchangeClient` の順に組み立てる。
+       - `HttpClient` → `HttpTransport` → `BitflyerSigningTransport` → `RestClient` → `BitflyerPublicApi/BitflyerPrivateApi` → `BitflyerExchangeClient` の順に組み立てる。
 
 ### 2.2 Stage2 で「やらないこと」（次ステージ以降に回すもの）
 
@@ -112,11 +109,10 @@ ExchangeApi.Infrastructure
   └─ ExchangeApiException
 
 ExchangeApi.Bitflyer
-  ├─ DTO: BalanceResponse
-  ├─ Raw API: IBitflyerRawApiClient.GetBalanceAsync
-  ├─ Raw 実装: BitflyerRawApiClient
-  ├─ Mapper: BitflyerDtoMapper.ToBalance
-  └─ Adapter: BitflyerExchangeClient.GetBalancesAsync
+  ├─ DTO: BitflyerBalanceResponse
+  ├─ Private API: IBitflyerPrivateApi.GetBalancesAsync
+  ├─ Private API 実装: BitflyerPrivateApi
+  └─ Adapter: BitflyerExchangeClient.GetBalancesAsync（bitFlyerレスポンスを直接 Balance に変換）
 ```
 
 Stage2 の時点では、`BitflyerExchangeClient` の他メソッド（板情報・注文系）は Stage1 の範囲または未実装であってよく、
@@ -138,15 +134,14 @@ Stage2 は、以下の条件をすべて満たした時点で完了とみなす�
    - `IRequestSigner` が定義され、bitFlyer 用の署名ロジックを持つ実装（`BitflyerRequestSigner` 等）が存在する。
    - `IRestClient` インターフェースと `RestClient` 実装が存在し、
      - `/v1/me/getbalance` に対して GET リクエストを行える。
-     - 成功時にレスポンス JSON を `IReadOnlyList<BalanceResponse>` にデシリアライズできる。
+     - 成功時にレスポンス JSON を `IReadOnlyList<BitflyerBalanceResponse>` にデシリアライズできる。
      - HTTP 4xx/5xx の場合に `ExchangeApiException` を送出する。
 
 3. **Bitflyer Adapter の観点**
-   - `BalanceResponse` DTO が定義されている。
-   - `IBitflyerRawApiClient.GetBalanceAsync` が定義され、`BitflyerRawApiClient` により実装されている。
-   - `BitflyerDtoMapper.ToBalance` が実装されている。
+   - `BitflyerBalanceResponse` DTO が定義されている。
+   - `IBitflyerPrivateApi.GetBalancesAsync` が定義され、`BitflyerPrivateApi` により実装されている。
    - `BitflyerExchangeClient.GetBalancesAsync` が `IExchangeAccountClient` の実装として存在し、
-     - 内部で `IBitflyerRawApiClient.GetBalanceAsync` を呼び出す。
+     - 内部で `IBitflyerPrivateApi.GetBalancesAsync` を呼び出す。
      - 取得した DTO 一覧を `Balance` 一覧に変換して返す。
 
 4. **組み立て・動作確認の観点**
@@ -158,7 +153,7 @@ Stage2 は、以下の条件をすべて満たした時点で完了とみなす�
 
 5. **ドキュメントの観点**
    - 本ドキュメント（A010-STG2-OVER）が Stage2 ゴールとしてリポジトリに配置されている。
-   - `getbalance` に関する最低限の設計メモまたは API マッピング表（Raw API → Domain）が整理されている。
+   - `getbalance` に関する最低限の設計メモまたは API マッピング表（Private API → Domain）が整理されている。
 
 ---
 

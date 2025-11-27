@@ -80,10 +80,11 @@ Stage2 で検証すべき観点を、階層別に整理する。
 ---
 
 ### 3.5 Factory（組み立て）
-1. **`Create(apiKey, apiSecret)` が例外なく `IExchangeClient` を返すこと**
-2. **内部で RestClient / RawApiClient / ExchangeClient が正しく構築されていること**
-3. **API key / secret が null・空・空白のとき ArgumentException を投げること**
-
+1. **Create(apiKey, apiSecret) がエラーなく IExchangeClient を返すこと**
+2. **内部で RestClient / RawApiClient / ExchangeClient が正しく組み立てられていること**
+3. **API key / secret が null・空文字の場合 ArgumentException を投げること**
+4. **Create(IApiCredentialProvider provider, exchangeId, accountId) で provider が返したキーを使って IExchangeClient を生成できること**
+5. **provider == null の場合 ArgumentNullException を投げること**
 ---
 
 ## 4. 擬似テストケース（サンプル）
@@ -130,7 +131,12 @@ Stage2 で検証すべき観点を、階層別に整理する。
 
 ---
 
-## 6. 今後の展望（Stage3 以降）
+## 6. 実行とインテグレーションテストの扱い
+- ユニットテスト（通信なし）は dotnet test tests/ExchangeApi.Bitflyer.Tests/ExchangeApi.Bitflyer.Tests.csproj などで実行する。
+- 実通信テストは任意の別プロジェクト/カテゴリに分離し、検証用 API キーを環境変数やシークレットで注入して手動実行とする（デフォルトの dotnet test には含めない）。キー未設定時はスキップする条件分岐を推奨。
+- ログや例外に秘密を出さないこと。レートリミットや署名エラーは ExchangeApiException で扱う。
+
+## 7. 次の展開（Stage3 以降）
 Stage2 のテスト項目は、次の API にほぼそのまま流用できる：
 - `/v1/me/getcollateral`
 - `/v1/me/getpositions`
@@ -145,3 +151,11 @@ Stage2 のテスト項目は、次の API にほぼそのまま流用できる�
 
 Stage2 は「最初の Private GET を確実に通す」ことを目的とするため、本書のテスト観点が Stage3 以降の基礎テンプレートとなる。
 
+
+---
+---
+
+## 8. 追補（A065 より）
+- Factory のプロバイダーオーバーロード: Create(IApiCredentialProvider provider, exchangeId, accountId) が provider から取得したキーを使えること、provider == null で ArgumentNullException を投げること。
+- 実行方針: 通信なしのユニットテストは通常の dotnet test で実行。実通信テストは別プロジェクト/カテゴリに分離し、検証用キーを環境変数やシークレットで注入して手動実行する（デフォルトの dotnet test には含めない、未設定ならスキップ）。
+- 秘密はログ/例外に出さない。レートリミットや署名エラーは ExchangeApiException で扱う。

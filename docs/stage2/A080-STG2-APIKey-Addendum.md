@@ -26,6 +26,27 @@ Stage2 に以下を追記する差分ドキュメント。既存文書は変更�
 - オプション: プロバイダーを渡すオーバーロード `Create(IApiCredentialProvider provider, string exchangeId, string accountId)` を提供。デフォルトプロバイダーは内蔵しない。
 - 使い方例: `var creds = provider.Get("bitflyer", "default"); var client = BitflyerClientFactory.Create(creds.ApiKey, creds.ApiSecret);`
 
+## 環境変数でのキー取得例
+- 名称規則: `<EXCHANGE>_<ACCOUNT>_API_KEY` / `<EXCHANGE>_<ACCOUNT>_API_SECRET`  
+  - 例: `BITFLYER_DEFAULT_API_KEY`, `BITFLYER_DEFAULT_API_SECRET`
+- 設定例  
+  - PowerShell:  
+    ```powershell
+    setx BITFLYER_DEFAULT_API_KEY "your_api_key"
+    setx BITFLYER_DEFAULT_API_SECRET "your_api_secret"
+    ```
+  - bash:  
+    ```bash
+    export BITFLYER_DEFAULT_API_KEY="your_api_key"
+    export BITFLYER_DEFAULT_API_SECRET="your_api_secret"
+    ```
+- 取得と生成の流れ  
+  ```csharp
+  var provider = new EnvironmentVariableApiCredentialProvider();
+  var creds = provider.Get("bitflyer", "default");
+  var client = BitflyerClientFactory.Create(creds.ApiKey, creds.ApiSecret);
+  ```
+
 ## 多取引所・多アカウント対応
 - 命名規則（例）: `<EXCHANGE>_<ACCOUNT>_API_KEY` / `<EXCHANGE>_<ACCOUNT>_API_SECRET`  
   - 例: `BITFLYER_DEFAULT_API_KEY`, `BITFLYER_TRADING_API_SECRET`, `BINANCE_MAIN_API_KEY`
@@ -38,4 +59,5 @@ Stage2 に以下を追記する差分ドキュメント。既存文書は変更�
 - ログ/表示/クリップボードに平文を出さない。平文はオンメモリ短期利用のみ。
 - どうしても表示が必要な場合は、表示前に本人認証（例: Windows Hello）を挟み、一時表示→即クリア。
 - 運用に応じてプロバイダを差し替えられるようにし、ローテーションや移行を支援する。
+- デフォルトプロバイダーはライブラリに内蔵しない（どのプロバイダーからキーを取ったかを呼び出し側で明示するため）。環境変数/CIシークレット/資格情報マネージャなど、環境ごとに選択する。
 

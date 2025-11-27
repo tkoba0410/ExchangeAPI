@@ -111,6 +111,7 @@ Currency: BTC, Amount: 0.xxxx, Available: 0.xxxx
 - config.json / appsettings.json に書く場合は `.user` ファイルに分離する
 - ログにキーを出力しない
 
+- デフォルトのプロバイダーはライブラリ内に持たない。どのプロバイダーを使うか（環境変数/CIシークレット/資格情報マネージャなど）は呼び出し側で明示する。
 ### 5.2 呼び出し頻度の上限
 `/v1/me/getbalance` は軽量 API だが、bitFlyer の Private API にはレート制限がある：
 - Private API: 1 秒間に約 2 回程度が上限

@@ -112,7 +112,7 @@ public interface IBitflyerPublicApi
   * 形式: `"BTC_JPY"`（bitFlyer 仕様に準拠）。
 * 戻り値
 
-  * `BitflyerTickerRaw`（bitFlyer の `GET /v1/ticker` レスポンスの写像）。
+  * `BitflyerTickerRaw`（bitFlyer の `GET /v1/getticker` レスポンスの写像）。
 
 ### 3.4 REST / HTTP インターフェース（Infrastructure）
 

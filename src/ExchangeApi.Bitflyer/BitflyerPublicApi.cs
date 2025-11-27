@@ -34,7 +34,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
         if (string.IsNullOrWhiteSpace(productCode))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        const string path = "/v1/ticker";
+        const string path = "/v1/getticker";
 
         IReadOnlyDictionary<string, string?> query =
             new Dictionary<string, string?>(StringComparer.Ordinal)

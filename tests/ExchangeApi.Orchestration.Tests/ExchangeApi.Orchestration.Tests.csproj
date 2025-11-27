@@ -20,4 +20,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\\..\\src\\ExchangeApi.Abstractions\\ExchangeApi.Abstractions.csproj" />
+    <ProjectReference Include="..\\..\\src\\ExchangeApi.Orchestration\\ExchangeApi.Orchestration.csproj" />
+  </ItemGroup>
+
 </Project>

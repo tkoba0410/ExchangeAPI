@@ -33,7 +33,8 @@ namespace ExchangeApi.Bitflyer.Tests
             };
 
             var fakeApi = new FakeBitflyerPublicApi(raw);
-            var client = new BitflyerExchangeClient(fakeApi);
+            var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+            var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi);
 
             // Act
             var ticker = await client.GetTickerAsync(Symbols.BtcJpy);
@@ -66,13 +67,15 @@ namespace ExchangeApi.Bitflyer.Tests
             };
 
             var fakeApi = new FakeBitflyerPublicApi(raw);
-            var client = new BitflyerExchangeClient(fakeApi);
+            var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+            var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<SymbolNotSupportedException>(async () =>
-            {
-                await client.GetTickerAsync("ETH/JPY");
-            });
+            var ex = await Assert.ThrowsAsync<ExchangeApiException>(async () =>
+                await client.GetTickerAsync("ETH/JPY"));
+
+            Assert.IsType<SymbolNotSupportedException>(ex.InnerException);
+
+
         }
     }
 }

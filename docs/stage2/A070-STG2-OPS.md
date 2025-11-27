@@ -1,5 +1,7 @@
 # A070-STG2-OPS Stage2 動作確認・運用メモ（get balance）
 
+> 状態: Stage2 FIX 版（変更凍結）。以降の変更は Stage3 以降で扱うこと。
+
 ## 1. 本文書の目的
 Stage2 の目標は、bitFlyer Private API `/v1/me/getbalance` を抽象層 `IExchangeClient` 経由で取得できる状態にすることである。
 

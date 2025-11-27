@@ -1,5 +1,7 @@
 # A050-STG2-IMPL Stage2 実装ノート（get balance）
 
+> 状態: Stage2 FIX 版（変更凍結）。以降の変更は Stage3 以降で扱うこと。
+
 ## 1. 本文書の目的
 Stage2（get balance）は、bitFlyer Private API の最初の実装ステージとして、
 `/v1/me/getbalance` を Abstractions 経由で利用可能にすることを目的とする。

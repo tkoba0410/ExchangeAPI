@@ -1,5 +1,7 @@
 # A030-STG2-ARCL Stage2 レイヤ構成（get balance）
 
+> 状態: Stage2 FIX 版（変更凍結）。以降の変更は Stage3 以降で扱うこと。
+
 ## 1. 本文書の目的
 Stage2（get balance）において、必要となるレイヤ構成と責務分担を明確化し、
 後続ステージ（Collateral / Positions / POST Private API）の拡張に耐えられる基盤構造を定義する。

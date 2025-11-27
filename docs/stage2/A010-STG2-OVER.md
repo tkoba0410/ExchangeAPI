@@ -1,5 +1,7 @@
 # A010-STG2-OVER Stage2 ゴール定義（get balance）
 
+> 状態: Stage2 は FIX 済み（変更凍結）。以降の変更は Stage3 以降で扱うこと。
+
 ## 1. Stage2 の目的
 
 Stage2 では、Stage1 で整備した設計・インターフェースとレイヤ構造を前提に、

@@ -1,5 +1,7 @@
 # A020-STG2-REQR Stage2 要件定義（get balance）
 
+> 状態: Stage2 FIX 版（変更凍結）。以降の変更は Stage3 以降で扱うこと。
+
 ## 1. 本文書の目的
 Stage2 では、bitFlyer Private API を用いた最初の読み取り処理として、
 **`/v1/me/getbalance` に対応する抽象インターフェースと実装を確立する**。

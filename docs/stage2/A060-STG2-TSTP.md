@@ -1,5 +1,7 @@
 # A060-STG2-TSTP Stage2 テスト観点（get balance）
 
+> 状態: Stage2 FIX 版（変更凍結）。本書の完了条件をもって Stage2 を FIX とする。以降の変更は Stage3 以降で扱うこと。
+
 ## 1. 本文書の目的
 Stage2 は bitFlyer Private API の最初の実装として、
 **`/v1/me/getbalance` を抽象層（IExchangeClient）経由で取得可能にする**ことを目的とする。
@@ -129,6 +131,7 @@ Stage2 で検証すべき観点を、階層別に整理する。
 - 正常系で実口座の JPY/BTC が正しく取得できる
 - エラー系で `ExchangeApiException` が適切に発生する
 - Factory が IExchangeClient を正常に構築する
+- 上記を満たした時点で Stage2 を FIX（変更凍結）とする
 
 ---
 

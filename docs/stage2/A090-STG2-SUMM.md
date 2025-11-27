@@ -1,5 +1,7 @@
 # A090-STG2-SUMM Stage2 FIX まとめ（get balance）
 
+> 状態: Stage2 は本ドキュメントをもって FIX・凍結済み。以降の変更は Stage3 以降の文書で扱う。
+
 ## 1. Stage2 の位置づけ
 
 - Stage1：Public GET（板など）の設計・実装
@@ -99,6 +101,7 @@ Stage2 は、以下の条件を満たした時点で「完了」とみなす。
    - DTO → Balance 変換のテストが存在する。
    - BitflyerExchangeClient.GetBalancesAsync のテストが存在し、
      Private API をモックした形で DTO → Domain の流れが検証されている。
+   - 本完了条件を満たした時点で Stage2 を FIX（変更凍結）とする。
 
 ---
 

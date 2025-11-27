@@ -12,9 +12,9 @@ namespace ExchangeApi.Abstractions.Contracts;
 public interface IExchangeTradingClient
 {
     /// <summary>
-    /// 注文を送信する。
+    /// 注文を発注する。
     /// </summary>
-    Task<OrderResult> SendOrderAsync(OrderRequest request, CancellationToken cancellationToken = default);
+    Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// child order をキャンセルする。

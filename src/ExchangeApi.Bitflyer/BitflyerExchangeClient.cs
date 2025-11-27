@@ -148,7 +148,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
     #region IExchangeTradingClient (send order)
 
-    public async Task<OrderResult> SendOrderAsync(
+    public async Task<OrderResult> PlaceOrderAsync(
         OrderRequest request,
         CancellationToken cancellationToken = default)
     {

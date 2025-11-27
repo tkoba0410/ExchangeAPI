@@ -8,7 +8,7 @@
 - 429/RateLimit: Retry-After/ヘッダ有無による挙動が設定で制御されるかの確認
 
 ## 2. 結合テスト（モック/スタブ）
-- Adapter 経由での SendOrderAsync(LIMIT/STOP) → DTO 生成確認
+- Adapter 経由での PlaceOrderAsync(LIMIT/STOP) → DTO 生成確認
 - Cancel API 呼び出しで正しいパラメータが渡ること
 - GET 系で DTO スタブが Domain に正しく変換されること
 - E2 エラーが抽象層に伝搬すること（再試行可否のフラグ確認）

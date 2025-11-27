@@ -17,7 +17,7 @@ Abstractions  ←  Infrastructure  ←  Bitflyer (API/Adapter)  ←  Factory
 ExchangeApi.Abstractions
   ├─ Domain: Position / Execution / Collateral
   ├─ Domain: OrderRequest (price / minute_to_expire / time_in_force / trigger_price)
-  └─ Interfaces: IExchangeTradingClient (SendOrderAsync, Cancel..., GetPositions..., GetExecutions..., GetCollateral)
+  └─ Interfaces: IExchangeTradingClient (PlaceOrderAsync, Cancel..., GetPositions..., GetExecutions..., GetCollateral)
 
 ExchangeApi.Infrastructure
   ├─ IRequestSigner（キャンセル系・拡張パラメータ対応）

@@ -30,6 +30,16 @@ public interface IExchangeClient : IExchangeAccountClient, IExchangeTradingClien
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// ローソク足を取得する（取引所が未対応の場合は例外）。
+    /// </summary>
+    Task<IReadOnlyList<Candlestick>> ListCandlesticksAsync(
+        string symbol,
+        string timescale,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 板情報を取得する。
     /// </summary>
     Task<Board> GetBoardAsync(

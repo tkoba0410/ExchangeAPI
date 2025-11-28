@@ -151,6 +151,27 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
     #endregion
 
+    #region IExchangeMarketClient (candlestick)
+
+    public Task<IReadOnlyList<Candlestick>> ListCandlesticksAsync(
+        string symbol,
+        string timescale,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null,
+        CancellationToken cancellationToken = default)
+    {
+        // bitFlyer は公式OHLCV APIなし: 明示的に未サポートを通知
+        throw new ExchangeApiException(
+            message: "Candlestick is not supported by bitFlyer.",
+            exchangeId: _exchangeId,
+            operation: "ListCandlesticks",
+            statusCode: System.Net.HttpStatusCode.NotImplemented,
+            exchangeErrorCode: "UNSUPPORTED_OPERATION",
+            errorCategory: ExchangeErrorCategory.Request);
+    }
+
+    #endregion
+
     #region IExchangeAccountClient (balances)
 
     /// <summary>

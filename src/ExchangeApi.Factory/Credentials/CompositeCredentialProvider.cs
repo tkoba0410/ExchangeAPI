@@ -31,7 +31,7 @@ public sealed class CompositeCredentialProvider : IApiCredentialProvider
 
     public ApiCredentials Get(string exchangeId, string accountId)
     {
-        Exception? lastError = null;
+        var errors = new List<string>();
 
         foreach (var provider in _providers)
         {
@@ -43,17 +43,16 @@ public sealed class CompositeCredentialProvider : IApiCredentialProvider
                     return creds;
                 }
 
-                lastError = new InvalidOperationException("Provider returned empty credentials.");
+                errors.Add($"{provider.GetType().Name}: returned empty credentials.");
             }
             catch (Exception ex)
             {
-                lastError = ex;
+                errors.Add($"{provider.GetType().Name}: {ex.GetType().Name} - {ex.Message}");
             }
         }
 
         throw new InvalidOperationException(
-            $"No credential provider could supply credentials for '{exchangeId}/{accountId}'.",
-            lastError);
+            $"No credential provider could supply credentials for '{exchangeId}/{accountId}'. Details: {string.Join(" | ", errors)}");
     }
 
     private static bool IsValid(ApiCredentials creds)

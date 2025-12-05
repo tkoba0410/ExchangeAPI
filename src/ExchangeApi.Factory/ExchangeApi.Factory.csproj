@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\\ExchangeApi.Contracts\\ExchangeApi.Contracts.csproj" />
+    <ProjectReference Include="..\\ExchangeApi.Transport\\ExchangeApi.Transport.csproj" />
   </ItemGroup>
 
 </Project>

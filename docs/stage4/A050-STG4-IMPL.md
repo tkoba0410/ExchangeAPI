@@ -7,6 +7,7 @@ Stage4 は実装を進めるステージではなく、抽象インターフェ�
 - ドメイン型は最小限に留める：Ticker / OrderBook / Execution / OrderRequest / OrderResult / OpenOrder / Position / Collateral。
 - Margin は建玉・証拠金サマリに限定し、詳細な口座状態や履歴は Raw へ逃がす。
 - OrderRequest は Stage3 の骨格を踏襲し、抽象メソッドのパラメータ要求と矛盾がないかを確認する（バリデーション詳細は Stage5 以降）。
+- ClientOrderId はオプションのまま保持し、IF（`IOrderIdMapper`）のみを契約層に置く。実装（例: InMemory）は Infrastructure/Adapter など別層で提供し、DI で差し替える。
 
 ## 2. Infrastructure / Adapter（設計メモ）
 - REST と WS を分離し、Transport/Adapter を差し替え可能に保つ設計方針を記述する。

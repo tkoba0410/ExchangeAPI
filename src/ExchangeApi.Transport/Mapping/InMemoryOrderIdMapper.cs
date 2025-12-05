@@ -3,11 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using ExchangeApi.Contracts.Contracts;
 
-namespace ExchangeApi.Contracts.Mapping;
+namespace ExchangeApi.Transport.Mapping;
 
 /// <summary>
 /// メモリ内でローカルIDとサーバーIDを対応付ける簡易実装。
-/// 容量上限を指定した場合、超過時に最古のエントリから削除する。
+/// テスト/サンプル用途を想定し、永続化や分散は考慮しない。
 /// </summary>
 public sealed class InMemoryOrderIdMapper : IOrderIdMapper
 {

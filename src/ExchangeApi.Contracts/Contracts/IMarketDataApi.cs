@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,4 +16,11 @@ public interface IMarketDataApi
     Task<OrderBook> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<Execution>> GetExecutionsAsync(string symbol, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Candlestick>> ListCandlesticksAsync(
+        string symbol,
+        string timescale,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null,
+        CancellationToken cancellationToken = default);
 }

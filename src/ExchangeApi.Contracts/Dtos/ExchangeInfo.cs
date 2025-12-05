@@ -20,6 +20,7 @@ public sealed record ExchangeFeatureFlags(
     bool SupportsMargin,
     bool SupportsStopOrder,
     bool SupportsParentOrder,
+    bool SupportsCandlestick,
     bool SupportsWithdraw);
 
 public sealed record ExchangeRateLimits(int? RequestsPerMinute, int? OrdersPerMinute);

@@ -3,7 +3,7 @@
 Stage4 は実装を進めるステージではなく、抽象インターフェースとドメインの整合性を固めるフェーズ。ここでは「何を残し、何を Stage5 に送るか」を明確化する。
 
 ## 1. 抽象/ドメイン
-- `IMarketDataApi` / `ITradingApi` / `IAccountApi` / `IMarginAccountApi` / `IRealtimeMarketDataApi` / `IExchangeInfoApi` のメソッドセットを凍結する。
+- `IMarketDataApi` / `ITradingApi` / `IAccountApi` / `IMarginAccountApi` / `IRealtimeMarketDataApi` / `IExchangeInfoApi` のメソッドセットを凍結する。MarketData には Candlesticks（ListCandlesticks）を含め、bittrade を初期実装ターゲットとする（bitFlyer など非対応は NotImplemented を返す）。
 - ドメイン型は最小限に留める：Ticker / OrderBook / Execution / OrderRequest / OrderResult / OpenOrder / Position / Collateral。
 - Margin は建玉・証拠金サマリに限定し、詳細な口座状態や履歴は Raw へ逃がす。
 - OrderRequest は Stage3 の骨格を踏襲し、抽象メソッドのパラメータ要求と矛盾がないかを確認する（バリデーション詳細は Stage5 以降）。

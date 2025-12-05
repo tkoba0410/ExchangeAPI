@@ -13,6 +13,7 @@ Stage4 は抽象 API を凍結するステージであり、実装は Stage5 以
 | Market | IMarketDataApi.GetTicker | REST | スナップショット | GET `/v1/getticker` | 抽象定義 | Stage5+ |
 | Market | IMarketDataApi.GetOrderBook | REST | スナップショット | GET `/v1/getboard` | 抽象定義 | Stage5+ |
 | Market | IMarketDataApi.GetExecutions | REST | スナップショット | GET `/v1/getexecutions` | 抽象定義 | Stage5+ |
+| Market | IMarketDataApi.ListCandlesticks | REST | OHLCV | （bitFlyer 非対応、bittrade を初期ターゲット） | 抽象定義 | Stage5+ |
 | Trading | ITradingApi.SendOrder | REST | MARKET/LIMIT/STOP/STOP_LIMIT | POST `/v1/me/sendchildorder` | 抽象定義 | Stage5+ |
 | Trading | ITradingApi.CancelOrder | REST | 単一キャンセル | POST `/v1/me/cancelchildorder` | 抽象定義 | Stage5+ |
 | Trading | ITradingApi.GetOpenOrders | REST | Open/Active | GET `/v1/me/getchildorders` | 抽象定義 | Stage5+ |
@@ -26,7 +27,7 @@ Stage4 は抽象 API を凍結するステージであり、実装は Stage5 以
 
 ## 2. ExchangeInfo の返却例（スケルトン）
 - Markets: `[{ Symbol: "BTC/JPY", ProductCode: "BTC_JPY", Type: Spot/Margin, MinSize, PriceIncrement, SizeIncrement }]`
-- Features: `{ SupportsWebSocket, SupportsMargin, SupportsStopOrder, SupportsParentOrder, SupportsWithdraw }` などの機能フラグ
+- Features: `{ SupportsWebSocket, SupportsMargin, SupportsStopOrder, SupportsParentOrder, SupportsCandlestick, SupportsWithdraw }` などの機能フラグ
 - RateLimits（任意）: `{ RequestsPerMinute, OrdersPerMinute }` のような概略値
 
 ## 3. Raw API の扱い（Stage4 抽象外）

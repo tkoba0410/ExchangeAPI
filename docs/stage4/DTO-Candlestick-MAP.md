@@ -1,6 +1,6 @@
 # DTO-Candlestick-MAP Candlestick マッピング仕様（複数取引所想定）
 
-## 1. 抽象 DTO 要約
+## 1. 抽象 DTO 要約（IMarketDataApi.ListCandlesticks 用）
 - DTO 名: `Candlestick`
 - 必須フィールド:
   - `Symbol` : 抽象シンボル（例: BTC/JPY）
@@ -25,7 +25,7 @@
 | --- | --- | --- | --- |
 | Binance（参考） | `/api/v3/klines` → [open time, open, high, low, close, volume, ...] | `open time` ms epoch (UTC)、シンボル大文字連結。quote volume, trades も返す。 | 未実装 |
 | BitBank（参考） | `/v1/candlestick/{pair}/{timescale}` → `ohlcv` 配列（[open, high, low, close, volume, timestamp]） | `timestamp` ms epoch (UTC)、`pair` を Symbol に変換。 | 未実装 |
-| BitTrade（参考） | （未調査） | 実仕様要確認。 | 未実装 |
+| BitTrade（初期ターゲット） | （未調査） | 実仕様要確認。 | 未実装 |
 | BTCBOX（参考） | （未調査） | 実仕様要確認。 | 未実装 |
 | CoinCheck（参考） | `/api/candles/{pair}/{period}` → `opened_at`, `high`, `low`, `close`, `volume` | `opened_at` epoch (UTC)。period は 1min/5min 等。 | 未実装 |
 | GMOコイン（参考） | `/public/v1/klines` → `openTime`, `open`, `high`, `low`, `close`, `volume` | `openTime` ISO8601 (UTC)。`symbol` を Symbol に変換。 | 未実装 |

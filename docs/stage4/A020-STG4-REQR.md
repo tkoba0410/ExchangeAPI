@@ -6,7 +6,7 @@
 - 取引所固有の実装・API 詳細は Stage5 以降に送る
 
 ## 2. ユースケース（代表）
-1) Market: Ticker/OrderBook/Executions をスナップショットで取得する  
+1) Market: Ticker/OrderBook/Executions/Candlesticks をスナップショットで取得する  
 2) Trading: 抽象 OrderRequest を送信し、OpenOrders を照会・Cancel する  
 3) Account: 現物残高を取得し、取引可否を判断する  
 4) Margin: 建玉（OpenPositions）と証拠金サマリ（Collateral）を取得する  
@@ -15,7 +15,7 @@
 
 ## 3. 機能要件
 - 抽象インターフェース（REST）
-  - `IMarketDataApi`: GetTicker / GetOrderBook / GetExecutions
+  - `IMarketDataApi`: GetTicker / GetOrderBook / GetExecutions / ListCandlesticks
   - `ITradingApi`: SendOrder / CancelOrder / GetOpenOrders
   - `IAccountApi`: GetBalances
   - `IMarginAccountApi : IAccountApi`: GetOpenPositions / GetCollateral（Margin はここまでに限定）
@@ -24,6 +24,9 @@
   - 購読の解除手段を必須とし、`IAsyncEnumerable<T>` + CancellationToken または `IDisposable` を返す形を想定
 - ExchangeInfo
   - `IExchangeInfoApi`: 将来拡張用のエントリーポイント（スケルトンのみ、例: 対応市場一覧/機能フラグ/概略レートリミット）
+- Candlestick 対応方針
+  - 抽象では ListCandlesticks を正式サポートするが、取引所非対応（例: bitFlyer）は `NotImplemented` 相当で明示的に拒否する。
+  - 初期の実装ターゲットは bittrade を想定する。
 - ドメイン型
   - Ticker / OrderBook / Execution / OrderRequest / OrderResult / OpenOrder / Position / Collateral
   - OrderRequest は Stage3 の骨格を踏襲し、抽象 IF との整合性を確認する

@@ -7,7 +7,7 @@ Stage4 を「ExchangeAPI の抽象 API（REST+WS）を正式に確定し凍結�
 
 ### 2.1 Stage4 でやること
 - 6 区分（Market/Trading/Account/Margin/Realtime/ExchangeInfo）で抽象インターフェースを定義・整理  
-  - REST: `IMarketDataApi`（Ticker/Board/Executions）、`ITradingApi`（Send/Cancel/OpenOrders）、`IAccountApi`（Balances）、`IMarginAccountApi`（Positions/Collateral）
+  - REST: `IMarketDataApi`（Ticker/Board/Executions/Candlesticks）、`ITradingApi`（Send/Cancel/OpenOrders）、`IAccountApi`（Balances）、`IMarginAccountApi`（Positions/Collateral）
   - WS: `IRealtimeMarketDataApi`（Subscribe Ticker/Board/Executions）
   - ExchangeInfo: 今後の拡張用の入口のみ用意
 - ドメイン型を最小セットに揃える（Ticker/OrderBook/Execution/OrderRequest/OrderResult/Position/Collateral など）。Margin は建玉・証拠金に限定する。

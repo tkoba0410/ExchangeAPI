@@ -1,51 +1,35 @@
-# A041-STG4-API-MAP bitFlyer API リストと実装状況（Stage4）
+# A041-STG4-API-MAP 抽象 API と bitFlyer 入口（参考）
 
-Stage4 時点での bitFlyer API 対応状況、抽象インターフェース対応表、固有エラーコード表（ドラフト）。
+Stage4 は抽象 API を凍結するステージであり、実装は Stage5 以降。bitFlyer を例に、6 区分ごとに抽象の対応範囲と実装ステージを示す。
 
-## 0. 分類（大区分）
-- HTTP / Public GET: 市場データ・システム状態（例: getticker, getboard, getexecutions, getmarkets, gethealth, getboardstate, getfundingrate, getcorporateleverage, getchats）
-- HTTP / Private GET: 口座/ポジション/約定/証拠金/注文照会/権限・状態（例: getbalance, getpositions, getexecutions, getcollateral, getchildorders, getparentorders, getpermissions, getboardstate, getbalancehistory, getcollateralaccounts, gettradingcommission）
-- HTTP / Private POST: 注文送信/キャンセル（例: sendchildorder, cancelchildorder, sendparentorder, cancelparentorder, withdraw）
-- WebSocket: リアルタイム配信（ticker/board/executions）
+## 0. 分類（6 区分）
+- REST: Market / Trading / Account / Margin
+- WS: Realtime
+- Other: ExchangeInfo（スケルトン）
 
-## 1. bitFlyer API リストと実装状況
-| API | Method | プロトコル | 区分 | ステージ | 実装状況 | 備考 |
+## 1. 抽象インターフェース対応表（参考マッピング）
+| 区分 | 抽象 IF / メソッド | プロトコル | 抽象範囲 | bitFlyer 参考 API | Stage4 スコープ | 実装ステージ |
 | --- | --- | --- | --- | --- | --- | --- |
-| WebSocket (ticker/board/executions) | WS | WS | WS | Stage6 | 未実装 | リアルタイム系 |
-| GET /v1/getmarkets | GET | HTTP | Public | Stage1? | 未実装 | 取扱商品一覧 |
-| GET /v1/markets | GET | HTTP | Public | Stage1? | 未実装 | 取扱商品一覧 |
-| GET /v1/getboard | GET | HTTP | Public | Stage1? | 未実装 | 板情報 |
-| GET /v1/board | GET | HTTP | Public | Stage1? | 未実装 | 板情報 |
-| GET /v1/getticker | GET | HTTP | Public | Stage1 | 済 | 現物ティッカー |
-| GET /v1/ticker | GET | HTTP | Public | Stage1 | 未実装 | 現物ティッカー |
-| GET /v1/getexecutions | GET | HTTP | Public | Stage1? | 未実装 | 約定履歴（板歩み） |
-| GET /v1/executions | GET | HTTP | Public | Stage1? | 未実装 | 約定履歴（板歩み） |
-| GET /v1/getboardstate | GET | HTTP | Public | Stage5+ | 未実装 | 相場状態 |
-| GET /v1/gethealth | GET | HTTP | Public | Stage5+ | 未実装 | 取引所状態 |
-| GET /v1/getfundingrate | GET | HTTP | Public | 時期未定 | 未実装 | ファンディングレート |
-| GET /v1/getcorporateleverage | GET | HTTP | Public | 時期未定 | 未実装 | 法人最大レバレッジ |
-| GET /v1/getchats | GET | HTTP | Public | 時期未定 | 未実装 | チャット |
-| GET /v1/me/getpermissions | GET | HTTP | Private GET | Stage5+ | 未実装 | APIキー権限確認 |
-| GET /v1/me/getbalance | GET | HTTP | Private GET | Stage2 | 済 | 残高 |
-| GET /v1/me/getcollateral | GET | HTTP | Private GET | Stage4 | 済 | 証拠金 |
-| GET /v1/me/getcollateralaccounts | GET | HTTP | Private GET | 時期未定 | 未実装 | 証拠金通貨別残高 |
-| GET /v1/me/getaddresses | GET | HTTP | 入出金 | 時期未定 | 未実装 | 仮想通貨入金アドレス |
-| GET /v1/me/getcoinins | GET | HTTP | 入出金 | 時期未定 | 未実装 | 仮想通貨入金履歴 |
-| GET /v1/me/getcoinouts | GET | HTTP | 入出金 | 時期未定 | 未実装 | 仮想通貨出金履歴 |
-| GET /v1/me/getbankaccounts | GET | HTTP | 入出金 | 時期未定 | 未実装 | 銀行口座一覧 |
-| GET /v1/me/getdeposits | GET | HTTP | 入出金 | 時期未定 | 未実装 | 日本円入金履歴 |
-| POST /v1/me/withdraw | POST | HTTP | 入出金 | 時期未定 | 未実装 | 日本円出金リクエスト |
-| GET /v1/me/getwithdrawals | GET | HTTP | 入出金 | 時期未定 | 未実装 | 日本円出金履歴 |
-| POST /v1/me/sendchildorder | POST | HTTP | Private POST | Stage3 | 済 | |
-| POST /v1/me/cancelchildorder | POST | HTTP | Private POST | Stage4 | 済 | child_order_acceptance_id 優先 |
-| POST /v1/me/sendparentorder | POST | HTTP | Private POST | Stage5+ | 未実装 | IFD/OCO/IFDOCO など |
-| POST /v1/me/cancelparentorder | POST | HTTP | Private POST | Stage5+ | 未実装 | 親注文キャンセル |
-| POST /v1/me/cancelallchildorders | POST | HTTP | Private POST | Stage4 | 済 | product_code 指定 |
-| GET /v1/me/getchildorders | GET | HTTP | Private GET | Stage5+ | 未実装 | Open/History 取得 |
-| GET /v1/me/getparentorders | GET | HTTP | Private GET | Stage5+ | 未実装 | 親注文一覧 |
-| GET /v1/me/getparentorder | GET | HTTP | Private GET | Stage5+ | 未実装 | 親注文詳細 |
-| GET /v1/me/getexecutions | GET | HTTP | Private GET | Stage4 | 済 | product_code 必須 |
-| GET /v1/me/getbalancehistory | GET | HTTP | Private GET | 時期未定 | 未実装 | 残高履歴 |
-| GET /v1/me/getpositions | GET | HTTP | Private GET | Stage4 | 済 | product_code 必須 |
-| GET /v1/me/getcollateralhistory | GET | HTTP | 入出金 | 時期未定 | 未実装 | 証拠金履歴 |
-| GET /v1/me/gettradingcommission | GET | HTTP | Private GET | 時期未定 | 未実装 | 手数料取得 |
+| Market | IMarketDataApi.GetTicker | REST | スナップショット | GET `/v1/getticker` | 抽象定義 | Stage5+ |
+| Market | IMarketDataApi.GetOrderBook | REST | スナップショット | GET `/v1/getboard` | 抽象定義 | Stage5+ |
+| Market | IMarketDataApi.GetExecutions | REST | スナップショット | GET `/v1/getexecutions` | 抽象定義 | Stage5+ |
+| Trading | ITradingApi.SendOrder | REST | MARKET/LIMIT/STOP/STOP_LIMIT | POST `/v1/me/sendchildorder` | 抽象定義 | Stage5+ |
+| Trading | ITradingApi.CancelOrder | REST | 単一キャンセル | POST `/v1/me/cancelchildorder` | 抽象定義 | Stage5+ |
+| Trading | ITradingApi.GetOpenOrders | REST | Open/Active | GET `/v1/me/getchildorders` | 抽象定義 | Stage5+ |
+| Account | IAccountApi.GetBalances | REST | 現物残高 | GET `/v1/me/getbalance` | 抽象定義 | Stage5+ |
+| Margin | IMarginAccountApi.GetOpenPositions | REST | 建玉一覧 | GET `/v1/me/getpositions` | 抽象定義 | Stage5+ |
+| Margin | IMarginAccountApi.GetCollateral | REST | 証拠金サマリ | GET `/v1/me/getcollateral` | 抽象定義 | Stage5+ |
+| Realtime | IRealtimeMarketDataApi.SubscribeTicker | WS | 配信購読 | WS `ticker` | 抽象定義 | Stage5+ |
+| Realtime | IRealtimeMarketDataApi.SubscribeOrderBook | WS | 配信購読 | WS `board` | 抽象定義 | Stage5+ |
+| Realtime | IRealtimeMarketDataApi.SubscribeExecutions | WS | 配信購読 | WS `executions` | 抽象定義 | Stage5+ |
+| ExchangeInfo | IExchangeInfoApi | REST | 市場/機能情報の入口 | （将来決定） | 抽象定義 | Stage5+ |
+
+## 2. Raw API の扱い（Stage4 抽象外）
+- 親注文（sendparentorder/cancelparentorder）、入出金、履歴系、権限確認などは Raw で扱う。
+- WS の再接続・バックプレッシャー・品質制御も実装ステージで扱う。
+
+## 3. スコープの考え方
+- Stage4: 抽象インターフェースとドメイン型の確定のみ（REST/WS を含む）
+- Stage5+: bitFlyer など取引所へのマッピング実装と運用ロジックを実装
+
+備考: 本表に記載の API はすべて「抽象定義のみが Stage4 スコープ」であり、実装は Stage5 以降で行う。

@@ -1,6 +1,6 @@
 # Quick Start
 
-ExchangeApi を最短で動かすための手順です。Stage4 時点の機能（bitFlyer での Ticker/発注/キャンセル/ポジション・約定取得）を対象としています。
+ExchangeApi を最短で動かすための手順です。実装されているのは Stage3 相当（bitFlyer での Ticker / MARKET 発注 / 残高取得）で、Stage4 は「REST+WS 抽象 API を定義する」設計フェーズです（実装は Stage5 以降）。
 
 ## 前提
 - .NET 10 以降
@@ -43,36 +43,30 @@ var ticker = await client.GetTickerAsync("BTC/JPY");
 Console.WriteLine($"Bid {ticker.BestBid} / Ask {ticker.BestAsk} / Last {ticker.LastTradedPrice}");
 ```
 
-## 4. 注文を出す（LIMIT/STOP 対応）
+## 4. 注文を出す（Stage3: MARKET）
 ```csharp
 using ExchangeApi.Abstractions.Dtos;
 
 var order = new OrderRequest(
     ProductCode: "BTC_JPY",
     Side: OrderSide.Buy,
-    OrderType: OrderType.Limit,
+    OrderType: OrderType.Market,
     Size: 0.01m,
-    Price: 4000000m);
+    Price: null);
 
 var result = await client.PlaceOrderAsync(order);
 Console.WriteLine($"Accepted: {result.OrderId}");
 ```
 
-## 5. キャンセルする
-```csharp
-await client.CancelOrderAsync("BTC_JPY", result.OrderId);
-await client.CancelAllOrdersAsync("BTC_JPY");
-```
-
-## 6. ポジション・約定を取る
-```csharp
-var positions = await client.ListPositionsAsync("FX_BTC_JPY");
-var executions = await client.ListExecutionsAsync("BTC_JPY");
-```
+## 5. （参考）Stage4 で定義された抽象
+- REST: `IMarketDataApi` / `ITradingApi` / `IAccountApi` / `IMarginAccountApi`
+- WS: `IRealtimeMarketDataApi`
+- ExchangeInfo: `IExchangeInfoApi`
+※ これらは Stage4 で設計のみ。実装は Stage5 以降。
 
 ## エラーとハマりポイント
 - サポート外シンボルは `SymbolNotSupportedException`（抽象層）で通知。
 - HTTP/bitFlyer エラーは `ExchangeApiException`。`StatusCode` と `ExchangeErrorCode` を確認。
-- STOP 注文で指値付きにする場合は `Price` と `TriggerPrice` を両方指定（STOP_LIMIT）。`Price` なしは成行（STOP）。
+- STOP/LIMIT/キャンセル/ポジション取得などは Stage5 以降で実装される予定。
 
 より詳しい説明は `docs/entry-guide.md` を参照してください。

@@ -1,45 +1,39 @@
-# A030-STG4-ARCL Stage4 レイヤ構成（Private 横展開 + 注文強化）
+# A030-STG4-ARCL Stage4 レイヤ構成（REST+WS 抽象確定）
 
 ## 1. 依存方向
 ```
-Abstractions  ←  Infrastructure  ←  Bitflyer (API/Adapter)  ←  Factory
+Abstractions (6 modules)
+     ↓
+Infrastructure / Adapter（実装は Stage5 以降）
+     ↓
+Exchange-specific API / Transport
+     ↓
+Factory
 ```
 
 ## 2. レイヤ別の役割
-- **Abstractions**: Domain モデル（Position/Execution/Collateral/OrderRequest 拡張）と抽象インターフェース（Trading/Account）
-- **Infrastructure**: RestClient/Signer の拡張（キャンセル系・E2 エラー・レートリミットフック）
-- **Bitflyer API**: Private GET/POST DTO と HTTP 呼び出し実装
-- **Bitflyer Adapter**: DTO ⇄ Domain マッピング、E2 エラー分類の適用
-- **Factory**: bitFlyer 向け DI 構築（GET/POST 全てを一括登録）
+- **Abstractions**: Market / Trading / Account / Margin / Realtime / ExchangeInfo の 6 区分で薄いインターフェースと最小ドメイン型を提供する。Stage4 の主成果。
+- **Infrastructure/Adapter**: 取引所固有 DTO ↔ Domain の変換、HTTP/WS 呼び出し、エラー分類フックを担当。Stage5 以降で実装。
+- **Exchange API (bitFlyer など)**: 実際の REST/WS エンドポイント呼び出し。Stage4 では参照のみ。
+- **Factory**: 取引所実装を組み立てる入口。Stage5 以降で拡張。
 
 ## 3. コンポーネント構成（Stage4 範囲）
 ```
 ExchangeApi.Abstractions
-  ├─ Domain: Position / Execution / Collateral
-  ├─ Domain: OrderRequest (price / minute_to_expire / time_in_force / trigger_price)
-  └─ Interfaces: IExchangeTradingClient (PlaceOrderAsync, Cancel..., GetPositions..., GetExecutions..., GetCollateral)
-
-ExchangeApi.Infrastructure
-  ├─ IRequestSigner（キャンセル系・拡張パラメータ対応）
-  ├─ IRestClient (GET/POST 拡張, E2 エラー処理)
-  ├─ ExchangeApiException (+ exchange code/category)
-  └─ RateLimit hook (インターフェース/設定のみ)
-
-ExchangeApi.Bitflyer.PrivateApi
-  ├─ DTO: Positions / Executions / Collateral
-  ├─ DTO: CancelChildOrder / CancelAllChildOrders
-  └─ BitflyerPrivateApi (GET/POST 拡張)
-
-ExchangeApi.Bitflyer.Adapter
-  ├─ Mapping: DTO → Domain (positions/executions/collateral)
-  ├─ Mapping: Domain → DTO (orders/cancel)
-  └─ E2 Error mapping (bitFlyer code → typed exception)
-
-ExchangeApi.Factory
-  └─ BitflyerClientFactory (GET/POST/Trading を全登録、設定を集約)
+  ├─ Domain: Ticker / OrderBook / Execution / OrderRequest / OrderResult / OpenOrder
+  ├─ Domain: Position / Collateral（Margin 用・最小）
+  ├─ REST Interfaces:
+  │    IMarketDataApi (GetTicker / GetOrderBook / GetExecutions)
+  │    ITradingApi (SendOrder / CancelOrder / GetOpenOrders)
+  │    IAccountApi (GetBalances)
+  │    IMarginAccountApi : IAccountApi (GetOpenPositions / GetCollateral)
+  ├─ WS Interface:
+  │    IRealtimeMarketDataApi (SubscribeTicker / SubscribeOrderBook / SubscribeExecutions)
+  └─ ExchangeInfo Interface:
+       IExchangeInfoApi (スケルトン入口)
 ```
 
-## 4. データフローの特徴
-- GET 系：RestClient.GET → PrivateApi DTO → Adapter で Domain に変換
-- POST 系：Domain → Adapter DTO → PrivateApi.POST → DTO → Adapter で Domain/Result に変換
-- エラー：RestClient/Adapter で HTTP + bitFlyer code を分類し、E2 例外として抽象層へ伝播
+## 4. データフローの特徴（設計ガイド）
+- REST: Client → Abstractions → Adapter (Stage5+) → Transport → Exchange API → Adapter → Domain
+- WS: Client → Abstractions → WS Adapter (Stage5+) → WS Stream → Domain events
+- Raw: 抽象化できない機能は Raw API として Adapter/Factory 側に逃がす（Stage4 では設計対象外）

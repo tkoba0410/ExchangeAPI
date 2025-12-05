@@ -6,8 +6,8 @@ Stage1 から将来ステージまでのラフなロードマップ。進行状�
 - **Stage1**: Public GET（/v1/getticker）による Ticker 取得を統一 DTO/抽象クライアントで提供。REST/Transport 分離を確立。
 - **Stage2**: Private GET の最初の縦スライス（/v1/me/getbalance）。認証付き GET、署名、エラー E1（HTTP ベース）の基盤整備。
 - **Stage3**: Private POST の最初の縦スライス（/v1/me/sendchildorder, MARKET）。POST 署名、ドメイン⇄DTO マッピング、トレード API のテンプレート確立。
-- **Stage4**: Private GET/POST を見据えた抽象インターフェース・ドメインモデルの網羅と凍結。positions/executions/collateral/cancel、注文種別拡張（LIMIT/STOP/time_in_force/minute_to_expire）を Abstractions まで整備し、E2 エラー分類の骨子を決める。実装の横展開は行わず、必要最小限のスタブで足場を確認する。
-- **Stage5**: bitFlyer 縦方向の深掘り（Stage4 で定義した抽象を実装する）。positions/executions/collateral/cancel などの Private GET/POST、注文種別拡張の実装と代表テストを完了する。横展開が不可欠な箇所のみ最小限に実装。
+- **Stage4**: REST+WS 抽象 API を正式に確定し凍結する。Market/Trading/Account/Margin/Realtime/ExchangeInfo の 6 区分で責務を分割し、薄い抽象インターフェースと最小ドメイン型を揃える。Margin は建玉・証拠金サマリに限定し、実装は Stage5 以降に送る。
+- **Stage5**: Stage4 で定義した抽象（REST+WS）を bitFlyer で実装する。LIMIT/STOP/キャンセル/ポジション・証拠金取得などを縦に通し、抽象の妥当性を検証する。必要に応じて Raw API（親注文/入出金等）も扱う。
 - **Stage6**: WebSocket/リアルタイム拡張（Ticker/Board/Executions）を bitFlyer で縦に通す。再接続・サブスク管理・バックプレッシャーを含むストリーム制御の土台を作る。
 - **Stage7**: 信頼性・運用強化。レート制御・リトライ・サーキットブレーカ、メトリクス/トレース（OpenTelemetry 等）、構成可能なログ/アラートポリシー。
 - **Stage8**: 複数取引所対応の実証と DX 仕上げ。追加取引所で Public/Private の一部機能を実装し、抽象インターフェースやエラー分類の汎用性を検証。DocFX などによる API リファレンス生成やサンプル/クックブック拡充もここでまとめる。

@@ -1,32 +1,43 @@
-# A020-STG4-REQR Stage4 要件定義（Private 横展開 + 注文強化）
+# A020-STG4-REQR Stage4 要件定義（REST+WS 抽象確定）
 
 ## 1. 対象
-- 取引所: bitFlyer
-- API: Private GET（positions/executions/collateral）、Private POST（cancelchildorder/cancelallchildorders）、注文送信（LIMIT/STOP/time_in_force/minute_to_expire 対応）
-- 抽象: IExchangeTradingClient / IExchangeClient の機能拡張
+- ExchangeAPI の抽象層を「REST+WS 抽象 API の正式確定」として整理するステージ
+- 6 区分: Market / Trading / Account / Margin / Realtime / ExchangeInfo
+- 取引所固有の実装・API 詳細は Stage5 以降に送る
 
 ## 2. ユースケース（代表）
-1) ポジション照会: 現在の建玉を取得し、サイズ/価格/建玉方向を確認できる  
-2) 約定履歴取得: 直近の executions を取得し、fills を集計できる  
-3) 証拠金照会: collateral を取得し、発注可能額を判断できる  
-4) 注文キャンセル: child order を ID でキャンセル、または全キャンセル  
-5) 新規注文（拡張）: LIMIT/STOP を time_in_force/minute_to_expire 付きで送信できる  
-6) エラー診断: bitFlyer 固有コードで例外が分類され、リトライ可否が判断できる  
+1) Market: Ticker/OrderBook/Executions をスナップショットで取得する  
+2) Trading: 抽象 OrderRequest を送信し、OpenOrders を照会・Cancel する  
+3) Account: 現物残高を取得し、取引可否を判断する  
+4) Margin: 建玉（OpenPositions）と証拠金サマリ（Collateral）を取得する  
+5) Realtime: WS で Ticker/OrderBook/Executions を購読し、更新を受け取る  
+6) ExchangeInfo: 対象市場/機能の存在を確認する入口（スケルトン）
 
 ## 3. 機能要件
-- 抽象モデル: Position/Execution/Collateral（仮称）を追加し、取引所固有 DTO からマッピングする
-- 注文: OrderRequest に price/minute_to_expire/time_in_force/trigger_price（STOP 用）を拡張
-- キャンセル: cancelchildorder/cancelallchildorders を抽象インターフェースに追加
-- エラー: HTTP + bitFlyer コードを E2 で分類し、typed 例外を投げる
-- 設定: time_in_force や product code、API キーなどを既存の Factory 経由で設定可能
+- 抽象インターフェース（REST）
+  - `IMarketDataApi`: GetTicker / GetOrderBook / GetExecutions
+  - `ITradingApi`: SendOrder / CancelOrder / GetOpenOrders
+  - `IAccountApi`: GetBalances
+  - `IMarginAccountApi : IAccountApi`: GetOpenPositions / GetCollateral（Margin はここまでに限定）
+- 抽象インターフェース（WS）
+  - `IRealtimeMarketDataApi`: SubscribeTicker / SubscribeOrderBook / SubscribeExecutions
+- ExchangeInfo
+  - `IExchangeInfoApi`: 将来拡張用のエントリーポイント（スケルトンのみ、例: 対応市場一覧/機能フラグ）
+- ドメイン型
+  - Ticker / OrderBook / Execution / OrderRequest / OrderResult / OpenOrder / Position / Collateral
+  - OrderRequest は Stage3 の骨格を踏襲し、抽象 IF との整合性を確認する
+- Raw API 方針
+  - 抽象化できない機能（親注文・入出金など）は Raw として切り出し、Stage4 では触れないことを明記
 
 ## 4. 非機能要件
-- 互換性: Stage3 までの MARKET 既存インターフェースは後方互換を維持
-- テスト: DTO マッピング/注文生成/エラー分類/キャンセルの単体テストを追加
-- 観測性: レートリミットやエラー分類のフックを提供（実装は簡易で可）
+- REST と WS の責務を分離し、薄い API として境界を明確化する
+- Stage3 までの公開 API との後方互換性を維持する
+- 抽象の肥大化を避け、Margin は最小能力に限定する
+- 将来のレート制御/リトライ/エラー分類はフック方針のみ示し、実装は Stage5 以降に任せる
 
 ## 5. 除外（Stage4 ではやらない）
-- WebSocket（Ticker/Board/Executions ストリーム）
-- 複数取引所実装
-- 高度な信頼性（サーキットブレーカ、指数バックオフの細かな調整）
-- 完全なドキュメント生成パイプライン（DocFX 等）は骨子のみ
+- bitFlyer など特定取引所の HTTP/WS 実装・マッピング
+- エラーコード分類の詳細実装、レートリミットや再接続ロジックの実装
+- 親注文/入出金/履歴系など抽象化しない API の対応
+- WebSocket の再接続や QoS 制御など運用ロジック
+- ドキュメント生成パイプラインの整備（骨子のみ）

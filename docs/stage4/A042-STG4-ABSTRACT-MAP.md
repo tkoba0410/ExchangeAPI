@@ -1,22 +1,23 @@
 # A042-STG4-ABSTRACT-MAP 抽象 API 対応表（Stage4）
 
-抽象インターフェースと bitFlyer API の対応をまとめた表。基本セットに絞り、未設計は「未」とする。
+Stage4 で確定する抽象インターフェースと代表 DTO を 6 区分で整理する。REST/WS を明確に分離し、Margin は拡張インターフェースで表現する。
 
-| DTO | 抽象インターフェース / メソッド | スコープ (Public/Private) | HTTP/WS | HTTPメソッド | 対応 bitFlyer API | ステージ | 実装状況 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Board | GetBoardAsync | Public | HTTP | GET | /v1/getboard | Stage1 | 済 |
-| Ticker | GetTickerAsync | Public | HTTP | GET | /v1/getticker | Stage1 | 済 |
-| Candlestick[] | ListCandlesticksAsync | Public | HTTP | GET | bitbank（参考） `/v1/candlestick/{pair}/{timescale}` ※bitFlyerは公式OHLCVなし（未サポート時は例外で通知） | Stage5 | 未実装 |
-| Balance[] | GetBalancesAsync | Private | HTTP | GET | /v1/me/getbalance | Stage2 | 済 |
-| Collateral | GetCollateralAsync | Private | HTTP | GET | /v1/me/getcollateral | Stage4 | 済 |
-| Position[] | ListPositionsAsync | Private | HTTP | GET | /v1/me/getpositions | Stage4 | 済 |
-| Execution[] | ListExecutionsAsync | Private | HTTP | GET | /v1/me/getexecutions | Stage4 | 済 |
-| OpenOrder[] | ListOpenOrdersAsync | Private | HTTP | GET | /v1/me/getchildorders?child_order_state=ACTIVE | Stage4 | 済 |
-| OrderResult | PlaceOrderAsync | Private | HTTP | POST | /v1/me/sendchildorder（STOP系で親注文を使う場合は sendparentorder） | Stage3/4 | 子注文: 済（MARKET/LIMIT/STOP/STOP_LIMIT） / 親注文: 未 |
-| CancelResult | CancelOrderAsync | Private | HTTP | POST | /v1/me/cancelchildorder | Stage4 | 済 |
-| CancelResult | CancelAllOrdersAsync | Private | HTTP | POST | /v1/me/cancelallchildorders | Stage4 | 済 |
-| (WS DTO 検討中) | SubscribeTicker/Board/Executions（仮） | Public | WS | - | WS (ticker/board/executions) | Stage6 | 未 |
-| (補助) | OrderId マッピング | N/A | - | - | InMemoryOrderIdMapper (optional) | N/A | 任意 |
+| 区分 | 抽象インターフェース / メソッド | プロトコル | スコープ | 備考 |
+| --- | --- | --- | --- | --- |
+| Market | IMarketDataApi.GetTicker | REST | Public | Ticker スナップショット |
+| Market | IMarketDataApi.GetOrderBook | REST | Public | OrderBook スナップショット |
+| Market | IMarketDataApi.GetExecutions | REST | Public | 約定履歴（歩み値） |
+| Trading | ITradingApi.SendOrder | REST | Private | OrderRequest → OrderResult |
+| Trading | ITradingApi.CancelOrder | REST | Private | OrderId 指定キャンセル |
+| Trading | ITradingApi.GetOpenOrders | REST | Private | OpenOrder 一覧取得 |
+| Account | IAccountApi.GetBalances | REST | Private | 現物残高 |
+| Margin | IMarginAccountApi.GetOpenPositions | REST | Private | 建玉一覧（Margin 拡張） |
+| Margin | IMarginAccountApi.GetCollateral | REST | Private | 証拠金サマリ（Margin 拡張） |
+| Realtime | IRealtimeMarketDataApi.SubscribeTicker | WS | Public | Ticker ストリーム購読 |
+| Realtime | IRealtimeMarketDataApi.SubscribeOrderBook | WS | Public | OrderBook ストリーム購読 |
+| Realtime | IRealtimeMarketDataApi.SubscribeExecutions | WS | Public | 約定ストリーム購読 |
+| ExchangeInfo | IExchangeInfoApi | REST | Public | 市場/機能情報の入口（スケルトン: 市場一覧/機能フラグなど） |
 
 備考:
-- 親注文系・入出金系・履歴系は現時点では抽象に含めない。必要になれば追加する。
+- IMarginAccountApi は IAccountApi を継承し、Margin 能力を追加する。
+- 親注文/入出金/履歴系など抽象化しない機能は Raw API として扱う。

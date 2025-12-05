@@ -1,36 +1,34 @@
-# A010-STG4-OVER Stage4 ゴール定義（抽象インターフェース整備・凍結）
+# A010-STG4-OVER Stage4 ゴール定義（REST+WS 抽象 API 確定）
 
 ## 1. Stage4 の目的
-Stage3 で確立した縦スライス（MARKET 発注）を土台に、**取引ライフサイクルを最後まで見据えた抽象インターフェースとドメインモデルを揃える**ことを目的とする。実装の横展開は行わず、以降の縦深フェーズ（Stage5 以降）で具体実装できる状態をつくる。
+Stage4 を「ExchangeAPI の抽象 API（REST+WS）を正式に確定し凍結するステージ」として再定義する。Market / Trading / Account / Margin / Realtime / ExchangeInfo の 6 区分で責務を分割し、以降の実装ステージ（Stage5 以降）が迷いなく進められるように**薄い抽象インターフェースと最小ドメインモデルを揃える**。
 
 ## 2. スコープ（Stage4 でやること / やらないこと）
 
 ### 2.1 Stage4 でやること
-- Private GET/POST を見据えた抽象インターフェースの追加・整理  
-  - `Positions/Executions/Collateral/OpenOrders` 取得、`Cancel` 系、`ListOrders` 等のメソッド定義  
-  - DTO/ドメインモデル（`Position`, `Execution`, `Collateral`, `OpenOrder`, `OrderRequest` 拡張）を Abstractions で揃える
-- 注文モデルの拡張（LIMIT/STOP/STOP_LIMIT、`TimeInForce`, `MinuteToExpire`, `TriggerPrice` 等）を抽象層で定義し、型の互換性を確認する
-- エラー分類の骨子（E2: 取引所固有コード分類の方針、再試行可否の表現など）を決め、例外型/enum を設計する
-- RateLimit/Retry など将来フックのインターフェースだけを用意する（実装は Stage5 以降で可）
-- ドキュメント整備：A010〜A070 を新方針に合わせて更新し、横展開は Stage5 以降に送ることを明記する
+- 6 区分（Market/Trading/Account/Margin/Realtime/ExchangeInfo）で抽象インターフェースを定義・整理  
+  - REST: `IMarketDataApi`（Ticker/Board/Executions）、`ITradingApi`（Send/Cancel/OpenOrders）、`IAccountApi`（Balances）、`IMarginAccountApi`（Positions/Collateral）
+  - WS: `IRealtimeMarketDataApi`（Subscribe Ticker/Board/Executions）
+  - ExchangeInfo: 今後の拡張用の入口のみ用意
+- ドメイン型を最小セットに揃える（Ticker/OrderBook/Execution/OrderRequest/OrderResult/Position/Collateral など）。Margin は建玉・証拠金に限定する。
+- 抽象化できない領域を Raw API として切り出す方針を明記する。
+- ドキュメント（A010〜A070）を新方針に合わせて刷新し、実装や横展開は Stage5 以降に送ることを明示する。
 
 ### 2.2 Stage4 でやらないこと
-- bitFlyer での positions/executions/collateral/cancel の実装やテスト（縦深実装は Stage5 の範囲）
-- 注文種別拡張の実装（Abstractions まで。送信ロジックは Stage5）
-- 取引所固有コードの詳細マッピングやリトライ方針の実装
-- WebSocket 系（Ticker/Board/Executions ストリーム）
+- bitFlyer など特定取引所への実装・テスト（REST/WS 両方とも Stage5 以降で実装）
+- 注文拡張やエラー分類の詳細実装（抽象の整合性確認まで）
+- WebSocket の再接続やストリーム制御などの運用ロジック
+- 信頼性パターン/レート制御の実装、DX 仕上げ
 - 複数取引所対応の実装
-- 信頼性パターンの本格実装（サーキットブレーカ/高度なリトライ）
-- DX 仕上げ（DocFX 生成/CLI などの最終形）
 
 ## 3. 完了条件（Definition of Done）
-1. Abstractions/Interfaces が positions/executions/collateral/open-orders/cancel を含み、注文モデル拡張が型として揃っている
-2. E2 エラー分類方針と例外/API 契約が定義され、ビルド時点で参照可能になっている
-3. RateLimit/Retry など将来フックのインターフェースが用意され、呼び出し側が差し替え可能な構造になっている
-4. 追加したメソッド/型のスタブ実装が存在し、Stage3 までの機能を壊さずにビルド/テストが通る
-5. ドキュメント: Stage4 A010〜A070 が新方針に更新され、横展開が Stage5 以降に送られたことを明示している
+1. 6 区分すべてに抽象インターフェースが定義され、REST/WS の責務が分離されている
+2. ドメイン型が抽象インターフェースに対応し、Margin は建玉・証拠金に限定されている
+3. ExchangeInfo の骨子（スケルトン）があり、Raw API に逃がす領域が明記されている
+4. Stage3 までの機能との互換を壊さず、Stage4 追加要素がビルド時に参照できる
+5. ドキュメント: Stage4 A010〜A070 が「REST+WS 抽象 API の確定」を中心に更新されている
 
 ## 4. Stage5 以降への接続
-- Stage5: Stage4 で定義した抽象を bitFlyer で縦方向に実装し、取引ライフサイクルを通す
-- Stage6: WebSocket/リアルタイム拡張に進む
-- Stage7 以降: 信頼性パターン強化を経て、最後に複数取引所対応・DX 仕上げを行う
+- Stage5: Stage4 で凍結した抽象を bitFlyer で実装（REST+WS の縦深実装を開始）
+- Stage6: 信頼性・運用・DX を強化し、リアルタイム運用パターンを仕上げる
+- Stage7 以降: 複数取引所対応・ドキュメント整備を進め、公開水準に仕上げる

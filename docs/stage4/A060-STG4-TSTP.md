@@ -1,25 +1,19 @@
-# A060-STG4-TSTP Stage4 テスト観点（Private 横展開 + 注文強化）
+# A060-STG4-TSTP Stage4 テスト観点（抽象整合性チェック）
+
+Stage4 のテストは「抽象の整合性」を確認することに特化し、実 API・運用系テストは Stage5 以降に委ねる。
 
 ## 1. 単体テスト
-- Domain バリデーション: OrderRequest の price/trigger_price/time_in_force/minute_to_expire
-- DTO ↔ Domain マッピング: positions/executions/collateral、OrderRequest → sendchildorder DTO、cancel DTO
-- エラー分類: bitFlyer code + HTTP ステータス → E2 例外のマッピング
-- RestClient/Signer: cancelchildorder/cancelallchildorders の署名・URI 構築
-- 429/RateLimit: Retry-After/ヘッダ有無による挙動が設定で制御されるかの確認
+- 抽象インターフェースが 6 区分すべて揃っているかのメタチェック
+- ドメイン型の欠落/矛盾チェック（例: OrderRequest が Trading 抽象の要求を満たすか）
+- Margin 拡張の継承構造（IMarginAccountApi : IAccountApi）が崩れていないかの型検証
+- REST/WS の責務分離が守られているか（同一 DTO を混在させていないか）
 
-## 2. 結合テスト（モック/スタブ）
-- Adapter 経由での PlaceOrderAsync(LIMIT/STOP) → DTO 生成確認
-- Cancel API 呼び出しで正しいパラメータが渡ること
-- GET 系で DTO スタブが Domain に正しく変換されること
-- E2 エラーが抽象層に伝搬すること（再試行可否のフラグ確認）
+## 2. スタブ/モックでの整合性確認
+- 抽象メソッドの入力/出力契約がコンパイル時に確認できること（nullability、必須/任意の扱い）
+- WS 購読メソッドがイベント/Dispose パターンなど、期待インターフェース形状を満たすか
+- ExchangeInfo や Raw API への拡張ポイントが重複なく配置されているか
 
-## 3. 手動/統合チェック（必要に応じて）
-- 小額の LIMIT/STOP 注文送信とキャンセルが通ること
-- positions/executions/collateral が実口座で取得できること
-- 429/400/403 系の代表エラーが期待どおり例外化されること
-- OrderRequest バリデーション: 組み合わせ不備（STOP で price/trigger の欠落など）が適切に弾かれること
-
-## 4. 非対象（Stage5+ へ委ねる）
-- 複数取引所間の比較テスト
-- WebSocket ストリームの録画/リプレイ
-- 本格的な負荷試験・レート制御の検証
+## 3. Stage5 以降へ送るテスト
+- DTO ↔ Domain マッピング、実 HTTP/WS 呼び出し、E2 エラー分類の検証
+- 再接続・レート制御・QoS・負荷試験など運用系のテスト
+- 実口座を用いた発注/キャンセル/取得の統合テスト

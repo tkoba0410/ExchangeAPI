@@ -21,3 +21,5 @@ Stage4 で確定する抽象インターフェースと代表 DTO を 6 区分�
 備考:
 - IMarginAccountApi は IAccountApi を継承し、Margin 能力を追加する。
 - 親注文/入出金/履歴系など抽象化しない機能は Raw API として扱う。
+- WS の購読は `IAsyncEnumerable<T>`（キャンセルは CancellationToken）または `IDisposable` を返す形を想定し、解除手段を必須とする。
+- WS イベントの最小 DTO 例: `TickerTick { Bid, Ask, Last, Timestamp }`, `OrderBookDelta { Bids[], Asks[], Snapshot, Timestamp }`, `ExecutionTick { Side, Price, Size, Timestamp }`。

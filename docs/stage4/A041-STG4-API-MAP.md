@@ -24,11 +24,16 @@ Stage4 は抽象 API を凍結するステージであり、実装は Stage5 以
 | Realtime | IRealtimeMarketDataApi.SubscribeExecutions | WS | 配信購読 | WS `executions` | 抽象定義 | Stage5+ |
 | ExchangeInfo | IExchangeInfoApi | REST | 市場/機能情報の入口 | （将来決定） | 抽象定義 | Stage5+ |
 
-## 2. Raw API の扱い（Stage4 抽象外）
-- 親注文（sendparentorder/cancelparentorder）、入出金、履歴系、権限確認などは Raw で扱う。
+## 2. ExchangeInfo の返却例（スケルトン）
+- Markets: `[{ Symbol: "BTC/JPY", ProductCode: "BTC_JPY", Type: Spot/Margin, MinSize, PriceIncrement, SizeIncrement }]`
+- Features: `{ SupportsWebSocket, SupportsMargin, SupportsStopOrder, SupportsParentOrder, SupportsWithdraw }` などの機能フラグ
+- RateLimits（任意）: `{ RequestsPerMinute, OrdersPerMinute }` のような概略値
+
+## 3. Raw API の扱い（Stage4 抽象外）
+- 親注文（sendparentorder/cancelparentorder/getparentorders/getparentorder）、入出金（withdraw/getdeposits/getwithdrawals）、履歴系（balancehistory/collateralhistory）や権限確認（getpermissions）などは Raw で扱う。
 - WS の再接続・バックプレッシャー・品質制御も実装ステージで扱う。
 
-## 3. スコープの考え方
+## 4. スコープの考え方
 - Stage4: 抽象インターフェースとドメイン型の確定のみ（REST/WS を含む）
 - Stage5+: bitFlyer など取引所へのマッピング実装と運用ロジックを実装
 

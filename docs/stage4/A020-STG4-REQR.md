@@ -21,8 +21,9 @@
   - `IMarginAccountApi : IAccountApi`: GetOpenPositions / GetCollateral（Margin はここまでに限定）
 - 抽象インターフェース（WS）
   - `IRealtimeMarketDataApi`: SubscribeTicker / SubscribeOrderBook / SubscribeExecutions
+  - 購読の解除手段を必須とし、`IAsyncEnumerable<T>` + CancellationToken または `IDisposable` を返す形を想定
 - ExchangeInfo
-  - `IExchangeInfoApi`: 将来拡張用のエントリーポイント（スケルトンのみ、例: 対応市場一覧/機能フラグ）
+  - `IExchangeInfoApi`: 将来拡張用のエントリーポイント（スケルトンのみ、例: 対応市場一覧/機能フラグ/概略レートリミット）
 - ドメイン型
   - Ticker / OrderBook / Execution / OrderRequest / OrderResult / OpenOrder / Position / Collateral
   - OrderRequest は Stage3 の骨格を踏襲し、抽象 IF との整合性を確認する

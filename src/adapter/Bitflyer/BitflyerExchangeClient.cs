@@ -158,7 +158,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         throw new ExchangeApiException(
             message: "Candlestick is not supported by bitFlyer.",
             exchangeId: _exchangeId,
-            operation: "ListCandlesticks",
+            operation: "GetCandlesticks",
             statusCode: System.Net.HttpStatusCode.NotImplemented,
             exchangeErrorCode: "UNSUPPORTED_OPERATION",
             errorCategory: ExchangeErrorCategory.Request);
@@ -275,9 +275,18 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
                 ChildOrderAcceptanceId = childOrderAcceptanceId,
             };
 
-            _ = await _privateTradingApi
+            var response = await _privateTradingApi
                 .CancelChildOrderAsync(dto, cancellationToken)
                 .ConfigureAwait(false);
+
+            if (response is null)
+            {
+                throw new ExchangeApiException(
+                    message: "bitFlyer cancelchildorder returned no response.",
+                    exchangeId: _exchangeId,
+                    operation: "CancelOrder",
+                    statusCode: null);
+            }
 
             return new CancelResult(true);
         }
@@ -312,9 +321,18 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
                 ProductCode = productCode,
             };
 
-            _ = await _privateTradingApi
+            var response = await _privateTradingApi
                 .CancelAllChildOrdersAsync(dto, cancellationToken)
                 .ConfigureAwait(false);
+
+            if (response is null)
+            {
+                throw new ExchangeApiException(
+                    message: "bitFlyer cancelallchildorders returned no response.",
+                    exchangeId: _exchangeId,
+                    operation: "CancelAllOrders",
+                    statusCode: null);
+            }
 
             return new CancelResult(true);
         }

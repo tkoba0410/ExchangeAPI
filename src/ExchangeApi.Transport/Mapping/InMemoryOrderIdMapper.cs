@@ -7,7 +7,7 @@ namespace ExchangeApi.Transport.Mapping;
 
 /// <summary>
 /// メモリ内でローカルIDとサーバーIDを対応付ける簡易実装。
-/// テスト/サンプル用途を想定し、永続化や分散は考慮しない。
+/// Transport 層で提供するサンプル/テスト用途の補助実装。永続化や分散は考慮しない。
 /// </summary>
 public sealed class InMemoryOrderIdMapper : IOrderIdMapper
 {

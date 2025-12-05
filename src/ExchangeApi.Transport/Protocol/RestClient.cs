@@ -1,13 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
-using System.Collections.Generic;
 using ExchangeApi.Contracts.Errors;
+using ExchangeApi.Transport.Logging;
+using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Transport;
 
 namespace ExchangeApi.Transport.Protocol
@@ -21,15 +23,24 @@ namespace ExchangeApi.Transport.Protocol
         private readonly Uri _baseUri;
         private readonly IHttpTransport _transport;
         private readonly JsonSerializerOptions _serializerOptions;
+        private readonly IRequestSigner? _requestSigner;
+        private readonly IHttpPolicy _policy;
+        private readonly IRestClientLogger _logger;
 
         public RestClient(
             Uri baseUri,
             IHttpTransport transport,
-            JsonSerializerOptions? serializerOptions = null)
+            JsonSerializerOptions? serializerOptions = null,
+            IRequestSigner? requestSigner = null,
+            IHttpPolicy? policy = null,
+            IRestClientLogger? logger = null)
         {
             _baseUri = baseUri ?? throw new ArgumentNullException(nameof(baseUri));
             _transport = transport ?? throw new ArgumentNullException(nameof(transport));
             _serializerOptions = serializerOptions ?? new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            _requestSigner = requestSigner;
+            _policy = policy ?? NoOpHttpPolicy.Instance;
+            _logger = logger ?? NoOpRestClientLogger.Instance;
         }
 
         private static string? TryParseErrorCode(string content)
@@ -78,6 +89,7 @@ namespace ExchangeApi.Transport.Protocol
             var requestUri = BuildUri(path, query);
 
             using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            _logger.LogRequest(request);
 
             if (!request.Headers.UserAgent.Any())
             {
@@ -91,8 +103,13 @@ namespace ExchangeApi.Transport.Protocol
 
             try
             {
-                using var response = await _transport
-                    .SendAsync(request, cancellationToken)
+                if (_requestSigner is not null)
+                {
+                    await _requestSigner.SignAsync(request, cancellationToken).ConfigureAwait(false);
+                }
+
+                using var response = await _policy
+                    .ExecuteAsync(() => _transport.SendAsync(request, cancellationToken), cancellationToken)
                     .ConfigureAwait(false);
 
                 var content = response.Content is null
@@ -100,6 +117,8 @@ namespace ExchangeApi.Transport.Protocol
                     : await response.Content
                         .ReadAsStringAsync(cancellationToken)
                         .ConfigureAwait(false);
+
+                _logger.LogResponse(response, content);
 
                 // ★ HTTP ステータス異常 → ExchangeApiException（E1）
                 if (!response.IsSuccessStatusCode)
@@ -142,18 +161,22 @@ namespace ExchangeApi.Transport.Protocol
             catch (HttpRequestException ex)
             {
                 // 通信エラー → ExchangeApiException に詳細を引き継ぐ
-                throw new ExchangeApiException(
+                var wrapped = new ExchangeApiException(
                     $"HTTP request failed for '{requestUri}'.",
                     statusCode: ex.StatusCode,
                     innerException: ex);
+                _logger.LogError(wrapped, request);
+                throw wrapped;
             }
 
             catch (TaskCanceledException ex)
             {
                 // ★ タイムアウト or キャンセル → ExchangeApiException
-                throw new ExchangeApiException(
+                var wrapped = new ExchangeApiException(
                     "HTTP request timed out or was canceled.",
                     innerException: ex);
+                _logger.LogError(wrapped, request);
+                throw wrapped;
             }
         }
 
@@ -175,6 +198,8 @@ namespace ExchangeApi.Transport.Protocol
                 Content = new StringContent(json, Encoding.UTF8, "application/json"),
             };
 
+            _logger.LogRequest(request);
+
             if (!request.Headers.UserAgent.Any())
             {
                 request.Headers.UserAgent.Add(DefaultUserAgent);
@@ -187,13 +212,20 @@ namespace ExchangeApi.Transport.Protocol
 
             try
             {
-                using var response = await _transport
-                    .SendAsync(request, cancellationToken)
+                if (_requestSigner is not null)
+                {
+                    await _requestSigner.SignAsync(request, cancellationToken).ConfigureAwait(false);
+                }
+
+                using var response = await _policy
+                    .ExecuteAsync(() => _transport.SendAsync(request, cancellationToken), cancellationToken)
                     .ConfigureAwait(false);
 
                 var content = response.Content is null
                     ? string.Empty
                     : await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+                _logger.LogResponse(response, content);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -231,16 +263,20 @@ namespace ExchangeApi.Transport.Protocol
             }
             catch (HttpRequestException ex)
             {
-                throw new ExchangeApiException(
+                var wrapped = new ExchangeApiException(
                     $"HTTP request failed for '{requestUri}'.",
                     statusCode: ex.StatusCode,
                     innerException: ex);
+                _logger.LogError(wrapped, request);
+                throw wrapped;
             }
             catch (TaskCanceledException ex)
             {
-                throw new ExchangeApiException(
+                var wrapped = new ExchangeApiException(
                     "HTTP request timed out or was canceled.",
                     innerException: ex);
+                _logger.LogError(wrapped, request);
+                throw wrapped;
             }
         }
         private Uri BuildUri(string path, IReadOnlyDictionary<string, string?>? query)

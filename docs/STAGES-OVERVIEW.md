@@ -6,14 +6,15 @@ Stage1 から将来ステージまでのラフなロードマップ。進行状�
 - **Stage1**: Public GET（/v1/getticker）による Ticker 取得を統一 DTO/抽象クライアントで提供。REST/Transport 分離を確立。
 - **Stage2**: Private GET の最初の縦スライス（/v1/me/getbalance）。認証付き GET、署名、エラー E1（HTTP ベース）の基盤整備。
 - **Stage3**: Private POST の最初の縦スライス（/v1/me/sendchildorder, MARKET）。POST 署名、ドメイン⇄DTO マッピング、トレード API のテンプレート確立。
-- **Stage4**: Private GET/POST の横展開（positions/executions/collateral/cancel）。注文種別拡張（LIMIT/STOP/time_in_force）。bitFlyer 固有コードを扱う E2 エラー分類、必要に応じてレートリミットのフック。利用者向けドキュメント整備（Quick Start/README 再編/Entry Guide）。
-- **Stage5**: 複数取引所対応の実証。追加取引所で Public/Private の一部機能を実装し、抽象インターフェースやエラー分類の汎用性を検証。DI/設定の多取引所対応。
-- **Stage6**: WebSocket/リアルタイム拡張（Ticker/Board/Executions）。再接続・サブスク管理・バックプレッシャーを含むストリーム制御。録画リプレイ/モックサーバを用いたテスト戦略。
+- **Stage4**: Private GET/POST を見据えた抽象インターフェース・ドメインモデルの網羅と凍結。positions/executions/collateral/cancel、注文種別拡張（LIMIT/STOP/time_in_force/minute_to_expire）を Abstractions まで整備し、E2 エラー分類の骨子を決める。実装の横展開は行わず、必要最小限のスタブで足場を確認する。
+- **Stage5**: bitFlyer 縦方向の深掘り（Stage4 で定義した抽象を実装する）。positions/executions/collateral/cancel などの Private GET/POST、注文種別拡張の実装と代表テストを完了する。横展開が不可欠な箇所のみ最小限に実装。
+- **Stage6**: WebSocket/リアルタイム拡張（Ticker/Board/Executions）を bitFlyer で縦に通す。再接続・サブスク管理・バックプレッシャーを含むストリーム制御の土台を作る。
 - **Stage7**: 信頼性・運用強化。レート制御・リトライ・サーキットブレーカ、メトリクス/トレース（OpenTelemetry 等）、構成可能なログ/アラートポリシー。
-- **Stage8**: DX/UX 仕上げ。DocFX などによる API リファレンス生成、サンプル/クックブック拡充、CLI や簡易ツール（任意）、互換性ガイド/サポートポリシーの明確化。
+- **Stage8**: 複数取引所対応の実証と DX 仕上げ。追加取引所で Public/Private の一部機能を実装し、抽象インターフェースやエラー分類の汎用性を検証。DocFX などによる API リファレンス生成やサンプル/クックブック拡充もここでまとめる。
 
 ## 進め方の目安
-- 各ステージは「最小縦スライス」を完了条件とし、次ステージで横展開・強化を行う。
+- 縦方向を先に深め、同形式の横展開は最後にまとめる方針とする（横展開が必要な箇所のみ最小限実装）。
+- 各ステージは「最小縦スライス」を完了条件とし、次ステージで強化を行う。
 - ドキュメントは Stage ごとに A0xx 形式（要求/設計/マッピング/テスト/運用）を基本とし、Stage4 以降は利用者向け資料（Quick Start/Entry Guide/Overview）を追加する。
 - ブレイキング変更はステージ間の境目でまとめて整理し、README/Overview に反映する。
 

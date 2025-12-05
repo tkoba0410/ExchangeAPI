@@ -15,17 +15,17 @@ Stage2（get balance）において、必要となるレイヤ構成と責務分
 Stage2 時点で必要となるレイヤと責務を以下に示す。
 
 ```
-ExchangeApi.Core（旧 ExchangeApi.Abstractions）
+ExchangeApi.Core（旧 ExchangeApi.Core）
    ├─ Domain（Balance）
    └─ Interfaces（IExchangeAccountClient, IExchangeClient）
 
-ExchangeApi.Transport（旧 ExchangeApi.Infrastructure）
+ExchangeApi.Transport（旧 ExchangeApi.Transport）
    ├─ IExchangeClock / SystemClock
    ├─ IRequestSigner（bitFlyer 署名アルゴリズム）
    ├─ IRestClient / RestClient（署名付き GET）
    └─ ExchangeApiException
 
-ExchangeApi.Factory（旧 ExchangeApi.Orchestration、Credential）
+ExchangeApi.Factory（旧 ExchangeApi.Factory、Credential）
    ├─ DTO: ApiCredentials
    ├─ IF: IApiCredentialProvider
    ├─ EnvironmentVariable / WindowsCredentialManager などの実装
@@ -47,7 +47,7 @@ ExchangeApi.Adapter.Bitflyer (Adapter)
 
 ## 3. レイヤ別の責務（詳細）
 
-### 3.1 ExchangeApi.Core（旧 ExchangeApi.Abstractions）
+### 3.1 ExchangeApi.Core（旧 ExchangeApi.Core）
 #### ■ Domain モデル
 - `Balance`（通貨コード・総残高・発注可能残高）
 - イミュータブル record として定義し、取引所固有の仕様に依存しない。
@@ -59,7 +59,7 @@ ExchangeApi.Adapter.Bitflyer (Adapter)
 
 ---
 
-### 3.2 ExchangeApi.Transport（旧 ExchangeApi.Infrastructure, Protocol + Transport）
+### 3.2 ExchangeApi.Transport（旧 ExchangeApi.Transport, Protocol + Transport）
 #### ■ IExchangeClock / SystemClock
 - 署名生成に必要となる UTC 時刻を抽象化。
 - テスト容易性の観点からインターフェースとする。

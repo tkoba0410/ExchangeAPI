@@ -16,10 +16,10 @@ dotnet build
 
 ## 2. DI 登録（最小例）
 ```csharp
-using ExchangeApi.Abstractions.Contracts;
-using ExchangeApi.Bitflyer;
-using ExchangeApi.Infrastructure.Protocol;
-using ExchangeApi.Infrastructure.Transport;
+using ExchangeApi.Core.Contracts;
+using ExchangeApi.Adapter.Bitflyer;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Transport;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
@@ -51,7 +51,7 @@ Console.WriteLine($"Bid {ticker.BestBid} / Ask {ticker.BestAsk} / Last {ticker.L
 
 ## 4. 注文を出す（Stage3: MARKET）
 ```csharp
-using ExchangeApi.Abstractions.Dtos;
+using ExchangeApi.Core.Dtos;
 
 var order = new OrderRequest(
     ProductCode: "BTC_JPY",

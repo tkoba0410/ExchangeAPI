@@ -55,20 +55,20 @@ Stage3 は **「Private POST 呼び出しパターンのテンプレート確立
 
 ## 3. レイヤ構成（Stage3 範囲）
 ```
-ExchangeApi.Abstractions
+ExchangeApi.Core
   ├─ Domain: OrderRequest / OrderResult
   └─ Interfaces: IExchangeTradingClient
 
-ExchangeApi.Infrastructure
+ExchangeApi.Transport
   ├─ IRequestSigner（POST 対応）
   ├─ IRestClient.PostAsync
   └─ ExchangeApiException
 
-ExchangeApi.Bitflyer (Private API)
+ExchangeApi.Adapter.Bitflyer (Private API)
   ├─ DTO: SendChildOrder Request/Response
   └─ BitflyerPrivateApi.SendChildOrderAsync
 
-ExchangeApi.Bitflyer (Adapter)
+ExchangeApi.Adapter.Bitflyer (Adapter)
   └─ BitflyerExchangeClient.SendOrderAsync
 ```
 

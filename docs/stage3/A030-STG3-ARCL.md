@@ -14,11 +14,11 @@ POST（body 付き / 署名あり）に対応できる形へ拡張すること�
 Stage3 のレイヤ構成を以下に示す。
 
 ```
-ExchangeApi.Core（旧 ExchangeApi.Abstractions）
+ExchangeApi.Core（旧 ExchangeApi.Core）
    ├─ Domain（Balance / OrderRequest / OrderResult）
    └─ Interfaces（IExchangeAccountClient / IExchangeTradingClient / IExchangeClient）
 
-ExchangeApi.Transport（旧 ExchangeApi.Infrastructure）
+ExchangeApi.Transport（旧 ExchangeApi.Transport）
    ├─ IExchangeClock / SystemClock
    ├─ IRequestSigner（GET + POST 署名対応）
    ├─ IRestClient
@@ -26,7 +26,7 @@ ExchangeApi.Transport（旧 ExchangeApi.Infrastructure）
    │     └─ PostAsync<TReq, TRes>()
    └─ ExchangeApiException（共通例外）
 
-ExchangeApi.Factory（旧 ExchangeApi.Orchestration、Credential Provider）
+ExchangeApi.Factory（旧 ExchangeApi.Factory、Credential Provider）
    ├─ ApiCredentials
    ├─ IApiCredentialProvider
    └─ Provider 実装（Environment / Windows / Composite など）
@@ -50,7 +50,7 @@ ExchangeApi.Adapter.Bitflyer (Adapter)
 
 ## 3. レイヤ別の責務定義
 
-### 3.1 ExchangeApi.Abstractions
+### 3.1 ExchangeApi.Core
 #### ■ Domain モデル
 - `OrderSide`（Buy / Sell）
 - `OrderType`（Market のみ、将来拡張可）
@@ -67,7 +67,7 @@ Abstractions 層は **取引所固有の仕様を一切含まず、純粋なド�
 
 ---
 
-### 3.2 ExchangeApi.Infrastructure（Protocol + Transport）
+### 3.2 ExchangeApi.Transport（Protocol + Transport）
 #### ■ IRequestSigner
 - bitFlyer の署名仕様を実装するインターフェース。
 - GET／POST の差分を吸収し、以下を担う：
@@ -95,14 +95,14 @@ Abstractions 層は **取引所固有の仕様を一切含まず、純粋なド�
 
 ---
 
-### 3.3 ExchangeApi.Orchestration（Credential Provider）
+### 3.3 ExchangeApi.Factory（Credential Provider）
 - API key / secret を取得する責務を専任させる層。
 - REST / Private API 層が資格情報取得をしないように分離する。
 - Provider の実装は環境変数／Windows Credential Manager／Composite など複数用意可能。
 
 ---
 
-### 3.4 ExchangeApi.Bitflyer.Private（Private API 層）
+### 3.4 ExchangeApi.Adapter.Bitflyer.Private（Private API 層）
 #### ■ 役割ベースのインターフェース
 - `IBitflyerPrivateApi`（Account 系）
   - `GetBalancesAsync()`（Stage2）
@@ -124,7 +124,7 @@ Abstractions 層は **取引所固有の仕様を一切含まず、純粋なド�
 
 ---
 
-### 3.5 ExchangeApi.Bitflyer.Adapter（ExchangeClient 層）
+### 3.5 ExchangeApi.Adapter.Bitflyer.Adapter（ExchangeClient 層）
 #### ■ BitflyerExchangeClient
 - `IExchangeTradingClient` の実装として `SendOrderAsync` を提供
 - `IBitflyerPrivateTradingApi` を呼び、DTO → Domain 変換を行う

@@ -19,7 +19,7 @@ Factory
 
 ## 3. コンポーネント構成（Stage4 範囲）
 ```
-ExchangeApi.Abstractions
+ExchangeApi.Core
   ├─ Domain: Ticker / OrderBook / Execution / OrderRequest / OrderResult / OpenOrder
   ├─ Domain: Position / Collateral（Margin 用・最小）
   ├─ REST Interfaces:

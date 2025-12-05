@@ -53,7 +53,7 @@ Stage2 では、Stage1 で整備した設計・インターフェースとレイ
      - `ExchangeApiException`
        - REST 呼び出しにおけるエラー情報を保持する共通例外クラス。
 
-4. **bitFlyer Private API 層（ExchangeApi.Bitflyer）**
+4. **bitFlyer Private API 層（ExchangeApi.Adapter.Bitflyer）**
    - `/v1/me/getbalance` に対応する DTO と REST 呼び出しを実装する。
      - `BitflyerBalanceResponse`
        - `CurrencyCode`（string）
@@ -64,7 +64,7 @@ Stage2 では、Stage1 で整備した設計・インターフェースとレイ
      - `BitflyerPrivateApi : IBitflyerPrivateApi`
        - 内部で `IRestClient.GetAsync<IReadOnlyList<BitflyerBalanceResponse>>("/v1/me/getbalance", ...)` を呼び出す。
 
-5. **Bitflyer Adapter 層（ExchangeApi.Bitflyer）**
+5. **Bitflyer Adapter 層（ExchangeApi.Adapter.Bitflyer）**
    - DTO → ドメイン変換と `IExchangeAccountClient` 実装を担う。
      - `BitflyerExchangeClient : IExchangeClient`
        - コンストラクタで `IBitflyerPublicApi` と `IBitflyerPrivateApi` を受け取る。
@@ -100,17 +100,17 @@ Stage2 では、Stage1 で整備した設計・インターフェースとレイ
 Stage2 で対象とするレイヤと責務を以下に整理する。
 
 ```text
-ExchangeApi.Abstractions
+ExchangeApi.Core
   ├─ Domain: Balance
   └─ Interfaces: IExchangeAccountClient.GetBalancesAsync, IExchangeClient
 
-ExchangeApi.Infrastructure
+ExchangeApi.Transport
   ├─ IExchangeClock / SystemClock
   ├─ IRequestSigner
   ├─ IRestClient / RestClient (GET + JSON + 署名)
   └─ ExchangeApiException
 
-ExchangeApi.Bitflyer
+ExchangeApi.Adapter.Bitflyer
   ├─ DTO: BitflyerBalanceResponse
   ├─ Private API: IBitflyerPrivateApi.GetBalancesAsync
   ├─ Private API 実装: BitflyerPrivateApi

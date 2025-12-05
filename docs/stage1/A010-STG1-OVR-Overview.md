@@ -97,10 +97,10 @@ Stage1 ではこのうち：
 
 実装済みの Stage1 では次の構成となっている：
 
-* `ExchangeApi.Core`（旧 ExchangeApi.Abstractions）… Boundary（依存なし）
-* `ExchangeApi.Transport`（旧 ExchangeApi.Infrastructure）… Protocol + Transport（技術モジュール）
-* `ExchangeApi.Adapter.Bitflyer`（旧 ExchangeApi.Bitflyer）… bitFlyer Adapter（Core / Transport に依存）
-* `ExchangeApi.Factory`（旧 ExchangeApi.Orchestration）… 資格情報や組み立て用の上位層（Stage2 以降で利用）
+* `ExchangeApi.Core`（旧 ExchangeApi.Core）… Boundary（依存なし）
+* `ExchangeApi.Transport`（旧 ExchangeApi.Transport）… Protocol + Transport（技術モジュール）
+* `ExchangeApi.Adapter.Bitflyer`（旧 ExchangeApi.Adapter.Bitflyer）… bitFlyer Adapter（Core / Transport に依存）
+* `ExchangeApi.Factory`（旧 ExchangeApi.Factory）… 資格情報や組み立て用の上位層（Stage2 以降で利用）
 
 ---
 

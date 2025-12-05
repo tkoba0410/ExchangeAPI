@@ -37,9 +37,9 @@ Stage1 の対象は「bitFlyer Public REST `GET /v1/getticker` による Ticker 
 
 * Stage1 のプロジェクト構成
 
-  * `ExchangeApi.Abstractions`
-  * `ExchangeApi.Infrastructure`
-  * `ExchangeApi.Bitflyer`
+  * `ExchangeApi.Core`
+  * `ExchangeApi.Transport`
+  * `ExchangeApi.Adapter.Bitflyer`
 * これらの依存関係および責務
 * Raw モデル（bitFlyer 固有モデル）の扱い
 
@@ -71,7 +71,7 @@ Stage1 のアーキテクチャは、**契約境界（Boundary）** と **技術
 ┌──────────────┴──────┐ ┌──────┴────────┐ ┌───────────────┴───────┐
 │ Adapter (bitFlyer)   │ │ Protocol (REST) │ │ Transport (HTTP Client) │
 └──────────────────────┘ └────────────────┘ └──────────────────────────┘
-                        （ExchangeApi.Infrastructure 内）
+                        （ExchangeApi.Transport 内）
 ```
 
 * **Boundary / Abstractions**
@@ -97,17 +97,17 @@ Stage1 では、ソリューションは少なくとも次のプロジェクト�
 
 ```text
 src/
-  ExchangeApi.Abstractions/
-  ExchangeApi.Infrastructure/
-  ExchangeApi.Bitflyer/
+  ExchangeApi.Core/
+  ExchangeApi.Transport/
+  ExchangeApi.Adapter.Bitflyer/
 
 tests/
-  ExchangeApi.Abstractions.Tests/
-  ExchangeApi.Infrastructure.Tests/
-  ExchangeApi.Bitflyer.Tests/
+  ExchangeApi.Core.Tests/
+  ExchangeApi.Transport.Tests/
+  ExchangeApi.Adapter.Bitflyer.Tests/
 ```
 
-### 4.1 ExchangeApi.Abstractions（Boundary）
+### 4.1 ExchangeApi.Core（Boundary）
 
 * 役割：取引所非依存の契約境界を定義する。
 * 主な内容：
@@ -121,7 +121,7 @@ tests/
   * 他のプロジェクトに依存しない（依存先ゼロ）。
   * HTTP / JSON / 認証などの技術的関心事を含まない。
 
-### 4.2 ExchangeApi.Infrastructure（Protocol + Transport）
+### 4.2 ExchangeApi.Transport（Protocol + Transport）
 
 * 役割：REST 通信および HTTP 通信の技術モジュールを提供する。
 * 主な内容：
@@ -138,7 +138,7 @@ tests/
   * Adapter 側から利用されるが、取引所固有ロジックは持たない。
   * Stage1 では GET + JSON デシリアライズの最小機能に限定する。
 
-### 4.3 ExchangeApi.Bitflyer（Adapter）
+### 4.3 ExchangeApi.Adapter.Bitflyer（Adapter）
 
 * 役割：bitFlyer Public REST API を呼び出し、Raw モデルを Ticker に変換する。
 * 主な内容：
@@ -161,32 +161,32 @@ Stage1〜Stage2 を通じて、次の依存方向ルールを **不変の正典*
 ### 5.1 プロジェクト間依存
 
 ```text
-ExchangeApi.Abstractions      ←  ExchangeApi.Infrastructure
-            ▲                 ←  ExchangeApi.Bitflyer
+ExchangeApi.Core      ←  ExchangeApi.Transport
+            ▲                 ←  ExchangeApi.Adapter.Bitflyer
             │
         （上位）
 ```
 
-* `ExchangeApi.Abstractions`
+* `ExchangeApi.Core`
 
   * 他プロジェクトに依存してはならない（MUST NOT）。
-* `ExchangeApi.Infrastructure`
+* `ExchangeApi.Transport`
 
-  * `ExchangeApi.Abstractions` に依存してよい（MUST）。
-  * `ExchangeApi.Bitflyer` に依存してはならない（MUST NOT）。
-* `ExchangeApi.Bitflyer`
+  * `ExchangeApi.Core` に依存してよい（MUST）。
+  * `ExchangeApi.Adapter.Bitflyer` に依存してはならない（MUST NOT）。
+* `ExchangeApi.Adapter.Bitflyer`
 
-  * `ExchangeApi.Abstractions` および `ExchangeApi.Infrastructure` に依存してよい（MUST）。
+  * `ExchangeApi.Core` および `ExchangeApi.Transport` に依存してよい（MUST）。
 
 ### 5.2 Raw モデルの依存
 
-* Raw モデル（`BitflyerTickerRaw`）は `ExchangeApi.Bitflyer` 内部の型とし、
+* Raw モデル（`BitflyerTickerRaw`）は `ExchangeApi.Adapter.Bitflyer` 内部の型とし、
   他プロジェクトから参照されてはならない（MUST NOT）。
 * Raw モデルは Abstractions への依存を持ってはならない（MUST NOT）。
 
 ### 5.3 コードレベルの依存
 
-* `IExchangeClient` と `Ticker` は `ExchangeApi.Abstractions` にのみ定義する（MUST）。
+* `IExchangeClient` と `Ticker` は `ExchangeApi.Core` にのみ定義する（MUST）。
 * Adapter 実装（`BitflyerExchangeClient`）は、ビジネスロジック層やアプリケーション層に依存しない（SHOULD）。
 
 ---
@@ -249,11 +249,11 @@ Stage1 の論理レイヤは、次の 3 段階で理解できる。
 
 Stage2 以降での拡張は、次の方針で行う。
 
-* `ExchangeApi.Infrastructure` において Transport / Protocol を強化する。
+* `ExchangeApi.Transport` において Transport / Protocol を強化する。
 
   * Retry / RateLimit / CircuitBreaker
   * 認証付き REST（署名 / timestamp / nonce 等）
-* `ExchangeApi.Bitflyer` において Private API / WebSocket / Board などの Adapter を段階的に追加する。
+* `ExchangeApi.Adapter.Bitflyer` において Private API / WebSocket / Board などの Adapter を段階的に追加する。
 * 新規取引所（`ExchangeApi.Binance` 等）は、Bitflyer と同じパターンで Adapter プロジェクトを追加する。
 * Boundary（Abstractions）は、必要に応じて DTO / インターフェースを拡張するが、
   Stage1 の基本構造（IExchangeClient / Ticker）の互換性を保つ。

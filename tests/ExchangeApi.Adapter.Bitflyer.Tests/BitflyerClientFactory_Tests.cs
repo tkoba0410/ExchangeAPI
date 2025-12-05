@@ -1,6 +1,6 @@
 using System;
-using ExchangeApi.Core.Contracts;
-using ExchangeApi.Core.Dtos;
+using ExchangeApi.Contracts.Contracts;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Adapter.Bitflyer;
 using Xunit;
 

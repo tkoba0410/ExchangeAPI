@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Errors;
+using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Transport;
 using Xunit;

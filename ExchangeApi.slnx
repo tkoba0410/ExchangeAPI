@@ -1,12 +1,12 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/ExchangeApi.Core/ExchangeApi.Core.csproj" />
+    <Project Path="src/ExchangeApi.Contracts/ExchangeApi.Contracts.csproj" />
     <Project Path="src/ExchangeApi.Adapter.Bitflyer/ExchangeApi.Adapter.Bitflyer.csproj" />
     <Project Path="src/ExchangeApi.Transport/ExchangeApi.Transport.csproj" />
     <Project Path="src/ExchangeApi.Factory/ExchangeApi.Factory.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/ExchangeApi.Core.Tests/ExchangeApi.Core.Tests.csproj" />
+    <Project Path="tests/ExchangeApi.Contracts.Tests/ExchangeApi.Contracts.Tests.csproj" />
     <Project Path="tests/ExchangeApi.Adapter.Bitflyer.Tests/ExchangeApi.Adapter.Bitflyer.Tests.csproj" />
     <Project Path="tests/ExchangeApi.Transport.Tests/ExchangeApi.Transport.Tests.csproj" />
     <Project Path="tests/ExchangeApi.Factory.Tests/ExchangeApi.Factory.Tests.csproj" />

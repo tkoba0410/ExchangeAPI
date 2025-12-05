@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
-using ExchangeApi.Core.Contracts;
-using ExchangeApi.Core.Dtos;
+using ExchangeApi.Contracts.Contracts;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 using ExchangeApi.Transport.Transport;

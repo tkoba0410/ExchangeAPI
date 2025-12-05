@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\ExchangeApi.Core\ExchangeApi.Core.csproj" />
+    <ProjectReference Include="..\ExchangeApi.Contracts\ExchangeApi.Contracts.csproj" />
     <ProjectReference Include="..\ExchangeApi.Transport\ExchangeApi.Transport.csproj" />
   </ItemGroup>
 

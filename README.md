@@ -15,7 +15,7 @@ Stage4 時点で **bitFlyer の Public/Private REST** に対応し、以下を�
 ## 🏗 プロジェクト構成（Stage4 時点）
 
 ```
-ExchangeApi.Core             ← 契約/共通DTO/エラー（旧: ExchangeApi.Core）
+ExchangeApi.Contracts             ← 契約/共通DTO/エラー（旧: ExchangeApi.Contracts）
 ExchangeApi.Transport        ← HTTP/WS 基盤（RestClient/Signer 等）
 ExchangeApi.Adapter.Bitflyer ← bitFlyer 実装（REST/WS マッピング）
 ExchangeApi.Factory          ← DI 組み立て（機能ごとの登録を選択）
@@ -60,7 +60,7 @@ dotnet test
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
-using ExchangeApi.Core.Contracts;
+using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Adapter.Bitflyer;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Transport;
@@ -118,7 +118,7 @@ Console.WriteLine($"Time: {ticker.Timestamp:O}");
 
 ```
 tests/
- ├─ ExchangeApi.Core.Tests
+ ├─ ExchangeApi.Contracts.Tests
  ├─ ExchangeApi.Transport.Tests
  ├─ ExchangeApi.Adapter.Bitflyer.Tests
 ```

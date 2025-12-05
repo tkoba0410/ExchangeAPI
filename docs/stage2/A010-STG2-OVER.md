@@ -100,7 +100,7 @@ Stage2 では、Stage1 で整備した設計・インターフェースとレイ
 Stage2 で対象とするレイヤと責務を以下に整理する。
 
 ```text
-ExchangeApi.Core
+ExchangeApi.Contracts
   ├─ Domain: Balance
   └─ Interfaces: IExchangeAccountClient.GetBalancesAsync, IExchangeClient
 

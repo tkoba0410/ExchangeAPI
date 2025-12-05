@@ -37,12 +37,12 @@ Stage1 は最小実装フェーズであり、**軽量・最短で動作まで�
 
 ```text
 src/
-  ExchangeApi.Core/
+  ExchangeApi.Contracts/
   ExchangeApi.Transport/
   ExchangeApi.Adapter.Bitflyer/
 
 tests/
-  ExchangeApi.Core.Tests/
+  ExchangeApi.Contracts.Tests/
   ExchangeApi.Transport.Tests/
   ExchangeApi.Adapter.Bitflyer.Tests/
 ```

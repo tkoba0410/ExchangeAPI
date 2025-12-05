@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Dtos;
-using ExchangeApi.Core.Errors;
+using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Adapter.Bitflyer;
 using ExchangeApi.Adapter.Bitflyer.Models;
 using ExchangeApi.Adapter.Bitflyer.Tests.Fakes;

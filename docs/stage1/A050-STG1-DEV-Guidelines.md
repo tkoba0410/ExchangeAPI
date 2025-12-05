@@ -34,7 +34,7 @@ Stage1 は軽量フェーズであり、将来 Stage2（認証 / WebSocket / 複
 本ガイドラインが適用されるのは次の範囲である。
 
 * Stage1 の開発（bitFlyer Ticker のみ）
-* プロジェクト：`ExchangeApi.Core` / `ExchangeApi.Transport` / `ExchangeApi.Adapter.Bitflyer`
+* プロジェクト：`ExchangeApi.Contracts` / `ExchangeApi.Transport` / `ExchangeApi.Adapter.Bitflyer`
 * テスト：各プロジェクトの単体テスト
 
 Stage2 移行時には、本ガイドラインは一部または全体が強化される。

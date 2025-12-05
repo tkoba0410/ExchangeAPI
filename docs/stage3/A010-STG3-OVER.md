@@ -55,7 +55,7 @@ Stage3 は **「Private POST 呼び出しパターンのテンプレート確立
 
 ## 3. レイヤ構成（Stage3 範囲）
 ```
-ExchangeApi.Core
+ExchangeApi.Contracts
   ├─ Domain: OrderRequest / OrderResult
   └─ Interfaces: IExchangeTradingClient
 

@@ -6,7 +6,7 @@
 Stage2（get balance）において、必要となるレイヤ構成と責務分担を明確化し、
 後続ステージ（Collateral / Positions / POST Private API）の拡張に耐えられる基盤構造を定義する。
 
-本ドキュメントは、**ExchangeApi.Core（旧 Abstractions）→ ExchangeApi.Transport（旧 Infrastructure）→ bitflyer private API → ExchangeApi.Adapter.Bitflyer** の流れを整理し、
+本ドキュメントは、**ExchangeApi.Contracts（旧 Abstractions）→ ExchangeApi.Transport（旧 Infrastructure）→ bitflyer private API → ExchangeApi.Adapter.Bitflyer** の流れを整理し、
 依存方向・レイヤ境界・役割を統一的に示すことを目的とする。
 
 ---
@@ -15,7 +15,7 @@ Stage2（get balance）において、必要となるレイヤ構成と責務分
 Stage2 時点で必要となるレイヤと責務を以下に示す。
 
 ```
-ExchangeApi.Core（旧 ExchangeApi.Core）
+ExchangeApi.Contracts（旧 ExchangeApi.Contracts）
    ├─ Domain（Balance）
    └─ Interfaces（IExchangeAccountClient, IExchangeClient）
 
@@ -47,7 +47,7 @@ ExchangeApi.Adapter.Bitflyer (Adapter)
 
 ## 3. レイヤ別の責務（詳細）
 
-### 3.1 ExchangeApi.Core（旧 ExchangeApi.Core）
+### 3.1 ExchangeApi.Contracts（旧 ExchangeApi.Contracts）
 #### ■ Domain モデル
 - `Balance`（通貨コード・総残高・発注可能残高）
 - イミュータブル record として定義し、取引所固有の仕様に依存しない。

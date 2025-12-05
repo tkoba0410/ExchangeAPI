@@ -6,7 +6,7 @@ Stage3 では、Private POST（`/v1/me/sendchildorder`）を end-to-end で通�
 
 Stage2 で確立した GET ベースの構造をそのまま継承しつつ、
 POST（body 付き / 署名あり）に対応できる形へ拡張することが目的である。
-※ Stage4 以降の命名: ExchangeApi.Core（旧 Abstractions）、ExchangeApi.Transport（旧 Infrastructure/Protocol）、ExchangeApi.Adapter.Bitflyer（旧 Bitflyer）、ExchangeApi.Factory（旧 Orchestration）
+※ Stage4 以降の命名: ExchangeApi.Contracts（旧 Abstractions）、ExchangeApi.Transport（旧 Infrastructure/Protocol）、ExchangeApi.Adapter.Bitflyer（旧 Bitflyer）、ExchangeApi.Factory（旧 Orchestration）
 
 ---
 
@@ -14,7 +14,7 @@ POST（body 付き / 署名あり）に対応できる形へ拡張すること�
 Stage3 のレイヤ構成を以下に示す。
 
 ```
-ExchangeApi.Core（旧 ExchangeApi.Core）
+ExchangeApi.Contracts（旧 ExchangeApi.Contracts）
    ├─ Domain（Balance / OrderRequest / OrderResult）
    └─ Interfaces（IExchangeAccountClient / IExchangeTradingClient / IExchangeClient）
 
@@ -50,7 +50,7 @@ ExchangeApi.Adapter.Bitflyer (Adapter)
 
 ## 3. レイヤ別の責務定義
 
-### 3.1 ExchangeApi.Core
+### 3.1 ExchangeApi.Contracts
 #### ■ Domain モデル
 - `OrderSide`（Buy / Sell）
 - `OrderType`（Market のみ、将来拡張可）

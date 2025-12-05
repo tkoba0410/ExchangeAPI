@@ -17,7 +17,7 @@ Stage1 最小アーキテクチャ構成（Architecture Specification）
 
 Stage1 の対象は「bitFlyer Public REST `GET /v1/getticker` による Ticker 取得」のみであり、
 ここで定義する構造は **今後 Stage2 での拡張（認証 / WebSocket / 複数取引所 / Transport/Protocol 強化）を前提にした最小構成**である。
-※ Stage4 以降の命名: ExchangeApi.Core（旧 Abstractions）、ExchangeApi.Transport（旧 Infrastructure/Protocol/Transport）、ExchangeApi.Adapter.Bitflyer（旧 Adapter/Bitflyer）、ExchangeApi.Factory（旧 Orchestration）。本書の記述は旧名称ベースだが、現在はこの対応で整理する。
+※ Stage4 以降の命名: ExchangeApi.Contracts（旧 Abstractions）、ExchangeApi.Transport（旧 Infrastructure/Protocol/Transport）、ExchangeApi.Adapter.Bitflyer（旧 Adapter/Bitflyer）、ExchangeApi.Factory（旧 Orchestration）。本書の記述は旧名称ベースだが、現在はこの対応で整理する。
 
 ---
 
@@ -37,7 +37,7 @@ Stage1 の対象は「bitFlyer Public REST `GET /v1/getticker` による Ticker 
 
 * Stage1 のプロジェクト構成
 
-  * `ExchangeApi.Core`
+  * `ExchangeApi.Contracts`
   * `ExchangeApi.Transport`
   * `ExchangeApi.Adapter.Bitflyer`
 * これらの依存関係および責務
@@ -97,17 +97,17 @@ Stage1 では、ソリューションは少なくとも次のプロジェクト�
 
 ```text
 src/
-  ExchangeApi.Core/
+  ExchangeApi.Contracts/
   ExchangeApi.Transport/
   ExchangeApi.Adapter.Bitflyer/
 
 tests/
-  ExchangeApi.Core.Tests/
+  ExchangeApi.Contracts.Tests/
   ExchangeApi.Transport.Tests/
   ExchangeApi.Adapter.Bitflyer.Tests/
 ```
 
-### 4.1 ExchangeApi.Core（Boundary）
+### 4.1 ExchangeApi.Contracts（Boundary）
 
 * 役割：取引所非依存の契約境界を定義する。
 * 主な内容：
@@ -161,22 +161,22 @@ Stage1〜Stage2 を通じて、次の依存方向ルールを **不変の正典*
 ### 5.1 プロジェクト間依存
 
 ```text
-ExchangeApi.Core      ←  ExchangeApi.Transport
+ExchangeApi.Contracts      ←  ExchangeApi.Transport
             ▲                 ←  ExchangeApi.Adapter.Bitflyer
             │
         （上位）
 ```
 
-* `ExchangeApi.Core`
+* `ExchangeApi.Contracts`
 
   * 他プロジェクトに依存してはならない（MUST NOT）。
 * `ExchangeApi.Transport`
 
-  * `ExchangeApi.Core` に依存してよい（MUST）。
+  * `ExchangeApi.Contracts` に依存してよい（MUST）。
   * `ExchangeApi.Adapter.Bitflyer` に依存してはならない（MUST NOT）。
 * `ExchangeApi.Adapter.Bitflyer`
 
-  * `ExchangeApi.Core` および `ExchangeApi.Transport` に依存してよい（MUST）。
+  * `ExchangeApi.Contracts` および `ExchangeApi.Transport` に依存してよい（MUST）。
 
 ### 5.2 Raw モデルの依存
 
@@ -186,7 +186,7 @@ ExchangeApi.Core      ←  ExchangeApi.Transport
 
 ### 5.3 コードレベルの依存
 
-* `IExchangeClient` と `Ticker` は `ExchangeApi.Core` にのみ定義する（MUST）。
+* `IExchangeClient` と `Ticker` は `ExchangeApi.Contracts` にのみ定義する（MUST）。
 * Adapter 実装（`BitflyerExchangeClient`）は、ビジネスロジック層やアプリケーション層に依存しない（SHOULD）。
 
 ---

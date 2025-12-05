@@ -16,7 +16,7 @@ dotnet build
 
 ## 2. DI 登録（最小例）
 ```csharp
-using ExchangeApi.Core.Contracts;
+using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Adapter.Bitflyer;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Transport;
@@ -51,7 +51,7 @@ Console.WriteLine($"Bid {ticker.BestBid} / Ask {ticker.BestAsk} / Last {ticker.L
 
 ## 4. 注文を出す（Stage3: MARKET）
 ```csharp
-using ExchangeApi.Core.Dtos;
+using ExchangeApi.Contracts.Dtos;
 
 var order = new OrderRequest(
     ProductCode: "BTC_JPY",

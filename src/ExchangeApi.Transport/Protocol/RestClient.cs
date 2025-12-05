@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
-using ExchangeApi.Core.Errors;
+using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Transport.Transport;
 
 namespace ExchangeApi.Transport.Protocol

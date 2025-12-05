@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Contracts;
-using ExchangeApi.Core.Dtos;
-using ExchangeApi.Core.Errors;
+using ExchangeApi.Contracts.Contracts;
+using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Adapter.Bitflyer.Models;
 
 namespace ExchangeApi.Adapter.Bitflyer;

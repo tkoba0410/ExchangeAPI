@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExchangeApi.Core.Contracts;
-using ExchangeApi.Core.Dtos;
+using ExchangeApi.Contracts.Contracts;
+using ExchangeApi.Contracts.Dtos;
 
 namespace ExchangeApi.Factory.Credentials;
 

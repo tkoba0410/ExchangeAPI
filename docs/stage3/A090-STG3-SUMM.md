@@ -71,7 +71,7 @@ Stage3 は **MARKET 注文 1 本の縦スライスに限定し、POST 対応の�
 - **A070-STG3-OPS**：動作確認手順・運用メモ
 
 ### 3.2 コード（想定される構成）
-- `ExchangeApi.Core`
+- `ExchangeApi.Contracts`
   - OrderSide / OrderType / OrderRequest / OrderResult
   - IExchangeTradingClient
 - `ExchangeApi.Transport`

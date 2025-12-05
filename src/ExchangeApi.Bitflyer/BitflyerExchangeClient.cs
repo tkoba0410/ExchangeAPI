@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,10 +10,9 @@ using ExchangeApi.Bitflyer.Models;
 namespace ExchangeApi.Bitflyer;
 
 /// <summary>
-/// bitFlyer 用の IExchangeClient 実装。
-/// Stage1 では Public GET（ticker）、Stage2 では Private GET（getbalance）をサポートする。
+/// bitFlyer 用の抽象 API 実装（REST）。
 /// </summary>
-public sealed class BitflyerExchangeClient : IExchangeClient
+public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMarginAccountApi
 {
     private readonly IBitflyerPublicApi _publicApi;
     private readonly IBitflyerPrivateApi _privateAccountApi;
@@ -103,12 +101,10 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
     #endregion
 
-    #region IExchangeMarketClient (board)
-
     /// <summary>
     /// 指定されたシンボルの板情報を取得する。
     /// </summary>
-    public async Task<Board> GetBoardAsync(
+    public async Task<OrderBook> GetOrderBookAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
@@ -120,17 +116,17 @@ public sealed class BitflyerExchangeClient : IExchangeClient
                 .GetBoardRawAsync(productCode, cancellationToken)
                 .ConfigureAwait(false);
 
-            var bids = rawBoard.Bids.Select(b => new BoardEntry(b.Price, b.Size)).ToArray();
-            var asks = rawBoard.Asks.Select(a => new BoardEntry(a.Price, a.Size)).ToArray();
+            var bids = rawBoard.Bids.Select(b => new OrderBookLevel(b.Price, b.Size)).ToArray();
+            var asks = rawBoard.Asks.Select(a => new OrderBookLevel(a.Price, a.Size)).ToArray();
 
-            return new Board(rawBoard.MidPrice, bids, asks);
+            return new OrderBook(bids, asks, rawBoard.MidPrice);
         }
         catch (SymbolNotSupportedException ex)
         {
             throw new ExchangeApiException(
                 message: $"Symbol '{ex.Symbol}' is not supported by bitFlyer.",
                 exchangeId: _exchangeId,
-                operation: "GetBoard",
+                operation: "GetOrderBook",
                 statusCode: null,
                 innerException: ex);
         }
@@ -143,13 +139,11 @@ public sealed class BitflyerExchangeClient : IExchangeClient
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getboard API.",
                 exchangeId: _exchangeId,
-                operation: "GetBoard",
+                operation: "GetOrderBook",
                 statusCode: null,
                 innerException: ex);
         }
     }
-
-    #endregion
 
     #region IExchangeMarketClient (candlestick)
 
@@ -215,9 +209,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
 
     #endregion
 
-    #region IExchangeTradingClient (send order)
-
-    public async Task<OrderResult> PlaceOrderAsync(
+    public async Task<OrderResult> SendOrderAsync(
         OrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -341,7 +333,7 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         }
     }
 
-    public async Task<IReadOnlyList<Position>> ListPositionsAsync(
+    public async Task<IReadOnlyList<Position>> GetOpenPositionsAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
@@ -365,25 +357,27 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         }
         catch (ExchangeApiException ex)
         {
-            throw EnrichBitflyerException(ex, "ListPositions");
+            throw EnrichBitflyerException(ex, "GetOpenPositions");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getpositions API.",
                 exchangeId: _exchangeId,
-                operation: "ListPositions",
+                operation: "GetOpenPositions",
                 statusCode: null,
                 innerException: ex);
         }
     }
 
-    public async Task<IReadOnlyList<Execution>> ListExecutionsAsync(
-        string productCode,
+    public async Task<IReadOnlyList<Execution>> GetExecutionsAsync(
+        string symbol,
         CancellationToken cancellationToken = default)
     {
         try
         {
+            var productCode = MapSymbolToProductCode(symbol);
+
             var raw = await _privateAccountApi
                 .GetExecutionsAsync(productCode, cancellationToken)
                 .ConfigureAwait(false);
@@ -403,20 +397,20 @@ public sealed class BitflyerExchangeClient : IExchangeClient
         }
         catch (ExchangeApiException ex)
         {
-            throw EnrichBitflyerException(ex, "ListExecutions");
+            throw EnrichBitflyerException(ex, "GetExecutions");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getexecutions API.",
                 exchangeId: _exchangeId,
-                operation: "ListExecutions",
+                operation: "GetExecutions",
                 statusCode: null,
                 innerException: ex);
         }
     }
 
-    public async Task<IReadOnlyList<OpenOrder>> ListOpenOrdersAsync(
+    public async Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {

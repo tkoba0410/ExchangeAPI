@@ -10,14 +10,13 @@
 - Stage4 追加（抽象のみ）: Market (Ticker/Board/Executions), Trading (Send/Cancel/OpenOrders), Account (Balances), Margin (Positions/Collateral), Realtime (WS サブスク), ExchangeInfo 入口
 
 ## 2. 抽象インターフェース（主要）
-- `IExchangeClient`: Market + Account + Trading をまとめた入口（Stage3 実装範囲）
 - Stage3 で利用できるメソッド: `GetTickerAsync`, `GetBalancesAsync`, `SendOrderAsync`（MARKET）
 - Stage4 で追加される抽象（実装は Stage5 以降）: `IMarketDataApi` / `ITradingApi` / `IAccountApi` / `IMarginAccountApi` / `IRealtimeMarketDataApi` / `IExchangeInfoApi`
 - DTO: Stage3 実装分は `Ticker`, `Balance`, `OrderRequest/Result`。Stage4 で `Position`, `Execution`, `Collateral`, `OpenOrder` 等の抽象型を追加予定。
 
 ## 3. セットアップ
 1) .NET 10+ 環境でリポジトリを取得・ビルド  
-2) DI 登録（Transport → RestClient → bitFlyer API → IExchangeClient）  
+2) DI 登録（Transport → RestClient → bitFlyer API → BitflyerExchangeClient → 各抽象IF にマップ）  
 3) Private API 利用時は API キー/シークレットを設定  
    - 署名は BitflyerPrivateApi 内で RestClient に委譲（RestClient 側の設定参照）
 

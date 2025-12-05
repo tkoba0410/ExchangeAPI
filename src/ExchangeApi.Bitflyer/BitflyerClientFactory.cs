@@ -9,7 +9,7 @@ using ExchangeApi.Infrastructure.Transport;
 namespace ExchangeApi.Bitflyer;
 
 /// <summary>
-/// Factory for constructing bitFlyer IExchangeClient instances.
+/// Factory for constructing bitFlyer client instances.
 /// HttpClient -> HttpTransport -> BitflyerSigningTransport -> RestClient -> BitflyerPublicApi/BitflyerPrivateApi -> BitflyerExchangeClient.
 /// </summary>
 public static class BitflyerClientFactory
@@ -19,7 +19,7 @@ public static class BitflyerClientFactory
     /// <summary>
     /// Create bitFlyer client with explicit API key/secret supplied by the caller.
     /// </summary>
-    public static IExchangeClient Create(string apiKey, string apiSecret)
+    public static BitflyerExchangeClient Create(string apiKey, string apiSecret)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
         {
@@ -55,7 +55,7 @@ public static class BitflyerClientFactory
     /// <summary>
     /// Create bitFlyer client using a credential provider to retrieve API key/secret.
     /// </summary>
-    public static IExchangeClient Create(IApiCredentialProvider provider, string exchangeId, string accountId)
+    public static BitflyerExchangeClient Create(IApiCredentialProvider provider, string exchangeId, string accountId)
     {
         if (provider is null)
         {

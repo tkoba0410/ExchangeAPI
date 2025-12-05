@@ -32,14 +32,20 @@ services.AddSingleton<IRestClient>(sp =>
 services.AddSingleton<IBitflyerPublicApi, BitflyerPublicApi>();
 services.AddSingleton<IBitflyerPrivateApi, BitflyerPrivateApi>();
 services.AddSingleton<IBitflyerPrivateTradingApi, BitflyerPrivateApi>();
-services.AddSingleton<IExchangeClient, BitflyerExchangeClient>();
+services.AddSingleton<BitflyerExchangeClient>();
+services.AddSingleton<IMarketDataApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
+services.AddSingleton<ITradingApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
+services.AddSingleton<IAccountApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
+services.AddSingleton<IMarginAccountApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
 var provider = services.BuildServiceProvider();
 ```
 
 ## 3. Ticker を取得
 ```csharp
-var client = provider.GetRequiredService<IExchangeClient>();
-var ticker = await client.GetTickerAsync("BTC/JPY");
+var market = provider.GetRequiredService<IMarketDataApi>();
+var trading = provider.GetRequiredService<ITradingApi>();
+var accounts = provider.GetRequiredService<IMarginAccountApi>();
+var ticker = await market.GetTickerAsync("BTC/JPY");
 Console.WriteLine($"Bid {ticker.BestBid} / Ask {ticker.BestAsk} / Last {ticker.LastTradedPrice}");
 ```
 
@@ -54,7 +60,7 @@ var order = new OrderRequest(
     Size: 0.01m,
     Price: null);
 
-var result = await client.PlaceOrderAsync(order);
+var result = await trading.SendOrderAsync(order);
 Console.WriteLine($"Accepted: {result.OrderId}");
 ```
 

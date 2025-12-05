@@ -84,11 +84,15 @@ services.AddSingleton<IRestClient>(sp =>
 // bitFlyer Public API
 services.AddSingleton<IBitflyerPublicApi, BitflyerPublicApi>();
 
-// 統一 IExchangeClient（bitFlyer 実装）
-services.AddSingleton<IExchangeClient, BitflyerExchangeClient>();
+// REST 抽象インターフェースで解決（BitflyerExchangeClient を共有）
+services.AddSingleton<BitflyerExchangeClient>();
+services.AddSingleton<IMarketDataApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
+services.AddSingleton<ITradingApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
+services.AddSingleton<IAccountApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
+services.AddSingleton<IMarginAccountApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
 
 var provider = services.BuildServiceProvider();
-var client = provider.GetRequiredService<IExchangeClient>();
+var client = provider.GetRequiredService<IMarketDataApi>();
 
 // BTC/JPY の最新 ticker
 var ticker = await client.GetTickerAsync("BTC/JPY");

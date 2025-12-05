@@ -81,7 +81,7 @@ namespace ExchangeApi.Bitflyer.Tests
         }
 
         [Fact]
-        public async Task GetBoardAsync_ReturnsMappedBoard()
+        public async Task GetOrderBookAsync_ReturnsMappedOrderBook()
         {
             var rawTicker = new BitflyerTickerRaw
             {
@@ -117,7 +117,7 @@ namespace ExchangeApi.Bitflyer.Tests
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
-            var board = await client.GetBoardAsync(Symbols.BtcJpy);
+            var board = await client.GetOrderBookAsync(Symbols.BtcJpy);
 
             Assert.Equal(boardRaw.MidPrice, board.MidPrice);
             Assert.Single(board.Bids);
@@ -127,7 +127,7 @@ namespace ExchangeApi.Bitflyer.Tests
         }
 
         [Fact]
-        public async Task ListOpenOrdersAsync_ReturnsMappedOrders()
+        public async Task GetOpenOrdersAsync_ReturnsMappedOrders()
         {
             var rawTicker = new BitflyerTickerRaw();
             var fakePublic = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoardRaw { Bids = Array.Empty<BitflyerBoardEntryRaw>(), Asks = Array.Empty<BitflyerBoardEntryRaw>() });
@@ -154,7 +154,7 @@ namespace ExchangeApi.Bitflyer.Tests
             var fakeTrading = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
             var client = new BitflyerExchangeClient(fakePublic, fakePrivate, fakeTrading);
 
-            var result = await client.ListOpenOrdersAsync("BTC_JPY");
+            var result = await client.GetOpenOrdersAsync("BTC_JPY");
 
             Assert.Single(result);
             var order = result[0];

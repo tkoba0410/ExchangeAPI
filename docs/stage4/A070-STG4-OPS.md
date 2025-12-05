@@ -8,7 +8,7 @@ Stage4 は抽象設計フェーズのため、ここでは「REST と WS の使�
 
 ## 2. 利用パターン（設計時の確認）
 1) スナップショット取得は REST（IMarketDataApi / ITradingApi / IAccountApi / IMarginAccountApi）を使う  
-2) リアルタイム更新は WS（IRealtimeMarketDataApi）を購読し、必要に応じて REST と併用する  
+2) リアルタイム更新は WS（IRealtimeMarketDataApi）を購読し、必要に応じて REST と併用する（イベント DTO は TickerTick / OrderBookDelta / ExecutionTick を使用）
 3) Margin 情報は IMarginAccountApi を通じて建玉・証拠金のみを取得し、詳細な履歴は Raw に任せる  
 4) ExchangeInfo で対象市場/機能の有無を確認し、存在しない機能は Raw やフォールバックで扱う  
 5) ClientOrderId を使わない場合は null を渡す/受け取るだけでよい。相関管理が必要な場合は別層の `IOrderIdMapper` 実装（例: InMemory）を差し込み、サーバーIDとの対応付けを行う。

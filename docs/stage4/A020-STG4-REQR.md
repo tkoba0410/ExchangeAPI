@@ -15,7 +15,7 @@
 
 ## 3. 機能要件
 - 抽象インターフェース（REST）
-  - `IMarketDataApi`: GetTicker / GetOrderBook / GetExecutions / ListCandlesticks
+  - `IMarketDataApi`: GetTicker / GetOrderBook / GetExecutions / GetCandlesticks
   - `ITradingApi`: SendOrder / CancelOrder / GetOpenOrders
   - `IAccountApi`: GetBalances
   - `IMarginAccountApi : IAccountApi`: GetOpenPositions / GetCollateral（Margin はここまでに限定）
@@ -25,7 +25,7 @@
 - ExchangeInfo
   - `IExchangeInfoApi`: 将来拡張用のエントリーポイント（スケルトンのみ、例: 対応市場一覧/機能フラグ/概略レートリミット）
 - Candlestick 対応方針
-  - 抽象では ListCandlesticks を正式サポートするが、取引所非対応（例: bitFlyer）は `NotImplemented` 相当で明示的に拒否する。
+  - 抽象では GetCandlesticks を正式サポートするが、取引所非対応（例: bitFlyer）は `NotImplemented` 相当で明示的に拒否する。
   - 初期の実装ターゲットは bittrade を想定する。
 - ドメイン型
   - Ticker / OrderBook / Execution / OrderRequest / OrderResult / OpenOrder / Position / Collateral

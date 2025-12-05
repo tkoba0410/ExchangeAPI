@@ -7,6 +7,7 @@ Stage4 のテストは「抽象の整合性」を確認することに特化し�
 - ドメイン型の欠落/矛盾チェック（例: OrderRequest が Trading 抽象の要求を満たすか）
 - Margin 拡張の継承構造（IMarginAccountApi : IAccountApi）が崩れていないかの型検証
 - REST/WS の責務分離が守られているか（同一 DTO を混在させていないか）
+- WS DTO（TickerTick / OrderBookDelta / ExecutionTick）が抽象に正式定義されていること、REST DTO と混在していないこと
 
 ## 2. スタブ/モックでの整合性確認
 - 抽象メソッドの入力/出力契約がコンパイル時に確認できること（nullability、必須/任意の扱い）

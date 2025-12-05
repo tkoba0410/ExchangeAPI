@@ -13,7 +13,7 @@ Stage4 は抽象 API を凍結するステージであり、実装は Stage5 以
 | Market | IMarketDataApi.GetTicker | REST | スナップショット | GET `/v1/getticker` | 抽象定義 | Stage5+ |
 | Market | IMarketDataApi.GetOrderBook | REST | スナップショット | GET `/v1/getboard` | 抽象定義 | Stage5+ |
 | Market | IMarketDataApi.GetExecutions | REST | スナップショット | GET `/v1/getexecutions` | 抽象定義 | Stage5+ |
-| Market | IMarketDataApi.ListCandlesticks | REST | OHLCV | （bitFlyer 非対応、bittrade を初期ターゲット） | 抽象定義 | Stage5+ |
+| Market | IMarketDataApi.GetCandlesticks | REST | OHLCV | （bitFlyer 非対応、bittrade を初期ターゲット） | 抽象定義 | Stage5+ |
 | Trading | ITradingApi.SendOrder | REST | MARKET/LIMIT/STOP/STOP_LIMIT | POST `/v1/me/sendchildorder` | 抽象定義 | Stage5+ |
 | Trading | ITradingApi.CancelOrder | REST | 単一キャンセル | POST `/v1/me/cancelchildorder` | 抽象定義 | Stage5+ |
 | Trading | ITradingApi.GetOpenOrders | REST | Open/Active | GET `/v1/me/getchildorders` | 抽象定義 | Stage5+ |

@@ -1,6 +1,6 @@
 # DTO-Candlestick-MAP Candlestick マッピング仕様（複数取引所想定）
 
-## 1. 抽象 DTO 要約（IMarketDataApi.ListCandlesticks 用）
+## 1. 抽象 DTO 要約（IMarketDataApi.GetCandlesticks 用）
 - DTO 名: `Candlestick`
 - 必須フィールド:
   - `Symbol` : 抽象シンボル（例: BTC/JPY）

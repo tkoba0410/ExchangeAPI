@@ -17,7 +17,7 @@ public interface IMarketDataApi
 
     Task<IReadOnlyList<Execution>> GetExecutionsAsync(string symbol, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<Candlestick>> ListCandlesticksAsync(
+    Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
         string symbol,
         string timescale,
         DateTimeOffset? from = null,

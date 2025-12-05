@@ -147,7 +147,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
 
     #region IExchangeMarketClient (candlestick)
 
-    public Task<IReadOnlyList<Candlestick>> ListCandlesticksAsync(
+    public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
         string symbol,
         string timescale,
         DateTimeOffset? from = null,

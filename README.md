@@ -15,16 +15,16 @@ Stage4 時点で **bitFlyer の Public/Private REST** に対応し、以下を�
 ## 🏗 プロジェクト構成（Stage4 時点）
 
 ```
-ExchangeApi.Abstractions      ← 仕様（Boundary）
-ExchangeApi.Infrastructure    ← REST / HTTP Transport（共通）
-ExchangeApi.Bitflyer          ← bitFlyer Adapter（Raw → DTO マッピング）
-ExchangeApi.Orchestration     ← 将来の複数取引所統合用（最小構成）
+ExchangeApi.Core             ← 契約/共通DTO/エラー（旧: ExchangeApi.Abstractions）
+ExchangeApi.Transport        ← HTTP/WS 基盤（RestClient/Signer 等）
+ExchangeApi.Adapter.Bitflyer ← bitFlyer 実装（REST/WS マッピング）
+ExchangeApi.Factory          ← DI 組み立て（機能ごとの登録を選択）
 ```
 
 依存方向は必ず以下を守ります：
 
 ```
-Abstractions  ←  Infrastructure  ←  Bitflyer
+Core  ←  Transport  ←  Adapter.Bitflyer  ←  Factory
 ```
 
 ---

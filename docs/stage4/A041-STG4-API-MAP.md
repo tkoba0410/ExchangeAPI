@@ -27,7 +27,7 @@ Stage4 は抽象 API を凍結するステージであり、実装は Stage5 以
 
 ## 2. ExchangeInfo の返却例（スケルトン）
 - Markets: `[{ Symbol: "BTC/JPY", ProductCode: "BTC_JPY", Type: Spot/Margin, MinSize, PriceIncrement, SizeIncrement }]`
-- Features: `{ SupportsWebSocket, SupportsMargin, SupportsStopOrder, SupportsParentOrder, SupportsCandlestick, SupportsWithdraw }` などの機能フラグ
+- Features: `{ SupportsWebSocket, SupportsMargin, SupportsStopOrder, SupportsParentOrder, SupportsCandlestick, SupportsOrderBookDelta, SupportsRealtimeExecutions, SupportsWithdraw }` などの機能フラグ（板差分/約定WS対応の有無を含める）
 - RateLimits（任意）: `{ RequestsPerMinute, OrdersPerMinute }` のような概略値
 
 ## 3. Raw API の扱い（Stage4 抽象外）

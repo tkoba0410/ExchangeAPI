@@ -21,6 +21,8 @@ public sealed record ExchangeFeatureFlags(
     bool SupportsStopOrder,
     bool SupportsParentOrder,
     bool SupportsCandlestick,
+    bool SupportsOrderBookDelta,
+    bool SupportsRealtimeExecutions,
     bool SupportsWithdraw);
 
 public sealed record ExchangeRateLimits(int? RequestsPerMinute, int? OrdersPerMinute);

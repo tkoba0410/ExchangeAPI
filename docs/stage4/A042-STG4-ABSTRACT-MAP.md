@@ -24,6 +24,11 @@ WS イベント DTO（抽象で採用する型）
 - `OrderBookDelta { Bids[], Asks[], Snapshot, Timestamp }` … Snapshot=true は初期板、false は差分
 - `ExecutionTick { Side, Price, Size, Timestamp }`
 
+Capabilities の一例（ExchangeInfo.Features）
+- SupportsWebSocket: WS 全般の有無
+- SupportsOrderBookDelta: 板差分をWSで配信するか（無い場合はスナップショットのみ）
+- SupportsRealtimeExecutions: 約定ストリームをWSで配信するか
+
 備考:
 - IMarginAccountApi は IAccountApi を継承し、Margin 能力を追加する。
 - 親注文/入出金/履歴系など抽象化しない機能は Raw API として扱う。

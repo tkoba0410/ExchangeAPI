@@ -484,10 +484,6 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         }
     }
 
-    #endregion
-
-    #region private mapping helpers
-
     /// <summary>
     /// 抽象シンボル（例: BTC/JPY）を bitFlyer の product_code にマップする。
     /// Stage1/2 時点では BTC/JPY のみサポート。
@@ -675,6 +671,4 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
             LastTradedPrice: raw.LastTradedPrice,
             Timestamp: raw.Timestamp);
     }
-
-    #endregion
 }

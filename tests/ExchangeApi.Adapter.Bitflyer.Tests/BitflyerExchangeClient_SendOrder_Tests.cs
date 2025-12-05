@@ -7,10 +7,10 @@ using Xunit;
 
 namespace ExchangeApi.Adapter.Bitflyer.Tests;
 
-public sealed class BitflyerExchangeClient_PlaceOrder_Tests
+public sealed class BitflyerExchangeClient_SendOrder_Tests
 {
     [Fact]
-    public async Task PlaceOrderAsync_MapsDomainToDtoAndReturnsResult()
+    public async Task SendOrderAsync_MapsDomainToDtoAndReturnsResult()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTickerRaw());
         var fakeAccount = new FakeBitflyerPrivateApi(new BitflyerBalanceResponse[0]);
@@ -25,7 +25,7 @@ public sealed class BitflyerExchangeClient_PlaceOrder_Tests
             OrderType: OrderType.Market,
             Size: 0.01m);
 
-        var result = await client.PlaceOrderAsync(order);
+        var result = await client.SendOrderAsync(order);
 
         Assert.Equal("ACCEPT-123", result.OrderId);
         Assert.NotNull(fakeTrading.LastRequest);
@@ -36,7 +36,7 @@ public sealed class BitflyerExchangeClient_PlaceOrder_Tests
     }
 
     [Fact]
-    public async Task PlaceOrderAsync_StopLimit_MapsChildOrderTypeStopLimit()
+    public async Task SendOrderAsync_StopLimit_MapsChildOrderTypeStopLimit()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTickerRaw());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
@@ -52,7 +52,7 @@ public sealed class BitflyerExchangeClient_PlaceOrder_Tests
             Price: 4000000m,
             TriggerPrice: 3990000m);
 
-        var result = await client.PlaceOrderAsync(order);
+        var result = await client.SendOrderAsync(order);
 
         Assert.Equal("ACCEPT-STOP", result.OrderId);
         Assert.NotNull(fakeTrading.LastRequest);
@@ -62,7 +62,7 @@ public sealed class BitflyerExchangeClient_PlaceOrder_Tests
     }
 
     [Fact]
-    public async Task PlaceOrderAsync_WhenApiReturns429_AddsRateLimitCategory()
+    public async Task SendOrderAsync_WhenApiReturns429_AddsRateLimitCategory()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTickerRaw());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
@@ -81,7 +81,7 @@ public sealed class BitflyerExchangeClient_PlaceOrder_Tests
             OrderType: OrderType.Market,
             Size: 0.01m);
 
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceOrderAsync(order));
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.SendOrderAsync(order));
         Assert.Equal(ExchangeErrorCategory.RateLimit, ex.ErrorCategory);
         Assert.Equal("TOO_MANY_REQUESTS", ex.ExchangeErrorCode);
         Assert.Equal("bitFlyer", ex.ExchangeId);
@@ -89,7 +89,7 @@ public sealed class BitflyerExchangeClient_PlaceOrder_Tests
     }
 
     [Fact]
-    public async Task PlaceOrderAsync_MarketDisallowsPriceOrTrigger()
+    public async Task SendOrderAsync_MarketDisallowsPriceOrTrigger()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTickerRaw());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
@@ -104,6 +104,6 @@ public sealed class BitflyerExchangeClient_PlaceOrder_Tests
             Price: 1m,
             TriggerPrice: 1m);
 
-        await Assert.ThrowsAsync<ArgumentException>(() => client.PlaceOrderAsync(order));
-    }
+        await Assert.ThrowsAsync<ArgumentException>(() => client.SendOrderAsync(order));
+}
 }

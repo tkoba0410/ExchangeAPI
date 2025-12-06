@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\\..\\src\\ExchangeApi.Contracts\\ExchangeApi.Contracts.csproj" />
     <ProjectReference Include="..\\..\\src\\ExchangeApi.Factory\\ExchangeApi.Factory.csproj" />
+    <ProjectReference Include="..\\..\\src\\ExchangeApi.Transport\\ExchangeApi.Transport.csproj" />
   </ItemGroup>
 
 </Project>

@@ -163,5 +163,43 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests
             Assert.Equal(OrderType.Limit, order.OrderType);
             Assert.Equal(0.1m, order.Size);
         }
+
+        [Fact]
+        public async Task CancelOrderAsync_NullResponse_Throws()
+        {
+            var rawTicker = new BitflyerTickerRaw { ProductCode = "BTC_JPY" };
+            var publicApi = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoardRaw { Bids = Array.Empty<BitflyerBoardEntryRaw>(), Asks = Array.Empty<BitflyerBoardEntryRaw>() });
+            var accountApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+            var tradingApi = new NullCancelTradingApi();
+            var client = new BitflyerExchangeClient(publicApi, accountApi, tradingApi);
+
+            await Assert.ThrowsAsync<ExchangeApiException>(() =>
+                client.CancelOrderAsync("BTC_JPY", "id-1"));
+        }
+
+        [Fact]
+        public async Task CancelAllOrdersAsync_NullResponse_Throws()
+        {
+            var rawTicker = new BitflyerTickerRaw { ProductCode = "BTC_JPY" };
+            var publicApi = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoardRaw { Bids = Array.Empty<BitflyerBoardEntryRaw>(), Asks = Array.Empty<BitflyerBoardEntryRaw>() });
+            var accountApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+            var tradingApi = new NullCancelTradingApi();
+            var client = new BitflyerExchangeClient(publicApi, accountApi, tradingApi);
+
+            await Assert.ThrowsAsync<ExchangeApiException>(() =>
+                client.CancelAllOrdersAsync("BTC_JPY"));
+        }
+
+        private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi
+        {
+            public Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(BitflyerSendChildOrderRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult(new BitflyerSendChildOrderResponse());
+
+            public Task<BitflyerEmptyResponse> CancelChildOrderAsync(BitflyerCancelChildOrderRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult<BitflyerEmptyResponse>(null!);
+
+            public Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(BitflyerCancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult<BitflyerEmptyResponse>(null!);
+        }
     }
 }

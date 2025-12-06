@@ -31,7 +31,6 @@ public class CompositeCredentialProvider_Tests
     [Fact]
     public void Get_Throws_WhenAllProvidersFail()
     {
-        // Arrange
         var providers = new IApiCredentialProvider[]
         {
             new ThrowingProvider(),
@@ -41,7 +40,9 @@ public class CompositeCredentialProvider_Tests
         var composite = new CompositeCredentialProvider(providers);
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => composite.Get("bitflyer", "default"));
+        var ex = Assert.Throws<InvalidOperationException>(() => composite.Get("bitflyer", "default"));
+        Assert.Contains("ThrowingProvider", ex.Message);
+        Assert.Contains("EmptyProvider", ex.Message);
     }
 
     private sealed class FixedProvider : IApiCredentialProvider

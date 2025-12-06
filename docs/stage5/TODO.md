@@ -13,6 +13,10 @@
 
 - 計画・見積り補助: 推奨順序に対して所要時間/依存関係を洗い出し、実行計画として明文化する（各タスクの初期見積りと依存をドキュメント化）。
 
+現状メモ:
+- テスト: `dotnet test` 実行済み（Contracts/Transport/Factory/Bitflyer）。Tradingのエラーハンドリング/ポーリング、Account/Margin、Market のマッピングをカバー。
+- ドキュメント: A010 のフォルダ構成を Account 配下統合・Raw API 記載に更新。TESTS.md を追加。
+
 推奨順序:
 1. REST専用化（Realtime除去）→ビルド確認
 2. フォルダ再編（Contracts DTO階層化・Bitflyer責務分離）

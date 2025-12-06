@@ -171,10 +171,11 @@ src/
         OrderRequest.cs
         OrderResult.cs
         OpenOrder.cs
+        OrderStatus.cs
         TimeInForce.cs
         OrderSide.cs
         OrderType.cs
-      Account/
+      Account/               ※ Margin も Account 配下に統合
         Balance.cs
         Collateral.cs
         Position.cs
@@ -222,7 +223,7 @@ src/
         MarketMapper.cs
         AccountMapper.cs
         MarginMapper.cs
-        ExchangeInfoMapper.cs
+      ExchangeInfoMapper.cs
 
       Trading/
         BitflyerTradingApi.cs      // ITradingApi 実装
@@ -235,7 +236,7 @@ src/
       ExchangeInfo/
         BitflyerExchangeInfoApi.cs // IExchangeInfoApi 実装
       RawApi/
-        BitflyerRawApiClient.cs
+        BitflyerRawApiClient.cs     // 抽象に載せないエンドポイントをラップ
 ```
 
 ### フォルダ構成における重要な原則
@@ -254,4 +255,3 @@ src/
 - REST-only の安定した土台を確立し、複数取引所展開が容易な状態にする。
 - 必要に応じて、Realtime/WS を **独立モジュール** として再導入する判断材料とする。
 - Stage6 では「運用・信頼性強化」や「抽象 API の追加仕様」を扱う可能性がある。
-

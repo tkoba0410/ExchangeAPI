@@ -6,6 +6,7 @@ Stage3 では、Private POST（`/v1/me/sendchildorder`）を end-to-end で通�
 
 Stage2 で確立した GET ベースの構造をそのまま継承しつつ、
 POST（body 付き / 署名あり）に対応できる形へ拡張することが目的である。
+※ Stage4 以降の命名: ExchangeApi.Contracts（旧 Abstractions）、ExchangeApi.Transport（旧 Infrastructure/Protocol）、ExchangeApi.Adapter.Bitflyer（旧 Bitflyer）、ExchangeApi.Factory（旧 Orchestration）
 
 ---
 
@@ -13,11 +14,11 @@ POST（body 付き / 署名あり）に対応できる形へ拡張すること�
 Stage3 のレイヤ構成を以下に示す。
 
 ```
-ExchangeApi.Abstractions
+ExchangeApi.Contracts（旧 ExchangeApi.Contracts）
    ├─ Domain（Balance / OrderRequest / OrderResult）
    └─ Interfaces（IExchangeAccountClient / IExchangeTradingClient / IExchangeClient）
 
-ExchangeApi.Infrastructure
+ExchangeApi.Transport（旧 ExchangeApi.Transport）
    ├─ IExchangeClock / SystemClock
    ├─ IRequestSigner（GET + POST 署名対応）
    ├─ IRestClient
@@ -25,19 +26,19 @@ ExchangeApi.Infrastructure
    │     └─ PostAsync<TReq, TRes>()
    └─ ExchangeApiException（共通例外）
 
-ExchangeApi.Orchestration（Credential Provider）
+ExchangeApi.Factory（旧 ExchangeApi.Factory、Credential Provider）
    ├─ ApiCredentials
    ├─ IApiCredentialProvider
    └─ Provider 実装（Environment / Windows / Composite など）
 
-ExchangeApi.Bitflyer (Private API)
+ExchangeApi.Adapter.Bitflyer (Private API)
    ├─ IBitflyerPrivateApi（Account 系: balance など）
    ├─ IBitflyerPrivateTradingApi（Trading 系: sendchildorder）
    ├─ DTO: BitflyerBalanceResponse（既存）
    ├─ DTO: BitflyerSendChildOrderRequest / Response（Stage3）
    └─ BitflyerPrivateApi（Account + Trading の両方を単一クラスで実装）
 
-ExchangeApi.Bitflyer (Adapter)
+ExchangeApi.Adapter.Bitflyer (Adapter)
    └─ BitflyerExchangeClient : IExchangeClient
          ├─ GetBalancesAsync（Stage2）
          └─ SendOrderAsync（Stage3）
@@ -49,7 +50,7 @@ ExchangeApi.Bitflyer (Adapter)
 
 ## 3. レイヤ別の責務定義
 
-### 3.1 ExchangeApi.Abstractions
+### 3.1 ExchangeApi.Contracts
 #### ■ Domain モデル
 - `OrderSide`（Buy / Sell）
 - `OrderType`（Market のみ、将来拡張可）
@@ -66,7 +67,7 @@ Abstractions 層は **取引所固有の仕様を一切含まず、純粋なド�
 
 ---
 
-### 3.2 ExchangeApi.Infrastructure（Protocol + Transport）
+### 3.2 ExchangeApi.Transport（Protocol + Transport）
 #### ■ IRequestSigner
 - bitFlyer の署名仕様を実装するインターフェース。
 - GET／POST の差分を吸収し、以下を担う：
@@ -94,18 +95,18 @@ Abstractions 層は **取引所固有の仕様を一切含まず、純粋なド�
 
 ---
 
-### 3.3 ExchangeApi.Orchestration（Credential Provider）
+### 3.3 ExchangeApi.Factory（Credential Provider）
 - API key / secret を取得する責務を専任させる層。
 - REST / Private API 層が資格情報取得をしないように分離する。
 - Provider の実装は環境変数／Windows Credential Manager／Composite など複数用意可能。
 
 ---
 
-### 3.4 ExchangeApi.Bitflyer.Private（Private API 層）
+### 3.4 ExchangeApi.Adapter.Bitflyer.Private（Private API 層）
 #### ■ 役割ベースのインターフェース
 - `IBitflyerPrivateApi`（Account 系）
   - `GetBalancesAsync()`（Stage2）
-  - 将来：`GetCollateralAsync()`, `GetPositionsAsync()`
+  - 将来：`GetCollateralAsync()`, `ListPositionsAsync()`
 
 - `IBitflyerPrivateTradingApi`（Trading 系）
   - `SendChildOrderAsync()`（Stage3）
@@ -123,7 +124,7 @@ Abstractions 層は **取引所固有の仕様を一切含まず、純粋なド�
 
 ---
 
-### 3.5 ExchangeApi.Bitflyer.Adapter（ExchangeClient 層）
+### 3.5 ExchangeApi.Adapter.Bitflyer.Adapter（ExchangeClient 層）
 #### ■ BitflyerExchangeClient
 - `IExchangeTradingClient` の実装として `SendOrderAsync` を提供
 - `IBitflyerPrivateTradingApi` を呼び、DTO → Domain 変換を行う

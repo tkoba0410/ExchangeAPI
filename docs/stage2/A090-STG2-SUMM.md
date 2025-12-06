@@ -62,15 +62,15 @@ Stage2 は、**「bitFlyer Private API 呼び出しのテンプレートを確�
 - **A070-STG2-OPS**：動作確認・運用メモ（Factory + GetBalancesAsync）
 
 ### 3.2 コード上の成果物（想定）
-- `ExchangeApi.Abstractions`
+- `ExchangeApi.Contracts`
   - `Balance` record
   - `IExchangeAccountClient`, `IExchangeClient`
-- `ExchangeApi.Infrastructure`
+- `ExchangeApi.Transport`
   - `IExchangeClock` / `SystemClock`
   - `IRequestSigner` / `BitflyerRequestSigner`
   - `IRestClient` / `RestClient`
   - `ExchangeApiException`
-- `ExchangeApi.Bitflyer`
+- `ExchangeApi.Adapter.Bitflyer`
   - DTO: `BitflyerBalanceResponse`
   - Private API: `IBitflyerPrivateApi`, `BitflyerPrivateApi`
   - Adapter: `BitflyerExchangeClient.GetBalancesAsync`（DTO → Balance 変換を内包）

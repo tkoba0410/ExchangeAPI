@@ -6,7 +6,7 @@
 Stage2（get balance）において、必要となるレイヤ構成と責務分担を明確化し、
 後続ステージ（Collateral / Positions / POST Private API）の拡張に耐えられる基盤構造を定義する。
 
-本ドキュメントは、**Abstractions → Infrastructure → Bitflyer Private API → Bitflyer.Adapter** の流れを整理し、
+本ドキュメントは、**ExchangeApi.Contracts（旧 Abstractions）→ ExchangeApi.Transport（旧 Infrastructure）→ bitflyer private API → ExchangeApi.Adapter.Bitflyer** の流れを整理し、
 依存方向・レイヤ境界・役割を統一的に示すことを目的とする。
 
 ---
@@ -15,28 +15,28 @@ Stage2（get balance）において、必要となるレイヤ構成と責務分
 Stage2 時点で必要となるレイヤと責務を以下に示す。
 
 ```
-ExchangeApi.Abstractions
+ExchangeApi.Contracts（旧 ExchangeApi.Contracts）
    ├─ Domain（Balance）
    └─ Interfaces（IExchangeAccountClient, IExchangeClient）
 
-ExchangeApi.Infrastructure
+ExchangeApi.Transport（旧 ExchangeApi.Transport）
    ├─ IExchangeClock / SystemClock
    ├─ IRequestSigner（bitFlyer 署名アルゴリズム）
    ├─ IRestClient / RestClient（署名付き GET）
    └─ ExchangeApiException
 
-ExchangeApi.Orchestration（Credential）
+ExchangeApi.Factory（旧 ExchangeApi.Factory、Credential）
    ├─ DTO: ApiCredentials
    ├─ IF: IApiCredentialProvider
    ├─ EnvironmentVariable / WindowsCredentialManager などの実装
    └─ CompositeCredentialProvider（フォールバック連鎖）
 
-ExchangeApi.Bitflyer (Private API)
+ExchangeApi.Adapter.Bitflyer (Private API)
    ├─ DTO: BitflyerBalanceResponse
    ├─ Private API IF: IBitflyerPrivateApi
    └─ Private API 実装: BitflyerPrivateApi
 
-ExchangeApi.Bitflyer (Adapter)
+ExchangeApi.Adapter.Bitflyer (Adapter)
    └─ ExchangeClient: BitflyerExchangeClient
        └─ GetBalancesAsync（Stage2 完了対象、DTOを直接 Balance に変換）
 ```
@@ -47,7 +47,7 @@ ExchangeApi.Bitflyer (Adapter)
 
 ## 3. レイヤ別の責務（詳細）
 
-### 3.1 ExchangeApi.Abstractions
+### 3.1 ExchangeApi.Contracts（旧 ExchangeApi.Contracts）
 #### ■ Domain モデル
 - `Balance`（通貨コード・総残高・発注可能残高）
 - イミュータブル record として定義し、取引所固有の仕様に依存しない。
@@ -59,7 +59,7 @@ ExchangeApi.Bitflyer (Adapter)
 
 ---
 
-### 3.2 ExchangeApi.Infrastructure（Protocol + Transport）
+### 3.2 ExchangeApi.Transport（旧 ExchangeApi.Transport, Protocol + Transport）
 #### ■ IExchangeClock / SystemClock
 - 署名生成に必要となる UTC 時刻を抽象化。
 - テスト容易性の観点からインターフェースとする。
@@ -86,7 +86,7 @@ ExchangeApi.Bitflyer (Adapter)
 
 ---
 
-### 3.3 ExchangeApi.Bitflyer.Private（Private API 層）
+### 3.3 ExchangeApi.Adapter.Bitflyer.Private（Private API 層）
 #### ■ DTO（BitflyerBalanceResponse）
 - bitFlyer のレスポンス構造をそのまま表現。
 - Domain とは切り離して定義する（疎結合の維持）。
@@ -103,7 +103,7 @@ Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken 
 
 ---
 
-### 3.4 ExchangeApi.Bitflyer.Adapter（ExchangeClient 層）
+### 3.4 ExchangeApi.Adapter.Bitflyer（ExchangeClient 層）
 #### ■ BitflyerExchangeClient
 - `IExchangeAccountClient` の実装クラス。
 - `GetBalancesAsync` の処理フロー：
@@ -114,7 +114,7 @@ Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken 
 
 ---
 
-### 3.5 ExchangeApi.Orchestration（Credential Provider 層）
+### 3.5 ExchangeApi.Factory（旧 Orchestration, Credential Provider 層）
 - `ApiCredentials` DTO と `IApiCredentialProvider` インターフェースを定義し、Factory で利用する資格情報の取得責務を担う。
 - 代表的な実装例：
   - `EnvironmentVariableApiCredentialProvider`（`<EXCHANGE>_<ACCOUNT>_API_KEY` 形式の環境変数を参照）

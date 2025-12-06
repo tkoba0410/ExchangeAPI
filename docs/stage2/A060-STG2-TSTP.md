@@ -136,7 +136,7 @@ Stage2 で検証すべき観点を、階層別に整理する。
 ---
 
 ## 6. 実行とインテグレーションテストの扱い
-- ユニットテスト（通信なし）は `dotnet test tests/ExchangeApi.Bitflyer.Tests/ExchangeApi.Bitflyer.Tests.csproj` などで通常実行する。
+- ユニットテスト（通信なし）は `dotnet test tests/ExchangeApi.Adapter.Bitflyer.Tests/ExchangeApi.Adapter.Bitflyer.Tests.csproj` などで通常実行する。
 - 実通信テストは別プロジェクト/カテゴリに切り出し、検証用 API キーを環境変数やシークレットから読み込んで手動実行する（デフォルトの `dotnet test` には含めない）。キー未設定時はスキップする条件を用意する。
 - ログや例外に秘密を出さない。レートリミットや署名エラーは `ExchangeApiException` でハンドリングする。
 

@@ -71,14 +71,14 @@ Stage3 は **MARKET 注文 1 本の縦スライスに限定し、POST 対応の�
 - **A070-STG3-OPS**：動作確認手順・運用メモ
 
 ### 3.2 コード（想定される構成）
-- `ExchangeApi.Abstractions`
+- `ExchangeApi.Contracts`
   - OrderSide / OrderType / OrderRequest / OrderResult
   - IExchangeTradingClient
-- `ExchangeApi.Infrastructure`
+- `ExchangeApi.Transport`
   - IRestClient（PostAsync 追加）
   - IRequestSigner（POST 署名対応）
   - ExchangeApiException
-- `ExchangeApi.Bitflyer`
+- `ExchangeApi.Adapter.Bitflyer`
   - DTO：BitflyerSendChildOrderRequest / Response
   - IBitflyerPrivateTradingApi
   - BitflyerPrivateApi（GET + POST 両対応）

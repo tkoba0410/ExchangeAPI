@@ -82,16 +82,16 @@ Stage1 の目的は、Exchange API Library の基盤となる **取引所非依�
 
 Stage1 におけるプロジェクトは最低限以下を含むものとする。
 
-* `ExchangeApi.Abstractions`  … Boundary（依存先なし）
-* `ExchangeApi.Infrastructure` … REST 向け Technical Modules
-* `ExchangeApi.Bitflyer`       … bitFlyer Adapter
+* `ExchangeApi.Contracts`  … Boundary（依存先なし）
+* `ExchangeApi.Transport` … REST 向け Technical Modules
+* `ExchangeApi.Adapter.Bitflyer`       … bitFlyer Adapter
 
 ### 4.2 依存方向（MUST）
 
-* `ExchangeApi.Abstractions` は他プロジェクトに依存してはならない（MUST NOT）。
-* `ExchangeApi.Infrastructure` は `ExchangeApi.Abstractions` へ依存してよい（MUST）。
-* `ExchangeApi.Bitflyer` は `ExchangeApi.Abstractions` と `ExchangeApi.Infrastructure` に依存してよい（MUST）。
-* Raw モデル（`BitflyerTickerRaw`）は `ExchangeApi.Bitflyer` 内部の型であり、他プロジェクトから参照しない（MUST）。
+* `ExchangeApi.Contracts` は他プロジェクトに依存してはならない（MUST NOT）。
+* `ExchangeApi.Transport` は `ExchangeApi.Contracts` へ依存してよい（MUST）。
+* `ExchangeApi.Adapter.Bitflyer` は `ExchangeApi.Contracts` と `ExchangeApi.Transport` に依存してよい（MUST）。
+* Raw モデル（`BitflyerTickerRaw`）は `ExchangeApi.Adapter.Bitflyer` 内部の型であり、他プロジェクトから参照しない（MUST）。
 
 ---
 
@@ -133,7 +133,7 @@ Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken =
 
 * **FR-4-1**: bitFlyer の `GET /v1/getticker` レスポンスを欠損なく保持する `BitflyerTickerRaw` を定義しなければならない（MUST）。
 * **FR-4-2**: `BitflyerTickerRaw` のフィールド名・型は bitFlyer 公式仕様に合わせること（SHOULD）。
-* **FR-4-3**: `BitflyerTickerRaw` は `ExchangeApi.Bitflyer` プロジェクト内に配置し、外部に公開しない（MUST）。
+* **FR-4-3**: `BitflyerTickerRaw` は `ExchangeApi.Adapter.Bitflyer` プロジェクト内に配置し、外部に公開しない（MUST）。
 
 ### FR-5: bitFlyer 公開 API インターフェース
 

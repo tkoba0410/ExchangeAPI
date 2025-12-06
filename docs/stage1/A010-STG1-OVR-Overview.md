@@ -71,7 +71,8 @@ Stage1 ではこのうち：
 * Adapter（bitFlyer）
 * Protocol（REST の最小実装）
 * Transport（HttpClient を包む最小実装）
-  だけを利用する。
+  だけを利用する。  
+  ※ Stage4 以降の命名: ExchangeApi.Contracts（旧 Abstractions）、ExchangeApi.Transport（旧 Infrastructure/Protocol/Transport）、ExchangeApi.Adapter.Bitflyer（旧 Adapter）、ExchangeApi.Factory（旧 Orchestration）
 
 ### 4.1 Boundary（Abstractions）
 
@@ -96,10 +97,10 @@ Stage1 ではこのうち：
 
 実装済みの Stage1 では次の構成となっている：
 
-* `ExchangeApi.Abstractions` … Boundary（依存なし）
-* `ExchangeApi.Infrastructure` … Protocol + Transport（技術モジュール）
-* `ExchangeApi.Bitflyer` … bitFlyer Adapter（Abstractions / Infrastructure に依存）
-* `ExchangeApi.Orchestration` … Stage2 で利用予定の上位層（現在は未実装）
+* `ExchangeApi.Contracts`（旧 ExchangeApi.Contracts）… Boundary（依存なし）
+* `ExchangeApi.Transport`（旧 ExchangeApi.Transport）… Protocol + Transport（技術モジュール）
+* `ExchangeApi.Adapter.Bitflyer`（旧 ExchangeApi.Adapter.Bitflyer）… bitFlyer Adapter（Core / Transport に依存）
+* `ExchangeApi.Factory`（旧 ExchangeApi.Factory）… 資格情報や組み立て用の上位層（Stage2 以降で利用）
 
 ---
 
@@ -108,9 +109,9 @@ Stage1 ではこのうち：
 Stage1〜Stage2 を通じて **不変の依存原則**：
 
 ```
-Boundary (Abstractions)
+Core (旧 Abstractions)
         ↑
-Adapter / Protocol / Transport
+Adapter.Bitflyer / Transport
 ```
 
 禁止（MUST NOT）：

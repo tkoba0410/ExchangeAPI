@@ -37,14 +37,14 @@ Stage1 は最小実装フェーズであり、**軽量・最短で動作まで�
 
 ```text
 src/
-  ExchangeApi.Abstractions/
-  ExchangeApi.Infrastructure/
-  ExchangeApi.Bitflyer/
+  ExchangeApi.Contracts/
+  ExchangeApi.Transport/
+  ExchangeApi.Adapter.Bitflyer/
 
 tests/
-  ExchangeApi.Abstractions.Tests/
-  ExchangeApi.Infrastructure.Tests/
-  ExchangeApi.Bitflyer.Tests/
+  ExchangeApi.Contracts.Tests/
+  ExchangeApi.Transport.Tests/
+  ExchangeApi.Adapter.Bitflyer.Tests/
 ```
 
 * Stage1 の設計仕様（A010〜A050）が最新状態で整合していること。
@@ -111,7 +111,7 @@ public sealed record Ticker(
 
 ### 2-2. Raw モデルの配置
 
-* `ExchangeApi.Bitflyer` プロジェクト内 `Models/` ディレクトリに配置。
+* `ExchangeApi.Adapter.Bitflyer` プロジェクト内 `Models/` ディレクトリに配置。
 * Abstractions・Infrastructure から参照されないようにする。
 
 **完了条件（DoD）**

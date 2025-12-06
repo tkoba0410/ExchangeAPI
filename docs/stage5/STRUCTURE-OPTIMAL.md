@@ -47,19 +47,17 @@ src/adapter/Bitflyer/
       BitflyerTickerRaw.cs
   RawApi/
     BitflyerRawApiClient.cs          // Public/Private をまとめた生APIクライアント
+    BitflyerRawApiFacade.cs          // Raw を外部公開する薄いラッパー
   Adapters/
-    TradingMapper.cs
-    MarketMapper.cs
-    AccountMapper.cs
-    MarginMapper.cs
-    ExchangeInfoMapper.cs
+    BitflyerCommonMapper.cs          // Side/Status/Symbol 等の共通マッピング
+    BitflyerTradingMapper.cs         // 注文系マッピング・バリデーション
+    BitflyerErrorMapper.cs           // エラーカテゴリ/例外ラップ
   Apis/
     Trading/BitflyerTradingApi.cs    // ITradingApi 実装（ポーリング等含む）
     Market/BitflyerMarketApi.cs      // IMarketDataApi 実装
     Account/BitflyerAccountApi.cs    // IAccountApi 実装
     Margin/BitflyerMarginApi.cs      // IMarginAccountApi 実装
     ExchangeInfo/BitflyerExchangeInfoApi.cs
-    RawApi/BitflyerRawApiFacade.cs   // Rawを外部に出す場合
   Facade/
     BitflyerExchangeClient.cs        // 上記APIを束ねる薄いファサード
   Factory/

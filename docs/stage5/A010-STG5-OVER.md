@@ -150,7 +150,7 @@ Stage5 は次を満たした時点で完了とみなす：
 ---
 
 ## 7. Stage5 で目指すフォルダ構成（REST Only / 責務明確化）
-Stage5 では、REST-only ライブラリとしてのシンプルさと可読性を最大化するため、次の構成を標準とする。
+Stage5 では、REST-only ライブラリとしてのシンプルさと可読性を最大化するため、次の構成を標準とする（Bitflyer についてはより最適化した案を `docs/stage5/STRUCTURE-OPTIMAL.md` に記載）。
 
 ```text
 src/

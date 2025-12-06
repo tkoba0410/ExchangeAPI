@@ -424,8 +424,77 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
                 exchangeId: _exchangeId,
                 operation: "GetExecutions",
                 statusCode: null,
-                innerException: ex);
+            innerException: ex);
         }
+    }
+
+    public async Task<OrderStatus> PollOrderStatusAsync(
+        string productCode,
+        string childOrderAcceptanceId,
+        TimeSpan? pollInterval = null,
+        int maxAttempts = 30,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        if (string.IsNullOrWhiteSpace(childOrderAcceptanceId))
+        {
+            throw new ArgumentException("childOrderAcceptanceId is required.", nameof(childOrderAcceptanceId));
+        }
+
+        var interval = pollInterval ?? TimeSpan.FromSeconds(1);
+
+        for (var attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var orders = await _privateAccountApi
+                .GetChildOrdersAsync(productCode, childOrderState: null, childOrderAcceptanceId, cancellationToken)
+                .ConfigureAwait(false);
+
+            var order = orders.FirstOrDefault();
+
+            if (order is null)
+            {
+                // 見つからない場合は完了とみなす（履歴に移動した可能性）。
+                return new OrderStatus(
+                    ProductCode: productCode,
+                    OrderAcceptanceId: childOrderAcceptanceId,
+                    Status: OrderStatusType.Completed,
+                    ExecutedSize: 0m,
+                    OutstandingSize: 0m,
+                    Price: null,
+                    AveragePrice: null);
+            }
+
+            var status = MapOrderStatusType(order.ChildOrderState);
+            var mapped = new OrderStatus(
+                ProductCode: order.ProductCode,
+                OrderAcceptanceId: order.ChildOrderAcceptanceId,
+                Status: status,
+                ExecutedSize: order.ExecutedSize,
+                OutstandingSize: order.OutstandingSize,
+                Price: order.Price == 0 ? null : order.Price,
+                AveragePrice: order.AveragePrice == 0 ? null : order.AveragePrice);
+
+            if (status is OrderStatusType.Completed or OrderStatusType.Canceled or OrderStatusType.Expired)
+            {
+                return mapped;
+            }
+
+            if (attempt == maxAttempts - 1)
+            {
+                return mapped with { Status = OrderStatusType.Active };
+            }
+
+            await Task.Delay(interval, cancellationToken).ConfigureAwait(false);
+        }
+
+        // ここには到達しない想定
+        throw new InvalidOperationException("Polling loop exited unexpectedly.");
     }
 
     public async Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(
@@ -440,7 +509,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         try
         {
             var rawOrders = await _privateAccountApi
-                .GetChildOrdersAsync(productCode, childOrderState: "ACTIVE", cancellationToken)
+                .GetChildOrdersAsync(productCode, childOrderState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken)
                 .ConfigureAwait(false);
 
             var mapped = rawOrders.Select(o => new OpenOrder(
@@ -537,6 +606,18 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
             "MARKET" => OrderType.Market,
             "STOP" or "STOP_LIMIT" => OrderType.Stop,
             _ => OrderType.Market,
+        };
+    }
+
+    private static OrderStatusType MapOrderStatusType(string childOrderState)
+    {
+        return childOrderState.ToUpperInvariant() switch
+        {
+            "ACTIVE" => OrderStatusType.Active,
+            "COMPLETED" => OrderStatusType.Completed,
+            "CANCELED" => OrderStatusType.Canceled,
+            "EXPIRED" => OrderStatusType.Expired,
+            _ => OrderStatusType.Unknown,
         };
     }
 

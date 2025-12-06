@@ -87,6 +87,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi, IBitflyerPrivateTr
     public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
         string productCode,
         string? childOrderState = null,
+        string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(productCode))
@@ -99,6 +100,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi, IBitflyerPrivateTr
         {
             ["product_code"] = productCode,
             ["child_order_state"] = childOrderState,
+            ["child_order_acceptance_id"] = childOrderAcceptanceId,
         };
 
         return _restClient.GetAsync<IReadOnlyList<BitflyerChildOrderResponse>>(

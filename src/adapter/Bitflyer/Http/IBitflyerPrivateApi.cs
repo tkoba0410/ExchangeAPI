@@ -28,5 +28,6 @@ public interface IBitflyerPrivateApi
     Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
         string productCode,
         string? childOrderState = null,
+        string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default);
 }

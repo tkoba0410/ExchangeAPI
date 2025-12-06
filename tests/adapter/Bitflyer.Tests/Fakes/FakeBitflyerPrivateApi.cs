@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bitflyer;
@@ -42,6 +43,20 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default)
         => Task.FromResult(_collateral);
 
-    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(string productCode, string? childOrderState = null, CancellationToken cancellationToken = default)
-        => Task.FromResult(_childOrders);
+    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
+        string productCode,
+        string? childOrderState = null,
+        string? childOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (!string.IsNullOrEmpty(childOrderAcceptanceId))
+        {
+            var filtered = _childOrders
+                .Where(o => o.ChildOrderAcceptanceId == childOrderAcceptanceId)
+                .ToArray();
+            return Task.FromResult<IReadOnlyList<BitflyerChildOrderResponse>>(filtered);
+        }
+
+        return Task.FromResult(_childOrders);
+    }
 }

@@ -13,12 +13,17 @@
       "another/account": { "ApiKey": "...", "ApiSecret": "..." }
     }
     ```  
-  - セキュリティはファイル権限に依存するので、配置先のアクセス制御に注意。
+  - セキュリティはファイル権限に依存するので、配置先のアクセス制御に注意（600/ユーザー専用に設定するなど）。
 - CompositeCredentialProvider  
   - 複数プロバイダをフォールバック順に束ねる。全て失敗した場合、プロバイダ名と理由をまとめた例外を返す。
 
 ## RestClient/Transport 組み立て
-- RestClientFactory（Factoryプロジェクト内）で以下を注入可能：
-  - `IRequestSigner`（署名）、`IHttpPolicy`（リトライ/タイムアウト等）、`IRestClientLogger`（ログ）
+- RestClientFactory で以下を注入可能：
+  - `IRequestSigner`（署名）、`IHttpPolicy`（リトライ/タイムアウト等は Stage5+ 実装）、`IRestClientLogger`（ログ）
   - `IHttpTransport` または `HttpClient` を差し替え可。
 - アダプタ側（例: bitFlyer）は Factory で組んだ RestClient を再利用し、署名/ポリシー/ログの統一を図る。
+
+## 運用ベストプラクティス（認証情報）
+- 環境変数: 開発/CI向け。不要になったら速やかに削除する。
+- ファイル: 権限をユーザー限定にし、バージョン管理に含めない。必要に応じて定期ローテーションを実施。
+- Windows Credential Manager: 管理者以外が参照できないようスコープを適切に設定し、キーは定期的に更新する。

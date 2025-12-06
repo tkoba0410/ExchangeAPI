@@ -27,6 +27,8 @@
 - Candlestick 対応方針
   - 抽象では GetCandlesticks を正式サポートするが、取引所非対応（例: bitFlyer）は `NotImplemented` 相当で明示的に拒否する。
   - 初期の実装ターゲットは bittrade を想定する。
+- Realtime 対応方針
+  - bitFlyer は WS 未実装のため、現状はスタブ。Stage5 以降で実装可否を再評価する。
 - ドメイン型
   - Ticker / OrderBook / Execution / OrderRequest / OrderResult / OpenOrder / Position / Collateral
   - OrderRequest は Stage3 の骨格を踏襲し、抽象 IF との整合性を確認する

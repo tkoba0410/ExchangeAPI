@@ -26,8 +26,8 @@ Stage4 は抽象 API を凍結するステージであり、実装は Stage5 以
 | ExchangeInfo | IExchangeInfoApi | REST | 市場/機能情報の入口 | （将来決定） | 抽象定義 | Stage5+ |
 
 ## 2. ExchangeInfo の返却例（スケルトン）
-- Markets: `[{ Symbol: "BTC/JPY", ProductCode: "BTC_JPY", Type: Spot/Margin, MinSize, PriceIncrement, SizeIncrement }]`
-- Features: `{ SupportsWebSocket, SupportsMargin, SupportsStopOrder, SupportsParentOrder, SupportsCandlestick, SupportsOrderBookDelta, SupportsRealtimeExecutions, SupportsWithdraw }` などの機能フラグ（板差分/約定WS対応の有無を含める）
+- Markets: 現状スケルトン（例: `[{ Symbol: "BTC/JPY", ProductCode: "BTC_JPY", Type: Spot, MinSize, PriceIncrement, SizeIncrement }]`）。実装時に対象市場を反映する。
+- Features: `{ SupportsWebSocket, SupportsMargin, SupportsStopOrder, SupportsParentOrder, SupportsCandlestick, SupportsOrderBookDelta, SupportsRealtimeExecutions, SupportsWithdraw }` などの機能フラグ（板差分/約定WS対応の有無を含める）。bitFlyer は Candlestick/OrderBookDelta/RealtimeExecutions は false。
 - RateLimits（任意）: `{ RequestsPerMinute, OrdersPerMinute }` のような概略値
 
 ## 3. Raw API の扱い（Stage4 抽象外）

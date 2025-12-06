@@ -13,6 +13,7 @@ Stage4 は抽象設計フェーズのため、ここでは「REST と WS の使�
 4) ExchangeInfo で対象市場/機能の有無を確認し、存在しない機能は Raw やフォールバックで扱う  
 5) ClientOrderId を使わない場合は null を渡す/受け取るだけでよい。相関管理が必要な場合は別層の `IOrderIdMapper` 実装（例: InMemory）を差し込み、サーバーIDとの対応付けを行う。
 6) Candlesticks は抽象で定義するが、取引所によっては未サポート（bitFlyer など）。`ExchangeInfo.Features.SupportsCandlestick` を確認し、未対応は例外（NotImplemented）を前提に運用する。
+7) Realtime（WS）は bitFlyer では未実装のためスタブのみ。WS 利用は Stage5 以降の実装を前提にし、現状は REST 併用で運用する。
 
 ## 3. 運用メモ（ガイドライン）
 - REST と WS を明確に役割分担する（REST=スナップショット/同期、WS=増分/リアルタイム）。

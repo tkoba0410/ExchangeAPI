@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Adapter.Bitflyer;
+using ExchangeApi.Adapter.Bitflyer.Facade;
 using ExchangeApi.Adapter.Bitflyer.Models;
 using ExchangeApi.Adapter.Bitflyer.Tests.Fakes;
 using Xunit;

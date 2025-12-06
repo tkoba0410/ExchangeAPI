@@ -9,7 +9,7 @@ using ExchangeApi.Adapter.Bitflyer.Apis.Trading;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 
-namespace ExchangeApi.Adapter.Bitflyer;
+namespace ExchangeApi.Adapter.Bitflyer.Facade;
 
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。

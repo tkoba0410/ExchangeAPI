@@ -55,6 +55,7 @@ namespace ExchangeApi.Adapter.Bitflyer;
 
         var publicApi = new BitflyerPublicApi(restClient);
         var privateApi = new BitflyerPrivateApi(restClient);
+        var rawApi = new BitflyerRawApiClient(publicApi, privateApi, privateApi);
 
         return new BitflyerExchangeClient(publicApi, privateApi, privateApi);
     }

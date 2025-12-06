@@ -36,7 +36,7 @@ public sealed class BitflyerTradingApi : ITradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        BitflyerMappers.ValidateOrderRequest(request);
+        BitflyerTradingMapper.ValidateOrderRequest(request);
 
         try
         {
@@ -44,12 +44,12 @@ public sealed class BitflyerTradingApi : ITradingApi
             {
                 ProductCode = request.ProductCode,
                 Side = request.Side == OrderSide.Buy ? "BUY" : "SELL",
-                ChildOrderType = BitflyerMappers.MapOrderType(request.OrderType, request.Price),
+                ChildOrderType = BitflyerTradingMapper.MapOrderType(request.OrderType, request.Price),
                 Size = request.Size,
                 Price = request.Price,
                 TriggerPrice = request.TriggerPrice,
                 MinuteToExpire = request.MinuteToExpire,
-                TimeInForce = BitflyerMappers.MapTimeInForce(request.TimeInForce),
+                TimeInForce = BitflyerTradingMapper.MapTimeInForce(request.TimeInForce),
             };
 
             var response = await _privateTradingApi
@@ -60,7 +60,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "SendOrder");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "SendOrder");
         }
         catch (Exception ex)
         {
@@ -113,7 +113,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "CancelOrder");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "CancelOrder");
         }
         catch (Exception ex)
         {
@@ -159,7 +159,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "CancelAllOrders");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "CancelAllOrders");
         }
         catch (Exception ex)
         {
@@ -191,8 +191,8 @@ public sealed class BitflyerTradingApi : ITradingApi
                 ProductCode: o.ProductCode,
                 OrderId: o.ChildOrderId,
                 OrderAcceptanceId: o.ChildOrderAcceptanceId,
-                Side: BitflyerMappers.MapSide(o.Side),
-                OrderType: BitflyerMappers.MapOrderTypeFromExchange(o.ChildOrderType),
+                Side: BitflyerCommonMapper.MapSide(o.Side),
+                OrderType: BitflyerTradingMapper.MapOrderTypeFromExchange(o.ChildOrderType),
                 Size: o.Size,
                 OutstandingSize: o.OutstandingSize,
                 ExecutedSize: o.ExecutedSize,
@@ -203,7 +203,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "GetOpenOrders");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetOpenOrders");
         }
         catch (Exception ex)
         {
@@ -257,7 +257,7 @@ public sealed class BitflyerTradingApi : ITradingApi
                     AveragePrice: null);
             }
 
-            var status = BitflyerMappers.MapOrderStatusType(order.ChildOrderState);
+            var status = BitflyerCommonMapper.MapOrderStatusType(order.ChildOrderState);
             var mapped = new OrderStatus(
                 ProductCode: order.ProductCode,
                 OrderAcceptanceId: order.ChildOrderAcceptanceId,

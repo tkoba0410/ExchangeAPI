@@ -38,7 +38,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "GetBalances");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetBalances");
         }
         catch (Exception ex)
         {
@@ -62,7 +62,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
             return raw
                 .Select(p => new Position(
                     ProductCode: p.ProductCode,
-                    Side: BitflyerMappers.MapSide(p.Side),
+                    Side: BitflyerCommonMapper.MapSide(p.Side),
                     Size: p.Size,
                     Price: p.Price,
                     OpenDate: p.OpenDate,
@@ -71,7 +71,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "GetOpenPositions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetOpenPositions");
         }
         catch (Exception ex)
         {
@@ -100,7 +100,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "GetCollateral");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetCollateral");
         }
         catch (Exception ex)
         {

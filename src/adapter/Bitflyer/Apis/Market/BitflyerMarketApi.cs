@@ -33,7 +33,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
     {
         try
         {
-            var productCode = BitflyerMappers.MapSymbolToProductCode(symbol);
+            var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
             var raw = await _publicApi.GetTickerRawAsync(productCode, cancellationToken).ConfigureAwait(false);
             return MapToTicker(symbol, raw);
         }
@@ -48,7 +48,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "GetTicker");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetTicker");
         }
         catch (Exception ex)
         {
@@ -65,7 +65,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
     {
         try
         {
-            var productCode = BitflyerMappers.MapSymbolToProductCode(symbol);
+            var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
             var rawBoard = await _publicApi.GetBoardRawAsync(productCode, cancellationToken).ConfigureAwait(false);
             return MapToOrderBook(symbol, rawBoard);
         }
@@ -80,7 +80,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "GetOrderBook");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetOrderBook");
         }
         catch (Exception ex)
         {
@@ -97,14 +97,14 @@ public sealed class BitflyerMarketApi : IMarketDataApi
     {
         try
         {
-            var productCode = BitflyerMappers.MapSymbolToProductCode(symbol);
+            var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
             var raw = await _privateApi.GetExecutionsAsync(productCode, cancellationToken).ConfigureAwait(false);
 
             var mapped = raw
                 .Select(e => new Execution(
                     ProductCode: e.ProductCode,
                     Id: e.Id,
-                    Side: BitflyerMappers.MapSide(e.Side),
+                    Side: BitflyerCommonMapper.MapSide(e.Side),
                     Price: e.Price,
                     Size: e.Size,
                     ExecutedAt: e.ExecDate,
@@ -115,7 +115,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "GetExecutions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetExecutions");
         }
         catch (Exception ex)
         {

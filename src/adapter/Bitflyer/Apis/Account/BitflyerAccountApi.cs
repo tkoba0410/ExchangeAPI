@@ -38,7 +38,7 @@ public sealed class BitflyerAccountApi : IAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerMappers.EnrichBitflyerException(ex, _exchangeId, "GetBalances");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetBalances");
         }
         catch (Exception ex)
         {

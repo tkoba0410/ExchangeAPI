@@ -21,9 +21,11 @@
 
 ## 4. 観測性フック
 - `IRestCallObserver`（コールバック）でログ/メトリクス/トレースを集約し、`IRestClientLogger` 拡張で RequestId/エンドポイント/所要時間/HTTP ステータス/主要ドメイン属性を記録（秘密情報除外）。OpenTelemetry に流す薄いアダプタをサンプル実装。
+- 実装済み: `RestCallOpenTelemetryObserver` で Activity/Meter を発行（メトリクス名: `exchangeapi_requests_total`, `exchangeapi_request_duration_seconds`、タグ: endpoint/method/status/product_code/error）。構造化 JSON ログサンプル `StructuredRestClientLogger` を追加。
 
 ## 5. 設定と DX
 - `BitflyerClientOptions` に Timeouts/Retry/RateLimit/CircuitBreaker/LoggingVerbosity を束ね、`WithObservability(...)` で Observer 注入を提供。最小設定の安全デフォルトと上級者向け詳細設定を両立する API シグネチャを確定。
+- 実装済み: `BitflyerClientOptions` と拡張メソッド `WithObservability(...)` を追加し、Factory でオプション経由の構成に対応。`HttpPolicyOptions` に `RateLimitBurst` を追加し、トークンバケット型 RateLimiter をデフォルト使用。
 
 ## 6. ドキュメント
 - 信頼性パターンの推奨デフォルトとシナリオ別設定例、ログ/メトリクス/トレースの取り扱いサンプルを追加。STAGES-OVERVIEW の Stage6 説明を REST-only 信頼性強化に更新し、A010 の DoD を完成させる。
@@ -32,3 +34,4 @@
 - Policy 単体テスト（成功/失敗/サーキット遷移）を優先実装し、次に劣化環境で Stage5 代表フローの結合テスト。
 - レートリミット・遅延・ネットワーク障害を模擬する Fault Injection テストを整備。Paper/Sandbox 未整備でも Fault Injection で代替する方針を前提にする。
 - Paper Trading/Sandbox/ドライラン利用方針を記載した運用ガイドを添える。
+- 実装済み: Transport レベルで 429/一時断/タイムアウト/CB 開放を検証する Fault Injection テストを追加。Stage5 代表フローの劣化環境 E2E は未。

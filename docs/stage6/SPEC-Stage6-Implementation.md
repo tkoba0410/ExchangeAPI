@@ -31,6 +31,7 @@
 - メトリクス項目: 成功率、p50/p95/p99 レイテンシ、エラー種別カウント、CircuitBreaker 状態（Open/Half-Open/Close）を最低限提供。
 - OTel 連携: Meter/Tracer/Logger に流す薄いアダプタをサンプル実装。
 - 命名/タグ例: `exchangeapi_request_duration_seconds{endpoint,status,product_code,cb_state}`、`exchangeapi_requests_total{endpoint,status}`、`exchangeapi_cb_state{endpoint}`。ログは JSON で `timestamp, request_id, endpoint, status_code, duration_ms, product_code, cb_state` を最低限に固定し、機密は出力しない。
+- 実装状況: `RestCallOpenTelemetryObserver` で Activity/Meter を発行（メトリクス名: `exchangeapi_requests_total`, `exchangeapi_request_duration_seconds`、タグ: endpoint/method/status/product_code/error）。構造化 JSON ログサンプル `StructuredRestClientLogger` を追加。
 
 ## 6. 設定と DX
 - `BitflyerClientOptions` に Timeouts/Retry/RateLimit/CircuitBreaker/LoggingVerbosity を束ねる。
@@ -40,6 +41,7 @@
   - `BitflyerClientOptions` に `Timeouts`, `RetryPolicy`, `RateLimitPolicy`, `CircuitBreakerPolicy`, `LoggingVerbosity`, `Observer` をプロパティとして持たせる。
   - `WithObservability(IRestCallObserver observer)` を拡張メソッドとして用意し、DI 容器経由でも直接注入でも利用できるようにする。
   - ポリシーは DI で共有インスタンスを注入し、呼び出しごとに参照する形を基本とする（状態を持つ CB はスレッドセーフ実装を前提）。
+- 実装状況: `BitflyerClientOptions` と `WithObservability(...)` を追加し、ファクトリでオプション経由の構成に対応。`HttpPolicyOptions` に `RateLimitBurst` を追加し、トークンバケット型 RateLimiter をデフォルトで使用。
 
 ## 7. ドキュメント
 - 信頼性パターンの推奨デフォルトとシナリオ別設定例を記載（低頻度トレード/高頻度ポーリングなど）。

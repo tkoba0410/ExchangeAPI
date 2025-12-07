@@ -11,15 +11,21 @@ namespace ExchangeApi.Transport.Policy;
 public sealed class RateLimitHttpPolicy : IHttpPolicy
 {
     private readonly TimeSpan _minInterval;
-    private DateTimeOffset _nextAllowed;
+    private readonly int _burst;
+    private double _tokens;
+    private DateTimeOffset _lastRefill;
     private readonly object _gate = new();
     private readonly Func<DateTimeOffset> _clock;
 
-    public RateLimitHttpPolicy(double requestsPerSecond, Func<DateTimeOffset>? clock = null)
+    public RateLimitHttpPolicy(double requestsPerSecond, int burst = 1, Func<DateTimeOffset>? clock = null)
     {
         if (requestsPerSecond <= 0) throw new ArgumentOutOfRangeException(nameof(requestsPerSecond));
+        if (burst < 1) throw new ArgumentOutOfRangeException(nameof(burst));
         _minInterval = TimeSpan.FromSeconds(1d / requestsPerSecond);
+        _burst = burst;
+        _tokens = burst;
         _clock = clock ?? (() => DateTimeOffset.UtcNow);
+        _lastRefill = _clock();
     }
 
     public async Task<HttpResponseMessage> ExecuteAsync(
@@ -43,15 +49,28 @@ public sealed class RateLimitHttpPolicy : IHttpPolicy
         lock (_gate)
         {
             var now = _clock();
-            if (_nextAllowed <= now)
+
+            // トークン補充
+            var elapsed = now - _lastRefill;
+            if (elapsed > TimeSpan.Zero)
             {
-                _nextAllowed = now + _minInterval;
+                var refill = elapsed.TotalSeconds / _minInterval.TotalSeconds;
+                _tokens = Math.Min(_burst, _tokens + refill);
+                _lastRefill = now;
+            }
+
+            if (_tokens >= 1d)
+            {
+                _tokens -= 1d;
                 return TimeSpan.Zero;
             }
 
-            var delay = _nextAllowed - now;
-            _nextAllowed += _minInterval;
-            return delay;
+            // 足りない分の時間を待機
+            var needed = 1d - _tokens;
+            var delaySeconds = needed * _minInterval.TotalSeconds;
+            _tokens = 0d;
+            _lastRefill = now + TimeSpan.FromSeconds(delaySeconds);
+            return TimeSpan.FromSeconds(delaySeconds);
         }
     }
 }

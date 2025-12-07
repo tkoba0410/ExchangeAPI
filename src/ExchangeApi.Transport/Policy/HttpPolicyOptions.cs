@@ -19,6 +19,8 @@ public sealed class HttpPolicyOptions
 
     public double RequestsPerSecond { get; init; } = 3d;
 
+    public int RateLimitBurst { get; init; } = 1;
+
     public int CircuitBreakerFailureThreshold { get; init; } = 5;
 
     public TimeSpan CircuitBreakerOpenDuration { get; init; } = TimeSpan.FromSeconds(5);

@@ -2,15 +2,16 @@ using System;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Adapter.Bitflyer.Factory;
+using ExchangeApi.Transport.Policy;
 using Xunit;
 
 namespace ExchangeApi.Adapter.Bitflyer.Tests;
 
-public class BitflyerClientFactory_Tests
-{
-    [Fact]
-    public void Create_WithProvider_DelegatesToProviderAndReturnsClient()
+    public class BitflyerClientFactory_Tests
     {
+        [Fact]
+        public void Create_WithProvider_DelegatesToProviderAndReturnsClient()
+        {
         // Arrange
         var provider = new FakeProvider(new ApiCredentials("key-1", "secret-1"));
 
@@ -28,6 +29,19 @@ public class BitflyerClientFactory_Tests
             BitflyerClientFactory.Create(provider: null!, "bitflyer", "default"));
     }
 
+    [Fact]
+    public void Create_WithOptions_Succeeds()
+    {
+        var options = new BitflyerClientOptions
+        {
+            PolicyOptions = new HttpPolicyOptions { RequestsPerSecond = 10 }
+        };
+
+        var client = BitflyerClientFactory.Create("key-1", "secret-1", options);
+
+        Assert.NotNull(client);
+    }
+
     private sealed class FakeProvider : IApiCredentialProvider
     {
         private readonly ApiCredentials _creds;
@@ -39,4 +53,5 @@ public class BitflyerClientFactory_Tests
 
         public ApiCredentials Get(string exchangeId, string accountId) => _creds;
     }
+
 }

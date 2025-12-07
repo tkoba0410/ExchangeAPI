@@ -32,6 +32,26 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
         IExchangeErrorClassifier? errorClassifier = null,
         HttpClient? httpClient = null)
     {
+        var options = new BitflyerClientOptions
+        {
+            Policy = policy,
+            Logger = logger,
+            Observer = observer,
+            ErrorClassifier = errorClassifier,
+            HttpClient = httpClient,
+        };
+
+        return Create(apiKey, apiSecret, options);
+    }
+
+    /// <summary>
+    /// Create bitFlyer client with explicit API key/secret supplied by the caller using options.
+    /// </summary>
+    public static BitflyerExchangeClient Create(
+        string apiKey,
+        string apiSecret,
+        BitflyerClientOptions? options)
+    {
         if (string.IsNullOrWhiteSpace(apiKey))
         {
             throw new ArgumentException("API key is required.", nameof(apiKey));
@@ -42,13 +62,17 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
             throw new ArgumentException("API secret is required.", nameof(apiSecret));
         }
 
-        httpClient ??= new HttpClient { BaseAddress = BitflyerApiBaseUri };
+        options ??= new BitflyerClientOptions();
+
+        var httpClient = options.HttpClient ?? new HttpClient { BaseAddress = BitflyerApiBaseUri };
 
         IHttpTransport baseTransport = new HttpTransport(httpClient, disposeHttpClient: false);
 
         IExchangeClock clock = new SystemClock();
-        policy ??= HttpPolicyFactory.CreateDefault();
-        errorClassifier ??= BitflyerErrorClassifier.Instance;
+        var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(options.PolicyOptions);
+        var logger = options.Logger;
+        var observer = options.Observer;
+        var errorClassifier = options.ErrorClassifier ?? BitflyerErrorClassifier.Instance;
 
         IRequestSigner signer = new BitflyerRequestSigner(apiKey, apiSecret, clock);
 
@@ -87,6 +111,14 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
         }
 
         var credentials = provider.Get(exchangeId, accountId);
-        return Create(credentials.ApiKey, credentials.ApiSecret, policy, logger, observer, errorClassifier, httpClient);
+        var options = new BitflyerClientOptions
+        {
+            Policy = policy,
+            Logger = logger,
+            Observer = observer,
+            ErrorClassifier = errorClassifier,
+            HttpClient = httpClient
+        };
+        return Create(credentials.ApiKey, credentials.ApiSecret, options);
     }
 }

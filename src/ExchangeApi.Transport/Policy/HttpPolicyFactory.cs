@@ -12,7 +12,7 @@ public static class HttpPolicyFactory
         var opts = options ?? HttpPolicyOptions.BitflyerDefaults();
 
         return new HttpPolicyPipeline(
-            new RateLimitHttpPolicy(opts.RequestsPerSecond),
+            new RateLimitHttpPolicy(opts.RequestsPerSecond, opts.RateLimitBurst),
             new CircuitBreakerHttpPolicy(opts.CircuitBreakerFailureThreshold, opts.CircuitBreakerOpenDuration),
             new RetryHttpPolicy(
                 opts.MaxRetryAttemptsForGet,

@@ -20,17 +20,22 @@ public static class RestClientFactory
         IRequestSigner? signer = null,
         IHttpPolicy? policy = null,
         IRestClientLogger? logger = null,
+        IRestCallObserver? observer = null,
+        IExchangeErrorClassifier? errorClassifier = null,
         HttpClient? httpClient = null)
     {
         if (baseUri is null) throw new ArgumentNullException(nameof(baseUri));
 
         transport ??= new HttpTransport(httpClient ?? new HttpClient { BaseAddress = baseUri }, disposeHttpClient: httpClient is null);
+        policy ??= HttpPolicyFactory.CreateDefault();
 
         return new RestClient(
             baseUri,
             transport,
             requestSigner: signer,
             policy: policy,
-            logger: logger);
+            logger: logger,
+            observer: observer,
+            errorClassifier: errorClassifier);
     }
 }

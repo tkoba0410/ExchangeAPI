@@ -8,6 +8,7 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 using ExchangeApi.Transport.Transport;
 using ExchangeApi.Adapter.Bitflyer.Facade;
+using ExchangeApi.Adapter.Bitflyer.Adapters;
 
 namespace ExchangeApi.Adapter.Bitflyer.Factory;
 
@@ -27,6 +28,8 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
         string apiSecret,
         IHttpPolicy? policy = null,
         IRestClientLogger? logger = null,
+        IRestCallObserver? observer = null,
+        IExchangeErrorClassifier? errorClassifier = null,
         HttpClient? httpClient = null)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
@@ -44,6 +47,8 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
         IHttpTransport baseTransport = new HttpTransport(httpClient, disposeHttpClient: false);
 
         IExchangeClock clock = new SystemClock();
+        policy ??= HttpPolicyFactory.CreateDefault();
+        errorClassifier ??= BitflyerErrorClassifier.Instance;
 
         IRequestSigner signer = new BitflyerRequestSigner(apiKey, apiSecret, clock);
 
@@ -52,7 +57,9 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
             baseTransport,
             requestSigner: signer,
             policy: policy,
-            logger: logger);
+            logger: logger,
+            observer: observer,
+            errorClassifier: errorClassifier);
 
         var publicApi = new BitflyerPublicApi(restClient);
         var privateApi = new BitflyerPrivateApi(restClient);
@@ -70,6 +77,8 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
         string accountId,
         IHttpPolicy? policy = null,
         IRestClientLogger? logger = null,
+        IRestCallObserver? observer = null,
+        IExchangeErrorClassifier? errorClassifier = null,
         HttpClient? httpClient = null)
     {
         if (provider is null)
@@ -78,6 +87,6 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
         }
 
         var credentials = provider.Get(exchangeId, accountId);
-        return Create(credentials.ApiKey, credentials.ApiSecret, policy, logger, httpClient);
+        return Create(credentials.ApiKey, credentials.ApiSecret, policy, logger, observer, errorClassifier, httpClient);
     }
 }

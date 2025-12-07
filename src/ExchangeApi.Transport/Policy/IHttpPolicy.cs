@@ -11,6 +11,7 @@ namespace ExchangeApi.Transport.Policy;
 public interface IHttpPolicy
 {
     Task<HttpResponseMessage> ExecuteAsync(
-        Func<Task<HttpResponseMessage>> sendAsync,
+        HttpRequestMessage request,
+        Func<CancellationToken, Task<HttpResponseMessage>> sendAsync,
         CancellationToken cancellationToken = default);
 }

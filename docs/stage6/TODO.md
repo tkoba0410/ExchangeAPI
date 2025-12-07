@@ -35,6 +35,7 @@
 - レートリミット・遅延・ネットワーク障害を模擬する Fault Injection テストを整備。Paper/Sandbox 未整備でも Fault Injection で代替する方針を前提にする。
 - Paper Trading/Sandbox/ドライラン利用方針を記載した運用ガイドを添える。
 - 実装済み: Transport レベルで 429/一時断/タイムアウト/CB 開放を検証する Fault Injection テストを追加。Stage5 代表フローの劣化環境 E2E は未。
+- 方針: 劣化環境では Stage5 代表フロー（残高→注文→約定確認→決済→履歴）をモックTransportで再現し、E2E テストを追加して DoD を満たす。簡略フローではなく正式フローを対象とする。
 
 ## 設計方針アップデート（シンプル化と将来性優先）
 - オプション一本化: `BitflyerClientOptions` に HttpClient/Transport/RestClient/Policy/Logger/Observer/ErrorClassifier を束ね、Factory は基本このオプション 1 つを受ける形に簡素化する。
@@ -43,3 +44,5 @@
 - 可視性の整理: Facade に Public/Private/Raw への読み取り専用プロパティを internal で持たせ、Tests からのみ利用可とする。公開 API のシンプルさを維持。
 - ドキュメント反映: 上記構成（Options一本化、TestFactory、APIバンドル、InternalsVisibleTo）を SPEC に明記し、テスト/本番の顔を分離する方針を定義する。
 - 観測性ガイド: Tracer/Meter 名（ActivitySource=`ExchangeApi.RestClient`, Meter=`exchangeapi`）、メトリクス/タグ（requests_total, request_duration_seconds with endpoint/method/status/product_code/error）、構造化ログ項目（機密除外）を推奨セットとしてドキュメント化し、`WithObservability(...)` での適用例を示す。
+- デフォルト値調整: Public/Private の代表エンドポイントで簡易計測（遅延/429/500 モック）を行い、Timeout/Retry/RL/CB の値を調整して SPEC/コードに固定する手順を記録。結果を DoD に反映。
+- internal シーム利用ガイド: TestFactory/ApiBundle の使い方と公開 API の使い分けを開発者向けに明記し、公開 API は最小、内部は Tests 限定とするルールを整理。

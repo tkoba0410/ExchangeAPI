@@ -19,6 +19,7 @@
 - Retry: GET 最大3回（指数バックオフ、base 200ms / max 2s）、POST はネットワーク一時障害のみ1回。
 - RateLimit: 5 req/s、バースト 2（実測で調整可）。
 - CircuitBreaker: 20s 窓で失敗率 >50% で Open、5s 後 Half-Open（1リクエスト成功で Close）。初期閾値は 3 回失敗。
+- 計測方針: Public/Private の代表エンドポイントに対し、遅延/429/500 を注入したモックで p50/p95/p99 レイテンシとエラー率を取得し、上記値を調整。計測手順をテストと並行で回し、結果をドキュメントとコードに反映して固定する。
 - これらは初期値。負荷/レイテンシ計測で見直し、SPECとコードに反映して固定する。
 
 ## 4. 失敗分類と再試行可否
@@ -50,6 +51,9 @@
 - メトリクス: `exchangeapi_requests_total{endpoint,method,status,product_code,error}`, `exchangeapi_request_duration_seconds{endpoint,method,status,product_code,error}`。
 - ログ: 構造化 JSON で `timestamp, event_type, method, uri/status_code, duration_ms(optional), product_code(optional), error(optional)` を記録し、機密（キー、署名）は出力しない。
 - サンプル: `RestCallOpenTelemetryObserver`（OTelブリッジ）と `StructuredRestClientLogger` を組み合わせ、Factory で `WithObservability(...)` 経由またはオプション注入で適用する。
+- コード例（適用例）:
+  - `var options = new BitflyerClientOptions().WithObservability(new RestCallOpenTelemetryObserver(), new StructuredRestClientLogger(Console.WriteLine));`
+  - Factory 経由で渡す: `var client = BitflyerClientFactory.Create(apiKey, apiSecret, options);`
 
 ## 7. ドキュメント
 - 信頼性パターンの推奨デフォルトとシナリオ別設定例を記載（低頻度トレード/高頻度ポーリングなど）。
@@ -63,6 +67,7 @@
 - 計測: Public/Private のスループット・レイテンシを計測し、デフォルト値見直しの根拠として記録。
 - Fault Injection 期待例: 連続 429 を 3 回発生→Retry の打ち切りと CB Open を確認、500ms の追加遅延を挿入→Timeout 発火と再試行挙動を確認、一時的な DNS/接続失敗→Transient 判定で 1 回だけ再試行。
 - 計測手順例: `hey` などで Public/Private の代表エンドポイントを一定 QPS で叩き、p50/p95/p99 とエラー率を取得。遅延注入や 429 応答のモックを組み合わせ、初期デフォルト値の妥当性を評価して SPEC/コードに反映する。
+- 劣化環境E2E: Stage5 代表フロー（残高→注文→約定確認→決済→履歴）をモック Transport で再現し、劣化条件（429/遅延/一時断/500系）下で成功する E2E テストを追加し DoD とする。
 
 ## 9. 完了条件（DoD）
 - デフォルト設定で Timeout/Retry/RateLimit/CircuitBreaker が有効になり、代表フローが成功する。

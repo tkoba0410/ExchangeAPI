@@ -7,6 +7,7 @@
 - Apis: Trading/Market/Account/Margin/ExchangeInfo/RawApi に抽象API実装を分割。Raw+Mapperを内部利用し、ポーリングなどビジネスロジックを担う。
 - Facade: Facade/BitflyerExchangeClient はAPIを束ねて委譲のみ。
 - Factory: 新構造で組み立て。必要ならRawを取り出せるオプションまたはプロパティを用意。
+- Factory の責務分界: 共通Factory（ExchangeApi.Factory）は認証/RestClient/Transport/ポリシー/ロギングなど共通基盤の組み立てのみ。取引所固有Factory（例: adapter/Bitflyer/Factory）は共通基盤を受け取り、Http→Raw→Adapters→Apis→Facade を配線するだけでビジネスロジックは持たない。
 
 ## エラーハンドリング
 - ErrorMapperを共通化し、エラーコード/HTTPステータスをカテゴリにマップ。

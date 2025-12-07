@@ -67,3 +67,6 @@ src/adapter/Bitflyer/
   Factory/
     BitflyerClientFactory.cs         // Http/Raw/Adapters/Apis/Facadeを組み立て、必要ならRawも返す
 ```
+
+## 共通ユーティリティの足場
+- `src/adapter/Common/` に共通アダプタ向けユーティリティのプレースホルダを用意（シンボル正規化/共通バリデーション/エラーマッピング補助などを想定）。現時点ではREADMEのみで実装なし。必要に応じてプロジェクト化する。

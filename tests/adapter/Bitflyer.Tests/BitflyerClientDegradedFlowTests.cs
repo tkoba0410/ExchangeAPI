@@ -66,8 +66,15 @@ public class BitflyerClientDegradedFlowTests
             maxAttempts: 3);
 
         Assert.Equal(OrderStatusType.Completed, status.Status);
+
+        // 4. executions（履歴取得）
+        var executions = await client.GetExecutionsAsync(Symbols.BtcJpy);
+        Assert.NotEmpty(executions);
+
+        // 呼び出し回数が劣化環境を通ったことを確認
         Assert.True(transport.BalanceCalls >= 2);
         Assert.True(transport.ChildOrderCalls >= 2);
+        Assert.True(transport.ExecutionCalls >= 1);
     }
 
     private sealed class DegradedBitflyerTransport : IHttpTransport
@@ -75,6 +82,7 @@ public class BitflyerClientDegradedFlowTests
         public int BalanceCalls { get; private set; }
         public int SendOrderCalls { get; private set; }
         public int ChildOrderCalls { get; private set; }
+        public int ExecutionCalls { get; private set; }
 
         public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
@@ -128,6 +136,17 @@ public class BitflyerClientDegradedFlowTests
                     {
                         Content = new StringContent(json, Encoding.UTF8, "application/json")
                     }, cancellationToken);
+            }
+
+            if (path.Contains("/v1/me/getexecutions", StringComparison.OrdinalIgnoreCase))
+            {
+                ExecutionCalls++;
+                var now = DateTime.UtcNow;
+                var json = $"[{{\"id\":1,\"child_order_acceptance_id\":\"JRF20240101-000000-abcdef\",\"product_code\":\"BTC_JPY\",\"side\":\"BUY\",\"price\":4000000,\"size\":0.001,\"exec_date\":\"{now:O}\"}}]";
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(json, Encoding.UTF8, "application/json")
+                });
             }
 
             // デフォルト: 200 ok

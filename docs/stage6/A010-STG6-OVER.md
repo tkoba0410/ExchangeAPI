@@ -191,3 +191,4 @@ Stage6 は、次の条件をすべて満たした時点で完了とみなす。
    - Fault Injection と劣化環境下での結合テストが整備され、代表フローが成功する。
    - Public/Private それぞれで簡易な負荷・レイテンシ計測が行われ、Timeout/Retry/RateLimit/CircuitBreaker のデフォルト値が計測結果を反映した形で確定している。
    - DoD に沿ったテスト（ポリシー単体/劣化環境結合/観測性サンプル）が緑である。
+   - 劣化環境で Stage5 代表フロー（残高→注文→約定確認→履歴）が TestFactory/モック Transport を用いて成功している。

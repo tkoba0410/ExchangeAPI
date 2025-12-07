@@ -45,4 +45,4 @@
 - ドキュメント反映: 上記構成（Options一本化、TestFactory、APIバンドル、InternalsVisibleTo）を SPEC に明記し、テスト/本番の顔を分離する方針を定義する。
 - 観測性ガイド: Tracer/Meter 名（ActivitySource=`ExchangeApi.RestClient`, Meter=`exchangeapi`）、メトリクス/タグ（requests_total, request_duration_seconds with endpoint/method/status/product_code/error）、構造化ログ項目（機密除外）を推奨セットとしてドキュメント化し、`WithObservability(...)` での適用例を示す。
 - デフォルト値調整: Public/Private の代表エンドポイントで簡易計測（遅延/429/500 モック）を行い、Timeout/Retry/RL/CB の値を調整して SPEC/コードに固定する手順を記録。結果を DoD に反映。
-- internal シーム利用ガイド: TestFactory/ApiBundle の使い方と公開 API の使い分けを開発者向けに明記し、公開 API は最小、内部は Tests 限定とするルールを整理。
+- internal シーム利用ガイド: TestFactory/ApiBundle の使い分けを開発者向けに明記し、公開 API は最小、内部は Tests 限定であることをルール化。必要ならCIで本番コードからの参照がないことをチェック。

@@ -46,3 +46,6 @@
 - 観測性ガイド: Tracer/Meter 名（ActivitySource=`ExchangeApi.RestClient`, Meter=`exchangeapi`）、メトリクス/タグ（requests_total, request_duration_seconds with endpoint/method/status/product_code/error）、構造化ログ項目（機密除外）を推奨セットとしてドキュメント化し、`WithObservability(...)` での適用例を示す。
 - デフォルト値調整: Public/Private の代表エンドポイントで簡易計測（遅延/429/500 モック）を行い、Timeout/Retry/RL/CB の値を調整して SPEC/コードに固定する手順を記録。結果を DoD に反映。
 - internal シーム利用ガイド: TestFactory/ApiBundle の使い分けを開発者向けに明記し、公開 API は最小、内部は Tests 限定であることをルール化。必要ならCIで本番コードからの参照がないことをチェック。
+- 本番近似計測の実施と反映: 遅延/429/500 を注入したモック計測を最低限行い、Timeout/Retry/RL/CB のデフォルト値を確定し SPEC/TODO/コードに反映する。可能なら本番近似の負荷ツールで p50/p95/p99 を取得して補強。
+- 劣化環境E2Eの正式化: 簡略版に加え、Stage5 正式フロー（残高→注文→約定確認→決済→履歴）をモック Transport で通すテストを追加し、DoD を「正式フロー完了」に更新する。
+- TestFactory 誤用防止: CI 等で本番コードから TestFactory/ApiBundle 参照が無いことをチェックするスクリプトを追加し、運用ドキュメントに記載する。

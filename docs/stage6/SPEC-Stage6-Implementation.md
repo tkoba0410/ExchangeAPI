@@ -42,6 +42,7 @@
   - `WithObservability(IRestCallObserver observer)` を拡張メソッドとして用意し、DI 容器経由でも直接注入でも利用できるようにする。
   - ポリシーは DI で共有インスタンスを注入し、呼び出しごとに参照する形を基本とする（状態を持つ CB はスレッドセーフ実装を前提）。
 - 実装状況: `BitflyerClientOptions` と `WithObservability(...)` を追加し、ファクトリでオプション経由の構成に対応。`HttpPolicyOptions` に `RateLimitBurst` を追加し、トークンバケット型 RateLimiter をデフォルトで使用。
+- 設計方針アップデート: Options 一本化で注入ポイントを簡素化し、本番は最小構成、詳細はオプションで上書き。Tests アセンブリ限定の TestFactory（InternalsVisibleTo）や API バンドル DTO を用意し、モック注入を本番 API とは分離する計画。
 
 ## 7. ドキュメント
 - 信頼性パターンの推奨デフォルトとシナリオ別設定例を記載（低頻度トレード/高頻度ポーリングなど）。

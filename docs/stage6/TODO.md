@@ -35,3 +35,10 @@
 - レートリミット・遅延・ネットワーク障害を模擬する Fault Injection テストを整備。Paper/Sandbox 未整備でも Fault Injection で代替する方針を前提にする。
 - Paper Trading/Sandbox/ドライラン利用方針を記載した運用ガイドを添える。
 - 実装済み: Transport レベルで 429/一時断/タイムアウト/CB 開放を検証する Fault Injection テストを追加。Stage5 代表フローの劣化環境 E2E は未。
+
+## 設計方針アップデート（シンプル化と将来性優先）
+- オプション一本化: `BitflyerClientOptions` に HttpClient/Transport/RestClient/Policy/Logger/Observer/ErrorClassifier を束ね、Factory は基本このオプション 1 つを受ける形に簡素化する。
+- テスト用シームの分離: 公開 API を汚さず、Tests アセンブリ限定の TestFactory（InternalsVisibleTo）を用意し、`IHttpTransport`/`IRestClient`/モック API バンドルを直接注入できるようにする。
+- API バンドル化: Public/Private/Raw のセットをまとめたバンドル DTO を用意し、Facade の internal コンストラクタで受け取れるようにする。本番は Factory が正規バンドルを組み立て、テストはモックバンドルを注入。
+- 可視性の整理: Facade に Public/Private/Raw への読み取り専用プロパティを internal で持たせ、Tests からのみ利用可とする。公開 API のシンプルさを維持。
+- ドキュメント反映: 上記構成（Options一本化、TestFactory、APIバンドル、InternalsVisibleTo）を SPEC に明記し、テスト/本番の顔を分離する方針を定義する。

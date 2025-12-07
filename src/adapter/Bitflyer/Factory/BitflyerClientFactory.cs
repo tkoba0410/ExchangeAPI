@@ -41,7 +41,7 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
             HttpClient = httpClient,
         };
 
-        return Create(apiKey, apiSecret, options);
+        return Create(apiKey, apiSecret, options, httpClient: httpClient);
     }
 
     /// <summary>
@@ -50,7 +50,9 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
     public static BitflyerExchangeClient Create(
         string apiKey,
         string apiSecret,
-        BitflyerClientOptions? options)
+        BitflyerClientOptions? options,
+        HttpClient? httpClient = null,
+        IHttpTransport? transportOverride = null)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
         {
@@ -64,9 +66,9 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
 
         options ??= new BitflyerClientOptions();
 
-        var httpClient = options.HttpClient ?? new HttpClient { BaseAddress = BitflyerApiBaseUri };
+        var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = BitflyerApiBaseUri };
 
-        IHttpTransport baseTransport = new HttpTransport(httpClient, disposeHttpClient: false);
+        IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
 
         IExchangeClock clock = new SystemClock();
         var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(options.PolicyOptions);

@@ -16,7 +16,7 @@
 現状メモ:
 - テスト: `dotnet test` 実行済み（Contracts/Transport/Factory/Bitflyer）。Tradingのエラーハンドリング/ポーリング、Account/Margin、Market のマッピングをカバー。
 - ドキュメント: A010 のフォルダ構成を Account 配下統合・Raw API 記載に更新。TESTS.md を追加。
-- 構成案: Bitflyer の最適構成案を `docs/stage5/STRUCTURE-OPTIMAL.md` に記載（Http→Raw→Adapters→Apis→Facade→Factory）。適用有無を決める。
+- 構成: Bitflyer は最適構成案どおり Http→Raw→Adapters→Apis→Facade→Factory に整理済み。Mapper は Common/Trading/Error の3本、RawApiFacade を追加済み。
 
 推奨順序:
 1. REST専用化（Realtime除去）→ビルド確認

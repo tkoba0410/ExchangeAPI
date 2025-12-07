@@ -81,6 +81,19 @@ public sealed class RestClientTests
     }
 
     [Fact]
+    public async Task BuildUri_EncodesSpecialCharacters()
+    {
+        var rest = CreateRestClient(out var transport);
+
+        var result = await rest.GetAsync<TestDto>(
+            "/api",
+            new Dictionary<string, string?> { ["q"] = "a b&c" });
+
+        Assert.Equal("ok", result.Value);
+        AssertQueryEquals("/api?q=a%20b%26c", transport.LastRequest!.RequestUri!.PathAndQuery);
+    }
+
+    [Fact]
     public async Task GetAsync_NoContentWithNullContent_DoesNotThrowNullReference()
     {
         var transport = new FakeTransport

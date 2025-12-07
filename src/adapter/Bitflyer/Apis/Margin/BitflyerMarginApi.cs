@@ -59,15 +59,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
                 .GetPositionsAsync(productCode, cancellationToken)
                 .ConfigureAwait(false);
 
-            return raw
-                .Select(p => new Position(
-                    ProductCode: p.ProductCode,
-                    Side: BitflyerCommonMapper.MapSide(p.Side),
-                    Size: p.Size,
-                    Price: p.Price,
-                    OpenDate: p.OpenDate,
-                    Pnl: p.Pnl))
-                .ToArray();
+            return BitflyerMarginMapper.MapPositions(raw);
         }
         catch (ExchangeApiException ex)
         {
@@ -92,11 +84,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
                 .GetCollateralAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            return new Collateral(
-                Amount: raw.Collateral,
-                OpenPositionPnl: raw.OpenPositionPnl,
-                RequireCollateral: raw.RequireCollateral,
-                KeepRate: raw.KeepRate);
+            return BitflyerMarginMapper.MapCollateral(raw);
         }
         catch (ExchangeApiException ex)
         {

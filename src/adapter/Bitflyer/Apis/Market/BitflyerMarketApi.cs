@@ -35,7 +35,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
             var raw = await _publicApi.GetTickerRawAsync(productCode, cancellationToken).ConfigureAwait(false);
-            return MapToTicker(symbol, raw);
+            return BitflyerMarketMapper.MapTicker(symbol, raw);
         }
         catch (SymbolNotSupportedException ex)
         {
@@ -67,7 +67,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
             var rawBoard = await _publicApi.GetBoardRawAsync(productCode, cancellationToken).ConfigureAwait(false);
-            return MapToOrderBook(symbol, rawBoard);
+            return BitflyerMarketMapper.MapOrderBook(rawBoard);
         }
         catch (SymbolNotSupportedException ex)
         {
@@ -142,31 +142,5 @@ public sealed class BitflyerMarketApi : IMarketDataApi
             operation: "GetCandlesticks",
             statusCode: null,
             exchangeErrorCode: "NOT_SUPPORTED");
-    }
-
-    private static Ticker MapToTicker(string symbol, BitflyerTickerRaw raw)
-    {
-        return new Ticker(
-            Symbol: symbol,
-            BestBid: raw.BestBid,
-            BestAsk: raw.BestAsk,
-            LastTradedPrice: raw.LastTradedPrice,
-            Timestamp: raw.Timestamp);
-    }
-
-    private static OrderBook MapToOrderBook(string symbol, BitflyerBoardRaw rawBoard)
-    {
-        var bids = rawBoard.Bids?
-            .Select(b => new OrderBookLevel(b.Price, b.Size))
-            .ToArray() ?? Array.Empty<OrderBookLevel>();
-
-        var asks = rawBoard.Asks?
-            .Select(a => new OrderBookLevel(a.Price, a.Size))
-            .ToArray() ?? Array.Empty<OrderBookLevel>();
-
-        return new OrderBook(
-            Bids: bids,
-            Asks: asks,
-            MidPrice: rawBoard.MidPrice);
     }
 }

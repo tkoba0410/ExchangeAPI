@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Contracts;
+using ExchangeApi.Adapter.Bitflyer.Adapters;
 using ExchangeApi.Contracts.Dtos;
 
 namespace ExchangeApi.Adapter.Bitflyer;
@@ -40,7 +41,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
             SupportsRealtimeExecutions: false,
             SupportsWithdraw: false);
 
-        var info = new ExchangeInfo(markets, features, null);
+        var info = BitflyerExchangeInfoMapper.MapExchangeInfo(markets, features, null);
         _cached = info;
         _lastUpdated = DateTimeOffset.UtcNow;
         return Task.FromResult(info);

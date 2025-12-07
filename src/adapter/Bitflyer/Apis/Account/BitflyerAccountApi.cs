@@ -29,12 +29,7 @@ public sealed class BitflyerAccountApi : IAccountApi
                 .GetBalancesAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            return rawBalances
-                .Select(b => new Balance(
-                    b.CurrencyCode,
-                    b.Amount,
-                    b.Available))
-                .ToArray();
+            return BitflyerAccountMapper.MapBalances(rawBalances);
         }
         catch (ExchangeApiException ex)
         {

@@ -51,6 +51,10 @@ src/adapter/Bitflyer/
   Adapters/
     BitflyerCommonMapper.cs          // Side/Status/Symbol 等の共通マッピング
     BitflyerTradingMapper.cs         // 注文系マッピング・バリデーション
+    BitflyerMarketMapper.cs          // Ticker/OrderBook 等のマーケットデータ正規化
+    BitflyerAccountMapper.cs         // 残高マッピング
+    BitflyerMarginMapper.cs          // 建玉/証拠金マッピング
+    BitflyerExchangeInfoMapper.cs    // ExchangeInfo 構築
     BitflyerErrorMapper.cs           // エラーカテゴリ/例外ラップ
   Apis/
     Trading/BitflyerTradingApi.cs    // ITradingApi 実装（ポーリング等含む）

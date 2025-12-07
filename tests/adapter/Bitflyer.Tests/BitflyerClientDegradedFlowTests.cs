@@ -79,7 +79,11 @@ public class BitflyerClientDegradedFlowTests
         var cancelAll = await client.CancelAllOrdersAsync("BTC_JPY");
         Assert.True(cancelAll.IsSuccess);
 
-        // 7. collateral（口座状態確認）
+        // 7. positions
+        var positions = await client.GetOpenPositionsAsync("BTC_JPY");
+        Assert.NotEmpty(positions);
+
+        // 8. collateral（口座状態確認）
         var collateral = await client.GetCollateralAsync();
         Assert.True(collateral.Amount > 0);
 
@@ -89,6 +93,7 @@ public class BitflyerClientDegradedFlowTests
         Assert.True(transport.ExecutionCalls >= 1);
         Assert.True(transport.CancelCalls >= 1);
         Assert.True(transport.CollateralCalls >= 1);
+        Assert.True(transport.PositionCalls >= 1);
     }
 
     private sealed class DegradedBitflyerTransport : IHttpTransport
@@ -99,6 +104,7 @@ public class BitflyerClientDegradedFlowTests
         public int ExecutionCalls { get; private set; }
         public int CancelCalls { get; private set; }
         public int CollateralCalls { get; private set; }
+        public int PositionCalls { get; private set; }
 
         public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
@@ -179,6 +185,17 @@ public class BitflyerClientDegradedFlowTests
             {
                 CollateralCalls++;
                 var json = "{\"collateral\":1000000,\"open_position_pnl\":0,\"require_collateral\":0,\"keep_rate\":10}";
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(json, Encoding.UTF8, "application/json")
+                });
+            }
+
+            if (path.Contains("/v1/me/getpositions", StringComparison.OrdinalIgnoreCase))
+            {
+                PositionCalls++;
+                var now = DateTime.UtcNow;
+                var json = $"[{{\"product_code\":\"BTC_JPY\",\"side\":\"BUY\",\"price\":4000000,\"size\":0.001,\"commission\":0,\"swap_point_accumulate\":0,\"require_collateral\":1000,\"open_date\":\"{now:O}\",\"leverage\":4}}]";
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")

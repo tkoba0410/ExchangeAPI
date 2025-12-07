@@ -42,3 +42,4 @@
 - API バンドル化: Public/Private/Raw のセットをまとめたバンドル DTO を用意し、Facade の internal コンストラクタで受け取れるようにする。本番は Factory が正規バンドルを組み立て、テストはモックバンドルを注入。
 - 可視性の整理: Facade に Public/Private/Raw への読み取り専用プロパティを internal で持たせ、Tests からのみ利用可とする。公開 API のシンプルさを維持。
 - ドキュメント反映: 上記構成（Options一本化、TestFactory、APIバンドル、InternalsVisibleTo）を SPEC に明記し、テスト/本番の顔を分離する方針を定義する。
+- 観測性ガイド: Tracer/Meter 名（ActivitySource=`ExchangeApi.RestClient`, Meter=`exchangeapi`）、メトリクス/タグ（requests_total, request_duration_seconds with endpoint/method/status/product_code/error）、構造化ログ項目（機密除外）を推奨セットとしてドキュメント化し、`WithObservability(...)` での適用例を示す。

@@ -43,6 +43,13 @@
   - ポリシーは DI で共有インスタンスを注入し、呼び出しごとに参照する形を基本とする（状態を持つ CB はスレッドセーフ実装を前提）。
 - 実装状況: `BitflyerClientOptions` と `WithObservability(...)` を追加し、ファクトリでオプション経由の構成に対応。`HttpPolicyOptions` に `RateLimitBurst` を追加し、トークンバケット型 RateLimiter をデフォルトで使用。
 - 設計方針アップデート: Options 一本化で注入ポイントを簡素化し、本番は最小構成、詳細はオプションで上書き。Tests アセンブリ限定の TestFactory（InternalsVisibleTo）や API バンドル DTO を用意し、モック注入を本番 API とは分離する計画。
+- internal シーム/利用ルール: Tests 専用に `BitflyerTestClientFactory` と `BitflyerApiBundle` を用意し、InternalsVisibleTo でのみ利用。公開 API のシグネチャは最小限を維持する。テストではモック Transport/RestClient/バンドルを差し込む。
+
+## 7. 観測性導入ガイド（推奨セット）
+- Tracer/Meter 名: ActivitySource=`ExchangeApi.RestClient`, Meter=`exchangeapi`。
+- メトリクス: `exchangeapi_requests_total{endpoint,method,status,product_code,error}`, `exchangeapi_request_duration_seconds{endpoint,method,status,product_code,error}`。
+- ログ: 構造化 JSON で `timestamp, event_type, method, uri/status_code, duration_ms(optional), product_code(optional), error(optional)` を記録し、機密（キー、署名）は出力しない。
+- サンプル: `RestCallOpenTelemetryObserver`（OTelブリッジ）と `StructuredRestClientLogger` を組み合わせ、Factory で `WithObservability(...)` 経由またはオプション注入で適用する。
 
 ## 7. ドキュメント
 - 信頼性パターンの推奨デフォルトとシナリオ別設定例を記載（低頻度トレード/高頻度ポーリングなど）。

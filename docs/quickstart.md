@@ -1,6 +1,6 @@
 # Quick Start
 
-ExchangeApi を最短で動かすための手順です。Stage5 時点では bitFlyer / REST のみをサポートし、Market/Trading/Account/Margin/ExchangeInfo の抽象APIを実装しています（WSは未実装）。
+ExchangeApi を最短で動かすための手順です。Stage6 では REST-only のまま、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）、E2/E3 エラー分類、観測性フックを整備しています（WSは未実装）。
 
 ## 前提
 - .NET 10 以降
@@ -55,7 +55,7 @@ var result = await trading.SendOrderAsync(order);
 Console.WriteLine($"Accepted: {result.OrderId}");
 ```
 
-## 5. 主要API（Stage5）
+## 5. 主要API（Stage6）
 - REST: `IMarketDataApi` / `ITradingApi` / `IAccountApi` / `IMarginAccountApi` / `IExchangeInfoApi`
 - WS: 未実装（Stage6以降に検討）
 

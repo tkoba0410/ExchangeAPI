@@ -1,14 +1,15 @@
 # Entry Guide
 
-利用者向けの導入ガイドです。Stage5 時点での対応範囲は bitFlyer / REST のみで、Market/Trading/Account/Margin/ExchangeInfo の抽象 API を実装済み（Realtime は未実装）。
+利用者向けの導入ガイドです。Stage6 では REST-only 方針を維持しつつ、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）、E2/E3エラー分類、観測性フックを整備しています（Realtime は未実装）。
 
-## 1. 対応範囲（Stage5）
+## 1. 対応範囲（Stage6）
 - 取引所: bitFlyer
 - Market: Ticker / Board / Executions（Candles は未サポート）
 - Trading: MARKET / LIMIT / STOP、キャンセル（単体・全件）、ポーリング
 - Account/Margin: 残高・建玉・証拠金・約定取得
 - ExchangeInfo: BTC/JPY の最小数量・価格刻みなど
 - WebSocket: 未実装（REST only）
+- 信頼性/運用: Timeout/Retry/RateLimit/CircuitBreaker デフォルト、E2/E3 エラー分類、観測性フック（OTelブリッジ/構造化ログ）
 
 ## 2. 抽象インターフェース（主要）
 - Stage5 で利用できるメソッド: `IMarketDataApi`（Ticker/Board/Executions）、`ITradingApi`（Send/Cancel/OpenOrders/Poll）、`IAccountApi`、`IMarginAccountApi`、`IExchangeInfoApi`

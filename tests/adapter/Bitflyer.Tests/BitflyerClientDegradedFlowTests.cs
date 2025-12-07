@@ -71,10 +71,24 @@ public class BitflyerClientDegradedFlowTests
         var executions = await client.GetExecutionsAsync(Symbols.BtcJpy);
         Assert.NotEmpty(executions);
 
+        // 5. child orders 履歴（完了済み想定で空）
+        var childOrders = await client.GetOpenOrdersAsync("BTC_JPY");
+        Assert.NotEmpty(childOrders);
+
+        // 6. cancel all（成功レスポンスを期待）
+        var cancelAll = await client.CancelAllOrdersAsync("BTC_JPY");
+        Assert.True(cancelAll.IsSuccess);
+
+        // 7. collateral（口座状態確認）
+        var collateral = await client.GetCollateralAsync();
+        Assert.True(collateral.Amount > 0);
+
         // 呼び出し回数が劣化環境を通ったことを確認
         Assert.True(transport.BalanceCalls >= 2);
         Assert.True(transport.ChildOrderCalls >= 2);
         Assert.True(transport.ExecutionCalls >= 1);
+        Assert.True(transport.CancelCalls >= 1);
+        Assert.True(transport.CollateralCalls >= 1);
     }
 
     private sealed class DegradedBitflyerTransport : IHttpTransport
@@ -83,6 +97,8 @@ public class BitflyerClientDegradedFlowTests
         public int SendOrderCalls { get; private set; }
         public int ChildOrderCalls { get; private set; }
         public int ExecutionCalls { get; private set; }
+        public int CancelCalls { get; private set; }
+        public int CollateralCalls { get; private set; }
 
         public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
@@ -116,6 +132,16 @@ public class BitflyerClientDegradedFlowTests
                 });
             }
 
+            if (path.Contains("/v1/me/cancelallchildorders", StringComparison.OrdinalIgnoreCase)
+                || path.Contains("/v1/me/cancelchildorder", StringComparison.OrdinalIgnoreCase))
+            {
+                CancelCalls++;
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent("{}", Encoding.UTF8, "application/json")
+                });
+            }
+
             if (path.Contains("/v1/me/getchildorders", StringComparison.OrdinalIgnoreCase))
             {
                 ChildOrderCalls++;
@@ -143,6 +169,16 @@ public class BitflyerClientDegradedFlowTests
                 ExecutionCalls++;
                 var now = DateTime.UtcNow;
                 var json = $"[{{\"id\":1,\"child_order_acceptance_id\":\"JRF20240101-000000-abcdef\",\"product_code\":\"BTC_JPY\",\"side\":\"BUY\",\"price\":4000000,\"size\":0.001,\"exec_date\":\"{now:O}\"}}]";
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(json, Encoding.UTF8, "application/json")
+                });
+            }
+
+            if (path.Contains("/v1/me/getcollateral", StringComparison.OrdinalIgnoreCase))
+            {
+                CollateralCalls++;
+                var json = "{\"collateral\":1000000,\"open_position_pnl\":0,\"require_collateral\":0,\"keep_rate\":10}";
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")

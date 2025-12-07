@@ -13,15 +13,15 @@ public sealed class HttpPolicyOptions
 
     public int MaxRetryAttemptsForOther { get; init; } = 1;
 
-    public TimeSpan RetryBaseDelay { get; init; } = TimeSpan.FromMilliseconds(500);
+    public TimeSpan RetryBaseDelay { get; init; } = TimeSpan.FromMilliseconds(200);
 
-    public TimeSpan RetryMaxDelay { get; init; } = TimeSpan.FromSeconds(4);
+    public TimeSpan RetryMaxDelay { get; init; } = TimeSpan.FromSeconds(2);
 
-    public double RequestsPerSecond { get; init; } = 3d;
+    public double RequestsPerSecond { get; init; } = 5d;
 
-    public int RateLimitBurst { get; init; } = 1;
+    public int RateLimitBurst { get; init; } = 2;
 
-    public int CircuitBreakerFailureThreshold { get; init; } = 5;
+    public int CircuitBreakerFailureThreshold { get; init; } = 3;
 
     public TimeSpan CircuitBreakerOpenDuration { get; init; } = TimeSpan.FromSeconds(5);
 

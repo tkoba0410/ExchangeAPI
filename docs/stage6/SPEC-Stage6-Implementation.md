@@ -15,10 +15,10 @@
 - 各フェーズでビルド/テストを緑にしてから次へ進む。
 
 ## 3. デフォルト値（初期合意の叩き台）
-- Timeout: Public 5s, Private 8–10s。
-- Retry: GET 最大3回（指数バックオフ2x, max delay 4s）、POST はネットワーク一時障害のみ1回。
-- RateLimit: Public 5req/s, Private 3req/s（実測で調整可）。
-- CircuitBreaker: 20s 窓で失敗率 >50% で Open、5s 後 Half-Open（1リクエスト成功で Close）。
+- Timeout: 8s（Public/Private共通の初期値）。
+- Retry: GET 最大3回（指数バックオフ、base 200ms / max 2s）、POST はネットワーク一時障害のみ1回。
+- RateLimit: 5 req/s、バースト 2（実測で調整可）。
+- CircuitBreaker: 20s 窓で失敗率 >50% で Open、5s 後 Half-Open（1リクエスト成功で Close）。初期閾値は 3 回失敗。
 - これらは初期値。負荷/レイテンシ計測で見直し、SPECとコードに反映して固定する。
 
 ## 4. 失敗分類と再試行可否

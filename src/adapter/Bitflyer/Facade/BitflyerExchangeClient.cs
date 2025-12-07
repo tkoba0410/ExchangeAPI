@@ -21,6 +21,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     private readonly IMarginAccountApi _marginApi;
     private readonly IAccountApi _accountApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
+    internal BitflyerApiBundle? ApiBundle { get; }
 
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
@@ -35,6 +36,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
             accountApi: new BitflyerAccountApi(privateApi, exchangeId),
             exchangeInfoApi: new BitflyerExchangeInfoApi())
     {
+        ApiBundle = new BitflyerApiBundle(publicApi, privateApi, privateTradingApi);
     }
 
     public BitflyerExchangeClient(
@@ -49,6 +51,17 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         _marginApi = marginApi ?? throw new ArgumentNullException(nameof(marginApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
+    }
+
+    internal BitflyerExchangeClient(BitflyerApiBundle bundle)
+        : this(
+            marketApi: new BitflyerMarketApi(bundle.PublicApi, bundle.PrivateApi, "bitFlyer"),
+            tradingApi: new BitflyerTradingApi(bundle.PrivateTradingApi, bundle.PrivateApi, "bitFlyer"),
+            marginApi: new BitflyerMarginApi(bundle.PrivateApi, "bitFlyer"),
+            accountApi: new BitflyerAccountApi(bundle.PrivateApi, "bitFlyer"),
+            exchangeInfoApi: new BitflyerExchangeInfoApi())
+    {
+        ApiBundle = bundle;
     }
 
     // Market

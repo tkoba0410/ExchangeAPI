@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Errors;
-using ExchangeApi.Adapter.Bitflyer;
+using ExchangeApi.Adapter.Bitflyer.Facade;
 using ExchangeApi.Adapter.Bitflyer.Models;
 using ExchangeApi.Adapter.Bitflyer.Tests.Fakes;
 using Xunit;
@@ -162,6 +162,86 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests
             Assert.Equal(OrderSide.Buy, order.Side);
             Assert.Equal(OrderType.Limit, order.OrderType);
             Assert.Equal(0.1m, order.Size);
+        }
+
+        [Fact]
+        public async Task GetBalancesAsync_ReturnsMappedBalances()
+        {
+            var rawTicker = new BitflyerTickerRaw { ProductCode = "BTC_JPY" };
+            var balances = new[]
+            {
+                new BitflyerBalanceResponse { CurrencyCode = "JPY", Amount = 10000m, Available = 8000m },
+                new BitflyerBalanceResponse { CurrencyCode = "BTC", Amount = 1.5m, Available = 1.2m },
+            };
+
+            var publicApi = new FakeBitflyerPublicApi(rawTicker);
+            var privateApi = new FakeBitflyerPrivateApi(balances);
+            var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
+
+            var result = await client.GetBalancesAsync();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, b => b.Currency == "JPY" && b.Amount == 10000m && b.Available == 8000m);
+            Assert.Contains(result, b => b.Currency == "BTC" && b.Amount == 1.5m && b.Available == 1.2m);
+        }
+
+        [Fact]
+        public async Task GetOpenPositionsAsync_ReturnsMappedPositions()
+        {
+            var rawTicker = new BitflyerTickerRaw { ProductCode = "BTC_JPY" };
+            var positions = new[]
+            {
+                new BitflyerPositionResponse
+                {
+                    ProductCode = "BTC_JPY",
+                    Side = "BUY",
+                    Size = 0.01m,
+                    Price = 3000000m,
+                    OpenDate = new DateTime(2025, 1, 1),
+                    Pnl = 1000m
+                }
+            };
+
+            var publicApi = new FakeBitflyerPublicApi(rawTicker);
+            var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>(), positions: positions);
+            var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
+
+            var result = await client.GetOpenPositionsAsync("BTC_JPY");
+
+            Assert.Single(result);
+            var pos = result[0];
+            Assert.Equal("BTC_JPY", pos.ProductCode);
+            Assert.Equal(OrderSide.Buy, pos.Side);
+            Assert.Equal(0.01m, pos.Size);
+            Assert.Equal(3000000m, pos.Price);
+            Assert.Equal(1000m, pos.Pnl);
+        }
+
+        [Fact]
+        public async Task GetCollateralAsync_ReturnsMappedCollateral()
+        {
+            var rawTicker = new BitflyerTickerRaw { ProductCode = "BTC_JPY" };
+            var collateral = new BitflyerCollateralResponse
+            {
+                Collateral = 100000m,
+                OpenPositionPnl = 2000m,
+                RequireCollateral = 50000m,
+                KeepRate = 1.2m
+            };
+
+            var publicApi = new FakeBitflyerPublicApi(rawTicker);
+            var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>(), collateral: collateral);
+            var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
+
+            var result = await client.GetCollateralAsync();
+
+            Assert.Equal(collateral.Collateral, result.Amount);
+            Assert.Equal(collateral.OpenPositionPnl, result.OpenPositionPnl);
+            Assert.Equal(collateral.RequireCollateral, result.RequireCollateral);
+            Assert.Equal(collateral.KeepRate, result.KeepRate);
         }
 
         [Fact]

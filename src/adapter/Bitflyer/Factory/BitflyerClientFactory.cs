@@ -7,8 +7,9 @@ using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 using ExchangeApi.Transport.Transport;
+using ExchangeApi.Adapter.Bitflyer.Facade;
 
-namespace ExchangeApi.Adapter.Bitflyer;
+namespace ExchangeApi.Adapter.Bitflyer.Factory;
 
 /// <summary>
     /// Factory for constructing bitFlyer client instances.
@@ -55,6 +56,7 @@ namespace ExchangeApi.Adapter.Bitflyer;
 
         var publicApi = new BitflyerPublicApi(restClient);
         var privateApi = new BitflyerPrivateApi(restClient);
+        var rawApi = new BitflyerRawApiClient(publicApi, privateApi, privateApi);
 
         return new BitflyerExchangeClient(publicApi, privateApi, privateApi);
     }

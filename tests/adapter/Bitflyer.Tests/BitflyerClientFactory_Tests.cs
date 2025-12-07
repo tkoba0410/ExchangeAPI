@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Adapter.Bitflyer;
+using ExchangeApi.Adapter.Bitflyer.Factory;
 using Xunit;
 
 namespace ExchangeApi.Adapter.Bitflyer.Tests;

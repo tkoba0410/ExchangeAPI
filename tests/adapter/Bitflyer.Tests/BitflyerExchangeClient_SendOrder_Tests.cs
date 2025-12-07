@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Errors;
+using ExchangeApi.Adapter.Bitflyer.Facade;
 using ExchangeApi.Adapter.Bitflyer.Models;
 using ExchangeApi.Adapter.Bitflyer.Tests.Fakes;
 using Xunit;
@@ -105,5 +106,54 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
             TriggerPrice: 1m);
 
         await Assert.ThrowsAsync<ArgumentException>(() => client.SendOrderAsync(order));
-}
+    }
+
+    [Fact]
+    public async Task SendOrderAsync_WhenInsufficientFunds_MapsBalanceCategory()
+    {
+        var fakePublic = new FakeBitflyerPublicApi(new BitflyerTickerRaw());
+        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+        var exception = new ExchangeApiException(
+            message: "insufficient funds",
+            exchangeErrorCode: "INSUFFICIENT_FUNDS");
+        var fakeTrading = new FakeBitflyerPrivateTradingApi(
+            new BitflyerSendChildOrderResponse(),
+            exceptionToThrow: exception);
+        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+
+        var order = new OrderRequest(
+            ProductCode: "BTC_JPY",
+            Side: OrderSide.Buy,
+            OrderType: OrderType.Market,
+            Size: 10m);
+
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.SendOrderAsync(order));
+        Assert.Equal(ExchangeErrorCategory.Balance, ex.ErrorCategory);
+        Assert.Equal("INSUFFICIENT_FUNDS", ex.ExchangeErrorCode);
+    }
+
+    [Fact]
+    public async Task SendOrderAsync_WhenAuthError_MapsAuthCategory()
+    {
+        var fakePublic = new FakeBitflyerPublicApi(new BitflyerTickerRaw());
+        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+        var exception = new ExchangeApiException(
+            message: "auth failed",
+            statusCode: System.Net.HttpStatusCode.Unauthorized,
+            exchangeErrorCode: "AUTHENTICATION_ERROR");
+        var fakeTrading = new FakeBitflyerPrivateTradingApi(
+            new BitflyerSendChildOrderResponse(),
+            exceptionToThrow: exception);
+        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+
+        var order = new OrderRequest(
+            ProductCode: "BTC_JPY",
+            Side: OrderSide.Buy,
+            OrderType: OrderType.Market,
+            Size: 0.01m);
+
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.SendOrderAsync(order));
+        Assert.Equal(ExchangeErrorCategory.Auth, ex.ErrorCategory);
+        Assert.Equal("AUTHENTICATION_ERROR", ex.ExchangeErrorCode);
+    }
 }

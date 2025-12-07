@@ -1,17 +1,31 @@
 # Stage6 Summary（REST-only 信頼性・運用強化）
 
-## 概要
-- REST-only 方針を維持しつつ、Timeout/Retry/RateLimit（トークンバケット＋バースト）/CircuitBreaker をポリシー層で実装し、Factory でデフォルト適用。
-- エラー分類を E2/E3 レベルに拡張し、`IExchangeErrorClassifier` + bitFlyer マッピングで Retry/CB がカテゴリベース判定。
-- 観測性フックを追加（`IRestCallObserver`、OTel ブリッジ、構造化ログ）、`WithObservability(...)` で適用可能。
-- DX/テストシーム: `BitflyerClientOptions` 一本化 + TestFactory/ApiBundle/InternalsVisibleTo でモック注入を分離。
+## 信頼性パターン
+- 実装: Timeout/Retry/RateLimit（トークンバケット＋バースト）/CircuitBreaker をポリシー層で実装し、Factory でデフォルト適用。
+- 目的: REST-onlyでもネットワーク揺らぎや429/5xxを吸収し、フェイルファストを一貫したルールで行う。
+- 効果: 最小設定で安全デフォルトが効き、劣化環境下でも呼び出しが安定。Retry/CB/RLがカテゴリベースで動くため運用判断がシンプル。
+
+## エラー分類
+- 実装: `IExchangeErrorClassifier` + bitFlyerマッピングで `ExchangeErrorCategory` を付与し、Retry/CB がカテゴリベース判定。
+- 目的: 再試行可否やCB判定を明確にし、取引所固有エラーをドメイン例外に揃える。
+- 効果: 認証/レートリミット/一時障害/業務エラーの扱いが統一され、運用判断と再試行ポリシーがぶれない。
+
+## 観測性
+- 実装: `IRestCallObserver`、OTelブリッジ（`exchangeapi_requests_total`, `exchangeapi_request_duration_seconds` with endpoint/method/status/product_code/error）、構造化JSONロガーを追加。`WithObservability(...)` で適用例を用意。
+- 目的: メトリクス/ログ/トレースの命名を標準化し、OTel/外部監視との接続を容易にする。
+- 効果: 監視導入が即時に可能になり、レイテンシ/エラー率/CB状態を一貫したタグで可視化できる。
+
+## DX / テストシーム
+- 実装: `BitflyerClientOptions` に設定を束ね、TestFactory/ApiBundle/InternalsVisibleTo でモック注入を分離。本番APIを汚さずテスト経路を確保。
+- 目的: 設定と依存注入ポイントを単純化し、劣化環境E2Eや将来の拡張を容易にする。
+- 効果: 公開APIのシンプルさを維持したまま、テスト専用シームでモック差し替えや劣化シナリオ検証が可能。
 
 ## デフォルト値（2024-計測叩き台）
 - Timeout: 8s
 - Retry: GET 最大3回（base 200ms / max 2s）、POST は一時障害のみ1回
 - RateLimit: 5 req/s, burst 2
 - CircuitBreaker: 20s窓で失敗率>50%でOpen、閾値3、Open後5sでHalf-Open
-※ 本番計測で見直し予定（遅延/429/500 モックでp50/p95/p99取得）
+- ※ 本番計測で見直し予定（遅延/429/500 モックでp50/p95/p99取得）
 
 ## 観測性（推奨セット）
 - ActivitySource=`ExchangeApi.RestClient`、Meter=`exchangeapi`

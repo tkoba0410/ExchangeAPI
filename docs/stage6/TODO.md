@@ -1,8 +1,8 @@
 # Stage6 やることリスト（REST-only 信頼性・運用強化）
 
 ## 1. 実装フェーズと優先度（デメリット克服の軸）
-- ① Timeout/Retry デフォルト導入 → ② RateLimiter → ③ CircuitBreaker → ④ 観測性フック → ⑤ Factory オプション拡張 → ⑥ Fault Injection/結合テスト。各ステップでビルド/テストを緑にしてから進む。
-- デフォルト値を早期合意: Timeout=Public 5s / Private 8–10s、Retry=GET 最大3回（指数2x, max 4s）・POSTはネットワーク一時障害のみ1回、RateLimit=Public 5req/s・Private 3req/s（実測で調整）、CircuitBreaker=20s 窓で失敗率>50%で Open、5s 後 Half-Open。
+- ① Timeout/Retry デフォルト導入 → ② RateLimiter → ③ CircuitBreaker → ④ 観測性フック → ⑤ Factory オプション拡張 → ⑥ Fault Injection/結合テスト。各ステップでビルド/テストを緑にしてから進む（実装済）。
+- デフォルト値の現状: Timeout=8s、Retry=GET 最大3回（指数2x, base 200ms / max 2s）・POST は一時障害のみ1回、RateLimit=5req/s + burst 2、CircuitBreaker=20s 窓で失敗率>50%で Open、閾値3、5s 後 Half-Open。※ 本番計測で見直し予定。
 
 ### 進行順序（チェックポイント付き）
 1. Timeout/Retry: デフォルト適用で代表フローが通ることを確認（ポリシー単体テスト緑）。
@@ -13,29 +13,29 @@
 6. Fault Injection/結合: 遅延/429/一時断を注入した劣化環境で Stage5 代表フロー成功。
 
 ## 2. 信頼性パターン（デフォルト込み）
-- Policy 層で RateLimiter（固定間隔/トークンバケット相当）、Retry、Timeout、CircuitBreaker を構成可能にし、安全寄りデフォルトを Factory から提供。サーキット状態など可視化ポイントを定義。
-- CircuitBreaker/Retry は失敗分類に紐づけ、再試行可否を一元管理。
+- Policy 層で RateLimiter（固定間隔/トークンバケット相当）、Retry、Timeout、CircuitBreaker を構成可能にし、安全寄りデフォルトを Factory から提供（実装済）。サーキット状態など可視化ポイントを定義。
+- CircuitBreaker/Retry は失敗分類に紐づけ、再試行可否を一元管理（実装済）。
 
 ## 3. エラー分類 E2/E3
-- `ExchangeApiException` を認証/権限・レートリミット・一時的ネットワーク・業務エラーに整理し、bitFlyer エラーコード→ドメイン例外のマッピング表と再試行可否基準を整備。
+- `ExchangeApiException` を認証/権限・レートリミット・一時的ネットワーク・業務エラーに整理し、bitFlyer エラーコード→ドメイン例外のマッピング表と再試行可否基準を整備（実装済、分類タグを Retry/CB が参照）。
 
 ## 4. 観測性フック
 - `IRestCallObserver`（コールバック）でログ/メトリクス/トレースを集約し、`IRestClientLogger` 拡張で RequestId/エンドポイント/所要時間/HTTP ステータス/主要ドメイン属性を記録（秘密情報除外）。OpenTelemetry に流す薄いアダプタをサンプル実装。
-- 実装済み: `RestCallOpenTelemetryObserver` で Activity/Meter を発行（メトリクス名: `exchangeapi_requests_total`, `exchangeapi_request_duration_seconds`、タグ: endpoint/method/status/product_code/error）。構造化 JSON ログサンプル `StructuredRestClientLogger` を追加。
+- 実装済み: `RestCallOpenTelemetryObserver` で Activity/Meter を発行（メトリクス名: `exchangeapi_requests_total`, `exchangeapi_request_duration_seconds`、タグ: endpoint/method/status/product_code/error）。構造化 JSON ロガー `StructuredRestClientLogger` を追加。
 
 ## 5. 設定と DX
 - `BitflyerClientOptions` に Timeouts/Retry/RateLimit/CircuitBreaker/LoggingVerbosity を束ね、`WithObservability(...)` で Observer 注入を提供。最小設定の安全デフォルトと上級者向け詳細設定を両立する API シグネチャを確定。
 - 実装済み: `BitflyerClientOptions` と拡張メソッド `WithObservability(...)` を追加し、Factory でオプション経由の構成に対応。`HttpPolicyOptions` に `RateLimitBurst` を追加し、トークンバケット型 RateLimiter をデフォルト使用。
 
 ## 6. ドキュメント
-- 信頼性パターンの推奨デフォルトとシナリオ別設定例、ログ/メトリクス/トレースの取り扱いサンプルを追加。STAGES-OVERVIEW の Stage6 説明を REST-only 信頼性強化に更新し、A010 の DoD を完成させる。
+- 信頼性パターンの推奨デフォルトとシナリオ別設定例、ログ/メトリクス/トレースの取り扱いサンプルを追加。STAGES-OVERVIEW の Stage6 説明を REST-only 信頼性強化に更新し、A010 の DoD を完成させる（更新済）。
 
 ## 7. テスト/検証
-- Policy 単体テスト（成功/失敗/サーキット遷移）を優先実装し、次に劣化環境で Stage5 代表フローの結合テスト。
-- レートリミット・遅延・ネットワーク障害を模擬する Fault Injection テストを整備。Paper/Sandbox 未整備でも Fault Injection で代替する方針を前提にする。
+- Policy 単体テスト（成功/失敗/サーキット遷移）を優先実装し、次に劣化環境で Stage5 代表フローの結合テスト（実装済）。
+- レートリミット・遅延・ネットワーク障害を模擬する Fault Injection テストを整備。Paper/Sandbox 未整備でも Fault Injection で代替する方針を前提にする（実装済）。
 - Paper Trading/Sandbox/ドライラン利用方針を記載した運用ガイドを添える。
 - 実装済み: Transport レベルで 429/一時断/タイムアウト/CB 開放を検証する Fault Injection テストを追加。TestFactory/モック Transport を用いた劣化環境 E2E（残高→注文→約定確認→履歴→キャンセル→ポジション→証拠金）を追加済み。
-- 方針: 劣化環境では Stage5 代表フロー（残高→注文→約定確認→決済→履歴）をモックTransportで再現し、E2E テストを追加して DoD を満たす。簡略フローではなく正式フローを対象とする。
+- 方針: 劣化環境では Stage5 正式フロー（残高→注文→約定確認→決済→履歴詳細）をモック Transport で再現し、E2E テストを追加して DoD を「正式フロー完了」に更新する（残タスク）。
 
 ## 設計方針アップデート（シンプル化と将来性優先）
 - オプション一本化: `BitflyerClientOptions` に HttpClient/Transport/RestClient/Policy/Logger/Observer/ErrorClassifier を束ね、Factory は基本このオプション 1 つを受ける形に簡素化する。

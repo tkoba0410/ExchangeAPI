@@ -34,9 +34,9 @@
 - 適用例: `new BitflyerClientOptions().WithObservability(new RestCallOpenTelemetryObserver(), new StructuredRestClientLogger(Console.WriteLine))`
 
 ## テスト状況
-- 単体: ポリシー（Retry/Timeout/RL/CB）、観測性通知
+- 単体: ポリシー（Retry/Timeout/RL/CB）、観測性通知、エラーマッピング境界
 - Fault Injection: 429/一時断/タイムアウト/CB開放を検証
-- 劣化環境E2E: TestFactory+モックTransportで代表フロー簡略版（残高→注文→約定確認→履歴）を通過
+- 劣化環境E2E: TestFactory+モックTransportで代表フロー拡張版（残高→注文→約定確認→履歴→キャンセル→ポジション→証拠金）を通過
 - 計測: 本番想定の実測調整は未実施（方針のみ記載）
 
 ## 残タスク/リスク

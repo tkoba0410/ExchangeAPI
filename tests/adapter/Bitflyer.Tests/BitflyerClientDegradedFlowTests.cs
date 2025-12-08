@@ -67,23 +67,50 @@ public class BitflyerClientDegradedFlowTests
 
         Assert.Equal(OrderStatusType.Completed, status.Status);
 
-        // 4. executions（履歴取得）
+        // 4. executions（約定履歴）
         var executions = await client.GetExecutionsAsync(Symbols.BtcJpy);
         Assert.NotEmpty(executions);
 
-        // 5. child orders 履歴（完了済み想定で空）
+        // 5. child orders 履歴（完了済みの履歴が返る）
         var childOrders = await client.GetOpenOrdersAsync("BTC_JPY");
         Assert.NotEmpty(childOrders);
 
-        // 6. cancel all（成功レスポンスを期待）
+        // 6. positions（建玉ありの確認）
+        var positionsBeforeClose = await client.GetOpenPositionsAsync("BTC_JPY");
+        Assert.NotEmpty(positionsBeforeClose);
+
+        // 7. close order（反対売買で決済）→ poll status
+        var closeOrderRequest = new OrderRequest(
+            ProductCode: "BTC_JPY",
+            Side: OrderSide.Sell,
+            OrderType: OrderType.Market,
+            Size: 0.001m,
+            Price: null,
+            TriggerPrice: null,
+            TimeInForce: null,
+            MinuteToExpire: null,
+            ClientOrderId: null);
+
+        var closeOrderResult = await client.SendOrderAsync(closeOrderRequest);
+        Assert.False(string.IsNullOrWhiteSpace(closeOrderResult.OrderId));
+
+        var closeStatus = await client.PollOrderStatusAsync(
+            productCode: "BTC_JPY",
+            childOrderAcceptanceId: closeOrderResult.OrderId,
+            pollInterval: TimeSpan.FromMilliseconds(10),
+            maxAttempts: 3);
+
+        Assert.Equal(OrderStatusType.Completed, closeStatus.Status);
+
+        // 8. positions（決済後に空）
+        var positionsAfterClose = await client.GetOpenPositionsAsync("BTC_JPY");
+        Assert.Empty(positionsAfterClose);
+
+        // 9. cancel all（成功レスポンスを期待、終端確認）
         var cancelAll = await client.CancelAllOrdersAsync("BTC_JPY");
         Assert.True(cancelAll.IsSuccess);
 
-        // 7. positions
-        var positions = await client.GetOpenPositionsAsync("BTC_JPY");
-        Assert.NotEmpty(positions);
-
-        // 8. collateral（口座状態確認）
+        // 10. collateral（口座状態確認）
         var collateral = await client.GetCollateralAsync();
         Assert.True(collateral.Amount > 0);
 
@@ -106,7 +133,9 @@ public class BitflyerClientDegradedFlowTests
         public int CollateralCalls { get; private set; }
         public int PositionCalls { get; private set; }
 
-        public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
+        private decimal _positionSize = 0;
+
+        public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
             var path = request.RequestUri?.AbsolutePath ?? string.Empty;
 
@@ -131,6 +160,35 @@ public class BitflyerClientDegradedFlowTests
             if (path.Contains("/v1/me/sendchildorder", StringComparison.OrdinalIgnoreCase))
             {
                 SendOrderCalls++;
+                var body = request.Content != null
+                    ? await request.Content.ReadAsStringAsync(cancellationToken)
+                    : string.Empty;
+
+                // ざっくり JSON を読む（Side と Size のみ）
+                var side = body.Contains("\"side\":\"SELL\"", StringComparison.OrdinalIgnoreCase)
+                    ? OrderSide.Sell
+                    : OrderSide.Buy;
+
+                var size = 0.0m;
+                const string sizeKey = "\"size\":";
+                var sizeIndex = body.IndexOf(sizeKey, StringComparison.OrdinalIgnoreCase);
+                if (sizeIndex >= 0)
+                {
+                    var after = body[(sizeIndex + sizeKey.Length)..];
+                    var end = after.IndexOfAny(new[] { ',', '}', ' ' });
+                    var sizeStr = end >= 0 ? after[..end] : after;
+                    decimal.TryParse(sizeStr, out size);
+                }
+
+                if (side == OrderSide.Buy)
+                {
+                    _positionSize += size;
+                }
+                else
+                {
+                    _positionSize = Math.Max(0, _positionSize - size);
+                }
+
                 var json = "{\"child_order_acceptance_id\":\"JRF20240101-000000-abcdef\"}";
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
@@ -195,10 +253,19 @@ public class BitflyerClientDegradedFlowTests
             {
                 PositionCalls++;
                 var now = DateTime.UtcNow;
-                var json = $"[{{\"product_code\":\"BTC_JPY\",\"side\":\"BUY\",\"price\":4000000,\"size\":0.001,\"commission\":0,\"swap_point_accumulate\":0,\"require_collateral\":1000,\"open_date\":\"{now:O}\",\"leverage\":4}}]";
+                if (_positionSize > 0)
+                {
+                    var json = $"[{{\"product_code\":\"BTC_JPY\",\"side\":\"BUY\",\"price\":4000000,\"size\":{_positionSize},\"commission\":0,\"swap_point_accumulate\":0,\"require_collateral\":1000,\"open_date\":\"{now:O}\",\"leverage\":4}}]";
+                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(json, Encoding.UTF8, "application/json")
+                    });
+                }
+
+                var emptyJson = "[]";
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent(json, Encoding.UTF8, "application/json")
+                    Content = new StringContent(emptyJson, Encoding.UTF8, "application/json")
                 });
             }
 

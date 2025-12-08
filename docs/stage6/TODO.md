@@ -34,7 +34,7 @@
 - Policy 単体テスト（成功/失敗/サーキット遷移）を優先実装し、次に劣化環境で Stage5 代表フローの結合テスト。
 - レートリミット・遅延・ネットワーク障害を模擬する Fault Injection テストを整備。Paper/Sandbox 未整備でも Fault Injection で代替する方針を前提にする。
 - Paper Trading/Sandbox/ドライラン利用方針を記載した運用ガイドを添える。
-- 実装済み: Transport レベルで 429/一時断/タイムアウト/CB 開放を検証する Fault Injection テストを追加。TestFactory/モック Transport を用いた劣化環境 E2E（残高→注文→約定確認→履歴）を追加済み。
+- 実装済み: Transport レベルで 429/一時断/タイムアウト/CB 開放を検証する Fault Injection テストを追加。TestFactory/モック Transport を用いた劣化環境 E2E（残高→注文→約定確認→履歴→キャンセル→ポジション→証拠金）を追加済み。
 - 方針: 劣化環境では Stage5 代表フロー（残高→注文→約定確認→決済→履歴）をモックTransportで再現し、E2E テストを追加して DoD を満たす。簡略フローではなく正式フローを対象とする。
 
 ## 設計方針アップデート（シンプル化と将来性優先）

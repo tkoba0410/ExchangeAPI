@@ -188,7 +188,6 @@ Stage6 は、次の条件をすべて満たした時点で完了とみなす。
    - 最小構成（デフォルト設定）で Stage5 と同等のフローが通り、追加設定で運用ニーズに応じたチューニングが可能である。
 
 5. **テスト・検証**
-   - Fault Injection と劣化環境下での結合テストが整備され、代表フローが成功する。
-   - Public/Private それぞれで簡易な負荷・レイテンシ計測が行われ、Timeout/Retry/RateLimit/CircuitBreaker のデフォルト値が計測結果を反映した形で確定している。
+   - Fault Injection と劣化環境下での結合テストが整備され、代表フローが成功する（残高→注文→約定確認→履歴→キャンセル→ポジション→証拠金を TestFactory/モック Transport で確認済み）。
+   - Public/Private それぞれで簡易な負荷・レイテンシ計測が行われ、Timeout/Retry/RateLimit/CircuitBreaker のデフォルト値が計測結果を反映した形で確定している（現状は叩き台、計測反映は残タスク）。
    - DoD に沿ったテスト（ポリシー単体/劣化環境結合/観測性サンプル）が緑である。
-   - 劣化環境で Stage5 代表フロー（残高→注文→約定確認→履歴）が TestFactory/モック Transport を用いて成功している。

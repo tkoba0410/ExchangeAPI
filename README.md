@@ -1,23 +1,26 @@
 # ExchangeApi
 
 ExchangeApi は、複数の暗号資産取引所向けに統一インターフェースを提供する C#/.NET ライブラリです。  
-Stage4 時点で **bitFlyer の Public/Private REST** に対応し、以下を提供します。
+Stage6 では **bitFlyer の Public/Private REST に特化した REST-only クライアント** として、以下を提供します。
 
-- Ticker/Board
-- 残高・証拠金
-- 発注（MARKET/LIMIT/STOP/STOP_LIMIT）、キャンセル/全キャンセル
+- Ticker/Board/MarketExecutions（歩み値, Public）
+- 残高・証拠金・AccountExecutions（自口座の約定履歴）
+- 発注（MARKET/LIMIT/STOP/STOP_LIMIT）、キャンセル
 - オープン注文・約定・ポジション一覧
+- Candlestick は未サポート（NotSupported）
+- WebSocket/Realtime は正式に廃止（REST のみ）
+- HTTP 呼び出しには Timeout/Retry/RateLimit/CircuitBreaker を含むポリシー層を用意
 
 詳しい使い方は Quick Start / Entry Guide を参照してください。
 
 ---
 
-## 🏗 プロジェクト構成（Stage4 時点）
+## 🏗 プロジェクト構成（Stage6 時点）
 
 ```
 ExchangeApi.Contracts             ← 契約/共通DTO/エラー（旧: ExchangeApi.Contracts）
-ExchangeApi.Transport        ← HTTP/WS 基盤（RestClient/Signer 等）
-ExchangeApi.Adapter.Bitflyer ← bitFlyer 実装（REST/WS マッピング）
+ExchangeApi.Transport        ← HTTP 基盤 + ポリシー（RestClient/Signer/Policy 等）
+ExchangeApi.Adapter.Bitflyer ← bitFlyer 実装（REST マッピング）
 ExchangeApi.Factory          ← DI 組み立て（機能ごとの登録を選択）
 ```
 
@@ -106,11 +109,13 @@ Console.WriteLine($"Time: {ticker.Timestamp:O}");
 
 ## 🎯 Stage4 の概要
 
-- 取引所: bitFlyer
-- Public: `GET /v1/getticker`, `GET /v1/getboard`
-- Private: 残高/証拠金/ポジション/約定/オープン注文、`sendchildorder`, `cancelchildorder`, `cancelallchildorders`
-- DTO: `Ticker`, `Board`, `Balance`, `Collateral`, `Position`, `Execution`, `OpenOrder`, `OrderRequest/Result`
+- 取引所: bitFlyer（REST-only）
+- Public: `GET /v1/getticker`, `GET /v1/getboard`, `GET /v1/getexecutions`（MarketExecutions）
+- Private: 残高/証拠金/ポジション/口座約定/オープン注文、`sendchildorder`, `cancelchildorder`, `cancelallchildorders`
+- DTO: `Ticker`, `Board`, `MarketExecution`, `AccountExecution`, `Balance`, `Collateral`, `Position`, `OpenOrder`, `OrderRequest/Result`
 - 例外: `SymbolNotSupportedException`（シンボル未対応）、`ExchangeApiException`（HTTP/取引所エラー）
+- 信頼性: Timeout/Retry/RateLimit/CircuitBreaker のデフォルトポリシーを組み込み
+- Realtime/WS: 非対応（REST のみ）
 
 ---
 
@@ -147,6 +152,6 @@ MIT License
 
 ---
 
-> **Stage1 Status:**  
-> ExchangeApi は v1.0.0-stage1 をもって Stage1 を完了しています。  
-> Stage2（認証/API拡張/WS/複数取引所統合）は S2xx 文書および v2 系タグで管理されます。
+> **Stage6 Status:**  
+> REST-only 方針で信頼性・運用強化中です（Timeout/Retry/RateLimit/CircuitBreaker / 観測性フック）。  
+> WebSocket/Realtime は廃止し、bitFlyer REST 縦スライスにフォーカスしています。

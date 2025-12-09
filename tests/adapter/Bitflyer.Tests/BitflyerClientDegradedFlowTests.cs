@@ -68,7 +68,7 @@ public class BitflyerClientDegradedFlowTests
         Assert.Equal(OrderStatusType.Completed, status.Status);
 
         // 4. executions（約定履歴）
-        var executions = await client.GetExecutionsAsync(Symbols.BtcJpy);
+        var executions = await client.GetMarketExecutionsAsync(Symbols.BtcJpy);
         Assert.NotEmpty(executions);
 
         // 5. child orders 履歴（完了済みの履歴が返る）
@@ -106,11 +106,7 @@ public class BitflyerClientDegradedFlowTests
         var positionsAfterClose = await client.GetOpenPositionsAsync("BTC_JPY");
         Assert.Empty(positionsAfterClose);
 
-        // 9. cancel all（成功レスポンスを期待、終端確認）
-        var cancelAll = await client.CancelAllOrdersAsync("BTC_JPY");
-        Assert.True(cancelAll.IsSuccess);
-
-        // 10. collateral（口座状態確認）
+        // 9. collateral（口座状態確認）
         var collateral = await client.GetCollateralAsync();
         Assert.True(collateral.Amount > 0);
 
@@ -118,7 +114,6 @@ public class BitflyerClientDegradedFlowTests
         Assert.True(transport.BalanceCalls >= 2);
         Assert.True(transport.ChildOrderCalls >= 2);
         Assert.True(transport.ExecutionCalls >= 1);
-        Assert.True(transport.CancelCalls >= 1);
         Assert.True(transport.CollateralCalls >= 1);
         Assert.True(transport.PositionCalls >= 1);
     }
@@ -144,17 +139,17 @@ public class BitflyerClientDegradedFlowTests
                 BalanceCalls++;
                 if (BalanceCalls == 1)
                 {
-                    return Task.FromResult(new HttpResponseMessage((HttpStatusCode)429)
+                    return new HttpResponseMessage((HttpStatusCode)429)
                     {
                         Content = new StringContent("{\"error_message\":\"too many\"}", Encoding.UTF8, "application/json")
-                    });
+                    };
                 }
 
                 var json = "[{\"currency_code\":\"JPY\",\"amount\":1000000,\"available\":1000000},{\"currency_code\":\"BTC\",\"amount\":1,\"available\":1}]";
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                return new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")
-                });
+                };
             }
 
             if (path.Contains("/v1/me/sendchildorder", StringComparison.OrdinalIgnoreCase))
@@ -190,20 +185,20 @@ public class BitflyerClientDegradedFlowTests
                 }
 
                 var json = "{\"child_order_acceptance_id\":\"JRF20240101-000000-abcdef\"}";
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                return new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")
-                });
+                };
             }
 
             if (path.Contains("/v1/me/cancelallchildorders", StringComparison.OrdinalIgnoreCase)
                 || path.Contains("/v1/me/cancelchildorder", StringComparison.OrdinalIgnoreCase))
             {
                 CancelCalls++;
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                return new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent("{}", Encoding.UTF8, "application/json")
-                });
+                };
             }
 
             if (path.Contains("/v1/me/getchildorders", StringComparison.OrdinalIgnoreCase))
@@ -211,21 +206,32 @@ public class BitflyerClientDegradedFlowTests
                 ChildOrderCalls++;
                 if (ChildOrderCalls == 1)
                 {
-                    return Task.FromResult(new HttpResponseMessage((HttpStatusCode)429)
+                    return new HttpResponseMessage((HttpStatusCode)429)
                     {
                         Content = new StringContent("{\"error_message\":\"too many\"}", Encoding.UTF8, "application/json")
-                    });
+                    };
                 }
 
                 var now = DateTime.UtcNow;
                 var json = $"[{{\"id\":1,\"child_order_id\":\"JFX123\",\"product_code\":\"BTC_JPY\",\"side\":\"BUY\",\"child_order_type\":\"MARKET\",\"price\":0,\"average_price\":4000000,\"size\":0.001,\"child_order_state\":\"COMPLETED\",\"expire_date\":\"{now:O}\",\"child_order_date\":\"{now:O}\",\"child_order_acceptance_id\":\"JRF20240101-000000-abcdef\",\"outstanding_size\":0,\"cancel_size\":0,\"executed_size\":0.001,\"total_commission\":0}}]";
 
                 // 少し遅延を挟んで劣化環境を模擬
-                return Task.Delay(TimeSpan.FromMilliseconds(50), cancellationToken).ContinueWith(_ =>
-                    new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = new StringContent(json, Encoding.UTF8, "application/json")
-                    }, cancellationToken);
+                await Task.Delay(TimeSpan.FromMilliseconds(50), cancellationToken);
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(json, Encoding.UTF8, "application/json")
+                };
+            }
+
+            if (path.Contains("/v1/getexecutions", StringComparison.OrdinalIgnoreCase))
+            {
+                ExecutionCalls++;
+                var now = DateTime.UtcNow;
+                var json = $"[{{\"id\":1,\"product_code\":\"BTC_JPY\",\"side\":\"BUY\",\"price\":4000000,\"size\":0.001,\"exec_date\":\"{now:O}\"}}]";
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(json, Encoding.UTF8, "application/json")
+                };
             }
 
             if (path.Contains("/v1/me/getexecutions", StringComparison.OrdinalIgnoreCase))
@@ -233,20 +239,20 @@ public class BitflyerClientDegradedFlowTests
                 ExecutionCalls++;
                 var now = DateTime.UtcNow;
                 var json = $"[{{\"id\":1,\"child_order_acceptance_id\":\"JRF20240101-000000-abcdef\",\"product_code\":\"BTC_JPY\",\"side\":\"BUY\",\"price\":4000000,\"size\":0.001,\"exec_date\":\"{now:O}\"}}]";
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                return new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")
-                });
+                };
             }
 
             if (path.Contains("/v1/me/getcollateral", StringComparison.OrdinalIgnoreCase))
             {
                 CollateralCalls++;
                 var json = "{\"collateral\":1000000,\"open_position_pnl\":0,\"require_collateral\":0,\"keep_rate\":10}";
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                return new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")
-                });
+                };
             }
 
             if (path.Contains("/v1/me/getpositions", StringComparison.OrdinalIgnoreCase))
@@ -256,24 +262,24 @@ public class BitflyerClientDegradedFlowTests
                 if (_positionSize > 0)
                 {
                     var json = $"[{{\"product_code\":\"BTC_JPY\",\"side\":\"BUY\",\"price\":4000000,\"size\":{_positionSize},\"commission\":0,\"swap_point_accumulate\":0,\"require_collateral\":1000,\"open_date\":\"{now:O}\",\"leverage\":4}}]";
-                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                    return new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = new StringContent(json, Encoding.UTF8, "application/json")
-                    });
+                    };
                 }
 
                 var emptyJson = "[]";
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                return new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(emptyJson, Encoding.UTF8, "application/json")
-                });
+                };
             }
 
             // デフォルト: 200 ok
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            return new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent("{}", Encoding.UTF8, "application/json")
-            });
+            };
         }
     }
 }

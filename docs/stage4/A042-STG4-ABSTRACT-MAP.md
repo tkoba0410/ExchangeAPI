@@ -6,7 +6,7 @@ Stage4 で確定する抽象インターフェースと代表 DTO を 6 区分�
 | --- | --- | --- | --- | --- |
 | Market | IMarketDataApi.GetTicker | REST | Public | Ticker スナップショット |
 | Market | IMarketDataApi.GetOrderBook | REST | Public | OrderBook スナップショット |
-| Market | IMarketDataApi.GetExecutions | REST | Public | 約定履歴（歩み値） |
+| Market | IMarketDataApi.GetMarketExecutions | REST | Public | 約定履歴（歩み値） |
 | Market | IMarketDataApi.GetCandlesticks | REST | Public | OHLCV（bittradeを初期ターゲット、未対応取引所は NotImplemented） |
 | Trading | ITradingApi.SendOrder | REST | Private | OrderRequest → OrderResult |
 | Trading | ITradingApi.CancelOrder | REST | Private | OrderId 指定キャンセル |

@@ -45,4 +45,34 @@ public sealed class BitflyerAccountApi : IAccountApi
                 innerException: ex);
         }
     }
+
+    public async Task<IReadOnlyList<AccountExecution>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        try
+        {
+            var raw = await _privateApi
+                .GetExecutionsAsync(productCode, cancellationToken)
+                .ConfigureAwait(false);
+
+            return BitflyerAccountMapper.MapAccountExecutions(productCode, raw);
+        }
+        catch (ExchangeApiException ex)
+        {
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetAccountExecutions");
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer getexecutions API.",
+                exchangeId: _exchangeId,
+                operation: "GetAccountExecutions",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
 }

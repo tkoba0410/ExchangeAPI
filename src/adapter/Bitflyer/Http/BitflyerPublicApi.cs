@@ -73,4 +73,27 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
             cancellationToken);
     }
 
+    /// <summary>
+    /// 生の約定履歴（市場全体の歩み値）を取得する。
+    /// </summary>
+    public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsRawAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+            throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
+
+        const string path = "/v1/getexecutions";
+
+        IReadOnlyDictionary<string, string?> query =
+            new Dictionary<string, string?>(StringComparer.Ordinal)
+            {
+                ["product_code"] = productCode,
+            };
+
+        return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionResponse>>(
+            path,
+            query,
+            cancellationToken);
+    }
 }

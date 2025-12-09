@@ -43,5 +43,28 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests.Fakes
 
             return Task.FromResult(_board);
         }
+
+        public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsRawAsync(string productCode, CancellationToken cancellationToken = default)
+        {
+            if (productCode != "BTC_JPY")
+            {
+                throw new System.ArgumentException($"Unexpected productCode: {productCode}", nameof(productCode));
+            }
+
+            IReadOnlyList<BitflyerExecutionResponse> executions = new[]
+            {
+                new BitflyerExecutionResponse
+                {
+                    Id = 1,
+                    ProductCode = productCode,
+                    Side = "BUY",
+                    Price = 100m,
+                    Size = 0.01m,
+                    ExecDate = System.DateTimeOffset.UtcNow,
+                }
+            };
+
+            return Task.FromResult(executions);
+        }
     }
 }

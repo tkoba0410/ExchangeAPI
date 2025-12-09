@@ -16,16 +16,13 @@ namespace ExchangeApi.Adapter.Bitflyer.Apis.Market;
 public sealed class BitflyerMarketApi : IMarketDataApi
 {
     private readonly IBitflyerPublicApi _publicApi;
-    private readonly IBitflyerPrivateApi _privateApi;
     private readonly string _exchangeId;
 
     public BitflyerMarketApi(
         IBitflyerPublicApi publicApi,
-        IBitflyerPrivateApi privateApi,
         string exchangeId = "bitFlyer")
     {
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
-        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
         _exchangeId = exchangeId;
     }
 
@@ -93,36 +90,29 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         }
     }
 
-    public async Task<IReadOnlyList<Execution>> GetExecutionsAsync(string symbol, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<MarketExecution>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default)
     {
         try
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
-            var raw = await _privateApi.GetExecutionsAsync(productCode, cancellationToken).ConfigureAwait(false);
+            var raw = await _publicApi.GetExecutionsRawAsync(productCode, cancellationToken).ConfigureAwait(false);
 
             var mapped = raw
-                .Select(e => new Execution(
-                    ProductCode: e.ProductCode,
-                    Id: e.Id,
-                    Side: BitflyerCommonMapper.MapSide(e.Side),
-                    Price: e.Price,
-                    Size: e.Size,
-                    ExecutedAt: e.ExecDate,
-                    ChildOrderAcceptanceId: e.ChildOrderAcceptanceId))
+                .Select(e => BitflyerMarketMapper.MapExecution(productCode, e))
                 .ToArray();
 
             return mapped;
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetExecutions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetMarketExecutions");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getexecutions API.",
                 exchangeId: _exchangeId,
-                operation: "GetExecutions",
+                operation: "GetMarketExecutions",
                 statusCode: null,
                 innerException: ex);
         }

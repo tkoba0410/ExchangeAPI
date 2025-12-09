@@ -19,4 +19,22 @@ internal static class BitflyerAccountMapper
                 b.Available))
             .ToArray();
     }
+
+    public static IReadOnlyList<AccountExecution> MapAccountExecutions(
+        string productCode,
+        IReadOnlyList<BitflyerExecutionResponse> rawExecutions)
+    {
+        if (rawExecutions is null) throw new ArgumentNullException(nameof(rawExecutions));
+
+        return rawExecutions
+            .Select(e => new AccountExecution(
+                ProductCode: productCode,
+                Id: e.Id,
+                Side: BitflyerCommonMapper.MapSide(e.Side),
+                Price: e.Price,
+                Size: e.Size,
+                ExecutedAt: e.ExecDate,
+                ChildOrderAcceptanceId: e.ChildOrderAcceptanceId))
+            .ToArray();
+    }
 }

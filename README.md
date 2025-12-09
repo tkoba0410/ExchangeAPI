@@ -5,11 +5,11 @@ Stage6 では **bitFlyer の Public/Private REST に特化した REST-only ク�
 
 - Ticker/Board/MarketExecutions（歩み値, Public）
 - 残高・証拠金・AccountExecutions（自口座の約定履歴）
-- 発注（MARKET/LIMIT/STOP/STOP_LIMIT）、キャンセル
+- 発注（MARKET/LIMIT/STOP。STOP_LIMIT は Stop + Price 指定で送信）、キャンセル
 - オープン注文・約定・ポジション一覧
 - Candlestick は未サポート（NotSupported）
 - WebSocket/Realtime は正式に廃止（REST のみ）
-- HTTP 呼び出しには Timeout/Retry/RateLimit/CircuitBreaker を含むポリシー層を用意
+- HTTP 呼び出しには Timeout/Retry/RateLimit/CircuitBreaker を含むポリシー層を用意（エラー分類はカテゴリ単位）
 
 詳しい使い方は Quick Start / Entry Guide を参照してください。
 
@@ -18,10 +18,10 @@ Stage6 では **bitFlyer の Public/Private REST に特化した REST-only ク�
 ## 🏗 プロジェクト構成（Stage6 時点）
 
 ```
-ExchangeApi.Contracts             ← 契約/共通DTO/エラー（旧: ExchangeApi.Contracts）
+ExchangeApi.Contracts        ← 契約/共通DTO/エラー
 ExchangeApi.Transport        ← HTTP 基盤 + ポリシー（RestClient/Signer/Policy 等）
-ExchangeApi.Adapter.Bitflyer ← bitFlyer 実装（REST マッピング）
-ExchangeApi.Factory          ← DI 組み立て（機能ごとの登録を選択）
+ExchangeApi.Adapter.Bitflyer ← bitFlyer 実装（REST マッピング/Factory）
+ExchangeApi.Factory          ← 共通 RestClient/認証周辺の組み立てヘルパ
 ```
 
 依存方向は必ず以下を守ります：
@@ -65,40 +65,23 @@ dotnet test
 using Microsoft.Extensions.DependencyInjection;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Adapter.Bitflyer;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Transport.Transport;
+using ExchangeApi.Adapter.Bitflyer.Factory;
 
-// DI コンテナ構築
 var services = new ServiceCollection();
 
-// HttpTransport
-services.AddSingleton<IHttpTransport, HttpTransport>();
+// Factory で Http/Signer/Policy をまとめて組み立てる
+var client = BitflyerClientFactory.Create("api-key", "api-secret");
 
-// REST Client（baseUri を指定）
-services.AddSingleton<IRestClient>(sp =>
-{
-    var http = sp.GetRequiredService<IHttpTransport>();
-    return new RestClient(
-        new Uri("https://api.bitflyer.com"),
-        http
-    );
-});
-
-// bitFlyer Public API
-services.AddSingleton<IBitflyerPublicApi, BitflyerPublicApi>();
-
-// REST 抽象インターフェースで解決（BitflyerExchangeClient を共有）
-services.AddSingleton<BitflyerExchangeClient>();
-services.AddSingleton<IMarketDataApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
-services.AddSingleton<ITradingApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
-services.AddSingleton<IAccountApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
-services.AddSingleton<IMarginAccountApi>(sp => sp.GetRequiredService<BitflyerExchangeClient>());
+services.AddSingleton<IMarketDataApi>(client);
+services.AddSingleton<ITradingApi>(client);
+services.AddSingleton<IAccountApi>(client);
+services.AddSingleton<IMarginAccountApi>(client);
 
 var provider = services.BuildServiceProvider();
-var client = provider.GetRequiredService<IMarketDataApi>();
+var market = provider.GetRequiredService<IMarketDataApi>();
 
 // BTC/JPY の最新 ticker
-var ticker = await client.GetTickerAsync("BTC/JPY");
+var ticker = await market.GetTickerAsync("BTC/JPY");
 
 Console.WriteLine($"Bid : {ticker.BestBid}");
 Console.WriteLine($"Ask : {ticker.BestAsk}");
@@ -107,14 +90,14 @@ Console.WriteLine($"Time: {ticker.Timestamp:O}");
 
 ---
 
-## 🎯 Stage4 の概要
+## 🎯 Stage6 の概要
 
-- 取引所: bitFlyer（REST-only）
+- 取引所: bitFlyer（REST-only、WS 廃止）
 - Public: `GET /v1/getticker`, `GET /v1/getboard`, `GET /v1/getexecutions`（MarketExecutions）
 - Private: 残高/証拠金/ポジション/口座約定/オープン注文、`sendchildorder`, `cancelchildorder`, `cancelallchildorders`
 - DTO: `Ticker`, `Board`, `MarketExecution`, `AccountExecution`, `Balance`, `Collateral`, `Position`, `OpenOrder`, `OrderRequest/Result`
-- 例外: `SymbolNotSupportedException`（シンボル未対応）、`ExchangeApiException`（HTTP/取引所エラー）
-- 信頼性: Timeout/Retry/RateLimit/CircuitBreaker のデフォルトポリシーを組み込み
+- 例外: `SymbolNotSupportedException`（シンボル未対応）、`ExchangeApiException`（HTTP/取引所エラー）※エラー分類はカテゴリ単位
+- 信頼性: Timeout/Retry/RateLimit/CircuitBreaker のデフォルトポリシーと観測性フックを用意
 - Realtime/WS: 非対応（REST のみ）
 
 ---
@@ -128,11 +111,12 @@ tests/
  ├─ ExchangeApi.Adapter.Bitflyer.Tests
 ```
 
-特に Stage1 で重要なテスト：
+代表的なテスト：
 
-- `TickerTests`（DTO）
-- `BitflyerExchangeClientTests`（Raw → Ticker）
 - `RestClientTests`（path + query → URI 構築）
+- `BitflyerExchangeClientTests`（Ticker マッピング）
+- `BitflyerExchangeClient_SendOrder_Tests` / `PollOrderStatus_Tests`（発注・ポーリングフロー）
+- `HttpPolicyTests`（Timeout/Retry/RateLimit/CircuitBreaker）
 
 ---
 

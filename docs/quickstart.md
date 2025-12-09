@@ -1,6 +1,6 @@
 # Quick Start
 
-ExchangeApi を最短で動かすための手順です。Stage6 では REST-only のまま、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）、E2/E3 エラー分類、観測性フックを整備しています（WSは未実装）。
+ExchangeApi を最短で動かすための手順です。Stage6 では REST-only のまま、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）と観測性フックを提供しています（WSは未実装、エラー分類はカテゴリ単位）。
 
 ## 前提
 - .NET 10 以降

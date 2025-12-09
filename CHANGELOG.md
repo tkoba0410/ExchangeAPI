@@ -4,18 +4,22 @@ ExchangeApi プロジェクトの変更履歴を管理します。
 
 ---
 
-## [Unreleased]
-次期リリース（Stage2）に向けた作業領域です。  
-Private REST / 認証 / WebSocket / Orchestration の設計を含みます。
+## [Unreleased] — Stage6 (in progress)
+REST-only 方針で bitFlyer 縦スライスを Private まで実装し、信頼性/運用を強化しています。WebSocket/Realtime は廃止済み。
 
-### Planned (Stage2)
-- Private REST API（Orders / Positions / Executions / Balance）
-- 認証（HMAC, API Key 管理）
-- WebSocket（Public / Private）
-- Error Model の詳細化
-- Orchestration（Multi-Exchange）基盤の準備
-- 番号体系（Series / 4文字カテゴリ）導入
-- Gシリーズ（Goal体系）の正式採用
+### Added
+- bitFlyer Private REST: 残高/証拠金/ポジション/口座約定/オープン注文、`sendchildorder`、`cancelchildorder`、`cancelallchildorders`
+- Stop/StopLimit（Stop+Price）を含む発注系のマッピングとポーリング実装
+- Timeout/Retry/RateLimit/CircuitBreaker のデフォルトポリシーと観測性フック（構造化ログ/OTelサンプル Observer）
+- `BitflyerClientFactory` とテスト用 Factory で Http/Signer/Policy 配線を簡略化
+
+### Changed
+- REST-only に統一（WS/Realtime は提供しない）
+- ExchangeErrorCategory によるカテゴリ粒度のエラー分類フックを導入
+
+### Planned (Next)
+- 複数取引所対応の検証とドキュメント整備
+- 信頼性テスト（劣化環境・Fault Injection）の拡充
 
 ---
 

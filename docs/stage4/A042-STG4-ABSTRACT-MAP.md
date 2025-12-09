@@ -1,6 +1,7 @@
 # A042-STG4-ABSTRACT-MAP 抽象 API 対応表（Stage4）
 
-Stage4 で確定する抽象インターフェースと代表 DTO を 6 区分で整理する。REST/WS を明確に分離し、Margin は拡張インターフェースで表現する。
+Stage4 で確定する抽象インターフェースと代表 DTO を 6 区分で整理する。REST/WS を明確に分離し、Margin は拡張インターフェースで表現する。  
+※ Stage6 現在は REST-only 運用で、Realtime/WS 系は提供していない。
 
 | 区分 | 抽象インターフェース / メソッド | プロトコル | スコープ | 備考 |
 | --- | --- | --- | --- | --- |
@@ -14,9 +15,6 @@ Stage4 で確定する抽象インターフェースと代表 DTO を 6 区分�
 | Account | IAccountApi.GetBalances | REST | Private | 現物残高 |
 | Margin | IMarginAccountApi.GetOpenPositions | REST | Private | 建玉一覧（Margin 拡張） |
 | Margin | IMarginAccountApi.GetCollateral | REST | Private | 証拠金サマリ（Margin 拡張） |
-| Realtime | IRealtimeMarketDataApi.SubscribeTicker | WS | Public | Ticker ストリーム購読 |
-| Realtime | IRealtimeMarketDataApi.SubscribeOrderBook | WS | Public | OrderBook ストリーム購読 |
-| Realtime | IRealtimeMarketDataApi.SubscribeExecutions | WS | Public | 約定ストリーム購読 |
 | ExchangeInfo | IExchangeInfoApi | REST | Public | 市場/機能情報の入口（スケルトン: 市場一覧/機能フラグなど） |
 
 WS イベント DTO（抽象で採用する型）

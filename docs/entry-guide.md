@@ -1,6 +1,6 @@
 # Entry Guide
 
-利用者向けの導入ガイドです。Stage6 では REST-only 方針を維持しつつ、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）、E2/E3 エラー分類、観測性フックを整備しています（Realtime/WS は廃止）。
+利用者向けの導入ガイドです。Stage6 では REST-only 方針を維持しつつ、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）と観測性フックを提供しています（Realtime/WS は廃止、エラー分類はカテゴリ単位）。
 
 ## 1. 対応範囲（Stage6）
 - 取引所: bitFlyer
@@ -9,7 +9,7 @@
 - Account/Margin: 残高・建玉・証拠金・AccountExecutions（自口座の約定履歴）
 - ExchangeInfo: BTC/JPY の最小数量・価格刻みなど
 - WebSocket: 非対応（REST only、正式廃止）
-- 信頼性/運用: Timeout/Retry/RateLimit/CircuitBreaker デフォルト、E2/E3 エラー分類、観測性フック（OTelブリッジ/構造化ログ）
+- 信頼性/運用: Timeout/Retry/RateLimit/CircuitBreaker デフォルト、観測性フック（OTelブリッジ/構造化ログ）
 
 ## 2. 抽象インターフェース（主要）
 - Stage6 で利用できるメソッド: `IMarketDataApi`（Ticker/Board/MarketExecutions）、`IAccountApi`（Balances/AccountExecutions）、`ITradingApi`（Send/Cancel/OpenOrders/Poll）、`IMarginAccountApi`、`IExchangeInfoApi`
@@ -32,7 +32,7 @@
 
 ## 5. エラーと例外
 - 未サポートシンボル: `SymbolNotSupportedException`
-- HTTP/取引所エラー: `ExchangeApiException`（`StatusCode`, `ExchangeErrorCode`, `ErrorCategory` を参照）
+- HTTP/取引所エラー: `ExchangeApiException`（`StatusCode`, `ExchangeErrorCode`, `ErrorCategory` を参照）※カテゴリ粒度の分類
 - STOP 系のパラメータ不足や不正値は `ArgumentException`
 
 ## 6. 利用上の注意

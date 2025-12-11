@@ -1,0 +1,25 @@
+{
+  "markets": [
+    {
+      "symbol": "BTC/JPY",
+      "productCode": "btcjpy",
+      "type": "Spot",
+      "priceIncrement": 0.01,
+      "sizeIncrement": 0.0001,
+      "minSize": 0.0001,
+      "minNotional": 1000,
+      "feeCurrency": null,
+      "feeType": "Percentage",
+      "makerFeeRate": 0,
+      "takerFeeRate": 0,
+      "isSupported": true,
+      "statusNote": "bittrade symbols API state=online"
+    }
+  ],
+  "features": null,
+  "rateLimits": null,
+  "maintenance": null,
+  "version": "draft",
+  "lastUpdated": null,
+  "notes": "Fee rates are not published via API; set to 0 for exchange trades. Update values as needed."
+}

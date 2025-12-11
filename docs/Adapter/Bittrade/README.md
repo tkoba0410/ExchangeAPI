@@ -15,6 +15,7 @@ Bittrade（Huobi 系 REST）向けの最小実装メモ。現状は Public/Priva
 - AccountExecutions/履歴系/ポジション: 未実装。API 仕様確認後に対応を検討（現状 NotSupported）。
 - WebSocket: 非対応。必要なら別モジュールで検討。
 - エラーコード詳細マッピング: 現状はHTTPステータス中心。公式エラーコード表に基づき `ExchangeErrorCategory` への正規化を拡張する。
+- 設定参照: 人間可読の設定メモは `docs/configs/exchangeinfo/bittrade.md`、機械読込は `configs/exchangeinfo/bittrade.json`。
 
 ## 利用例（Public）
 ```csharp

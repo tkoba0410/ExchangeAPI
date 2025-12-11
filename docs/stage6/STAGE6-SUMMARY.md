@@ -1,12 +1,12 @@
 # Stage6 Summary（REST-only 信頼性・運用強化）
 
 ## 信頼性パターン
-- 実装: Timeout/Retry/RateLimit（トークンバケット＋バースト）/CircuitBreaker をポリシー層で実装し、Factory でデフォルト適用。
+- 実装: Timeout/Retry/RateLimit（トークンバケット＋バースト）/CircuitBreaker をポリシー層で実装し、Factory でデフォルト適用。Retry/RateLimit/CB に Observer フックを追加し、リトライ・待機・遮断イベントを観測可能に。
 - 目的: REST-onlyでもネットワーク揺らぎや429/5xxを吸収し、フェイルファストを一貫したルールで行う。
 - 効果: 最小設定で安全デフォルトが効き、劣化環境下でも呼び出しが安定。Retry/CB/RLがカテゴリベースで動くため運用判断がシンプル。
 
 ## エラー分類
-- 実装: `IExchangeErrorClassifier` + bitFlyerマッピングで `ExchangeErrorCategory` を付与し、Retry/CB がカテゴリベース判定。
+- 実装: `IExchangeErrorClassifier` + bitFlyerマッピングで `ExchangeErrorCategory` を付与し、Retry/CB がカテゴリベース判定。エラーペイロードパーサ追加で error_code/message/code 以外の非JSONテキストもメッセージとして扱う。
 - 目的: 再試行可否やCB判定を明確にし、取引所固有エラーをドメイン例外に揃える。
 - 効果: 認証/レートリミット/一時障害/業務エラーの扱いが統一され、運用判断と再試行ポリシーがぶれない。
 
@@ -43,3 +43,4 @@
 - 本番計測によるデフォルト値の最終確定（計測結果をSPEC/TODOに反映）
 - 劣化環境E2Eを正式なStage5フロー（決済/履歴詳細含む）まで拡充するか検討
 - TestFactory/ApiBundleの誤用防止: 公開APIとの使い分けを開発者ガイドで徹底、必要ならCIで参照チェック
+- ExchangeInfo を JSON で読み込み切り替える運用（設定フラグ/DIサンプル）を決定・実装する

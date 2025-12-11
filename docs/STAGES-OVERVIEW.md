@@ -8,7 +8,7 @@ Stage1〜将来ステージのロードマップ。進行状況に応じて改�
 - **Stage3**: Private POST 初期縦スライス（/v1/me/sendchildorder, MARKET）。署名付き POST、ドメイン⇄DTO マッピング、トレード API テンプレート確立。
 - **Stage4**: 抽象 API の確定（REST-only へ集約）。Market/Trading/Account/Margin/ExchangeInfo/Raw の区分でインターフェースと最小ドメイン型を固定。
 - **Stage5**: Stage4 抽象 REST を bitFlyer で実装・検証（REST-only）。LIMIT/STOP/キャンセル/ポジション・証拠金取得、エラー/ポーリングを含むトレードフローを通す。WS/Realtime は廃止。
-- **Stage6**: REST-only 信頼性・運用強化。Timeout/Retry/RateLimit/CircuitBreaker の安全デフォルト、E2/E3 エラー分類、観測性フック（ログ/メトリクス/トレース）、Factory オプション拡張、Fault Injection と劣化環境E2E（TestFactory+モックで代表フロー確認）を整備。
+- **Stage6**: REST-only 信頼性・運用強化。Timeout/Retry/RateLimit/CircuitBreaker の安全デフォルト、E2/E3 エラー分類、観測性フック（ログ/メトリクス/トレース）、Factory オプション拡張、Fault Injection と劣化環境E2E（TestFactory+モックで代表フロー確認）を整備。ExchangeInfo に刻み/数量/手数料通貨/種別/メンテ等の静的メタを集約。今後、JSON から ExchangeInfo を読み込み `IExchangeInfoApi` で切り替え/上書きできるようにする検討を残す。
 - **Stage7**: 複数取引所対応の実証と DX 仕上げ。追加取引所で縦スライスを実装し、抽象 API/エラー分類/ポリシーの汎用性を検証。API リファレンスやサンプル/クックブック拡充。
 - **Stage8**: 拡張機能や高頻度ワークロード向け最適化（必要に応じて定義）。運用自動化、追加の信頼性パターン、配布/リリース体制の強化を含む。
 

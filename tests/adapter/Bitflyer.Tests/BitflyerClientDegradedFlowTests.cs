@@ -68,7 +68,7 @@ public class BitflyerClientDegradedFlowTests
         Assert.Equal(OrderStatusType.Completed, status.Status);
 
         // 4. executions（約定履歴）
-        var executions = await client.GetMarketExecutionsAsync(Symbols.BtcJpy);
+        var executions = await client.GetMarketExecutionsAsync("BTC/JPY");
         Assert.NotEmpty(executions);
 
         // 5. child orders 履歴（完了済みの履歴が返る）

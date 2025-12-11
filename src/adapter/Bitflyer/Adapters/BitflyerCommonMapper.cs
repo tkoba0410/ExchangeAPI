@@ -23,7 +23,7 @@ internal static class BitflyerCommonMapper
 
     public static string MapSymbolToProductCode(string symbol)
     {
-        if (string.Equals(symbol, Symbols.BtcJpy, StringComparison.Ordinal))
+        if (string.Equals(symbol, "BTC/JPY", StringComparison.Ordinal))
         {
             return "BTC_JPY";
         }

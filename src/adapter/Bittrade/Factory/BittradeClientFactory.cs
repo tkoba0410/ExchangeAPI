@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using ExchangeApi.Adapter.Bittrade.Adapters;
 using ExchangeApi.Adapter.Bittrade.Apis;
+using ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
 using ExchangeApi.Adapter.Bittrade.Http;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Transport.Policy;
@@ -23,14 +24,17 @@ public static class BittradeClientFactory
         return new BittradeMarketDataApi(restClient);
     }
 
-    public static (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account) CreatePrivate(
+    public static IExchangeInfoApi CreateExchangeInfo() =>
+        new BittradeExchangeInfoApi(CreateRestClient());
+
+    public static (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account, IExchangeInfoApi ExchangeInfo) CreatePrivate(
         string accessKey,
         string secretKey,
         string accountId)
     {
         var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
         var trading = new BittradeTradingApi(restClient, accountId);
-        return (new BittradeMarketDataApi(restClient), trading, trading);
+        return (new BittradeMarketDataApi(restClient), trading, trading, new BittradeExchangeInfoApi(restClient));
     }
 
     private static RestClient CreateRestClient(IRequestSigner? signer = null)

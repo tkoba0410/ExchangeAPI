@@ -5,13 +5,14 @@ Bittrade（Huobi 系 REST）向けの最小実装メモ。現状は Public/Priva
 ## 現在の対応
 - Public: Ticker (`market/detail/merged`), OrderBook (`market/depth` step0), MarketExecutions (`market/trade`), Candles 未対応（NotSupported）。
 - Private: 残高 (`v1/account/accounts/{id}/balance`), 注文送信 (`v1/order/orders/place` LIMIT/MARKET), キャンセル (`submitcancel`), 未約定一覧 (`openOrders`), 注文詳細（単回ポーリング）。
+- ExchangeInfo: `/v1/common/symbols` から刻み・最小数量・最小ノッチを取得し `ExchangeMarketInfo` にマッピング（手数料は未取得）。
 - Factory: `BittradeClientFactory.CreatePublic()` / `CreatePrivate(accessKey, secretKey, accountId)` で構築。署名/HmacSHA256 + ポリシー/エラー分類は Factory でセット。
 - 署名: Huobi形式（AccessKeyId/SignatureVersion=2/HmacSHA256/Timestamp を canonical string 署名、Signature をクエリ付与）。
 - エラー分類: HTTP ステータス中心の簡易分類（Auth/RateLimit/Server/Request/Unknown）。
 
 ## 未対応/今後
-- ExchangeInfo: 取引ペア刻み/最小数量/手数料/メンテ情報を API から取得し `ExchangeMarketInfo` に埋める（TODO）。
-- AccountExecutions/履歴系/ポジション: 未実装。API 仕様確認後に対応を検討。
+- ExchangeInfo: 手数料通貨/種別・メンテ情報の取得、JSON 初期値の用意。
+- AccountExecutions/履歴系/ポジション: 未実装。API 仕様確認後に対応を検討（現状 NotSupported）。
 - WebSocket: 非対応。必要なら別モジュールで検討。
 - エラーコード詳細マッピング: 現状はHTTPステータス中心。公式エラーコード表に基づき `ExchangeErrorCategory` への正規化を拡張する。
 

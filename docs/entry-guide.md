@@ -43,7 +43,7 @@
 - 抽象 API 対応表: `docs/stage4/A042-STG4-ABSTRACT-MAP.md`（Stage4時点）
 - Stage5 構成: `docs/stage5/STRUCTURE-OPTIMAL.md`
 - 動作確認メモ: `docs/stage5/TESTS.md`
-- Contracts 詳細: `docs/contracts/`（注文 DTO, ExchangeInfo, 認証の補足）
+- Contracts 詳細: `docs/Contracts/`（注文 DTO, ExchangeInfo, 認証の補足）
 - Stage 概要: `docs/STAGES-OVERVIEW.md`
 
 ## 8. 次ステップ（今後の拡張）

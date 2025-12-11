@@ -12,5 +12,6 @@
     <Project Path="tests/adapter/Bittrade.Tests/ExchangeApi.Adapter.Bittrade.Tests.csproj" />
     <Project Path="tests/ExchangeApi.Transport.Tests/ExchangeApi.Transport.Tests.csproj" />
     <Project Path="tests/ExchangeApi.Factory.Tests/ExchangeApi.Factory.Tests.csproj" />
+    <Project Path="tests/Integration.Public.Tests/Integration.Public.Tests.csproj" />
   </Folder>
 </Solution>

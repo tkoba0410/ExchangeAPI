@@ -16,8 +16,9 @@ public sealed class RateLimitHttpPolicy : IHttpPolicy
     private DateTimeOffset _lastRefill;
     private readonly object _gate = new();
     private readonly Func<DateTimeOffset> _clock;
+    private readonly IPolicyObserver _observer;
 
-    public RateLimitHttpPolicy(double requestsPerSecond, int burst = 1, Func<DateTimeOffset>? clock = null)
+    public RateLimitHttpPolicy(double requestsPerSecond, int burst = 1, Func<DateTimeOffset>? clock = null, IPolicyObserver? observer = null)
     {
         if (requestsPerSecond <= 0) throw new ArgumentOutOfRangeException(nameof(requestsPerSecond));
         if (burst < 1) throw new ArgumentOutOfRangeException(nameof(burst));
@@ -26,6 +27,7 @@ public sealed class RateLimitHttpPolicy : IHttpPolicy
         _tokens = burst;
         _clock = clock ?? (() => DateTimeOffset.UtcNow);
         _lastRefill = _clock();
+        _observer = observer ?? NoOpPolicyObserver.Instance;
     }
 
     public async Task<HttpResponseMessage> ExecuteAsync(
@@ -38,6 +40,7 @@ public sealed class RateLimitHttpPolicy : IHttpPolicy
         var delay = GetDelay();
         if (delay > TimeSpan.Zero)
         {
+            _observer.OnRateLimitDelay(delay);
             await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
         }
 

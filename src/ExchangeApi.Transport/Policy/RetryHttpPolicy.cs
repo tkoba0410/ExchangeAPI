@@ -16,8 +16,9 @@ public sealed class RetryHttpPolicy : IHttpPolicy
     private readonly int _maxAttemptsForOther;
     private readonly TimeSpan _baseDelay;
     private readonly TimeSpan _maxDelay;
+    private readonly IPolicyObserver _observer;
 
-    public RetryHttpPolicy(int maxAttemptsForGet, int maxAttemptsForOther, TimeSpan baseDelay, TimeSpan maxDelay)
+    public RetryHttpPolicy(int maxAttemptsForGet, int maxAttemptsForOther, TimeSpan baseDelay, TimeSpan maxDelay, IPolicyObserver? observer = null)
     {
         if (maxAttemptsForGet < 1) throw new ArgumentOutOfRangeException(nameof(maxAttemptsForGet));
         if (maxAttemptsForOther < 1) throw new ArgumentOutOfRangeException(nameof(maxAttemptsForOther));
@@ -28,6 +29,7 @@ public sealed class RetryHttpPolicy : IHttpPolicy
         _maxAttemptsForOther = maxAttemptsForOther;
         _baseDelay = baseDelay;
         _maxDelay = maxDelay;
+        _observer = observer ?? NoOpPolicyObserver.Instance;
     }
 
     public async Task<HttpResponseMessage> ExecuteAsync(
@@ -48,8 +50,10 @@ public sealed class RetryHttpPolicy : IHttpPolicy
 
                 if (ShouldRetryResponse(response))
                 {
+                    var delay = GetDelay(attempt);
+                    _observer.OnRetry(request, attempt, maxAttempts, delay, null, response);
                     response.Dispose();
-                    await DelayAsync(attempt, cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                     continue;
                 }
 
@@ -57,7 +61,9 @@ public sealed class RetryHttpPolicy : IHttpPolicy
             }
             catch (Exception ex) when (ShouldRetryException(ex, cancellationToken) && attempt < maxAttempts)
             {
-                await DelayAsync(attempt, cancellationToken).ConfigureAwait(false);
+                var delay = GetDelay(attempt);
+                _observer.OnRetry(request, attempt, maxAttempts, delay, ex, null);
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 continue;
             }
         }
@@ -95,10 +101,10 @@ public sealed class RetryHttpPolicy : IHttpPolicy
         };
     }
 
-    private Task DelayAsync(int attempt, CancellationToken cancellationToken)
+    private TimeSpan GetDelay(int attempt)
     {
         var delay = TimeSpan.FromMilliseconds(_baseDelay.TotalMilliseconds * Math.Pow(2, attempt - 1));
         if (delay > _maxDelay) delay = _maxDelay;
-        return Task.Delay(delay, cancellationToken);
+        return delay;
     }
 }

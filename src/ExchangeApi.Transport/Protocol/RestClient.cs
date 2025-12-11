@@ -28,6 +28,7 @@ namespace ExchangeApi.Transport.Protocol
         private readonly IRestClientLogger _logger;
         private readonly IRestCallObserver _observer;
         private readonly IExchangeErrorClassifier? _errorClassifier;
+        private readonly IErrorPayloadParser _errorPayloadParser;
 
         public RestClient(
             Uri baseUri,
@@ -37,7 +38,8 @@ namespace ExchangeApi.Transport.Protocol
             IHttpPolicy? policy = null,
             IRestClientLogger? logger = null,
             IRestCallObserver? observer = null,
-            IExchangeErrorClassifier? errorClassifier = null)
+            IExchangeErrorClassifier? errorClassifier = null,
+            IErrorPayloadParser? errorPayloadParser = null)
         {
             _baseUri = baseUri ?? throw new ArgumentNullException(nameof(baseUri));
             _transport = transport ?? throw new ArgumentNullException(nameof(transport));
@@ -47,39 +49,7 @@ namespace ExchangeApi.Transport.Protocol
             _logger = logger ?? NoOpRestClientLogger.Instance;
             _observer = observer ?? NoOpRestCallObserver.Instance;
             _errorClassifier = errorClassifier;
-        }
-
-        private static string? TryParseErrorCode(string content)
-        {
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                return null;
-            }
-
-            try
-            {
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
-
-                if (root.ValueKind == JsonValueKind.Object)
-                {
-                    if (root.TryGetProperty("error_message", out var msg) && msg.ValueKind == JsonValueKind.String)
-                    {
-                        return msg.GetString();
-                    }
-
-                    if (root.TryGetProperty("error_code", out var code) && code.ValueKind == JsonValueKind.String)
-                    {
-                        return code.GetString();
-                    }
-                }
-            }
-            catch (JsonException)
-            {
-                // ignore parse failures; return null
-            }
-
-            return null;
+            _errorPayloadParser = errorPayloadParser ?? DefaultErrorPayloadParser.Instance;
         }
 
         public async Task<TResponse> GetAsync<TResponse>(
@@ -133,11 +103,12 @@ namespace ExchangeApi.Transport.Protocol
                 // ★ HTTP ステータス異常 → ExchangeApiException（E1）
                 if (!response.IsSuccessStatusCode)
                 {
-                    var errorCode = TryParseErrorCode(content);
+                    var payload = _errorPayloadParser.Parse(content);
+                    var errorCode = payload.ErrorCode;
                     var category = _errorClassifier?.Classify(response.StatusCode, errorCode);
 
                     var exception = new ExchangeApiException(
-                        $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Body: {content}",
+                        $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Error: {payload.ErrorMessage ?? content}",
                         exchangeId: null,
                         operation: null,
                         statusCode: response.StatusCode,
@@ -259,11 +230,12 @@ namespace ExchangeApi.Transport.Protocol
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    var errorCode = TryParseErrorCode(content);
+                    var payload = _errorPayloadParser.Parse(content);
+                    var errorCode = payload.ErrorCode;
                     var category = _errorClassifier?.Classify(response.StatusCode, errorCode);
 
                     var exception = new ExchangeApiException(
-                        $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Body: {content}",
+                        $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Error: {payload.ErrorMessage ?? content}",
                         exchangeId: null,
                         operation: null,
                         statusCode: response.StatusCode,

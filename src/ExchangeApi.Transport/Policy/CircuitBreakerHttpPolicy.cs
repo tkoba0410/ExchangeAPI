@@ -15,13 +15,14 @@ public sealed class CircuitBreakerHttpPolicy : IHttpPolicy
     private readonly int _failureThreshold;
     private readonly TimeSpan _openDuration;
     private readonly Func<DateTimeOffset> _clock;
+    private readonly IPolicyObserver _observer;
 
     private readonly object _gate = new();
     private CircuitState _state = CircuitState.Closed;
     private int _failureCount;
     private DateTimeOffset _openUntil;
 
-    public CircuitBreakerHttpPolicy(int failureThreshold, TimeSpan openDuration, Func<DateTimeOffset>? clock = null)
+    public CircuitBreakerHttpPolicy(int failureThreshold, TimeSpan openDuration, Func<DateTimeOffset>? clock = null, IPolicyObserver? observer = null)
     {
         if (failureThreshold < 1) throw new ArgumentOutOfRangeException(nameof(failureThreshold));
         if (openDuration <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(openDuration));
@@ -29,6 +30,7 @@ public sealed class CircuitBreakerHttpPolicy : IHttpPolicy
         _failureThreshold = failureThreshold;
         _openDuration = openDuration;
         _clock = clock ?? (() => DateTimeOffset.UtcNow);
+        _observer = observer ?? NoOpPolicyObserver.Instance;
     }
 
     public async Task<HttpResponseMessage> ExecuteAsync(
@@ -75,6 +77,7 @@ public sealed class CircuitBreakerHttpPolicy : IHttpPolicy
                 }
                 else
                 {
+                    _observer.OnCircuitRejected();
                     throw new HttpRequestException("Circuit breaker is open.", null, HttpStatusCode.ServiceUnavailable);
                 }
             }
@@ -100,6 +103,7 @@ public sealed class CircuitBreakerHttpPolicy : IHttpPolicy
             {
                 _state = CircuitState.Open;
                 _openUntil = _clock().Add(_openDuration);
+                _observer.OnCircuitOpened(_openDuration);
             }
         }
     }

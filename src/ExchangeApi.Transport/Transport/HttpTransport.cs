@@ -29,6 +29,18 @@ public sealed class HttpTransport : IHttpTransport, IDisposable
         _disposeHttpClient = disposeHttpClient;
     }
 
+    /// <summary>
+    /// <see cref="HttpMessageHandler"/> を指定して内部で <see cref="HttpClient"/> を生成する。
+    /// </summary>
+    /// <param name="handler">HTTP ハンドラ。Keep-Alive や Proxy 設定などを含めてカスタマイズ可能。</param>
+    /// <param name="disposeHandler">Dispose 時にハンドラも破棄する場合は true。</param>
+    public HttpTransport(HttpMessageHandler handler, bool disposeHandler = true)
+    {
+        if (handler is null) throw new ArgumentNullException(nameof(handler));
+        _httpClient = new HttpClient(handler, disposeHandler);
+        _disposeHttpClient = true;
+    }
+
     /// <inheritdoc />
     public Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,

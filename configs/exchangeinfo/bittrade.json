@@ -22,5 +22,6 @@
   "maintenance": null,
   "version": "draft",
   "lastUpdated": null,
-  "notes": "Fee rates are not published via API; set to 0 for exchange trades. Update values as needed."
+  "notes": "Fee rates are not published via API; set to 0 for exchange trades. Update values as needed.",
+  "source": "https://www.bittrade.co.jp/ja-jp/support/trx-quota/?type=exchange"
 }

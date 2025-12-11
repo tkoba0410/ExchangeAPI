@@ -12,4 +12,4 @@
 - MakerFeeRate / TakerFeeRate: 0（手数料無料と明記されているため 0 設定）。FeeCurrency/FeeType: null/Percentage（約定通貨で徴収想定）
 - IsSupported: true（symbols API state=online）
 - Maintenance: なし（不明の場合は null）
-
+- 引用元: https://www.bittrade.co.jp/ja-jp/support/trx-quota/?type=exchange

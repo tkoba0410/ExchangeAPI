@@ -5,15 +5,16 @@
       "productCode": "btcjpy",
       "type": "Spot",
       "priceIncrement": 0.01,
-      "sizeIncrement": 0.0001,
-      "minSize": 0.0001,
-      "minNotional": 1000,
+      "sizeIncrement": 0.00001,
+      "minSize": 0.00001,
+      "minNotional": 2,
+      "maxSize": 10,
       "feeCurrency": null,
       "feeType": "Percentage",
       "makerFeeRate": 0,
       "takerFeeRate": 0,
       "isSupported": true,
-      "statusNote": "bittrade symbols API state=online"
+      "statusNote": "bittrade symbols API state=online; market buy max 10,000,000 JPY; market sell max 5 BTC"
     }
   ],
   "features": null,

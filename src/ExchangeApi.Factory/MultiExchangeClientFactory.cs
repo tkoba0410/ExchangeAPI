@@ -24,4 +24,14 @@ public static class MultiExchangeClientFactory
         BittradeExchangeClient bt = BittradeClientFactory.CreateDefault(bittradeAccessKey, bittradeSecretKey, bittradeAccountId);
         return new MultiExchangeClient(bf, bt);
     }
+
+    /// <summary>
+    /// bitFlyer/Bittrade の Public API だけをまとめた軽量クライアントを作成する。
+    /// </summary>
+    public static MultiExchangePublicClient CreatePublic()
+    {
+        BitflyerPublicClient bf = BitflyerClientFactory.CreatePublic();
+        BittradePublicClient bt = BittradeClientFactory.CreatePublicClient();
+        return new MultiExchangePublicClient(bf, bt);
+    }
 }

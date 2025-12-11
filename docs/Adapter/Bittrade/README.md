@@ -6,7 +6,7 @@ Bittrade（Huobi 系 REST）向けの最小実装メモ。現状は Public/Priva
 - Public: Ticker (`market/detail/merged`), OrderBook (`market/depth` step0), MarketExecutions (`market/trade`), Candles 未対応（NotSupported）。
 - Private: 残高 (`v1/account/accounts/{id}/balance`), 注文送信 (`v1/order/orders/place` LIMIT/MARKET), キャンセル (`submitcancel`), 未約定一覧 (`openOrders`), 注文詳細（単回ポーリング）。
 - ExchangeInfo: `/v1/common/symbols` から刻み・最小数量・最小ノッチを取得し `ExchangeMarketInfo` にマッピング（手数料は未取得）。
-- Factory: `BittradeClientFactory.CreatePublic()` / `CreatePrivate(accessKey, secretKey, accountId)` で構築。署名/HmacSHA256 + ポリシー/エラー分類は Factory でセット。
+- Factory: `BittradeClientFactory.CreatePublic()` / `CreatePublicClient()` / `CreatePrivate(accessKey, secretKey, accountId)` で構築。署名/HmacSHA256 + ポリシー/エラー分類は Factory でセット。
 - 署名: Huobi形式（AccessKeyId/SignatureVersion=2/HmacSHA256/Timestamp を canonical string 署名、Signature をクエリ付与）。
 - エラー分類: HTTP ステータス中心の簡易分類（Auth/RateLimit/Server/Request/Unknown）。
 
@@ -19,8 +19,9 @@ Bittrade（Huobi 系 REST）向けの最小実装メモ。現状は Public/Priva
 
 ## 利用例（Public）
 ```csharp
-var market = BittradeClientFactory.CreatePublic();
-var ticker = await market.GetTickerAsync("BTC/JPY");
+var publicClient = BittradeClientFactory.CreatePublicClient();
+var ticker = await publicClient.GetTickerAsync("BTC/JPY");
+var exchangeInfo = await publicClient.GetExchangeInfoAsync();
 ```
 
 ## 利用例（Private）

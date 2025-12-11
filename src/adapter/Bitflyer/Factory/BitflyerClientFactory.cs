@@ -16,9 +16,40 @@ namespace ExchangeApi.Adapter.Bitflyer.Factory;
     /// Factory for constructing bitFlyer client instances.
     /// HttpClient -> HttpTransport -> RestClient(署名/ポリシー/ログ) -> BitflyerPublicApi/BitflyerPrivateApi -> BitflyerExchangeClient.
     /// </summary>
-    public static class BitflyerClientFactory
+public static class BitflyerClientFactory
+{
+    private static readonly Uri BitflyerApiBaseUri = new("https://api.bitflyer.com");
+
+    /// <summary>
+    /// Public API のみを利用する軽量クライアントを作成する。
+    /// 署名を行わず、マーケット/ExchangeInfo 取得に限定する。
+    /// </summary>
+    public static BitflyerPublicClient CreatePublic(
+        BitflyerClientOptions? options = null,
+        HttpClient? httpClient = null,
+        IHttpTransport? transportOverride = null)
     {
-        private static readonly Uri BitflyerApiBaseUri = new("https://api.bitflyer.com");
+        options ??= new BitflyerClientOptions();
+
+        var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = BitflyerApiBaseUri };
+        IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
+
+        var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(options.PolicyOptions);
+        var logger = options.Logger;
+        var observer = options.Observer;
+        var errorClassifier = options.ErrorClassifier ?? BitflyerErrorClassifier.Instance;
+
+        IRestClient restClient = new RestClient(
+            BitflyerApiBaseUri,
+            baseTransport,
+            policy: policy,
+            logger: logger,
+            observer: observer,
+            errorClassifier: errorClassifier);
+
+        var publicApi = new BitflyerPublicApi(restClient);
+        return new BitflyerPublicClient(publicApi);
+    }
 
     /// <summary>
     /// Create bitFlyer client with explicit API key/secret supplied by the caller.

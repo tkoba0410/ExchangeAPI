@@ -20,11 +20,10 @@ public static class BittradeClientFactory
 {
     private static readonly Uri BaseUri = new("https://api-cloud.bittrade.co.jp/");
 
-    public static IMarketDataApi CreatePublic()
-    {
-        var restClient = CreateRestClient();
-        return new BittradeMarketDataApi(restClient);
-    }
+    public static IMarketDataApi CreatePublic() => CreatePublicClient();
+
+    public static BittradePublicClient CreatePublicClient() =>
+        new BittradePublicClient(CreateRestClient());
 
     public static IExchangeInfoApi CreateExchangeInfo() =>
         new BittradeExchangeInfoApi(CreateRestClient());

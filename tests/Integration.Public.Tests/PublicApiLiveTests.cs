@@ -15,6 +15,7 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var ticker = await client.GetTickerAsync("BTC/JPY", cts.Token);
+        Console.WriteLine($"bitFlyer Ticker: {ticker.Symbol} bid={ticker.BestBid} ask={ticker.BestAsk} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}");
 
         Assert.Equal("BTC/JPY", ticker.Symbol);
         Assert.True(ticker.BestBid > 0);
@@ -28,6 +29,7 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var info = await client.GetExchangeInfoAsync(cts.Token);
+        Console.WriteLine($"bitFlyer ExchangeInfo markets={info.Markets.Count}");
 
         Assert.NotEmpty(info.Markets);
     }
@@ -39,6 +41,7 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var ticker = await client.GetTickerAsync("BTC/JPY", cts.Token);
+        Console.WriteLine($"Bittrade Ticker: {ticker.Symbol} bid={ticker.BestBid} ask={ticker.BestAsk} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}");
 
         Assert.Equal("BTC/JPY", ticker.Symbol);
         Assert.True(ticker.BestBid > 0);
@@ -52,6 +55,7 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var info = await client.GetExchangeInfoAsync(cts.Token);
+        Console.WriteLine($"Bittrade ExchangeInfo markets={info.Markets.Count}");
 
         Assert.NotEmpty(info.Markets);
     }

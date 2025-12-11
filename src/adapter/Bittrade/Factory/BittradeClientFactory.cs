@@ -1,6 +1,8 @@
 using System;
 using System.Net.Http;
+using ExchangeApi.Adapter.Bittrade.Adapters;
 using ExchangeApi.Adapter.Bittrade.Apis;
+using ExchangeApi.Adapter.Bittrade.Http;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
@@ -9,7 +11,7 @@ using ExchangeApi.Transport.Transport;
 namespace ExchangeApi.Adapter.Bittrade.Factory;
 
 /// <summary>
-/// Bittrade Public API クライアントを構築するファクトリ（Publicのみ）。
+/// Bittrade API クライアントを構築するファクトリ。
 /// </summary>
 public static class BittradeClientFactory
 {
@@ -17,10 +19,32 @@ public static class BittradeClientFactory
 
     public static IMarketDataApi CreatePublic()
     {
+        var restClient = CreateRestClient();
+        return new BittradeMarketDataApi(restClient);
+    }
+
+    public static (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account) CreatePrivate(
+        string accessKey,
+        string secretKey,
+        string accountId)
+    {
+        var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
+        var trading = new BittradeTradingApi(restClient, accountId);
+        return (new BittradeMarketDataApi(restClient), trading, trading);
+    }
+
+    private static RestClient CreateRestClient(IRequestSigner? signer = null)
+    {
         var handler = new HttpClientHandler();
         var transport = new HttpTransport(new HttpClient(handler, disposeHandler: true), disposeHttpClient: true);
-        var policy = HttpPolicyFactory.CreateDefault();
-        var restClient = new RestClient(BaseUri, transport, policy: policy);
-        return new BittradeMarketDataApi(restClient);
+        var observer = NoOpPolicyObserver.Instance;
+        var policy = HttpPolicyFactory.CreateDefault(observer: observer);
+        var restClient = new RestClient(
+            BaseUri,
+            transport,
+            policy: policy,
+            errorClassifier: new BittradeErrorClassifier(),
+            requestSigner: signer);
+        return restClient;
     }
 }

@@ -12,7 +12,7 @@ Bittrade（Huobi 系 REST）向けの最小実装メモ。現状は Public/Priva
 
 ## 未対応/今後
 - ExchangeInfo: 手数料通貨/種別・メンテ情報は API 非提供のため JSON 等で手動設定（例: `configs/exchangeinfo/bittrade.json` で手数料 0/null を指定）。メンテ情報は不明のため null。
-- AccountExecutions/履歴系/ポジション: 未実装。API 仕様確認後に対応を検討（現状 NotSupported）。
+- AccountExecutions/履歴系/ポジション: REST API では提供されないため NotSupported（仕様変更時に再検討）。
 - WebSocket: 非対応。必要なら別モジュールで検討。
 - エラーコード詳細マッピング: 現状はHTTPステータス中心。公式エラーコード表に基づき `ExchangeErrorCategory` への正規化を拡張する。
 - 設定参照: 人間可読の設定メモは `docs/configs/exchangeinfo/bittrade.md`、機械読込は `configs/exchangeinfo/bittrade.json`。

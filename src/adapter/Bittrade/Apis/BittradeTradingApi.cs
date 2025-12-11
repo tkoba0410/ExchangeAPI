@@ -143,7 +143,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
 
     public Task<IReadOnlyList<AccountExecution>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException("Bittrade account executions not implemented.");
+        throw new NotSupportedException("Bittrade account executions are not provided via REST in this adapter.");
     }
 
     private static string ToApiSymbol(string symbol) =>

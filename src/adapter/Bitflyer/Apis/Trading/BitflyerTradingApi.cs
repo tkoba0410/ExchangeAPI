@@ -126,52 +126,6 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
     }
 
-    public async Task<CancelResult> CancelAllOrdersAsync(
-        string productCode,
-        CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(productCode))
-        {
-            throw new ArgumentException("productCode is required.", nameof(productCode));
-        }
-
-        try
-        {
-            var dto = new BitflyerCancelAllChildOrdersRequest
-            {
-                ProductCode = productCode,
-            };
-
-            var response = await _privateTradingApi
-                .CancelAllChildOrdersAsync(dto, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (response is null)
-            {
-                throw new ExchangeApiException(
-                    message: "bitFlyer cancelallchildorders returned no response.",
-                    exchangeId: _exchangeId,
-                    operation: "CancelAllOrders",
-                    statusCode: null);
-            }
-
-            return new CancelResult(true);
-        }
-        catch (ExchangeApiException ex)
-        {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "CancelAllOrders");
-        }
-        catch (Exception ex)
-        {
-            throw new ExchangeApiException(
-                message: "Failed to call bitFlyer cancelallchildorders API.",
-                exchangeId: _exchangeId,
-                operation: "CancelAllOrders",
-                statusCode: null,
-                innerException: ex);
-        }
-    }
-
     public async Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(
         string productCode,
         CancellationToken cancellationToken = default)

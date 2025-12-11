@@ -38,9 +38,9 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             // Act
-            var ticker = await client.GetTickerAsync(Symbols.BtcJpy);
+            var ticker = await client.GetTickerAsync("BTC/JPY");
 
-            Assert.Equal(Symbols.BtcJpy, ticker.Symbol);
+            Assert.Equal("BTC/JPY", ticker.Symbol);
             Assert.Equal(raw.BestBid, ticker.BestBid);
             Assert.Equal(raw.BestAsk, ticker.BestAsk);
             Assert.Equal(raw.LastTradedPrice, ticker.LastTradedPrice);
@@ -117,7 +117,7 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
-            var board = await client.GetOrderBookAsync(Symbols.BtcJpy);
+            var board = await client.GetOrderBookAsync("BTC/JPY");
 
             Assert.Equal(boardRaw.MidPrice, board.MidPrice);
             Assert.Single(board.Bids);
@@ -255,19 +255,6 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests
 
             await Assert.ThrowsAsync<ExchangeApiException>(() =>
                 client.CancelOrderAsync("BTC_JPY", "id-1"));
-        }
-
-        [Fact]
-        public async Task CancelAllOrdersAsync_NullResponse_Throws()
-        {
-            var rawTicker = new BitflyerTickerRaw { ProductCode = "BTC_JPY" };
-            var publicApi = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoardRaw { Bids = Array.Empty<BitflyerBoardEntryRaw>(), Asks = Array.Empty<BitflyerBoardEntryRaw>() });
-            var accountApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
-            var tradingApi = new NullCancelTradingApi();
-            var client = new BitflyerExchangeClient(publicApi, accountApi, tradingApi);
-
-            await Assert.ThrowsAsync<ExchangeApiException>(() =>
-                client.CancelAllOrdersAsync("BTC_JPY"));
         }
 
         private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi

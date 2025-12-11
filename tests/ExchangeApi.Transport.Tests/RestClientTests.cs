@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Errors;
+using ExchangeApi.Transport.Logging;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Transport;
 using Xunit;
@@ -77,6 +78,19 @@ public sealed class RestClientTests
 
         Assert.Equal("ok", result.Value);
         AssertQueryEquals("/api", transport.LastRequest!.RequestUri!.PathAndQuery);
+    }
+
+    [Fact]
+    public async Task BuildUri_EncodesSpecialCharacters()
+    {
+        var rest = CreateRestClient(out var transport);
+
+        var result = await rest.GetAsync<TestDto>(
+            "/api",
+            new Dictionary<string, string?> { ["q"] = "a b&c" });
+
+        Assert.Equal("ok", result.Value);
+        AssertQueryEquals("/api?q=a%20b%26c", transport.LastRequest!.RequestUri!.PathAndQuery);
     }
 
     [Fact]
@@ -211,6 +225,27 @@ public sealed class RestClientTests
         Assert.IsType<JsonException>(ex.InnerException);
     }
 
+    [Fact]
+    public async Task Observer_Is_Notified_On_Request_Response_And_Error()
+    {
+        var observer = new RecordingObserver();
+        var transport = new FakeTransport
+        {
+            ResponseFactory = () => new HttpResponseMessage(HttpStatusCode.BadRequest)
+            {
+                Content = new StringContent("{\"error_message\":\"bad\"}", Encoding.UTF8, "application/json")
+            }
+        };
+        var rest = new RestClient(new Uri("https://example.com"), transport, observer: observer);
+
+        await Assert.ThrowsAsync<ExchangeApiException>(() => rest.GetAsync<TestDto>("/api"));
+
+        Assert.True(observer.RequestCalled);
+        Assert.True(observer.ResponseCalled);
+        Assert.True(observer.ErrorCalled);
+        Assert.Equal(HttpStatusCode.BadRequest, observer.LastStatus);
+        Assert.NotEqual(Guid.Empty, observer.LastRequestId);
+    }
 
 
 
@@ -262,6 +297,33 @@ public sealed class RestClientTests
                     Content = new StringContent("{\"Value\":\"ok\"}", Encoding.UTF8, "application/json"),
                 };
             return Task.FromResult(response);
+        }
+    }
+
+    private sealed class RecordingObserver : IRestCallObserver
+    {
+        public bool RequestCalled { get; private set; }
+        public bool ResponseCalled { get; private set; }
+        public bool ErrorCalled { get; private set; }
+        public Guid LastRequestId { get; private set; }
+        public HttpStatusCode? LastStatus { get; private set; }
+
+        public void OnRequest(RestCallContext context)
+        {
+            RequestCalled = true;
+            LastRequestId = context.RequestId;
+        }
+
+        public void OnResponse(RestCallContext context, HttpResponseMessage response, string content, TimeSpan duration)
+        {
+            ResponseCalled = true;
+            LastStatus = response.StatusCode;
+        }
+
+        public void OnError(RestCallContext context, Exception exception, TimeSpan duration, HttpStatusCode? statusCode = null)
+        {
+            ErrorCalled = true;
+            LastStatus = statusCode;
         }
     }
 

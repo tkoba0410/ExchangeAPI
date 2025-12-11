@@ -14,6 +14,7 @@ namespace ExchangeApi.Adapter.Bitflyer;
 public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
 {
     private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(10);
+    private static readonly TimeSpan DailyMaintenanceEndJst = new(4, 10, 0);
     private static ExchangeInfo? _cached;
     private static DateTimeOffset _lastUpdated;
 
@@ -28,7 +29,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
         var markets = new List<ExchangeMarketInfo>
         {
             // bitFlyer Lightning BTC/JPY: 最小数量 0.001 BTC, 価格単位 1 円, 数量刻み 0.001 BTC を初期値とする。
-            new("BTC/JPY", "BTC_JPY", "Spot", MinSize: 0.001m, PriceIncrement: 1m, SizeIncrement: 0.001m),
+            new("BTC/JPY", "BTC_JPY", "Spot", MinSize: 0.001m, PriceIncrement: 1m, SizeIncrement: 0.001m, FeeCurrency: "BTC"),
         };
 
         var features = new ExchangeFeatureFlags(
@@ -41,9 +42,48 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
             SupportsRealtimeExecutions: false,
             SupportsWithdraw: false);
 
-        var info = BitflyerExchangeInfoMapper.MapExchangeInfo(markets, features, null);
+        var maintenance = new ExchangeMaintenance(
+            Status: ExchangeMaintenanceStatus.Planned,
+            PlannedUntil: GetNextDailyMaintenanceEndUtc(),
+            Message: "Daily maintenance 04:00-04:10 JST");
+
+        var info = BitflyerExchangeInfoMapper.MapExchangeInfo(markets, features, null, maintenance);
         _cached = info;
         _lastUpdated = DateTimeOffset.UtcNow;
         return Task.FromResult(info);
+    }
+
+    private static DateTimeOffset? GetNextDailyMaintenanceEndUtc()
+    {
+        // bitFlyer は毎日 04:00-04:10 (JST) に定期メンテ。終了予定のみを返す。
+        try
+        {
+            var jst = GetTokyoTimeZone();
+            var nowJst = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, jst);
+            var todayEnd = nowJst.Date.Add(DailyMaintenanceEndJst);
+            var nextEndLocal = nowJst.TimeOfDay < DailyMaintenanceEndJst
+                ? todayEnd
+                : todayEnd.AddDays(1);
+            var nextEndUtc = TimeZoneInfo.ConvertTimeToUtc(nextEndLocal, jst);
+            return new DateTimeOffset(nextEndUtc);
+        }
+        catch
+        {
+            // タイムゾーン解決が失敗した場合はメンテ終了時刻なしで返す。
+            return null;
+        }
+    }
+
+    private static TimeZoneInfo GetTokyoTimeZone()
+    {
+        // Linux は "Asia/Tokyo", Windows は "Tokyo Standard Time"。
+        try
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Asia/Tokyo");
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time");
+        }
     }
 }

@@ -12,12 +12,13 @@ Stage4 は抽象 API を凍結するステージであり、実装は Stage5 以
 | --- | --- | --- | --- | --- | --- | --- |
 | Market | IMarketDataApi.GetTicker | REST | スナップショット | GET `/v1/getticker` | 抽象定義 | Stage5+ |
 | Market | IMarketDataApi.GetOrderBook | REST | スナップショット | GET `/v1/getboard` | 抽象定義 | Stage5+ |
-| Market | IMarketDataApi.GetExecutions | REST | スナップショット | GET `/v1/getexecutions` | 抽象定義 | Stage5+ |
+| Market | IMarketDataApi.GetMarketExecutions | REST | スナップショット（市場約定） | GET `/v1/getexecutions` | 抽象定義 | Stage5+ |
 | Market | IMarketDataApi.GetCandlesticks | REST | OHLCV | （bitFlyer 非対応、bittrade を初期ターゲット） | 抽象定義 | Stage5+ |
 | Trading | ITradingApi.SendOrder | REST | MARKET/LIMIT/STOP/STOP_LIMIT | POST `/v1/me/sendchildorder` | 抽象定義 | Stage5+ |
 | Trading | ITradingApi.CancelOrder | REST | 単一キャンセル | POST `/v1/me/cancelchildorder` | 抽象定義 | Stage5+ |
 | Trading | ITradingApi.GetOpenOrders | REST | Open/Active | GET `/v1/me/getchildorders` | 抽象定義 | Stage5+ |
 | Account | IAccountApi.GetBalances | REST | 現物残高 | GET `/v1/me/getbalance` | 抽象定義 | Stage5+ |
+| Account | IAccountApi.GetAccountExecutions | REST | 口座約定履歴 | GET `/v1/me/getexecutions` | 抽象定義 | Stage5+ |
 | Margin | IMarginAccountApi.GetOpenPositions | REST | 建玉一覧 | GET `/v1/me/getpositions` | 抽象定義 | Stage5+ |
 | Margin | IMarginAccountApi.GetCollateral | REST | 証拠金サマリ | GET `/v1/me/getcollateral` | 抽象定義 | Stage5+ |
 | Realtime | IRealtimeMarketDataApi.SubscribeTicker | WS | 配信購読 | WS `ticker` | 抽象定義 | Stage5+ |

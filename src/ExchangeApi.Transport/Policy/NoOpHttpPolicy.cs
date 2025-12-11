@@ -15,10 +15,11 @@ public sealed class NoOpHttpPolicy : IHttpPolicy
     private NoOpHttpPolicy() { }
 
     public Task<HttpResponseMessage> ExecuteAsync(
-        Func<Task<HttpResponseMessage>> sendAsync,
+        HttpRequestMessage request,
+        Func<CancellationToken, Task<HttpResponseMessage>> sendAsync,
         CancellationToken cancellationToken = default)
     {
         if (sendAsync is null) throw new ArgumentNullException(nameof(sendAsync));
-        return sendAsync();
+        return sendAsync(cancellationToken);
     }
 }

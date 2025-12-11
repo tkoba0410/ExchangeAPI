@@ -21,6 +21,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     private readonly IMarginAccountApi _marginApi;
     private readonly IAccountApi _accountApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
+    internal BitflyerApiBundle? ApiBundle { get; }
 
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
@@ -29,12 +30,13 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         string exchangeId = "bitFlyer",
         string accountId = "default")
         : this(
-            marketApi: new BitflyerMarketApi(publicApi, privateApi, exchangeId),
+            marketApi: new BitflyerMarketApi(publicApi, exchangeId),
             tradingApi: new BitflyerTradingApi(privateTradingApi, privateApi, exchangeId),
             marginApi: new BitflyerMarginApi(privateApi, exchangeId),
             accountApi: new BitflyerAccountApi(privateApi, exchangeId),
             exchangeInfoApi: new BitflyerExchangeInfoApi())
     {
+        ApiBundle = new BitflyerApiBundle(publicApi, privateApi, privateTradingApi);
     }
 
     public BitflyerExchangeClient(
@@ -51,6 +53,17 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
     }
 
+    internal BitflyerExchangeClient(BitflyerApiBundle bundle)
+        : this(
+            marketApi: new BitflyerMarketApi(bundle.PublicApi, "bitFlyer"),
+            tradingApi: new BitflyerTradingApi(bundle.PrivateTradingApi, bundle.PrivateApi, "bitFlyer"),
+            marginApi: new BitflyerMarginApi(bundle.PrivateApi, "bitFlyer"),
+            accountApi: new BitflyerAccountApi(bundle.PrivateApi, "bitFlyer"),
+            exchangeInfoApi: new BitflyerExchangeInfoApi())
+    {
+        ApiBundle = bundle;
+    }
+
     // Market
     public Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerAsync(symbol, cancellationToken);
@@ -58,8 +71,8 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     public Task<OrderBook> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetOrderBookAsync(symbol, cancellationToken);
 
-    public Task<IReadOnlyList<Execution>> GetExecutionsAsync(string symbol, CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsAsync(symbol, cancellationToken);
+    public Task<IReadOnlyList<MarketExecution>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default) =>
+        _marketApi.GetMarketExecutionsAsync(symbol, cancellationToken);
 
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
         string symbol,
@@ -79,16 +92,6 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     public Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(string productCode, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOpenOrdersAsync(productCode, cancellationToken);
 
-    public Task<CancelResult> CancelAllOrdersAsync(string productCode, CancellationToken cancellationToken = default)
-    {
-        if (_tradingApi is BitflyerTradingApi concrete)
-        {
-            return concrete.CancelAllOrdersAsync(productCode, cancellationToken);
-        }
-
-        throw new NotSupportedException("CancelAllOrdersAsync is not supported by the configured trading API.");
-    }
-
     public Task<OrderStatus> PollOrderStatusAsync(string productCode, string childOrderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
         _tradingApi.PollOrderStatusAsync(productCode, childOrderAcceptanceId, pollInterval, maxAttempts, cancellationToken);
 
@@ -101,6 +104,9 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
 
     public Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default) =>
         _marginApi.GetCollateralAsync(cancellationToken);
+
+    public Task<IReadOnlyList<AccountExecution>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+        _accountApi.GetAccountExecutionsAsync(productCode, cancellationToken);
 
     // ExchangeInfo
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>

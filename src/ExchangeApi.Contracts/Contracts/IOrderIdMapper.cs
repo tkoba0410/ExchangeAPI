@@ -6,6 +6,10 @@ namespace ExchangeApi.Contracts.Contracts;
 /// ローカル注文IDとサーバー注文IDの対応を保持するためのマッパー。
 /// ライブラリは保存を強制しないが、利用者が任意で差し込める拡張ポイントとして提供する。
 /// </summary>
+/// <remarks>
+/// 並行呼び出しが行われるため実装側での thread-safe を前提とする。
+/// ライブラリは永続化や期限切れ処理を行わないので、メモリ/DB など用途に応じて利用者が選択する。
+/// </remarks>
 public interface IOrderIdMapper
 {
     /// <summary>

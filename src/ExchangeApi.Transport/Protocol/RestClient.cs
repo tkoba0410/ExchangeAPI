@@ -26,6 +26,9 @@ namespace ExchangeApi.Transport.Protocol
         private readonly IRequestSigner? _requestSigner;
         private readonly IHttpPolicy _policy;
         private readonly IRestClientLogger _logger;
+        private readonly IRestCallObserver _observer;
+        private readonly IExchangeErrorClassifier? _errorClassifier;
+        private readonly IErrorPayloadParser _errorPayloadParser;
 
         public RestClient(
             Uri baseUri,
@@ -33,7 +36,10 @@ namespace ExchangeApi.Transport.Protocol
             JsonSerializerOptions? serializerOptions = null,
             IRequestSigner? requestSigner = null,
             IHttpPolicy? policy = null,
-            IRestClientLogger? logger = null)
+            IRestClientLogger? logger = null,
+            IRestCallObserver? observer = null,
+            IExchangeErrorClassifier? errorClassifier = null,
+            IErrorPayloadParser? errorPayloadParser = null)
         {
             _baseUri = baseUri ?? throw new ArgumentNullException(nameof(baseUri));
             _transport = transport ?? throw new ArgumentNullException(nameof(transport));
@@ -41,39 +47,9 @@ namespace ExchangeApi.Transport.Protocol
             _requestSigner = requestSigner;
             _policy = policy ?? NoOpHttpPolicy.Instance;
             _logger = logger ?? NoOpRestClientLogger.Instance;
-        }
-
-        private static string? TryParseErrorCode(string content)
-        {
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                return null;
-            }
-
-            try
-            {
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
-
-                if (root.ValueKind == JsonValueKind.Object)
-                {
-                    if (root.TryGetProperty("error_message", out var msg) && msg.ValueKind == JsonValueKind.String)
-                    {
-                        return msg.GetString();
-                    }
-
-                    if (root.TryGetProperty("error_code", out var code) && code.ValueKind == JsonValueKind.String)
-                    {
-                        return code.GetString();
-                    }
-                }
-            }
-            catch (JsonException)
-            {
-                // ignore parse failures; return null
-            }
-
-            return null;
+            _observer = observer ?? NoOpRestCallObserver.Instance;
+            _errorClassifier = errorClassifier;
+            _errorPayloadParser = errorPayloadParser ?? DefaultErrorPayloadParser.Instance;
         }
 
         public async Task<TResponse> GetAsync<TResponse>(
@@ -90,6 +66,9 @@ namespace ExchangeApi.Transport.Protocol
 
             using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
             _logger.LogRequest(request);
+            var context = new RestCallContext(request);
+            var startedAt = DateTimeOffset.UtcNow;
+            _observer.OnRequest(context);
 
             if (!request.Headers.UserAgent.Any())
             {
@@ -109,7 +88,7 @@ namespace ExchangeApi.Transport.Protocol
                 }
 
                 using var response = await _policy
-                    .ExecuteAsync(() => _transport.SendAsync(request, cancellationToken), cancellationToken)
+                    .ExecuteAsync(request, ct => _transport.SendAsync(request, ct), cancellationToken)
                     .ConfigureAwait(false);
 
                 var content = response.Content is null
@@ -119,18 +98,24 @@ namespace ExchangeApi.Transport.Protocol
                         .ConfigureAwait(false);
 
                 _logger.LogResponse(response, content);
+                _observer.OnResponse(context, response, content, DateTimeOffset.UtcNow - startedAt);
 
                 // ★ HTTP ステータス異常 → ExchangeApiException（E1）
                 if (!response.IsSuccessStatusCode)
                 {
-                    var errorCode = TryParseErrorCode(content);
+                    var payload = _errorPayloadParser.Parse(content);
+                    var errorCode = payload.ErrorCode;
+                    var category = _errorClassifier?.Classify(response.StatusCode, errorCode);
 
-                    throw new ExchangeApiException(
-                        $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Body: {content}",
+                    var exception = new ExchangeApiException(
+                        $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Error: {payload.ErrorMessage ?? content}",
                         exchangeId: null,
                         operation: null,
                         statusCode: response.StatusCode,
-                        exchangeErrorCode: errorCode);
+                        exchangeErrorCode: errorCode,
+                        errorCategory: category);
+                    _observer.OnError(context, exception, DateTimeOffset.UtcNow - startedAt, response.StatusCode);
+                    throw exception;
                 }
 
                 try
@@ -139,6 +124,9 @@ namespace ExchangeApi.Transport.Protocol
 
                     if (result is null)
                     {
+                        var parseEx = new ExchangeApiException(
+                            $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
+                        _observer.OnError(context, parseEx, DateTimeOffset.UtcNow - startedAt);
                         throw new ExchangeApiException(
                             $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
                     }
@@ -148,34 +136,43 @@ namespace ExchangeApi.Transport.Protocol
                 catch (JsonException ex)
                 {
                     // ★ JSON パース失敗 → ExchangeApiException
-                    throw new ExchangeApiException(
+                    var wrapped = new ExchangeApiException(
                         "Failed to deserialize JSON response.",
                         innerException: ex);
+                    _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt);
+                    throw wrapped;
                 }
             }
-            catch (ExchangeApiException)
+            catch (ExchangeApiException ex)
             {
                 // すでにラップ済みのものはそのまま上に投げる
+                _observer.OnError(context, ex, DateTimeOffset.UtcNow - startedAt, ex.StatusCode);
                 throw;
             }
             catch (HttpRequestException ex)
             {
                 // 通信エラー → ExchangeApiException に詳細を引き継ぐ
+                var category = _errorClassifier?.Classify(ex.StatusCode, null) ?? ExchangeErrorCategory.Network;
                 var wrapped = new ExchangeApiException(
                     $"HTTP request failed for '{requestUri}'.",
                     statusCode: ex.StatusCode,
+                    errorCategory: category,
                     innerException: ex);
                 _logger.LogError(wrapped, request);
+                _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt, ex.StatusCode);
                 throw wrapped;
             }
 
             catch (TaskCanceledException ex)
             {
                 // ★ タイムアウト or キャンセル → ExchangeApiException
+                var category = _errorClassifier?.Classify(null, null) ?? ExchangeErrorCategory.Network;
                 var wrapped = new ExchangeApiException(
                     "HTTP request timed out or was canceled.",
+                    errorCategory: category,
                     innerException: ex);
                 _logger.LogError(wrapped, request);
+                _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt);
                 throw wrapped;
             }
         }
@@ -199,6 +196,9 @@ namespace ExchangeApi.Transport.Protocol
             };
 
             _logger.LogRequest(request);
+            var context = new RestCallContext(request);
+            var startedAt = DateTimeOffset.UtcNow;
+            _observer.OnRequest(context);
 
             if (!request.Headers.UserAgent.Any())
             {
@@ -218,7 +218,7 @@ namespace ExchangeApi.Transport.Protocol
                 }
 
                 using var response = await _policy
-                    .ExecuteAsync(() => _transport.SendAsync(request, cancellationToken), cancellationToken)
+                    .ExecuteAsync(request, ct => _transport.SendAsync(request, ct), cancellationToken)
                     .ConfigureAwait(false);
 
                 var content = response.Content is null
@@ -226,17 +226,23 @@ namespace ExchangeApi.Transport.Protocol
                     : await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
                 _logger.LogResponse(response, content);
+                _observer.OnResponse(context, response, content, DateTimeOffset.UtcNow - startedAt);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    var errorCode = TryParseErrorCode(content);
+                    var payload = _errorPayloadParser.Parse(content);
+                    var errorCode = payload.ErrorCode;
+                    var category = _errorClassifier?.Classify(response.StatusCode, errorCode);
 
-                    throw new ExchangeApiException(
-                        $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Body: {content}",
+                    var exception = new ExchangeApiException(
+                        $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Error: {payload.ErrorMessage ?? content}",
                         exchangeId: null,
                         operation: null,
                         statusCode: response.StatusCode,
-                        exchangeErrorCode: errorCode);
+                        exchangeErrorCode: errorCode,
+                        errorCategory: category);
+                    _observer.OnError(context, exception, DateTimeOffset.UtcNow - startedAt, response.StatusCode);
+                    throw exception;
                 }
 
                 try
@@ -244,6 +250,9 @@ namespace ExchangeApi.Transport.Protocol
                     var result = JsonSerializer.Deserialize<TResponse>(content, _serializerOptions);
                     if (result is null)
                     {
+                        var parseEx = new ExchangeApiException(
+                            $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
+                        _observer.OnError(context, parseEx, DateTimeOffset.UtcNow - startedAt);
                         throw new ExchangeApiException(
                             $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
                     }
@@ -252,30 +261,39 @@ namespace ExchangeApi.Transport.Protocol
                 }
                 catch (JsonException ex)
                 {
-                    throw new ExchangeApiException(
+                    var wrapped = new ExchangeApiException(
                         "Failed to deserialize JSON response.",
                         innerException: ex);
+                    _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt);
+                    throw wrapped;
                 }
             }
-            catch (ExchangeApiException)
+            catch (ExchangeApiException ex)
             {
+                _observer.OnError(context, ex, DateTimeOffset.UtcNow - startedAt, ex.StatusCode);
                 throw;
             }
             catch (HttpRequestException ex)
             {
+                var category = _errorClassifier?.Classify(ex.StatusCode, null) ?? ExchangeErrorCategory.Network;
                 var wrapped = new ExchangeApiException(
                     $"HTTP request failed for '{requestUri}'.",
                     statusCode: ex.StatusCode,
+                    errorCategory: category,
                     innerException: ex);
                 _logger.LogError(wrapped, request);
+                _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt, ex.StatusCode);
                 throw wrapped;
             }
             catch (TaskCanceledException ex)
             {
+                var category = _errorClassifier?.Classify(null, null) ?? ExchangeErrorCategory.Network;
                 var wrapped = new ExchangeApiException(
                     "HTTP request timed out or was canceled.",
+                    errorCategory: category,
                     innerException: ex);
                 _logger.LogError(wrapped, request);
+                _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt);
                 throw wrapped;
             }
         }

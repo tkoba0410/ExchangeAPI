@@ -5,7 +5,7 @@ Stage4 では「抽象 API の入口」を整理し、具体的な取引所マ�
 ## 1. REST: Market Data
 - `IMarketDataApi.GetTicker` → 例: `/v1/getticker`
 - `IMarketDataApi.GetOrderBook` → 例: `/v1/getboard`
-- `IMarketDataApi.GetExecutions` → 例: `/v1/getexecutions`
+- `IMarketDataApi.GetMarketExecutions` → 例: `/v1/getexecutions`（市場約定）
 抽象はスナップショット取得に限定し、履歴/特殊チャネルは Raw に逃がす。
 
 ## 2. REST: Trading
@@ -16,6 +16,7 @@ Stage4 では「抽象 API の入口」を整理し、具体的な取引所マ�
 
 ## 3. REST: Account（Spot）
 - `IAccountApi.GetBalances` → 例: `/v1/me/getbalance`
+- `IAccountApi.GetAccountExecutions` → 例: `/v1/me/getexecutions`（口座約定）
 入出金や残高履歴は Stage4 抽象外。
 
 ## 4. REST: Margin（Account の拡張能力）

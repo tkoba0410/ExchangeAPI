@@ -11,4 +11,9 @@ namespace ExchangeApi.Contracts.Contracts;
 public interface IAccountApi
 {
     Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 口座の約定履歴を取得する。
+    /// </summary>
+    Task<IReadOnlyList<AccountExecution>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default);
 }

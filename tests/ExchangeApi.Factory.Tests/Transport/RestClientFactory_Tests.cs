@@ -66,10 +66,13 @@ public class RestClientFactory_Tests
     {
         public bool Called { get; private set; }
 
-        public Task<HttpResponseMessage> ExecuteAsync(Func<Task<HttpResponseMessage>> sendAsync, CancellationToken cancellationToken = default)
+        public Task<HttpResponseMessage> ExecuteAsync(
+            HttpRequestMessage request,
+            Func<CancellationToken, Task<HttpResponseMessage>> sendAsync,
+            CancellationToken cancellationToken = default)
         {
             Called = true;
-            return sendAsync();
+            return sendAsync(cancellationToken);
         }
     }
 

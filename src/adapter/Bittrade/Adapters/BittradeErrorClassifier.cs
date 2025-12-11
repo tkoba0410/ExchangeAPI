@@ -13,6 +13,21 @@ public sealed class BittradeErrorClassifier : IExchangeErrorClassifier
     {
         if (statusCode is null) return ExchangeErrorCategory.Unknown;
 
+        // Bittrade error_code (Huobi系) 例: 2000 invalid.ip, 2001 invalid.json, 2002 auth.fail, 4000 too.many.request
+        if (exchangeErrorCode is not null)
+        {
+            return exchangeErrorCode switch
+            {
+                "invalid.ip" => ExchangeErrorCategory.Auth,
+                "invalid.json" => ExchangeErrorCategory.Request,
+                "invalid.authType" => ExchangeErrorCategory.Auth,
+                "auth.fail" => ExchangeErrorCategory.Auth,
+                "too.many.request" => ExchangeErrorCategory.RateLimit,
+                "too.many.connection" => ExchangeErrorCategory.RateLimit,
+                _ => null
+            };
+        }
+
         var status = statusCode.Value;
         if (status == HttpStatusCode.Unauthorized || status == HttpStatusCode.Forbidden)
             return ExchangeErrorCategory.Auth;

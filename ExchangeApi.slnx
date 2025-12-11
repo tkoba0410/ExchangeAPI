@@ -2,12 +2,14 @@
   <Folder Name="/src/">
     <Project Path="src/ExchangeApi.Contracts/ExchangeApi.Contracts.csproj" />
     <Project Path="src/adapter/Bitflyer/ExchangeApi.Adapter.Bitflyer.csproj" />
+    <Project Path="src/adapter/Bittrade/ExchangeApi.Adapter.Bittrade.csproj" />
     <Project Path="src/ExchangeApi.Transport/ExchangeApi.Transport.csproj" />
     <Project Path="src/ExchangeApi.Factory/ExchangeApi.Factory.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ExchangeApi.Contracts.Tests/ExchangeApi.Contracts.Tests.csproj" />
     <Project Path="tests/adapter/Bitflyer.Tests/ExchangeApi.Adapter.Bitflyer.Tests.csproj" />
+    <Project Path="tests/adapter/Bittrade.Tests/ExchangeApi.Adapter.Bittrade.Tests.csproj" />
     <Project Path="tests/ExchangeApi.Transport.Tests/ExchangeApi.Transport.Tests.csproj" />
     <Project Path="tests/ExchangeApi.Factory.Tests/ExchangeApi.Factory.Tests.csproj" />
   </Folder>

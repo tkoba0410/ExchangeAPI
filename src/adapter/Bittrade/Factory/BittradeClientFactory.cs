@@ -3,7 +3,9 @@ using System.Net.Http;
 using ExchangeApi.Adapter.Bittrade.Adapters;
 using ExchangeApi.Adapter.Bittrade.Apis;
 using ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
+using ExchangeApi.Adapter.Bittrade.Facade;
 using ExchangeApi.Adapter.Bittrade.Http;
+using ExchangeApi.Adapter.Bittrade.RawApiClient;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
@@ -27,14 +29,28 @@ public static class BittradeClientFactory
     public static IExchangeInfoApi CreateExchangeInfo() =>
         new BittradeExchangeInfoApi(CreateRestClient());
 
-    public static (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account, IExchangeInfoApi ExchangeInfo) CreatePrivate(
+    public static (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account, IExchangeInfoApi ExchangeInfo, BittradeRawApiClient BittradeRaw) CreatePrivate(
         string accessKey,
         string secretKey,
         string accountId)
     {
         var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
         var trading = new BittradeTradingApi(restClient, accountId);
-        return (new BittradeMarketDataApi(restClient), trading, trading, new BittradeExchangeInfoApi(restClient));
+        var raw = new BittradeRawApiClient(restClient);
+        return (new BittradeMarketDataApi(restClient), trading, trading, new BittradeExchangeInfoApi(restClient), raw);
+    }
+
+    public static BittradeExchangeClient CreateDefault(
+        string accessKey,
+        string secretKey,
+        string accountId)
+    {
+        var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
+        var market = new BittradeMarketDataApi(restClient);
+        var trading = new BittradeTradingApi(restClient, accountId);
+        var exchangeInfo = new BittradeExchangeInfoApi(restClient);
+        var raw = new BittradeRawApiClient(restClient);
+        return new BittradeExchangeClient(market, trading, trading, exchangeInfo, raw);
     }
 
     private static RestClient CreateRestClient(IRequestSigner? signer = null)

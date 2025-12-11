@@ -3,12 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Adapter.Bittrade.RawApi;
 
-internal sealed record BittradeMergedResponse(
+public sealed record BittradeMergedResponse(
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("tick")] BittradeMergedTick? Tick,
     [property: JsonPropertyName("ts")] long? Ts);
 
-internal sealed record BittradeMergedTick(
+public sealed record BittradeMergedTick(
     [property: JsonPropertyName("close")] decimal Close,
     [property: JsonPropertyName("open")] decimal Open,
     [property: JsonPropertyName("low")] decimal Low,
@@ -19,25 +19,25 @@ internal sealed record BittradeMergedTick(
     [property: JsonPropertyName("bid")] decimal[] Bid,
     [property: JsonPropertyName("ask")] decimal[] Ask);
 
-internal sealed record BittradeDepthResponse(
+public sealed record BittradeDepthResponse(
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("tick")] BittradeDepthTick? Tick,
     [property: JsonPropertyName("ts")] long? Ts);
 
-internal sealed record BittradeDepthTick(
+public sealed record BittradeDepthTick(
     [property: JsonPropertyName("bids")] IReadOnlyList<IReadOnlyList<decimal>>? Bids,
     [property: JsonPropertyName("asks")] IReadOnlyList<IReadOnlyList<decimal>>? Asks,
     [property: JsonPropertyName("ts")] long? Ts);
 
-internal sealed record BittradeTradeResponse(
+public sealed record BittradeTradeResponse(
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("tick")] BittradeTradeTick? Tick,
     [property: JsonPropertyName("ts")] long? Ts);
 
-internal sealed record BittradeTradeTick(
+public sealed record BittradeTradeTick(
     [property: JsonPropertyName("data")] IReadOnlyList<BittradeTradeEntry>? Data);
 
-internal sealed record BittradeTradeEntry(
+public sealed record BittradeTradeEntry(
     [property: JsonPropertyName("id")] long Id,
     [property: JsonPropertyName("price")] decimal Price,
     [property: JsonPropertyName("amount")] decimal Amount,

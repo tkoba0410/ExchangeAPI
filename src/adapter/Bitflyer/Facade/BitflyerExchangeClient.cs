@@ -22,6 +22,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     private readonly IAccountApi _accountApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
     internal BitflyerApiBundle? ApiBundle { get; }
+    public BitflyerRawApiClient? Raw { get; }
 
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
@@ -37,6 +38,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
             exchangeInfoApi: new BitflyerExchangeInfoApi())
     {
         ApiBundle = new BitflyerApiBundle(publicApi, privateApi, privateTradingApi);
+        Raw = new BitflyerRawApiClient(publicApi, privateApi, privateTradingApi);
     }
 
     public BitflyerExchangeClient(

@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Adapter.Bittrade.RawApi;
 
-internal sealed record BittradeSymbolsResponse(
+public sealed record BittradeSymbolsResponse(
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("data")] IReadOnlyList<BittradeSymbolInfo>? Data);
 
-internal sealed record BittradeSymbolInfo(
+public sealed record BittradeSymbolInfo(
     [property: JsonPropertyName("symbol")] string Symbol,
     [property: JsonPropertyName("base-currency")] string BaseCurrency,
     [property: JsonPropertyName("quote-currency")] string QuoteCurrency,

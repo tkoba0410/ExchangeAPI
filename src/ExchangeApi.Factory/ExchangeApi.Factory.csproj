@@ -11,6 +11,8 @@
   <ItemGroup>
     <ProjectReference Include="..\\ExchangeApi.Contracts\\ExchangeApi.Contracts.csproj" />
     <ProjectReference Include="..\\ExchangeApi.Transport\\ExchangeApi.Transport.csproj" />
+    <ProjectReference Include="..\\adapter\\Bitflyer\\ExchangeApi.Adapter.Bitflyer.csproj" />
+    <ProjectReference Include="..\\adapter\\Bittrade\\ExchangeApi.Adapter.Bittrade.csproj" />
   </ItemGroup>
 
 </Project>

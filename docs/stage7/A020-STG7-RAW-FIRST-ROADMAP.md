@@ -71,7 +71,7 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
 - プロジェクト: `ExchangeApi.Contracts/Transport/Factory` → `Common.Core`; `adapter/Bitflyer` → `Exchange.Bitflyer`; `adapter/Bittrade` → `Exchange.Bittrade`; `ExchangeApi.Factory` の統合クライアント要素 → `Unified.Client`（任意）。
 - 名前空間: `ExchangeApi.Contracts.*` → `Common.*`; `ExchangeApi.Transport.*` → `Common.Transport.*`; `ExchangeApi.Adapter.Bitflyer.*` → `Exchange.Bitflyer.*`; `ExchangeApi.Adapter.Bittrade.*` → `Exchange.Bittrade.*`.
 
-## 構成イメージ（フォルダ/プロジェクト）
+## 構成イメージ（フォルダ/プロジェクト）※最小 csproj 本数を維持
 ```
 src/
   Common/                     # <csproj: Common.Core> Transport/Policy/Contracts を束ねる基盤
@@ -79,15 +79,14 @@ src/
     Common.Transport/         # RestClient/Policy/Logging（ソースフォルダ）
     Common.Factory/           # 組み立てヘルパ（ソースフォルダ）
   Exchange/
-    Bitflyer/                 # <csproj: Exchange.Bitflyer> Raw/Abstract を同居させる
-      Raw/                    # bitFlyer Raw 実装（完全レベル対象）
-      Abstract/               # Raw を包む薄い共通ラッパ
-    Bittrade/                 # <csproj: Exchange.Bittrade>
-      Raw/                    # 主要/一部レベルの Raw
-      Abstract/               # 必要に応じて追加
+    Bitflyer/                 # <csproj: Exchange.Bitflyer> Raw/Abstract をフォルダで分離
+      Raw/                    # bitFlyer Raw 実装
+      Abstract/               # Raw を包むラッパ
+    Bittrade/                 # <csproj: Exchange.Bittrade> Raw/Abstract をフォルダで分離
+      Raw/
+      Abstract/
     Common/                   # 取引所間で共有する補助があれば（ソースフォルダ）
-  Unified/
-    Client/                   # <csproj: Unified.Client> 各取引所を束ね、Primary 切替を持つ統合クライアント（任意）
+  Exchange.Factory/           # <csproj: Exchange.Factory> 組み立てヘルパ（必要なら Unified の組み立てもここで）
 tests/
   Common.Tests/               # <csproj: Common.Core.Tests>
     Common.Contracts.Tests/   # （サブフォルダ）
@@ -100,8 +99,9 @@ tests/
     Bittrade.Tests/           # <csproj: Exchange.Bittrade.Tests>
       Raw/
       Abstract/
-  Unified/
-    Client.Tests/             # <csproj: Unified.Client.Tests> 統合クライアントのスモーク（統合を作る場合）
+  Exchange.Factory.Tests/     # <csproj: ExchangeApi.Factory.Tests>（統合クライアントのスモークもここで扱う想定）
 docs/
   ...                         # QuickStart (Raw-first), Abstract/Unified の利用ガイド
 ```
+
+最小のプロジェクト本数（推奨）：Common.Core / Exchange.Bitflyer / Exchange.Bittrade / Exchange.Factory の4本。Unified.Client を別にしたい場合のみ5本目を追加。

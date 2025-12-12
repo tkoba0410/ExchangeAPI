@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\\..\\src\\Common.Core\\Common.Core.csproj" />
-    <ProjectReference Include="..\\..\\src\\ExchangeApi.Factory\\ExchangeApi.Factory.csproj" />
+    <ProjectReference Include="..\\..\\src\\Exchange.Factory\\Exchange.Factory.csproj" />
   </ItemGroup>
 
 </Project>

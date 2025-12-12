@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisLevel>latest</AnalysisLevel>
+    <RootNamespace>ExchangeApi.Factory</RootNamespace>
+    <AssemblyName>ExchangeApi.Factory</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

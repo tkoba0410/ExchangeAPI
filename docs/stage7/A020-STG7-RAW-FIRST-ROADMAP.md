@@ -41,8 +41,8 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
 ## 段階的移行ステップ（現構成 → 最小プロジェクト構成）
 0. 現状把握
    - 現在: `ExchangeApi.Contracts/Transport/Factory`, `adapter/Bitflyer|Bittrade|Common`, テストは対応する *.Tests。
-   - 目標: プロジェクトを 3〜4 本に集約（Common.Core, Exchange.Bitflyer, Exchange.Bittrade, 任意で Unified.Client）、フォルダで Raw/Abstract を分離。
-   - 命名: 新 csproj 名は `Common.Core`, `Exchange.Bitflyer`, `Exchange.Bittrade`, `Unified.Client`（任意）。新 namespace は `Common.*`, `Exchange.Bitflyer.*`, `Exchange.Bittrade.*`, `Unified.Client`.
+   - 目標: プロジェクトを 4 本に集約（Common.Core, Exchange.Bitflyer, Exchange.Bittrade, Exchange.Factory）、フォルダで Raw/Abstract を分離。
+   - 命名: 新 csproj 名は `Common.Core`, `Exchange.Bitflyer`, `Exchange.Bittrade`, `Exchange.Factory`。統合クライアントは Factory 内のヘルパとして扱う。
 1. Common をまとめる
    - `ExchangeApi.Contracts/Transport/Factory` を `Common.Core`（単一 csproj）に統合。名前空間は後方互換のため既存を保持しつつ新しいルートを段階導入。
    - テストも `Common.Core.Tests` にまとめる（既存テストをフォルダ移動）。
@@ -52,10 +52,9 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
    - Bittrade も同様に整理し、共通コードは `Exchange/Common` か `Common.Core` に寄せる。
    - テストは `Exchange.Bitflyer.Tests` に集約し、フォルダで Raw/Abstract を分ける。
    - 作業チェック: 既存 `ExchangeApi.Adapter.Bitflyer` csproj を `src/Exchange.Bitflyer/Exchange.Bitflyer.csproj` に移動し、`<RootNamespace>` を `Exchange.Bitflyer` に設定。コード内 using を順次リネーム（旧 namespace は `using` alias で暫定対応可）。テスト csproj も同様。
-3. 統合クライアントを追加（任意）
-   - `Unified.Client` を追加し、各取引所クライアントを束ねるだけの薄いファサードに留める。Primary 設定を注入できる形に。
-   - スモークテストを `Unified.Client.Tests` で追加（主要経路のみ）。
-   - 作業チェック: `Unified.Client.csproj` を作成し、Bitflyer/Bittrade プロジェクト参照を追加。`IUnifiedClient` の API を最小限で定義し、DI 拡張 `AddUnifiedClient(primary: Bitflyer|Bittrade)` を用意。
+3. 統合クライアントの扱い（任意）
+   - 各取引所クライアントを束ねる薄いファサードは Exchange.Factory 内のヘルパで提供する（別 csproj を増やさない）。
+   - スモークテストは Factory.Tests など既存のテストプロジェクトで扱う。
 4. Raw-first へのドキュメント更新
    - README/QuickStart を Raw-first で書き直し、抽象/統合はオプションとして別セクションに分離。
    - 実装レベル（完全/主要/抽象/一部）の対応表を追加し、各取引所の位置付けを明示。
@@ -69,7 +68,7 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
    - 作業チェック: `dotnet test` 対象を新 csproj に更新。ライブテスト用の環境変数名（例: `EXCHANGEAPI_LIVE=1`）を決めてパイプラインに記載。
 
 ## 旧→新 対応の目安
-- プロジェクト: `ExchangeApi.Contracts/Transport/Factory` → `Common.Core`; `adapter/Bitflyer` → `Exchange.Bitflyer`; `adapter/Bittrade` → `Exchange.Bittrade`; `ExchangeApi.Factory` の統合クライアント要素 → `Unified.Client`（任意）。
+- プロジェクト: `ExchangeApi.Contracts/Transport/Factory` → `Common.Core`; `adapter/Bitflyer` → `Exchange.Bitflyer`; `adapter/Bittrade` → `Exchange.Bittrade`; `ExchangeApi.Factory` → `Exchange.Factory`（統合クライアント組み立てもここに含める）。
 - 名前空間: `ExchangeApi.Contracts.*` → `Common.*`; `ExchangeApi.Transport.*` → `Common.Transport.*`; `ExchangeApi.Adapter.Bitflyer.*` → `Exchange.Bitflyer.*`; `ExchangeApi.Adapter.Bittrade.*` → `Exchange.Bittrade.*`.
 
 ## 構成イメージ（フォルダ/プロジェクト）※最小 csproj 本数を維持
@@ -86,7 +85,7 @@ src/
       Raw/
       Abstract/
     Common/                   # 取引所間で共有する補助があれば（ソースフォルダ）
-  Exchange.Factory/           # <csproj: Exchange.Factory> 組み立てヘルパ（必要なら Unified の組み立てもここで）
+  Exchange.Factory/           # <csproj: Exchange.Factory> 組み立てヘルパ（統合クライアントの組み立てもここで実施）
 tests/
   Common.Tests/               # <csproj: Common.Core.Tests>
     Common.Contracts.Tests/   # （サブフォルダ）
@@ -103,4 +102,4 @@ docs/
   ...                         # QuickStart (Raw-first), Abstract/Unified の利用ガイド
 ```
 
-最小のプロジェクト本数（推奨）：Common.Core / Exchange.Bitflyer / Exchange.Bittrade / Exchange.Factory の4本。Unified.Client を別にしたい場合のみ5本目を追加。
+最小のプロジェクト本数（推奨）：Common.Core / Exchange.Bitflyer / Exchange.Bittrade / Exchange.Factory の4本。統合クライアントが必要な場合も Factory 内のヘルパで扱い、プロジェクトは増やさない。

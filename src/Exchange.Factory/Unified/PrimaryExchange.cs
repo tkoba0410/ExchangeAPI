@@ -1,4 +1,4 @@
-namespace Unified.Client;
+namespace ExchangeApi.Factory.Unified;
 
 /// <summary>
 /// 統合クライアントで使用する Primary 取引所の指定。

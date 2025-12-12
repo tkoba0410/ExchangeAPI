@@ -1,7 +1,7 @@
 # A010-STG1-OVR-Overview（Stage1 正典 / 全面改訂版）
 
 > **NOTE (命名アップデート)**  
-> 現在のコードは Raw-first レイアウト（`Common.Core` / `Exchange.(Bitflyer|Bittrade)` / `ExchangeApi.Factory` / `Unified.Client`）に移行済みです。本書は Stage1 当時の命名（`ExchangeApi.Contracts` / `ExchangeApi.Transport` / `ExchangeApi.Adapter.Bitflyer` など）で記述しています。読み替えて参照してください。
+> 現在のコードは Raw-first レイアウト（`Common.Core` / `Exchange.(Bitflyer|Bittrade)` / `Exchange.Factory`、統合は Factory 内ヘルパで対応）に移行済みです。本書は Stage1 当時の命名（`ExchangeApi.Contracts` / `ExchangeApi.Transport` / `ExchangeApi.Adapter.Bitflyer` など）で記述しています。読み替えて参照してください。
 
 本書は Exchange API Library **Stage1 の唯一の正典（Single Source of Truth）** として、
 プロジェクトの目的・構造・依存方向・設計原則を定義する。Stage1 は bitFlyer Public REST

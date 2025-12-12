@@ -60,10 +60,10 @@ Console.WriteLine($"Accepted: {result.OrderId}");
 - WS: 未実装（Stage6以降に検討）
 
 ## 6. 統合クライアントを使う場合（オプション）
-Raw-first が基本ですが、複数取引所を束ねる薄いファサード `UnifiedClient` も用意できます。
+Raw-first が基本ですが、複数取引所を束ねる薄いファサード `UnifiedClient`（Exchange.Factory 内）も用意できます。
 
 ```csharp
-using Unified.Client;
+using ExchangeApi.Factory.Unified;
 using Exchange.Bitflyer.Factory;
 using Exchange.Bittrade.Factory;
 

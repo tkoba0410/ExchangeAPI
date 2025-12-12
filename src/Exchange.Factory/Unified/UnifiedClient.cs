@@ -2,7 +2,7 @@ using Common.Core.Contracts.Contracts;
 using Exchange.Bitflyer.Facade;
 using Exchange.Bittrade.Facade;
 
-namespace Unified.Client;
+namespace ExchangeApi.Factory.Unified;
 
 /// <summary>
 /// Exchange.* クライアントを束ね、Primary を設定で切り替えられる薄いファサード。

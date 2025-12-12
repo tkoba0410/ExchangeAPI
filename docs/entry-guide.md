@@ -1,6 +1,6 @@
 # Entry Guide
 
-利用者向けの導入ガイドです。Raw-first レイアウト（Common.Core + Exchange.* + Factory + Unified.Client）に移行済み。REST-only 方針を維持しつつ、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）と観測性フックを提供しています（Realtime/WS は廃止、エラー分類はカテゴリ単位）。
+利用者向けの導入ガイドです。Raw-first レイアウト（Common.Core + Exchange.* + Exchange.Factory）に移行済み。Unified 的な束ねは Factory 側のヘルパで扱う想定です。REST-only 方針を維持しつつ、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）と観測性フックを提供しています（Realtime/WS は廃止、エラー分類はカテゴリ単位）。
 
 ## 1. 対応範囲（現行）
 - 取引所: bitFlyer
@@ -51,6 +51,6 @@
 - Stage7 移行ロードマップ: `docs/stage7/A020-STG7-RAW-FIRST-ROADMAP.md`（新レイアウトの詳細）
 
 ## 8. 次ステップ（今後の拡張）
-- Raw-first での取引所追加、Unified.Client での Primary 切替サポートを拡充
+- Raw-first での取引所追加、必要に応じた Factory 経由の統合クライアント組み立てヘルパ
 - ドキュメントの旧命名から新命名への置き換え継続（Stage1〜6資料は旧名のままの箇所あり）
 - WS/Realtime の再検討は別モジュールで扱う予定（現時点では REST-only 維持）

@@ -4,7 +4,6 @@
     <Project Path="src/Exchange.Bitflyer/ExchangeApi.Adapter.Bitflyer.csproj" />
     <Project Path="src/Exchange.Bittrade/ExchangeApi.Adapter.Bittrade.csproj" />
     <Project Path="src/Exchange.Factory/Exchange.Factory.csproj" />
-    <Project Path="src/Unified.Client/Unified.Client.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ExchangeApi.Contracts.Tests/ExchangeApi.Contracts.Tests.csproj" />

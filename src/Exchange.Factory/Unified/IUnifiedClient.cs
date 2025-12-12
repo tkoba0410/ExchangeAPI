@@ -1,4 +1,4 @@
-namespace Unified.Client;
+namespace ExchangeApi.Factory.Unified;
 
 using Common.Core.Contracts.Contracts;
 using Exchange.Bitflyer.Facade;

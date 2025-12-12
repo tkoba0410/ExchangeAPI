@@ -1,9 +1,8 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/ExchangeApi.Contracts/ExchangeApi.Contracts.csproj" />
+    <Project Path="src/Common.Core/Common.Core.csproj" />
     <Project Path="src/adapter/Bitflyer/ExchangeApi.Adapter.Bitflyer.csproj" />
     <Project Path="src/adapter/Bittrade/ExchangeApi.Adapter.Bittrade.csproj" />
-    <Project Path="src/ExchangeApi.Transport/ExchangeApi.Transport.csproj" />
     <Project Path="src/ExchangeApi.Factory/ExchangeApi.Factory.csproj" />
   </Folder>
   <Folder Name="/tests/">

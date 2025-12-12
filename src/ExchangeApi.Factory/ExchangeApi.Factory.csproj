@@ -10,8 +10,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\\Common.Core\\Common.Core.csproj" />
-    <ProjectReference Include="..\\adapter\\Bitflyer\\ExchangeApi.Adapter.Bitflyer.csproj" />
-    <ProjectReference Include="..\\adapter\\Bittrade\\ExchangeApi.Adapter.Bittrade.csproj" />
+    <ProjectReference Include="..\\Exchange.Bitflyer\\ExchangeApi.Adapter.Bitflyer.csproj" />
+    <ProjectReference Include="..\\Exchange.Bittrade\\ExchangeApi.Adapter.Bittrade.csproj" />
   </ItemGroup>
 
 </Project>

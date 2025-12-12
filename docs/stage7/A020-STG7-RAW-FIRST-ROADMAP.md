@@ -77,7 +77,6 @@ src/
   Common/                     # <csproj: Common.Core> Transport/Policy/Contracts を束ねる基盤
     Common.Contracts/         # DTO/Errors（ソースフォルダ）
     Common.Transport/         # RestClient/Policy/Logging（ソースフォルダ）
-    Common.Factory/           # 組み立てヘルパ（ソースフォルダ）
   Exchange/
     Bitflyer/                 # <csproj: Exchange.Bitflyer> Raw/Abstract をフォルダで分離
       Raw/                    # bitFlyer Raw 実装
@@ -91,7 +90,6 @@ tests/
   Common.Tests/               # <csproj: Common.Core.Tests>
     Common.Contracts.Tests/   # （サブフォルダ）
     Common.Transport.Tests/
-    Common.Factory.Tests/
   Exchange/
     Bitflyer.Tests/           # <csproj: Exchange.Bitflyer.Tests> Raw/Abstract をフォルダで分離
       Raw/

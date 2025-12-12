@@ -7,6 +7,7 @@ using ExchangeApi.Adapter.Bittrade.Facade;
 using ExchangeApi.Adapter.Bittrade.Http;
 using ExchangeApi.Adapter.Bittrade.RawApiClient;
 using ExchangeApi.Contracts.Contracts;
+using ExchangeApi.Transport.Logging;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Transport;
@@ -22,8 +23,10 @@ public static class BittradeClientFactory
 
     public static IMarketDataApi CreatePublic() => CreatePublicClient();
 
-    public static BittradePublicClient CreatePublicClient() =>
-        new BittradePublicClient(CreateRestClient());
+    public static BittradePublicClient CreatePublicClient(
+        IRestCallObserver? observer = null,
+        IRestClientLogger? logger = null) =>
+        new BittradePublicClient(CreateRestClient(observer: observer, logger: logger));
 
     public static IExchangeInfoApi CreateExchangeInfo() =>
         new BittradeExchangeInfoApi(CreateRestClient());
@@ -52,18 +55,23 @@ public static class BittradeClientFactory
         return new BittradeExchangeClient(market, trading, trading, exchangeInfo, raw);
     }
 
-    private static RestClient CreateRestClient(IRequestSigner? signer = null)
+    private static RestClient CreateRestClient(
+        IRequestSigner? signer = null,
+        IRestCallObserver? observer = null,
+        IRestClientLogger? logger = null)
     {
         var handler = new HttpClientHandler();
         var transport = new HttpTransport(new HttpClient(handler, disposeHandler: true), disposeHttpClient: true);
-        var observer = NoOpPolicyObserver.Instance;
-        var policy = HttpPolicyFactory.CreateDefault(observer: observer);
+        var policyObserver = NoOpPolicyObserver.Instance;
+        var policy = HttpPolicyFactory.CreateDefault(observer: policyObserver);
         var restClient = new RestClient(
             BaseUri,
             transport,
             policy: policy,
             errorClassifier: new BittradeErrorClassifier(),
-            requestSigner: signer);
+            requestSigner: signer,
+            observer: observer,
+            logger: logger);
         return restClient;
     }
 }

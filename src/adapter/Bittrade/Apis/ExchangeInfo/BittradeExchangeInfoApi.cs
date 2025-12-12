@@ -9,6 +9,7 @@ using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Transport.Protocol;
+using System.Text.Json;
 using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 
 namespace ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
@@ -46,8 +47,8 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
         var product = s.Symbol.ToLowerInvariant();
         var priceIncrement = Pow10(-s.PricePrecision);
         var sizeIncrement = Pow10(-s.AmountPrecision);
-        var minSize = ParseDecimal(s.MinOrderAmount);
-        var minNotional = ParseNullableDecimal(s.MinOrderValue);
+        var minSize = ParseDecimalFlexible(s.MinOrderAmount);
+        var minNotional = ParseNullableDecimalFlexible(s.MinOrderValue);
         var supported = string.Equals(s.State, "online", StringComparison.OrdinalIgnoreCase);
 
         return new ExchangeMarketInfo(
@@ -67,15 +68,32 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
             StatusNote: s.State);
     }
 
+    private static decimal ParseDecimalFlexible(JsonElement element)
+    {
+        return element.ValueKind switch
+        {
+            JsonValueKind.String => ParseDecimal(element.GetString()!),
+            JsonValueKind.Number => element.GetDecimal(),
+            _ => throw new ExchangeApiException($"Unexpected JSON type for decimal: {element.ValueKind}")
+        };
+    }
+
+    private static decimal? ParseNullableDecimalFlexible(JsonElement element)
+    {
+        if (element.ValueKind == JsonValueKind.Null || element.ValueKind == JsonValueKind.Undefined) return null;
+        if (element.ValueKind == JsonValueKind.String)
+        {
+            var s = element.GetString();
+            return string.IsNullOrWhiteSpace(s) ? null : ParseDecimal(s);
+        }
+
+        if (element.ValueKind == JsonValueKind.Number) return element.GetDecimal();
+        return null;
+    }
+
     private static decimal Pow10(int power) =>
         (decimal)Math.Pow(10, power);
 
     private static decimal ParseDecimal(string s) =>
         decimal.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture);
-
-    private static decimal? ParseNullableDecimal(string? s)
-    {
-        if (string.IsNullOrWhiteSpace(s)) return null;
-        return decimal.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture);
-    }
 }

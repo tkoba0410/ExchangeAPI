@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Adapter.Bittrade.RawApi;
@@ -14,6 +15,6 @@ public sealed record BittradeSymbolInfo(
     [property: JsonPropertyName("price-precision")] int PricePrecision,
     [property: JsonPropertyName("amount-precision")] int AmountPrecision,
     [property: JsonPropertyName("value-precision")] int? ValuePrecision,
-    [property: JsonPropertyName("min-order-amt")] string MinOrderAmount,
-    [property: JsonPropertyName("min-order-value")] string? MinOrderValue,
+    [property: JsonPropertyName("min-order-amt")] JsonElement MinOrderAmount,
+    [property: JsonPropertyName("min-order-value")] JsonElement MinOrderValue,
     [property: JsonPropertyName("state")] string State);

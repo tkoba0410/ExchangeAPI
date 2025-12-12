@@ -15,19 +15,20 @@ Stage6 では **bitFlyer の Public/Private REST に特化した REST-only ク�
 
 ---
 
-## 🏗 プロジェクト構成（Stage6 時点）
+## 🏗 プロジェクト構成（Raw-first 移行後）
 
 ```
-ExchangeApi.Contracts        ← 契約/共通DTO/エラー
-ExchangeApi.Transport        ← HTTP 基盤 + ポリシー（RestClient/Signer/Policy 等）
-ExchangeApi.Adapter.Bitflyer ← bitFlyer 実装（REST マッピング/Factory）
-ExchangeApi.Factory          ← 共通 RestClient/認証周辺の組み立てヘルパ
+Common.Core                  ← 契約/共通DTO/エラー + HTTP基盤/ポリシー
+Exchange.Bitflyer            ← bitFlyer 実装（REST マッピング/Factory）
+Exchange.Bittrade            ← Bittrade 実装
+Exchange.Common              ← 取引所共通ヘルパ（プレースホルダ）
+ExchangeApi.Factory          ← 共通の組み立てヘルパ（現状の Factory を継続利用）
 ```
 
-依存方向は必ず以下を守ります：
+依存方向（Raw-first/最小プロジェクト構成）：
 
 ```
-Core  ←  Transport  ←  Adapter.Bitflyer  ←  Factory
+Common.Core  ←  Exchange.(各取引所)  ←  Factory
 ```
 
 ---

@@ -17,7 +17,7 @@ Stage1 最小アーキテクチャ構成（Architecture Specification）
 
 Stage1 の対象は「bitFlyer Public REST `GET /v1/getticker` による Ticker 取得」のみであり、
 ここで定義する構造は **今後 Stage2 での拡張（認証 / WebSocket / 複数取引所 / Transport/Protocol 強化）を前提にした最小構成**である。
-※ Stage4 以降の命名: ExchangeApi.Contracts（旧 Abstractions）、ExchangeApi.Transport（旧 Infrastructure/Protocol/Transport）、ExchangeApi.Adapter.Bitflyer（旧 Adapter/Bitflyer）、ExchangeApi.Factory（旧 Orchestration）。本書の記述は旧名称ベースだが、現在はこの対応で整理する。
+※ 現在は Raw-first レイアウト（Common.Core / Exchange.(Bitflyer|Bittrade) / ExchangeApi.Factory / Unified.Client）に移行済み。本文は旧命名（ExchangeApi.Contracts/Transport/Adapter）を前提としているため、読み替えて参照すること。
 
 ---
 

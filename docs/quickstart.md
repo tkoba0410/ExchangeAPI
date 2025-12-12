@@ -16,9 +16,9 @@ dotnet build
 
 ## 2. DI 登録（最小例）
 ```csharp
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Adapter.Bitflyer.Factory;
-using ExchangeApi.Adapter.Bitflyer.Facade;
+using Common.Core.Contracts.Contracts;
+using Exchange.Bitflyer.Factory;
+using Exchange.Bitflyer.Facade;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();

@@ -1,11 +1,11 @@
 # Quick Start
 
-ExchangeApi を最短で動かすための手順です。Stage6 では REST-only のまま、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）と観測性フックを提供しています（WSは未実装、エラー分類はカテゴリ単位）。
+ExchangeApi を最短で動かすための手順です。Raw-first のレイアウト（`Common.Core` + `Exchange.(Bitflyer|Bittrade)` + `ExchangeApi.Factory`）に移行済みです。REST-only で、信頼性パターン（Timeout/Retry/RateLimit/CircuitBreaker）と観測性フックを提供しています（WSは未実装、エラー分類はカテゴリ単位）。
 
 ## 前提
 - .NET 10 以降
 - bitFlyer の API キー（Private API を使う場合）
-- プロジェクトに `ExchangeApi` ソース一式があること
+- プロジェクトに `Common.Core` / `Exchange.Bitflyer` / `Exchange.Bittrade` / `ExchangeApi.Factory` のソースがあること（ソリューションに含まれています）
 
 ## 1. インストール & ビルド
 ```bash

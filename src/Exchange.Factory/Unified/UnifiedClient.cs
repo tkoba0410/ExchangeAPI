@@ -1,6 +1,7 @@
-using Common.Core.Contracts.Contracts;
-using Exchange.Bitflyer.Facade;
-using Exchange.Bittrade.Facade;
+using ExchangeApi.Contracts.Contracts;
+using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Adapter.Bitflyer.Facade;
+using ExchangeApi.Adapter.Bittrade.Facade;
 
 namespace ExchangeApi.Factory.Unified;
 
@@ -19,7 +20,7 @@ public sealed class UnifiedClient : IUnifiedClient
         Primary = primary switch
         {
             PrimaryExchange.Bitflyer => (Market: (IMarketDataApi)bitflyer, Trading: bitflyer, Account: bitflyer, Margin: bitflyer),
-            PrimaryExchange.Bittrade => (Market: (IMarketDataApi)bittrade, Trading: bittrade, Account: bittrade, Margin: bittrade),
+            PrimaryExchange.Bittrade => (Market: (IMarketDataApi)bittrade, Trading: bittrade, Account: bittrade, Margin: NotSupportedMarginAccountApi.Instance),
             _ => throw new ArgumentOutOfRangeException(nameof(primary), primary, "Unsupported primary exchange."),
         };
     }
@@ -33,4 +34,21 @@ public sealed class UnifiedClient : IUnifiedClient
     public IMarginAccountApi PrimaryMargin => Primary.Margin;
 
     private (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account, IMarginAccountApi Margin) Primary { get; }
+
+    private sealed class NotSupportedMarginAccountApi : IMarginAccountApi
+    {
+        public static readonly NotSupportedMarginAccountApi Instance = new();
+
+        public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
+            Task.FromException<IReadOnlyList<Balance>>(new NotSupportedException("Account API not supported for this exchange."));
+
+        public Task<IReadOnlyList<AccountExecution>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+            Task.FromException<IReadOnlyList<AccountExecution>>(new NotSupportedException("Account API not supported for this exchange."));
+
+        public Task<IReadOnlyList<Position>> GetOpenPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+            Task.FromException<IReadOnlyList<Position>>(new NotSupportedException("Margin account API not supported for this exchange."));
+
+        public Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default) =>
+            Task.FromException<Collateral>(new NotSupportedException("Margin account API not supported for this exchange."));
+    }
 }

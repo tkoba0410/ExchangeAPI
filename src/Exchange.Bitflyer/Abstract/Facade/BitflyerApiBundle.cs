@@ -31,7 +31,7 @@ internal sealed class BitflyerApiBundle
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
         var publicApi = new BitflyerPublicApi(restClient);
         var privateApi = new BitflyerPrivateApi(restClient);
-        var privateTradingApi = new BitflyerPrivateApi(restClient);
+        var privateTradingApi = new BitflyerPrivateTradingApi(restClient);
         return new BitflyerApiBundle(publicApi, privateApi, privateTradingApi);
     }
 }

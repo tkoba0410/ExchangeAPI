@@ -120,9 +120,10 @@ public static class BitflyerClientFactory
 
         var publicApi = new BitflyerPublicApi(restClient);
         var privateApi = new BitflyerPrivateApi(restClient);
-        var rawApi = new BitflyerRawApiClient(publicApi, privateApi, privateApi);
+        var privateTradingApi = new BitflyerPrivateTradingApi(restClient);
+        var rawApi = new BitflyerRawApiClient(publicApi, privateApi, privateTradingApi);
 
-        return new BitflyerExchangeClient(publicApi, privateApi, privateApi);
+        return new BitflyerExchangeClient(publicApi, privateApi, privateTradingApi);
     }
 
     /// <summary>

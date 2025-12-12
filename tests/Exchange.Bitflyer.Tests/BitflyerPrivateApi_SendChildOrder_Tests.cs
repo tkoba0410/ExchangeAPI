@@ -13,7 +13,7 @@ public sealed class BitflyerPrivateApi_SendChildOrder_Tests
     public async Task SendChildOrderAsync_CallsRestClientPostWithCorrectPath()
     {
         var fakeRest = new FakeRestClient();
-        var api = new BitflyerPrivateApi(fakeRest);
+        var api = new BitflyerPrivateTradingApi(fakeRest);
 
         var request = new BitflyerSendChildOrderRequest
         {
@@ -47,4 +47,3 @@ public sealed class BitflyerPrivateApi_SendChildOrder_Tests
         }
     }
 }
-

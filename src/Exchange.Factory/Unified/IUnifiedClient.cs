@@ -1,8 +1,8 @@
 namespace ExchangeApi.Factory.Unified;
 
-using Common.Core.Contracts.Contracts;
-using Exchange.Bitflyer.Facade;
-using Exchange.Bittrade.Facade;
+using ExchangeApi.Contracts.Contracts;
+using ExchangeApi.Adapter.Bitflyer.Facade;
+using ExchangeApi.Adapter.Bittrade.Facade;
 
 /// <summary>
 /// 複数取引所クライアントを束ねる薄いファサード。

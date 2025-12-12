@@ -55,9 +55,26 @@ var result = await trading.SendOrderAsync(order);
 Console.WriteLine($"Accepted: {result.OrderId}");
 ```
 
-## 5. 主要API（Stage6）
+## 5. 主要API
 - REST: `IMarketDataApi` / `ITradingApi` / `IAccountApi` / `IMarginAccountApi` / `IExchangeInfoApi`
 - WS: 未実装（Stage6以降に検討）
+
+## 6. 統合クライアントを使う場合（オプション）
+Raw-first が基本ですが、複数取引所を束ねる薄いファサード `UnifiedClient` も用意できます。
+
+```csharp
+using Unified.Client;
+using Exchange.Bitflyer.Factory;
+using Exchange.Bittrade.Factory;
+
+var bitflyer = BitflyerClientFactory.Create("api-key", "api-secret");
+var bittrade = BittradeClientFactory.CreatePublic();
+
+var unified = new UnifiedClient(bitflyer, bittrade, primary: PrimaryExchange.Bitflyer);
+
+var ticker = await unified.PrimaryMarket.GetTickerAsync("BTC/JPY"); // Primary=bitFlyer
+var tickerBt = await unified.Bittrade.GetTickerAsync("BTC_USDT");   // Bittrade を直接
+```
 
 ## エラーとハマりポイント
 - サポート外シンボルは `SymbolNotSupportedException`（抽象層）で通知。

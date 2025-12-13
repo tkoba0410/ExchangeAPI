@@ -9,7 +9,7 @@ namespace Exchange.Bitflyer.Tests;
 public sealed class BitflyerPrivateApi_SendChildOrder_Tests
 {
     [Fact]
-    public async Task SendChildOrderAsync_CallsRestClientPostWithCorrectPath()
+    public async Task PlaceChildOrderAsync_CallsRestClientPostWithCorrectPath()
     {
         var fakeRest = new FakeRestClient();
         var api = new BitflyerPrivateTradingApi(fakeRest);
@@ -22,7 +22,7 @@ public sealed class BitflyerPrivateApi_SendChildOrder_Tests
             Size = 0.01m,
         };
 
-        await api.SendChildOrderAsync(request, CancellationToken.None);
+        await api.PlaceChildOrderAsync(request, CancellationToken.None);
 
         Assert.Equal("/v1/me/sendchildorder", fakeRest.LastPath);
         Assert.Equal(request, fakeRest.LastBody);

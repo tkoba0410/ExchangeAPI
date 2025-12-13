@@ -43,8 +43,8 @@ public sealed class BittradeRawApiClient
     public Task<BittradeBalancesResponse> GetBalancesAsync(string accountId, CancellationToken cancellationToken = default) =>
         _privateApi.GetBalancesAsync(accountId, cancellationToken);
 
-    public Task<BittradeOpenOrdersResponse> GetOpenOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default) =>
-        _privateApi.GetOpenOrdersAsync(symbol, accountId, cancellationToken);
+    public Task<BittradeOpenOrdersResponse> GetOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default) =>
+        _privateApi.GetOrdersAsync(symbol, accountId, cancellationToken);
 
     public Task<BittradeOrderDetailResponse> GetOrderAsync(string orderId, CancellationToken cancellationToken = default) =>
         _privateApi.GetOrderAsync(orderId, cancellationToken);

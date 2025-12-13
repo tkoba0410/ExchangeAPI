@@ -130,7 +130,7 @@ namespace Exchange.Bitflyer.Tests
         }
 
         [Fact]
-        public async Task GetOpenOrdersAsync_ReturnsMappedOrders()
+        public async Task GetOrdersAsync_ReturnsMappedOrders()
         {
             var rawTicker = new BitflyerTicker();
             var fakePublic = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoard { Bids = Array.Empty<BitflyerBoardEntry>(), Asks = Array.Empty<BitflyerBoardEntry>() });
@@ -157,7 +157,7 @@ namespace Exchange.Bitflyer.Tests
             var fakeTrading = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
             var client = new BitflyerExchangeClient(fakePublic, fakePrivate, fakeTrading);
 
-            var result = await client.GetOpenOrdersAsync("BTC_JPY");
+            var result = await client.GetOrdersAsync("BTC_JPY");
 
             Assert.Single(result);
             var order = result[0];
@@ -262,13 +262,13 @@ namespace Exchange.Bitflyer.Tests
 
         private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi
         {
-            public Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(BitflyerSendChildOrderRequest request, CancellationToken cancellationToken = default)
+            public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(BitflyerSendChildOrderRequest request, CancellationToken cancellationToken = default)
                 => Task.FromResult(new BitflyerSendChildOrderResponse());
 
             public Task<BitflyerEmptyResponse> CancelChildOrderAsync(BitflyerCancelChildOrderRequest request, CancellationToken cancellationToken = default)
                 => Task.FromResult<BitflyerEmptyResponse>(null!);
 
-            public Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(BitflyerCancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
+            public Task<BitflyerEmptyResponse> CancelAllOrdersAsync(BitflyerCancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
                 => Task.FromResult<BitflyerEmptyResponse>(null!);
 
             public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(BitflyerSendParentOrderRequest request, CancellationToken cancellationToken = default) =>
@@ -277,7 +277,7 @@ namespace Exchange.Bitflyer.Tests
             public Task<BitflyerEmptyResponse> CancelParentOrderAsync(BitflyerCancelParentOrderRequest request, CancellationToken cancellationToken = default) =>
                 Task.FromResult<BitflyerEmptyResponse>(null!);
 
-            public Task<BitflyerWithdrawResponse> WithdrawAsync(BitflyerWithdrawRequest request, CancellationToken cancellationToken = default) =>
+            public Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(BitflyerWithdrawRequest request, CancellationToken cancellationToken = default) =>
                 Task.FromResult(new BitflyerWithdrawResponse());
         }
     }

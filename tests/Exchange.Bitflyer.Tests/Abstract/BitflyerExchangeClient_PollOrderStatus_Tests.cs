@@ -83,7 +83,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
-        public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(string productCode, string? childOrderState = null, string? childOrderAcceptanceId = null, string? childOrderId = null, string? parentOrderId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(string productCode, string? childOrderState = null, string? childOrderAcceptanceId = null, string? childOrderId = null, string? parentOrderId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
         {
             if (_queue.Count == 0)
             {

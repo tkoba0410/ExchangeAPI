@@ -108,7 +108,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         return _restClient.GetAsync<IReadOnlyList<BitflyerCollateralAccount>>(path, query: null, cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
+    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
         string productCode,
         string? childOrderState = null,
         string? childOrderAcceptanceId = null,

@@ -26,7 +26,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(BitflyerSendChildOrderRequest request, CancellationToken cancellationToken = default)
+    public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(BitflyerSendChildOrderRequest request, CancellationToken cancellationToken = default)
     {
         if (_exceptionToThrow is not null)
         {
@@ -43,7 +43,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return Task.FromResult(new BitflyerEmptyResponse());
     }
 
-    public Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(BitflyerCancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
+    public Task<BitflyerEmptyResponse> CancelAllOrdersAsync(BitflyerCancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
     {
         LastCancelAllRequest = request;
         return Task.FromResult(new BitflyerEmptyResponse());
@@ -61,7 +61,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return Task.FromResult(new BitflyerEmptyResponse());
     }
 
-    public Task<BitflyerWithdrawResponse> WithdrawAsync(BitflyerWithdrawRequest request, CancellationToken cancellationToken = default)
+    public Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(BitflyerWithdrawRequest request, CancellationToken cancellationToken = default)
     {
         LastWithdrawRequest = request;
         return Task.FromResult(new BitflyerWithdrawResponse { MessageId = "WITHDRAW" });

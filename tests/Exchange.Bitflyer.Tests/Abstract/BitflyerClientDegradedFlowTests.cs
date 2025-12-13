@@ -55,7 +55,7 @@ public class BitflyerClientDegradedFlowTests
             MinuteToExpire: null,
             ClientOrderId: null);
 
-        var orderResult = await client.SendOrderAsync(orderRequest);
+        var orderResult = await client.PlaceOrderAsync(orderRequest);
         Assert.False(string.IsNullOrWhiteSpace(orderResult.OrderId));
 
         // 3. poll status（初回429後にCOMPLETED）
@@ -72,7 +72,7 @@ public class BitflyerClientDegradedFlowTests
         Assert.NotEmpty(executions);
 
         // 5. child orders 履歴（完了済みの履歴が返る）
-        var childOrders = await client.GetOpenOrdersAsync("BTC_JPY");
+        var childOrders = await client.GetOrdersAsync("BTC_JPY");
         Assert.NotEmpty(childOrders);
 
         // 6. positions（建玉ありの確認）
@@ -91,7 +91,7 @@ public class BitflyerClientDegradedFlowTests
             MinuteToExpire: null,
             ClientOrderId: null);
 
-        var closeOrderResult = await client.SendOrderAsync(closeOrderRequest);
+        var closeOrderResult = await client.PlaceOrderAsync(closeOrderRequest);
         Assert.False(string.IsNullOrWhiteSpace(closeOrderResult.OrderId));
 
         var closeStatus = await client.PollOrderStatusAsync(

@@ -30,7 +30,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         _exchangeId = exchangeId;
     }
 
-    public async Task<OrderResult> SendOrderAsync(
+    public async Task<OrderResult> PlaceOrderAsync(
         OrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -53,7 +53,7 @@ public sealed class BitflyerTradingApi : ITradingApi
             };
 
             var response = await _privateTradingApi
-                .SendChildOrderAsync(dto, cancellationToken)
+                .PlaceChildOrderAsync(dto, cancellationToken)
                 .ConfigureAwait(false);
 
             return new OrderResult(response.ChildOrderAcceptanceId, request.ClientOrderId);
@@ -126,7 +126,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
     }
 
-    public async Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(
+    public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
@@ -138,7 +138,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         try
         {
             var rawOrders = await _privateAccountApi
-                .GetChildOrdersAsync(productCode, childOrderState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
+                .GetOrdersAsync(productCode, childOrderState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var mapped = rawOrders.Select(o => new OpenOrder(
@@ -194,7 +194,7 @@ public sealed class BitflyerTradingApi : ITradingApi
             cancellationToken.ThrowIfCancellationRequested();
 
             var orders = await _privateAccountApi
-                .GetChildOrdersAsync(productCode, childOrderState: null, childOrderAcceptanceId, cancellationToken: cancellationToken)
+                .GetOrdersAsync(productCode, childOrderState: null, childOrderAcceptanceId, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var order = orders.FirstOrDefault();

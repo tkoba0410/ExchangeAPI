@@ -43,27 +43,27 @@ public sealed class BitflyerRawApiClient
     public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default) =>
         _privateApi.GetCollateralAsync(cancellationToken);
 
-    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
+    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
         string productCode,
         string? childOrderState = null,
         string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetChildOrdersAsync(productCode, childOrderState, childOrderAcceptanceId, cancellationToken: cancellationToken);
+        _privateApi.GetOrdersAsync(productCode, childOrderState, childOrderAcceptanceId, cancellationToken: cancellationToken);
 
-    public Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(
+    public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(
         BitflyerSendChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateTradingApi.SendChildOrderAsync(request, cancellationToken);
+        _privateTradingApi.PlaceChildOrderAsync(request, cancellationToken);
 
     public Task<BitflyerEmptyResponse> CancelChildOrderAsync(
         BitflyerCancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _privateTradingApi.CancelChildOrderAsync(request, cancellationToken);
 
-    public Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(
+    public Task<BitflyerEmptyResponse> CancelAllOrdersAsync(
         BitflyerCancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateTradingApi.CancelAllChildOrdersAsync(request, cancellationToken);
+        _privateTradingApi.CancelAllOrdersAsync(request, cancellationToken);
 
     public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(
         BitflyerSendParentOrderRequest request,
@@ -75,8 +75,8 @@ public sealed class BitflyerRawApiClient
         CancellationToken cancellationToken = default) =>
         _privateTradingApi.CancelParentOrderAsync(request, cancellationToken);
 
-    public Task<BitflyerWithdrawResponse> WithdrawAsync(
+    public Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(
         BitflyerWithdrawRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateTradingApi.WithdrawAsync(request, cancellationToken);
+        _privateTradingApi.RequestWithdrawalAsync(request, cancellationToken);
 }

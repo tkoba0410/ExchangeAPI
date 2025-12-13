@@ -36,25 +36,25 @@ public sealed class BitflyerRawApiFacade
     public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default) =>
         _raw.GetCollateralAsync(cancellationToken);
 
-    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
+    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
         string productCode,
         string? childOrderState = null,
         string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default) =>
-        _raw.GetChildOrdersAsync(productCode, childOrderState, childOrderAcceptanceId, cancellationToken);
+        _raw.GetOrdersAsync(productCode, childOrderState, childOrderAcceptanceId, cancellationToken);
 
-    public Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(
+    public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(
         BitflyerSendChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _raw.SendChildOrderAsync(request, cancellationToken);
+        _raw.PlaceChildOrderAsync(request, cancellationToken);
 
     public Task<BitflyerEmptyResponse> CancelChildOrderAsync(
         BitflyerCancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _raw.CancelChildOrderAsync(request, cancellationToken);
 
-    public Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(
+    public Task<BitflyerEmptyResponse> CancelAllOrdersAsync(
         BitflyerCancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _raw.CancelAllChildOrdersAsync(request, cancellationToken);
+        _raw.CancelAllOrdersAsync(request, cancellationToken);
 }

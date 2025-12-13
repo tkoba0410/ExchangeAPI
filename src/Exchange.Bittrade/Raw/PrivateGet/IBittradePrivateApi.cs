@@ -13,7 +13,7 @@ public interface IBittradePrivateApi
 
     Task<BittradeBalancesResponse> GetBalancesAsync(string accountId, CancellationToken cancellationToken = default);
 
-    Task<BittradeOpenOrdersResponse> GetOpenOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default);
+    Task<BittradeOpenOrdersResponse> GetOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default);
 
     Task<BittradeOrderDetailResponse> GetOrderAsync(string orderId, CancellationToken cancellationToken = default);
 }

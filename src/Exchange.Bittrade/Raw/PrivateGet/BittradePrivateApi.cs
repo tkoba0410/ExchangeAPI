@@ -33,7 +33,7 @@ public sealed class BittradePrivateApi : IBittradePrivateApi
             cancellationToken: cancellationToken);
     }
 
-    public Task<BittradeOpenOrdersResponse> GetOpenOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default)
+    public Task<BittradeOpenOrdersResponse> GetOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
         EnsureAccountId(accountId);

@@ -40,7 +40,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         return BittradeMapper.MapBalances(resp.Data);
     }
 
-    public async Task<OrderResult> SendOrderAsync(OrderRequest request, CancellationToken cancellationToken = default)
+    public async Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -93,7 +93,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         return new CancelResult(true);
     }
 
-    public async Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(string productCode, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(string productCode, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(productCode);
         var resp = await _restClient.GetAsync<BittradeOpenOrdersResponse>(

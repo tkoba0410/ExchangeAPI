@@ -36,7 +36,7 @@ public interface IBitflyerPrivateApi
     Task<IReadOnlyList<BitflyerCollateralAccount>> GetCollateralAccountsAsync(
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
+    Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
         string productCode,
         string? childOrderState = null,
         string? childOrderAcceptanceId = null,

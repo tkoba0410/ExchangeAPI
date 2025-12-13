@@ -83,14 +83,14 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         _marketApi.GetCandlesticksAsync(symbol, timescale, from, to, cancellationToken);
 
     // Trading
-    public Task<OrderResult> SendOrderAsync(OrderRequest request, CancellationToken cancellationToken = default) =>
-        _tradingApi.SendOrderAsync(request, cancellationToken);
+    public Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken cancellationToken = default) =>
+        _tradingApi.PlaceOrderAsync(request, cancellationToken);
 
     public Task<CancelResult> CancelOrderAsync(string productCode, string childOrderAcceptanceId, CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderAsync(productCode, childOrderAcceptanceId, cancellationToken);
 
-    public Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOpenOrdersAsync(productCode, cancellationToken);
+    public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(string productCode, CancellationToken cancellationToken = default) =>
+        _tradingApi.GetOrdersAsync(productCode, cancellationToken);
 
     public Task<OrderStatus> PollOrderStatusAsync(string productCode, string childOrderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
         _tradingApi.PollOrderStatusAsync(productCode, childOrderAcceptanceId, pollInterval, maxAttempts, cancellationToken);

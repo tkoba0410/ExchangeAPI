@@ -11,7 +11,7 @@ namespace Exchange.Bitflyer.Raw;
 /// </summary>
 public interface IBitflyerPrivateTradingApi
 {
-    Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(
+    Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(
         BitflyerSendChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
@@ -19,7 +19,7 @@ public interface IBitflyerPrivateTradingApi
         BitflyerCancelChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(
+    Task<BitflyerEmptyResponse> CancelAllOrdersAsync(
         BitflyerCancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
@@ -31,7 +31,7 @@ public interface IBitflyerPrivateTradingApi
         BitflyerCancelParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerWithdrawResponse> WithdrawAsync(
+    Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(
         BitflyerWithdrawRequest request,
         CancellationToken cancellationToken = default);
 }

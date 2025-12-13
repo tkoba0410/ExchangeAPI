@@ -20,7 +20,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(
+    public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(
         BitflyerSendChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -48,7 +48,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
             cancellationToken);
     }
 
-    public Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(
+    public Task<BitflyerEmptyResponse> CancelAllOrdersAsync(
         BitflyerCancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -80,7 +80,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return _restClient.PostAsync<BitflyerCancelParentOrderRequest, BitflyerEmptyResponse>(path, request, cancellationToken);
     }
 
-    public Task<BitflyerWithdrawResponse> WithdrawAsync(
+    public Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(
         BitflyerWithdrawRequest request,
         CancellationToken cancellationToken = default)
     {

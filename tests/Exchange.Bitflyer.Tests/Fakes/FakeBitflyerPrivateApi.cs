@@ -55,7 +55,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     public Task<IReadOnlyList<BitflyerCollateralAccount>> GetCollateralAccountsAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(_collateralAccounts);
 
-    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(
+    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
         string productCode,
         string? childOrderState = null,
         string? childOrderAcceptanceId = null,

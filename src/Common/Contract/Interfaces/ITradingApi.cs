@@ -11,11 +11,11 @@ namespace Common.Contract.Interfaces;
 /// </summary>
 public interface ITradingApi
 {
-    Task<OrderResult> SendOrderAsync(OrderRequest request, CancellationToken cancellationToken = default);
+    Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken cancellationToken = default);
 
     Task<CancelResult> CancelOrderAsync(string productCode, string childOrderAcceptanceId, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(string productCode, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(string productCode, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 注文の状態をポーリングし、完了/キャンセル/期限切れを検知する。

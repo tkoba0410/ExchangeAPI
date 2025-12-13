@@ -6,6 +6,6 @@ namespace Exchange.Bitflyer.Raw;
 public sealed class BitflyerBoard
 {
     [JsonPropertyName("mid_price")] public decimal MidPrice { get; init; }
-    [JsonPropertyName("bids")] public IReadOnlyList<BitflyerBoardEntryRaw> Bids { get; init; } = [];
-    [JsonPropertyName("asks")] public IReadOnlyList<BitflyerBoardEntryRaw> Asks { get; init; } = [];
+    [JsonPropertyName("bids")] public IReadOnlyList<BitflyerBoardEntry> Bids { get; init; } = [];
+    [JsonPropertyName("asks")] public IReadOnlyList<BitflyerBoardEntry> Asks { get; init; } = [];
 }

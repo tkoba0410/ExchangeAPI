@@ -1,4 +1,5 @@
 using System;
+using ExchangeApi.Adapter.Bitflyer;
 using ExchangeApi.Contracts.Dtos;
 
 namespace ExchangeApi.Adapter.Bitflyer.Adapters;
@@ -8,27 +9,27 @@ internal static class BitflyerTradingMapper
     public static string MapOrderType(OrderType orderType, decimal? price) =>
         orderType switch
         {
-            OrderType.Market => "MARKET",
-            OrderType.Limit => "LIMIT",
-            OrderType.Stop => price is null ? "STOP" : "STOP_LIMIT",
-            _ => "MARKET",
+            OrderType.Market => BitflyerConstants.ConditionType.Market,
+            OrderType.Limit => BitflyerConstants.ConditionType.Limit,
+            OrderType.Stop => price is null ? BitflyerConstants.ConditionType.Stop : BitflyerConstants.ConditionType.StopLimit,
+            _ => BitflyerConstants.ConditionType.Market,
         };
 
     public static OrderType MapOrderTypeFromExchange(string childOrderType) =>
         childOrderType.ToUpperInvariant() switch
         {
-            "LIMIT" => OrderType.Limit,
-            "MARKET" => OrderType.Market,
-            "STOP" or "STOP_LIMIT" => OrderType.Stop,
+            BitflyerConstants.ConditionType.Limit => OrderType.Limit,
+            BitflyerConstants.ConditionType.Market => OrderType.Market,
+            BitflyerConstants.ConditionType.Stop or BitflyerConstants.ConditionType.StopLimit => OrderType.Stop,
             _ => OrderType.Market,
         };
 
     public static string? MapTimeInForce(TimeInForce? tif) =>
         tif switch
         {
-            TimeInForce.Gtc => "GTC",
-            TimeInForce.Ioc => "IOC",
-            TimeInForce.Fok => "FOK",
+            TimeInForce.Gtc => BitflyerConstants.TimeInForce.Gtc,
+            TimeInForce.Ioc => BitflyerConstants.TimeInForce.Ioc,
+            TimeInForce.Fok => BitflyerConstants.TimeInForce.Fok,
             _ => null,
         };
 

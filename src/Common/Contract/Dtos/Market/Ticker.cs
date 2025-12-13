@@ -1,9 +1,12 @@
-﻿namespace Common.Contract.Dtos;
+﻿using Common.Contract.Enums;
+
+namespace Common.Contract.Dtos;
 
 /// <summary>
 /// 取引所共通フォーマットのティッカー情報。
 /// Stage1 では最小限の情報のみを提供する。
 /// </summary>
+/// <param name="Exchange">取引所コード。</param>
 /// <param name="Symbol">シンボル (例: "BTC/JPY")。</param>
 /// <param name="BestBid">最良買い気配価格。</param>
 /// <param name="BestAsk">最良売り気配価格。</param>
@@ -14,6 +17,7 @@
 /// ティッカーの発生時刻（UTC）。取引所のタイムスタンプ。
 /// </param>
 public sealed record Ticker(
+    ExchangeCode Exchange,
     string Symbol,
     decimal BestBid,
     decimal BestAsk,

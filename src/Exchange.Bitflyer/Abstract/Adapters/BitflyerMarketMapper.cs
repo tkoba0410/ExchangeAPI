@@ -14,6 +14,7 @@ internal static class BitflyerMarketMapper
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 
         return new Ticker(
+            Exchange: ExchangeCode.Bitflyer,
             Symbol: symbol,
             BestBid: raw.BestBid,
             BestAsk: raw.BestAsk,

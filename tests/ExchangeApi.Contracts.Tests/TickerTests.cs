@@ -19,13 +19,15 @@ public class TickerTests
 
         // Act
         var ticker = new Ticker(
-            symbol,
-            bestBid,
-            bestAsk,
-            lastPrice,
-            timestamp);
+            Exchange: ExchangeCode.None,
+            Symbol: symbol,
+            BestBid: bestBid,
+            BestAsk: bestAsk,
+            LastTradedPrice: lastPrice,
+            Timestamp: timestamp);
 
         // Assert
+        Assert.Equal(ExchangeCode.None, ticker.Exchange);
         Assert.Equal(symbol, ticker.Symbol);
         Assert.Equal(bestBid, ticker.BestBid);
         Assert.Equal(bestAsk, ticker.BestAsk);
@@ -38,11 +40,12 @@ public class TickerTests
     {
         // Arrange
         var original = new Ticker(
-            "BTC/JPY",
-            5_000_000m,
-            5_001_000m,
-            5_000_500m,
-            new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            Exchange: ExchangeCode.None,
+            Symbol: "BTC/JPY",
+            BestBid: 5_000_000m,
+            BestAsk: 5_001_000m,
+            LastTradedPrice: 5_000_500m,
+            Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         // Act
         var modified = original with { BestBid = 4_999_000m };
@@ -58,11 +61,12 @@ public class TickerTests
     {
         // Arrange
         var original = new Ticker(
-            "BTC/JPY",
-            5_000_000m,
-            5_001_000m,
-            5_000_500m,
-            new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            Exchange: ExchangeCode.None,
+            Symbol: "BTC/JPY",
+            BestBid: 5_000_000m,
+            BestAsk: 5_001_000m,
+            LastTradedPrice: 5_000_500m,
+            Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         // Act
         var modified = original with { BestBid = 4_999_000m };

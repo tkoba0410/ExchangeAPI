@@ -49,11 +49,12 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         var bestAskSize = tick.Ask is { Length: >= 2 } ? tick.Ask[1] : 0m;
 
         return new Ticker(
-            canonicalSymbol,
-            bestBid,
-            bestAsk,
-            tick.Close,
-            timestamp);
+            Exchange: ExchangeCode.Bittrade,
+            Symbol: canonicalSymbol,
+            BestBid: bestBid,
+            BestAsk: bestAsk,
+            LastTradedPrice: tick.Close,
+            Timestamp: timestamp);
     }
 
     public async Task<OrderBook> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default)

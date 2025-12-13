@@ -5,7 +5,7 @@ namespace Exchange.Bitflyer.Raw;
 
 /// <summary>bitFlyer サイド (BUY/SELL)。</summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
-internal enum Side
+public enum Side
 {
     [EnumMember(Value = "BUY")]
     Buy,

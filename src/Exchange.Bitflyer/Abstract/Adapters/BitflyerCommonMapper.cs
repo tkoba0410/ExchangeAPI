@@ -7,6 +7,9 @@ namespace Exchange.Bitflyer.Abstract;
 
 internal static class BitflyerCommonMapper
 {
+    public static OrderSide MapSide(Side side) =>
+        BitflyerSideMapper.ToOrderSide(side);
+
     public static OrderSide MapSide(string side) =>
         BitflyerSideMapper.ToOrderSide(side);
 

@@ -65,7 +65,7 @@ namespace Exchange.Bitflyer.Tests.Fakes
                 {
                     Id = 1,
                     ProductCode = productCode,
-                    Side = "BUY",
+                    Side = Side.Buy,
                     Price = 100m,
                     Size = 0.01m,
                     ExecDate = System.DateTimeOffset.UtcNow,

@@ -71,14 +71,14 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
 - 名前空間: `ExchangeApi.*` 旧系は段階的に `Common.*` / `Exchange.*` に寄せる。既存 using は互換のため当面残してよい。
 
 ## 構成イメージ（フォルダ/プロジェクト）
-### 4本体制（現行・推奨: プロジェクトを増やさない）
+### 4本体制（現行・推奨: 取引所ごとに Raw+Abstract を同梱、プロジェクトは増やさない）
 ```
 src/
   Common.Core/                  # <csproj: Common.Core> Transport/Policy/Contracts、クロスカット処理
-  Exchange.Bitflyer/            # <csproj: Exchange.Bitflyer> bitFlyer 専用（Raw/Abstract はフォルダで分離）
+  Exchange.Bitflyer/            # <csproj: Exchange.Bitflyer> bitFlyer 専用。Raw/Abstract を同梱しフォルダ分離
     Raw/                        # PublicGet / PrivateGet / PrivatePost / Signer / RawApi
     Abstract/                   # Market / Trading / Account / ExchangeInfo / Facade / Factory
-  Exchange.Bittrade/            # <csproj: Exchange.Bittrade> Bittrade 専用（Raw/Abstract はフォルダで分離）
+  Exchange.Bittrade/            # <csproj: Exchange.Bittrade> Bittrade 専用。Raw/Abstract を同梱しフォルダ分離
     Raw/                        # PublicGet / PrivateGet / PrivatePost / Signer / RawApi
     Abstract/                   # Market / Trading / Account / ExchangeInfo / Facade / Factory
   Exchange.Factory/             # <csproj: Exchange.Factory> 複数取引所の抽象を束ねる薄いファサード/ヘルパ
@@ -119,3 +119,7 @@ tests/
 
 依存の流れ（単一路線を維持）:
 `Common.Contracts → Common.Transport → Exchange.*.Raw → Exchange.*.Abstract → Exchange.Unified`.
+
+### メタパッケージ（全部入りを1参照で欲しい場合のオプション）
+- 追加で `Exchange.All`（薄い csproj）を用意し、`Common.Core` / `Exchange.Bitflyer` / `Exchange.Bittrade` / `Exchange.Factory` を `<PackageReference>` で束ねるだけのロールアップにする。
+- 中身は README と統合用の簡易ビルダー程度にとどめる。単一巨大 DLL にはしない。利用者は「使う取引所だけ参照」か「Exchange.All を参照」で選択できる。

@@ -91,6 +91,6 @@ namespace Exchange.Bitflyer.Tests.Fakes
             Task.FromResult(JsonDocument.Parse("{}").RootElement);
 
         public Task<BitflyerFundingRateResponse> GetFundingRateAsync(string productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new BitflyerFundingRateResponse(ProductCode.BtcJpy, 0m));
+            Task.FromResult(new BitflyerFundingRateResponse(0m, System.DateTimeOffset.UtcNow));
     }
 }

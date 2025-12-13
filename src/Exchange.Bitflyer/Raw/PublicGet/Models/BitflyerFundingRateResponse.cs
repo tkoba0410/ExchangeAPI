@@ -1,7 +1,11 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace Exchange.Bitflyer.Raw;
 
+/// <summary>
+/// ファンディングレート (/v1/getfundingrate) のレスポンス DTO。
+/// </summary>
 public sealed record BitflyerFundingRateResponse(
-[property: JsonPropertyName("product_code")] ProductCode ProductCode,
-    [property: JsonPropertyName("funding_rate")] decimal FundingRate);
+    [property: JsonPropertyName("current_funding_rate")] decimal CurrentFundingRate,
+    [property: JsonPropertyName("next_funding_rate_settledate")] DateTimeOffset NextFundingRateSettleDate);

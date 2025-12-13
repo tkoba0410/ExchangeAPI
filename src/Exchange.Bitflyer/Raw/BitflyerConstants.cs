@@ -96,4 +96,10 @@ internal static class BitflyerConstants
         public const string Ioc = "IOC";
         public const string Fok = "FOK";
     }
+
+    internal static class Side
+    {
+        public const string Buy = "BUY";
+        public const string Sell = "SELL";
+    }
 }

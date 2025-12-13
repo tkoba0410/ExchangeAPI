@@ -7,9 +7,10 @@ namespace ExchangeApi.Adapter.Bitflyer.Adapters;
 internal static class BitflyerCommonMapper
 {
     public static OrderSide MapSide(string side) =>
-        string.Equals(side, "BUY", StringComparison.OrdinalIgnoreCase)
-            ? OrderSide.Buy
-            : OrderSide.Sell;
+        BitflyerSideMapper.ToOrderSide(side);
+
+    public static string MapSideToExchange(OrderSide side) =>
+        BitflyerSideMapper.ToApi(side);
 
     public static OrderStatusType MapOrderStatusType(string childOrderState) =>
         childOrderState.ToUpperInvariant() switch

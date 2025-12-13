@@ -17,13 +17,15 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     private readonly IReadOnlyList<BitflyerChildOrderResponse> _childOrders;
     private readonly IReadOnlyList<BitflyerCollateralAccount> _collateralAccounts;
     private readonly IReadOnlyList<JsonElement> _genericList = Array.Empty<JsonElement>();
+    private readonly IReadOnlyList<BitflyerParentOrderResponse> _parentOrders = Array.Empty<BitflyerParentOrderResponse>();
 
     public FakeBitflyerPrivateApi(
         IReadOnlyList<BitflyerBalanceResponse> response,
         IReadOnlyList<BitflyerPositionResponse>? positions = null,
         IReadOnlyList<BitflyerExecutionPrivateResponse>? executions = null,
         BitflyerCollateralResponse? collateral = null,
-        IReadOnlyList<BitflyerChildOrderResponse>? childOrders = null)
+        IReadOnlyList<BitflyerChildOrderResponse>? childOrders = null,
+        IReadOnlyList<BitflyerParentOrderResponse>? parentOrders = null)
     {
         _response = response;
         _positions = positions ?? Array.Empty<BitflyerPositionResponse>();
@@ -31,6 +33,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         _collateral = collateral ?? new BitflyerCollateralResponse();
         _childOrders = childOrders ?? Array.Empty<BitflyerChildOrderResponse>();
         _collateralAccounts = Array.Empty<BitflyerCollateralAccount>();
+        _parentOrders = parentOrders ?? Array.Empty<BitflyerParentOrderResponse>();
     }
 
     public Task<IReadOnlyList<string>> GetPermissionsAsync(CancellationToken cancellationToken = default) =>
@@ -74,8 +77,8 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         return Task.FromResult(_childOrders);
     }
 
-    public Task<IReadOnlyList<JsonElement>> GetParentOrdersAsync(string productCode, int? count = null, long? before = null, long? after = null, string? parentOrderState = null, CancellationToken cancellationToken = default) =>
-        Task.FromResult(_genericList);
+    public Task<IReadOnlyList<BitflyerParentOrderResponse>> GetParentOrdersAsync(string productCode, int? count = null, long? before = null, long? after = null, string? parentOrderState = null, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_parentOrders);
 
     public Task<JsonElement> GetParentOrderAsync(string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
         Task.FromResult(JsonDocument.Parse("{}").RootElement);

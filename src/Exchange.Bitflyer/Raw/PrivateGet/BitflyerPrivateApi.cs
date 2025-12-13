@@ -143,7 +143,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken);
     }
 
-    public Task<IReadOnlyList<JsonElement>> GetParentOrdersAsync(
+    public Task<IReadOnlyList<BitflyerParentOrderResponse>> GetParentOrdersAsync(
         string productCode,
         int? count = null,
         long? before = null,
@@ -165,7 +165,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             [BitflyerConstants.QueryKeys.After] = after?.ToString(),
             [BitflyerConstants.QueryKeys.ParentOrderState] = parentOrderState,
         };
-        return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query, cancellationToken);
+        return _restClient.GetAsync<IReadOnlyList<BitflyerParentOrderResponse>>(path, query, cancellationToken);
     }
 
     public Task<JsonElement> GetParentOrderAsync(

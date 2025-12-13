@@ -47,7 +47,7 @@ public interface IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<JsonElement>> GetParentOrdersAsync(
+    Task<IReadOnlyList<BitflyerParentOrderResponse>> GetParentOrdersAsync(
         string productCode,
         int? count = null,
         long? before = null,

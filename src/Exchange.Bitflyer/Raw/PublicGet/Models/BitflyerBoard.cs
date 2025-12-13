@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Exchange.Bitflyer.Raw;
 
-public sealed class BitflyerBoardRaw
+public sealed class BitflyerBoard
 {
     [JsonPropertyName("mid_price")] public decimal MidPrice { get; init; }
     [JsonPropertyName("bids")] public IReadOnlyList<BitflyerBoardEntryRaw> Bids { get; init; } = [];

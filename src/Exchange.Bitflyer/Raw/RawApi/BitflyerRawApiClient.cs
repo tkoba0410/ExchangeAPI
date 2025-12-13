@@ -25,10 +25,10 @@ public sealed class BitflyerRawApiClient
         _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
     }
 
-    public Task<BitflyerTickerRaw> GetTickerAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<BitflyerTicker> GetTickerAsync(string productCode, CancellationToken cancellationToken = default) =>
         _publicApi.GetTickerRawAsync(productCode, cancellationToken: cancellationToken);
 
-    public Task<BitflyerBoardRaw> GetBoardAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<BitflyerBoard> GetBoardAsync(string productCode, CancellationToken cancellationToken = default) =>
         _publicApi.GetBoardRawAsync(productCode, cancellationToken: cancellationToken);
 
     public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>

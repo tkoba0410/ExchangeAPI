@@ -27,9 +27,9 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
     }
 
     /// <summary>
-    /// 生の ticker JSON を取得し、<see cref="BitflyerTickerRaw"/> にデシリアライズして返す。
+    /// 生の ticker JSON を取得し、<see cref="BitflyerTicker"/> にデシリアライズして返す。
     /// </summary>
-    public Task<BitflyerTickerRaw> GetTickerRawAsync(
+    public Task<BitflyerTicker> GetTickerRawAsync(
         string productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
@@ -45,16 +45,16 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
                 [BitflyerConstants.QueryKeys.ProductCode] = productCode,
             };
 
-        return _restClient.GetAsync<BitflyerTickerRaw>(
+        return _restClient.GetAsync<BitflyerTicker>(
             path,
             query,
             cancellationToken);
     }
 
     /// <summary>
-    /// 生の板情報 JSON を取得し、<see cref="BitflyerBoardRaw"/> にデシリアライズして返す。
+    /// 生の板情報 JSON を取得し、<see cref="BitflyerBoard"/> にデシリアライズして返す。
     /// </summary>
-    public Task<BitflyerBoardRaw> GetBoardRawAsync(
+    public Task<BitflyerBoard> GetBoardRawAsync(
         string productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
@@ -70,7 +70,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
                 [BitflyerConstants.QueryKeys.ProductCode] = productCode,
             };
 
-        return _restClient.GetAsync<BitflyerBoardRaw>(
+        return _restClient.GetAsync<BitflyerBoard>(
             path,
             query,
             cancellationToken);

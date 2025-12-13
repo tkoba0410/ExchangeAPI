@@ -18,10 +18,10 @@ public sealed class BitflyerRawApiFacade
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public Task<BitflyerTickerRaw> GetTickerAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<BitflyerTicker> GetTickerAsync(string productCode, CancellationToken cancellationToken = default) =>
         _raw.GetTickerAsync(productCode, cancellationToken);
 
-    public Task<BitflyerBoardRaw> GetBoardAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<BitflyerBoard> GetBoardAsync(string productCode, CancellationToken cancellationToken = default) =>
         _raw.GetBoardAsync(productCode, cancellationToken);
 
     public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>

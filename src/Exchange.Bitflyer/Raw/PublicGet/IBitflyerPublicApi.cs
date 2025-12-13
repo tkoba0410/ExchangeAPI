@@ -22,7 +22,7 @@ namespace Exchange.Bitflyer.Raw
         /// </param>
         /// <param name="useAliasPath">true の場合 /v1/ticker を使用し、false の場合 /v1/getticker を使用。</param>
         /// <returns>bitFlyer の Ticker Raw レスポンス。</returns>
-        Task<BitflyerTickerRaw> GetTickerRawAsync(
+        Task<BitflyerTicker> GetTickerRawAsync(
             string productCode,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default);
@@ -30,7 +30,7 @@ namespace Exchange.Bitflyer.Raw
         /// <summary>
         /// 板情報の Raw レスポンスを取得します。
         /// </summary>
-        Task<BitflyerBoardRaw> GetBoardRawAsync(
+        Task<BitflyerBoard> GetBoardRawAsync(
             string productCode,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default);

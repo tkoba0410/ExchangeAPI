@@ -76,7 +76,7 @@ namespace Exchange.Bitflyer.Tests
         private static IBitflyerPublicApi CreateDummyPublicApi()
         {
             // 既存の Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
-            var rawTicker = new BitflyerTickerRaw
+            var rawTicker = new BitflyerTicker
             {
                 ProductCode = ProductCode.BtcJpy,
                 Timestamp = DateTimeOffset.UnixEpoch,

@@ -8,16 +8,16 @@ namespace Exchange.Bitflyer.Tests.Fakes
 {
     internal sealed class FakeBitflyerPublicApi : IBitflyerPublicApi
     {
-        private readonly BitflyerTickerRaw _response;
-        private readonly BitflyerBoardRaw? _board;
+        private readonly BitflyerTicker _response;
+        private readonly BitflyerBoard? _board;
 
-        public FakeBitflyerPublicApi(BitflyerTickerRaw response, BitflyerBoardRaw? board = null)
+        public FakeBitflyerPublicApi(BitflyerTicker response, BitflyerBoard? board = null)
         {
             _response = response;
             _board = board;
         }
 
-        public Task<BitflyerTickerRaw> GetTickerRawAsync(
+        public Task<BitflyerTicker> GetTickerRawAsync(
             string productCode,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default)
@@ -31,7 +31,7 @@ namespace Exchange.Bitflyer.Tests.Fakes
             return Task.FromResult(_response);
         }
 
-        public Task<BitflyerBoardRaw> GetBoardRawAsync(string productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
+        public Task<BitflyerBoard> GetBoardRawAsync(string productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
         {
             if (_board is null)
             {

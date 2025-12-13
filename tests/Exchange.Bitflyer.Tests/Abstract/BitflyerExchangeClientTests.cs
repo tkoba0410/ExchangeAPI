@@ -19,7 +19,7 @@ namespace Exchange.Bitflyer.Tests
         public async Task GetTickerAsync_BtcJpy_ReturnsMappedTicker()
         {
             // Arrange
-            var raw = new BitflyerTickerRaw
+            var raw = new BitflyerTicker
             {
                 ProductCode = ProductCode.BtcJpy,
                 Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
@@ -54,7 +54,7 @@ namespace Exchange.Bitflyer.Tests
         public async Task GetTickerAsync_UnsupportedSymbol_ThrowsSymbolNotSupportedException()
         {
             // Arrange
-            var raw = new BitflyerTickerRaw
+            var raw = new BitflyerTicker
             {
                 ProductCode = ProductCode.BtcJpy,
                 Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
@@ -86,7 +86,7 @@ namespace Exchange.Bitflyer.Tests
         [Fact]
         public async Task GetOrderBookAsync_ReturnsMappedOrderBook()
         {
-            var rawTicker = new BitflyerTickerRaw
+            var rawTicker = new BitflyerTicker
             {
                 ProductCode = ProductCode.BtcJpy,
                 Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
@@ -102,7 +102,7 @@ namespace Exchange.Bitflyer.Tests
                 VolumeByProduct = 200.0m
             };
 
-            var boardRaw = new BitflyerBoardRaw
+            var boardRaw = new BitflyerBoard
             {
                 MidPrice = 100.5m,
                 Bids = new[]
@@ -132,8 +132,8 @@ namespace Exchange.Bitflyer.Tests
         [Fact]
         public async Task GetOpenOrdersAsync_ReturnsMappedOrders()
         {
-            var rawTicker = new BitflyerTickerRaw();
-            var fakePublic = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoardRaw { Bids = Array.Empty<BitflyerBoardEntryRaw>(), Asks = Array.Empty<BitflyerBoardEntryRaw>() });
+            var rawTicker = new BitflyerTicker();
+            var fakePublic = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoard { Bids = Array.Empty<BitflyerBoardEntryRaw>(), Asks = Array.Empty<BitflyerBoardEntryRaw>() });
 
             var childOrders = new[]
             {
@@ -170,7 +170,7 @@ namespace Exchange.Bitflyer.Tests
         [Fact]
         public async Task GetBalancesAsync_ReturnsMappedBalances()
         {
-            var rawTicker = new BitflyerTickerRaw { ProductCode = ProductCode.BtcJpy };
+            var rawTicker = new BitflyerTicker { ProductCode = ProductCode.BtcJpy };
             var balances = new[]
             {
                 new BitflyerBalanceResponse { CurrencyCode = "JPY", Amount = 10000m, Available = 8000m },
@@ -192,7 +192,7 @@ namespace Exchange.Bitflyer.Tests
         [Fact]
         public async Task GetOpenPositionsAsync_ReturnsMappedPositions()
         {
-            var rawTicker = new BitflyerTickerRaw { ProductCode = ProductCode.BtcJpy };
+            var rawTicker = new BitflyerTicker { ProductCode = ProductCode.BtcJpy };
             var positions = new[]
             {
                 new BitflyerPositionResponse
@@ -225,7 +225,7 @@ namespace Exchange.Bitflyer.Tests
         [Fact]
         public async Task GetCollateralAsync_ReturnsMappedCollateral()
         {
-            var rawTicker = new BitflyerTickerRaw { ProductCode = ProductCode.BtcJpy };
+            var rawTicker = new BitflyerTicker { ProductCode = ProductCode.BtcJpy };
             var collateral = new BitflyerCollateralResponse
             {
                 Collateral = 100000m,
@@ -250,8 +250,8 @@ namespace Exchange.Bitflyer.Tests
         [Fact]
         public async Task CancelOrderAsync_NullResponse_Throws()
         {
-            var rawTicker = new BitflyerTickerRaw { ProductCode = ProductCode.BtcJpy };
-            var publicApi = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoardRaw { Bids = Array.Empty<BitflyerBoardEntryRaw>(), Asks = Array.Empty<BitflyerBoardEntryRaw>() });
+            var rawTicker = new BitflyerTicker { ProductCode = ProductCode.BtcJpy };
+            var publicApi = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoard { Bids = Array.Empty<BitflyerBoardEntryRaw>(), Asks = Array.Empty<BitflyerBoardEntryRaw>() });
             var accountApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
             var tradingApi = new NullCancelTradingApi();
             var client = new BitflyerExchangeClient(publicApi, accountApi, tradingApi);

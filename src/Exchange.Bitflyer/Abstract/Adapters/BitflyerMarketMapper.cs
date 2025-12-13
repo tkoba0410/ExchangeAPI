@@ -7,7 +7,7 @@ namespace Exchange.Bitflyer.Abstract;
 
 internal static class BitflyerMarketMapper
 {
-    public static Ticker MapTicker(string symbol, BitflyerTickerRaw raw)
+    public static Ticker MapTicker(string symbol, BitflyerTicker raw)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 
@@ -19,7 +19,7 @@ internal static class BitflyerMarketMapper
             Timestamp: raw.Timestamp);
     }
 
-    public static OrderBook MapOrderBook(BitflyerBoardRaw rawBoard)
+    public static OrderBook MapOrderBook(BitflyerBoard rawBoard)
     {
         if (rawBoard is null) throw new ArgumentNullException(nameof(rawBoard));
 

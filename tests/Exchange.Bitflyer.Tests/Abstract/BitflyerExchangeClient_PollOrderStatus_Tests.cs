@@ -45,7 +45,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             Size = active.Size,
         };
 
-        var publicApi = new FakeBitflyerPublicApi(new BitflyerTickerRaw());
+        var publicApi = new FakeBitflyerPublicApi(new BitflyerTicker());
         var sequenceApi = new SequenceChildOrderApi(new[] { active }, new[] { completed });
         var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
         var client = new BitflyerExchangeClient(publicApi, sequenceApi, tradingApi);

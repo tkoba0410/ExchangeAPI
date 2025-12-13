@@ -8,8 +8,6 @@ namespace Exchange.Bitflyer.Raw;
 public enum ParentOrderType
 {
     [EnumMember(Value = "SIMPLE")] Simple,
-    [EnumMember(Value = "MARKET")] Market,
-    [EnumMember(Value = "LIMIT")] Limit,
     [EnumMember(Value = "STOP_LIMIT")] StopLimit,
     [EnumMember(Value = "STOP")] Stop,
     [EnumMember(Value = "TRAIL")] Trail,

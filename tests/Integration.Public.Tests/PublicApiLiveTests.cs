@@ -29,7 +29,7 @@ public class PublicApiLiveTests
         var msg = $"bitFlyer Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
-        Assert.Equal("BTC/JPY", ticker.Symbol);
+        Assert.Equal(Common.Contract.Enums.Symbol.BtcJpy, ticker.Symbol);
         Assert.True(ticker.LastTradedPrice > 0);
     }
 
@@ -57,7 +57,7 @@ public class PublicApiLiveTests
         var msg = $"Bittrade Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
-        Assert.Equal("BTC/JPY", ticker.Symbol);
+        Assert.Equal(Common.Contract.Enums.Symbol.BtcJpy, ticker.Symbol);
         Assert.True(ticker.LastTradedPrice > 0);
     }
 

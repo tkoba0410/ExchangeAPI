@@ -50,6 +50,18 @@ internal static class BitflyerCommonMapper
             _ => "BTC_JPY",
         };
 
+    public static Symbol ToSymbol(string symbol)
+    {
+        var productCode = MapSymbolToProductCode(symbol);
+        return productCode switch
+        {
+            RawProductCode.BtcJpy => Symbol.BtcJpy,
+            RawProductCode.EthJpy => Symbol.EthJpy,
+            RawProductCode.FxBtcJpy => Symbol.FxBtcJpy,
+            _ => Symbol.Unknown
+        };
+    }
+
     public static OrderState MapOrderStatus(string childOrderStatusState) =>
         (childOrderStatusState ?? string.Empty).ToUpperInvariant() switch
         {

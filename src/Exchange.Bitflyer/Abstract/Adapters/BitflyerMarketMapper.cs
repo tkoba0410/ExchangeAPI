@@ -15,7 +15,7 @@ internal static class BitflyerMarketMapper
 
         return new Ticker(
             Exchange: ExchangeCode.Bitflyer,
-            Symbol: symbol,
+            Symbol: BitflyerCommonMapper.ToSymbol(symbol),
             LastTradedPrice: raw.LastTradedPrice,
             Timestamp: raw.Timestamp);
     }

@@ -16,6 +16,6 @@ namespace Common.Contract.Dtos;
 /// </param>
 public sealed record Ticker(
     ExchangeCode Exchange,
-    string Symbol,
+    Symbol Symbol,
     decimal LastTradedPrice,
     DateTimeOffset Timestamp);

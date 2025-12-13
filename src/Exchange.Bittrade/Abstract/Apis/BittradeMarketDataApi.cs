@@ -42,10 +42,11 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
             ? DateTimeOffset.FromUnixTimeMilliseconds(ts.Value)
             : DateTimeOffset.UtcNow;
         var canonicalSymbol = ToCanonicalSymbol(symbol);
+        var symbolEnum = MapSymbol(canonicalSymbol);
 
         return new Ticker(
             Exchange: ExchangeCode.Bittrade,
-            Symbol: canonicalSymbol,
+            Symbol: symbolEnum,
             LastTradedPrice: tick.Close,
             Timestamp: timestamp);
     }
@@ -143,4 +144,13 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
 
         return upper;
     }
+
+    private static Symbol MapSymbol(string canonicalSymbol) =>
+        canonicalSymbol switch
+        {
+            "BTC/JPY" or "BTC_JPY" => Symbol.BtcJpy,
+            "ETH/JPY" or "ETH_JPY" => Symbol.EthJpy,
+            "FX_BTC/JPY" or "FX_BTC_JPY" => Symbol.FxBtcJpy,
+            _ => Symbol.Unknown
+        };
 }

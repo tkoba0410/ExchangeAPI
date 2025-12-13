@@ -45,7 +45,7 @@ namespace Exchange.Bitflyer.Tests
             // Act
             var ticker = await client.GetTickerAsync("BTC/JPY");
 
-            Assert.Equal("BTC/JPY", ticker.Symbol);
+            Assert.Equal(Symbol.BtcJpy, ticker.Symbol);
             Assert.Equal(raw.LastTradedPrice, ticker.LastTradedPrice);
             Assert.Equal(raw.Timestamp /* 正規化 */, ticker.Timestamp);
         }

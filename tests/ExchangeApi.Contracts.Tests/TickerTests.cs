@@ -11,20 +11,19 @@ public class TickerTests
     public void Constructor_SetsPropertiesCorrectly()
     {
         // Arrange
-        var symbol = "BTC/JPY";
         var lastPrice = 5_000_500m;
         var timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero); // UTC
 
         // Act
         var ticker = new Ticker(
             Exchange: ExchangeCode.None,
-            Symbol: symbol,
+            Symbol: Symbol.BtcJpy,
             LastTradedPrice: lastPrice,
             Timestamp: timestamp);
 
         // Assert
         Assert.Equal(ExchangeCode.None, ticker.Exchange);
-        Assert.Equal(symbol, ticker.Symbol);
+        Assert.Equal(Symbol.BtcJpy, ticker.Symbol);
         Assert.Equal(lastPrice, ticker.LastTradedPrice);
         Assert.Equal(timestamp, ticker.Timestamp);
     }
@@ -35,7 +34,7 @@ public class TickerTests
         // Arrange
         var original = new Ticker(
             Exchange: ExchangeCode.None,
-            Symbol: "BTC/JPY",
+            Symbol: Symbol.BtcJpy,
             LastTradedPrice: 5_000_500m,
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
@@ -54,7 +53,7 @@ public class TickerTests
         // Arrange
         var original = new Ticker(
             Exchange: ExchangeCode.None,
-            Symbol: "BTC/JPY",
+            Symbol: Symbol.BtcJpy,
             LastTradedPrice: 5_000_500m,
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 

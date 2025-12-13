@@ -73,30 +73,6 @@ internal static class BitflyerConstants
         public const string OrderExpired = "EXPIRED";
     }
 
-    internal static class OrderMethod
-    {
-        public const string Simple = "SIMPLE";
-        public const string Ifd = "IFD";
-        public const string Oco = "OCO";
-        public const string IfdOco = "IFDOCO";
-    }
-
-    internal static class ConditionType
-    {
-        public const string Limit = "LIMIT";
-        public const string Market = "MARKET";
-        public const string Stop = "STOP";
-        public const string StopLimit = "STOP_LIMIT";
-        public const string Trail = "TRAIL";
-    }
-
-    internal static class TimeInForce
-    {
-        public const string Gtc = "GTC";
-        public const string Ioc = "IOC";
-        public const string Fok = "FOK";
-    }
-
     internal static class Side
     {
         public const string Buy = "BUY";

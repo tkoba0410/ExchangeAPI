@@ -7,7 +7,7 @@ namespace Exchange.Bitflyer.Raw;
 /// </summary>
 public sealed class BitflyerCancelChildOrderRequest
 {
-    [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
+    [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
 
     /// <summary>
     /// child_order_acceptance_id を優先して使用する。

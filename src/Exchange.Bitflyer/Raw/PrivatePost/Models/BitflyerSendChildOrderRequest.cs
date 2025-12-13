@@ -7,7 +7,7 @@ namespace Exchange.Bitflyer.Raw;
 /// </summary>
 public sealed class BitflyerSendChildOrderRequest
 {
-    [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
+    [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
     [JsonPropertyName("child_order_type")] public string ChildOrderType { get; init; } = string.Empty;
     [JsonPropertyName("side")] public Side Side { get; init; }
     [JsonPropertyName("size")] public decimal Size { get; init; }

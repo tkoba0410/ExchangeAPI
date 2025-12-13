@@ -37,12 +37,12 @@ internal static class BitflyerMarketMapper
             MidPrice: rawBoard.MidPrice);
     }
 
-    public static MarketExecution MapExecution(string productCode, BitflyerExecutionPublicResponse raw)
+    public static MarketExecution MapExecution(ProductCode productCode, BitflyerExecutionPublicResponse raw)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 
         return new MarketExecution(
-            ProductCode: productCode,
+            ProductCode: BitflyerCommonMapper.ToApiProductCode(productCode),
             Id: raw.Id,
             Side: BitflyerCommonMapper.MapSide(raw.Side),
             Price: raw.Price,

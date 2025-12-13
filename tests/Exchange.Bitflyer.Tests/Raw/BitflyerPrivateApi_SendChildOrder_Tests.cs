@@ -16,7 +16,7 @@ public sealed class BitflyerPrivateApi_SendChildOrder_Tests
 
         var request = new BitflyerSendChildOrderRequest
         {
-            ProductCode = "BTC_JPY",
+            ProductCode = ProductCode.BtcJpy,
             ChildOrderType = "MARKET",
             Side = Side.Buy,
             Size = 0.01m,

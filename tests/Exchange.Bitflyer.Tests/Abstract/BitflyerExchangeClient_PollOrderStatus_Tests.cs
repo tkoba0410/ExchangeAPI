@@ -20,7 +20,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var acceptanceId = "ACCEPT-1";
         var active = new BitflyerChildOrderResponse
         {
-            ProductCode = "BTC_JPY",
+            ProductCode = ProductCode.BtcJpy,
             ChildOrderAcceptanceId = acceptanceId,
             ChildOrderState = "ACTIVE",
             ExecutedSize = 0m,

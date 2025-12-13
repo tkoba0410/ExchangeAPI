@@ -42,7 +42,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         {
             var dto = new BitflyerSendChildOrderRequest
             {
-                ProductCode = request.ProductCode,
+                ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(request.ProductCode),
                 Side = BitflyerCommonMapper.MapSideToExchange(request.Side),
                 ChildOrderType = BitflyerTradingMapper.MapOrderType(request.OrderType, request.Price),
                 Size = request.Size,
@@ -92,7 +92,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         {
             var dto = new BitflyerCancelChildOrderRequest
             {
-                ProductCode = productCode,
+                ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(productCode),
                 ChildOrderAcceptanceId = childOrderAcceptanceId,
             };
 
@@ -142,7 +142,7 @@ public sealed class BitflyerTradingApi : ITradingApi
                 .ConfigureAwait(false);
 
             var mapped = rawOrders.Select(o => new OpenOrder(
-                ProductCode: o.ProductCode,
+                ProductCode: BitflyerCommonMapper.ToApiProductCode(o.ProductCode),
                 OrderId: o.ChildOrderId,
                 OrderAcceptanceId: o.ChildOrderAcceptanceId,
                 Side: BitflyerCommonMapper.MapSide(o.Side),
@@ -213,7 +213,7 @@ public sealed class BitflyerTradingApi : ITradingApi
 
             var status = BitflyerCommonMapper.MapOrderStatusType(order.ChildOrderState);
             var mapped = new OrderStatus(
-                ProductCode: order.ProductCode,
+                ProductCode: BitflyerCommonMapper.ToApiProductCode(order.ProductCode),
                 OrderAcceptanceId: order.ChildOrderAcceptanceId,
                 Status: status,
                 ExecutedSize: order.ExecutedSize,

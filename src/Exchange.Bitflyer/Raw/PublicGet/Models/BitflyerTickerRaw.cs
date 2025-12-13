@@ -17,7 +17,7 @@ namespace Exchange.Bitflyer.Raw
         /// 例: <c>BTC_JPY</c>。
         /// </summary>
         [JsonPropertyName("product_code")]
-        public string ProductCode { get; init; } = string.Empty;
+        public ProductCode ProductCode { get; init; }
 
         /// <summary>
         /// ティッカーの発生時刻。

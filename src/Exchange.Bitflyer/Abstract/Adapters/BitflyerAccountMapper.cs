@@ -28,7 +28,7 @@ internal static class BitflyerAccountMapper
 
         return rawExecutions
             .Select(e => new AccountExecution(
-                ProductCode: productCode,
+                ProductCode: BitflyerCommonMapper.ToApiProductCode(e.ProductCode),
                 Id: e.Id,
                 Side: BitflyerCommonMapper.MapSide(e.Side),
                 Price: e.Price,

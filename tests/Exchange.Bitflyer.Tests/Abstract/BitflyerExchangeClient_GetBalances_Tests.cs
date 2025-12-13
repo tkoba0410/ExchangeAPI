@@ -78,7 +78,7 @@ namespace Exchange.Bitflyer.Tests
             // 既存の Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
             var rawTicker = new BitflyerTickerRaw
             {
-                ProductCode = "BTC_JPY",
+                ProductCode = ProductCode.BtcJpy,
                 Timestamp = DateTimeOffset.UnixEpoch,
                 TickId = 0,
                 BestBid = 0m,

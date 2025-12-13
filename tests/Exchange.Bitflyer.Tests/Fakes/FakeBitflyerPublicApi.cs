@@ -64,7 +64,7 @@ namespace Exchange.Bitflyer.Tests.Fakes
                 new BitflyerExecutionPublicResponse
                 {
                     Id = 1,
-                    ProductCode = productCode,
+                    ProductCode = ProductCode.BtcJpy,
                     Side = Side.Buy,
                     Price = 100m,
                     Size = 0.01m,
@@ -76,7 +76,7 @@ namespace Exchange.Bitflyer.Tests.Fakes
         }
 
         public Task<IReadOnlyList<BitflyerMarket>> GetMarketsAsync(string? region = null, bool useAliasPath = false, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BitflyerMarket>>(new[] { new BitflyerMarket("BTC_JPY", "BTC_JPY") });
+            Task.FromResult<IReadOnlyList<BitflyerMarket>>(new[] { new BitflyerMarket(ProductCode.BtcJpy, "BTC_JPY") });
 
         public Task<IReadOnlyList<BitflyerChat>> GetChatsAsync(string? fromDate = null, string? region = null, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<BitflyerChat>>(new[] { new BitflyerChat("n", "m", System.DateTimeOffset.UtcNow) });
@@ -91,6 +91,6 @@ namespace Exchange.Bitflyer.Tests.Fakes
             Task.FromResult(JsonDocument.Parse("{}").RootElement);
 
         public Task<BitflyerFundingRateResponse> GetFundingRateAsync(string productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new BitflyerFundingRateResponse(productCode, 0m));
+            Task.FromResult(new BitflyerFundingRateResponse(ProductCode.BtcJpy, 0m));
     }
 }

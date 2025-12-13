@@ -31,12 +31,12 @@
 | GET /v1/me/getcoinouts | Private | ○ | - | - |
 | GET /v1/me/getbankaccounts | Private | ○ | - | - |
 | GET /v1/me/getdeposits | Private | ○ | - | - |
-| POST /v1/me/withdraw | Private | ○ | - | - |
+| POST /v1/me/withdraw | Private | × | - | - |
 | GET /v1/me/getwithdrawals | Private | ○ | - | - |
 | POST /v1/me/sendchildorder | Private | ○ | ○ | `BitflyerTradingApi.SendOrderAsync` |
 | POST /v1/me/cancelchildorder | Private | ○ | ○ | `BitflyerTradingApi.CancelOrderAsync` |
-| POST /v1/me/sendparentorder | Private | ○ | - | - |
-| POST /v1/me/cancelparentorder | Private | ○ | - | - |
+| POST /v1/me/sendparentorder | Private | × | - | - |
+| POST /v1/me/cancelparentorder | Private | × | - | - |
 | POST /v1/me/cancelallchildorders | Private | ○ | △ | 抽象で未露出（必要なら拡張） |
 | GET /v1/me/getchildorders | Private | ○ | ○ | `BitflyerTradingApi.GetOpenOrdersAsync` 等で利用 |
 | GET /v1/me/getparentorders | Private | ○ | - | - |

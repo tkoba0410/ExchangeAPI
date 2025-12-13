@@ -65,9 +65,4 @@ internal static class BitflyerConstants
         public const string FromDate = "from_date";
     }
 
-    internal static class Side
-    {
-        public const string Buy = "BUY";
-        public const string Sell = "SELL";
-    }
 }

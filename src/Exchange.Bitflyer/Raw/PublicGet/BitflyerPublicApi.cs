@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer.Models;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
 using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Adapter.Bitflyer;
+namespace Exchange.Bitflyer.Raw.PublicGet;
 
 /// <summary>
 /// bitFlyer 公開 REST API の実装。

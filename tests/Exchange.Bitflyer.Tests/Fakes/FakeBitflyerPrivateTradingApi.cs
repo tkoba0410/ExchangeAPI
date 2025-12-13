@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer;
-using ExchangeApi.Adapter.Bitflyer.Models;
+using Exchange.Bitflyer.Raw.PrivatePost;
+using Exchange.Bitflyer.Raw.PrivatePost.Models;
 
-namespace ExchangeApi.Adapter.Bitflyer.Tests.Fakes;
+namespace Exchange.Bitflyer.Tests.Fakes;
 
 public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
 {

@@ -7,10 +7,15 @@ using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 using ExchangeApi.Transport.Transport;
-using ExchangeApi.Adapter.Bitflyer.Facade;
-using ExchangeApi.Adapter.Bitflyer.Adapters;
+using Exchange.Bitflyer.Abstract.Facade;
+using Exchange.Bitflyer.Abstract.Adapters;
+using Exchange.Bitflyer.Raw.PrivateGet;
+using Exchange.Bitflyer.Raw.PrivatePost;
+using Exchange.Bitflyer.Raw.PublicGet;
+using Exchange.Bitflyer.Raw.RawApi;
+using Exchange.Bitflyer.Raw.Signer;
 
-namespace ExchangeApi.Adapter.Bitflyer.Factory;
+namespace Exchange.Bitflyer.Abstract.Factory;
 
 /// <summary>
     /// Factory for constructing bitFlyer client instances.

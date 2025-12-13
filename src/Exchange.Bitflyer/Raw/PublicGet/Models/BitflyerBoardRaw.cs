@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Adapter.Bitflyer.Models;
+namespace Exchange.Bitflyer.Raw.PublicGet.Models;
 
 public sealed class BitflyerBoardRaw
 {

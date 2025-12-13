@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer;
-using ExchangeApi.Adapter.Bitflyer.Models;
+using Exchange.Bitflyer.Raw.PrivateGet;
+using Exchange.Bitflyer.Raw.PrivateGet.Models;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
 
-namespace ExchangeApi.Adapter.Bitflyer.Tests.Fakes;
+namespace Exchange.Bitflyer.Tests.Fakes;
 
 public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
 {

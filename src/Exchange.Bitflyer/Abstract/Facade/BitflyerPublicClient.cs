@@ -1,12 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer;
-using ExchangeApi.Adapter.Bitflyer.Apis.Market;
+using Exchange.Bitflyer.Abstract.Apis.ExchangeInfo;
+using Exchange.Bitflyer.Abstract.Apis.Market;
+using Exchange.Bitflyer.Raw.PublicGet;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 
-namespace ExchangeApi.Adapter.Bitflyer.Facade;
+namespace Exchange.Bitflyer.Abstract.Facade;
 
 /// <summary>
 /// bitFlyer の Public API だけを利用する軽量クライアント。

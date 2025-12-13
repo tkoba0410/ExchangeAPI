@@ -1,11 +1,11 @@
 using System;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Adapter.Bitflyer.Factory;
+using Exchange.Bitflyer.Abstract.Factory;
 using ExchangeApi.Transport.Policy;
 using Xunit;
 
-namespace ExchangeApi.Adapter.Bitflyer.Tests;
+namespace Exchange.Bitflyer.Tests;
 
     public class BitflyerClientFactory_Tests
     {

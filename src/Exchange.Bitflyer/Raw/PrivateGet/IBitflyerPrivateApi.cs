@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer.Models;
+using Exchange.Bitflyer.Raw.PrivateGet.Models;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
 
-namespace ExchangeApi.Adapter.Bitflyer;
+namespace Exchange.Bitflyer.Raw.PrivateGet;
 
 /// <summary>
 /// bitFlyer Private REST API への Raw アクセスインターフェース。

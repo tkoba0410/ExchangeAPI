@@ -2,14 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer.Apis.Account;
-using ExchangeApi.Adapter.Bitflyer.Apis.Market;
-using ExchangeApi.Adapter.Bitflyer.Apis.Margin;
-using ExchangeApi.Adapter.Bitflyer.Apis.Trading;
+using Exchange.Bitflyer.Abstract.Apis.Account;
+using Exchange.Bitflyer.Abstract.Apis.Market;
+using Exchange.Bitflyer.Abstract.Apis.Margin;
+using Exchange.Bitflyer.Abstract.Apis.Trading;
+using Exchange.Bitflyer.Abstract.Apis.ExchangeInfo;
+using Exchange.Bitflyer.Raw.RawApi;
+using Exchange.Bitflyer.Raw.PrivateGet;
+using Exchange.Bitflyer.Raw.PrivatePost;
+using Exchange.Bitflyer.Raw.PublicGet;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 
-namespace ExchangeApi.Adapter.Bitflyer.Facade;
+namespace Exchange.Bitflyer.Abstract.Facade;
 
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。

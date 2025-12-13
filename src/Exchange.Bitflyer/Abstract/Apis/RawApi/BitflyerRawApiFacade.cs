@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer.Models;
+using Exchange.Bitflyer.Raw.PrivateGet.Models;
+using Exchange.Bitflyer.Raw.PrivatePost.Models;
+using Exchange.Bitflyer.Raw.RawApi;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
 
-namespace ExchangeApi.Adapter.Bitflyer.Apis.RawApi;
+namespace Exchange.Bitflyer.Abstract.Apis.RawApi;
 
 /// <summary>
 /// Raw API を外部提供するための薄いファサード。

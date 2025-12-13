@@ -6,7 +6,7 @@
 Stage2（get balance）において、必要となるレイヤ構成と責務分担を明確化し、
 後続ステージ（Collateral / Positions / POST Private API）の拡張に耐えられる基盤構造を定義する。
 
-本ドキュメントは、**ExchangeApi.Contracts（旧 Abstractions）→ ExchangeApi.Transport（旧 Infrastructure）→ bitflyer private API → ExchangeApi.Adapter.Bitflyer** の流れを整理し、
+本ドキュメントは、**ExchangeApi.Contracts（旧 Abstractions）→ ExchangeApi.Transport（旧 Infrastructure）→ bitflyer private API → Exchange.Bitflyer** の流れを整理し、
 依存方向・レイヤ境界・役割を統一的に示すことを目的とする。
 
 ---
@@ -31,12 +31,12 @@ ExchangeApi.Factory（旧 ExchangeApi.Factory、Credential）
    ├─ EnvironmentVariable / WindowsCredentialManager などの実装
    └─ CompositeCredentialProvider（フォールバック連鎖）
 
-ExchangeApi.Adapter.Bitflyer (Private API)
+Exchange.Bitflyer (Private API)
    ├─ DTO: BitflyerBalanceResponse
    ├─ Private API IF: IBitflyerPrivateApi
    └─ Private API 実装: BitflyerPrivateApi
 
-ExchangeApi.Adapter.Bitflyer (Adapter)
+Exchange.Bitflyer (Adapter)
    └─ ExchangeClient: BitflyerExchangeClient
        └─ GetBalancesAsync（Stage2 完了対象、DTOを直接 Balance に変換）
 ```
@@ -86,7 +86,7 @@ ExchangeApi.Adapter.Bitflyer (Adapter)
 
 ---
 
-### 3.3 ExchangeApi.Adapter.Bitflyer.Private（Private API 層）
+### 3.3 Exchange.Bitflyer.Private（Private API 層）
 #### ■ DTO（BitflyerBalanceResponse）
 - bitFlyer のレスポンス構造をそのまま表現。
 - Domain とは切り離して定義する（疎結合の維持）。
@@ -103,7 +103,7 @@ Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken 
 
 ---
 
-### 3.4 ExchangeApi.Adapter.Bitflyer（ExchangeClient 層）
+### 3.4 Exchange.Bitflyer（ExchangeClient 層）
 #### ■ BitflyerExchangeClient
 - `IExchangeAccountClient` の実装クラス。
 - `GetBalancesAsync` の処理フロー：

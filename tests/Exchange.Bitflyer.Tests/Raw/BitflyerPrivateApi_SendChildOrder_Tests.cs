@@ -1,11 +1,11 @@
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer;
-using ExchangeApi.Adapter.Bitflyer.Models;
+using Exchange.Bitflyer.Raw.PrivatePost;
+using Exchange.Bitflyer.Raw.PrivatePost.Models;
 using ExchangeApi.Transport.Protocol;
 using Xunit;
 
-namespace ExchangeApi.Adapter.Bitflyer.Tests;
+namespace Exchange.Bitflyer.Tests;
 
 public sealed class BitflyerPrivateApi_SendChildOrder_Tests
 {

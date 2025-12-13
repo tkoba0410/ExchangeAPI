@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Adapter.Bitflyer.Models;
+namespace Exchange.Bitflyer.Raw.PrivateGet.Models;
 
 /// <summary>
 /// bitFlyer /v1/me/getbalance の Raw レスポンス。

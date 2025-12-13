@@ -39,7 +39,7 @@ Stage1 の対象は「bitFlyer Public REST `GET /v1/getticker` による Ticker 
 
   * `ExchangeApi.Contracts`
   * `ExchangeApi.Transport`
-  * `ExchangeApi.Adapter.Bitflyer`
+  * `Exchange.Bitflyer`
 * これらの依存関係および責務
 * Raw モデル（bitFlyer 固有モデル）の扱い
 
@@ -99,12 +99,12 @@ Stage1 では、ソリューションは少なくとも次のプロジェクト�
 src/
   ExchangeApi.Contracts/
   ExchangeApi.Transport/
-  ExchangeApi.Adapter.Bitflyer/
+  Exchange.Bitflyer/
 
 tests/
   ExchangeApi.Contracts.Tests/
   ExchangeApi.Transport.Tests/
-  ExchangeApi.Adapter.Bitflyer.Tests/
+  Exchange.Bitflyer.Tests/
 ```
 
 ### 4.1 ExchangeApi.Contracts（Boundary）
@@ -138,7 +138,7 @@ tests/
   * Adapter 側から利用されるが、取引所固有ロジックは持たない。
   * Stage1 では GET + JSON デシリアライズの最小機能に限定する。
 
-### 4.3 ExchangeApi.Adapter.Bitflyer（Adapter）
+### 4.3 Exchange.Bitflyer（Adapter）
 
 * 役割：bitFlyer Public REST API を呼び出し、Raw モデルを Ticker に変換する。
 * 主な内容：
@@ -162,7 +162,7 @@ Stage1〜Stage2 を通じて、次の依存方向ルールを **不変の正典*
 
 ```text
 ExchangeApi.Contracts      ←  ExchangeApi.Transport
-            ▲                 ←  ExchangeApi.Adapter.Bitflyer
+            ▲                 ←  Exchange.Bitflyer
             │
         （上位）
 ```
@@ -173,14 +173,14 @@ ExchangeApi.Contracts      ←  ExchangeApi.Transport
 * `ExchangeApi.Transport`
 
   * `ExchangeApi.Contracts` に依存してよい（MUST）。
-  * `ExchangeApi.Adapter.Bitflyer` に依存してはならない（MUST NOT）。
-* `ExchangeApi.Adapter.Bitflyer`
+  * `Exchange.Bitflyer` に依存してはならない（MUST NOT）。
+* `Exchange.Bitflyer`
 
   * `ExchangeApi.Contracts` および `ExchangeApi.Transport` に依存してよい（MUST）。
 
 ### 5.2 Raw モデルの依存
 
-* Raw モデル（`BitflyerTickerRaw`）は `ExchangeApi.Adapter.Bitflyer` 内部の型とし、
+* Raw モデル（`BitflyerTickerRaw`）は `Exchange.Bitflyer` 内部の型とし、
   他プロジェクトから参照されてはならない（MUST NOT）。
 * Raw モデルは Abstractions への依存を持ってはならない（MUST NOT）。
 
@@ -253,7 +253,7 @@ Stage2 以降での拡張は、次の方針で行う。
 
   * Retry / RateLimit / CircuitBreaker
   * 認証付き REST（署名 / timestamp / nonce 等）
-* `ExchangeApi.Adapter.Bitflyer` において Private API / WebSocket / Board などの Adapter を段階的に追加する。
+* `Exchange.Bitflyer` において Private API / WebSocket / Board などの Adapter を段階的に追加する。
 * 新規取引所（`ExchangeApi.Binance` 等）は、Bitflyer と同じパターンで Adapter プロジェクトを追加する。
 * Boundary（Abstractions）は、必要に応じて DTO / インターフェースを拡張するが、
   Stage1 の基本構造（IExchangeClient / Ticker）の互換性を保つ。

@@ -65,8 +65,8 @@ dotnet test
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
 using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Adapter.Bitflyer;
-using ExchangeApi.Adapter.Bitflyer.Factory;
+using Exchange.Bitflyer;
+using Exchange.Bitflyer.Factory;
 
 var services = new ServiceCollection();
 
@@ -109,7 +109,7 @@ Console.WriteLine($"Time: {ticker.Timestamp:O}");
 tests/
  ├─ ExchangeApi.Contracts.Tests
  ├─ ExchangeApi.Transport.Tests
- ├─ ExchangeApi.Adapter.Bitflyer.Tests
+ ├─ Exchange.Bitflyer.Tests
 ```
 
 代表的なテスト：

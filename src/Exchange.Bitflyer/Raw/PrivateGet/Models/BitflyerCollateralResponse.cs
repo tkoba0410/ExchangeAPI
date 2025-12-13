@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Adapter.Bitflyer.Models;
+namespace Exchange.Bitflyer.Raw.PrivateGet.Models;
 
 /// <summary>
 /// /v1/me/getcollateral のレスポンス DTO。

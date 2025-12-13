@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Exchange.Bitflyer.Abstract.Adapters;
 using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Adapter.Bitflyer.Adapters;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 
-namespace ExchangeApi.Adapter.Bitflyer;
+namespace Exchange.Bitflyer.Abstract.Apis.ExchangeInfo;
 
 /// <summary>
 /// bitFlyer の ExchangeInfo 実装。現状は対応可否を返すスケルトン。
@@ -15,10 +16,10 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
 {
     private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan DailyMaintenanceEndJst = new(4, 10, 0);
-    private static ExchangeInfo? _cached;
+    private static ExchangeInfoDto? _cached;
     private static DateTimeOffset _lastUpdated;
 
-    public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default)
+    public Task<ExchangeInfoDto> GetExchangeInfoAsync(CancellationToken cancellationToken = default)
     {
         if (_cached is { } cached && DateTimeOffset.UtcNow - _lastUpdated < CacheTtl)
         {

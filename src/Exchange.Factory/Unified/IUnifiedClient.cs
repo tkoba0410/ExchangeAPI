@@ -1,7 +1,7 @@
 namespace ExchangeApi.Factory.Unified;
 
 using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Adapter.Bitflyer.Facade;
+using Exchange.Bitflyer.Abstract.Facade;
 using ExchangeApi.Adapter.Bittrade.Facade;
 
 /// <summary>

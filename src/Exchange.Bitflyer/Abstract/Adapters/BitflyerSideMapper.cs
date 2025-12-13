@@ -1,9 +1,9 @@
 using System;
 using Exchange.Bitflyer;
-using ExchangeApi.Adapter.Bitflyer;
+using Exchange.Bitflyer.Raw;
 using ExchangeApi.Contracts.Dtos;
 
-namespace ExchangeApi.Adapter.Bitflyer.Adapters;
+namespace Exchange.Bitflyer.Abstract.Adapters;
 
 /// <summary>bitFlyer のサイド文字列と enum のマッピング。</summary>
 internal static class BitflyerSideMapper

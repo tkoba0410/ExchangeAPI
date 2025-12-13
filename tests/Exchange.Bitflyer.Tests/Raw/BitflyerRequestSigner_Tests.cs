@@ -1,11 +1,11 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer;
+using Exchange.Bitflyer.Raw.Signer;
 using ExchangeApi.Transport.Time;
 using Xunit;
 
-namespace ExchangeApi.Adapter.Bitflyer.Tests;
+namespace Exchange.Bitflyer.Tests;
 
 public sealed class BitflyerRequestSigner_Tests
 {
@@ -54,4 +54,3 @@ public sealed class BitflyerRequestSigner_Tests
         public System.DateTimeOffset UtcNow => System.DateTimeOffset.FromUnixTimeSeconds(_timestamp);
     }
 }
-

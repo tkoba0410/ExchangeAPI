@@ -1,7 +1,8 @@
 using System.Net;
+using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Adapter.Bitflyer.Adapters;
+namespace Exchange.Bitflyer.Abstract.Adapters;
 
 internal sealed class BitflyerErrorClassifier : IExchangeErrorClassifier
 {
@@ -9,7 +10,7 @@ internal sealed class BitflyerErrorClassifier : IExchangeErrorClassifier
 
     private BitflyerErrorClassifier() { }
 
-    public Contracts.Errors.ExchangeErrorCategory? Classify(HttpStatusCode? statusCode, string? exchangeErrorCode)
+    public ExchangeErrorCategory? Classify(HttpStatusCode? statusCode, string? exchangeErrorCode)
     {
         return BitflyerErrorMapper.MapErrorCategory(statusCode, exchangeErrorCode);
     }

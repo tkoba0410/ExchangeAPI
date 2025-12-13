@@ -110,7 +110,7 @@ ExchangeApi.Transport (旧)/Common.Core (現)
   ├─ IRestClient / RestClient (GET + JSON + 署名)
   └─ ExchangeApiException
 
-Exchange.Bitflyer（旧 ExchangeApi.Adapter.Bitflyer）
+Exchange.Bitflyer（旧 Exchange.Bitflyer）
   ├─ DTO: BitflyerBalanceResponse
   ├─ Private API: IBitflyerPrivateApi.GetBalancesAsync
   ├─ Private API 実装: BitflyerPrivateApi

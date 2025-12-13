@@ -84,14 +84,14 @@ Stage1 におけるプロジェクトは最低限以下を含むものとする�
 
 * `ExchangeApi.Contracts`  … Boundary（依存先なし）
 * `ExchangeApi.Transport` … REST 向け Technical Modules
-* `ExchangeApi.Adapter.Bitflyer`       … bitFlyer Adapter
+* `Exchange.Bitflyer`       … bitFlyer Adapter
 
 ### 4.2 依存方向（MUST）
 
 * `ExchangeApi.Contracts` は他プロジェクトに依存してはならない（MUST NOT）。
 * `ExchangeApi.Transport` は `ExchangeApi.Contracts` へ依存してよい（MUST）。
-* `ExchangeApi.Adapter.Bitflyer` は `ExchangeApi.Contracts` と `ExchangeApi.Transport` に依存してよい（MUST）。
-* Raw モデル（`BitflyerTickerRaw`）は `ExchangeApi.Adapter.Bitflyer` 内部の型であり、他プロジェクトから参照しない（MUST）。
+* `Exchange.Bitflyer` は `ExchangeApi.Contracts` と `ExchangeApi.Transport` に依存してよい（MUST）。
+* Raw モデル（`BitflyerTickerRaw`）は `Exchange.Bitflyer` 内部の型であり、他プロジェクトから参照しない（MUST）。
 
 ---
 
@@ -133,7 +133,7 @@ Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken =
 
 * **FR-4-1**: bitFlyer の `GET /v1/getticker` レスポンスを欠損なく保持する `BitflyerTickerRaw` を定義しなければならない（MUST）。
 * **FR-4-2**: `BitflyerTickerRaw` のフィールド名・型は bitFlyer 公式仕様に合わせること（SHOULD）。
-* **FR-4-3**: `BitflyerTickerRaw` は `ExchangeApi.Adapter.Bitflyer` プロジェクト内に配置し、外部に公開しない（MUST）。
+* **FR-4-3**: `BitflyerTickerRaw` は `Exchange.Bitflyer` プロジェクト内に配置し、外部に公開しない（MUST）。
 
 ### FR-5: bitFlyer 公開 API インターフェース
 

@@ -2,12 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Adapter.Bitflyer.Facade;
-using ExchangeApi.Adapter.Bitflyer.Models;
-using ExchangeApi.Adapter.Bitflyer.Tests.Fakes;
+using Exchange.Bitflyer.Abstract.Facade;
+using Exchange.Bitflyer.Raw.PrivateGet;
+using Exchange.Bitflyer.Raw.PrivateGet.Models;
+using Exchange.Bitflyer.Raw.PublicGet;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
+using Exchange.Bitflyer.Raw.PrivatePost.Models;
+using Exchange.Bitflyer.Tests.Fakes;
 using Xunit;
 
-namespace ExchangeApi.Adapter.Bitflyer.Tests
+namespace Exchange.Bitflyer.Tests
 {
     public class BitflyerExchangeClient_GetBalances_Tests
     {

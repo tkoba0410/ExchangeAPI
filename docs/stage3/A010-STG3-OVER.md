@@ -64,11 +64,11 @@ ExchangeApi.Transport
   ├─ IRestClient.PostAsync
   └─ ExchangeApiException
 
-ExchangeApi.Adapter.Bitflyer (Private API)
+Exchange.Bitflyer (Private API)
   ├─ DTO: SendChildOrder Request/Response
   └─ BitflyerPrivateApi.SendChildOrderAsync
 
-ExchangeApi.Adapter.Bitflyer (Adapter)
+Exchange.Bitflyer (Adapter)
   └─ BitflyerExchangeClient.SendOrderAsync
 ```
 

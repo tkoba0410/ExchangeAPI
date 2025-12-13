@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer.Adapters;
+using Exchange.Bitflyer.Abstract.Adapters;
+using Exchange.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Errors;
 
-namespace ExchangeApi.Adapter.Bitflyer.Apis.Margin;
+namespace Exchange.Bitflyer.Abstract.Apis.Margin;
 
 public sealed class BitflyerMarginApi : IMarginAccountApi
 {

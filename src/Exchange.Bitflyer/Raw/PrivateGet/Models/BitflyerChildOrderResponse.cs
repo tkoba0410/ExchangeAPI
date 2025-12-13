@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Adapter.Bitflyer.Models;
+namespace Exchange.Bitflyer.Raw.PrivateGet.Models;
 
 public sealed class BitflyerChildOrderResponse
 {

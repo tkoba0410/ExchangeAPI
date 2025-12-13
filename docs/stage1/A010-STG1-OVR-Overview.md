@@ -1,7 +1,7 @@
 # A010-STG1-OVR-Overview（Stage1 正典 / 全面改訂版）
 
 > **NOTE (命名アップデート)**  
-> 現在のコードは Raw-first レイアウト（`Common.Core` / `Exchange.(Bitflyer|Bittrade)` / `Exchange.Factory`、統合は Factory 内ヘルパで対応）に移行済みです。本書は Stage1 当時の命名（`ExchangeApi.Contracts` / `ExchangeApi.Transport` / `ExchangeApi.Adapter.Bitflyer` など）で記述しています。読み替えて参照してください。
+> 現在のコードは Raw-first レイアウト（`Common.Core` / `Exchange.(Bitflyer|Bittrade)` / `Exchange.Factory`、統合は Factory 内ヘルパで対応）に移行済みです。本書は Stage1 当時の命名（`ExchangeApi.Contracts` / `ExchangeApi.Transport` / `Exchange.Bitflyer` など）で記述しています。読み替えて参照してください。
 
 本書は Exchange API Library **Stage1 の唯一の正典（Single Source of Truth）** として、
 プロジェクトの目的・構造・依存方向・設計原則を定義する。Stage1 は bitFlyer Public REST
@@ -75,7 +75,7 @@ Stage1 ではこのうち：
 * Protocol（REST の最小実装）
 * Transport（HttpClient を包む最小実装）
   だけを利用する。  
-  ※ Stage4 以降の命名: ExchangeApi.Contracts（旧 Abstractions）、ExchangeApi.Transport（旧 Infrastructure/Protocol/Transport）、ExchangeApi.Adapter.Bitflyer（旧 Adapter）、ExchangeApi.Factory（旧 Orchestration）
+  ※ Stage4 以降の命名: ExchangeApi.Contracts（旧 Abstractions）、ExchangeApi.Transport（旧 Infrastructure/Protocol/Transport）、Exchange.Bitflyer（旧 Adapter）、ExchangeApi.Factory（旧 Orchestration）
 
 ### 4.1 Boundary（Abstractions）
 
@@ -102,7 +102,7 @@ Stage1 ではこのうち：
 
 * `ExchangeApi.Contracts`（旧 ExchangeApi.Contracts）… Boundary（依存なし）
 * `ExchangeApi.Transport`（旧 ExchangeApi.Transport）… Protocol + Transport（技術モジュール）
-* `ExchangeApi.Adapter.Bitflyer`（旧 ExchangeApi.Adapter.Bitflyer）… bitFlyer Adapter（Core / Transport に依存）
+* `Exchange.Bitflyer`（旧 Exchange.Bitflyer）… bitFlyer Adapter（Core / Transport に依存）
 * `ExchangeApi.Factory`（旧 ExchangeApi.Factory）… 資格情報や組み立て用の上位層（Stage2 以降で利用）
 
 ---

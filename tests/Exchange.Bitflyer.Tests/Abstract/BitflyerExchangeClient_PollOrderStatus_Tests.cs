@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer.Facade;
-using ExchangeApi.Adapter.Bitflyer.Models;
-using ExchangeApi.Adapter.Bitflyer.Tests.Fakes;
+using Exchange.Bitflyer.Abstract.Facade;
+using Exchange.Bitflyer.Raw.PrivateGet;
+using Exchange.Bitflyer.Raw.PrivateGet.Models;
+using Exchange.Bitflyer.Raw.PrivatePost;
+using Exchange.Bitflyer.Raw.PrivatePost.Models;
+using Exchange.Bitflyer.Tests.Fakes;
 using ExchangeApi.Contracts.Dtos;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
+using ExecutionResponse = Exchange.Bitflyer.Raw.PublicGet.Models.BitflyerExecutionResponse;
 using Xunit;
 
-namespace ExchangeApi.Adapter.Bitflyer.Tests;
+namespace Exchange.Bitflyer.Tests;
 
 public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
 {
@@ -76,7 +81,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
-        public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(string productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<ExecutionResponse>> GetExecutionsAsync(string productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
         public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default)

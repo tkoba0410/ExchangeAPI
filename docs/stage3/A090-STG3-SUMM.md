@@ -78,7 +78,7 @@ Stage3 は **MARKET 注文 1 本の縦スライスに限定し、POST 対応の�
   - IRestClient（PostAsync 追加）
   - IRequestSigner（POST 署名対応）
   - ExchangeApiException
-- `ExchangeApi.Adapter.Bitflyer`
+- `Exchange.Bitflyer`
   - DTO：BitflyerSendChildOrderRequest / Response
   - IBitflyerPrivateTradingApi
   - BitflyerPrivateApi（GET + POST 両対応）

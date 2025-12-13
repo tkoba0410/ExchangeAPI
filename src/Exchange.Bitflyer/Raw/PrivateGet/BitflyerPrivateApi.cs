@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer.Models;
+using Exchange.Bitflyer.Raw.PrivateGet.Models;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
 using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Adapter.Bitflyer;
+namespace Exchange.Bitflyer.Raw.PrivateGet;
 
 /// <summary>
 /// bitFlyer Private REST API（情報系）の実装。

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Transport;
 
-namespace ExchangeApi.Adapter.Bitflyer;
+namespace Exchange.Bitflyer.Raw.Signer;
 
 public sealed class BitflyerSigningTransport : IHttpTransport
 {

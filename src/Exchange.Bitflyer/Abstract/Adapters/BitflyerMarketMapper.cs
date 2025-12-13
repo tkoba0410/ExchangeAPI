@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using ExchangeApi.Adapter.Bitflyer.Models;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
 using ExchangeApi.Contracts.Dtos;
 
-namespace ExchangeApi.Adapter.Bitflyer.Adapters;
+namespace Exchange.Bitflyer.Abstract.Adapters;
 
 internal static class BitflyerMarketMapper
 {

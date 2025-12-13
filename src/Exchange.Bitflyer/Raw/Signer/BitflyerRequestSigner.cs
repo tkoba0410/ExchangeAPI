@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 
-namespace ExchangeApi.Adapter.Bitflyer;
+namespace Exchange.Bitflyer.Raw.Signer;
 
 public sealed class BitflyerRequestSigner : IRequestSigner
 {

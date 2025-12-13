@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Adapter.Bitflyer.Models;
+namespace Exchange.Bitflyer.Raw.PrivatePost.Models;
 
 /// <summary>
 /// /v1/me/sendchildorder のリクエスト DTO。

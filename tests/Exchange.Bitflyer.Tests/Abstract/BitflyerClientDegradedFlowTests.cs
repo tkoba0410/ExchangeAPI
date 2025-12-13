@@ -4,14 +4,14 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer.Factory;
+using Exchange.Bitflyer.Abstract.Factory;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Transport.Logging;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Transport;
 using Xunit;
 
-namespace ExchangeApi.Adapter.Bitflyer.Tests;
+namespace Exchange.Bitflyer.Tests;
 
 public class BitflyerClientDegradedFlowTests
 {

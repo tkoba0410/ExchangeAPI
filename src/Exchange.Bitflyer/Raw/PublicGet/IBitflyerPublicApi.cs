@@ -2,9 +2,9 @@
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bitflyer.Models;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
 
-namespace ExchangeApi.Adapter.Bitflyer
+namespace Exchange.Bitflyer.Raw.PublicGet
 {
     /// <summary>
     /// bitFlyer Public REST API (GET /v1/getticker) への Raw アクセスインターフェース。

@@ -1,8 +1,8 @@
 using System;
-using ExchangeApi.Adapter.Bitflyer;
+using Exchange.Bitflyer.Raw;
 using ExchangeApi.Contracts.Dtos;
 
-namespace ExchangeApi.Adapter.Bitflyer.Adapters;
+namespace Exchange.Bitflyer.Abstract.Adapters;
 
 internal static class BitflyerTradingMapper
 {

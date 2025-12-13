@@ -1,4 +1,4 @@
-using ExchangeApi.Adapter.Bitflyer.Facade;
+using Exchange.Bitflyer.Abstract.Facade;
 using ExchangeApi.Adapter.Bittrade.Facade;
 
 namespace ExchangeApi.Factory;

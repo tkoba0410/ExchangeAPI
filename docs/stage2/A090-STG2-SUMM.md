@@ -70,7 +70,7 @@ Stage2 は、**「bitFlyer Private API 呼び出しのテンプレートを確�
   - `IRequestSigner` / `BitflyerRequestSigner`
   - `IRestClient` / `RestClient`
   - `ExchangeApiException`
-- `ExchangeApi.Adapter.Bitflyer`
+- `Exchange.Bitflyer`
   - DTO: `BitflyerBalanceResponse`
   - Private API: `IBitflyerPrivateApi`, `BitflyerPrivateApi`
   - Adapter: `BitflyerExchangeClient.GetBalancesAsync`（DTO → Balance 変換を内包）

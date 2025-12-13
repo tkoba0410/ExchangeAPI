@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Adapter.Bitflyer.Models;
+namespace Exchange.Bitflyer.Raw.PublicGet.Models;
 
 public sealed record BitflyerFundingRateResponse(
     [property: JsonPropertyName("product_code")] string ProductCode,

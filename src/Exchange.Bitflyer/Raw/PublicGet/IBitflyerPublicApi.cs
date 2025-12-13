@@ -70,7 +70,7 @@ namespace Exchange.Bitflyer.Raw
             string productCode,
             CancellationToken cancellationToken = default);
 
-        Task<JsonElement> GetCorporateLeverageAsync(CancellationToken cancellationToken = default);
+        Task<BitflyerCorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default);
 
         Task<BitflyerFundingRateResponse> GetFundingRateAsync(
             string productCode,

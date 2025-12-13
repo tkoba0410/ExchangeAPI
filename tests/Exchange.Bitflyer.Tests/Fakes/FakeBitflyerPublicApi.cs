@@ -87,8 +87,12 @@ namespace Exchange.Bitflyer.Tests.Fakes
         public Task<BitflyerBoardStateResponse> GetBoardStateAsync(string productCode, CancellationToken cancellationToken = default) =>
             Task.FromResult(new BitflyerBoardStateResponse("NORMAL", "RUNNING", null));
 
-        public Task<JsonElement> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(JsonDocument.Parse("{}").RootElement);
+        public Task<BitflyerCorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(new BitflyerCorporateLeverageResponse(
+                CurrentMax: 7.7m,
+                CurrentStartDate: System.DateTimeOffset.UtcNow,
+                NextMax: 7.65m,
+                NextStartDate: System.DateTimeOffset.UtcNow.AddDays(7)));
 
         public Task<BitflyerFundingRateResponse> GetFundingRateAsync(string productCode, CancellationToken cancellationToken = default) =>
             Task.FromResult(new BitflyerFundingRateResponse(0m, System.DateTimeOffset.UtcNow));

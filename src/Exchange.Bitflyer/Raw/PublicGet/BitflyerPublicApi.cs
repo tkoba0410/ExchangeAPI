@@ -182,10 +182,10 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
         return _restClient.GetAsync<BitflyerBoardStateResponse>(path, query, cancellationToken);
     }
 
-    public Task<JsonElement> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
+    public Task<BitflyerCorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
     {
         const string path = BitflyerConstants.Paths.GetCorporateLeverage;
-        return _restClient.GetAsync<JsonElement>(path, query: null, cancellationToken);
+        return _restClient.GetAsync<BitflyerCorporateLeverageResponse>(path, query: null, cancellationToken);
     }
 
     public Task<BitflyerFundingRateResponse> GetFundingRateAsync(

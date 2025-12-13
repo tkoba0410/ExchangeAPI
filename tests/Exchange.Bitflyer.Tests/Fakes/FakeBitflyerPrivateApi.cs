@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Raw;
+using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 
 namespace Exchange.Bitflyer.Tests.Fakes;
 
@@ -93,7 +94,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
             {
                 new BitflyerParentOrderDetailParameter
                 {
-                    ProductCode = ProductCode.BtcJpy,
+                    ProductCode = RawProductCode.BtcJpy,
                     ConditionType = ConditionType.Limit,
                     Side = Side.Buy,
                     Size = 0.1m,

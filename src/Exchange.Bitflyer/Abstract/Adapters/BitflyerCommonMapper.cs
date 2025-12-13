@@ -1,7 +1,8 @@
 using System;
-using Exchange.Bitflyer.Raw;
 using Common.Contract.Dtos;
 using Common.Contract.Errors;
+using Exchange.Bitflyer.Raw;
+using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 
 namespace Exchange.Bitflyer.Abstract;
 
@@ -16,46 +17,46 @@ internal static class BitflyerCommonMapper
     public static Side MapSideToExchange(OrderSide side) =>
         BitflyerSideMapper.ToRawSide(side);
 
-    public static ProductCode MapSymbolToProductCode(string symbol)
+    public static RawProductCode MapSymbolToProductCode(string symbol)
     {
         if (string.Equals(symbol, "BTC/JPY", StringComparison.Ordinal) ||
             string.Equals(symbol, "BTC_JPY", StringComparison.Ordinal))
         {
-            return ProductCode.BtcJpy;
+            return RawProductCode.BtcJpy;
         }
 
         if (string.Equals(symbol, "ETH/JPY", StringComparison.Ordinal) ||
             string.Equals(symbol, "ETH_JPY", StringComparison.Ordinal))
         {
-            return ProductCode.EthJpy;
+            return RawProductCode.EthJpy;
         }
 
         if (string.Equals(symbol, "FX_BTC_JPY", StringComparison.Ordinal) ||
             string.Equals(symbol, "FX_BTC/JPY", StringComparison.Ordinal))
         {
-            return ProductCode.FxBtcJpy;
+            return RawProductCode.FxBtcJpy;
         }
 
         throw new SymbolNotSupportedException(symbol);
     }
 
-    public static string ToApiProductCode(ProductCode productCode) =>
+    public static string ToApiProductCode(RawProductCode productCode) =>
         productCode switch
         {
-            ProductCode.BtcJpy => "BTC_JPY",
-            ProductCode.EthJpy => "ETH_JPY",
-            ProductCode.FxBtcJpy => "FX_BTC_JPY",
+            RawProductCode.BtcJpy => "BTC_JPY",
+            RawProductCode.EthJpy => "ETH_JPY",
+            RawProductCode.FxBtcJpy => "FX_BTC_JPY",
             _ => "BTC_JPY",
         };
 
-    public static OrderStatusType MapOrderStatusType(string childOrderState) =>
+    public static OrderStatus MapOrderStatusSnapshot(string childOrderState) =>
         (childOrderState ?? string.Empty).ToUpperInvariant() switch
         {
-            "ACTIVE" => OrderStatusType.Active,
-            "COMPLETED" => OrderStatusType.Completed,
-            "CANCELED" => OrderStatusType.Canceled,
-            "EXPIRED" => OrderStatusType.Expired,
-            _ => OrderStatusType.Unknown,
+            "ACTIVE" => OrderStatus.Active,
+            "COMPLETED" => OrderStatus.Completed,
+            "CANCELED" => OrderStatus.Canceled,
+            "EXPIRED" => OrderStatus.Expired,
+            _ => OrderStatus.Unknown,
         };
 
 }

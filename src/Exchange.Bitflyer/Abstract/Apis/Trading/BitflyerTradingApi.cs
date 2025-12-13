@@ -170,7 +170,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
     }
 
-    public async Task<OrderStatus> PollOrderStatusAsync(
+    public async Task<OrderStatusSnapshot> PollOrderStatusAsync(
         string productCode,
         string childOrderAcceptanceId,
         TimeSpan? pollInterval = null,
@@ -201,18 +201,18 @@ public sealed class BitflyerTradingApi : ITradingApi
 
             if (order is null)
             {
-                return new OrderStatus(
+                return new OrderStatusSnapshot(
                     ProductCode: productCode,
                     OrderAcceptanceId: childOrderAcceptanceId,
-                    Status: OrderStatusType.Completed,
+                    Status: OrderStatus.Completed,
                     ExecutedSize: 0m,
                     OutstandingSize: 0m,
                     Price: null,
                     AveragePrice: null);
             }
 
-            var status = BitflyerCommonMapper.MapOrderStatusType(order.ChildOrderState);
-            var mapped = new OrderStatus(
+            var status = BitflyerCommonMapper.MapOrderStatusSnapshot(order.ChildOrderState);
+            var mapped = new OrderStatusSnapshot(
                 ProductCode: BitflyerCommonMapper.ToApiProductCode(order.ProductCode),
                 OrderAcceptanceId: order.ChildOrderAcceptanceId,
                 Status: status,
@@ -221,14 +221,14 @@ public sealed class BitflyerTradingApi : ITradingApi
                 Price: order.Price == 0 ? null : order.Price,
                 AveragePrice: order.AveragePrice == 0 ? null : order.AveragePrice);
 
-            if (status is OrderStatusType.Completed or OrderStatusType.Canceled or OrderStatusType.Expired)
+            if (status is OrderStatus.Completed or OrderStatus.Canceled or OrderStatus.Expired)
             {
                 return mapped;
             }
 
             if (attempt == maxAttempts - 1)
             {
-                return mapped with { Status = OrderStatusType.Active };
+                return mapped with { Status = OrderStatus.Active };
             }
 
             await Task.Delay(interval, cancellationToken).ConfigureAwait(false);

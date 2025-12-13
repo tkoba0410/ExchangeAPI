@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
+using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 using Exchange.Bitflyer.Tests.Fakes;
 using Common.Contract.Dtos;
 using ExecutionResponse = Exchange.Bitflyer.Raw.BitflyerExecutionPrivateResponse;
@@ -20,7 +21,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var acceptanceId = "ACCEPT-1";
         var active = new BitflyerChildOrderResponse
         {
-            ProductCode = ProductCode.BtcJpy,
+            ProductCode = RawProductCode.BtcJpy,
             ChildOrderAcceptanceId = acceptanceId,
             ChildOrderState = "ACTIVE",
             ExecutedSize = 0m,
@@ -56,7 +57,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             pollInterval: TimeSpan.FromMilliseconds(1),
             maxAttempts: 5);
 
-        Assert.Equal(OrderStatusType.Completed, status.Status);
+        Assert.Equal(OrderStatus.Completed, status.Status);
         Assert.Equal(0m, status.OutstandingSize);
         Assert.Equal(0.01m, status.ExecutedSize);
         Assert.Equal(3000000m, status.AveragePrice);

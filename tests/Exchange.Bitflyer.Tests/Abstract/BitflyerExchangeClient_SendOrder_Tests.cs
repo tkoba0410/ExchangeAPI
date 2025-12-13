@@ -3,6 +3,7 @@ using Common.Contract.Dtos;
 using Common.Contract.Errors;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
+using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 using Exchange.Bitflyer.Tests.Fakes;
 using Xunit;
 
@@ -30,7 +31,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         Assert.Equal("ACCEPT-123", result.OrderId);
         Assert.NotNull(fakeTrading.LastRequest);
-        Assert.Equal(ProductCode.BtcJpy, fakeTrading.LastRequest!.ProductCode);
+        Assert.Equal(RawProductCode.BtcJpy, fakeTrading.LastRequest!.ProductCode);
         Assert.Equal(Side.Buy, fakeTrading.LastRequest!.Side);
         Assert.Equal(ChildOrderType.Market, fakeTrading.LastRequest!.ChildOrderType);
         Assert.Equal(0.01m, fakeTrading.LastRequest!.Size);

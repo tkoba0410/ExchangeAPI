@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Exchange.Bitflyer.Raw;
 using Common.Contract.Dtos;
+using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 
 namespace Exchange.Bitflyer.Abstract;
 
@@ -37,7 +38,7 @@ internal static class BitflyerMarketMapper
             MidPrice: rawBoard.MidPrice);
     }
 
-    public static MarketExecution MapExecution(ProductCode productCode, BitflyerExecutionPublicResponse raw)
+    public static MarketExecution MapExecution(RawProductCode productCode, BitflyerExecutionPublicResponse raw)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 

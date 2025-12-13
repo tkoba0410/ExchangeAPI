@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Common.Contract.Dtos;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
+using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 using Exchange.Bitflyer.Tests.Fakes;
 using Xunit;
 
@@ -78,7 +79,7 @@ namespace Exchange.Bitflyer.Tests
             // 既存の Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
             var rawTicker = new BitflyerTicker
             {
-                ProductCode = ProductCode.BtcJpy,
+                ProductCode = RawProductCode.BtcJpy,
                 Timestamp = DateTimeOffset.UnixEpoch,
                 TickId = 0,
                 BestBid = 0m,

@@ -24,7 +24,7 @@ public interface ITradingApi
     /// <param name="childOrderAcceptanceId">注文の acceptance id。</param>
     /// <param name="pollInterval">ポーリング間隔（null なら 1s）。</param>
     /// <param name="maxAttempts">最大試行回数（デフォルト 30）。</param>
-    Task<OrderStatus> PollOrderStatusAsync(
+    Task<OrderStatusSnapshot> PollOrderStatusAsync(
         string productCode,
         string childOrderAcceptanceId,
         TimeSpan? pollInterval = null,

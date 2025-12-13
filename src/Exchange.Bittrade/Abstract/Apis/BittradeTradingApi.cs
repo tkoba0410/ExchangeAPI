@@ -108,7 +108,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         return resp.Data.Select(BittradeMapper.MapOrderSummary).ToList();
     }
 
-    public Task<OrderStatus> PollOrderStatusAsync(
+    public Task<OrderStatusSnapshot> PollOrderStatusAsync(
         string productCode,
         string orderId,
         TimeSpan? pollInterval = null,
@@ -119,7 +119,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         return PollOrderStatusOnceAsync(orderId, cancellationToken);
     }
 
-    private async Task<OrderStatus> PollOrderStatusOnceAsync(string orderId, CancellationToken cancellationToken)
+    private async Task<OrderStatusSnapshot> PollOrderStatusOnceAsync(string orderId, CancellationToken cancellationToken)
     {
         var resp = await _restClient.GetAsync<BittradeOrderDetailResponse>(
             $"v1/order/orders/{orderId}",
@@ -131,7 +131,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         }
 
         var order = BittradeMapper.MapOrder(resp.Data);
-        return new OrderStatus(
+        return new OrderStatusSnapshot(
             order.ProductCode,
             orderId,
             BittradeMapper.ParseStatus(resp.Data.State),

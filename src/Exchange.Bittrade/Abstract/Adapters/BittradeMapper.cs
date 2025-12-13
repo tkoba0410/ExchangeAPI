@@ -66,17 +66,17 @@ internal static class BittradeMapper
             ClientOrderId: summary.ClientOrderId);
     }
 
-    public static OrderStatusType ParseStatus(string state)
+    public static OrderStatus ParseStatus(string state)
     {
         return state switch
         {
-            "submitted" => OrderStatusType.Active,
-            "partial-filled" => OrderStatusType.Active,
-            "filled" => OrderStatusType.Completed,
-            "partial-canceled" => OrderStatusType.Canceled,
-            "canceled" => OrderStatusType.Canceled,
-            "expired" => OrderStatusType.Expired,
-            _ => OrderStatusType.Unknown
+            "submitted" => OrderStatus.Active,
+            "partial-filled" => OrderStatus.Active,
+            "filled" => OrderStatus.Completed,
+            "partial-canceled" => OrderStatus.Canceled,
+            "canceled" => OrderStatus.Canceled,
+            "expired" => OrderStatus.Expired,
+            _ => OrderStatus.Unknown
         };
     }
 

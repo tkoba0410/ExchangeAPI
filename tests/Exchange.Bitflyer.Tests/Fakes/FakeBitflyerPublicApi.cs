@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Raw;
+using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 
 namespace Exchange.Bitflyer.Tests.Fakes
 {
@@ -64,7 +65,7 @@ namespace Exchange.Bitflyer.Tests.Fakes
                 new BitflyerExecutionPublicResponse
                 {
                     Id = 1,
-                    ProductCode = ProductCode.BtcJpy,
+                    ProductCode = RawProductCode.BtcJpy,
                     Side = Side.Buy,
                     Price = 100m,
                     Size = 0.01m,
@@ -76,7 +77,7 @@ namespace Exchange.Bitflyer.Tests.Fakes
         }
 
         public Task<IReadOnlyList<BitflyerMarket>> GetMarketsAsync(string? region = null, bool useAliasPath = false, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BitflyerMarket>>(new[] { new BitflyerMarket(ProductCode.BtcJpy, "BTC_JPY") });
+            Task.FromResult<IReadOnlyList<BitflyerMarket>>(new[] { new BitflyerMarket(RawProductCode.BtcJpy, "BTC_JPY") });
 
         public Task<IReadOnlyList<BitflyerChat>> GetChatsAsync(string? fromDate = null, string? region = null, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<BitflyerChat>>(new[] { new BitflyerChat("n", "m", System.DateTimeOffset.UtcNow) });

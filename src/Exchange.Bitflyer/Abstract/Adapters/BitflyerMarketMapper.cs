@@ -32,10 +32,7 @@ internal static class BitflyerMarketMapper
             .Select(a => new OrderBookLevel(a.Price, a.Size))
             .ToArray() ?? Array.Empty<OrderBookLevel>();
 
-        return new OrderBook(
-            Bids: bids,
-            Asks: asks,
-            MidPrice: rawBoard.MidPrice);
+        return new OrderBook(bids, asks, rawBoard.MidPrice);
     }
 
     public static MarketExecution MapExecution(RawProductCode productCode, BitflyerExecutionPublicResponse raw)

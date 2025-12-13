@@ -5,12 +5,6 @@ using ExchangeApi.Contracts.Dtos;
 namespace ExchangeApi.Adapter.Bitflyer.Adapters;
 
 /// <summary>bitFlyer のサイド文字列と enum のマッピング。</summary>
-internal enum BitflyerSide
-{
-    Buy,
-    Sell,
-}
-
 internal static class BitflyerSideMapper
 {
     public static BitflyerSide FromApi(string side) =>

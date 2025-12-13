@@ -3,9 +3,9 @@
 Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段階的に拡張するための変更ロードマップ。
 
 ## 方針
-- レイヤーは一方向: Common(Transport/Policy/Contracts) → 取引所 Raw → 共通抽象ラッパ → 統合クライアント。
-- 入口は Raw-first。抽象は各取引所に寄せたラッパとしてオプション提供。統合クライアントはそれらを束ねるだけにとどめる。
-- 実装レベルを明示して期待値とテスト密度を管理する。
+- 2段×2層（計4層）で一方向: 下段=実装系（Common: Transport/Policy/Contracts → 取引所 Raw）、上段=抽象系（取引所抽象 → 薄い統合ファサード）。
+- 入口は Raw-first。抽象は「基本取引ロジックに必要な最小」だけをラップし、統合ファサードは束ねるだけ（追加抽象は作らない）。
+- 実装レベル（完全/主要/抽象/一部）を明示して期待値とテスト密度を管理する。
 
 ### 実装レベルの定義
 - 完全: 公式 API ほぼ全網羅（Raw）、ライブ/モック両テスト、Breaking を明示。主力取引所向け。
@@ -15,13 +15,13 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
 
 ## ロードマップ（案）
 1. レイヤー整理と命名
-   - フォルダ/名前空間を Raw と抽象で明示分離（例: Bitflyer.Raw / Bitflyer.Abstract）。
+   - フォルダ/名前空間を「実装系（Common/Raw）」と「抽象系（Abstract/統合）」に分ける（例: Bitflyer.Raw / Bitflyer.Abstract、統合は Factory 内の薄いヘルパ）。
    - 統合クライアントに Primary 設定を持たせ、QuickStart のデフォルトを設定で差し替え可能にする。
 2. レベル付与と範囲決定
    - 取引所ごとに実装レベルを宣言（例: bitFlyer=完全, Bittrade=主要, 新規=一部）。
    - README/Docs にレベル表を追加し、NotSupported や部分対応を明示。
 3. テスト/CI 方針の切り分け
-   - Raw を厚め、抽象/統合はスモークに抑えるルールを文書化。
+   - Raw を厚め、抽象/統合はスモークに抑えるルールを文書化。クロスカット（署名/リトライ/レート制限/ログ）は Common.Transport で吸収。
    - ライブ統合テストはレベル「完全/主要」の主要経路のみを opt-in で実行。
 4. ドキュメント更新
    - QuickStart を Raw-first に刷新。抽象は「共通化が必要なら」の章に分離。
@@ -32,7 +32,7 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
    - 一部レベルは探索的に進め、次のステップへ上げる条件を TODO に残す。
 
 ## 成果物
-- レイヤー/名前空間整理後のプロジェクト構成と統合クライアントの Primary 設定。
+- 2段×2層のレイヤー/名前空間整理後のプロジェクト構成と統合クライアントの Primary 設定。
 - 実装レベル対応表（取引所 × レベル × 対応 API）。
 - Raw-first QuickStart/Docs の更新と、抽象/統合の利用ガイド。
 - テスト/CI のレベル別実行ポリシー。
@@ -40,21 +40,20 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
 
 ## 段階的移行ステップ（現構成 → 最小プロジェクト構成）
 0. 現状把握
-   - 現在: `ExchangeApi.Contracts/Transport/Factory`, `adapter/Bitflyer|Bittrade|Common`, テストは対応する *.Tests。
-   - 目標: プロジェクトを 4 本に集約（Common.Core, Exchange.Bitflyer, Exchange.Bittrade, Exchange.Factory）、フォルダで Raw/Abstract を分離。
-   - 命名: 新 csproj 名は `Common.Core`, `Exchange.Bitflyer`, `Exchange.Bittrade`, `Exchange.Factory`。統合クライアントは Factory 内のヘルパとして扱う。
+   - 現在: `Common.Core` に集約済み。`Exchange.Bitflyer` / `Exchange.Bittrade` は Raw/Abstract にフォルダ分離済み、`Exchange.Factory` に統合ヘルパあり。
+   - 目標: 2段×2層を明示（実装系: Common + Raw、抽象系: 各取引所抽象 + 統合）。プロジェクト本数は 4 本を維持。
+   - 命名: csproj 名は `Common.Core`, `Exchange.Bitflyer`, `Exchange.Bittrade`, `Exchange.Factory`。統合クライアントは Factory 内のヘルパとして扱う。
 1. Common をまとめる
    - `ExchangeApi.Contracts/Transport/Factory` を `Common.Core`（単一 csproj）に統合。名前空間は後方互換のため既存を保持しつつ新しいルートを段階導入。
    - テストも `Common.Core.Tests` にまとめる（既存テストをフォルダ移動）。
    - 作業チェック: `src/ExchangeApi.Contracts` 等の `Compile Include` を新 csproj に移動し、ソリューションに `Common.Core.csproj` を追加。テスト csproj も同様。
-2. 取引所ごとの Raw/Abstract をフォルダで分離
-   - `adapter/Bitflyer` 配下を `Raw/` と `Abstract/` フォルダに整理（プロジェクトは一つ: `Exchange.Bitflyer`）。抽象は Raw を呼ぶ薄い層に限定。
-   - Bittrade も同様に整理し、共通コードは `Exchange/Common` か `Common.Core` に寄せる。
-   - テストは `Exchange.Bitflyer.Tests` に集約し、フォルダで Raw/Abstract を分ける。
-   - 作業チェック: 既存 `ExchangeApi.Adapter.Bitflyer` csproj を `src/Exchange.Bitflyer/Exchange.Bitflyer.csproj` に移動し、`<RootNamespace>` を `Exchange.Bitflyer` に設定。コード内 using を順次リネーム（旧 namespace は `using` alias で暫定対応可）。テスト csproj も同様。
-3. 統合クライアントの扱い（任意）
-   - 各取引所クライアントを束ねる薄いファサードは Exchange.Factory 内のヘルパで提供する（別 csproj を増やさない）。
-   - スモークテストは Factory.Tests など既存のテストプロジェクトで扱う。
+2. 取引所ごとの Raw/Abstract を維持しつつ 2段×2層を明示
+   - Raw は仕様準拠で厚め（PublicGet/PrivateGet/PrivatePost/Signer/RawApi に分離）。クロスカットは Common.Transport で吸収。
+   - 抽象は「基本取引ロジックに必要な最小」（板/約定/発注/残高など）のみをラップ。差異は `NotSupported` を許容。
+   - テストは Raw 厚め + 抽象スモークで分離し、`.Tests` フォルダも Raw/Abstract で区切る。
+3. 統合クライアントの扱い
+   - Exchange.Factory 内の薄いヘルパで、各取引所抽象を束ねるだけに留める。二重抽象は作らない。
+   - スモークテストは Factory.Tests で実施。Primary 設定でデフォルト取引所を切り替え可能にする。
 4. Raw-first へのドキュメント更新
    - README/QuickStart を Raw-first で書き直し、抽象/統合はオプションとして別セクションに分離。
    - 実装レベル（完全/主要/抽象/一部）の対応表を追加し、各取引所の位置付けを明示。
@@ -68,8 +67,8 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
    - 作業チェック: `dotnet test` 対象を新 csproj に更新。ライブテスト用の環境変数名（例: `EXCHANGEAPI_LIVE=1`）を決めてパイプラインに記載。
 
 ## 旧→新 対応の目安
-- プロジェクト: `ExchangeApi.Contracts/Transport/Factory` → `Common.Core`; `adapter/Bitflyer` → `Exchange.Bitflyer`; `adapter/Bittrade` → `Exchange.Bittrade`; `ExchangeApi.Factory` → `Exchange.Factory`（統合クライアント組み立てもここに含める）。
-- 名前空間: `ExchangeApi.Contracts.*` → `Common.*`; `ExchangeApi.Transport.*` → `Common.Transport.*`; `ExchangeApi.Adapter.Bitflyer.*` → `Exchange.Bitflyer.*`; `ExchangeApi.Adapter.Bittrade.*` → `Exchange.Bittrade.*`.
+- プロジェクト: `Common.Core`（Transport/Policy/Contracts） → そのまま。`Exchange.Bitflyer`/`Exchange.Bittrade` → Raw/Abstract をフォルダ分離した単一 csproj のまま。`Exchange.Factory` → 統合ヘルパ（Unified を含む）。
+- 名前空間: `ExchangeApi.*` 旧系は段階的に `Common.*` / `Exchange.*` に寄せる。既存 using は互換のため当面残してよい。
 
 ## 構成イメージ（フォルダ/プロジェクト）※最小 csproj 本数を維持
 ```

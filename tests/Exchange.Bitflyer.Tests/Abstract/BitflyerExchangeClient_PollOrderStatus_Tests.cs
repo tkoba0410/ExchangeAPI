@@ -28,7 +28,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             Price = 3000000m,
             AveragePrice = 0m,
             Side = Side.Buy,
-            ChildOrderType = "LIMIT",
+            ChildOrderType = ChildOrderType.Limit,
             Size = 0.01m,
         };
         var completed = new BitflyerChildOrderResponse

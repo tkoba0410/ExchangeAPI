@@ -6,21 +6,22 @@ namespace Exchange.Bitflyer.Abstract;
 
 internal static class BitflyerTradingMapper
 {
-    public static string MapOrderType(OrderType orderType, decimal? price) =>
+    public static ChildOrderType MapOrderType(OrderType orderType, decimal? price) =>
         orderType switch
         {
-            OrderType.Market => BitflyerConstants.ConditionType.Market,
-            OrderType.Limit => BitflyerConstants.ConditionType.Limit,
-            OrderType.Stop => price is null ? BitflyerConstants.ConditionType.Stop : BitflyerConstants.ConditionType.StopLimit,
-            _ => BitflyerConstants.ConditionType.Market,
+            OrderType.Market => ChildOrderType.Market,
+            OrderType.Limit => ChildOrderType.Limit,
+            OrderType.Stop => price is null ? ChildOrderType.Stop : ChildOrderType.StopLimit,
+            _ => ChildOrderType.Market,
         };
 
-    public static OrderType MapOrderTypeFromExchange(string childOrderType) =>
-        childOrderType.ToUpperInvariant() switch
+    public static OrderType MapOrderTypeFromExchange(ChildOrderType childOrderType) =>
+        childOrderType switch
         {
-            BitflyerConstants.ConditionType.Limit => OrderType.Limit,
-            BitflyerConstants.ConditionType.Market => OrderType.Market,
-            BitflyerConstants.ConditionType.Stop or BitflyerConstants.ConditionType.StopLimit => OrderType.Stop,
+            ChildOrderType.Limit => OrderType.Limit,
+            ChildOrderType.Market => OrderType.Market,
+            ChildOrderType.Stop or ChildOrderType.StopLimit => OrderType.Stop,
+            ChildOrderType.Trail => OrderType.Stop,
             _ => OrderType.Market,
         };
 

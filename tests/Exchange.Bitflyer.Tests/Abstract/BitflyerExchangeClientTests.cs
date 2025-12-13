@@ -143,7 +143,7 @@ namespace Exchange.Bitflyer.Tests
                     ChildOrderAcceptanceId = "JRF-1",
                     ProductCode = ProductCode.BtcJpy,
                     Side = Side.Buy,
-                    ChildOrderType = "LIMIT",
+                ChildOrderType = ChildOrderType.Limit,
                     Price = 100m,
                     Size = 0.1m,
                     OutstandingSize = 0.1m,

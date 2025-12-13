@@ -32,7 +32,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         Assert.NotNull(fakeTrading.LastRequest);
         Assert.Equal(ProductCode.BtcJpy, fakeTrading.LastRequest!.ProductCode);
         Assert.Equal(Side.Buy, fakeTrading.LastRequest!.Side);
-        Assert.Equal("MARKET", fakeTrading.LastRequest!.ChildOrderType);
+        Assert.Equal(ChildOrderType.Market, fakeTrading.LastRequest!.ChildOrderType);
         Assert.Equal(0.01m, fakeTrading.LastRequest!.Size);
     }
 
@@ -57,7 +57,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         Assert.Equal("ACCEPT-STOP", result.OrderId);
         Assert.NotNull(fakeTrading.LastRequest);
-        Assert.Equal("STOP_LIMIT", fakeTrading.LastRequest!.ChildOrderType);
+        Assert.Equal(ChildOrderType.StopLimit, fakeTrading.LastRequest!.ChildOrderType);
         Assert.Equal(4000000m, fakeTrading.LastRequest!.Price);
         Assert.Equal(3990000m, fakeTrading.LastRequest!.TriggerPrice);
     }

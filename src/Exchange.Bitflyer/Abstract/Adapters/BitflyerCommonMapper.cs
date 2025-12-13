@@ -49,12 +49,12 @@ internal static class BitflyerCommonMapper
         };
 
     public static OrderStatusType MapOrderStatusType(string childOrderState) =>
-        childOrderState.ToUpperInvariant() switch
+        (childOrderState ?? string.Empty).ToUpperInvariant() switch
         {
-            BitflyerConstants.States.OrderActive => OrderStatusType.Active,
-            BitflyerConstants.States.OrderCompleted => OrderStatusType.Completed,
-            BitflyerConstants.States.OrderCanceled => OrderStatusType.Canceled,
-            BitflyerConstants.States.OrderExpired => OrderStatusType.Expired,
+            "ACTIVE" => OrderStatusType.Active,
+            "COMPLETED" => OrderStatusType.Completed,
+            "CANCELED" => OrderStatusType.Canceled,
+            "EXPIRED" => OrderStatusType.Expired,
             _ => OrderStatusType.Unknown,
         };
 

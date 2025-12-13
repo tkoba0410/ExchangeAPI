@@ -14,8 +14,8 @@ public sealed class BitflyerChildOrderResponse
     [JsonPropertyName("average_price")] public decimal AveragePrice { get; init; }
     [JsonPropertyName("size")] public decimal Size { get; init; }
     [JsonPropertyName("child_order_state")] public string ChildOrderState { get; init; } = string.Empty;
-    [JsonPropertyName("expire_date")] public DateTime ExpireDate { get; init; }
-    [JsonPropertyName("child_order_date")] public DateTime ChildOrderDate { get; init; }
+    [JsonPropertyName("expire_date")] public DateTimeOffset ExpireDate { get; init; }
+    [JsonPropertyName("child_order_date")] public DateTimeOffset ChildOrderDate { get; init; }
     [JsonPropertyName("child_order_acceptance_id")] public string ChildOrderAcceptanceId { get; init; } = string.Empty;
     [JsonPropertyName("outstanding_size")] public decimal OutstandingSize { get; init; }
     [JsonPropertyName("cancel_size")] public decimal CancelSize { get; init; }

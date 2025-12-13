@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
 using Exchange.Bitflyer.Tests.Fakes;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Dtos;
 using ExecutionResponse = Exchange.Bitflyer.Raw.BitflyerExecutionPrivateResponse;
 using Xunit;
 

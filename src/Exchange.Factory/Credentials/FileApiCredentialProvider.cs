@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
 
 namespace ExchangeApi.Factory.Credentials;
 

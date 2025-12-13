@@ -1,10 +1,10 @@
 using System;
 using System.Net.Http;
 using Exchange.Bitflyer.Abstract;
-using ExchangeApi.Transport.Logging;
-using ExchangeApi.Transport.Policy;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Transport.Transport;
+using Common.Transport.Logging;
+using Common.Transport.Policy;
+using Common.Transport.Protocol;
+using Common.Transport.Transport;
 
 namespace Exchange.Bitflyer.Abstract;
 

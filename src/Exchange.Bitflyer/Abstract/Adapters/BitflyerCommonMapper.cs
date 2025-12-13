@@ -1,7 +1,7 @@
 using System;
 using Exchange.Bitflyer.Raw;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Errors;
+using Common.Contract.Dtos;
+using Common.Contract.Errors;
 
 namespace Exchange.Bitflyer.Abstract;
 

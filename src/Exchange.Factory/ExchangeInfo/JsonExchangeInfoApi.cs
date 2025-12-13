@@ -6,9 +6,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
+using ExchangeInfoDto = Common.Contract.Dtos.ExchangeInfo;
 
 namespace ExchangeApi.Factory.ExchangeInfo;
 

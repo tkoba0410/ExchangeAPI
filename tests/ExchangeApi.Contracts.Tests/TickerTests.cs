@@ -1,8 +1,8 @@
 using System;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Dtos;
 using Xunit;
 
-namespace ExchangeApi.Contracts.Tests;
+namespace Common.Contract.Tests;
 
 public class TickerTests
 {

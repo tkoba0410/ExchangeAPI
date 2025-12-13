@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.RawApi;
-using ExchangeApi.Transport.Protocol;
+using Common.Transport.Protocol;
 
 namespace ExchangeApi.Adapter.Bittrade;
 

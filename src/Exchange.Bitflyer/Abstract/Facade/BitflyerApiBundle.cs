@@ -1,7 +1,7 @@
 using System;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
-using ExchangeApi.Transport.Protocol;
+using Common.Transport.Protocol;
 
 namespace Exchange.Bitflyer.Abstract;
 

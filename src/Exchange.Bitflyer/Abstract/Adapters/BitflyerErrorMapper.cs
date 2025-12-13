@@ -1,4 +1,4 @@
-using ExchangeApi.Contracts.Errors;
+using Common.Contract.Errors;
 
 namespace Exchange.Bitflyer.Abstract;
 

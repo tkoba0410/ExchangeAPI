@@ -2,8 +2,8 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Transport.Transport;
+using Common.Transport.Protocol;
+using Common.Transport.Transport;
 
 namespace Exchange.Bitflyer.Raw;
 

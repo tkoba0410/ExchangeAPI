@@ -7,13 +7,13 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Errors;
-using ExchangeApi.Transport.Logging;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Transport.Transport;
+using Common.Contract.Errors;
+using Common.Transport.Logging;
+using Common.Transport.Protocol;
+using Common.Transport.Transport;
 using Xunit;
 
-namespace ExchangeApi.Transport.Tests;
+namespace Common.Transport.Tests;
 
 public sealed class RestClientTests
 {

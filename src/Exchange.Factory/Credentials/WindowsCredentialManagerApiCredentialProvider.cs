@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace ExchangeApi.Factory.Credentials;

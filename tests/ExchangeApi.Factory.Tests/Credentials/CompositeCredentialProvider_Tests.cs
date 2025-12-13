@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
 using ExchangeApi.Factory.Credentials;
 
 namespace ExchangeApi.Factory.Tests.Credentials;

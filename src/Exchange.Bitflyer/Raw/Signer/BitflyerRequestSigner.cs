@@ -4,8 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Transport.Time;
+using Common.Transport.Protocol;
+using Common.Transport.Time;
 
 namespace Exchange.Bitflyer.Raw;
 

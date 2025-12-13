@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Abstract;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Transport.Logging;
-using ExchangeApi.Transport.Policy;
-using ExchangeApi.Transport.Transport;
+using Common.Contract.Dtos;
+using Common.Transport.Logging;
+using Common.Transport.Policy;
+using Common.Transport.Transport;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

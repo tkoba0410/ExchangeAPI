@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.Apis;
 using ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Transport.Protocol;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
+using Common.Transport.Protocol;
 
 namespace ExchangeApi.Adapter.Bittrade.Facade;
 

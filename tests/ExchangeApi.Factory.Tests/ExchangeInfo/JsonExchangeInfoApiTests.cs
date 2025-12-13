@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Dtos;
 using ExchangeApi.Factory.ExchangeInfo;
 using Xunit;
 

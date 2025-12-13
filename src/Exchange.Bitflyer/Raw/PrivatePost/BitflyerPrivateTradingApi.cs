@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Raw;
-using ExchangeApi.Transport.Protocol;
+using Common.Transport.Protocol;
 
 namespace Exchange.Bitflyer.Raw;
 

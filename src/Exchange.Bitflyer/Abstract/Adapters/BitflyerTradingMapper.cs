@@ -1,7 +1,7 @@
 using System;
 using Exchange.Bitflyer.Raw;
-using ExchangeApi.Contracts.Dtos;
-using ContractTimeInForce = ExchangeApi.Contracts.Dtos.TimeInForce;
+using Common.Contract.Dtos;
+using ContractTimeInForce = Common.Contract.Dtos.TimeInForce;
 using RawTimeInForce = Exchange.Bitflyer.Raw.TimeInForce;
 
 namespace Exchange.Bitflyer.Abstract;

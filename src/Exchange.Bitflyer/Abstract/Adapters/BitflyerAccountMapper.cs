@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Exchange.Bitflyer.Raw;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Dtos;
 
 namespace Exchange.Bitflyer.Abstract;
 

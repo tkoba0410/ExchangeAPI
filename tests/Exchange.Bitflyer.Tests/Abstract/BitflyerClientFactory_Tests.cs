@@ -1,8 +1,8 @@
 using System;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
 using Exchange.Bitflyer.Abstract;
-using ExchangeApi.Transport.Policy;
+using Common.Transport.Policy;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

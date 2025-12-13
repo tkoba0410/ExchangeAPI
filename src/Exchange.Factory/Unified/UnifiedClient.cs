@@ -1,5 +1,5 @@
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
 using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Adapter.Bittrade.Facade;
 

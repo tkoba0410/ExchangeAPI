@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Errors;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
+using Common.Contract.Errors;
 
 namespace Exchange.Bitflyer.Abstract;
 

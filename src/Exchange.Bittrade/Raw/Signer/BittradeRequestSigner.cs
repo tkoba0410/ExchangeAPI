@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Transport.Protocol;
+using Common.Transport.Protocol;
 
 namespace ExchangeApi.Adapter.Bittrade.Http;
 

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ExchangeApi.Adapter.Bittrade.RawApi;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Errors;
+using Common.Contract.Dtos;
+using Common.Contract.Errors;
 
 namespace ExchangeApi.Adapter.Bittrade.Adapters;
 

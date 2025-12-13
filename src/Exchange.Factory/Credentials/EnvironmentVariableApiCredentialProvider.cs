@@ -1,6 +1,6 @@
 using System;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
 
 namespace ExchangeApi.Factory.Credentials;
 

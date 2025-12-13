@@ -5,12 +5,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.RawApi;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Errors;
-using ExchangeApi.Transport.Protocol;
+using Common.Contract.Contracts;
+using Common.Contract.Dtos;
+using Common.Contract.Errors;
+using Common.Transport.Protocol;
 using System.Text.Json;
-using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeInfoDto = Common.Contract.Dtos.ExchangeInfo;
 
 namespace ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
 

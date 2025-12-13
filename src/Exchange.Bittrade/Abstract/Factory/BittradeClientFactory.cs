@@ -5,11 +5,11 @@ using ExchangeApi.Adapter.Bittrade.Apis;
 using ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
 using ExchangeApi.Adapter.Bittrade.Facade;
 using ExchangeApi.Adapter.Bittrade.Http;
-using ExchangeApi.Contracts.Contracts;
-using ExchangeApi.Transport.Logging;
-using ExchangeApi.Transport.Policy;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Transport.Transport;
+using Common.Contract.Contracts;
+using Common.Transport.Logging;
+using Common.Transport.Policy;
+using Common.Transport.Protocol;
+using Common.Transport.Transport;
 
 namespace ExchangeApi.Adapter.Bittrade.Factory;
 

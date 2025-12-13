@@ -1,9 +1,9 @@
 using System;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Extensions;
+using Common.Contract.Dtos;
+using Common.Contract.Extensions;
 using Xunit;
 
-namespace ExchangeApi.Contracts.Tests.Extensions;
+namespace Common.Contract.Tests.Extensions;
 
 public class ExchangeMaintenanceExtensionsTests
 {

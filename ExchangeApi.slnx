@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/Common.Core/Common.Core.csproj" />
+    <Project Path="src/Common/Common.csproj" />
     <Project Path="src/Exchange.Bitflyer/Exchange.Bitflyer.csproj" />
     <Project Path="src/Exchange.Bittrade/ExchangeApi.Adapter.Bittrade.csproj" />
     <Project Path="src/Exchange.Factory/Exchange.Factory.csproj" />

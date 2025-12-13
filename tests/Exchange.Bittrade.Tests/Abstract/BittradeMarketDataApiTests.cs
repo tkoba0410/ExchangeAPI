@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.Apis;
 using ExchangeApi.Adapter.Bittrade.RawApi;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Transport.Transport;
+using Common.Contract.Dtos;
+using Common.Transport.Protocol;
+using Common.Transport.Transport;
 using Xunit;
 
 namespace ExchangeApi.Adapter.Bittrade.Tests;

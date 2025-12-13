@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Raw;
-using ExchangeApi.Transport.Protocol;
+using Common.Transport.Protocol;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

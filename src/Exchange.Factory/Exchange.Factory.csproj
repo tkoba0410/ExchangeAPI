@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\\Common.Core\\Common.Core.csproj" />
+    <ProjectReference Include="..\\Common\\Common.csproj" />
     <ProjectReference Include="..\\Exchange.Bitflyer\\Exchange.Bitflyer.csproj" />
     <ProjectReference Include="..\\Exchange.Bittrade\\ExchangeApi.Adapter.Bittrade.csproj" />
   </ItemGroup>

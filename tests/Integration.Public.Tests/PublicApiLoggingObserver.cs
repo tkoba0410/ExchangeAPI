@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using ExchangeApi.Transport.Logging;
+using Common.Transport.Logging;
 
 namespace Integration.Public.Tests;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Dtos;
+using Common.Contract.Dtos;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
 using Exchange.Bitflyer.Tests.Fakes;

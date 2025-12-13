@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Errors;
+using Common.Contract.Dtos;
+using Common.Contract.Errors;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
 using Exchange.Bitflyer.Tests.Fakes;

@@ -2,7 +2,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Raw;
-using ExchangeApi.Transport.Time;
+using Common.Transport.Time;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

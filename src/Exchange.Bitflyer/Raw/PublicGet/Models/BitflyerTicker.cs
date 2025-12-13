@@ -6,7 +6,7 @@ namespace Exchange.Bitflyer.Raw
     /// bitFlyer Public REST API の <c>GET /v1/getticker</c> レスポンスを
     /// ほぼそのまま写像した Raw モデル。
     /// 
-    /// - ExchangeApi.Contracts の Ticker とは 1:1 ではなく、
+    /// - Common.Contract の Ticker とは 1:1 ではなく、
     ///   取引所固有のフィールドもすべて保持するための内部用 DTO
     /// - Stage1 では Bitflyer アダプタ内でのみ使用し、外部には公開しない
     /// </summary>

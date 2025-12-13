@@ -3,10 +3,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Transport.Logging;
-using ExchangeApi.Transport.Policy;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Transport.Transport;
+using Common.Transport.Logging;
+using Common.Transport.Policy;
+using Common.Transport.Protocol;
+using Common.Transport.Transport;
 using ExchangeApi.Factory.Transport;
 
 namespace ExchangeApi.Factory.Tests.Transport;

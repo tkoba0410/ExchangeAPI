@@ -20,7 +20,7 @@ public sealed class BitflyerParentOrderResponse
     [JsonPropertyName("average_price")] public decimal AveragePrice { get; init; }
     [JsonPropertyName("size")] public decimal Size { get; init; }
 
-    [JsonPropertyName("parent_order_state")] public string ParentOrderState { get; init; } = string.Empty;
+    [JsonPropertyName("parent_order_state")] public ParentOrderState ParentOrderState { get; init; }
 
     [JsonPropertyName("expire_date")] public DateTimeOffset ExpireDate { get; init; }
     [JsonPropertyName("parent_order_date")] public DateTimeOffset ParentOrderDate { get; init; }

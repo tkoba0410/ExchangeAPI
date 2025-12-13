@@ -1,4 +1,5 @@
 using System;
+using Exchange.Bitflyer;
 using ExchangeApi.Adapter.Bitflyer;
 using ExchangeApi.Contracts.Dtos;
 

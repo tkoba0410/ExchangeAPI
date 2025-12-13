@@ -1,4 +1,4 @@
-namespace ExchangeApi.Adapter.Bitflyer;
+namespace Exchange.Bitflyer;
 
 /// <summary>bitFlyer サイド (BUY/SELL)。</summary>
 internal enum BitflyerSide

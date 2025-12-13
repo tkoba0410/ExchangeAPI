@@ -9,7 +9,7 @@ namespace Exchange.Bitflyer.Raw;
 public sealed class BitflyerPositionResponse
 {
     [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
-    [JsonPropertyName("side")] public string Side { get; init; } = string.Empty;
+    [JsonPropertyName("side")] public Side Side { get; init; }
     [JsonPropertyName("size")] public decimal Size { get; init; }
     [JsonPropertyName("price")] public decimal Price { get; init; }
     [JsonPropertyName("pnl")] public decimal Pnl { get; init; }

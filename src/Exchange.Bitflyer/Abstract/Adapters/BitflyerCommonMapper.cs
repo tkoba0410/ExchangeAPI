@@ -13,8 +13,8 @@ internal static class BitflyerCommonMapper
     public static OrderSide MapSide(string side) =>
         BitflyerSideMapper.ToOrderSide(side);
 
-    public static string MapSideToExchange(OrderSide side) =>
-        BitflyerSideMapper.ToApi(side);
+    public static Side MapSideToExchange(OrderSide side) =>
+        BitflyerSideMapper.ToRawSide(side);
 
     public static OrderStatusType MapOrderStatusType(string childOrderState) =>
         childOrderState.ToUpperInvariant() switch

@@ -27,7 +27,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             OutstandingSize = 0.01m,
             Price = 3000000m,
             AveragePrice = 0m,
-            Side = "BUY",
+            Side = Side.Buy,
             ChildOrderType = "LIMIT",
             Size = 0.01m,
         };

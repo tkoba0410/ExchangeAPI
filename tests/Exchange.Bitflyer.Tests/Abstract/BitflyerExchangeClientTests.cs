@@ -142,7 +142,7 @@ namespace Exchange.Bitflyer.Tests
                     ChildOrderId = "JOR-1",
                     ChildOrderAcceptanceId = "JRF-1",
                     ProductCode = "BTC_JPY",
-                    Side = "BUY",
+                    Side = Side.Buy,
                     ChildOrderType = "LIMIT",
                     Price = 100m,
                     Size = 0.1m,
@@ -198,7 +198,7 @@ namespace Exchange.Bitflyer.Tests
                 new BitflyerPositionResponse
                 {
                     ProductCode = "BTC_JPY",
-                    Side = "BUY",
+                    Side = Side.Buy,
                     Size = 0.01m,
                     Price = 3000000m,
                     OpenDate = new DateTime(2025, 1, 1),

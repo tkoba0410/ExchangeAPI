@@ -39,5 +39,13 @@ internal static class BitflyerSideMapper
             _ => OrderSide.Buy,
         };
 
+    public static Side ToRawSide(OrderSide side) =>
+        side switch
+        {
+            OrderSide.Buy => Side.Buy,
+            OrderSide.Sell => Side.Sell,
+            _ => Side.Buy,
+        };
+
     public static OrderSide ToOrderSide(string side) => ToOrderSide(FromApi(side));
 }

@@ -18,7 +18,7 @@ public sealed class BitflyerPrivateApi_SendChildOrder_Tests
         {
             ProductCode = "BTC_JPY",
             ChildOrderType = "MARKET",
-            Side = "BUY",
+            Side = Side.Buy,
             Size = 0.01m,
         };
 

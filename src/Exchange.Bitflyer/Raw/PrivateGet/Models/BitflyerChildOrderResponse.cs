@@ -8,7 +8,7 @@ public sealed class BitflyerChildOrderResponse
     [JsonPropertyName("id")] public long Id { get; init; }
     [JsonPropertyName("child_order_id")] public string ChildOrderId { get; init; } = string.Empty;
     [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
-    [JsonPropertyName("side")] public string Side { get; init; } = string.Empty;
+    [JsonPropertyName("side")] public Side Side { get; init; }
     [JsonPropertyName("child_order_type")] public string ChildOrderType { get; init; } = string.Empty;
     [JsonPropertyName("price")] public decimal Price { get; init; }
     [JsonPropertyName("average_price")] public decimal AveragePrice { get; init; }

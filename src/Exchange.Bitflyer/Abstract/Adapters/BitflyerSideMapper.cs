@@ -1,5 +1,4 @@
 using System;
-using Exchange.Bitflyer;
 using Exchange.Bitflyer.Raw;
 using ExchangeApi.Contracts.Dtos;
 
@@ -8,19 +7,19 @@ namespace Exchange.Bitflyer.Abstract;
 /// <summary>bitFlyer のサイド文字列と enum のマッピング。</summary>
 internal static class BitflyerSideMapper
 {
-    public static BitflyerSide FromApi(string side) =>
+    public static Side FromApi(string side) =>
         (side ?? string.Empty).ToUpperInvariant() switch
         {
-            BitflyerConstants.Side.Buy => BitflyerSide.Buy,
-            BitflyerConstants.Side.Sell => BitflyerSide.Sell,
-            _ => BitflyerSide.Sell, // 互換性のためデフォルトは SELL
+            BitflyerConstants.Side.Buy => Side.Buy,
+            BitflyerConstants.Side.Sell => Side.Sell,
+            _ => Side.Sell, // 互換性のためデフォルトは SELL
         };
 
-    public static string ToApi(BitflyerSide side) =>
+    public static string ToApi(Side side) =>
         side switch
         {
-            BitflyerSide.Buy => BitflyerConstants.Side.Buy,
-            BitflyerSide.Sell => BitflyerConstants.Side.Sell,
+            Side.Buy => BitflyerConstants.Side.Buy,
+            Side.Sell => BitflyerConstants.Side.Sell,
             _ => BitflyerConstants.Side.Buy,
         };
 
@@ -32,11 +31,11 @@ internal static class BitflyerSideMapper
             _ => BitflyerConstants.Side.Buy,
         };
 
-    public static OrderSide ToOrderSide(BitflyerSide side) =>
+    public static OrderSide ToOrderSide(Side side) =>
         side switch
         {
-            BitflyerSide.Buy => OrderSide.Buy,
-            BitflyerSide.Sell => OrderSide.Sell,
+            Side.Buy => OrderSide.Buy,
+            Side.Sell => OrderSide.Sell,
             _ => OrderSide.Buy,
         };
 

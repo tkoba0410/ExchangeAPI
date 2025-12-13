@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Common.Core\Common.Core.csproj" />
-    <ProjectReference Include="..\..\src\Exchange.Bitflyer\ExchangeApi.Adapter.Bitflyer.csproj" />
+    <ProjectReference Include="..\..\src\Exchange.Bitflyer\Exchange.Bitflyer.csproj" />
   </ItemGroup>
 
 </Project>

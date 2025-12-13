@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.Adapters;
 using ExchangeApi.Adapter.Bittrade.RawApi;
-using Common.Contract;
+using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
 using Common.Contract.Errors;
 using Common.Transport.Protocol;

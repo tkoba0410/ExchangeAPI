@@ -1,4 +1,4 @@
-using Common.Contract;
+using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
 using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Adapter.Bittrade.Facade;

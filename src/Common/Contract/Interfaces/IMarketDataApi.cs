@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.Contract.Dtos;
 
-namespace Common.Contract;
+namespace Common.Contract.Interfaces;
 
 /// <summary>
 /// 市場データ（REST）を取得するための抽象インターフェース。

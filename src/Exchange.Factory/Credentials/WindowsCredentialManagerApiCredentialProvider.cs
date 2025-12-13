@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Common.Contract;
+using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 

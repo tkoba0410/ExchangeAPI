@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.Contract.Dtos;
 
-namespace Common.Contract;
+namespace Common.Contract.Interfaces;
 
 /// <summary>
 /// 取引（REST）の抽象インターフェース。

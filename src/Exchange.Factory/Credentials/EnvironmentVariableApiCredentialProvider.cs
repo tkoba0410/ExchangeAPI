@@ -1,5 +1,5 @@
 using System;
-using Common.Contract;
+using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
 
 namespace ExchangeApi.Factory.Credentials;

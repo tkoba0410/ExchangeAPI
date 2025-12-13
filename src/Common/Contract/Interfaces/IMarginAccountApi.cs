@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.Contract.Dtos;
 
-namespace Common.Contract;
+namespace Common.Contract.Interfaces;
 
 /// <summary>
 /// マージン口座（REST）の抽象インターフェース。

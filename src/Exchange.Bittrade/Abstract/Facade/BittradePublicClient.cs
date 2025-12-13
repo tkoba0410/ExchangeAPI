@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.Apis;
 using ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
-using Common.Contract;
+using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
 using Common.Transport.Protocol;
 

@@ -38,7 +38,7 @@ namespace Exchange.Bitflyer.Raw.PublicGet
         /// <summary>
         /// 市場全体の約定履歴（歩み値）の Raw レスポンスを取得します。
         /// </summary>
-        Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsRawAsync(
+        Task<IReadOnlyList<BitflyerExecutionPublicResponse>> GetExecutionsRawAsync(
             string productCode,
             int? count = null,
             long? before = null,

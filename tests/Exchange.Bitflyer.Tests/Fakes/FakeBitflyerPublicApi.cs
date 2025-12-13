@@ -47,7 +47,7 @@ namespace Exchange.Bitflyer.Tests.Fakes
             return Task.FromResult(_board);
         }
 
-        public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsRawAsync(
+        public Task<IReadOnlyList<BitflyerExecutionPublicResponse>> GetExecutionsRawAsync(
             string productCode,
             int? count = null,
             long? before = null,
@@ -60,9 +60,9 @@ namespace Exchange.Bitflyer.Tests.Fakes
                 throw new System.ArgumentException($"Unexpected productCode: {productCode}", nameof(productCode));
             }
 
-            IReadOnlyList<BitflyerExecutionResponse> executions = new[]
+            IReadOnlyList<BitflyerExecutionPublicResponse> executions = new[]
             {
-                new BitflyerExecutionResponse
+                new BitflyerExecutionPublicResponse
                 {
                     Id = 1,
                     ProductCode = productCode,

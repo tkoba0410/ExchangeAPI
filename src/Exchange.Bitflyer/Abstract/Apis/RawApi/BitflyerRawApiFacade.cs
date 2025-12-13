@@ -30,7 +30,7 @@ public sealed class BitflyerRawApiFacade
     public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _raw.GetBalancesAsync(cancellationToken);
 
-    public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<BitflyerExecutionPrivateResponse>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
         _raw.GetExecutionsAsync(productCode, cancellationToken);
 
     public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>

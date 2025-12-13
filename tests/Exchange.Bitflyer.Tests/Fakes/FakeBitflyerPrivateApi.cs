@@ -14,7 +14,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
 {
     private readonly IReadOnlyList<BitflyerBalanceResponse> _response;
     private readonly IReadOnlyList<BitflyerPositionResponse> _positions;
-    private readonly IReadOnlyList<BitflyerExecutionResponse> _executions;
+    private readonly IReadOnlyList<BitflyerExecutionPrivateResponse> _executions;
     private readonly BitflyerCollateralResponse _collateral;
     private readonly IReadOnlyList<BitflyerChildOrderResponse> _childOrders;
     private readonly IReadOnlyList<BitflyerCollateralAccount> _collateralAccounts;
@@ -23,13 +23,13 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     public FakeBitflyerPrivateApi(
         IReadOnlyList<BitflyerBalanceResponse> response,
         IReadOnlyList<BitflyerPositionResponse>? positions = null,
-        IReadOnlyList<BitflyerExecutionResponse>? executions = null,
+        IReadOnlyList<BitflyerExecutionPrivateResponse>? executions = null,
         BitflyerCollateralResponse? collateral = null,
         IReadOnlyList<BitflyerChildOrderResponse>? childOrders = null)
     {
         _response = response;
         _positions = positions ?? Array.Empty<BitflyerPositionResponse>();
-        _executions = executions ?? Array.Empty<BitflyerExecutionResponse>();
+        _executions = executions ?? Array.Empty<BitflyerExecutionPrivateResponse>();
         _collateral = collateral ?? new BitflyerCollateralResponse();
         _childOrders = childOrders ?? Array.Empty<BitflyerChildOrderResponse>();
         _collateralAccounts = Array.Empty<BitflyerCollateralAccount>();
@@ -45,7 +45,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default)
         => Task.FromResult(_positions);
 
-    public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(string productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<BitflyerExecutionPrivateResponse>> GetExecutionsAsync(string productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
         => Task.FromResult(_executions);
 
     public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default)

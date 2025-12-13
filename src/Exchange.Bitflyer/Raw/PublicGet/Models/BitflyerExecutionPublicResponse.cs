@@ -4,9 +4,9 @@ using System.Text.Json.Serialization;
 namespace Exchange.Bitflyer.Raw.PublicGet.Models;
 
 /// <summary>
-/// /v1/me/getexecutions のレスポンス DTO。
+/// Public 約定履歴 (/v1/getexecutions, /v1/executions) のレスポンス DTO。
 /// </summary>
-public sealed class BitflyerExecutionResponse
+public sealed class BitflyerExecutionPublicResponse
 {
     [JsonPropertyName("id")] public long Id { get; init; }
     [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;

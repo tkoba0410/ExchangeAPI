@@ -60,7 +60,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(
+    public Task<IReadOnlyList<BitflyerExecutionPrivateResponse>> GetExecutionsAsync(
         string productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
@@ -85,7 +85,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
 
-        return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionResponse>>(
+        return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionPrivateResponse>>(
             path,
             query,
             cancellationToken);

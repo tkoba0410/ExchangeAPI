@@ -22,7 +22,7 @@ public interface IBitflyerPrivateApi
         string productCode,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(
+    Task<IReadOnlyList<BitflyerExecutionPrivateResponse>> GetExecutionsAsync(
         string productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,

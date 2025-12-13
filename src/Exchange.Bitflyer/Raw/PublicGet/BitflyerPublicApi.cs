@@ -79,7 +79,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
     /// <summary>
     /// 生の約定履歴（市場全体の歩み値）を取得する。
     /// </summary>
-    public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsRawAsync(
+    public Task<IReadOnlyList<BitflyerExecutionPublicResponse>> GetExecutionsRawAsync(
         string productCode,
         int? count = null,
         long? before = null,
@@ -101,7 +101,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
                 [BitflyerConstants.QueryKeys.After] = after?.ToString(),
             };
 
-        return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionResponse>>(
+        return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionPublicResponse>>(
             path,
             query,
             cancellationToken);

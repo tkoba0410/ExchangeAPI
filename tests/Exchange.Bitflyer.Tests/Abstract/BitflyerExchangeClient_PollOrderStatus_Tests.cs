@@ -8,10 +8,10 @@ using Exchange.Bitflyer.Raw.PrivateGet;
 using Exchange.Bitflyer.Raw.PrivateGet.Models;
 using Exchange.Bitflyer.Raw.PrivatePost;
 using Exchange.Bitflyer.Raw.PrivatePost.Models;
+using Exchange.Bitflyer.Raw.PublicGet.Models;
 using Exchange.Bitflyer.Tests.Fakes;
 using ExchangeApi.Contracts.Dtos;
-using Exchange.Bitflyer.Raw.PublicGet.Models;
-using ExecutionResponse = Exchange.Bitflyer.Raw.PublicGet.Models.BitflyerExecutionResponse;
+using ExecutionResponse = Exchange.Bitflyer.Raw.PrivateGet.Models.BitflyerExecutionPrivateResponse;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

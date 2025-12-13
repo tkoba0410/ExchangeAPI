@@ -39,7 +39,7 @@ public sealed class BitflyerRawApiClient
     public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _privateApi.GetBalancesAsync(cancellationToken);
 
-    public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<BitflyerExecutionPrivateResponse>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
         _privateApi.GetExecutionsAsync(productCode, cancellationToken: cancellationToken);
 
     public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>

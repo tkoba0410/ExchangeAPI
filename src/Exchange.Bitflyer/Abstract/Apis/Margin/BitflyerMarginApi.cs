@@ -61,7 +61,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
         try
         {
             var raw = await _privateApi
-                .GetExecutionsAsync(productCode, cancellationToken)
+                .GetExecutionsAsync(productCode, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             return BitflyerAccountMapper.MapAccountExecutions(productCode, raw);

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bitflyer.Models;
@@ -19,5 +21,17 @@ public interface IBitflyerPrivateTradingApi
 
     Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(
         BitflyerCancelAllChildOrdersRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<JsonElement> SendParentOrderAsync(
+        Dictionary<string, object?> body,
+        CancellationToken cancellationToken = default);
+
+    Task<BitflyerEmptyResponse> CancelParentOrderAsync(
+        Dictionary<string, object?> body,
+        CancellationToken cancellationToken = default);
+
+    Task<JsonElement> WithdrawAsync(
+        Dictionary<string, object?> body,
         CancellationToken cancellationToken = default);
 }

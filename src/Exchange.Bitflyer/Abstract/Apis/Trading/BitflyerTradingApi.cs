@@ -138,7 +138,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         try
         {
             var rawOrders = await _privateAccountApi
-                .GetChildOrdersAsync(productCode, childOrderState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken)
+                .GetChildOrdersAsync(productCode, childOrderState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var mapped = rawOrders.Select(o => new OpenOrder(
@@ -194,7 +194,7 @@ public sealed class BitflyerTradingApi : ITradingApi
             cancellationToken.ThrowIfCancellationRequested();
 
             var orders = await _privateAccountApi
-                .GetChildOrdersAsync(productCode, childOrderState: null, childOrderAcceptanceId, cancellationToken)
+                .GetChildOrdersAsync(productCode, childOrderState: null, childOrderAcceptanceId, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var order = orders.FirstOrDefault();

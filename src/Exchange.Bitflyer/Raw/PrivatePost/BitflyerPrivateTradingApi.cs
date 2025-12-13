@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bitflyer.Models;
@@ -58,5 +60,32 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
             path,
             request,
             cancellationToken);
+    }
+
+    public Task<JsonElement> SendParentOrderAsync(
+        Dictionary<string, object?> body,
+        CancellationToken cancellationToken = default)
+    {
+        if (body is null) throw new ArgumentNullException(nameof(body));
+        const string path = "/v1/me/sendparentorder";
+        return _restClient.PostAsync<Dictionary<string, object?>, JsonElement>(path, body, cancellationToken);
+    }
+
+    public Task<BitflyerEmptyResponse> CancelParentOrderAsync(
+        Dictionary<string, object?> body,
+        CancellationToken cancellationToken = default)
+    {
+        if (body is null) throw new ArgumentNullException(nameof(body));
+        const string path = "/v1/me/cancelparentorder";
+        return _restClient.PostAsync<Dictionary<string, object?>, BitflyerEmptyResponse>(path, body, cancellationToken);
+    }
+
+    public Task<JsonElement> WithdrawAsync(
+        Dictionary<string, object?> body,
+        CancellationToken cancellationToken = default)
+    {
+        if (body is null) throw new ArgumentNullException(nameof(body));
+        const string path = "/v1/me/withdraw";
+        return _restClient.PostAsync<Dictionary<string, object?>, JsonElement>(path, body, cancellationToken);
     }
 }

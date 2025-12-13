@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bitflyer.Models;
@@ -30,12 +31,13 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
     /// </summary>
     public Task<BitflyerTickerRaw> GetTickerRawAsync(
         string productCode,
+        bool useAliasPath = false,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(productCode))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        const string path = "/v1/getticker";
+        var path = useAliasPath ? "/v1/ticker" : "/v1/getticker";
 
         IReadOnlyDictionary<string, string?> query =
             new Dictionary<string, string?>(StringComparer.Ordinal)
@@ -54,12 +56,13 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
     /// </summary>
     public Task<BitflyerBoardRaw> GetBoardRawAsync(
         string productCode,
+        bool useAliasPath = false,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(productCode))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        const string path = "/v1/getboard";
+        var path = useAliasPath ? "/v1/board" : "/v1/getboard";
 
         IReadOnlyDictionary<string, string?> query =
             new Dictionary<string, string?>(StringComparer.Ordinal)
@@ -78,22 +81,127 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
     /// </summary>
     public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsRawAsync(
         string productCode,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        bool useAliasPath = false,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(productCode))
-            throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
+            throw new ArgumentException("productCode is required.", nameof(productCode));
 
-        const string path = "/v1/getexecutions";
+        var path = useAliasPath ? "/v1/executions" : "/v1/getexecutions";
 
         IReadOnlyDictionary<string, string?> query =
             new Dictionary<string, string?>(StringComparer.Ordinal)
             {
                 ["product_code"] = productCode,
+                ["count"] = count?.ToString(),
+                ["before"] = before?.ToString(),
+                ["after"] = after?.ToString(),
             };
 
         return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionResponse>>(
             path,
             query,
             cancellationToken);
+    }
+
+    public Task<IReadOnlyList<BitflyerMarket>> GetMarketsAsync(
+        string? region = null,
+        bool useAliasPath = false,
+        CancellationToken cancellationToken = default)
+    {
+        var path = useAliasPath ? "/v1/markets" : "/v1/getmarkets";
+        if (!string.IsNullOrWhiteSpace(region))
+        {
+            path = $"{path}/{region}";
+        }
+
+        return _restClient.GetAsync<IReadOnlyList<BitflyerMarket>>(
+            path,
+            query: null,
+            cancellationToken);
+    }
+
+    public Task<IReadOnlyList<BitflyerChat>> GetChatsAsync(
+        string? fromDate = null,
+        string? region = null,
+        CancellationToken cancellationToken = default)
+    {
+        var path = "/v1/getchats";
+        if (!string.IsNullOrWhiteSpace(region))
+        {
+            path = $"{path}/{region}";
+        }
+
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["from_date"] = fromDate,
+        };
+
+        return _restClient.GetAsync<IReadOnlyList<BitflyerChat>>(
+            path,
+            query,
+            cancellationToken);
+    }
+
+    public Task<BitflyerHealthResponse> GetHealthAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        const string path = "/v1/gethealth";
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["product_code"] = productCode,
+        };
+
+        return _restClient.GetAsync<BitflyerHealthResponse>(path, query, cancellationToken);
+    }
+
+    public Task<BitflyerBoardStateResponse> GetBoardStateAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        const string path = "/v1/getboardstate";
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["product_code"] = productCode,
+        };
+
+        return _restClient.GetAsync<BitflyerBoardStateResponse>(path, query, cancellationToken);
+    }
+
+    public Task<JsonElement> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
+    {
+        const string path = "/v1/getcorporateleverage";
+        return _restClient.GetAsync<JsonElement>(path, query: null, cancellationToken);
+    }
+
+    public Task<BitflyerFundingRateResponse> GetFundingRateAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        const string path = "/v1/getfundingrate";
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["product_code"] = productCode,
+        };
+        return _restClient.GetAsync<BitflyerFundingRateResponse>(path, query, cancellationToken);
     }
 }

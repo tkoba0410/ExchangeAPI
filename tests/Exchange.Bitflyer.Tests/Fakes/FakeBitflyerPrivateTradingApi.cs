@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bitflyer;
@@ -13,6 +15,8 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     public BitflyerSendChildOrderRequest? LastRequest { get; private set; }
     public BitflyerCancelChildOrderRequest? LastCancelRequest { get; private set; }
     public BitflyerCancelAllChildOrdersRequest? LastCancelAllRequest { get; private set; }
+    public Dictionary<string, object?>? LastParentOrderBody { get; private set; }
+    public Dictionary<string, object?>? LastWithdrawBody { get; private set; }
 
     public FakeBitflyerPrivateTradingApi(
         BitflyerSendChildOrderResponse response,
@@ -43,5 +47,23 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         LastCancelAllRequest = request;
         return Task.FromResult(new BitflyerEmptyResponse());
+    }
+
+    public Task<JsonElement> SendParentOrderAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default)
+    {
+        LastParentOrderBody = body;
+        return Task.FromResult(JsonDocument.Parse("{}").RootElement);
+    }
+
+    public Task<BitflyerEmptyResponse> CancelParentOrderAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default)
+    {
+        LastParentOrderBody = body;
+        return Task.FromResult(new BitflyerEmptyResponse());
+    }
+
+    public Task<JsonElement> WithdrawAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default)
+    {
+        LastWithdrawBody = body;
+        return Task.FromResult(JsonDocument.Parse("{}").RootElement);
     }
 }

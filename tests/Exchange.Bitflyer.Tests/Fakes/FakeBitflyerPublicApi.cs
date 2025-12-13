@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bitflyer;
@@ -18,6 +20,7 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests.Fakes
 
         public Task<BitflyerTickerRaw> GetTickerRawAsync(
             string productCode,
+            bool useAliasPath = false,
             CancellationToken cancellationToken = default)
         {
             // Stage1 では BTC_JPY のみ想定なので、簡単なガードだけ入れておく
@@ -29,7 +32,7 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests.Fakes
             return Task.FromResult(_response);
         }
 
-        public Task<BitflyerBoardRaw> GetBoardRawAsync(string productCode, CancellationToken cancellationToken = default)
+        public Task<BitflyerBoardRaw> GetBoardRawAsync(string productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
         {
             if (_board is null)
             {
@@ -44,7 +47,13 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests.Fakes
             return Task.FromResult(_board);
         }
 
-        public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsRawAsync(string productCode, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsRawAsync(
+            string productCode,
+            int? count = null,
+            long? before = null,
+            long? after = null,
+            bool useAliasPath = false,
+            CancellationToken cancellationToken = default)
         {
             if (productCode != "BTC_JPY")
             {
@@ -66,5 +75,23 @@ namespace ExchangeApi.Adapter.Bitflyer.Tests.Fakes
 
             return Task.FromResult(executions);
         }
+
+        public Task<IReadOnlyList<BitflyerMarket>> GetMarketsAsync(string? region = null, bool useAliasPath = false, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<BitflyerMarket>>(new[] { new BitflyerMarket("BTC_JPY", "BTC_JPY") });
+
+        public Task<IReadOnlyList<BitflyerChat>> GetChatsAsync(string? fromDate = null, string? region = null, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<BitflyerChat>>(new[] { new BitflyerChat("n", "m", System.DateTimeOffset.UtcNow) });
+
+        public Task<BitflyerHealthResponse> GetHealthAsync(string productCode, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new BitflyerHealthResponse("NORMAL"));
+
+        public Task<BitflyerBoardStateResponse> GetBoardStateAsync(string productCode, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new BitflyerBoardStateResponse("NORMAL", "RUNNING", null));
+
+        public Task<JsonElement> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(JsonDocument.Parse("{}").RootElement);
+
+        public Task<BitflyerFundingRateResponse> GetFundingRateAsync(string productCode, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new BitflyerFundingRateResponse(productCode, 0m));
     }
 }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bitflyer.Facade;
 using ExchangeApi.Adapter.Bitflyer.Models;
@@ -68,19 +70,19 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             _queue = new Queue<IReadOnlyList<BitflyerChildOrderResponse>>(snapshots);
         }
 
-        public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(System.Threading.CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
-        public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(string productCode, System.Threading.CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
-        public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(string productCode, System.Threading.CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(string productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
-        public Task<BitflyerCollateralResponse> GetCollateralAsync(System.Threading.CancellationToken cancellationToken = default)
+        public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
-        public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(string productCode, string? childOrderState = null, string? childOrderAcceptanceId = null, System.Threading.CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetChildOrdersAsync(string productCode, string? childOrderState = null, string? childOrderAcceptanceId = null, string? childOrderId = null, string? parentOrderId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
         {
             if (_queue.Count == 0)
             {
@@ -89,5 +91,19 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
 
             return Task.FromResult(_queue.Dequeue());
         }
+
+        public Task<IReadOnlyList<string>> GetPermissionsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+        public Task<IReadOnlyList<BitflyerCollateralAccount>> GetCollateralAccountsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<BitflyerCollateralAccount>>(Array.Empty<BitflyerCollateralAccount>());
+        public Task<IReadOnlyList<JsonElement>> GetParentOrdersAsync(string productCode, int? count = null, long? before = null, long? after = null, string? parentOrderState = null, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<JsonElement> GetParentOrderAsync(string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) => Task.FromResult(JsonDocument.Parse("{}").RootElement);
+        public Task<IReadOnlyList<JsonElement>> GetBalanceHistoryAsync(string? currencyCode = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<IReadOnlyList<JsonElement>> GetCollateralHistoryAsync(int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<JsonElement> GetTradingCommissionAsync(string productCode, CancellationToken cancellationToken = default) => Task.FromResult(JsonDocument.Parse("{}").RootElement);
+        public Task<IReadOnlyList<JsonElement>> GetAddressesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<IReadOnlyList<JsonElement>> GetCoinInsAsync(int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<IReadOnlyList<JsonElement>> GetCoinOutsAsync(string? messageId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<IReadOnlyList<JsonElement>> GetDepositsAsync(int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<IReadOnlyList<JsonElement>> GetWithdrawalsAsync(string? messageId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<IReadOnlyList<JsonElement>> GetBankAccountsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
     }
 }

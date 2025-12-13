@@ -26,16 +26,16 @@ public sealed class BitflyerRawApiClient
     }
 
     public Task<BitflyerTickerRaw> GetTickerAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _publicApi.GetTickerRawAsync(productCode, cancellationToken);
+        _publicApi.GetTickerRawAsync(productCode, cancellationToken: cancellationToken);
 
     public Task<BitflyerBoardRaw> GetBoardAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _publicApi.GetBoardRawAsync(productCode, cancellationToken);
+        _publicApi.GetBoardRawAsync(productCode, cancellationToken: cancellationToken);
 
     public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _privateApi.GetBalancesAsync(cancellationToken);
 
     public Task<IReadOnlyList<BitflyerExecutionResponse>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _privateApi.GetExecutionsAsync(productCode, cancellationToken);
+        _privateApi.GetExecutionsAsync(productCode, cancellationToken: cancellationToken);
 
     public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
         _privateApi.GetPositionsAsync(productCode, cancellationToken);
@@ -48,7 +48,7 @@ public sealed class BitflyerRawApiClient
         string? childOrderState = null,
         string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetChildOrdersAsync(productCode, childOrderState, childOrderAcceptanceId, cancellationToken);
+        _privateApi.GetChildOrdersAsync(productCode, childOrderState, childOrderAcceptanceId, cancellationToken: cancellationToken);
 
     public Task<BitflyerSendChildOrderResponse> SendChildOrderAsync(
         BitflyerSendChildOrderRequest request,

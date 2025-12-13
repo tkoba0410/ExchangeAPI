@@ -22,7 +22,7 @@ public sealed class BitflyerSendChildOrderRequest
 
     [JsonPropertyName("time_in_force")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? TimeInForce { get; init; }
+    public TimeInForce? TimeInForce { get; init; }
 
     [JsonPropertyName("trigger_price")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

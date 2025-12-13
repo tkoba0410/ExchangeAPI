@@ -21,5 +21,5 @@ public sealed class BitflyerChildOrderResponse
     [JsonPropertyName("cancel_size")] public decimal CancelSize { get; init; }
     [JsonPropertyName("executed_size")] public decimal ExecutedSize { get; init; }
     [JsonPropertyName("total_commission")] public decimal TotalCommission { get; init; }
-    [JsonPropertyName("time_in_force")] public string? TimeInForce { get; init; }
+    [JsonPropertyName("time_in_force")] public TimeInForce? TimeInForce { get; init; }
 }

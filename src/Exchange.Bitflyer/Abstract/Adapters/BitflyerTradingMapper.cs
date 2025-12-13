@@ -1,6 +1,8 @@
 using System;
 using Exchange.Bitflyer.Raw;
 using ExchangeApi.Contracts.Dtos;
+using ContractTimeInForce = ExchangeApi.Contracts.Dtos.TimeInForce;
+using RawTimeInForce = Exchange.Bitflyer.Raw.TimeInForce;
 
 namespace Exchange.Bitflyer.Abstract;
 
@@ -25,12 +27,12 @@ internal static class BitflyerTradingMapper
             _ => OrderType.Market,
         };
 
-    public static string? MapTimeInForce(TimeInForce? tif) =>
+    public static RawTimeInForce? MapTimeInForce(ContractTimeInForce? tif) =>
         tif switch
         {
-            TimeInForce.Gtc => BitflyerConstants.TimeInForce.Gtc,
-            TimeInForce.Ioc => BitflyerConstants.TimeInForce.Ioc,
-            TimeInForce.Fok => BitflyerConstants.TimeInForce.Fok,
+            ContractTimeInForce.Gtc => RawTimeInForce.Gtc,
+            ContractTimeInForce.Ioc => RawTimeInForce.Ioc,
+            ContractTimeInForce.Fok => RawTimeInForce.Fok,
             _ => null,
         };
 

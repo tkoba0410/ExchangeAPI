@@ -80,8 +80,29 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     public Task<IReadOnlyList<BitflyerParentOrderResponse>> GetParentOrdersAsync(string productCode, int? count = null, long? before = null, long? after = null, string? parentOrderState = null, CancellationToken cancellationToken = default) =>
         Task.FromResult(_parentOrders);
 
-    public Task<JsonElement> GetParentOrderAsync(string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
-        Task.FromResult(JsonDocument.Parse("{}").RootElement);
+    public Task<BitflyerParentOrderDetailResponse> GetParentOrderAsync(string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
+        Task.FromResult(new BitflyerParentOrderDetailResponse
+        {
+            Id = 1,
+            ParentOrderId = parentOrderId ?? "PARENT-ID",
+            OrderMethod = OrderMethod.Simple,
+            ExpireDate = System.DateTimeOffset.UtcNow,
+            TimeInForce = TimeInForce.Gtc,
+            ParentOrderAcceptanceId = parentOrderAcceptanceId ?? "PARENT-ACCEPT",
+            Parameters = new[]
+            {
+                new BitflyerParentOrderDetailParameter
+                {
+                    ProductCode = ProductCode.BtcJpy,
+                    ConditionType = ChildOrderType.Limit,
+                    Side = Side.Buy,
+                    Size = 0.1m,
+                    Price = 30000m,
+                    TriggerPrice = 0m,
+                    Offset = 0m,
+                }
+            }
+        });
 
     public Task<IReadOnlyList<JsonElement>> GetBalanceHistoryAsync(string? currencyCode = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
         Task.FromResult(_genericList);

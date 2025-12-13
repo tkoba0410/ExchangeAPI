@@ -55,7 +55,7 @@ public interface IBitflyerPrivateApi
         string? parentOrderState = null,
         CancellationToken cancellationToken = default);
 
-    Task<JsonElement> GetParentOrderAsync(
+    Task<BitflyerParentOrderDetailResponse> GetParentOrderAsync(
         string? parentOrderId = null,
         string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default);

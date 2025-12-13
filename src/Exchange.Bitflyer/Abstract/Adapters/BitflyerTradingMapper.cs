@@ -13,8 +13,7 @@ internal static class BitflyerTradingMapper
         {
             OrderType.Market => ChildOrderType.Market,
             OrderType.Limit => ChildOrderType.Limit,
-            OrderType.Stop => price is null ? ChildOrderType.Stop : ChildOrderType.StopLimit,
-            _ => ChildOrderType.Market,
+            _ => throw new ArgumentOutOfRangeException(nameof(orderType), orderType, "Unsupported child_order_type. Only LIMIT/MARKET are accepted."),
         };
 
     public static OrderType MapOrderTypeFromExchange(ChildOrderType childOrderType) =>
@@ -22,8 +21,6 @@ internal static class BitflyerTradingMapper
         {
             ChildOrderType.Limit => OrderType.Limit,
             ChildOrderType.Market => OrderType.Market,
-            ChildOrderType.Stop or ChildOrderType.StopLimit => OrderType.Stop,
-            ChildOrderType.Trail => OrderType.Stop,
             _ => OrderType.Market,
         };
 
@@ -62,9 +59,7 @@ internal static class BitflyerTradingMapper
                     throw new ArgumentException("Limit order must not specify TriggerPrice.", nameof(request));
                 break;
             case OrderType.Stop:
-                if (request.TriggerPrice is null)
-                    throw new ArgumentException("Stop order requires TriggerPrice.", nameof(request));
-                break;
+                throw new ArgumentOutOfRangeException(nameof(request.OrderType), request.OrderType, "Stop orders are not supported on sendchildorder. Use parent orders.");
             default:
                 throw new ArgumentOutOfRangeException(nameof(request.OrderType), request.OrderType, "Unsupported order type.");
         }

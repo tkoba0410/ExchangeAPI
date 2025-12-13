@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Exchange.Bitflyer.Raw;
 
-/// <summary>bitFlyer child order type (LIMIT/MARKET/STOP/STOP_LIMIT/TRAIL)。</summary>
+/// <summary>bitFlyer child order type (LIMIT / MARKET)。</summary>
 [JsonConverter(typeof(ChildOrderTypeJsonConverter))]
 public enum ChildOrderType
 {
@@ -14,15 +14,6 @@ public enum ChildOrderType
 
     [EnumMember(Value = "LIMIT")]
     Limit,
-
-    [EnumMember(Value = "STOP")]
-    Stop,
-
-    [EnumMember(Value = "STOP_LIMIT")]
-    StopLimit,
-
-    [EnumMember(Value = "TRAIL")]
-    Trail,
 
     Unknown
 }
@@ -36,9 +27,6 @@ internal sealed class ChildOrderTypeJsonConverter : JsonConverter<ChildOrderType
         {
             "MARKET" => ChildOrderType.Market,
             "LIMIT" => ChildOrderType.Limit,
-            "STOP" => ChildOrderType.Stop,
-            "STOP_LIMIT" => ChildOrderType.StopLimit,
-            "TRAIL" => ChildOrderType.Trail,
             _ => ChildOrderType.Unknown
         };
     }
@@ -49,9 +37,6 @@ internal sealed class ChildOrderTypeJsonConverter : JsonConverter<ChildOrderType
         {
             ChildOrderType.Market => "MARKET",
             ChildOrderType.Limit => "LIMIT",
-            ChildOrderType.Stop => "STOP",
-            ChildOrderType.StopLimit => "STOP_LIMIT",
-            ChildOrderType.Trail => "TRAIL",
             _ => "MARKET",
         };
         writer.WriteStringValue(str);

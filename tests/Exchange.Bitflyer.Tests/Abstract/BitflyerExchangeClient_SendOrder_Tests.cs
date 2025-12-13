@@ -37,7 +37,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     }
 
     [Fact]
-    public async Task SendOrderAsync_StopLimit_MapsChildOrderTypeStopLimit()
+    public async Task SendOrderAsync_StopLimit_Throws()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
@@ -53,13 +53,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
             Price: 4000000m,
             TriggerPrice: 3990000m);
 
-        var result = await client.SendOrderAsync(order);
-
-        Assert.Equal("ACCEPT-STOP", result.OrderId);
-        Assert.NotNull(fakeTrading.LastRequest);
-        Assert.Equal(ChildOrderType.StopLimit, fakeTrading.LastRequest!.ChildOrderType);
-        Assert.Equal(4000000m, fakeTrading.LastRequest!.Price);
-        Assert.Equal(3990000m, fakeTrading.LastRequest!.TriggerPrice);
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => client.SendOrderAsync(order));
     }
 
     [Fact]

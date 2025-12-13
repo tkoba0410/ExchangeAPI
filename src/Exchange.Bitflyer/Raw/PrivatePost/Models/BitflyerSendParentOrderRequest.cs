@@ -22,7 +22,7 @@ public sealed class BitflyerSendParentOrderRequest
 public sealed class BitflyerParentOrderParameter
 {
     [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
-    [JsonPropertyName("condition_type")] public ChildOrderType ConditionType { get; init; }
+    [JsonPropertyName("condition_type")] public ConditionType ConditionType { get; init; }
     [JsonPropertyName("side")] public Side Side { get; init; }
     [JsonPropertyName("size")] public decimal Size { get; init; }
 

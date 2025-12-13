@@ -94,7 +94,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
                 new BitflyerParentOrderDetailParameter
                 {
                     ProductCode = ProductCode.BtcJpy,
-                    ConditionType = ChildOrderType.Limit,
+                    ConditionType = ConditionType.Limit,
                     Side = Side.Buy,
                     Size = 0.1m,
                     Price = 30000m,

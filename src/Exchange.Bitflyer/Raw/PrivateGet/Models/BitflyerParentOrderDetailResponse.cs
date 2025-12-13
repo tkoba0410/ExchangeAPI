@@ -26,7 +26,7 @@ public sealed class BitflyerParentOrderDetailResponse
 public sealed class BitflyerParentOrderDetailParameter
 {
     [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
-    [JsonPropertyName("condition_type")] public ChildOrderType ConditionType { get; init; }
+    [JsonPropertyName("condition_type")] public ConditionType ConditionType { get; init; }
     [JsonPropertyName("side")] public Side Side { get; init; }
     [JsonPropertyName("size")] public decimal Size { get; init; }
     [JsonPropertyName("price")] public decimal Price { get; init; }

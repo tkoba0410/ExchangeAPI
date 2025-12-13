@@ -3,40 +3,55 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.RawApi;
-using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Adapter.Bittrade.RawApiClient;
+namespace ExchangeApi.Adapter.Bittrade;
 
 /// <summary>
-/// Bittrade の Raw API ラッパー（最低限の Public/Private）。
+/// Bittrade の Raw API アクセス（Public/Private/Trading をまとめた薄いファサード）。
 /// </summary>
 public sealed class BittradeRawApiClient
 {
-    private readonly IRestClient _restClient;
+    private readonly IBittradePublicApi _publicApi;
+    private readonly IBittradePrivateApi _privateApi;
+    private readonly IBittradePrivateTradingApi _privateTradingApi;
 
-    public BittradeRawApiClient(IRestClient restClient)
+    public BittradeRawApiClient(
+        IBittradePublicApi publicApi,
+        IBittradePrivateApi privateApi,
+        IBittradePrivateTradingApi privateTradingApi)
     {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
+        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
+        _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
     }
 
     public Task<BittradeMergedResponse> GetTickerAsync(string symbol, CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<BittradeMergedResponse>($"market/detail/merged?symbol={ToApiSymbol(symbol)}", cancellationToken: cancellationToken);
+        _publicApi.GetTickerRawAsync(symbol, cancellationToken);
 
     public Task<BittradeDepthResponse> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<BittradeDepthResponse>($"market/depth?symbol={ToApiSymbol(symbol)}&type=step0", cancellationToken: cancellationToken);
+        _publicApi.GetOrderBookRawAsync(symbol, cancellationToken);
 
     public Task<BittradeTradeResponse> GetTradesAsync(string symbol, CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<BittradeTradeResponse>($"market/trade?symbol={ToApiSymbol(symbol)}", cancellationToken: cancellationToken);
+        _publicApi.GetTradesRawAsync(symbol, cancellationToken);
+
+    public Task<BittradeSymbolsResponse> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
+        _publicApi.GetSymbolsRawAsync(cancellationToken);
+
+    public Task<BittradeAccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default) =>
+        _privateApi.GetAccountsAsync(cancellationToken);
 
     public Task<BittradeBalancesResponse> GetBalancesAsync(string accountId, CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<BittradeBalancesResponse>($"v1/account/accounts/{accountId}/balance", cancellationToken: cancellationToken);
+        _privateApi.GetBalancesAsync(accountId, cancellationToken);
+
+    public Task<BittradeOpenOrdersResponse> GetOpenOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default) =>
+        _privateApi.GetOpenOrdersAsync(symbol, accountId, cancellationToken);
+
+    public Task<BittradeOrderDetailResponse> GetOrderAsync(string orderId, CancellationToken cancellationToken = default) =>
+        _privateApi.GetOrderAsync(orderId, cancellationToken);
 
     public Task<BittradePlaceOrderResponse> PlaceOrderAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default) =>
-        _restClient.PostAsync<Dictionary<string, object?>, BittradePlaceOrderResponse>("v1/order/orders/place", body, cancellationToken);
+        _privateTradingApi.PlaceOrderAsync(body, cancellationToken);
 
     public Task<BittradeCancelOrderResponse> CancelOrderAsync(string orderId, CancellationToken cancellationToken = default) =>
-        _restClient.PostAsync<object?, BittradeCancelOrderResponse>($"v1/order/orders/{orderId}/submitcancel", null, cancellationToken);
-
-    private static string ToApiSymbol(string symbol) =>
-        symbol.Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
+        _privateTradingApi.CancelOrderAsync(orderId, cancellationToken);
 }

@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.Apis;
 using ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
-using ExchangeApi.Adapter.Bittrade.RawApiClient;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 

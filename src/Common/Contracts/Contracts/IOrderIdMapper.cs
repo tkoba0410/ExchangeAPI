@@ -1,6 +1,6 @@
 using System;
 
-namespace Common.Contract.Contracts;
+namespace Common.Contract;
 
 /// <summary>
 /// ローカル注文IDとサーバー注文IDの対応を保持するためのマッパー。

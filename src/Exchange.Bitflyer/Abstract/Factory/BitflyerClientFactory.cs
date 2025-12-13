@@ -1,6 +1,6 @@
 using System;
 using System.Net.Http;
-using Common.Contract.Contracts;
+using Common.Contract;
 using Common.Contract.Dtos;
 using Common.Transport.Logging;
 using Common.Transport.Policy;

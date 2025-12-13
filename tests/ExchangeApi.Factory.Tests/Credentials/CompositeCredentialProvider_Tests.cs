@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Common.Contract.Contracts;
+using Common.Contract;
 using Common.Contract.Dtos;
 using ExchangeApi.Factory.Credentials;
 

@@ -1,6 +1,6 @@
 using Common.Contract.Dtos;
 
-namespace Common.Contract.Contracts;
+namespace Common.Contract;
 
 /// <summary>
 /// 取引所とアカウントに対応する API キー/シークレットを提供する。

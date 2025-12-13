@@ -1,5 +1,5 @@
 using System;
-using Common.Contract.Contracts;
+using Common.Contract;
 using Common.Contract.Dtos;
 using Exchange.Bitflyer.Abstract;
 using Common.Transport.Policy;

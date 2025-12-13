@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Abstract;
-using Common.Contract.Contracts;
+using Common.Contract;
 using Common.Contract.Dtos;
 using ExchangeInfoDto = Common.Contract.Dtos.ExchangeInfo;
 

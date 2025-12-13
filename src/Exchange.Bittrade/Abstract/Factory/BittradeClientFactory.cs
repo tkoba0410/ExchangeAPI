@@ -5,7 +5,7 @@ using ExchangeApi.Adapter.Bittrade.Apis;
 using ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
 using ExchangeApi.Adapter.Bittrade.Facade;
 using ExchangeApi.Adapter.Bittrade.Http;
-using Common.Contract.Contracts;
+using Common.Contract;
 using Common.Transport.Logging;
 using Common.Transport.Policy;
 using Common.Transport.Protocol;

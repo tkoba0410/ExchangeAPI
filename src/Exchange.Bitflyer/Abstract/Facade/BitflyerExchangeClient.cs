@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
-using Common.Contract.Contracts;
+using Common.Contract;
 using Common.Contract.Dtos;
 
 namespace Exchange.Bitflyer.Abstract;

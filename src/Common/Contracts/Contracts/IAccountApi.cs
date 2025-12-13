@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.Contract.Dtos;
 
-namespace Common.Contract.Contracts;
+namespace Common.Contract;
 
 /// <summary>
 /// 現物口座情報（REST）の抽象インターフェース。

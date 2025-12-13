@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.Contract.Contracts;
+using Common.Contract;
 using Common.Contract.Dtos;
 
 namespace ExchangeApi.Factory.Credentials;

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Common.Contract.Contracts;
+using Common.Contract;
 
 namespace Common.Transport.Mapping;
 

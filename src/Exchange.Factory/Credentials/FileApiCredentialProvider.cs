@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using Common.Contract.Contracts;
+using Common.Contract;
 using Common.Contract.Dtos;
 
 namespace ExchangeApi.Factory.Credentials;

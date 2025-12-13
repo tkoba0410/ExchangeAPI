@@ -62,30 +62,30 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
             cancellationToken);
     }
 
-    public Task<JsonElement> SendParentOrderAsync(
-        Dictionary<string, object?> body,
+    public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(
+        BitflyerSendParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (body is null) throw new ArgumentNullException(nameof(body));
+        if (request is null) throw new ArgumentNullException(nameof(request));
         const string path = BitflyerConstants.Paths.SendParentOrder;
-        return _restClient.PostAsync<Dictionary<string, object?>, JsonElement>(path, body, cancellationToken);
+        return _restClient.PostAsync<BitflyerSendParentOrderRequest, BitflyerSendParentOrderResponse>(path, request, cancellationToken);
     }
 
     public Task<BitflyerEmptyResponse> CancelParentOrderAsync(
-        Dictionary<string, object?> body,
+        BitflyerCancelParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (body is null) throw new ArgumentNullException(nameof(body));
+        if (request is null) throw new ArgumentNullException(nameof(request));
         const string path = BitflyerConstants.Paths.CancelParentOrder;
-        return _restClient.PostAsync<Dictionary<string, object?>, BitflyerEmptyResponse>(path, body, cancellationToken);
+        return _restClient.PostAsync<BitflyerCancelParentOrderRequest, BitflyerEmptyResponse>(path, request, cancellationToken);
     }
 
-    public Task<JsonElement> WithdrawAsync(
-        Dictionary<string, object?> body,
+    public Task<BitflyerWithdrawResponse> WithdrawAsync(
+        BitflyerWithdrawRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (body is null) throw new ArgumentNullException(nameof(body));
+        if (request is null) throw new ArgumentNullException(nameof(request));
         const string path = BitflyerConstants.Paths.Withdraw;
-        return _restClient.PostAsync<Dictionary<string, object?>, JsonElement>(path, body, cancellationToken);
+        return _restClient.PostAsync<BitflyerWithdrawRequest, BitflyerWithdrawResponse>(path, request, cancellationToken);
     }
 }

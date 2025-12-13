@@ -14,8 +14,9 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     public BitflyerSendChildOrderRequest? LastRequest { get; private set; }
     public BitflyerCancelChildOrderRequest? LastCancelRequest { get; private set; }
     public BitflyerCancelAllChildOrdersRequest? LastCancelAllRequest { get; private set; }
-    public Dictionary<string, object?>? LastParentOrderBody { get; private set; }
-    public Dictionary<string, object?>? LastWithdrawBody { get; private set; }
+    public BitflyerSendParentOrderRequest? LastParentOrderRequest { get; private set; }
+    public BitflyerCancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
+    public BitflyerWithdrawRequest? LastWithdrawRequest { get; private set; }
 
     public FakeBitflyerPrivateTradingApi(
         BitflyerSendChildOrderResponse response,
@@ -48,21 +49,21 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return Task.FromResult(new BitflyerEmptyResponse());
     }
 
-    public Task<JsonElement> SendParentOrderAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default)
+    public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(BitflyerSendParentOrderRequest request, CancellationToken cancellationToken = default)
     {
-        LastParentOrderBody = body;
-        return Task.FromResult(JsonDocument.Parse("{}").RootElement);
+        LastParentOrderRequest = request;
+        return Task.FromResult(new BitflyerSendParentOrderResponse { ParentOrderAcceptanceId = "PARENT" });
     }
 
-    public Task<BitflyerEmptyResponse> CancelParentOrderAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default)
+    public Task<BitflyerEmptyResponse> CancelParentOrderAsync(BitflyerCancelParentOrderRequest request, CancellationToken cancellationToken = default)
     {
-        LastParentOrderBody = body;
+        LastCancelParentOrderRequest = request;
         return Task.FromResult(new BitflyerEmptyResponse());
     }
 
-    public Task<JsonElement> WithdrawAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default)
+    public Task<BitflyerWithdrawResponse> WithdrawAsync(BitflyerWithdrawRequest request, CancellationToken cancellationToken = default)
     {
-        LastWithdrawBody = body;
-        return Task.FromResult(JsonDocument.Parse("{}").RootElement);
+        LastWithdrawRequest = request;
+        return Task.FromResult(new BitflyerWithdrawResponse { MessageId = "WITHDRAW" });
     }
 }

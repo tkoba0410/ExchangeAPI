@@ -64,4 +64,19 @@ public sealed class BitflyerRawApiClient
         BitflyerCancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _privateTradingApi.CancelAllChildOrdersAsync(request, cancellationToken);
+
+    public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(
+        BitflyerSendParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.SendParentOrderAsync(request, cancellationToken);
+
+    public Task<BitflyerEmptyResponse> CancelParentOrderAsync(
+        BitflyerCancelParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.CancelParentOrderAsync(request, cancellationToken);
+
+    public Task<BitflyerWithdrawResponse> WithdrawAsync(
+        BitflyerWithdrawRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.WithdrawAsync(request, cancellationToken);
 }

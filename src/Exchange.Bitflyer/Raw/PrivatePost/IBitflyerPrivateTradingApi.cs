@@ -23,15 +23,15 @@ public interface IBitflyerPrivateTradingApi
         BitflyerCancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<JsonElement> SendParentOrderAsync(
-        Dictionary<string, object?> body,
+    Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(
+        BitflyerSendParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
     Task<BitflyerEmptyResponse> CancelParentOrderAsync(
-        Dictionary<string, object?> body,
+        BitflyerCancelParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<JsonElement> WithdrawAsync(
-        Dictionary<string, object?> body,
+    Task<BitflyerWithdrawResponse> WithdrawAsync(
+        BitflyerWithdrawRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -2,12 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
-using Exchange.Bitflyer.Abstract.Facade;
-using Exchange.Bitflyer.Raw.PrivateGet;
-using Exchange.Bitflyer.Raw.PrivateGet.Models;
-using Exchange.Bitflyer.Raw.PublicGet;
-using Exchange.Bitflyer.Raw.PublicGet.Models;
-using Exchange.Bitflyer.Raw.PrivatePost.Models;
+using Exchange.Bitflyer.Abstract;
+using Exchange.Bitflyer.Raw;
 using Exchange.Bitflyer.Tests.Fakes;
 using Xunit;
 

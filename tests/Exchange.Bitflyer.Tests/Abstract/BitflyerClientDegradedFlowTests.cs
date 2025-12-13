@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract.Factory;
+using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Transport.Logging;
 using ExchangeApi.Transport.Policy;

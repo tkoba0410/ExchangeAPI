@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace Exchange.Bitflyer.Raw.PublicGet.Models;
+namespace Exchange.Bitflyer.Raw;
 
 public sealed record BitflyerChat(
     [property: JsonPropertyName("nickname")] string? Nickname,

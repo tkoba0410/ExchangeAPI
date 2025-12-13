@@ -1,13 +1,9 @@
 using System;
-using Exchange.Bitflyer.Abstract.Apis.Account;
-using Exchange.Bitflyer.Abstract.Apis.Market;
-using Exchange.Bitflyer.Abstract.Apis.Trading;
-using Exchange.Bitflyer.Raw.PrivateGet;
-using Exchange.Bitflyer.Raw.PrivatePost;
-using Exchange.Bitflyer.Raw.PublicGet;
+using Exchange.Bitflyer.Abstract;
+using Exchange.Bitflyer.Raw;
 using ExchangeApi.Transport.Protocol;
 
-namespace Exchange.Bitflyer.Abstract.Facade;
+namespace Exchange.Bitflyer.Abstract;
 
 /// <summary>
 /// bitFlyer API 実装のセットをまとめるバンドル。

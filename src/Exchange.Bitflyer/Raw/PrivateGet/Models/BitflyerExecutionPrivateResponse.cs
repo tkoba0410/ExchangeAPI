@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace Exchange.Bitflyer.Raw.PrivateGet.Models;
+namespace Exchange.Bitflyer.Raw;
 
 /// <summary>
 /// Private 約定履歴 (/v1/me/getexecutions) のレスポンス DTO。

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Exchange.Bitflyer.Raw.PublicGet.Models;
+namespace Exchange.Bitflyer.Raw;
 
 public sealed class BitflyerBoardEntryRaw
 {

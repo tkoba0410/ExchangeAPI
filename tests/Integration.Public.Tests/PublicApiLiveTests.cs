@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract.Factory;
+using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Adapter.Bittrade.Factory;
 using Xunit.Abstractions;
 

@@ -2,7 +2,7 @@ using System.Net;
 using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Transport.Protocol;
 
-namespace Exchange.Bitflyer.Abstract.Adapters;
+namespace Exchange.Bitflyer.Abstract;
 
 internal sealed class BitflyerErrorClassifier : IExchangeErrorClassifier
 {

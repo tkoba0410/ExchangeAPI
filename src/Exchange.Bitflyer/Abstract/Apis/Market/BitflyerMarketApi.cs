@@ -2,14 +2,13 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract.Adapters;
-using Exchange.Bitflyer.Raw.PublicGet.Models;
-using Exchange.Bitflyer.Raw.PublicGet;
+using Exchange.Bitflyer.Abstract;
+using Exchange.Bitflyer.Raw;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Errors;
 
-namespace Exchange.Bitflyer.Abstract.Apis.Market;
+namespace Exchange.Bitflyer.Abstract;
 
 /// <summary>
 /// bitFlyer の MarketData API 実装（REST）。

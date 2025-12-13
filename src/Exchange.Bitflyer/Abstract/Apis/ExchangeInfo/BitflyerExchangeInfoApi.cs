@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract.Adapters;
+using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 
-namespace Exchange.Bitflyer.Abstract.Apis.ExchangeInfo;
+namespace Exchange.Bitflyer.Abstract;
 
 /// <summary>
 /// bitFlyer の ExchangeInfo 実装。現状は対応可否を返すスケルトン。

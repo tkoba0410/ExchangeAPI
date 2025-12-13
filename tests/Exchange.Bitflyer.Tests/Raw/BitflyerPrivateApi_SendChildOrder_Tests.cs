@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Raw.PrivatePost;
-using Exchange.Bitflyer.Raw.PrivatePost.Models;
+using Exchange.Bitflyer.Raw;
 using ExchangeApi.Transport.Protocol;
 using Xunit;
 

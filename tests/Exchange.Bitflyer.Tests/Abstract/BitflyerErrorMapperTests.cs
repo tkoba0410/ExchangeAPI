@@ -1,5 +1,5 @@
 using System.Net;
-using Exchange.Bitflyer.Abstract.Adapters;
+using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Contracts.Errors;
 using Xunit;
 

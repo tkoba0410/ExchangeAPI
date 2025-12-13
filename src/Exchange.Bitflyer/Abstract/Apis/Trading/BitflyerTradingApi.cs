@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract.Adapters;
-using Exchange.Bitflyer.Raw.PrivateGet;
-using Exchange.Bitflyer.Raw.PrivatePost;
-using Exchange.Bitflyer.Raw.PrivatePost.Models;
+using Exchange.Bitflyer.Abstract;
+using Exchange.Bitflyer.Raw;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Errors;
 
-namespace Exchange.Bitflyer.Abstract.Apis.Trading;
+namespace Exchange.Bitflyer.Abstract;
 
 /// <summary>
 /// bitFlyer の Trading API 実装（REST）。

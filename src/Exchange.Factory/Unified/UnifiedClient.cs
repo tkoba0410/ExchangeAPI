@@ -1,6 +1,6 @@
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
-using Exchange.Bitflyer.Abstract.Facade;
+using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Adapter.Bittrade.Facade;
 
 namespace ExchangeApi.Factory.Unified;

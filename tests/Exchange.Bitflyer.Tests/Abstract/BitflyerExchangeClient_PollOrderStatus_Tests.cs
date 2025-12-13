@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract.Facade;
-using Exchange.Bitflyer.Raw.PrivateGet;
-using Exchange.Bitflyer.Raw.PrivateGet.Models;
-using Exchange.Bitflyer.Raw.PrivatePost;
-using Exchange.Bitflyer.Raw.PrivatePost.Models;
-using Exchange.Bitflyer.Raw.PublicGet.Models;
+using Exchange.Bitflyer.Abstract;
+using Exchange.Bitflyer.Raw;
 using Exchange.Bitflyer.Tests.Fakes;
 using ExchangeApi.Contracts.Dtos;
-using ExecutionResponse = Exchange.Bitflyer.Raw.PrivateGet.Models.BitflyerExecutionPrivateResponse;
+using ExecutionResponse = Exchange.Bitflyer.Raw.BitflyerExecutionPrivateResponse;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

@@ -3,7 +3,7 @@ using Exchange.Bitflyer;
 using Exchange.Bitflyer.Raw;
 using ExchangeApi.Contracts.Dtos;
 
-namespace Exchange.Bitflyer.Abstract.Adapters;
+namespace Exchange.Bitflyer.Abstract;
 
 /// <summary>bitFlyer のサイド文字列と enum のマッピング。</summary>
 internal static class BitflyerSideMapper

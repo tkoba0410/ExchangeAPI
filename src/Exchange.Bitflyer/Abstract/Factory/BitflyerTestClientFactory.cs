@@ -1,13 +1,12 @@
 using System;
 using System.Net.Http;
-using Exchange.Bitflyer.Abstract.Adapters;
-using Exchange.Bitflyer.Abstract.Facade;
+using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Transport.Logging;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Transport;
 
-namespace Exchange.Bitflyer.Abstract.Factory;
+namespace Exchange.Bitflyer.Abstract;
 
 /// <summary>
 /// テスト専用のファクトリ。公開 API を汚さずにモックやカスタム Transport を注入できる。

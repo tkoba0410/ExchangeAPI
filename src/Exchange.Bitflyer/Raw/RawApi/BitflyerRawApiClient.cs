@@ -2,14 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Raw.PrivateGet;
-using Exchange.Bitflyer.Raw.PrivateGet.Models;
-using Exchange.Bitflyer.Raw.PrivatePost;
-using Exchange.Bitflyer.Raw.PrivatePost.Models;
-using Exchange.Bitflyer.Raw.PublicGet;
-using Exchange.Bitflyer.Raw.PublicGet.Models;
+using Exchange.Bitflyer.Raw;
 
-namespace Exchange.Bitflyer.Raw.RawApi;
+namespace Exchange.Bitflyer.Raw;
 
 /// <summary>
 /// bitFlyer の Raw API アクセス。抽象化しづらい/詳細情報をそのまま返す用途向け。

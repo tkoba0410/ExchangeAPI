@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Raw.PrivatePost;
-using Exchange.Bitflyer.Raw.PrivatePost.Models;
+using Exchange.Bitflyer.Raw;
 
 namespace Exchange.Bitflyer.Tests.Fakes;
 

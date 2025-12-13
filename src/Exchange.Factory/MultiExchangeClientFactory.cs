@@ -1,7 +1,6 @@
-using Exchange.Bitflyer.Abstract.Factory;
+using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Adapter.Bittrade.Factory;
 using ExchangeApi.Adapter.Bittrade.Facade;
-using Exchange.Bitflyer.Abstract.Facade;
 
 namespace ExchangeApi.Factory;
 

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Exchange.Bitflyer.Raw.PrivateGet.Models;
+using Exchange.Bitflyer.Raw;
 using ExchangeApi.Contracts.Dtos;
 
-namespace Exchange.Bitflyer.Abstract.Adapters;
+namespace Exchange.Bitflyer.Abstract;
 
 internal static class BitflyerAccountMapper
 {

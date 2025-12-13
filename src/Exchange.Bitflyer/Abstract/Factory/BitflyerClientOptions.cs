@@ -3,7 +3,7 @@ using ExchangeApi.Transport.Logging;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 
-namespace Exchange.Bitflyer.Abstract.Factory;
+namespace Exchange.Bitflyer.Abstract;
 
 /// <summary>
 /// bitFlyer クライアントの構成オプション。

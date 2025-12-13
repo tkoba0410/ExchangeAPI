@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Exchange.Bitflyer.Raw.PrivateGet.Models;
+namespace Exchange.Bitflyer.Raw;
 
 public sealed record BitflyerCollateralAccount(
     [property: JsonPropertyName("currency_code")] string CurrencyCode,

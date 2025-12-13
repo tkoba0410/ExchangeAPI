@@ -1,7 +1,7 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Raw.Signer;
+using Exchange.Bitflyer.Raw;
 using ExchangeApi.Transport.Time;
 using Xunit;
 

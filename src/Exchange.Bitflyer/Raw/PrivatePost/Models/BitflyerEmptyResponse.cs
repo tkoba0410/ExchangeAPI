@@ -1,4 +1,4 @@
-namespace Exchange.Bitflyer.Raw.PrivatePost.Models;
+namespace Exchange.Bitflyer.Raw;
 
 /// <summary>
 /// 空レスポンスを扱うためのプレースホルダ。

@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract.Apis.ExchangeInfo;
+using Exchange.Bitflyer.Abstract;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

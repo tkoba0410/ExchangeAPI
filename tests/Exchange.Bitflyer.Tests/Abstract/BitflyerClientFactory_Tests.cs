@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Contracts.Contracts;
 using ExchangeApi.Contracts.Dtos;
-using Exchange.Bitflyer.Abstract.Factory;
+using Exchange.Bitflyer.Abstract;
 using ExchangeApi.Transport.Policy;
 using Xunit;
 

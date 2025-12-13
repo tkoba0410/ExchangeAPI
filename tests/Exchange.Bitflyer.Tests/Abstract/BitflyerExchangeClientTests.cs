@@ -271,14 +271,14 @@ namespace Exchange.Bitflyer.Tests
             public Task<BitflyerEmptyResponse> CancelAllChildOrdersAsync(BitflyerCancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
                 => Task.FromResult<BitflyerEmptyResponse>(null!);
 
-            public Task<JsonElement> SendParentOrderAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default) =>
-                Task.FromResult(JsonDocument.Parse("{}").RootElement);
+            public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(BitflyerSendParentOrderRequest request, CancellationToken cancellationToken = default) =>
+                Task.FromResult(new BitflyerSendParentOrderResponse());
 
-            public Task<BitflyerEmptyResponse> CancelParentOrderAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default) =>
+            public Task<BitflyerEmptyResponse> CancelParentOrderAsync(BitflyerCancelParentOrderRequest request, CancellationToken cancellationToken = default) =>
                 Task.FromResult<BitflyerEmptyResponse>(null!);
 
-            public Task<JsonElement> WithdrawAsync(Dictionary<string, object?> body, CancellationToken cancellationToken = default) =>
-                Task.FromResult(JsonDocument.Parse("{}").RootElement);
+            public Task<BitflyerWithdrawResponse> WithdrawAsync(BitflyerWithdrawRequest request, CancellationToken cancellationToken = default) =>
+                Task.FromResult(new BitflyerWithdrawResponse());
         }
     }
 }

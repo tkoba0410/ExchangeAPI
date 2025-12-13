@@ -6,7 +6,7 @@ namespace Exchange.Bitflyer.Raw;
 /// <summary>/v1/me/sendparentorder リクエスト DTO。</summary>
 public sealed class BitflyerSendParentOrderRequest
 {
-    [JsonPropertyName("order_method")] public string OrderMethod { get; init; } = string.Empty; // SIMPLE/IFD/OCO/IFDOCO
+    [JsonPropertyName("order_method")] public OrderMethod OrderMethod { get; init; }
 
     [JsonPropertyName("minute_to_expire")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

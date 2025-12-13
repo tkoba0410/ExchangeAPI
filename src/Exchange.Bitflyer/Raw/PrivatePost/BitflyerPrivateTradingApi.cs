@@ -26,7 +26,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        const string path = "/v1/me/sendchildorder";
+        const string path = BitflyerConstants.Paths.SendChildOrder;
 
         return _restClient.PostAsync<BitflyerSendChildOrderRequest, BitflyerSendChildOrderResponse>(
             path,
@@ -40,7 +40,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        const string path = "/v1/me/cancelchildorder";
+        const string path = BitflyerConstants.Paths.CancelChildOrder;
 
         return _restClient.PostAsync<BitflyerCancelChildOrderRequest, BitflyerEmptyResponse>(
             path,
@@ -54,7 +54,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        const string path = "/v1/me/cancelallchildorders";
+        const string path = BitflyerConstants.Paths.CancelAllChildOrders;
 
         return _restClient.PostAsync<BitflyerCancelAllChildOrdersRequest, BitflyerEmptyResponse>(
             path,
@@ -67,7 +67,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         CancellationToken cancellationToken = default)
     {
         if (body is null) throw new ArgumentNullException(nameof(body));
-        const string path = "/v1/me/sendparentorder";
+        const string path = BitflyerConstants.Paths.SendParentOrder;
         return _restClient.PostAsync<Dictionary<string, object?>, JsonElement>(path, body, cancellationToken);
     }
 
@@ -76,7 +76,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         CancellationToken cancellationToken = default)
     {
         if (body is null) throw new ArgumentNullException(nameof(body));
-        const string path = "/v1/me/cancelparentorder";
+        const string path = BitflyerConstants.Paths.CancelParentOrder;
         return _restClient.PostAsync<Dictionary<string, object?>, BitflyerEmptyResponse>(path, body, cancellationToken);
     }
 
@@ -85,7 +85,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         CancellationToken cancellationToken = default)
     {
         if (body is null) throw new ArgumentNullException(nameof(body));
-        const string path = "/v1/me/withdraw";
+        const string path = BitflyerConstants.Paths.Withdraw;
         return _restClient.PostAsync<Dictionary<string, object?>, JsonElement>(path, body, cancellationToken);
     }
 }

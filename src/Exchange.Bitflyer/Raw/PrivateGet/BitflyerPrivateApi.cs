@@ -23,14 +23,14 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public Task<IReadOnlyList<string>> GetPermissionsAsync(
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getpermissions";
+        const string path = BitflyerConstants.Paths.GetPermissions;
         return _restClient.GetAsync<IReadOnlyList<string>>(path, query: null, cancellationToken);
     }
 
     public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getbalance";
+        const string path = BitflyerConstants.Paths.GetBalance;
 
         return _restClient.GetAsync<IReadOnlyList<BitflyerBalanceResponse>>(
             path,
@@ -47,10 +47,10 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = "/v1/me/getpositions";
+        const string path = BitflyerConstants.Paths.GetPositions;
         var query = new Dictionary<string, string?>
         {
-            ["product_code"] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
         };
 
         return _restClient.GetAsync<IReadOnlyList<BitflyerPositionResponse>>(
@@ -73,15 +73,15 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = "/v1/me/getexecutions";
+        const string path = BitflyerConstants.Paths.GetPrivateExecutions;
         var query = new Dictionary<string, string?>
         {
-            ["product_code"] = productCode,
-            ["child_order_id"] = childOrderId,
-            ["child_order_acceptance_id"] = childOrderAcceptanceId,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+            [BitflyerConstants.QueryKeys.ChildOrderId] = childOrderId,
+            [BitflyerConstants.QueryKeys.ChildOrderAcceptanceId] = childOrderAcceptanceId,
+            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
 
         return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionResponse>>(
@@ -93,7 +93,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public Task<BitflyerCollateralResponse> GetCollateralAsync(
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getcollateral";
+        const string path = BitflyerConstants.Paths.GetCollateral;
 
         return _restClient.GetAsync<BitflyerCollateralResponse>(
             path,
@@ -104,7 +104,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public Task<IReadOnlyList<BitflyerCollateralAccount>> GetCollateralAccountsAsync(
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getcollateralaccounts";
+        const string path = BitflyerConstants.Paths.GetCollateralAccounts;
         return _restClient.GetAsync<IReadOnlyList<BitflyerCollateralAccount>>(path, query: null, cancellationToken);
     }
 
@@ -124,17 +124,17 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = "/v1/me/getchildorders";
+        const string path = BitflyerConstants.Paths.GetChildOrders;
         var query = new Dictionary<string, string?>
         {
-            ["product_code"] = productCode,
-            ["child_order_state"] = childOrderState,
-            ["child_order_acceptance_id"] = childOrderAcceptanceId,
-            ["child_order_id"] = childOrderId,
-            ["parent_order_id"] = parentOrderId,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+            [BitflyerConstants.QueryKeys.ChildOrderState] = childOrderState,
+            [BitflyerConstants.QueryKeys.ChildOrderAcceptanceId] = childOrderAcceptanceId,
+            [BitflyerConstants.QueryKeys.ChildOrderId] = childOrderId,
+            [BitflyerConstants.QueryKeys.ParentOrderId] = parentOrderId,
+            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
 
         return _restClient.GetAsync<IReadOnlyList<BitflyerChildOrderResponse>>(
@@ -156,14 +156,14 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = "/v1/me/getparentorders";
+        const string path = BitflyerConstants.Paths.GetParentOrders;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["product_code"] = productCode,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-            ["parent_order_state"] = parentOrderState,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
+            [BitflyerConstants.QueryKeys.ParentOrderState] = parentOrderState,
         };
         return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query, cancellationToken);
     }
@@ -173,11 +173,11 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getparentorder";
+        const string path = BitflyerConstants.Paths.GetParentOrder;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["parent_order_id"] = parentOrderId,
-            ["parent_order_acceptance_id"] = parentOrderAcceptanceId,
+            [BitflyerConstants.QueryKeys.ParentOrderId] = parentOrderId,
+            [BitflyerConstants.QueryKeys.ParentOrderAcceptanceId] = parentOrderAcceptanceId,
         };
         return _restClient.GetAsync<JsonElement>(path, query, cancellationToken);
     }
@@ -189,13 +189,13 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getbalancehistory";
+        const string path = BitflyerConstants.Paths.GetBalanceHistory;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["currency_code"] = currencyCode,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
+            [BitflyerConstants.QueryKeys.CurrencyCode] = currencyCode,
+            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
 
         return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query, cancellationToken);
@@ -207,12 +207,12 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getcollateralhistory";
+        const string path = BitflyerConstants.Paths.GetCollateralHistory;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
+            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
         return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query, cancellationToken);
     }
@@ -226,10 +226,10 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = "/v1/me/gettradingcommission";
+        const string path = BitflyerConstants.Paths.GetTradingCommission;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["product_code"] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
         };
         return _restClient.GetAsync<JsonElement>(path, query, cancellationToken);
     }
@@ -237,7 +237,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public Task<IReadOnlyList<JsonElement>> GetAddressesAsync(
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getaddresses";
+        const string path = BitflyerConstants.Paths.GetAddresses;
         return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query: null, cancellationToken);
     }
 
@@ -247,12 +247,12 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getcoinins";
+        const string path = BitflyerConstants.Paths.GetCoinIns;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
+            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
         return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query, cancellationToken);
     }
@@ -264,13 +264,13 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getcoinouts";
+        const string path = BitflyerConstants.Paths.GetCoinOuts;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["message_id"] = messageId,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
+            [BitflyerConstants.QueryKeys.MessageId] = messageId,
+            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
         return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query, cancellationToken);
     }
@@ -281,12 +281,12 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getdeposits";
+        const string path = BitflyerConstants.Paths.GetDeposits;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
+            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
         return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query, cancellationToken);
     }
@@ -298,13 +298,13 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getwithdrawals";
+        const string path = BitflyerConstants.Paths.GetWithdrawals;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["message_id"] = messageId,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
+            [BitflyerConstants.QueryKeys.MessageId] = messageId,
+            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
         return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query, cancellationToken);
     }
@@ -312,7 +312,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public Task<IReadOnlyList<JsonElement>> GetBankAccountsAsync(
         CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/me/getbankaccounts";
+        const string path = BitflyerConstants.Paths.GetBankAccounts;
         return _restClient.GetAsync<IReadOnlyList<JsonElement>>(path, query: null, cancellationToken);
     }
 }

@@ -37,12 +37,12 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
         if (string.IsNullOrWhiteSpace(productCode))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        var path = useAliasPath ? "/v1/ticker" : "/v1/getticker";
+        var path = useAliasPath ? BitflyerConstants.Paths.Ticker : BitflyerConstants.Paths.GetTicker;
 
         IReadOnlyDictionary<string, string?> query =
             new Dictionary<string, string?>(StringComparer.Ordinal)
             {
-                ["product_code"] = productCode,
+                [BitflyerConstants.QueryKeys.ProductCode] = productCode,
             };
 
         return _restClient.GetAsync<BitflyerTickerRaw>(
@@ -62,12 +62,12 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
         if (string.IsNullOrWhiteSpace(productCode))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        var path = useAliasPath ? "/v1/board" : "/v1/getboard";
+        var path = useAliasPath ? BitflyerConstants.Paths.Board : BitflyerConstants.Paths.GetBoard;
 
         IReadOnlyDictionary<string, string?> query =
             new Dictionary<string, string?>(StringComparer.Ordinal)
             {
-                ["product_code"] = productCode,
+                [BitflyerConstants.QueryKeys.ProductCode] = productCode,
             };
 
         return _restClient.GetAsync<BitflyerBoardRaw>(
@@ -90,15 +90,15 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
         if (string.IsNullOrWhiteSpace(productCode))
             throw new ArgumentException("productCode is required.", nameof(productCode));
 
-        var path = useAliasPath ? "/v1/executions" : "/v1/getexecutions";
+        var path = useAliasPath ? BitflyerConstants.Paths.Executions : BitflyerConstants.Paths.GetExecutions;
 
         IReadOnlyDictionary<string, string?> query =
             new Dictionary<string, string?>(StringComparer.Ordinal)
             {
-                ["product_code"] = productCode,
-                ["count"] = count?.ToString(),
-                ["before"] = before?.ToString(),
-                ["after"] = after?.ToString(),
+                [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+                [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
+                [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
+                [BitflyerConstants.QueryKeys.After] = after?.ToString(),
             };
 
         return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionResponse>>(
@@ -112,7 +112,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
     {
-        var path = useAliasPath ? "/v1/markets" : "/v1/getmarkets";
+        var path = useAliasPath ? BitflyerConstants.Paths.Markets : BitflyerConstants.Paths.GetMarkets;
         if (!string.IsNullOrWhiteSpace(region))
         {
             path = $"{path}/{region}";
@@ -129,7 +129,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
         string? region = null,
         CancellationToken cancellationToken = default)
     {
-        var path = "/v1/getchats";
+        var path = BitflyerConstants.Paths.GetChats;
         if (!string.IsNullOrWhiteSpace(region))
         {
             path = $"{path}/{region}";
@@ -137,7 +137,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
 
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["from_date"] = fromDate,
+            [BitflyerConstants.QueryKeys.FromDate] = fromDate,
         };
 
         return _restClient.GetAsync<IReadOnlyList<BitflyerChat>>(
@@ -155,10 +155,10 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = "/v1/gethealth";
+        const string path = BitflyerConstants.Paths.GetHealth;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["product_code"] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
         };
 
         return _restClient.GetAsync<BitflyerHealthResponse>(path, query, cancellationToken);
@@ -173,10 +173,10 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = "/v1/getboardstate";
+        const string path = BitflyerConstants.Paths.GetBoardState;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            ["product_code"] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
         };
 
         return _restClient.GetAsync<BitflyerBoardStateResponse>(path, query, cancellationToken);
@@ -184,7 +184,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
 
     public Task<JsonElement> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
     {
-        const string path = "/v1/getcorporateleverage";
+        const string path = BitflyerConstants.Paths.GetCorporateLeverage;
         return _restClient.GetAsync<JsonElement>(path, query: null, cancellationToken);
     }
 
@@ -197,7 +197,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = "/v1/getfundingrate";
+        const string path = BitflyerConstants.Paths.GetFundingRate;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
             ["product_code"] = productCode,

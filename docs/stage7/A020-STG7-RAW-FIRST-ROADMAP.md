@@ -97,29 +97,6 @@ docs/
 
 最小のプロジェクト本数（推奨）：Common.Core / Exchange.Bitflyer / Exchange.Bittrade / Exchange.Factory の4本。統合クライアントが必要な場合も Factory 内のヘルパで扱い、プロジェクトは増やさない。
 
-### 境界をプロジェクトで完全分離する場合（プロジェクト数増を許容）
-```
-src/
-  Common.Contracts/             # <csproj: Common.Contracts> DTO/Errors（仕様共通）
-  Common.Transport/             # <csproj: Common.Transport> RestClient/Policy/署名/ログ等のクロスカット
-  Exchange.Bitflyer.Raw/        # <csproj: Exchange.Bitflyer.Raw> bitFlyer 仕様準拠（PublicGet/PrivateGet/PrivatePost/Signer/RawApi）
-  Exchange.Bitflyer.Abstract/   # <csproj: Exchange.Bitflyer.Abstract> 共通抽象ラッパ（Market/Trading/Account/ExchangeInfo/Facade/Factory）
-  Exchange.Bittrade.Raw/        # <csproj: Exchange.Bittrade.Raw> Bittrade 仕様準拠
-  Exchange.Bittrade.Abstract/   # <csproj: Exchange.Bittrade.Abstract> 共通抽象ラッパ
-  Exchange.Unified/             # <csproj: Exchange.Unified> 複数取引所の抽象を束ねる薄いファサード/Factory
-tests/
-  Common.Contracts.Tests/
-  Common.Transport.Tests/
-  Exchange.Bitflyer.Raw.Tests/
-  Exchange.Bitflyer.Abstract.Tests/
-  Exchange.Bittrade.Raw.Tests/
-  Exchange.Bittrade.Abstract.Tests/
-  Exchange.Unified.Tests/       # 統合のスモーク
-```
-
-依存の流れ（単一路線を維持）:
-`Common.Contracts → Common.Transport → Exchange.*.Raw → Exchange.*.Abstract → Exchange.Unified`.
-
 ### メタパッケージ（全部入りを1参照で欲しい場合のオプション）
 - 追加で `Exchange.All`（薄い csproj）を用意し、`Common.Core` / `Exchange.Bitflyer` / `Exchange.Bittrade` / `Exchange.Factory` を `<PackageReference>` で束ねるだけのロールアップにする。
 - 中身は README と統合用の簡易ビルダー程度にとどめる。単一巨大 DLL にはしない。利用者は「使う取引所だけ参照」か「Exchange.All を参照」で選択できる。

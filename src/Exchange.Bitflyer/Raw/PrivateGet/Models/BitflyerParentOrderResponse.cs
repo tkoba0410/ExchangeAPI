@@ -14,7 +14,7 @@ public sealed class BitflyerParentOrderResponse
     [JsonPropertyName("side")] public Side Side { get; init; }
 
     /// <summary>親注文種別。ドキュメント例では STOP / IFD などが返る。</summary>
-    [JsonPropertyName("parent_order_type")] public string ParentOrderType { get; init; } = string.Empty;
+    [JsonPropertyName("parent_order_type")] public ParentOrderType ParentOrderType { get; init; }
 
     [JsonPropertyName("price")] public decimal Price { get; init; }
     [JsonPropertyName("average_price")] public decimal AveragePrice { get; init; }

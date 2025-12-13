@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 
 namespace Common.Contract.Interfaces;
 

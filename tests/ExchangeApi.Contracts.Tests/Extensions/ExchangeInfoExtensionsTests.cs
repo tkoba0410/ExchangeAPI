@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using Common.Contract.Extensions;
 using Xunit;
 

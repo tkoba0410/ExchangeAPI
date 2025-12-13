@@ -110,7 +110,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
 
     public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
         string productCode,
-        string? childOrderState = null,
+        string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
         string? parentOrderId = null,
@@ -128,7 +128,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         var query = new Dictionary<string, string?>
         {
             [BitflyerConstants.QueryKeys.ProductCode] = productCode,
-            [BitflyerConstants.QueryKeys.ChildOrderState] = childOrderState,
+            [BitflyerConstants.QueryKeys.ChildOrderStatusState] = childOrderStatusState,
             [BitflyerConstants.QueryKeys.ChildOrderAcceptanceId] = childOrderAcceptanceId,
             [BitflyerConstants.QueryKeys.ChildOrderId] = childOrderId,
             [BitflyerConstants.QueryKeys.ParentOrderId] = parentOrderId,
@@ -148,7 +148,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         int? count = null,
         long? before = null,
         long? after = null,
-        string? parentOrderState = null,
+        string? parentOrderStatusState = null,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(productCode))
@@ -163,7 +163,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
             [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
             [BitflyerConstants.QueryKeys.After] = after?.ToString(),
-            [BitflyerConstants.QueryKeys.ParentOrderState] = parentOrderState,
+            [BitflyerConstants.QueryKeys.ParentOrderStatusState] = parentOrderStatusState,
         };
         return _restClient.GetAsync<IReadOnlyList<BitflyerParentOrderResponse>>(path, query, cancellationToken);
     }

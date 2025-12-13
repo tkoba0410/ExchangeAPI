@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using Common.Contract.Errors;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;

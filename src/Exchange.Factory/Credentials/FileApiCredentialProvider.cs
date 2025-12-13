@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 
 namespace ExchangeApi.Factory.Credentials;
 

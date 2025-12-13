@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 
 namespace ExchangeApi.Factory.Credentials;
 

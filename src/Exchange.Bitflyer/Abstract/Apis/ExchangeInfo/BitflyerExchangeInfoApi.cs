@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Exchange.Bitflyer.Abstract;
 using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using ExchangeInfoDto = Common.Contract.Dtos.ExchangeInfo;
 
 namespace Exchange.Bitflyer.Abstract;

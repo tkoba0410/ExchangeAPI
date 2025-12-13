@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.Apis;
 using ExchangeApi.Adapter.Bittrade.RawApi;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using Common.Transport.Protocol;
 using Common.Transport.Transport;
 using Xunit;

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Abstract;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using Common.Transport.Logging;
 using Common.Transport.Policy;
 using Common.Transport.Transport;
@@ -65,7 +66,7 @@ public class BitflyerClientDegradedFlowTests
             pollInterval: TimeSpan.FromMilliseconds(10),
             maxAttempts: 3);
 
-        Assert.Equal(OrderStatus.Completed, status.Status);
+        Assert.Equal(OrderState.Completed, status.Status);
 
         // 4. executions（約定履歴）
         var executions = await client.GetMarketExecutionsAsync("BTC/JPY");
@@ -100,7 +101,7 @@ public class BitflyerClientDegradedFlowTests
             pollInterval: TimeSpan.FromMilliseconds(10),
             maxAttempts: 3);
 
-        Assert.Equal(OrderStatus.Completed, closeStatus.Status);
+        Assert.Equal(OrderState.Completed, closeStatus.Status);
 
         // 8. positions（決済後に空）
         var positionsAfterClose = await client.GetOpenPositionsAsync("BTC_JPY");

@@ -1,4 +1,5 @@
 using System;
+using Common.Contract.Enums;
 using Common.Contract.Dtos;
 using Common.Contract.Errors;
 using Exchange.Bitflyer.Raw;
@@ -49,14 +50,14 @@ internal static class BitflyerCommonMapper
             _ => "BTC_JPY",
         };
 
-    public static OrderStatus MapOrderStatusSnapshot(string childOrderState) =>
-        (childOrderState ?? string.Empty).ToUpperInvariant() switch
+    public static OrderState MapOrderStatus(string childOrderStatusState) =>
+        (childOrderStatusState ?? string.Empty).ToUpperInvariant() switch
         {
-            "ACTIVE" => OrderStatus.Active,
-            "COMPLETED" => OrderStatus.Completed,
-            "CANCELED" => OrderStatus.Canceled,
-            "EXPIRED" => OrderStatus.Expired,
-            _ => OrderStatus.Unknown,
+            "ACTIVE" => OrderState.Active,
+            "COMPLETED" => OrderState.Completed,
+            "CANCELED" => OrderState.Canceled,
+            "EXPIRED" => OrderState.Expired,
+            _ => OrderState.Unknown,
         };
 
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Exchange.Bitflyer.Raw;
+using Common.Contract.Enums;
 using Common.Contract.Dtos;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 

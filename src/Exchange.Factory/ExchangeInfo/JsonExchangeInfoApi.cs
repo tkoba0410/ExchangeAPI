@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using ExchangeInfoDto = Common.Contract.Dtos.ExchangeInfo;
 
 namespace ExchangeApi.Factory.ExchangeInfo;

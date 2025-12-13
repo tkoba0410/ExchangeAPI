@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ExchangeApi.Adapter.Bittrade.RawApi;
+using Common.Contract.Enums;
 using Common.Contract.Dtos;
 using Common.Contract.Errors;
 
@@ -66,17 +67,17 @@ internal static class BittradeMapper
             ClientOrderId: summary.ClientOrderId);
     }
 
-    public static OrderStatus ParseStatus(string state)
+    public static OrderState ParseStatus(string state)
     {
         return state switch
         {
-            "submitted" => OrderStatus.Active,
-            "partial-filled" => OrderStatus.Active,
-            "filled" => OrderStatus.Completed,
-            "partial-canceled" => OrderStatus.Canceled,
-            "canceled" => OrderStatus.Canceled,
-            "expired" => OrderStatus.Expired,
-            _ => OrderStatus.Unknown
+            "submitted" => OrderState.Active,
+            "partial-filled" => OrderState.Active,
+            "filled" => OrderState.Completed,
+            "partial-canceled" => OrderState.Canceled,
+            "canceled" => OrderState.Canceled,
+            "expired" => OrderState.Expired,
+            _ => OrderState.Unknown
         };
     }
 

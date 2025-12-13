@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 
 namespace Common.Contract.Interfaces;
 
@@ -24,7 +25,7 @@ public interface ITradingApi
     /// <param name="childOrderAcceptanceId">注文の acceptance id。</param>
     /// <param name="pollInterval">ポーリング間隔（null なら 1s）。</param>
     /// <param name="maxAttempts">最大試行回数（デフォルト 30）。</param>
-    Task<OrderStatusSnapshot> PollOrderStatusAsync(
+    Task<OrderStatus> PollOrderStatusAsync(
         string productCode,
         string childOrderAcceptanceId,
         TimeSpan? pollInterval = null,

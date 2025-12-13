@@ -5,6 +5,7 @@ using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
 using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 
 namespace Exchange.Bitflyer.Abstract;
 

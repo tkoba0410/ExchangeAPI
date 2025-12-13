@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using ExchangeApi.Factory.ExchangeInfo;
 using Xunit;
 

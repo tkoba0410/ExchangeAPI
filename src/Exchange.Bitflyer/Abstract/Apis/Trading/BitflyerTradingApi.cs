@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
 using Common.Contract.Interfaces;
+using Common.Contract.Enums;
 using Common.Contract.Dtos;
 using Common.Contract.Errors;
 
@@ -138,7 +139,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         try
         {
             var rawOrders = await _privateAccountApi
-                .GetOrdersAsync(productCode, childOrderState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
+                .GetOrdersAsync(productCode, childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var mapped = rawOrders.Select(o => new OpenOrder(
@@ -170,7 +171,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
     }
 
-    public async Task<OrderStatusSnapshot> PollOrderStatusAsync(
+    public async Task<OrderStatus> PollOrderStatusAsync(
         string productCode,
         string childOrderAcceptanceId,
         TimeSpan? pollInterval = null,
@@ -194,25 +195,25 @@ public sealed class BitflyerTradingApi : ITradingApi
             cancellationToken.ThrowIfCancellationRequested();
 
             var orders = await _privateAccountApi
-                .GetOrdersAsync(productCode, childOrderState: null, childOrderAcceptanceId, cancellationToken: cancellationToken)
+                .GetOrdersAsync(productCode, childOrderStatusState: null, childOrderAcceptanceId, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var order = orders.FirstOrDefault();
 
             if (order is null)
             {
-                return new OrderStatusSnapshot(
+                return new OrderStatus(
                     ProductCode: productCode,
                     OrderAcceptanceId: childOrderAcceptanceId,
-                    Status: OrderStatus.Completed,
-                    ExecutedSize: 0m,
-                    OutstandingSize: 0m,
-                    Price: null,
-                    AveragePrice: null);
+                Status: OrderState.Completed,
+                ExecutedSize: 0m,
+                OutstandingSize: 0m,
+                Price: null,
+                AveragePrice: null);
             }
 
-            var status = BitflyerCommonMapper.MapOrderStatusSnapshot(order.ChildOrderState);
-            var mapped = new OrderStatusSnapshot(
+            var status = BitflyerCommonMapper.MapOrderStatus(order.ChildOrderStatusState);
+            var mapped = new OrderStatus(
                 ProductCode: BitflyerCommonMapper.ToApiProductCode(order.ProductCode),
                 OrderAcceptanceId: order.ChildOrderAcceptanceId,
                 Status: status,
@@ -221,14 +222,14 @@ public sealed class BitflyerTradingApi : ITradingApi
                 Price: order.Price == 0 ? null : order.Price,
                 AveragePrice: order.AveragePrice == 0 ? null : order.AveragePrice);
 
-            if (status is OrderStatus.Completed or OrderStatus.Canceled or OrderStatus.Expired)
+            if (status is OrderState.Completed or OrderState.Canceled or OrderState.Expired)
             {
                 return mapped;
             }
 
             if (attempt == maxAttempts - 1)
             {
-                return mapped with { Status = OrderStatus.Active };
+                return mapped with { Status = OrderState.Active };
             }
 
             await Task.Delay(interval, cancellationToken).ConfigureAwait(false);

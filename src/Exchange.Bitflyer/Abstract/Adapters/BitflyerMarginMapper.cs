@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Exchange.Bitflyer.Raw;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 
 namespace Exchange.Bitflyer.Abstract;
 

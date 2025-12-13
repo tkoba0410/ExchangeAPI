@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Adapter.Bittrade.Apis;
 using ExchangeApi.Adapter.Bittrade.Apis.ExchangeInfo;
 using Common.Contract.Interfaces;
+using Common.Contract.Enums;
 using Common.Contract.Dtos;
 
 namespace ExchangeApi.Adapter.Bittrade.Facade;
@@ -59,7 +60,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(string productCode, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrdersAsync(productCode, cancellationToken);
 
-    public Task<OrderStatusSnapshot> PollOrderStatusAsync(string productCode, string orderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
+    public Task<OrderStatus> PollOrderStatusAsync(string productCode, string orderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
         _tradingApi.PollOrderStatusAsync(productCode, orderAcceptanceId, pollInterval, maxAttempts, cancellationToken);
 
     public Task<IReadOnlyList<AccountExecution>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>

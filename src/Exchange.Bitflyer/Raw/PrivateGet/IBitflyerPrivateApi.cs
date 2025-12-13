@@ -38,7 +38,7 @@ public interface IBitflyerPrivateApi
 
     Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
         string productCode,
-        string? childOrderState = null,
+        string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
         string? parentOrderId = null,
@@ -52,7 +52,7 @@ public interface IBitflyerPrivateApi
         int? count = null,
         long? before = null,
         long? after = null,
-        string? parentOrderState = null,
+        string? parentOrderStatusState = null,
         CancellationToken cancellationToken = default);
 
     Task<BitflyerParentOrderDetailResponse> GetParentOrderAsync(

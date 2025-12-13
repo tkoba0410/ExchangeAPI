@@ -58,7 +58,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
 
     public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
         string productCode,
-        string? childOrderState = null,
+        string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
         string? parentOrderId = null,
@@ -78,7 +78,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         return Task.FromResult(_childOrders);
     }
 
-    public Task<IReadOnlyList<BitflyerParentOrderResponse>> GetParentOrdersAsync(string productCode, int? count = null, long? before = null, long? after = null, string? parentOrderState = null, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<BitflyerParentOrderResponse>> GetParentOrdersAsync(string productCode, int? count = null, long? before = null, long? after = null, string? parentOrderStatusState = null, CancellationToken cancellationToken = default) =>
         Task.FromResult(_parentOrders);
 
     public Task<BitflyerParentOrderDetailResponse> GetParentOrderAsync(string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>

@@ -1,6 +1,7 @@
 using System;
 using Exchange.Bitflyer.Raw;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 
 namespace Exchange.Bitflyer.Abstract;
 

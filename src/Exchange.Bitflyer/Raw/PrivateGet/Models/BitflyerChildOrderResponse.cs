@@ -13,7 +13,7 @@ public sealed class BitflyerChildOrderResponse
     [JsonPropertyName("price")] public decimal Price { get; init; }
     [JsonPropertyName("average_price")] public decimal AveragePrice { get; init; }
     [JsonPropertyName("size")] public decimal Size { get; init; }
-    [JsonPropertyName("child_order_state")] public string ChildOrderState { get; init; } = string.Empty;
+    [JsonPropertyName("child_order_state")] public string ChildOrderStatusState { get; init; } = string.Empty;
     [JsonPropertyName("expire_date")] public DateTimeOffset ExpireDate { get; init; }
     [JsonPropertyName("child_order_date")] public DateTimeOffset ChildOrderDate { get; init; }
     [JsonPropertyName("child_order_acceptance_id")] public string ChildOrderAcceptanceId { get; init; } = string.Empty;

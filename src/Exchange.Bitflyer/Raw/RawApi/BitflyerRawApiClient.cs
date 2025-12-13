@@ -45,10 +45,10 @@ public sealed class BitflyerRawApiClient
 
     public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
         string productCode,
-        string? childOrderState = null,
+        string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetOrdersAsync(productCode, childOrderState, childOrderAcceptanceId, cancellationToken: cancellationToken);
+        _privateApi.GetOrdersAsync(productCode, childOrderStatusState, childOrderAcceptanceId, cancellationToken: cancellationToken);
 
     public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(
         BitflyerSendChildOrderRequest request,

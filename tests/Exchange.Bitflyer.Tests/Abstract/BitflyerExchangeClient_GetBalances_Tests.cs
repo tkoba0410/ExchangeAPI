@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;

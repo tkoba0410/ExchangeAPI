@@ -1,6 +1,7 @@
 using System;
 using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using Exchange.Bitflyer.Abstract;
 using Common.Transport.Policy;
 using Xunit;

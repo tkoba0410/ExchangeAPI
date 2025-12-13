@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Common.Contract.Interfaces;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace ExchangeApi.Factory.Credentials;

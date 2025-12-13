@@ -6,7 +6,12 @@
 
 | Endpoint | 種別 | Raw | 抽象 | 抽象メソッド |
 | --- | --- | --- | --- | --- |
-| GET /v1/getmarkets （/v1/markets, /v1/getmarkets/usa, /v1/markets/usa, /v1/getmarkets/eu, /v1/markets/eu） | Public | ○ | - | - |
+| GET /v1/getmarkets | Public | ○ | - | - |
+| GET /v1/markets | Public | ○ | - | - |
+| GET /v1/getmarkets/usa | Public | ○ | - | - |
+| GET /v1/markets/usa | Public | ○ | - | - |
+| GET /v1/getmarkets/eu | Public | ○ | - | - |
+| GET /v1/markets/eu | Public | ○ | - | - |
 | GET /v1/getboard （/v1/board） | Public | ○ | ○ | `BitflyerMarketApi.GetOrderBookAsync` |
 | GET /v1/getticker （/v1/ticker） | Public | ○ | ○ | `BitflyerMarketApi.GetTickerAsync` |
 | GET /v1/getexecutions （/v1/executions） | Public | ○ | ○ | `BitflyerMarketApi.GetMarketExecutionsAsync` |
@@ -14,7 +19,9 @@
 | GET /v1/gethealth | Public | ○ | - | - |
 | GET /v1/getfundingrate | Public | ○ | - | - |
 | GET /v1/getcorporateleverage | Public | ○ | - | - |
-| GET /v1/getchats （/v1/getchats/usa, /v1/getchats/eu） | Public | ○ | - | - |
+| GET /v1/getchats | Public | ○ | - | - |
+| GET /v1/getchats/usa | Public | ○ | - | - |
+| GET /v1/getchats/eu | Public | ○ | - | - |
 | GET /v1/me/getpermissions | Private | ○ | - | - |
 | GET /v1/me/getbalance | Private | ○ | ○ | `BitflyerAccountApi.GetBalancesAsync` |
 | GET /v1/me/getcollateral | Private | ○ | ○ | `BitflyerMarginApi.GetCollateralAsync` |

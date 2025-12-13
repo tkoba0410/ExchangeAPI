@@ -70,7 +70,8 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
 - プロジェクト: `Common.Core`（Transport/Policy/Contracts） → そのまま。`Exchange.Bitflyer`/`Exchange.Bittrade` → Raw/Abstract をフォルダ分離した単一 csproj のまま。`Exchange.Factory` → 統合ヘルパ（Unified を含む）。
 - 名前空間: `ExchangeApi.*` 旧系は段階的に `Common.*` / `Exchange.*` に寄せる。既存 using は互換のため当面残してよい。
 
-## 構成イメージ（フォルダ/プロジェクト）※最小 csproj 本数を維持
+## 構成イメージ（フォルダ/プロジェクト）
+### 4本体制（現行・推奨: プロジェクトを増やさない）
 ```
 src/
   Common.Core/                  # <csproj: Common.Core> Transport/Policy/Contracts、クロスカット処理
@@ -95,3 +96,26 @@ docs/
 ```
 
 最小のプロジェクト本数（推奨）：Common.Core / Exchange.Bitflyer / Exchange.Bittrade / Exchange.Factory の4本。統合クライアントが必要な場合も Factory 内のヘルパで扱い、プロジェクトは増やさない。
+
+### 境界をプロジェクトで完全分離する場合（プロジェクト数増を許容）
+```
+src/
+  Common.Contracts/             # <csproj: Common.Contracts> DTO/Errors（仕様共通）
+  Common.Transport/             # <csproj: Common.Transport> RestClient/Policy/署名/ログ等のクロスカット
+  Exchange.Bitflyer.Raw/        # <csproj: Exchange.Bitflyer.Raw> bitFlyer 仕様準拠（PublicGet/PrivateGet/PrivatePost/Signer/RawApi）
+  Exchange.Bitflyer.Abstract/   # <csproj: Exchange.Bitflyer.Abstract> 共通抽象ラッパ（Market/Trading/Account/ExchangeInfo/Facade/Factory）
+  Exchange.Bittrade.Raw/        # <csproj: Exchange.Bittrade.Raw> Bittrade 仕様準拠
+  Exchange.Bittrade.Abstract/   # <csproj: Exchange.Bittrade.Abstract> 共通抽象ラッパ
+  Exchange.Unified/             # <csproj: Exchange.Unified> 複数取引所の抽象を束ねる薄いファサード/Factory
+tests/
+  Common.Contracts.Tests/
+  Common.Transport.Tests/
+  Exchange.Bitflyer.Raw.Tests/
+  Exchange.Bitflyer.Abstract.Tests/
+  Exchange.Bittrade.Raw.Tests/
+  Exchange.Bittrade.Abstract.Tests/
+  Exchange.Unified.Tests/       # 統合のスモーク
+```
+
+依存の流れ（単一路線を維持）:
+`Common.Contracts → Common.Transport → Exchange.*.Raw → Exchange.*.Abstract → Exchange.Unified`.

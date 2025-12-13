@@ -12,6 +12,9 @@ public enum ProductCode
     [EnumMember(Value = "BTC_JPY")]
     BtcJpy,
 
+    [EnumMember(Value = "ETH_JPY")]
+    EthJpy,
+
     [EnumMember(Value = "FX_BTC_JPY")]
     FxBtcJpy,
 
@@ -26,6 +29,7 @@ internal sealed class ProductCodeJsonConverter : JsonConverter<ProductCode>
         return value switch
         {
             "BTC_JPY" => ProductCode.BtcJpy,
+            "ETH_JPY" => ProductCode.EthJpy,
             "FX_BTC_JPY" => ProductCode.FxBtcJpy,
             _ => ProductCode.Unknown
         };
@@ -36,6 +40,7 @@ internal sealed class ProductCodeJsonConverter : JsonConverter<ProductCode>
         var str = value switch
         {
             ProductCode.BtcJpy => "BTC_JPY",
+            ProductCode.EthJpy => "ETH_JPY",
             ProductCode.FxBtcJpy => "FX_BTC_JPY",
             _ => "BTC_JPY",
         };

@@ -24,6 +24,12 @@ internal static class BitflyerCommonMapper
             return ProductCode.BtcJpy;
         }
 
+        if (string.Equals(symbol, "ETH/JPY", StringComparison.Ordinal) ||
+            string.Equals(symbol, "ETH_JPY", StringComparison.Ordinal))
+        {
+            return ProductCode.EthJpy;
+        }
+
         if (string.Equals(symbol, "FX_BTC_JPY", StringComparison.Ordinal) ||
             string.Equals(symbol, "FX_BTC/JPY", StringComparison.Ordinal))
         {
@@ -37,6 +43,7 @@ internal static class BitflyerCommonMapper
         productCode switch
         {
             ProductCode.BtcJpy => "BTC_JPY",
+            ProductCode.EthJpy => "ETH_JPY",
             ProductCode.FxBtcJpy => "FX_BTC_JPY",
             _ => "BTC_JPY",
         };

@@ -12,8 +12,6 @@ public class TickerTests
     {
         // Arrange
         var symbol = "BTC/JPY";
-        var bestBid = 5_000_000m;
-        var bestAsk = 5_001_000m;
         var lastPrice = 5_000_500m;
         var timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero); // UTC
 
@@ -21,16 +19,12 @@ public class TickerTests
         var ticker = new Ticker(
             Exchange: ExchangeCode.None,
             Symbol: symbol,
-            BestBid: bestBid,
-            BestAsk: bestAsk,
             LastTradedPrice: lastPrice,
             Timestamp: timestamp);
 
         // Assert
         Assert.Equal(ExchangeCode.None, ticker.Exchange);
         Assert.Equal(symbol, ticker.Symbol);
-        Assert.Equal(bestBid, ticker.BestBid);
-        Assert.Equal(bestAsk, ticker.BestAsk);
         Assert.Equal(lastPrice, ticker.LastTradedPrice);
         Assert.Equal(timestamp, ticker.Timestamp);
     }
@@ -42,17 +36,15 @@ public class TickerTests
         var original = new Ticker(
             Exchange: ExchangeCode.None,
             Symbol: "BTC/JPY",
-            BestBid: 5_000_000m,
-            BestAsk: 5_001_000m,
             LastTradedPrice: 5_000_500m,
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         // Act
-        var modified = original with { BestBid = 4_999_000m };
+        var modified = original with { LastTradedPrice = 4_999_000m };
 
         // Assert
-        Assert.Equal(5_000_000m, original.BestBid);
-        Assert.Equal(4_999_000m, modified.BestBid);
+        Assert.Equal(5_000_500m, original.LastTradedPrice);
+        Assert.Equal(4_999_000m, modified.LastTradedPrice);
         Assert.NotSame(original, modified);
     }
 
@@ -63,17 +55,15 @@ public class TickerTests
         var original = new Ticker(
             Exchange: ExchangeCode.None,
             Symbol: "BTC/JPY",
-            BestBid: 5_000_000m,
-            BestAsk: 5_001_000m,
             LastTradedPrice: 5_000_500m,
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         // Act
-        var modified = original with { BestBid = 4_999_000m };
+        var modified = original with { LastTradedPrice = 4_999_000m };
 
         // Assert
-        Assert.Equal(5_000_000m, original.BestBid);
-        Assert.Equal(4_999_000m, modified.BestBid);
+        Assert.Equal(5_000_500m, original.LastTradedPrice);
+        Assert.Equal(4_999_000m, modified.LastTradedPrice);
         Assert.NotSame(original, modified);
     }
 }

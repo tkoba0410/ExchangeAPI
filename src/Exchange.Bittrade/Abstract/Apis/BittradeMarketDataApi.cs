@@ -43,14 +43,9 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
             : DateTimeOffset.UtcNow;
         var canonicalSymbol = ToCanonicalSymbol(symbol);
 
-        var bestBid = tick.Bid is { Length: >= 2 } ? tick.Bid[0] : throw new ExchangeApiException("Bittrade ticker missing bid.");
-        var bestAsk = tick.Ask is { Length: >= 2 } ? tick.Ask[0] : throw new ExchangeApiException("Bittrade ticker missing ask.");
-
         return new Ticker(
             Exchange: ExchangeCode.Bittrade,
             Symbol: canonicalSymbol,
-            BestBid: bestBid,
-            BestAsk: bestAsk,
             LastTradedPrice: tick.Close,
             Timestamp: timestamp);
     }

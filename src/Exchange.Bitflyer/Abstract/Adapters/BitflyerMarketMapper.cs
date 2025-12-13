@@ -16,8 +16,6 @@ internal static class BitflyerMarketMapper
         return new Ticker(
             Exchange: ExchangeCode.Bitflyer,
             Symbol: symbol,
-            BestBid: raw.BestBid,
-            BestAsk: raw.BestAsk,
             LastTradedPrice: raw.LastTradedPrice,
             Timestamp: raw.Timestamp);
     }

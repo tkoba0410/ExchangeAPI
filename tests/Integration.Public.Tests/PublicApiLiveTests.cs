@@ -26,12 +26,11 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var ticker = await client.GetTickerAsync("BTC/JPY", cts.Token);
-        var msg = $"bitFlyer Ticker: {ticker.Symbol} bid={ticker.BestBid} ask={ticker.BestAsk} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
+        var msg = $"bitFlyer Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
         Assert.Equal("BTC/JPY", ticker.Symbol);
-        Assert.True(ticker.BestBid > 0);
-        Assert.True(ticker.BestAsk > 0);
+        Assert.True(ticker.LastTradedPrice > 0);
     }
 
     [LiveFact]
@@ -55,12 +54,11 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var ticker = await client.GetTickerAsync("BTC/JPY", cts.Token);
-        var msg = $"Bittrade Ticker: {ticker.Symbol} bid={ticker.BestBid} ask={ticker.BestAsk} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
+        var msg = $"Bittrade Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
         Assert.Equal("BTC/JPY", ticker.Symbol);
-        Assert.True(ticker.BestBid > 0);
-        Assert.True(ticker.BestAsk > 0);
+        Assert.True(ticker.LastTradedPrice > 0);
     }
 
     [LiveFact]

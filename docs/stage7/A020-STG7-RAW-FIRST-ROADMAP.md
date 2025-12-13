@@ -73,32 +73,25 @@ Raw-first を基本に、実装レベル（完全/主要/抽象/一部）で段�
 ## 構成イメージ（フォルダ/プロジェクト）※最小 csproj 本数を維持
 ```
 src/
-  Common/                     # <csproj: Common.Core> Transport/Policy/Contracts を束ねる基盤
-    Common.Contracts/         # DTO/Errors（ソースフォルダ）
-    Common.Transport/         # RestClient/Policy/Logging（ソースフォルダ）
-  Exchange/
-    Bitflyer/                 # <csproj: Exchange.Bitflyer> Raw/Abstract をフォルダで分離
-      Raw/                    # bitFlyer Raw 実装
-      Abstract/               # Raw を包むラッパ
-    Bittrade/                 # <csproj: Exchange.Bittrade> Raw/Abstract をフォルダで分離
-      Raw/
-      Abstract/
-    Common/                   # 取引所間で共有する補助があれば（ソースフォルダ）
-  Exchange.Factory/           # <csproj: Exchange.Factory> 組み立てヘルパ（統合クライアントの組み立てもここで実施）
+  Common.Core/                  # <csproj: Common.Core> Transport/Policy/Contracts、クロスカット処理
+  Exchange.Bitflyer/            # <csproj: Exchange.Bitflyer> bitFlyer 専用（Raw/Abstract はフォルダで分離）
+    Raw/                        # PublicGet / PrivateGet / PrivatePost / Signer / RawApi
+    Abstract/                   # Market / Trading / Account / ExchangeInfo / Facade / Factory
+  Exchange.Bittrade/            # <csproj: Exchange.Bittrade> Bittrade 専用（Raw/Abstract はフォルダで分離）
+    Raw/                        # PublicGet / PrivateGet / PrivatePost / Signer / RawApi
+    Abstract/                   # Market / Trading / Account / ExchangeInfo / Facade / Factory
+  Exchange.Factory/             # <csproj: Exchange.Factory> 複数取引所の抽象を束ねる薄いファサード/ヘルパ
 tests/
-  Common.Tests/               # <csproj: Common.Core.Tests>
-    Common.Contracts.Tests/   # （サブフォルダ）
-    Common.Transport.Tests/
-  Exchange/
-    Bitflyer.Tests/           # <csproj: Exchange.Bitflyer.Tests> Raw/Abstract をフォルダで分離
-      Raw/
-      Abstract/
-    Bittrade.Tests/           # <csproj: Exchange.Bittrade.Tests>
-      Raw/
-      Abstract/
-  Exchange.Factory.Tests/     # <csproj: ExchangeApi.Factory.Tests>（統合クライアントのスモークもここで扱う想定）
+  Common.Core.Tests/            # <csproj: Common.Core.Tests>
+  Exchange.Bitflyer.Tests/      # <csproj: Exchange.Bitflyer.Tests> Raw / Abstract ごとにフォルダ分け
+    Raw/
+    Abstract/
+  Exchange.Bittrade.Tests/      # <csproj: Exchange.Bittrade.Tests>
+    Raw/
+    Abstract/
+  Exchange.Factory.Tests/       # <csproj: Exchange.Factory.Tests> 統合クライアントのスモーク
 docs/
-  ...                         # QuickStart (Raw-first), Abstract/Unified の利用ガイド
+  ...                           # QuickStart (Raw-first), 抽象/統合の利用ガイド、レベル表
 ```
 
 最小のプロジェクト本数（推奨）：Common.Core / Exchange.Bitflyer / Exchange.Bittrade / Exchange.Factory の4本。統合クライアントが必要な場合も Factory 内のヘルパで扱い、プロジェクトは増やさない。

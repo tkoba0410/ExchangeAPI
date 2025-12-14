@@ -6,7 +6,7 @@ namespace Common.Contract.Dtos;
 /// 証拠金情報。
 /// </summary>
 public sealed record Collateral(
-    ExchangeCode Exchange,
+    ExchangeCode ExchangeCode,
     string Currency,
     decimal Amount,
     decimal OpenPositionPnl,

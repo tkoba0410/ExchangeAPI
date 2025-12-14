@@ -11,16 +11,14 @@ public sealed record OrderBook
 {
     public IReadOnlyList<OrderBookLevel> Bids { get; init; }
     public IReadOnlyList<OrderBookLevel> Asks { get; init; }
-    public decimal? MidPrice { get; init; }
 
-    public OrderBook(IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks, decimal? midPrice = null)
+    public OrderBook(IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks)
     {
         if (bids is null) throw new ArgumentNullException(nameof(bids));
         if (asks is null) throw new ArgumentNullException(nameof(asks));
 
         Bids = SortDescending(bids);
         Asks = SortAscending(asks);
-        MidPrice = midPrice;
     }
 
     private static IReadOnlyList<OrderBookLevel> SortDescending(IEnumerable<OrderBookLevel> levels)

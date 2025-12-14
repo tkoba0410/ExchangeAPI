@@ -18,21 +18,16 @@ public sealed class OrderBookBuffer
         _asks = new SortedDictionary<decimal, decimal>(Comparer<decimal>.Default); // 昇順
     }
 
-    public OrderBookBuffer(IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks, decimal? midPrice = null)
+    public OrderBookBuffer(IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks)
         : this()
     {
         ApplyLevels(bids, asks);
-        MidPrice = midPrice;
     }
-
-    /// <summary>オプションで保持するミッドプライス（供給されない場合は null のまま）。</summary>
-    public decimal? MidPrice { get; set; }
 
     public void Clear()
     {
         _bids.Clear();
         _asks.Clear();
-        MidPrice = null;
     }
 
     public void ApplySnapshot(OrderBook snapshot)
@@ -40,7 +35,6 @@ public sealed class OrderBookBuffer
         if (snapshot is null) throw new ArgumentNullException(nameof(snapshot));
         Clear();
         ApplyLevels(snapshot.Bids, snapshot.Asks);
-        MidPrice = snapshot.MidPrice;
     }
 
     public void ApplyLevels(IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks)
@@ -83,6 +77,6 @@ public sealed class OrderBookBuffer
     {
         var bids = _bids.Select(kv => new OrderBookLevel(kv.Key, kv.Value)).ToList();
         var asks = _asks.Select(kv => new OrderBookLevel(kv.Key, kv.Value)).ToList();
-        return new OrderBook(bids, asks, MidPrice);
+        return new OrderBook(bids, asks);
     }
 }

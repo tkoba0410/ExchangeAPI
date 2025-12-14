@@ -61,7 +61,6 @@ public class BittradeMarketDataApiTests
         Assert.Equal(2, book.Asks.Count);
         Assert.Equal(100m, book.Bids[0].Price);
         Assert.Equal(101m, book.Asks[0].Price);
-        Assert.Equal(100.5m, book.MidPrice);
     }
 
     [Fact]

@@ -122,7 +122,6 @@ namespace Exchange.Bitflyer.Tests
 
             var board = await client.GetOrderBookAsync("BTC/JPY");
 
-            Assert.Equal(boardRaw.MidPrice, board.MidPrice);
             Assert.Single(board.Bids);
             Assert.Single(board.Asks);
             Assert.Equal(100m, board.Bids[0].Price);

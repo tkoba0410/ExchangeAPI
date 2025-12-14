@@ -66,13 +66,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         var bids = response.Tick.Bids?.Select(ToLevel).ToList() ?? new List<OrderBookLevel>();
         var asks = response.Tick.Asks?.Select(ToLevel).ToList() ?? new List<OrderBookLevel>();
 
-        decimal? mid = null;
-        if (bids.Count > 0 && asks.Count > 0)
-        {
-            mid = (bids[0].Price + asks[0].Price) / 2m;
-        }
-
-        return new OrderBook(bids, asks, mid);
+        return new OrderBook(bids, asks);
     }
 
     public async Task<IReadOnlyList<MarketExecution>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default)

@@ -23,4 +23,17 @@ public sealed record OrderRequest(
     decimal? SizeIncrement = null,
     decimal? MinSize = null,
     decimal? MaxSize = null,
-    decimal? MinNotional = null);
+    decimal? MinNotional = null)
+{
+    /// <summary>成行注文を生成するユーティリティ。</summary>
+    public static OrderRequest Market(Symbol symbol, Side side, decimal size) =>
+        new(symbol, side, OrderType.Market, size);
+
+    /// <summary>指値注文を生成するユーティリティ。</summary>
+    public static OrderRequest Limit(Symbol symbol, Side side, decimal size, decimal price) =>
+        new(symbol, side, OrderType.Limit, size, price);
+
+    /// <summary>逆指値（成行）注文を生成するユーティリティ。</summary>
+    public static OrderRequest Stop(Symbol symbol, Side side, decimal size, decimal triggerPrice) =>
+        new(symbol, side, OrderType.Stop, size, null, triggerPrice);
+}

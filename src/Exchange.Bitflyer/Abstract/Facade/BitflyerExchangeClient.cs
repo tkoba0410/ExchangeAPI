@@ -8,7 +8,6 @@ using Common.Contract.Interfaces;
 using Common.Contract.Enums;
 using Common.Contract.Dtos;
 using ContractSide = Common.Contract.Enums.Side;
-using ContractTimeInForce = Common.Contract.Enums.TimeInForce;
 
 namespace Exchange.Bitflyer.Abstract;
 
@@ -91,11 +90,9 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         ContractSide side,
         decimal size,
         decimal price,
-        ContractTimeInForce? timeInForce = null,
-        int? minuteToExpire = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceLimitOrderAsync(symbol, side, size, price, timeInForce, minuteToExpire, clientOrderId, cancellationToken);
+        _tradingApi.PlaceLimitOrderAsync(symbol, side, size, price, clientOrderId, cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
         Symbol symbol,
@@ -111,11 +108,9 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         decimal size,
         decimal triggerPrice,
         decimal? price = null,
-        ContractTimeInForce? timeInForce = null,
-        int? minuteToExpire = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, price, timeInForce, minuteToExpire, clientOrderId, cancellationToken);
+        _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, price, clientOrderId, cancellationToken);
 
     public Task<CancelResult> CancelOrderAsync(string productCode, string childOrderAcceptanceId, CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderAsync(productCode, childOrderAcceptanceId, cancellationToken);

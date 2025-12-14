@@ -17,8 +17,6 @@ public interface ITradingApi
         Side side,
         decimal size,
         decimal price,
-        TimeInForce? timeInForce = null,
-        int? minuteToExpire = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default);
 
@@ -35,8 +33,6 @@ public interface ITradingApi
         decimal size,
         decimal triggerPrice,
         decimal? price = null,
-        TimeInForce? timeInForce = null,
-        int? minuteToExpire = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default);
 

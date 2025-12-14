@@ -56,11 +56,9 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         Side side,
         decimal size,
         decimal price,
-        TimeInForce? timeInForce = null,
-        int? minuteToExpire = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceLimitOrderAsync(symbol, side, size, price, timeInForce, minuteToExpire, clientOrderId, cancellationToken);
+        _tradingApi.PlaceLimitOrderAsync(symbol, side, size, price, clientOrderId, cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
         Symbol symbol,
@@ -76,11 +74,9 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         decimal size,
         decimal triggerPrice,
         decimal? price = null,
-        TimeInForce? timeInForce = null,
-        int? minuteToExpire = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, price, timeInForce, minuteToExpire, clientOrderId, cancellationToken);
+        _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, price, clientOrderId, cancellationToken);
 
     public Task<CancelResult> CancelOrderAsync(string productCode, string orderId, CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderAsync(productCode, orderId, cancellationToken);

@@ -10,7 +10,6 @@ using Common.Contract.Enums;
 using Common.Contract.Dtos;
 using Common.Contract.Errors;
 using ContractSide = Common.Contract.Enums.Side;
-using ContractTimeInForce = Common.Contract.Enums.TimeInForce;
 
 namespace Exchange.Bitflyer.Abstract;
 
@@ -38,12 +37,10 @@ public sealed class BitflyerTradingApi : ITradingApi
         ContractSide side,
         decimal size,
         decimal price,
-        ContractTimeInForce? timeInForce = null,
-        int? minuteToExpire = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(
-            new OrderRequest(symbol, side, OrderType.Limit, size, clientOrderId, price, null, minuteToExpire, timeInForce),
+            new OrderRequest(symbol, side, OrderType.Limit, size, clientOrderId, price, null, null, null),
             cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
@@ -62,8 +59,6 @@ public sealed class BitflyerTradingApi : ITradingApi
         decimal size,
         decimal triggerPrice,
         decimal? price = null,
-        ContractTimeInForce? timeInForce = null,
-        int? minuteToExpire = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         throw new NotSupportedException("bitFlyer child orders do not support stop orders; use parent orders instead.");

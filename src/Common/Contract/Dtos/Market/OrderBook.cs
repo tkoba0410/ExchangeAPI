@@ -28,7 +28,9 @@ public sealed record OrderBook
         var dict = new SortedDictionary<decimal, decimal>(Comparer<decimal>.Create((x, y) => y.CompareTo(x)));
         foreach (var level in levels)
         {
-            dict[level.Price] = level.Size;
+            dict[level.Price] = dict.TryGetValue(level.Price, out var size)
+                ? size + level.Size
+                : level.Size;
         }
         return dict.Select(kv => new OrderBookLevel(kv.Key, kv.Value)).ToList();
     }
@@ -38,7 +40,9 @@ public sealed record OrderBook
         var dict = new SortedDictionary<decimal, decimal>(Comparer<decimal>.Default);
         foreach (var level in levels)
         {
-            dict[level.Price] = level.Size;
+            dict[level.Price] = dict.TryGetValue(level.Price, out var size)
+                ? size + level.Size
+                : level.Size;
         }
         return dict.Select(kv => new OrderBookLevel(kv.Key, kv.Value)).ToList();
     }

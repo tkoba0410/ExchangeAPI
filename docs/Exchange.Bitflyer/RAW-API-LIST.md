@@ -1,48 +1,60 @@
-# bitFlyer Lightning REST API 実装一覧（Raw 層）
+# bitFlyer RAW API List
 
-現在 Raw 層で実装済みの HTTP エンドポイント一覧と、抽象層での対応状況。
+Exchange.Bitflyer アダプターで利用している主要な REST エンドポイント（2025-01 時点）。
 
-表は提示順に並べています。種別は Public/Private（Auth）。Raw=実装あり、抽象=抽象層で公開しているか、抽象メソッドは代表メソッド名。
+## Public API
+- `GET /v1/ticker` (別名 `/v1/getticker`)
+  - 用途: ティッカー取得
+  - 対応コード: `BitflyerMarketApi.GetTickerAsync` → `IBitflyerPublicApi.GetTickerRawAsync`
+- `GET /v1/board` (別名 `/v1/getboard`)
+  - 用途: 板情報取得
+  - 対応コード: `BitflyerMarketApi.GetOrderBookAsync` → `IBitflyerPublicApi.GetBoardRawAsync`
+- `GET /v1/executions`
+  - 用途: 市場全体の約定（歩み値）取得
+  - 対応コード: `BitflyerMarketApi.GetMarketExecutionsAsync` → `IBitflyerPublicApi.GetExecutionsRawAsync`
+- `GET /v1/markets`
+  - 用途: 取扱い銘柄一覧
+  - 対応コード: `BitflyerExchangeInfoApi` 経由で利用
+- その他の公開情報（ヘルスチェック/ボード状態など）
+  - `GET /v1/gethealth`, `GET /v1/getboardstate`, `GET /v1/getfunding_rate` などは Raw に用意（現状アダプターでは未使用）。
 
-| Endpoint | 種別 | Raw | 抽象 | 抽象メソッド |
-| --- | --- | --- | --- | --- |
-| GET /v1/getmarkets | Public | ○ | - | - |
-| GET /v1/markets | Public | ○ | - | - |
-| GET /v1/getmarkets/usa | Public | ○ | - | - |
-| GET /v1/markets/usa | Public | ○ | - | - |
-| GET /v1/getmarkets/eu | Public | ○ | - | - |
-| GET /v1/markets/eu | Public | ○ | - | - |
-| GET /v1/getboard （/v1/board） | Public | ○ | ○ | `BitflyerMarketApi.GetOrderBookAsync` |
-| GET /v1/getticker （/v1/ticker） | Public | ○ | ○ | `BitflyerMarketApi.GetTickerAsync` |
-| GET /v1/getexecutions （/v1/executions） | Public | ○ | ○ | `BitflyerMarketApi.GetMarketExecutionsAsync` |
-| GET /v1/getboardstate | Public | ○ | - | - |
-| GET /v1/gethealth | Public | ○ | - | - |
-| GET /v1/getfundingrate | Public | ○ | - | - |
-| GET /v1/getcorporateleverage | Public | ○ | - | - |
-| GET /v1/getchats | Public | ○ | - | - |
-| GET /v1/getchats/usa | Public | ○ | - | - |
-| GET /v1/getchats/eu | Public | ○ | - | - |
-| GET /v1/me/getpermissions | Private | ○ | - | - |
-| GET /v1/me/getbalance | Private | ○ | ○ | `BitflyerAccountApi.GetBalancesAsync` |
-| GET /v1/me/getcollateral | Private | ○ | ○ | `BitflyerMarginApi.GetCollateralAsync` |
-| GET /v1/me/getcollateralaccounts | Private | ○ | - | - |
-| GET /v1/me/getaddresses | Private | ○ | - | - |
-| GET /v1/me/getcoinins | Private | ○ | - | - |
-| GET /v1/me/getcoinouts | Private | ○ | - | - |
-| GET /v1/me/getbankaccounts | Private | ○ | - | - |
-| GET /v1/me/getdeposits | Private | ○ | - | - |
-| POST /v1/me/withdraw | Private | ○ | - | - |
-| GET /v1/me/getwithdrawals | Private | ○ | - | - |
-| POST /v1/me/sendchildorder | Private | ○ | ○ | `BitflyerTradingApi.SendOrderAsync` |
-| POST /v1/me/cancelchildorder | Private | ○ | ○ | `BitflyerTradingApi.CancelOrderAsync` |
-| POST /v1/me/sendparentorder | Private | ○ | - | - |
-| POST /v1/me/cancelparentorder | Private | ○ | - | - |
-| POST /v1/me/cancelallchildorders | Private | ○ | △ | 抽象で未露出（必要なら拡張） |
-| GET /v1/me/getchildorders | Private | ○ | ○ | `BitflyerTradingApi.GetOpenOrdersAsync` 等で利用 |
-| GET /v1/me/getparentorders | Private | ○ | - | - |
-| GET /v1/me/getparentorder | Private | ○ | - | - |
-| GET /v1/me/getexecutions | Private | ○ | ○ | `BitflyerAccountApi.GetAccountExecutionsAsync` |
-| GET /v1/me/getbalancehistory | Private | ○ | - | - |
-| GET /v1/me/getpositions | Private | ○ | ○ | `BitflyerMarginApi.GetOpenPositionsAsync` |
-| GET /v1/me/getcollateralhistory | Private | ○ | - | - |
-| GET /v1/me/gettradingcommission | Private | ○ | - | - |
+## Private API（Account / Margin）
+- `GET /v1/me/getbalance`
+  - 用途: 残高取得
+  - 対応コード: `BitflyerAccountApi.GetBalancesAsync`, `BitflyerMarginApi.GetBalancesAsync`
+- `GET /v1/me/getcollateral`
+  - 用途: 証拠金取得
+  - 対応コード: `BitflyerMarginApi.GetCollateralAsync`
+- `GET /v1/me/getpositions`
+  - 用途: 建玉一覧取得
+  - 対応コード: `BitflyerMarginApi.GetOpenPositionsAsync`
+- `GET /v1/me/getexecutions`
+  - 用途: 口座約定履歴取得
+  - 対応コード: `BitflyerAccountApi.GetAccountExecutionsAsync`, `BitflyerMarginApi.GetAccountExecutionsAsync`
+- `GET /v1/me/getchildorders`
+  - 用途: 子注文一覧取得
+  - 対応コード: `BitflyerTradingApi.GetOrdersAsync`
+
+## Private API（Trading）
+- `POST /v1/me/sendchildorder`
+  - 用途: 子注文発注（成行/指値）
+  - 対応コード: `BitflyerTradingApi.PlaceLimitOrderAsync`, `PlaceMarketOrderAsync`
+- `POST /v1/me/cancelchildorder`
+  - 用途: 子注文キャンセル
+  - 対応コード: `BitflyerTradingApi.CancelOrderAsync`
+- `POST /v1/me/cancelallchildorders`
+  - Raw に存在（全キャンセル）。現行アダプターでは未使用。
+- 親注文（OCO/IFDOCOなど）
+  - `POST /v1/me/sendparentorder`, `POST /v1/me/cancelparentorder`, `GET /v1/me/getparentorders`, `GET /v1/me/getparentorder`
+  - Raw に定義済み。現行アダプターでは未使用。
+
+## 未実装/NotSupported
+- ローソク足（candlesticks）: Public REST 経由では未サポート。`GetCandlesticksAsync` は NotSupported を返す。
+- WebSocket API: このアダプターでは扱わない（REST のみ）。
+
+## 補足
+- product_code 例: `BTC_JPY`, `ETH_JPY`, `FX_BTC_JPY`
+- Public API はパラメータ `product_code` を大文字スネークケースで指定。
+- Private API は認証ヘッダが必要（ACCESS-KEY / ACCESS-TIMESTAMP / ACCESS-SIGN / ACCESS-NONCE）。
+- エラー時は bitFlyer 固有のコードを `ExchangeApiException` にマッピングして返す。
+

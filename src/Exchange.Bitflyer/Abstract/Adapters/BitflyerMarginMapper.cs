@@ -15,7 +15,8 @@ internal static class BitflyerMarginMapper
 
         return rawPositions
             .Select(p => new Position(
-                ProductCode: BitflyerCommonMapper.ToApiProductCode(p.ProductCode),
+                Exchange: ExchangeCode.Bitflyer,
+                Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(p.ProductCode)),
                 Side: BitflyerCommonMapper.MapSide(p.Side),
                 Size: p.Size,
                 Price: p.Price,

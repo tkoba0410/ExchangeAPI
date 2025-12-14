@@ -1,12 +1,12 @@
 using System;
+using Common.Contract.Enums;
 
 namespace Common.Contract.Dtos;
 
-/// <summary>
-/// 建玉情報。
-/// </summary>
+/// <summary>建玉情報。</summary>
 public sealed record Position(
-    string ProductCode,
+    ExchangeCode Exchange,
+    Symbol Symbol,
     OrderSide Side,
     decimal Size,
     decimal Price,

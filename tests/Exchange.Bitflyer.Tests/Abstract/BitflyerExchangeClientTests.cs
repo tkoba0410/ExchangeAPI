@@ -214,7 +214,7 @@ namespace Exchange.Bitflyer.Tests
 
             Assert.Single(result);
             var pos = result[0];
-            Assert.Equal("BTC_JPY", pos.ProductCode);
+            Assert.Equal(Symbol.BtcJpy, pos.Symbol);
             Assert.Equal(OrderSide.Buy, pos.Side);
             Assert.Equal(0.01m, pos.Size);
             Assert.Equal(3000000m, pos.Price);

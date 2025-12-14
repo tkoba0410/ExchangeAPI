@@ -83,7 +83,7 @@ public class BittradeMarketDataApiTests
         Assert.Equal(2, executions.Count);
         Assert.Equal(Side.Buy, executions[0].Side);
         Assert.Equal(Side.Sell, executions[1].Side);
-        Assert.Equal("BTC/JPY", executions[0].ProductCode);
+        Assert.Equal(Symbol.BtcJpy, executions[0].Symbol);
     }
 
     private static BittradeMarketDataApi CreateApi(string expectedPath, string responseJson)

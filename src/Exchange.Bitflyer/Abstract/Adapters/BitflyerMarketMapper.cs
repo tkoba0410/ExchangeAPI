@@ -40,8 +40,8 @@ internal static class BitflyerMarketMapper
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 
         return new ExecutionMarket(
-            ProductCode: BitflyerCommonMapper.ToApiProductCode(productCode),
-            Id: raw.Id,
+            Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(productCode)),
+            OrderId: raw.Id.ToString(),
             Side: BitflyerCommonMapper.MapSide(raw.Side),
             Price: raw.Price,
             Size: raw.Size,

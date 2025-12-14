@@ -82,10 +82,11 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         }
 
         var productCode = ToCanonicalSymbol(symbol);
+        var symbolEnum = ExchangeApi.Adapter.Bittrade.Adapters.BittradeMapper.ParseSymbol(productCode);
         var executions = response.Tick.Data
             .Select(d => new ExecutionMarket(
-                productCode,
-                d.Id,
+                symbolEnum,
+                d.Id.ToString(),
                 MapSide(d.Direction),
                 d.Price,
                 d.Amount,

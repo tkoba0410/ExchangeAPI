@@ -29,6 +29,8 @@ internal static class BitflyerMarginMapper
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 
         return new Collateral(
+            Exchange: ExchangeCode.Bitflyer,
+            Currency: "JPY",
             Amount: raw.Collateral,
             OpenPositionPnl: raw.OpenPositionPnl,
             RequireCollateral: raw.RequireCollateral,

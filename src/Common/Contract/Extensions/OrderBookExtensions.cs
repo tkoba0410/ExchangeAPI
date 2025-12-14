@@ -5,7 +5,7 @@ using Common.Contract.Dtos;
 
 namespace Common.Contract.Extensions;
 
-/// <summary>OrderBook に対する共通ユーティリティ。</summary>
+/// <summary>OrderBook に対する共通ユーティリティ（両サイドを参照）。</summary>
 public static class OrderBookExtensions
 {
     /// <summary>最良買い気配（Bid）。板が空なら null。</summary>
@@ -43,7 +43,11 @@ public static class OrderBookExtensions
     /// <summary>総サイズ（全レベルの size 合計）。</summary>
     public static decimal GetTotalSize(this OrderBook orderBook) =>
         (orderBook?.Asks?.Sum(x => x.Size) ?? 0m) + (orderBook?.Bids?.Sum(x => x.Size) ?? 0m);
+}
 
+/// <summary>片側（IEnumerable&lt;OrderBookLevel&gt;）に対するユーティリティ。</summary>
+public static class OrderBookLevelExtensions
+{
     /// <summary>加重平均価格（価格×数量の総和 / サイズ総和）。対象が空なら null。</summary>
     public static decimal? GetAveragePrice(this IEnumerable<OrderBookLevel> levels)
     {

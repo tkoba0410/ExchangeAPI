@@ -1,3 +1,5 @@
+using Common.Contract.Enums;
+
 namespace Common.Contract.Dtos;
 
 /// <summary>
@@ -10,7 +12,7 @@ namespace Common.Contract.Dtos;
 /// </remarks>
 /// </summary>
 public sealed record OrderRequest(
-    string ProductCode,
+    Symbol Symbol,
     OrderSide Side,
     OrderType OrderType,
     decimal Size,

@@ -23,7 +23,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
         var order = new OrderRequest(
-            ProductCode: "BTC_JPY",
+            Symbol: Symbol.BtcJpy,
             Side: OrderSide.Buy,
             OrderType: OrderType.Market,
             Size: 0.01m);
@@ -48,7 +48,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
         var order = new OrderRequest(
-            ProductCode: "BTC_JPY",
+            Symbol: Symbol.BtcJpy,
             Side: OrderSide.Sell,
             OrderType: OrderType.Stop,
             Size: 0.5m,
@@ -73,7 +73,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
         var order = new OrderRequest(
-            ProductCode: "BTC_JPY",
+            Symbol: Symbol.BtcJpy,
             Side: OrderSide.Buy,
             OrderType: OrderType.Market,
             Size: 0.01m);
@@ -94,7 +94,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
         var order = new OrderRequest(
-            ProductCode: "BTC_JPY",
+            Symbol: Symbol.BtcJpy,
             Side: OrderSide.Buy,
             OrderType: OrderType.Market,
             Size: 0.01m,
@@ -118,7 +118,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
         var order = new OrderRequest(
-            ProductCode: "BTC_JPY",
+            Symbol: Symbol.BtcJpy,
             Side: OrderSide.Buy,
             OrderType: OrderType.Market,
             Size: 10m);
@@ -143,7 +143,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
         var order = new OrderRequest(
-            ProductCode: "BTC_JPY",
+            Symbol: Symbol.BtcJpy,
             Side: OrderSide.Buy,
             OrderType: OrderType.Market,
             Size: 0.01m);

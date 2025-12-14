@@ -45,7 +45,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var apiSymbol = ToApiSymbol(request.ProductCode);
+        var apiSymbol = ToApiSymbol(request.Symbol);
         var type = ToOrderType(request);
 
         var body = new Dictionary<string, object?>
@@ -96,7 +96,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
 
     public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(string productCode, CancellationToken cancellationToken = default)
     {
-        var apiSymbol = ToApiSymbol(productCode);
+        var apiSymbol = ToApiSymbol(BittradeMapper.ParseSymbol(productCode));
         var resp = await _restClient.GetAsync<BittradeOpenOrdersResponse>(
             $"v1/order/openOrders?symbol={apiSymbol}&account-id={_accountId}",
             cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -148,8 +148,14 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         throw new NotSupportedException("Bittrade account executions are not provided via REST in this adapter.");
     }
 
-    private static string ToApiSymbol(string symbol) =>
-        symbol.Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
+    private static string ToApiSymbol(Symbol symbol) =>
+        symbol switch
+        {
+            Symbol.BtcJpy => "btcjpy",
+            Symbol.EthJpy => "ethjpy",
+            Symbol.FxBtcJpy => "fxbtcjpy",
+            _ => symbol.ToString().Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant()
+        };
 
     private static string ToOrderType(OrderRequest request)
     {

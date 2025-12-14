@@ -41,6 +41,15 @@ internal static class BitflyerCommonMapper
         throw new SymbolNotSupportedException(symbol);
     }
 
+    public static RawProductCode MapSymbolToProductCode(Symbol symbol) =>
+        symbol switch
+        {
+            Symbol.BtcJpy => RawProductCode.BtcJpy,
+            Symbol.EthJpy => RawProductCode.EthJpy,
+            Symbol.FxBtcJpy => RawProductCode.FxBtcJpy,
+            _ => throw new SymbolNotSupportedException(symbol.ToString())
+        };
+
     public static string ToApiProductCode(RawProductCode productCode) =>
         productCode switch
         {

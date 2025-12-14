@@ -43,7 +43,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         {
             var dto = new BitflyerSendChildOrderRequest
             {
-                ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(request.ProductCode),
+                ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(request.Symbol),
                 Side = BitflyerCommonMapper.MapSideToExchange(request.Side),
                 ChildOrderType = BitflyerTradingMapper.MapOrderType(request.OrderType, request.Price),
                 Size = request.Size,

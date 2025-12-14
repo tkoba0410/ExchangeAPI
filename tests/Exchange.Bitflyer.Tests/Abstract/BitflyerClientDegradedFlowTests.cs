@@ -46,7 +46,7 @@ public class BitflyerClientDegradedFlowTests
 
         // 2. send order（劣化環境だが成功）
         var orderRequest = new OrderRequest(
-            ProductCode: "BTC_JPY",
+            Symbol: Symbol.BtcJpy,
             Side: OrderSide.Buy,
             OrderType: OrderType.Market,
             Size: 0.001m,
@@ -82,7 +82,7 @@ public class BitflyerClientDegradedFlowTests
 
         // 7. close order（反対売買で決済）→ poll status
         var closeOrderRequest = new OrderRequest(
-            ProductCode: "BTC_JPY",
+            Symbol: Symbol.BtcJpy,
             Side: OrderSide.Sell,
             OrderType: OrderType.Market,
             Size: 0.001m,

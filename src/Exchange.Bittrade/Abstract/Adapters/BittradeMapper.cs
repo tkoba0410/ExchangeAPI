@@ -144,6 +144,8 @@ internal static class BittradeMapper
             _ => Symbol.Unknown
         };
 
+    public static Symbol ParseSymbol(string symbol) => MapSymbol(ToCanonicalSymbol(symbol));
+
     public static string ToProductCode(Symbol symbol) =>
         symbol switch
         {

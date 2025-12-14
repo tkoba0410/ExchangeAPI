@@ -36,8 +36,8 @@ internal static class BitflyerTradingMapper
 
     public static void ValidateOrderRequest(OrderRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.ProductCode))
-            throw new ArgumentException("ProductCode is required.", nameof(request));
+        if (request.Symbol == Symbol.Unknown)
+            throw new ArgumentException("Symbol is required.", nameof(request));
         if (request.Size <= 0)
             throw new ArgumentException("Size must be greater than zero.", nameof(request));
         if (request.MinuteToExpire is { } mte && mte <= 0)

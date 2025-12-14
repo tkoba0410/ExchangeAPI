@@ -5,7 +5,7 @@ namespace Common.Contract.Dtos;
 
 /// <summary>建玉情報。</summary>
 public sealed record Position(
-    ExchangeCode Exchange,
+    ExchangeCode ExchangeCode,
     Symbol Symbol,
     Side Side,
     decimal Size,

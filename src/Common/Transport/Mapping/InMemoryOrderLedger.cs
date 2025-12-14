@@ -29,21 +29,11 @@ public sealed class InMemoryOrderLedger : IOrderLedger
     public Task<OrderLedgerEntry> CreatePendingAsync(OrderRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var now = DateTimeOffset.UtcNow;
         var localId = Guid.NewGuid().ToString("N");
-        var entry = new OrderLedgerEntry(
-            LocalId: localId,
-            Exchange: ExchangeCode.Unknown,
-            Symbol: request.Symbol,
-            Side: request.Side,
-            OrderType: request.OrderType,
-            Size: request.Size,
-            Price: request.Price,
-            TriggerPrice: request.TriggerPrice,
-            ServerOrderId: null,
-            Status: OrderState.Active,
-            CreatedAt: now,
-            UpdatedAt: now);
+        var entry = OrderLedgerEntry.CreatePending(
+            localId: localId,
+            exchange: ExchangeCode.Unknown,
+            request: request);
 
         _byLocal[localId] = entry;
         return Task.FromResult(entry);

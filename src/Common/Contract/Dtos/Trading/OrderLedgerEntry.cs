@@ -17,4 +17,31 @@ public sealed record OrderLedgerEntry(
     OrderState Status,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
-    string? LastError = null);
+    string? LastError = null)
+{
+    /// <summary>注文リクエストから台帳エントリを生成するユーティリティ。</summary>
+    public static OrderLedgerEntry CreatePending(
+        string localId,
+        ExchangeCode exchange,
+        OrderRequest request,
+        string? serverOrderId = null,
+        DateTimeOffset? createdAt = null,
+        OrderState status = OrderState.Active)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        var now = createdAt ?? DateTimeOffset.UtcNow;
+        return new OrderLedgerEntry(
+            LocalId: localId,
+            Exchange: exchange,
+            Symbol: request.Symbol,
+            Side: request.Side,
+            OrderType: request.OrderType,
+            Size: request.Size,
+            Price: request.Price,
+            TriggerPrice: request.TriggerPrice,
+            ServerOrderId: serverOrderId,
+            Status: status,
+            CreatedAt: now,
+            UpdatedAt: now);
+    }
+}

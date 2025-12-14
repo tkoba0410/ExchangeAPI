@@ -43,4 +43,41 @@ public static class OrderBookExtensions
     /// <summary>総サイズ（全レベルの size 合計）。</summary>
     public static decimal GetTotalSize(this OrderBook orderBook) =>
         (orderBook?.Asks?.Sum(x => x.Size) ?? 0m) + (orderBook?.Bids?.Sum(x => x.Size) ?? 0m);
+
+    /// <summary>成行買いで指定サイズを呑み切る計算（asks 側を上から食い進める）。</summary>
+    public static MarketFillResult CalcMarketBuy(this OrderBook orderBook, decimal takerSize)
+    {
+        if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
+        return Fill(orderBook.Asks, takerSize);
+    }
+
+    /// <summary>成行売りで指定サイズを呑み切る計算（bids 側を下から食い進める）。</summary>
+    public static MarketFillResult CalcMarketSell(this OrderBook orderBook, decimal takerSize)
+    {
+        if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
+        return Fill(orderBook.Bids, takerSize);
+    }
+
+    private static MarketFillResult Fill(IReadOnlyList<OrderBookLevel> levels, decimal takerSize)
+    {
+        if (levels is null) throw new ArgumentNullException(nameof(levels));
+        if (takerSize <= 0) throw new ArgumentOutOfRangeException(nameof(takerSize));
+
+        decimal remaining = takerSize;
+        decimal totalSize = 0;
+        decimal totalValue = 0;
+
+        foreach (var level in levels)
+        {
+            if (remaining <= 0) break;
+            var use = Math.Min(level.Size, remaining);
+            totalSize += use;
+            totalValue += use * level.Price;
+            remaining -= use;
+        }
+
+        var filled = remaining <= 0;
+        var avg = totalSize > 0 ? totalValue / totalSize : (decimal?)null;
+        return new MarketFillResult(filled, totalSize, totalValue, avg);
+    }
 }

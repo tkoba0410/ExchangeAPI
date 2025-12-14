@@ -10,7 +10,17 @@ using Common.Contract.Interfaces;
 
 namespace Common.Transport.Mapping;
 
-/// <summary>インメモリ実装の簡易注文台帳。</summary>
+/// <summary>
+/// インメモリ実装の簡易注文台帳。
+/// <para>
+/// 使い方の例:
+/// 1) 発注前に <see cref="CreatePendingAsync"/> でエントリを作成し localId を得る
+/// 2) 送信に成功したら <see cref="MarkSubmittedAsync"/> に serverOrderId を渡して紐付ける
+/// 3) ポーリングなどで状態が変わったら <see cref="MarkStatusAsync"/> で更新する
+/// 4) 未完了を確認したいときは <see cref="ListActiveAsync"/> を呼ぶ
+/// </para>
+/// 永続化や分散は行わないため、再起動で内容は失われる。必要に応じて別実装に差し替える。
+/// </summary>
 public sealed class InMemoryOrderLedger : IOrderLedger
 {
     private readonly ConcurrentDictionary<string, OrderLedgerEntry> _byLocal = new();

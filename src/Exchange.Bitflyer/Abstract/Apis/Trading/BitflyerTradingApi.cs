@@ -104,13 +104,13 @@ public sealed class BitflyerTradingApi : ITradingApi
     }
 
     public async Task<CancelResult> CancelOrderAsync(
-        string productCode,
+        Symbol symbol,
         string childOrderAcceptanceId,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (symbol == Symbol.Unknown)
         {
-            throw new ArgumentException("productCode is required.", nameof(productCode));
+            throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
         if (string.IsNullOrWhiteSpace(childOrderAcceptanceId))
@@ -122,7 +122,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         {
             var dto = new BitflyerCancelChildOrderRequest
             {
-                ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(productCode),
+                ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol),
                 ChildOrderAcceptanceId = childOrderAcceptanceId,
             };
 
@@ -157,18 +157,18 @@ public sealed class BitflyerTradingApi : ITradingApi
     }
 
     public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(
-        string productCode,
+        Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (symbol == Symbol.Unknown)
         {
-            throw new ArgumentException("productCode is required.", nameof(productCode));
+            throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
         try
         {
             var rawOrders = await _privateAccountApi
-                .GetOrdersAsync(productCode, childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
+                .GetOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var mapped = rawOrders.Select(o => new OpenOrder(
@@ -205,15 +205,15 @@ public sealed class BitflyerTradingApi : ITradingApi
     }
 
     public async Task<OrderStatus> PollOrderStatusAsync(
-        string productCode,
+        Symbol symbol,
         string childOrderAcceptanceId,
         TimeSpan? pollInterval = null,
         int maxAttempts = 30,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (symbol == Symbol.Unknown)
         {
-            throw new ArgumentException("productCode is required.", nameof(productCode));
+            throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
         if (string.IsNullOrWhiteSpace(childOrderAcceptanceId))
@@ -228,13 +228,14 @@ public sealed class BitflyerTradingApi : ITradingApi
             cancellationToken.ThrowIfCancellationRequested();
 
             var orders = await _privateAccountApi
-                .GetOrdersAsync(productCode, childOrderStatusState: null, childOrderAcceptanceId, cancellationToken: cancellationToken)
+                .GetOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: null, childOrderAcceptanceId, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var order = orders.FirstOrDefault();
 
             if (order is null)
             {
+                var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
                 return new OrderStatus(
                     ProductCode: productCode,
                     OrderAcceptanceId: childOrderAcceptanceId,

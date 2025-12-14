@@ -111,27 +111,27 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, clientOrderId, cancellationToken);
 
-    public Task<CancelResult> CancelOrderAsync(string productCode, string childOrderAcceptanceId, CancellationToken cancellationToken = default) =>
-        _tradingApi.CancelOrderAsync(productCode, childOrderAcceptanceId, cancellationToken);
+    public Task<CancelResult> CancelOrderAsync(Symbol symbol, string childOrderAcceptanceId, CancellationToken cancellationToken = default) =>
+        _tradingApi.CancelOrderAsync(symbol, childOrderAcceptanceId, cancellationToken);
 
-    public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOrdersAsync(productCode, cancellationToken);
+    public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        _tradingApi.GetOrdersAsync(symbol, cancellationToken);
 
-    public Task<OrderStatus> PollOrderStatusAsync(string productCode, string childOrderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
-        _tradingApi.PollOrderStatusAsync(productCode, childOrderAcceptanceId, pollInterval, maxAttempts, cancellationToken);
+    public Task<OrderStatus> PollOrderStatusAsync(Symbol symbol, string childOrderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
+        _tradingApi.PollOrderStatusAsync(symbol, childOrderAcceptanceId, pollInterval, maxAttempts, cancellationToken);
 
     // Account/Margin
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesAsync(cancellationToken);
 
-    public Task<IReadOnlyList<Position>> GetOpenPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _marginApi.GetOpenPositionsAsync(productCode, cancellationToken);
+    public Task<IReadOnlyList<Position>> GetOpenPositionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        _marginApi.GetOpenPositionsAsync(symbol, cancellationToken);
 
     public Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default) =>
         _marginApi.GetCollateralAsync(cancellationToken);
 
-    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _accountApi.GetAccountExecutionsAsync(productCode, cancellationToken);
+    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        _accountApi.GetAccountExecutionsAsync(symbol, cancellationToken);
 
     // ExchangeInfo
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>

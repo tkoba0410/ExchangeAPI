@@ -157,7 +157,7 @@ namespace Exchange.Bitflyer.Tests
             var fakeTrading = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
             var client = new BitflyerExchangeClient(fakePublic, fakePrivate, fakeTrading);
 
-            var result = await client.GetOrdersAsync("BTC_JPY");
+            var result = await client.GetOrdersAsync(Symbol.BtcJpy);
 
             Assert.Single(result);
             var order = result[0];
@@ -211,7 +211,7 @@ namespace Exchange.Bitflyer.Tests
             var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
             var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
 
-            var result = await client.GetOpenPositionsAsync("BTC_JPY");
+            var result = await client.GetOpenPositionsAsync(Symbol.BtcJpy);
 
             Assert.Single(result);
             var pos = result[0];
@@ -257,7 +257,7 @@ namespace Exchange.Bitflyer.Tests
             var client = new BitflyerExchangeClient(publicApi, accountApi, tradingApi);
 
             await Assert.ThrowsAsync<ExchangeApiException>(() =>
-                client.CancelOrderAsync("BTC_JPY", "id-1"));
+                client.CancelOrderAsync(Symbol.BtcJpy, "id-1"));
         }
 
         private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi

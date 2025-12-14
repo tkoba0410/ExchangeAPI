@@ -50,7 +50,7 @@ public class BitflyerClientDegradedFlowTests
 
         // 3. poll status（初回429後にCOMPLETED）
         var status = await client.PollOrderStatusAsync(
-            productCode: "BTC_JPY",
+            symbol: Symbol.BtcJpy,
             childOrderAcceptanceId: orderResult.OrderId,
             pollInterval: TimeSpan.FromMilliseconds(10),
             maxAttempts: 3);
@@ -62,11 +62,11 @@ public class BitflyerClientDegradedFlowTests
         Assert.NotEmpty(executions);
 
         // 5. child orders 履歴（完了済みの履歴が返る）
-        var childOrders = await client.GetOrdersAsync("BTC_JPY");
+        var childOrders = await client.GetOrdersAsync(Symbol.BtcJpy);
         Assert.NotEmpty(childOrders);
 
         // 6. positions（建玉ありの確認）
-        var positionsBeforeClose = await client.GetOpenPositionsAsync("BTC_JPY");
+        var positionsBeforeClose = await client.GetOpenPositionsAsync(Symbol.BtcJpy);
         Assert.NotEmpty(positionsBeforeClose);
 
         // 7. close order（反対売買で決済）→ poll status
@@ -74,7 +74,7 @@ public class BitflyerClientDegradedFlowTests
         Assert.False(string.IsNullOrWhiteSpace(closeOrderResult.OrderId));
 
         var closeStatus = await client.PollOrderStatusAsync(
-            productCode: "BTC_JPY",
+            symbol: Symbol.BtcJpy,
             childOrderAcceptanceId: closeOrderResult.OrderId,
             pollInterval: TimeSpan.FromMilliseconds(10),
             maxAttempts: 3);
@@ -82,7 +82,7 @@ public class BitflyerClientDegradedFlowTests
         Assert.Equal(OrderState.Completed, closeStatus.Status);
 
         // 8. positions（決済後に空）
-        var positionsAfterClose = await client.GetOpenPositionsAsync("BTC_JPY");
+        var positionsAfterClose = await client.GetOpenPositionsAsync(Symbol.BtcJpy);
         Assert.Empty(positionsAfterClose);
 
         // 9. collateral（口座状態確認）

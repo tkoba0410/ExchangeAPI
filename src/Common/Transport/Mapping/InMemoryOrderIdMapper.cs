@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Common.Contract.Interfaces;
+using Common.Contract.Enums;
 
 namespace Common.Transport.Mapping;
 
@@ -11,9 +12,9 @@ namespace Common.Transport.Mapping;
 /// </summary>
 public sealed class InMemoryOrderIdMapper : IOrderIdMapper
 {
-    private readonly ConcurrentDictionary<(string localId, string productCode), string> _localToServer = new();
-    private readonly ConcurrentDictionary<(string serverId, string productCode), string> _serverToLocal = new();
-    private readonly Queue<(string localId, string productCode)> _orderQueue = new();
+    private readonly ConcurrentDictionary<(string localId, Symbol symbol), string> _localToServer = new();
+    private readonly ConcurrentDictionary<(string serverId, Symbol symbol), string> _serverToLocal = new();
+    private readonly Queue<(string localId, Symbol symbol)> _orderQueue = new();
     private readonly object _lock = new();
     private readonly int? _capacity;
 
@@ -26,14 +27,14 @@ public sealed class InMemoryOrderIdMapper : IOrderIdMapper
         _capacity = capacity;
     }
 
-    public void Save(string localOrderId, string serverOrderId, string productCode)
+    public void Save(string localOrderId, string serverOrderId, Symbol symbol)
     {
         if (string.IsNullOrWhiteSpace(localOrderId)) throw new ArgumentNullException(nameof(localOrderId));
         if (string.IsNullOrWhiteSpace(serverOrderId)) throw new ArgumentNullException(nameof(serverOrderId));
-        if (string.IsNullOrWhiteSpace(productCode)) throw new ArgumentNullException(nameof(productCode));
+        if (symbol == Symbol.Unknown) throw new ArgumentNullException(nameof(symbol));
 
-        var localKey = (localOrderId, productCode);
-        var serverKey = (serverOrderId, productCode);
+        var localKey = (localOrderId, symbol);
+        var serverKey = (serverOrderId, symbol);
 
         _localToServer[localKey] = serverOrderId;
         _serverToLocal[serverKey] = localOrderId;
@@ -49,7 +50,7 @@ public sealed class InMemoryOrderIdMapper : IOrderIdMapper
                 {
                     if (_localToServer.TryRemove(oldest, out var removedServerId))
                     {
-                        var removedServerKey = (removedServerId, oldest.productCode);
+                        var removedServerKey = (removedServerId, oldest.symbol);
                         _ = _serverToLocal.TryRemove(removedServerKey, out _);
                     }
                 }
@@ -57,15 +58,15 @@ public sealed class InMemoryOrderIdMapper : IOrderIdMapper
         }
     }
 
-    public bool TryGetServerOrderId(string localOrderId, string productCode, out string? serverOrderId)
+    public bool TryGetServerOrderId(string localOrderId, Symbol symbol, out string? serverOrderId)
     {
-        if (string.IsNullOrWhiteSpace(localOrderId) || string.IsNullOrWhiteSpace(productCode))
+        if (string.IsNullOrWhiteSpace(localOrderId) || symbol == Symbol.Unknown)
         {
             serverOrderId = null;
             return false;
         }
 
-        var key = (localOrderId, productCode);
+        var key = (localOrderId, symbol);
         if (_localToServer.TryGetValue(key, out var value))
         {
             serverOrderId = value;
@@ -76,15 +77,15 @@ public sealed class InMemoryOrderIdMapper : IOrderIdMapper
         return false;
     }
 
-    public bool TryGetLocalOrderId(string serverOrderId, string productCode, out string? localOrderId)
+    public bool TryGetLocalOrderId(string serverOrderId, Symbol symbol, out string? localOrderId)
     {
-        if (string.IsNullOrWhiteSpace(serverOrderId) || string.IsNullOrWhiteSpace(productCode))
+        if (string.IsNullOrWhiteSpace(serverOrderId) || symbol == Symbol.Unknown)
         {
             localOrderId = null;
             return false;
         }
 
-        var key = (serverOrderId, productCode);
+        var key = (serverOrderId, symbol);
         if (_serverToLocal.TryGetValue(key, out var value))
         {
             localOrderId = value;

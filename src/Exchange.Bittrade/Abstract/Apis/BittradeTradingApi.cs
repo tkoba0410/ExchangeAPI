@@ -107,7 +107,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         return new OrderResult(resp.OrderId.ToString());
     }
 
-    public async Task<CancelResult> CancelOrderAsync(string productCode, string orderId, CancellationToken cancellationToken = default)
+    public async Task<CancelResult> CancelOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default)
     {
         var resp = await _restClient.PostAsync<object?, BittradeCancelOrderResponse>(
             $"v1/order/orders/{orderId}/submitcancel",
@@ -122,9 +122,9 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         return new CancelResult(true);
     }
 
-    public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(string productCode, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
-        var apiSymbol = ToApiSymbol(BittradeMapper.ParseSymbol(productCode));
+        var apiSymbol = ToApiSymbol(symbol);
         var resp = await _restClient.GetAsync<BittradeOpenOrdersResponse>(
             $"v1/order/openOrders?symbol={apiSymbol}&account-id={_accountId}",
             cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -138,7 +138,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
     }
 
     public Task<OrderStatus> PollOrderStatusAsync(
-        string productCode,
+        Symbol symbol,
         string orderId,
         TimeSpan? pollInterval = null,
         int maxAttempts = 30,
@@ -171,7 +171,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             null);
     }
 
-    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         throw new NotSupportedException("Bittrade account executions are not provided via REST in this adapter.");
     }

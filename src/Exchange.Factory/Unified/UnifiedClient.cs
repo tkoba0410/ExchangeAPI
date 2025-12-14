@@ -43,10 +43,10 @@ public sealed class UnifiedClient : IUnifiedClient
         public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
             Task.FromException<IReadOnlyList<Balance>>(new NotSupportedException("Account API not supported for this exchange."));
 
-        public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+        public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
             Task.FromException<IReadOnlyList<ExecutionAccount>>(new NotSupportedException("Account API not supported for this exchange."));
 
-        public Task<IReadOnlyList<Position>> GetOpenPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+        public Task<IReadOnlyList<Position>> GetOpenPositionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
             Task.FromException<IReadOnlyList<Position>>(new NotSupportedException("Margin account API not supported for this exchange."));
 
         public Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default) =>

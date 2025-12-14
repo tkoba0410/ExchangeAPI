@@ -1,4 +1,5 @@
 using System;
+using Common.Contract.Enums;
 
 namespace Common.Contract.Interfaces;
 
@@ -15,15 +16,15 @@ public interface IOrderIdMapper
     /// <summary>
     /// 対応を保存する。
     /// </summary>
-    void Save(string localOrderId, string serverOrderId, string productCode);
+    void Save(string localOrderId, string serverOrderId, Symbol symbol);
 
     /// <summary>
     /// ローカルIDからサーバーIDを取得する。
     /// </summary>
-    bool TryGetServerOrderId(string localOrderId, string productCode, out string? serverOrderId);
+    bool TryGetServerOrderId(string localOrderId, Symbol symbol, out string? serverOrderId);
 
     /// <summary>
     /// サーバーIDからローカルIDを取得する。
     /// </summary>
-    bool TryGetLocalOrderId(string serverOrderId, string productCode, out string? localOrderId);
+    bool TryGetLocalOrderId(string serverOrderId, Symbol symbol, out string? localOrderId);
 }

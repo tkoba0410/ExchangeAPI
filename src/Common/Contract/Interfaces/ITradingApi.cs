@@ -35,9 +35,9 @@ public interface ITradingApi
         string? clientOrderId = null,
         CancellationToken cancellationToken = default);
 
-    Task<CancelResult> CancelOrderAsync(string productCode, string childOrderAcceptanceId, CancellationToken cancellationToken = default);
+    Task<CancelResult> CancelOrderAsync(Symbol symbol, string childOrderAcceptanceId, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(string productCode, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 注文の状態をポーリングし、完了/キャンセル/期限切れを検知する。
@@ -47,7 +47,7 @@ public interface ITradingApi
     /// <param name="pollInterval">ポーリング間隔（null なら 1s）。</param>
     /// <param name="maxAttempts">最大試行回数（デフォルト 30）。</param>
     Task<OrderStatus> PollOrderStatusAsync(
-        string productCode,
+        Symbol symbol,
         string childOrderAcceptanceId,
         TimeSpan? pollInterval = null,
         int maxAttempts = 30,

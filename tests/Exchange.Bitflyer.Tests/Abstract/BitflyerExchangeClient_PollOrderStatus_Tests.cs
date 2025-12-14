@@ -54,7 +54,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var client = new BitflyerExchangeClient(publicApi, sequenceApi, tradingApi);
 
         var status = await client.PollOrderStatusAsync(
-            productCode: "BTC_JPY",
+            symbol: Symbol.BtcJpy,
             childOrderAcceptanceId: acceptanceId,
             pollInterval: TimeSpan.FromMilliseconds(1),
             maxAttempts: 5);

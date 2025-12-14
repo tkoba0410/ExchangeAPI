@@ -48,15 +48,16 @@ public sealed class BitflyerAccountApi : IAccountApi
         }
     }
 
-    public async Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (symbol == Symbol.Unknown)
         {
-            throw new ArgumentException("productCode is required.", nameof(productCode));
+            throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
         try
         {
+            var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
             var raw = await _privateApi
                 .GetExecutionsAsync(productCode, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);

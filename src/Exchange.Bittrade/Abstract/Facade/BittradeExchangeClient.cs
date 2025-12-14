@@ -77,17 +77,17 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, clientOrderId, cancellationToken);
 
-    public Task<CancelResult> CancelOrderAsync(string productCode, string orderId, CancellationToken cancellationToken = default) =>
-        _tradingApi.CancelOrderAsync(productCode, orderId, cancellationToken);
+    public Task<CancelResult> CancelOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default) =>
+        _tradingApi.CancelOrderAsync(symbol, orderId, cancellationToken);
 
-    public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOrdersAsync(productCode, cancellationToken);
+    public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        _tradingApi.GetOrdersAsync(symbol, cancellationToken);
 
-    public Task<OrderStatus> PollOrderStatusAsync(string productCode, string orderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
-        _tradingApi.PollOrderStatusAsync(productCode, orderAcceptanceId, pollInterval, maxAttempts, cancellationToken);
+    public Task<OrderStatus> PollOrderStatusAsync(Symbol symbol, string orderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
+        _tradingApi.PollOrderStatusAsync(symbol, orderAcceptanceId, pollInterval, maxAttempts, cancellationToken);
 
-    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _accountApi.GetAccountExecutionsAsync(productCode, cancellationToken);
+    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        _accountApi.GetAccountExecutionsAsync(symbol, cancellationToken);
 
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);

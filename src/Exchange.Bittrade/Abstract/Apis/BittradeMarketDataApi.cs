@@ -66,7 +66,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         var bids = response.Tick.Bids?.Select(ToLevel).ToList() ?? new List<OrderBookLevel>();
         var asks = response.Tick.Asks?.Select(ToLevel).ToList() ?? new List<OrderBookLevel>();
 
-        return new OrderBook(bids, asks);
+        return new OrderBook(ExchangeCode.Bittrade, bids, asks);
     }
 
     public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default)
@@ -85,6 +85,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         var symbolEnum = ExchangeApi.Adapter.Bittrade.Adapters.BittradeMapper.ParseSymbol(productCode);
         var executions = response.Tick.Data
             .Select(d => new ExecutionMarket(
+                ExchangeCode.Bittrade,
                 symbolEnum,
                 d.Id.ToString(),
                 MapSide(d.Direction),

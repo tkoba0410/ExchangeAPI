@@ -32,7 +32,7 @@ internal static class BitflyerMarketMapper
             .Select(a => new OrderBookLevel(a.Price, a.Size))
             .ToArray() ?? Array.Empty<OrderBookLevel>();
 
-        return new OrderBook(bids, asks);
+        return new OrderBook(ExchangeCode.Bitflyer, bids, asks);
     }
 
     public static ExecutionMarket MapExecution(RawProductCode productCode, BitflyerExecutionPublicResponse raw)
@@ -40,6 +40,7 @@ internal static class BitflyerMarketMapper
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 
         return new ExecutionMarket(
+            ExchangeCode: ExchangeCode.Bitflyer,
             Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(productCode)),
             OrderId: raw.Id.ToString(),
             Side: BitflyerCommonMapper.MapSide(raw.Side),

@@ -1,4 +1,5 @@
 using System;
+using Common.Contract.Enums;
 
 namespace Common.Contract.Dtos;
 
@@ -7,10 +8,11 @@ namespace Common.Contract.Dtos;
 /// </summary>
 /// <remarks>
 /// Stage6 の bitFlyer 実装では REST 取得を提供しないため、利用側で NotSupported を受け取る前提で使用する。
-/// </summary>
+/// </remarks>
 public sealed record Candlestick(
-    string Symbol,
-    string Timescale,
+    ExchangeCode ExchangeCode,
+    Symbol Symbol,
+    TimeSpan Timescale,
     DateTimeOffset OpenTime,
     DateTimeOffset CloseTime,
     decimal Open,

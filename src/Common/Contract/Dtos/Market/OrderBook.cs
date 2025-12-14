@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common.Contract.Enums;
 
 namespace Common.Contract.Dtos;
 
@@ -9,11 +10,13 @@ namespace Common.Contract.Dtos;
 /// </summary>
 public sealed record OrderBook
 {
+    public ExchangeCode ExchangeCode { get; init; }
     public IReadOnlyList<OrderBookLevel> Bids { get; init; }
     public IReadOnlyList<OrderBookLevel> Asks { get; init; }
 
-    public OrderBook(IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks)
+    public OrderBook(ExchangeCode exchangeCode, IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks)
     {
+        ExchangeCode = exchangeCode;
         if (bids is null) throw new ArgumentNullException(nameof(bids));
         if (asks is null) throw new ArgumentNullException(nameof(asks));
 

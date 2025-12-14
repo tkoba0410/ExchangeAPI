@@ -14,7 +14,7 @@ namespace Exchange.Bitflyer.Tests;
 public sealed class BitflyerExchangeClient_SendOrder_Tests
 {
     [Fact]
-    public async Task PlaceOrderAsync_MapsDomainToDtoAndReturnsResult()
+    public async Task PlaceMarketOrder_MapsDomainToDtoAndReturnsResult()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(new BitflyerBalanceResponse[0]);
@@ -23,13 +23,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
-        var order = new OrderRequest(
-            Symbol: Symbol.BtcJpy,
-            Side: ContractSide.Buy,
-            OrderType: OrderType.Market,
-            Size: 0.01m);
-
-        var result = await client.PlaceOrderAsync(order);
+        var result = await client.PlaceMarketOrderAsync(Symbol.BtcJpy, ContractSide.Buy, 0.01m);
 
         Assert.Equal("ACCEPT-123", result.OrderId);
         Assert.NotNull(fakeTrading.LastRequest);
@@ -40,7 +34,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     }
 
     [Fact]
-    public async Task PlaceOrderAsync_StopLimit_Throws()
+    public async Task PlaceStopOrderAsync_ThrowsNotSupported()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
@@ -48,19 +42,12 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var fakeTrading = new FakeBitflyerPrivateTradingApi(tradingResponse);
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
-        var order = new OrderRequest(
-            Symbol: Symbol.BtcJpy,
-            Side: ContractSide.Sell,
-            OrderType: OrderType.Stop,
-            Size: 0.5m,
-            Price: 4000000m,
-            TriggerPrice: 3990000m);
-
-        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => client.PlaceOrderAsync(order));
+        await Assert.ThrowsAsync<NotSupportedException>(() =>
+            client.PlaceStopOrderAsync(Symbol.BtcJpy, ContractSide.Sell, 0.5m, triggerPrice: 3990000m, price: 4000000m));
     }
 
     [Fact]
-    public async Task PlaceOrderAsync_WhenApiReturns429_AddsRateLimitCategory()
+    public async Task PlaceMarketOrder_WhenApiReturns429_AddsRateLimitCategory()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
@@ -73,13 +60,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
             exceptionToThrow: exception);
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
-        var order = new OrderRequest(
-            Symbol: Symbol.BtcJpy,
-            Side: ContractSide.Buy,
-            OrderType: OrderType.Market,
-            Size: 0.01m);
-
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceOrderAsync(order));
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(Symbol.BtcJpy, ContractSide.Buy, 0.01m));
         Assert.Equal(ExchangeErrorCategory.RateLimit, ex.ErrorCategory);
         Assert.Equal("TOO_MANY_REQUESTS", ex.ExchangeErrorCode);
         Assert.Equal("bitFlyer", ex.ExchangeId);
@@ -87,26 +68,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     }
 
     [Fact]
-    public async Task PlaceOrderAsync_MarketDisallowsPriceOrTrigger()
-    {
-        var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
-        var fakeTrading = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
-
-        var order = new OrderRequest(
-            Symbol: Symbol.BtcJpy,
-            Side: ContractSide.Buy,
-            OrderType: OrderType.Market,
-            Size: 0.01m,
-            Price: 1m,
-            TriggerPrice: 1m);
-
-        await Assert.ThrowsAsync<ArgumentException>(() => client.PlaceOrderAsync(order));
-    }
-
-    [Fact]
-    public async Task PlaceOrderAsync_WhenInsufficientFunds_MapsBalanceCategory()
+    public async Task PlaceMarketOrderAsync_WhenInsufficientFunds_MapsBalanceCategory()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
@@ -118,19 +80,13 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
             exceptionToThrow: exception);
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
-        var order = new OrderRequest(
-            Symbol: Symbol.BtcJpy,
-            Side: ContractSide.Buy,
-            OrderType: OrderType.Market,
-            Size: 10m);
-
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceOrderAsync(order));
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(Symbol.BtcJpy, ContractSide.Buy, 10m));
         Assert.Equal(ExchangeErrorCategory.Balance, ex.ErrorCategory);
         Assert.Equal("INSUFFICIENT_FUNDS", ex.ExchangeErrorCode);
     }
 
     [Fact]
-    public async Task PlaceOrderAsync_WhenAuthError_MapsAuthCategory()
+    public async Task PlaceMarketOrderAsync_WhenAuthError_MapsAuthCategory()
     {
         var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
@@ -143,13 +99,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
             exceptionToThrow: exception);
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
-        var order = new OrderRequest(
-            Symbol: Symbol.BtcJpy,
-            Side: ContractSide.Buy,
-            OrderType: OrderType.Market,
-            Size: 0.01m);
-
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceOrderAsync(order));
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(Symbol.BtcJpy, ContractSide.Buy, 0.01m));
         Assert.Equal(ExchangeErrorCategory.Auth, ex.ErrorCategory);
         Assert.Equal("AUTHENTICATION_ERROR", ex.ExchangeErrorCode);
     }

@@ -45,18 +45,7 @@ public class BitflyerClientDegradedFlowTests
         Assert.NotEmpty(balances);
 
         // 2. send order（劣化環境だが成功）
-        var orderRequest = new OrderRequest(
-            Symbol: Symbol.BtcJpy,
-            Side: Side.Buy,
-            OrderType: OrderType.Market,
-            Size: 0.001m,
-            Price: null,
-            TriggerPrice: null,
-            TimeInForce: null,
-            MinuteToExpire: null,
-            ClientOrderId: null);
-
-        var orderResult = await client.PlaceOrderAsync(orderRequest);
+        var orderResult = await client.PlaceMarketOrderAsync(Symbol.BtcJpy, Side.Buy, 0.001m);
         Assert.False(string.IsNullOrWhiteSpace(orderResult.OrderId));
 
         // 3. poll status（初回429後にCOMPLETED）
@@ -81,18 +70,7 @@ public class BitflyerClientDegradedFlowTests
         Assert.NotEmpty(positionsBeforeClose);
 
         // 7. close order（反対売買で決済）→ poll status
-        var closeOrderRequest = new OrderRequest(
-            Symbol: Symbol.BtcJpy,
-            Side: Side.Sell,
-            OrderType: OrderType.Market,
-            Size: 0.001m,
-            Price: null,
-            TriggerPrice: null,
-            TimeInForce: null,
-            MinuteToExpire: null,
-            ClientOrderId: null);
-
-        var closeOrderResult = await client.PlaceOrderAsync(closeOrderRequest);
+        var closeOrderResult = await client.PlaceMarketOrderAsync(Symbol.BtcJpy, Side.Sell, 0.001m);
         Assert.False(string.IsNullOrWhiteSpace(closeOrderResult.OrderId));
 
         var closeStatus = await client.PollOrderStatusAsync(

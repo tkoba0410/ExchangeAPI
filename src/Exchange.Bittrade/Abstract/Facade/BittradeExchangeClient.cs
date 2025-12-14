@@ -51,8 +51,36 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesAsync(cancellationToken);
 
-    public Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceOrderAsync(request, cancellationToken);
+    public Task<OrderResult> PlaceLimitOrderAsync(
+        Symbol symbol,
+        Side side,
+        decimal size,
+        decimal price,
+        TimeInForce? timeInForce = null,
+        int? minuteToExpire = null,
+        string? clientOrderId = null,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.PlaceLimitOrderAsync(symbol, side, size, price, timeInForce, minuteToExpire, clientOrderId, cancellationToken);
+
+    public Task<OrderResult> PlaceMarketOrderAsync(
+        Symbol symbol,
+        Side side,
+        decimal size,
+        string? clientOrderId = null,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.PlaceMarketOrderAsync(symbol, side, size, clientOrderId, cancellationToken);
+
+    public Task<OrderResult> PlaceStopOrderAsync(
+        Symbol symbol,
+        Side side,
+        decimal size,
+        decimal triggerPrice,
+        decimal? price = null,
+        TimeInForce? timeInForce = null,
+        int? minuteToExpire = null,
+        string? clientOrderId = null,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, price, timeInForce, minuteToExpire, clientOrderId, cancellationToken);
 
     public Task<CancelResult> CancelOrderAsync(string productCode, string orderId, CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderAsync(productCode, orderId, cancellationToken);

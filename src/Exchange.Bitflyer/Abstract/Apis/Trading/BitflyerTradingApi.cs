@@ -9,6 +9,8 @@ using Common.Contract.Interfaces;
 using Common.Contract.Enums;
 using Common.Contract.Dtos;
 using Common.Contract.Errors;
+using ContractSide = Common.Contract.Enums.Side;
+using ContractTimeInForce = Common.Contract.Enums.TimeInForce;
 
 namespace Exchange.Bitflyer.Abstract;
 
@@ -31,12 +33,45 @@ public sealed class BitflyerTradingApi : ITradingApi
         _exchangeId = exchangeId;
     }
 
-    public async Task<OrderResult> PlaceOrderAsync(
-        OrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
+    public Task<OrderResult> PlaceLimitOrderAsync(
+        Symbol symbol,
+        ContractSide side,
+        decimal size,
+        decimal price,
+        ContractTimeInForce? timeInForce = null,
+        int? minuteToExpire = null,
+        string? clientOrderId = null,
+        CancellationToken cancellationToken = default) =>
+        PlaceOrderInternal(
+            new OrderRequest(symbol, side, OrderType.Limit, size, clientOrderId, price, null, minuteToExpire, timeInForce),
+            cancellationToken);
 
+    public Task<OrderResult> PlaceMarketOrderAsync(
+        Symbol symbol,
+        ContractSide side,
+        decimal size,
+        string? clientOrderId = null,
+        CancellationToken cancellationToken = default) =>
+        PlaceOrderInternal(
+            new OrderRequest(symbol, side, OrderType.Market, size, clientOrderId),
+            cancellationToken);
+
+    public Task<OrderResult> PlaceStopOrderAsync(
+        Symbol symbol,
+        ContractSide side,
+        decimal size,
+        decimal triggerPrice,
+        decimal? price = null,
+        ContractTimeInForce? timeInForce = null,
+        int? minuteToExpire = null,
+        string? clientOrderId = null,
+        CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException("bitFlyer child orders do not support stop orders; use parent orders instead.");
+
+    private async Task<OrderResult> PlaceOrderInternal(
+        OrderRequest request,
+        CancellationToken cancellationToken)
+    {
         BitflyerTradingMapper.ValidateOrderRequest(request);
 
         try

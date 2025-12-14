@@ -41,10 +41,43 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         return BittradeMapper.MapBalances(resp.Data);
     }
 
-    public async Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
+    public Task<OrderResult> PlaceLimitOrderAsync(
+        Symbol symbol,
+        Side side,
+        decimal size,
+        decimal price,
+        TimeInForce? timeInForce = null,
+        int? minuteToExpire = null,
+        string? clientOrderId = null,
+        CancellationToken cancellationToken = default) =>
+        PlaceOrderInternal(
+            new OrderRequest(symbol, side, OrderType.Limit, size, clientOrderId, price, null, minuteToExpire, timeInForce),
+            cancellationToken);
 
+    public Task<OrderResult> PlaceMarketOrderAsync(
+        Symbol symbol,
+        Side side,
+        decimal size,
+        string? clientOrderId = null,
+        CancellationToken cancellationToken = default) =>
+        PlaceOrderInternal(
+            new OrderRequest(symbol, side, OrderType.Market, size, clientOrderId),
+            cancellationToken);
+
+    public Task<OrderResult> PlaceStopOrderAsync(
+        Symbol symbol,
+        Side side,
+        decimal size,
+        decimal triggerPrice,
+        decimal? price = null,
+        TimeInForce? timeInForce = null,
+        int? minuteToExpire = null,
+        string? clientOrderId = null,
+        CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException("Bittrade does not support stop orders via this adapter.");
+
+    private async Task<OrderResult> PlaceOrderInternal(OrderRequest request, CancellationToken cancellationToken)
+    {
         var apiSymbol = ToApiSymbol(request.Symbol);
         var type = ToOrderType(request);
 
@@ -157,9 +190,8 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             _ => symbol.ToString().Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant()
         };
 
-    private static string ToOrderType(OrderRequest request)
-    {
-        return (request.Side, request.OrderType) switch
+    private static string ToOrderType(OrderRequest request) =>
+        (request.Side, request.OrderType) switch
         {
             (Side.Buy, OrderType.Market) => "buy-market",
             (Side.Sell, OrderType.Market) => "sell-market",
@@ -167,5 +199,4 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             (Side.Sell, OrderType.Limit) => "sell-limit",
             _ => throw new ExchangeApiException($"Unsupported order type: {request.OrderType}")
         };
-    }
 }

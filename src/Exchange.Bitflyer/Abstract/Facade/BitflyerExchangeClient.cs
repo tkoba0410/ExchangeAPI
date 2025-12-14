@@ -78,7 +78,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
 
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
         Symbol symbol,
-        string timescale,
+        TimeSpan timescale,
         DateTimeOffset? from = null,
         DateTimeOffset? to = null,
         CancellationToken cancellationToken = default) =>

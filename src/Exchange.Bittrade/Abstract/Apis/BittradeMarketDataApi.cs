@@ -97,7 +97,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
 
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
         Symbol symbol,
-        string timescale,
+        TimeSpan timescale,
         DateTimeOffset? from = null,
         DateTimeOffset? to = null,
         CancellationToken cancellationToken = default)

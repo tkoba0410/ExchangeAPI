@@ -44,11 +44,25 @@ public static class OrderBookExtensions
     public static decimal GetTotalSize(this OrderBook orderBook) =>
         (orderBook?.Asks?.Sum(x => x.Size) ?? 0m) + (orderBook?.Bids?.Sum(x => x.Size) ?? 0m);
 
+    /// <summary>サイズ指定で買い成行を呑み切る計算（asks 側）。</summary>
+    public static MarketFillResult CalcBuyPriceBySize(this OrderBook orderBook, decimal takerSize)
+    {
+        if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
+        return Fill(orderBook.Asks, takerSize);
+    }
+
+    /// <summary>サイズ指定で売り成行を呑み切る計算（bids 側）。</summary>
+    public static MarketFillResult CalcSellPriceBySize(this OrderBook orderBook, decimal takerSize)
+    {
+        if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
+        return Fill(orderBook.Bids, takerSize);
+    }
+
     /// <summary>
-    /// 指定価格以下で約定可能な買い側の集計（asks 側、昇順想定）。
+    /// 価格指定で買い側の約定可能量を計算（asks 側、昇順想定）。
     /// 合計サイズ・合計コスト・平均価格を返す。
     /// </summary>
-    public static MarketFillResult CalcExecutableSizeForBuy(this OrderBook orderBook, decimal maxPrice)
+    public static MarketFillResult CalcBuySizeByPrice(this OrderBook orderBook, decimal maxPrice)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
         if (maxPrice <= 0) throw new ArgumentOutOfRangeException(nameof(maxPrice));
@@ -73,10 +87,10 @@ public static class OrderBookExtensions
     }
 
     /// <summary>
-    /// 指定価格以上で約定可能な売り側の集計（bids 側、降順想定）。
+    /// 価格指定で売り側の約定可能量を計算（bids 側、降順想定）。
     /// 合計サイズ・合計受取・平均価格を返す。
     /// </summary>
-    public static MarketFillResult CalcExecutableSizeForSell(this OrderBook orderBook, decimal minPrice)
+    public static MarketFillResult CalcSellSizeByPrice(this OrderBook orderBook, decimal minPrice)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
         if (minPrice <= 0) throw new ArgumentOutOfRangeException(nameof(minPrice));
@@ -98,20 +112,6 @@ public static class OrderBookExtensions
         var avg = totalSize > 0 ? totalValue / totalSize : (decimal?)null;
         var filled = totalSize > 0;
         return new MarketFillResult(filled, totalSize, totalValue, avg);
-    }
-
-    /// <summary>成行買いで指定サイズを呑み切る計算（asks 側を上から食い進める）。</summary>
-    public static MarketFillResult CalcMarketBuy(this OrderBook orderBook, decimal takerSize)
-    {
-        if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
-        return Fill(orderBook.Asks, takerSize);
-    }
-
-    /// <summary>成行売りで指定サイズを呑み切る計算（bids 側を下から食い進める）。</summary>
-    public static MarketFillResult CalcMarketSell(this OrderBook orderBook, decimal takerSize)
-    {
-        if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
-        return Fill(orderBook.Bids, takerSize);
     }
 
     private static MarketFillResult Fill(IReadOnlyList<OrderBookLevel> levels, decimal takerSize)

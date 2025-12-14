@@ -35,11 +35,11 @@ internal static class BitflyerMarketMapper
         return new OrderBook(bids, asks);
     }
 
-    public static MarketExecution MapExecution(RawProductCode productCode, BitflyerExecutionPublicResponse raw)
+    public static ExecutionMarket MapExecution(RawProductCode productCode, BitflyerExecutionPublicResponse raw)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 
-        return new MarketExecution(
+        return new ExecutionMarket(
             ProductCode: BitflyerCommonMapper.ToApiProductCode(productCode),
             Id: raw.Id,
             Side: BitflyerCommonMapper.MapSide(raw.Side),

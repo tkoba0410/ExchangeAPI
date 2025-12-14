@@ -16,7 +16,7 @@ public interface IMarketDataApi
 
     Task<OrderBook> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<MarketExecution>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
         string symbol,

@@ -91,7 +91,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         }
     }
 
-    public async Task<IReadOnlyList<MarketExecution>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default)
     {
         try
         {

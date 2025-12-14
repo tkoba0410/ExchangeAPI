@@ -69,7 +69,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         return new OrderBook(bids, asks);
     }
 
-    public async Task<IReadOnlyList<MarketExecution>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
         var response = await _restClient.GetAsync<BittradeTradeResponse>(
@@ -83,7 +83,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
 
         var productCode = ToCanonicalSymbol(symbol);
         var executions = response.Tick.Data
-            .Select(d => new MarketExecution(
+            .Select(d => new ExecutionMarket(
                 productCode,
                 d.Id,
                 MapSide(d.Direction),

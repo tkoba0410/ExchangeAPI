@@ -43,7 +43,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
         await Assert.ThrowsAsync<NotSupportedException>(() =>
-            client.PlaceStopOrderAsync(Symbol.BtcJpy, ContractSide.Sell, 0.5m, triggerPrice: 3990000m, price: 4000000m));
+            client.PlaceStopOrderAsync(Symbol.BtcJpy, ContractSide.Sell, 0.5m, triggerPrice: 3990000m));
     }
 
     [Fact]

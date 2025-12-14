@@ -73,10 +73,9 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         Side side,
         decimal size,
         decimal triggerPrice,
-        decimal? price = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, price, clientOrderId, cancellationToken);
+        _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, clientOrderId, cancellationToken);
 
     public Task<CancelResult> CancelOrderAsync(string productCode, string orderId, CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderAsync(productCode, orderId, cancellationToken);

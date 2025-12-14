@@ -32,7 +32,6 @@ public interface ITradingApi
         Side side,
         decimal size,
         decimal triggerPrice,
-        decimal? price = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default);
 

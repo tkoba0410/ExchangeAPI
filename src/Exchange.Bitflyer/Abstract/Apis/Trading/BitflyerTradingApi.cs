@@ -58,7 +58,6 @@ public sealed class BitflyerTradingApi : ITradingApi
         ContractSide side,
         decimal size,
         decimal triggerPrice,
-        decimal? price = null,
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         throw new NotSupportedException("bitFlyer child orders do not support stop orders; use parent orders instead.");

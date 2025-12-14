@@ -2,7 +2,7 @@ using System;
 using Exchange.Bitflyer.Raw;
 using Common.Contract.Dtos;
 using Common.Contract.Enums;
-using ContractTimeInForce = Common.Contract.Dtos.TimeInForce;
+using ContractTimeInForce = Common.Contract.Enums.TimeInForce;
 using RawTimeInForce = Exchange.Bitflyer.Raw.TimeInForce;
 
 namespace Exchange.Bitflyer.Abstract;

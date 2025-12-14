@@ -13,16 +13,16 @@ internal static class BittradeMapper
 {
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public static IReadOnlyList<ExchangeBalance> MapBalances(BittradeBalanceData data)
+    public static IReadOnlyList<Balance> MapBalances(BittradeBalanceData data)
     {
-        var result = new List<ExchangeBalance>();
+        var result = new List<Balance>();
         foreach (var group in data.List.GroupBy(e => e.Currency, StringComparer.OrdinalIgnoreCase))
         {
             var total = group.Sum(e => ParseDecimal(e.Balance));
             var available = group
                 .Where(x => string.Equals(x.Type, "trade", StringComparison.OrdinalIgnoreCase))
                 .Sum(e => ParseDecimal(e.Balance));
-            result.Add(ExchangeBalance.Create(
+            result.Add(Balance.Create(
                 exchange: Exchange,
                 currency: group.Key.ToUpperInvariant(),
                 amount: total,

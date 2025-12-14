@@ -23,7 +23,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
         _exchangeId = exchangeId;
     }
 
-    public async Task<IReadOnlyList<ExchangeBalance>> GetBalancesAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -32,7 +32,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
                 .ConfigureAwait(false);
 
             return rawBalances
-                .Select(b => ExchangeBalance.Create(
+                .Select(b => Balance.Create(
                     exchange: ExchangeCode.Bitflyer,
                     currency: b.CurrencyCode,
                     amount: b.Amount,

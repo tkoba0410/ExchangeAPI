@@ -27,7 +27,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
 
-    public async Task<IReadOnlyList<ExchangeBalance>> GetBalancesAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
     {
         var resp = await _restClient.GetAsync<BittradeBalancesResponse>(
             $"v1/account/accounts/{_accountId}/balance",

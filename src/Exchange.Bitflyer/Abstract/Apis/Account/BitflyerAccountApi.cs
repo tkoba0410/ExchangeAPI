@@ -23,7 +23,7 @@ public sealed class BitflyerAccountApi : IAccountApi
         _exchangeId = exchangeId;
     }
 
-    public async Task<IReadOnlyList<ExchangeBalance>> GetBalancesAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
     {
         try
         {

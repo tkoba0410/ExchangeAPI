@@ -41,7 +41,7 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             Exchange: Exchange,
-            ProductCode: ToCanonicalSymbol(detail.Symbol),
+            Symbol: ToCanonicalSymbol(detail.Symbol),
             OrderId: detail.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,
             OrderType: type,
@@ -66,7 +66,7 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             Exchange: Exchange,
-            ProductCode: ToCanonicalSymbol(summary.Symbol),
+            Symbol: ToCanonicalSymbol(summary.Symbol),
             OrderId: summary.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,
             OrderType: type,

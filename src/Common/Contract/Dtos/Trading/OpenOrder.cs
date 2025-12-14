@@ -8,7 +8,7 @@ namespace Common.Contract.Dtos;
 /// </summary>
 public sealed record OpenOrder(
     ExchangeCode Exchange,
-    string ProductCode,
+    string Symbol,
     string OrderId,
     OrderSide Side,
     OrderType OrderType,

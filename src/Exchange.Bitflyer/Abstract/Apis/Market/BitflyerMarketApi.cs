@@ -27,13 +27,13 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         _exchangeId = exchangeId;
     }
 
-    public async Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken = default)
+    public async Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         try
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
             var raw = await _publicApi.GetTickerRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
-            return BitflyerMarketMapper.MapTicker(symbol, raw);
+            return BitflyerMarketMapper.MapTicker(BitflyerCommonMapper.ToApiProductCode(productCode), raw);
         }
         catch (SymbolNotSupportedException ex)
         {
@@ -59,7 +59,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         }
     }
 
-    public async Task<OrderBook> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default)
+    public async Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -91,7 +91,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         }
     }
 
-    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -120,7 +120,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
     }
 
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
-        string symbol,
+        Symbol symbol,
         string timescale,
         DateTimeOffset? from = null,
         DateTimeOffset? to = null,

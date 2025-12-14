@@ -36,16 +36,16 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         Raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken = default) =>
+    public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerAsync(symbol, cancellationToken);
 
-    public Task<OrderBook> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default) =>
+    public Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetOrderBookAsync(symbol, cancellationToken);
 
-    public Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsAsync(symbol, cancellationToken);
 
-    public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(string symbol, string timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(Symbol symbol, string timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(symbol, timescale, from, to, cancellationToken);
 
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>

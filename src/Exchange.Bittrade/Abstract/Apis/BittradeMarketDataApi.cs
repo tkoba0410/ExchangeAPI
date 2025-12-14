@@ -24,7 +24,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public async Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken = default)
+    public async Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
         var response = await _restClient.GetAsync<BittradeMergedResponse>(
@@ -41,8 +41,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         var timestamp = ts.HasValue && ts.Value > 0
             ? DateTimeOffset.FromUnixTimeMilliseconds(ts.Value)
             : DateTimeOffset.UtcNow;
-        var canonicalSymbol = ToCanonicalSymbol(symbol);
-        var symbolEnum = MapSymbol(canonicalSymbol);
+        var symbolEnum = symbol;
 
         return new Ticker(
             Exchange: ExchangeCode.Bittrade,
@@ -51,7 +50,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
             Timestamp: timestamp);
     }
 
-    public async Task<OrderBook> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default)
+    public async Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
         var response = await _restClient.GetAsync<BittradeDepthResponse>(
@@ -69,7 +68,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         return new OrderBook(ExchangeCode.Bittrade, bids, asks);
     }
 
-    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
         var response = await _restClient.GetAsync<BittradeTradeResponse>(
@@ -81,8 +80,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
             throw new ExchangeApiException("Bittrade trades response is invalid.");
         }
 
-        var productCode = ToCanonicalSymbol(symbol);
-        var symbolEnum = ExchangeApi.Adapter.Bittrade.Adapters.BittradeMapper.ParseSymbol(productCode);
+        var symbolEnum = symbol;
         var executions = response.Tick.Data
             .Select(d => new ExecutionMarket(
                 ExchangeCode.Bittrade,
@@ -98,7 +96,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
     }
 
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
-        string symbol,
+        Symbol symbol,
         string timescale,
         DateTimeOffset? from = null,
         DateTimeOffset? to = null,
@@ -118,35 +116,12 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
             ? Side.Buy
             : Side.Sell;
 
-    private static string ToApiSymbol(string symbol) =>
-        symbol.Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
-
-    private static string ToCanonicalSymbol(string symbol)
-    {
-        if (symbol.Contains('/')) return symbol.ToUpperInvariant();
-        var upper = symbol.ToUpperInvariant();
-        if (upper.EndsWith("JPY", StringComparison.Ordinal))
+    private static string ToApiSymbol(Symbol symbol) =>
+        symbol switch
         {
-            var basePart = upper[..^3];
-            return $"{basePart}/JPY";
-        }
-
-        // fallback: split midpoint
-        if (upper.Length >= 6)
-        {
-            var mid = upper.Length / 2;
-            return $"{upper[..mid]}/{upper[mid..]}";
-        }
-
-        return upper;
-    }
-
-    private static Symbol MapSymbol(string canonicalSymbol) =>
-        canonicalSymbol switch
-        {
-            "BTC/JPY" or "BTC_JPY" => Symbol.BtcJpy,
-            "ETH/JPY" or "ETH_JPY" => Symbol.EthJpy,
-            "FX_BTC/JPY" or "FX_BTC_JPY" => Symbol.FxBtcJpy,
-            _ => Symbol.Unknown
+            Symbol.BtcJpy => "btcjpy",
+            Symbol.EthJpy => "ethjpy",
+            Symbol.FxBtcJpy => "fxbtcjpy",
+            _ => symbol.ToString().Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant()
         };
 }

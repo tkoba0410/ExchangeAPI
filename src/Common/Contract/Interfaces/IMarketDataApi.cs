@@ -12,14 +12,14 @@ namespace Common.Contract.Interfaces;
 /// </summary>
 public interface IMarketDataApi
 {
-    Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken = default);
+    Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default);
 
-    Task<OrderBook> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default);
+    Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
-        string symbol,
+        Symbol symbol,
         string timescale,
         DateTimeOffset? from = null,
         DateTimeOffset? to = null,

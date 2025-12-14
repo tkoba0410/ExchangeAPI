@@ -67,17 +67,17 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     }
 
     // Market
-    public Task<Ticker> GetTickerAsync(string symbol, CancellationToken cancellationToken = default) =>
+    public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerAsync(symbol, cancellationToken);
 
-    public Task<OrderBook> GetOrderBookAsync(string symbol, CancellationToken cancellationToken = default) =>
+    public Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetOrderBookAsync(symbol, cancellationToken);
 
-    public Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(string symbol, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsAsync(symbol, cancellationToken);
 
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
-        string symbol,
+        Symbol symbol,
         string timescale,
         DateTimeOffset? from = null,
         DateTimeOffset? to = null,

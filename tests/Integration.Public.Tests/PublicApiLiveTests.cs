@@ -25,7 +25,7 @@ public class PublicApiLiveTests
         var client = BitflyerClientFactory.CreatePublic(options);
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var ticker = await client.GetTickerAsync("BTC/JPY", cts.Token);
+        var ticker = await client.GetTickerAsync(Common.Contract.Enums.Symbol.BtcJpy, cts.Token);
         var msg = $"bitFlyer Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
@@ -53,7 +53,7 @@ public class PublicApiLiveTests
         var client = BittradeClientFactory.CreatePublicClient(observer: _observer);
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var ticker = await client.GetTickerAsync("BTC/JPY", cts.Token);
+        var ticker = await client.GetTickerAsync(Common.Contract.Enums.Symbol.BtcJpy, cts.Token);
         var msg = $"Bittrade Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 

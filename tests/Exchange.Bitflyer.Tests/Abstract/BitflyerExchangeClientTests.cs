@@ -44,7 +44,7 @@ namespace Exchange.Bitflyer.Tests
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             // Act
-            var ticker = await client.GetTickerAsync("BTC/JPY");
+            var ticker = await client.GetTickerAsync(Symbol.BtcJpy);
 
             Assert.Equal(Symbol.BtcJpy, ticker.Symbol);
             Assert.Equal(raw.LastTradedPrice, ticker.LastTradedPrice);
@@ -77,7 +77,7 @@ namespace Exchange.Bitflyer.Tests
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(async () =>
-            await client.GetTickerAsync("UNKNOWN/JPY"));
+            await client.GetTickerAsync(Symbol.Unknown));
 
         Assert.IsType<SymbolNotSupportedException>(ex.InnerException);
 
@@ -121,7 +121,7 @@ namespace Exchange.Bitflyer.Tests
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
-            var board = await client.GetOrderBookAsync("BTC/JPY");
+            var board = await client.GetOrderBookAsync(Symbol.BtcJpy);
 
             Assert.Single(board.Bids);
             Assert.Single(board.Asks);

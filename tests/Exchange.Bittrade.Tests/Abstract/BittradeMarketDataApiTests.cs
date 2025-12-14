@@ -35,7 +35,7 @@ public class BittradeMarketDataApiTests
         """;
         var api = CreateApi("/market/detail/merged?symbol=btcjpy", json);
 
-        var ticker = await api.GetTickerAsync("BTC/JPY");
+        var ticker = await api.GetTickerAsync(Symbol.BtcJpy);
 
         Assert.Equal(Symbol.BtcJpy, ticker.Symbol);
         Assert.Equal(100m, ticker.LastTradedPrice);
@@ -55,7 +55,7 @@ public class BittradeMarketDataApiTests
         """;
         var api = CreateApi("/market/depth?symbol=btcjpy&type=step0", json);
 
-        var book = await api.GetOrderBookAsync("BTC/JPY");
+        var book = await api.GetOrderBookAsync(Symbol.BtcJpy);
 
         Assert.Equal(2, book.Bids.Count);
         Assert.Equal(2, book.Asks.Count);
@@ -78,7 +78,7 @@ public class BittradeMarketDataApiTests
         """;
         var api = CreateApi("/market/trade?symbol=btcjpy", json);
 
-        var executions = await api.GetMarketExecutionsAsync("BTC/JPY");
+        var executions = await api.GetMarketExecutionsAsync(Symbol.BtcJpy);
 
         Assert.Equal(2, executions.Count);
         Assert.Equal(Side.Buy, executions[0].Side);

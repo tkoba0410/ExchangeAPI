@@ -3,7 +3,7 @@
 Contracts プロジェクトの責務と主な DTO/インターフェースをまとめます。依存方向は `Contracts → Transport → Adapter.Bitflyer → Factory` で一方向。
 
 ## 役割
-- 抽象インターフェース: `IMarketDataApi`, `ITradingApi`, `IAccountApi`, `IMarginAccountApi`, `IExchangeInfoApi`, `IApiCredentialProvider`, `IOrderIdMapper`
+- 抽象インターフェース: `IMarketDataApi`, `ITradingApi`, `IAccountApi`, `IMarginAccountApi`, `IExchangeInfoApi`, `IApiCredentialProvider`
 - 共通 DTO: Market/Trading/Account/ExchangeInfo/Errors。挙動は Transport/Adapter に委譲し、ここでは形だけを定義する。
 - エラー分類: `ExchangeErrorCategory` で取引所固有エラーを正規化し、上位ポリシー判定に使う。
 

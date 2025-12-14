@@ -9,6 +9,7 @@ using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 using Exchange.Bitflyer.Tests.Fakes;
 using Common.Contract.Dtos;
 using Common.Contract.Enums;
+using ContractSide = Common.Contract.Enums.Side;
 using ExecutionResponse = Exchange.Bitflyer.Raw.BitflyerExecutionPrivateResponse;
 using Xunit;
 
@@ -29,7 +30,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             OutstandingSize = 0.01m,
             Price = 3000000m,
             AveragePrice = 0m,
-            Side = Side.Buy,
+            Side = Exchange.Bitflyer.Raw.Side.Buy,
             ChildOrderType = ChildOrderType.Limit,
             Size = 0.01m,
         };

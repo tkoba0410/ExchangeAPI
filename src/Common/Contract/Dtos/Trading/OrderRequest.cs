@@ -13,7 +13,7 @@ namespace Common.Contract.Dtos;
 /// </summary>
 public sealed record OrderRequest(
     Symbol Symbol,
-    OrderSide Side,
+    Side Side,
     OrderType OrderType,
     decimal Size,
     string? ClientOrderId = null,

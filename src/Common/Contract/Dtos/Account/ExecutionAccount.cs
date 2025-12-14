@@ -10,7 +10,7 @@ namespace Common.Contract.Dtos;
 public sealed record ExecutionAccount(
     Symbol Symbol,
     string OrderId,
-    OrderSide Side,
+    Side Side,
     decimal Price,
     decimal Size,
     DateTimeOffset ExecutedAt,

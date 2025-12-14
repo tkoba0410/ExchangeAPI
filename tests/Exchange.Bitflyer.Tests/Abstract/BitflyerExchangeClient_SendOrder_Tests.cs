@@ -5,6 +5,7 @@ using Common.Contract.Errors;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
+using ContractSide = Common.Contract.Enums.Side;
 using Exchange.Bitflyer.Tests.Fakes;
 using Xunit;
 
@@ -24,7 +25,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var order = new OrderRequest(
             Symbol: Symbol.BtcJpy,
-            Side: OrderSide.Buy,
+            Side: ContractSide.Buy,
             OrderType: OrderType.Market,
             Size: 0.01m);
 
@@ -33,7 +34,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         Assert.Equal("ACCEPT-123", result.OrderId);
         Assert.NotNull(fakeTrading.LastRequest);
         Assert.Equal(RawProductCode.BtcJpy, fakeTrading.LastRequest!.ProductCode);
-        Assert.Equal(Side.Buy, fakeTrading.LastRequest!.Side);
+        Assert.Equal(Exchange.Bitflyer.Raw.Side.Buy, fakeTrading.LastRequest!.Side);
         Assert.Equal(ChildOrderType.Market, fakeTrading.LastRequest!.ChildOrderType);
         Assert.Equal(0.01m, fakeTrading.LastRequest!.Size);
     }
@@ -49,7 +50,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var order = new OrderRequest(
             Symbol: Symbol.BtcJpy,
-            Side: OrderSide.Sell,
+            Side: ContractSide.Sell,
             OrderType: OrderType.Stop,
             Size: 0.5m,
             Price: 4000000m,
@@ -74,7 +75,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var order = new OrderRequest(
             Symbol: Symbol.BtcJpy,
-            Side: OrderSide.Buy,
+            Side: ContractSide.Buy,
             OrderType: OrderType.Market,
             Size: 0.01m);
 
@@ -95,7 +96,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var order = new OrderRequest(
             Symbol: Symbol.BtcJpy,
-            Side: OrderSide.Buy,
+            Side: ContractSide.Buy,
             OrderType: OrderType.Market,
             Size: 0.01m,
             Price: 1m,
@@ -119,7 +120,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var order = new OrderRequest(
             Symbol: Symbol.BtcJpy,
-            Side: OrderSide.Buy,
+            Side: ContractSide.Buy,
             OrderType: OrderType.Market,
             Size: 10m);
 
@@ -144,7 +145,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var order = new OrderRequest(
             Symbol: Symbol.BtcJpy,
-            Side: OrderSide.Buy,
+            Side: ContractSide.Buy,
             OrderType: OrderType.Market,
             Size: 0.01m);
 

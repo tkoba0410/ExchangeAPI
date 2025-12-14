@@ -9,6 +9,7 @@ using Common.Contract.Errors;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bitflyer.Raw;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
+using ContractSide = Common.Contract.Enums.Side;
 using Exchange.Bitflyer.Tests.Fakes;
 using Xunit;
 
@@ -141,7 +142,7 @@ namespace Exchange.Bitflyer.Tests
                     ChildOrderId = "JOR-1",
                     ChildOrderAcceptanceId = "JRF-1",
                     ProductCode = RawProductCode.BtcJpy,
-                    Side = Side.Buy,
+                    Side = Exchange.Bitflyer.Raw.Side.Buy,
                 ChildOrderType = ChildOrderType.Limit,
                     Price = 100m,
                     Size = 0.1m,
@@ -161,7 +162,7 @@ namespace Exchange.Bitflyer.Tests
             Assert.Single(result);
             var order = result[0];
             Assert.Equal("JOR-1", order.OrderId);
-            Assert.Equal(OrderSide.Buy, order.Side);
+            Assert.Equal(ContractSide.Buy, order.Side);
             Assert.Equal(OrderType.Limit, order.OrderType);
             Assert.Equal(0.1m, order.Size);
         }
@@ -197,7 +198,7 @@ namespace Exchange.Bitflyer.Tests
                 new BitflyerPositionResponse
                 {
                     ProductCode = RawProductCode.BtcJpy,
-                    Side = Side.Buy,
+                    Side = Exchange.Bitflyer.Raw.Side.Buy,
                     Size = 0.01m,
                     Price = 3000000m,
                     OpenDate = new DateTime(2025, 1, 1),
@@ -215,7 +216,7 @@ namespace Exchange.Bitflyer.Tests
             Assert.Single(result);
             var pos = result[0];
             Assert.Equal(Symbol.BtcJpy, pos.Symbol);
-            Assert.Equal(OrderSide.Buy, pos.Side);
+            Assert.Equal(ContractSide.Buy, pos.Side);
             Assert.Equal(0.01m, pos.Size);
             Assert.Equal(3000000m, pos.Price);
             Assert.Equal(1000m, pos.Pnl);

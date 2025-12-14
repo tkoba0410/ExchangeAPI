@@ -95,15 +95,15 @@ internal static class BittradeMapper
         };
     }
 
-    public static (OrderSide Side, OrderType OrderType) ParseOrderType(string type)
+    public static (Side Side, OrderType OrderType) ParseOrderType(string type)
     {
         // format: buy-market, sell-limit, buy-limit
         var parts = type.Split('-', StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length != 2) throw new ExchangeApiException($"Unsupported order type: {type}");
 
         var side = string.Equals(parts[0], "buy", StringComparison.OrdinalIgnoreCase)
-            ? OrderSide.Buy
-            : OrderSide.Sell;
+            ? Side.Buy
+            : Side.Sell;
 
         var orderType = parts[1] switch
         {

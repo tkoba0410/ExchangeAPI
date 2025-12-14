@@ -111,10 +111,10 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         return new OrderBookLevel(level[0], level[1]);
     }
 
-    private static OrderSide MapSide(string direction) =>
+    private static Side MapSide(string direction) =>
         string.Equals(direction, "buy", StringComparison.OrdinalIgnoreCase)
-            ? OrderSide.Buy
-            : OrderSide.Sell;
+            ? Side.Buy
+            : Side.Sell;
 
     private static string ToApiSymbol(string symbol) =>
         symbol.Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant();

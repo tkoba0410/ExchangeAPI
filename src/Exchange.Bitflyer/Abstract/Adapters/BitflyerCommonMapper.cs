@@ -2,20 +2,21 @@ using System;
 using Common.Contract.Enums;
 using Common.Contract.Dtos;
 using Common.Contract.Errors;
-using Exchange.Bitflyer.Raw;
+using ContractSide = Common.Contract.Enums.Side;
+using RawSide = Exchange.Bitflyer.Raw.Side;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 
 namespace Exchange.Bitflyer.Abstract;
 
 internal static class BitflyerCommonMapper
 {
-    public static OrderSide MapSide(Side side) =>
+    public static ContractSide MapSide(RawSide side) =>
         BitflyerSideMapper.ToOrderSide(side);
 
-    public static OrderSide MapSide(string side) =>
+    public static ContractSide MapSide(string side) =>
         BitflyerSideMapper.ToOrderSide(side);
 
-    public static Side MapSideToExchange(OrderSide side) =>
+    public static RawSide MapSideToExchange(ContractSide side) =>
         BitflyerSideMapper.ToRawSide(side);
 
     public static RawProductCode MapSymbolToProductCode(string symbol)

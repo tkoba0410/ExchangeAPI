@@ -7,7 +7,7 @@ namespace Common.Contract.Dtos;
 public sealed record Position(
     ExchangeCode Exchange,
     Symbol Symbol,
-    OrderSide Side,
+    Side Side,
     decimal Size,
     decimal Price,
     DateTimeOffset? OpenDate = null,

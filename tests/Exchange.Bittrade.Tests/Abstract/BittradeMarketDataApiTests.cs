@@ -81,8 +81,8 @@ public class BittradeMarketDataApiTests
         var executions = await api.GetMarketExecutionsAsync("BTC/JPY");
 
         Assert.Equal(2, executions.Count);
-        Assert.Equal(OrderSide.Buy, executions[0].Side);
-        Assert.Equal(OrderSide.Sell, executions[1].Side);
+        Assert.Equal(Side.Buy, executions[0].Side);
+        Assert.Equal(Side.Sell, executions[1].Side);
         Assert.Equal("BTC/JPY", executions[0].ProductCode);
     }
 

@@ -161,10 +161,10 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
     {
         return (request.Side, request.OrderType) switch
         {
-            (OrderSide.Buy, OrderType.Market) => "buy-market",
-            (OrderSide.Sell, OrderType.Market) => "sell-market",
-            (OrderSide.Buy, OrderType.Limit) => "buy-limit",
-            (OrderSide.Sell, OrderType.Limit) => "sell-limit",
+            (Side.Buy, OrderType.Market) => "buy-market",
+            (Side.Sell, OrderType.Market) => "sell-market",
+            (Side.Buy, OrderType.Limit) => "buy-limit",
+            (Side.Sell, OrderType.Limit) => "sell-limit",
             _ => throw new ExchangeApiException($"Unsupported order type: {request.OrderType}")
         };
     }

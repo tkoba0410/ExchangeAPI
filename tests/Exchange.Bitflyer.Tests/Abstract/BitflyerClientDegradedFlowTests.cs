@@ -47,7 +47,7 @@ public class BitflyerClientDegradedFlowTests
         // 2. send order（劣化環境だが成功）
         var orderRequest = new OrderRequest(
             Symbol: Symbol.BtcJpy,
-            Side: OrderSide.Buy,
+            Side: Side.Buy,
             OrderType: OrderType.Market,
             Size: 0.001m,
             Price: null,
@@ -83,7 +83,7 @@ public class BitflyerClientDegradedFlowTests
         // 7. close order（反対売買で決済）→ poll status
         var closeOrderRequest = new OrderRequest(
             Symbol: Symbol.BtcJpy,
-            Side: OrderSide.Sell,
+            Side: Side.Sell,
             OrderType: OrderType.Market,
             Size: 0.001m,
             Price: null,
@@ -162,8 +162,8 @@ public class BitflyerClientDegradedFlowTests
 
                 // ざっくり JSON を読む（Side と Size のみ）
                 var side = body.Contains("\"side\":\"SELL\"", StringComparison.OrdinalIgnoreCase)
-                    ? OrderSide.Sell
-                    : OrderSide.Buy;
+                    ? Side.Sell
+                    : Side.Buy;
 
                 var size = 0.0m;
                 const string sizeKey = "\"size\":";
@@ -176,7 +176,7 @@ public class BitflyerClientDegradedFlowTests
                     decimal.TryParse(sizeStr, out size);
                 }
 
-                if (side == OrderSide.Buy)
+                if (side == Side.Buy)
                 {
                     _positionSize += size;
                 }

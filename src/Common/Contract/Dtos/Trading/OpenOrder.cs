@@ -10,7 +10,7 @@ public sealed record OpenOrder(
     ExchangeCode Exchange,
     Symbol Symbol,
     string OrderId,
-    OrderSide Side,
+    Side Side,
     OrderType OrderType,
     decimal Size,
     decimal OutstandingSize,

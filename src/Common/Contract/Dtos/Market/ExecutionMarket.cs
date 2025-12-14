@@ -7,7 +7,7 @@ namespace Common.Contract.Dtos;
 public sealed record ExecutionMarket(
     string ProductCode,
     long Id,
-    OrderSide Side,
+    Side Side,
     decimal Price,
     decimal Size,
     DateTimeOffset ExecutedAt);

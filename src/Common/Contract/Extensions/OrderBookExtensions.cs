@@ -44,46 +44,60 @@ public static class OrderBookExtensions
     public static decimal GetTotalSize(this OrderBook orderBook) =>
         (orderBook?.Asks?.Sum(x => x.Size) ?? 0m) + (orderBook?.Bids?.Sum(x => x.Size) ?? 0m);
 
-    /// <summary>指定価格までに約定可能な買いサイズ（asks 側、昇順想定）。</summary>
-    public static decimal CalcExecutableSizeForBuy(this OrderBook orderBook, decimal maxPrice)
+    /// <summary>
+    /// 指定価格以下で約定可能な買い側の集計（asks 側、昇順想定）。
+    /// 合計サイズ・合計コスト・平均価格を返す。
+    /// </summary>
+    public static MarketFillResult CalcExecutableSizeForBuy(this OrderBook orderBook, decimal maxPrice)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
         if (maxPrice <= 0) throw new ArgumentOutOfRangeException(nameof(maxPrice));
 
-        decimal total = 0;
+        decimal totalSize = 0;
+        decimal totalValue = 0;
         foreach (var level in orderBook.Asks)
         {
             if (level.Price <= maxPrice)
             {
-                total += level.Size;
+                totalSize += level.Size;
+                totalValue += level.Price * level.Size;
             }
             else
             {
                 break; // 昇順を想定
             }
         }
-        return total;
+        var avg = totalSize > 0 ? totalValue / totalSize : (decimal?)null;
+        var filled = totalSize > 0;
+        return new MarketFillResult(filled, totalSize, totalValue, avg);
     }
 
-    /// <summary>指定価格までに約定可能な売りサイズ（bids 側、降順想定）。</summary>
-    public static decimal CalcExecutableSizeForSell(this OrderBook orderBook, decimal minPrice)
+    /// <summary>
+    /// 指定価格以上で約定可能な売り側の集計（bids 側、降順想定）。
+    /// 合計サイズ・合計受取・平均価格を返す。
+    /// </summary>
+    public static MarketFillResult CalcExecutableSizeForSell(this OrderBook orderBook, decimal minPrice)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
         if (minPrice <= 0) throw new ArgumentOutOfRangeException(nameof(minPrice));
 
-        decimal total = 0;
+        decimal totalSize = 0;
+        decimal totalValue = 0;
         foreach (var level in orderBook.Bids)
         {
             if (level.Price >= minPrice)
             {
-                total += level.Size;
+                totalSize += level.Size;
+                totalValue += level.Price * level.Size;
             }
             else
             {
                 break; // 降順を想定
             }
         }
-        return total;
+        var avg = totalSize > 0 ? totalValue / totalSize : (decimal?)null;
+        var filled = totalSize > 0;
+        return new MarketFillResult(filled, totalSize, totalValue, avg);
     }
 
     /// <summary>成行買いで指定サイズを呑み切る計算（asks 側を上から食い進める）。</summary>

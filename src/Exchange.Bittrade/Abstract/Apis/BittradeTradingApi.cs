@@ -132,8 +132,9 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         }
 
         var order = BittradeMapper.MapOrder(resp.Data);
+        var productCode = BittradeMapper.ToProductCode(order.Symbol);
         return new OrderStatus(
-            order.Symbol,
+            productCode,
             orderId,
             BittradeMapper.ParseStatus(resp.Data.State),
             order.ExecutedSize,

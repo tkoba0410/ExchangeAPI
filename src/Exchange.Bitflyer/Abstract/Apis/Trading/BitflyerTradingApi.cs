@@ -144,7 +144,7 @@ public sealed class BitflyerTradingApi : ITradingApi
 
             var mapped = rawOrders.Select(o => new OpenOrder(
                 Exchange: ExchangeCode.Bitflyer,
-                Symbol: BitflyerCommonMapper.ToApiProductCode(o.ProductCode),
+                Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(o.ProductCode)),
                 OrderId: o.ChildOrderId,
                 Side: BitflyerCommonMapper.MapSide(o.Side),
                 OrderType: BitflyerTradingMapper.MapOrderTypeFromExchange(o.ChildOrderType),

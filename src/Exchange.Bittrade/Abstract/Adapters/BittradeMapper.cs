@@ -41,7 +41,7 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             Exchange: Exchange,
-            Symbol: ToCanonicalSymbol(detail.Symbol),
+            Symbol: MapSymbol(ToCanonicalSymbol(detail.Symbol)),
             OrderId: detail.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,
             OrderType: type,
@@ -66,7 +66,7 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             Exchange: Exchange,
-            Symbol: ToCanonicalSymbol(summary.Symbol),
+            Symbol: MapSymbol(ToCanonicalSymbol(summary.Symbol)),
             OrderId: summary.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,
             OrderType: type,
@@ -134,4 +134,22 @@ internal static class BittradeMapper
         }
         return upper;
     }
+
+    private static Symbol MapSymbol(string canonicalSymbol) =>
+        canonicalSymbol switch
+        {
+            "BTC/JPY" or "BTC_JPY" => Symbol.BtcJpy,
+            "ETH/JPY" or "ETH_JPY" => Symbol.EthJpy,
+            "FX_BTC/JPY" or "FX_BTC_JPY" => Symbol.FxBtcJpy,
+            _ => Symbol.Unknown
+        };
+
+    public static string ToProductCode(Symbol symbol) =>
+        symbol switch
+        {
+            Symbol.BtcJpy => "BTC_JPY",
+            Symbol.EthJpy => "ETH_JPY",
+            Symbol.FxBtcJpy => "FX_BTC_JPY",
+            _ => symbol.ToString().ToUpperInvariant()
+        };
 }

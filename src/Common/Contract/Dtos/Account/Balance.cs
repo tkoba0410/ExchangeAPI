@@ -5,7 +5,7 @@ namespace Common.Contract.Dtos;
 
 /// <summary>口座残高（通貨のみ型安全）。</summary>
 public sealed record Balance(
-    ExchangeCode Exchange,
+    ExchangeCode ExchangeCode,
     string Currency,
     decimal Amount,
     decimal Available,
@@ -23,7 +23,7 @@ public sealed record Balance(
         var code = codeResolver?.Invoke(currency) ?? CurrencyCodeConverter.FromString(currency);
 
         return new Balance(
-            Exchange: exchange,
+            ExchangeCode: exchange,
             Currency: currency,
             Amount: amount,
             Available: available,

@@ -83,8 +83,8 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrdersAsync(symbol, cancellationToken);
 
-    public Task<OrderStatus> PollOrderStatusAsync(Symbol symbol, string orderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
-        _tradingApi.PollOrderStatusAsync(symbol, orderAcceptanceId, pollInterval, maxAttempts, cancellationToken);
+    public Task<OrderStatus> PollOrderStatusAsync(Symbol symbol, string orderId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
+        _tradingApi.PollOrderStatusAsync(symbol, orderId, pollInterval, maxAttempts, cancellationToken);
 
     public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _accountApi.GetAccountExecutionsAsync(symbol, cancellationToken);

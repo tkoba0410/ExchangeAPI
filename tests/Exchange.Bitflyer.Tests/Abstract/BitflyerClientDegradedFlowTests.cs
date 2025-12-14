@@ -51,7 +51,7 @@ public class BitflyerClientDegradedFlowTests
         // 3. poll status（初回429後にCOMPLETED）
         var status = await client.PollOrderStatusAsync(
             symbol: Symbol.BtcJpy,
-            childOrderAcceptanceId: orderResult.OrderId,
+            orderId: orderResult.OrderId,
             pollInterval: TimeSpan.FromMilliseconds(10),
             maxAttempts: 3);
 
@@ -75,7 +75,7 @@ public class BitflyerClientDegradedFlowTests
 
         var closeStatus = await client.PollOrderStatusAsync(
             symbol: Symbol.BtcJpy,
-            childOrderAcceptanceId: closeOrderResult.OrderId,
+            orderId: closeOrderResult.OrderId,
             pollInterval: TimeSpan.FromMilliseconds(10),
             maxAttempts: 3);
 

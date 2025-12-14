@@ -206,7 +206,7 @@ public sealed class BitflyerTradingApi : ITradingApi
 
     public async Task<OrderStatus> PollOrderStatusAsync(
         Symbol symbol,
-        string childOrderAcceptanceId,
+        string orderId,
         TimeSpan? pollInterval = null,
         int maxAttempts = 30,
         CancellationToken cancellationToken = default)
@@ -216,9 +216,9 @@ public sealed class BitflyerTradingApi : ITradingApi
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
-        if (string.IsNullOrWhiteSpace(childOrderAcceptanceId))
+        if (string.IsNullOrWhiteSpace(orderId))
         {
-            throw new ArgumentException("childOrderAcceptanceId is required.", nameof(childOrderAcceptanceId));
+            throw new ArgumentException("orderId is required.", nameof(orderId));
         }
 
         var interval = pollInterval ?? TimeSpan.FromSeconds(1);
@@ -228,7 +228,7 @@ public sealed class BitflyerTradingApi : ITradingApi
             cancellationToken.ThrowIfCancellationRequested();
 
             var orders = await _privateAccountApi
-                .GetOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: null, childOrderAcceptanceId, cancellationToken: cancellationToken)
+                .GetOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: null, orderId, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var order = orders.FirstOrDefault();
@@ -238,7 +238,7 @@ public sealed class BitflyerTradingApi : ITradingApi
                 var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
                 return new OrderStatus(
                     ProductCode: productCode,
-                    OrderAcceptanceId: childOrderAcceptanceId,
+                    OrderAcceptanceId: orderId,
                 Status: OrderState.Completed,
                 ExecutedSize: 0m,
                 OutstandingSize: 0m,

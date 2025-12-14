@@ -117,8 +117,8 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrdersAsync(symbol, cancellationToken);
 
-    public Task<OrderStatus> PollOrderStatusAsync(Symbol symbol, string childOrderAcceptanceId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
-        _tradingApi.PollOrderStatusAsync(symbol, childOrderAcceptanceId, pollInterval, maxAttempts, cancellationToken);
+    public Task<OrderStatus> PollOrderStatusAsync(Symbol symbol, string orderId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
+        _tradingApi.PollOrderStatusAsync(symbol, orderId, pollInterval, maxAttempts, cancellationToken);
 
     // Account/Margin
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>

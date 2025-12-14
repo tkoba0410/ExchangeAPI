@@ -38,18 +38,14 @@ public sealed class BitflyerTradingApi : ITradingApi
         decimal size,
         decimal price,
         CancellationToken cancellationToken = default) =>
-        PlaceOrderInternal(
-            new OrderRequest(symbol, side, OrderType.Limit, size, price, null, null, null),
-            cancellationToken);
+        PlaceOrderInternal(OrderRequest.Limit(symbol, side, size, price), cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
         Symbol symbol,
         ContractSide side,
         decimal size,
         CancellationToken cancellationToken = default) =>
-        PlaceOrderInternal(
-            new OrderRequest(symbol, side, OrderType.Market, size),
-            cancellationToken);
+        PlaceOrderInternal(OrderRequest.Market(symbol, side, size), cancellationToken);
 
     public Task<OrderResult> PlaceStopOrderAsync(
         Symbol symbol,

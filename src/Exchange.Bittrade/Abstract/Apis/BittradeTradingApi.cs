@@ -49,7 +49,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(
-            new OrderRequest(symbol, side, OrderType.Limit, size, clientOrderId, price, null, null, null),
+            new OrderRequest(symbol, side, OrderType.Limit, size, price, null, null, null),
             cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
@@ -59,7 +59,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(
-            new OrderRequest(symbol, side, OrderType.Market, size, clientOrderId),
+            new OrderRequest(symbol, side, OrderType.Market, size),
             cancellationToken);
 
     public Task<OrderResult> PlaceStopOrderAsync(
@@ -87,11 +87,6 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         if (request.OrderType == OrderType.Limit)
         {
             body["price"] = request.Price?.ToString();
-        }
-
-        if (!string.IsNullOrWhiteSpace(request.ClientOrderId))
-        {
-            body["client-order-id"] = request.ClientOrderId;
         }
 
         var resp = await _restClient.PostAsync<Dictionary<string, object?>, BittradePlaceOrderResponse>(

@@ -18,6 +18,5 @@ public sealed record OpenOrder(
     decimal? Price,
     DateTimeOffset? OrderedAt = null,
     DateTimeOffset? UpdatedAt = null,
-    string? ClientOrderId = null,
     decimal? StopPrice = null,
     string? Status = null);

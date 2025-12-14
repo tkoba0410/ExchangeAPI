@@ -4,6 +4,6 @@ namespace Common.Contract.Dtos;
 /// 抽象注文レスポンス。
 /// </summary>
 /// <summary>
-/// 注文結果。ローカル発行の ClientOrderId とサーバーからの OrderId（child_order_acceptance_id）を保持する。
+/// 注文結果。サーバーからの OrderId（child_order_acceptance_id）を保持する。
 /// </summary>
-public sealed record OrderResult(string OrderId, string? ClientOrderId = null);
+public sealed record OrderResult(string OrderId);

@@ -40,7 +40,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(
-            new OrderRequest(symbol, side, OrderType.Limit, size, clientOrderId, price, null, null, null),
+            new OrderRequest(symbol, side, OrderType.Limit, size, price, null, null, null),
             cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
@@ -50,7 +50,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(
-            new OrderRequest(symbol, side, OrderType.Market, size, clientOrderId),
+            new OrderRequest(symbol, side, OrderType.Market, size),
             cancellationToken);
 
     public Task<OrderResult> PlaceStopOrderAsync(
@@ -86,7 +86,7 @@ public sealed class BitflyerTradingApi : ITradingApi
                 .PlaceChildOrderAsync(dto, cancellationToken)
                 .ConfigureAwait(false);
 
-            return new OrderResult(response.ChildOrderAcceptanceId, request.ClientOrderId);
+            return new OrderResult(response.ChildOrderAcceptanceId);
         }
         catch (ExchangeApiException ex)
         {
@@ -183,7 +183,6 @@ public sealed class BitflyerTradingApi : ITradingApi
                 Price: o.Price == 0 ? null : o.Price,
                 OrderedAt: o.ChildOrderDate,
                 UpdatedAt: null,
-                ClientOrderId: null,
                 StopPrice: null,
                 Status: o.ChildOrderStatusState)).ToArray();
 

@@ -51,7 +51,6 @@ internal static class BittradeMapper
             Price: detail.Price is null ? (decimal?)null : ParseDecimal(detail.Price),
             OrderedAt: DateTimeOffset.FromUnixTimeMilliseconds(detail.CreatedAt),
             UpdatedAt: detail.FinishedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(detail.FinishedAt.Value) : null,
-            ClientOrderId: detail.ClientOrderId,
             StopPrice: null,
             Status: detail.State);
     }
@@ -76,7 +75,6 @@ internal static class BittradeMapper
             Price: summary.Price is null ? (decimal?)null : ParseDecimal(summary.Price),
             OrderedAt: DateTimeOffset.FromUnixTimeMilliseconds(summary.CreatedAt),
             UpdatedAt: null,
-            ClientOrderId: summary.ClientOrderId,
             StopPrice: null,
             Status: summary.State);
     }

@@ -40,7 +40,7 @@ internal static class BittradeMapper
         var outstanding = Math.Max(0, size - filled);
 
         return new OpenOrder(
-            Exchange: Exchange,
+            ExchangeCode: Exchange,
             Symbol: MapSymbol(ToCanonicalSymbol(detail.Symbol)),
             OrderId: detail.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,
@@ -65,7 +65,7 @@ internal static class BittradeMapper
         var outstanding = Math.Max(0, size - filled);
 
         return new OpenOrder(
-            Exchange: Exchange,
+            ExchangeCode: Exchange,
             Symbol: MapSymbol(ToCanonicalSymbol(summary.Symbol)),
             OrderId: summary.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,

@@ -7,7 +7,7 @@ namespace Common.Contract.Dtos;
 /// オープンな子注文の概要（受付IDなし、Exchange/時刻を含む）。
 /// </summary>
 public sealed record OpenOrder(
-    ExchangeCode Exchange,
+    ExchangeCode ExchangeCode,
     Symbol Symbol,
     string OrderId,
     Side Side,

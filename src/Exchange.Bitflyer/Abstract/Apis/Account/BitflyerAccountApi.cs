@@ -48,7 +48,7 @@ public sealed class BitflyerAccountApi : IAccountApi
         }
     }
 
-    public async Task<IReadOnlyList<AccountExecution>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(productCode))
         {

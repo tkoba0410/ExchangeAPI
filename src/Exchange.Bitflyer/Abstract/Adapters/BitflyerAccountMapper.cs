@@ -24,14 +24,14 @@ internal static class BitflyerAccountMapper
             .ToArray();
     }
 
-    public static IReadOnlyList<AccountExecution> MapAccountExecutions(
+    public static IReadOnlyList<ExecutionAccount> MapAccountExecutions(
         string productCode,
         IReadOnlyList<BitflyerExecutionPrivateResponse> rawExecutions)
     {
         if (rawExecutions is null) throw new ArgumentNullException(nameof(rawExecutions));
 
         return rawExecutions
-            .Select(e => new AccountExecution(
+            .Select(e => new ExecutionAccount(
                 ProductCode: BitflyerCommonMapper.ToApiProductCode(e.ProductCode),
                 Id: e.Id,
                 Side: BitflyerCommonMapper.MapSide(e.Side),

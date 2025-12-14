@@ -106,7 +106,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     public Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default) =>
         _marginApi.GetCollateralAsync(cancellationToken);
 
-    public Task<IReadOnlyList<AccountExecution>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
         _accountApi.GetAccountExecutionsAsync(productCode, cancellationToken);
 
     // ExchangeInfo

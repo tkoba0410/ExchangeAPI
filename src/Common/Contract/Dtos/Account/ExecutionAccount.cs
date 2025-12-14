@@ -1,11 +1,12 @@
 using System;
+using Common.Contract.Enums;
 
 namespace Common.Contract.Dtos;
 
 /// <summary>
 /// 口座の約定履歴。
 /// </summary>
-public sealed record AccountExecution(
+public sealed record ExecutionAccount(
     string ProductCode,
     long Id,
     OrderSide Side,

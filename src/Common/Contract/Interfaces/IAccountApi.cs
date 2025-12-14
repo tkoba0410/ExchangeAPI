@@ -16,5 +16,5 @@ public interface IAccountApi
     /// <summary>
     /// 口座の約定履歴を取得する。
     /// </summary>
-    Task<IReadOnlyList<AccountExecution>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(string productCode, CancellationToken cancellationToken = default);
 }

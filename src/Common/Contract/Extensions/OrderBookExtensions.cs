@@ -44,6 +44,48 @@ public static class OrderBookExtensions
     public static decimal GetTotalSize(this OrderBook orderBook) =>
         (orderBook?.Asks?.Sum(x => x.Size) ?? 0m) + (orderBook?.Bids?.Sum(x => x.Size) ?? 0m);
 
+    /// <summary>指定価格までに約定可能な買いサイズ（asks 側、昇順想定）。</summary>
+    public static decimal CalcExecutableSizeForBuy(this OrderBook orderBook, decimal maxPrice)
+    {
+        if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
+        if (maxPrice <= 0) throw new ArgumentOutOfRangeException(nameof(maxPrice));
+
+        decimal total = 0;
+        foreach (var level in orderBook.Asks)
+        {
+            if (level.Price <= maxPrice)
+            {
+                total += level.Size;
+            }
+            else
+            {
+                break; // 昇順を想定
+            }
+        }
+        return total;
+    }
+
+    /// <summary>指定価格までに約定可能な売りサイズ（bids 側、降順想定）。</summary>
+    public static decimal CalcExecutableSizeForSell(this OrderBook orderBook, decimal minPrice)
+    {
+        if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
+        if (minPrice <= 0) throw new ArgumentOutOfRangeException(nameof(minPrice));
+
+        decimal total = 0;
+        foreach (var level in orderBook.Bids)
+        {
+            if (level.Price >= minPrice)
+            {
+                total += level.Size;
+            }
+            else
+            {
+                break; // 降順を想定
+            }
+        }
+        return total;
+    }
+
     /// <summary>成行買いで指定サイズを呑み切る計算（asks 側を上から食い進める）。</summary>
     public static MarketFillResult CalcMarketBuy(this OrderBook orderBook, decimal takerSize)
     {

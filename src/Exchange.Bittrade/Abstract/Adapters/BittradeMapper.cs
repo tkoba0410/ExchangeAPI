@@ -40,16 +40,20 @@ internal static class BittradeMapper
         var outstanding = Math.Max(0, size - filled);
 
         return new OpenOrder(
+            Exchange: Exchange,
             ProductCode: ToCanonicalSymbol(detail.Symbol),
             OrderId: detail.Id.ToString(CultureInfo.InvariantCulture),
-            OrderAcceptanceId: detail.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,
             OrderType: type,
             Size: size,
             OutstandingSize: outstanding,
             ExecutedSize: filled,
             Price: detail.Price is null ? (decimal?)null : ParseDecimal(detail.Price),
-            ClientOrderId: detail.ClientOrderId);
+            OrderedAt: DateTimeOffset.FromUnixTimeMilliseconds(detail.CreatedAt),
+            UpdatedAt: detail.FinishedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(detail.FinishedAt.Value) : null,
+            ClientOrderId: detail.ClientOrderId,
+            StopPrice: null,
+            Status: detail.State);
     }
 
     public static OpenOrder MapOrderSummary(BittradeOrderSummary summary)
@@ -61,16 +65,20 @@ internal static class BittradeMapper
         var outstanding = Math.Max(0, size - filled);
 
         return new OpenOrder(
+            Exchange: Exchange,
             ProductCode: ToCanonicalSymbol(summary.Symbol),
             OrderId: summary.Id.ToString(CultureInfo.InvariantCulture),
-            OrderAcceptanceId: summary.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,
             OrderType: type,
             Size: size,
             OutstandingSize: outstanding,
             ExecutedSize: filled,
             Price: summary.Price is null ? (decimal?)null : ParseDecimal(summary.Price),
-            ClientOrderId: summary.ClientOrderId);
+            OrderedAt: DateTimeOffset.FromUnixTimeMilliseconds(summary.CreatedAt),
+            UpdatedAt: null,
+            ClientOrderId: summary.ClientOrderId,
+            StopPrice: null,
+            Status: summary.State);
     }
 
     public static OrderState ParseStatus(string state)

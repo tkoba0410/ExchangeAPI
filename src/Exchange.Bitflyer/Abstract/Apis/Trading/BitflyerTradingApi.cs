@@ -143,16 +143,20 @@ public sealed class BitflyerTradingApi : ITradingApi
                 .ConfigureAwait(false);
 
             var mapped = rawOrders.Select(o => new OpenOrder(
+                Exchange: ExchangeCode.Bitflyer,
                 ProductCode: BitflyerCommonMapper.ToApiProductCode(o.ProductCode),
                 OrderId: o.ChildOrderId,
-                OrderAcceptanceId: o.ChildOrderAcceptanceId,
                 Side: BitflyerCommonMapper.MapSide(o.Side),
                 OrderType: BitflyerTradingMapper.MapOrderTypeFromExchange(o.ChildOrderType),
                 Size: o.Size,
                 OutstandingSize: o.OutstandingSize,
                 ExecutedSize: o.ExecutedSize,
                 Price: o.Price == 0 ? null : o.Price,
-                ClientOrderId: null)).ToArray();
+                OrderedAt: o.ChildOrderDate,
+                UpdatedAt: null,
+                ClientOrderId: null,
+                StopPrice: null,
+                Status: o.ChildOrderStatusState)).ToArray();
 
             return mapped;
         }

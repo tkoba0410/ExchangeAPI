@@ -97,7 +97,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         _tradingApi.PollOrderStatusAsync(productCode, childOrderAcceptanceId, pollInterval, maxAttempts, cancellationToken);
 
     // Account/Margin
-    public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<ExchangeBalance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesAsync(cancellationToken);
 
     public Task<IReadOnlyList<Position>> GetOpenPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>

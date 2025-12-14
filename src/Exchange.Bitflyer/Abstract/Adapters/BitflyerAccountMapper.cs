@@ -9,15 +9,18 @@ namespace Exchange.Bitflyer.Abstract;
 
 internal static class BitflyerAccountMapper
 {
-    public static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BitflyerBalanceResponse> rawBalances)
+    private const ExchangeCode Exchange = ExchangeCode.Bitflyer;
+
+    public static IReadOnlyList<ExchangeBalance> MapBalances(IReadOnlyList<BitflyerBalanceResponse> rawBalances)
     {
         if (rawBalances is null) throw new ArgumentNullException(nameof(rawBalances));
 
         return rawBalances
-            .Select(b => new Balance(
-                b.CurrencyCode,
-                b.Amount,
-                b.Available))
+            .Select(b => ExchangeBalance.Create(
+                exchange: Exchange,
+                currency: b.CurrencyCode,
+                amount: b.Amount,
+                available: b.Available))
             .ToArray();
     }
 

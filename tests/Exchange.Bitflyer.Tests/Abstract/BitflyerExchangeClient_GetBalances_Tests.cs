@@ -40,7 +40,7 @@ namespace Exchange.Bitflyer.Tests
             var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
             // Act
-            IReadOnlyList<Balance> result = await client.GetBalancesAsync();
+            IReadOnlyList<ExchangeBalance> result = await client.GetBalancesAsync();
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -69,7 +69,7 @@ namespace Exchange.Bitflyer.Tests
             var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
             // Act
-            IReadOnlyList<Balance> result = await client.GetBalancesAsync();
+            IReadOnlyList<ExchangeBalance> result = await client.GetBalancesAsync();
 
             // Assert
             Assert.Empty(result);

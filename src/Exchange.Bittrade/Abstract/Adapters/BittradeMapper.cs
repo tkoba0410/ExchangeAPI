@@ -3,24 +3,30 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ExchangeApi.Adapter.Bittrade.RawApi;
-using Common.Contract.Enums;
 using Common.Contract.Dtos;
+using Common.Contract.Enums;
 using Common.Contract.Errors;
 
 namespace ExchangeApi.Adapter.Bittrade.Adapters;
 
 internal static class BittradeMapper
 {
-    public static IReadOnlyList<Balance> MapBalances(BittradeBalanceData data)
+    private const ExchangeCode Exchange = ExchangeCode.Bittrade;
+
+    public static IReadOnlyList<ExchangeBalance> MapBalances(BittradeBalanceData data)
     {
-        var result = new List<Balance>();
+        var result = new List<ExchangeBalance>();
         foreach (var group in data.List.GroupBy(e => e.Currency, StringComparer.OrdinalIgnoreCase))
         {
             var total = group.Sum(e => ParseDecimal(e.Balance));
             var available = group
                 .Where(x => string.Equals(x.Type, "trade", StringComparison.OrdinalIgnoreCase))
                 .Sum(e => ParseDecimal(e.Balance));
-            result.Add(new Balance(group.Key.ToUpperInvariant(), total, available));
+            result.Add(ExchangeBalance.Create(
+                exchange: Exchange,
+                currency: group.Key.ToUpperInvariant(),
+                amount: total,
+                available: available));
         }
         return result;
     }

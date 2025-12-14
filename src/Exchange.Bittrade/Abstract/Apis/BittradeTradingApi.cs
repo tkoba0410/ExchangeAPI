@@ -46,7 +46,6 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         Side side,
         decimal size,
         decimal price,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(
             new OrderRequest(symbol, side, OrderType.Limit, size, price, null, null, null),
@@ -56,7 +55,6 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         Symbol symbol,
         Side side,
         decimal size,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(
             new OrderRequest(symbol, side, OrderType.Market, size),
@@ -67,7 +65,6 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         Side side,
         decimal size,
         decimal triggerPrice,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         throw new NotSupportedException("Bittrade does not support stop orders via this adapter.");
 

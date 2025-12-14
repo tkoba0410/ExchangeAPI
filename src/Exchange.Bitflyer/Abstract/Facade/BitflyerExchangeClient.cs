@@ -90,26 +90,23 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
         ContractSide side,
         decimal size,
         decimal price,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceLimitOrderAsync(symbol, side, size, price, clientOrderId, cancellationToken);
+        _tradingApi.PlaceLimitOrderAsync(symbol, side, size, price, cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
         Symbol symbol,
         ContractSide side,
         decimal size,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceMarketOrderAsync(symbol, side, size, clientOrderId, cancellationToken);
+        _tradingApi.PlaceMarketOrderAsync(symbol, side, size, cancellationToken);
 
     public Task<OrderResult> PlaceStopOrderAsync(
         Symbol symbol,
         ContractSide side,
         decimal size,
         decimal triggerPrice,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, clientOrderId, cancellationToken);
+        _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, cancellationToken);
 
     public Task<CancelResult> CancelOrderAsync(Symbol symbol, string childOrderAcceptanceId, CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderAsync(symbol, childOrderAcceptanceId, cancellationToken);

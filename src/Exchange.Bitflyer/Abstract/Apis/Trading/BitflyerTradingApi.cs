@@ -37,7 +37,6 @@ public sealed class BitflyerTradingApi : ITradingApi
         ContractSide side,
         decimal size,
         decimal price,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(
             new OrderRequest(symbol, side, OrderType.Limit, size, price, null, null, null),
@@ -47,7 +46,6 @@ public sealed class BitflyerTradingApi : ITradingApi
         Symbol symbol,
         ContractSide side,
         decimal size,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(
             new OrderRequest(symbol, side, OrderType.Market, size),
@@ -58,7 +56,6 @@ public sealed class BitflyerTradingApi : ITradingApi
         ContractSide side,
         decimal size,
         decimal triggerPrice,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default) =>
         throw new NotSupportedException("bitFlyer child orders do not support stop orders; use parent orders instead.");
 

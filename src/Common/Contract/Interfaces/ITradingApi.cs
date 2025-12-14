@@ -17,14 +17,12 @@ public interface ITradingApi
         Side side,
         decimal size,
         decimal price,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default);
 
     Task<OrderResult> PlaceMarketOrderAsync(
         Symbol symbol,
         Side side,
         decimal size,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default);
 
     Task<OrderResult> PlaceStopOrderAsync(
@@ -32,7 +30,6 @@ public interface ITradingApi
         Side side,
         decimal size,
         decimal triggerPrice,
-        string? clientOrderId = null,
         CancellationToken cancellationToken = default);
 
     Task<CancelResult> CancelOrderAsync(Symbol symbol, string childOrderAcceptanceId, CancellationToken cancellationToken = default);

@@ -33,6 +33,7 @@ internal static class BitflyerAccountMapper
 
         return rawExecutions
             .Select(e => new ExecutionAccount(
+                Exchange: ExchangeCode.Bitflyer,
                 Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(e.ProductCode)),
                 OrderId: e.Id.ToString(CultureInfo.InvariantCulture),
                 Side: BitflyerCommonMapper.MapSide(e.Side),

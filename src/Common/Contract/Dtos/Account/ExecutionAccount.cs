@@ -1,19 +1,19 @@
 using System;
+using System.Globalization;
 using Common.Contract.Enums;
 
 namespace Common.Contract.Dtos;
 
 /// <summary>
-/// 口座の約定履歴。
+/// 口座の約定履歴（シンボル＋注文IDベース）。
 /// </summary>
 public sealed record ExecutionAccount(
-    string ProductCode,
-    long Id,
+    Symbol Symbol,
+    string OrderId,
     OrderSide Side,
     decimal Price,
     decimal Size,
     DateTimeOffset ExecutedAt,
-    string? ChildOrderAcceptanceId = null,
     decimal? Commission = null,
     decimal? Pnl = null,
     string? Liquidity = null);

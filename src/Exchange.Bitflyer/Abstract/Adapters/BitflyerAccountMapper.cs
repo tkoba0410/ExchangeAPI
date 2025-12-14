@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using Exchange.Bitflyer.Raw;
 using Common.Contract.Dtos;
 using Common.Contract.Enums;
@@ -32,13 +33,15 @@ internal static class BitflyerAccountMapper
 
         return rawExecutions
             .Select(e => new ExecutionAccount(
-                ProductCode: BitflyerCommonMapper.ToApiProductCode(e.ProductCode),
-                Id: e.Id,
+                Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(e.ProductCode)),
+                OrderId: e.Id.ToString(CultureInfo.InvariantCulture),
                 Side: BitflyerCommonMapper.MapSide(e.Side),
                 Price: e.Price,
                 Size: e.Size,
                 ExecutedAt: e.ExecDate,
-                ChildOrderAcceptanceId: e.ChildOrderAcceptanceId))
+                Commission: null,
+                Pnl: null,
+                Liquidity: null))
             .ToArray();
     }
 }

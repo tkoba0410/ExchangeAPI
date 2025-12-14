@@ -48,14 +48,14 @@ public static class OrderBookExtensions
     public static FillEstimate CalcBuyPriceBySize(this OrderBook orderBook, decimal takerSize)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
-        return Fill(orderBook.Asks, takerSize);
+        return Fill(orderBook.Asks, takerSize, isBuy: true, targetSize: takerSize, targetPrice: null);
     }
 
     /// <summary>サイズ指定で売り成行を呑み切る計算（bids 側）。</summary>
     public static FillEstimate CalcSellPriceBySize(this OrderBook orderBook, decimal takerSize)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
-        return Fill(orderBook.Bids, takerSize);
+        return Fill(orderBook.Bids, takerSize, isBuy: false, targetSize: takerSize, targetPrice: null);
     }
 
     /// <summary>
@@ -83,7 +83,14 @@ public static class OrderBookExtensions
         }
         var avg = totalSize > 0 ? totalValue / totalSize : (decimal?)null;
         var filled = totalSize > 0;
-        return new FillEstimate(filled, totalSize, totalValue, avg);
+        // 買いなので符号は正
+        return new FillEstimate(
+            filled,
+            SignedSize: totalSize,
+            Delta: totalValue,
+            EstimatedAveragePrice: avg,
+            TargetPrice: maxPrice,
+            TargetSize: null);
     }
 
     /// <summary>
@@ -111,10 +118,17 @@ public static class OrderBookExtensions
         }
         var avg = totalSize > 0 ? totalValue / totalSize : (decimal?)null;
         var filled = totalSize > 0;
-        return new FillEstimate(filled, totalSize, totalValue, avg);
+        // 売りなので符号は負
+        return new FillEstimate(
+            filled,
+            SignedSize: -totalSize,
+            Delta: -totalValue,
+            EstimatedAveragePrice: avg,
+            TargetPrice: minPrice,
+            TargetSize: null);
     }
 
-    private static FillEstimate Fill(IReadOnlyList<OrderBookLevel> levels, decimal takerSize)
+    private static FillEstimate Fill(IReadOnlyList<OrderBookLevel> levels, decimal takerSize, bool isBuy, decimal? targetSize, decimal? targetPrice)
     {
         if (levels is null) throw new ArgumentNullException(nameof(levels));
         if (takerSize <= 0) throw new ArgumentOutOfRangeException(nameof(takerSize));
@@ -134,6 +148,14 @@ public static class OrderBookExtensions
 
         var filled = remaining <= 0;
         var avg = totalSize > 0 ? totalValue / totalSize : (decimal?)null;
-        return new FillEstimate(filled, totalSize, totalValue, avg);
+        var signedSize = isBuy ? totalSize : -totalSize;
+        var delta = isBuy ? totalValue : -totalValue;
+        return new FillEstimate(
+            filled,
+            SignedSize: signedSize,
+            Delta: delta,
+            EstimatedAveragePrice: avg,
+            TargetPrice: targetPrice,
+            TargetSize: targetSize);
     }
 }

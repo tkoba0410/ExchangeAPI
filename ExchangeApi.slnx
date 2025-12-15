@@ -2,15 +2,14 @@
   <Folder Name="/src/">
     <Project Path="src/Common/Common.csproj" />
     <Project Path="src/Exchange.Bitflyer/Exchange.Bitflyer.csproj" />
-    <Project Path="src/Exchange.Bittrade/ExchangeApi.Adapter.Bittrade.csproj" />
-    <Project Path="src/Exchange.Factory/Exchange.Factory.csproj" />
+    <Project Path="src/Exchange.Bittrade/Exchange.Bittrade.csproj" />
+    <Project Path="src/Factory/Factory.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/ExchangeApi.Contracts.Tests/ExchangeApi.Contracts.Tests.csproj" />
-    <Project Path="tests/Exchange.Bitflyer.Tests/ExchangeApi.Adapter.Bitflyer.Tests.csproj" />
-    <Project Path="tests/Exchange.Bittrade.Tests/ExchangeApi.Adapter.Bittrade.Tests.csproj" />
-    <Project Path="tests/ExchangeApi.Transport.Tests/ExchangeApi.Transport.Tests.csproj" />
-    <Project Path="tests/ExchangeApi.Factory.Tests/ExchangeApi.Factory.Tests.csproj" />
+    <Project Path="tests/Common.Tests/Common.Tests.csproj" />
+    <Project Path="tests/Exchange.Bitflyer.Tests/Exchange.Bitflyer.Tests.csproj" />
+    <Project Path="tests/Exchange.Bittrade.Tests/Exchange.Bittrade.Tests.csproj" />
+    <Project Path="tests/Factory.Tests/Factory.Tests.csproj" />
     <Project Path="tests/Integration.Public.Tests/Integration.Public.Tests.csproj" />
   </Folder>
 </Solution>

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\\..\\src\\Common\\Common.csproj" />
-    <ProjectReference Include="..\\..\\src\\Exchange.Bittrade\\ExchangeApi.Adapter.Bittrade.csproj" />
+    <ProjectReference Include="..\\..\\src\\Factory\\Factory.csproj" />
   </ItemGroup>
 
 </Project>

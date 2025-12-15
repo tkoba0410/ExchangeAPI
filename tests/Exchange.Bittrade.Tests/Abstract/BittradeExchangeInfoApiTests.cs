@@ -10,7 +10,7 @@ using Common.Transport.Protocol;
 using Common.Transport.Transport;
 using Xunit;
 
-namespace ExchangeApi.Adapter.Bittrade.Tests;
+namespace Exchange.Bittrade.Tests;
 
 public class BittradeExchangeInfoApiTests
 {

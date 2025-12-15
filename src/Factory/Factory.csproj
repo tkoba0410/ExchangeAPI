@@ -13,7 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\\Common\\Common.csproj" />
     <ProjectReference Include="..\\Exchange.Bitflyer\\Exchange.Bitflyer.csproj" />
-    <ProjectReference Include="..\\Exchange.Bittrade\\ExchangeApi.Adapter.Bittrade.csproj" />
+    <ProjectReference Include="..\\Exchange.Bittrade\\Exchange.Bittrade.csproj" />
   </ItemGroup>
 
 </Project>

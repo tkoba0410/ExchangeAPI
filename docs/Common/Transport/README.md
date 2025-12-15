@@ -1,31 +1,143 @@
-# Transport レイヤー概要
+# Common.Transport
 
-HTTP 基盤レイヤーの構成要素と役割をまとめます。RestClient にポリシー/署名/観測/エラー分類を差し込む設計。
+`Common.Transport` は、
+**ExchangeAPI における HTTP 通信・再試行・レート制御・可観測性を含む通信基盤**を提供する。
 
-## 主な構成
-- Protocol: `IRestClient`/`RestClient`（JSON HTTP 呼び出し）, `IRequestSigner`, `IExchangeErrorClassifier`, `IErrorPayloadParser`（デフォルトは error_code/message 抽出）
-- Transport: `IHttpTransport`/`HttpTransport`（HttpClient ベース、ハンドラ注入も可）
-- Policy: `IHttpPolicy`/`HttpPolicyPipeline`、`Timeout`/`Retry`/`RateLimit`/`CircuitBreaker`、`HttpPolicyFactory`（デフォルト構成）、`IPolicyObserver`（リトライ/レートリミット/遮断イベント）
-- Logging/Observability: `IRestClientLogger`（構造化/NoOp）、`IRestCallObserver`（OTel/メトリクス/NoOp）
-- Time: `IExchangeClock`/`SystemClock`
-- Mapping: `InMemoryOrderIdMapper`（簡易 ID マッピング）
+このレイヤは、
+- 上位レイヤ（Factory / Exchange 実装）から HTTP 実装を隠蔽し
+- 通信失敗を `Common.Contracts` に従って正規化し
+- 安定した再試行・制御・観測を提供する
 
-## エラーとエラーパース
-- `ExchangeApiException` に統一し、HTTP ステータス異常/JSON パース失敗/HttpRequestException/タイムアウトをラップ。`ExchangeErrorCategory` で分類。
-- `IErrorPayloadParser` でエラーボディをパース（デフォルトは JSON の error_code/message/code を抽出し、非JSONは本文をそのままメッセージに）。
+ことを目的とする。
 
-## ポリシー
-- `HttpPolicyPipeline` で複数ポリシーを順適用。
-- `RetryHttpPolicy`: GET/その他で試行回数を分け、RateLimit/5xx/ネットワーク/タイムアウトを指数バックオフでリトライ。`IPolicyObserver.OnRetry` で観測。
-- `RateLimitHttpPolicy`: トークンバケットで最小間隔を保証し、遅延を `OnRateLimitDelay` で通知。
-- `CircuitBreakerHttpPolicy`: 連続失敗で Open/HalfOpen を制御し、遮断/開放を `OnCircuitOpened`/`OnCircuitRejected` で通知。
-- `TimeoutHttpPolicy`: リクエスト全体のタイムアウト。
-- `HttpPolicyFactory`: デフォルト構成を組み立て、Observer を渡せる。
+---
 
-## Transport
-- `HttpTransport` は HttpClient または HttpMessageHandler を注入可能。Dispose の責務をコンストラクタで選択。
+## このレイヤの責務
 
-## ペンディングタスク
-- OrderIdMapper の永続化/上限制御サンプル追加、ドキュメント化。
-- JSON 以外の POST/PUT（フォーム/バイナリ）対応のための RestClient 拡張オーバーロード検討。
-- ポリシー/HttpClient の詳細なチューニングガイド（SocketsHttpHandler 設定例、プロキシ/KeepAlive）。
+Common.Transport の責務は以下に集約される。
+
+- HTTP リクエスト/レスポンスの送受信
+- Retry / RateLimit / CircuitBreaker / Timeout の適用
+- エラーの正規化（`ExchangeApiException`）
+- ログ・メトリクス・トレースの発行
+
+**取引所ドメインの知識は持たない。**
+
+---
+
+## レイヤ構成（概要）
+
+```
+IRestClient
+   |
+   v
+[ Policy Pipeline ]
+   |
+   v
+IHttpTransport
+   |
+   v
+HttpClient
+```
+
+- `IRestClient` : 上位レイヤが利用する唯一の通信 API
+- Policy Pipeline : 再試行・制御・遮断
+- `IHttpTransport` : 実際の HTTP 送信
+
+---
+
+## 主な構成要素
+
+### Protocol
+
+- `IRestClient` / `RestClient`
+- `IRequestSigner`
+- `IErrorPayloadParser`
+- `IExchangeErrorClassifier`
+
+リクエスト構築・署名・レスポンス解釈を担当する。
+
+---
+
+### Policy
+
+- `IHttpPolicy`
+- `HttpPolicyPipeline`
+- Retry / RateLimit / CircuitBreaker / Timeout
+- `HttpPolicyFactory` / `HttpPolicyOptions`
+
+通信の安定性とシステム保護を担う。
+
+判断基準は `Common.Contracts` に従う。
+
+---
+
+### Transport
+
+- `IHttpTransport`
+- `HttpTransport`
+
+HttpClient を用いた実送信を担当する。
+
+---
+
+### Observability
+
+- `IRestClientLogger`
+- `IRestCallObserver`
+- `RestCallContext`
+- OpenTelemetry / Metrics 実装
+
+ログ・メトリクス・トレースを提供する。
+
+---
+
+### Time
+
+- `IExchangeClock`
+- `SystemClock`
+
+テスト可能な時刻取得を提供する。
+
+---
+
+## Common.Contracts との関係
+
+Common.Transport は、
+`Common.Contracts` に定義された以下の契約を **必ず遵守**する。
+
+- `ExchangeApiException`
+- `ExchangeErrorCategory`
+- ErrorMapping / RetryDecision
+
+Transport 実装は、
+**独自のエラー解釈や Retry 判断を行ってはならない。**
+
+---
+
+## 含まれないもの
+
+- 取引所固有の API パス
+- ドメイン DTO（Order / Balance 等）
+- 取引所ごとの認証方式の詳細
+
+これらは上位（Exchange.*）の責務である。
+
+---
+
+## 次に読むべき文書
+
+- `Architecture.md` : レイヤ構造と依存関係
+- `RestClient.md` : RestClient の使い方と拡張点
+- `Policies.md` : Policy の構成と設定
+- `Observability.md` : ログ・メトリクス
+- `HttpTransport.md` : HttpClient の扱い
+
+---
+
+## まとめ
+
+- Common.Transport は **通信基盤の中核**
+- エラー・再試行・観測を一貫して提供する
+- ドメイン知識は持たず、契約に従う
+

@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract;
-using ExchangeApi.Adapter.Bittrade.Factory;
+using Exchange.Bitflyer.Abstract.Factory;
+using Exchange.Bittrade.Abstract.Factory;
 using Xunit.Abstractions;
 
 namespace Integration.Public.Tests;
@@ -25,11 +25,11 @@ public class PublicApiLiveTests
         var client = BitflyerClientFactory.CreatePublic(options);
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var ticker = await client.GetTickerAsync(Common.Contract.Enums.Symbol.BtcJpy, cts.Token);
+        var ticker = await client.GetTickerAsync(Common.Enums.Symbol.BtcJpy, cts.Token);
         var msg = $"bitFlyer Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
-        Assert.Equal(Common.Contract.Enums.Symbol.BtcJpy, ticker.Symbol);
+        Assert.Equal(Common.Enums.Symbol.BtcJpy, ticker.Symbol);
         Assert.True(ticker.LastTradedPrice > 0);
     }
 
@@ -53,11 +53,11 @@ public class PublicApiLiveTests
         var client = BittradeClientFactory.CreatePublicClient(observer: _observer);
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var ticker = await client.GetTickerAsync(Common.Contract.Enums.Symbol.BtcJpy, cts.Token);
+        var ticker = await client.GetTickerAsync(Common.Enums.Symbol.BtcJpy, cts.Token);
         var msg = $"Bittrade Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
-        Assert.Equal(Common.Contract.Enums.Symbol.BtcJpy, ticker.Symbol);
+        Assert.Equal(Common.Enums.Symbol.BtcJpy, ticker.Symbol);
         Assert.True(ticker.LastTradedPrice > 0);
     }
 

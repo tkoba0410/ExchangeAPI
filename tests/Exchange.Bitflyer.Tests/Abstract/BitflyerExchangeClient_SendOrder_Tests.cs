@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
-using Common.Contract.Errors;
-using Exchange.Bitflyer.Abstract;
+using Common.Dtos;
+using Common.Enums;
+using Core.Contracts.Errors;
+using Exchange.Bitflyer.Abstract.Facade;
 using Exchange.Bitflyer.Raw;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
-using ContractSide = Common.Contract.Enums.Side;
+using ContractSide = Common.Enums.Side;
 using Exchange.Bitflyer.Tests.Fakes;
 using Xunit;
 

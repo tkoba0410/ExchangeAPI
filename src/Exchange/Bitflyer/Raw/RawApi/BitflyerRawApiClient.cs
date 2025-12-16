@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Exchange.Bitflyer.Raw;
+namespace Exchange.Bitflyer.Raw;
+
+/// <summary>
+/// bitFlyer の Raw API アクセス。抽象化しづらい/詳細情報をそのまま返す用途向け。
+/// </summary>
+public sealed class BitflyerRawApiClient
+{
+    private readonly IBitflyerPublicApi _publicApi;
+    private readonly IBitflyerPrivateApi _privateApi;
+    private readonly IBitflyerPrivateTradingApi _privateTradingApi;
+
+    public BitflyerRawApiClient(
+        IBitflyerPublicApi publicApi,
+        IBitflyerPrivateApi privateApi,
+        IBitflyerPrivateTradingApi privateTradingApi)
+    {
+        _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
+        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
+        _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
+    }
+
+    public Task<BitflyerTicker> GetTickerAsync(string productCode, CancellationToken cancellationToken = default) =>
+        _publicApi.GetTickerRawAsync(productCode, cancellationToken: cancellationToken);
+
+    public Task<BitflyerBoard> GetBoardAsync(string productCode, CancellationToken cancellationToken = default) =>
+        _publicApi.GetBoardRawAsync(productCode, cancellationToken: cancellationToken);
+
+    public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
+        _privateApi.GetBalancesAsync(cancellationToken);
+
+    public Task<IReadOnlyList<BitflyerExecutionPrivateResponse>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+        _privateApi.GetExecutionsAsync(productCode, cancellationToken: cancellationToken);
+
+    public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+        _privateApi.GetPositionsAsync(productCode, cancellationToken);
+
+    public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default) =>
+        _privateApi.GetCollateralAsync(cancellationToken);
+
+    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
+        string productCode,
+        string? childOrderStatusState = null,
+        string? childOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        _privateApi.GetOrdersAsync(productCode, childOrderStatusState, childOrderAcceptanceId, cancellationToken: cancellationToken);
+
+    public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(
+        BitflyerSendChildOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.PlaceChildOrderAsync(request, cancellationToken);
+
+    public Task<BitflyerEmptyResponse> CancelChildOrderAsync(
+        BitflyerCancelChildOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.CancelChildOrderAsync(request, cancellationToken);
+
+    public Task<BitflyerEmptyResponse> CancelAllOrdersAsync(
+        BitflyerCancelAllChildOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.CancelAllOrdersAsync(request, cancellationToken);
+
+    public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(
+        BitflyerSendParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.SendParentOrderAsync(request, cancellationToken);
+
+    public Task<BitflyerEmptyResponse> CancelParentOrderAsync(
+        BitflyerCancelParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.CancelParentOrderAsync(request, cancellationToken);
+
+    public Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(
+        BitflyerWithdrawRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.RequestWithdrawalAsync(request, cancellationToken);
+}

@@ -3,13 +3,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Transport.Logging;
-using Common.Transport.Policy;
-using Common.Transport.Protocol;
-using Common.Transport.Transport;
-using ExchangeApi.Factory.Transport;
+using Core.Transport.Logging;
+using Core.Transport.Policy;
+using Core.Transport.Protocol;
+using Core.Transport.Transport;
+using Core.Composition.Factory.Transport;
 
-namespace ExchangeApi.Factory.Tests.Transport;
+namespace Core.Composition.Factory.Tests.Transport;
 
 public class RestClientFactory_Tests
 {

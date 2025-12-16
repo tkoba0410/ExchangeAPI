@@ -3,12 +3,12 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Adapter.Bittrade.Apis;
-using ExchangeApi.Adapter.Bittrade.RawApi;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
-using Common.Transport.Protocol;
-using Common.Transport.Transport;
+using Exchange.Bittrade.Abstract.Apis;
+using Exchange.Bittrade.Raw;
+using Common.Dtos;
+using Common.Enums;
+using Core.Transport.Protocol;
+using Core.Transport.Transport;
 using Xunit;
 
 namespace Exchange.Bittrade.Tests;

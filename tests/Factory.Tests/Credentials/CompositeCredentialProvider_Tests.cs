@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Common.Contract.Interfaces;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
-using ExchangeApi.Factory.Credentials;
+using Common.Interfaces;
+using Common.Dtos;
+using Common.Enums;
+using Core.Composition.Factory.Credentials;
 
-namespace ExchangeApi.Factory.Tests.Credentials;
+namespace Core.Composition.Factory.Tests.Credentials;
 
 public class CompositeCredentialProvider_Tests
 {

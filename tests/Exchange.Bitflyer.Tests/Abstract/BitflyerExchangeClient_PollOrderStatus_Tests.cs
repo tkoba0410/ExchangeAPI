@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract;
+using Exchange.Bitflyer.Abstract.Facade;
 using Exchange.Bitflyer.Raw;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 using Exchange.Bitflyer.Tests.Fakes;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
-using ContractSide = Common.Contract.Enums.Side;
+using Common.Dtos;
+using Common.Enums;
+using ContractSide = Common.Enums.Side;
 using ExecutionResponse = Exchange.Bitflyer.Raw.BitflyerExecutionPrivateResponse;
 using Xunit;
 

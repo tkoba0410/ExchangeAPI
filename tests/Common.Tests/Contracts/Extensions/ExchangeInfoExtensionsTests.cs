@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
-using Common.Contract.Extensions;
+using Common.Dtos;
+using Common.Enums;
+using Common.Extensions;
 using Xunit;
 
-namespace Common.Contract.Tests.Extensions;
+namespace Common.Tests.Contracts.Extensions;
 
 public class ExchangeInfoExtensionsTests
 {

@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using ExchangeApi.Factory.Credentials;
+using Core.Composition.Factory.Credentials;
 
-namespace ExchangeApi.Factory.Tests.Credentials;
+namespace Core.Composition.Factory.Tests.Credentials;
 
 public class FileApiCredentialProvider_Tests
 {

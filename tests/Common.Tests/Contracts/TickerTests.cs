@@ -1,9 +1,9 @@
 using System;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
+using Common.Dtos;
+using Common.Enums;
 using Xunit;
 
-namespace Common.Contract.Tests;
+namespace Common.Tests.Contracts;
 
 public class TickerTests
 {

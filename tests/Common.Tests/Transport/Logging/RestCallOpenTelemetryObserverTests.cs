@@ -3,10 +3,10 @@ using System.Diagnostics.Metrics;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Common.Transport.Logging;
+using Core.Transport.Logging;
 using Xunit;
 
-namespace Common.Transport.Tests.Logging;
+namespace Core.Transport.Tests.Logging;
 
 public class RestCallOpenTelemetryObserverTests
 {

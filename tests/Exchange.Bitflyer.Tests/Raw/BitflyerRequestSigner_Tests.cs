@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Raw;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
-using Common.Transport.Time;
+using Core.Transport.Time;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

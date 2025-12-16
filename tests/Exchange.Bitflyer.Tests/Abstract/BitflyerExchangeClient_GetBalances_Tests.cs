@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
-using Exchange.Bitflyer.Abstract;
+using Common.Dtos;
+using Common.Enums;
+using Exchange.Bitflyer.Abstract.Facade;
 using Exchange.Bitflyer.Raw;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
 using Exchange.Bitflyer.Tests.Fakes;

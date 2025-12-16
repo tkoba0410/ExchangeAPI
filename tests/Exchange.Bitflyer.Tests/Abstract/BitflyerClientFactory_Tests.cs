@@ -1,9 +1,9 @@
 using System;
-using Common.Contract.Interfaces;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
-using Exchange.Bitflyer.Abstract;
-using Common.Transport.Policy;
+using Common.Interfaces;
+using Common.Dtos;
+using Common.Enums;
+using Core.Transport.Policy;
+using Exchange.Bitflyer.Abstract.Factory;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

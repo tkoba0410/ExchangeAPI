@@ -1,9 +1,9 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Common/Common.csproj" />
-    <Project Path="src/Exchange.Bitflyer/Exchange.Bitflyer.csproj" />
-    <Project Path="src/Exchange.Bittrade/Exchange.Bittrade.csproj" />
-    <Project Path="src/Factory/Factory.csproj" />
+    <Project Path="src/Core/Core.csproj" />
+    <Project Path="src/Exchange/Bitflyer/Exchange.Bitflyer.csproj" />
+    <Project Path="src/Exchange/Bittrade/Exchange.Bittrade.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Common.Tests/Common.Tests.csproj" />

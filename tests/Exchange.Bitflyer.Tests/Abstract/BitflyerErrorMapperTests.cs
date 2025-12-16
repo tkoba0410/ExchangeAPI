@@ -1,6 +1,6 @@
 using System.Net;
-using Exchange.Bitflyer.Abstract;
-using Common.Contract.Errors;
+using Core.Contracts.Errors;
+using Exchange.Bitflyer.Abstract.Adapters;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

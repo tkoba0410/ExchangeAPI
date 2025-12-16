@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\\..\\src\\Common\\Common.csproj" />
-    <ProjectReference Include="..\\..\\src\\Factory\\Factory.csproj" />
+    <ProjectReference Include="../../src/Common/Common.csproj" />
+    <ProjectReference Include="../../src/Core/Core.csproj" />
   </ItemGroup>
 
 </Project>

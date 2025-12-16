@@ -1,12 +1,12 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
-using ExchangeApi.Factory.ExchangeInfo;
+using Common.Dtos;
+using Common.Enums;
+using Core.Composition.Factory.ExchangeInfo;
 using Xunit;
 
-namespace ExchangeApi.Factory.Tests.ExchangeInfo;
+namespace Core.Composition.Factory.Tests.ExchangeInfo;
 
 public class JsonExchangeInfoApiTests : IAsyncLifetime
 {

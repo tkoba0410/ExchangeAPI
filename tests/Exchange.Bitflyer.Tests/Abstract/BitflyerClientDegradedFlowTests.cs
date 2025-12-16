@@ -4,12 +4,12 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract;
-using Common.Contract.Dtos;
-using Common.Contract.Enums;
-using Common.Transport.Logging;
-using Common.Transport.Policy;
-using Common.Transport.Transport;
+using Common.Dtos;
+using Common.Enums;
+using Core.Transport.Logging;
+using Core.Transport.Policy;
+using Core.Transport.Transport;
+using Exchange.Bitflyer.Abstract.Factory;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

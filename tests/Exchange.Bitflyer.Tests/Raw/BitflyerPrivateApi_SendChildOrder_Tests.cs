@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Exchange.Bitflyer.Raw;
 using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
-using Common.Transport.Protocol;
+using Core.Transport.Protocol;
 using Xunit;
 
 namespace Exchange.Bitflyer.Tests;

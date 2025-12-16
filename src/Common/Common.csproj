@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Composition/Factory/MultiExchangeClient.cs" />
-    <Compile Remove="Composition/Factory/MultiExchangeClientFactory.cs" />
-    <Compile Remove="Composition/Factory/MultiExchangePublicClient.cs" />
-    <Compile Remove="Composition/Factory/Unified/**/*.cs" />
     <Compile Remove="**/bin/**/*.cs" />
     <Compile Remove="**/obj/**/*.cs" />
   </ItemGroup>

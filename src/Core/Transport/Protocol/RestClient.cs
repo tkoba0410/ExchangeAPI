@@ -8,9 +8,9 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Contracts.Errors;
-using Core.Transport.Logging;
+using Core.Transport.Observability;
 using Core.Transport.Policy;
-using Core.Transport.Transport;
+using Core.Transport.Http;
 
 namespace Core.Transport.Protocol
 {

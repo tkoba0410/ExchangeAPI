@@ -3,13 +3,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Transport.Logging;
+using Core.Transport.Observability;
 using Core.Transport.Policy;
 using Core.Transport.Protocol;
-using Core.Transport.Transport;
-using Composition.Factory.Transport;
+using Core.Transport.Http;
+using Composition.Transport;
 
-namespace Composition.Factory.Tests.Transport;
+namespace Composition.Tests.Transport;
 
 public class RestClientFactory_Tests
 {

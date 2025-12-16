@@ -2,7 +2,7 @@ using System;
 using Common.Interfaces;
 using Common.Dtos;
 using Common.Enums;
-namespace Composition.Factory.Credentials;
+namespace Composition.Credentials;
 
 /// <summary>
 /// 環境変数から API キー/シークレットを取得するプロバイダー。

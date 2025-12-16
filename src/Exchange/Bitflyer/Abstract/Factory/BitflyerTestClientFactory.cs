@@ -1,9 +1,9 @@
 using System;
 using System.Net.Http;
-using Core.Transport.Logging;
+using Core.Transport.Observability;
 using Core.Transport.Policy;
 using Core.Transport.Protocol;
-using Core.Transport.Transport;
+using Core.Transport.Http;
 using Exchange.Bitflyer.Abstract.Adapters;
 using Exchange.Bitflyer.Abstract.Facade;
 namespace Exchange.Bitflyer.Abstract.Factory;

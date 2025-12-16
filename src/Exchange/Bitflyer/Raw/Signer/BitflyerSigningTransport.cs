@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Transport.Protocol;
-using Core.Transport.Transport;
+using Core.Transport.Http;
 namespace Exchange.Bitflyer.Raw;
 
 public sealed class BitflyerSigningTransport : IHttpTransport

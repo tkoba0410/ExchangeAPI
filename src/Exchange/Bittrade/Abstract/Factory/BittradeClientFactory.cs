@@ -6,10 +6,10 @@ using Exchange.Bittrade.Abstract.Apis.ExchangeInfo;
 using Exchange.Bittrade.Abstract.Facade;
 using Exchange.Bittrade.Raw;
 using Common.Interfaces;
-using Core.Transport.Logging;
+using Core.Transport.Observability;
 using Core.Transport.Policy;
 using Core.Transport.Protocol;
-using Core.Transport.Transport;
+using Core.Transport.Http;
 namespace Exchange.Bittrade.Abstract.Factory;
 
 /// <summary>

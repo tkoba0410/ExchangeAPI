@@ -1,6 +1,6 @@
 using System;
 using System.Net.Http;
-namespace Core.Transport.Logging;
+namespace Core.Transport.Observability;
 
 /// <summary>
 /// REST 呼び出しの観測コンテキスト。

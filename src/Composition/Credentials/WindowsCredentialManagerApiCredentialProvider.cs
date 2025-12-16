@@ -5,7 +5,7 @@ using Common.Interfaces;
 using Common.Dtos;
 using Common.Enums;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
-namespace Composition.Factory.Credentials;
+namespace Composition.Credentials;
 
 /// <summary>
 /// Windows 資格情報マネージャーから API キー/シークレットを取得するプロバイダー。

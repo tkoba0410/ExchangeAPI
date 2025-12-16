@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.Dtos;
 using Common.Enums;
-using Core.Transport.Logging;
+using Core.Transport.Observability;
 using Core.Transport.Policy;
-using Core.Transport.Transport;
+using Core.Transport.Http;
 using Exchange.Bitflyer.Abstract.Factory;
 using Xunit;
 

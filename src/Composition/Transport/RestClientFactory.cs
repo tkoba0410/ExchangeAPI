@@ -1,12 +1,12 @@
 using System;
 using System.Net.Http;
 using Common.Interfaces;
-using Core.Transport.Logging;
+using Core.Transport.Observability;
 using Core.Transport.Policy;
 using Core.Transport.Protocol;
 using Core.Transport.Time;
-using Core.Transport.Transport;
-namespace Composition.Factory.Transport;
+using Core.Transport.Http;
+namespace Composition.Transport;
 
 /// <summary>
 /// RestClient を組み立てる共通ファクトリ。ポリシー/ロガー/署名の拡張ポイントを一箇所にまとめる。

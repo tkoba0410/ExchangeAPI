@@ -1,5 +1,5 @@
 using System.Net.Http;
-using Core.Transport.Logging;
+using Core.Transport.Observability;
 using Core.Transport.Policy;
 using Core.Transport.Protocol;
 namespace Exchange.Bitflyer.Abstract.Factory;

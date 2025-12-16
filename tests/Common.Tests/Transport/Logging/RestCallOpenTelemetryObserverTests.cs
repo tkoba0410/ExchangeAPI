@@ -3,7 +3,7 @@ using System.Diagnostics.Metrics;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Core.Transport.Logging;
+using Core.Transport.Observability;
 using Xunit;
 
 namespace Core.Transport.Tests.Logging;

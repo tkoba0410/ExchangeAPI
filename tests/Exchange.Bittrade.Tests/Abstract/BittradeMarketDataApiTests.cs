@@ -8,7 +8,7 @@ using Exchange.Bittrade.Raw;
 using Common.Dtos;
 using Common.Enums;
 using Core.Transport.Protocol;
-using Core.Transport.Transport;
+using Core.Transport.Http;
 using Xunit;
 
 namespace Exchange.Bittrade.Tests;

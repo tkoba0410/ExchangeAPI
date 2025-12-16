@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Text.Json;
-namespace Core.Transport.Logging;
+namespace Core.Transport.Observability;
 
 /// <summary>
 /// JSON で標準化されたログを出力するロガー（サンプル実装）。

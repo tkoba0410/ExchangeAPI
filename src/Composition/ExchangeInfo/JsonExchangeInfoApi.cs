@@ -10,7 +10,7 @@ using Common.Interfaces;
 using Common.Dtos;
 using Common.Enums;
 using ExchangeInfoDto = Common.Dtos.ExchangeInfo;
-namespace Composition.Factory.ExchangeInfo;
+namespace Composition.ExchangeInfo;
 
 /// <summary>
 /// JSON ファイルから ExchangeInfo を読み込む IExchangeInfoApi 実装。

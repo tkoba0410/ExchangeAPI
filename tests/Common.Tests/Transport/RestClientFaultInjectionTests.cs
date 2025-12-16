@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Transport.Policy;
 using Core.Transport.Protocol;
-using Core.Transport.Transport;
+using Core.Transport.Http;
 using Xunit;
 
 namespace Core.Transport.Tests;

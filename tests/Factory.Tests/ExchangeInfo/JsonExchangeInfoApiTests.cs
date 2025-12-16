@@ -3,10 +3,10 @@ using System.IO;
 using System.Threading.Tasks;
 using Common.Dtos;
 using Common.Enums;
-using Common.Composition.Factory.ExchangeInfo;
+using Composition.Factory.ExchangeInfo;
 using Xunit;
 
-namespace Common.Composition.Factory.Tests.ExchangeInfo;
+namespace Composition.Factory.Tests.ExchangeInfo;
 
 public class JsonExchangeInfoApiTests : IAsyncLifetime
 {

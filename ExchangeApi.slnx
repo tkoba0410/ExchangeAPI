@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Common/Common.csproj" />
     <Project Path="src/Core/Core.csproj" />
+    <Project Path="src/Composition/Composition.csproj" />
     <Project Path="src/Exchange/Bitflyer/Exchange.Bitflyer.csproj" />
     <Project Path="src/Exchange/Bittrade/Exchange.Bittrade.csproj" />
   </Folder>

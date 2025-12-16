@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Common.Interfaces;
 using Common.Dtos;
 using Common.Enums;
-using Common.Composition.Factory.Credentials;
+using Composition.Factory.Credentials;
 
-namespace Common.Composition.Factory.Tests.Credentials;
+namespace Composition.Factory.Tests.Credentials;
 
 public class CompositeCredentialProvider_Tests
 {

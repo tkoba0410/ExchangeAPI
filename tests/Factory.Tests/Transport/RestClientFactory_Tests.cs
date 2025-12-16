@@ -7,9 +7,9 @@ using Core.Transport.Logging;
 using Core.Transport.Policy;
 using Core.Transport.Protocol;
 using Core.Transport.Transport;
-using Common.Composition.Factory.Transport;
+using Composition.Factory.Transport;
 
-namespace Common.Composition.Factory.Tests.Transport;
+namespace Composition.Factory.Tests.Transport;
 
 public class RestClientFactory_Tests
 {

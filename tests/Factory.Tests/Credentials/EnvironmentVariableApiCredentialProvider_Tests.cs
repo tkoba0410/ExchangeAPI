@@ -1,7 +1,7 @@
 using System;
-using Common.Composition.Factory.Credentials;
+using Composition.Factory.Credentials;
 
-namespace Common.Composition.Factory.Tests.Credentials;
+namespace Composition.Factory.Tests.Credentials;
 
 public class EnvironmentVariableApiCredentialProvider_Tests
 {

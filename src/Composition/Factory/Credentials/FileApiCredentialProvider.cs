@@ -5,7 +5,7 @@ using System.Text.Json;
 using Common.Interfaces;
 using Common.Dtos;
 using Common.Enums;
-namespace Common.Composition.Factory.Credentials;
+namespace Composition.Factory.Credentials;
 
 /// <summary>
 /// ファイル(JSON)からAPIキー/シークレットを取得するプロバイダー。クロスプラットフォームで動作。

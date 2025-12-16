@@ -1,4 +1,4 @@
-namespace Core.Composition.Factory.Unified;
+namespace Common.Composition.Factory.Unified;
 
 using Common.Interfaces;
 using Exchange.Bitflyer.Abstract;

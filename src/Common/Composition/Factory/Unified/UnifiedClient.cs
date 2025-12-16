@@ -3,7 +3,7 @@ using Common.Dtos;
 using Common.Enums;
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bittrade.Abstract.Facade;
-namespace Core.Composition.Factory.Unified;
+namespace Common.Composition.Factory.Unified;
 
 /// <summary>
 /// Exchange.* クライアントを束ね、Primary を設定で切り替えられる薄いファサード。

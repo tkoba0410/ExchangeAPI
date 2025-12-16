@@ -1,6 +1,6 @@
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bittrade.Abstract.Facade;
-namespace Core.Composition.Factory;
+namespace Common.Composition.Factory;
 
 /// <summary>
 /// 複数取引所の Public クライアントをまとめて保持する軽量クライアント。

@@ -1,7 +1,7 @@
 using System;
-using Core.Composition.Factory.Credentials;
+using Common.Composition.Factory.Credentials;
 
-namespace Core.Composition.Factory.Tests.Credentials;
+namespace Common.Composition.Factory.Tests.Credentials;
 
 public class WindowsCredentialManagerApiCredentialProvider_Tests
 {

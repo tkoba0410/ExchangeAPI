@@ -1,7 +1,7 @@
 using Exchange.Bitflyer.Abstract;
 using Exchange.Bittrade.Abstract.Factory;
 using Exchange.Bittrade.Abstract.Facade;
-namespace Core.Composition.Factory;
+namespace Common.Composition.Factory;
 
 /// <summary>
 /// 複数取引所のクライアントをまとめた全部入りクライアントを生成するファクトリ。

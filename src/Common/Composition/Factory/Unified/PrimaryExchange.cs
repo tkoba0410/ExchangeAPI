@@ -1,4 +1,4 @@
-namespace Core.Composition.Factory.Unified;
+namespace Common.Composition.Factory.Unified;
 
 /// <summary>
 /// 統合クライアントで使用する Primary 取引所の指定。

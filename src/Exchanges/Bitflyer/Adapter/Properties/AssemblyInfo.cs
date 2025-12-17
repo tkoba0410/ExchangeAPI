@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Exchange.Bitflyer.Tests")]
+[assembly: InternalsVisibleTo("Exchange.Bitflyer.Adapter.Tests")]

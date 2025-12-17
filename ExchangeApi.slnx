@@ -12,9 +12,11 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Common.Tests/Common.Tests.csproj" />
-    <Project Path="tests/Exchange.Bitflyer.Tests/Exchange.Bitflyer.Tests.csproj" />
-    <Project Path="tests/Exchange.Bittrade.Tests/Exchange.Bittrade.Tests.csproj" />
-    <Project Path="tests/Factory.Tests/Factory.Tests.csproj" />
+    <Project Path="tests/Composition.Tests/Composition.Tests.csproj" />
+    <Project Path="tests/Exchanges/Bitflyer/Raw.Tests/Exchange.Bitflyer.Raw.Tests.csproj" />
+    <Project Path="tests/Exchanges/Bitflyer/Adapter.Tests/Exchange.Bitflyer.Adapter.Tests.csproj" />
+    <Project Path="tests/Exchanges/Bittrade/Raw.Tests/Exchange.Bittrade.Raw.Tests.csproj" />
+    <Project Path="tests/Exchanges/Bittrade/Adapter.Tests/Exchange.Bittrade.Adapter.Tests.csproj" />
     <Project Path="tests/Integration.Public.Tests/Integration.Public.Tests.csproj" />
   </Folder>
 </Solution>

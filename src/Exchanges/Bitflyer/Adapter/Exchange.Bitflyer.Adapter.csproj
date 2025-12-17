@@ -1,16 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Exchanges\Bittrade\Raw\Exchange.Bittrade.Raw.csproj" />
-    <ProjectReference Include="..\..\Exchanges\Bittrade\Adapter\Exchange.Bittrade.Adapter.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisLevel>latest</AnalysisLevel>
+    <RootNamespace>Exchange.Bitflyer</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Common.csproj" />
+    <ProjectReference Include="..\..\..\Core\Core.csproj" />
+    <ProjectReference Include="..\Raw\Exchange.Bitflyer.Raw.csproj" />
+  </ItemGroup>
 
 </Project>

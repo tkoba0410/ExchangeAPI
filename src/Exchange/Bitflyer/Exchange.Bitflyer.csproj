@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\Common\Common.csproj" />
-    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\Core\Core.csproj" />
+    <ProjectReference Include="..\..\Exchanges\Bitflyer\Raw\Exchange.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="..\..\Exchanges\Bitflyer\Adapter\Exchange.Bitflyer.Adapter.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

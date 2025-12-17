@@ -3,7 +3,11 @@
     <Project Path="src/Common/Common.csproj" />
     <Project Path="src/Core/Core.csproj" />
     <Project Path="src/Composition/Composition.csproj" />
+    <Project Path="src/Exchanges/Bitflyer/Raw/Exchange.Bitflyer.Raw.csproj" />
+    <Project Path="src/Exchanges/Bitflyer/Adapter/Exchange.Bitflyer.Adapter.csproj" />
     <Project Path="src/Exchange/Bitflyer/Exchange.Bitflyer.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Raw/Exchange.Bittrade.Raw.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Adapter/Exchange.Bittrade.Adapter.csproj" />
     <Project Path="src/Exchange/Bittrade/Exchange.Bittrade.csproj" />
   </Folder>
   <Folder Name="/tests/">

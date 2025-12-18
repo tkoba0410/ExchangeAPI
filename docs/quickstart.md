@@ -16,9 +16,9 @@ dotnet build
 
 ## 2. DI 登録（最小例）
 ```csharp
-using Common.Core.Contracts.Contracts;
-using Exchange.Bitflyer.Factory;
-using Exchange.Bitflyer.Facade;
+using ExchangeApi.Common.Contracts.Contracts;
+using ExchangeApi.Exchanges.Bitflyer.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Facade;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
@@ -42,7 +42,7 @@ Console.WriteLine($"Bid {ticker.BestBid} / Ask {ticker.BestAsk} / Last {ticker.L
 
 ## 4. 注文を出す（MARKET/LIMIT/STOP）
 ```csharp
-using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Common.Dtos;
 
 var order = new OrderRequest(
     ProductCode: "BTC_JPY",
@@ -64,8 +64,8 @@ Raw-first が基本ですが、複数取引所を束ねる薄いファサード 
 
 ```csharp
 using ExchangeApi.Factory.Unified;
-using Exchange.Bitflyer.Factory;
-using Exchange.Bittrade.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Factory;
+using ExchangeApi.Exchanges.Bittrade.Factory;
 
 var bitflyer = BitflyerClientFactory.Create("api-key", "api-secret");
 var bittrade = BittradeClientFactory.CreatePublic();

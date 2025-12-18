@@ -35,7 +35,7 @@
 ### Bitflyer（公開 API のみ）
 
 ```csharp
-using Composition.Factory;
+using ExchangeApi.Composition.Factory;
 
 var bitflyerRaw = BitflyerFactory.CreateRaw();
 
@@ -51,7 +51,7 @@ var ticker = await bitflyerRaw.GetTickerAsync("BTC_JPY");
 ### Bittrade（公開 API のみ）
 
 ```csharp
-using Composition.Factory;
+using ExchangeApi.Composition.Factory;
 
 var bittradeRaw = BittradeFactory.CreateRaw();
 
@@ -69,7 +69,7 @@ Adapter は **Common.DTO / Common.Interface** を返す薄いラッパです。
 ### Bitflyer Adapter
 
 ```csharp
-using Composition.Factory;
+using ExchangeApi.Composition.Factory;
 
 var api = BitflyerFactory.CreateAdapter();
 
@@ -84,8 +84,8 @@ var balances = await api.GetBalancesAsync();
 ### Bittrade Adapter（注意点あり）
 
 ```csharp
-using Composition.Factory;
-using Common.Dtos;
+using ExchangeApi.Composition.Factory;
+using ExchangeApi.Common.Dtos;
 
 var api = BittradeFactory.CreateAdapter(
     new BittradeFactoryOptions {

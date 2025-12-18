@@ -31,7 +31,7 @@ ExchangeApi.Factory          ← 共通の組み立てヘルパ（現状の Fact
 Common.Core  ←  Exchange.(各取引所)  ←  Factory
 ```
 
-> `src/Exchange/*` の互換ハブ csproj は後方互換のため一時的に残しています。次の破壊的変更リリースで削除予定です。以後は `src/Exchanges/*/{Raw,Adapter}` と `src/Composition` を参照してください。
+> 旧互換ハブ（`src/Exchange/*`）は破壊的変更として削除済みです。今後は `src/Exchanges/*/{Raw,Adapter}` と `src/Composition` を直接参照してください。
 
 ---
 

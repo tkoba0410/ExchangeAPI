@@ -16,6 +16,7 @@ REST-only 方針で bitFlyer 縦スライスを Private まで実装し、信頼
 ### Changed
 - REST-only に統一（WS/Realtime は提供しない）
 - ExchangeErrorCategory によるカテゴリ粒度のエラー分類フックを導入
+- **Breaking:** `src/Exchange/*` の互換ハブ csproj（Bitflyer/Bittrade）を削除しました。引き続き利用する場合は `src/Exchanges/*/{Raw,Adapter}` と `src/Composition` を直接参照してください。
 
 ### Planned (Next)
 - 複数取引所対応の検証とドキュメント整備

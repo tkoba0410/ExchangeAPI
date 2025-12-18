@@ -1,4 +1,4 @@
-namespace Core.Transport.Protocol;
+namespace ExchangeApi.Core.Transport.Protocol;
 
 /// <summary>
 /// エラーレスポンスのペイロードからコード/メッセージを抽出するためのパーサ。

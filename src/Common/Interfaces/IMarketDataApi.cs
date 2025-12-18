@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Dtos;
-using Common.Enums;
-namespace Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Interfaces;
 
 /// <summary>
 /// 市場データ（REST）を取得するための抽象インターフェース。

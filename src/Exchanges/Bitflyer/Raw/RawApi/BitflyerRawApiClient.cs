@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Raw;
-namespace Exchange.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>
 /// bitFlyer の Raw API アクセス。抽象化しづらい/詳細情報をそのまま返す用途向け。

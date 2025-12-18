@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-namespace Common.Dtos;
+namespace ExchangeApi.Common.Dtos;
 
 public sealed record ExchangeInfo(
     IReadOnlyList<ExchangeMarketInfo> Markets,

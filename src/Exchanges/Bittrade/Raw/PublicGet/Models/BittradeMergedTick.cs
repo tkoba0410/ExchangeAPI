@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-namespace Exchange.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record BittradeMergedTick(
     [property: JsonPropertyName("close")] decimal Close,

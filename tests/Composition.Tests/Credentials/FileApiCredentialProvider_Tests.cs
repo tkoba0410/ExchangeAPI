@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using Composition.Credentials;
+using ExchangeApi.Composition.Credentials;
 
 namespace Composition.Tests.Credentials;
 

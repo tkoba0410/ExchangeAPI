@@ -1,13 +1,13 @@
 using System;
 using System.Net.Http;
-using Common.Dtos;
-using Common.Interfaces;
-using Core.Transport.Http;
-using Core.Transport.Observability;
-using Core.Transport.Policy;
-using Core.Transport.Protocol;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Core.Transport.Observability;
+using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Core.Transport.Protocol;
 
-namespace Composition.Factory;
+namespace ExchangeApi.Composition.Factory;
 
 /// <summary>
 /// Bittrade 用の生成オプション。

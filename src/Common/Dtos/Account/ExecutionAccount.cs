@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
-using Common.Enums;
-namespace Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>
 /// 口座の約定履歴（シンボル＋注文IDベース）。

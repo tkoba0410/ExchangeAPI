@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Exchange.Bitflyer.Raw
+namespace ExchangeApi.Exchanges.Bitflyer.Raw
 {
     /// <summary>
     /// bitFlyer Public REST API の <c>GET /v1/getticker</c> レスポンスを

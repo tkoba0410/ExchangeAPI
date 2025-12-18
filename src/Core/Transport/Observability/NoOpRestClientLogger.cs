@@ -1,6 +1,6 @@
 using System;
 using System.Net.Http;
-namespace Core.Transport.Observability;
+namespace ExchangeApi.Core.Transport.Observability;
 
 /// <summary>
 /// 何も記録しないダミー実装。

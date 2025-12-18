@@ -3,8 +3,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Contracts.Errors;
-namespace Core.Transport.Policy;
+using ExchangeApi.Core.Contracts.Errors;
+namespace ExchangeApi.Core.Transport.Policy;
 
 /// <summary>
 /// 連続失敗を検知してフェイルファストする簡易サーキットブレーカ。

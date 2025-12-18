@@ -1,11 +1,11 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
-namespace Composition.Credentials;
+namespace ExchangeApi.Composition.Credentials;
 
 /// <summary>
 /// Windows 資格情報マネージャーから API キー/シークレットを取得するプロバイダー。

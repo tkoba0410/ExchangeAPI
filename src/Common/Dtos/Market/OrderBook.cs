@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.Enums;
-namespace Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>
 /// 板スナップショット。Bids は価格降順、Asks は価格昇順で内部整列される。

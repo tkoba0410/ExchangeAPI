@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-namespace Core.Contracts.Transport;
+namespace ExchangeApi.Core.Contracts.Transport;
 
 /// <summary>HTTP レスポンスのメタ情報。</summary>
 public sealed record HttpResponseMeta(

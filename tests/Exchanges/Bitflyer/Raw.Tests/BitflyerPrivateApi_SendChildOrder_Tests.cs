@@ -1,11 +1,11 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Raw;
-using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
-using Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using ExchangeApi.Core.Transport.Protocol;
 using Xunit;
 
-namespace Exchange.Bitflyer.Tests;
+namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
 public sealed class BitflyerPrivateApi_SendChildOrder_Tests
 {

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract;
-using Exchange.Bitflyer.Abstract.Adapters;
-using Exchange.Bitflyer.Raw;
-using Common.Interfaces;
-using Common.Enums;
-using Common.Dtos;
-using Core.Contracts.Errors;
-using ContractSide = Common.Enums.Side;
-namespace Exchange.Bitflyer.Abstract.Apis.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Adapter;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Core.Contracts.Errors;
+using ContractSide = ExchangeApi.Common.Enums.Side;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 
 /// <summary>
 /// bitFlyer の Trading API 実装（REST）。

@@ -1,4 +1,4 @@
-namespace Common.Enums;
+namespace ExchangeApi.Common.Enums;
 
 /// <summary>取引所識別コード。</summary>
 public enum ExchangeCode

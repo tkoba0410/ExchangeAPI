@@ -1,4 +1,4 @@
-namespace Common.Dtos;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>
 /// キャンセル結果を示す簡易 DTO。

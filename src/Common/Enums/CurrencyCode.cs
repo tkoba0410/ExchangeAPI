@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-namespace Common.Enums;
+namespace ExchangeApi.Common.Enums;
 
 /// <summary>主要通貨コード。</summary>
 public enum CurrencyCode

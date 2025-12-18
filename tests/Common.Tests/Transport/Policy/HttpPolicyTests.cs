@@ -3,11 +3,11 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Contracts.Errors;
-using Core.Transport.Policy;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Policy;
 using Xunit;
 
-namespace Core.Transport.Tests.Policy;
+namespace ExchangeApi.Core.Transport.Tests.Policy;
 
 public class HttpPolicyTests
 {

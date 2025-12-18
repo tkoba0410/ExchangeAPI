@@ -3,11 +3,11 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Transport.Observability;
-using Core.Transport.Policy;
-using Core.Transport.Protocol;
-using Core.Transport.Http;
-using Composition.Transport;
+using ExchangeApi.Core.Transport.Observability;
+using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Composition.Transport;
 
 namespace Composition.Tests.Transport;
 

@@ -1,7 +1,7 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-namespace Core.Transport.Protocol;
+namespace ExchangeApi.Core.Transport.Protocol;
 
 /// <summary>
 /// HTTP リクエストに署名・認証ヘッダを付与する責務を持つインターフェース。

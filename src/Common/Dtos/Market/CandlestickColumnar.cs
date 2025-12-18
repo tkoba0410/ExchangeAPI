@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Common.Enums;
-namespace Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>
 /// Candlestick を列指向で保持する内部向けバッファ。

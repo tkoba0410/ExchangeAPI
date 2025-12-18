@@ -1,4 +1,4 @@
-namespace Exchange.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>
 /// 空レスポンスを扱うためのプレースホルダ。

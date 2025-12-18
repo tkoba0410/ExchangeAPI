@@ -1,9 +1,9 @@
 using System.Net;
-using Core.Contracts.Errors;
-using Exchange.Bitflyer.Abstract.Adapters;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using Xunit;
 
-namespace Exchange.Bitflyer.Tests;
+namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
 public class BitflyerErrorMapperTests
 {

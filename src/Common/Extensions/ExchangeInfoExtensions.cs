@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using Common.Dtos;
-using Common.Enums;
-namespace Common.Extensions;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Extensions;
 
 /// <summary>
 /// ExchangeInfo の検索ヘルパ。

@@ -4,9 +4,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Transport.Protocol;
-using Core.Transport.Time;
-namespace Exchange.Bitflyer.Raw;
+using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Core.Transport.Time;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 public sealed class BitflyerRequestSigner : IRequestSigner
 {

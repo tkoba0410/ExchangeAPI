@@ -1,5 +1,5 @@
-using Core.Contracts.Errors;
-namespace Exchange.Bitflyer.Abstract.Adapters;
+using ExchangeApi.Core.Contracts.Errors;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerErrorMapper
 {

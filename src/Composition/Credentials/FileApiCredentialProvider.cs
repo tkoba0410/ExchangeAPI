@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
-namespace Composition.Credentials;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Composition.Credentials;
 
 /// <summary>
 /// ファイル(JSON)からAPIキー/シークレットを取得するプロバイダー。クロスプラットフォームで動作。

@@ -1,4 +1,4 @@
-namespace Common.Dtos;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>約定見積（フィル見積）。</summary>
 public sealed record FillEstimate(

@@ -1,6 +1,6 @@
 using System;
 using System.Text.Json;
-namespace Core.Transport.Protocol;
+namespace ExchangeApi.Core.Transport.Protocol;
 
 /// <summary>
 /// 一般的な JSON エラーフォーマットを対象にしたデフォルトパーサ。

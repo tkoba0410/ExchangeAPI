@@ -7,12 +7,12 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Contracts.Errors;
-using Core.Transport.Observability;
-using Core.Transport.Policy;
-using Core.Transport.Http;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Observability;
+using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Core.Transport.Http;
 
-namespace Core.Transport.Protocol
+namespace ExchangeApi.Core.Transport.Protocol
 {
     public class RestClient : IRestClient
     {

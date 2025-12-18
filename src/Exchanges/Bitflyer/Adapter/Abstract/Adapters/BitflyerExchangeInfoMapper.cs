@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Common.Dtos;
-using Common.Enums;
-namespace Exchange.Bitflyer.Abstract.Adapters;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerExchangeInfoMapper
 {

@@ -1,6 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
-namespace Exchange.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>
 /// 親注文一覧 (/v1/me/getparentorders) のレスポンス DTO。

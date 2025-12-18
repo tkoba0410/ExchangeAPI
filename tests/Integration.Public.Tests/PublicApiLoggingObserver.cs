@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using Core.Transport.Observability;
+using ExchangeApi.Core.Transport.Observability;
 
 namespace Integration.Public.Tests;
 

@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Exchange.Bittrade.Raw;
-using Common.Dtos;
-using Common.Enums;
-using Core.Contracts.Errors;
-namespace Exchange.Bittrade.Abstract.Adapters;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Contracts.Errors;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 
 internal static class BittradeMapper
 {

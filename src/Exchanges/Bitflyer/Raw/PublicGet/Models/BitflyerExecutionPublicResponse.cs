@@ -1,6 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
-namespace Exchange.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>
 /// Public 約定履歴 (/v1/getexecutions, /v1/executions) のレスポンス DTO。

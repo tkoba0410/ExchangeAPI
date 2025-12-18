@@ -3,14 +3,14 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bittrade.Abstract.Apis.ExchangeInfo;
-using Common.Dtos;
-using Common.Enums;
-using Core.Transport.Protocol;
-using Core.Transport.Http;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Core.Transport.Http;
 using Xunit;
 
-namespace Exchange.Bittrade.Tests;
+namespace ExchangeApi.Exchanges.Bittrade.Tests;
 
 public class BittradeExchangeInfoApiTests
 {

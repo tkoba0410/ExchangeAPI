@@ -1,4 +1,4 @@
-namespace Common.Dtos;
+namespace ExchangeApi.Common.Dtos;
 
 using System;
 

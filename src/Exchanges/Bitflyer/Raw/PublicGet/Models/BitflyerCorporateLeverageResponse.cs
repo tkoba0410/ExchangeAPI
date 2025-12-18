@@ -1,6 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
-namespace Exchange.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>
 /// 法人アカウント最大レバレッジ (/v1/getcorporateleverage) のレスポンス DTO。

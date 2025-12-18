@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-namespace Core.Contracts.Transport;
+namespace ExchangeApi.Core.Contracts.Transport;
 
 /// <summary>HTTP リクエストのメタ情報（秘密情報は含めない）。</summary>
 public sealed record HttpRequestMeta(

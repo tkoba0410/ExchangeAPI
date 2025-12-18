@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
-namespace Composition.Credentials;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Composition.Credentials;
 
 /// <summary>
 /// 複数のプロバイダーをフォールバック順に束ねる。

@@ -1,4 +1,4 @@
-namespace Common.Enums;
+namespace ExchangeApi.Common.Enums;
 
 /// <summary>取引ペア/シンボルの基本セット。</summary>
 public enum Symbol

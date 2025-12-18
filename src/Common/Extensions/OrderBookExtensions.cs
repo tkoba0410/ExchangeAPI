@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.Dtos;
-namespace Common.Extensions;
+using ExchangeApi.Common.Dtos;
+namespace ExchangeApi.Common.Extensions;
 
 /// <summary>OrderBook に対する共通ユーティリティ（両サイドを参照）。</summary>
 public static class OrderBookExtensions

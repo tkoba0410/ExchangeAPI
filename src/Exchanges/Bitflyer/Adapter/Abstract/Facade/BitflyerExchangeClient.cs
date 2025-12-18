@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Interfaces;
-using Common.Enums;
-using Common.Dtos;
-using Exchange.Bitflyer.Abstract.Apis.Account;
-using Exchange.Bitflyer.Abstract.Apis.ExchangeInfo;
-using Exchange.Bitflyer.Abstract.Apis.Margin;
-using Exchange.Bitflyer.Abstract.Apis.Market;
-using Exchange.Bitflyer.Abstract.Apis.Trading;
-using Exchange.Bitflyer.Abstract.Adapters;
-using Exchange.Bitflyer.Raw;
-using ContractSide = Common.Enums.Side;
-namespace Exchange.Bitflyer.Abstract.Facade;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Account;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ContractSide = ExchangeApi.Common.Enums.Side;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。

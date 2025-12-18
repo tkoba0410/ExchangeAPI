@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Common.Dtos;
-using Common.Enums;
-using Exchange.Bitflyer.Abstract.Facade;
-using Exchange.Bitflyer.Raw;
-using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
-using Exchange.Bitflyer.Tests.Fakes;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
 
-namespace Exchange.Bitflyer.Tests
+namespace ExchangeApi.Exchanges.Bitflyer.Tests
 {
     public class BitflyerExchangeClient_GetBalances_Tests
     {

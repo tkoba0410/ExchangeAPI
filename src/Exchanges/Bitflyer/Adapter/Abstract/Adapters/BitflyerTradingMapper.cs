@@ -1,10 +1,10 @@
 using System;
-using Exchange.Bitflyer.Raw;
-using Common.Dtos;
-using Common.Enums;
-using ContractTimeInForce = Common.Enums.TimeInForce;
-using RawTimeInForce = Exchange.Bitflyer.Raw.TimeInForce;
-namespace Exchange.Bitflyer.Abstract.Adapters;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ContractTimeInForce = ExchangeApi.Common.Enums.TimeInForce;
+using RawTimeInForce = ExchangeApi.Exchanges.Bitflyer.Raw.TimeInForce;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerTradingMapper
 {

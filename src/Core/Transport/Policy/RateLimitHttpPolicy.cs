@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-namespace Core.Transport.Policy;
+namespace ExchangeApi.Core.Transport.Policy;
 
 /// <summary>
 /// 固定間隔でリクエストを整流する簡易レートリミットポリシー。

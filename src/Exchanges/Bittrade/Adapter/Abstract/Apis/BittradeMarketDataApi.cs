@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bittrade.Raw;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
-using Core.Contracts.Errors;
-using Core.Transport.Protocol;
-namespace Exchange.Bittrade.Abstract.Apis;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 
 /// <summary>
 /// Bittrade の Public REST 実装（Ticker/OrderBook/Executions）。

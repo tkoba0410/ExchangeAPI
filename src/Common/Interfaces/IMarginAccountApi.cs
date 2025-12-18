@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Dtos;
-using Common.Enums;
-namespace Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Interfaces;
 
 /// <summary>
 /// マージン口座（REST）の抽象インターフェース。

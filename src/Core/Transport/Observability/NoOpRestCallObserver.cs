@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
-namespace Core.Transport.Observability;
+namespace ExchangeApi.Core.Transport.Observability;
 
 /// <summary>
 /// 観測を行わないダミーオブザーバ。

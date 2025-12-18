@@ -1,4 +1,4 @@
-namespace Core.Contracts.Errors;
+namespace ExchangeApi.Core.Contracts.Errors;
 
 /// <summary>
 /// 取引所固有コードを分類するカテゴリ。

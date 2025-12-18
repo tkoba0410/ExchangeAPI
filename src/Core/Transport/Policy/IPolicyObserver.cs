@@ -1,6 +1,6 @@
 using System;
 using System.Net.Http;
-namespace Core.Transport.Policy;
+namespace ExchangeApi.Core.Transport.Policy;
 
 /// <summary>
 /// ポリシーの挙動を観測するためのフック。

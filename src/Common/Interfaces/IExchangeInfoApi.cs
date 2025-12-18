@@ -1,8 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Dtos;
-using Common.Enums;
-namespace Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Interfaces;
 
 /// <summary>
 /// 取引所の機能や市場情報を提供する抽象インターフェース。

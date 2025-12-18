@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
-namespace Core.Transport.Observability;
+namespace ExchangeApi.Core.Transport.Observability;
 
 /// <summary>
 /// 簡易なメトリクス集計用オブザーバ（サンプル実装）。

@@ -1,6 +1,6 @@
-using Common.Dtos;
-using Common.Enums;
-namespace Common.Extensions;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Extensions;
 
 /// <summary>Side/Sizeを持つ型向けの符号付きサイズ計算。</summary>
 public static class SideSizeExtensions

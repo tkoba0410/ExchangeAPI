@@ -1,5 +1,5 @@
-using Common.Enums;
-namespace Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>
 /// 抽象注文リクエスト。

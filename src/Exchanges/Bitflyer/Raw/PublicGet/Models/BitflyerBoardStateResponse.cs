@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-namespace Exchange.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 public sealed record BitflyerBoardStateResponse(
     [property: JsonPropertyName("health")] string? Health,

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-namespace Exchange.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record BittradeAccountsResponse(
     [property: JsonPropertyName("status")] string Status,

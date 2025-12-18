@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-namespace Core.Transport.Protocol;
+namespace ExchangeApi.Core.Transport.Protocol;
 
 /// <summary>
 /// JSON ベースの REST API を呼び出すための最小限のクライアント インターフェース。

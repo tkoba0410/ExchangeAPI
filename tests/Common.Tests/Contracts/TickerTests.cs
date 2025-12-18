@@ -1,6 +1,6 @@
 using System;
-using Common.Dtos;
-using Common.Enums;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
 using Xunit;
 
 namespace Common.Tests.Contracts;

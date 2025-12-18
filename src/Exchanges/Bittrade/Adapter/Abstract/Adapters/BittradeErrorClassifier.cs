@@ -1,7 +1,7 @@
 using System.Net;
-using Core.Contracts.Errors;
-using Core.Transport.Protocol;
-namespace Exchange.Bittrade.Abstract.Adapters;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 
 /// <summary>
 /// Bittrade エラーをカテゴリに正規化する。

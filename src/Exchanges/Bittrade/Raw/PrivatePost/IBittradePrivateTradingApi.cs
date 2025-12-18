@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bittrade.Raw;
-namespace Exchange.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
 /// Bittrade Private REST API（取引系 POST）の Raw アクセス。

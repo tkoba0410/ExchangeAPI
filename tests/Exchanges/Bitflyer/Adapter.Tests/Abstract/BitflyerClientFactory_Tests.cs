@@ -1,12 +1,12 @@
 using System;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
-using Core.Transport.Policy;
-using Exchange.Bitflyer.Abstract.Factory;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
 using Xunit;
 
-namespace Exchange.Bitflyer.Tests;
+namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
     public class BitflyerClientFactory_Tests
     {

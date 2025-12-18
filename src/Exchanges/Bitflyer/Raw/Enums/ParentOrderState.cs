@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
-namespace Exchange.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>親注文状態 (parent_order_state)。</summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]

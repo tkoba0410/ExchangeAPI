@@ -1,5 +1,5 @@
 using System;
-using Core.Contracts.Errors;
+using ExchangeApi.Core.Contracts.Errors;
 using Xunit;
 
 namespace Common.Tests.Contracts;

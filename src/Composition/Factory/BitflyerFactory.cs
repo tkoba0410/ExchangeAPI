@@ -1,12 +1,12 @@
 using System;
-using Composition.Transport;
-using Core.Transport.Policy;
-using Core.Transport.Protocol;
-using Core.Transport.Time;
-using Exchange.Bitflyer.Abstract.Facade;
-using Exchange.Bitflyer.Raw;
+using ExchangeApi.Composition.Transport;
+using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Core.Transport.Time;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 
-namespace Composition.Factory;
+namespace ExchangeApi.Composition.Factory;
 
 /// <summary>
 /// bitFlyer 用の標準配線を提供するファクトリ。

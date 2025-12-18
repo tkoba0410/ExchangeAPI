@@ -1,4 +1,4 @@
-namespace Core.Transport.Time;
+namespace ExchangeApi.Core.Transport.Time;
 
 /// <summary>
 /// 実際のシステム時刻を返す実装。

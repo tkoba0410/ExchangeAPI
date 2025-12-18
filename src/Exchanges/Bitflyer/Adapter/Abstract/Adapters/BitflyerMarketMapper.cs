@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
-using Exchange.Bitflyer.Raw;
-using Common.Enums;
-using Common.Dtos;
-using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
-namespace Exchange.Bitflyer.Abstract.Adapters;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Dtos;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerMarketMapper
 {

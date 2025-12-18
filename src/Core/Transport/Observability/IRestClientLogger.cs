@@ -1,6 +1,6 @@
 using System;
 using System.Net.Http;
-namespace Core.Transport.Observability;
+namespace ExchangeApi.Core.Transport.Observability;
 
 /// <summary>
 /// RestClient のリクエスト/レスポンスを記録するための拡張ポイント。

@@ -1,11 +1,11 @@
 using System;
-using Common.Enums;
-using Common.Dtos;
-using Core.Contracts.Errors;
-using ContractSide = Common.Enums.Side;
-using RawSide = Exchange.Bitflyer.Raw.Side;
-using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
-namespace Exchange.Bitflyer.Abstract.Adapters;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Core.Contracts.Errors;
+using ContractSide = ExchangeApi.Common.Enums.Side;
+using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerCommonMapper
 {

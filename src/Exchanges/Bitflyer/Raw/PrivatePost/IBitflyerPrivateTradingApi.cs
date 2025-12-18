@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Raw;
-namespace Exchange.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>
 /// bitFlyer Private Trading API のインターフェース。

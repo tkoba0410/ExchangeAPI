@@ -4,15 +4,15 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bittrade.Raw;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
-using Core.Contracts.Errors;
-using Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
 using System.Text.Json;
-using ExchangeInfoDto = Common.Dtos.ExchangeInfo;
-namespace Exchange.Bittrade.Abstract.Apis.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Common.Dtos.ExchangeInfo;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 
 /// <summary>
 /// Bittrade の ExchangeInfo API 実装（/v1/common/symbols を使用）。

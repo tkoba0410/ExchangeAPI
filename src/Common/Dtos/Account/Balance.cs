@@ -1,6 +1,6 @@
 using System;
-using Common.Enums;
-namespace Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>口座残高（通貨のみ型安全）。</summary>
 public sealed record Balance(

@@ -1,7 +1,7 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-namespace Core.Transport.Http;
+namespace ExchangeApi.Core.Transport.Http;
 
 /// <summary>
 /// HTTP トランスポートの共通インターフェース。

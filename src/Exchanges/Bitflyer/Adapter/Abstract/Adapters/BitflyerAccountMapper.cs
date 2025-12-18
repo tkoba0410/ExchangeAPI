@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
-using Exchange.Bitflyer.Raw;
-using Common.Dtos;
-using Common.Enums;
-namespace Exchange.Bitflyer.Abstract.Adapters;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerAccountMapper
 {

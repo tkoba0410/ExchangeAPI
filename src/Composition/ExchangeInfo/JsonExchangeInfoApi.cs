@@ -6,11 +6,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
-using ExchangeInfoDto = Common.Dtos.ExchangeInfo;
-namespace Composition.ExchangeInfo;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeInfoDto = ExchangeApi.Common.Dtos.ExchangeInfo;
+namespace ExchangeApi.Composition.ExchangeInfo;
 
 /// <summary>
 /// JSON ファイルから ExchangeInfo を読み込む IExchangeInfoApi 実装。

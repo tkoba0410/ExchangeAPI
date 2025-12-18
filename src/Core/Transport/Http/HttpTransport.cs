@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-namespace Core.Transport.Http;
+namespace ExchangeApi.Core.Transport.Http;
 
 /// <summary>
 /// <see cref="HttpClient"/> を用いたデフォルト実装の HTTP トランスポート。

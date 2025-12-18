@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bittrade.Abstract.Apis;
-using Exchange.Bittrade.Abstract.Apis.ExchangeInfo;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
-using Core.Transport.Protocol;
-namespace Exchange.Bittrade.Abstract.Facade;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Transport.Protocol;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
 /// Bittrade の Public API だけを利用する軽量クライアント。

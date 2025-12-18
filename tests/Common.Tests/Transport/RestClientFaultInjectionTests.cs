@@ -3,12 +3,12 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Transport.Policy;
-using Core.Transport.Protocol;
-using Core.Transport.Http;
+using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Core.Transport.Http;
 using Xunit;
 
-namespace Core.Transport.Tests;
+namespace ExchangeApi.Core.Transport.Tests;
 
 public class RestClientFaultInjectionTests
 {
@@ -96,7 +96,7 @@ public class RestClientFaultInjectionTests
             transport,
             policy: HttpPolicyFactory.CreateDefault(options));
 
-        await Assert.ThrowsAsync<Core.Contracts.Errors.ExchangeApiException>(() => rest.GetAsync<TestDto>("/api"));
+        await Assert.ThrowsAsync<ExchangeApi.Core.Contracts.Errors.ExchangeApiException>(() => rest.GetAsync<TestDto>("/api"));
         Assert.Equal(1, transport.SendCount);
     }
 
@@ -120,10 +120,10 @@ public class RestClientFaultInjectionTests
             transport,
             policy: policy);
 
-        var ex1 = await Assert.ThrowsAsync<Core.Contracts.Errors.ExchangeApiException>(() => rest.GetAsync<TestDto>("/api"));
+        var ex1 = await Assert.ThrowsAsync<ExchangeApi.Core.Contracts.Errors.ExchangeApiException>(() => rest.GetAsync<TestDto>("/api"));
         Assert.Equal(HttpStatusCode.InternalServerError, ex1.StatusCode);
 
-        var ex2 = await Assert.ThrowsAsync<Core.Contracts.Errors.ExchangeApiException>(() => rest.GetAsync<TestDto>("/api"));
+        var ex2 = await Assert.ThrowsAsync<ExchangeApi.Core.Contracts.Errors.ExchangeApiException>(() => rest.GetAsync<TestDto>("/api"));
         Assert.Equal(HttpStatusCode.ServiceUnavailable, ex2.StatusCode); // CB opens
         Assert.Equal(1, transport.SendCount); // second call short-circuited
     }

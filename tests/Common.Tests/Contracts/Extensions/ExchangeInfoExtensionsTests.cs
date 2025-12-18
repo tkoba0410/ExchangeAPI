@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Common.Dtos;
-using Common.Enums;
-using Common.Extensions;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Extensions;
 using Xunit;
 
 namespace Common.Tests.Contracts.Extensions;

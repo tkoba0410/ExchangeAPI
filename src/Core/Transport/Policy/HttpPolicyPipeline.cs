@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-namespace Core.Transport.Policy;
+namespace ExchangeApi.Core.Transport.Policy;
 
 /// <summary>
 /// 複数のポリシーを順に適用するコンポジション。

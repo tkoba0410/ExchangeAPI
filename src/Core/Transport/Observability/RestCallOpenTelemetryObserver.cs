@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Net;
 using System.Net.Http;
-namespace Core.Transport.Observability;
+namespace ExchangeApi.Core.Transport.Observability;
 
 /// <summary>
 /// Activity/Meter を用いた簡易 OpenTelemetry ブリッジのサンプル実装。

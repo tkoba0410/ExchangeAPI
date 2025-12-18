@@ -1,4 +1,4 @@
-namespace Core.Transport.Time;
+namespace ExchangeApi.Core.Transport.Time;
 
 /// <summary>
 /// 時刻取得を抽象化するインターフェース。

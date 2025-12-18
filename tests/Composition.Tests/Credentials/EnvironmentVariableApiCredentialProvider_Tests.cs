@@ -1,5 +1,5 @@
 using System;
-using Composition.Credentials;
+using ExchangeApi.Composition.Credentials;
 
 namespace Composition.Tests.Credentials;
 

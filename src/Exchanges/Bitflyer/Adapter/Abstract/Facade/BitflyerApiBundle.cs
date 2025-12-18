@@ -1,8 +1,8 @@
 using System;
-using Exchange.Bitflyer.Abstract;
-using Exchange.Bitflyer.Raw;
-using Core.Transport.Protocol;
-namespace Exchange.Bitflyer.Abstract.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Core.Transport.Protocol;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
 /// <summary>
 /// bitFlyer API 実装のセットをまとめるバンドル。

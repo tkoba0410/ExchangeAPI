@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-namespace Exchange.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 public sealed record BitflyerMarket(
 [property: JsonPropertyName("product_code")] ProductCode ProductCode,

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract.Facade;
-using Exchange.Bitflyer.Raw;
-using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
-using Exchange.Bitflyer.Tests.Fakes;
-using Common.Dtos;
-using Common.Enums;
-using ContractSide = Common.Enums.Side;
-using ExecutionResponse = Exchange.Bitflyer.Raw.BitflyerExecutionPrivateResponse;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ContractSide = ExchangeApi.Common.Enums.Side;
+using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.BitflyerExecutionPrivateResponse;
 using Xunit;
 
-namespace Exchange.Bitflyer.Tests;
+namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
 public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
 {
@@ -30,7 +30,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             OutstandingSize = 0.01m,
             Price = 3000000m,
             AveragePrice = 0m,
-            Side = Exchange.Bitflyer.Raw.Side.Buy,
+            Side = ExchangeApi.Exchanges.Bitflyer.Raw.Side.Buy,
             ChildOrderType = ChildOrderType.Limit,
             Size = 0.01m,
         };

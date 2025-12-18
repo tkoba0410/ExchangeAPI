@@ -1,5 +1,5 @@
 using System;
-namespace Core.Transport.Policy;
+namespace ExchangeApi.Core.Transport.Policy;
 
 /// <summary>
 /// HTTP ポリシーのデフォルト設定。

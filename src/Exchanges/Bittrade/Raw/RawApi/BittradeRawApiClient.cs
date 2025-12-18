@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bittrade.Raw;
-namespace Exchange.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
 /// Bittrade の Raw API アクセス（Public/Private/Trading をまとめた薄いファサード）。

@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
-namespace Exchange.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>親注文種別（一覧レスポンスの parent_order_type）。</summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]

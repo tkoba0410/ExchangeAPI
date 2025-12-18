@@ -3,15 +3,15 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bittrade.Abstract.Apis;
-using Exchange.Bittrade.Raw;
-using Common.Dtos;
-using Common.Enums;
-using Core.Transport.Protocol;
-using Core.Transport.Http;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Core.Transport.Http;
 using Xunit;
 
-namespace Exchange.Bittrade.Tests;
+namespace ExchangeApi.Exchanges.Bittrade.Tests;
 
 public class BittradeMarketDataApiTests
 {

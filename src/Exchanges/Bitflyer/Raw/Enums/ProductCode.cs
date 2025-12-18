@@ -2,7 +2,7 @@ using System;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-namespace Exchange.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>bitFlyer プロダクトコード。</summary>
 [JsonConverter(typeof(ProductCodeJsonConverter))]

@@ -1,12 +1,12 @@
 using System;
 using System.Net.Http;
-using Common.Interfaces;
-using Core.Transport.Observability;
-using Core.Transport.Policy;
-using Core.Transport.Protocol;
-using Core.Transport.Time;
-using Core.Transport.Http;
-namespace Composition.Transport;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Core.Transport.Observability;
+using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Core.Transport.Time;
+using ExchangeApi.Core.Transport.Http;
+namespace ExchangeApi.Composition.Transport;
 
 /// <summary>
 /// RestClient を組み立てる共通ファクトリ。ポリシー/ロガー/署名の拡張ポイントを一箇所にまとめる。

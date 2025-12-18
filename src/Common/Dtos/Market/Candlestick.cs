@@ -1,6 +1,6 @@
 using System;
-using Common.Enums;
-namespace Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>
 /// ローソク足（OHLCV）。

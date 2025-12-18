@@ -1,8 +1,8 @@
 using System;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
-namespace Composition.Credentials;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Composition.Credentials;
 
 /// <summary>
 /// 環境変数から API キー/シークレットを取得するプロバイダー。

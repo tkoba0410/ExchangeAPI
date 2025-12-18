@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-namespace Core.Contracts.Errors;
+namespace ExchangeApi.Core.Contracts.Errors;
 
 /// <summary>
 /// 取引所 API 呼び出し時の例外を表す共通例外クラス。

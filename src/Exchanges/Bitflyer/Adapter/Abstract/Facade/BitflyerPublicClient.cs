@@ -1,13 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Interfaces;
-using Common.Dtos;
-using Common.Enums;
-using Exchange.Bitflyer.Abstract.Apis.ExchangeInfo;
-using Exchange.Bitflyer.Abstract.Apis.Market;
-using Exchange.Bitflyer.Raw;
-namespace Exchange.Bitflyer.Abstract.Facade;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
 /// <summary>
 /// bitFlyer の Public API だけを利用する軽量クライアント。

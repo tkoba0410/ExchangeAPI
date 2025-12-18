@@ -2,7 +2,7 @@ using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace Exchange.Bitflyer.Tests.Guard;
+namespace ExchangeApi.Exchanges.Bitflyer.Tests.Guard;
 
 public class NoTestFactoryUsageTests
 {

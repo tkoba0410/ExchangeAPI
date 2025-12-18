@@ -1,4 +1,4 @@
-namespace Common.Dtos;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>
 /// 抽象注文レスポンス。

@@ -1,6 +1,6 @@
 using System;
-using Common.Enums;
-namespace Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Dtos;
 
 /// <summary>
 /// オープンな子注文の概要（受付IDなし、Exchange/時刻を含む）。

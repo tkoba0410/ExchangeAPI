@@ -1,6 +1,6 @@
-using Common.Dtos;
-using Common.Enums;
-namespace Common.Interfaces;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+namespace ExchangeApi.Common.Interfaces;
 
 /// <summary>
 /// 取引所とアカウントに対応する API キー/シークレットを提供する。

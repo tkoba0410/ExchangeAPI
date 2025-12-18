@@ -1,15 +1,15 @@
 using System.Threading.Tasks;
-using Common.Dtos;
-using Common.Enums;
-using Core.Contracts.Errors;
-using Exchange.Bitflyer.Abstract.Facade;
-using Exchange.Bitflyer.Raw;
-using RawProductCode = Exchange.Bitflyer.Raw.ProductCode;
-using ContractSide = Common.Enums.Side;
-using Exchange.Bitflyer.Tests.Fakes;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using ContractSide = ExchangeApi.Common.Enums.Side;
+using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
 
-namespace Exchange.Bitflyer.Tests;
+namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
 public sealed class BitflyerExchangeClient_SendOrder_Tests
 {
@@ -28,7 +28,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         Assert.Equal("ACCEPT-123", result.OrderId);
         Assert.NotNull(fakeTrading.LastRequest);
         Assert.Equal(RawProductCode.BtcJpy, fakeTrading.LastRequest!.ProductCode);
-        Assert.Equal(Exchange.Bitflyer.Raw.Side.Buy, fakeTrading.LastRequest!.Side);
+        Assert.Equal(ExchangeApi.Exchanges.Bitflyer.Raw.Side.Buy, fakeTrading.LastRequest!.Side);
         Assert.Equal(ChildOrderType.Market, fakeTrading.LastRequest!.ChildOrderType);
         Assert.Equal(0.01m, fakeTrading.LastRequest!.Size);
     }

@@ -2,9 +2,9 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Transport.Protocol;
-using Core.Transport.Http;
-namespace Exchange.Bitflyer.Raw;
+using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Core.Transport.Http;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 public sealed class BitflyerSigningTransport : IHttpTransport
 {

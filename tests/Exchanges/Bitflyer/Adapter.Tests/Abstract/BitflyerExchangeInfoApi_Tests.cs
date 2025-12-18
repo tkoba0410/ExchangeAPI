@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
-using Exchange.Bitflyer.Abstract.Apis.ExchangeInfo;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using Xunit;
 
-namespace Exchange.Bitflyer.Tests;
+namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
 public class BitflyerExchangeInfoApi_Tests
 {

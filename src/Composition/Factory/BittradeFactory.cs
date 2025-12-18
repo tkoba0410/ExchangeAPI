@@ -1,14 +1,14 @@
 using System;
-using Composition.Transport;
-using Core.Transport.Policy;
-using Core.Transport.Protocol;
-using Exchange.Bittrade.Abstract.Adapters;
-using Exchange.Bittrade.Abstract.Apis;
-using Exchange.Bittrade.Abstract.Apis.ExchangeInfo;
-using Exchange.Bittrade.Abstract.Facade;
-using Exchange.Bittrade.Raw;
+using ExchangeApi.Composition.Transport;
+using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 
-namespace Composition.Factory;
+namespace ExchangeApi.Composition.Factory;
 
 /// <summary>
 /// Bittrade 用の標準配線ファクトリ。Raw を既定とし、Adapter は明示 opt-in。

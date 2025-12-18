@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Common.Dtos;
-using Common.Enums;
-using Composition.ExchangeInfo;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Composition.ExchangeInfo;
 using Xunit;
 
 namespace Composition.Tests.ExchangeInfo;

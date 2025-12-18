@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Interfaces;
-using Common.Enums;
-using Common.Dtos;
-using Exchange.Bittrade.Abstract.Apis;
-using Exchange.Bittrade.Abstract.Apis.ExchangeInfo;
-using Exchange.Bittrade.Raw;
-namespace Exchange.Bittrade.Abstract.Facade;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
 /// Bittrade 用のファサード。Raw API も提供する。

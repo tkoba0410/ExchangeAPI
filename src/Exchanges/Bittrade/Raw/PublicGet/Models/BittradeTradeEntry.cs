@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-namespace Exchange.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record BittradeTradeEntry(
     [property: JsonPropertyName("id")] long Id,

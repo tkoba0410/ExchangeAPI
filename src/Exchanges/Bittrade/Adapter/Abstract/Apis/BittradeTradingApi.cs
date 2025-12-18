@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Exchange.Bittrade.Abstract.Adapters;
-using Exchange.Bittrade.Raw;
-using Common.Interfaces;
-using Common.Enums;
-using Common.Dtos;
-using Core.Contracts.Errors;
-using Core.Transport.Protocol;
-namespace Exchange.Bittrade.Abstract.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 
 /// <summary>
 /// Bittrade Private トレード/アカウント API（最小スコープ: Balance, Order, Cancel, OpenOrders, Status）。

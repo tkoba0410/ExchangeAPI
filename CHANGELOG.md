@@ -12,6 +12,9 @@ ExchangeApi プロジェクトの変更履歴を管理します。
 - `Symbol` 値オブジェクト（`readonly record struct`）と取引所別 `SymbolMapper`
 - `ExchangeCodeParser` / `ExchangeCodeFormatter`
 - `ExchangeFeatureNotSupportedException`
+- `OrderKey` / `OrderIdKind`（注文識別子の型付け）
+- `ExchangeOrderNotFoundException`（not found の明示化）
+- `OrderState` enum（`OrderStatus` と分離）
 
 ### Changed
 - **Breaking:** `ITradingApi.PollOrderStatusAsync` を削除し、`GetOrderAsync` に集約
@@ -19,7 +22,15 @@ ExchangeApi プロジェクトの変更履歴を管理します。
 - **Breaking:** exchangeId(string) を `ExchangeCode` に統一（CredentialProvider/Factory/例外）
 - **Breaking:** Facade は共通 IF を実装し、未対応機能は `ExchangeFeatureNotSupportedException` に統一
 - **Breaking:** `BitflyerExchangeClient.Raw` / `BittradeExchangeClient.Raw` を削除（Raw は専用 Factory/Raw API を利用）
+- **Breaking:** `GetOrderAsync` / `CancelOrderAsync` は `OrderKey` を受け取る契約へ変更
+- **Breaking:** `OpenOrder.OrderId` / `OrderStatus.OrderAcceptanceId` を廃止し `OrderKey` に統一
 
+### Fixed
+- bitFlyer の not found を `Completed` 扱いしない（`ExchangeOrderNotFoundException`）
+- bitFlyer の未知 product_code フォールバックを廃止
+
+### Docs
+- 移行ガイド: `MIGRATION.md` を追加
 ---
 
 ## [v0.1.0] — Stage1 Final — 2025-xx-xx

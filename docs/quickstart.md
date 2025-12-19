@@ -48,27 +48,56 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 
 var result = await trading.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), Side.Buy, 0.01m);
-Console.WriteLine($"Accepted: {result.OrderId}");
+Console.WriteLine($"Accepted: {result.Key}");
 ```
 
 ## 5. 注文の完了を待つ（ポーリング）
 ```csharp
 using ExchangeApi.Common.UseCases;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Core.Contracts.Errors;
 
-var status = await OrderPolling.WaitForOrderAsync(
-    trading,
-    new Symbol("BTC/JPY"),
-    result.OrderId,
-    new PollingOptions(TimeSpan.FromSeconds(1), 30));
-Console.WriteLine($"Order status: {status.Status}");
+try
+{
+    var status = await OrderPolling.WaitForOrderAsync(
+        trading,
+        new Symbol("BTC/JPY"),
+        result.Key,
+        new PollingOptions(TimeSpan.FromSeconds(1), 30)
+        {
+            NotFoundPolicy = NotFoundPolicy.Continue
+        });
+    Console.WriteLine($"Order status: {status.Status}");
+}
+catch (ExchangeOrderNotFoundException)
+{
+    Console.WriteLine("Order not found (still propagating or invalid key).");
+}
 ```
 
-## 6. 主要API
+## 6. OpenOrder から照会/キャンセル
+```csharp
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
+
+var orders = await trading.GetOrdersAsync(new Symbol("BTC/JPY"));
+var first = orders[0];
+
+var status = await trading.GetOrderAsync(new Symbol("BTC/JPY"), first.Key);
+Console.WriteLine($"OpenOrder status: {status.Status}");
+
+await trading.CancelOrderAsync(new Symbol("BTC/JPY"), first.Key);
+```
+
+## 7. 注文識別子の基本ルール
+- `OrderKey` は `(OrderIdKind, Value)` の組です。
+- `OrderResult.Key` / `OpenOrder.Key` をそのまま `GetOrderAsync` / `CancelOrderAsync` / `OrderPolling` に渡せます。
+
+## 8. 主要API
 - REST: `IMarketDataApi` / `ITradingApi` / `IAccountApi` / `IMarginAccountApi` / `IExchangeInfoApi`
 - WS: 未実装（Stage6以降に検討）
 
-## 7. 統合クライアントを使う場合（オプション）
+## 9. 統合クライアントを使う場合（オプション）
 Raw-first が基本ですが、複数取引所を束ねる薄いファサード `UnifiedClient`（Exchange.Factory 内）も用意できます。
 
 ```csharp
@@ -87,8 +116,9 @@ var tickerBt = await unified.Bittrade.GetTickerAsync(new Symbol("BTC_USDT"));   
 ```
 
 ## エラーとハマりポイント
-- サポート外シンボルは `SymbolNotSupportedException`（抽象層）で通知。
+- サポート外シンボルは `SymbolNotSupportedException`。
 - 未対応機能は `ExchangeFeatureNotSupportedException`。
-- HTTP/bitFlyer エラーは `ExchangeApiException`。`StatusCode` と `ExchangeErrorCode` を確認。
+- 注文が見つからない場合は `ExchangeOrderNotFoundException`（`NotFoundPolicy` で挙動を選択）。
+- HTTP/取引所エラーは `ExchangeApiException`。`StatusCode` と `ExchangeErrorCode` を確認。
 
 より詳しい説明は `docs/entry-guide.md` を参照してください。

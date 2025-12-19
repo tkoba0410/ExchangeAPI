@@ -12,6 +12,7 @@ Stage6 では **bitFlyer の Public/Private REST に特化した REST-only ク�
 - HTTP 呼び出しには Timeout/Retry/RateLimit/CircuitBreaker を含むポリシー層を用意（エラー分類はカテゴリ単位）
 
 詳しい使い方は Quick Start / Entry Guide を参照してください。
+OrderKey 導入による破壊的変更があるため、移行は `MIGRATION.md` を参照してください。
 
 ---
 
@@ -66,9 +67,9 @@ dotnet test
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
-using ExchangeApi.Contracts.Contracts;
-using Exchange.Bitflyer;
-using Exchange.Bitflyer.Factory;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Types;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
 
 var services = new ServiceCollection();
 
@@ -84,7 +85,7 @@ var provider = services.BuildServiceProvider();
 var market = provider.GetRequiredService<IMarketDataApi>();
 
 // BTC/JPY の最新 ticker
-var ticker = await market.GetTickerAsync("BTC/JPY");
+var ticker = await market.GetTickerAsync(new Symbol("BTC/JPY"));
 
 Console.WriteLine($"Bid : {ticker.BestBid}");
 Console.WriteLine($"Ask : {ticker.BestAsk}");

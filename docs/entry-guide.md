@@ -30,22 +30,37 @@
 - 口座約定（Private）: `GetAccountExecutionsAsync(new Symbol("BTC/JPY"))`
 - 残高: `GetBalancesAsync()`
 - 発注: `PlaceMarketOrderAsync` / `PlaceLimitOrderAsync`（STOP は取引所依存）
-- キャンセル: `CancelOrderAsync`（全件キャンセルは Raw API でのみ提供）
+- キャンセル: `CancelOrderAsync(Symbol, OrderKey)`（全件キャンセルは Raw API でのみ提供）
+- 照会: `GetOrderAsync(Symbol, OrderKey)`
 - ポーリング: `OrderPolling.WaitForOrderAsync`（1s/最大30回がデフォルト）
 
-## 5. エラーと例外
+## 5. 注文識別子（OrderKey）
+- `OrderKey = (OrderIdKind, Value)` の組です。
+- **接続保証**: `OrderResult.Key` / `OpenOrder.Key` は、そのまま `GetOrderAsync` / `CancelOrderAsync` / `OrderPolling` に渡せます。
+
+### bitFlyer の注意点
+- `AcceptanceId` と `ExchangeOrderId` は別物です。
+- 一覧 API から `AcceptanceId` が取れない場合は `OpenOrder.Key` が `ExchangeOrderId` になります。
+- `OrderIdKind.ExchangeOrderId` を受け付けない API では `ExchangeFeatureNotSupportedException` を投げます。
+
+## 6. ポーリングと not found
+- not found は `ExchangeOrderNotFoundException` として扱います。
+- `NotFoundPolicy.Continue` は再試行継続、`NotFoundPolicy.StopAsNotFound` は例外をそのまま返します（デフォルトは Continue）。
+
+## 7. エラーと例外
 - 未サポートシンボル: `SymbolNotSupportedException`
 - 未対応機能: `ExchangeFeatureNotSupportedException`
+- 注文が見つからない: `ExchangeOrderNotFoundException`
 - HTTP/取引所エラー: `ExchangeApiException`（`StatusCode`, `ExchangeErrorCode`, `ErrorCategory` を参照）※カテゴリ粒度の分類
 - STOP 系のパラメータ不足や不正値は `ArgumentException`
 
-## 6. 利用上の注意
+## 8. 利用上の注意
 - Candles は REST 未サポート（`ExchangeFeatureNotSupportedException` を返す）。
 - product_code は bitFlyer 仕様に合わせる（例: `BTC_JPY`, `FX_BTC_JPY`）。抽象シンボルは `BTC/JPY`。
 - `Symbol` は値オブジェクト。新銘柄は `new Symbol("XYZ/JPY")` のように文字列で表現できる。
 - exchangeId は `ExchangeCode` に統一。文字列入力が必要な場合は `ExchangeCodeParser.Parse(string)` を入口で使う。
 
-## 7. 参考ドキュメント
+## 9. 参考ドキュメント
 - 抽象 API 対応表: `docs/stage4/A042-STG4-ABSTRACT-MAP.md`（Stage4時点、名称は旧構成）  
 - Stage5 構成: `docs/stage5/STRUCTURE-OPTIMAL.md`（旧命名ベースだが概念は踏襲）  
 - 動作確認メモ: `docs/stage5/TESTS.md`  
@@ -53,7 +68,7 @@
 - Stage 概要: `docs/STAGES-OVERVIEW.md`  
 - Stage7 移行ロードマップ: `docs/stage7/A020-STG7-RAW-FIRST-ROADMAP.md`（新レイアウトの詳細）
 
-## 8. 次ステップ（今後の拡張）
+## 10. 次ステップ（今後の拡張）
 - Raw-first での取引所追加、必要に応じた Factory 経由の統合クライアント組み立てヘルパ
 - ドキュメントの旧命名から新命名への置き換え継続（Stage1〜6資料は旧名のままの箇所あり）
 - WS/Realtime の再検討は別モジュールで扱う予定（現時点では REST-only 維持）

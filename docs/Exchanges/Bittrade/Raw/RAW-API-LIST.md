@@ -24,7 +24,7 @@ Bittradeアダプターで使用している主要なRESTエンドポイント�
   - 対応コード: `BittradeTradingApi.GetOrdersAsync` → `BittradeMapper.MapOrderSummary`
 - `GET /v1/order/orders/{orderId}`
   - 用途: 注文詳細（ステータス照会）
-  - 対応コード: `BittradeTradingApi.PollOrderStatusAsync` (単回照会)
+  - 対応コード: `BittradeTradingApi.GetOrderAsync`
 - `POST /v1/order/orders/place`
   - 用途: 新規注文（market/limit）
   - 対応コード: `BittradeTradingApi.PlaceOrderInternal`
@@ -33,7 +33,7 @@ Bittradeアダプターで使用している主要なRESTエンドポイント�
   - 対応コード: `BittradeTradingApi.CancelOrderAsync`
 
 ## Private API (未実装/NotSupported)
-- 口座約定履歴（execution history）: REST 経由では未提供のため `GetAccountExecutionsAsync` は NotSupported。
+- 口座約定履歴（execution history）: REST 経由では未提供のため `GetAccountExecutionsAsync` は `ExchangeFeatureNotSupportedException`。
 - Stop注文: このアダプターでは stop 系を未サポート。
 
 ## Symbol マッピング
@@ -43,4 +43,3 @@ Bittradeアダプターで使用している主要なRESTエンドポイント�
 ## 備考
 - エラーハンドリング: `status != "ok"` は `ExchangeApiException` を投げる。
 - タイムスタンプ: Unix ms を `DateTimeOffset.FromUnixTimeMilliseconds` で正規化。
-

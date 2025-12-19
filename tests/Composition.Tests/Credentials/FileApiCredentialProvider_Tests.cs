@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using ExchangeApi.Common.Enums;
 using ExchangeApi.Composition.Credentials;
 
 namespace Composition.Tests.Credentials;
@@ -22,7 +23,7 @@ public class FileApiCredentialProvider_Tests
 
             var provider = new FileApiCredentialProvider(path);
 
-            var creds = provider.Get("bitflyer", "default");
+            var creds = provider.Get(ExchangeCode.Bitflyer, "default");
 
             Assert.Equal("key1", creds.ApiKey);
             Assert.Equal("sec1", creds.ApiSecret);

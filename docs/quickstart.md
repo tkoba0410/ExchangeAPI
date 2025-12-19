@@ -16,9 +16,8 @@ dotnet build
 
 ## 2. DI 登録（最小例）
 ```csharp
-using ExchangeApi.Common.Contracts.Contracts;
-using ExchangeApi.Exchanges.Bitflyer.Factory;
-using ExchangeApi.Exchanges.Bitflyer.Facade;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
@@ -28,57 +27,68 @@ services.AddSingleton<IMarketDataApi>(client);
 services.AddSingleton<ITradingApi>(client);
 services.AddSingleton<IAccountApi>(client);
 services.AddSingleton<IMarginAccountApi>(client);
+services.AddSingleton<IExchangeInfoApi>(client);
 var provider = services.BuildServiceProvider();
 ```
 
 ## 3. Ticker を取得
 ```csharp
+using ExchangeApi.Common.Types;
+
 var market = provider.GetRequiredService<IMarketDataApi>();
 var trading = provider.GetRequiredService<ITradingApi>();
 var accounts = provider.GetRequiredService<IMarginAccountApi>();
-var ticker = await market.GetTickerAsync("BTC/JPY");
-Console.WriteLine($"Bid {ticker.BestBid} / Ask {ticker.BestAsk} / Last {ticker.LastTradedPrice}");
+var ticker = await market.GetTickerAsync(new Symbol("BTC/JPY"));
+Console.WriteLine($"Last {ticker.LastTradedPrice} @ {ticker.Timestamp:O}");
 ```
 
-## 4. 注文を出す（MARKET/LIMIT/STOP）
+## 4. 注文を出す（MARKET/LIMIT）
 ```csharp
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 
-var order = new OrderRequest(
-    ProductCode: "BTC_JPY",
-    Side: OrderSide.Buy,
-    OrderType: OrderType.Market,
-    Size: 0.01m,
-    Price: null);
-
-var result = await trading.SendOrderAsync(order);
+var result = await trading.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), Side.Buy, 0.01m);
 Console.WriteLine($"Accepted: {result.OrderId}");
 ```
 
-## 5. 主要API
+## 5. 注文の完了を待つ（ポーリング）
+```csharp
+using ExchangeApi.Common.UseCases;
+using ExchangeApi.Common.Types;
+
+var status = await OrderPolling.WaitForOrderAsync(
+    trading,
+    new Symbol("BTC/JPY"),
+    result.OrderId,
+    new PollingOptions(TimeSpan.FromSeconds(1), 30));
+Console.WriteLine($"Order status: {status.Status}");
+```
+
+## 6. 主要API
 - REST: `IMarketDataApi` / `ITradingApi` / `IAccountApi` / `IMarginAccountApi` / `IExchangeInfoApi`
 - WS: 未実装（Stage6以降に検討）
 
-## 6. 統合クライアントを使う場合（オプション）
+## 7. 統合クライアントを使う場合（オプション）
 Raw-first が基本ですが、複数取引所を束ねる薄いファサード `UnifiedClient`（Exchange.Factory 内）も用意できます。
 
 ```csharp
 using ExchangeApi.Factory.Unified;
-using ExchangeApi.Exchanges.Bitflyer.Factory;
-using ExchangeApi.Exchanges.Bittrade.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Factory;
+using ExchangeApi.Common.Types;
 
 var bitflyer = BitflyerClientFactory.Create("api-key", "api-secret");
 var bittrade = BittradeClientFactory.CreatePublic();
 
 var unified = new UnifiedClient(bitflyer, bittrade, primary: PrimaryExchange.Bitflyer);
 
-var ticker = await unified.PrimaryMarket.GetTickerAsync("BTC/JPY"); // Primary=bitFlyer
-var tickerBt = await unified.Bittrade.GetTickerAsync("BTC_USDT");   // Bittrade を直接
+var ticker = await unified.PrimaryMarket.GetTickerAsync(new Symbol("BTC/JPY")); // Primary=bitFlyer
+var tickerBt = await unified.Bittrade.GetTickerAsync(new Symbol("BTC_USDT"));   // Bittrade を直接
 ```
 
 ## エラーとハマりポイント
 - サポート外シンボルは `SymbolNotSupportedException`（抽象層）で通知。
+- 未対応機能は `ExchangeFeatureNotSupportedException`。
 - HTTP/bitFlyer エラーは `ExchangeApiException`。`StatusCode` と `ExchangeErrorCode` を確認。
-- Candles は REST未サポート（NotSupported）。
 
 より詳しい説明は `docs/entry-guide.md` を参照してください。

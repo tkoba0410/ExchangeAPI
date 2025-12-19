@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 
 public sealed class BitflyerMarginApi : IMarginAccountApi
 {
     private readonly IBitflyerPrivateApi _privateApi;
-    private readonly string _exchangeId;
+    private readonly ExchangeCode _exchange;
 
-    public BitflyerMarginApi(IBitflyerPrivateApi privateApi, string exchangeId = "bitFlyer")
+    public BitflyerMarginApi(IBitflyerPrivateApi privateApi, ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
-        _exchangeId = exchangeId;
+        _exchange = exchange;
     }
 
     public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
@@ -41,13 +41,13 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetBalances");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetBalances");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getbalance API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetBalances",
                 statusCode: null,
                 innerException: ex);
@@ -56,7 +56,7 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
 
     public async Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
-        if (symbol == Symbol.Unknown)
+        if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
@@ -72,13 +72,13 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetAccountExecutions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetAccountExecutions");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getexecutions API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetAccountExecutions",
                 statusCode: null,
                 innerException: ex);
@@ -98,13 +98,13 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetOpenPositions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetOpenPositions");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getpositions API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetOpenPositions",
                 statusCode: null,
                 innerException: ex);
@@ -123,13 +123,13 @@ public sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetCollateral");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetCollateral");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getcollateral API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetCollateral",
                 statusCode: null,
                 innerException: ex);

@@ -40,13 +40,11 @@ public static class BittradeFactory
         var publicApi = new BittradePublicApi(restClient);
         var privateApi = new BittradePrivateApi(restClient);
         var privateTradingApi = new BittradePrivateTradingApi(restClient);
-        var raw = new BittradeRawApiClient(publicApi, privateApi, privateTradingApi);
-
         var marketApi = new BittradeMarketDataApi(restClient);
         var tradingApi = new BittradeTradingApi(restClient, settings.AccountId);
         var exchangeInfoApi = new BittradeExchangeInfoApi(restClient);
 
-        return new BittradeExchangeClient(marketApi, tradingApi, tradingApi, exchangeInfoApi, raw);
+        return new BittradeExchangeClient(marketApi, tradingApi, tradingApi, exchangeInfoApi);
     }
 
     private static RestClient CreateRestClient(BittradeFactoryOptions settings, bool requireCredentials)
@@ -68,7 +66,7 @@ public static class BittradeFactory
     private static IRequestSigner? CreateSigner(BittradeFactoryOptions settings, bool requireCredentials)
     {
         var credentials = settings.Credentials
-            ?? settings.CredentialProvider?.Get(settings.ExchangeId, settings.AccountId);
+            ?? settings.CredentialProvider?.Get(settings.Exchange, settings.AccountId);
 
         if (credentials is null)
         {

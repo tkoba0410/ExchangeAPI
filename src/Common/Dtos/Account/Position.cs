@@ -1,5 +1,6 @@
 using System;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 namespace ExchangeApi.Common.Dtos;
 
 /// <summary>建玉情報。</summary>

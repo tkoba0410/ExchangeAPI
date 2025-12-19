@@ -4,8 +4,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
+using ExchangeApi.Common.UseCases;
 using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Http;
@@ -45,44 +46,44 @@ public class BitflyerClientDegradedFlowTests
         Assert.NotEmpty(balances);
 
         // 2. send order（劣化環境だが成功）
-        var orderResult = await client.PlaceMarketOrderAsync(Symbol.BtcJpy, Side.Buy, 0.001m);
+        var orderResult = await client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), Side.Buy, 0.001m);
         Assert.False(string.IsNullOrWhiteSpace(orderResult.OrderId));
 
         // 3. poll status（初回429後にCOMPLETED）
-        var status = await client.PollOrderStatusAsync(
-            symbol: Symbol.BtcJpy,
+        var status = await OrderPolling.WaitForOrderAsync(
+            api: client,
+            symbol: new Symbol("BTC/JPY"),
             orderId: orderResult.OrderId,
-            pollInterval: TimeSpan.FromMilliseconds(10),
-            maxAttempts: 3);
+            options: new PollingOptions(TimeSpan.FromMilliseconds(10), 3));
 
         Assert.Equal(OrderState.Completed, status.Status);
 
         // 4. executions（約定履歴）
-        var executions = await client.GetMarketExecutionsAsync(Symbol.BtcJpy);
+        var executions = await client.GetMarketExecutionsAsync(new Symbol("BTC/JPY"));
         Assert.NotEmpty(executions);
 
         // 5. child orders 履歴（完了済みの履歴が返る）
-        var childOrders = await client.GetOrdersAsync(Symbol.BtcJpy);
+        var childOrders = await client.GetOrdersAsync(new Symbol("BTC/JPY"));
         Assert.NotEmpty(childOrders);
 
         // 6. positions（建玉ありの確認）
-        var positionsBeforeClose = await client.GetOpenPositionsAsync(Symbol.BtcJpy);
+        var positionsBeforeClose = await client.GetOpenPositionsAsync(new Symbol("BTC/JPY"));
         Assert.NotEmpty(positionsBeforeClose);
 
         // 7. close order（反対売買で決済）→ poll status
-        var closeOrderResult = await client.PlaceMarketOrderAsync(Symbol.BtcJpy, Side.Sell, 0.001m);
+        var closeOrderResult = await client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), Side.Sell, 0.001m);
         Assert.False(string.IsNullOrWhiteSpace(closeOrderResult.OrderId));
 
-        var closeStatus = await client.PollOrderStatusAsync(
-            symbol: Symbol.BtcJpy,
+        var closeStatus = await OrderPolling.WaitForOrderAsync(
+            api: client,
+            symbol: new Symbol("BTC/JPY"),
             orderId: closeOrderResult.OrderId,
-            pollInterval: TimeSpan.FromMilliseconds(10),
-            maxAttempts: 3);
+            options: new PollingOptions(TimeSpan.FromMilliseconds(10), 3));
 
         Assert.Equal(OrderState.Completed, closeStatus.Status);
 
         // 8. positions（決済後に空）
-        var positionsAfterClose = await client.GetOpenPositionsAsync(Symbol.BtcJpy);
+        var positionsAfterClose = await client.GetOpenPositionsAsync(new Symbol("BTC/JPY"));
         Assert.Empty(positionsAfterClose);
 
         // 9. collateral（口座状態確認）

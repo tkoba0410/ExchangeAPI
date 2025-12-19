@@ -127,7 +127,6 @@ public static class BitflyerClientFactory
         var publicApi = new BitflyerPublicApi(restClient);
         var privateApi = new BitflyerPrivateApi(restClient);
         var privateTradingApi = new BitflyerPrivateTradingApi(restClient);
-        var rawApi = new BitflyerRawApiClient(publicApi, privateApi, privateTradingApi);
 
         return new BitflyerExchangeClient(publicApi, privateApi, privateTradingApi);
     }
@@ -137,7 +136,7 @@ public static class BitflyerClientFactory
     /// </summary>
     public static BitflyerExchangeClient Create(
         IApiCredentialProvider provider,
-        string exchangeId,
+        ExchangeCode exchange,
         string accountId,
         IHttpPolicy? policy = null,
         IRestClientLogger? logger = null,
@@ -150,7 +149,7 @@ public static class BitflyerClientFactory
             throw new ArgumentNullException(nameof(provider));
         }
 
-        var credentials = provider.Get(exchangeId, accountId);
+        var credentials = provider.Get(exchange, accountId);
         var options = new BitflyerClientOptions
         {
             Policy = policy,

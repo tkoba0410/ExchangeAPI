@@ -23,7 +23,7 @@ public class CompositeCredentialProvider_Tests
         var composite = new CompositeCredentialProvider(providers);
 
         // Act
-        var result = composite.Get("bitflyer", "default");
+        var result = composite.Get(ExchangeCode.Bitflyer, "default");
 
         // Assert
         Assert.Equal(expected, result);
@@ -41,7 +41,7 @@ public class CompositeCredentialProvider_Tests
         var composite = new CompositeCredentialProvider(providers);
 
         // Act & Assert
-        var ex = Assert.Throws<InvalidOperationException>(() => composite.Get("bitflyer", "default"));
+        var ex = Assert.Throws<InvalidOperationException>(() => composite.Get(ExchangeCode.Bitflyer, "default"));
         Assert.Contains("ThrowingProvider", ex.Message);
         Assert.Contains("EmptyProvider", ex.Message);
     }
@@ -55,12 +55,12 @@ public class CompositeCredentialProvider_Tests
             _creds = creds;
         }
 
-        public ApiCredentials Get(string exchangeId, string accountId) => _creds;
+        public ApiCredentials Get(ExchangeCode exchange, string accountId) => _creds;
     }
 
     private sealed class ThrowingProvider : IApiCredentialProvider
     {
-        public ApiCredentials Get(string exchangeId, string accountId)
+        public ApiCredentials Get(ExchangeCode exchange, string accountId)
         {
             throw new InvalidOperationException("fail");
         }
@@ -68,7 +68,7 @@ public class CompositeCredentialProvider_Tests
 
     private sealed class EmptyProvider : IApiCredentialProvider
     {
-        public ApiCredentials Get(string exchangeId, string accountId)
+        public ApiCredentials Get(ExchangeCode exchange, string accountId)
         {
             return new ApiCredentials(string.Empty, string.Empty);
         }

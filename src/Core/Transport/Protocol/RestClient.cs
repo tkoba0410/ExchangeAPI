@@ -109,7 +109,7 @@ namespace ExchangeApi.Core.Transport.Protocol
 
                     var exception = new ExchangeApiException(
                         $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Error: {payload.ErrorMessage ?? content}",
-                        exchangeId: null,
+                        exchange: null,
                         operation: null,
                         statusCode: response.StatusCode,
                         exchangeErrorCode: errorCode,
@@ -236,7 +236,7 @@ namespace ExchangeApi.Core.Transport.Protocol
 
                     var exception = new ExchangeApiException(
                         $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Error: {payload.ErrorMessage ?? content}",
-                        exchangeId: null,
+                        exchange: null,
                         operation: null,
                         statusCode: response.StatusCode,
                         exchangeErrorCode: errorCode,

@@ -11,5 +11,5 @@ public interface IApiCredentialProvider
     /// <summary>
     /// exchange/account に紐づく API 認証情報を返す。
     /// </summary>
-    ApiCredentials Get(string exchangeId, string accountId);
+    ApiCredentials Get(ExchangeCode exchange, string accountId);
 }

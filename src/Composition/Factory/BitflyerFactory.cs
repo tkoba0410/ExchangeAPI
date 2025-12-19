@@ -31,7 +31,7 @@ public static class BitflyerFactory
             components.PublicApi,
             components.PrivateApi,
             components.PrivateTradingApi,
-            exchangeId: settings.ExchangeId,
+            exchangeCode: settings.Exchange,
             accountId: settings.AccountId);
     }
 
@@ -64,7 +64,7 @@ public static class BitflyerFactory
     private static IRequestSigner? CreateSigner(BitflyerFactoryOptions settings)
     {
         var credentials = settings.Credentials
-            ?? settings.CredentialProvider?.Get(settings.ExchangeId, settings.AccountId);
+            ?? settings.CredentialProvider?.Get(settings.Exchange, settings.AccountId);
 
         if (credentials is null)
         {

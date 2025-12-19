@@ -1,4 +1,5 @@
 using System;
+using ExchangeApi.Common.Enums;
 using ExchangeApi.Composition.Credentials;
 
 namespace Composition.Tests.Credentials;
@@ -18,6 +19,6 @@ public class WindowsCredentialManagerApiCredentialProvider_Tests
         }
 
         // Act & Assert
-        Assert.Throws<PlatformNotSupportedException>(() => provider.Get("bitflyer", "default"));
+        Assert.Throws<PlatformNotSupportedException>(() => provider.Get(ExchangeCode.Bitflyer, "default"));
     }
 }

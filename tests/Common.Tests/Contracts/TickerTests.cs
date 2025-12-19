@@ -1,6 +1,7 @@
 using System;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using Xunit;
 
 namespace Common.Tests.Contracts;
@@ -17,13 +18,13 @@ public class TickerTests
         // Act
         var ticker = new Ticker(
             Exchange: ExchangeCode.None,
-            Symbol: Symbol.BtcJpy,
+            Symbol: new Symbol("BTC/JPY"),
             LastTradedPrice: lastPrice,
             Timestamp: timestamp);
 
         // Assert
         Assert.Equal(ExchangeCode.None, ticker.Exchange);
-        Assert.Equal(Symbol.BtcJpy, ticker.Symbol);
+        Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
         Assert.Equal(lastPrice, ticker.LastTradedPrice);
         Assert.Equal(timestamp, ticker.Timestamp);
     }
@@ -34,7 +35,7 @@ public class TickerTests
         // Arrange
         var original = new Ticker(
             Exchange: ExchangeCode.None,
-            Symbol: Symbol.BtcJpy,
+            Symbol: new Symbol("BTC/JPY"),
             LastTradedPrice: 5_000_500m,
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
@@ -53,7 +54,7 @@ public class TickerTests
         // Arrange
         var original = new Ticker(
             Exchange: ExchangeCode.None,
-            Symbol: Symbol.BtcJpy,
+            Symbol: new Symbol("BTC/JPY"),
             LastTradedPrice: 5_000_500m,
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 

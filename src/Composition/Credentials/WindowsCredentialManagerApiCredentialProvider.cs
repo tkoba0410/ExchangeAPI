@@ -4,20 +4,21 @@ using System.Text;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 namespace ExchangeApi.Composition.Credentials;
 
 /// <summary>
 /// Windows 資格情報マネージャーから API キー/シークレットを取得するプロバイダー。
-/// ターゲット名: exchangeId/accountId/api_key | api_secret（小文字想定）。
+/// ターゲット名: exchange/accountId/api_key | api_secret（小文字想定）。
 /// </summary>
 public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredentialProvider
 {
-    public ApiCredentials Get(string exchangeId, string accountId)
+    public ApiCredentials Get(ExchangeCode exchange, string accountId)
     {
-        if (string.IsNullOrWhiteSpace(exchangeId))
+        if (exchange is ExchangeCode.None or ExchangeCode.Unknown)
         {
-            throw new ArgumentException("ExchangeId is required.", nameof(exchangeId));
+            throw new ArgumentException("ExchangeCode is required.", nameof(exchange));
         }
 
         if (string.IsNullOrWhiteSpace(accountId))
@@ -30,6 +31,7 @@ public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredenti
             throw new PlatformNotSupportedException("Windows Credential Manager is only available on Windows.");
         }
 
+        var exchangeId = ExchangeCodeFormatter.ToCanonicalId(exchange);
         var apiKeyTarget = BuildTarget(exchangeId, accountId, "api_key");
         var apiSecretTarget = BuildTarget(exchangeId, accountId, "api_secret");
 

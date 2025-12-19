@@ -17,7 +17,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests;
         var provider = new FakeProvider(new ApiCredentials("key-1", "secret-1"));
 
         // Act
-        var client = BitflyerClientFactory.Create(provider, "bitflyer", "default");
+        var client = BitflyerClientFactory.Create(provider, ExchangeCode.Bitflyer, "default");
 
         // Assert
         Assert.NotNull(client);
@@ -27,7 +27,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests;
     public void Create_WithProvider_NullProvider_Throws()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            BitflyerClientFactory.Create(provider: null!, "bitflyer", "default"));
+            BitflyerClientFactory.Create(provider: null!, ExchangeCode.Bitflyer, "default"));
     }
 
     [Fact]
@@ -52,7 +52,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests;
             _creds = creds;
         }
 
-        public ApiCredentials Get(string exchangeId, string accountId) => _creds;
+        public ApiCredentials Get(ExchangeCode exchange, string accountId) => _creds;
     }
 
 }

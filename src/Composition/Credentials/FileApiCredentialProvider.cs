@@ -5,13 +5,14 @@ using System.Text.Json;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 namespace ExchangeApi.Composition.Credentials;
 
 /// <summary>
 /// ファイル(JSON)からAPIキー/シークレットを取得するプロバイダー。クロスプラットフォームで動作。
 /// 形式:
 /// {
-///   "bitFlyer/default": { "ApiKey": "...", "ApiSecret": "..." },
+///   "bitflyer/default": { "ApiKey": "...", "ApiSecret": "..." },
 ///   "exchange/account": { "ApiKey": "...", "ApiSecret": "..." }
 /// }
 /// セキュリティはファイル権限に依存するため、配置先のアクセス制御に注意。
@@ -44,11 +45,11 @@ public sealed class FileApiCredentialProvider : IApiCredentialProvider
         _store = dict ?? throw new InvalidOperationException("Credential file is empty or invalid.");
     }
 
-    public ApiCredentials Get(string exchangeId, string accountId)
+    public ApiCredentials Get(ExchangeCode exchange, string accountId)
     {
-        if (string.IsNullOrWhiteSpace(exchangeId))
+        if (exchange is ExchangeCode.None or ExchangeCode.Unknown)
         {
-            throw new ArgumentException("ExchangeId is required.", nameof(exchangeId));
+            throw new ArgumentException("ExchangeCode is required.", nameof(exchange));
         }
 
         if (string.IsNullOrWhiteSpace(accountId))
@@ -56,6 +57,7 @@ public sealed class FileApiCredentialProvider : IApiCredentialProvider
             throw new ArgumentException("AccountId is required.", nameof(accountId));
         }
 
+        var exchangeId = ExchangeCodeFormatter.ToCanonicalId(exchange);
         var key = $"{exchangeId}/{accountId}";
         if (_store.TryGetValue(key, out var creds) && IsValid(creds))
         {

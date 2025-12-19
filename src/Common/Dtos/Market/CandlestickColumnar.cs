@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 namespace ExchangeApi.Common.Dtos;
 
 /// <summary>

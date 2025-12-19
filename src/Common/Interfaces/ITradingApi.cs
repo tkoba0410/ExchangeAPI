@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 namespace ExchangeApi.Common.Interfaces;
 
 /// <summary>
@@ -36,16 +37,10 @@ public interface ITradingApi
     Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 注文の状態をポーリングし、完了/キャンセル/期限切れを検知する。
+    /// 注文の状態を単発で取得する。
     /// </summary>
-    /// <param name="symbol">シンボル。</param>
-    /// <param name="orderId">注文の acceptance id。</param>
-    /// <param name="pollInterval">ポーリング間隔（null なら 1s）。</param>
-    /// <param name="maxAttempts">最大試行回数（デフォルト 30）。</param>
-    Task<OrderStatus> PollOrderStatusAsync(
+    Task<OrderStatus> GetOrderAsync(
         Symbol symbol,
         string orderId,
-        TimeSpan? pollInterval = null,
-        int maxAttempts = 30,
         CancellationToken cancellationToken = default);
 }

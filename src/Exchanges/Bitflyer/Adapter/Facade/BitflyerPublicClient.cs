@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
@@ -20,7 +21,7 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi
     public BitflyerPublicClient(IBitflyerPublicApi publicApi)
     {
         if (publicApi is null) throw new ArgumentNullException(nameof(publicApi));
-        _marketApi = new BitflyerMarketApi(publicApi, "bitFlyer");
+        _marketApi = new BitflyerMarketApi(publicApi, ExchangeCode.Bitflyer);
         _exchangeInfoApi = new BitflyerExchangeInfoApi();
     }
 

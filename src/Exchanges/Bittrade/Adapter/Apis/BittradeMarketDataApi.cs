@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
@@ -40,11 +42,9 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         var timestamp = ts.HasValue && ts.Value > 0
             ? DateTimeOffset.FromUnixTimeMilliseconds(ts.Value)
             : DateTimeOffset.UtcNow;
-        var symbolEnum = symbol;
-
         return new Ticker(
             Exchange: ExchangeCode.Bittrade,
-            Symbol: symbolEnum,
+            Symbol: symbol,
             LastTradedPrice: tick.Close,
             Timestamp: timestamp);
     }
@@ -79,11 +79,10 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
             throw new ExchangeApiException("Bittrade trades response is invalid.");
         }
 
-        var symbolEnum = symbol;
         var executions = response.Tick.Data
             .Select(d => new ExecutionMarket(
                 ExchangeCode.Bittrade,
-                symbolEnum,
+                symbol,
                 d.Id.ToString(),
                 MapSide(d.Direction),
                 d.Price,
@@ -101,7 +100,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         DateTimeOffset? to = null,
         CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException("Bittrade candlesticks are not implemented.");
+        throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Candlesticks");
     }
 
     private static OrderBookLevel ToLevel(IReadOnlyList<decimal> level)
@@ -116,11 +115,5 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
             : Side.Sell;
 
     private static string ToApiSymbol(Symbol symbol) =>
-        symbol switch
-        {
-            Symbol.BtcJpy => "btcjpy",
-            Symbol.EthJpy => "ethjpy",
-            Symbol.FxBtcJpy => "fxbtcjpy",
-            _ => symbol.ToString().Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant()
-        };
+        BittradeSymbolMapper.ToApiSymbol(symbol);
 }

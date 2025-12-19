@@ -7,9 +7,9 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
-using ContractSide = ExchangeApi.Common.Enums.Side;
+using ExchangeApi.Common.Types;
+using ExchangeApi.Common.UseCases;
 using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.BitflyerExecutionPrivateResponse;
 using Xunit;
 
@@ -18,7 +18,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
 {
     [Fact]
-    public async Task PollOrderStatusAsync_CompletesWhenStateTransitions()
+    public async Task WaitForOrderAsync_CompletesWhenStateTransitions()
     {
         var acceptanceId = "ACCEPT-1";
         var active = new BitflyerChildOrderResponse
@@ -53,11 +53,11 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
         var client = new BitflyerExchangeClient(publicApi, sequenceApi, tradingApi);
 
-        var status = await client.PollOrderStatusAsync(
-            symbol: Symbol.BtcJpy,
+        var status = await OrderPolling.WaitForOrderAsync(
+            api: client,
+            symbol: new Symbol("BTC/JPY"),
             orderId: acceptanceId,
-            pollInterval: TimeSpan.FromMilliseconds(1),
-            maxAttempts: 5);
+            options: new PollingOptions(TimeSpan.FromMilliseconds(1), 5));
 
         Assert.Equal(OrderState.Completed, status.Status);
         Assert.Equal(0m, status.OutstandingSize);

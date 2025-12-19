@@ -4,13 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
@@ -18,7 +18,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMarginAccountApi
+public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IMarginAccountApi, IExchangeInfoApi
 {
     private readonly IMarketDataApi _marketApi;
     private readonly ITradingApi _tradingApi;
@@ -26,23 +26,21 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     private readonly IAccountApi _accountApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
     internal BitflyerApiBundle? ApiBundle { get; }
-    public BitflyerRawApiClient? Raw { get; }
 
     public BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
         IBitflyerPrivateApi privateApi,
         IBitflyerPrivateTradingApi privateTradingApi,
-        string exchangeId = "bitFlyer",
+        ExchangeCode exchangeCode = ExchangeCode.Bitflyer,
         string accountId = "default")
         : this(
-            marketApi: new BitflyerMarketApi(publicApi, exchangeId),
-            tradingApi: new BitflyerTradingApi(privateTradingApi, privateApi, exchangeId),
-            marginApi: new BitflyerMarginApi(privateApi, exchangeId),
-            accountApi: new BitflyerAccountApi(privateApi, exchangeId),
+            marketApi: new BitflyerMarketApi(publicApi, exchangeCode),
+            tradingApi: new BitflyerTradingApi(privateTradingApi, privateApi, exchangeCode),
+            marginApi: new BitflyerMarginApi(privateApi, exchangeCode),
+            accountApi: new BitflyerAccountApi(privateApi, exchangeCode),
             exchangeInfoApi: new BitflyerExchangeInfoApi())
     {
         ApiBundle = new BitflyerApiBundle(publicApi, privateApi, privateTradingApi);
-        Raw = new BitflyerRawApiClient(publicApi, privateApi, privateTradingApi);
     }
 
     public BitflyerExchangeClient(
@@ -61,10 +59,10 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
         : this(
-            marketApi: new BitflyerMarketApi(bundle.PublicApi, "bitFlyer"),
-            tradingApi: new BitflyerTradingApi(bundle.PrivateTradingApi, bundle.PrivateApi, "bitFlyer"),
-            marginApi: new BitflyerMarginApi(bundle.PrivateApi, "bitFlyer"),
-            accountApi: new BitflyerAccountApi(bundle.PrivateApi, "bitFlyer"),
+            marketApi: new BitflyerMarketApi(bundle.PublicApi, ExchangeCode.Bitflyer),
+            tradingApi: new BitflyerTradingApi(bundle.PrivateTradingApi, bundle.PrivateApi, ExchangeCode.Bitflyer),
+            marginApi: new BitflyerMarginApi(bundle.PrivateApi, ExchangeCode.Bitflyer),
+            accountApi: new BitflyerAccountApi(bundle.PrivateApi, ExchangeCode.Bitflyer),
             exchangeInfoApi: new BitflyerExchangeInfoApi())
     {
         ApiBundle = bundle;
@@ -118,8 +116,8 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IMargi
     public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrdersAsync(symbol, cancellationToken);
 
-    public Task<OrderStatus> PollOrderStatusAsync(Symbol symbol, string orderId, TimeSpan? pollInterval = null, int maxAttempts = 30, CancellationToken cancellationToken = default) =>
-        _tradingApi.PollOrderStatusAsync(symbol, orderId, pollInterval, maxAttempts, cancellationToken);
+    public Task<OrderStatus> GetOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default) =>
+        _tradingApi.GetOrderAsync(symbol, orderId, cancellationToken);
 
     // Account/Margin
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>

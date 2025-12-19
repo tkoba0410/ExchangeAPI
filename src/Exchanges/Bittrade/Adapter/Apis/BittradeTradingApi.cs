@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
@@ -61,7 +62,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         decimal size,
         decimal triggerPrice,
         CancellationToken cancellationToken = default) =>
-        throw new NotSupportedException("Bittrade does not support stop orders via this adapter.");
+        throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "StopOrder");
 
     private async Task<OrderResult> PlaceOrderInternal(OrderRequest request, CancellationToken cancellationToken)
     {
@@ -96,6 +97,11 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
 
     public async Task<CancelResult> CancelOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default)
     {
+        if (symbol.IsEmpty)
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+
         var resp = await _restClient.PostAsync<object?, BittradeCancelOrderResponse>(
             $"v1/order/orders/{orderId}/submitcancel",
             body: null,
@@ -124,19 +130,16 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         return resp.Data.Select(BittradeMapper.MapOrderSummary).ToList();
     }
 
-    public Task<OrderStatus> PollOrderStatusAsync(
+    public async Task<OrderStatus> GetOrderAsync(
         Symbol symbol,
         string orderId,
-        TimeSpan? pollInterval = null,
-        int maxAttempts = 30,
         CancellationToken cancellationToken = default)
     {
-        // Bittrade は即時に詳細を返すため、単一呼び出しのみ実施（pollInterval/maxAttempts は無視）。
-        return PollOrderStatusOnceAsync(orderId, cancellationToken);
-    }
+        if (symbol.IsEmpty)
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
 
-    private async Task<OrderStatus> PollOrderStatusOnceAsync(string orderId, CancellationToken cancellationToken)
-    {
         var resp = await _restClient.GetAsync<BittradeOrderDetailResponse>(
             $"v1/order/orders/{orderId}",
             cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -160,17 +163,11 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
 
     public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException("Bittrade account executions are not provided via REST in this adapter.");
+        throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "AccountExecutions");
     }
 
     private static string ToApiSymbol(Symbol symbol) =>
-        symbol switch
-        {
-            Symbol.BtcJpy => "btcjpy",
-            Symbol.EthJpy => "ethjpy",
-            Symbol.FxBtcJpy => "fxbtcjpy",
-            _ => symbol.ToString().Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant()
-        };
+        BittradeSymbolMapper.ToApiSymbol(symbol);
 
     private static string ToOrderType(OrderRequest request) =>
         (request.Side, request.OrderType) switch

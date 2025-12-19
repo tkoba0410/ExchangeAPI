@@ -2,6 +2,7 @@ using System;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ContractTimeInForce = ExchangeApi.Common.Enums.TimeInForce;
 using RawTimeInForce = ExchangeApi.Exchanges.Bitflyer.Raw.TimeInForce;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
@@ -35,7 +36,7 @@ internal static class BitflyerTradingMapper
 
     public static void ValidateOrderRequest(OrderRequest request)
     {
-        if (request.Symbol == Symbol.Unknown)
+        if (request.Symbol.IsEmpty)
             throw new ArgumentException("Symbol is required.", nameof(request));
         if (request.Size <= 0)
             throw new ArgumentException("Size must be greater than zero.", nameof(request));

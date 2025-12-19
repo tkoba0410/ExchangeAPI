@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 
@@ -17,14 +17,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 public sealed class BitflyerMarketApi : IMarketDataApi
 {
     private readonly IBitflyerPublicApi _publicApi;
-    private readonly string _exchangeId;
+    private readonly ExchangeCode _exchange;
 
     public BitflyerMarketApi(
         IBitflyerPublicApi publicApi,
-        string exchangeId = "bitFlyer")
+        ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
-        _exchangeId = exchangeId;
+        _exchange = exchange;
     }
 
     public async Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
@@ -39,20 +39,20 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         {
             throw new ExchangeApiException(
                 message: ex.Message,
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetTicker",
                 statusCode: null,
                 innerException: ex);
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetTicker");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetTicker");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getticker API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetTicker",
                 statusCode: null,
                 innerException: ex);
@@ -71,20 +71,20 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         {
             throw new ExchangeApiException(
                 message: ex.Message,
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetOrderBook",
                 statusCode: null,
                 innerException: ex);
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetOrderBook");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetOrderBook");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getboard API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetOrderBook",
                 statusCode: null,
                 innerException: ex);
@@ -106,13 +106,13 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetMarketExecutions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetMarketExecutions");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getexecutions API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetMarketExecutions",
                 statusCode: null,
                 innerException: ex);
@@ -127,11 +127,6 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         CancellationToken cancellationToken = default)
     {
         // bitFlyer RESTでは未サポート。将来Raw経由で実装する場合はここを置き換える。
-        throw new ExchangeApiException(
-            message: "bitFlyer does not support candlesticks via REST.",
-            exchangeId: _exchangeId,
-            operation: "GetCandlesticks",
-            statusCode: null,
-            exchangeErrorCode: "NOT_SUPPORTED");
+        throw new ExchangeFeatureNotSupportedException(_exchange, "Candlesticks");
     }
 }

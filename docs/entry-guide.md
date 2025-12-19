@@ -5,14 +5,14 @@
 ## 1. 対応範囲（現行）
 - 取引所: bitFlyer
 - Market: Ticker / Board / MarketExecutions（歩み値, Candles は未サポート, Public）
-- Trading: MARKET / LIMIT / STOP、キャンセル（単体）、ポーリング
+- Trading: MARKET / LIMIT（STOP は取引所依存）、キャンセル（単体）
 - Account/Margin: 残高・建玉・証拠金・AccountExecutions（自口座の約定履歴）
 - ExchangeInfo: BTC/JPY の最小数量・価格刻みなど
 - WebSocket: 非対応（REST only、正式廃止）
 - 信頼性/運用: Timeout/Retry/RateLimit/CircuitBreaker デフォルト、観測性フック（OTelブリッジ/構造化ログ）
 
 ## 2. 抽象インターフェース（主要）
-- Stage6 で利用できるメソッド: `IMarketDataApi`（Ticker/Board/MarketExecutions）、`IAccountApi`（Balances/AccountExecutions）、`ITradingApi`（Send/Cancel/OpenOrders/Poll）、`IMarginAccountApi`、`IExchangeInfoApi`
+- `IMarketDataApi`（Ticker/Board/MarketExecutions）、`IAccountApi`（Balances/AccountExecutions）、`ITradingApi`（Place/Cancel/OpenOrders/GetOrder）、`IMarginAccountApi`、`IExchangeInfoApi`
 - DTO: `Ticker`, `Board/OrderBook`, `MarketExecution`, `AccountExecution`, `OrderRequest/Result/Status`, `OpenOrder`, `Balance`, `Position`, `Collateral`, `ExchangeInfo`
 
 ## 3. セットアップ（簡易）
@@ -25,22 +25,25 @@
 4) Private API 利用時は API キー/シークレットを設定（署名は RestClient/Signer に委譲）
 
 ## 4. 典型的な呼び出し（Stage6）
-- Ticker: `GetTickerAsync("BTC/JPY")`
-- 市場約定（歩み値, Public）: `GetMarketExecutionsAsync("BTC/JPY")`
-- 口座約定（Private）: `GetAccountExecutionsAsync("BTC_JPY")`
+- Ticker: `GetTickerAsync(new Symbol("BTC/JPY"))`
+- 市場約定（歩み値, Public）: `GetMarketExecutionsAsync(new Symbol("BTC/JPY"))`
+- 口座約定（Private）: `GetAccountExecutionsAsync(new Symbol("BTC/JPY"))`
 - 残高: `GetBalancesAsync()`
-- 発注: `SendOrderAsync(new OrderRequest(...))`（MARKET/LIMIT/STOP に対応）
+- 発注: `PlaceMarketOrderAsync` / `PlaceLimitOrderAsync`（STOP は取引所依存）
 - キャンセル: `CancelOrderAsync`（全件キャンセルは Raw API でのみ提供）
-- ポーリング: `PollOrderStatusAsync`（1s/最大30回がデフォルト）
+- ポーリング: `OrderPolling.WaitForOrderAsync`（1s/最大30回がデフォルト）
 
 ## 5. エラーと例外
 - 未サポートシンボル: `SymbolNotSupportedException`
+- 未対応機能: `ExchangeFeatureNotSupportedException`
 - HTTP/取引所エラー: `ExchangeApiException`（`StatusCode`, `ExchangeErrorCode`, `ErrorCategory` を参照）※カテゴリ粒度の分類
 - STOP 系のパラメータ不足や不正値は `ArgumentException`
 
 ## 6. 利用上の注意
-- Candles は REST 未サポート（NotSupported を返す）。
+- Candles は REST 未サポート（`ExchangeFeatureNotSupportedException` を返す）。
 - product_code は bitFlyer 仕様に合わせる（例: `BTC_JPY`, `FX_BTC_JPY`）。抽象シンボルは `BTC/JPY`。
+- `Symbol` は値オブジェクト。新銘柄は `new Symbol("XYZ/JPY")` のように文字列で表現できる。
+- exchangeId は `ExchangeCode` に統一。文字列入力が必要な場合は `ExchangeCodeParser.Parse(string)` を入口で使う。
 
 ## 7. 参考ドキュメント
 - 抽象 API 対応表: `docs/stage4/A042-STG4-ABSTRACT-MAP.md`（Stage4時点、名称は旧構成）  

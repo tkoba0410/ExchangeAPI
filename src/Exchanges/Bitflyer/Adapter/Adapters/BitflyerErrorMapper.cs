@@ -1,4 +1,5 @@
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Common.Enums;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerErrorMapper
@@ -39,9 +40,9 @@ internal static class BitflyerErrorMapper
         };
     }
 
-    public static ExchangeApiException EnrichBitflyerException(ExchangeApiException ex, string exchangeId, string operation)
+    public static ExchangeApiException EnrichBitflyerException(ExchangeApiException ex, ExchangeCode exchange, string operation)
     {
-        if (ex.ExchangeId == exchangeId && ex.Operation == operation)
+        if (ex.Exchange == exchange && ex.Operation == operation)
         {
             return ex;
         }
@@ -50,7 +51,7 @@ internal static class BitflyerErrorMapper
 
         return new ExchangeApiException(
             message: ex.Message,
-            exchangeId: exchangeId,
+            exchange: exchange,
             operation: operation,
             statusCode: ex.StatusCode,
             exchangeErrorCode: ex.ExchangeErrorCode,

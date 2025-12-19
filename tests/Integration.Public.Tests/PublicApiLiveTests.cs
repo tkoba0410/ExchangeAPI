@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Factory;
 using Xunit.Abstractions;
@@ -25,11 +26,11 @@ public class PublicApiLiveTests
         var client = BitflyerClientFactory.CreatePublic(options);
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var ticker = await client.GetTickerAsync(ExchangeApi.Common.Enums.Symbol.BtcJpy, cts.Token);
+        var ticker = await client.GetTickerAsync(new Symbol("BTC/JPY"), cts.Token);
         var msg = $"bitFlyer Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
-        Assert.Equal(ExchangeApi.Common.Enums.Symbol.BtcJpy, ticker.Symbol);
+        Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
         Assert.True(ticker.LastTradedPrice > 0);
     }
 
@@ -53,11 +54,11 @@ public class PublicApiLiveTests
         var client = BittradeClientFactory.CreatePublicClient(observer: _observer);
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var ticker = await client.GetTickerAsync(ExchangeApi.Common.Enums.Symbol.BtcJpy, cts.Token);
+        var ticker = await client.GetTickerAsync(new Symbol("BTC/JPY"), cts.Token);
         var msg = $"Bittrade Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
-        Assert.Equal(ExchangeApi.Common.Enums.Symbol.BtcJpy, ticker.Symbol);
+        Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
         Assert.True(ticker.LastTradedPrice > 0);
     }
 

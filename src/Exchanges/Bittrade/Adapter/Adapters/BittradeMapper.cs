@@ -5,6 +5,7 @@ using System.Linq;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 
@@ -40,7 +41,7 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             ExchangeCode: Exchange,
-            Symbol: MapSymbol(ToCanonicalSymbol(detail.Symbol)),
+            Symbol: BittradeSymbolMapper.Parse(detail.Symbol),
             OrderId: detail.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,
             OrderType: type,
@@ -64,7 +65,7 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             ExchangeCode: Exchange,
-            Symbol: MapSymbol(ToCanonicalSymbol(summary.Symbol)),
+            Symbol: BittradeSymbolMapper.Parse(summary.Symbol),
             OrderId: summary.Id.ToString(CultureInfo.InvariantCulture),
             Side: side,
             OrderType: type,
@@ -115,40 +116,6 @@ internal static class BittradeMapper
     private static decimal ParseDecimal(string s) =>
         decimal.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture);
 
-    private static string ToCanonicalSymbol(string symbol)
-    {
-        if (symbol.Contains('/')) return symbol.ToUpperInvariant();
-        var upper = symbol.ToUpperInvariant();
-        if (upper.EndsWith("JPY", StringComparison.Ordinal))
-        {
-            var basePart = upper[..^3];
-            return $"{basePart}/JPY";
-        }
-        if (upper.Length >= 6)
-        {
-            var mid = upper.Length / 2;
-            return $"{upper[..mid]}/{upper[mid..]}";
-        }
-        return upper;
-    }
-
-    private static Symbol MapSymbol(string canonicalSymbol) =>
-        canonicalSymbol switch
-        {
-            "BTC/JPY" or "BTC_JPY" => Symbol.BtcJpy,
-            "ETH/JPY" or "ETH_JPY" => Symbol.EthJpy,
-            "FX_BTC/JPY" or "FX_BTC_JPY" => Symbol.FxBtcJpy,
-            _ => Symbol.Unknown
-        };
-
-    public static Symbol ParseSymbol(string symbol) => MapSymbol(ToCanonicalSymbol(symbol));
-
     public static string ToProductCode(Symbol symbol) =>
-        symbol switch
-        {
-            Symbol.BtcJpy => "BTC_JPY",
-            Symbol.EthJpy => "ETH_JPY",
-            Symbol.FxBtcJpy => "FX_BTC_JPY",
-            _ => symbol.ToString().ToUpperInvariant()
-        };
+        BittradeSymbolMapper.ToProductCode(symbol);
 }

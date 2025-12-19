@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;

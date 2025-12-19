@@ -4,23 +4,21 @@ ExchangeApi プロジェクトの変更履歴を管理します。
 
 ---
 
-## [Unreleased] — Stage6 (in progress)
-REST-only 方針で bitFlyer 縦スライスを Private まで実装し、信頼性/運用を強化しています。WebSocket/Realtime は廃止済み。
+## [Unreleased] — Stage7 (in progress)
+取引所差分の吸収と契約整理を進め、型の一貫性と例外統一を強化しています。
 
 ### Added
-- bitFlyer Private REST: 残高/証拠金/ポジション/口座約定/オープン注文、`sendchildorder`、`cancelchildorder`、`cancelallchildorders`
-- Stop/StopLimit（Stop+Price）を含む発注系のマッピングとポーリング実装
-- Timeout/Retry/RateLimit/CircuitBreaker のデフォルトポリシーと観測性フック（構造化ログ/OTelサンプル Observer）
-- `BitflyerClientFactory` とテスト用 Factory で Http/Signer/Policy 配線を簡略化
+- `OrderPolling.WaitForOrderAsync` ユースケース（ポーリングは契約外へ分離）
+- `Symbol` 値オブジェクト（`readonly record struct`）と取引所別 `SymbolMapper`
+- `ExchangeCodeParser` / `ExchangeCodeFormatter`
+- `ExchangeFeatureNotSupportedException`
 
 ### Changed
-- REST-only に統一（WS/Realtime は提供しない）
-- ExchangeErrorCategory によるカテゴリ粒度のエラー分類フックを導入
-- **Breaking:** `src/Exchange/*` の互換ハブ csproj（Bitflyer/Bittrade）を削除しました。引き続き利用する場合は `src/Exchanges/*/{Raw,Adapter}` と `src/Composition` を直接参照してください。
-
-### Planned (Next)
-- 複数取引所対応の検証とドキュメント整備
-- 信頼性テスト（劣化環境・Fault Injection）の拡充
+- **Breaking:** `ITradingApi.PollOrderStatusAsync` を削除し、`GetOrderAsync` に集約
+- **Breaking:** `Symbol` enum を廃止し `Symbol` 型に統一
+- **Breaking:** exchangeId(string) を `ExchangeCode` に統一（CredentialProvider/Factory/例外）
+- **Breaking:** Facade は共通 IF を実装し、未対応機能は `ExchangeFeatureNotSupportedException` に統一
+- **Breaking:** `BitflyerExchangeClient.Raw` / `BittradeExchangeClient.Raw` を削除（Raw は専用 Factory/Raw API を利用）
 
 ---
 

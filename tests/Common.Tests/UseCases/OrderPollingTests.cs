@@ -1,0 +1,96 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Types;
+using ExchangeApi.Common.UseCases;
+using Xunit;
+
+namespace Common.Tests.UseCases;
+
+public sealed class OrderPollingTests
+{
+    [Fact]
+    public async Task WaitForOrderAsync_ReturnsLastStatus_WhenMaxAttemptsReached()
+    {
+        var api = new FakeTradingApi(_ => new OrderStatus(
+            ProductCode: "BTC_JPY",
+            OrderAcceptanceId: "order-1",
+            Status: OrderState.Active,
+            ExecutedSize: 0m,
+            OutstandingSize: 1m,
+            Price: 100m,
+            AveragePrice: null));
+
+        var options = new PollingOptions(TimeSpan.Zero, 3);
+        var result = await OrderPolling.WaitForOrderAsync(
+            api,
+            new Symbol("BTC/JPY"),
+            "order-1",
+            options,
+            CancellationToken.None);
+
+        Assert.Equal(OrderState.Active, result.Status);
+        Assert.Equal(3, api.CallCount);
+    }
+
+    [Fact]
+    public async Task WaitForOrderAsync_CancelsDuringDelay()
+    {
+        var api = new FakeTradingApi(_ => new OrderStatus(
+            ProductCode: "BTC_JPY",
+            OrderAcceptanceId: "order-1",
+            Status: OrderState.Active,
+            ExecutedSize: 0m,
+            OutstandingSize: 1m,
+            Price: 100m,
+            AveragePrice: null));
+
+        using var cts = new CancellationTokenSource();
+        cts.CancelAfter(TimeSpan.FromMilliseconds(10));
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            OrderPolling.WaitForOrderAsync(
+                api,
+                new Symbol("BTC/JPY"),
+                "order-1",
+                new PollingOptions(TimeSpan.FromMilliseconds(50), 5),
+                cts.Token));
+    }
+
+    private sealed class FakeTradingApi : ITradingApi
+    {
+        private readonly Func<string, OrderStatus> _next;
+
+        public FakeTradingApi(Func<string, OrderStatus> next)
+        {
+            _next = next;
+        }
+
+        public int CallCount { get; private set; }
+
+        public Task<OrderStatus> GetOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default)
+        {
+            CallCount++;
+            return Task.FromResult(_next(orderId));
+        }
+
+        public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, decimal size, decimal price, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, decimal size, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, decimal size, decimal triggerPrice, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<CancelResult> CancelOrderAsync(Symbol symbol, string childOrderAcceptanceId, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+    }
+}

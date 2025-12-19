@@ -1,6 +1,6 @@
 using System;
-using System.Globalization;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 namespace ExchangeApi.Common.Dtos;
 
 /// <summary>

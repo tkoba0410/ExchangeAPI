@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ContractSide = ExchangeApi.Common.Enums.Side;
@@ -20,16 +20,16 @@ public sealed class BitflyerTradingApi : ITradingApi
 {
     private readonly IBitflyerPrivateTradingApi _privateTradingApi;
     private readonly IBitflyerPrivateApi _privateAccountApi;
-    private readonly string _exchangeId;
+    private readonly ExchangeCode _exchange;
 
     public BitflyerTradingApi(
         IBitflyerPrivateTradingApi privateTradingApi,
         IBitflyerPrivateApi privateAccountApi,
-        string exchangeId = "bitFlyer")
+        ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
         _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
         _privateAccountApi = privateAccountApi ?? throw new ArgumentNullException(nameof(privateAccountApi));
-        _exchangeId = exchangeId;
+        _exchange = exchange;
     }
 
     public Task<OrderResult> PlaceLimitOrderAsync(
@@ -53,7 +53,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         decimal size,
         decimal triggerPrice,
         CancellationToken cancellationToken = default) =>
-        throw new NotSupportedException("bitFlyer child orders do not support stop orders; use parent orders instead.");
+        throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, "StopOrder");
 
     private async Task<OrderResult> PlaceOrderInternal(
         OrderRequest request,
@@ -83,13 +83,13 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "SendOrder");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "SendOrder");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer sendchildorder API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "SendOrder",
                 statusCode: null,
                 innerException: ex);
@@ -101,7 +101,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         string childOrderAcceptanceId,
         CancellationToken cancellationToken = default)
     {
-        if (symbol == Symbol.Unknown)
+        if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
@@ -127,7 +127,7 @@ public sealed class BitflyerTradingApi : ITradingApi
             {
                 throw new ExchangeApiException(
                     message: "bitFlyer cancelchildorder returned no response.",
-                    exchangeId: _exchangeId,
+                    exchange: _exchange,
                     operation: "CancelOrder",
                     statusCode: null);
             }
@@ -136,13 +136,13 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "CancelOrder");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "CancelOrder");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer cancelchildorder API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "CancelOrder",
                 statusCode: null,
                 innerException: ex);
@@ -153,7 +153,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        if (symbol == Symbol.Unknown)
+        if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
@@ -183,27 +183,25 @@ public sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchangeId, "GetOpenOrders");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetOpenOrders");
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getchildorders API.",
-                exchangeId: _exchangeId,
+                exchange: _exchange,
                 operation: "GetOpenOrders",
                 statusCode: null,
                 innerException: ex);
         }
     }
 
-    public async Task<OrderStatus> PollOrderStatusAsync(
+    public async Task<OrderStatus> GetOrderAsync(
         Symbol symbol,
         string orderId,
-        TimeSpan? pollInterval = null,
-        int maxAttempts = 30,
         CancellationToken cancellationToken = default)
     {
-        if (symbol == Symbol.Unknown)
+        if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
@@ -213,54 +211,33 @@ public sealed class BitflyerTradingApi : ITradingApi
             throw new ArgumentException("orderId is required.", nameof(orderId));
         }
 
-        var interval = pollInterval ?? TimeSpan.FromSeconds(1);
+        var orders = await _privateAccountApi
+            .GetOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: null, orderId, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
 
-        for (var attempt = 0; attempt < maxAttempts; attempt++)
+        var order = orders.FirstOrDefault();
+
+        if (order is null)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var orders = await _privateAccountApi
-                .GetOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: null, orderId, cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-
-            var order = orders.FirstOrDefault();
-
-            if (order is null)
-            {
-                var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
-                return new OrderStatus(
-                    ProductCode: productCode,
-                    OrderAcceptanceId: orderId,
+            var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
+            return new OrderStatus(
+                ProductCode: productCode,
+                OrderAcceptanceId: orderId,
                 Status: OrderState.Completed,
                 ExecutedSize: 0m,
                 OutstandingSize: 0m,
                 Price: null,
                 AveragePrice: null);
-            }
-
-            var status = BitflyerCommonMapper.MapOrderStatus(order.ChildOrderStatusState);
-            var mapped = new OrderStatus(
-                ProductCode: BitflyerCommonMapper.ToApiProductCode(order.ProductCode),
-                OrderAcceptanceId: order.ChildOrderAcceptanceId,
-                Status: status,
-                ExecutedSize: order.ExecutedSize,
-                OutstandingSize: order.OutstandingSize,
-                Price: order.Price == 0 ? null : order.Price,
-                AveragePrice: order.AveragePrice == 0 ? null : order.AveragePrice);
-
-            if (status is OrderState.Completed or OrderState.Canceled or OrderState.Expired)
-            {
-                return mapped;
-            }
-
-            if (attempt == maxAttempts - 1)
-            {
-                return mapped with { Status = OrderState.Active };
-            }
-
-            await Task.Delay(interval, cancellationToken).ConfigureAwait(false);
         }
 
-        throw new InvalidOperationException("Polling loop exited unexpectedly.");
+        var status = BitflyerCommonMapper.MapOrderStatus(order.ChildOrderStatusState);
+        return new OrderStatus(
+            ProductCode: BitflyerCommonMapper.ToApiProductCode(order.ProductCode),
+            OrderAcceptanceId: order.ChildOrderAcceptanceId,
+            Status: status,
+            ExecutedSize: order.ExecutedSize,
+            OutstandingSize: order.OutstandingSize,
+            Price: order.Price == 0 ? null : order.Price,
+            AveragePrice: order.AveragePrice == 0 ? null : order.AveragePrice);
     }
 }

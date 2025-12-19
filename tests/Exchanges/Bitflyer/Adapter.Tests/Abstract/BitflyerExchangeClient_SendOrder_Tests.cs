@@ -25,7 +25,8 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var result = await client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, 0.01m);
 
-        Assert.Equal("ACCEPT-123", result.OrderId);
+        Assert.Equal(OrderIdKind.AcceptanceId, result.Key.Kind);
+        Assert.Equal("ACCEPT-123", result.Key.Value);
         Assert.NotNull(fakeTrading.LastRequest);
         Assert.Equal(RawProductCode.BtcJpy, fakeTrading.LastRequest!.ProductCode);
         Assert.Equal(ExchangeApi.Exchanges.Bitflyer.Raw.Side.Buy, fakeTrading.LastRequest!.Side);

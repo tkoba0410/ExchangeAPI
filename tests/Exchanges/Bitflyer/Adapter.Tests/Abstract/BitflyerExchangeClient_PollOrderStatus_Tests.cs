@@ -56,7 +56,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var status = await OrderPolling.WaitForOrderAsync(
             api: client,
             symbol: new Symbol("BTC/JPY"),
-            orderId: acceptanceId,
+            orderKey: new OrderKey(OrderIdKind.AcceptanceId, acceptanceId),
             options: new PollingOptions(TimeSpan.FromMilliseconds(1), 5));
 
         Assert.Equal(OrderState.Completed, status.Status);

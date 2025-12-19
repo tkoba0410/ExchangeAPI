@@ -42,7 +42,7 @@ internal static class BittradeMapper
         return new OpenOrder(
             ExchangeCode: Exchange,
             Symbol: BittradeSymbolMapper.Parse(detail.Symbol),
-            OrderId: detail.Id.ToString(CultureInfo.InvariantCulture),
+            Key: new OrderKey(OrderIdKind.ExchangeOrderId, detail.Id.ToString(CultureInfo.InvariantCulture)),
             Side: side,
             OrderType: type,
             Size: size,
@@ -52,7 +52,8 @@ internal static class BittradeMapper
             OrderedAt: DateTimeOffset.FromUnixTimeMilliseconds(detail.CreatedAt),
             UpdatedAt: detail.FinishedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(detail.FinishedAt.Value) : null,
             StopPrice: null,
-            Status: detail.State);
+            Status: detail.State,
+            ExchangeOrderId: detail.Id.ToString(CultureInfo.InvariantCulture));
     }
 
     public static OpenOrder MapOrderSummary(BittradeOrderSummary summary)
@@ -66,7 +67,7 @@ internal static class BittradeMapper
         return new OpenOrder(
             ExchangeCode: Exchange,
             Symbol: BittradeSymbolMapper.Parse(summary.Symbol),
-            OrderId: summary.Id.ToString(CultureInfo.InvariantCulture),
+            Key: new OrderKey(OrderIdKind.ExchangeOrderId, summary.Id.ToString(CultureInfo.InvariantCulture)),
             Side: side,
             OrderType: type,
             Size: size,
@@ -76,7 +77,8 @@ internal static class BittradeMapper
             OrderedAt: DateTimeOffset.FromUnixTimeMilliseconds(summary.CreatedAt),
             UpdatedAt: null,
             StopPrice: null,
-            Status: summary.State);
+            Status: summary.State,
+            ExchangeOrderId: summary.Id.ToString(CultureInfo.InvariantCulture));
     }
 
     public static OrderState ParseStatus(string state)

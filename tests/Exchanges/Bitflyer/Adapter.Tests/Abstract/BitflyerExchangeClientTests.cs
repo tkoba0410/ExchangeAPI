@@ -159,7 +159,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
 
             Assert.Single(result);
             var order = result[0];
-            Assert.Equal("JOR-1", order.OrderId);
+            Assert.Equal(OrderIdKind.AcceptanceId, order.Key.Kind);
+            Assert.Equal("JRF-1", order.Key.Value);
             Assert.Equal(ContractSide.Buy, order.Side);
             Assert.Equal(OrderType.Limit, order.OrderType);
             Assert.Equal(0.1m, order.Size);
@@ -255,7 +256,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var client = new BitflyerExchangeClient(publicApi, accountApi, tradingApi);
 
             await Assert.ThrowsAsync<ExchangeApiException>(() =>
-                client.CancelOrderAsync(new Symbol("BTC/JPY"), "id-1"));
+                client.CancelOrderAsync(new Symbol("BTC/JPY"), new OrderKey(OrderIdKind.AcceptanceId, "id-1")));
         }
 
         private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi

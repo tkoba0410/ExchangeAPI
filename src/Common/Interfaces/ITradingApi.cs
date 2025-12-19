@@ -32,7 +32,7 @@ public interface ITradingApi
         decimal triggerPrice,
         CancellationToken cancellationToken = default);
 
-    Task<CancelResult> CancelOrderAsync(Symbol symbol, string childOrderAcceptanceId, CancellationToken cancellationToken = default);
+    Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default);
 
@@ -41,6 +41,6 @@ public interface ITradingApi
     /// </summary>
     Task<OrderStatus> GetOrderAsync(
         Symbol symbol,
-        string orderId,
+        OrderKey orderKey,
         CancellationToken cancellationToken = default);
 }

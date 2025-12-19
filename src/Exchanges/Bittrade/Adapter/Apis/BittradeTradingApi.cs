@@ -92,18 +92,25 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             throw new ExchangeApiException("Bittrade place order failed.");
         }
 
-        return new OrderResult(resp.OrderId.ToString());
+        var orderId = resp.OrderId.ToString();
+        var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
+        return new OrderResult(key, ExchangeOrderId: orderId);
     }
 
-    public async Task<CancelResult> CancelOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default)
+    public async Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default)
     {
         if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
+        if (orderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
+        {
+            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, $"CancelOrderBy{orderKey.Kind}");
+        }
+
         var resp = await _restClient.PostAsync<object?, BittradeCancelOrderResponse>(
-            $"v1/order/orders/{orderId}/submitcancel",
+            $"v1/order/orders/{orderKey.Value}/submitcancel",
             body: null,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -132,7 +139,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
 
     public async Task<OrderStatus> GetOrderAsync(
         Symbol symbol,
-        string orderId,
+        OrderKey orderKey,
         CancellationToken cancellationToken = default)
     {
         if (symbol.IsEmpty)
@@ -140,8 +147,13 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
+        if (orderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
+        {
+            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, $"GetOrderBy{orderKey.Kind}");
+        }
+
         var resp = await _restClient.GetAsync<BittradeOrderDetailResponse>(
-            $"v1/order/orders/{orderId}",
+            $"v1/order/orders/{orderKey.Value}",
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (!string.Equals(resp.Status, "ok", StringComparison.OrdinalIgnoreCase) || resp.Data is null)
@@ -151,9 +163,12 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
 
         var order = BittradeMapper.MapOrder(resp.Data);
         var productCode = BittradeMapper.ToProductCode(order.Symbol);
+        var key = orderKey.Kind == OrderIdKind.AcceptanceId
+            ? new OrderKey(OrderIdKind.AcceptanceId, orderKey.Value)
+            : new OrderKey(OrderIdKind.ExchangeOrderId, orderKey.Value);
         return new OrderStatus(
             productCode,
-            orderId,
+            key,
             BittradeMapper.ParseStatus(resp.Data.State),
             order.ExecutedSize,
             order.OutstandingSize,

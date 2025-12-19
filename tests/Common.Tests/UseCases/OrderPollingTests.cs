@@ -7,6 +7,7 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Common.UseCases;
+using ExchangeApi.Core.Contracts.Errors;
 using Xunit;
 
 namespace Common.Tests.UseCases;
@@ -18,7 +19,7 @@ public sealed class OrderPollingTests
     {
         var api = new FakeTradingApi(_ => new OrderStatus(
             ProductCode: "BTC_JPY",
-            OrderAcceptanceId: "order-1",
+            Key: new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
             Status: OrderState.Active,
             ExecutedSize: 0m,
             OutstandingSize: 1m,
@@ -29,7 +30,7 @@ public sealed class OrderPollingTests
         var result = await OrderPolling.WaitForOrderAsync(
             api,
             new Symbol("BTC/JPY"),
-            "order-1",
+            new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
             options,
             CancellationToken.None);
 
@@ -42,7 +43,7 @@ public sealed class OrderPollingTests
     {
         var api = new FakeTradingApi(_ => new OrderStatus(
             ProductCode: "BTC_JPY",
-            OrderAcceptanceId: "order-1",
+            Key: new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
             Status: OrderState.Active,
             ExecutedSize: 0m,
             OutstandingSize: 1m,
@@ -52,30 +53,67 @@ public sealed class OrderPollingTests
         using var cts = new CancellationTokenSource();
         cts.CancelAfter(TimeSpan.FromMilliseconds(10));
 
-        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
             OrderPolling.WaitForOrderAsync(
                 api,
                 new Symbol("BTC/JPY"),
-                "order-1",
+                new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
                 new PollingOptions(TimeSpan.FromMilliseconds(50), 5),
                 cts.Token));
     }
 
+    [Fact]
+    public async Task WaitForOrderAsync_NotFound_ContinuesUntilMaxAttempts()
+    {
+        var api = new NotFoundTradingApi();
+        var options = new PollingOptions(TimeSpan.Zero, 3);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            OrderPolling.WaitForOrderAsync(
+                api,
+                new Symbol("BTC/JPY"),
+                new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
+                options,
+                CancellationToken.None));
+
+        Assert.Equal(3, api.CallCount);
+    }
+
+    [Fact]
+    public async Task WaitForOrderAsync_NotFound_StopAsNotFound_Throws()
+    {
+        var api = new NotFoundTradingApi();
+        var options = new PollingOptions(TimeSpan.Zero, 3)
+        {
+            NotFoundPolicy = NotFoundPolicy.StopAsNotFound
+        };
+
+        await Assert.ThrowsAsync<ExchangeOrderNotFoundException>(() =>
+            OrderPolling.WaitForOrderAsync(
+                api,
+                new Symbol("BTC/JPY"),
+                new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
+                options,
+                CancellationToken.None));
+
+        Assert.Equal(1, api.CallCount);
+    }
+
     private sealed class FakeTradingApi : ITradingApi
     {
-        private readonly Func<string, OrderStatus> _next;
+        private readonly Func<OrderKey, OrderStatus> _next;
 
-        public FakeTradingApi(Func<string, OrderStatus> next)
+        public FakeTradingApi(Func<OrderKey, OrderStatus> next)
         {
             _next = next;
         }
 
         public int CallCount { get; private set; }
 
-        public Task<OrderStatus> GetOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default)
+        public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default)
         {
             CallCount++;
-            return Task.FromResult(_next(orderId));
+            return Task.FromResult(_next(orderKey));
         }
 
         public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, decimal size, decimal price, CancellationToken cancellationToken = default) =>
@@ -87,7 +125,33 @@ public sealed class OrderPollingTests
         public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, decimal size, decimal triggerPrice, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
-        public Task<CancelResult> CancelOrderAsync(Symbol symbol, string childOrderAcceptanceId, CancellationToken cancellationToken = default) =>
+        public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+    }
+
+    private sealed class NotFoundTradingApi : ITradingApi
+    {
+        public int CallCount { get; private set; }
+
+        public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default)
+        {
+            CallCount++;
+            throw new ExchangeOrderNotFoundException(ExchangeCode.Sandbox, "GetOrder", symbol.ToString(), orderKey.ToString());
+        }
+
+        public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, decimal size, decimal price, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, decimal size, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, decimal size, decimal triggerPrice, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
         public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>

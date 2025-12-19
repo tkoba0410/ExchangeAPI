@@ -69,14 +69,14 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, cancellationToken);
 
-    public Task<CancelResult> CancelOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default) =>
-        _tradingApi.CancelOrderAsync(symbol, orderId, cancellationToken);
+    public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
+        _tradingApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
 
     public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrdersAsync(symbol, cancellationToken);
 
-    public Task<OrderStatus> GetOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOrderAsync(symbol, orderId, cancellationToken);
+    public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
+        _tradingApi.GetOrderAsync(symbol, orderKey, cancellationToken);
 
     public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _accountApi.GetAccountExecutionsAsync(symbol, cancellationToken);

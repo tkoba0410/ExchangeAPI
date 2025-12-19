@@ -11,7 +11,7 @@ internal static class BitflyerSymbolMapper
     {
         if (symbol.IsEmpty)
         {
-            throw new SymbolNotSupportedException(symbol);
+            throw new SymbolNotSupportedException(symbol.ToString());
         }
 
         return ToProductCode(symbol.Value);
@@ -37,7 +37,7 @@ internal static class BitflyerSymbolMapper
             return RawProductCode.FxBtcJpy;
         }
 
-        throw new SymbolNotSupportedException(new Symbol(symbol));
+        throw new SymbolNotSupportedException(symbol);
     }
 
     public static string ToApiProductCode(RawProductCode productCode) =>
@@ -46,7 +46,7 @@ internal static class BitflyerSymbolMapper
             RawProductCode.BtcJpy => "BTC_JPY",
             RawProductCode.EthJpy => "ETH_JPY",
             RawProductCode.FxBtcJpy => "FX_BTC_JPY",
-            _ => "BTC_JPY",
+            _ => throw new SymbolNotSupportedException(productCode.ToString()),
         };
 
     public static Symbol FromProductCode(string symbol)
@@ -57,7 +57,7 @@ internal static class BitflyerSymbolMapper
             RawProductCode.BtcJpy => new Symbol("BTC/JPY"),
             RawProductCode.EthJpy => new Symbol("ETH/JPY"),
             RawProductCode.FxBtcJpy => new Symbol("FX_BTC/JPY"),
-            _ => Symbol.Empty
+            _ => throw new SymbolNotSupportedException(symbol)
         };
     }
 }

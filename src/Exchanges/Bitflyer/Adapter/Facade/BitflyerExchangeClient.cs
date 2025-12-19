@@ -110,14 +110,14 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, cancellationToken);
 
-    public Task<CancelResult> CancelOrderAsync(Symbol symbol, string childOrderAcceptanceId, CancellationToken cancellationToken = default) =>
-        _tradingApi.CancelOrderAsync(symbol, childOrderAcceptanceId, cancellationToken);
+    public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
+        _tradingApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
 
     public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrdersAsync(symbol, cancellationToken);
 
-    public Task<OrderStatus> GetOrderAsync(Symbol symbol, string orderId, CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOrderAsync(symbol, orderId, cancellationToken);
+    public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
+        _tradingApi.GetOrderAsync(symbol, orderKey, cancellationToken);
 
     // Account/Margin
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>

@@ -9,7 +9,7 @@ namespace ExchangeApi.Common.Dtos;
 public sealed record OpenOrder(
     ExchangeCode ExchangeCode,
     Symbol Symbol,
-    string OrderId,
+    OrderKey Key,
     Side Side,
     OrderType OrderType,
     decimal Size,
@@ -19,4 +19,6 @@ public sealed record OpenOrder(
     DateTimeOffset? OrderedAt = null,
     DateTimeOffset? UpdatedAt = null,
     decimal? StopPrice = null,
-    string? Status = null);
+    string? Status = null,
+    string? ExchangeOrderId = null,
+    string? AcceptanceId = null);

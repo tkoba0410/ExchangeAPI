@@ -1,5 +1,3 @@
-using ExchangeApi.Common.Types;
-
 namespace ExchangeApi.Core.Contracts.Errors;
 
 /// <summary>
@@ -7,17 +5,17 @@ namespace ExchangeApi.Core.Contracts.Errors;
 /// </summary>
 public class SymbolNotSupportedException : ExchangeApiException
 {
-    public Symbol Symbol { get; }
+    public string SymbolValue { get; }
 
-    public SymbolNotSupportedException(Symbol symbol)
-        : base($"Symbol is not supported: '{symbol}'.")
+    public SymbolNotSupportedException(string symbolValue)
+        : base($"Symbol is not supported: '{symbolValue}'.")
     {
-        Symbol = symbol;
+        SymbolValue = symbolValue;
     }
 
-    public SymbolNotSupportedException(Symbol symbol, Exception innerException)
-        : base($"Symbol is not supported: '{symbol}'.", innerException)
+    public SymbolNotSupportedException(string symbolValue, Exception innerException)
+        : base($"Symbol is not supported: '{symbolValue}'.", innerException)
     {
-        Symbol = symbol;
+        SymbolValue = symbolValue;
     }
 }

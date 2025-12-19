@@ -3,7 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Core.Contracts.Errors;
 
 namespace ExchangeApi.Common.UseCases;
 
@@ -15,18 +17,13 @@ public static class OrderPolling
     public static async Task<OrderStatus> WaitForOrderAsync(
         ITradingApi api,
         Symbol symbol,
-        string orderId,
+        OrderKey orderKey,
         PollingOptions? options = null,
         CancellationToken cancellationToken = default)
     {
         if (api is null)
         {
             throw new ArgumentNullException(nameof(api));
-        }
-
-        if (string.IsNullOrWhiteSpace(orderId))
-        {
-            throw new ArgumentException("orderId is required.", nameof(orderId));
         }
 
         var resolvedOptions = options ?? PollingOptions.Default;
@@ -47,7 +44,19 @@ public static class OrderPolling
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            latest = await api.GetOrderAsync(symbol, orderId, cancellationToken).ConfigureAwait(false);
+            try
+            {
+                latest = await api.GetOrderAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
+            }
+            catch (ExchangeOrderNotFoundException) when (resolvedOptions.NotFoundPolicy == NotFoundPolicy.Continue)
+            {
+                if (attempt < resolvedOptions.MaxAttempts - 1 && resolvedOptions.Interval > TimeSpan.Zero)
+                {
+                    await Task.Delay(resolvedOptions.Interval, cancellationToken).ConfigureAwait(false);
+                }
+
+                continue;
+            }
 
             if (IsTerminal(latest.Status))
             {
@@ -69,5 +78,13 @@ public static class OrderPolling
 
 public sealed record PollingOptions(TimeSpan Interval, int MaxAttempts)
 {
+    public NotFoundPolicy NotFoundPolicy { get; init; } = NotFoundPolicy.Continue;
+
     public static PollingOptions Default { get; } = new(TimeSpan.FromSeconds(1), 30);
+}
+
+public enum NotFoundPolicy
+{
+    Continue,
+    StopAsNotFound
 }

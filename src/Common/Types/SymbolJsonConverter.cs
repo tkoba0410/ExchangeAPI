@@ -18,6 +18,6 @@ public sealed class SymbolJsonConverter : JsonConverter<Symbol>
 
     public override void Write(Utf8JsonWriter writer, Symbol value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value.Value);
+        writer.WriteStringValue(value.ToString());
     }
 }

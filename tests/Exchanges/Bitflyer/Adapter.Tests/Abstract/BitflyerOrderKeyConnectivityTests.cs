@@ -72,7 +72,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
         var api = new BitflyerTradingApi(tradingApi, privateApi);
 
-        var openOrders = await api.GetChildOrdersAsync(new Symbol("BTC/JPY"));
+        var openOrders = await api.GetOrdersAsync(new Symbol("BTC/JPY"));
         var key = openOrders[0].Key;
 
         var status = await api.GetOrderAsync(new Symbol("BTC/JPY"), key);

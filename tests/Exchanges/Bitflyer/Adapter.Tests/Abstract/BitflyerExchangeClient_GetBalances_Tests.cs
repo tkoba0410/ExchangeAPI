@@ -6,6 +6,7 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Ticker;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
 
@@ -78,7 +79,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         private static IBitflyerPublicApi CreateDummyPublicApi()
         {
             // 既存の Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
-            var rawTicker = new Ticker
+            var rawTicker = new RawTicker
             {
                 ProductCode = RawProductCode.BtcJpy,
                 Timestamp = DateTimeOffset.UnixEpoch,

@@ -15,6 +15,13 @@ public sealed class BitflyerRawApi
     private readonly IBitflyerPrivateApi _privateApi;
     private readonly IBitflyerPrivateTradingApi _privateTradingApi;
 
+    /// <summary>
+    /// Raw API 用の RestClient を受け取って Raw API を生成します。
+    /// </summary>
+    /// <param name="restClient">
+    /// 署名・認証・ポリシー設定済みの RestClient を渡してください。
+    /// 署名や認証が不要な Public API のみを使う場合でも、呼び出し側で責務を分離します。
+    /// </param>
     public BitflyerRawApi(IRestClient restClient)
         : this(
             publicApi: new BitflyerPublicApi(restClient ?? throw new ArgumentNullException(nameof(restClient))),

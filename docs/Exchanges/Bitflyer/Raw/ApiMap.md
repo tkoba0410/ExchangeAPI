@@ -14,48 +14,48 @@
 
 ## API 実装対応表（Raw only）
 
-| HTTP METHOD | Path                              | 種別      | Raw Verb | Raw メソッド                           | Request DTO              |
-| ----------- | --------------------------------- | ------- | -------- | ---------------------------------- | ------------------------ |
-| GET         | /v1/getmarkets                    | Public  | Get      | GetMarketsAsync                    | -                        |
-| GET         | /v1/markets                       | Public  | Get      | GetMarketsAsync                    | -                        |
-| GET         | /v1/getmarkets/usa                | Public  | Get      | GetUsaMarketsAsync                 | -                        |
-| GET         | /v1/markets/usa                   | Public  | Get      | GetUsaMarketsAsync                 | -                        |
-| GET         | /v1/getmarkets/eu                 | Public  | Get      | GetEuMarketsAsync                  | -                        |
-| GET         | /v1/markets/eu                    | Public  | Get      | GetEuMarketsAsync                  | -                        |
-| GET         | /v1/getboard（/v1/board）           | Public  | Get      | GetOrderBookAsync                  | -                        |
-| GET         | /v1/getticker（/v1/ticker）         | Public  | Get      | GetTickerByProductCodeAsync        | -                        |
-| GET         | /v1/getexecutions（/v1/executions） | Public  | Get      | GetExecutionsAsync                 | GetExecutionsRequest     |
-| GET         | /v1/getboardstate                 | Public  | Get      | GetBoardStateAsync                 | -                        |
-| GET         | /v1/gethealth                     | Public  | Get      | GetHealthAsync                     | -                        |
-| GET         | /v1/getfundingrate                | Public  | Get      | GetFundingRateAsync                | -                        |
-| GET         | /v1/getcorporateleverage          | Public  | Get      | GetCorporateLeverageAsync          | -                        |
-| GET         | /v1/getchats                      | Public  | Get      | GetChatsAsync                      | -                        |
-| GET         | /v1/getchats/usa                  | Public  | Get      | GetUsaChatsAsync                   | -                        |
-| GET         | /v1/getchats/eu                   | Public  | Get      | GetEuChatsAsync                    | -                        |
-| GET         | /v1/me/getpermissions             | Private | Get      | GetPermissionsAsync                | -                        |
-| GET         | /v1/me/getbalance                 | Private | Get      | GetBalancesAsync                   | -                        |
-| GET         | /v1/me/getcollateral              | Private | Get      | GetCollateralAsync                 | -                        |
-| GET         | /v1/me/getcollateralaccounts      | Private | Get      | GetCollateralAccountsAsync         | -                        |
-| GET         | /v1/me/getaddresses               | Private | Get      | GetAddressesAsync                  | -                        |
-| GET         | /v1/me/getcoinins                 | Private | Get      | GetCoinInsAsync                    | -                        |
-| GET         | /v1/me/getcoinouts                | Private | Get      | GetCoinOutsAsync                   | -                        |
-| GET         | /v1/me/getbankaccounts            | Private | Get      | GetBankAccountsAsync               | -                        |
-| GET         | /v1/me/getdeposits                | Private | Get      | GetDepositsAsync                   | -                        |
-| POST        | /v1/me/withdraw                   | Private | Create   | CreateWithdrawalAsync              | CreateWithdrawalRequest  |
-| GET         | /v1/me/getwithdrawals             | Private | Get      | GetWithdrawalsAsync                | -                        |
-| POST        | /v1/me/sendchildorder             | Private | Create   | CreateChildOrderAsync              | CreateChildOrderRequest  |
-| POST        | /v1/me/cancelchildorder           | Private | Cancel   | CancelChildOrderAsync              | CancelChildOrderRequest  |
-| POST        | /v1/me/sendparentorder            | Private | Create   | CreateParentOrderAsync             | CreateParentOrderRequest |
-| POST        | /v1/me/cancelparentorder          | Private | Cancel   | CancelParentOrderAsync             | CancelParentOrderRequest |
-| POST        | /v1/me/cancelallchildorders       | Private | Cancel   | CancelOrdersAsync                  | CancelAllOrdersRequest   |
-| GET         | /v1/me/getchildorders             | Private | Get      | GetOrdersAsync                     | GetOrdersRequest         |
-| GET         | /v1/me/getparentorders            | Private | Get      | GetParentOrdersAsync               | -                        |
-| GET         | /v1/me/getparentorder             | Private | Get      | GetParentOrderByParentOrderIdAsync | -                        |
-| GET         | /v1/me/getexecutions              | Private | Get      | GetAccountExecutionsAsync          | GetExecutionsRequest     |
-| GET         | /v1/me/getbalancehistory          | Private | Get      | GetBalanceHistoryAsync             | -                        |
-| GET         | /v1/me/getpositions               | Private | Get      | GetOpenPositionsAsync              | -                        |
-| GET         | /v1/me/getcollateralhistory       | Private | Get      | GetCollateralHistoryAsync          | -                        |
-| GET         | /v1/me/gettradingcommission       | Private | Get      | GetTradingCommissionAsync          | -                        |
+| HTTP METHOD | Path                              | 種別      | Raw Verb | Raw メソッド              | Request DTO                 |
+| ----------- | --------------------------------- | ------- | -------- | ------------------------- | --------------------------- |
+| GET         | /v1/getmarkets                    | Public  | Get      | GetMarketsAsync           | -                           |
+| GET         | /v1/markets                       | Public  | Get      | GetMarketsAsync           | -                           |
+| GET         | /v1/getmarkets/usa                | Public  | Get      | GetMarketsAsync           | -                           |
+| GET         | /v1/markets/usa                   | Public  | Get      | GetMarketsAsync           | -                           |
+| GET         | /v1/getmarkets/eu                 | Public  | Get      | GetMarketsAsync           | -                           |
+| GET         | /v1/markets/eu                    | Public  | Get      | GetMarketsAsync           | -                           |
+| GET         | /v1/getboard（/v1/board）           | Public  | Get      | GetBoardRawAsync          | -                           |
+| GET         | /v1/getticker（/v1/ticker）         | Public  | Get      | GetTickerRawAsync         | -                           |
+| GET         | /v1/getexecutions（/v1/executions） | Public  | Get      | GetExecutionsRawAsync     | -                           |
+| GET         | /v1/getboardstate                 | Public  | Get      | GetBoardStateAsync        | -                           |
+| GET         | /v1/gethealth                     | Public  | Get      | GetHealthAsync            | -                           |
+| GET         | /v1/getfundingrate                | Public  | Get      | GetFundingRateAsync       | -                           |
+| GET         | /v1/getcorporateleverage          | Public  | Get      | GetCorporateLeverageAsync | -                           |
+| GET         | /v1/getchats                      | Public  | Get      | GetChatsAsync             | -                           |
+| GET         | /v1/getchats/usa                  | Public  | Get      | GetChatsAsync             | -                           |
+| GET         | /v1/getchats/eu                   | Public  | Get      | GetChatsAsync             | -                           |
+| GET         | /v1/me/getpermissions             | Private | Get      | GetPermissionsAsync       | -                           |
+| GET         | /v1/me/getbalance                 | Private | Get      | GetBalancesAsync          | -                           |
+| GET         | /v1/me/getcollateral              | Private | Get      | GetCollateralAsync        | -                           |
+| GET         | /v1/me/getcollateralaccounts      | Private | Get      | GetCollateralAccountsAsync| -                           |
+| GET         | /v1/me/getaddresses               | Private | Get      | GetAddressesAsync         | -                           |
+| GET         | /v1/me/getcoinins                 | Private | Get      | GetCoinInsAsync           | -                           |
+| GET         | /v1/me/getcoinouts                | Private | Get      | GetCoinOutsAsync          | -                           |
+| GET         | /v1/me/getbankaccounts            | Private | Get      | GetBankAccountsAsync      | -                           |
+| GET         | /v1/me/getdeposits                | Private | Get      | GetDepositsAsync          | -                           |
+| POST        | /v1/me/withdraw                   | Private | Create   | CreateWithdrawalAsync     | CreateWithdrawalRequest     |
+| GET         | /v1/me/getwithdrawals             | Private | Get      | GetWithdrawalsAsync       | -                           |
+| POST        | /v1/me/sendchildorder             | Private | Create   | CreateChildOrderAsync     | CreateChildOrderRequest     |
+| POST        | /v1/me/cancelchildorder           | Private | Cancel   | CancelChildOrderAsync     | CancelChildOrderRequest     |
+| POST        | /v1/me/sendparentorder            | Private | Create   | CreateParentOrderAsync    | CreateParentOrderRequest    |
+| POST        | /v1/me/cancelparentorder          | Private | Cancel   | CancelParentOrderAsync    | CancelParentOrderRequest    |
+| POST        | /v1/me/cancelallchildorders       | Private | Cancel   | CancelAllChildOrdersAsync | CancelAllChildOrdersRequest |
+| GET         | /v1/me/getchildorders             | Private | Get      | GetChildOrdersAsync       | -                           |
+| GET         | /v1/me/getparentorders            | Private | Get      | GetParentOrdersAsync      | -                           |
+| GET         | /v1/me/getparentorder             | Private | Get      | GetParentOrderAsync       | -                           |
+| GET         | /v1/me/getexecutions              | Private | Get      | GetExecutionsAsync        | -                           |
+| GET         | /v1/me/getbalancehistory          | Private | Get      | GetBalanceHistoryAsync    | -                           |
+| GET         | /v1/me/getpositions               | Private | Get      | GetPositionsAsync         | -                           |
+| GET         | /v1/me/getcollateralhistory       | Private | Get      | GetCollateralHistoryAsync | -                           |
+| GET         | /v1/me/gettradingcommission       | Private | Get      | GetTradingCommissionAsync | -                           |
 
 ---
 

@@ -128,7 +128,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         }
 
         [Fact]
-        public async Task GetChildOrdersAsync_ReturnsMappedOrders()
+    public async Task GetOrdersAsync_ReturnsMappedOrders()
         {
             var rawTicker = new Ticker();
             var fakePublic = new FakeBitflyerPublicApi(rawTicker, new Board { Bids = Array.Empty<BoardEntry>(), Asks = Array.Empty<BoardEntry>() });
@@ -155,7 +155,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakeTrading = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = new BitflyerExchangeClient(fakePublic, fakePrivate, fakeTrading);
 
-            var result = await client.GetChildOrdersAsync(new Symbol("BTC/JPY"));
+            var result = await client.GetOrdersAsync(new Symbol("BTC/JPY"));
 
             Assert.Single(result);
             var order = result[0];

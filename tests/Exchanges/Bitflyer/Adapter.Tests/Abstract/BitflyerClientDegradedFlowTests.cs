@@ -63,7 +63,7 @@ public class BitflyerClientDegradedFlowTests
         Assert.NotEmpty(executions);
 
         // 5. child orders 履歴（完了済みの履歴が返る）
-        var childOrders = await client.GetChildOrdersAsync(new Symbol("BTC/JPY"));
+        var childOrders = await client.GetOrdersAsync(new Symbol("BTC/JPY"));
         Assert.NotEmpty(childOrders);
 
         // 6. positions（建玉ありの確認）

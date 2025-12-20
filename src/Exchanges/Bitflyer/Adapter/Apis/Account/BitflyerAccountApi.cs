@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
@@ -73,6 +74,35 @@ internal sealed class BitflyerAccountApi : IAccountApi
                 message: "Failed to call bitFlyer getexecutions API.",
                 exchange: _exchange,
                 operation: "GetAccountExecutions",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
+    public async Task<JsonElement> GetTradingCommissionAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    {
+        if (symbol.IsEmpty)
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+
+        try
+        {
+            var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
+            return await _privateApi
+                .GetTradingCommissionAsync(productCode, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (ExchangeApiException ex)
+        {
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetTradingCommission");
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer gettradingcommission API.",
+                exchange: _exchange,
+                operation: "GetTradingCommission",
                 statusCode: null,
                 innerException: ex);
         }

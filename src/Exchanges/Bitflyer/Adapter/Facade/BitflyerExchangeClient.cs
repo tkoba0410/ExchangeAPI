@@ -12,6 +12,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Core.Contracts.Errors;
 using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
@@ -26,6 +27,8 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private readonly IMarginAccountApi _marginApi;
     private readonly IAccountApi _accountApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
+    private readonly MarketApi? _marketApiConcrete;
+    private readonly BitflyerAccountApi? _accountApiConcrete;
     internal BitflyerApiBundle? ApiBundle { get; }
 
     internal BitflyerExchangeClient(
@@ -56,6 +59,8 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _marginApi = marginApi ?? throw new ArgumentNullException(nameof(marginApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
+        _marketApiConcrete = _marketApi as MarketApi;
+        _accountApiConcrete = _accountApi as BitflyerAccountApi;
     }
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
@@ -86,6 +91,12 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         DateTimeOffset? to = null,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(symbol, timescale, from, to, cancellationToken);
+
+    public Task<HealthResponse> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        GetMarketApi().GetHealthAsync(symbol, cancellationToken);
+
+    public Task<BoardStateResponse> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        GetMarketApi().GetBoardStateAsync(symbol, cancellationToken);
 
     // Trading
     public Task<OrderResult> PlaceLimitOrderAsync(
@@ -133,7 +144,30 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _accountApi.GetAccountExecutionsAsync(symbol, cancellationToken);
 
+    public Task<System.Text.Json.JsonElement> GetTradingCommissionAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        GetAccountApi().GetTradingCommissionAsync(symbol, cancellationToken);
+
     // ExchangeInfo
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+
+    private MarketApi GetMarketApi()
+    {
+        if (_marketApiConcrete is null)
+        {
+            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, "MarketRawAccess");
+        }
+
+        return _marketApiConcrete;
+    }
+
+    private BitflyerAccountApi GetAccountApi()
+    {
+        if (_accountApiConcrete is null)
+        {
+            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, "AccountRawAccess");
+        }
+
+        return _accountApiConcrete;
+    }
 }

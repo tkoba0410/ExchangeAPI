@@ -130,4 +130,58 @@ internal sealed class MarketApi : IMarketDataApi
         // bitFlyer RESTでは未サポート。将来Raw経由で実装する場合はここを置き換える。
         throw new ExchangeFeatureNotSupportedException(_exchange, "Candlesticks");
     }
+
+    public async Task<HealthResponse> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    {
+        if (symbol.IsEmpty)
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+
+        try
+        {
+            var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
+            return await _publicApi.GetHealthAsync(productCode, cancellationToken).ConfigureAwait(false);
+        }
+        catch (ExchangeApiException ex)
+        {
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetHealth");
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer gethealth API.",
+                exchange: _exchange,
+                operation: "GetHealth",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
+
+    public async Task<BoardStateResponse> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    {
+        if (symbol.IsEmpty)
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+
+        try
+        {
+            var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
+            return await _publicApi.GetBoardStateAsync(productCode, cancellationToken).ConfigureAwait(false);
+        }
+        catch (ExchangeApiException ex)
+        {
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetBoardState");
+        }
+        catch (Exception ex)
+        {
+            throw new ExchangeApiException(
+                message: "Failed to call bitFlyer getboardstate API.",
+                exchange: _exchange,
+                operation: "GetBoardState",
+                statusCode: null,
+                innerException: ex);
+        }
+    }
 }

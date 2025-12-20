@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
@@ -244,6 +245,20 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             Assert.Equal(collateral.OpenPositionPnl, result.OpenPositionPnl);
             Assert.Equal(collateral.RequireCollateral, result.RequireCollateral);
             Assert.Equal(collateral.KeepRate, result.KeepRate);
+        }
+
+        [Fact]
+        public async Task GetTradingCommissionAsync_ReturnsRawJson()
+        {
+            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
+            var publicApi = new FakeBitflyerPublicApi(rawTicker);
+            var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
+            var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
+            var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
+
+            var result = await client.GetTradingCommissionAsync(new Symbol("BTC/JPY"));
+
+            Assert.Equal(JsonValueKind.Object, result.ValueKind);
         }
 
         [Fact]

@@ -16,7 +16,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 /// </summary>
 public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi
 {
-    private readonly IMarketDataApi _marketApi;
+    private readonly MarketApi _marketApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
 
     internal BitflyerPublicClient(IBitflyerPublicApi publicApi)
@@ -37,6 +37,12 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi
 
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(Symbol symbol, TimeSpan timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(symbol, timescale, from, to, cancellationToken);
+
+    public Task<HealthResponse> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        _marketApi.GetHealthAsync(symbol, cancellationToken);
+
+    public Task<BoardStateResponse> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+        _marketApi.GetBoardStateAsync(symbol, cancellationToken);
 
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);

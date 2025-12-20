@@ -18,6 +18,14 @@
 | Margin      | Positions / Collateral        | `GetOpenPositionsAsync`, `GetCollateralAsync` |
 | ExchangeInfo| Market metadata               | `GetExchangeInfoAsync` |
 
+### 追加公開（今回のスコープ）
+
+| Endpoint | 公開 | 抽象メソッド |
+| --- | --- | --- |
+| /v1/gethealth | ○ | `BitflyerMarketApi.GetHealthAsync` |
+| /v1/getboardstate | ○ | `BitflyerMarketApi.GetBoardStateAsync` |
+| /v1/me/gettradingcommission | ○ | `BitflyerAccountApi.GetTradingCommissionAsync` |
+
 ---
 
 ## 注記

@@ -5,7 +5,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// <summary>
 /// 親注文一覧 (/v1/me/getparentorders) のレスポンス DTO。
 /// </summary>
-public sealed class BitflyerParentOrderResponse
+public sealed class ParentOrderResponse
 {
     [JsonPropertyName("id")] public long Id { get; init; }
     [JsonPropertyName("parent_order_id")] public string ParentOrderId { get; init; } = string.Empty;

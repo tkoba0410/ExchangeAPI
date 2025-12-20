@@ -16,10 +16,10 @@ public static class BitflyerFactory
 {
     private static readonly Uri DefaultBaseUri = new("https://api.bitflyer.com");
 
-    public static BitflyerRawApiClient CreateRaw(BitflyerFactoryOptions? options = null)
+    public static BitflyerRawApi CreateRaw(BitflyerFactoryOptions? options = null)
     {
         var components = CreateRawComponents(options ?? new BitflyerFactoryOptions());
-        return new BitflyerRawApiClient(components.PublicApi, components.PrivateApi, components.PrivateTradingApi);
+        return new BitflyerRawApi(components.PublicApi, components.PrivateApi, components.PrivateTradingApi);
     }
 
     public static BitflyerExchangeClient CreateAdapter(BitflyerFactoryOptions? options = null)

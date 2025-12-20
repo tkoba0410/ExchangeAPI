@@ -12,6 +12,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
@@ -27,14 +28,14 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private readonly IExchangeInfoApi _exchangeInfoApi;
     internal BitflyerApiBundle? ApiBundle { get; }
 
-    public BitflyerExchangeClient(
+    internal BitflyerExchangeClient(
         IBitflyerPublicApi publicApi,
         IBitflyerPrivateApi privateApi,
         IBitflyerPrivateTradingApi privateTradingApi,
         ExchangeCode exchangeCode = ExchangeCode.Bitflyer,
         string accountId = "default")
         : this(
-            marketApi: new BitflyerMarketApi(publicApi, exchangeCode),
+            marketApi: new MarketApi(publicApi, exchangeCode),
             tradingApi: new BitflyerTradingApi(privateTradingApi, privateApi, exchangeCode),
             marginApi: new BitflyerMarginApi(privateApi, exchangeCode),
             accountApi: new BitflyerAccountApi(privateApi, exchangeCode),
@@ -59,7 +60,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
         : this(
-            marketApi: new BitflyerMarketApi(bundle.PublicApi, ExchangeCode.Bitflyer),
+            marketApi: new MarketApi(bundle.PublicApi, ExchangeCode.Bitflyer),
             tradingApi: new BitflyerTradingApi(bundle.PrivateTradingApi, bundle.PrivateApi, ExchangeCode.Bitflyer),
             marginApi: new BitflyerMarginApi(bundle.PrivateApi, ExchangeCode.Bitflyer),
             accountApi: new BitflyerAccountApi(bundle.PrivateApi, ExchangeCode.Bitflyer),
@@ -69,7 +70,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     }
 
     // Market
-    public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<CommonTicker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerAsync(symbol, cancellationToken);
 
     public Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default) =>

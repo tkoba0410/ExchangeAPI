@@ -8,6 +8,7 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
 /// <summary>
@@ -18,14 +19,14 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi
     private readonly IMarketDataApi _marketApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
 
-    public BitflyerPublicClient(IBitflyerPublicApi publicApi)
+    internal BitflyerPublicClient(IBitflyerPublicApi publicApi)
     {
         if (publicApi is null) throw new ArgumentNullException(nameof(publicApi));
-        _marketApi = new BitflyerMarketApi(publicApi, ExchangeCode.Bitflyer);
+        _marketApi = new MarketApi(publicApi, ExchangeCode.Bitflyer);
         _exchangeInfoApi = new BitflyerExchangeInfoApi();
     }
 
-    public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<CommonTicker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerAsync(symbol, cancellationToken);
 
     public Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default) =>

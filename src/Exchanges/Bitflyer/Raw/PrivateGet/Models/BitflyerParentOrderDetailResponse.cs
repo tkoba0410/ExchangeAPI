@@ -6,7 +6,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// <summary>
 /// 親注文の詳細 (/v1/me/getparentorder) のレスポンス DTO。
 /// </summary>
-public sealed class BitflyerParentOrderDetailResponse
+public sealed class ParentOrderDetailResponse
 {
     [JsonPropertyName("id")] public long Id { get; init; }
     [JsonPropertyName("parent_order_id")] public string ParentOrderId { get; init; } = string.Empty;
@@ -15,14 +15,14 @@ public sealed class BitflyerParentOrderDetailResponse
     [JsonPropertyName("time_in_force")] public TimeInForce TimeInForce { get; init; }
 
     [JsonPropertyName("parameters")]
-    public IReadOnlyList<BitflyerParentOrderDetailParameter> Parameters { get; init; } =
-        Array.Empty<BitflyerParentOrderDetailParameter>();
+    public IReadOnlyList<ParentOrderDetailParameter> Parameters { get; init; } =
+        Array.Empty<ParentOrderDetailParameter>();
 
     [JsonPropertyName("parent_order_acceptance_id")]
     public string ParentOrderAcceptanceId { get; init; } = string.Empty;
 }
 
-public sealed class BitflyerParentOrderDetailParameter
+public sealed class ParentOrderDetailParameter
 {
     [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
     [JsonPropertyName("condition_type")] public ConditionType ConditionType { get; init; }

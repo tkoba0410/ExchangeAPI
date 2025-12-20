@@ -9,25 +9,25 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 
 public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
 {
-    private readonly BitflyerSendChildOrderResponse _response;
+    private readonly CreateChildOrderResponse _response;
     private readonly Exception? _exceptionToThrow;
 
-    public BitflyerSendChildOrderRequest? LastRequest { get; private set; }
-    public BitflyerCancelChildOrderRequest? LastCancelRequest { get; private set; }
-    public BitflyerCancelAllChildOrdersRequest? LastCancelAllRequest { get; private set; }
-    public BitflyerSendParentOrderRequest? LastParentOrderRequest { get; private set; }
-    public BitflyerCancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
-    public BitflyerWithdrawRequest? LastWithdrawRequest { get; private set; }
+    public CreateChildOrderRequest? LastRequest { get; private set; }
+    public CancelChildOrderRequest? LastCancelRequest { get; private set; }
+    public CancelAllChildOrdersRequest? LastCancelAllRequest { get; private set; }
+    public CreateParentOrderRequest? LastParentOrderRequest { get; private set; }
+    public CancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
+    public CreateWithdrawalRequest? LastWithdrawRequest { get; private set; }
 
     public FakeBitflyerPrivateTradingApi(
-        BitflyerSendChildOrderResponse response,
+        CreateChildOrderResponse response,
         Exception? exceptionToThrow = null)
     {
         _response = response;
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(BitflyerSendChildOrderRequest request, CancellationToken cancellationToken = default)
+    public Task<CreateChildOrderResponse> CreateChildOrderAsync(CreateChildOrderRequest request, CancellationToken cancellationToken = default)
     {
         if (_exceptionToThrow is not null)
         {
@@ -38,33 +38,33 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return Task.FromResult(_response);
     }
 
-    public Task<BitflyerEmptyResponse> CancelChildOrderAsync(BitflyerCancelChildOrderRequest request, CancellationToken cancellationToken = default)
+    public Task<EmptyResponse> CancelChildOrderAsync(CancelChildOrderRequest request, CancellationToken cancellationToken = default)
     {
         LastCancelRequest = request;
-        return Task.FromResult(new BitflyerEmptyResponse());
+        return Task.FromResult(new EmptyResponse());
     }
 
-    public Task<BitflyerEmptyResponse> CancelAllOrdersAsync(BitflyerCancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
+    public Task<EmptyResponse> CancelAllChildOrdersAsync(CancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
     {
         LastCancelAllRequest = request;
-        return Task.FromResult(new BitflyerEmptyResponse());
+        return Task.FromResult(new EmptyResponse());
     }
 
-    public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(BitflyerSendParentOrderRequest request, CancellationToken cancellationToken = default)
+    public Task<CreateParentOrderResponse> CreateParentOrderAsync(CreateParentOrderRequest request, CancellationToken cancellationToken = default)
     {
         LastParentOrderRequest = request;
-        return Task.FromResult(new BitflyerSendParentOrderResponse { ParentOrderAcceptanceId = "PARENT" });
+        return Task.FromResult(new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT" });
     }
 
-    public Task<BitflyerEmptyResponse> CancelParentOrderAsync(BitflyerCancelParentOrderRequest request, CancellationToken cancellationToken = default)
+    public Task<EmptyResponse> CancelParentOrderAsync(CancelParentOrderRequest request, CancellationToken cancellationToken = default)
     {
         LastCancelParentOrderRequest = request;
-        return Task.FromResult(new BitflyerEmptyResponse());
+        return Task.FromResult(new EmptyResponse());
     }
 
-    public Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(BitflyerWithdrawRequest request, CancellationToken cancellationToken = default)
+    public Task<CreateWithdrawalResponse> CreateWithdrawalAsync(CreateWithdrawalRequest request, CancellationToken cancellationToken = default)
     {
         LastWithdrawRequest = request;
-        return Task.FromResult(new BitflyerWithdrawResponse { MessageId = "WITHDRAW" });
+        return Task.FromResult(new CreateWithdrawalResponse { MessageId = "WITHDRAW" });
     }
 }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>/v1/me/withdraw リクエスト DTO。</summary>
-public sealed class BitflyerWithdrawRequest
+public sealed class CreateWithdrawalRequest
 {
     [JsonPropertyName("currency_code")] public string CurrencyCode { get; init; } = string.Empty; // "JPY"
     [JsonPropertyName("bank_account_id")] public int BankAccountId { get; init; }
@@ -13,7 +13,7 @@ public sealed class BitflyerWithdrawRequest
     public string? Code { get; init; }
 }
 
-public sealed class BitflyerWithdrawResponse
+public sealed class CreateWithdrawalResponse
 {
     [JsonPropertyName("message_id")] public string MessageId { get; init; } = string.Empty;
 }

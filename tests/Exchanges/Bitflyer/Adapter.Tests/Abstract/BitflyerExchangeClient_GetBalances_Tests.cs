@@ -19,13 +19,13 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             // Arrange
             var rawBalances = new[]
             {
-                new BitflyerBalanceResponse
+                new BalanceResponse
                 {
                     CurrencyCode = "JPY",
                     Amount = 100000m,
                     Available = 80000m,
                 },
-                new BitflyerBalanceResponse
+                new BalanceResponse
                 {
                     CurrencyCode = "BTC",
                     Amount = 0.01m,
@@ -35,7 +35,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
 
             var fakePublicApi = CreateDummyPublicApi();
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
 
             var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
@@ -60,11 +60,11 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         public async Task GetBalancesAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
         {
             // Arrange
-            var rawBalances = Array.Empty<BitflyerBalanceResponse>();
+            var rawBalances = Array.Empty<BalanceResponse>();
 
             var fakePublicApi = CreateDummyPublicApi();
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
 
             var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
@@ -78,7 +78,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         private static IBitflyerPublicApi CreateDummyPublicApi()
         {
             // 既存の Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
-            var rawTicker = new BitflyerTicker
+            var rawTicker = new Ticker
             {
                 ProductCode = RawProductCode.BtcJpy,
                 Timestamp = DateTimeOffset.UnixEpoch,

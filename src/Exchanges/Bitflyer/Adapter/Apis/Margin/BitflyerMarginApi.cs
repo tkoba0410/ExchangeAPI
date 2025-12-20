@@ -12,7 +12,7 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 
-public sealed class BitflyerMarginApi : IMarginAccountApi
+internal sealed class BitflyerMarginApi : IMarginAccountApi
 {
     private readonly IBitflyerPrivateApi _privateApi;
     private readonly ExchangeCode _exchange;

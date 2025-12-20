@@ -8,29 +8,29 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// <summary>
 /// bitFlyer Private Trading API のインターフェース。
 /// </summary>
-public interface IBitflyerPrivateTradingApi
+internal interface IBitflyerPrivateTradingApi
 {
-    Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(
-        BitflyerSendChildOrderRequest request,
+    Task<CreateChildOrderResponse> CreateChildOrderAsync(
+        CreateChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerEmptyResponse> CancelChildOrderAsync(
-        BitflyerCancelChildOrderRequest request,
+    Task<EmptyResponse> CancelChildOrderAsync(
+        CancelChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerEmptyResponse> CancelAllOrdersAsync(
-        BitflyerCancelAllChildOrdersRequest request,
+    Task<EmptyResponse> CancelAllChildOrdersAsync(
+        CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(
-        BitflyerSendParentOrderRequest request,
+    Task<CreateParentOrderResponse> CreateParentOrderAsync(
+        CreateParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerEmptyResponse> CancelParentOrderAsync(
-        BitflyerCancelParentOrderRequest request,
+    Task<EmptyResponse> CancelParentOrderAsync(
+        CancelParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(
-        BitflyerWithdrawRequest request,
+    Task<CreateWithdrawalResponse> CreateWithdrawalAsync(
+        CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default);
 }

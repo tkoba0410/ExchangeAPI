@@ -10,7 +10,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// <summary>
 /// bitFlyer Private REST API（情報系）の実装。
 /// </summary>
-public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
+internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
 {
     private readonly IRestClient _restClient;
 
@@ -26,18 +26,18 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         return _restClient.GetAsync<IReadOnlyList<string>>(path, query: null, cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(
+    public Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(
         CancellationToken cancellationToken = default)
     {
         const string path = BitflyerConstants.Paths.GetBalance;
 
-        return _restClient.GetAsync<IReadOnlyList<BitflyerBalanceResponse>>(
+        return _restClient.GetAsync<IReadOnlyList<BalanceResponse>>(
             path,
             query: null,
             cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(
+    public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
@@ -52,13 +52,13 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             [BitflyerConstants.QueryKeys.ProductCode] = productCode,
         };
 
-        return _restClient.GetAsync<IReadOnlyList<BitflyerPositionResponse>>(
+        return _restClient.GetAsync<IReadOnlyList<PositionResponse>>(
             path,
             query,
             cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerExecutionPrivateResponse>> GetExecutionsAsync(
+    public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(
         string productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
@@ -83,31 +83,31 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
 
-        return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionPrivateResponse>>(
+        return _restClient.GetAsync<IReadOnlyList<ExecutionPrivateResponse>>(
             path,
             query,
             cancellationToken);
     }
 
-    public Task<BitflyerCollateralResponse> GetCollateralAsync(
+    public Task<CollateralResponse> GetCollateralAsync(
         CancellationToken cancellationToken = default)
     {
         const string path = BitflyerConstants.Paths.GetCollateral;
 
-        return _restClient.GetAsync<BitflyerCollateralResponse>(
+        return _restClient.GetAsync<CollateralResponse>(
             path,
             query: null,
             cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerCollateralAccount>> GetCollateralAccountsAsync(
+    public Task<IReadOnlyList<CollateralAccount>> GetCollateralAccountsAsync(
         CancellationToken cancellationToken = default)
     {
         const string path = BitflyerConstants.Paths.GetCollateralAccounts;
-        return _restClient.GetAsync<IReadOnlyList<BitflyerCollateralAccount>>(path, query: null, cancellationToken);
+        return _restClient.GetAsync<IReadOnlyList<CollateralAccount>>(path, query: null, cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
+    public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
         string productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
@@ -136,13 +136,13 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             [BitflyerConstants.QueryKeys.After] = after?.ToString(),
         };
 
-        return _restClient.GetAsync<IReadOnlyList<BitflyerChildOrderResponse>>(
+        return _restClient.GetAsync<IReadOnlyList<ChildOrderResponse>>(
             path,
             query,
             cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerParentOrderResponse>> GetParentOrdersAsync(
+    public Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(
         string productCode,
         int? count = null,
         long? before = null,
@@ -164,10 +164,10 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             [BitflyerConstants.QueryKeys.After] = after?.ToString(),
             [BitflyerConstants.QueryKeys.ParentOrderStatusState] = parentOrderStatusState,
         };
-        return _restClient.GetAsync<IReadOnlyList<BitflyerParentOrderResponse>>(path, query, cancellationToken);
+        return _restClient.GetAsync<IReadOnlyList<ParentOrderResponse>>(path, query, cancellationToken);
     }
 
-    public Task<BitflyerParentOrderDetailResponse> GetParentOrderAsync(
+    public Task<ParentOrderDetailResponse> GetParentOrderAsync(
         string? parentOrderId = null,
         string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default)
@@ -178,7 +178,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             [BitflyerConstants.QueryKeys.ParentOrderId] = parentOrderId,
             [BitflyerConstants.QueryKeys.ParentOrderAcceptanceId] = parentOrderAcceptanceId,
         };
-        return _restClient.GetAsync<BitflyerParentOrderDetailResponse>(path, query, cancellationToken);
+        return _restClient.GetAsync<ParentOrderDetailResponse>(path, query, cancellationToken);
     }
 
     public Task<IReadOnlyList<JsonElement>> GetBalanceHistoryAsync(

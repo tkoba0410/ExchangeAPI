@@ -10,7 +10,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// <summary>
 /// bitFlyer Private Trading REST API の実装（発注・キャンセル系）。
 /// </summary>
-public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
+internal sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
 {
     private readonly IRestClient _restClient;
 
@@ -19,72 +19,72 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(
-        BitflyerSendChildOrderRequest request,
+    public Task<CreateChildOrderResponse> CreateChildOrderAsync(
+        CreateChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         const string path = BitflyerConstants.Paths.SendChildOrder;
 
-        return _restClient.PostAsync<BitflyerSendChildOrderRequest, BitflyerSendChildOrderResponse>(
+        return _restClient.PostAsync<CreateChildOrderRequest, CreateChildOrderResponse>(
             path,
             request,
             cancellationToken);
     }
 
-    public Task<BitflyerEmptyResponse> CancelChildOrderAsync(
-        BitflyerCancelChildOrderRequest request,
+    public Task<EmptyResponse> CancelChildOrderAsync(
+        CancelChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         const string path = BitflyerConstants.Paths.CancelChildOrder;
 
-        return _restClient.PostAsync<BitflyerCancelChildOrderRequest, BitflyerEmptyResponse>(
+        return _restClient.PostAsync<CancelChildOrderRequest, EmptyResponse>(
             path,
             request,
             cancellationToken);
     }
 
-    public Task<BitflyerEmptyResponse> CancelAllOrdersAsync(
-        BitflyerCancelAllChildOrdersRequest request,
+    public Task<EmptyResponse> CancelAllChildOrdersAsync(
+        CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         const string path = BitflyerConstants.Paths.CancelAllChildOrders;
 
-        return _restClient.PostAsync<BitflyerCancelAllChildOrdersRequest, BitflyerEmptyResponse>(
+        return _restClient.PostAsync<CancelAllChildOrdersRequest, EmptyResponse>(
             path,
             request,
             cancellationToken);
     }
 
-    public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(
-        BitflyerSendParentOrderRequest request,
+    public Task<CreateParentOrderResponse> CreateParentOrderAsync(
+        CreateParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
         const string path = BitflyerConstants.Paths.SendParentOrder;
-        return _restClient.PostAsync<BitflyerSendParentOrderRequest, BitflyerSendParentOrderResponse>(path, request, cancellationToken);
+        return _restClient.PostAsync<CreateParentOrderRequest, CreateParentOrderResponse>(path, request, cancellationToken);
     }
 
-    public Task<BitflyerEmptyResponse> CancelParentOrderAsync(
-        BitflyerCancelParentOrderRequest request,
+    public Task<EmptyResponse> CancelParentOrderAsync(
+        CancelParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
         const string path = BitflyerConstants.Paths.CancelParentOrder;
-        return _restClient.PostAsync<BitflyerCancelParentOrderRequest, BitflyerEmptyResponse>(path, request, cancellationToken);
+        return _restClient.PostAsync<CancelParentOrderRequest, EmptyResponse>(path, request, cancellationToken);
     }
 
-    public Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(
-        BitflyerWithdrawRequest request,
+    public Task<CreateWithdrawalResponse> CreateWithdrawalAsync(
+        CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
         const string path = BitflyerConstants.Paths.Withdraw;
-        return _restClient.PostAsync<BitflyerWithdrawRequest, BitflyerWithdrawResponse>(path, request, cancellationToken);
+        return _restClient.PostAsync<CreateWithdrawalRequest, CreateWithdrawalResponse>(path, request, cancellationToken);
     }
 }

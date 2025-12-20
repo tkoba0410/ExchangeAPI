@@ -16,9 +16,9 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceMarketOrder_MapsDomainToDtoAndReturnsResult()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(new BitflyerBalanceResponse[0]);
-        var tradingResponse = new BitflyerSendChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-123" };
+        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
+        var fakeAccount = new FakeBitflyerPrivateApi(new BalanceResponse[0]);
+        var tradingResponse = new CreateChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-123" };
         var fakeTrading = new FakeBitflyerPrivateTradingApi(tradingResponse);
 
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
@@ -37,9 +37,9 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceStopOrderAsync_ThrowsNotSupported()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
-        var tradingResponse = new BitflyerSendChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-STOP" };
+        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
+        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
+        var tradingResponse = new CreateChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-STOP" };
         var fakeTrading = new FakeBitflyerPrivateTradingApi(tradingResponse);
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
@@ -50,14 +50,14 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceMarketOrder_WhenApiReturns429_AddsRateLimitCategory()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
+        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var exception = new ExchangeApiException(
             message: "too many requests",
             statusCode: (System.Net.HttpStatusCode)429,
             exchangeErrorCode: "TOO_MANY_REQUESTS");
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
-            new BitflyerSendChildOrderResponse(),
+            new CreateChildOrderResponse(),
             exceptionToThrow: exception);
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
@@ -71,13 +71,13 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceMarketOrderAsync_WhenInsufficientFunds_MapsBalanceCategory()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
+        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var exception = new ExchangeApiException(
             message: "insufficient funds",
             exchangeErrorCode: "INSUFFICIENT_FUNDS");
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
-            new BitflyerSendChildOrderResponse(),
+            new CreateChildOrderResponse(),
             exceptionToThrow: exception);
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 
@@ -89,14 +89,14 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceMarketOrderAsync_WhenAuthError_MapsAuthCategory()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new BitflyerTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
+        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var exception = new ExchangeApiException(
             message: "auth failed",
             statusCode: System.Net.HttpStatusCode.Unauthorized,
             exchangeErrorCode: "AUTHENTICATION_ERROR");
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
-            new BitflyerSendChildOrderResponse(),
+            new CreateChildOrderResponse(),
             exceptionToThrow: exception);
         var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
 

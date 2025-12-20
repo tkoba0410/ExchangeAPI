@@ -18,7 +18,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
         var acceptanceId = "ACCEPT-1";
         var childOrders = new[]
         {
-            new BitflyerChildOrderResponse
+            new ChildOrderResponse
             {
                 ChildOrderId = "JRF-1",
                 ChildOrderAcceptanceId = acceptanceId,
@@ -31,8 +31,8 @@ public sealed class BitflyerOrderKeyConnectivityTests
             }
         };
 
-        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>(), childOrders: childOrders);
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse
+        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>(), childOrders: childOrders);
+        var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse
         {
             ChildOrderAcceptanceId = acceptanceId
         });
@@ -55,7 +55,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
         var acceptanceId = "ACCEPT-2";
         var childOrders = new[]
         {
-            new BitflyerChildOrderResponse
+            new ChildOrderResponse
             {
                 ChildOrderId = "JRF-2",
                 ChildOrderAcceptanceId = acceptanceId,
@@ -68,11 +68,11 @@ public sealed class BitflyerOrderKeyConnectivityTests
             }
         };
 
-        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>(), childOrders: childOrders);
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>(), childOrders: childOrders);
+        var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
         var api = new BitflyerTradingApi(tradingApi, privateApi);
 
-        var openOrders = await api.GetOrdersAsync(new Symbol("BTC/JPY"));
+        var openOrders = await api.GetChildOrdersAsync(new Symbol("BTC/JPY"));
         var key = openOrders[0].Key;
 
         var status = await api.GetOrderAsync(new Symbol("BTC/JPY"), key);

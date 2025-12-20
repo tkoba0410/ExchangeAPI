@@ -6,7 +6,7 @@ using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Http;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
-public sealed class BitflyerSigningTransport : IHttpTransport
+internal sealed class BitflyerSigningTransport : IHttpTransport
 {
     private readonly IHttpTransport _inner;
     private readonly IRequestSigner _signer;

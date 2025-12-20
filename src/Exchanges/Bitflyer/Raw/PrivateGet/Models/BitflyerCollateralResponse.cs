@@ -4,7 +4,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// <summary>
 /// /v1/me/getcollateral のレスポンス DTO。
 /// </summary>
-public sealed class BitflyerCollateralResponse
+public sealed class CollateralResponse
 {
     [JsonPropertyName("collateral")] public decimal Collateral { get; init; }
     [JsonPropertyName("open_position_pnl")] public decimal OpenPositionPnl { get; init; }

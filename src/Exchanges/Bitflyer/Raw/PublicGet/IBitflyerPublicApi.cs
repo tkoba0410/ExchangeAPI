@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw
     /// <summary>
     /// bitFlyer Public REST API (GET /v1/getticker) への Raw アクセスインターフェース。
     /// </summary>
-    public interface IBitflyerPublicApi
+internal interface IBitflyerPublicApi
     {
         /// <summary>
         /// Ticker 情報の Raw レスポンスを取得します。
@@ -22,7 +22,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw
         /// </param>
         /// <param name="useAliasPath">true の場合 /v1/ticker を使用し、false の場合 /v1/getticker を使用。</param>
         /// <returns>bitFlyer の Ticker Raw レスポンス。</returns>
-        Task<BitflyerTicker> GetTickerRawAsync(
+        Task<Ticker> GetTickerRawAsync(
             string productCode,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default);
@@ -30,7 +30,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw
         /// <summary>
         /// 板情報の Raw レスポンスを取得します。
         /// </summary>
-        Task<BitflyerBoard> GetBoardRawAsync(
+        Task<Board> GetBoardRawAsync(
             string productCode,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default);
@@ -38,7 +38,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw
         /// <summary>
         /// 市場全体の約定履歴（歩み値）の Raw レスポンスを取得します。
         /// </summary>
-        Task<IReadOnlyList<BitflyerExecutionPublicResponse>> GetExecutionsRawAsync(
+        Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsRawAsync(
             string productCode,
             int? count = null,
             long? before = null,
@@ -49,7 +49,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw
         /// <summary>
         /// 取扱い銘柄一覧（国別含む）を取得します。
         /// </summary>
-        Task<IReadOnlyList<BitflyerMarket>> GetMarketsAsync(
+        Task<IReadOnlyList<Market>> GetMarketsAsync(
             string? region = null,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default);
@@ -57,22 +57,22 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw
         /// <summary>
         /// チャットログを取得します。
         /// </summary>
-        Task<IReadOnlyList<BitflyerChat>> GetChatsAsync(
+        Task<IReadOnlyList<Chat>> GetChatsAsync(
             string? fromDate = null,
             string? region = null,
             CancellationToken cancellationToken = default);
 
-        Task<BitflyerHealthResponse> GetHealthAsync(
+        Task<HealthResponse> GetHealthAsync(
             string productCode,
             CancellationToken cancellationToken = default);
 
-        Task<BitflyerBoardStateResponse> GetBoardStateAsync(
+        Task<BoardStateResponse> GetBoardStateAsync(
             string productCode,
             CancellationToken cancellationToken = default);
 
-        Task<BitflyerCorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default);
+        Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default);
 
-        Task<BitflyerFundingRateResponse> GetFundingRateAsync(
+        Task<FundingRateResponse> GetFundingRateAsync(
             string productCode,
             CancellationToken cancellationToken = default);
     }

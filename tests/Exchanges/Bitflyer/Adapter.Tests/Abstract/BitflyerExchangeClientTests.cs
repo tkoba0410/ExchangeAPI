@@ -20,7 +20,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         public async Task GetTickerAsync_BtcJpy_ReturnsMappedTicker()
         {
             // Arrange
-            var raw = new BitflyerTicker
+            var raw = new Ticker
             {
                 ProductCode = RawProductCode.BtcJpy,
                 Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
@@ -37,8 +37,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             };
 
             var fakeApi = new FakeBitflyerPublicApi(raw);
-            var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             // Act
@@ -53,7 +53,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         public async Task GetTickerAsync_UnsupportedSymbol_ThrowsSymbolNotSupportedException()
         {
             // Arrange
-            var raw = new BitflyerTicker
+            var raw = new Ticker
             {
                 ProductCode = RawProductCode.BtcJpy,
                 Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
@@ -70,8 +70,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             };
 
             var fakeApi = new FakeBitflyerPublicApi(raw);
-            var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(async () =>
@@ -85,7 +85,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task GetOrderBookAsync_ReturnsMappedOrderBook()
         {
-            var rawTicker = new BitflyerTicker
+            var rawTicker = new Ticker
             {
                 ProductCode = RawProductCode.BtcJpy,
                 Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
@@ -101,22 +101,22 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
                 VolumeByProduct = 200.0m
             };
 
-            var boardRaw = new BitflyerBoard
+            var boardRaw = new Board
             {
                 MidPrice = 100.5m,
                 Bids = new[]
                 {
-                    new BitflyerBoardEntry { Price = 100m, Size = 0.1m },
+                    new BoardEntry { Price = 100m, Size = 0.1m },
                 },
                 Asks = new[]
                 {
-                    new BitflyerBoardEntry { Price = 101m, Size = 0.2m },
+                    new BoardEntry { Price = 101m, Size = 0.2m },
                 }
             };
 
             var fakeApi = new FakeBitflyerPublicApi(rawTicker, boardRaw);
-            var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             var board = await client.GetOrderBookAsync(new Symbol("BTC/JPY"));
@@ -128,14 +128,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         }
 
         [Fact]
-        public async Task GetOrdersAsync_ReturnsMappedOrders()
+        public async Task GetChildOrdersAsync_ReturnsMappedOrders()
         {
-            var rawTicker = new BitflyerTicker();
-            var fakePublic = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoard { Bids = Array.Empty<BitflyerBoardEntry>(), Asks = Array.Empty<BitflyerBoardEntry>() });
+            var rawTicker = new Ticker();
+            var fakePublic = new FakeBitflyerPublicApi(rawTicker, new Board { Bids = Array.Empty<BoardEntry>(), Asks = Array.Empty<BoardEntry>() });
 
             var childOrders = new[]
             {
-                new BitflyerChildOrderResponse
+                new ChildOrderResponse
                 {
                     ChildOrderId = "JOR-1",
                     ChildOrderAcceptanceId = "JRF-1",
@@ -150,12 +150,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             };
 
             var fakePrivate = new FakeBitflyerPrivateApi(
-                Array.Empty<BitflyerBalanceResponse>(),
+                Array.Empty<BalanceResponse>(),
                 childOrders: childOrders);
-            var fakeTrading = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var fakeTrading = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = new BitflyerExchangeClient(fakePublic, fakePrivate, fakeTrading);
 
-            var result = await client.GetOrdersAsync(new Symbol("BTC/JPY"));
+            var result = await client.GetChildOrdersAsync(new Symbol("BTC/JPY"));
 
             Assert.Single(result);
             var order = result[0];
@@ -169,16 +169,16 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task GetBalancesAsync_ReturnsMappedBalances()
         {
-            var rawTicker = new BitflyerTicker { ProductCode = RawProductCode.BtcJpy };
+            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
             var balances = new[]
             {
-                new BitflyerBalanceResponse { CurrencyCode = "JPY", Amount = 10000m, Available = 8000m },
-                new BitflyerBalanceResponse { CurrencyCode = "BTC", Amount = 1.5m, Available = 1.2m },
+                new BalanceResponse { CurrencyCode = "JPY", Amount = 10000m, Available = 8000m },
+                new BalanceResponse { CurrencyCode = "BTC", Amount = 1.5m, Available = 1.2m },
             };
 
             var publicApi = new FakeBitflyerPublicApi(rawTicker);
             var privateApi = new FakeBitflyerPrivateApi(balances);
-            var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
 
             var result = await client.GetBalancesAsync();
@@ -191,10 +191,10 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task GetOpenPositionsAsync_ReturnsMappedPositions()
         {
-            var rawTicker = new BitflyerTicker { ProductCode = RawProductCode.BtcJpy };
+            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
             var positions = new[]
             {
-                new BitflyerPositionResponse
+                new PositionResponse
                 {
                     ProductCode = RawProductCode.BtcJpy,
                     Side = ExchangeApi.Exchanges.Bitflyer.Raw.Side.Buy,
@@ -206,8 +206,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             };
 
             var publicApi = new FakeBitflyerPublicApi(rawTicker);
-            var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>(), positions: positions);
-            var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>(), positions: positions);
+            var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
 
             var result = await client.GetOpenPositionsAsync(new Symbol("BTC/JPY"));
@@ -224,8 +224,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task GetCollateralAsync_ReturnsMappedCollateral()
         {
-            var rawTicker = new BitflyerTicker { ProductCode = RawProductCode.BtcJpy };
-            var collateral = new BitflyerCollateralResponse
+            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
+            var collateral = new CollateralResponse
             {
                 Collateral = 100000m,
                 OpenPositionPnl = 2000m,
@@ -234,8 +234,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             };
 
             var publicApi = new FakeBitflyerPublicApi(rawTicker);
-            var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>(), collateral: collateral);
-            var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+            var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>(), collateral: collateral);
+            var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
 
             var result = await client.GetCollateralAsync();
@@ -249,9 +249,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task CancelOrderAsync_NullResponse_Throws()
         {
-            var rawTicker = new BitflyerTicker { ProductCode = RawProductCode.BtcJpy };
-            var publicApi = new FakeBitflyerPublicApi(rawTicker, new BitflyerBoard { Bids = Array.Empty<BitflyerBoardEntry>(), Asks = Array.Empty<BitflyerBoardEntry>() });
-            var accountApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
+            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
+            var publicApi = new FakeBitflyerPublicApi(rawTicker, new Board { Bids = Array.Empty<BoardEntry>(), Asks = Array.Empty<BoardEntry>() });
+            var accountApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
             var tradingApi = new NullCancelTradingApi();
             var client = new BitflyerExchangeClient(publicApi, accountApi, tradingApi);
 
@@ -261,23 +261,23 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
 
         private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi
         {
-            public Task<BitflyerSendChildOrderResponse> PlaceChildOrderAsync(BitflyerSendChildOrderRequest request, CancellationToken cancellationToken = default)
-                => Task.FromResult(new BitflyerSendChildOrderResponse());
+            public Task<CreateChildOrderResponse> CreateChildOrderAsync(CreateChildOrderRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult(new CreateChildOrderResponse());
 
-            public Task<BitflyerEmptyResponse> CancelChildOrderAsync(BitflyerCancelChildOrderRequest request, CancellationToken cancellationToken = default)
-                => Task.FromResult<BitflyerEmptyResponse>(null!);
+            public Task<EmptyResponse> CancelChildOrderAsync(CancelChildOrderRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult<EmptyResponse>(null!);
 
-            public Task<BitflyerEmptyResponse> CancelAllOrdersAsync(BitflyerCancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
-                => Task.FromResult<BitflyerEmptyResponse>(null!);
+            public Task<EmptyResponse> CancelAllChildOrdersAsync(CancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult<EmptyResponse>(null!);
 
-            public Task<BitflyerSendParentOrderResponse> SendParentOrderAsync(BitflyerSendParentOrderRequest request, CancellationToken cancellationToken = default) =>
-                Task.FromResult(new BitflyerSendParentOrderResponse());
+            public Task<CreateParentOrderResponse> CreateParentOrderAsync(CreateParentOrderRequest request, CancellationToken cancellationToken = default) =>
+                Task.FromResult(new CreateParentOrderResponse());
 
-            public Task<BitflyerEmptyResponse> CancelParentOrderAsync(BitflyerCancelParentOrderRequest request, CancellationToken cancellationToken = default) =>
-                Task.FromResult<BitflyerEmptyResponse>(null!);
+            public Task<EmptyResponse> CancelParentOrderAsync(CancelParentOrderRequest request, CancellationToken cancellationToken = default) =>
+                Task.FromResult<EmptyResponse>(null!);
 
-            public Task<BitflyerWithdrawResponse> RequestWithdrawalAsync(BitflyerWithdrawRequest request, CancellationToken cancellationToken = default) =>
-                Task.FromResult(new BitflyerWithdrawResponse());
+            public Task<CreateWithdrawalResponse> CreateWithdrawalAsync(CreateWithdrawalRequest request, CancellationToken cancellationToken = default) =>
+                Task.FromResult(new CreateWithdrawalResponse());
         }
     }
 }

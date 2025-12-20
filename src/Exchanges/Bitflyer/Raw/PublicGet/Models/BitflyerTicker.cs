@@ -10,7 +10,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw
     ///   取引所固有のフィールドもすべて保持するための内部用 DTO
     /// - Stage1 では Bitflyer アダプタ内でのみ使用し、外部には公開しない
     /// </summary>
-    public sealed class BitflyerTicker
+    public sealed class Ticker
     {
         /// <summary>
         /// プロダクトコード。

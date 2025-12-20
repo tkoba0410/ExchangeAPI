@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerMarginMapper
 {
-    public static IReadOnlyList<Position> MapPositions(IReadOnlyList<BitflyerPositionResponse> rawPositions)
+    public static IReadOnlyList<Position> MapPositions(IReadOnlyList<PositionResponse> rawPositions)
     {
         if (rawPositions is null) throw new ArgumentNullException(nameof(rawPositions));
 
@@ -24,7 +24,7 @@ internal static class BitflyerMarginMapper
             .ToArray();
     }
 
-    public static Collateral MapCollateral(BitflyerCollateralResponse raw)
+    public static Collateral MapCollateral(CollateralResponse raw)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 

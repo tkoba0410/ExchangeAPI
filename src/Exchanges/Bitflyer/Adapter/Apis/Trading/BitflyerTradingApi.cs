@@ -16,7 +16,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 /// <summary>
 /// bitFlyer の Trading API 実装（REST）。
 /// </summary>
-public sealed class BitflyerTradingApi : ITradingApi
+internal sealed class BitflyerTradingApi : ITradingApi
 {
     private readonly IBitflyerPrivateTradingApi _privateTradingApi;
     private readonly IBitflyerPrivateApi _privateAccountApi;
@@ -63,7 +63,7 @@ public sealed class BitflyerTradingApi : ITradingApi
 
         try
         {
-            var dto = new BitflyerSendChildOrderRequest
+            var dto = new CreateChildOrderRequest
             {
                 ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(request.Symbol),
                 Side = BitflyerCommonMapper.MapSideToExchange(request.Side),
@@ -76,7 +76,7 @@ public sealed class BitflyerTradingApi : ITradingApi
             };
 
             var response = await _privateTradingApi
-                .PlaceChildOrderAsync(dto, cancellationToken)
+                .CreateChildOrderAsync(dto, cancellationToken)
                 .ConfigureAwait(false);
 
             var acceptanceId = response.ChildOrderAcceptanceId;
@@ -110,18 +110,18 @@ public sealed class BitflyerTradingApi : ITradingApi
 
         try
         {
-            BitflyerCancelChildOrderRequest dto;
+            CancelChildOrderRequest dto;
             switch (orderKey.Kind)
             {
                 case OrderIdKind.AcceptanceId:
-                    dto = new BitflyerCancelChildOrderRequest
+                    dto = new CancelChildOrderRequest
                     {
                         ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol),
                         ChildOrderAcceptanceId = orderKey.Value,
                     };
                     break;
                 case OrderIdKind.ExchangeOrderId:
-                    dto = new BitflyerCancelChildOrderRequest
+                    dto = new CancelChildOrderRequest
                     {
                         ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol),
                         ChildOrderId = orderKey.Value,
@@ -173,7 +173,7 @@ public sealed class BitflyerTradingApi : ITradingApi
         try
         {
             var rawOrders = await _privateAccountApi
-                .GetOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
+                .GetChildOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var mapped = rawOrders.Select(o =>
@@ -234,19 +234,19 @@ public sealed class BitflyerTradingApi : ITradingApi
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
-        IReadOnlyList<BitflyerChildOrderResponse> orders;
+        IReadOnlyList<ChildOrderResponse> orders;
         var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
 
         switch (orderKey.Kind)
         {
             case OrderIdKind.AcceptanceId:
                 orders = await _privateAccountApi
-                    .GetOrdersAsync(productCode, childOrderStatusState: null, childOrderAcceptanceId: orderKey.Value, cancellationToken: cancellationToken)
+                    .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderAcceptanceId: orderKey.Value, cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
                 break;
             case OrderIdKind.ExchangeOrderId:
                 orders = await _privateAccountApi
-                    .GetOrdersAsync(productCode, childOrderStatusState: null, childOrderId: orderKey.Value, cancellationToken: cancellationToken)
+                    .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderId: orderKey.Value, cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
                 break;
             default:

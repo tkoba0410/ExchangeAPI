@@ -5,7 +5,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// <summary>
 /// Private 約定履歴 (/v1/me/getexecutions) のレスポンス DTO。
 /// </summary>
-public sealed class BitflyerExecutionPrivateResponse
+public sealed class ExecutionPrivateResponse
 {
     [JsonPropertyName("id")] public long Id { get; init; }
     [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>/v1/me/cancelparentorder リクエスト DTO。</summary>
-public sealed class BitflyerCancelParentOrderRequest
+public sealed class CancelParentOrderRequest
 {
     [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
 

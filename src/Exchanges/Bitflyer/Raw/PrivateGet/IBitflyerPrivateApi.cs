@@ -8,19 +8,19 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// <summary>
 /// bitFlyer Private REST API への Raw アクセスインターフェース。
 /// </summary>
-public interface IBitflyerPrivateApi
+internal interface IBitflyerPrivateApi
 {
     Task<IReadOnlyList<string>> GetPermissionsAsync(
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(
+    Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(
+    Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(
         string productCode,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<BitflyerExecutionPrivateResponse>> GetExecutionsAsync(
+    Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(
         string productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
@@ -29,13 +29,13 @@ public interface IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerCollateralResponse> GetCollateralAsync(
+    Task<CollateralResponse> GetCollateralAsync(
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<BitflyerCollateralAccount>> GetCollateralAccountsAsync(
+    Task<IReadOnlyList<CollateralAccount>> GetCollateralAccountsAsync(
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
+    Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
         string productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
@@ -46,7 +46,7 @@ public interface IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<BitflyerParentOrderResponse>> GetParentOrdersAsync(
+    Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(
         string productCode,
         int? count = null,
         long? before = null,
@@ -54,7 +54,7 @@ public interface IBitflyerPrivateApi
         string? parentOrderStatusState = null,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerParentOrderDetailResponse> GetParentOrderAsync(
+    Task<ParentOrderDetailResponse> GetParentOrderAsync(
         string? parentOrderId = null,
         string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default);

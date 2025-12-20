@@ -8,7 +8,7 @@ using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Time;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
-public sealed class BitflyerRequestSigner : IRequestSigner
+internal sealed class BitflyerRequestSigner : IRequestSigner
 {
     private readonly string _apiKey;
     private readonly string _apiSecret;

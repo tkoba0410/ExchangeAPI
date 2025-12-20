@@ -4,7 +4,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// <summary>
 /// /v1/me/cancelchildorder のリクエスト DTO。
 /// </summary>
-public sealed class BitflyerCancelChildOrderRequest
+public sealed class CancelChildOrderRequest
 {
     [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
 

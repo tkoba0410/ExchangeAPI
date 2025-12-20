@@ -18,8 +18,8 @@ public sealed class BitflyerTradingApi_NotFoundTests
     [Fact]
     public async Task GetOrderAsync_ByAcceptanceId_NotFound_Throws()
     {
-        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BitflyerBalanceResponse>());
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
+        var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
         var api = new BitflyerTradingApi(tradingApi, privateApi);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-404");
@@ -30,8 +30,8 @@ public sealed class BitflyerTradingApi_NotFoundTests
     [Fact]
     public async Task GetOrderAsync_ByExchangeOrderId_NotFound_Throws()
     {
-        var privateApi = new RecordingPrivateApi(Array.Empty<BitflyerChildOrderResponse>());
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new BitflyerSendChildOrderResponse());
+        var privateApi = new RecordingPrivateApi(Array.Empty<ChildOrderResponse>());
+        var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
         var api = new BitflyerTradingApi(tradingApi, privateApi);
 
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, "JRF-404");
@@ -44,12 +44,12 @@ public sealed class BitflyerTradingApi_NotFoundTests
 
     private sealed class RecordingPrivateApi : IBitflyerPrivateApi
     {
-        private readonly IReadOnlyList<BitflyerChildOrderResponse> _orders;
+        private readonly IReadOnlyList<ChildOrderResponse> _orders;
 
         public string? LastChildOrderId { get; private set; }
         public string? LastChildOrderAcceptanceId { get; private set; }
 
-        public RecordingPrivateApi(IReadOnlyList<BitflyerChildOrderResponse> orders)
+        public RecordingPrivateApi(IReadOnlyList<ChildOrderResponse> orders)
         {
             _orders = orders;
         }
@@ -57,22 +57,22 @@ public sealed class BitflyerTradingApi_NotFoundTests
         public Task<IReadOnlyList<string>> GetPermissionsAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
 
-        public Task<IReadOnlyList<BitflyerBalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BitflyerBalanceResponse>>(Array.Empty<BitflyerBalanceResponse>());
+        public Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<BalanceResponse>>(Array.Empty<BalanceResponse>());
 
-        public Task<IReadOnlyList<BitflyerPositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BitflyerPositionResponse>>(Array.Empty<BitflyerPositionResponse>());
+        public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<PositionResponse>>(Array.Empty<PositionResponse>());
 
-        public Task<IReadOnlyList<BitflyerExecutionPrivateResponse>> GetExecutionsAsync(string productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BitflyerExecutionPrivateResponse>>(Array.Empty<BitflyerExecutionPrivateResponse>());
+        public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(string productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<ExecutionPrivateResponse>>(Array.Empty<ExecutionPrivateResponse>());
 
-        public Task<BitflyerCollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(new BitflyerCollateralResponse());
+        public Task<CollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(new CollateralResponse());
 
-        public Task<IReadOnlyList<BitflyerCollateralAccount>> GetCollateralAccountsAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BitflyerCollateralAccount>>(Array.Empty<BitflyerCollateralAccount>());
+        public Task<IReadOnlyList<CollateralAccount>> GetCollateralAccountsAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<CollateralAccount>>(Array.Empty<CollateralAccount>());
 
-        public Task<IReadOnlyList<BitflyerChildOrderResponse>> GetOrdersAsync(
+        public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
             string productCode,
             string? childOrderStatusState = null,
             string? childOrderAcceptanceId = null,
@@ -88,22 +88,22 @@ public sealed class BitflyerTradingApi_NotFoundTests
 
             if (!string.IsNullOrEmpty(childOrderAcceptanceId))
             {
-                return Task.FromResult<IReadOnlyList<BitflyerChildOrderResponse>>(Array.Empty<BitflyerChildOrderResponse>());
+                return Task.FromResult<IReadOnlyList<ChildOrderResponse>>(Array.Empty<ChildOrderResponse>());
             }
 
             if (!string.IsNullOrEmpty(childOrderId))
             {
-                return Task.FromResult<IReadOnlyList<BitflyerChildOrderResponse>>(Array.Empty<BitflyerChildOrderResponse>());
+                return Task.FromResult<IReadOnlyList<ChildOrderResponse>>(Array.Empty<ChildOrderResponse>());
             }
 
             return Task.FromResult(_orders);
         }
 
-        public Task<IReadOnlyList<BitflyerParentOrderResponse>> GetParentOrdersAsync(string productCode, int? count = null, long? before = null, long? after = null, string? parentOrderStatusState = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BitflyerParentOrderResponse>>(Array.Empty<BitflyerParentOrderResponse>());
+        public Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(string productCode, int? count = null, long? before = null, long? after = null, string? parentOrderStatusState = null, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<ParentOrderResponse>>(Array.Empty<ParentOrderResponse>());
 
-        public Task<BitflyerParentOrderDetailResponse> GetParentOrderAsync(string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new BitflyerParentOrderDetailResponse());
+        public Task<ParentOrderDetailResponse> GetParentOrderAsync(string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new ParentOrderDetailResponse());
 
         public Task<IReadOnlyList<JsonElement>> GetBalanceHistoryAsync(string? currencyCode = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());

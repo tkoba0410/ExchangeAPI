@@ -9,17 +9,18 @@ using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
+using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 
 /// <summary>
 /// bitFlyer の MarketData API 実装（REST）。
 /// </summary>
-public sealed class BitflyerMarketApi : IMarketDataApi
+internal sealed class MarketApi : IMarketDataApi
 {
     private readonly IBitflyerPublicApi _publicApi;
     private readonly ExchangeCode _exchange;
 
-    public BitflyerMarketApi(
+    public MarketApi(
         IBitflyerPublicApi publicApi,
         ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
@@ -27,13 +28,13 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         _exchange = exchange;
     }
 
-    public async Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    public async Task<CommonTicker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         try
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
             var raw = await _publicApi.GetTickerRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
-            return BitflyerMarketMapper.MapTicker(BitflyerCommonMapper.ToApiProductCode(productCode), raw);
+            return MarketMapper.MapTicker(BitflyerCommonMapper.ToApiProductCode(productCode), raw);
         }
         catch (SymbolNotSupportedException ex)
         {
@@ -65,7 +66,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
             var rawBoard = await _publicApi.GetBoardRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
-            return BitflyerMarketMapper.MapOrderBook(rawBoard);
+            return MarketMapper.MapOrderBook(rawBoard);
         }
         catch (SymbolNotSupportedException ex)
         {
@@ -99,7 +100,7 @@ public sealed class BitflyerMarketApi : IMarketDataApi
             var raw = await _publicApi.GetExecutionsRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
 
             var mapped = raw
-                .Select(e => BitflyerMarketMapper.MapExecution(productCode, e))
+                .Select(e => MarketMapper.MapExecution(productCode, e))
                 .ToArray();
 
             return mapped;

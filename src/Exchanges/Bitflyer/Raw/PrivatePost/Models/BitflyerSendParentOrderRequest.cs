@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>/v1/me/sendparentorder リクエスト DTO。</summary>
-public sealed class BitflyerSendParentOrderRequest
+public sealed class CreateParentOrderRequest
 {
     [JsonPropertyName("order_method")] public OrderMethod OrderMethod { get; init; }
 
@@ -15,10 +15,10 @@ public sealed class BitflyerSendParentOrderRequest
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public TimeInForce? TimeInForce { get; init; }
 
-    [JsonPropertyName("parameters")] public IReadOnlyList<BitflyerParentOrderParameter> Parameters { get; init; } = new List<BitflyerParentOrderParameter>();
+    [JsonPropertyName("parameters")] public IReadOnlyList<ParentOrderParameter> Parameters { get; init; } = new List<ParentOrderParameter>();
 }
 
-public sealed class BitflyerParentOrderParameter
+public sealed class ParentOrderParameter
 {
     [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
     [JsonPropertyName("condition_type")] public ConditionType ConditionType { get; init; }
@@ -38,7 +38,7 @@ public sealed class BitflyerParentOrderParameter
     public decimal? Offset { get; init; }
 }
 
-public sealed class BitflyerSendParentOrderResponse
+public sealed class CreateParentOrderResponse
 {
     [JsonPropertyName("parent_order_acceptance_id")]
     public string ParentOrderAcceptanceId { get; init; } = string.Empty;

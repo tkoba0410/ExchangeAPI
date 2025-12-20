@@ -10,12 +10,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 public sealed class BitflyerPrivateApi_SendChildOrder_Tests
 {
     [Fact]
-    public async Task PlaceChildOrderAsync_CallsRestClientPostWithCorrectPath()
+    public async Task CreateChildOrderAsync_CallsRestClientPostWithCorrectPath()
     {
         var fakeRest = new FakeRestClient();
         var api = new BitflyerPrivateTradingApi(fakeRest);
 
-        var request = new BitflyerSendChildOrderRequest
+        var request = new CreateChildOrderRequest
         {
             ProductCode = RawProductCode.BtcJpy,
             ChildOrderType = ChildOrderType.Market,
@@ -23,7 +23,7 @@ public sealed class BitflyerPrivateApi_SendChildOrder_Tests
             Size = 0.01m,
         };
 
-        await api.PlaceChildOrderAsync(request, CancellationToken.None);
+        await api.CreateChildOrderAsync(request, CancellationToken.None);
 
         Assert.Equal("/v1/me/sendchildorder", fakeRest.LastPath);
         Assert.Equal(request, fakeRest.LastBody);

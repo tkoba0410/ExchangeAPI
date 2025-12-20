@@ -11,7 +11,7 @@ internal static class BitflyerAccountMapper
 {
     private const ExchangeCode Exchange = ExchangeCode.Bitflyer;
 
-    public static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BitflyerBalanceResponse> rawBalances)
+    public static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BalanceResponse> rawBalances)
     {
         if (rawBalances is null) throw new ArgumentNullException(nameof(rawBalances));
 
@@ -26,7 +26,7 @@ internal static class BitflyerAccountMapper
 
     public static IReadOnlyList<ExecutionAccount> MapAccountExecutions(
         string productCode,
-        IReadOnlyList<BitflyerExecutionPrivateResponse> rawExecutions)
+        IReadOnlyList<ExecutionPrivateResponse> rawExecutions)
     {
         if (rawExecutions is null) throw new ArgumentNullException(nameof(rawExecutions));
 

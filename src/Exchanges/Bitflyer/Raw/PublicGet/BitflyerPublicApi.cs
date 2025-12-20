@@ -11,7 +11,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// bitFlyer 公開 REST API の実装。
 /// Transport/Protocol 層に依存し、取引所固有のロジックのみを提供する。
 /// </summary>
-public sealed class BitflyerPublicApi : IBitflyerPublicApi
+internal sealed class BitflyerPublicApi : IBitflyerPublicApi
 {
     private readonly IRestClient _restClient;
 
@@ -26,9 +26,9 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
     }
 
     /// <summary>
-    /// 生の ticker JSON を取得し、<see cref="BitflyerTicker"/> にデシリアライズして返す。
+    /// 生の ticker JSON を取得し、<see cref="Ticker"/> にデシリアライズして返す。
     /// </summary>
-    public Task<BitflyerTicker> GetTickerRawAsync(
+    public Task<Ticker> GetTickerRawAsync(
         string productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
@@ -44,16 +44,16 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
                 [BitflyerConstants.QueryKeys.ProductCode] = productCode,
             };
 
-        return _restClient.GetAsync<BitflyerTicker>(
+        return _restClient.GetAsync<Ticker>(
             path,
             query,
             cancellationToken);
     }
 
     /// <summary>
-    /// 生の板情報 JSON を取得し、<see cref="BitflyerBoard"/> にデシリアライズして返す。
+    /// 生の板情報 JSON を取得し、<see cref="Board"/> にデシリアライズして返す。
     /// </summary>
-    public Task<BitflyerBoard> GetBoardRawAsync(
+    public Task<Board> GetBoardRawAsync(
         string productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
@@ -69,7 +69,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
                 [BitflyerConstants.QueryKeys.ProductCode] = productCode,
             };
 
-        return _restClient.GetAsync<BitflyerBoard>(
+        return _restClient.GetAsync<Board>(
             path,
             query,
             cancellationToken);
@@ -78,7 +78,7 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
     /// <summary>
     /// 生の約定履歴（市場全体の歩み値）を取得する。
     /// </summary>
-    public Task<IReadOnlyList<BitflyerExecutionPublicResponse>> GetExecutionsRawAsync(
+    public Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsRawAsync(
         string productCode,
         int? count = null,
         long? before = null,
@@ -100,13 +100,13 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
                 [BitflyerConstants.QueryKeys.After] = after?.ToString(),
             };
 
-        return _restClient.GetAsync<IReadOnlyList<BitflyerExecutionPublicResponse>>(
+        return _restClient.GetAsync<IReadOnlyList<ExecutionPublicResponse>>(
             path,
             query,
             cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerMarket>> GetMarketsAsync(
+    public Task<IReadOnlyList<Market>> GetMarketsAsync(
         string? region = null,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
@@ -117,13 +117,13 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
             path = $"{path}/{region}";
         }
 
-        return _restClient.GetAsync<IReadOnlyList<BitflyerMarket>>(
+        return _restClient.GetAsync<IReadOnlyList<Market>>(
             path,
             query: null,
             cancellationToken);
     }
 
-    public Task<IReadOnlyList<BitflyerChat>> GetChatsAsync(
+    public Task<IReadOnlyList<Chat>> GetChatsAsync(
         string? fromDate = null,
         string? region = null,
         CancellationToken cancellationToken = default)
@@ -139,13 +139,13 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
             [BitflyerConstants.QueryKeys.FromDate] = fromDate,
         };
 
-        return _restClient.GetAsync<IReadOnlyList<BitflyerChat>>(
+        return _restClient.GetAsync<IReadOnlyList<Chat>>(
             path,
             query,
             cancellationToken);
     }
 
-    public Task<BitflyerHealthResponse> GetHealthAsync(
+    public Task<HealthResponse> GetHealthAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
@@ -160,10 +160,10 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
             [BitflyerConstants.QueryKeys.ProductCode] = productCode,
         };
 
-        return _restClient.GetAsync<BitflyerHealthResponse>(path, query, cancellationToken);
+        return _restClient.GetAsync<HealthResponse>(path, query, cancellationToken);
     }
 
-    public Task<BitflyerBoardStateResponse> GetBoardStateAsync(
+    public Task<BoardStateResponse> GetBoardStateAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
@@ -178,16 +178,16 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
             [BitflyerConstants.QueryKeys.ProductCode] = productCode,
         };
 
-        return _restClient.GetAsync<BitflyerBoardStateResponse>(path, query, cancellationToken);
+        return _restClient.GetAsync<BoardStateResponse>(path, query, cancellationToken);
     }
 
-    public Task<BitflyerCorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
+    public Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
     {
         const string path = BitflyerConstants.Paths.GetCorporateLeverage;
-        return _restClient.GetAsync<BitflyerCorporateLeverageResponse>(path, query: null, cancellationToken);
+        return _restClient.GetAsync<CorporateLeverageResponse>(path, query: null, cancellationToken);
     }
 
-    public Task<BitflyerFundingRateResponse> GetFundingRateAsync(
+    public Task<FundingRateResponse> GetFundingRateAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
@@ -201,6 +201,6 @@ public sealed class BitflyerPublicApi : IBitflyerPublicApi
         {
             ["product_code"] = productCode,
         };
-        return _restClient.GetAsync<BitflyerFundingRateResponse>(path, query, cancellationToken);
+        return _restClient.GetAsync<FundingRateResponse>(path, query, cancellationToken);
     }
 }

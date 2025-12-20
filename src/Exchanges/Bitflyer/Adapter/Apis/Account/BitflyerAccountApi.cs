@@ -11,7 +11,7 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Account;
 
-public sealed class BitflyerAccountApi : IAccountApi
+internal sealed class BitflyerAccountApi : IAccountApi
 {
     private readonly IBitflyerPrivateApi _privateApi;
     private readonly ExchangeCode _exchange;

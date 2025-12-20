@@ -9,16 +9,16 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
 {
     internal sealed class FakeBitflyerPublicApi : IBitflyerPublicApi
     {
-        private readonly BitflyerTicker _response;
-        private readonly BitflyerBoard? _board;
+        private readonly Ticker _response;
+        private readonly Board? _board;
 
-        public FakeBitflyerPublicApi(BitflyerTicker response, BitflyerBoard? board = null)
+        public FakeBitflyerPublicApi(Ticker response, Board? board = null)
         {
             _response = response;
             _board = board;
         }
 
-        public Task<BitflyerTicker> GetTickerRawAsync(
+        public Task<Ticker> GetTickerRawAsync(
             string productCode,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default)
@@ -32,7 +32,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
             return Task.FromResult(_response);
         }
 
-        public Task<BitflyerBoard> GetBoardRawAsync(string productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
+        public Task<Board> GetBoardRawAsync(string productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
         {
             if (_board is null)
             {
@@ -47,7 +47,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
             return Task.FromResult(_board);
         }
 
-        public Task<IReadOnlyList<BitflyerExecutionPublicResponse>> GetExecutionsRawAsync(
+        public Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsRawAsync(
             string productCode,
             int? count = null,
             long? before = null,
@@ -60,9 +60,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
                 throw new System.ArgumentException($"Unexpected productCode: {productCode}", nameof(productCode));
             }
 
-            IReadOnlyList<BitflyerExecutionPublicResponse> executions = new[]
+            IReadOnlyList<ExecutionPublicResponse> executions = new[]
             {
-                new BitflyerExecutionPublicResponse
+                new ExecutionPublicResponse
                 {
                     Id = 1,
                     ProductCode = RawProductCode.BtcJpy,
@@ -76,26 +76,26 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
             return Task.FromResult(executions);
         }
 
-        public Task<IReadOnlyList<BitflyerMarket>> GetMarketsAsync(string? region = null, bool useAliasPath = false, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BitflyerMarket>>(new[] { new BitflyerMarket(RawProductCode.BtcJpy, "BTC_JPY") });
+        public Task<IReadOnlyList<Market>> GetMarketsAsync(string? region = null, bool useAliasPath = false, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<Market>>(new[] { new Market(RawProductCode.BtcJpy, "BTC_JPY") });
 
-        public Task<IReadOnlyList<BitflyerChat>> GetChatsAsync(string? fromDate = null, string? region = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BitflyerChat>>(new[] { new BitflyerChat("n", "m", System.DateTimeOffset.UtcNow) });
+        public Task<IReadOnlyList<Chat>> GetChatsAsync(string? fromDate = null, string? region = null, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<Chat>>(new[] { new Chat("n", "m", System.DateTimeOffset.UtcNow) });
 
-        public Task<BitflyerHealthResponse> GetHealthAsync(string productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new BitflyerHealthResponse("NORMAL"));
+        public Task<HealthResponse> GetHealthAsync(string productCode, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new HealthResponse("NORMAL"));
 
-        public Task<BitflyerBoardStateResponse> GetBoardStateAsync(string productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new BitflyerBoardStateResponse("NORMAL", "RUNNING", null));
+        public Task<BoardStateResponse> GetBoardStateAsync(string productCode, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new BoardStateResponse("NORMAL", "RUNNING", null));
 
-        public Task<BitflyerCorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(new BitflyerCorporateLeverageResponse(
+        public Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(new CorporateLeverageResponse(
                 CurrentMax: 7.7m,
                 CurrentStartDate: System.DateTimeOffset.UtcNow,
                 NextMax: 7.65m,
                 NextStartDate: System.DateTimeOffset.UtcNow.AddDays(7)));
 
-        public Task<BitflyerFundingRateResponse> GetFundingRateAsync(string productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new BitflyerFundingRateResponse(0m, System.DateTimeOffset.UtcNow));
+        public Task<FundingRateResponse> GetFundingRateAsync(string productCode, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new FundingRateResponse(0m, System.DateTimeOffset.UtcNow));
     }
 }

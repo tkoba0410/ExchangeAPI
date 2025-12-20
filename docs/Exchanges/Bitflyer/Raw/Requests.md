@@ -8,7 +8,7 @@
   - **Query が 3 個以上**
   - **Query のカテゴリが 2 種以上**（Filter / Range / Paging / Sort など）
 
-> 命名規則は `doc/Exchanges/Raw/Naming.md` を参照。
+> 命名規則は `../../Raw/Naming.md` を参照。
 
 ---
 
@@ -36,4 +36,3 @@
 ---
 
 > Requests は “DTO の入口”。ApiMap は “Endpoint の入口”。
-

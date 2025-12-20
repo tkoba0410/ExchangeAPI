@@ -13,7 +13,19 @@ Raw API は、各取引所が提供する **公式 REST API の鏡像**として
 
 * 本規則は **Raw レイヤにのみ適用**される
 * Adapter / Common / Application レイヤには適用しない
-* Adapter 側の命名は `doc/Exchanges/Adapter/Naming.md` を参照する
+* Adapter 側の命名は `../Adapter/Naming.md` を参照する
+
+---
+
+## 追加ルール（正本の明文化）
+
+1) **Raw API の公開面は取引所ごとに単一クラスに統一する**
+   - 公開クラスは 1 つのみ（例: `BitflyerRawApi`）。
+   - 実装は partial / internal class / フォルダ分割で整理してよいが、公開クラスは増やさない。
+2) **Path に send が含まれても Raw の Verb は Create を用いる**
+   - 例: `/me/sendchildorder` → `CreateChildOrderAsync`。
+3) **Raw DTO は exchange prefix を付けない**
+   - 衝突は namespace で解決する（`ExchangeApi.Exchanges.<Exchange>.Raw`）。
 
 ---
 

@@ -11,16 +11,16 @@ Raw API は公式 API の **鏡像（faithful mapping）** として設計され
 
 ## このディレクトリの読み方
 
-bitFlyer Raw API を理解・利用する際は、以下の順で読むことを推奨します。
+正本は Raw-only の一覧である `ApiMap.md` です。抽象層（Adapter/Facade）の公開状況は補助ビューとして参照します。
 
-1. **API 実装対応表**（まず全体像を把握）  
+1. **ApiMap.md**（正本 / Raw-only）  
    → [`ApiMap.md`](ApiMap.md)
-
-2. **命名・設計規則**（なぜこの名前・形なのか）  
-   → [`../../Raw/Naming.md`](../../Raw/Naming.md)
-
-3. **利用例・最短ルート**（実際に呼ぶ）  
-   → `Quickstart.md`（予定）
+2. **ApiMap.Decomposition.md**（補助: 命名分解ビュー）  
+   → [`ApiMap.Decomposition.md`](ApiMap.Decomposition.md)
+3. **Requests.md**（DTO 一覧）  
+   → [`Requests.md`](Requests.md)
+4. **抽象層公開状況**（補助ビュー）  
+   → [`../Adapter/ApiExposureMap.md`](../Adapter/ApiExposureMap.md)
 
 ---
 
@@ -47,16 +47,11 @@ Core / HTTP / Policy
 このディレクトリには、以下の情報を用途別に分割して配置します。
 
 - **ApiMap.md**  
-  公式 REST API の Endpoint と Raw / 抽象層での対応関係一覧
-
-- **Quickstart.md**（予定）  
-  bitFlyer Raw API を最短で利用するための例
-
-- **Requests.md**（予定）  
+  公式 REST API の Endpoint と Raw-only 対応表（正本）
+- **ApiMap.Decomposition.md**  
+  命名分解の補助ビュー
+- **Requests.md**  
   Request DTO（Body / Query 集約）の一覧と用途
-
-- **Errors.md** / **Constraints.md**（必要に応じて追加）  
-  bitFlyer 固有のエラーや制約
 
 ---
 
@@ -78,4 +73,3 @@ Core / HTTP / Policy
 ---
 
 > Raw API は例外を恐れない。ただし例外は文書に残す。
-

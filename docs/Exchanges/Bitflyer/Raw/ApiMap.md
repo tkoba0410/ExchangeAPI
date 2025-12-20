@@ -63,7 +63,7 @@
 
 * 本表は Raw 層の **唯一の正本**です
 * 抽象層での公開状況は Adapter 側ドキュメントを参照してください
-* Raw API の命名および Request DTO は `doc/Exchanges/Raw/Naming.md` の規則に従います
+* Raw API の命名および Request DTO は `../../Raw/Naming.md` の規則に従います
 
 ---
 

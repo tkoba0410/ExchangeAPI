@@ -59,7 +59,7 @@
 * **ByCondition は原則 Path 識別子のみ**。
 
   * 本表では、bitFlyer の多くが `product_code` を必須 Query として扱うため、補助ビューとして `ByProductCode` を明示しています。
-  * 実際にメソッド名へ `ByProductCode` を付与するかは、Raw/Naming.md の「必須 Query 例外」ルールに従います。
+  * 実際にメソッド名へ `ByProductCode` を付与するかは、`../../Raw/Naming.md` の「必須 Query 例外」ルールに従います。
 
 * `getmarkets/usa` / `getmarkets/eu` は **Path に埋め込まれた固定条件**であり、
   `ByRegionUsa` / `ByRegionEu` は補助的な表現です。実装は `GetUsaMarketsAsync` のような固定名でも可。

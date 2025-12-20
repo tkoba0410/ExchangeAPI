@@ -1,122 +1,135 @@
-# ExchangeAPI Documentation
+# Exchanges / Adapter レイヤ
 
-> ExchangeAPI は、複数の暗号資産取引所 API を扱うための **技術基盤＋取引所 SDK 集合**です。
-> 本ドキュメントは **1分で全体像が分かり、次に読むべき場所へ迷わず進める** ことを目的とします。
+本ドキュメントは **ExchangeAPI における Adapter レイヤ全体の設計思想・責務・使い方** を説明します。
 
----
+Adapter レイヤは、各取引所の Raw API を利用し、
+**取引所ごとの差異を最小限の共通語彙へ翻訳するための層**です。
 
-## はじめに（1分で分かる全体像）
-
-### 何ができるのか
-
-- 各取引所の **raw API（SDK 相当）** を主役として利用できる
-- HTTP / Retry / RateLimit / Observability などの **共通技術基盤**を再利用できる
-- 必要な場合のみ、最小限の **共通語彙（Adapter）** を使える
-
-### 何をしないのか
-
-- 複数取引所を束ねる統合クライアント
-- クロス取引・アービトラージ・戦略実装
-
-> Raw が主役。共通化は最小。束ねない。
+> Adapter は翻訳層であり、抽象化層ではない。
 
 ---
 
-## 最初に読む（導線）
+## Adapter レイヤの位置づけ
 
-1. **クイックスタート**  
-   → 実際に API を呼ぶ最短ルート  
-   [`quickstart.md`](quickstart.md)
+```
+Application
+   ↑
+Adapter API（本レイヤ）
+   ↑
+Raw API（第一選択）
+   ↑
+Core / HTTP / Policy
+```
 
-2. **エントリーガイド**  
-   → 利用シーン別の考え方・選び方  
-   [`entry-guide.md`](entry-guide.md)
-
-3. **設計思想（Architecture）**  
-   → なぜこの構造なのか  
-   [`Core/README.md`](Core/README.md)
-
----
-
-## レイヤ別ドキュメント
-
-### Core（技術基盤）
-
-HTTP / Policy / Observability / Error 契約など、
-**全取引所で共通の技術基盤**を提供します。
-
-- [`Core/README.md`](Core/README.md)
+- Adapter は **必須ではない**
+- Raw API を直接使える場合は、常に Raw API を優先する
+- Adapter は Application と Raw API の間に位置する
 
 ---
 
-### Common（共通語彙）
+## Adapter がやること
 
-DTO / Enum / Interface など、
-**意味だけを共有する最小セット**です。
+Adapter レイヤは以下を責務とします。
 
-- [`Common/README.md`](Common/README.md)
-- [`Common/Contracts/README.md`](Common/Contracts/README.md)
+- 取引所ごとの **名称差・構造差の翻訳**
+- 共通 DTO / Interface（`Common`）へのマッピング
+- 複数の Raw API 呼び出しをまとめた **意味的操作**
 
----
+例：
 
-### Composition（標準配線）
-
-Credentials / ExchangeInfo / RestClient を組み立て、
-**Raw または Adapter を生成する入口**です。
-
-- [`Composition/README.md`](Composition/README.md)
-- [`Composition/Factory/README.md`](Composition/Factory/README.md)
+- 取引所ごとに異なる注文・残高レスポンスを共通 DTO に変換
+- Public / Private API の差異を吸収
 
 ---
 
-### Exchanges（取引所実装）
+## Adapter がやらないこと
 
-各取引所は **Raw / Adapter** の 2 層で構成されます。
-
-- [`Exchanges/README.md`](Exchanges/README.md)
-
-#### 対応取引所
-
-- Bitflyer  
-  - Raw API / Adapter API
-- Bittrade  
-  - Raw API / Adapter API
+- 取引所機能の拡張・補完
+- 意味の推測・自動補完
+- ビジネスロジック・戦略判断
+- 取引所間の自動統合・横断操作
 
 ---
 
-## どれを使えばよいか？（早見表）
+## Raw API との関係
 
-| 目的 | 推奨 |
+- Adapter は **必ず Raw API を利用**する
+- Adapter が HTTP を直接呼ぶことはない
+- Raw API の制約・癖は Adapter で隠しすぎない
+
+Raw API は **事実の写像**、
+Adapter は **意味の翻訳**です。
+
+---
+
+## Adapter を使うべきケース
+
+| 要件 | 推奨 |
 |---|---|
-| 取引所固有機能を使いたい | Raw |
-| 完全な制御が必要 | Raw |
-| 共通 DTO / Interface で処理したい | Adapter |
-| 複数取引所をまとめたい | 対象外（アプリ側で実装） |
+| 複数取引所で同じ処理を書きたい | Adapter |
+| 共通 DTO / Interface が欲しい | Adapter |
+| 単一取引所・完全制御 | Raw API |
+| 取引所固有機能を最大限使いたい | Raw API |
 
 ---
 
-## テストについて
+## 構成
 
-- Raw / Adapter / Core / Common それぞれで **責務ごとにテストを分離**しています
-- Live / Integration テストは別プロジェクトで管理しています
+各取引所の Adapter は以下の構成を持ちます。
 
----
+```
+Exchanges/
+  Bitflyer/
+    Adapter/
+      XxxAdapter.cs
+  Bittrade/
+    Adapter/
+      XxxAdapter.cs
+```
 
-## このドキュメントの位置づけ
-
-- 本 README は **docs 全体の入口**です
-- 各 README は独立して読めるように設計されています
-- 設計の正本はリポジトリ直下の `ARCHITECTURE.md` です
-
----
-
-## 次に読む
-
-- Raw API を直接使いたい → [`Exchanges/README.md`](Exchanges/README.md)
-- Factory の使い方を知りたい → [`Composition/Factory/README.md`](Composition/Factory/README.md)
-- エラーや Retry の考え方 → [`Common/Contracts/README.md`](Common/Contracts/README.md)
+- Adapter は取引所ごとに独立
+- Raw API とは別ディレクトリで管理
 
 ---
 
-> **Raw first. Minimal abstraction. No unification.**
+## 生成と利用
+
+Adapter は **Composition / Factory** を通して生成します。
+
+- Raw API
+- 共通 DTO / Interface
+- 必要な設定情報
+
+はすべて外部から注入されます。
+
+Adapter 自身は **接続・認証・HTTP 管理を行いません**。
+
+---
+
+## 設計原則
+
+- Adapter は **状態を持たない**
+- Adapter は Raw API を **委譲して利用**する
+- Raw API の命名・構造を尊重する
+- Adapter 固有の例外を作らない
+
+---
+
+## 命名規約・設計規約
+
+Adapter API の命名規約・設計規約は別ドキュメントで管理します。
+
+- Adapter API 命名規約 → （今後追加予定）
+
+本 README では Adapter レイヤの **役割と責務** のみを扱います。
+
+---
+
+## まとめ
+
+- Adapter は **任意の翻訳レイヤ**
+- Raw API が常に主役
+- Adapter は意味を揃えるが、機能は盛らない
+
+> Raw first. Minimal translation. No unification.
 

@@ -13,7 +13,7 @@ internal static class BittradeMapper
 {
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public static IReadOnlyList<Balance> MapBalances(BittradeBalanceData data)
+    public static IReadOnlyList<Balance> MapBalances(BalanceData data)
     {
         var result = new List<Balance>();
         foreach (var group in data.List.GroupBy(e => e.Currency, StringComparer.OrdinalIgnoreCase))
@@ -31,7 +31,7 @@ internal static class BittradeMapper
         return result;
     }
 
-    public static OpenOrder MapOrder(BittradeOrderDetail detail)
+    public static OpenOrder MapOrder(OrderDetail detail)
     {
         var (side, type) = ParseOrderType(detail.Type);
         var status = ParseStatus(detail.State);
@@ -56,7 +56,7 @@ internal static class BittradeMapper
             ExchangeOrderId: detail.Id.ToString(CultureInfo.InvariantCulture));
     }
 
-    public static OpenOrder MapOrderSummary(BittradeOrderSummary summary)
+    public static OpenOrder MapOrderSummary(OrderSummary summary)
     {
         var (side, type) = ParseOrderType(summary.Type);
         var status = ParseStatus(summary.State);

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-public sealed record BittradeMergedResponse(
+public sealed record MergedResponse(
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("tick")] BittradeMergedTick? Tick,
+    [property: JsonPropertyName("tick")] MergedTick? Tick,
     [property: JsonPropertyName("ts")] long? Ts);

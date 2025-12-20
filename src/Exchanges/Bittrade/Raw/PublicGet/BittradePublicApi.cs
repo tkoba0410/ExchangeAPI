@@ -1,14 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
-/// Bittrade Public REST API（Ticker/Depth/Trades/ExchangeInfo）の Raw 実装。
+/// Bittrade Public REST API の Raw 実装。
 /// </summary>
-public sealed class BittradePublicApi : IBittradePublicApi
+internal sealed class BittradePublicApi : IBittradePublicApi
 {
     private readonly IRestClient _restClient;
 
@@ -17,39 +16,66 @@ public sealed class BittradePublicApi : IBittradePublicApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<BittradeMergedResponse> GetTickerRawAsync(string symbol, CancellationToken cancellationToken = default)
+    public Task<MergedResponse> GetMergedTickerAsync(string symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        return _restClient.GetAsync<BittradeMergedResponse>(
+        return _restClient.GetAsync<MergedResponse>(
             $"market/detail/merged?symbol={ToApiSymbol(symbol)}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<BittradeDepthResponse> GetOrderBookRawAsync(string symbol, CancellationToken cancellationToken = default)
+    public Task<DepthResponse> GetDepthAsync(string symbol, string? type = null, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        return _restClient.GetAsync<BittradeDepthResponse>(
-            $"market/depth?symbol={ToApiSymbol(symbol)}&type=step0",
+        var depthType = string.IsNullOrWhiteSpace(type) ? "step0" : type;
+        return _restClient.GetAsync<DepthResponse>(
+            $"market/depth?symbol={ToApiSymbol(symbol)}&type={depthType}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<BittradeTradeResponse> GetTradesRawAsync(string symbol, CancellationToken cancellationToken = default)
+    public Task<TradeResponse> GetTradesAsync(string symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        return _restClient.GetAsync<BittradeTradeResponse>(
+        return _restClient.GetAsync<TradeResponse>(
             $"market/trade?symbol={ToApiSymbol(symbol)}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<BittradeSymbolsResponse> GetSymbolsRawAsync(CancellationToken cancellationToken = default)
+    public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default) =>
+        _restClient.GetAsync<SymbolsResponse>("v1/common/symbols", cancellationToken: cancellationToken);
+
+    public Task<CurrenciesResponse> GetCurrenciesAsync(CancellationToken cancellationToken = default) =>
+        _restClient.GetAsync<CurrenciesResponse>("v1/common/currencys", cancellationToken: cancellationToken);
+
+    public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default) =>
+        _restClient.GetAsync<TimestampResponse>("v1/common/timestamp", cancellationToken: cancellationToken);
+
+    public Task<KlinesResponse> GetKlinesAsync(string symbol, string period, int? size = null, CancellationToken cancellationToken = default)
     {
-        return _restClient.GetAsync<BittradeSymbolsResponse>(
-            "v1/common/symbols",
+        EnsureSymbol(symbol);
+        if (string.IsNullOrWhiteSpace(period)) throw new ArgumentException("period is required.", nameof(period));
+        var sizeParam = size.HasValue ? $"&size={size.Value}" : string.Empty;
+        return _restClient.GetAsync<KlinesResponse>(
+            $"market/history/kline?period={period}&symbol={ToApiSymbol(symbol)}{sizeParam}",
             cancellationToken: cancellationToken);
     }
 
+    public Task<TickersResponse> GetTickersAsync(CancellationToken cancellationToken = default) =>
+        _restClient.GetAsync<TickersResponse>("market/tickers", cancellationToken: cancellationToken);
+
+    public Task<TradeHistoryResponse> GetTradeHistoryAsync(string symbol, CancellationToken cancellationToken = default)
+    {
+        EnsureSymbol(symbol);
+        return _restClient.GetAsync<TradeHistoryResponse>(
+            $"market/history/trade?symbol={ToApiSymbol(symbol)}",
+            cancellationToken: cancellationToken);
+    }
+
+    public Task<RetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default) =>
+        _restClient.GetAsync<RetailMaintainTimeResponse>("v1/retail/maintain/time", cancellationToken: cancellationToken);
+
     private static string ToApiSymbol(string symbol) =>
-        symbol.Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
+        symbol.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
 
     private static void EnsureSymbol(string symbol)
     {

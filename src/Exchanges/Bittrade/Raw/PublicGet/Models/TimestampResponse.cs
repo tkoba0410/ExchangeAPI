@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-public sealed record CancelOrderResponse(
+public sealed record TimestampResponse(
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("data")] string OrderId);
+    [property: JsonPropertyName("data")] long Data);

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-public sealed record BittradeTradeResponse(
+public sealed record TradeResponse(
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("tick")] BittradeTradeTick? Tick,
+    [property: JsonPropertyName("tick")] TradeTick? Tick,
     [property: JsonPropertyName("ts")] long? Ts);

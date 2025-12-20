@@ -28,7 +28,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
     public async Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
-        var response = await _restClient.GetAsync<BittradeMergedResponse>(
+        var response = await _restClient.GetAsync<MergedResponse>(
             $"market/detail/merged?symbol={apiSymbol}",
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -52,7 +52,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
     public async Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
-        var response = await _restClient.GetAsync<BittradeDepthResponse>(
+        var response = await _restClient.GetAsync<DepthResponse>(
             $"market/depth?symbol={apiSymbol}&type=step0",
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -70,7 +70,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
     public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
-        var response = await _restClient.GetAsync<BittradeTradeResponse>(
+        var response = await _restClient.GetAsync<TradeResponse>(
             $"market/trade?symbol={apiSymbol}",
             cancellationToken: cancellationToken).ConfigureAwait(false);
 

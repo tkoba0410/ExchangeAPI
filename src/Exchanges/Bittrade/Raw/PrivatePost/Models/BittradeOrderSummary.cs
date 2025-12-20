@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-public sealed record BittradeOrderSummary(
+public sealed record OrderSummary(
     [property: JsonPropertyName("id")] long Id,
     [property: JsonPropertyName("symbol")] string Symbol,
     [property: JsonPropertyName("account-id")] string AccountId,

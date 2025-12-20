@@ -1,18 +1,29 @@
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
 /// Bittrade Public REST API の Raw アクセス（認証不要）。
 /// </summary>
-public interface IBittradePublicApi
+internal interface IBittradePublicApi
 {
-    Task<BittradeMergedResponse> GetTickerRawAsync(string symbol, CancellationToken cancellationToken = default);
+    Task<MergedResponse> GetMergedTickerAsync(string symbol, CancellationToken cancellationToken = default);
 
-    Task<BittradeDepthResponse> GetOrderBookRawAsync(string symbol, CancellationToken cancellationToken = default);
+    Task<DepthResponse> GetDepthAsync(string symbol, string? type = null, CancellationToken cancellationToken = default);
 
-    Task<BittradeTradeResponse> GetTradesRawAsync(string symbol, CancellationToken cancellationToken = default);
+    Task<TradeResponse> GetTradesAsync(string symbol, CancellationToken cancellationToken = default);
 
-    Task<BittradeSymbolsResponse> GetSymbolsRawAsync(CancellationToken cancellationToken = default);
+    Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default);
+
+    Task<CurrenciesResponse> GetCurrenciesAsync(CancellationToken cancellationToken = default);
+
+    Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default);
+
+    Task<KlinesResponse> GetKlinesAsync(string symbol, string period, int? size = null, CancellationToken cancellationToken = default);
+
+    Task<TickersResponse> GetTickersAsync(CancellationToken cancellationToken = default);
+
+    Task<TradeHistoryResponse> GetTradeHistoryAsync(string symbol, CancellationToken cancellationToken = default);
+
+    Task<RetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default);
 }

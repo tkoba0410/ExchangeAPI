@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-public sealed record BittradeMergedTick(
+public sealed record MergedTick(
     [property: JsonPropertyName("close")] decimal Close,
     [property: JsonPropertyName("open")] decimal Open,
     [property: JsonPropertyName("low")] decimal Low,

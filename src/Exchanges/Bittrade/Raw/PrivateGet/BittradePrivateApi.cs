@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
 /// Bittrade Private REST API（情報系 GET）の Raw 実装。
 /// </summary>
-public sealed class BittradePrivateApi : IBittradePrivateApi
+internal sealed class BittradePrivateApi : IBittradePrivateApi
 {
     private readonly IRestClient _restClient;
 
@@ -17,59 +18,152 @@ public sealed class BittradePrivateApi : IBittradePrivateApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<BittradeAccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default)
-    {
-        return _restClient.GetAsync<BittradeAccountsResponse>(
-            "v1/account/accounts",
-            cancellationToken: cancellationToken);
-    }
+    public Task<AccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default) =>
+        _restClient.GetAsync<AccountsResponse>("v1/account/accounts", cancellationToken: cancellationToken);
 
-    public Task<BittradeBalancesResponse> GetBalancesAsync(string accountId, CancellationToken cancellationToken = default)
+    public Task<BalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default)
     {
-        EnsureAccountId(accountId);
-        return _restClient.GetAsync<BittradeBalancesResponse>(
+        EnsureRequired(accountId, nameof(accountId));
+        return _restClient.GetAsync<BalancesResponse>(
             $"v1/account/accounts/{accountId}/balance",
             cancellationToken: cancellationToken);
     }
 
-    public Task<BittradeOpenOrdersResponse> GetOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default)
+    public Task<OpenOrdersResponse> GetOpenOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default)
     {
-        EnsureSymbol(symbol);
-        EnsureAccountId(accountId);
+        EnsureRequired(symbol, nameof(symbol));
+        EnsureRequired(accountId, nameof(accountId));
+        var query = BuildQuery(
+            ("symbol", ToApiSymbol(symbol)),
+            ("account-id", accountId));
 
-        return _restClient.GetAsync<BittradeOpenOrdersResponse>(
-            $"v1/order/openOrders?symbol={ToApiSymbol(symbol)}&account-id={accountId}",
+        return _restClient.GetAsync<OpenOrdersResponse>(
+            $"v1/order/openOrders?{query}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<BittradeOrderDetailResponse> GetOrderAsync(string orderId, CancellationToken cancellationToken = default)
+    public Task<OrderDetailResponse> GetOrderAsync(string orderId, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(orderId))
-        {
-            throw new ArgumentException("orderId is required.", nameof(orderId));
-        }
-
-        return _restClient.GetAsync<BittradeOrderDetailResponse>(
+        EnsureRequired(orderId, nameof(orderId));
+        return _restClient.GetAsync<OrderDetailResponse>(
             $"v1/order/orders/{orderId}",
             cancellationToken: cancellationToken);
     }
 
-    private static string ToApiSymbol(string symbol) =>
-        symbol.Replace("/", "", StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
-
-    private static void EnsureSymbol(string symbol)
+    public Task<OrderMatchResultsResponse> GetOrderMatchResultsAsync(string orderId, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(symbol))
+        EnsureRequired(orderId, nameof(orderId));
+        return _restClient.GetAsync<OrderMatchResultsResponse>(
+            $"v1/order/orders/{orderId}/matchresults",
+            cancellationToken: cancellationToken);
+    }
+
+    public Task<OrdersResponse> GetOrdersAsync(
+        string symbol,
+        string states,
+        string? startDate = null,
+        string? endDate = null,
+        long? from = null,
+        string? direct = null,
+        int? size = null,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureRequired(symbol, nameof(symbol));
+        EnsureRequired(states, nameof(states));
+
+        var query = BuildQuery(
+            ("symbol", ToApiSymbol(symbol)),
+            ("states", states),
+            ("start-date", startDate),
+            ("end-date", endDate),
+            ("from", from?.ToString()),
+            ("direct", direct),
+            ("size", size?.ToString()));
+
+        return _restClient.GetAsync<OrdersResponse>(
+            $"v1/order/orders?{query}",
+            cancellationToken: cancellationToken);
+    }
+
+    public Task<MatchResultsResponse> GetMatchResultsAsync(
+        string? symbol = null,
+        string? types = null,
+        string? startDate = null,
+        string? endDate = null,
+        long? from = null,
+        string? direct = null,
+        int? size = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = BuildQuery(
+            ("symbol", string.IsNullOrWhiteSpace(symbol) ? null : ToApiSymbol(symbol)),
+            ("types", types),
+            ("start-date", startDate),
+            ("end-date", endDate),
+            ("from", from?.ToString()),
+            ("direct", direct),
+            ("size", size?.ToString()));
+
+        return _restClient.GetAsync<MatchResultsResponse>(
+            $"v1/order/matchresults?{query}",
+            cancellationToken: cancellationToken);
+    }
+
+    public Task<DepositWithdrawsResponse> GetDepositWithdrawsAsync(
+        string type,
+        string? currency = null,
+        long? from = null,
+        int? size = null,
+        string? direct = null,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureRequired(type, nameof(type));
+        var query = BuildQuery(
+            ("type", type),
+            ("currency", currency),
+            ("from", from?.ToString()),
+            ("size", size?.ToString()),
+            ("direct", direct));
+
+        return _restClient.GetAsync<DepositWithdrawsResponse>(
+            $"v1/query/deposit-withdraw?{query}",
+            cancellationToken: cancellationToken);
+    }
+
+    public Task<RetailOrdersResponse> GetRetailOrdersAsync(
+        int direct,
+        int? status = null,
+        long? startTime = null,
+        long? endTime = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = BuildQuery(
+            ("direct", direct.ToString()),
+            ("status", status?.ToString()),
+            ("start_time", startTime?.ToString()),
+            ("end_time", endTime?.ToString()));
+
+        return _restClient.GetAsync<RetailOrdersResponse>(
+            $"v1/retail/order/list?{query}",
+            cancellationToken: cancellationToken);
+    }
+
+    private static string ToApiSymbol(string symbol) =>
+        symbol.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
+
+    private static void EnsureRequired(string value, string name)
+    {
+        if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
+            throw new ArgumentException($"{name} is required.", name);
         }
     }
 
-    private static void EnsureAccountId(string accountId)
+    private static string BuildQuery(params (string Key, string? Value)[] items)
     {
-        if (string.IsNullOrWhiteSpace(accountId))
-        {
-            throw new ArgumentException("accountId is required.", nameof(accountId));
-        }
+        var parts = items
+            .Where(i => !string.IsNullOrWhiteSpace(i.Value))
+            .Select(i => $"{i.Key}={Uri.EscapeDataString(i.Value!)}");
+        return string.Join("&", parts);
     }
 }

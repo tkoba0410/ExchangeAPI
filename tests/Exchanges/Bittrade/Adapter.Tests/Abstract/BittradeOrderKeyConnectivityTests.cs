@@ -16,7 +16,7 @@ public sealed class BittradeOrderKeyConnectivityTests
     public async Task GetOrderAsync_UsesOrderKeyValue_WithAcceptanceId()
     {
         var rest = new RecordingRestClient(
-            getResponse: new BittradeOrderDetailResponse(
+            getResponse: new OrderDetailResponse(
                 Status: "ok",
                 Data: CreateOrderDetail(1001)));
         var api = new BittradeTradingApi(rest, accountId: "account-1");
@@ -33,7 +33,7 @@ public sealed class BittradeOrderKeyConnectivityTests
     public async Task CancelOrderAsync_UsesOrderKeyValue_WithAcceptanceId()
     {
         var rest = new RecordingRestClient(
-            postResponse: new BittradeCancelOrderResponse("ok", "1002"));
+            postResponse: new CancelOrderResponse("ok", "1002"));
         var api = new BittradeTradingApi(rest, accountId: "account-1");
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1002");
@@ -43,7 +43,7 @@ public sealed class BittradeOrderKeyConnectivityTests
         Assert.Equal("v1/order/orders/1002/submitcancel", rest.LastPostPath);
     }
 
-    private static BittradeOrderDetail CreateOrderDetail(long id) =>
+    private static OrderDetail CreateOrderDetail(long id) =>
         new(
             Id: id,
             Symbol: "btcjpy",

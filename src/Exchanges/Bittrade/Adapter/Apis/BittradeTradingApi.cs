@@ -29,7 +29,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
 
     public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
     {
-        var resp = await _restClient.GetAsync<BittradeBalancesResponse>(
+        var resp = await _restClient.GetAsync<BalancesResponse>(
             $"v1/account/accounts/{_accountId}/balance",
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -82,7 +82,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             body["price"] = request.Price?.ToString();
         }
 
-        var resp = await _restClient.PostAsync<Dictionary<string, object?>, BittradePlaceOrderResponse>(
+        var resp = await _restClient.PostAsync<Dictionary<string, object?>, PlaceOrderResponse>(
             "v1/order/orders/place",
             body,
             cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -109,7 +109,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, $"CancelOrderBy{orderKey.Kind}");
         }
 
-        var resp = await _restClient.PostAsync<object?, BittradeCancelOrderResponse>(
+        var resp = await _restClient.PostAsync<object?, CancelOrderResponse>(
             $"v1/order/orders/{orderKey.Value}/submitcancel",
             body: null,
             cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -125,7 +125,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
     public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
-        var resp = await _restClient.GetAsync<BittradeOpenOrdersResponse>(
+        var resp = await _restClient.GetAsync<OpenOrdersResponse>(
             $"v1/order/openOrders?symbol={apiSymbol}&account-id={_accountId}",
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -152,7 +152,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, $"GetOrderBy{orderKey.Kind}");
         }
 
-        var resp = await _restClient.GetAsync<BittradeOrderDetailResponse>(
+        var resp = await _restClient.GetAsync<OrderDetailResponse>(
             $"v1/order/orders/{orderKey.Value}",
             cancellationToken: cancellationToken).ConfigureAwait(false);
 

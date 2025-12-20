@@ -17,12 +17,12 @@ public static class BittradeFactory
 {
     private static readonly Uri DefaultBaseUri = new("https://api-cloud.bittrade.co.jp/");
 
-    public static BittradeRawApiClient CreateRaw(BittradeFactoryOptions? options = null)
+    public static BittradeRawApi CreateRaw(BittradeFactoryOptions? options = null)
     {
         var settings = options ?? new BittradeFactoryOptions();
         var restClient = CreateRestClient(settings, requireCredentials: false);
 
-        return new BittradeRawApiClient(
+        return new BittradeRawApi(
             new BittradePublicApi(restClient),
             new BittradePrivateApi(restClient),
             new BittradePrivateTradingApi(restClient));

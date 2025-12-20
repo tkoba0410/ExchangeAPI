@@ -28,7 +28,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
 
     public async Task<ExchangeInfoDto> GetExchangeInfoAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _restClient.GetAsync<BittradeSymbolsResponse>(
+        var response = await _restClient.GetAsync<SymbolsResponse>(
             "v1/common/symbols",
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -41,7 +41,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
         return new ExchangeInfoDto(markets, Features: null, RateLimits: null, Maintenance: null);
     }
 
-    private static ExchangeMarketInfo MapSymbol(BittradeSymbolInfo s)
+    private static ExchangeMarketInfo MapSymbol(SymbolInfo s)
     {
         var symbol = $"{s.BaseCurrency.ToUpperInvariant()}/{s.QuoteCurrency.ToUpperInvariant()}";
         var product = s.Symbol.ToLowerInvariant();

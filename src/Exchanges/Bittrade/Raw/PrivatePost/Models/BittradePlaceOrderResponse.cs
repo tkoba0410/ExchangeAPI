@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-public sealed record BittradePlaceOrderResponse(
+public sealed record PlaceOrderResponse(
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("data")] long OrderId);

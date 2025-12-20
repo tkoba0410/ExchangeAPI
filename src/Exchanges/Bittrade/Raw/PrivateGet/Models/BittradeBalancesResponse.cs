@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-public sealed record BittradeBalancesResponse(
+public sealed record BalancesResponse(
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("data")] BittradeBalanceData? Data);
+    [property: JsonPropertyName("data")] BalanceData? Data);

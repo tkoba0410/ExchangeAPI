@@ -29,7 +29,7 @@ public static class BittradeClientFactory
     public static IExchangeInfoApi CreateExchangeInfo() =>
         new BittradeExchangeInfoApi(CreateRestClient());
 
-    public static (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account, IExchangeInfoApi ExchangeInfo, BittradeRawApiClient BittradeRaw) CreatePrivate(
+    public static (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account, IExchangeInfoApi ExchangeInfo, BittradeRawApi BittradeRaw) CreatePrivate(
         string accessKey,
         string secretKey,
         string accountId)
@@ -39,7 +39,7 @@ public static class BittradeClientFactory
         var privateApi = new BittradePrivateApi(restClient);
         var privateTrading = new BittradePrivateTradingApi(restClient);
         var trading = new BittradeTradingApi(restClient, accountId);
-        var raw = new BittradeRawApiClient(publicApi, privateApi, privateTrading);
+        var raw = new BittradeRawApi(publicApi, privateApi, privateTrading);
         return (new BittradeMarketDataApi(restClient), trading, trading, new BittradeExchangeInfoApi(restClient), raw);
     }
 

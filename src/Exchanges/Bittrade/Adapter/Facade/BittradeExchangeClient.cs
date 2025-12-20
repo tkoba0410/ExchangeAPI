@@ -7,6 +7,9 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
@@ -18,6 +21,8 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
+    private readonly BittradeMarketDataApi? _bittradeMarketApi;
+    private readonly BittradeExchangeInfoApi? _bittradeExchangeInfoApi;
 
     public BittradeExchangeClient(
         IMarketDataApi marketApi,
@@ -29,6 +34,28 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
+        _bittradeMarketApi = marketApi as BittradeMarketDataApi;
+        _bittradeExchangeInfoApi = exchangeInfoApi as BittradeExchangeInfoApi;
+    }
+
+    public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
+    {
+        if (_bittradeMarketApi is null)
+        {
+            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Timestamp");
+        }
+
+        return _bittradeMarketApi.GetTimestampAsync(cancellationToken);
+    }
+
+    public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
+    {
+        if (_bittradeExchangeInfoApi is null)
+        {
+            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Symbols");
+        }
+
+        return _bittradeExchangeInfoApi.GetSymbolsAsync(cancellationToken);
     }
 
     public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>

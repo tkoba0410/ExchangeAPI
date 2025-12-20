@@ -24,9 +24,9 @@
 
 | Path | Adapter 露出 | 抽象メソッド |
 | --- | --- | --- |
-| /v1/common/symbols | ○ | `BittradeExchangeInfoApi.GetExchangeInfoAsync` |
+| /v1/common/symbols | ○ | `BittradeExchangeInfoApi.GetSymbolsAsync` |
 | /v1/common/currencys | - | - |
-| /v1/common/timestamp | - | - |
+| /v1/common/timestamp | ○ | `BittradeMarketDataApi.GetTimestampAsync` |
 | /market/history/kline | - | - |
 | /market/detail/merged | ○ | `BittradeMarketDataApi.GetTickerAsync` |
 | /market/tickers | - | - |

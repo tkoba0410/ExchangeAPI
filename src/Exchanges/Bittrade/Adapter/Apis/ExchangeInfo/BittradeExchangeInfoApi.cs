@@ -26,11 +26,12 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
+    public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default) =>
+        _restClient.GetAsync<SymbolsResponse>("v1/common/symbols", cancellationToken: cancellationToken);
+
     public async Task<ExchangeInfoDto> GetExchangeInfoAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _restClient.GetAsync<SymbolsResponse>(
-            "v1/common/symbols",
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+        var response = await GetSymbolsAsync(cancellationToken).ConfigureAwait(false);
 
         if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Data is null)
         {

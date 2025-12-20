@@ -25,6 +25,9 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
+    public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default) =>
+        _restClient.GetAsync<TimestampResponse>("v1/common/timestamp", cancellationToken: cancellationToken);
+
     public async Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);

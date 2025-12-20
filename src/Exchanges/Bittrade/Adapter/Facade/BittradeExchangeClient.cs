@@ -10,6 +10,7 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
@@ -21,8 +22,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
-    private readonly BittradeMarketDataApi? _bittradeMarketApi;
-    private readonly BittradeExchangeInfoApi? _bittradeExchangeInfoApi;
+    private readonly IRestClient? _restClient;
 
     public BittradeExchangeClient(
         IMarketDataApi marketApi,
@@ -34,28 +34,37 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
-        _bittradeMarketApi = marketApi as BittradeMarketDataApi;
-        _bittradeExchangeInfoApi = exchangeInfoApi as BittradeExchangeInfoApi;
+    }
+
+    public BittradeExchangeClient(
+        IMarketDataApi marketApi,
+        ITradingApi tradingApi,
+        IAccountApi accountApi,
+        IExchangeInfoApi exchangeInfoApi,
+        IRestClient restClient)
+        : this(marketApi, tradingApi, accountApi, exchangeInfoApi)
+    {
+        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
     {
-        if (_bittradeMarketApi is null)
+        if (_restClient is null)
         {
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Timestamp");
         }
 
-        return _bittradeMarketApi.GetTimestampAsync(cancellationToken);
+        return _restClient.GetAsync<TimestampResponse>("v1/common/timestamp", cancellationToken: cancellationToken);
     }
 
     public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
     {
-        if (_bittradeExchangeInfoApi is null)
+        if (_restClient is null)
         {
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Symbols");
         }
 
-        return _bittradeExchangeInfoApi.GetSymbolsAsync(cancellationToken);
+        return _restClient.GetAsync<SymbolsResponse>("v1/common/symbols", cancellationToken: cancellationToken);
     }
 
     public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>

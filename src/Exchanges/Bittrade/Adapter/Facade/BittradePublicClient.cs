@@ -20,40 +20,38 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi
 {
     private readonly IMarketDataApi _marketApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
-    private readonly BittradeMarketDataApi? _bittradeMarketApi;
-    private readonly BittradeExchangeInfoApi? _bittradeExchangeInfoApi;
+    private readonly IRestClient? _restClient;
 
     public BittradePublicClient(IRestClient restClient)
         : this(new BittradeMarketDataApi(restClient), new BittradeExchangeInfoApi(restClient))
     {
+        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
     public BittradePublicClient(IMarketDataApi marketApi, IExchangeInfoApi exchangeInfoApi)
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
-        _bittradeMarketApi = marketApi as BittradeMarketDataApi;
-        _bittradeExchangeInfoApi = exchangeInfoApi as BittradeExchangeInfoApi;
     }
 
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
     {
-        if (_bittradeMarketApi is null)
+        if (_restClient is null)
         {
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Timestamp");
         }
 
-        return _bittradeMarketApi.GetTimestampAsync(cancellationToken);
+        return _restClient.GetAsync<TimestampResponse>("v1/common/timestamp", cancellationToken: cancellationToken);
     }
 
     public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
     {
-        if (_bittradeExchangeInfoApi is null)
+        if (_restClient is null)
         {
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Symbols");
         }
 
-        return _bittradeExchangeInfoApi.GetSymbolsAsync(cancellationToken);
+        return _restClient.GetAsync<SymbolsResponse>("v1/common/symbols", cancellationToken: cancellationToken);
     }
 
     public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>

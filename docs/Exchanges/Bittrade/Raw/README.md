@@ -1,7 +1,6 @@
-# bitFlyer Raw API
+# Bittrade Raw API
 
-本ディレクトリは、**bitFlyer Lightning REST API** をそのまま扱うための **Raw API ドキュメント群**です。
-
+本ディレクトリは、**Bittrade REST API** をそのまま扱うための **Raw API ドキュメント群**です。
 Raw API は公式 API の **鏡像（faithful mapping）** として設計されており、
 取引所固有の構造・語彙・制約を **抽象化せずに公開**します。
 
@@ -24,6 +23,29 @@ Raw API は公式 API の **鏡像（faithful mapping）** として設計され
 
 ---
 
+## 一次ソース（仕様書）
+
+- `../Rest API共通情報 – BitTrade API Reference.htm`
+
+---
+
+## 共通仕様（要点）
+
+- **Host**: `https://api-cloud.bittrade.co.jp`
+- **署名/認証**: 公開 API 以外は署名必須
+  - 署名パラメータ: `AccessKeyId`, `SignatureMethod=HmacSHA256`, `SignatureVersion=2`, `Timestamp`, `Signature`
+  - **GET**: URL の全パラメータを署名対象に含める
+  - **POST**: 署名パラメータのみを署名対象とし、その他の値は JSON Body に入れる
+- **レート制限**:
+  - 公開 API: IP 毎に 1 秒 10 回
+  - 署名 API: API キー毎に 1 秒 10 回
+- **共通エラー形式**（例）:
+  - `status`: `ok` / `error`
+  - `err-code`: エラーコード
+  - `err-msg`: エラーメッセージ
+
+---
+
 ## Raw API の位置づけ
 
 ```
@@ -31,7 +53,7 @@ Application
    ↑
 Adapter API（任意）
    ↑
-bitFlyer Raw API（本ディレクトリ）
+Bittrade Raw API（本ディレクトリ）
    ↑
 Core / HTTP / Policy
 ```
@@ -39,36 +61,6 @@ Core / HTTP / Policy
 - Raw API は **常に第一選択**です
 - Adapter は Raw API を利用した翻訳層であり、必須ではありません
 - Raw API は Adapter の都合を考慮しません
-
----
-
-## 何が含まれるか
-
-このディレクトリには、以下の情報を用途別に分割して配置します。
-
-- **ApiMap.md**  
-  公式 REST API の Endpoint と Raw-only 対応表（正本）
-- **ApiMap.Decomposition.md**  
-  命名分解の補助ビュー
-- **Requests.md**  
-  Request DTO（Body / Query 集約）の一覧と用途
-
----
-
-## Raw API が提供しないもの
-
-- 複数取引所を横断する統合 API
-- 意味の補完・推測・共通化
-- 業務ロジック・取引戦略
-
-それらは **Application** または **Adapter** の責務です。
-
----
-
-## 補足
-
-- 抽象層で未露出の API も、Raw 層では **意図的に保持**されます
-- 抽象層への昇格は、ユースケースが明確になった段階で検討します
 
 ---
 

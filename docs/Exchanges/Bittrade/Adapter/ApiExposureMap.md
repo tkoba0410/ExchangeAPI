@@ -1,6 +1,6 @@
-# bitFlyer 抽象層公開状況（補助ビュー）
+# Bittrade 抽象層公開状況（補助ビュー）
 
-本ドキュメントは、**bitFlyer の Adapter/Facade が公開している API** を整理した補助ビューです。  
+本ドキュメントは、**Bittrade の Adapter/Facade が公開している API** を整理した補助ビューです。  
 正本（Raw-only）は `../Raw/ApiMap.md` です。
 
 * Raw-only の一覧は正本に集約し、ここでは **抽象層で公開している API と代表メソッド**を示します。
@@ -14,17 +14,42 @@
 | ----------- | ----------------------------- | -------------- |
 | Market      | Ticker / OrderBook / Executions | `GetTickerAsync`, `GetOrderBookAsync`, `GetMarketExecutionsAsync` |
 | Trading     | Place / Cancel / Orders / Status | `PlaceMarketOrderAsync`, `CancelOrderAsync`, `GetOrdersAsync`, `GetOrderAsync` |
-| Account     | Balances / AccountExecutions  | `GetBalancesAsync`, `GetAccountExecutionsAsync` |
-| Margin      | Positions / Collateral        | `GetOpenPositionsAsync`, `GetCollateralAsync` |
+| Account     | Balances                      | `GetBalancesAsync` |
 | ExchangeInfo| Market metadata               | `GetExchangeInfoAsync` |
+| Margin      | Not supported                 | `GetOpenPositionsAsync` / `GetCollateralAsync` -> `ExchangeFeatureNotSupportedException` |
 
-### 追加公開（今回のスコープ）
+---
 
-| Endpoint | 公開 | 抽象メソッド |
+## Raw エンドポイント別の公開状況
+
+| Path | Adapter 露出 | 抽象メソッド |
 | --- | --- | --- |
-| /v1/gethealth | ○ | `BitflyerMarketApi.GetHealthAsync` |
-| /v1/getboardstate | ○ | `BitflyerMarketApi.GetBoardStateAsync` |
-| /v1/me/gettradingcommission | ○ | `BitflyerAccountApi.GetTradingCommissionAsync` |
+| /v1/common/symbols | ○ | `BittradeExchangeInfoApi.GetExchangeInfoAsync` |
+| /v1/common/currencys | - | - |
+| /v1/common/timestamp | - | - |
+| /market/history/kline | - | - |
+| /market/detail/merged | ○ | `BittradeMarketDataApi.GetTickerAsync` |
+| /market/tickers | - | - |
+| /market/depth | ○ | `BittradeMarketDataApi.GetOrderBookAsync` |
+| /market/trade | ○ | `BittradeMarketDataApi.GetMarketExecutionsAsync` |
+| /market/history/trade | - | - |
+| /v1/retail/maintain/time | - | - |
+| /v1/account/accounts | - | - |
+| /v1/account/accounts/{account-id}/balance | ○ | `BittradeTradingApi.GetBalancesAsync` |
+| /v1/order/orders/place | ○ | `BittradeTradingApi.PlaceLimitOrderAsync` / `PlaceMarketOrderAsync` |
+| /v1/order/openOrders | ○ | `BittradeTradingApi.GetOrdersAsync` |
+| /v1/order/orders/{order-id}/submitcancel | ○ | `BittradeTradingApi.CancelOrderAsync` |
+| /v1/order/orders/batchcancel | - | - |
+| /v1/order/orders/batchCancelOpenOrders | - | - |
+| /v1/order/orders/{order-id} | ○ | `BittradeTradingApi.GetOrderAsync` |
+| /v1/order/orders/{order-id}/matchresults | - | - |
+| /v1/order/orders | - | - |
+| /v1/order/matchresults | - | - |
+| /v1/dw/withdraw/api/create | - | - |
+| /v1/dw/withdraw-virtual/{withdraw-id}/cancel | - | - |
+| /v1/query/deposit-withdraw | - | - |
+| /v1/retail/order/place | - | - |
+| /v1/retail/order/list | - | - |
 
 ---
 

@@ -1,9 +1,11 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Common.Types;
 
 public readonly record struct OrderKey
 {
+    [JsonConstructor]
     public OrderKey(OrderIdKind kind, string value) : this()
     {
         if (string.IsNullOrWhiteSpace(value))

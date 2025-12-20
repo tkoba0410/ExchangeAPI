@@ -1,4 +1,5 @@
 using ExchangeApi.Common.Types;
+using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using Xunit;
@@ -22,5 +23,17 @@ public sealed class BitflyerSymbolMapperTests
         var symbol = BitflyerSymbolMapper.FromProductCode("BTC_JPY");
 
         Assert.Equal(new Symbol("BTC/JPY"), symbol);
+    }
+
+    [Fact]
+    public void FromProductCode_Unknown_Throws()
+    {
+        Assert.Throws<SymbolNotSupportedException>(() => BitflyerSymbolMapper.FromProductCode("UNKNOWN"));
+    }
+
+    [Fact]
+    public void ToApiProductCode_Unknown_Throws()
+    {
+        Assert.Throws<SymbolNotSupportedException>(() => BitflyerSymbolMapper.ToApiProductCode((ProductCode)999));
     }
 }

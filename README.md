@@ -59,6 +59,18 @@ dotnet build
 dotnet test
 ```
 
+## ✅ Testing / CI
+
+Fast suite（外部依存なし）:
+- `dotnet test ExchangeApi.slnx`（`LIVE_PUBLIC` 未設定なら Integration.Public.Tests はスキップされます）
+- `dotnet build docs-samples/DocsSamples.csproj`（ドキュメントのサンプルをコンパイル確認）
+
+Live suite（opt-in, 外部API依存）:
+- `LIVE_PUBLIC=1 dotnet test tests/Integration.Public.Tests/Integration.Public.Tests.csproj`
+- 実API/レート制限に依存するため、CI では手動実行を推奨します
+
+Integration のスキップ条件は `LIVE_PUBLIC` 環境変数です（`tests/Integration.Public.Tests/LiveFactAttribute.cs`）。
+
 ---
 
 ## 🚀 使い方：bitFlyer の Ticker を取得する（最小例）

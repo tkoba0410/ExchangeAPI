@@ -112,8 +112,8 @@ public sealed class BittradeRawApi
     public Task<RetailOrdersResponse> GetRetailOrdersAsync(
         int direct,
         int? status = null,
-        long? startTime = null,
-        long? endTime = null,
+        DateTimeOffset? startTime = null,
+        DateTimeOffset? endTime = null,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetRetailOrdersAsync(direct, status, startTime, endTime, cancellationToken);
 

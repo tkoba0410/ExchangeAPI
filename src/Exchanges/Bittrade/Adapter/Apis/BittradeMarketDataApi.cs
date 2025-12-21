@@ -42,9 +42,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
 
         var tick = response.Tick;
         var ts = response.Ts ?? tick.Ts;
-        var timestamp = ts.HasValue && ts.Value > 0
-            ? DateTimeOffset.FromUnixTimeMilliseconds(ts.Value)
-            : DateTimeOffset.UtcNow;
+        var timestamp = ts ?? DateTimeOffset.UtcNow;
         return new Ticker(
             Exchange: ExchangeCode.Bittrade,
             Symbol: symbol,
@@ -90,7 +88,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
                 MapSide(d.Direction),
                 d.Price,
                 d.Amount,
-                DateTimeOffset.FromUnixTimeMilliseconds(d.Ts)))
+                d.Ts))
             .ToList();
 
         return executions;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,8 +54,8 @@ public sealed class BittradeOrderKeyConnectivityTests
             State: BittradeOrderState.Filled,
             Type: BittradeOrderType.BuyLimit,
             ClientOrderId: null,
-            CreatedAt: 1,
-            FinishedAt: 2,
+            CreatedAt: DateTimeOffset.FromUnixTimeMilliseconds(1),
+            FinishedAt: DateTimeOffset.FromUnixTimeMilliseconds(2),
             FilledAmount: "0.01",
             FilledCashAmount: "1",
             Fees: "0");

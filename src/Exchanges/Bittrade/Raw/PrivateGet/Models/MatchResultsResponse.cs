@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
@@ -20,4 +21,5 @@ public sealed record MatchResultEntry(
     [property: JsonPropertyName("filled-amount")] decimal FilledAmount,
     [property: JsonPropertyName("filled-fees")] decimal FilledFees,
     [property: JsonPropertyName("source")] string? Source,
-    [property: JsonPropertyName("created-at")] long CreatedAt);
+    [property: JsonPropertyName("created-at")]
+    [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset CreatedAt);

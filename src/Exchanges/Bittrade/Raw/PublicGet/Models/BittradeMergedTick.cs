@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
@@ -8,6 +9,7 @@ public sealed record MergedTick(
     [property: JsonPropertyName("high")] decimal High,
     [property: JsonPropertyName("amount")] decimal Amount,
     [property: JsonPropertyName("vol")] decimal Volume,
-    [property: JsonPropertyName("ts")] long? Ts,
+    [property: JsonPropertyName("ts")]
+    [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset? Ts,
     [property: JsonPropertyName("bid")] decimal[] Bid,
     [property: JsonPropertyName("ask")] decimal[] Ask);

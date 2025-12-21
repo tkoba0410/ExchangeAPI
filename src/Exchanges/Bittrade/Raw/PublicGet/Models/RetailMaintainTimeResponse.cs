@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
@@ -10,5 +11,6 @@ public sealed record RetailMaintainTimeResponse(
 public sealed record RetailMaintainTimeData(
     [property: JsonPropertyName("start_time")] string StartTime,
     [property: JsonPropertyName("end_time")] string EndTime,
-    [property: JsonPropertyName("ts")] long Ts,
+    [property: JsonPropertyName("ts")]
+    [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset Ts,
     [property: JsonPropertyName("state")] int State);

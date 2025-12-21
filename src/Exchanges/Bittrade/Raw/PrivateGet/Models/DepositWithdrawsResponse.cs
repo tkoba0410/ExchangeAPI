@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
@@ -14,4 +15,5 @@ public sealed record DepositWithdrawEntry(
     [property: JsonPropertyName("address")] string? Address,
     [property: JsonPropertyName("tx-hash")] string? TxHash,
     [property: JsonPropertyName("state")] string? State,
-    [property: JsonPropertyName("created-at")] long? CreatedAt);
+    [property: JsonPropertyName("created-at")]
+    [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset? CreatedAt);

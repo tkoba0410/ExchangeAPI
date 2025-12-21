@@ -133,15 +133,17 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
     public Task<RetailOrdersResponse> GetRetailOrdersAsync(
         int direct,
         int? status = null,
-        long? startTime = null,
-        long? endTime = null,
+        DateTimeOffset? startTime = null,
+        DateTimeOffset? endTime = null,
         CancellationToken cancellationToken = default)
     {
+        var startTimeMs = startTime?.ToUnixTimeMilliseconds();
+        var endTimeMs = endTime?.ToUnixTimeMilliseconds();
         var query = BuildQuery(
             ("direct", direct.ToString()),
             ("status", status?.ToString()),
-            ("start_time", startTime?.ToString()),
-            ("end_time", endTime?.ToString()));
+            ("start_time", startTimeMs?.ToString()),
+            ("end_time", endTimeMs?.ToString()));
 
         return _restClient.GetAsync<RetailOrdersResponse>(
             $"v1/retail/order/list?{query}",

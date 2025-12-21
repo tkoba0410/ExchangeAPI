@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
@@ -16,4 +17,5 @@ public sealed record RetailOrderEntry(
     [property: JsonPropertyName("amount")] string? Amount,
     [property: JsonPropertyName("cash_amount")] string? CashAmount,
     [property: JsonPropertyName("status")] int? Status,
-    [property: JsonPropertyName("created_at")] long? CreatedAt);
+    [property: JsonPropertyName("created_at")]
+    [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset? CreatedAt);

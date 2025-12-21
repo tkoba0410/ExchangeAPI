@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
@@ -5,7 +6,8 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 public sealed record KlinesResponse(
     [property: JsonPropertyName("ch")] string? Channel,
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("ts")] long Ts,
+    [property: JsonPropertyName("ts")]
+    [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset Ts,
     [property: JsonPropertyName("data")] IReadOnlyList<KlineEntry>? Data);
 
 public sealed record KlineEntry(

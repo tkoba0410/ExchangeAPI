@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
@@ -7,4 +8,5 @@ public sealed record CancelOpenOrdersRequest(
     [property: JsonPropertyName("side")] BittradeOrderSide? Side = null,
     [property: JsonPropertyName("size")] string? Size = null,
     [property: JsonPropertyName("price")] string? Price = null,
-    [property: JsonPropertyName("created-at")] long? CreatedAt = null);
+    [property: JsonPropertyName("created-at")]
+    [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset? CreatedAt = null);

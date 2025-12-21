@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
@@ -48,7 +49,7 @@ internal interface IBittradePrivateApi
     Task<RetailOrdersResponse> GetRetailOrdersAsync(
         int direct,
         int? status = null,
-        long? startTime = null,
-        long? endTime = null,
+        DateTimeOffset? startTime = null,
+        DateTimeOffset? endTime = null,
         CancellationToken cancellationToken = default);
 }

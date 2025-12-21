@@ -21,7 +21,7 @@ public sealed class BittradePublicClientTests
         var response = await client.GetTimestampAsync();
 
         Assert.Equal("ok", response.Status);
-        Assert.Equal(1700000000000L, response.Data);
+        Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1700000000000), response.Data);
     }
 
     [Fact]

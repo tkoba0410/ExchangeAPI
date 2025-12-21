@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
@@ -10,5 +11,6 @@ public sealed record OrderSummary(
     [property: JsonPropertyName("state")] BittradeOrderState State,
     [property: JsonPropertyName("type")] BittradeOrderType Type,
     [property: JsonPropertyName("client-order-id")] string? ClientOrderId,
-    [property: JsonPropertyName("created-at")] long CreatedAt,
+    [property: JsonPropertyName("created-at")]
+    [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset CreatedAt,
     [property: JsonPropertyName("field-amount")] string FilledAmount);

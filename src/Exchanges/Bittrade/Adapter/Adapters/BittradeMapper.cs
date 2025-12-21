@@ -52,7 +52,7 @@ internal static class BittradeMapper
             OrderedAt: DateTimeOffset.FromUnixTimeMilliseconds(detail.CreatedAt),
             UpdatedAt: detail.FinishedAt.HasValue ? DateTimeOffset.FromUnixTimeMilliseconds(detail.FinishedAt.Value) : null,
             StopPrice: null,
-            Status: detail.State,
+            Status: ToWireValue(detail.State),
             ExchangeOrderId: detail.Id.ToString(CultureInfo.InvariantCulture));
     }
 
@@ -77,42 +77,37 @@ internal static class BittradeMapper
             OrderedAt: DateTimeOffset.FromUnixTimeMilliseconds(summary.CreatedAt),
             UpdatedAt: null,
             StopPrice: null,
-            Status: summary.State,
+            Status: ToWireValue(summary.State),
             ExchangeOrderId: summary.Id.ToString(CultureInfo.InvariantCulture));
     }
 
-    public static OrderState ParseStatus(string state)
+    public static OrderState ParseStatus(BittradeOrderState state)
     {
         return state switch
         {
-            "submitted" => OrderState.Active,
-            "partial-filled" => OrderState.Active,
-            "filled" => OrderState.Completed,
-            "partial-canceled" => OrderState.Canceled,
-            "canceled" => OrderState.Canceled,
-            "expired" => OrderState.Expired,
+            BittradeOrderState.Submitted => OrderState.Active,
+            BittradeOrderState.PartialFilled => OrderState.Active,
+            BittradeOrderState.Filled => OrderState.Completed,
+            BittradeOrderState.PartialCanceled => OrderState.Canceled,
+            BittradeOrderState.Canceled => OrderState.Canceled,
             _ => OrderState.Unknown
         };
     }
 
-    public static (Side Side, OrderType OrderType) ParseOrderType(string type)
+    public static (Side Side, OrderType OrderType) ParseOrderType(BittradeOrderType type)
     {
-        // format: buy-market, sell-limit, buy-limit
-        var parts = type.Split('-', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length != 2) throw new ExchangeApiException($"Unsupported order type: {type}");
-
-        var side = string.Equals(parts[0], "buy", StringComparison.OrdinalIgnoreCase)
-            ? Side.Buy
-            : Side.Sell;
-
-        var orderType = parts[1] switch
+        return type switch
         {
-            "market" => OrderType.Market,
-            "limit" => OrderType.Limit,
-            _ => throw new ExchangeApiException($"Unsupported order subtype: {parts[1]}")
+            BittradeOrderType.BuyMarket => (Side.Buy, OrderType.Market),
+            BittradeOrderType.SellMarket => (Side.Sell, OrderType.Market),
+            BittradeOrderType.BuyLimit => (Side.Buy, OrderType.Limit),
+            BittradeOrderType.SellLimit => (Side.Sell, OrderType.Limit),
+            BittradeOrderType.BuyLimitMaker => (Side.Buy, OrderType.Limit),
+            BittradeOrderType.SellLimitMaker => (Side.Sell, OrderType.Limit),
+            BittradeOrderType.BuyIoc => (Side.Buy, OrderType.Limit),
+            BittradeOrderType.SellIoc => (Side.Sell, OrderType.Limit),
+            _ => throw new ExchangeApiException($"Unsupported order type: {type}")
         };
-
-        return (side, orderType);
     }
 
     private static decimal ParseDecimal(string s) =>
@@ -120,4 +115,17 @@ internal static class BittradeMapper
 
     public static string ToProductCode(Symbol symbol) =>
         BittradeSymbolMapper.ToProductCode(symbol);
+
+    private static string ToWireValue(BittradeOrderState state)
+    {
+        return state switch
+        {
+            BittradeOrderState.Submitted => "submitted",
+            BittradeOrderState.PartialFilled => "partial-filled",
+            BittradeOrderState.PartialCanceled => "partial-canceled",
+            BittradeOrderState.Filled => "filled",
+            BittradeOrderState.Canceled => "canceled",
+            _ => state.ToString()
+        };
+    }
 }

@@ -168,7 +168,7 @@
 | --- | --- | --- | --- |
 | account-id | string | yes | 口座ID |
 | symbol | string | yes | 例: `btcjpy` |
-| type | string | yes | 例: `buy-limit` / `sell-market` |
+| type | string | yes | `buy-market` / `sell-market` / `buy-limit` / `sell-limit` / `buy-limit-maker` / `sell-limit-maker` / `buy-ioc` / `sell-ioc` |
 | amount | string | yes | 数量 |
 | price | string | no | 指値時のみ |
 | source | string | no | 例: `api` |

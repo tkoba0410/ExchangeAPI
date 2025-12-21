@@ -12,14 +12,14 @@ internal interface IBittradePrivateApi
 
     Task<BalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default);
 
-    Task<OpenOrdersResponse> GetOpenOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default);
+    Task<OpenOrdersResponse> GetOpenOrdersAsync(Symbol symbol, string accountId, CancellationToken cancellationToken = default);
 
-    Task<OrderDetailResponse> GetOrderAsync(string orderId, CancellationToken cancellationToken = default);
+    Task<OrderDetailResponse> GetOrderAsync(OrderId orderId, CancellationToken cancellationToken = default);
 
-    Task<OrderMatchResultsResponse> GetOrderMatchResultsAsync(string orderId, CancellationToken cancellationToken = default);
+    Task<OrderMatchResultsResponse> GetOrderMatchResultsAsync(OrderId orderId, CancellationToken cancellationToken = default);
 
     Task<OrdersResponse> GetOrdersAsync(
-        string symbol,
+        Symbol symbol,
         string states,
         string? startDate = null,
         string? endDate = null,
@@ -29,7 +29,7 @@ internal interface IBittradePrivateApi
         CancellationToken cancellationToken = default);
 
     Task<MatchResultsResponse> GetMatchResultsAsync(
-        string? symbol = null,
+        Symbol? symbol = null,
         string? types = null,
         string? startDate = null,
         string? endDate = null,

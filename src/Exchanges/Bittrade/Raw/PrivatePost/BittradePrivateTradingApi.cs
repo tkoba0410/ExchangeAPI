@@ -26,15 +26,15 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
             cancellationToken);
     }
 
-    public Task<CancelOrderResponse> CancelOrderAsync(string orderId, CancellationToken cancellationToken = default)
+    public Task<CancelOrderResponse> CancelOrderAsync(OrderId orderId, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(orderId))
+        if (string.IsNullOrWhiteSpace(orderId.Value))
         {
             throw new ArgumentException("orderId is required.", nameof(orderId));
         }
 
         return _restClient.PostAsync<object?, CancelOrderResponse>(
-            $"v1/order/orders/{orderId}/submitcancel",
+            $"v1/order/orders/{orderId.Value}/submitcancel",
             body: null,
             cancellationToken: cancellationToken);
     }

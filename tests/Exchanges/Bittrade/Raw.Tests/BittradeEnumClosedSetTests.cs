@@ -30,8 +30,8 @@ public sealed class BittradeEnumClosedSetTests
         var detail = JsonSerializer.Deserialize<OrderDetail>(json);
 
         Assert.NotNull(detail);
-        Assert.Equal(BittradeOrderState.Submitted, detail!.State);
-        Assert.Equal(BittradeOrderType.BuyLimit, detail.Type);
+        Assert.Equal(OrderState.Submitted, detail!.State);
+        Assert.Equal(OrderType.BuyLimit, detail.Type);
     }
 
     [Fact]
@@ -110,6 +110,6 @@ public sealed class BittradeEnumClosedSetTests
         var request = JsonSerializer.Deserialize<CancelOpenOrdersRequest>(json);
 
         Assert.NotNull(request);
-        Assert.Equal(BittradeOrderSide.Buy, request!.Side);
+        Assert.Equal(OrderSide.Buy, request!.Side);
     }
 }

@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
+using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
+using CommonOrderState = ExchangeApi.Common.Enums.OrderState;
+using CommonOrderType = ExchangeApi.Common.Enums.OrderType;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 
 internal static class BittradeMapper
@@ -41,8 +46,8 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             ExchangeCode: Exchange,
-            Symbol: BittradeSymbolMapper.Parse(detail.Symbol),
-            Key: new OrderKey(OrderIdKind.ExchangeOrderId, detail.Id.ToString(CultureInfo.InvariantCulture)),
+            Symbol: BittradeSymbolMapper.Parse(detail.Symbol.Value),
+            Key: new OrderKey(OrderIdKind.ExchangeOrderId, detail.Id.Value),
             Side: side,
             OrderType: type,
             Size: size,
@@ -53,7 +58,7 @@ internal static class BittradeMapper
             UpdatedAt: detail.FinishedAt,
             StopPrice: null,
             Status: ToWireValue(detail.State),
-            ExchangeOrderId: detail.Id.ToString(CultureInfo.InvariantCulture));
+            ExchangeOrderId: detail.Id.Value);
     }
 
     public static OpenOrder MapOrderSummary(OrderSummary summary)
@@ -66,8 +71,8 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             ExchangeCode: Exchange,
-            Symbol: BittradeSymbolMapper.Parse(summary.Symbol),
-            Key: new OrderKey(OrderIdKind.ExchangeOrderId, summary.Id.ToString(CultureInfo.InvariantCulture)),
+            Symbol: BittradeSymbolMapper.Parse(summary.Symbol.Value),
+            Key: new OrderKey(OrderIdKind.ExchangeOrderId, summary.Id.Value),
             Side: side,
             OrderType: type,
             Size: size,
@@ -78,34 +83,34 @@ internal static class BittradeMapper
             UpdatedAt: null,
             StopPrice: null,
             Status: ToWireValue(summary.State),
-            ExchangeOrderId: summary.Id.ToString(CultureInfo.InvariantCulture));
+            ExchangeOrderId: summary.Id.Value);
     }
 
-    public static OrderState ParseStatus(BittradeOrderState state)
+    public static CommonOrderState ParseStatus(RawOrderState state)
     {
         return state switch
         {
-            BittradeOrderState.Submitted => OrderState.Active,
-            BittradeOrderState.PartialFilled => OrderState.Active,
-            BittradeOrderState.Filled => OrderState.Completed,
-            BittradeOrderState.PartialCanceled => OrderState.Canceled,
-            BittradeOrderState.Canceled => OrderState.Canceled,
-            _ => OrderState.Unknown
+            RawOrderState.Submitted => CommonOrderState.Active,
+            RawOrderState.PartialFilled => CommonOrderState.Active,
+            RawOrderState.Filled => CommonOrderState.Completed,
+            RawOrderState.PartialCanceled => CommonOrderState.Canceled,
+            RawOrderState.Canceled => CommonOrderState.Canceled,
+            _ => CommonOrderState.Unknown
         };
     }
 
-    public static (Side Side, OrderType OrderType) ParseOrderType(BittradeOrderType type)
+    public static (Side Side, CommonOrderType OrderType) ParseOrderType(RawOrderType type)
     {
         return type switch
         {
-            BittradeOrderType.BuyMarket => (Side.Buy, OrderType.Market),
-            BittradeOrderType.SellMarket => (Side.Sell, OrderType.Market),
-            BittradeOrderType.BuyLimit => (Side.Buy, OrderType.Limit),
-            BittradeOrderType.SellLimit => (Side.Sell, OrderType.Limit),
-            BittradeOrderType.BuyLimitMaker => (Side.Buy, OrderType.Limit),
-            BittradeOrderType.SellLimitMaker => (Side.Sell, OrderType.Limit),
-            BittradeOrderType.BuyIoc => (Side.Buy, OrderType.Limit),
-            BittradeOrderType.SellIoc => (Side.Sell, OrderType.Limit),
+            RawOrderType.BuyMarket => (Side.Buy, CommonOrderType.Market),
+            RawOrderType.SellMarket => (Side.Sell, CommonOrderType.Market),
+            RawOrderType.BuyLimit => (Side.Buy, CommonOrderType.Limit),
+            RawOrderType.SellLimit => (Side.Sell, CommonOrderType.Limit),
+            RawOrderType.BuyLimitMaker => (Side.Buy, CommonOrderType.Limit),
+            RawOrderType.SellLimitMaker => (Side.Sell, CommonOrderType.Limit),
+            RawOrderType.BuyIoc => (Side.Buy, CommonOrderType.Limit),
+            RawOrderType.SellIoc => (Side.Sell, CommonOrderType.Limit),
             _ => throw new ExchangeApiException($"Unsupported order type: {type}")
         };
     }
@@ -113,18 +118,18 @@ internal static class BittradeMapper
     private static decimal ParseDecimal(string s) =>
         decimal.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture);
 
-    public static string ToProductCode(Symbol symbol) =>
+    public static string ToProductCode(CommonSymbol symbol) =>
         BittradeSymbolMapper.ToProductCode(symbol);
 
-    private static string ToWireValue(BittradeOrderState state)
+    private static string ToWireValue(RawOrderState state)
     {
         return state switch
         {
-            BittradeOrderState.Submitted => "submitted",
-            BittradeOrderState.PartialFilled => "partial-filled",
-            BittradeOrderState.PartialCanceled => "partial-canceled",
-            BittradeOrderState.Filled => "filled",
-            BittradeOrderState.Canceled => "canceled",
+            RawOrderState.Submitted => "submitted",
+            RawOrderState.PartialFilled => "partial-filled",
+            RawOrderState.PartialCanceled => "partial-canceled",
+            RawOrderState.Filled => "filled",
+            RawOrderState.Canceled => "canceled",
             _ => state.ToString()
         };
     }

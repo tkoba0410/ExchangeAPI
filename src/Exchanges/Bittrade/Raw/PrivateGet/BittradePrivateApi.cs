@@ -29,9 +29,9 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             cancellationToken: cancellationToken);
     }
 
-    public Task<OpenOrdersResponse> GetOpenOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default)
+    public Task<OpenOrdersResponse> GetOpenOrdersAsync(Symbol symbol, string accountId, CancellationToken cancellationToken = default)
     {
-        EnsureRequired(symbol, nameof(symbol));
+        EnsureSymbol(symbol);
         EnsureRequired(accountId, nameof(accountId));
         var query = BuildQuery(
             ("symbol", ToApiSymbol(symbol)),
@@ -42,24 +42,24 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             cancellationToken: cancellationToken);
     }
 
-    public Task<OrderDetailResponse> GetOrderAsync(string orderId, CancellationToken cancellationToken = default)
+    public Task<OrderDetailResponse> GetOrderAsync(OrderId orderId, CancellationToken cancellationToken = default)
     {
-        EnsureRequired(orderId, nameof(orderId));
+        EnsureRequired(orderId.Value, nameof(orderId));
         return _restClient.GetAsync<OrderDetailResponse>(
-            $"v1/order/orders/{orderId}",
+            $"v1/order/orders/{orderId.Value}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<OrderMatchResultsResponse> GetOrderMatchResultsAsync(string orderId, CancellationToken cancellationToken = default)
+    public Task<OrderMatchResultsResponse> GetOrderMatchResultsAsync(OrderId orderId, CancellationToken cancellationToken = default)
     {
-        EnsureRequired(orderId, nameof(orderId));
+        EnsureRequired(orderId.Value, nameof(orderId));
         return _restClient.GetAsync<OrderMatchResultsResponse>(
-            $"v1/order/orders/{orderId}/matchresults",
+            $"v1/order/orders/{orderId.Value}/matchresults",
             cancellationToken: cancellationToken);
     }
 
     public Task<OrdersResponse> GetOrdersAsync(
-        string symbol,
+        Symbol symbol,
         string states,
         string? startDate = null,
         string? endDate = null,
@@ -68,7 +68,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         int? size = null,
         CancellationToken cancellationToken = default)
     {
-        EnsureRequired(symbol, nameof(symbol));
+        EnsureSymbol(symbol);
         EnsureRequired(states, nameof(states));
 
         var query = BuildQuery(
@@ -86,7 +86,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
     }
 
     public Task<MatchResultsResponse> GetMatchResultsAsync(
-        string? symbol = null,
+        Symbol? symbol = null,
         string? types = null,
         string? startDate = null,
         string? endDate = null,
@@ -96,7 +96,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         CancellationToken cancellationToken = default)
     {
         var query = BuildQuery(
-            ("symbol", string.IsNullOrWhiteSpace(symbol) ? null : ToApiSymbol(symbol)),
+            ("symbol", symbol.HasValue ? ToApiSymbol(symbol.Value) : null),
             ("types", types),
             ("start-date", startDate),
             ("end-date", endDate),
@@ -150,14 +150,22 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             cancellationToken: cancellationToken);
     }
 
-    private static string ToApiSymbol(string symbol) =>
-        symbol.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
+    private static string ToApiSymbol(Symbol symbol) =>
+        symbol.Value.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
 
     private static void EnsureRequired(string value, string name)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
             throw new ArgumentException($"{name} is required.", name);
+        }
+    }
+
+    private static void EnsureSymbol(Symbol symbol)
+    {
+        if (string.IsNullOrWhiteSpace(symbol.Value))
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
         }
     }
 

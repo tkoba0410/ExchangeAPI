@@ -7,7 +7,9 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Enums;
+using CommonOrderType = ExchangeApi.Common.Enums.OrderType;
 using ExchangeApi.Common.Types;
+using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
@@ -42,7 +44,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
     }
 
     public Task<OrderResult> PlaceLimitOrderAsync(
-        Symbol symbol,
+        CommonSymbol symbol,
         Side side,
         decimal size,
         decimal price,
@@ -50,14 +52,14 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         PlaceOrderInternal(OrderRequest.Limit(symbol, side, size, price), cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
-        Symbol symbol,
+        CommonSymbol symbol,
         Side side,
         decimal size,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(OrderRequest.Market(symbol, side, size), cancellationToken);
 
     public Task<OrderResult> PlaceStopOrderAsync(
-        Symbol symbol,
+        CommonSymbol symbol,
         Side side,
         decimal size,
         decimal triggerPrice,
@@ -77,7 +79,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             ["amount"] = request.Size.ToString()
         };
 
-        if (request.OrderType == OrderType.Limit)
+        if (request.OrderType == CommonOrderType.Limit)
         {
             body["price"] = request.Price?.ToString();
         }
@@ -92,12 +94,12 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             throw new ExchangeApiException("Bittrade place order failed.");
         }
 
-        var orderId = resp.OrderId.ToString();
+        var orderId = resp.OrderId.Value;
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
         return new OrderResult(key, ExchangeOrderId: orderId);
     }
 
-    public async Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default)
+    public async Task<CancelResult> CancelOrderAsync(CommonSymbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default)
     {
         if (symbol.IsEmpty)
         {
@@ -122,7 +124,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
         return new CancelResult(true);
     }
 
-    public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
         var resp = await _restClient.GetAsync<OpenOrdersResponse>(
@@ -138,7 +140,7 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
     }
 
     public async Task<OrderStatus> GetOrderAsync(
-        Symbol symbol,
+        CommonSymbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
     {
@@ -176,21 +178,21 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
             null);
     }
 
-    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
     {
         throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "AccountExecutions");
     }
 
-    private static string ToApiSymbol(Symbol symbol) =>
+    private static string ToApiSymbol(CommonSymbol symbol) =>
         BittradeSymbolMapper.ToApiSymbol(symbol);
 
     private static string ToOrderType(OrderRequest request) =>
         (request.Side, request.OrderType) switch
         {
-            (Side.Buy, OrderType.Market) => "buy-market",
-            (Side.Sell, OrderType.Market) => "sell-market",
-            (Side.Buy, OrderType.Limit) => "buy-limit",
-            (Side.Sell, OrderType.Limit) => "sell-limit",
+            (Side.Buy, CommonOrderType.Market) => "buy-market",
+            (Side.Sell, CommonOrderType.Market) => "sell-market",
+            (Side.Buy, CommonOrderType.Limit) => "buy-limit",
+            (Side.Sell, CommonOrderType.Limit) => "sell-limit",
             _ => throw new ExchangeApiException($"Unsupported order type: {request.OrderType}")
         };
 }

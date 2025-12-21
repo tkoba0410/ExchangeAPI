@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
@@ -28,7 +28,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default) =>
         _restClient.GetAsync<TimestampResponse>("v1/common/timestamp", cancellationToken: cancellationToken);
 
-    public async Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    public async Task<Ticker> GetTickerAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
         var response = await _restClient.GetAsync<MergedResponse>(
@@ -50,7 +50,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
             Timestamp: timestamp);
     }
 
-    public async Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    public async Task<OrderBook> GetOrderBookAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
         var response = await _restClient.GetAsync<DepthResponse>(
@@ -68,7 +68,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         return new OrderBook(ExchangeCode.Bittrade, bids, asks);
     }
 
-    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
     {
         var apiSymbol = ToApiSymbol(symbol);
         var response = await _restClient.GetAsync<TradeResponse>(
@@ -95,7 +95,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
     }
 
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
-        Symbol symbol,
+        CommonSymbol symbol,
         TimeSpan timescale,
         DateTimeOffset? from = null,
         DateTimeOffset? to = null,
@@ -115,6 +115,6 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
             ? Side.Buy
             : Side.Sell;
 
-    private static string ToApiSymbol(Symbol symbol) =>
+    private static string ToApiSymbol(CommonSymbol symbol) =>
         BittradeSymbolMapper.ToApiSymbol(symbol);
 }

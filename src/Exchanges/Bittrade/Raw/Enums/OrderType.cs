@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-[JsonConverter(typeof(BittradeOrderTypeJsonConverter))]
-public enum BittradeOrderType
+[JsonConverter(typeof(OrderTypeJsonConverter))]
+public enum OrderType
 {
     [EnumMember(Value = "buy-limit")]
     BuyLimit,

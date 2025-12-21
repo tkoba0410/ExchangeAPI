@@ -7,7 +7,8 @@ public sealed record TickersResponse(
     [property: JsonPropertyName("data")] IReadOnlyList<TickerEntry>? Data);
 
 public sealed record TickerEntry(
-    [property: JsonPropertyName("symbol")] string Symbol,
+    [property: JsonPropertyName("symbol")]
+    [property: JsonConverter(typeof(SymbolJsonConverter))] Symbol Symbol,
     [property: JsonPropertyName("open")] decimal Open,
     [property: JsonPropertyName("close")] decimal Close,
     [property: JsonPropertyName("low")] decimal Low,

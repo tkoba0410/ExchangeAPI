@@ -2,8 +2,9 @@ using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record CreateRetailOrderRequest(
-    [property: JsonPropertyName("symbol")] string Symbol,
-    [property: JsonPropertyName("type")] BittradeRetailOrderType Type,
+    [property: JsonPropertyName("symbol")]
+    [property: JsonConverter(typeof(SymbolJsonConverter))] Symbol Symbol,
+    [property: JsonPropertyName("type")] RetailOrderType Type,
     [property: JsonPropertyName("price")] string? Price = null,
     [property: JsonPropertyName("amount")] string? Amount = null,
     [property: JsonPropertyName("cash_amount")] string? CashAmount = null);

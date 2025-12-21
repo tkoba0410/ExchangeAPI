@@ -11,7 +11,8 @@ public sealed record RetailOrdersResponse(
 
 public sealed record RetailOrderEntry(
     [property: JsonPropertyName("id")] long Id,
-    [property: JsonPropertyName("symbol")] string Symbol,
+    [property: JsonPropertyName("symbol")]
+    [property: JsonConverter(typeof(SymbolJsonConverter))] Symbol Symbol,
     [property: JsonPropertyName("type")] int Type,
     [property: JsonPropertyName("price")] string? Price,
     [property: JsonPropertyName("amount")] string? Amount,

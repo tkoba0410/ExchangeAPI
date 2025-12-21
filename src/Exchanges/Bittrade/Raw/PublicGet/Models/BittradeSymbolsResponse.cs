@@ -8,7 +8,8 @@ public sealed record SymbolsResponse(
     [property: JsonPropertyName("data")] IReadOnlyList<SymbolInfo>? Data);
 
 public sealed record SymbolInfo(
-    [property: JsonPropertyName("symbol")] string Symbol,
+    [property: JsonPropertyName("symbol")]
+    [property: JsonConverter(typeof(SymbolJsonConverter))] Symbol Symbol,
     [property: JsonPropertyName("base-currency")] string BaseCurrency,
     [property: JsonPropertyName("quote-currency")] string QuoteCurrency,
     [property: JsonPropertyName("price-precision")] int PricePrecision,

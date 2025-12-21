@@ -40,7 +40,7 @@ Raw の値は「変化が大きい（増える前提）」と「変化が小さ�
 - kline interval（戦略に直結する場合）
 
 **表現**
-- 取引所専用 enum（例: BittradeOrderSide）を Raw 層に定義する
+- 取引所専用 enum（例: OrderSide）を Raw 層に定義する
 - JSON からのデシリアライズは strict（未知値は例外）
 
 **理由**

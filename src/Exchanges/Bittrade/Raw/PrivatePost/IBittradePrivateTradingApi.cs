@@ -9,7 +9,7 @@ internal interface IBittradePrivateTradingApi
 {
     Task<PlaceOrderResponse> CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken = default);
 
-    Task<CancelOrderResponse> CancelOrderAsync(string orderId, CancellationToken cancellationToken = default);
+    Task<CancelOrderResponse> CancelOrderAsync(OrderId orderId, CancellationToken cancellationToken = default);
 
     Task<CancelOrdersResponse> CancelOrdersAsync(CancelOrdersRequest request, CancellationToken cancellationToken = default);
 

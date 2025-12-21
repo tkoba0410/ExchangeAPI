@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-[JsonConverter(typeof(BittradeOrderSideJsonConverter))]
-public enum BittradeOrderSide
+[JsonConverter(typeof(OrderSideJsonConverter))]
+public enum OrderSide
 {
     [EnumMember(Value = "buy")]
     Buy,

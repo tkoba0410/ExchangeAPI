@@ -16,7 +16,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<MergedResponse> GetMergedTickerAsync(string symbol, CancellationToken cancellationToken = default)
+    public Task<MergedResponse> GetMergedTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
         return _restClient.GetAsync<MergedResponse>(
@@ -24,7 +24,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
             cancellationToken: cancellationToken);
     }
 
-    public Task<DepthResponse> GetDepthAsync(string symbol, string? type = null, CancellationToken cancellationToken = default)
+    public Task<DepthResponse> GetDepthAsync(Symbol symbol, string? type = null, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
         var depthType = string.IsNullOrWhiteSpace(type) ? "step0" : type;
@@ -33,7 +33,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
             cancellationToken: cancellationToken);
     }
 
-    public Task<TradeResponse> GetTradesAsync(string symbol, CancellationToken cancellationToken = default)
+    public Task<TradeResponse> GetTradesAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
         return _restClient.GetAsync<TradeResponse>(
@@ -50,7 +50,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default) =>
         _restClient.GetAsync<TimestampResponse>("v1/common/timestamp", cancellationToken: cancellationToken);
 
-    public Task<KlinesResponse> GetKlinesAsync(string symbol, string period, int? size = null, CancellationToken cancellationToken = default)
+    public Task<KlinesResponse> GetKlinesAsync(Symbol symbol, string period, int? size = null, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
         if (string.IsNullOrWhiteSpace(period)) throw new ArgumentException("period is required.", nameof(period));
@@ -63,7 +63,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public Task<TickersResponse> GetTickersAsync(CancellationToken cancellationToken = default) =>
         _restClient.GetAsync<TickersResponse>("market/tickers", cancellationToken: cancellationToken);
 
-    public Task<TradeHistoryResponse> GetTradeHistoryAsync(string symbol, CancellationToken cancellationToken = default)
+    public Task<TradeHistoryResponse> GetTradeHistoryAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
         return _restClient.GetAsync<TradeHistoryResponse>(
@@ -74,12 +74,12 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public Task<RetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default) =>
         _restClient.GetAsync<RetailMaintainTimeResponse>("v1/retail/maintain/time", cancellationToken: cancellationToken);
 
-    private static string ToApiSymbol(string symbol) =>
-        symbol.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
+    private static string ToApiSymbol(Symbol symbol) =>
+        symbol.Value.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
 
-    private static void EnsureSymbol(string symbol)
+    private static void EnsureSymbol(Symbol symbol)
     {
-        if (string.IsNullOrWhiteSpace(symbol))
+        if (string.IsNullOrWhiteSpace(symbol.Value))
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }

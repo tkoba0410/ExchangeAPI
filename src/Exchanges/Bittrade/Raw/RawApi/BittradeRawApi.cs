@@ -41,22 +41,22 @@ public sealed class BittradeRawApi
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default) =>
         _publicApi.GetTimestampAsync(cancellationToken);
 
-    public Task<KlinesResponse> GetKlinesAsync(string symbol, string period, int? size = null, CancellationToken cancellationToken = default) =>
+    public Task<KlinesResponse> GetKlinesAsync(Symbol symbol, string period, int? size = null, CancellationToken cancellationToken = default) =>
         _publicApi.GetKlinesAsync(symbol, period, size, cancellationToken);
 
-    public Task<MergedResponse> GetMergedTickerAsync(string symbol, CancellationToken cancellationToken = default) =>
+    public Task<MergedResponse> GetMergedTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _publicApi.GetMergedTickerAsync(symbol, cancellationToken);
 
     public Task<TickersResponse> GetTickersAsync(CancellationToken cancellationToken = default) =>
         _publicApi.GetTickersAsync(cancellationToken);
 
-    public Task<DepthResponse> GetDepthAsync(string symbol, string? type = null, CancellationToken cancellationToken = default) =>
+    public Task<DepthResponse> GetDepthAsync(Symbol symbol, string? type = null, CancellationToken cancellationToken = default) =>
         _publicApi.GetDepthAsync(symbol, type, cancellationToken);
 
-    public Task<TradeResponse> GetTradesAsync(string symbol, CancellationToken cancellationToken = default) =>
+    public Task<TradeResponse> GetTradesAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _publicApi.GetTradesAsync(symbol, cancellationToken);
 
-    public Task<TradeHistoryResponse> GetTradeHistoryAsync(string symbol, CancellationToken cancellationToken = default) =>
+    public Task<TradeHistoryResponse> GetTradeHistoryAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _publicApi.GetTradeHistoryAsync(symbol, cancellationToken);
 
     public Task<RetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default) =>
@@ -69,17 +69,17 @@ public sealed class BittradeRawApi
     public Task<BalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default) =>
         _privateApi.GetAccountBalanceAsync(accountId, cancellationToken);
 
-    public Task<OpenOrdersResponse> GetOpenOrdersAsync(string symbol, string accountId, CancellationToken cancellationToken = default) =>
+    public Task<OpenOrdersResponse> GetOpenOrdersAsync(Symbol symbol, string accountId, CancellationToken cancellationToken = default) =>
         _privateApi.GetOpenOrdersAsync(symbol, accountId, cancellationToken);
 
-    public Task<OrderDetailResponse> GetOrderAsync(string orderId, CancellationToken cancellationToken = default) =>
+    public Task<OrderDetailResponse> GetOrderAsync(OrderId orderId, CancellationToken cancellationToken = default) =>
         _privateApi.GetOrderAsync(orderId, cancellationToken);
 
-    public Task<OrderMatchResultsResponse> GetOrderMatchResultsAsync(string orderId, CancellationToken cancellationToken = default) =>
+    public Task<OrderMatchResultsResponse> GetOrderMatchResultsAsync(OrderId orderId, CancellationToken cancellationToken = default) =>
         _privateApi.GetOrderMatchResultsAsync(orderId, cancellationToken);
 
     public Task<OrdersResponse> GetOrdersAsync(
-        string symbol,
+        Symbol symbol,
         string states,
         string? startDate = null,
         string? endDate = null,
@@ -90,7 +90,7 @@ public sealed class BittradeRawApi
         _privateApi.GetOrdersAsync(symbol, states, startDate, endDate, from, direct, size, cancellationToken);
 
     public Task<MatchResultsResponse> GetMatchResultsAsync(
-        string? symbol = null,
+        Symbol? symbol = null,
         string? types = null,
         string? startDate = null,
         string? endDate = null,
@@ -121,7 +121,7 @@ public sealed class BittradeRawApi
     public Task<PlaceOrderResponse> CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken = default) =>
         _privateTradingApi.CreateOrderAsync(request, cancellationToken);
 
-    public Task<CancelOrderResponse> CancelOrderAsync(string orderId, CancellationToken cancellationToken = default) =>
+    public Task<CancelOrderResponse> CancelOrderAsync(OrderId orderId, CancellationToken cancellationToken = default) =>
         _privateTradingApi.CancelOrderAsync(orderId, cancellationToken);
 
     public Task<CancelOrdersResponse> CancelOrdersAsync(CancelOrdersRequest request, CancellationToken cancellationToken = default) =>

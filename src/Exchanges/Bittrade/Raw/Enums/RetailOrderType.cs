@@ -2,8 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-[JsonConverter(typeof(BittradeRetailOrderTypeJsonConverter))]
-public enum BittradeRetailOrderType
+[JsonConverter(typeof(RetailOrderTypeJsonConverter))]
+public enum RetailOrderType
 {
     Buy = 1,
     Sell = 2

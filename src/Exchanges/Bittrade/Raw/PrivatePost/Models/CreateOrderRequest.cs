@@ -3,8 +3,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record CreateOrderRequest(
     [property: JsonPropertyName("account-id")] string AccountId,
-    [property: JsonPropertyName("symbol")] string Symbol,
-    [property: JsonPropertyName("type")] BittradeOrderType Type,
+    [property: JsonPropertyName("symbol")]
+    [property: JsonConverter(typeof(SymbolJsonConverter))] Symbol Symbol,
+    [property: JsonPropertyName("type")] OrderType Type,
     [property: JsonPropertyName("amount")] string Amount,
     [property: JsonPropertyName("price")] string? Price = null,
     [property: JsonPropertyName("source")] string? Source = null);

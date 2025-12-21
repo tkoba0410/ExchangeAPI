@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
@@ -67,23 +68,23 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         return _restClient.GetAsync<SymbolsResponse>("v1/common/symbols", cancellationToken: cancellationToken);
     }
 
-    public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<Ticker> GetTickerAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerAsync(symbol, cancellationToken);
 
-    public Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<OrderBook> GetOrderBookAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetOrderBookAsync(symbol, cancellationToken);
 
-    public Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsAsync(symbol, cancellationToken);
 
-    public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(Symbol symbol, TimeSpan timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(CommonSymbol symbol, TimeSpan timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(symbol, timescale, from, to, cancellationToken);
 
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesAsync(cancellationToken);
 
     public Task<OrderResult> PlaceLimitOrderAsync(
-        Symbol symbol,
+        CommonSymbol symbol,
         Side side,
         decimal size,
         decimal price,
@@ -91,33 +92,33 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _tradingApi.PlaceLimitOrderAsync(symbol, side, size, price, cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
-        Symbol symbol,
+        CommonSymbol symbol,
         Side side,
         decimal size,
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceMarketOrderAsync(symbol, side, size, cancellationToken);
 
     public Task<OrderResult> PlaceStopOrderAsync(
-        Symbol symbol,
+        CommonSymbol symbol,
         Side side,
         decimal size,
         decimal triggerPrice,
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, cancellationToken);
 
-    public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
+    public Task<CancelResult> CancelOrderAsync(CommonSymbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
 
-    public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrdersAsync(symbol, cancellationToken);
 
-    public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
+    public Task<OrderStatus> GetOrderAsync(CommonSymbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrderAsync(symbol, orderKey, cancellationToken);
 
-    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>
         _accountApi.GetAccountExecutionsAsync(symbol, cancellationToken);
 
-    public Task<IReadOnlyList<Position>> GetOpenPositionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<Position>> GetOpenPositionsAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>
         throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "MarginPositions");
 
     public Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default) =>

@@ -4,6 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using CommonSymbol = ExchangeApi.Common.Types.Symbol;
+using RawSymbol = ExchangeApi.Exchanges.Bittrade.Raw.Symbol;
+using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
+using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Exchanges.Bittrade.Raw;
@@ -23,7 +27,7 @@ public sealed class BittradeOrderKeyConnectivityTests
         var api = new BittradeTradingApi(rest, accountId: "account-1");
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1001");
-        var status = await api.GetOrderAsync(new Symbol("BTC/JPY"), key);
+        var status = await api.GetOrderAsync(new CommonSymbol("BTC/JPY"), key);
 
         Assert.Equal("v1/order/orders/1001", rest.LastGetPath);
         Assert.Equal(OrderIdKind.AcceptanceId, status.Key.Kind);
@@ -34,11 +38,11 @@ public sealed class BittradeOrderKeyConnectivityTests
     public async Task CancelOrderAsync_UsesOrderKeyValue_WithAcceptanceId()
     {
         var rest = new RecordingRestClient(
-            postResponse: new CancelOrderResponse("ok", "1002"));
+            postResponse: new CancelOrderResponse("ok", new OrderId("1002")));
         var api = new BittradeTradingApi(rest, accountId: "account-1");
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1002");
-        var result = await api.CancelOrderAsync(new Symbol("BTC/JPY"), key);
+        var result = await api.CancelOrderAsync(new CommonSymbol("BTC/JPY"), key);
 
         Assert.True(result.IsSuccess);
         Assert.Equal("v1/order/orders/1002/submitcancel", rest.LastPostPath);
@@ -46,13 +50,13 @@ public sealed class BittradeOrderKeyConnectivityTests
 
     private static OrderDetail CreateOrderDetail(long id) =>
         new(
-            Id: id,
-            Symbol: "btcjpy",
+            Id: new OrderId(id.ToString()),
+            Symbol: new RawSymbol("btcjpy"),
             AccountId: "account-1",
             Amount: "0.01",
             Price: "100",
-            State: BittradeOrderState.Filled,
-            Type: BittradeOrderType.BuyLimit,
+            State: RawOrderState.Filled,
+            Type: RawOrderType.BuyLimit,
             ClientOrderId: null,
             CreatedAt: DateTimeOffset.FromUnixTimeMilliseconds(1),
             FinishedAt: DateTimeOffset.FromUnixTimeMilliseconds(2),

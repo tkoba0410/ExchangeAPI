@@ -52,7 +52,7 @@ public sealed class BittradePublicClientTests
         Assert.Equal("ok", response.Status);
         Assert.NotNull(response.Data);
         Assert.Single(response.Data!);
-        Assert.Equal("btcjpy", response.Data![0].Symbol);
+        Assert.Equal("btcjpy", response.Data![0].Symbol.Value);
     }
 
     private static BittradePublicClient CreateClient(string expectedPath, string responseJson)

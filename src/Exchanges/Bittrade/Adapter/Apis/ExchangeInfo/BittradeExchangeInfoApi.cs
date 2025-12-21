@@ -45,7 +45,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
     private static ExchangeMarketInfo MapSymbol(SymbolInfo s)
     {
         var symbol = $"{s.BaseCurrency.ToUpperInvariant()}/{s.QuoteCurrency.ToUpperInvariant()}";
-        var product = s.Symbol.ToLowerInvariant();
+        var product = s.Symbol.Value.ToLowerInvariant();
         var priceIncrement = Pow10(-s.PricePrecision);
         var sizeIncrement = Pow10(-s.AmountPrecision);
         var minSize = ParseDecimalFlexible(s.MinOrderAmount);

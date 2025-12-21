@@ -8,4 +8,5 @@ public sealed record CancelOpenOrdersResponse(
 public sealed record CancelOpenOrdersResult(
     [property: JsonPropertyName("success-count")] int SuccessCount,
     [property: JsonPropertyName("failed-count")] int FailedCount,
-    [property: JsonPropertyName("next-id")] long? NextId);
+    [property: JsonPropertyName("next-id")]
+    [property: JsonConverter(typeof(CursorIdJsonConverter))] CursorId? NextId);

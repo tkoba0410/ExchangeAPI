@@ -11,7 +11,8 @@ public sealed record KlinesResponse(
     [property: JsonPropertyName("data")] IReadOnlyList<KlineEntry>? Data);
 
 public sealed record KlineEntry(
-    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("id")]
+    [property: JsonConverter(typeof(KlineIdJsonConverter))] KlineId Id,
     [property: JsonPropertyName("open")] decimal Open,
     [property: JsonPropertyName("close")] decimal Close,
     [property: JsonPropertyName("low")] decimal Low,

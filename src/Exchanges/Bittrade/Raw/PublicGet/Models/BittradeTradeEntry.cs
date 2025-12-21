@@ -3,7 +3,8 @@ using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record TradeEntry(
-    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("id")]
+    [property: JsonConverter(typeof(TradeIdJsonConverter))] TradeId Id,
     [property: JsonPropertyName("price")] decimal Price,
     [property: JsonPropertyName("amount")] decimal Amount,
     [property: JsonPropertyName("direction")] string Direction,

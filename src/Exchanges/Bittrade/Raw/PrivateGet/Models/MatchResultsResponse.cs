@@ -12,10 +12,12 @@ public sealed record OrderMatchResultsResponse(
     [property: JsonPropertyName("data")] IReadOnlyList<MatchResultEntry>? Data);
 
 public sealed record MatchResultEntry(
-    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("id")]
+    [property: JsonConverter(typeof(MatchResultIdJsonConverter))] MatchResultId Id,
     [property: JsonPropertyName("order-id")]
     [property: JsonConverter(typeof(OrderIdJsonConverter))] OrderId OrderId,
-    [property: JsonPropertyName("match-id")] long MatchId,
+    [property: JsonPropertyName("match-id")]
+    [property: JsonConverter(typeof(MatchIdJsonConverter))] MatchId MatchId,
     [property: JsonPropertyName("symbol")]
     [property: JsonConverter(typeof(SymbolJsonConverter))] Symbol Symbol,
     [property: JsonPropertyName("type")] string Type,

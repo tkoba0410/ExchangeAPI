@@ -11,7 +11,8 @@ public sealed record TradeHistoryResponse(
     [property: JsonPropertyName("data")] IReadOnlyList<TradeHistoryEntry>? Data);
 
 public sealed record TradeHistoryEntry(
-    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("id")]
+    [property: JsonConverter(typeof(TradeHistoryIdJsonConverter))] TradeHistoryId Id,
     [property: JsonPropertyName("ts")]
     [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset Ts,
     [property: JsonPropertyName("data")] IReadOnlyList<TradeEntry>? Data);

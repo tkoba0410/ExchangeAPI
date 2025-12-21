@@ -8,7 +8,8 @@ public sealed record DepositWithdrawsResponse(
     [property: JsonPropertyName("data")] IReadOnlyList<DepositWithdrawEntry>? Data);
 
 public sealed record DepositWithdrawEntry(
-    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("id")]
+    [property: JsonConverter(typeof(DepositWithdrawIdJsonConverter))] DepositWithdrawId Id,
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("currency")] string Currency,
     [property: JsonPropertyName("amount")] decimal Amount,

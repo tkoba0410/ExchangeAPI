@@ -10,7 +10,8 @@ public sealed record RetailOrdersResponse(
     [property: JsonPropertyName("success")] bool? Success);
 
 public sealed record RetailOrderEntry(
-    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("id")]
+    [property: JsonConverter(typeof(RetailOrderIdJsonConverter))] RetailOrderId Id,
     [property: JsonPropertyName("symbol")]
     [property: JsonConverter(typeof(SymbolJsonConverter))] Symbol Symbol,
     [property: JsonPropertyName("type")] int Type,

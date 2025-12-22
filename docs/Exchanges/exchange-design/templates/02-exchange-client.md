@@ -1,8 +1,9 @@
-# 02 ExchangeClient Implementation Template (Common + Raw/Wire Gate)
+# 02 ExchangeClient Implementation Template (Common + Raw/Wire Gate + Capability)
 
 ポイント：
 - client 自体は Raw/Wire API を **implements しない**
 - Raw/Wire は **ゲート経由で取り出す**（C1：未対応は例外）
+- Capability は `client.As<TCapability>()` で短く呼べる
 
 ## 公開インターフェイス（Common 正面玄関）
 
@@ -116,4 +117,19 @@ internal sealed class BitflyerExchangeClient :
         return wire is not null;
     }
 }
+```
+
+## 利用コード例（見た目の比較）
+
+```csharp
+// Common（普通の利用者）
+var t = await client.MarketData.GetTickerAsync(symbol);
+
+// Raw（玄人）
+var raw = client.Raw<IBitflyerRawApi>();
+var board = await raw.MarketData.GetBoardAsync("BTC_JPY");
+
+// Wire（正規化）
+var wire = client.Wire<IBitflyerWireApi>();
+var wt = await wire.MarketData.GetTickerAsync("BTC_JPY");
 ```

@@ -62,3 +62,4 @@ Bitflyer/
 - Raw：公式鏡像（意味変換しない、Price/Size禁止、open setはstring）
 - Wire：status判定・エラー抽出・Try-parse（ただしCommon化しない）
 - Adapter：Wire → Common DTO、例外 Enrich（Exchange/Operation必須）
+- Factory/Composition：public/private、rest client、raw/wire/adapter の束ねを担当

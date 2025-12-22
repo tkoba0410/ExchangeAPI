@@ -4,15 +4,6 @@
 
 ---
 
-## 0. Adapter 層の位置づけ（再確認）
-
-Adapter 層は：
-- **Common API（ITradingApi / IMarketDataApi / IAccountApi / IExchangeInfoApi）を実装**
-- Raw / Wire の差分を吸収し、Common DTO を返す
-- 例外を **必ず Enrich** して上位に伝える
-
----
-
 ## 1. Adapter が守るべき絶対ルール
 
 ### 1.1 例外 Enrich（必須）
@@ -37,7 +28,7 @@ catch (ExchangeApiException ex)
 <Exchange>.<Area>.<Method>
 ```
 
-Operation は定数として集中管理する。
+Operation は定数として集中管理する（取引所ごとに Operations.cs を持つ）。
 
 ```csharp
 internal static class Operations
@@ -49,28 +40,14 @@ internal static class Operations
 }
 ```
 
-### 1.3 Parsing ルール（再掲）
+### 1.3 Parsing ルール
 
 - Adapter での parsing は原則禁止
 - parsing が必要な場合は Wire（Normalized）で行う（Try-style + context 付き例外）
 
 ---
 
-## 2. Common DTO 変換テンプレ
-
-### 2.1 Common DTO 例（既存前提）
-
-```csharp
-public sealed record Ticker(
-    Price BestBid,
-    Price BestAsk,
-    Price Last,
-    Size Volume,
-    DateTimeOffset Timestamp
-);
-```
-
-### 2.2 Wire → Common Mapper（専用クラス）
+## 2. Mapper（Wire → Common DTO）
 
 ```csharp
 internal static class BitflyerMapper
@@ -118,14 +95,15 @@ internal sealed class BitflyerMarketDataApi : IMarketDataApi
 
 ---
 
-## 4. Trading / Account Adapter の注意点
+## 4. Trading / Account Adapter の注意点（必須）
 
 - Common Request → Raw Request 変換は Adapter の責務
 - request body は型付き DTO（Dictionary 直書きは禁止）
+- `Price/Size` は entry point 以外で string に戻さない（Parse/OrThrow 方針）
 
 ---
 
-## 5. Adapter がやってはいけないこと（禁止）
+## 5. 禁止事項
 
 - Raw DTO / Wire DTO を外に返す
 - 取引所固有の enum / 文字列を Common に漏らす

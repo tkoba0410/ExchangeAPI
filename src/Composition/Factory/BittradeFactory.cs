@@ -4,6 +4,7 @@ using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
@@ -42,9 +43,10 @@ public static class BittradeFactory
         var privateTradingApi = new BittradePrivateTradingApi(restClient);
         var marketApi = new BittradeMarketDataApi(restClient);
         var tradingApi = new BittradeTradingApi(restClient, settings.AccountId);
+        var accountApi = new BittradeAccountApi(restClient, settings.AccountId);
         var exchangeInfoApi = new BittradeExchangeInfoApi(restClient);
 
-        return new BittradeExchangeClient(marketApi, tradingApi, tradingApi, exchangeInfoApi);
+        return new BittradeExchangeClient(marketApi, tradingApi, accountApi, exchangeInfoApi);
     }
 
     private static RestClient CreateRestClient(BittradeFactoryOptions settings, bool requireCredentials)

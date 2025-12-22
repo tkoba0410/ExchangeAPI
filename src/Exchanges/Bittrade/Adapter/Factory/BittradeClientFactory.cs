@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
@@ -39,8 +40,9 @@ public static class BittradeClientFactory
         var privateApi = new BittradePrivateApi(restClient);
         var privateTrading = new BittradePrivateTradingApi(restClient);
         var trading = new BittradeTradingApi(restClient, accountId);
+        var account = new BittradeAccountApi(restClient, accountId);
         var raw = new BittradeRawApi(publicApi, privateApi, privateTrading);
-        return (new BittradeMarketDataApi(restClient), trading, trading, new BittradeExchangeInfoApi(restClient), raw);
+        return (new BittradeMarketDataApi(restClient), trading, account, new BittradeExchangeInfoApi(restClient), raw);
     }
 
     public static BittradeExchangeClient CreateDefault(
@@ -51,8 +53,9 @@ public static class BittradeClientFactory
         var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
         var market = new BittradeMarketDataApi(restClient);
         var trading = new BittradeTradingApi(restClient, accountId);
+        var account = new BittradeAccountApi(restClient, accountId);
         var exchangeInfo = new BittradeExchangeInfoApi(restClient);
-        return new BittradeExchangeClient(market, trading, trading, exchangeInfo, restClient);
+        return new BittradeExchangeClient(market, trading, account, exchangeInfo, restClient);
     }
 
     private static RestClient CreateRestClient(

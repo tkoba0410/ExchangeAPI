@@ -23,10 +23,10 @@ internal static class BittradeMapper
         var result = new List<Balance>();
         foreach (var group in data.List.GroupBy(e => e.Currency, StringComparer.OrdinalIgnoreCase))
         {
-            var total = group.Sum(e => ParseDecimal(e.Balance));
+            var total = group.Sum(e => ParseDecimalOrThrow(e.Balance, "balance", "BalanceEntry"));
             var available = group
                 .Where(x => string.Equals(x.Type, "trade", StringComparison.OrdinalIgnoreCase))
-                .Sum(e => ParseDecimal(e.Balance));
+                .Sum(e => ParseDecimalOrThrow(e.Balance, "balance", "BalanceEntry"));
             result.Add(Balance.Create(
                 exchange: Exchange,
                 currency: group.Key.ToUpperInvariant(),
@@ -40,8 +40,8 @@ internal static class BittradeMapper
     {
         var (side, type) = ParseOrderType(detail.Type);
         var status = ParseStatus(detail.State);
-        var sizeValue = ParseDecimal(detail.Amount);
-        var filledValue = ParseDecimal(detail.FilledAmount);
+        var sizeValue = ParseDecimalOrThrow(detail.Amount, "amount", "OrderDetail");
+        var filledValue = ParseDecimalOrThrow(detail.FilledAmount, "field-amount", "OrderDetail");
         var outstandingValue = Math.Max(0, sizeValue - filledValue);
 
         return new OpenOrder(
@@ -53,7 +53,7 @@ internal static class BittradeMapper
             Size: new Size(sizeValue),
             OutstandingSize: new Size(outstandingValue),
             ExecutedSize: new Size(filledValue),
-            Price: detail.Price is null ? (Price?)null : new Price(ParseDecimal(detail.Price)),
+            Price: detail.Price is null ? (Price?)null : new Price(ParseDecimalOrThrow(detail.Price, "price", "OrderDetail")),
             OrderedAt: detail.CreatedAt,
             UpdatedAt: detail.FinishedAt,
             StopPrice: null,
@@ -65,8 +65,8 @@ internal static class BittradeMapper
     {
         var (side, type) = ParseOrderType(summary.Type);
         var status = ParseStatus(summary.State);
-        var sizeValue = ParseDecimal(summary.Amount);
-        var filledValue = ParseDecimal(summary.FilledAmount);
+        var sizeValue = ParseDecimalOrThrow(summary.Amount, "amount", "OrderSummary");
+        var filledValue = ParseDecimalOrThrow(summary.FilledAmount, "field-amount", "OrderSummary");
         var outstandingValue = Math.Max(0, sizeValue - filledValue);
 
         return new OpenOrder(
@@ -78,7 +78,7 @@ internal static class BittradeMapper
             Size: new Size(sizeValue),
             OutstandingSize: new Size(outstandingValue),
             ExecutedSize: new Size(filledValue),
-            Price: summary.Price is null ? (Price?)null : new Price(ParseDecimal(summary.Price)),
+            Price: summary.Price is null ? (Price?)null : new Price(ParseDecimalOrThrow(summary.Price, "price", "OrderSummary")),
             OrderedAt: summary.CreatedAt,
             UpdatedAt: null,
             StopPrice: null,
@@ -115,8 +115,15 @@ internal static class BittradeMapper
         };
     }
 
-    private static decimal ParseDecimal(string s) =>
-        decimal.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture);
+    private static decimal ParseDecimalOrThrow(string s, string field, string dto)
+    {
+        if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
+        {
+            return value;
+        }
+
+        throw new ExchangeApiException($"Invalid decimal for {dto}.{field}: '{s}'.");
+    }
 
     public static string ToProductCode(CommonSymbol symbol) =>
         BittradeSymbolMapper.ToProductCode(symbol);

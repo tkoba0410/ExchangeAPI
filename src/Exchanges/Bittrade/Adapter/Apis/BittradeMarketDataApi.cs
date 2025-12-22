@@ -17,82 +17,128 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 /// <summary>
 /// Bittrade の Public REST 実装（Ticker/OrderBook/Executions）。
 /// </summary>
-public sealed class BittradeMarketDataApi : IMarketDataApi
+internal sealed class BittradeMarketDataApi : IMarketDataApi
 {
     private readonly IRestClient _restClient;
+    private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
     public BittradeMarketDataApi(IRestClient restClient)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<TimestampResponse>("v1/common/timestamp", cancellationToken: cancellationToken);
+    public async Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
+    {
+        const string operation = "Bittrade.Market.GetTimestamp";
+        try
+        {
+            return await _restClient.GetAsync<TimestampResponse>(
+                "v1/common/timestamp",
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+        catch (ExchangeApiException ex)
+        {
+            throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
+        }
+    }
 
     public async Task<Ticker> GetTickerAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
     {
-        var apiSymbol = ToApiSymbol(symbol);
-        var response = await _restClient.GetAsync<MergedResponse>(
-            $"market/detail/merged?symbol={apiSymbol}",
-            cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Tick is null)
+        const string operation = "Bittrade.Market.GetTicker";
+        try
         {
-            throw new ExchangeApiException("Bittrade ticker response is invalid.");
-        }
+            var apiSymbol = ToApiSymbol(symbol);
+            var response = await _restClient.GetAsync<MergedResponse>(
+                $"market/detail/merged?symbol={apiSymbol}",
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        var tick = response.Tick;
-        var ts = response.Ts ?? tick.Ts;
-        var timestamp = ts ?? DateTimeOffset.UtcNow;
-        return new Ticker(
-            Exchange: ExchangeCode.Bittrade,
-            Symbol: symbol,
-            LastTradedPrice: new Price(tick.Close),
-            Timestamp: timestamp);
+            if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Tick is null)
+            {
+                throw new ExchangeApiException(
+                    message: "Bittrade ticker response is invalid.",
+                    exchange: Exchange,
+                    operation: operation);
+            }
+
+            var tick = response.Tick;
+            var ts = response.Ts ?? tick.Ts;
+            var timestamp = ts ?? DateTimeOffset.UtcNow;
+            return new Ticker(
+                Exchange: Exchange,
+                Symbol: symbol,
+                LastTradedPrice: new Price(tick.Close),
+                Timestamp: timestamp);
+        }
+        catch (ExchangeApiException ex)
+        {
+            throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
+        }
     }
 
     public async Task<OrderBook> GetOrderBookAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
     {
-        var apiSymbol = ToApiSymbol(symbol);
-        var response = await _restClient.GetAsync<DepthResponse>(
-            $"market/depth?symbol={apiSymbol}&type=step0",
-            cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Tick is null)
+        const string operation = "Bittrade.Market.GetOrderBook";
+        try
         {
-            throw new ExchangeApiException("Bittrade depth response is invalid.");
+            var apiSymbol = ToApiSymbol(symbol);
+            var response = await _restClient.GetAsync<DepthResponse>(
+                $"market/depth?symbol={apiSymbol}&type=step0",
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Tick is null)
+            {
+                throw new ExchangeApiException(
+                    message: "Bittrade depth response is invalid.",
+                    exchange: Exchange,
+                    operation: operation);
+            }
+
+            var bids = response.Tick.Bids?.Select(ToLevel).ToList() ?? new List<OrderBookLevel>();
+            var asks = response.Tick.Asks?.Select(ToLevel).ToList() ?? new List<OrderBookLevel>();
+
+            return new OrderBook(Exchange, bids, asks);
         }
-
-        var bids = response.Tick.Bids?.Select(ToLevel).ToList() ?? new List<OrderBookLevel>();
-        var asks = response.Tick.Asks?.Select(ToLevel).ToList() ?? new List<OrderBookLevel>();
-
-        return new OrderBook(ExchangeCode.Bittrade, bids, asks);
+        catch (ExchangeApiException ex)
+        {
+            throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
+        }
     }
 
     public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
     {
-        var apiSymbol = ToApiSymbol(symbol);
-        var response = await _restClient.GetAsync<TradeResponse>(
-            $"market/trade?symbol={apiSymbol}",
-            cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Tick?.Data is null)
+        const string operation = "Bittrade.Market.GetExecutions";
+        try
         {
-            throw new ExchangeApiException("Bittrade trades response is invalid.");
+            var apiSymbol = ToApiSymbol(symbol);
+            var response = await _restClient.GetAsync<TradeResponse>(
+                $"market/trade?symbol={apiSymbol}",
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Tick?.Data is null)
+            {
+                throw new ExchangeApiException(
+                    message: "Bittrade trades response is invalid.",
+                    exchange: Exchange,
+                    operation: operation);
+            }
+
+            var executions = response.Tick.Data
+                .Select(d => new ExecutionMarket(
+                    Exchange,
+                    symbol,
+                    d.Id.ToString(),
+                    MapSide(d.Direction),
+                    new Price(d.Price),
+                    new Size(d.Amount),
+                    d.Ts))
+                .ToList();
+
+            return executions;
         }
-
-        var executions = response.Tick.Data
-            .Select(d => new ExecutionMarket(
-                ExchangeCode.Bittrade,
-                symbol,
-                d.Id.ToString(),
-                MapSide(d.Direction),
-                new Price(d.Price),
-                new Size(d.Amount),
-                d.Ts))
-            .ToList();
-
-        return executions;
+        catch (ExchangeApiException ex)
+        {
+            throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
+        }
     }
 
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(

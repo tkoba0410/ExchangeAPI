@@ -9,6 +9,7 @@ using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using System.Text.Json;
@@ -18,29 +19,53 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 /// <summary>
 /// Bittrade の ExchangeInfo API 実装（/v1/common/symbols を使用）。
 /// </summary>
-public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
+internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
 {
     private readonly IRestClient _restClient;
+    private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
     public BittradeExchangeInfoApi(IRestClient restClient)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<SymbolsResponse>("v1/common/symbols", cancellationToken: cancellationToken);
+    public async Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
+    {
+        const string operation = "Bittrade.ExchangeInfo.GetSymbols";
+        try
+        {
+            return await _restClient.GetAsync<SymbolsResponse>(
+                "v1/common/symbols",
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+        catch (ExchangeApiException ex)
+        {
+            throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
+        }
+    }
 
     public async Task<ExchangeInfoDto> GetExchangeInfoAsync(CancellationToken cancellationToken = default)
     {
-        var response = await GetSymbolsAsync(cancellationToken).ConfigureAwait(false);
-
-        if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Data is null)
+        const string operation = "Bittrade.ExchangeInfo.GetExchangeInfo";
+        try
         {
-            throw new ExchangeApiException("Bittrade symbols response invalid.");
-        }
+            var response = await GetSymbolsAsync(cancellationToken).ConfigureAwait(false);
 
-        var markets = response.Data.Select(MapSymbol).ToList();
-        return new ExchangeInfoDto(markets, Features: null, RateLimits: null, Maintenance: null);
+            if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Data is null)
+            {
+                throw new ExchangeApiException(
+                    message: "Bittrade symbols response invalid.",
+                    exchange: Exchange,
+                    operation: operation);
+            }
+
+            var markets = response.Data.Select(MapSymbol).ToList();
+            return new ExchangeInfoDto(markets, Features: null, RateLimits: null, Maintenance: null);
+        }
+        catch (ExchangeApiException ex)
+        {
+            throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
+        }
     }
 
     private static ExchangeMarketInfo MapSymbol(SymbolInfo s)
@@ -49,8 +74,8 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
         var product = s.Symbol.Value.ToLowerInvariant();
         var priceIncrement = Pow10(-s.PricePrecision);
         var sizeIncrement = Pow10(-s.AmountPrecision);
-        var minSize = ParseDecimalFlexible(s.MinOrderAmount);
-        var minNotional = ParseNullableDecimalFlexible(s.MinOrderValue);
+        var minSize = ParseDecimalFlexible(s.MinOrderAmount, "min-order-amt");
+        var minNotional = ParseNullableDecimalFlexible(s.MinOrderValue, "min-order-value");
         var supported = string.Equals(s.State, "online", StringComparison.OrdinalIgnoreCase);
 
         return new ExchangeMarketInfo(
@@ -70,23 +95,23 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
             StatusNote: s.State);
     }
 
-    private static decimal ParseDecimalFlexible(JsonElement element)
+    private static decimal ParseDecimalFlexible(JsonElement element, string field)
     {
         return element.ValueKind switch
         {
-            JsonValueKind.String => ParseDecimal(element.GetString()!),
+            JsonValueKind.String => ParseDecimalOrThrow(element.GetString()!, field),
             JsonValueKind.Number => element.GetDecimal(),
-            _ => throw new ExchangeApiException($"Unexpected JSON type for decimal: {element.ValueKind}")
+            _ => throw new ExchangeApiException($"Unexpected JSON type for {field}: {element.ValueKind}")
         };
     }
 
-    private static decimal? ParseNullableDecimalFlexible(JsonElement element)
+    private static decimal? ParseNullableDecimalFlexible(JsonElement element, string field)
     {
         if (element.ValueKind == JsonValueKind.Null || element.ValueKind == JsonValueKind.Undefined) return null;
         if (element.ValueKind == JsonValueKind.String)
         {
             var s = element.GetString();
-            return string.IsNullOrWhiteSpace(s) ? null : ParseDecimal(s);
+            return string.IsNullOrWhiteSpace(s) ? null : ParseDecimalOrThrow(s, field);
         }
 
         if (element.ValueKind == JsonValueKind.Number) return element.GetDecimal();
@@ -96,6 +121,13 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
     private static decimal Pow10(int power) =>
         (decimal)Math.Pow(10, power);
 
-    private static decimal ParseDecimal(string s) =>
-        decimal.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture);
+    private static decimal ParseDecimalOrThrow(string s, string field)
+    {
+        if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
+        {
+            return value;
+        }
+
+        throw new ExchangeApiException($"Invalid decimal for SymbolInfo.{field}: '{s}'.");
+    }
 }

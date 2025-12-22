@@ -21,9 +21,9 @@ public sealed class OrderPollingTests
             ProductCode: "BTC_JPY",
             Key: new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
             Status: OrderState.Active,
-            ExecutedSize: 0m,
-            OutstandingSize: 1m,
-            Price: 100m,
+            ExecutedSize: new Size(0m),
+            OutstandingSize: new Size(1m),
+            Price: new Price(100m),
             AveragePrice: null));
 
         var options = new PollingOptions(TimeSpan.Zero, 3);
@@ -45,9 +45,9 @@ public sealed class OrderPollingTests
             ProductCode: "BTC_JPY",
             Key: new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
             Status: OrderState.Active,
-            ExecutedSize: 0m,
-            OutstandingSize: 1m,
-            Price: 100m,
+            ExecutedSize: new Size(0m),
+            OutstandingSize: new Size(1m),
+            Price: new Price(100m),
             AveragePrice: null));
 
         using var cts = new CancellationTokenSource();
@@ -116,13 +116,13 @@ public sealed class OrderPollingTests
             return Task.FromResult(_next(orderKey));
         }
 
-        public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, decimal size, decimal price, CancellationToken cancellationToken = default) =>
+        public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
-        public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, decimal size, CancellationToken cancellationToken = default) =>
+        public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
-        public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, decimal size, decimal triggerPrice, CancellationToken cancellationToken = default) =>
+        public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
         public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
@@ -142,13 +142,13 @@ public sealed class OrderPollingTests
             throw new ExchangeOrderNotFoundException(ExchangeCode.Sandbox, "GetOrder", symbol.ToString(), orderKey.ToString());
         }
 
-        public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, decimal size, decimal price, CancellationToken cancellationToken = default) =>
+        public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
-        public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, decimal size, CancellationToken cancellationToken = default) =>
+        public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
-        public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, decimal size, decimal triggerPrice, CancellationToken cancellationToken = default) =>
+        public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
         public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>

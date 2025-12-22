@@ -14,26 +14,26 @@ public sealed record OrderRequest(
     Symbol Symbol,
     Side Side,
     OrderType OrderType,
-    decimal Size,
-    decimal? Price = null,
-    decimal? TriggerPrice = null,
+    Size Size,
+    Price? Price = null,
+    Price? TriggerPrice = null,
     int? MinuteToExpire = null,
     TimeInForce? TimeInForce = null,
-    decimal? PriceIncrement = null,
-    decimal? SizeIncrement = null,
-    decimal? MinSize = null,
-    decimal? MaxSize = null,
+    Price? PriceIncrement = null,
+    Size? SizeIncrement = null,
+    Size? MinSize = null,
+    Size? MaxSize = null,
     decimal? MinNotional = null)
 {
     /// <summary>成行注文を生成するユーティリティ。</summary>
-    public static OrderRequest Market(Symbol symbol, Side side, decimal size) =>
+    public static OrderRequest Market(Symbol symbol, Side side, Size size) =>
         new(symbol, side, OrderType.Market, size);
 
     /// <summary>指値注文を生成するユーティリティ。</summary>
-    public static OrderRequest Limit(Symbol symbol, Side side, decimal size, decimal price) =>
+    public static OrderRequest Limit(Symbol symbol, Side side, Size size, Price price) =>
         new(symbol, side, OrderType.Limit, size, price);
 
     /// <summary>逆指値（成行）注文を生成するユーティリティ。</summary>
-    public static OrderRequest Stop(Symbol symbol, Side side, decimal size, decimal triggerPrice) =>
+    public static OrderRequest Stop(Symbol symbol, Side side, Size size, Price triggerPrice) =>
         new(symbol, side, OrderType.Stop, size, null, triggerPrice);
 }

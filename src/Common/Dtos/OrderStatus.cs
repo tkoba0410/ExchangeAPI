@@ -8,7 +8,7 @@ public sealed record OrderStatus(
     string ProductCode,
     OrderKey Key,
     OrderState Status,
-    decimal ExecutedSize,
-    decimal OutstandingSize,
-    decimal? Price,
-    decimal? AveragePrice);
+    Size ExecutedSize,
+    Size OutstandingSize,
+    Price? Price,
+    Price? AveragePrice);

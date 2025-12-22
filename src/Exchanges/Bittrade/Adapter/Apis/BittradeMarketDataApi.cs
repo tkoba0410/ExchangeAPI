@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
@@ -46,7 +47,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
         return new Ticker(
             Exchange: ExchangeCode.Bittrade,
             Symbol: symbol,
-            LastTradedPrice: tick.Close,
+            LastTradedPrice: new Price(tick.Close),
             Timestamp: timestamp);
     }
 
@@ -86,8 +87,8 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
                 symbol,
                 d.Id.ToString(),
                 MapSide(d.Direction),
-                d.Price,
-                d.Amount,
+                new Price(d.Price),
+                new Size(d.Amount),
                 d.Ts))
             .ToList();
 
@@ -107,7 +108,7 @@ public sealed class BittradeMarketDataApi : IMarketDataApi
     private static OrderBookLevel ToLevel(IReadOnlyList<decimal> level)
     {
         if (level.Count < 2) throw new ExchangeApiException("Invalid order book level.");
-        return new OrderBookLevel(level[0], level[1]);
+        return new OrderBookLevel(new Price(level[0]), new Size(level[1]));
     }
 
     private static Side MapSide(string direction) =>

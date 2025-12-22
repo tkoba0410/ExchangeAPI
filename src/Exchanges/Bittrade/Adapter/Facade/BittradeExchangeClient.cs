@@ -86,23 +86,23 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<OrderResult> PlaceLimitOrderAsync(
         CommonSymbol symbol,
         Side side,
-        decimal size,
-        decimal price,
+        Size size,
+        Price price,
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceLimitOrderAsync(symbol, side, size, price, cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
         CommonSymbol symbol,
         Side side,
-        decimal size,
+        Size size,
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceMarketOrderAsync(symbol, side, size, cancellationToken);
 
     public Task<OrderResult> PlaceStopOrderAsync(
         CommonSymbol symbol,
         Side side,
-        decimal size,
-        decimal triggerPrice,
+        Size size,
+        Price triggerPrice,
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceStopOrderAsync(symbol, side, size, triggerPrice, cancellationToken);
 

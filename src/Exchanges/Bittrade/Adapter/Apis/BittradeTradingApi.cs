@@ -46,23 +46,23 @@ public sealed class BittradeTradingApi : ITradingApi, IAccountApi
     public Task<OrderResult> PlaceLimitOrderAsync(
         CommonSymbol symbol,
         Side side,
-        decimal size,
-        decimal price,
+        Size size,
+        Price price,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(OrderRequest.Limit(symbol, side, size, price), cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
         CommonSymbol symbol,
         Side side,
-        decimal size,
+        Size size,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(OrderRequest.Market(symbol, side, size), cancellationToken);
 
     public Task<OrderResult> PlaceStopOrderAsync(
         CommonSymbol symbol,
         Side side,
-        decimal size,
-        decimal triggerPrice,
+        Size size,
+        Price triggerPrice,
         CancellationToken cancellationToken = default) =>
         throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "StopOrder");
 

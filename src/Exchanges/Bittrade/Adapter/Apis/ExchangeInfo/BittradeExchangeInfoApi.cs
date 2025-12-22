@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using System.Text.Json;
@@ -56,11 +57,11 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
             Symbol: symbol,
             ProductCode: product,
             Type: "Spot",
-            MinSize: minSize,
+            MinSize: new Size(minSize),
             MaxSize: null,
             MinNotional: minNotional,
-            PriceIncrement: priceIncrement,
-            SizeIncrement: sizeIncrement,
+            PriceIncrement: new Price(priceIncrement),
+            SizeIncrement: new Size(sizeIncrement),
             MakerFeeRate: null,
             TakerFeeRate: null,
             FeeCurrency: null,

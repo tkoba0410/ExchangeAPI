@@ -17,5 +17,5 @@ namespace ExchangeApi.Common.Dtos;
 public sealed record Ticker(
     ExchangeCode Exchange,
     Symbol Symbol,
-    decimal LastTradedPrice,
+    Price LastTradedPrice,
     DateTimeOffset Timestamp);

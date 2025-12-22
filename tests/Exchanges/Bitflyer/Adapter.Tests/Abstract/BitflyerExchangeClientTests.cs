@@ -43,11 +43,11 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             // Act
-            var ticker = await client.GetTickerAsync(new Symbol("BTC/JPY"));
+        var ticker = await client.GetTickerAsync(new Symbol("BTC/JPY"));
 
-            Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
-            Assert.Equal(raw.LastTradedPrice, ticker.LastTradedPrice);
-            Assert.Equal(raw.Timestamp /* 正規化 */, ticker.Timestamp);
+        Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
+        Assert.Equal(new Price(raw.LastTradedPrice), ticker.LastTradedPrice);
+        Assert.Equal(raw.Timestamp /* 正規化 */, ticker.Timestamp);
         }
 
         [Fact]
@@ -124,8 +124,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
 
             Assert.Single(board.Bids);
             Assert.Single(board.Asks);
-            Assert.Equal(100m, board.Bids[0].Price);
-            Assert.Equal(0.1m, board.Bids[0].Size);
+            Assert.Equal(new Price(100m), board.Bids[0].Price);
+            Assert.Equal(new Size(0.1m), board.Bids[0].Size);
         }
 
         [Fact]
@@ -164,7 +164,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             Assert.Equal("JRF-1", order.Key.Value);
             Assert.Equal(ContractSide.Buy, order.Side);
             Assert.Equal(OrderType.Limit, order.OrderType);
-            Assert.Equal(0.1m, order.Size);
+            Assert.Equal(new Size(0.1m), order.Size);
         }
 
         [Fact]
@@ -217,8 +217,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var pos = result[0];
             Assert.Equal(new Symbol("BTC/JPY"), pos.Symbol);
             Assert.Equal(ContractSide.Buy, pos.Side);
-            Assert.Equal(0.01m, pos.Size);
-            Assert.Equal(3000000m, pos.Price);
+            Assert.Equal(new Size(0.01m), pos.Size);
+            Assert.Equal(new Price(3000000m), pos.Price);
             Assert.Equal(1000m, pos.Pnl);
         }
 

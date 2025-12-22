@@ -6,6 +6,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeInfoDto = ExchangeApi.Common.Dtos.ExchangeInfo;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 
@@ -30,7 +31,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
         var markets = new List<ExchangeMarketInfo>
         {
             // bitFlyer Lightning BTC/JPY: 最小数量 0.001 BTC, 価格単位 1 円, 数量刻み 0.001 BTC を初期値とする。
-            new("BTC/JPY", "BTC_JPY", "Spot", MinSize: 0.001m, PriceIncrement: 1m, SizeIncrement: 0.001m, FeeCurrency: "BTC"),
+            new("BTC/JPY", "BTC_JPY", "Spot", MinSize: new Size(0.001m), PriceIncrement: new Price(1m), SizeIncrement: new Size(0.001m), FeeCurrency: "BTC"),
         };
 
         var features = new ExchangeFeatureFlags(

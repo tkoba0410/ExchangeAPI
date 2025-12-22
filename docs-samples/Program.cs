@@ -38,13 +38,13 @@ _ = exchangeKey;
 
 sealed class FakeTradingApi : ITradingApi
 {
-    public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, decimal size, decimal price, CancellationToken cancellationToken = default) =>
+    public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
         Task.FromResult(new OrderResult(new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-TEST"), AcceptanceId: "ACCEPT-TEST"));
 
-    public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, decimal size, CancellationToken cancellationToken = default) =>
+    public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
         Task.FromResult(new OrderResult(new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-TEST"), AcceptanceId: "ACCEPT-TEST"));
 
-    public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, decimal size, decimal triggerPrice, CancellationToken cancellationToken = default) =>
+    public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) =>
         Task.FromResult(new OrderResult(new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-TEST"), AcceptanceId: "ACCEPT-TEST"));
 
     public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
@@ -58,10 +58,10 @@ sealed class FakeTradingApi : ITradingApi
             new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-TEST"),
             Side.Buy,
             OrderType.Market,
-            0.01m,
-            0.01m,
-            0m,
-            Price: 100m);
+            new Size(0.01m),
+            new Size(0.01m),
+            new Size(0m),
+            Price: new Price(100m));
         return Task.FromResult<IReadOnlyList<OpenOrder>>(new[] { order });
     }
 
@@ -71,9 +71,9 @@ sealed class FakeTradingApi : ITradingApi
             ProductCode: "BTC_JPY",
             Key: orderKey,
             Status: OrderState.Active,
-            ExecutedSize: 0m,
-            OutstandingSize: 0.01m,
-            Price: 100m,
+            ExecutedSize: new Size(0m),
+            OutstandingSize: new Size(0.01m),
+            Price: new Price(100m),
             AveragePrice: null));
     }
 }

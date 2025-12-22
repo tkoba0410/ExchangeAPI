@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Dtos;
+using ExchangeApi.Common.Types;
 using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
 using RawBoard = ExchangeApi.Exchanges.Bitflyer.Raw.Board;
 using RawExecutionPublicResponse = ExchangeApi.Exchanges.Bitflyer.Raw.ExecutionPublicResponse;
@@ -18,7 +19,7 @@ internal static class MarketMapper
         return new CommonTicker(
             Exchange: ExchangeCode.Bitflyer,
             Symbol: BitflyerCommonMapper.ToSymbol(symbol),
-            LastTradedPrice: raw.LastTradedPrice,
+            LastTradedPrice: new Price(raw.LastTradedPrice),
             Timestamp: raw.Timestamp);
     }
 
@@ -27,11 +28,11 @@ internal static class MarketMapper
         if (rawBoard is null) throw new ArgumentNullException(nameof(rawBoard));
 
         var bids = rawBoard.Bids?
-            .Select(b => new OrderBookLevel(b.Price, b.Size))
+            .Select(b => new OrderBookLevel(new Price(b.Price), new Size(b.Size)))
             .ToArray() ?? Array.Empty<OrderBookLevel>();
 
         var asks = rawBoard.Asks?
-            .Select(a => new OrderBookLevel(a.Price, a.Size))
+            .Select(a => new OrderBookLevel(new Price(a.Price), new Size(a.Size)))
             .ToArray() ?? Array.Empty<OrderBookLevel>();
 
         return new OrderBook(ExchangeCode.Bitflyer, bids, asks);
@@ -46,8 +47,8 @@ internal static class MarketMapper
             Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(productCode)),
             OrderId: raw.Id.ToString(),
             Side: BitflyerCommonMapper.MapSide(raw.Side),
-            Price: raw.Price,
-            Size: raw.Size,
+            Price: new Price(raw.Price),
+            Size: new Size(raw.Size),
             ExecutedAt: raw.ExecDate);
     }
 }

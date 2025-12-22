@@ -37,7 +37,7 @@ public class BittradeMarketDataApiTests
         var ticker = await api.GetTickerAsync(new Symbol("BTC/JPY"));
 
         Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
-        Assert.Equal(100m, ticker.LastTradedPrice);
+        Assert.Equal(new Price(100m), ticker.LastTradedPrice);
         Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1700000000000), ticker.Timestamp);
     }
 
@@ -58,8 +58,8 @@ public class BittradeMarketDataApiTests
 
         Assert.Equal(2, book.Bids.Count);
         Assert.Equal(2, book.Asks.Count);
-        Assert.Equal(100m, book.Bids[0].Price);
-        Assert.Equal(101m, book.Asks[0].Price);
+        Assert.Equal(new Price(100m), book.Bids[0].Price);
+        Assert.Equal(new Price(101m), book.Asks[0].Price);
     }
 
     [Fact]

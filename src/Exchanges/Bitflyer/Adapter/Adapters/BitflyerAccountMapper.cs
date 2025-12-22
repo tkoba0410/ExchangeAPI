@@ -5,6 +5,7 @@ using System.Globalization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerAccountMapper
@@ -36,8 +37,8 @@ internal static class BitflyerAccountMapper
                 Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(e.ProductCode)),
                 OrderId: e.Id.ToString(CultureInfo.InvariantCulture),
                 Side: BitflyerCommonMapper.MapSide(e.Side),
-                Price: e.Price,
-                Size: e.Size,
+                Price: new Price(e.Price),
+                Size: new Size(e.Size),
                 ExecutedAt: e.ExecDate,
                 Commission: null,
                 Pnl: null,

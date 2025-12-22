@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Http;
 using Xunit;
@@ -43,9 +44,9 @@ public class BittradeExchangeInfoApiTests
         var m = info.Markets[0];
         Assert.Equal("BTC/JPY", m.Symbol);
         Assert.Equal("btcjpy", m.ProductCode);
-        Assert.Equal(0.01m, m.PriceIncrement);
-        Assert.Equal(0.0001m, m.SizeIncrement);
-        Assert.Equal(0.0001m, m.MinSize);
+        Assert.Equal(new Price(0.01m), m.PriceIncrement);
+        Assert.Equal(new Size(0.0001m), m.SizeIncrement);
+        Assert.Equal(new Size(0.0001m), m.MinSize);
         Assert.Equal(1000m, m.MinNotional);
         Assert.True(m.IsSupported);
     }

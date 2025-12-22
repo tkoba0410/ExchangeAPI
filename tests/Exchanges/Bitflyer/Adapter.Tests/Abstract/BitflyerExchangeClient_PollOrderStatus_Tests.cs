@@ -60,9 +60,9 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             options: new PollingOptions(TimeSpan.FromMilliseconds(1), 5));
 
         Assert.Equal(OrderState.Completed, status.Status);
-        Assert.Equal(0m, status.OutstandingSize);
-        Assert.Equal(0.01m, status.ExecutedSize);
-        Assert.Equal(3000000m, status.AveragePrice);
+        Assert.Equal(0m, status.OutstandingSize.Value);
+        Assert.Equal(0.01m, status.ExecutedSize.Value);
+        Assert.Equal(3000000m, status.AveragePrice!.Value.Value);
     }
 
     private sealed class SequenceChildOrderApi : IBitflyerPrivateApi

@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerTradingMapper
 {
-    public static ChildOrderType MapOrderType(OrderType orderType, decimal? price) =>
+    public static ChildOrderType MapOrderType(OrderType orderType, Price? price) =>
         orderType switch
         {
             OrderType.Market => ChildOrderType.Market,
@@ -38,13 +38,13 @@ internal static class BitflyerTradingMapper
     {
         if (request.Symbol.IsEmpty)
             throw new ArgumentException("Symbol is required.", nameof(request));
-        if (request.Size <= 0)
+        if (request.Size.Value <= 0)
             throw new ArgumentException("Size must be greater than zero.", nameof(request));
         if (request.MinuteToExpire is { } mte && mte <= 0)
             throw new ArgumentException("MinuteToExpire must be positive when specified.", nameof(request));
-        if (request.Price is { } price && price <= 0)
+        if (request.Price is { } price && price.Value <= 0)
             throw new ArgumentException("Price must be greater than zero when specified.", nameof(request));
-        if (request.TriggerPrice is { } tp && tp <= 0)
+        if (request.TriggerPrice is { } tp && tp.Value <= 0)
             throw new ArgumentException("TriggerPrice must be greater than zero when specified.", nameof(request));
 
         switch (request.OrderType)

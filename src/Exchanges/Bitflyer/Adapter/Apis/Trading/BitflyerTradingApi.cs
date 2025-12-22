@@ -35,23 +35,23 @@ internal sealed class BitflyerTradingApi : ITradingApi
     public Task<OrderResult> PlaceLimitOrderAsync(
         Symbol symbol,
         ContractSide side,
-        decimal size,
-        decimal price,
+        Size size,
+        Price price,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(OrderRequest.Limit(symbol, side, size, price), cancellationToken);
 
     public Task<OrderResult> PlaceMarketOrderAsync(
         Symbol symbol,
         ContractSide side,
-        decimal size,
+        Size size,
         CancellationToken cancellationToken = default) =>
         PlaceOrderInternal(OrderRequest.Market(symbol, side, size), cancellationToken);
 
     public Task<OrderResult> PlaceStopOrderAsync(
         Symbol symbol,
         ContractSide side,
-        decimal size,
-        decimal triggerPrice,
+        Size size,
+        Price triggerPrice,
         CancellationToken cancellationToken = default) =>
         throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, "StopOrder");
 
@@ -68,9 +68,9 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(request.Symbol),
                 Side = BitflyerCommonMapper.MapSideToExchange(request.Side),
                 ChildOrderType = BitflyerTradingMapper.MapOrderType(request.OrderType, request.Price),
-                Size = request.Size,
-                Price = request.Price,
-                TriggerPrice = request.TriggerPrice,
+                Size = request.Size.Value,
+                Price = request.Price?.Value,
+                TriggerPrice = request.TriggerPrice?.Value,
                 MinuteToExpire = request.MinuteToExpire,
                 TimeInForce = BitflyerTradingMapper.MapTimeInForce(request.TimeInForce),
             };
@@ -195,10 +195,10 @@ internal sealed class BitflyerTradingApi : ITradingApi
                     Key: key,
                     Side: BitflyerCommonMapper.MapSide(o.Side),
                     OrderType: BitflyerTradingMapper.MapOrderTypeFromExchange(o.ChildOrderType),
-                    Size: o.Size,
-                    OutstandingSize: o.OutstandingSize,
-                    ExecutedSize: o.ExecutedSize,
-                    Price: o.Price == 0 ? null : o.Price,
+                    Size: new Size(o.Size),
+                    OutstandingSize: new Size(o.OutstandingSize),
+                    ExecutedSize: new Size(o.ExecutedSize),
+                    Price: o.Price == 0 ? null : new Price(o.Price),
                     OrderedAt: o.ChildOrderDate,
                     UpdatedAt: null,
                     StopPrice: null,
@@ -268,9 +268,9 @@ internal sealed class BitflyerTradingApi : ITradingApi
             ProductCode: BitflyerCommonMapper.ToApiProductCode(order.ProductCode),
             Key: resolvedKey,
             Status: status,
-            ExecutedSize: order.ExecutedSize,
-            OutstandingSize: order.OutstandingSize,
-            Price: order.Price == 0 ? null : order.Price,
-            AveragePrice: order.AveragePrice == 0 ? null : order.AveragePrice);
+            ExecutedSize: new Size(order.ExecutedSize),
+            OutstandingSize: new Size(order.OutstandingSize),
+            Price: order.Price == 0 ? null : new Price(order.Price),
+            AveragePrice: order.AveragePrice == 0 ? null : new Price(order.AveragePrice));
     }
 }

@@ -19,13 +19,13 @@ public class TickerTests
         var ticker = new Ticker(
             Exchange: ExchangeCode.None,
             Symbol: new Symbol("BTC/JPY"),
-            LastTradedPrice: lastPrice,
+            LastTradedPrice: new Price(lastPrice),
             Timestamp: timestamp);
 
         // Assert
         Assert.Equal(ExchangeCode.None, ticker.Exchange);
         Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
-        Assert.Equal(lastPrice, ticker.LastTradedPrice);
+        Assert.Equal(new Price(lastPrice), ticker.LastTradedPrice);
         Assert.Equal(timestamp, ticker.Timestamp);
     }
 
@@ -36,15 +36,15 @@ public class TickerTests
         var original = new Ticker(
             Exchange: ExchangeCode.None,
             Symbol: new Symbol("BTC/JPY"),
-            LastTradedPrice: 5_000_500m,
+            LastTradedPrice: new Price(5_000_500m),
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         // Act
-        var modified = original with { LastTradedPrice = 4_999_000m };
+        var modified = original with { LastTradedPrice = new Price(4_999_000m) };
 
         // Assert
-        Assert.Equal(5_000_500m, original.LastTradedPrice);
-        Assert.Equal(4_999_000m, modified.LastTradedPrice);
+        Assert.Equal(new Price(5_000_500m), original.LastTradedPrice);
+        Assert.Equal(new Price(4_999_000m), modified.LastTradedPrice);
         Assert.NotSame(original, modified);
     }
 
@@ -55,15 +55,15 @@ public class TickerTests
         var original = new Ticker(
             Exchange: ExchangeCode.None,
             Symbol: new Symbol("BTC/JPY"),
-            LastTradedPrice: 5_000_500m,
+            LastTradedPrice: new Price(5_000_500m),
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         // Act
-        var modified = original with { LastTradedPrice = 4_999_000m };
+        var modified = original with { LastTradedPrice = new Price(4_999_000m) };
 
         // Assert
-        Assert.Equal(5_000_500m, original.LastTradedPrice);
-        Assert.Equal(4_999_000m, modified.LastTradedPrice);
+        Assert.Equal(new Price(5_000_500m), original.LastTradedPrice);
+        Assert.Equal(new Price(4_999_000m), modified.LastTradedPrice);
         Assert.NotSame(original, modified);
     }
 }

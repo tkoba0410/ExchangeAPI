@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ExchangeApi.Common.Types;
 namespace ExchangeApi.Common.Dtos;
 
 public sealed record ExchangeInfo(
@@ -21,11 +22,11 @@ public sealed record ExchangeMarketInfo(
     string Symbol,
     string ProductCode,
     string Type,
-    decimal? MinSize = null,
-    decimal? MaxSize = null,
+    Size? MinSize = null,
+    Size? MaxSize = null,
     decimal? MinNotional = null,
-    decimal? PriceIncrement = null,
-    decimal? SizeIncrement = null,
+    Price? PriceIncrement = null,
+    Size? SizeIncrement = null,
     decimal? MakerFeeRate = null,
     decimal? TakerFeeRate = null,
     string? FeeCurrency = null,

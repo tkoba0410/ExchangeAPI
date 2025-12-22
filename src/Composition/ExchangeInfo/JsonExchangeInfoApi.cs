@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeInfoDto = ExchangeApi.Common.Dtos.ExchangeInfo;
 namespace ExchangeApi.Composition.ExchangeInfo;
 
@@ -122,7 +123,12 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true,
             ReadCommentHandling = JsonCommentHandling.Skip,
-            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            Converters =
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
+                new PriceJsonConverter(),
+                new SizeJsonConverter(),
+            }
         };
 
     private sealed record ExchangeInfoDocument(

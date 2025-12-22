@@ -8,7 +8,7 @@ public sealed record Position(
     ExchangeCode ExchangeCode,
     Symbol Symbol,
     Side Side,
-    decimal Size,
-    decimal Price,
+    Size Size,
+    Price Price,
     DateTimeOffset? OpenDate = null,
     decimal? Pnl = null);

@@ -15,10 +15,10 @@ public sealed class OrderStatusJsonTests
             ProductCode: "BTC_JPY",
             Key: new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-1"),
             Status: OrderState.Completed,
-            ExecutedSize: 0.01m,
-            OutstandingSize: 0m,
-            Price: 100m,
-            AveragePrice: 100m);
+            ExecutedSize: new Size(0.01m),
+            OutstandingSize: new Size(0m),
+            Price: new Price(100m),
+            AveragePrice: new Price(100m));
 
         var json = JsonSerializer.Serialize(status);
         var restored = JsonSerializer.Deserialize<OrderStatus>(json);

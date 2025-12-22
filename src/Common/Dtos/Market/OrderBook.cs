@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 namespace ExchangeApi.Common.Dtos;
 
 /// <summary>
@@ -28,11 +29,12 @@ public sealed record OrderBook
         var dict = new SortedDictionary<decimal, decimal>(Comparer<decimal>.Create((x, y) => y.CompareTo(x)));
         foreach (var level in levels)
         {
-            dict[level.Price] = dict.TryGetValue(level.Price, out var size)
-                ? size + level.Size
-                : level.Size;
+            var price = level.Price.Value;
+            dict[price] = dict.TryGetValue(price, out var size)
+                ? size + level.Size.Value
+                : level.Size.Value;
         }
-        return dict.Select(kv => new OrderBookLevel(kv.Key, kv.Value)).ToList();
+        return dict.Select(kv => new OrderBookLevel(new Price(kv.Key), new Size(kv.Value))).ToList();
     }
 
     private static IReadOnlyList<OrderBookLevel> SortAscending(IEnumerable<OrderBookLevel> levels)
@@ -40,15 +42,16 @@ public sealed record OrderBook
         var dict = new SortedDictionary<decimal, decimal>(Comparer<decimal>.Default);
         foreach (var level in levels)
         {
-            dict[level.Price] = dict.TryGetValue(level.Price, out var size)
-                ? size + level.Size
-                : level.Size;
+            var price = level.Price.Value;
+            dict[price] = dict.TryGetValue(price, out var size)
+                ? size + level.Size.Value
+                : level.Size.Value;
         }
-        return dict.Select(kv => new OrderBookLevel(kv.Key, kv.Value)).ToList();
+        return dict.Select(kv => new OrderBookLevel(new Price(kv.Key), new Size(kv.Value))).ToList();
     }
 }
 
 /// <summary>
 /// 板の価格レベル。
 /// </summary>
-public sealed record OrderBookLevel(decimal Price, decimal Size);
+public sealed record OrderBookLevel(Price Price, Size Size);

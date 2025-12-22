@@ -9,6 +9,6 @@ public sealed record ExecutionMarket(
     Symbol Symbol,
     string OrderId,
     Side Side,
-    decimal Price,
-    decimal Size,
+    Price Price,
+    Size Size,
     DateTimeOffset ExecutedAt);

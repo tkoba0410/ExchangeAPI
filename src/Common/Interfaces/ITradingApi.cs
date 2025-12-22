@@ -15,21 +15,21 @@ public interface ITradingApi
     Task<OrderResult> PlaceLimitOrderAsync(
         Symbol symbol,
         Side side,
-        decimal size,
-        decimal price,
+        Size size,
+        Price price,
         CancellationToken cancellationToken = default);
 
     Task<OrderResult> PlaceMarketOrderAsync(
         Symbol symbol,
         Side side,
-        decimal size,
+        Size size,
         CancellationToken cancellationToken = default);
 
     Task<OrderResult> PlaceStopOrderAsync(
         Symbol symbol,
         Side side,
-        decimal size,
-        decimal triggerPrice,
+        Size size,
+        Price triggerPrice,
         CancellationToken cancellationToken = default);
 
     Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default);

@@ -38,7 +38,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
         });
         var api = new BitflyerTradingApi(tradingApi, privateApi);
 
-        var result = await api.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, 0.01m);
+        var result = await api.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
         var status = await api.GetOrderAsync(new Symbol("BTC/JPY"), result.Key);
         await api.CancelOrderAsync(new Symbol("BTC/JPY"), result.Key);
 

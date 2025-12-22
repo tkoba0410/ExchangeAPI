@@ -31,7 +31,7 @@ public class PublicApiLiveTests
         Log(msg);
 
         Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
-        Assert.True(ticker.LastTradedPrice > 0);
+        Assert.True(ticker.LastTradedPrice.Value > 0);
     }
 
     [LiveFact]
@@ -59,7 +59,7 @@ public class PublicApiLiveTests
         Log(msg);
 
         Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
-        Assert.True(ticker.LastTradedPrice > 0);
+        Assert.True(ticker.LastTradedPrice.Value > 0);
     }
 
     [LiveFact]

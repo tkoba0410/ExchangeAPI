@@ -40,9 +40,9 @@ internal static class BittradeMapper
     {
         var (side, type) = ParseOrderType(detail.Type);
         var status = ParseStatus(detail.State);
-        var size = ParseDecimal(detail.Amount);
-        var filled = ParseDecimal(detail.FilledAmount);
-        var outstanding = Math.Max(0, size - filled);
+        var sizeValue = ParseDecimal(detail.Amount);
+        var filledValue = ParseDecimal(detail.FilledAmount);
+        var outstandingValue = Math.Max(0, sizeValue - filledValue);
 
         return new OpenOrder(
             ExchangeCode: Exchange,
@@ -50,10 +50,10 @@ internal static class BittradeMapper
             Key: new OrderKey(OrderIdKind.ExchangeOrderId, detail.Id.Value),
             Side: side,
             OrderType: type,
-            Size: size,
-            OutstandingSize: outstanding,
-            ExecutedSize: filled,
-            Price: detail.Price is null ? (decimal?)null : ParseDecimal(detail.Price),
+            Size: new Size(sizeValue),
+            OutstandingSize: new Size(outstandingValue),
+            ExecutedSize: new Size(filledValue),
+            Price: detail.Price is null ? (Price?)null : new Price(ParseDecimal(detail.Price)),
             OrderedAt: detail.CreatedAt,
             UpdatedAt: detail.FinishedAt,
             StopPrice: null,
@@ -65,9 +65,9 @@ internal static class BittradeMapper
     {
         var (side, type) = ParseOrderType(summary.Type);
         var status = ParseStatus(summary.State);
-        var size = ParseDecimal(summary.Amount);
-        var filled = ParseDecimal(summary.FilledAmount);
-        var outstanding = Math.Max(0, size - filled);
+        var sizeValue = ParseDecimal(summary.Amount);
+        var filledValue = ParseDecimal(summary.FilledAmount);
+        var outstandingValue = Math.Max(0, sizeValue - filledValue);
 
         return new OpenOrder(
             ExchangeCode: Exchange,
@@ -75,10 +75,10 @@ internal static class BittradeMapper
             Key: new OrderKey(OrderIdKind.ExchangeOrderId, summary.Id.Value),
             Side: side,
             OrderType: type,
-            Size: size,
-            OutstandingSize: outstanding,
-            ExecutedSize: filled,
-            Price: summary.Price is null ? (decimal?)null : ParseDecimal(summary.Price),
+            Size: new Size(sizeValue),
+            OutstandingSize: new Size(outstandingValue),
+            ExecutedSize: new Size(filledValue),
+            Price: summary.Price is null ? (Price?)null : new Price(ParseDecimal(summary.Price)),
             OrderedAt: summary.CreatedAt,
             UpdatedAt: null,
             StopPrice: null,

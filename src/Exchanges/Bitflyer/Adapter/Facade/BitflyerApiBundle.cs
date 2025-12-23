@@ -43,11 +43,12 @@ internal sealed class BitflyerApiBundle
         var publicApi = new BitflyerPublicApi(raw.MarketData);
         var privateApi = new BitflyerPrivateApi(restClient);
         var privateTradingApi = new BitflyerPrivateTradingApi(restClient);
+        var wireTrading = new Wire.Private.BitflyerWireTradingApi(raw.Trading, privateTradingApi);
         var wire = new BitflyerWireApi(raw, restClient);
         return new BitflyerApiBundle(
             marketData: publicApi,
             account: privateApi,
-            trading: privateTradingApi,
+            trading: wireTrading,
             exchangeInfo: publicApi,
             rawBundle: raw,
             wireBundle: wire);

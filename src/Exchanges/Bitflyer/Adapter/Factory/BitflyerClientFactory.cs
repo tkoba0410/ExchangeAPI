@@ -136,12 +136,13 @@ public static class BitflyerClientFactory
         var publicApi = new Raw.PublicGet.BitflyerPublicApi(raw.MarketData);
         var privateApi = new Raw.PrivateGet.BitflyerPrivateApi(restClient);
         var privateTradingApi = new Raw.PrivatePost.BitflyerPrivateTradingApi(restClient);
+        var wireTrading = new Wire.Private.BitflyerWireTradingApi(raw.Trading, privateTradingApi);
         var wire = new BitflyerWireApi(raw, restClient);
 
         return new BitflyerExchangeClient(
             marketData: publicApi,
             account: privateApi,
-            trading: privateTradingApi,
+            trading: wireTrading,
             exchangeInfo: publicApi,
             rawBundle: raw,
             wireBundle: wire);

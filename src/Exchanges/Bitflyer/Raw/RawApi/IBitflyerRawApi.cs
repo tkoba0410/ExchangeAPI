@@ -1,3 +1,5 @@
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 /// <summary>
@@ -6,4 +8,5 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 public interface IBitflyerRawApi
 {
     IBitflyerRawMarketDataApi MarketData { get; }
+    IBitflyerRawTradingApi Trading { get; }
 }

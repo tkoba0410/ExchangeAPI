@@ -31,7 +31,10 @@ public sealed class BitflyerWireApi : IBitflyerWireApi
     }
 
     internal BitflyerWireApi(Raw.IBitflyerRawApi raw, IRestClient restClient)
-        : this(raw, restClient, new BitflyerPrivateTradingApi(restClient))
+        : this(
+            raw,
+            restClient,
+            new Private.BitflyerWireTradingApi(raw.Trading, new Raw.PrivatePost.BitflyerPrivateTradingApi(restClient)))
     {
     }
 

@@ -41,7 +41,7 @@ public static class BitflyerFactory
         return new BitflyerExchangeClient(
             components.PublicApi,
             components.PrivateApi,
-            components.PrivateTradingApi,
+            components.TradingApi,
             components.PublicApi,
             exchangeCode: settings.Exchange,
             accountId: settings.AccountId);
@@ -51,12 +51,18 @@ public static class BitflyerFactory
     {
         var restClient = CreateRestClient(settings);
         var raw = new Raw.BitflyerRawApi(restClient);
+        var publicApi = new BitflyerPublicApi(raw.MarketData);
+        var privateApi = new BitflyerPrivateApi(restClient);
+        var legacyTradingApi = new BitflyerPrivateTradingApi(restClient);
+        var wireTradingApi = new ExchangeApi.Exchanges.Bitflyer.Wire.Private.BitflyerWireTradingApi(
+            raw.Trading,
+            legacyTradingApi);
         return new BitflyerComponents(
             RestClient: restClient,
             Raw: raw,
-            PublicApi: new BitflyerPublicApi(raw.MarketData),
-            PrivateApi: new BitflyerPrivateApi(restClient),
-            PrivateTradingApi: new BitflyerPrivateTradingApi(restClient));
+            PublicApi: publicApi,
+            PrivateApi: privateApi,
+            TradingApi: wireTradingApi);
     }
 
     private static RestClient CreateRestClient(BitflyerFactoryOptions settings)
@@ -94,5 +100,5 @@ public static class BitflyerFactory
         Raw.BitflyerRawApi Raw,
         BitflyerPublicApi PublicApi,
         BitflyerPrivateApi PrivateApi,
-        BitflyerPrivateTradingApi PrivateTradingApi);
+        IBitflyerWireTradingApi TradingApi);
 }

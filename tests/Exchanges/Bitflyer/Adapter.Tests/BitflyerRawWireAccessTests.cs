@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Extensions;
+using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Tests;
@@ -20,7 +22,28 @@ public sealed class BitflyerRawWireAccessTests
         var wire = client.Wire<IBitflyerWireApi>();
 
         Assert.NotNull(raw);
+        Assert.NotNull(raw.Trading);
         Assert.NotNull(wire);
+        Assert.NotNull(wire.Trading);
+    }
+
+    [Fact]
+    public async Task PublicClient_WireTrading_IsNotSupported()
+    {
+        var client = BitflyerClientFactory.CreatePublic();
+
+        var wire = client.Wire<IBitflyerWireApi>();
+
+        var request = new CreateChildOrderRequest
+        {
+            ProductCode = ProductCode.BtcJpy,
+            ChildOrderType = ChildOrderType.Market,
+            Side = Side.Buy,
+            Size = 0.01m,
+        };
+
+        await Assert.ThrowsAsync<ExchangeFeatureNotSupportedException>(() =>
+            wire.Trading.CreateChildOrderAsync(request));
     }
 
     private sealed class FakeRestClient : IRestClient

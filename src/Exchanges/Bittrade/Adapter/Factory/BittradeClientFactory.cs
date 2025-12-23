@@ -6,6 +6,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
@@ -39,9 +40,9 @@ public static class BittradeClientFactory
         var publicApi = new BittradePublicApi(restClient);
         var privateApi = new BittradePrivateApi(restClient);
         var privateTrading = new BittradePrivateTradingApi(restClient);
-        var trading = new BittradeTradingApi(restClient, accountId);
-        var account = new BittradeAccountApi(restClient, accountId);
         var raw = new BittradeRawApi(publicApi, privateApi, privateTrading);
+        var trading = new BittradeTradingApi(new BittradeWireTradingApi(raw.Trading, accountId));
+        var account = new BittradeAccountApi(restClient, accountId);
         return (new BittradeMarketDataApi(restClient), trading, account, new BittradeExchangeInfoApi(restClient), raw);
     }
 
@@ -52,7 +53,8 @@ public static class BittradeClientFactory
     {
         var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
         var market = new BittradeMarketDataApi(restClient);
-        var trading = new BittradeTradingApi(restClient, accountId);
+        var raw = new BittradeRawApi(restClient);
+        var trading = new BittradeTradingApi(new BittradeWireTradingApi(raw.Trading, accountId));
         var account = new BittradeAccountApi(restClient, accountId);
         var exchangeInfo = new BittradeExchangeInfoApi(restClient);
         return new BittradeExchangeClient(market, trading, account, exchangeInfo, restClient, accountId);

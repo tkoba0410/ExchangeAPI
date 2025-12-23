@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 
 namespace ExchangeApi.Composition.Factory;
 
@@ -41,8 +42,9 @@ public static class BittradeFactory
         var publicApi = new BittradePublicApi(restClient);
         var privateApi = new BittradePrivateApi(restClient);
         var privateTradingApi = new BittradePrivateTradingApi(restClient);
+        var raw = new BittradeRawApi(publicApi, privateApi, privateTradingApi);
         var marketApi = new BittradeMarketDataApi(restClient);
-        var tradingApi = new BittradeTradingApi(restClient, settings.AccountId);
+        var tradingApi = new BittradeTradingApi(new BittradeWireTradingApi(raw.Trading, settings.AccountId));
         var accountApi = new BittradeAccountApi(restClient, settings.AccountId);
         var exchangeInfoApi = new BittradeExchangeInfoApi(restClient);
 

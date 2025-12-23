@@ -7,6 +7,9 @@ public sealed record BittradeWireOrder(
     string Symbol,
     string Side,
     string Type,
+    string? State,
     decimal? Price,
     decimal Size,
+    decimal? FilledSize,
+    decimal? OutstandingSize,
     DateTimeOffset? CreatedAt);

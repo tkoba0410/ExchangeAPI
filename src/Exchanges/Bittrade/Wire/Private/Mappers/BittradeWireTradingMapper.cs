@@ -25,19 +25,31 @@ internal static class BittradeWireTradingMapper
             Symbol: request.Symbol,
             Side: request.Side,
             Type: request.Type,
+            State: null,
             Price: request.Price,
             Size: request.Size,
+            FilledSize: null,
+            OutstandingSize: null,
             CreatedAt: null);
 
     public static BittradeWireOrder ToWire(OrderDetail raw)
-        => new(
+    {
+        var size = ParseRequiredDecimal(raw.Amount, "amount");
+        var filled = ParseDecimalOrThrow(raw.FilledAmount, "field-amount") ?? 0m;
+        var outstanding = Math.Max(0m, size - filled);
+
+        return new BittradeWireOrder(
             OrderId: raw.Id.Value,
             Symbol: raw.Symbol.Value,
             Side: ToSide(raw.Type),
             Type: ToWireEnumValue(raw.Type),
+            State: ToWireEnumValue(raw.State),
             Price: ParseDecimalOrThrow(raw.Price, "price"),
-            Size: ParseRequiredDecimal(raw.Amount, "amount"),
+            Size: size,
+            FilledSize: filled,
+            OutstandingSize: outstanding,
             CreatedAt: raw.CreatedAt);
+    }
 
     public static BittradeWireOpenOrder ToWireOpenOrder(OrderSummary raw)
         => new(

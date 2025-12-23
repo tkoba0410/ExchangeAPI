@@ -7,11 +7,12 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// <summary>
 /// Bittrade の Raw API アクセス（Public/Private/Trading をまとめた単一入口）。
 /// </summary>
-public sealed class BittradeRawApi
+public sealed class BittradeRawApi : IBittradeRawApi
 {
     private readonly IBittradePublicApi _publicApi;
     private readonly IBittradePrivateApi _privateApi;
     private readonly IBittradePrivateTradingApi _privateTradingApi;
+    public IBittradeRawMarketDataApi MarketData { get; }
 
     public BittradeRawApi(IRestClient restClient)
         : this(
@@ -29,6 +30,7 @@ public sealed class BittradeRawApi
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
         _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
+        MarketData = new BittradeRawMarketDataApi(_publicApi);
     }
 
     // Public

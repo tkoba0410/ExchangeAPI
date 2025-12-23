@@ -4,8 +4,8 @@ using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ContractSide = ExchangeApi.Common.Enums.Side;
-using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawSide = ExchangeApi.Exchanges.Bitflyer.Wire.Side;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerCommonMapper

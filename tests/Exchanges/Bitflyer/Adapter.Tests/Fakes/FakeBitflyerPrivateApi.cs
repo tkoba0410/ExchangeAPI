@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using ExchangeApi.Exchanges.Bitflyer.Wire;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 

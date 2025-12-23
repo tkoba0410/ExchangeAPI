@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Wire;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;

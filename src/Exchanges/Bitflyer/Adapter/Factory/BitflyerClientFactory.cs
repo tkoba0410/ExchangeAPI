@@ -15,7 +15,8 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Wire;
+using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
 
 /// <summary>
@@ -53,8 +54,10 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var publicApi = new BitflyerPublicApi(restClient);
-        return new BitflyerPublicClient(publicApi);
+        var raw = new Raw.BitflyerRawApi(restClient);
+        var publicApi = new BitflyerPublicApi(raw.MarketData);
+        var wire = new BitflyerWireApi(restClient);
+        return new BitflyerPublicClient(publicApi, rawBundle: raw, wireBundle: wire);
     }
 
     /// <summary>
@@ -124,11 +127,13 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var publicApi = new BitflyerPublicApi(restClient);
+        var raw = new Raw.BitflyerRawApi(restClient);
+        var publicApi = new BitflyerPublicApi(raw.MarketData);
         var privateApi = new BitflyerPrivateApi(restClient);
         var privateTradingApi = new BitflyerPrivateTradingApi(restClient);
+        var wire = new BitflyerWireApi(restClient);
 
-        return new BitflyerExchangeClient(publicApi, privateApi, privateTradingApi);
+        return new BitflyerExchangeClient(publicApi, privateApi, privateTradingApi, rawBundle: raw, wireBundle: wire);
     }
 
     /// <summary>

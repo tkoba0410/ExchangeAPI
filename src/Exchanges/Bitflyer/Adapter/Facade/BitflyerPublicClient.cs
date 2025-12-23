@@ -1,29 +1,36 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Clients.Internal;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Wire;
 using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
 /// <summary>
 /// bitFlyer の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi
+public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess, IHasWireAccess
 {
     private readonly MarketApi _marketApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
+    private readonly object? _rawBundle;
+    private readonly object? _wireBundle;
 
-    internal BitflyerPublicClient(IBitflyerPublicApi publicApi)
+    public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bitflyer;
+
+    internal BitflyerPublicClient(IBitflyerPublicApi publicApi, object? rawBundle = null, object? wireBundle = null)
     {
         if (publicApi is null) throw new ArgumentNullException(nameof(publicApi));
         _marketApi = new MarketApi(publicApi, ExchangeCode.Bitflyer);
         _exchangeInfoApi = new BitflyerExchangeInfoApi();
+        _rawBundle = rawBundle;
+        _wireBundle = wireBundle;
     }
 
     public Task<CommonTicker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
@@ -46,4 +53,16 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi
 
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+
+    public bool TryGetRaw<T>(out T raw) where T : class
+    {
+        raw = _rawBundle as T ?? null!;
+        return raw is not null;
+    }
+
+    public bool TryGetWire<T>(out T wire) where T : class
+    {
+        wire = _wireBundle as T ?? null!;
+        return wire is not null;
+    }
 }

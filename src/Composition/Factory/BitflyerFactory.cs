@@ -4,28 +4,36 @@ using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Time;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Wire;
 
 namespace ExchangeApi.Composition.Factory;
 
 /// <summary>
 /// bitFlyer 用の標準配線を提供するファクトリ。
-/// 既定は Raw クライアントを返し、Adapter は明示的に呼び出した場合のみ生成する。
+    /// 既定は Wire クライアントを返し、Adapter は明示的に呼び出した場合のみ生成する。
 /// </summary>
 public static class BitflyerFactory
 {
     private static readonly Uri DefaultBaseUri = new("https://api.bitflyer.com");
 
-    public static BitflyerRawApi CreateRaw(BitflyerFactoryOptions? options = null)
+    public static BitflyerWireApi CreateWire(BitflyerFactoryOptions? options = null)
     {
-        var components = CreateRawComponents(options ?? new BitflyerFactoryOptions());
-        return new BitflyerRawApi(components.PublicApi, components.PrivateApi, components.PrivateTradingApi);
+        var components = CreateWireComponents(options ?? new BitflyerFactoryOptions());
+        return new BitflyerWireApi(components.PublicApi, components.PrivateApi, components.PrivateTradingApi);
+    }
+
+    public static Raw.BitflyerRawApi CreateRaw(BitflyerFactoryOptions? options = null)
+    {
+        var settings = options ?? new BitflyerFactoryOptions();
+        var restClient = CreateRestClient(settings);
+        return new Raw.BitflyerRawApi(restClient);
     }
 
     public static BitflyerExchangeClient CreateAdapter(BitflyerFactoryOptions? options = null)
     {
         var settings = options ?? new BitflyerFactoryOptions();
-        var components = CreateRawComponents(settings);
+        var components = CreateWireComponents(settings);
 
         return new BitflyerExchangeClient(
             components.PublicApi,
@@ -35,12 +43,13 @@ public static class BitflyerFactory
             accountId: settings.AccountId);
     }
 
-    private static BitflyerComponents CreateRawComponents(BitflyerFactoryOptions settings)
+    private static BitflyerComponents CreateWireComponents(BitflyerFactoryOptions settings)
     {
         var restClient = CreateRestClient(settings);
+        var raw = new Raw.BitflyerRawApi(restClient);
         return new BitflyerComponents(
             RestClient: restClient,
-            PublicApi: new BitflyerPublicApi(restClient),
+            PublicApi: new BitflyerPublicApi(raw.MarketData),
             PrivateApi: new BitflyerPrivateApi(restClient),
             PrivateTradingApi: new BitflyerPrivateTradingApi(restClient));
     }

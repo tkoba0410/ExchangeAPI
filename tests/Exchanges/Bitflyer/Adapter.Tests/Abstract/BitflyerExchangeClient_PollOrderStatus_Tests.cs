@@ -4,13 +4,13 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using ExchangeApi.Exchanges.Bitflyer.Wire;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Common.UseCases;
-using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.ExecutionPrivateResponse;
+using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Wire.ExecutionPrivateResponse;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
@@ -30,7 +30,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             OutstandingSize = 0.01m,
             Price = 3000000m,
             AveragePrice = 0m,
-            Side = ExchangeApi.Exchanges.Bitflyer.Raw.Side.Buy,
+            Side = ExchangeApi.Exchanges.Bitflyer.Wire.Side.Buy,
             ChildOrderType = ChildOrderType.Limit,
             Size = 0.01m,
         };

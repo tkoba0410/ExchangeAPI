@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Clients.Internal;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
@@ -11,19 +12,25 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire;
+using ExchangeApi.Exchanges.Bittrade.Wire.Public;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
 /// Bittrade 用のファサード。各 API 実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IMarginAccountApi, IExchangeInfoApi
+public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IMarginAccountApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess, IHasWireAccess
 {
     private readonly IMarketDataApi _marketApi;
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
     private readonly IRestClient? _restClient;
+    private readonly object? _rawBundle;
+    private readonly object? _wireBundle;
+
+    public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bittrade;
 
     public BittradeExchangeClient(
         IMarketDataApi marketApi,
@@ -46,6 +53,9 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         : this(marketApi, tradingApi, accountApi, exchangeInfoApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        var raw = new BittradeRawApi(_restClient);
+        _rawBundle = raw;
+        _wireBundle = new BittradeWireApi(new BittradeWireMarketDataApi(raw.MarketData));
     }
 
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
@@ -126,4 +136,16 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
 
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+
+    public bool TryGetRaw<T>(out T raw) where T : class
+    {
+        raw = _rawBundle as T ?? null!;
+        return raw is not null;
+    }
+
+    public bool TryGetWire<T>(out T wire) where T : class
+    {
+        wire = _wireBundle as T ?? null!;
+        return wire is not null;
+    }
 }

@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\..\Common\Common.csproj" />
     <ProjectReference Include="..\..\..\Core\Core.csproj" />
     <ProjectReference Include="..\Raw\Exchange.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="..\Wire\Exchange.Bitflyer.Wire.csproj" />
   </ItemGroup>
 
 </Project>

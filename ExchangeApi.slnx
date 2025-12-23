@@ -4,14 +4,16 @@
     <Project Path="src/Core/Core.csproj" />
     <Project Path="src/Composition/Composition.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Raw/Exchange.Bitflyer.Raw.csproj" />
+    <Project Path="src/Exchanges/Bitflyer/Wire/Exchange.Bitflyer.Wire.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Adapter/Exchange.Bitflyer.Adapter.csproj" />
     <Project Path="src/Exchanges/Bittrade/Raw/Exchange.Bittrade.Raw.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Wire/Exchange.Bittrade.Wire.csproj" />
     <Project Path="src/Exchanges/Bittrade/Adapter/Exchange.Bittrade.Adapter.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Common.Tests/Common.Tests.csproj" />
     <Project Path="tests/Composition.Tests/Composition.Tests.csproj" />
-    <Project Path="tests/Exchanges/Bitflyer/Raw.Tests/Exchange.Bitflyer.Raw.Tests.csproj" />
+    <Project Path="tests/Exchanges/Bitflyer/Wire.Tests/Exchange.Bitflyer.Wire.Tests.csproj" />
     <Project Path="tests/Exchanges/Bitflyer/Adapter.Tests/Exchange.Bitflyer.Adapter.Tests.csproj" />
     <Project Path="tests/Exchanges/Bittrade/Raw.Tests/Exchange.Bittrade.Raw.Tests.csproj" />
     <Project Path="tests/Exchanges/Bittrade/Adapter.Tests/Exchange.Bittrade.Adapter.Tests.csproj" />

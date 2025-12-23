@@ -13,6 +13,7 @@
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Exchanges\Bitflyer\Raw\Exchange.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="..\Exchanges\Bitflyer\Wire\Exchange.Bitflyer.Wire.csproj" />
     <ProjectReference Include="..\Exchanges\Bitflyer\Adapter\Exchange.Bitflyer.Adapter.csproj" />
     <ProjectReference Include="..\Exchanges\Bittrade\Raw\Exchange.Bittrade.Raw.csproj" />
     <ProjectReference Include="..\Exchanges\Bittrade\Adapter\Exchange.Bittrade.Adapter.csproj" />

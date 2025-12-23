@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\..\Common\Common.csproj" />
     <ProjectReference Include="..\..\..\Core\Core.csproj" />
     <ProjectReference Include="..\Raw\Exchange.Bittrade.Raw.csproj" />
+    <ProjectReference Include="..\Wire\Exchange.Bittrade.Wire.csproj" />
   </ItemGroup>
 
 </Project>

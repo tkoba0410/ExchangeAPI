@@ -1,7 +1,7 @@
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Wire;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;

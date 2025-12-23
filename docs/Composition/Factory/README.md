@@ -15,7 +15,7 @@
 
 をまとめて行い、
 
-* **Raw クライアント（既定）**
+* **Wire/Raw クライアント（既定）**（bitFlyer は Wire、Bittrade は Raw）
 * **Adapter クライアント（明示指定時のみ）**
 
 を生成します。
@@ -24,27 +24,41 @@
 
 ## 2. 基本方針（最重要）
 
-* **既定は Raw**：取引所の生 API（SDK 相当）を主役とする
+* **既定は Wire/Raw**：bitFlyer は Wire、Bittrade は Raw を主役とする
 * **Adapter は明示**：共通語彙で扱いたい場合のみ選択する
 * **束ねない**：複数取引所をまとめる API は提供しない
 
 ---
 
-## 3. クイックスタート（Raw 既定）
+## 3. クイックスタート（Wire 既定）
 
 ### Bitflyer（公開 API のみ）
 
 ```csharp
 using ExchangeApi.Composition.Factory;
 
-var bitflyerRaw = BitflyerFactory.CreateRaw();
+var bitflyerWire = BitflyerFactory.CreateWire();
 
 // 例：公開 API を直接呼び出す
-var ticker = await bitflyerRaw.GetTickerAsync("BTC_JPY");
+var ticker = await bitflyerWire.GetTickerAsync("BTC_JPY");
 ```
 
 * 資格情報は不要
 * signer は内部で省略されます
+
+---
+
+### Bitflyer Raw（Mirror）
+
+```csharp
+using ExchangeApi.Composition.Factory;
+
+var bitflyerRaw = BitflyerFactory.CreateRaw();
+
+var ticker = await bitflyerRaw.MarketData.GetTickerAsync("BTC_JPY");
+```
+
+* Raw は公式レスポンスの鏡像を返します
 
 ---
 
@@ -112,7 +126,7 @@ var balances = await api.GetBalancesAsync();
 ## 5. オプション指定（必要なときだけ）
 
 ```csharp
-var raw = BitflyerFactory.CreateRaw(
+var bitflyerWire = BitflyerFactory.CreateWire(
     new BitflyerFactoryOptions {
         Credentials = new ApiCredentials("key", "secret"),
         PolicyOptions = new HttpPolicyOptions {
@@ -158,7 +172,7 @@ Composition / Factory は、以下を **意図的に提供しません**。
   * 複数取引所で共通の処理を書きたい
   * DTO / Interface を揃えたい
 
-迷ったら **Raw** を選んでください。
+迷ったら **bitFlyer は Wire / Bittrade は Raw** を選んでください。
 
 ---
 

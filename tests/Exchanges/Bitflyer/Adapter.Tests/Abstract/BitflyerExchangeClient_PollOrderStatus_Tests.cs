@@ -51,7 +51,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var publicApi = new FakeBitflyerPublicApi(new Ticker());
         var sequenceApi = new SequenceChildOrderApi(new[] { active }, new[] { completed });
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var client = new BitflyerExchangeClient(publicApi, sequenceApi, tradingApi);
+        var client = new BitflyerExchangeClient(publicApi, sequenceApi, tradingApi, publicApi);
 
         var status = await OrderPolling.WaitForOrderAsync(
             api: client,

@@ -2,48 +2,18 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Private;
 namespace ExchangeApi.Exchanges.Bitflyer.Wire;
 
 /// <summary>
 /// bitFlyer Private REST API への Raw アクセスインターフェース。
 /// </summary>
-internal interface IBitflyerPrivateApi
+internal interface IBitflyerPrivateApi : IBitflyerWireAccountApi
 {
     Task<IReadOnlyList<string>> GetPermissionsAsync(
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(
-        CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(
-        string productCode,
-        CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(
-        string productCode,
-        string? childOrderId = null,
-        string? childOrderAcceptanceId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default);
-
-    Task<CollateralResponse> GetCollateralAsync(
-        CancellationToken cancellationToken = default);
-
     Task<IReadOnlyList<CollateralAccount>> GetCollateralAccountsAsync(
-        CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-        string productCode,
-        string? childOrderStatusState = null,
-        string? childOrderAcceptanceId = null,
-        string? childOrderId = null,
-        string? parentOrderId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(
@@ -70,10 +40,6 @@ internal interface IBitflyerPrivateApi
         int? count = null,
         long? before = null,
         long? after = null,
-        CancellationToken cancellationToken = default);
-
-    Task<JsonElement> GetTradingCommissionAsync(
-        string productCode,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<JsonElement>> GetAddressesAsync(

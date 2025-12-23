@@ -38,7 +38,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
 
-            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
+            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi, fakePublicApi);
 
             // Act
             IReadOnlyList<Balance> result = await client.GetBalancesAsync();
@@ -67,7 +67,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
 
-            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
+            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi, fakePublicApi);
 
             // Act
             IReadOnlyList<Balance> result = await client.GetBalancesAsync();

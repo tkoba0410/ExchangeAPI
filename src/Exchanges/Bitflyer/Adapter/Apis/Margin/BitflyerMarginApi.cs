@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Private;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
@@ -15,12 +15,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 
 internal sealed class BitflyerMarginApi : IMarginAccountApi
 {
-    private readonly IBitflyerPrivateApi _privateApi;
+    private readonly IBitflyerWireAccountApi _accountApi;
     private readonly ExchangeCode _exchange;
 
-    public BitflyerMarginApi(IBitflyerPrivateApi privateApi, ExchangeCode exchange = ExchangeCode.Bitflyer)
+    public BitflyerMarginApi(IBitflyerWireAccountApi accountApi, ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
-        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
+        _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _exchange = exchange;
     }
 
@@ -29,7 +29,7 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         var operation = BitflyerOperations.Margin.GetBalances;
         try
         {
-            var rawBalances = await _privateApi
+            var rawBalances = await _accountApi
                 .GetBalancesAsync(cancellationToken)
                 .ConfigureAwait(false);
 
@@ -67,7 +67,7 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         try
         {
             var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
-            var raw = await _privateApi
+            var raw = await _accountApi
                 .GetExecutionsAsync(productCode, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
@@ -94,7 +94,7 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         try
         {
             var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
-            var raw = await _privateApi
+            var raw = await _accountApi
                 .GetPositionsAsync(productCode, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -120,7 +120,7 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         var operation = BitflyerOperations.Margin.GetCollateral;
         try
         {
-            var raw = await _privateApi
+            var raw = await _accountApi
                 .GetCollateralAsync(cancellationToken)
                 .ConfigureAwait(false);
 

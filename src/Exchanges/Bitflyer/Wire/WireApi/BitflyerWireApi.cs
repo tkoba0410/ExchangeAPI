@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Private;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 namespace ExchangeApi.Exchanges.Bitflyer.Wire;
 
@@ -11,9 +10,10 @@ namespace ExchangeApi.Exchanges.Bitflyer.Wire;
 /// </summary>
 public sealed class BitflyerWireApi : IBitflyerWireApi
 {
-    private readonly IBitflyerPublicApi _publicApi;
-    private readonly IBitflyerPrivateApi _privateApi;
-    private readonly IBitflyerPrivateTradingApi _privateTradingApi;
+    public IBitflyerWireMarketDataApi MarketData { get; }
+    public IBitflyerWireTradingApi Trading { get; }
+    public IBitflyerWireAccountApi Account { get; }
+    public IBitflyerWireExchangeInfoApi ExchangeInfo { get; }
 
     /// <summary>
     /// Wire API 用の RestClient を受け取って Wire API を生成します。
@@ -30,75 +30,37 @@ public sealed class BitflyerWireApi : IBitflyerWireApi
     }
 
     internal BitflyerWireApi(Raw.IBitflyerRawApi raw, IRestClient restClient)
-        : this(
-            publicApi: new BitflyerPublicApi((raw ?? throw new ArgumentNullException(nameof(raw))).MarketData),
-            privateApi: new BitflyerPrivateApi(restClient),
-            privateTradingApi: new BitflyerPrivateTradingApi(restClient))
+        : this(raw, restClient, new BitflyerPrivateTradingApi(restClient))
     {
     }
 
     internal BitflyerWireApi(
-        IBitflyerPublicApi publicApi,
-        IBitflyerPrivateApi privateApi,
-        IBitflyerPrivateTradingApi privateTradingApi)
+        Raw.IBitflyerRawApi raw,
+        IRestClient restClient,
+        IBitflyerWireTradingApi tradingApi)
     {
-        _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
-        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
-        _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
+        if (raw is null) throw new ArgumentNullException(nameof(raw));
+        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+        if (tradingApi is null) throw new ArgumentNullException(nameof(tradingApi));
+
+        var publicApi = new BitflyerPublicApi(raw.MarketData);
+        var privateApi = new BitflyerPrivateApi(restClient);
+
+        MarketData = publicApi;
+        Trading = tradingApi;
+        Account = privateApi;
+        ExchangeInfo = publicApi;
     }
 
-    public Task<Ticker> GetTickerAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _publicApi.GetTickerRawAsync(productCode, cancellationToken: cancellationToken);
-
-    public Task<Board> GetBoardAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _publicApi.GetBoardRawAsync(productCode, cancellationToken: cancellationToken);
-
-    public Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
-        _privateApi.GetBalancesAsync(cancellationToken);
-
-    public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _privateApi.GetExecutionsAsync(productCode, cancellationToken: cancellationToken);
-
-    public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _privateApi.GetPositionsAsync(productCode, cancellationToken);
-
-    public Task<CollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default) =>
-        _privateApi.GetCollateralAsync(cancellationToken);
-
-    public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-        string productCode,
-        string? childOrderStatusState = null,
-        string? childOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default) =>
-        _privateApi.GetChildOrdersAsync(productCode, childOrderStatusState, childOrderAcceptanceId, cancellationToken: cancellationToken);
-
-    public Task<CreateChildOrderResponse> CreateChildOrderAsync(
-        CreateChildOrderRequest request,
-        CancellationToken cancellationToken = default) =>
-        _privateTradingApi.CreateChildOrderAsync(request, cancellationToken);
-
-    public Task<EmptyResponse> CancelChildOrderAsync(
-        CancelChildOrderRequest request,
-        CancellationToken cancellationToken = default) =>
-        _privateTradingApi.CancelChildOrderAsync(request, cancellationToken);
-
-    public Task<EmptyResponse> CancelAllChildOrdersAsync(
-        CancelAllChildOrdersRequest request,
-        CancellationToken cancellationToken = default) =>
-        _privateTradingApi.CancelAllChildOrdersAsync(request, cancellationToken);
-
-    public Task<CreateParentOrderResponse> CreateParentOrderAsync(
-        CreateParentOrderRequest request,
-        CancellationToken cancellationToken = default) =>
-        _privateTradingApi.CreateParentOrderAsync(request, cancellationToken);
-
-    public Task<EmptyResponse> CancelParentOrderAsync(
-        CancelParentOrderRequest request,
-        CancellationToken cancellationToken = default) =>
-        _privateTradingApi.CancelParentOrderAsync(request, cancellationToken);
-
-    public Task<CreateWithdrawalResponse> CreateWithdrawalAsync(
-        CreateWithdrawalRequest request,
-        CancellationToken cancellationToken = default) =>
-        _privateTradingApi.CreateWithdrawalAsync(request, cancellationToken);
+    internal BitflyerWireApi(
+        IBitflyerWireMarketDataApi marketData,
+        IBitflyerWireTradingApi trading,
+        IBitflyerWireAccountApi account,
+        IBitflyerWireExchangeInfoApi exchangeInfo)
+    {
+        MarketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
+        Trading = trading ?? throw new ArgumentNullException(nameof(trading));
+        Account = account ?? throw new ArgumentNullException(nameof(account));
+        ExchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
+    }
 }

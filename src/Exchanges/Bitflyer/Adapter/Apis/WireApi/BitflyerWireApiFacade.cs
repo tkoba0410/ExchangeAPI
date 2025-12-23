@@ -10,50 +10,50 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.WireApi;
 /// </summary>
 public sealed class BitflyerWireApiFacade
 {
-    private readonly BitflyerWireApi _wire;
+    private readonly IBitflyerWireApi _wire;
 
-    public BitflyerWireApiFacade(BitflyerWireApi wire)
+    public BitflyerWireApiFacade(IBitflyerWireApi wire)
     {
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
     public Task<Ticker> GetTickerAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _wire.GetTickerAsync(productCode, cancellationToken);
+        _wire.MarketData.GetTickerRawAsync(productCode, cancellationToken: cancellationToken);
 
     public Task<Board> GetBoardAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _wire.GetBoardAsync(productCode, cancellationToken);
+        _wire.MarketData.GetBoardRawAsync(productCode, cancellationToken: cancellationToken);
 
     public Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
-        _wire.GetBalancesAsync(cancellationToken);
+        _wire.Account.GetBalancesAsync(cancellationToken);
 
     public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _wire.GetExecutionsAsync(productCode, cancellationToken);
+        _wire.Account.GetExecutionsAsync(productCode, cancellationToken: cancellationToken);
 
     public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
-        _wire.GetPositionsAsync(productCode, cancellationToken);
+        _wire.Account.GetPositionsAsync(productCode, cancellationToken);
 
     public Task<CollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default) =>
-        _wire.GetCollateralAsync(cancellationToken);
+        _wire.Account.GetCollateralAsync(cancellationToken);
 
     public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
         string productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default) =>
-        _wire.GetChildOrdersAsync(productCode, childOrderStatusState, childOrderAcceptanceId, cancellationToken);
+        _wire.Account.GetChildOrdersAsync(productCode, childOrderStatusState, childOrderAcceptanceId, cancellationToken: cancellationToken);
 
     public Task<CreateChildOrderResponse> CreateChildOrderAsync(
         CreateChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _wire.CreateChildOrderAsync(request, cancellationToken);
+        _wire.Trading.CreateChildOrderAsync(request, cancellationToken);
 
     public Task<EmptyResponse> CancelChildOrderAsync(
         CancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _wire.CancelChildOrderAsync(request, cancellationToken);
+        _wire.Trading.CancelChildOrderAsync(request, cancellationToken);
 
     public Task<EmptyResponse> CancelAllChildOrdersAsync(
         CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _wire.CancelAllChildOrdersAsync(request, cancellationToken);
+        _wire.Trading.CancelAllChildOrdersAsync(request, cancellationToken);
 }

@@ -1,5 +1,7 @@
 using System;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Private;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
@@ -10,22 +12,25 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 /// </summary>
 internal sealed class BitflyerApiBundle
 {
-    public IBitflyerPublicApi PublicApi { get; }
-    public IBitflyerPrivateApi PrivateApi { get; }
-    public IBitflyerPrivateTradingApi PrivateTradingApi { get; }
+    public IBitflyerWireMarketDataApi MarketData { get; }
+    public IBitflyerWireAccountApi Account { get; }
+    public IBitflyerWireTradingApi Trading { get; }
+    public IBitflyerWireExchangeInfoApi ExchangeInfo { get; }
     public object? RawBundle { get; }
     public object? WireBundle { get; }
 
     public BitflyerApiBundle(
-        IBitflyerPublicApi publicApi,
-        IBitflyerPrivateApi privateApi,
-        IBitflyerPrivateTradingApi privateTradingApi,
+        IBitflyerWireMarketDataApi marketData,
+        IBitflyerWireAccountApi account,
+        IBitflyerWireTradingApi trading,
+        IBitflyerWireExchangeInfoApi exchangeInfo,
         object? rawBundle = null,
         object? wireBundle = null)
     {
-        PublicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
-        PrivateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
-        PrivateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
+        MarketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
+        Account = account ?? throw new ArgumentNullException(nameof(account));
+        Trading = trading ?? throw new ArgumentNullException(nameof(trading));
+        ExchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
         RawBundle = rawBundle;
         WireBundle = wireBundle;
     }
@@ -38,6 +43,12 @@ internal sealed class BitflyerApiBundle
         var privateApi = new BitflyerPrivateApi(restClient);
         var privateTradingApi = new BitflyerPrivateTradingApi(restClient);
         var wire = new BitflyerWireApi(raw, restClient);
-        return new BitflyerApiBundle(publicApi, privateApi, privateTradingApi, rawBundle: raw, wireBundle: wire);
+        return new BitflyerApiBundle(
+            marketData: publicApi,
+            account: privateApi,
+            trading: privateTradingApi,
+            exchangeInfo: publicApi,
+            rawBundle: raw,
+            wireBundle: wire);
     }
 }

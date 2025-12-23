@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Private;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
@@ -19,17 +20,17 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 /// </summary>
 internal sealed class BitflyerTradingApi : ITradingApi
 {
-    private readonly IBitflyerPrivateTradingApi _privateTradingApi;
-    private readonly IBitflyerPrivateApi _privateAccountApi;
+    private readonly IBitflyerWireTradingApi _tradingApi;
+    private readonly IBitflyerWireAccountApi _accountApi;
     private readonly ExchangeCode _exchange;
 
     public BitflyerTradingApi(
-        IBitflyerPrivateTradingApi privateTradingApi,
-        IBitflyerPrivateApi privateAccountApi,
+        IBitflyerWireTradingApi tradingApi,
+        IBitflyerWireAccountApi accountApi,
         ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
-        _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
-        _privateAccountApi = privateAccountApi ?? throw new ArgumentNullException(nameof(privateAccountApi));
+        _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
+        _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _exchange = exchange;
     }
 
@@ -77,7 +78,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 TimeInForce = BitflyerTradingMapper.MapTimeInForce(request.TimeInForce),
             };
 
-            var response = await _privateTradingApi
+            var response = await _tradingApi
                 .CreateChildOrderAsync(dto, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -134,7 +135,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
                     throw new ExchangeFeatureNotSupportedException(_exchange, $"CancelOrderBy{orderKey.Kind}");
             }
 
-            var response = await _privateTradingApi
+            var response = await _tradingApi
                 .CancelChildOrderAsync(dto, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -176,7 +177,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
 
         try
         {
-            var rawOrders = await _privateAccountApi
+            var rawOrders = await _accountApi
                 .GetChildOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
@@ -246,12 +247,12 @@ internal sealed class BitflyerTradingApi : ITradingApi
             switch (orderKey.Kind)
             {
                 case OrderIdKind.AcceptanceId:
-                    orders = await _privateAccountApi
+                    orders = await _accountApi
                         .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderAcceptanceId: orderKey.Value, cancellationToken: cancellationToken)
                         .ConfigureAwait(false);
                     break;
                 case OrderIdKind.ExchangeOrderId:
-                    orders = await _privateAccountApi
+                    orders = await _accountApi
                         .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderId: orderKey.Value, cancellationToken: cancellationToken)
                         .ConfigureAwait(false);
                     break;

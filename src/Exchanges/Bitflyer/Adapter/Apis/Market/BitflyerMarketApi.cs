@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
@@ -18,14 +19,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 /// </summary>
 internal sealed class MarketApi : IMarketDataApi
 {
-    private readonly IBitflyerPublicApi _publicApi;
+    private readonly IBitflyerWireMarketDataApi _marketData;
     private readonly ExchangeCode _exchange;
 
     public MarketApi(
-        IBitflyerPublicApi publicApi,
+        IBitflyerWireMarketDataApi marketData,
         ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
-        _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
+        _marketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
         _exchange = exchange;
     }
 
@@ -35,7 +36,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
-            var raw = await _publicApi.GetTickerRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
+            var raw = await _marketData.GetTickerRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
             return MarketMapper.MapTicker(BitflyerCommonMapper.ToApiProductCode(productCode), raw);
         }
         catch (SymbolNotSupportedException ex)
@@ -68,7 +69,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
-            var rawBoard = await _publicApi.GetBoardRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
+            var rawBoard = await _marketData.GetBoardRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
             return MarketMapper.MapOrderBook(rawBoard);
         }
         catch (SymbolNotSupportedException ex)
@@ -101,7 +102,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
-            var raw = await _publicApi.GetExecutionsRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
+            var raw = await _marketData.GetExecutionsRawAsync(BitflyerCommonMapper.ToApiProductCode(productCode), cancellationToken: cancellationToken).ConfigureAwait(false);
 
             var mapped = raw
                 .Select(e => MarketMapper.MapExecution(productCode, e))
@@ -146,7 +147,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
-            return await _publicApi.GetHealthAsync(productCode, cancellationToken).ConfigureAwait(false);
+            return await _marketData.GetHealthAsync(productCode, cancellationToken).ConfigureAwait(false);
         }
         catch (ExchangeApiException ex)
         {
@@ -174,7 +175,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
-            return await _publicApi.GetBoardStateAsync(productCode, cancellationToken).ConfigureAwait(false);
+            return await _marketData.GetBoardStateAsync(productCode, cancellationToken).ConfigureAwait(false);
         }
         catch (ExchangeApiException ex)
         {

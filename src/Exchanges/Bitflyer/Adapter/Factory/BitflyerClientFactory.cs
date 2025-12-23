@@ -16,6 +16,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Private;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
 
@@ -56,7 +57,11 @@ public static class BitflyerClientFactory
 
         var raw = new Raw.BitflyerRawApi(restClient);
         var publicApi = new BitflyerPublicApi(raw.MarketData);
-        var wire = new BitflyerWireApi(raw, restClient);
+        var wire = new BitflyerWireApi(
+            marketData: publicApi,
+            trading: new BitflyerWireTradingApiNotSupported(),
+            account: new BitflyerWireAccountApiNotSupported(),
+            exchangeInfo: publicApi);
         return new BitflyerPublicClient(publicApi, rawBundle: raw, wireBundle: wire);
     }
 
@@ -133,7 +138,13 @@ public static class BitflyerClientFactory
         var privateTradingApi = new BitflyerPrivateTradingApi(restClient);
         var wire = new BitflyerWireApi(raw, restClient);
 
-        return new BitflyerExchangeClient(publicApi, privateApi, privateTradingApi, rawBundle: raw, wireBundle: wire);
+        return new BitflyerExchangeClient(
+            marketData: publicApi,
+            account: privateApi,
+            trading: privateTradingApi,
+            exchangeInfo: publicApi,
+            rawBundle: raw,
+            wireBundle: wire);
     }
 
     /// <summary>

@@ -22,7 +22,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var tradingResponse = new CreateChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-123" };
         var fakeTrading = new FakeBitflyerPrivateTradingApi(tradingResponse);
 
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading, fakePublic);
 
         var result = await client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
 
@@ -42,7 +42,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var tradingResponse = new CreateChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-STOP" };
         var fakeTrading = new FakeBitflyerPrivateTradingApi(tradingResponse);
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading, fakePublic);
 
         await Assert.ThrowsAsync<ExchangeFeatureNotSupportedException>(() =>
             client.PlaceStopOrderAsync(new Symbol("BTC/JPY"), ContractSide.Sell, new Size(0.5m), triggerPrice: new Price(3990000m)));
@@ -60,7 +60,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
             new CreateChildOrderResponse(),
             exceptionToThrow: exception);
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading, fakePublic);
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m)));
         Assert.Equal(ExchangeErrorCategory.RateLimit, ex.ErrorCategory);
@@ -80,7 +80,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
             new CreateChildOrderResponse(),
             exceptionToThrow: exception);
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading, fakePublic);
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(10m)));
         Assert.Equal(ExchangeErrorCategory.Balance, ex.ErrorCategory);
@@ -99,7 +99,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
             new CreateChildOrderResponse(),
             exceptionToThrow: exception);
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading, fakePublic);
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m)));
         Assert.Equal(ExchangeErrorCategory.Auth, ex.ErrorCategory);

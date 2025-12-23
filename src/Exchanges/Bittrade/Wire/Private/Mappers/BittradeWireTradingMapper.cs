@@ -58,7 +58,7 @@ internal static class BittradeWireTradingMapper
             return result;
         }
 
-        throw new FormatException($"Unknown order type: '{text}'.");
+        throw new FormatException($"Invalid type: '{text}'.");
     }
 
     private static string NormalizeEnumKey(string text)
@@ -86,7 +86,7 @@ internal static class BittradeWireTradingMapper
     {
         if (string.IsNullOrWhiteSpace(text))
         {
-            throw new FormatException($"Missing {field}.");
+            throw new FormatException($"Missing {field}: <missing>.");
         }
 
         if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))

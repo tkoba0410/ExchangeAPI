@@ -14,7 +14,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Wire.Private;
 
 internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
 {
-    private const string OkStatus = "ok";
     private readonly IBittradeRawTradingApi _raw;
     private readonly string _accountId;
 
@@ -35,15 +34,11 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
         }
         catch (FormatException ex)
         {
-            throw new ExchangeApiException(
-                $"{operation}: {ex.Message}",
-                exchange: ExchangeCode.Bittrade,
-                operation: operation,
-                errorCategory: ExchangeErrorCategory.Unknown);
+            throw BittradeWireErrors.UnexpectedMessage(operation, ex.Message);
         }
 
         var raw = await _raw.CreateOrderAsync(rawRequest, ct).ConfigureAwait(false);
-        RequireOk(raw.Status, operation);
+        BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
 
         return BittradeWireTradingMapper.ToWire(raw, request);
     }
@@ -52,22 +47,18 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
     {
         var operation = BittradeWireOperations.Trading.CancelOrder;
         var raw = await _raw.CancelOrderAsync(new OrderId(orderId), ct).ConfigureAwait(false);
-        RequireOk(raw.Status, operation);
+        BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
     }
 
     public async Task<IReadOnlyList<BittradeWireOpenOrder>> GetOpenOrdersAsync(string symbol, CancellationToken ct = default)
     {
         var operation = BittradeWireOperations.Trading.GetOpenOrders;
         var raw = await _raw.GetOpenOrdersAsync(Symbol.From(symbol), _accountId, ct).ConfigureAwait(false);
-        RequireOk(raw.Status, operation);
+        BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
 
         if (raw.Data is null)
         {
-            throw new ExchangeApiException(
-                $"{operation}: missing data.",
-                exchange: ExchangeCode.Bittrade,
-                operation: operation,
-                errorCategory: ExchangeErrorCategory.Unknown);
+            throw BittradeWireErrors.Missing(operation, "data");
         }
 
         return raw.Data.Select(MapOpenOrder).ToArray();
@@ -77,13 +68,9 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
     {
         var operation = BittradeWireOperations.Trading.GetOrder;
         var raw = await _raw.GetOrderAsync(new OrderId(orderId), ct).ConfigureAwait(false);
-        RequireOk(raw.Status, operation);
+        BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
 
-        var data = raw.Data ?? throw new ExchangeApiException(
-            $"{operation}: missing data.",
-            exchange: ExchangeCode.Bittrade,
-            operation: operation,
-            errorCategory: ExchangeErrorCategory.Unknown);
+        var data = raw.Data ?? throw BittradeWireErrors.Missing(operation, "data");
 
         try
         {
@@ -91,11 +78,7 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
         }
         catch (FormatException ex)
         {
-            throw new ExchangeApiException(
-                $"{operation}: {ex.Message}",
-                exchange: ExchangeCode.Bittrade,
-                operation: operation,
-                errorCategory: ExchangeErrorCategory.Unknown);
+            throw BittradeWireErrors.UnexpectedMessage(operation, ex.Message);
         }
     }
 
@@ -107,32 +90,7 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
         }
         catch (FormatException ex)
         {
-            throw new ExchangeApiException(
-                $"{BittradeWireOperations.Trading.GetOpenOrders}: {ex.Message}",
-                exchange: ExchangeCode.Bittrade,
-                operation: BittradeWireOperations.Trading.GetOpenOrders,
-                errorCategory: ExchangeErrorCategory.Unknown);
-        }
-    }
-
-    private static void RequireOk(string? status, string operation)
-    {
-        if (string.IsNullOrWhiteSpace(status))
-        {
-            throw new ExchangeApiException(
-                $"{operation}: status is missing.",
-                exchange: ExchangeCode.Bittrade,
-                operation: operation,
-                errorCategory: ExchangeErrorCategory.Unknown);
-        }
-
-        if (!string.Equals(status, OkStatus, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new ExchangeApiException(
-                $"{operation}: status={status}.",
-                exchange: ExchangeCode.Bittrade,
-                operation: operation,
-                errorCategory: ExchangeErrorCategory.Request);
+            throw BittradeWireErrors.UnexpectedMessage(BittradeWireOperations.Trading.GetOpenOrders, ex.Message);
         }
     }
 }

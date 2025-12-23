@@ -32,6 +32,7 @@ public sealed class BittradeWireTradingTests
         Assert.Equal(ExchangeCode.Bittrade, ex.Exchange);
         Assert.Equal(BittradeWireOperations.Trading.PlaceOrder, ex.Operation);
         Assert.Equal(ExchangeErrorCategory.Request, ex.ErrorCategory);
+        Assert.Contains("status=error", ex.Message);
     }
 
     [Fact]
@@ -62,6 +63,7 @@ public sealed class BittradeWireTradingTests
 
         Assert.Equal(ExchangeCode.Bittrade, ex.Exchange);
         Assert.Equal(BittradeWireOperations.Trading.GetOpenOrders, ex.Operation);
+        Assert.Equal(ExchangeErrorCategory.Unknown, ex.ErrorCategory);
         Assert.Contains("amount", ex.Message);
         Assert.Contains("bad", ex.Message);
     }

@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.WireApi;
 

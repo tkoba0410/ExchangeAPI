@@ -1,8 +1,7 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Core.Transport.Time;
 using Xunit;
 

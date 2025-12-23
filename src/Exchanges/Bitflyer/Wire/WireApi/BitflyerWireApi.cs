@@ -1,7 +1,8 @@
 using System;
 using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Private;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 namespace ExchangeApi.Exchanges.Bitflyer.Wire;
 

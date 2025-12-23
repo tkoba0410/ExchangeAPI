@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;

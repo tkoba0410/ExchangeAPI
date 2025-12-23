@@ -2,11 +2,13 @@ using System;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
 using ContractSide = ExchangeApi.Common.Enums.Side;
-using RawSide = ExchangeApi.Exchanges.Bitflyer.Wire.Side;
+using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 

@@ -1,7 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
 using ExchangeApi.Core.Transport.Protocol;
 using Xunit;
 

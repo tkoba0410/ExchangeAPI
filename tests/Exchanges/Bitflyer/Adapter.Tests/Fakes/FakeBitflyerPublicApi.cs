@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
 {
@@ -66,7 +67,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
                 {
                     Id = 1,
                     ProductCode = RawProductCode.BtcJpy,
-                    Side = Side.Buy,
+                    Side = RawSide.Buy,
                     Price = 100m,
                     Size = 0.01m,
                     ExecDate = System.DateTimeOffset.UtcNow,

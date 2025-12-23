@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Common.Enums;
-using RawSide = ExchangeApi.Exchanges.Bitflyer.Wire.Side;
+using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 

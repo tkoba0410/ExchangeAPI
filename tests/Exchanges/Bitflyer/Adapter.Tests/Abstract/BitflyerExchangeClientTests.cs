@@ -5,9 +5,13 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawChildOrderType = ExchangeApi.Exchanges.Bitflyer.Raw.ChildOrderType;
+using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
@@ -141,8 +145,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
                     ChildOrderId = "JOR-1",
                     ChildOrderAcceptanceId = "JRF-1",
                     ProductCode = RawProductCode.BtcJpy,
-                    Side = ExchangeApi.Exchanges.Bitflyer.Wire.Side.Buy,
-                ChildOrderType = ChildOrderType.Limit,
+                    Side = RawSide.Buy,
+                ChildOrderType = RawChildOrderType.Limit,
                     Price = 100m,
                     Size = 0.1m,
                     OutstandingSize = 0.1m,
@@ -198,7 +202,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
                 new PositionResponse
                 {
                     ProductCode = RawProductCode.BtcJpy,
-                    Side = ExchangeApi.Exchanges.Bitflyer.Wire.Side.Buy,
+                    Side = RawSide.Buy,
                     Size = 0.01m,
                     Price = 3000000m,
                     OpenDate = new DateTime(2025, 1, 1),

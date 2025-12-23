@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;

@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 

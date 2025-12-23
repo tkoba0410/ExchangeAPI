@@ -56,7 +56,7 @@ public static class BitflyerClientFactory
             errorClassifier: errorClassifier);
 
         var raw = new Raw.BitflyerRawApi(restClient);
-        var publicApi = new BitflyerPublicApi(raw.MarketData);
+        var publicApi = new Raw.PublicGet.BitflyerPublicApi(raw.MarketData);
         var wire = new BitflyerWireApi(
             marketData: publicApi,
             trading: new BitflyerWireTradingApiNotSupported(),
@@ -121,7 +121,7 @@ public static class BitflyerClientFactory
         var observer = options.Observer;
         var errorClassifier = options.ErrorClassifier ?? BitflyerErrorClassifier.Instance;
 
-        IRequestSigner signer = new BitflyerRequestSigner(apiKey, apiSecret, clock);
+        IRequestSigner signer = new Raw.BitflyerRequestSigner(apiKey, apiSecret, clock);
 
         IRestClient restClient = new RestClient(
             BitflyerApiBaseUri,
@@ -133,9 +133,9 @@ public static class BitflyerClientFactory
             errorClassifier: errorClassifier);
 
         var raw = new Raw.BitflyerRawApi(restClient);
-        var publicApi = new BitflyerPublicApi(raw.MarketData);
-        var privateApi = new BitflyerPrivateApi(restClient);
-        var privateTradingApi = new BitflyerPrivateTradingApi(restClient);
+        var publicApi = new Raw.PublicGet.BitflyerPublicApi(raw.MarketData);
+        var privateApi = new Raw.PrivateGet.BitflyerPrivateApi(restClient);
+        var privateTradingApi = new Raw.PrivatePost.BitflyerPrivateTradingApi(restClient);
         var wire = new BitflyerWireApi(raw, restClient);
 
         return new BitflyerExchangeClient(

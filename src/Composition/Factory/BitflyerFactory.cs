@@ -4,6 +4,9 @@ using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Time;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
 
@@ -83,7 +86,7 @@ public static class BitflyerFactory
         }
 
         var clock = settings.Clock ?? new SystemClock();
-        return new BitflyerRequestSigner(credentials.ApiKey, credentials.ApiSecret, clock);
+        return new Raw.BitflyerRequestSigner(credentials.ApiKey, credentials.ApiSecret, clock);
     }
 
     private sealed record BitflyerComponents(

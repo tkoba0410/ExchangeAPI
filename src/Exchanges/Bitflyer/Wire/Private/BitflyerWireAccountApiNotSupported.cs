@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Private;
 

@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Wire;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
-using RawTicker = ExchangeApi.Exchanges.Bitflyer.Wire.Ticker;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Ticker;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
 

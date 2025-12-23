@@ -14,6 +14,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Wire;
 using ExchangeApi.Exchanges.Bittrade.Wire.Public;
+using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
@@ -55,7 +56,26 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
         var raw = new BittradeRawApi(_restClient);
         _rawBundle = raw;
-        _wireBundle = new BittradeWireApi(new BittradeWireMarketDataApi(raw.MarketData));
+        _wireBundle = new BittradeWireApi(
+            new BittradeWireMarketDataApi(raw.MarketData),
+            new BittradeWireTradingApiNotSupported());
+    }
+
+    public BittradeExchangeClient(
+        IMarketDataApi marketApi,
+        ITradingApi tradingApi,
+        IAccountApi accountApi,
+        IExchangeInfoApi exchangeInfoApi,
+        IRestClient restClient,
+        string accountId)
+        : this(marketApi, tradingApi, accountApi, exchangeInfoApi)
+    {
+        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        var raw = new BittradeRawApi(_restClient);
+        _rawBundle = raw;
+        _wireBundle = new BittradeWireApi(
+            new BittradeWireMarketDataApi(raw.MarketData),
+            new BittradeWireTradingApi(raw.Trading, accountId));
     }
 
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)

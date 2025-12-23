@@ -33,6 +33,14 @@ public sealed class BittradeWireAccessTests
         Assert.NotNull(wire);
     }
 
+    [Fact]
+    public void Wire_PrivateClient_ExposesTrading()
+    {
+        var client = BittradeClientFactory.CreateDefault("dummy", "dummy", "account-id");
+        var wire = client.Wire<IBittradeWireApi>();
+        Assert.NotNull(wire.Trading);
+    }
+
     private sealed class FakeMarketDataApi : IMarketDataApi
     {
         public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>

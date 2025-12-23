@@ -13,6 +13,7 @@ public sealed class BittradeRawApi : IBittradeRawApi
     private readonly IBittradePrivateApi _privateApi;
     private readonly IBittradePrivateTradingApi _privateTradingApi;
     public IBittradeRawMarketDataApi MarketData { get; }
+    public IBittradeRawTradingApi Trading { get; }
 
     public BittradeRawApi(IRestClient restClient)
         : this(
@@ -31,6 +32,7 @@ public sealed class BittradeRawApi : IBittradeRawApi
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
         _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
         MarketData = new BittradeRawMarketDataApi(_publicApi);
+        Trading = new BittradeRawTradingApi(_privateApi, _privateTradingApi);
     }
 
     // Public

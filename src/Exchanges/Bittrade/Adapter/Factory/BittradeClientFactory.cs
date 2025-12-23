@@ -55,7 +55,7 @@ public static class BittradeClientFactory
         var trading = new BittradeTradingApi(restClient, accountId);
         var account = new BittradeAccountApi(restClient, accountId);
         var exchangeInfo = new BittradeExchangeInfoApi(restClient);
-        return new BittradeExchangeClient(market, trading, account, exchangeInfo, restClient);
+        return new BittradeExchangeClient(market, trading, account, exchangeInfo, restClient, accountId);
     }
 
     private static RestClient CreateRestClient(

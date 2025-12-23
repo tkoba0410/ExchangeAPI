@@ -11,6 +11,7 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ContractSide = ExchangeApi.Common.Enums.Side;
+using ExchangeApi.Exchanges.Bitflyer.Adapter;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 
 /// <summary>
@@ -59,6 +60,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
         OrderRequest request,
         CancellationToken cancellationToken)
     {
+        var operation = BitflyerOperations.Trading.PlaceOrder;
         BitflyerTradingMapper.ValidateOrderRequest(request);
 
         try
@@ -85,14 +87,14 @@ internal sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "SendOrder");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer sendchildorder API.",
                 exchange: _exchange,
-                operation: "SendOrder",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -103,6 +105,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Trading.CancelOrder;
         if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
@@ -140,7 +143,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 throw new ExchangeApiException(
                     message: "bitFlyer cancelchildorder returned no response.",
                     exchange: _exchange,
-                    operation: "CancelOrder",
+                    operation: operation,
                     statusCode: null);
             }
 
@@ -148,14 +151,14 @@ internal sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "CancelOrder");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer cancelchildorder API.",
                 exchange: _exchange,
-                operation: "CancelOrder",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -165,6 +168,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Trading.GetOpenOrders;
         if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
@@ -187,7 +191,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
                         : throw new ExchangeApiException(
                             message: "bitFlyer order is missing both acceptanceId and exchangeOrderId.",
                             exchange: _exchange,
-                            operation: "GetOpenOrders");
+                            operation: operation);
 
                 return new OpenOrder(
                     ExchangeCode: ExchangeCode.Bitflyer,
@@ -211,14 +215,14 @@ internal sealed class BitflyerTradingApi : ITradingApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetOpenOrders");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getchildorders API.",
                 exchange: _exchange,
-                operation: "GetOpenOrders",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -229,6 +233,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Trading.GetOrder;
         if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
@@ -236,41 +241,47 @@ internal sealed class BitflyerTradingApi : ITradingApi
 
         IReadOnlyList<ChildOrderResponse> orders;
         var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
-
-        switch (orderKey.Kind)
+        try
         {
-            case OrderIdKind.AcceptanceId:
-                orders = await _privateAccountApi
-                    .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderAcceptanceId: orderKey.Value, cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
-                break;
-            case OrderIdKind.ExchangeOrderId:
-                orders = await _privateAccountApi
-                    .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderId: orderKey.Value, cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
-                break;
-            default:
-                throw new ExchangeFeatureNotSupportedException(_exchange, $"GetOrderBy{orderKey.Kind}");
+            switch (orderKey.Kind)
+            {
+                case OrderIdKind.AcceptanceId:
+                    orders = await _privateAccountApi
+                        .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderAcceptanceId: orderKey.Value, cancellationToken: cancellationToken)
+                        .ConfigureAwait(false);
+                    break;
+                case OrderIdKind.ExchangeOrderId:
+                    orders = await _privateAccountApi
+                        .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderId: orderKey.Value, cancellationToken: cancellationToken)
+                        .ConfigureAwait(false);
+                    break;
+                default:
+                    throw new ExchangeFeatureNotSupportedException(_exchange, $"GetOrderBy{orderKey.Kind}");
+            }
+
+            var order = orders.FirstOrDefault();
+
+            if (order is null)
+            {
+                throw new ExchangeOrderNotFoundException(_exchange, operation, symbol.ToString(), orderKey.ToString());
+            }
+
+            var status = BitflyerCommonMapper.MapOrderStatus(order.ChildOrderStatusState);
+            var resolvedKey = !string.IsNullOrWhiteSpace(order.ChildOrderAcceptanceId)
+                ? new OrderKey(OrderIdKind.AcceptanceId, order.ChildOrderAcceptanceId)
+                : new OrderKey(OrderIdKind.ExchangeOrderId, order.ChildOrderId);
+            return new OrderStatus(
+                ProductCode: BitflyerCommonMapper.ToApiProductCode(order.ProductCode),
+                Key: resolvedKey,
+                Status: status,
+                ExecutedSize: new Size(order.ExecutedSize),
+                OutstandingSize: new Size(order.OutstandingSize),
+                Price: order.Price == 0 ? null : new Price(order.Price),
+                AveragePrice: order.AveragePrice == 0 ? null : new Price(order.AveragePrice));
         }
-
-        var order = orders.FirstOrDefault();
-
-        if (order is null)
+        catch (ExchangeApiException ex)
         {
-            throw new ExchangeOrderNotFoundException(_exchange, "GetOrder", symbol.ToString(), orderKey.ToString());
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
-
-        var status = BitflyerCommonMapper.MapOrderStatus(order.ChildOrderStatusState);
-        var resolvedKey = !string.IsNullOrWhiteSpace(order.ChildOrderAcceptanceId)
-            ? new OrderKey(OrderIdKind.AcceptanceId, order.ChildOrderAcceptanceId)
-            : new OrderKey(OrderIdKind.ExchangeOrderId, order.ChildOrderId);
-        return new OrderStatus(
-            ProductCode: BitflyerCommonMapper.ToApiProductCode(order.ProductCode),
-            Key: resolvedKey,
-            Status: status,
-            ExecutedSize: new Size(order.ExecutedSize),
-            OutstandingSize: new Size(order.OutstandingSize),
-            Price: order.Price == 0 ? null : new Price(order.Price),
-            AveragePrice: order.AveragePrice == 0 ? null : new Price(order.AveragePrice));
     }
 }

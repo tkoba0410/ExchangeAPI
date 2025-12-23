@@ -10,6 +10,7 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
+using ExchangeApi.Exchanges.Bitflyer.Adapter;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 
 /// <summary>
@@ -30,6 +31,7 @@ internal sealed class MarketApi : IMarketDataApi
 
     public async Task<CommonTicker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.MarketData.GetTicker;
         try
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
@@ -41,20 +43,20 @@ internal sealed class MarketApi : IMarketDataApi
             throw new ExchangeApiException(
                 message: ex.Message,
                 exchange: _exchange,
-                operation: "GetTicker",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetTicker");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getticker API.",
                 exchange: _exchange,
-                operation: "GetTicker",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -62,6 +64,7 @@ internal sealed class MarketApi : IMarketDataApi
 
     public async Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.MarketData.GetOrderBook;
         try
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
@@ -73,20 +76,20 @@ internal sealed class MarketApi : IMarketDataApi
             throw new ExchangeApiException(
                 message: ex.Message,
                 exchange: _exchange,
-                operation: "GetOrderBook",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetOrderBook");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getboard API.",
                 exchange: _exchange,
-                operation: "GetOrderBook",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -94,6 +97,7 @@ internal sealed class MarketApi : IMarketDataApi
 
     public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.MarketData.GetExecutions;
         try
         {
             var productCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol);
@@ -107,14 +111,14 @@ internal sealed class MarketApi : IMarketDataApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetMarketExecutions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getexecutions API.",
                 exchange: _exchange,
-                operation: "GetMarketExecutions",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -133,6 +137,7 @@ internal sealed class MarketApi : IMarketDataApi
 
     public async Task<HealthResponse> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.MarketData.GetHealth;
         if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
@@ -145,14 +150,14 @@ internal sealed class MarketApi : IMarketDataApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetHealth");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer gethealth API.",
                 exchange: _exchange,
-                operation: "GetHealth",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -160,6 +165,7 @@ internal sealed class MarketApi : IMarketDataApi
 
     public async Task<BoardStateResponse> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.MarketData.GetBoardState;
         if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
@@ -172,14 +178,14 @@ internal sealed class MarketApi : IMarketDataApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetBoardState");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getboardstate API.",
                 exchange: _exchange,
-                operation: "GetBoardState",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }

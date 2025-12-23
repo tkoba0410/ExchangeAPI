@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.ProductCode;
@@ -65,7 +66,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         Assert.Equal(ExchangeErrorCategory.RateLimit, ex.ErrorCategory);
         Assert.Equal("TOO_MANY_REQUESTS", ex.ExchangeErrorCode);
         Assert.Equal(ExchangeCode.Bitflyer, ex.Exchange);
-        Assert.Equal("SendOrder", ex.Operation);
+        Assert.Equal(BitflyerOperations.Trading.PlaceOrder, ex.Operation);
     }
 
     [Fact]

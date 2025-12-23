@@ -10,6 +10,7 @@ using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bitflyer.Adapter;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Account;
 
 internal sealed class BitflyerAccountApi : IAccountApi
@@ -25,6 +26,7 @@ internal sealed class BitflyerAccountApi : IAccountApi
 
     public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Account.GetBalances;
         try
         {
             var rawBalances = await _privateApi
@@ -35,14 +37,14 @@ internal sealed class BitflyerAccountApi : IAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetBalances");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getbalance API.",
                 exchange: _exchange,
-                operation: "GetBalances",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -50,6 +52,7 @@ internal sealed class BitflyerAccountApi : IAccountApi
 
     public async Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Account.GetAccountExecutions;
         if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
@@ -66,14 +69,14 @@ internal sealed class BitflyerAccountApi : IAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetAccountExecutions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getexecutions API.",
                 exchange: _exchange,
-                operation: "GetAccountExecutions",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -81,6 +84,7 @@ internal sealed class BitflyerAccountApi : IAccountApi
 
     public async Task<JsonElement> GetTradingCommissionAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Account.GetTradingCommission;
         if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
@@ -95,14 +99,14 @@ internal sealed class BitflyerAccountApi : IAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetTradingCommission");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer gettradingcommission API.",
                 exchange: _exchange,
-                operation: "GetTradingCommission",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }

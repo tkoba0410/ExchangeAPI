@@ -10,6 +10,7 @@ using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bitflyer.Adapter;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 
 internal sealed class BitflyerMarginApi : IMarginAccountApi
@@ -25,6 +26,7 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
 
     public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Margin.GetBalances;
         try
         {
             var rawBalances = await _privateApi
@@ -41,14 +43,14 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetBalances");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getbalance API.",
                 exchange: _exchange,
-                operation: "GetBalances",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -56,6 +58,7 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
 
     public async Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Margin.GetAccountExecutions;
         if (symbol.IsEmpty)
         {
             throw new ArgumentException("symbol is required.", nameof(symbol));
@@ -72,14 +75,14 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetAccountExecutions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getexecutions API.",
                 exchange: _exchange,
-                operation: "GetAccountExecutions",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -87,6 +90,7 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
 
     public async Task<IReadOnlyList<Position>> GetOpenPositionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Margin.GetOpenPositions;
         try
         {
             var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
@@ -98,14 +102,14 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetOpenPositions");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getpositions API.",
                 exchange: _exchange,
-                operation: "GetOpenPositions",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }
@@ -113,6 +117,7 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
 
     public async Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default)
     {
+        var operation = BitflyerOperations.Margin.GetCollateral;
         try
         {
             var raw = await _privateApi
@@ -123,14 +128,14 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         }
         catch (ExchangeApiException ex)
         {
-            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, "GetCollateral");
+            throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
         catch (Exception ex)
         {
             throw new ExchangeApiException(
                 message: "Failed to call bitFlyer getcollateral API.",
                 exchange: _exchange,
-                operation: "GetCollateral",
+                operation: operation,
                 statusCode: null,
                 innerException: ex);
         }

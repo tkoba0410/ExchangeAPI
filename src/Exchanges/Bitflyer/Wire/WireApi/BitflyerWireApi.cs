@@ -24,7 +24,14 @@ public sealed class BitflyerWireApi : IBitflyerWireApi
     /// </param>
     public BitflyerWireApi(IRestClient restClient)
         : this(
-            publicApi: new BitflyerPublicApi(new Raw.BitflyerRawApi(restClient ?? throw new ArgumentNullException(nameof(restClient))).MarketData),
+            raw: new Raw.BitflyerRawApi(restClient ?? throw new ArgumentNullException(nameof(restClient))),
+            restClient: restClient)
+    {
+    }
+
+    internal BitflyerWireApi(Raw.IBitflyerRawApi raw, IRestClient restClient)
+        : this(
+            publicApi: new BitflyerPublicApi((raw ?? throw new ArgumentNullException(nameof(raw))).MarketData),
             privateApi: new BitflyerPrivateApi(restClient),
             privateTradingApi: new BitflyerPrivateTradingApi(restClient))
     {

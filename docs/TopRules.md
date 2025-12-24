@@ -128,3 +128,6 @@
 
 この原則を守ることで、
 文書とコードの整合性は最小コストで維持される。
+
+
+- フォルダ構成（場所）の正本は [`docs/FolderStructure.md`](./FolderStructure.md) に定義する

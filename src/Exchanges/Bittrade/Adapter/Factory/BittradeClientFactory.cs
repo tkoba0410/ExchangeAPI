@@ -26,7 +26,8 @@ public static class BittradeClientFactory
     public static BittradePublicClient CreatePublicClient(
         IRestCallObserver? observer = null,
         IRestClientLogger? logger = null) =>
-        new BittradePublicClient(CreateRestClient(observer: observer, logger: logger));
+        new BittradePublicClient(BittradeApiBundle.FromRestClient(
+            CreateRestClient(observer: observer, logger: logger)));
 
     public static IExchangeInfoApi CreateExchangeInfo() =>
         new BittradeExchangeInfoApi(CreateRestClient());
@@ -52,12 +53,8 @@ public static class BittradeClientFactory
         string accountId)
     {
         var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
-        var market = new BittradeMarketDataApi(restClient);
-        var raw = new BittradeRawApi(restClient);
-        var trading = new BittradeTradingApi(new BittradeWireTradingApi(raw.Trading, accountId));
-        var account = new BittradeAccountApi(restClient, accountId);
-        var exchangeInfo = new BittradeExchangeInfoApi(restClient);
-        return new BittradeExchangeClient(market, trading, account, exchangeInfo, restClient, accountId);
+        var bundle = BittradeApiBundle.FromRestClient(restClient, accountId);
+        return new BittradeExchangeClient(bundle);
     }
 
     private static RestClient CreateRestClient(

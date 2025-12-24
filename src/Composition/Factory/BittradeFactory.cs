@@ -3,12 +3,8 @@ using ExchangeApi.Composition.Transport;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 
 namespace ExchangeApi.Composition.Factory;
 
@@ -39,16 +35,8 @@ public static class BittradeFactory
         }
 
         var restClient = CreateRestClient(settings, requireCredentials: true);
-        var publicApi = new BittradePublicApi(restClient);
-        var privateApi = new BittradePrivateApi(restClient);
-        var privateTradingApi = new BittradePrivateTradingApi(restClient);
-        var raw = new BittradeRawApi(publicApi, privateApi, privateTradingApi);
-        var marketApi = new BittradeMarketDataApi(restClient);
-        var tradingApi = new BittradeTradingApi(new BittradeWireTradingApi(raw.Trading, settings.AccountId));
-        var accountApi = new BittradeAccountApi(restClient, settings.AccountId);
-        var exchangeInfoApi = new BittradeExchangeInfoApi(restClient);
-
-        return new BittradeExchangeClient(marketApi, tradingApi, accountApi, exchangeInfoApi);
+        var bundle = BittradeApiBundle.FromRestClient(restClient, settings.AccountId);
+        return new BittradeExchangeClient(bundle);
     }
 
     private static RestClient CreateRestClient(BittradeFactoryOptions settings, bool requireCredentials)

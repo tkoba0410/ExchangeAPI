@@ -49,22 +49,22 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
 
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
     {
-        if (_restClient is null)
+        if (!TryGetRaw<BittradeRawApi>(out var raw))
         {
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Timestamp");
         }
 
-        return _restClient.GetAsync<TimestampResponse>("v1/common/timestamp", cancellationToken: cancellationToken);
+        return raw.GetTimestampAsync(cancellationToken);
     }
 
     public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
     {
-        if (_restClient is null)
+        if (!TryGetRaw<BittradeRawApi>(out var raw))
         {
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Symbols");
         }
 
-        return _restClient.GetAsync<SymbolsResponse>("v1/common/symbols", cancellationToken: cancellationToken);
+        return raw.GetSymbolsAsync(cancellationToken);
     }
 
     public Task<Ticker> GetTickerAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>

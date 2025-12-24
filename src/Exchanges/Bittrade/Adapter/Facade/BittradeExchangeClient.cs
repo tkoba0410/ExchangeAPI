@@ -10,6 +10,7 @@ using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Wire;
@@ -30,6 +31,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private readonly IRestClient? _restClient;
     private readonly object? _rawBundle;
     private readonly object? _wireBundle;
+    internal BittradeApiBundle? ApiBundle { get; }
 
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bittrade;
 
@@ -43,6 +45,24 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
+    }
+
+    internal BittradeExchangeClient(BittradeApiBundle bundle)
+    {
+        if (bundle is null) throw new ArgumentNullException(nameof(bundle));
+        if (string.IsNullOrWhiteSpace(bundle.AccountId))
+        {
+            throw new InvalidOperationException("BittradeApiBundle.AccountId is required to create BittradeExchangeClient.");
+        }
+
+        _marketApi = new BittradeMarketDataApi(bundle.RestClient);
+        _tradingApi = new BittradeTradingApi(bundle.Trading);
+        _accountApi = new BittradeAccountApi(bundle.RestClient, bundle.AccountId);
+        _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.RestClient);
+        _restClient = bundle.RestClient;
+        _rawBundle = bundle.RawBundle;
+        _wireBundle = bundle.WireBundle;
+        ApiBundle = bundle;
     }
 
     public BittradeExchangeClient(

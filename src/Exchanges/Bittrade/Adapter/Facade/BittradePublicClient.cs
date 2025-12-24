@@ -27,6 +27,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     private readonly IRestClient? _restClient;
     private readonly object? _rawBundle;
     private readonly object? _wireBundle;
+    internal BittradeApiBundle? ApiBundle { get; }
 
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bittrade;
 
@@ -45,6 +46,17 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
+    }
+
+    internal BittradePublicClient(BittradeApiBundle bundle)
+    {
+        if (bundle is null) throw new ArgumentNullException(nameof(bundle));
+        _marketApi = new BittradeMarketDataApi(bundle.RestClient);
+        _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.RestClient);
+        _restClient = bundle.RestClient;
+        _rawBundle = bundle.RawBundle;
+        _wireBundle = bundle.WireBundle;
+        ApiBundle = bundle;
     }
 
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)

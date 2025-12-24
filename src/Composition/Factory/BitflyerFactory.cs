@@ -14,17 +14,11 @@ namespace ExchangeApi.Composition.Factory;
 
 /// <summary>
 /// bitFlyer 用の標準配線を提供するファクトリ。
-    /// 既定は Wire クライアントを返し、Adapter は明示的に呼び出した場合のみ生成する。
+/// Raw を既定とし、Adapter / Wire は明示的に opt-in する。
 /// </summary>
 public static class BitflyerFactory
 {
     private static readonly Uri DefaultBaseUri = new("https://api.bitflyer.com");
-
-    public static BitflyerWireApi CreateWire(BitflyerFactoryOptions? options = null)
-    {
-        var components = CreateWireComponents(options ?? new BitflyerFactoryOptions());
-        return new BitflyerWireApi(components.Raw, components.RestClient);
-    }
 
     public static Raw.BitflyerRawApi CreateRaw(BitflyerFactoryOptions? options = null)
     {
@@ -45,6 +39,12 @@ public static class BitflyerFactory
             components.PublicApi,
             exchangeCode: settings.Exchange,
             accountId: settings.AccountId);
+    }
+
+    public static BitflyerWireApi CreateWire(BitflyerFactoryOptions? options = null)
+    {
+        var components = CreateWireComponents(options ?? new BitflyerFactoryOptions());
+        return new BitflyerWireApi(components.Raw, components.RestClient);
     }
 
     private static BitflyerComponents CreateWireComponents(BitflyerFactoryOptions settings)

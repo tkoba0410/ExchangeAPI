@@ -16,11 +16,16 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Account;
 internal sealed class BitflyerAccountApi : IAccountApi
 {
     private readonly IBitflyerWireAccountApi _accountApi;
+    private readonly IExchangeMarketResolver _markets;
     private readonly ExchangeCode _exchange;
 
-    public BitflyerAccountApi(IBitflyerWireAccountApi accountApi, ExchangeCode exchange = ExchangeCode.Bitflyer)
+    public BitflyerAccountApi(
+        IBitflyerWireAccountApi accountApi,
+        IExchangeMarketResolver markets,
+        ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
+        _markets = markets ?? throw new ArgumentNullException(nameof(markets));
         _exchange = exchange;
     }
 
@@ -60,12 +65,16 @@ internal sealed class BitflyerAccountApi : IAccountApi
 
         try
         {
-            var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
+            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var raw = await _accountApi
                 .GetExecutionsAsync(productCode, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            return BitflyerAccountMapper.MapAccountExecutions(productCode, raw);
+            return BitflyerAccountMapper.MapAccountExecutions(symbol, raw);
+        }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
         }
         catch (ExchangeApiException ex)
         {
@@ -92,10 +101,14 @@ internal sealed class BitflyerAccountApi : IAccountApi
 
         try
         {
-            var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
+            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             return await _accountApi
                 .GetTradingCommissionAsync(productCode, cancellationToken)
                 .ConfigureAwait(false);
+        }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
         }
         catch (ExchangeApiException ex)
         {
@@ -110,5 +123,11 @@ internal sealed class BitflyerAccountApi : IAccountApi
                 statusCode: null,
                 innerException: ex);
         }
+    }
+
+    private async Task<string> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
+    {
+        var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
+        return market.ProductCode;
     }
 }

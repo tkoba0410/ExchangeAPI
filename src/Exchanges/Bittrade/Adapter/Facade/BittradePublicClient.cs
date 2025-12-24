@@ -15,6 +15,7 @@ using ExchangeApi.Exchanges.Bittrade.Wire;
 using ExchangeApi.Exchanges.Bittrade.Wire.Public;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Common.Services;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
@@ -32,9 +33,14 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bittrade;
 
     public BittradePublicClient(IRestClient restClient)
-        : this(new BittradeMarketDataApi(restClient), new BittradeExchangeInfoApi(restClient))
     {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+
+        var exchangeInfo = new BittradeExchangeInfoApi(restClient);
+        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        _marketApi = new BittradeMarketDataApi(restClient, markets);
+        _exchangeInfoApi = exchangeInfo;
+        _restClient = restClient;
         var raw = new BittradeRawApi(_restClient);
         _rawBundle = raw;
         _wireBundle = new BittradeWireApi(
@@ -52,8 +58,8 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     internal BittradePublicClient(BittradeApiBundle bundle)
     {
         if (bundle is null) throw new ArgumentNullException(nameof(bundle));
-        _marketApi = new BittradeMarketDataApi(bundle.RestClient);
-        _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.RestClient);
+        _marketApi = new BittradeMarketDataApi(bundle.RestClient, bundle.Markets);
+        _exchangeInfoApi = bundle.ExchangeInfo;
         _restClient = bundle.RestClient;
         _rawBundle = bundle.RawBundle;
         _wireBundle = bundle.WireBundle;

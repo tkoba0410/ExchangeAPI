@@ -22,15 +22,18 @@ internal sealed class BitflyerTradingApi : ITradingApi
 {
     private readonly IBitflyerWireTradingApi _tradingApi;
     private readonly IBitflyerWireAccountApi _accountApi;
+    private readonly IExchangeMarketResolver _markets;
     private readonly ExchangeCode _exchange;
 
     public BitflyerTradingApi(
         IBitflyerWireTradingApi tradingApi,
         IBitflyerWireAccountApi accountApi,
+        IExchangeMarketResolver markets,
         ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
+        _markets = markets ?? throw new ArgumentNullException(nameof(markets));
         _exchange = exchange;
     }
 
@@ -68,7 +71,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
         {
             var dto = new CreateChildOrderRequest
             {
-                ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(request.Symbol),
+                ProductCode = await ToProductCodeAsync(request.Symbol, cancellationToken).ConfigureAwait(false),
                 Side = BitflyerCommonMapper.MapSideToExchange(request.Side),
                 ChildOrderType = BitflyerTradingMapper.MapOrderType(request.OrderType, request.Price),
                 Size = request.Size.Value,
@@ -85,6 +88,10 @@ internal sealed class BitflyerTradingApi : ITradingApi
             var acceptanceId = response.ChildOrderAcceptanceId;
             var key = new OrderKey(OrderIdKind.AcceptanceId, acceptanceId);
             return new OrderResult(key, AcceptanceId: acceptanceId);
+        }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
         }
         catch (ExchangeApiException ex)
         {
@@ -115,19 +122,20 @@ internal sealed class BitflyerTradingApi : ITradingApi
         try
         {
             CancelChildOrderRequest dto;
+            var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             switch (orderKey.Kind)
             {
                 case OrderIdKind.AcceptanceId:
                     dto = new CancelChildOrderRequest
                     {
-                        ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol),
+                        ProductCode = productCode,
                         ChildOrderAcceptanceId = orderKey.Value,
                     };
                     break;
                 case OrderIdKind.ExchangeOrderId:
                     dto = new CancelChildOrderRequest
                     {
-                        ProductCode = BitflyerCommonMapper.MapSymbolToProductCode(symbol),
+                        ProductCode = productCode,
                         ChildOrderId = orderKey.Value,
                     };
                     break;
@@ -149,6 +157,10 @@ internal sealed class BitflyerTradingApi : ITradingApi
             }
 
             return new CancelResult(true);
+        }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
         }
         catch (ExchangeApiException ex)
         {
@@ -177,8 +189,9 @@ internal sealed class BitflyerTradingApi : ITradingApi
 
         try
         {
+            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var rawOrders = await _accountApi
-                .GetChildOrdersAsync(BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol)), childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
+                .GetChildOrdersAsync(productCode, childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var mapped = rawOrders.Select(o =>
@@ -196,7 +209,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
 
                 return new OpenOrder(
                     ExchangeCode: ExchangeCode.Bitflyer,
-                    Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(o.ProductCode)),
+                    Symbol: symbol,
                     Key: key,
                     Side: BitflyerCommonMapper.MapSide(o.Side),
                     OrderType: BitflyerTradingMapper.MapOrderTypeFromExchange(o.ChildOrderType),
@@ -213,6 +226,10 @@ internal sealed class BitflyerTradingApi : ITradingApi
             }).ToArray();
 
             return mapped;
+        }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
         }
         catch (ExchangeApiException ex)
         {
@@ -241,9 +258,9 @@ internal sealed class BitflyerTradingApi : ITradingApi
         }
 
         IReadOnlyList<ChildOrderResponse> orders;
-        var productCode = BitflyerCommonMapper.ToApiProductCode(BitflyerCommonMapper.MapSymbolToProductCode(symbol));
         try
         {
+            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             switch (orderKey.Kind)
             {
                 case OrderIdKind.AcceptanceId:
@@ -272,7 +289,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 ? new OrderKey(OrderIdKind.AcceptanceId, order.ChildOrderAcceptanceId)
                 : new OrderKey(OrderIdKind.ExchangeOrderId, order.ChildOrderId);
             return new OrderStatus(
-                ProductCode: BitflyerCommonMapper.ToApiProductCode(order.ProductCode),
+                ProductCode: productCode,
                 Key: resolvedKey,
                 Status: status,
                 ExecutedSize: new Size(order.ExecutedSize),
@@ -280,9 +297,25 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 Price: order.Price == 0 ? null : new Price(order.Price),
                 AveragePrice: order.AveragePrice == 0 ? null : new Price(order.AveragePrice));
         }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
+        }
         catch (ExchangeApiException ex)
         {
             throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
         }
+    }
+
+    private async Task<string> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
+    {
+        var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
+        return market.ProductCode;
+    }
+
+    private async Task<ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode> ToProductCodeAsync(Symbol symbol, CancellationToken ct)
+    {
+        var productCode = await ToApiProductCodeAsync(symbol, ct).ConfigureAwait(false);
+        return BitflyerCommonMapper.ParseProductCode(productCode);
     }
 }

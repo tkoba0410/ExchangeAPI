@@ -79,10 +79,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi, fakeApi);
 
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(async () =>
-            await client.GetTickerAsync(Symbol.Empty));
-
-        Assert.IsType<SymbolNotSupportedException>(ex.InnerException);
+        await Assert.ThrowsAsync<SymbolNotSupportedException>(() =>
+            client.GetTickerAsync(Symbol.Empty));
 
 
         }

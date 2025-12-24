@@ -26,7 +26,7 @@ internal static class BitflyerAccountMapper
     }
 
     public static IReadOnlyList<ExecutionAccount> MapAccountExecutions(
-        string productCode,
+        Symbol symbol,
         IReadOnlyList<ExecutionPrivateResponse> rawExecutions)
     {
         if (rawExecutions is null) throw new ArgumentNullException(nameof(rawExecutions));
@@ -34,7 +34,7 @@ internal static class BitflyerAccountMapper
         return rawExecutions
             .Select(e => new ExecutionAccount(
                 ExchangeCode: ExchangeCode.Bitflyer,
-                Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(e.ProductCode)),
+                Symbol: symbol,
                 OrderId: e.Id.ToString(CultureInfo.InvariantCulture),
                 Side: BitflyerCommonMapper.MapSide(e.Side),
                 Price: new Price(e.Price),

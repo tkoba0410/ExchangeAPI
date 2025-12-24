@@ -46,7 +46,7 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             ExchangeCode: Exchange,
-            Symbol: BittradeSymbolMapper.Parse(detail.Symbol.Value),
+            Symbol: CommonSymbol.Parse(detail.Symbol.Value),
             Key: new OrderKey(OrderIdKind.ExchangeOrderId, detail.Id.Value),
             Side: side,
             OrderType: type,
@@ -71,7 +71,7 @@ internal static class BittradeMapper
 
         return new OpenOrder(
             ExchangeCode: Exchange,
-            Symbol: BittradeSymbolMapper.Parse(summary.Symbol.Value),
+            Symbol: CommonSymbol.Parse(summary.Symbol.Value),
             Key: new OrderKey(OrderIdKind.ExchangeOrderId, summary.Id.Value),
             Side: side,
             OrderType: type,
@@ -124,9 +124,6 @@ internal static class BittradeMapper
 
         throw new ExchangeApiException($"Invalid decimal for {dto}.{field}: '{s}'.");
     }
-
-    public static string ToProductCode(CommonSymbol symbol) =>
-        BittradeSymbolMapper.ToProductCode(symbol);
 
     private static string ToWireValue(RawOrderState state)
     {

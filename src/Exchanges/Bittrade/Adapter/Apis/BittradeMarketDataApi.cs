@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
@@ -20,11 +20,13 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 internal sealed class BittradeMarketDataApi : IMarketDataApi
 {
     private readonly IRestClient _restClient;
+    private readonly IExchangeMarketResolver _markets;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public BittradeMarketDataApi(IRestClient restClient)
+    public BittradeMarketDataApi(IRestClient restClient, IExchangeMarketResolver markets)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
     public async Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
@@ -47,7 +49,7 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         const string operation = "Bittrade.Market.GetTicker";
         try
         {
-            var apiSymbol = ToApiSymbol(symbol);
+            var apiSymbol = await ToApiSymbolAsync(symbol, cancellationToken).ConfigureAwait(false);
             var response = await _restClient.GetAsync<MergedResponse>(
                 $"market/detail/merged?symbol={apiSymbol}",
                 cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -69,6 +71,10 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
                 LastTradedPrice: new Price(tick.Close),
                 Timestamp: timestamp);
         }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
@@ -80,7 +86,7 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         const string operation = "Bittrade.Market.GetOrderBook";
         try
         {
-            var apiSymbol = ToApiSymbol(symbol);
+            var apiSymbol = await ToApiSymbolAsync(symbol, cancellationToken).ConfigureAwait(false);
             var response = await _restClient.GetAsync<DepthResponse>(
                 $"market/depth?symbol={apiSymbol}&type=step0",
                 cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -98,6 +104,10 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
 
             return new OrderBook(Exchange, bids, asks);
         }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
@@ -109,7 +119,7 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         const string operation = "Bittrade.Market.GetExecutions";
         try
         {
-            var apiSymbol = ToApiSymbol(symbol);
+            var apiSymbol = await ToApiSymbolAsync(symbol, cancellationToken).ConfigureAwait(false);
             var response = await _restClient.GetAsync<TradeResponse>(
                 $"market/trade?symbol={apiSymbol}",
                 cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -134,6 +144,10 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
                 .ToList();
 
             return executions;
+        }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
         }
         catch (ExchangeApiException ex)
         {
@@ -162,6 +176,9 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
             ? Side.Buy
             : Side.Sell;
 
-    private static string ToApiSymbol(CommonSymbol symbol) =>
-        BittradeSymbolMapper.ToApiSymbol(symbol);
+    private async Task<string> ToApiSymbolAsync(CommonSymbol symbol, CancellationToken ct)
+    {
+        var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
+        return market.ProductCode.Replace("_", string.Empty, StringComparison.Ordinal).ToLowerInvariant();
+    }
 }

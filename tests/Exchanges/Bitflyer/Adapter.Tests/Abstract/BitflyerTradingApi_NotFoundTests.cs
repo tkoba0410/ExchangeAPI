@@ -10,6 +10,9 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Services;
+using ExchangeApi.Common.Dtos;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
@@ -21,7 +24,7 @@ public sealed class BitflyerTradingApi_NotFoundTests
     {
         var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var api = new BitflyerTradingApi(tradingApi, privateApi);
+        var api = new BitflyerTradingApi(tradingApi, privateApi, CreateResolver());
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-404");
         await Assert.ThrowsAsync<ExchangeOrderNotFoundException>(() =>
@@ -33,7 +36,7 @@ public sealed class BitflyerTradingApi_NotFoundTests
     {
         var privateApi = new RecordingPrivateApi(Array.Empty<ChildOrderResponse>());
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var api = new BitflyerTradingApi(tradingApi, privateApi);
+        var api = new BitflyerTradingApi(tradingApi, privateApi, CreateResolver());
 
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, "JRF-404");
         await Assert.ThrowsAsync<ExchangeOrderNotFoundException>(() =>
@@ -132,5 +135,22 @@ public sealed class BitflyerTradingApi_NotFoundTests
 
         public Task<IReadOnlyList<JsonElement>> GetBankAccountsAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+    }
+
+    private static IExchangeMarketResolver CreateResolver() =>
+        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
+            new[] { new ExchangeMarketInfo("BTC/JPY", "BTC_JPY", "Spot") },
+            null,
+            null,
+            null)));
+
+    private sealed class StubExchangeInfoApi : IExchangeInfoApi
+    {
+        private readonly ExchangeInfo _info;
+
+        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
+
+        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(_info);
     }
 }

@@ -1,116 +1,82 @@
-# DesignContract：Exchange層 正本（再検証反映版）
+# Exchange Design Contract
 
-> 本文書は **Exchange 層の Single Source of Truth** である。  
-> 実装・レビュー・将来拡張は、必ず本契約に準拠する。
-
----
-
-## 0. 設計原則（優先順位）
-
-1. **使い勝手（最優先）**  
-   - 普通の利用者は迷わず・短く書けること
-2. **論理性**  
-   - レイヤ境界が型と責務で守られること
-3. **合理性**  
-   - Raw-first・拡張容易・保守可能であること
+本書は、ExchangeAPI における **取引所実装の最上位契約（Single Source of Truth）** である。
+本書で定義された原則・責務は、すべての取引所実装・規約文書・テンプレートに優先する。
 
 ---
 
-## 1. 想定ユーザーと利用導線
+## 1. 設計ゴール
 
-### 1.1 普通の利用者（最優先）
-- 取引所差分を意識せず、Common API のみで完結したい
+* 取引所ごとの差分を「仕様差」に閉じ込める
+* 実装者が **どの層で何をしてよいか／してはいけないか** を迷わない
+* 未知の仕様変更が **安全側（fail-fast）** に倒れる設計とする
 
-```csharp
-await client.MarketData.GetTickerAsync(symbol);
-await client.Trading.PlaceOrderAsync(req);
+---
+
+## 2. レイヤモデル
+
+Exchange 実装は、以下の層モデルを採用する。
+
+```
+[ Raw ] → [ Normalized / Wire ] → [ Adapter ] → [ Common ]
 ```
 
-### 1.2 玄人 / 調査用途
-- 公式 API の挙動を把握したい
-- Common に未昇格の機能を使いたい
+### 2.1 Raw（鏡像）
 
-```csharp
-var raw  = client.Raw<IBitflyerRawApi>();
-var wire = client.Wire<IBitflyerWireApi>();
-```
+Raw 層は、**公式 API 仕様の鏡像**である。
 
----
+* HTTP endpoint / request / response / JSON 形状を忠実に表現する
+* 意味変換・正規化・推測を行ってはならない
+* 「安全性」を最優先とする
 
-## 2. データ変換モデル（Exchange層の正本）
+#### Raw 層の原則
 
-Exchange 層では、データの形を次の **3 段階**で扱う。
+* **未知値は fail-fast（例外）**
+* 公式仕様が string の値は string として保持する
+* open set（例：symbol / product_code / currency / id 群）は enum 化しない
 
-### 2.1 Raw（JSON構造化後 / 公式API鏡像）
+#### Raw enum ポリシー
 
-- JSON を DTO にデシリアライズした **公式 API の鏡像**を扱う。
-- Raw は取引所仕様の正本であり、**意味変換・正規化・共通化は行わない**。
-
-#### Raw DTO の型制約（重要）
-
-Raw DTO は、公式レスポンスの型を忠実に保持しなければならない。
-
-- 許可される型：
-  - `string`, `number`, `bool`, `array`, `object` に対応する DTO
-- 禁止される型：
-  - `Price`, `Size` 等のドメイン型
-  - 意味変換を伴う enum（Domain enum）
-
-#### Raw 層で **行ってはならないこと**
-
-- status / result に基づく成功・失敗の判定
-- 数値・日時の意味変換（string → decimal / DateTime 等）
-- フィールドの省略・再構成
-- 取引所仕様に存在しない補助情報の付与
+* closed set（仕様上、追加が重大変更となる値）は strict enum を許可
+* open set は enum 禁止（string または strong type）
 
 ---
 
-### 2.2 Normalized（正規化 / 取引所内実用形）
+### 2.2 Normalized / Wire
 
-- Raw を基に、取引所内での実用性のために **軽い正規化**を行う。
-- この層は **依然として取引所固有**であり、Common ではない。
+Normalized 層は、**Raw を束ね、利用しやすく配線する層**である。
+本プロジェクトでは、この層を **Wire** と呼ぶ。
 
-#### 正規化の例
+* Raw API を組み合わせて再利用性を高める
+* 再試行、timestamp 取得、補助的な配線は許可される
+* **意味変換・ドメイン解釈は行わない**
 
-- status != ok の例外化
-- error_code / message の抽出
-- 数値文字列の Try-style parsing（文脈付き例外）
-
-#### Normalized 層で **行ってはならないこと**
-
-- 他取引所との意味的整合を取る処理
-- 取引戦略・業務ルールの組み込み
-- Common DTO に近い型への変換
+> Normalized と Wire は **概念的に同義**であり、実装単位としては Wire を採用する。
 
 ---
 
-### 2.3 Common（抽象化）
+### 2.3 Adapter
 
-- 複数取引所に共通な DTO / API に抽象化する層。
-- 利用者の **第一導線**。
-- Raw / Normalized を直接露出してはならない。
+Adapter 層は、Raw/Wire を **Common 契約に適合させる唯一の層**である。
 
----
+* Common DTO への変換
+* 値の検証、制約チェック
+* 例外の正規化（ExchangeApiException など）
 
-（参考）Wire（生テキスト）および JSON デシリアライズは Core（Transport / Protocol）の責務であり、本契約の範囲外とする。
-
----
-
-## 3. Raw-first 実装方針
-
-- すべての取引所は将来的に Raw API を完備する
-- bitflyer / bittrade / coincheck は最初から Raw を正本として実装してよい
-- 機能追加は原則、次の順で昇格させる
-
-```text
-Raw → Normalized → Common
-```
+Adapter 以外の層で、ドメイン解釈を行ってはならない。
 
 ---
 
-## 4. Done の定義（設計遵守）
+## 3. Symbol / 値解釈の基本方針
 
-- 普通の利用者は Common API だけで迷わず使える
-- 玄人は Raw / Normalized を最短導線で使える
-- Raw / Normalized / Common の境界が型と契約で守られている
-- 将来、全取引所 Raw 化しても設計を壊さず拡張できる
+* 入力文字列の揺れ吸収（`BTCJPY`, `BTC_JPY`, `BTC/JPY` 等）は **entry-point のみ**
+* Adapter 内では **ExchangeInfo に基づく strict な検証**を行う
+* 推測による補正は禁止する
+
+---
+
+## 4. 本書の位置づけ
+
+* 本書は **WHY / WHAT** を定義する
+* 実装上の MUST / DO / DON’T は `STRUCTURE-RULES.md` に委譲する
+* 衝突がある場合は **本書を最優先**とする

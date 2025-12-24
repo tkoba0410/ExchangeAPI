@@ -4,6 +4,7 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
+using ExchangeApi.Core.Contracts.Errors;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
 using Xunit;
 
@@ -35,5 +36,16 @@ public sealed class BitflyerPublicClientTests
         Assert.Equal("NORMAL", result.Health);
         Assert.Equal("RUNNING", result.State);
         Assert.Null(result.Data);
+    }
+
+    [Fact]
+    public async Task GetTickerAsync_UnknownSymbol_Throws()
+    {
+        var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
+        var publicApi = new FakeBitflyerPublicApi(rawTicker);
+        var client = new BitflyerPublicClient(publicApi);
+
+        await Assert.ThrowsAsync<SymbolNotSupportedException>(() =>
+            client.GetTickerAsync(new Symbol("ETH/JPY")));
     }
 }

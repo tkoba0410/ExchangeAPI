@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Services;
+using ExchangeApi.Common.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
@@ -15,7 +18,7 @@ public sealed class BittradeErrorEnrichTests
     public async Task GetTickerAsync_EnrichesExchangeAndOperation()
     {
         var rest = new ThrowingRestClient();
-        var api = new BittradeMarketDataApi(rest);
+        var api = new BittradeMarketDataApi(rest, CreateResolver());
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
             api.GetTickerAsync(new Symbol("BTC/JPY"), CancellationToken.None));
@@ -41,5 +44,22 @@ public sealed class BittradeErrorEnrichTests
         {
             throw new ExchangeApiException("boom");
         }
+    }
+
+    private static IExchangeMarketResolver CreateResolver() =>
+        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
+            new[] { new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot") },
+            null,
+            null,
+            null)));
+
+    private sealed class StubExchangeInfoApi : IExchangeInfoApi
+    {
+        private readonly ExchangeInfo _info;
+
+        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
+
+        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(_info);
     }
 }

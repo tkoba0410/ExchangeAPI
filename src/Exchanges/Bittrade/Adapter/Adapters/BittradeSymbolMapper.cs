@@ -5,8 +5,15 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
 
 internal static class BittradeSymbolMapper
 {
-    public static Symbol Parse(string symbol) =>
-        new Symbol(ToCanonicalSymbol(symbol));
+    public static Symbol Parse(string symbol)
+    {
+        if (string.IsNullOrWhiteSpace(symbol))
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+
+        return new Symbol(symbol);
+    }
 
     public static string ToProductCode(Symbol symbol)
     {
@@ -35,31 +42,4 @@ internal static class BittradeSymbolMapper
         return productCode.Replace("_", string.Empty, StringComparison.Ordinal).ToLowerInvariant();
     }
 
-    private static string ToCanonicalSymbol(string symbol)
-    {
-        if (string.IsNullOrWhiteSpace(symbol))
-        {
-            return string.Empty;
-        }
-
-        if (symbol.Contains('/'))
-        {
-            return symbol.ToUpperInvariant();
-        }
-
-        var upper = symbol.ToUpperInvariant();
-        if (upper.EndsWith("JPY", StringComparison.Ordinal))
-        {
-            var basePart = upper[..^3];
-            return $"{basePart}/JPY";
-        }
-
-        if (upper.Length >= 6)
-        {
-            var mid = upper.Length / 2;
-            return $"{upper[..mid]}/{upper[mid..]}";
-        }
-
-        return upper;
-    }
 }

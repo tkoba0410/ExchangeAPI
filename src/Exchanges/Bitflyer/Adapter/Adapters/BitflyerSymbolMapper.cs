@@ -19,45 +19,19 @@ internal static class BitflyerSymbolMapper
 
     public static RawProductCode ToProductCode(string symbol)
     {
-        if (string.Equals(symbol, "BTC/JPY", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(symbol, "BTC_JPY", StringComparison.OrdinalIgnoreCase))
-        {
-            return RawProductCode.BtcJpy;
-        }
-
-        if (string.Equals(symbol, "ETH/JPY", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(symbol, "ETH_JPY", StringComparison.OrdinalIgnoreCase))
-        {
-            return RawProductCode.EthJpy;
-        }
-
-        if (string.Equals(symbol, "FX_BTC_JPY", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(symbol, "FX_BTC/JPY", StringComparison.OrdinalIgnoreCase))
-        {
-            return RawProductCode.FxBtcJpy;
-        }
-
-        throw new SymbolNotSupportedException(symbol);
+        return BitflyerCommonMapper.ParseProductCode(symbol);
     }
 
     public static string ToApiProductCode(RawProductCode productCode) =>
-        productCode switch
-        {
-            RawProductCode.BtcJpy => "BTC_JPY",
-            RawProductCode.EthJpy => "ETH_JPY",
-            RawProductCode.FxBtcJpy => "FX_BTC_JPY",
-            _ => throw new SymbolNotSupportedException(productCode.ToString()),
-        };
+        BitflyerCommonMapper.ToApiProductCode(productCode);
 
     public static Symbol FromProductCode(string symbol)
     {
-        var productCode = ToProductCode(symbol);
-        return productCode switch
+        if (string.IsNullOrWhiteSpace(symbol))
         {
-            RawProductCode.BtcJpy => new Symbol("BTC/JPY"),
-            RawProductCode.EthJpy => new Symbol("ETH/JPY"),
-            RawProductCode.FxBtcJpy => new Symbol("FX_BTC/JPY"),
-            _ => throw new SymbolNotSupportedException(symbol)
-        };
+            throw new SymbolNotSupportedException(symbol ?? string.Empty);
+        }
+
+        return new Symbol(symbol);
     }
 }

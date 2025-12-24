@@ -6,19 +6,18 @@ using ExchangeApi.Common.Types;
 using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
 using RawBoard = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Board;
 using RawExecutionPublicResponse = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.ExecutionPublicResponse;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
 using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class MarketMapper
 {
-    public static CommonTicker MapTicker(string symbol, RawTicker raw)
+    public static CommonTicker MapTicker(Symbol symbol, RawTicker raw)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 
         return new CommonTicker(
             Exchange: ExchangeCode.Bitflyer,
-            Symbol: BitflyerCommonMapper.ToSymbol(symbol),
+            Symbol: symbol,
             LastTradedPrice: new Price(raw.LastTradedPrice),
             Timestamp: raw.Timestamp);
     }
@@ -38,13 +37,13 @@ internal static class MarketMapper
         return new OrderBook(ExchangeCode.Bitflyer, bids, asks);
     }
 
-    public static ExecutionMarket MapExecution(RawProductCode productCode, RawExecutionPublicResponse raw)
+    public static ExecutionMarket MapExecution(Symbol symbol, RawExecutionPublicResponse raw)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
 
         return new ExecutionMarket(
             ExchangeCode: ExchangeCode.Bitflyer,
-            Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(productCode)),
+            Symbol: symbol,
             OrderId: raw.Id.ToString(),
             Side: BitflyerCommonMapper.MapSide(raw.Side),
             Price: new Price(raw.Price),

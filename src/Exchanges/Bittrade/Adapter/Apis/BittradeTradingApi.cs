@@ -19,11 +19,13 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 internal sealed class BittradeTradingApi : ITradingApi
 {
     private readonly IBittradeWireTradingApi _wire;
+    private readonly IExchangeMarketResolver _markets;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public BittradeTradingApi(IBittradeWireTradingApi wire)
+    public BittradeTradingApi(IBittradeWireTradingApi wire, IExchangeMarketResolver markets)
     {
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
+        _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
     public Task<OrderResult> PlaceLimitOrderAsync(
@@ -53,9 +55,14 @@ internal sealed class BittradeTradingApi : ITradingApi
     {
         try
         {
-            var wireRequest = BittradeTradingMapper.ToWire(request);
+            var apiSymbol = await ToApiSymbolAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
+            var wireRequest = BittradeTradingMapper.ToWire(apiSymbol, request);
             var wire = await _wire.PlaceOrderAsync(wireRequest, cancellationToken).ConfigureAwait(false);
             return BittradeTradingMapper.ToOrderResult(wire);
+        }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
         }
         catch (ExchangeApiException ex)
         {
@@ -93,8 +100,13 @@ internal sealed class BittradeTradingApi : ITradingApi
         const string operation = BittradeOperations.Trading.GetOpenOrders;
         try
         {
-            var wire = await _wire.GetOpenOrdersAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
-            return wire.Select(BittradeTradingMapper.ToOpenOrder).ToList();
+            var apiSymbol = await ToApiSymbolAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var wire = await _wire.GetOpenOrdersAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
+            return wire.Select(order => BittradeTradingMapper.ToOpenOrder(symbol, order)).ToList();
+        }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
         }
         catch (ExchangeApiException ex)
         {
@@ -120,16 +132,27 @@ internal sealed class BittradeTradingApi : ITradingApi
         const string operation = BittradeOperations.Trading.GetOrder;
         try
         {
+            var market = await _markets.ResolveAsync(symbol, cancellationToken).ConfigureAwait(false);
             var key = orderKey.Kind == OrderIdKind.AcceptanceId
                 ? new OrderKey(OrderIdKind.AcceptanceId, orderKey.Value)
                 : new OrderKey(OrderIdKind.ExchangeOrderId, orderKey.Value);
 
             var wire = await _wire.GetOrderAsync(orderKey.Value, cancellationToken).ConfigureAwait(false);
-            return BittradeTradingMapper.ToOrderStatus(wire, key);
+            return BittradeTradingMapper.ToOrderStatus(market.ProductCode, wire, key);
+        }
+        catch (SymbolNotSupportedException)
+        {
+            throw;
         }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
         }
+    }
+
+    private async Task<string> ToApiSymbolAsync(CommonSymbol symbol, CancellationToken ct)
+    {
+        var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
+        return market.ProductCode.Replace("_", string.Empty, StringComparison.Ordinal).ToLowerInvariant();
     }
 }

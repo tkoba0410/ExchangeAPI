@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Services;
+using ExchangeApi.Common.Dtos;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -22,7 +25,7 @@ public sealed class BittradeOrderKeyConnectivityTests
         {
             Order = CreateWireOrder("1001")
         };
-        var api = new BittradeTradingApi(wire);
+        var api = new BittradeTradingApi(wire, CreateResolver());
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1001");
         var status = await api.GetOrderAsync(new CommonSymbol("BTC/JPY"), key);
@@ -36,7 +39,7 @@ public sealed class BittradeOrderKeyConnectivityTests
     public async Task CancelOrderAsync_UsesOrderKeyValue_WithAcceptanceId()
     {
         var wire = new RecordingWireTradingApi();
-        var api = new BittradeTradingApi(wire);
+        var api = new BittradeTradingApi(wire, CreateResolver());
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1002");
         var result = await api.CancelOrderAsync(new CommonSymbol("BTC/JPY"), key);
@@ -57,6 +60,23 @@ public sealed class BittradeOrderKeyConnectivityTests
             FilledSize: 0.01m,
             OutstandingSize: 0m,
             CreatedAt: DateTimeOffset.FromUnixTimeMilliseconds(1));
+
+    private static IExchangeMarketResolver CreateResolver() =>
+        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
+            new[] { new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot") },
+            null,
+            null,
+            null)));
+
+    private sealed class StubExchangeInfoApi : IExchangeInfoApi
+    {
+        private readonly ExchangeInfo _info;
+
+        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
+
+        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(_info);
+    }
 
     private sealed class RecordingWireTradingApi : IBittradeWireTradingApi
     {

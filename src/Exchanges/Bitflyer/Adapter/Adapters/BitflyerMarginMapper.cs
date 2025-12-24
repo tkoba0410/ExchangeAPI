@@ -9,14 +9,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerMarginMapper
 {
-    public static IReadOnlyList<Position> MapPositions(IReadOnlyList<PositionResponse> rawPositions)
+    public static IReadOnlyList<Position> MapPositions(Symbol symbol, IReadOnlyList<PositionResponse> rawPositions)
     {
         if (rawPositions is null) throw new ArgumentNullException(nameof(rawPositions));
 
         return rawPositions
             .Select(p => new Position(
                 ExchangeCode: ExchangeCode.Bitflyer,
-                Symbol: BitflyerCommonMapper.ToSymbol(BitflyerCommonMapper.ToApiProductCode(p.ProductCode)),
+                Symbol: symbol,
                 Side: BitflyerCommonMapper.MapSide(p.Side),
                 Size: new Size(p.Size),
                 Price: new Price(p.Price),

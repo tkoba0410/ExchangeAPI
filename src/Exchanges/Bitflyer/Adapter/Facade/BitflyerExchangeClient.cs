@@ -16,6 +16,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Common.Services;
 using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
@@ -48,10 +49,10 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         object? rawBundle = null,
         object? wireBundle = null)
         : this(
-            marketApi: new MarketApi(marketData, exchangeCode),
-            tradingApi: new BitflyerTradingApi(trading, account, exchangeCode),
-            marginApi: new BitflyerMarginApi(account, exchangeCode),
-            accountApi: new BitflyerAccountApi(account, exchangeCode),
+            marketApi: CreateMarketApi(marketData),
+            tradingApi: CreateTradingApi(trading, account),
+            marginApi: CreateMarginApi(account),
+            accountApi: CreateAccountApi(account),
             exchangeInfoApi: new BitflyerExchangeInfoApi(),
             rawBundle: rawBundle,
             wireBundle: wireBundle)
@@ -81,15 +82,45 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
         : this(
-            marketApi: new MarketApi(bundle.MarketData, ExchangeCode.Bitflyer),
-            tradingApi: new BitflyerTradingApi(bundle.Trading, bundle.Account, ExchangeCode.Bitflyer),
-            marginApi: new BitflyerMarginApi(bundle.Account, ExchangeCode.Bitflyer),
-            accountApi: new BitflyerAccountApi(bundle.Account, ExchangeCode.Bitflyer),
+            marketApi: CreateMarketApi(bundle.MarketData),
+            tradingApi: CreateTradingApi(bundle.Trading, bundle.Account),
+            marginApi: CreateMarginApi(bundle.Account),
+            accountApi: CreateAccountApi(bundle.Account),
             exchangeInfoApi: new BitflyerExchangeInfoApi(),
             rawBundle: bundle.RawBundle,
             wireBundle: bundle.WireBundle)
     {
         ApiBundle = bundle;
+    }
+
+    private static MarketApi CreateMarketApi(IBitflyerWireMarketDataApi marketData)
+    {
+        var exchangeInfo = new BitflyerExchangeInfoApi();
+        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        return new MarketApi(marketData, markets, ExchangeCode.Bitflyer);
+    }
+
+    private static BitflyerTradingApi CreateTradingApi(
+        IBitflyerWireTradingApi trading,
+        IBitflyerWireAccountApi account)
+    {
+        var exchangeInfo = new BitflyerExchangeInfoApi();
+        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        return new BitflyerTradingApi(trading, account, markets, ExchangeCode.Bitflyer);
+    }
+
+    private static BitflyerMarginApi CreateMarginApi(IBitflyerWireAccountApi account)
+    {
+        var exchangeInfo = new BitflyerExchangeInfoApi();
+        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        return new BitflyerMarginApi(account, markets, ExchangeCode.Bitflyer);
+    }
+
+    private static BitflyerAccountApi CreateAccountApi(IBitflyerWireAccountApi account)
+    {
+        var exchangeInfo = new BitflyerExchangeInfoApi();
+        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        return new BitflyerAccountApi(account, markets, ExchangeCode.Bitflyer);
     }
 
     // Market

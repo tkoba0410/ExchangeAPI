@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Common.Services;
+using ExchangeApi.Common.Dtos;
+using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Http;
 using Xunit;
@@ -85,13 +89,35 @@ public class BittradeMarketDataApiTests
         Assert.Equal(new Symbol("BTC/JPY"), executions[0].Symbol);
     }
 
+    [Fact]
+    public async Task GetTickerAsync_UnknownSymbol_Throws()
+    {
+        var api = CreateApi("/market/detail/merged?symbol=btcjpy", "{}");
+
+        await Assert.ThrowsAsync<SymbolNotSupportedException>(() => api.GetTickerAsync(new Symbol("DOGE/JPY")));
+    }
+
     private static BittradeMarketDataApi CreateApi(string expectedPath, string responseJson)
     {
         var handler = new StubHandler(expectedPath, responseJson);
         var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost/") };
         var transport = new HttpTransport(client, disposeHttpClient: true);
         var restClient = new RestClient(client.BaseAddress!, transport);
-        return new BittradeMarketDataApi(restClient);
+        var markets = CreateResolver(new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot"));
+        return new BittradeMarketDataApi(restClient, markets);
+    }
+
+    private static IExchangeMarketResolver CreateResolver(params ExchangeMarketInfo[] markets) =>
+        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(markets, null, null, null)));
+
+    private sealed class StubExchangeInfoApi : IExchangeInfoApi
+    {
+        private readonly ExchangeInfo _info;
+
+        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
+
+        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(_info);
     }
 
     private sealed class StubHandler : HttpMessageHandler

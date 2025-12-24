@@ -9,6 +9,7 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+using ExchangeApi.Common.Services;
 using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
@@ -27,8 +28,9 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     internal BitflyerPublicClient(IBitflyerWireMarketDataApi marketData, object? rawBundle = null, object? wireBundle = null)
     {
         if (marketData is null) throw new ArgumentNullException(nameof(marketData));
-        _marketApi = new MarketApi(marketData, ExchangeCode.Bitflyer);
         _exchangeInfoApi = new BitflyerExchangeInfoApi();
+        var markets = new ExchangeInfoMarketResolver(_exchangeInfoApi);
+        _marketApi = new MarketApi(marketData, markets, ExchangeCode.Bitflyer);
         _rawBundle = rawBundle;
         _wireBundle = wireBundle;
     }

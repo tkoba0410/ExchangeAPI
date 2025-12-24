@@ -12,16 +12,20 @@ internal static class BittradeTradingMapper
 {
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public static BittradeWireCreateOrderRequest ToWire(OrderRequest request)
+    public static BittradeWireCreateOrderRequest ToWire(string apiSymbol, OrderRequest request)
     {
-        var symbol = BittradeSymbolMapper.ToApiSymbol(request.Symbol);
+        if (string.IsNullOrWhiteSpace(apiSymbol))
+        {
+            throw new ArgumentException("apiSymbol is required.", nameof(apiSymbol));
+        }
+
         var side = MapSide(request.Side);
         var type = MapOrderType(request.Side, request.OrderType);
         var price = request.Price?.Value;
         var size = request.Size.Value;
 
         return new BittradeWireCreateOrderRequest(
-            Symbol: symbol,
+            Symbol: apiSymbol,
             Side: side,
             Type: type,
             Price: price,
@@ -34,9 +38,8 @@ internal static class BittradeTradingMapper
         return new OrderResult(key, ExchangeOrderId: wire.OrderId);
     }
 
-    public static OpenOrder ToOpenOrder(BittradeWireOpenOrder wire)
+    public static OpenOrder ToOpenOrder(Symbol symbol, BittradeWireOpenOrder wire)
     {
-        var symbol = BittradeSymbolMapper.Parse(wire.Symbol);
         var (side, type) = ParseSideAndType(wire.Side, wire.Type);
         var status = ParseStatus(wire.State);
         var price = wire.Price is null ? (Price?)null : new Price(wire.Price.Value);
@@ -61,16 +64,20 @@ internal static class BittradeTradingMapper
             ExchangeOrderId: wire.OrderId);
     }
 
-    public static OrderStatus ToOrderStatus(BittradeWireOrder wire, OrderKey key)
+    public static OrderStatus ToOrderStatus(string productCode, BittradeWireOrder wire, OrderKey key)
     {
-        var symbol = BittradeSymbolMapper.Parse(wire.Symbol);
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
         var status = ParseStatus(wire.State);
         var price = wire.Price is null ? (Price?)null : new Price(wire.Price.Value);
         var executed = new Size(wire.FilledSize ?? 0m);
         var outstanding = new Size(wire.OutstandingSize ?? wire.Size);
 
         return new OrderStatus(
-            BittradeSymbolMapper.ToProductCode(symbol),
+            productCode,
             key,
             status,
             executed,

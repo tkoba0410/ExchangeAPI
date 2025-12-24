@@ -17,6 +17,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Factory;
 /// <summary>
 /// Bittrade API クライアントを構築するファクトリ。
 /// </summary>
+[Obsolete("Use ExchangeApi.Composition.Factory.BittradeFactory. This factory will be removed in a future major release.")]
 public static class BittradeClientFactory
 {
     private static readonly Uri BaseUri = new("https://api-cloud.bittrade.co.jp/");

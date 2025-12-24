@@ -7,9 +7,12 @@ using ExchangeApi.Common.Extensions;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Factory;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Wire;
+using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Core.Transport.Protocol;
+using System.Net;
+using System.Net.Http;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Tests;
 
@@ -28,7 +31,9 @@ public sealed class BittradeWireAccessTests
     [Fact]
     public void Wire_Supported_CanResolveBundle()
     {
-        var client = BittradeClientFactory.CreatePublicClient();
+        var restClient = CreateRestClient();
+        var bundle = BittradeApiBundle.FromRestClient(restClient);
+        var client = new BittradePublicClient(bundle);
         var wire = client.Wire<IBittradeWireApi>();
         Assert.NotNull(wire);
     }
@@ -36,9 +41,24 @@ public sealed class BittradeWireAccessTests
     [Fact]
     public void Wire_PrivateClient_ExposesTrading()
     {
-        var client = BittradeClientFactory.CreateDefault("dummy", "dummy", "account-id");
+        var restClient = CreateRestClient();
+        var bundle = BittradeApiBundle.FromRestClient(restClient, "account-id");
+        var client = new BittradeExchangeClient(bundle);
         var wire = client.Wire<IBittradeWireApi>();
         Assert.NotNull(wire.Trading);
+    }
+
+    private static IRestClient CreateRestClient()
+    {
+        var http = new HttpClient(new StubHandler()) { BaseAddress = new Uri("http://localhost/") };
+        var transport = new HttpTransport(http, disposeHttpClient: true);
+        return new RestClient(http.BaseAddress!, transport);
+    }
+
+    private sealed class StubHandler : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
     }
 
     private sealed class FakeMarketDataApi : IMarketDataApi

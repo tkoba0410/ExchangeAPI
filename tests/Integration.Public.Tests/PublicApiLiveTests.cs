@@ -3,7 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Factory;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
+using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Core.Transport.Protocol;
+using System.Net.Http;
 using Xunit.Abstractions;
 
 namespace Integration.Public.Tests;
@@ -51,7 +55,7 @@ public class PublicApiLiveTests
     [LiveFact]
     public async Task Bittrade_PublicTicker_Works()
     {
-        var client = BittradeClientFactory.CreatePublicClient(observer: _observer);
+        var client = CreateBittradePublicClient();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var ticker = await client.GetTickerAsync(new Symbol("BTC/JPY"), cts.Token);
@@ -65,7 +69,7 @@ public class PublicApiLiveTests
     [LiveFact]
     public async Task Bittrade_PublicExchangeInfo_Works()
     {
-        var client = BittradeClientFactory.CreatePublicClient(observer: _observer);
+        var client = CreateBittradePublicClient();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var info = await client.GetExchangeInfoAsync(cts.Token);
@@ -79,5 +83,18 @@ public class PublicApiLiveTests
     {
         _output.WriteLine(message);
         Console.WriteLine(message);
+    }
+
+    private BittradePublicClient CreateBittradePublicClient()
+    {
+        var baseUri = new Uri("https://api-cloud.bittrade.co.jp/");
+        var http = new HttpClient { BaseAddress = baseUri };
+        var transport = new HttpTransport(http, disposeHttpClient: true);
+        var restClient = new RestClient(
+            baseUri,
+            transport,
+            observer: _observer,
+            errorClassifier: new BittradeErrorClassifier());
+        return new BittradePublicClient(restClient);
     }
 }

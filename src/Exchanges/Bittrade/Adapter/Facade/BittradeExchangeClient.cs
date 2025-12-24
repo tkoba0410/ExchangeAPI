@@ -102,22 +102,22 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
 
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
     {
-        if (!TryGetRaw<BittradeRawApi>(out var raw))
+        if (!TryGetWire<BittradeWireApi>(out var wire))
         {
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Timestamp");
         }
 
-        return raw.GetTimestampAsync(cancellationToken);
+        return wire.Common.GetTimestampAsync(cancellationToken);
     }
 
     public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
     {
-        if (!TryGetRaw<BittradeRawApi>(out var raw))
+        if (!TryGetWire<BittradeWireApi>(out var wire))
         {
             throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Symbols");
         }
 
-        return raw.GetSymbolsAsync(cancellationToken);
+        return wire.Common.GetSymbolsAsync(cancellationToken);
     }
 
     public Task<Ticker> GetTickerAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>

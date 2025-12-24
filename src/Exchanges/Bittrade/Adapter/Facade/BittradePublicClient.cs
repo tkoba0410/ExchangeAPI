@@ -39,7 +39,8 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         _rawBundle = raw;
         _wireBundle = new BittradeWireApi(
             new BittradeWireMarketDataApi(raw.MarketData),
-            new BittradeWireTradingApiNotSupported());
+            new BittradeWireTradingApiNotSupported(),
+            new BittradeWireCommonApi(raw));
     }
 
     public BittradePublicClient(IMarketDataApi marketApi, IExchangeInfoApi exchangeInfoApi)

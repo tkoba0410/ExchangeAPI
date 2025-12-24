@@ -78,7 +78,8 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _rawBundle = raw;
         _wireBundle = new BittradeWireApi(
             new BittradeWireMarketDataApi(raw.MarketData),
-            new BittradeWireTradingApiNotSupported());
+            new BittradeWireTradingApiNotSupported(),
+            new BittradeWireCommonApi(raw));
     }
 
     public BittradeExchangeClient(
@@ -95,7 +96,8 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _rawBundle = raw;
         _wireBundle = new BittradeWireApi(
             new BittradeWireMarketDataApi(raw.MarketData),
-            new BittradeWireTradingApi(raw.Trading, accountId));
+            new BittradeWireTradingApi(raw.Trading, accountId),
+            new BittradeWireCommonApi(raw));
     }
 
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)

@@ -42,10 +42,11 @@ internal sealed class BittradeApiBundle
         var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
         var raw = new BittradeRawApi(restClient);
         var wireMarket = new BittradeWireMarketDataApi(raw.MarketData);
+        var wireCommon = new BittradeWireCommonApi(raw);
         var wireTrading = normalizedAccountId is null
             ? (IBittradeWireTradingApi)new BittradeWireTradingApiNotSupported()
             : new BittradeWireTradingApi(raw.Trading, normalizedAccountId);
-        var wire = new BittradeWireApi(wireMarket, wireTrading);
+        var wire = new BittradeWireApi(wireMarket, wireTrading, wireCommon);
         return new BittradeApiBundle(
             marketData: wireMarket,
             trading: wireTrading,

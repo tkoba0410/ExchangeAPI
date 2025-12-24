@@ -1,21 +1,13 @@
 using System;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Core.Contracts.Errors;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 
 internal static class BitflyerCommonMapper
 {
-    private static readonly IReadOnlyDictionary<RawProductCode, string> ProductCodeMap = BuildProductCodeMap();
-    private static readonly IReadOnlyDictionary<string, RawProductCode> ProductCodeLookup =
-        ProductCodeMap.ToDictionary(kvp => kvp.Value, kvp => kvp.Key, StringComparer.Ordinal);
-
     public static ContractSide MapSide(RawSide side) =>
         BitflyerSideMapper.ToOrderSide(side);
 
@@ -26,9 +18,9 @@ internal static class BitflyerCommonMapper
         BitflyerSideMapper.ToRawSide(side);
 
     public static string ToApiProductCode(RawProductCode productCode) =>
-        ProductCodeMap.TryGetValue(productCode, out var code)
-            ? code
-            : throw new SymbolNotSupportedException(productCode.ToString());
+        string.IsNullOrWhiteSpace(productCode.Value)
+            ? throw new SymbolNotSupportedException(productCode.ToString())
+            : productCode.Value;
 
     public static RawProductCode ParseProductCode(string productCode)
     {
@@ -37,24 +29,7 @@ internal static class BitflyerCommonMapper
             throw new SymbolNotSupportedException(productCode ?? string.Empty);
         }
 
-        return ProductCodeLookup.TryGetValue(productCode, out var code)
-            ? code
-            : throw new SymbolNotSupportedException(productCode);
-    }
-
-    private static IReadOnlyDictionary<RawProductCode, string> BuildProductCodeMap()
-    {
-        var map = new Dictionary<RawProductCode, string>();
-        foreach (var value in Enum.GetValues<RawProductCode>())
-        {
-            if (value == RawProductCode.Unknown) continue;
-            var member = typeof(RawProductCode).GetField(value.ToString());
-            var attr = member?.GetCustomAttribute<EnumMemberAttribute>();
-            var code = string.IsNullOrWhiteSpace(attr?.Value) ? value.ToString() : attr.Value!;
-            map[value] = code;
-        }
-
-        return map;
+        return new RawProductCode(productCode);
     }
 
     public static OrderState MapOrderStatus(string childOrderStatusState) =>

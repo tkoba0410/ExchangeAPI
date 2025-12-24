@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 
@@ -45,10 +45,10 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         CancellationToken cancellationToken = default)
         => Task.FromResult(_response);
 
-    public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(RawProductCode productCode, CancellationToken cancellationToken = default)
         => Task.FromResult(_positions);
 
-    public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(string productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(RawProductCode productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default)
         => Task.FromResult(_executions);
 
     public Task<CollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default)
@@ -58,7 +58,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         Task.FromResult(_collateralAccounts);
 
     public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
@@ -79,7 +79,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         return Task.FromResult(_childOrders);
     }
 
-    public Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(string productCode, int? count = null, long? before = null, long? after = null, string? parentOrderStatusState = null, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(RawProductCode productCode, int? count = null, long? before = null, long? after = null, string? parentOrderStatusState = null, CancellationToken cancellationToken = default) =>
         Task.FromResult(_parentOrders);
 
     public Task<ParentOrderDetailResponse> GetParentOrderAsync(string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
@@ -95,7 +95,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
             {
                 new ParentOrderDetailParameter
                 {
-                    ProductCode = RawProductCode.BtcJpy,
+                    ProductCode = new RawProductCode("BTC_JPY"),
                     ConditionType = ConditionType.Limit,
                     Side = Side.Buy,
                     Size = 0.1m,
@@ -112,7 +112,7 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     public Task<IReadOnlyList<JsonElement>> GetCollateralHistoryAsync(int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
         Task.FromResult(_genericList);
 
-    public Task<JsonElement> GetTradingCommissionAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<JsonElement> GetTradingCommissionAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
         Task.FromResult(JsonDocument.Parse("{}").RootElement);
 
     public Task<IReadOnlyList<JsonElement>> GetAddressesAsync(CancellationToken cancellationToken = default) =>

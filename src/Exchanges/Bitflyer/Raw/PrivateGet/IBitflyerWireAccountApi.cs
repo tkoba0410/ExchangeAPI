@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
@@ -11,7 +12,7 @@ public interface IBitflyerWireAccountApi
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
         int? count = null,
@@ -20,14 +21,14 @@ public interface IBitflyerWireAccountApi
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(
-        string productCode,
+        RawProductCode productCode,
         CancellationToken cancellationToken = default);
 
     Task<CollateralResponse> GetCollateralAsync(
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
@@ -38,6 +39,6 @@ public interface IBitflyerWireAccountApi
         CancellationToken cancellationToken = default);
 
     Task<JsonElement> GetTradingCommissionAsync(
-        string productCode,
+        RawProductCode productCode,
         CancellationToken cancellationToken = default);
 }

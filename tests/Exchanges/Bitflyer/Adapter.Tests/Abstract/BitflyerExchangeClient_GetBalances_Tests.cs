@@ -7,7 +7,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Ticker;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
@@ -83,7 +83,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             // 既存の Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
             var rawTicker = new RawTicker
             {
-                ProductCode = RawProductCode.BtcJpy,
+                ProductCode = new RawProductCode("BTC_JPY"),
                 Timestamp = DateTimeOffset.UnixEpoch,
                 TickId = 0,
                 BestBid = 0m,

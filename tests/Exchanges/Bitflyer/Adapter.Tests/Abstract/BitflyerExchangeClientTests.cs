@@ -9,7 +9,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 using RawChildOrderType = ExchangeApi.Exchanges.Bitflyer.Raw.ChildOrderType;
 using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using ContractSide = ExchangeApi.Common.Enums.Side;
@@ -27,7 +27,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             // Arrange
             var raw = new Ticker
             {
-                ProductCode = RawProductCode.BtcJpy,
+                ProductCode = new RawProductCode("BTC_JPY"),
                 Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
                 TickId = 123,
                 BestBid = 100m,
@@ -60,7 +60,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             // Arrange
             var raw = new Ticker
             {
-                ProductCode = RawProductCode.BtcJpy,
+                ProductCode = new RawProductCode("BTC_JPY"),
                 Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
                 TickId = 123,
                 BestBid = 100m,
@@ -90,7 +90,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         {
             var rawTicker = new Ticker
             {
-                ProductCode = RawProductCode.BtcJpy,
+                ProductCode = new RawProductCode("BTC_JPY"),
                 Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
                 TickId = 123,
                 BestBid = 100m,
@@ -142,7 +142,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
                 {
                     ChildOrderId = "JOR-1",
                     ChildOrderAcceptanceId = "JRF-1",
-                    ProductCode = RawProductCode.BtcJpy,
+                    ProductCode = new RawProductCode("BTC_JPY"),
                     Side = RawSide.Buy,
                 ChildOrderType = RawChildOrderType.Limit,
                     Price = 100m,
@@ -172,7 +172,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task GetBalancesAsync_ReturnsMappedBalances()
         {
-            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
+            var rawTicker = new Ticker { ProductCode = new RawProductCode("BTC_JPY") };
             var balances = new[]
             {
                 new BalanceResponse { CurrencyCode = "JPY", Amount = 10000m, Available = 8000m },
@@ -194,12 +194,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task GetOpenPositionsAsync_ReturnsMappedPositions()
         {
-            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
+            var rawTicker = new Ticker { ProductCode = new RawProductCode("BTC_JPY") };
             var positions = new[]
             {
                 new PositionResponse
                 {
-                    ProductCode = RawProductCode.BtcJpy,
+                    ProductCode = new RawProductCode("BTC_JPY"),
                     Side = RawSide.Buy,
                     Size = 0.01m,
                     Price = 3000000m,
@@ -227,7 +227,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task GetCollateralAsync_ReturnsMappedCollateral()
         {
-            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
+            var rawTicker = new Ticker { ProductCode = new RawProductCode("BTC_JPY") };
             var collateral = new CollateralResponse
             {
                 Collateral = 100000m,
@@ -252,7 +252,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task GetTradingCommissionAsync_ReturnsRawJson()
         {
-            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
+            var rawTicker = new Ticker { ProductCode = new RawProductCode("BTC_JPY") };
             var publicApi = new FakeBitflyerPublicApi(rawTicker);
             var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
             var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
@@ -266,7 +266,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         [Fact]
         public async Task CancelOrderAsync_NullResponse_Throws()
         {
-            var rawTicker = new Ticker { ProductCode = RawProductCode.BtcJpy };
+            var rawTicker = new Ticker { ProductCode = new RawProductCode("BTC_JPY") };
             var publicApi = new FakeBitflyerPublicApi(rawTicker, new Board { Bids = Array.Empty<BoardEntry>(), Asks = Array.Empty<BoardEntry>() });
             var accountApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
             var tradingApi = new NullCancelTradingApi();

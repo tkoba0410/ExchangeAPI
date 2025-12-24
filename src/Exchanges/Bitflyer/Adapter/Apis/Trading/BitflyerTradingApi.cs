@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
@@ -189,7 +190,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
 
         try
         {
-            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var rawOrders = await _accountApi
                 .GetChildOrdersAsync(productCode, childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
@@ -260,7 +261,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
         IReadOnlyList<ChildOrderResponse> orders;
         try
         {
-            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             switch (orderKey.Kind)
             {
                 case OrderIdKind.AcceptanceId:
@@ -307,15 +308,14 @@ internal sealed class BitflyerTradingApi : ITradingApi
         }
     }
 
-    private async Task<string> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
+    private async Task<RawProductCode> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
     {
         var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return market.ProductCode;
+        return new RawProductCode(market.ProductCode);
     }
 
-    private async Task<ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode> ToProductCodeAsync(Symbol symbol, CancellationToken ct)
+    private async Task<RawProductCode> ToProductCodeAsync(Symbol symbol, CancellationToken ct)
     {
-        var productCode = await ToApiProductCodeAsync(symbol, ct).ConfigureAwait(false);
-        return BitflyerCommonMapper.ParseProductCode(productCode);
+        return await ToApiProductCodeAsync(symbol, ct).ConfigureAwait(false);
     }
 }

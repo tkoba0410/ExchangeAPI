@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
 /// <summary>
@@ -16,7 +17,7 @@ internal interface IBitflyerPrivateApi : IBitflyerWireAccountApi
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(
-        string productCode,
+        RawProductCode productCode,
         int? count = null,
         long? before = null,
         long? after = null,

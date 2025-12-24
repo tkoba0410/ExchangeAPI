@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.WireApi;
 
@@ -20,26 +21,26 @@ public sealed class BitflyerWireApiFacade
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<Ticker> GetTickerAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<Ticker> GetTickerAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
         _wire.MarketData.GetTickerRawAsync(productCode, cancellationToken: cancellationToken);
 
-    public Task<Board> GetBoardAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<Board> GetBoardAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
         _wire.MarketData.GetBoardRawAsync(productCode, cancellationToken: cancellationToken);
 
     public Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _wire.Account.GetBalancesAsync(cancellationToken);
 
-    public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
         _wire.Account.GetExecutionsAsync(productCode, cancellationToken: cancellationToken);
 
-    public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(string productCode, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
         _wire.Account.GetPositionsAsync(productCode, cancellationToken);
 
     public Task<CollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default) =>
         _wire.Account.GetCollateralAsync(cancellationToken);
 
     public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default) =>

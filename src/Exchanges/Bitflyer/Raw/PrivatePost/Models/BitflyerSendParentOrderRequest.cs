@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
 /// <summary>/v1/me/sendparentorder リクエスト DTO。</summary>
@@ -21,7 +22,7 @@ public sealed class CreateParentOrderRequest
 
 public sealed class ParentOrderParameter
 {
-    [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
+    [JsonPropertyName("product_code")] public RawProductCode ProductCode { get; init; }
     [JsonPropertyName("condition_type")] public ConditionType ConditionType { get; init; }
     [JsonPropertyName("side")] public Side Side { get; init; }
     [JsonPropertyName("size")] public decimal Size { get; init; }

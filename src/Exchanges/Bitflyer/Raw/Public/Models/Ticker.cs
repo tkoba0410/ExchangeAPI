@@ -1,10 +1,11 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 public sealed class Ticker
 {
     [JsonPropertyName("product_code")]
-    public string ProductCode { get; init; } = string.Empty;
+    public RawProductCode ProductCode { get; init; }
 
     [JsonPropertyName("timestamp")]
     public DateTimeOffset Timestamp { get; init; }

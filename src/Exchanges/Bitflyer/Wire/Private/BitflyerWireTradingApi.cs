@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
@@ -86,14 +87,10 @@ internal sealed class BitflyerWireTradingApi : IBitflyerWireTradingApi
         ChildOrderAcceptanceId = response.ChildOrderAcceptanceId,
     };
 
-    private static string MapProductCode(ProductCode productCode) =>
-        productCode switch
-        {
-            ProductCode.BtcJpy => "BTC_JPY",
-            ProductCode.EthJpy => "ETH_JPY",
-            ProductCode.FxBtcJpy => "FX_BTC_JPY",
-            _ => throw new ArgumentOutOfRangeException(nameof(productCode), productCode, "Unsupported product_code."),
-        };
+    private static string MapProductCode(RawProductCode productCode) =>
+        string.IsNullOrWhiteSpace(productCode.Value)
+            ? throw new ArgumentOutOfRangeException(nameof(productCode), productCode, "Unsupported product_code.")
+            : productCode.Value;
 
     private static string MapChildOrderType(ChildOrderType childOrderType) =>
         childOrderType switch

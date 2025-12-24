@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
@@ -45,7 +46,7 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
     }
 
     public Task<IReadOnlyList<RawGetChildOrdersResponse>> GetChildOrdersAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
@@ -55,7 +56,7 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (string.IsNullOrWhiteSpace(productCode.Value))
         {
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
@@ -63,7 +64,7 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
         const string path = BitflyerConstants.Paths.GetChildOrders;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode.Value,
             [BitflyerConstants.QueryKeys.ChildOrderStatusState] = childOrderStatusState,
             [BitflyerConstants.QueryKeys.ChildOrderAcceptanceId] = childOrderAcceptanceId,
             [BitflyerConstants.QueryKeys.ChildOrderId] = childOrderId,
@@ -77,7 +78,7 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
     }
 
     public async Task<RawGetChildOrdersResponse?> GetChildOrderAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default)

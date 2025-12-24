@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
@@ -38,10 +39,10 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     }
 
     public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(
-        string productCode,
+        RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (string.IsNullOrWhiteSpace(productCode.Value))
         {
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
@@ -49,7 +50,7 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         const string path = BitflyerConstants.Paths.GetPositions;
         var query = new Dictionary<string, string?>
         {
-            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode.Value,
         };
 
         return _restClient.GetAsync<IReadOnlyList<PositionResponse>>(
@@ -59,7 +60,7 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     }
 
     public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
         int? count = null,
@@ -67,7 +68,7 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (string.IsNullOrWhiteSpace(productCode.Value))
         {
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
@@ -75,7 +76,7 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         const string path = BitflyerConstants.Paths.GetPrivateExecutions;
         var query = new Dictionary<string, string?>
         {
-            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode.Value,
             [BitflyerConstants.QueryKeys.ChildOrderId] = childOrderId,
             [BitflyerConstants.QueryKeys.ChildOrderAcceptanceId] = childOrderAcceptanceId,
             [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
@@ -108,7 +109,7 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     }
 
     public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
@@ -118,7 +119,7 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (string.IsNullOrWhiteSpace(productCode.Value))
         {
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
@@ -126,7 +127,7 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         const string path = BitflyerConstants.Paths.GetChildOrders;
         var query = new Dictionary<string, string?>
         {
-            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode.Value,
             [BitflyerConstants.QueryKeys.ChildOrderStatusState] = childOrderStatusState,
             [BitflyerConstants.QueryKeys.ChildOrderAcceptanceId] = childOrderAcceptanceId,
             [BitflyerConstants.QueryKeys.ChildOrderId] = childOrderId,
@@ -143,14 +144,14 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     }
 
     public Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(
-        string productCode,
+        RawProductCode productCode,
         int? count = null,
         long? before = null,
         long? after = null,
         string? parentOrderStatusState = null,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (string.IsNullOrWhiteSpace(productCode.Value))
         {
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
@@ -158,7 +159,7 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         const string path = BitflyerConstants.Paths.GetParentOrders;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode.Value,
             [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
             [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
             [BitflyerConstants.QueryKeys.After] = after?.ToString(),
@@ -217,10 +218,10 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     }
 
     public Task<JsonElement> GetTradingCommissionAsync(
-        string productCode,
+        RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (string.IsNullOrWhiteSpace(productCode.Value))
         {
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
@@ -228,7 +229,7 @@ internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         const string path = BitflyerConstants.Paths.GetTradingCommission;
         var query = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            [BitflyerConstants.QueryKeys.ProductCode] = productCode,
+            [BitflyerConstants.QueryKeys.ProductCode] = productCode.Value,
         };
         return _restClient.GetAsync<JsonElement>(path, query, cancellationToken);
     }

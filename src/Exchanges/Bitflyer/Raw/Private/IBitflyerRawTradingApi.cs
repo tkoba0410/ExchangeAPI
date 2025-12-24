@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
@@ -17,7 +18,7 @@ public interface IBitflyerRawTradingApi
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<RawGetChildOrdersResponse>> GetChildOrdersAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
@@ -28,7 +29,7 @@ public interface IBitflyerRawTradingApi
         CancellationToken cancellationToken = default);
 
     Task<RawGetChildOrdersResponse?> GetChildOrderAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
         CancellationToken cancellationToken = default);

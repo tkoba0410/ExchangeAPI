@@ -1,6 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 
 /// <summary>
@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
 public sealed class ExecutionPublicResponse
 {
     [JsonPropertyName("id")] public long Id { get; init; }
-    [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
+    [JsonPropertyName("product_code")] public RawProductCode ProductCode { get; init; }
     [JsonPropertyName("side")] public Side Side { get; init; }
     [JsonPropertyName("price")] public decimal Price { get; init; }
     [JsonPropertyName("size")] public decimal Size { get; init; }

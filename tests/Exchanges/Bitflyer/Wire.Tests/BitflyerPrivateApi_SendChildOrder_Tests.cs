@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 using ExchangeApi.Core.Transport.Protocol;
 using Xunit;
 
@@ -18,7 +18,7 @@ public sealed class BitflyerPrivateApi_SendChildOrder_Tests
 
         var request = new CreateChildOrderRequest
         {
-            ProductCode = RawProductCode.BtcJpy,
+            ProductCode = new RawProductCode("BTC_JPY"),
             ChildOrderType = ChildOrderType.Market,
             Side = Side.Buy,
             Size = 0.01m,

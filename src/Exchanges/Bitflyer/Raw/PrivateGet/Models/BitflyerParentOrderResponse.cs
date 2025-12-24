@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
 /// <summary>
@@ -10,7 +11,7 @@ public sealed class ParentOrderResponse
 {
     [JsonPropertyName("id")] public long Id { get; init; }
     [JsonPropertyName("parent_order_id")] public string ParentOrderId { get; init; } = string.Empty;
-    [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; }
+    [JsonPropertyName("product_code")] public RawProductCode ProductCode { get; init; }
     [JsonPropertyName("side")] public Side Side { get; init; }
 
     /// <summary>親注文種別。ドキュメント例では STOP / IFD などが返る。</summary>

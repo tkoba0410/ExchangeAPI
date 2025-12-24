@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet
 {
@@ -18,7 +18,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet
         /// 例: <c>BTC_JPY</c>。
         /// </summary>
         [JsonPropertyName("product_code")]
-        public ProductCode ProductCode { get; init; }
+        public RawProductCode ProductCode { get; init; }
 
         /// <summary>
         /// ティッカーの発生時刻。

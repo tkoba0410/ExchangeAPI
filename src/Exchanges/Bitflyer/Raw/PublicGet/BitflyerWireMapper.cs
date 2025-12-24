@@ -9,7 +9,7 @@ internal static class BitflyerWireMapper
 {
     public static Ticker MapTicker(Raw.Ticker raw) => new()
     {
-        ProductCode = ParseProductCode(raw.ProductCode),
+        ProductCode = raw.ProductCode,
         Timestamp = raw.Timestamp,
         TickId = raw.TickId,
         BestBid = raw.BestBid,
@@ -33,7 +33,7 @@ internal static class BitflyerWireMapper
     public static ExecutionPublicResponse MapExecution(Raw.ExecutionPublicResponse raw) => new()
     {
         Id = raw.Id,
-        ProductCode = ParseProductCode(raw.ProductCode),
+        ProductCode = raw.ProductCode,
         Side = ParseSideOrThrow(raw.Side, fieldName: "ExecutionPublicResponse.side"),
         Price = raw.Price,
         Size = raw.Size,
@@ -42,7 +42,7 @@ internal static class BitflyerWireMapper
     };
 
     public static Market MapMarket(Raw.Market raw) =>
-        new(ParseProductCode(raw.ProductCode), raw.Alias);
+        new(raw.ProductCode, raw.Alias);
 
     public static Chat MapChat(Raw.Chat raw) =>
         new(raw.Nickname, raw.Message, raw.Date);
@@ -61,14 +61,6 @@ internal static class BitflyerWireMapper
 
     private static IReadOnlyList<BoardEntry> MapBoardEntries(IReadOnlyList<Raw.BoardEntry> entries) =>
         entries.Select(entry => new BoardEntry { Price = entry.Price, Size = entry.Size }).ToArray();
-
-    private static Raw.ProductCode ParseProductCode(string? value) => value switch
-    {
-        "BTC_JPY" => Raw.ProductCode.BtcJpy,
-        "ETH_JPY" => Raw.ProductCode.EthJpy,
-        "FX_BTC_JPY" => Raw.ProductCode.FxBtcJpy,
-        _ => Raw.ProductCode.Unknown,
-    };
 
     private static Raw.Side ParseSideOrThrow(string? value, string fieldName)
     {

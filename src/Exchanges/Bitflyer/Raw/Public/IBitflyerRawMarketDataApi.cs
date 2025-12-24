@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
@@ -10,17 +11,17 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 public interface IBitflyerRawMarketDataApi
 {
     Task<Ticker> GetTickerAsync(
-        string productCode,
+        RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default);
 
     Task<Board> GetBoardAsync(
-        string productCode,
+        RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsAsync(
-        string productCode,
+        RawProductCode productCode,
         int? count = null,
         long? before = null,
         long? after = null,
@@ -38,16 +39,16 @@ public interface IBitflyerRawMarketDataApi
         CancellationToken cancellationToken = default);
 
     Task<HealthResponse> GetHealthAsync(
-        string productCode,
+        RawProductCode productCode,
         CancellationToken cancellationToken = default);
 
     Task<BoardStateResponse> GetBoardStateAsync(
-        string productCode,
+        RawProductCode productCode,
         CancellationToken cancellationToken = default);
 
     Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default);
 
     Task<FundingRateResponse> GetFundingRateAsync(
-        string productCode,
+        RawProductCode productCode,
         CancellationToken cancellationToken = default);
 }

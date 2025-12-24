@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.ProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
@@ -20,12 +20,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
         }
 
         public Task<Ticker> GetTickerRawAsync(
-            string productCode,
+            RawProductCode productCode,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default)
         {
             // Stage1 では BTC_JPY のみ想定なので、簡単なガードだけ入れておく
-            if (productCode != "BTC_JPY")
+            if (productCode.Value != "BTC_JPY")
             {
                 throw new System.ArgumentException($"Unexpected productCode: {productCode}", nameof(productCode));
             }
@@ -33,14 +33,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
             return Task.FromResult(_response);
         }
 
-        public Task<Board> GetBoardRawAsync(string productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
+        public Task<Board> GetBoardRawAsync(RawProductCode productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
         {
             if (_board is null)
             {
                 throw new System.InvalidOperationException("Board response is not configured.");
             }
 
-            if (productCode != "BTC_JPY")
+            if (productCode.Value != "BTC_JPY")
             {
                 throw new System.ArgumentException($"Unexpected productCode: {productCode}", nameof(productCode));
             }
@@ -49,14 +49,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
         }
 
         public Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsRawAsync(
-            string productCode,
+            RawProductCode productCode,
             int? count = null,
             long? before = null,
             long? after = null,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default)
         {
-            if (productCode != "BTC_JPY")
+            if (productCode.Value != "BTC_JPY")
             {
                 throw new System.ArgumentException($"Unexpected productCode: {productCode}", nameof(productCode));
             }
@@ -66,7 +66,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
                 new ExecutionPublicResponse
                 {
                     Id = 1,
-                    ProductCode = RawProductCode.BtcJpy,
+                    ProductCode = new RawProductCode("BTC_JPY"),
                     Side = RawSide.Buy,
                     Price = 100m,
                     Size = 0.01m,
@@ -78,15 +78,15 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
         }
 
         public Task<IReadOnlyList<Market>> GetMarketsAsync(string? region = null, bool useAliasPath = false, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<Market>>(new[] { new Market(RawProductCode.BtcJpy, "BTC_JPY") });
+            Task.FromResult<IReadOnlyList<Market>>(new[] { new Market(new RawProductCode("BTC_JPY"), "BTC_JPY") });
 
         public Task<IReadOnlyList<Chat>> GetChatsAsync(string? fromDate = null, string? region = null, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<Chat>>(new[] { new Chat("n", "m", System.DateTimeOffset.UtcNow) });
 
-        public Task<HealthResponse> GetHealthAsync(string productCode, CancellationToken cancellationToken = default) =>
+        public Task<HealthResponse> GetHealthAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
             Task.FromResult(new HealthResponse("NORMAL"));
 
-        public Task<BoardStateResponse> GetBoardStateAsync(string productCode, CancellationToken cancellationToken = default) =>
+        public Task<BoardStateResponse> GetBoardStateAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
             Task.FromResult(new BoardStateResponse("NORMAL", "RUNNING", null));
 
         public Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
@@ -96,7 +96,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
                 NextMax: 7.65m,
                 NextStartDate: System.DateTimeOffset.UtcNow.AddDays(7)));
 
-        public Task<FundingRateResponse> GetFundingRateAsync(string productCode, CancellationToken cancellationToken = default) =>
+        public Task<FundingRateResponse> GetFundingRateAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
             Task.FromResult(new FundingRateResponse(0m, System.DateTimeOffset.UtcNow));
     }
 }

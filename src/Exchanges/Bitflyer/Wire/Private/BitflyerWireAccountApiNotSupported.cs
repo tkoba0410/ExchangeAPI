@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Private;
 
@@ -18,7 +19,7 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
         throw NotSupported();
 
     public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
         int? count = null,
@@ -28,7 +29,7 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
         throw NotSupported();
 
     public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(
-        string productCode,
+        RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
@@ -37,7 +38,7 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
         throw NotSupported();
 
     public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-        string productCode,
+        RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
@@ -49,7 +50,7 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
         throw NotSupported();
 
     public Task<JsonElement> GetTradingCommissionAsync(
-        string productCode,
+        RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 }

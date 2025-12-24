@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Common.Interfaces;
 using ExchangeApi.Common.Dtos;
 using ExchangeApi.Common.Enums;
@@ -196,9 +197,9 @@ internal sealed class MarketApi : IMarketDataApi
         }
     }
 
-    private async Task<string> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
+    private async Task<RawProductCode> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
     {
         var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return market.ProductCode;
+        return new RawProductCode(market.ProductCode);
     }
 }

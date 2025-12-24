@@ -60,6 +60,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         ApiBundle = bundle;
     }
 
+    [Obsolete("Use Wire.Common via IHasWireAccess for raw endpoints. This API will be removed in a future major release.")]
     public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
     {
         if (!TryGetWire<BittradeWireApi>(out var wire))
@@ -70,6 +71,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         return wire.Common.GetTimestampAsync(cancellationToken);
     }
 
+    [Obsolete("Use Wire.Common via IHasWireAccess for raw endpoints. This API will be removed in a future major release.")]
     public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
     {
         if (!TryGetWire<BittradeWireApi>(out var wire))

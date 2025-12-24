@@ -12,7 +12,7 @@ internal static class BitflyerSideMapper
         {
             "BUY" => RawSide.Buy,
             "SELL" => RawSide.Sell,
-            _ => RawSide.Sell, // 互換性のためデフォルトは SELL
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, "Unknown bitFlyer side"),
         };
 
     public static string ToApi(RawSide side) =>
@@ -20,7 +20,7 @@ internal static class BitflyerSideMapper
         {
             RawSide.Buy => "BUY",
             RawSide.Sell => "SELL",
-            _ => "BUY",
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, "Unknown bitFlyer side"),
         };
 
     public static string ToApi(ContractSide side) =>
@@ -28,7 +28,7 @@ internal static class BitflyerSideMapper
         {
             ContractSide.Buy => "BUY",
             ContractSide.Sell => "SELL",
-            _ => "BUY",
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, "Unknown bitFlyer side"),
         };
 
     public static ContractSide ToOrderSide(RawSide side) =>
@@ -36,7 +36,7 @@ internal static class BitflyerSideMapper
         {
             RawSide.Buy => ContractSide.Buy,
             RawSide.Sell => ContractSide.Sell,
-            _ => ContractSide.Buy,
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, "Unknown bitFlyer side"),
         };
 
     public static RawSide ToRawSide(ContractSide side) =>
@@ -44,7 +44,7 @@ internal static class BitflyerSideMapper
         {
             ContractSide.Buy => RawSide.Buy,
             ContractSide.Sell => RawSide.Sell,
-            _ => RawSide.Buy,
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, "Unknown bitFlyer side"),
         };
 
     public static ContractSide ToOrderSide(string side) => ToOrderSide(FromApi(side));

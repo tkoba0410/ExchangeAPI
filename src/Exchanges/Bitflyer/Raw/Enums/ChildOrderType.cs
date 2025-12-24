@@ -26,7 +26,7 @@ internal sealed class ChildOrderTypeJsonConverter : JsonConverter<ChildOrderType
         {
             "MARKET" => ChildOrderType.Market,
             "LIMIT" => ChildOrderType.Limit,
-            _ => ChildOrderType.Unknown
+            _ => throw new JsonException($"Unknown {nameof(ChildOrderType)} value: '{value}'.")
         };
     }
 
@@ -36,7 +36,7 @@ internal sealed class ChildOrderTypeJsonConverter : JsonConverter<ChildOrderType
         {
             ChildOrderType.Market => "MARKET",
             ChildOrderType.Limit => "LIMIT",
-            _ => "MARKET",
+            _ => throw new JsonException($"Unknown {nameof(ChildOrderType)} value: '{value}'."),
         };
         writer.WriteStringValue(str);
     }

@@ -95,7 +95,7 @@ internal static class BittradeMapper
             RawOrderState.Filled => CommonOrderState.Completed,
             RawOrderState.PartialCanceled => CommonOrderState.Canceled,
             RawOrderState.Canceled => CommonOrderState.Canceled,
-            _ => CommonOrderState.Unknown
+            _ => throw new ExchangeApiException($"Unsupported order state: {state}")
         };
     }
 
@@ -134,7 +134,7 @@ internal static class BittradeMapper
             RawOrderState.PartialCanceled => "partial-canceled",
             RawOrderState.Filled => "filled",
             RawOrderState.Canceled => "canceled",
-            _ => state.ToString()
+            _ => throw new ExchangeApiException($"Unsupported order state: {state}")
         };
     }
 }

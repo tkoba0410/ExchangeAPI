@@ -172,9 +172,12 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
     }
 
     private static Side MapSide(string direction) =>
-        string.Equals(direction, "buy", StringComparison.OrdinalIgnoreCase)
-            ? Side.Buy
-            : Side.Sell;
+        direction switch
+        {
+            var value when string.Equals(value, "buy", StringComparison.OrdinalIgnoreCase) => Side.Buy,
+            var value when string.Equals(value, "sell", StringComparison.OrdinalIgnoreCase) => Side.Sell,
+            _ => throw new ExchangeApiException($"Unsupported side: {direction}.", exchange: Exchange)
+        };
 
     private async Task<string> ToApiSymbolAsync(CommonSymbol symbol, CancellationToken ct)
     {

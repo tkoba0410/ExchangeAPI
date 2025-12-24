@@ -22,7 +22,7 @@ internal static class BitflyerTradingMapper
         {
             ChildOrderType.Limit => OrderType.Limit,
             ChildOrderType.Market => OrderType.Market,
-            _ => OrderType.Market,
+            _ => throw new ArgumentOutOfRangeException(nameof(childOrderType), childOrderType, "Unknown bitFlyer child_order_type"),
         };
 
     public static RawTimeInForce? MapTimeInForce(ContractTimeInForce? tif) =>
@@ -31,7 +31,8 @@ internal static class BitflyerTradingMapper
             ContractTimeInForce.Gtc => RawTimeInForce.Gtc,
             ContractTimeInForce.Ioc => RawTimeInForce.Ioc,
             ContractTimeInForce.Fok => RawTimeInForce.Fok,
-            _ => null,
+            null => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(tif), tif, "Unknown bitFlyer time_in_force"),
         };
 
     public static void ValidateOrderRequest(OrderRequest request)

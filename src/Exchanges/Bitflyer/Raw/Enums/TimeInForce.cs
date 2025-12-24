@@ -30,7 +30,7 @@ internal sealed class TimeInForceJsonConverter : JsonConverter<TimeInForce>
             "GTC" => TimeInForce.Gtc,
             "IOC" => TimeInForce.Ioc,
             "FOK" => TimeInForce.Fok,
-            _ => TimeInForce.Unknown
+            _ => throw new JsonException($"Unknown {nameof(TimeInForce)} value: '{value}'.")
         };
     }
 
@@ -41,7 +41,7 @@ internal sealed class TimeInForceJsonConverter : JsonConverter<TimeInForce>
             TimeInForce.Gtc => "GTC",
             TimeInForce.Ioc => "IOC",
             TimeInForce.Fok => "FOK",
-            _ => "GTC",
+            _ => throw new JsonException($"Unknown {nameof(TimeInForce)} value: '{value}'."),
         };
         writer.WriteStringValue(str);
     }

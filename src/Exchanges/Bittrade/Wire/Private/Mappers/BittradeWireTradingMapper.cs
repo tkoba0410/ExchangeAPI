@@ -113,7 +113,8 @@ internal static class BittradeWireTradingMapper
         type switch
         {
             OrderType.BuyLimit or OrderType.BuyMarket or OrderType.BuyLimitMaker or OrderType.BuyIoc => "buy",
-            _ => "sell",
+            OrderType.SellLimit or OrderType.SellMarket or OrderType.SellLimitMaker or OrderType.SellIoc => "sell",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown Bittrade order type"),
         };
 
     private static string ToWireEnumValue<T>(T value)

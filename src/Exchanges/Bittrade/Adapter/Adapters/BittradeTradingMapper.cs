@@ -115,9 +115,12 @@ internal static class BittradeTradingMapper
             _ => throw new ExchangeApiException($"Unsupported side: {side}.", exchange: Exchange)
         };
 
-        var parsedType = type.Contains("market", StringComparison.OrdinalIgnoreCase)
-            ? OrderType.Market
-            : OrderType.Limit;
+        var parsedType = type.ToLowerInvariant() switch
+        {
+            var value when value.Contains("market", StringComparison.OrdinalIgnoreCase) => OrderType.Market,
+            var value when value.Contains("limit", StringComparison.OrdinalIgnoreCase) => OrderType.Limit,
+            _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
+        };
 
         return (parsedSide, parsedType);
     }
@@ -131,7 +134,7 @@ internal static class BittradeTradingMapper
             "filled" => ExchangeApi.Common.Enums.OrderState.Completed,
             "partial-canceled" => ExchangeApi.Common.Enums.OrderState.Canceled,
             "canceled" => ExchangeApi.Common.Enums.OrderState.Canceled,
-            _ => ExchangeApi.Common.Enums.OrderState.Unknown
+            _ => throw new ExchangeApiException($"Unsupported order state: {state}.", exchange: Exchange)
         };
     }
 }

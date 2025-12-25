@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using ExchangeApi.Common.Interfaces;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;

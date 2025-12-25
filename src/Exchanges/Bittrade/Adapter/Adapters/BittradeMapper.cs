@@ -5,7 +5,7 @@ using System.Linq;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
 using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;

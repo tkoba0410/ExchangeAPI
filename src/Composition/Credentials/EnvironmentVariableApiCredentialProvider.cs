@@ -1,6 +1,6 @@
 using System;
-using ExchangeApi.Common.Interfaces;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 namespace ExchangeApi.Composition.Credentials;

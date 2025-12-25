@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
-using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
+using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using RawBoard = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Board;
 using RawExecutionPublicResponse = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.ExecutionPublicResponse;
 using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Ticker;

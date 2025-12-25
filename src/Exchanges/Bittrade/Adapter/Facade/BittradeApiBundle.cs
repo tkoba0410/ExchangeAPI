@@ -3,8 +3,8 @@ using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Wire;
 using ExchangeApi.Exchanges.Bittrade.Wire.Public;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private;
-using ExchangeApi.Common.Interfaces;
-using ExchangeApi.Common.Services;
+using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Core.Services;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Core.Transport.Protocol;
 

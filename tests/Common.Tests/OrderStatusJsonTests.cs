@@ -1,5 +1,5 @@
 using System.Text.Json;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using Xunit;

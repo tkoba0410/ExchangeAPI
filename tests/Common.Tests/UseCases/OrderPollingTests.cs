@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Common.UseCases;
+using ExchangeApi.Core.UseCases;
 using ExchangeApi.Core.Contracts.Errors;
 using Xunit;
 

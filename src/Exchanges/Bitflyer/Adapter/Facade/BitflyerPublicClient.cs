@@ -2,15 +2,15 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Clients.Internal;
-using ExchangeApi.Common.Interfaces;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
-using ExchangeApi.Common.Services;
-using CommonTicker = ExchangeApi.Common.Dtos.Ticker;
+using ExchangeApi.Core.Services;
+using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
 /// <summary>

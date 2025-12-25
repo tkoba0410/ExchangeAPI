@@ -11,9 +11,9 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using ExchangeApi.Common.Interfaces;
-using ExchangeApi.Common.Services;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Core.Services;
+using ExchangeApi.Contracts.Dtos;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;

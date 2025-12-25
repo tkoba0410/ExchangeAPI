@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
 

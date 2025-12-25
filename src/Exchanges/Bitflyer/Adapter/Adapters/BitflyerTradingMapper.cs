@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ContractTimeInForce = ExchangeApi.Common.Enums.TimeInForce;

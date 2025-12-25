@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
-using ExchangeApi.Common.Interfaces;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;

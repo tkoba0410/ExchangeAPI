@@ -1,6 +1,6 @@
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Extensions;
-using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Core.Extensions;
+using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Contracts.Errors;
 
 namespace ExchangeApi.Common.Tests;

@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/Common/Common.csproj" />
     <Project Path="src/Core/Core.csproj" />
     <Project Path="src/Composition/Composition.csproj" />
+    <Project Path="src/Shared/Common/Shared.Common.csproj" />
+    <Project Path="src/Shared/Contracts/Shared.Contracts.csproj" />
+    <Project Path="src/Shared/Domain/Shared.Domain.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Raw/Exchange.Bitflyer.Raw.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Wire/Exchange.Bitflyer.Wire.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Adapter/Exchange.Bitflyer.Adapter.csproj" />

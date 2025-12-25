@@ -1,6 +1,6 @@
 using System;
 using System.Net.Http;
-using ExchangeApi.Common.Interfaces;
+using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;

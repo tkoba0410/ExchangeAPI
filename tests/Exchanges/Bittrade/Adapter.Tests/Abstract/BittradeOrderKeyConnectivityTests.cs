@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
-using ExchangeApi.Common.Interfaces;
-using ExchangeApi.Common.Services;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Core.Services;
+using ExchangeApi.Contracts.Dtos;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;

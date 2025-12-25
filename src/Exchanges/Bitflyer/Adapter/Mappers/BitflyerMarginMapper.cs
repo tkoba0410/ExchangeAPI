@@ -5,7 +5,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class BitflyerMarginMapper
 {

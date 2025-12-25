@@ -12,7 +12,7 @@ using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
 using CommonOrderState = ExchangeApi.Common.Enums.OrderState;
 using CommonOrderType = ExchangeApi.Common.Enums.OrderType;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
 internal static class BittradeMapper
 {

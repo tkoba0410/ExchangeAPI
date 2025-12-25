@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using Xunit;
 

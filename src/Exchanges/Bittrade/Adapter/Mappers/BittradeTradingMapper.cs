@@ -6,7 +6,7 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Requests;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
 internal static class BittradeTradingMapper
 {

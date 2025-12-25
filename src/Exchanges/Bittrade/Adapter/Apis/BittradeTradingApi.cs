@@ -8,7 +8,7 @@ using ExchangeApi.Common.Types;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Models;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;

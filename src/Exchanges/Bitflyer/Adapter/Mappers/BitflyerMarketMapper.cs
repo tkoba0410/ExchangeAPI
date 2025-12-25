@@ -7,7 +7,7 @@ using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using RawBoard = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Board;
 using RawExecutionPublicResponse = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.ExecutionPublicResponse;
 using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Ticker;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class MarketMapper
 {

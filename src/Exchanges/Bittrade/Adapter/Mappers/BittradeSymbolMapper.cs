@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Common.Types;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
 internal static class BittradeSymbolMapper
 {

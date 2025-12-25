@@ -1,7 +1,7 @@
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Common.Enums;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Adapters;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
 internal static class BittradeErrorMapper
 {

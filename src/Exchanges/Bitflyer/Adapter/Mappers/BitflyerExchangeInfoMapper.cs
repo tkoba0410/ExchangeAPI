@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class BitflyerExchangeInfoMapper
 {

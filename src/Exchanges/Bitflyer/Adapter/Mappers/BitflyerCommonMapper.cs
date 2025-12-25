@@ -4,7 +4,7 @@ using ExchangeApi.Core.Contracts.Errors;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Adapters;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class BitflyerCommonMapper
 {

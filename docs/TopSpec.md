@@ -8,9 +8,9 @@
 
 ---
 
-## 0. 本書が決めること / 決めないこと
+## 1. 本書が決めること / 決めないこと
 
-### 0.1 決めること
+### 1.1 決めること
 
 * 外部契約（public contract）の境界
 * 不変条件（invariants）
@@ -19,7 +19,7 @@
 * 取引所横断（cross-exchange）の共通化対象
 * Contracts / Common / Domain の責務分離
 
-### 0.2 決めないこと
+### 1.2 決めないこと
 
 * 内部実装の最適解、性能方針
 * アルゴリズム選択
@@ -27,7 +27,7 @@
 
 ---
 
-## 1. 大原則（絶対境界）
+## 2. 大原則（絶対境界）
 
 > **Wire DTO および Normalized DTO までは「仕様（spec）」であり、
 > Adapter 以降は「ドメイン（domain）」である。**
@@ -36,9 +36,64 @@
 
 ---
 
-## 2. ゴール / 非ゴール
+## 3. 憲法 FIX 宣言（変更ポリシー）【最終】
 
-### 2.1 ゴール
+本書は、本リポジトリにおける **最上位仕様（憲法）** として扱う。
+
+### 3.1 変更の扱い
+
+* 本書の変更は、原則として **破壊的変更** とみなす
+* 変更を行う場合は、必ず次を明記する
+
+  * 変更対象の章番号
+  * 変更理由（Why）
+  * 影響範囲（Contracts / Common / Domain / Exchanges / Composition）
+
+### 3.2 変更できないもの
+
+次に挙げる事項は、本書において **固定（FIX）** とする。
+
+* 層構造および責務境界（spec / domain）
+* Cross-Exchange 共通化対象の範囲（4種限定）
+* Contracts / Common / Domain の責務分離
+* 依存方向および禁止事項
+* 正本（source of truth）の所在
+* 公開エントリポイント（Factory）と命名規約
+
+### 3.3 互換性および破壊的変更に関する補足規定
+
+本仕様における変更の互換性について、以下を補足規定として定める。
+
+1. Contracts 層における公開インターフェースの変更は、本仕様における互換性判断の基準点とする。
+
+2. 次に該当する変更は、破壊的変更とみなす。
+
+   * 公開インターフェースのシグネチャ変更
+   * 必須フィールドの追加または削除
+   * 既存フィールドの意味変更
+   * 列挙型における既存値の意味変更または削除
+
+3. 次に該当する変更は、非破壊的変更とみなす。
+
+   * Optional フィールドの追加
+   * ErrorCode の追加（既存の意味を変更しない場合）
+   * Wire 層または Normalized 層におけるフィールド追加
+
+4. Contracts 層に影響する変更には、変更理由および影響範囲を明示した変更履歴を付与するものとする。
+
+### 3.4 下位仕様との関係
+
+* 下位仕様（Contracts API 詳細、DTO フィールド定義、ErrorCode 一覧等）は改訂可能とする
+* ただし、下位仕様は **本書の境界・不変条件に反してはならない**
+
+---
+
+> 本書を変更する前に、まず **「本当に憲法を変える必要があるか」** を問うこと。
+> 多くの場合、答えは **下位仕様で解決できる**。
+
+## 4. ゴール / 非ゴール
+
+### 4.1 ゴール
 
 * 日本国内の全取引所 API（Public / Private）への対応
 * 海外主要取引所の Public API（Market Data 等）への対応
@@ -48,7 +103,7 @@
 2. **Normalized 層**（仕様）
 3. **Adapter〜上位**（ドメイン）
 
-### 2.2 非ゴール
+### 4.2 非ゴール
 
 * 取引所ごとの詳細仕様を本書に完全記述すること
 * 意味的に一致しない概念を無理に統一すること
@@ -56,15 +111,15 @@
 
 ---
 
-## 3. 論理階層（下層 → 上層）
+## 5. 論理階層（下層 → 上層）
 
-### 3.1 Core（実行基盤）
+### 5.1 Core（実行基盤）
 
 * HTTP / Retry / Clock / Signer / Serializer など
 * 取引所・ドメインの概念を一切持たない
 * API を成立させる技術基盤
 
-### 3.2 Wire 層（仕様）
+### 5.2 Wire 層（仕様）
 
 * 取引所 API の通信表現そのもの
 * 正本：**text.json（生レスポンス）**
@@ -75,7 +130,7 @@
 * `text.json → wireDto`
 * 意味判断は禁止
 
-### 3.3 Normalized 層（仕様）
+### 5.3 Normalized 層（仕様）
 
 * 取引所内で一貫した表現に整理した DTO
 * 命名・型・精度・時刻表現を統一
@@ -85,7 +140,7 @@
 * `wireDto → normalizedDto`
 * 意味判断は「取引所仕様の範囲」に限定
 
-### 3.4 Adapter 層（境界 / 翻訳関所）
+### 5.4 Adapter 層（境界 / 翻訳関所）
 
 > **仕様（spec）と言語（domain）を翻訳する唯一の関所**
 
@@ -93,19 +148,19 @@
 * `normalizedDto → contractDto` を Mapper により変換
 * 取引所差分をここで完全に吸収
 
-### 3.5 Contracts（利用の契約 / ドメイン入口）
+### 5.5 Contracts（利用の契約 / ドメイン入口）
 
 * 利用者・上位アプリが依存してよい唯一の契約
 * interface と抽象 DTO（入出力）
 * 取引所を一切知らない
 
-### 3.6 Domain（複数取引所抽象化の振る舞い）
+### 5.6 Domain（複数取引所抽象化の振る舞い）
 
 * 複数取引所を横断して扱うための主要ふるまい
 * UseCase / Domain Service / Policy
 * **入力は Contracts（Interface/DTO）と Common（語彙）に限定**
 
-### 3.7 Composition（供給レイヤ）
+### 5.7 Composition（供給レイヤ）
 
 * Core / Exchanges を組み立てて提供
 * Factory / Options / Credential 注入
@@ -113,7 +168,7 @@
 
 ---
 
-## 3.8 公開エントリポイント（Factory）[確定]
+## 6. 公開エントリポイント（Factory）[確定]
 
 Composition は、利用者が「どの層を使うか」を誤らないために、入口（Factory）を **3 系統に限定**する。
 
@@ -123,7 +178,7 @@ Composition は、利用者が「どの層を使うか」を誤らないため�
 
 命名は上記を正とし、公開 API に `Adapter` の語を露出しない（内部層としては `Adapter` を保持してよい）。
 
-### 3.8.1 `CreateExchange(...)` の用途（混乱防止条文）
+### 6.1 `CreateExchange(...)` の用途（混乱防止条文）
 
 `CreateExchange(...)` は **取引所を固定して使いたい利用者**、または **Adapter 実装・差分調査のために Normalized を直接扱いたい実装者**のための入口である。
 
@@ -137,7 +192,7 @@ Composition は、利用者が「どの層を使うか」を誤らないため�
 
 ---
 
-## 3.9 Contracts 公開面（クライアント集約）[確定]
+## 7. Contracts 公開面（クライアント集約）[確定]
 
 Contracts は、横断利用における公開面を次の形で提供する。
 
@@ -161,17 +216,17 @@ Contracts は、横断利用における公開面を次の形で提供する。
 
 ---
 
-## 3.10 Contracts DTO と Common 語彙の境界（Step 4）[確定]
+## 8. Contracts DTO と Common 語彙の境界（旧 [Design-Step-04]）[確定]
 
 Contracts と Common の境界は、取引所横断（cross-exchange）の混線を防ぐために、次の規約で固定する。
 
-### 3.10.1 Contracts（DTO：入出力の形）
+### 8.1 Contracts（DTO：入出力の形）
 
 * Contracts に置くのは **利用者に公開する I/O の形**に限定する。
 * Interface の引数・戻り値に現れるデータ構造（Request/Response/DTO）は **必ず Contracts** に属する。
 * Contracts DTO は取引所固有情報（取引所名、取引所固有フィールド、Wire/Normalized DTO）を含んではならない。
 
-### 3.10.2 Common（語彙：値・分類・失敗・パース）
+### 8.2 Common（語彙：値・分類・失敗・パース）
 
 * Common に置くのは **複数 DTO / 複数 API で再利用される語彙**に限定する。
 * Common は次のカテゴリで構成される。
@@ -181,12 +236,12 @@ Contracts と Common の境界は、取引所横断（cross-exchange）の混線
   * **Errors**：`ErrorCode`, `ExchangeError`, `Retryability` 等
   * **Parsing**：Try/OrThrow 規約、例外型
 
-### 3.10.3 DTO 内での Common 利用（推奨）
+### 8.3 DTO 内での Common 利用（推奨）
 
 * Contracts DTO のフィールド型として Common の Value/Type/Error を利用してよい（推奨）。
-* ただし **Common は Contracts DTO を参照してはならない**（依存方向は 9 章に従う）。
+* ただし **Common は Contracts DTO を参照してはならない**（依存方向は 15 章に従う）。
 
-### 3.10.4 例外規約（enum / error の置き場）
+### 8.4 例外規約（enum / error の置き場）
 
 * **DTO 専用 enum**（当該 DTO でしか使わない分類）は Contracts に置いてよい。
 * エラーを DTO として返す場合：
@@ -194,7 +249,7 @@ Contracts と Common の境界は、取引所横断（cross-exchange）の混線
   * エラー **DTO（形）** は Contracts
   * エラー **語彙（分類/扱い：ErrorCode 等）** は Common
 
-### 3.10.5 Contracts DTO の粒度（最小共通の暴走防止条文）
+### 8.5 Contracts DTO の粒度（最小共通の暴走防止条文）
 
 Contracts DTO は「最小共通」であることを要するが、過度に痩せさせて利用性を損なってはならない。
 次の原則で粒度を固定する。
@@ -209,7 +264,7 @@ Contracts DTO は「最小共通」であることを要するが、過度に痩
 
 ---
 
-## 4. 物理構成（フォルダ構成）
+## 9. 物理構成（フォルダ構成）
 
 本リポジトリでは **論理構成（責務境界）を最優先で固定** する。
 その上で、取引所非依存の上層（Contracts / Common / Domain）は
@@ -249,7 +304,7 @@ src/
 
 ---
 
-## 5. 正本（source of truth）の所在
+## 10. 正本（source of truth）の所在
 
 * 取引所固有の仕様：`doc-api` と `src/Exchanges/*`（Wire/Samples を含む）
 * 通信・基盤の契約：`src/Core`
@@ -260,7 +315,7 @@ src/
 
 ---
 
-## 6. 取引所横断（Cross-Exchange）の共通化対象
+## 11. 取引所横断（Cross-Exchange）の共通化対象
 
 > 取引所横断として共通化される対象は、以下 **4 種**に限定する。
 
@@ -273,9 +328,9 @@ src/
 
 ---
 
-## 7. Contracts / Common / Domain の責務分離（確定）
+## 12. Contracts / Common / Domain の責務分離（確定）
 
-### 7.1 Contracts（Usage Contract）
+### 12.1 Contracts（Usage Contract）
 
 * 役割：利用者が依存してよい唯一の契約面
 * 含む：
@@ -287,7 +342,7 @@ src/
   * 取引所名・取引所固有概念の露出
   * Wire/Normalized DTO の混入
 
-### 7.2 Common（共通語彙）
+### 12.2 Common（共通語彙）
 
 * 役割：契約と実装の双方から参照可能な横断語彙
 * 含む：
@@ -297,7 +352,7 @@ src/
   * Errors：`ErrorCode`, `ExchangeError`, `Retryability` 等
   * Parsing：Try/OrThrow 規約、例外型
 
-### 7.3 Domain（横断ふるまい）
+### 12.3 Domain（横断ふるまい）
 
 * 役割：複数取引所を横断して扱うユースケース・サービス
 * 依存：
@@ -311,16 +366,16 @@ src/
 
 ---
 
-## 8. 横断4種の Common / Contracts 割り当て（確定）
+## 13. 横断4種の Common / Contracts 割り当て（確定）
 
-### 8.1 原則
+### 13.1 原則
 
 * **Interface** → `Contracts`
 * **DTO** → `Contracts`
 * **Type / Enum** → `Common`（例外あり）
 * **Error** → `Common`（例外あり）
 
-### 8.2 例外
+### 13.2 例外
 
 * DTO 専用の enum（その DTO でしか使わない分類）は `Contracts` に置いてよい
 * エラーを DTO として返す場合：
@@ -330,13 +385,14 @@ src/
 
 ---
 
-## 8.3 Shared 配下で境界を崩さないための補足条文（命名・参照ルール）
+
+### 13.3 Shared 配下で境界を崩さないための補足条文（命名・参照ルール）
 
 `src/Shared/` 配下に `Common / Contracts / Domain` を物理的に集約する場合でも、
 境界は **責務** と **参照** により強制されなければならない。
 本条はそのための最小ルールを定める。
 
-### 8.3.1 名前空間（命名）
+#### 13.3.1 名前空間（命名）
 
 * `src/Shared/Common/**` は `ExchangeApi.Common.*`
 * `src/Shared/Contracts/**` は `ExchangeApi.Contracts.*`
@@ -344,7 +400,7 @@ src/
 
 > 物理階層が近いほど、名前空間は境界の代替となる。
 
-### 8.3.2 参照禁止（compile-time での向き）
+#### 13.3.2 参照禁止（compile-time での向き）
 
 * `Common` は `Contracts` と `Domain` を参照してはならない
 * `Contracts` は `Domain` を参照してはならない
@@ -353,7 +409,7 @@ src/
 
 （許可される参照は「依存方向（必須）」章に従う）
 
-#### 自動検査（運用条文）
+##### 13.3.2.1 自動検査（運用条文）
 
 Shared 配下では物理距離が近いため、参照禁止は **自動検査**により担保することを推奨する。
 少なくとも次のいずれかを導入し、CI で失敗させる。
@@ -363,19 +419,19 @@ Shared 配下では物理距離が近いため、参照禁止は **自動検査*
 
 > 人手レビューのみでの担保は、長期運用で破綻しやすい。
 
-### 8.3.3 公開面の最小化（internal の活用）
+#### 13.3.3 公開面の最小化（internal の活用）
 
 * `Shared` 内部の実装詳細は原則 `internal` とし、公開面は最小にする
 * `Contracts` の公開型は「利用契約」に必要なものに限定する
 * `Common` の公開型は「語彙（Value/Type/Error/Parsing）」に限定する
 
-### 8.3.4 ファイル/型配置の判定基準（迷ったら）
+#### 13.3.4 ファイル/型配置の判定基準（迷ったら）
 
 * 利用者が依存する呼び口（Interface）と、その入出力（DTO） → `Contracts`
 * DTO/エラー等で再利用される語彙（Value/Type） → `Common`
 * 複数取引所を横断するふるまい（UseCase/Service/Policy） → `Domain`
 
-### 8.3.5 禁止パターン（Shared で起きやすい混線）
+#### 13.3.5 禁止パターン（Shared で起きやすい混線）
 
 * `Common` に interface（呼び口）を置くこと
 * `Contracts` に横断ふるまい（UseCase/Service）を置くこと
@@ -383,18 +439,18 @@ Shared 配下では物理距離が近いため、参照禁止は **自動検査*
 
 ---
 
-## 8.4 Raw / Exchange への明示的アクセス（Step 5）[確定]
+## 14. Raw / Exchange への明示的アクセス（旧 [Design-Step-05]）[確定]
 
 利用者のデフォルト入口は `CreateClient(...) -> IExchangeClient` とし、
 Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・調査用途に限り**、
 明示的な操作として提供してよい。
 
-### 8.4.1 目的
+### 14.1 目的
 
 * 業務ロジックが Wire/Normalized に侵入することを防ぐ
 * 必要なときだけ仕様観測・障害解析・差分調査を可能にする
 
-### 8.4.2 提供形（明示的 opt-in）
+### 14.2 提供形（明示的 opt-in）
 
 * `IExchangeClient` は通常、Contracts（Market/Trading/Account/Info）だけを提供する
 * Raw/Exchange へのアクセスを提供する場合は、次の **明示的インタフェース**を用いる
@@ -404,16 +460,16 @@ Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・
 
 > 利用者はキャスト等により「覗く」意思を明示しなければならない。
 
-### 8.4.3 禁止
+### 14.3 禁止
 
 * Contracts の戻り値型として Wire/Normalized DTO を返すこと
 * Domain が Raw/Exchange を参照すること
 
 ---
 
-## 9. 依存方向（必須）
+## 15. 依存方向（必須）
 
-### 9.1 許可
+### 15.1 許可
 
 * `Domain -> Contracts`
 * `Domain -> Common`
@@ -422,7 +478,7 @@ Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・
 * `Exchanges(Wire/Normalize) -> Common`（必要な語彙のみ）
 * `Composition -> *`（配線のみのため全参照可）
 
-### 9.2 禁止
+### 15.2 禁止
 
 * `Contracts -> Domain`
 * `Common -> Domain`
@@ -432,23 +488,24 @@ Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・
 
 ---
 
-## 9.3 Domain 公開形（Step 6）[確定]
+
+### 15.3 Domain 公開形（旧 [Design-Step-06]）[確定]
 
 Domain は「取引所横断の主要ふるまい」を提供する層であり、
 **新たな利用契約（契約 interface / DTO）を定義しない**。
 
-### 9.3.1 Domain が提供するもの
+#### 15.3.1 Domain が提供するもの
 
 * UseCase（例：注文ポーリング、状態待機、共通の手順）
 * Domain Service（例：横断ルーティング、ポリシー適用）
 * Policy（例：再試行方針、タイムアウト戦略）
 
-### 9.3.2 Domain の入力・出力
+#### 15.3.2 Domain の入力・出力
 
 * 入力は **Contracts（Interface/DTO）と Common（語彙）に限定**する
 * 出力は **Contracts DTO / Common Value / Common Error** に限定する
 
-### 9.3.3 禁止
+#### 15.3.3 禁止
 
 * Domain が Exchanges（取引所実装）を参照すること
 * Domain が Wire/Normalized DTO を参照すること
@@ -457,42 +514,43 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ---
 
-## 9.4 公開 API の命名規約（Raw / Exchange / Client / Facade）[確定]
+
+### 15.4 公開 API の命名規約（Raw / Exchange / Client / Facade）[確定]
 
 公開 API の命名は、層の誤用と混線を防ぐために次で固定する。
 
-### 9.4.1 Factory 名（入口）
+#### 15.4.1 Factory 名（入口）
 
 * Wire（spec）：`CreateRaw(...)`
 * Normalized（spec）：`CreateExchange(...)`
 * Contracts（cross-exchange）：`CreateClient(...)`
 
-### 9.4.2 返り値の型名（層が一目で分かること）
+#### 15.4.2 返り値の型名（層が一目で分かること）
 
 * Wire DTO：接頭辞 `Wire` を付ける（例：`WireTickerDto`）
 * Normalized DTO：接尾辞 `Normalized` を付ける（例：`BitflyerTickerNormalized`）
 * Contracts DTO：取引所名を含めない（例：`TickerDto`）
 
-### 9.4.3 クライアント型名（利用者が迷わないこと）
+#### 15.4.3 クライアント型名（利用者が迷わないこと）
 
 * Contracts の基本入口は `IExchangeClient` とする（`CreateClient` の返り値）
 * `IExchangeClient` の配下プロパティは API グループ名と一致させる
 
   * `Market`, `Trading`, `Account`, `Info`
 
-### 9.4.4 API グループ名とメソッド名（全層で同名）
+#### 15.4.4 API グループ名とメソッド名（全層で同名）
 
 * グループ名（例：`Market.GetTickerAsync`）は Wire / Normalized / Contracts で揃える
 * メソッド名は揃え、**層の違いは返却 DTO の型で表現する**
 
-### 9.4.5 公開面に出してよい語彙
+#### 15.4.5 公開面に出してよい語彙
 
 * 公開面（Contracts）に出してよいのは `Contracts` と `Common` のみ
 * 公開面の名称に `Adapter` を含めない（Adapter は内部層として保持してよい）
 
 ---
 
-## 10. 不変条件（Invariants）
+## 16. 不変条件（Invariants）
 
 * **Price/Size パース規約**
 
@@ -502,7 +560,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 * `normalizedDto → contractDto` は Adapter（およびその配下 Mapper）のみが行う
 
-### 10.x 数値・時刻・識別子に関する補足不変条件
+### 16.1 数値・時刻・識別子に関する補足不変条件
 
 本仕様における数値、時刻、および識別子の取り扱いについて、以下を補足不変条件として定める。
 
@@ -519,21 +577,21 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ---
 
-## 11. Converter / Mapper 規約
+## 17. Converter / Mapper 規約
 
-### 11.1 Converter
+### 17.1 Converter
 
 * 対象：Wire 層のみ
 * JSON を仕様どおり読めるかを保証
 * 失敗意味：取引所仕様不一致・破損
 
-### 11.2 Mapper
+### 17.2 Mapper
 
 * 対象：Normalize / Adapter
 * 意味的変換・正規化
 * 失敗意味：解釈不能・前提違反
 
-### 11.x サンプル JSON を正本とする運用規約
+### 17.3 サンプル JSON を正本とする運用規約
 
 本仕様において、Wire 層の正本はサンプル JSON とし、その運用について以下を定める。
 
@@ -547,7 +605,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ---
 
-## 12. 禁止事項（破壊防止ルール）
+## 18. 禁止事項（破壊防止ルール）
 
 * Wire/Normalized DTO を Contracts から返してはならない
 * Contracts が取引所仕様を知ってはならない
@@ -558,7 +616,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ---
 
-## 13. 一文要約
+## 19. 一文要約
 
 > **仕様は読む。意味は作る。**
 > **Wire/Normalize は仕様、Adapter 以降はドメイン。**
@@ -566,66 +624,11 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ---
 
-## 14. 憲法 FIX 宣言（変更ポリシー）【最終】
-
-本書は、本リポジトリにおける **最上位仕様（憲法）** として扱う。
-
-### 14.1 変更の扱い
-
-* 本書の変更は、原則として **破壊的変更** とみなす
-* 変更を行う場合は、必ず次を明記する
-
-  * 変更対象の章番号
-  * 変更理由（Why）
-  * 影響範囲（Contracts / Common / Domain / Exchanges / Composition）
-
-### 14.2 変更できないもの
-
-次に挙げる事項は、本書において **固定（FIX）** とする。
-
-* 層構造および責務境界（spec / domain）
-* Cross-Exchange 共通化対象の範囲（4種限定）
-* Contracts / Common / Domain の責務分離
-* 依存方向および禁止事項
-* 正本（source of truth）の所在
-* 公開エントリポイント（Factory）と命名規約
-
-### 14.x 互換性および破壊的変更に関する補足規定
-
-本仕様における変更の互換性について、以下を補足規定として定める。
-
-1. Contracts 層における公開インターフェースの変更は、本仕様における互換性判断の基準点とする。
-
-2. 次に該当する変更は、破壊的変更とみなす。
-
-   * 公開インターフェースのシグネチャ変更
-   * 必須フィールドの追加または削除
-   * 既存フィールドの意味変更
-   * 列挙型における既存値の意味変更または削除
-
-3. 次に該当する変更は、非破壊的変更とみなす。
-
-   * Optional フィールドの追加
-   * ErrorCode の追加（既存の意味を変更しない場合）
-   * Wire 層または Normalized 層におけるフィールド追加
-
-4. Contracts 層に影響する変更には、変更理由および影響範囲を明示した変更履歴を付与するものとする。
-
-### 14.3 下位仕様との関係
-
-* 下位仕様（Contracts API 詳細、DTO フィールド定義、ErrorCode 一覧等）は改訂可能とする
-* ただし、下位仕様は **本書の境界・不変条件に反してはならない**
-
----
-
-> 本書を変更する前に、まず **「本当に憲法を変える必要があるか」** を問うこと。
-> 多くの場合、答えは **下位仕様で解決できる**。
-
-## 15. 運用および拡張に関する附則
+## 20. 運用および拡張に関する附則
 
 本章は、本仕様の運用および将来的な拡張に関する共通原則を定めるものである。
 
-#### 15.1 エラー正規化方針
+### 20.1 エラー正規化方針
 
 1. エラーは Common 層において正規化され、Contracts 層では正規化後のエラーのみを扱うものとする。
 
@@ -637,7 +640,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 3. 元エラー情報は、解析および診断目的で保持されるが、Contracts 層の利用者に対して必須とはしない。
 
-#### 15.2 ページング、レート制限およびキャンセル
+### 20.2 ページング、レート制限およびキャンセル
 
 1. ページングを伴う操作については、継続トークン等を用いた共通的な表現を採用するものとする。
 

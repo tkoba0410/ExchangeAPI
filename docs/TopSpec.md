@@ -10,7 +10,7 @@
 
 ## 0. 本書が決めること / 決めないこと
 
-### 決めること
+### 0.1 決めること
 
 * 外部契約（public contract）の境界
 * 不変条件（invariants）
@@ -19,7 +19,7 @@
 * 取引所横断（cross-exchange）の共通化対象
 * Contracts / Common / Domain の責務分離
 
-### 決めないこと
+### 0.2 決めないこと
 
 * 内部実装の最適解、性能方針
 * アルゴリズム選択
@@ -330,13 +330,13 @@ src/
 
 ---
 
-## 4.1 Shared 配下で境界を崩さないための補足条文（命名・参照ルール）
+## 8.3 Shared 配下で境界を崩さないための補足条文（命名・参照ルール）
 
 `src/Shared/` 配下に `Common / Contracts / Domain` を物理的に集約する場合でも、
 境界は **責務** と **参照** により強制されなければならない。
 本条はそのための最小ルールを定める。
 
-### 4.1.1 名前空間（命名）
+### 8.3.1 名前空間（命名）
 
 * `src/Shared/Common/**` は `ExchangeApi.Common.*`
 * `src/Shared/Contracts/**` は `ExchangeApi.Contracts.*`
@@ -344,7 +344,7 @@ src/
 
 > 物理階層が近いほど、名前空間は境界の代替となる。
 
-### 4.1.2 参照禁止（compile-time での向き）
+### 8.3.2 参照禁止（compile-time での向き）
 
 * `Common` は `Contracts` と `Domain` を参照してはならない
 * `Contracts` は `Domain` を参照してはならない
@@ -363,19 +363,19 @@ Shared 配下では物理距離が近いため、参照禁止は **自動検査*
 
 > 人手レビューのみでの担保は、長期運用で破綻しやすい。
 
-### 4.1.3 公開面の最小化（internal の活用）
+### 8.3.3 公開面の最小化（internal の活用）
 
 * `Shared` 内部の実装詳細は原則 `internal` とし、公開面は最小にする
 * `Contracts` の公開型は「利用契約」に必要なものに限定する
 * `Common` の公開型は「語彙（Value/Type/Error/Parsing）」に限定する
 
-### 4.1.4 ファイル/型配置の判定基準（迷ったら）
+### 8.3.4 ファイル/型配置の判定基準（迷ったら）
 
 * 利用者が依存する呼び口（Interface）と、その入出力（DTO） → `Contracts`
 * DTO/エラー等で再利用される語彙（Value/Type） → `Common`
 * 複数取引所を横断するふるまい（UseCase/Service/Policy） → `Domain`
 
-### 4.1.5 禁止パターン（Shared で起きやすい混線）
+### 8.3.5 禁止パターン（Shared で起きやすい混線）
 
 * `Common` に interface（呼び口）を置くこと
 * `Contracts` に横断ふるまい（UseCase/Service）を置くこと
@@ -383,18 +383,18 @@ Shared 配下では物理距離が近いため、参照禁止は **自動検査*
 
 ---
 
-## 3.11 Raw / Exchange への明示的アクセス（Step 5）[確定]
+## 8.4 Raw / Exchange への明示的アクセス（Step 5）[確定]
 
 利用者のデフォルト入口は `CreateClient(...) -> IExchangeClient` とし、
 Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・調査用途に限り**、
 明示的な操作として提供してよい。
 
-### 3.11.1 目的
+### 8.4.1 目的
 
 * 業務ロジックが Wire/Normalized に侵入することを防ぐ
 * 必要なときだけ仕様観測・障害解析・差分調査を可能にする
 
-### 3.11.2 提供形（明示的 opt-in）
+### 8.4.2 提供形（明示的 opt-in）
 
 * `IExchangeClient` は通常、Contracts（Market/Trading/Account/Info）だけを提供する
 * Raw/Exchange へのアクセスを提供する場合は、次の **明示的インタフェース**を用いる
@@ -404,7 +404,7 @@ Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・
 
 > 利用者はキャスト等により「覗く」意思を明示しなければならない。
 
-### 3.11.3 禁止
+### 8.4.3 禁止
 
 * Contracts の戻り値型として Wire/Normalized DTO を返すこと
 * Domain が Raw/Exchange を参照すること
@@ -432,23 +432,23 @@ Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・
 
 ---
 
-## 3.12 Domain 公開形（Step 6）[確定]
+## 9.3 Domain 公開形（Step 6）[確定]
 
 Domain は「取引所横断の主要ふるまい」を提供する層であり、
 **新たな利用契約（契約 interface / DTO）を定義しない**。
 
-### 3.12.1 Domain が提供するもの
+### 9.3.1 Domain が提供するもの
 
 * UseCase（例：注文ポーリング、状態待機、共通の手順）
 * Domain Service（例：横断ルーティング、ポリシー適用）
 * Policy（例：再試行方針、タイムアウト戦略）
 
-### 3.12.2 Domain の入力・出力
+### 9.3.2 Domain の入力・出力
 
 * 入力は **Contracts（Interface/DTO）と Common（語彙）に限定**する
 * 出力は **Contracts DTO / Common Value / Common Error** に限定する
 
-### 3.12.3 禁止
+### 9.3.3 禁止
 
 * Domain が Exchanges（取引所実装）を参照すること
 * Domain が Wire/Normalized DTO を参照すること
@@ -457,35 +457,35 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ---
 
-## 3.13 公開 API の命名規約（Raw / Exchange / Client / Facade）[確定]
+## 9.4 公開 API の命名規約（Raw / Exchange / Client / Facade）[確定]
 
 公開 API の命名は、層の誤用と混線を防ぐために次で固定する。
 
-### 3.13.1 Factory 名（入口）
+### 9.4.1 Factory 名（入口）
 
 * Wire（spec）：`CreateRaw(...)`
 * Normalized（spec）：`CreateExchange(...)`
 * Contracts（cross-exchange）：`CreateClient(...)`
 
-### 3.13.2 返り値の型名（層が一目で分かること）
+### 9.4.2 返り値の型名（層が一目で分かること）
 
 * Wire DTO：接頭辞 `Wire` を付ける（例：`WireTickerDto`）
 * Normalized DTO：接尾辞 `Normalized` を付ける（例：`BitflyerTickerNormalized`）
 * Contracts DTO：取引所名を含めない（例：`TickerDto`）
 
-### 3.13.3 クライアント型名（利用者が迷わないこと）
+### 9.4.3 クライアント型名（利用者が迷わないこと）
 
 * Contracts の基本入口は `IExchangeClient` とする（`CreateClient` の返り値）
 * `IExchangeClient` の配下プロパティは API グループ名と一致させる
 
   * `Market`, `Trading`, `Account`, `Info`
 
-### 3.13.4 API グループ名とメソッド名（全層で同名）
+### 9.4.4 API グループ名とメソッド名（全層で同名）
 
 * グループ名（例：`Market.GetTickerAsync`）は Wire / Normalized / Contracts で揃える
 * メソッド名は揃え、**層の違いは返却 DTO の型で表現する**
 
-### 3.13.5 公開面に出してよい語彙
+### 9.4.5 公開面に出してよい語彙
 
 * 公開面（Contracts）に出してよいのは `Contracts` と `Common` のみ
 * 公開面の名称に `Adapter` を含めない（Adapter は内部層として保持してよい）
@@ -506,13 +506,13 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ## 11. Converter / Mapper 規約
 
-### Converter
+### 11.1 Converter
 
 * 対象：Wire 層のみ
 * JSON を仕様どおり読めるかを保証
 * 失敗意味：取引所仕様不一致・破損
 
-### Mapper
+### 11.2 Mapper
 
 * 対象：Normalize / Adapter
 * 意味的変換・正規化

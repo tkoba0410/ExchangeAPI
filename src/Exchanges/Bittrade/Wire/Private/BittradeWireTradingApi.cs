@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Wire.Converters;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Requests;
 

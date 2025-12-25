@@ -6,7 +6,7 @@ using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Requests;
 
-namespace ExchangeApi.Exchanges.Bittrade.Wire.Private.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Wire.Converters;
 
 internal static class BittradeWireTradingMapper
 {

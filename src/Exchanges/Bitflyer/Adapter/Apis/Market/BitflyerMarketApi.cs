@@ -150,7 +150,7 @@ internal sealed class MarketApi : IMarketDataApi
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var raw = await _marketData.GetHealthAsync(productCode, cancellationToken).ConfigureAwait(false);
             var normalized = BitflyerHealthNormalizer.Normalize(raw);
-            return MarketMapper.MapHealth(normalized);
+            return new HealthResponse(normalized.Status);
         }
         catch (SymbolNotSupportedException)
         {
@@ -184,7 +184,10 @@ internal sealed class MarketApi : IMarketDataApi
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var raw = await _marketData.GetBoardStateAsync(productCode, cancellationToken).ConfigureAwait(false);
             var normalized = BitflyerBoardStateNormalizer.Normalize(raw);
-            return MarketMapper.MapBoardState(normalized);
+            return new BoardStateResponse(
+                Health: normalized.Health,
+                State: normalized.State,
+                Data: normalized.Data);
         }
         catch (SymbolNotSupportedException)
         {

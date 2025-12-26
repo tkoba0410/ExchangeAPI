@@ -4,7 +4,6 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
@@ -50,20 +49,4 @@ internal static class MarketMapper
             ExecutedAt: normalized.ExecutedAt);
     }
 
-    public static HealthResponse MapHealth(BitflyerHealthNormalized normalized)
-    {
-        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-
-        return new HealthResponse(normalized.Status);
-    }
-
-    public static BoardStateResponse MapBoardState(BitflyerBoardStateNormalized normalized)
-    {
-        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-
-        return new BoardStateResponse(
-            Health: normalized.Health,
-            State: normalized.State,
-            Data: normalized.Data);
-    }
 }

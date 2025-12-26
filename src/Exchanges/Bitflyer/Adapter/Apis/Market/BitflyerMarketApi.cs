@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Contracts.Interfaces;
@@ -40,7 +41,8 @@ internal sealed class MarketApi : IMarketDataApi
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var raw = await _marketData.GetTickerRawAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return MarketMapper.MapTicker(symbol, raw);
+            var normalized = BitflyerTickerNormalizer.Normalize(raw);
+            return MarketMapper.MapTicker(symbol, normalized);
         }
         catch (SymbolNotSupportedException)
         {

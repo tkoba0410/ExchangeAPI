@@ -3,23 +3,23 @@ using System.Linq;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using RawBoard = ExchangeApi.Exchanges.Bitflyer.Wire.Public.Board;
 using RawExecutionPublicResponse = ExchangeApi.Exchanges.Bitflyer.Wire.Public.ExecutionPublicResponse;
-using RawTicker = ExchangeApi.Exchanges.Bitflyer.Wire.Public.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class MarketMapper
 {
-    public static CommonTicker MapTicker(Symbol symbol, RawTicker raw)
+    public static CommonTicker MapTicker(Symbol symbol, BitflyerTickerNormalized normalized)
     {
-        if (raw is null) throw new ArgumentNullException(nameof(raw));
+        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
         return new CommonTicker(
             Exchange: ExchangeCode.Bitflyer,
             Symbol: symbol,
-            LastTradedPrice: new Price(raw.LastTradedPrice),
-            Timestamp: raw.Timestamp);
+            LastTradedPrice: new Price(normalized.LastTradedPrice),
+            Timestamp: normalized.Timestamp);
     }
 
     public static OrderBook MapOrderBook(RawBoard rawBoard)

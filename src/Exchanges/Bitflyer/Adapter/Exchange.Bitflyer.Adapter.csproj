@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Wire\Exchange.Bitflyer.Wire.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\\Normalize\\**\\*.cs" />
+  </ItemGroup>
+
 </Project>

@@ -100,6 +100,7 @@ internal sealed class MarketApi : IMarketDataApi
             var raw = await _marketData.GetExecutionsRawAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             var mapped = raw
+                .Select(BitflyerExecutionNormalizer.Normalize)
                 .Select(e => MarketMapper.MapExecution(symbol, e))
                 .ToArray();
 

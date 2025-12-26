@@ -6,7 +6,6 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using RawBoard = ExchangeApi.Exchanges.Bitflyer.Wire.Public.Board;
-using RawExecutionPublicResponse = ExchangeApi.Exchanges.Bitflyer.Wire.Public.ExecutionPublicResponse;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class MarketMapper
@@ -37,17 +36,17 @@ internal static class MarketMapper
         return new OrderBook(ExchangeCode.Bitflyer, bids, asks);
     }
 
-    public static ExecutionMarket MapExecution(Symbol symbol, RawExecutionPublicResponse raw)
+    public static ExecutionMarket MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)
     {
-        if (raw is null) throw new ArgumentNullException(nameof(raw));
+        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
         return new ExecutionMarket(
             ExchangeCode: ExchangeCode.Bitflyer,
             Symbol: symbol,
-            OrderId: raw.Id.ToString(),
-            Side: BitflyerCommonMapper.MapSide(raw.Side),
-            Price: new Price(raw.Price),
-            Size: new Size(raw.Size),
-            ExecutedAt: raw.ExecDate);
+            OrderId: normalized.Id.ToString(),
+            Side: BitflyerCommonMapper.MapSide(normalized.Side),
+            Price: new Price(normalized.Price),
+            Size: new Size(normalized.Size),
+            ExecutedAt: normalized.ExecutedAt);
     }
 }

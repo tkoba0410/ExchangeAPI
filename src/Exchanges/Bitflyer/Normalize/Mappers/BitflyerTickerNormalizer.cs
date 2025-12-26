@@ -1,0 +1,13 @@
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
+
+namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
+
+internal static class BitflyerTickerNormalizer
+{
+    public static BitflyerTickerNormalized Normalize(Ticker wire) =>
+        new(
+            ProductCode: wire.ProductCode.Value,
+            LastTradedPrice: wire.LastTradedPrice,
+            Timestamp: wire.Timestamp);
+}

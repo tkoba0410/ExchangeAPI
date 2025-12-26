@@ -1,9 +1,0 @@
-{
-  "product_code": "btc_jpy",
-  "child_order_type": "LIMIT",
-  "side": "BUY",
-  "price": 5800000,
-  "size": 0.01,
-  "minute_to_expire": 10080,
-  "time_in_force": "GTC"
-}

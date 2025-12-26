@@ -200,13 +200,20 @@
 ### 5.2 Raw 層（仕様 / 鏡像）
 
 * 取引所 API の通信表現そのもの（鏡像）
-* 正本：**text.json（生レスポンス）**
+* 正本（fact）：**`spec/exchange-api/<Exchange>/<Group>/<Endpoint>/sample.json`（生レスポンス）**
 * JSON形・フィールド名・欠損をそのまま保持（意味判断は禁止）
 
 **変換手段：Converter**（＝JSONを読めることの保証）
 
-* `text.json → rawDto`
+* `sample.json → rawDto`
 * 意味判断は禁止
+
+補足（正本と実装の分離）：
+
+* `spec/exchange-api/**` は **規格（正本 / source of truth）** である。
+* `src/Exchanges/<Exchange>/Raw/**` は **実装（鏡像の具現化）** であり、必要に応じて
+  `spec/exchange-api/**` の内容を **ミラー**として配置してよい（ただし正本ではない）。
+
 
 ### 5.3 Normalized 層（仕様）
 
@@ -350,7 +357,23 @@ Contracts DTO は「最小共通」であることを要するが、過度に痩
 
 以下は推奨される物理構成の一例である。
 
+また、取引所APIの **規格表（正本）** は `spec/exchange-api/**` に独立して配置する。
+`src/Exchanges/*/Raw` はその規格表を実装する層であり、正本は `spec/` 側に置く。
+
 ```
+```
+spec/
+└─ exchange-api/              # 取引所API 規格表（正本 / source of truth）
+   └─ <Exchange>/
+      └─ <Group>/
+         └─ <Endpoint>/
+            ├─ spec.md         # 規格（人間が読む）
+            ├─ sample.json     # 鏡像サンプル（fact / 機械が読む）
+            └─ cases/          # 任意：欠損/null/境界値など追加ケース（factではない）
+
+```
+
+```text
 src/
 ├─ Core/
 │  ├─ Abstractions/
@@ -364,11 +387,8 @@ src/
 ├─ Exchanges/
 │  ├─ AA/
 │  │  ├─ Raw/
-│  │  │  ├─ Samples/          # Raw サンプルJSON（鏡像 / 正本）
-│  │  │  │  ├─ Market/
-│  │  │  │  │  └─ GetTicker.json
-│  │  │  │  └─ Trading/
-│  │  │  │     └─ SendChildOrder.json
+│  │  │  ├─ Samples/          # （任意）テスト用コピー/同期先。正本は spec/exchange-api 側。
+│  │  │  │  └─ ...
 │  │  │  ├─ Converters/
 │  │  │  └─ Dtos/
 │  │  ├─ Normalize/
@@ -384,12 +404,25 @@ src/
    └─ Options/
 ```
 
+注記（Raw/Samples の位置づけ）：
+
+* `spec/exchange-api/<Exchange>/<Group>/<Endpoint>/sample.json` が **鏡像サンプル（fact）の正本**。
+* `src/Exchanges/<Exchange>/Raw/Samples/**` は、
+  実装・テスト都合で **同期/コピー**して置いてよいが、正本ではない。
+* 正本と実装が乖離する運用を禁止する（正本変更→実装追従が必須）。
+
 ---
 
 ## 10. 正本（source of truth）の所在
 
-* 取引所固有の仕様：`doc-api` と `src/Exchanges/*`（Raw/Samples を含む）
-  * Raw サンプル JSON（鏡像 / fact の正本）：`src/Exchanges/<Exchange>/Raw/Samples/<Group>/<Endpoint>.json`
+* 取引所固有の仕様（規格表 / 正本）：`spec/exchange-api/**`
+  * 規格（人間が読む）：`spec/exchange-api/<Exchange>/<Group>/<Endpoint>/spec.md`
+  * 鏡像サンプル（fact の正本）：`spec/exchange-api/<Exchange>/<Group>/<Endpoint>/sample.json`
+  * 追加ケース（任意 / factではない）：`spec/exchange-api/<Exchange>/<Group>/<Endpoint>/cases/*.json`
+
+* 取引所固有の実装：`src/Exchanges/*`
+  * Raw 層は鏡像 spec を実装する層（Converter はここに存在する）。
+  * `src/Exchanges/<Exchange>/Raw/Samples/**` を置く場合、それは同期先であり正本ではない。
 * 通信・基盤の契約：`src/Core`
 * 取引所横断の契約：`src/Contracts`
 * 取引所横断の語彙：`src/Common`

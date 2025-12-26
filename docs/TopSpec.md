@@ -364,7 +364,11 @@ src/
 ├─ Exchanges/
 │  ├─ AA/
 │  │  ├─ Raw/
-│  │  │  ├─ Samples/          # text.json（正本）
+│  │  │  ├─ Samples/          # Raw サンプルJSON（鏡像 / 正本）
+│  │  │  │  ├─ Market/
+│  │  │  │  │  └─ GetTicker.json
+│  │  │  │  └─ Trading/
+│  │  │  │     └─ SendChildOrder.json
 │  │  │  ├─ Converters/
 │  │  │  └─ Dtos/
 │  │  ├─ Normalize/
@@ -385,6 +389,7 @@ src/
 ## 10. 正本（source of truth）の所在
 
 * 取引所固有の仕様：`doc-api` と `src/Exchanges/*`（Raw/Samples を含む）
+  * Raw サンプル JSON（鏡像 / fact の正本）：`src/Exchanges/<Exchange>/Raw/Samples/<Group>/<Endpoint>.json`
 * 通信・基盤の契約：`src/Core`
 * 取引所横断の契約：`src/Contracts`
 * 取引所横断の語彙：`src/Common`

@@ -4,6 +4,7 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 

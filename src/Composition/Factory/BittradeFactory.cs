@@ -5,6 +5,10 @@ using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire;
+using ExchangeApi.Exchanges.Bittrade.Wire.Private;
+using ExchangeApi.Exchanges.Bittrade.Wire.Public;
+using ExchangeApi.Contracts.Interfaces;
 
 namespace ExchangeApi.Composition.Factory;
 
@@ -26,18 +30,36 @@ public static class BittradeFactory
             new BittradePrivateTradingApi(restClient));
     }
 
-    public static BittradeExchangeClient CreateAdapter(BittradeFactoryOptions? options = null)
+    public static IExchangeClient CreateClient(BittradeFactoryOptions? options = null)
     {
         var settings = options ?? new BittradeFactoryOptions();
         if (string.IsNullOrWhiteSpace(settings.AccountId))
         {
-            throw new InvalidOperationException("BittradeFactoryOptions.AccountId must be specified to create an adapter.");
+            throw new InvalidOperationException("BittradeFactoryOptions.AccountId must be specified to create a client.");
         }
 
         var restClient = CreateRestClient(settings, requireCredentials: true);
         var bundle = BittradeApiBundle.FromRestClient(restClient, settings.AccountId);
         return new BittradeExchangeClient(bundle);
     }
+
+    public static BittradeWireApi CreateExchange(BittradeFactoryOptions? options = null)
+    {
+        var settings = options ?? new BittradeFactoryOptions();
+        var restClient = CreateRestClient(settings, requireCredentials: false);
+        var raw = new BittradeRawApi(restClient);
+        var trading = string.IsNullOrWhiteSpace(settings.AccountId)
+            ? (IBittradeWireTradingApi)new BittradeWireTradingApiNotSupported()
+            : new BittradeWireTradingApi(raw.Trading, settings.AccountId);
+        return new BittradeWireApi(
+            new BittradeWireMarketDataApi(raw.MarketData),
+            trading,
+            new BittradeWireCommonApi(raw));
+    }
+
+    [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]
+    internal static BittradeExchangeClient CreateAdapter(BittradeFactoryOptions? options = null) =>
+        (BittradeExchangeClient)CreateClient(options);
 
     private static RestClient CreateRestClient(BittradeFactoryOptions settings, bool requireCredentials)
     {
@@ -64,7 +86,7 @@ public static class BittradeFactory
         {
             if (requireCredentials)
             {
-                throw new InvalidOperationException("Bittrade credentials are required to create the adapter.");
+                throw new InvalidOperationException("Bittrade credentials are required to create the client.");
             }
 
             return null;

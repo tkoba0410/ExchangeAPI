@@ -15,7 +15,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Core.Services;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
@@ -37,6 +37,10 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private readonly object? _wireBundle;
 
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bitflyer;
+    public IMarketDataApi Market => _marketApi;
+    public ITradingApi Trading => _tradingApi;
+    public IAccountApi Account => _accountApi;
+    public IExchangeInfoApi Info => _exchangeInfoApi;
 
     internal BitflyerExchangeClient(
         IBitflyerWireMarketDataApi marketData,

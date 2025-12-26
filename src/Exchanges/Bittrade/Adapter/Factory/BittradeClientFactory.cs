@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Core.Services;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;

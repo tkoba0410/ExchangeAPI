@@ -7,8 +7,8 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
-using ExchangeApi.Core.Services;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
@@ -19,10 +19,16 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
 {
     private readonly MarketApi _marketApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
+    private readonly ITradingApi _tradingApi;
+    private readonly IAccountApi _accountApi;
     private readonly object? _rawBundle;
     private readonly object? _wireBundle;
 
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bitflyer;
+    public IMarketDataApi Market => _marketApi;
+    public ITradingApi Trading => _tradingApi;
+    public IAccountApi Account => _accountApi;
+    public IExchangeInfoApi Info => _exchangeInfoApi;
 
     internal BitflyerPublicClient(IBitflyerWireMarketDataApi marketData, object? rawBundle = null, object? wireBundle = null)
     {
@@ -30,6 +36,8 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         _exchangeInfoApi = new BitflyerExchangeInfoApi();
         var markets = new ExchangeInfoMarketResolver(_exchangeInfoApi);
         _marketApi = new MarketApi(marketData, markets, ExchangeCode.Bitflyer);
+        _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bitflyer);
+        _accountApi = new NotSupportedAccountApi(ExchangeCode.Bitflyer);
         _rawBundle = rawBundle;
         _wireBundle = wireBundle;
     }

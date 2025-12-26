@@ -9,6 +9,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Contracts.Interfaces;
 
 namespace ExchangeApi.Composition.Factory;
 
@@ -27,7 +28,7 @@ public static class BitflyerFactory
         return new Raw.BitflyerRawApi(restClient);
     }
 
-    public static BitflyerExchangeClient CreateAdapter(BitflyerFactoryOptions? options = null)
+    public static IExchangeClient CreateClient(BitflyerFactoryOptions? options = null)
     {
         var settings = options ?? new BitflyerFactoryOptions();
         var components = CreateWireComponents(settings);
@@ -41,11 +42,15 @@ public static class BitflyerFactory
             accountId: settings.AccountId);
     }
 
-    public static BitflyerWireApi CreateWire(BitflyerFactoryOptions? options = null)
+    public static BitflyerWireApi CreateExchange(BitflyerFactoryOptions? options = null)
     {
         var components = CreateWireComponents(options ?? new BitflyerFactoryOptions());
         return new BitflyerWireApi(components.Raw, components.RestClient);
     }
+
+    [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]
+    internal static BitflyerExchangeClient CreateAdapter(BitflyerFactoryOptions? options = null) =>
+        (BitflyerExchangeClient)CreateClient(options);
 
     private static BitflyerComponents CreateWireComponents(BitflyerFactoryOptions settings)
     {

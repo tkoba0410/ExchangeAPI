@@ -12,7 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Common\Shared.Common.csproj" />
     <ProjectReference Include="..\..\..\Shared\Contracts\Shared.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Domain\Shared.Domain.csproj" />
     <ProjectReference Include="..\..\..\Core\Core.csproj" />
     <ProjectReference Include="..\Raw\Exchange.Bitflyer.Raw.csproj" />
     <ProjectReference Include="..\Wire\Exchange.Bitflyer.Wire.csproj" />

@@ -33,6 +33,10 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     internal BittradeApiBundle? ApiBundle { get; }
 
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bittrade;
+    public IMarketDataApi Market => _marketApi;
+    public ITradingApi Trading => _tradingApi;
+    public IAccountApi Account => _accountApi;
+    public IExchangeInfoApi Info => _exchangeInfoApi;
 
     public BittradeExchangeClient(
         IMarketDataApi marketApi,

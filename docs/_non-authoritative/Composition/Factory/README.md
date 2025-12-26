@@ -25,7 +25,7 @@
 をまとめて行い、
 
 * **Wire/Raw クライアント（既定）**（bitFlyer は Wire、Bittrade は Raw）
-* **Adapter クライアント（明示指定時のみ）**
+* **Contracts クライアント（明示指定時のみ）**
 
 を生成します。
 
@@ -34,19 +34,19 @@
 ## 2. 基本方針（最重要）
 
 * **既定は Wire/Raw**：bitFlyer は Wire、Bittrade は Raw を主役とする
-* **Adapter は明示**：共通語彙で扱いたい場合のみ選択する
+* **Contracts は明示**：共通語彙で扱いたい場合のみ選択する
 * **束ねない**：複数取引所をまとめる API は提供しない
 
 ---
 
-## 3. クイックスタート（Wire 既定）
+## 3. クイックスタート（Wire/Raw 既定）
 
 ### Bitflyer（公開 API のみ）
 
 ```csharp
 using ExchangeApi.Composition.Factory;
 
-var bitflyerWire = BitflyerFactory.CreateWire();
+var bitflyerWire = BitflyerFactory.CreateExchange();
 
 // 例：公開 API を直接呼び出す
 var ticker = await bitflyerWire.GetTickerAsync("BTC_JPY");
@@ -85,18 +85,18 @@ var markets = await bittradeRaw.GetMarketsAsync();
 
 ---
 
-## 4. Adapter を使う場合（明示）
+## 4. Contracts を使う場合（明示）
 
-Adapter は **Common.DTO / Common.Interface** を返す薄いラッパです。
+Contracts は **Contracts.DTO / Contracts.Interface** を返す薄いラッパです。
 
-### Bitflyer Adapter
+### Bitflyer Client
 
 ```csharp
 using ExchangeApi.Composition.Factory;
 
-var api = BitflyerFactory.CreateAdapter();
+var api = BitflyerFactory.CreateClient();
 
-// Common.DTO を返す
+// Contracts.DTO を返す
 var balances = await api.GetBalancesAsync();
 ```
 
@@ -104,13 +104,13 @@ var balances = await api.GetBalancesAsync();
 
 ---
 
-### Bittrade Adapter（注意点あり）
+### Bittrade Client（注意点あり）
 
 ```csharp
 using ExchangeApi.Composition.Factory;
-using ExchangeApi.Common.Dtos;
+using ExchangeApi.Contracts.Dtos;
 
-var api = BittradeFactory.CreateAdapter(
+var api = BittradeFactory.CreateClient(
     new BittradeFactoryOptions {
         AccountId = "your-account-id",
         Credentials = new ApiCredentials("accessKey", "secretKey")
@@ -135,7 +135,7 @@ var balances = await api.GetBalancesAsync();
 ## 5. オプション指定（必要なときだけ）
 
 ```csharp
-var bitflyerWire = BitflyerFactory.CreateWire(
+var bitflyerWire = BitflyerFactory.CreateExchange(
     new BitflyerFactoryOptions {
         Credentials = new ApiCredentials("key", "secret"),
         PolicyOptions = new HttpPolicyOptions {
@@ -176,12 +176,12 @@ Composition / Factory は、以下を **意図的に提供しません**。
   * 取引所固有機能を使いたい
   * 完全な制御が必要
 
-* **Adapter を使うべき場合**
+* **Contracts を使うべき場合**
 
   * 複数取引所で共通の処理を書きたい
   * DTO / Interface を揃えたい
 
-迷ったら **bitFlyer は Wire / Bittrade は Raw** を選んでください。
+迷ったら **bitFlyer は Exchange / Bittrade は Raw** を選んでください。
 
 ---
 

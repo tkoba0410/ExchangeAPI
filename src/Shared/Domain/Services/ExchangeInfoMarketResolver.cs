@@ -2,12 +2,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Core.Extensions;
+using ExchangeApi.Domain.Extensions;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 
-namespace ExchangeApi.Core.Services;
+namespace ExchangeApi.Domain.Services;
 
 public sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
 {

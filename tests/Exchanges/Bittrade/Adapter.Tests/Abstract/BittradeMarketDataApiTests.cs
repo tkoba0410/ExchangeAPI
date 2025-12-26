@@ -7,7 +7,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Core.Services;
+using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;

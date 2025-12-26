@@ -13,7 +13,7 @@ using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Core.UseCases;
+using ExchangeApi.Domain.UseCases;
 using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet.ExecutionPrivateResponse;
 using Xunit;
 

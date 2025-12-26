@@ -6,7 +6,7 @@ using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Core.UseCases;
+using ExchangeApi.Domain.UseCases;
 using ExchangeApi.Core.Contracts.Errors;
 using Xunit;
 

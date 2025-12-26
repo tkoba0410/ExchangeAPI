@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
-namespace ExchangeApi.Core.Extensions;
+namespace ExchangeApi.Domain.Extensions;
 
 /// <summary>
 /// ExchangeMaintenance 判定用の簡易ヘルパ。

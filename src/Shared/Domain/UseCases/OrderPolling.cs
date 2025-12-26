@@ -7,7 +7,7 @@ using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Contracts.Errors;
 
-namespace ExchangeApi.Core.UseCases;
+namespace ExchangeApi.Domain.UseCases;
 
 /// <summary>
 /// 注文状態をポーリングするユースケース。

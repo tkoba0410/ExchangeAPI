@@ -23,7 +23,7 @@
   - [4.2 非ゴール](#42-非ゴール)
 - [5. 論理階層（下層 → 上層）](#5-論理階層下層-上層)
   - [5.1 Core（実行基盤）](#51-core実行基盤)
-  - [5.2 Wire 層（仕様）](#52-wire-層仕様)
+  - [5.2 Raw 層（仕様 / 鏡像）](#52-raw-層仕様--鏡像)
   - [5.3 Normalized 層（仕様）](#53-normalized-層仕様)
   - [5.4 Adapter 層（境界 / 翻訳関所）](#54-adapter-層境界-翻訳関所)
   - [5.5 Contracts（利用の契約 / ドメイン入口）](#55-contracts利用の契約-ドメイン入口)
@@ -107,7 +107,7 @@
 
 ## 2. 大原則（絶対境界）
 
-> **Wire DTO および Normalized DTO までは「仕様（spec）」であり、
+> **Raw DTO および Normalized DTO までは「仕様（spec）」であり、
 > Adapter 以降は「ドメイン（domain）」である。**
 
 この境界は **絶対** とし、越境を禁止する。
@@ -155,7 +155,7 @@
 
    * Optional フィールドの追加
    * ErrorCode の追加（既存の意味を変更しない場合）
-   * Wire 層または Normalized 層におけるフィールド追加
+   * Raw 層または Normalized 層におけるフィールド追加
 
 4. Contracts 層に影響する変更には、変更理由および影響範囲を明示した変更履歴を付与するものとする。
 
@@ -177,7 +177,7 @@
 * 海外主要取引所の Public API（Market Data 等）への対応
 * 取引所 API を以下の層として整理し、仕様差分と責務を分離する
 
-1. **Wire（Raw）層**（仕様）
+1. **Raw 層（鏡像 spec）**（仕様）
 2. **Normalized 層**（仕様）
 3. **Adapter〜上位**（ドメイン）
 
@@ -197,15 +197,15 @@
 * 取引所・ドメインの概念を一切持たない
 * API を成立させる技術基盤
 
-### 5.2 Wire 層（仕様）
+### 5.2 Raw 層（仕様 / 鏡像）
 
-* 取引所 API の通信表現そのもの
+* 取引所 API の通信表現そのもの（鏡像）
 * 正本：**text.json（生レスポンス）**
-* JSON形・フィールド名・欠損をそのまま保持
+* JSON形・フィールド名・欠損をそのまま保持（意味判断は禁止）
 
-**変換手段：Converter**
+**変換手段：Converter**（＝JSONを読めることの保証）
 
-* `text.json → wireDto`
+* `text.json → rawDto`
 * 意味判断は禁止
 
 ### 5.3 Normalized 層（仕様）
@@ -215,7 +215,7 @@
 
 **変換手段：Mapper**
 
-* `wireDto → normalizedDto`
+* `rawDto → normalizedDto`
 * 意味判断は「取引所仕様の範囲」に限定
 
 ### 5.4 Adapter 層（境界 / 翻訳関所）
@@ -250,7 +250,7 @@
 
 Composition は、利用者が「どの層を使うか」を誤らないために、入口（Factory）を **3 系統に限定**する。
 
-* **Wire（spec）入口**：`CreateRaw(...)` → Wire DTO を返す Raw API を生成
+* **Raw（spec）入口**：`CreateRaw(...)` → Raw DTO を返す Raw API（鏡像）を生成
 * **Normalized（spec）入口**：`CreateExchange(...)` → Normalized DTO を返す取引所固定 API を生成
 * **Contracts（cross-exchange）入口**：`CreateClient(...)` → Contracts Interface/DTO を返すクライアントを生成
 
@@ -302,7 +302,7 @@ Contracts と Common の境界は、取引所横断（cross-exchange）の混線
 
 * Contracts に置くのは **利用者に公開する I/O の形**に限定する。
 * Interface の引数・戻り値に現れるデータ構造（Request/Response/DTO）は **必ず Contracts** に属する。
-* Contracts DTO は取引所固有情報（取引所名、取引所固有フィールド、Wire/Normalized DTO）を含んではならない。
+* Contracts DTO は取引所固有情報（取引所名、取引所固有フィールド、Raw/Normalized DTO）を含んではならない。
 
 ### 8.2 Common（語彙：値・分類・失敗・パース）
 
@@ -363,7 +363,7 @@ src/
 │
 ├─ Exchanges/
 │  ├─ AA/
-│  │  ├─ Wire/
+│  │  ├─ Raw/
 │  │  │  ├─ Samples/          # text.json（正本）
 │  │  │  ├─ Converters/
 │  │  │  └─ Dtos/
@@ -384,7 +384,7 @@ src/
 
 ## 10. 正本（source of truth）の所在
 
-* 取引所固有の仕様：`doc-api` と `src/Exchanges/*`（Wire/Samples を含む）
+* 取引所固有の仕様：`doc-api` と `src/Exchanges/*`（Raw/Samples を含む）
 * 通信・基盤の契約：`src/Core`
 * 取引所横断の契約：`src/Contracts`
 * 取引所横断の語彙：`src/Common`
@@ -417,8 +417,8 @@ src/
   * DTO（例：`TickerDto`, `OrderDto`, `PlaceOrderRequest`）
 * 禁止：
 
-  * 取引所名・取引所固有概念の露出
-  * Wire/Normalized DTO の混入
+* 取引所名・取引所固有概念の露出
+* Raw/Normalized DTO の混入
 
 ### 12.2 Common（共通語彙）
 
@@ -440,7 +440,7 @@ src/
 * 禁止：
 
   * Exchanges への直接依存
-  * 取引所固有 DTO（Wire/Normalized）への依存
+* 取引所固有 DTO（Raw/Normalized）への依存
 
 ---
 
@@ -513,19 +513,19 @@ Shared 配下では物理距離が近いため、参照禁止は **自動検査*
 
 * `Common` に interface（呼び口）を置くこと
 * `Contracts` に横断ふるまい（UseCase/Service）を置くこと
-* `Domain` に取引所固有 DTO（Wire/Normalized）や取引所名を持ち込むこと
+* `Domain` に取引所固有 DTO（Raw/Normalized）や取引所名を持ち込むこと
 
 ---
 
 ## 14. Raw / Exchange への明示的アクセス（旧 [Design-Step-05]）[確定]
 
 利用者のデフォルト入口は `CreateClient(...) -> IExchangeClient` とし、
-Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・調査用途に限り**、
+Raw（鏡像 spec）や Normalized（Exchange）へのアクセスは **デバッグ・調査用途に限り**、
 明示的な操作として提供してよい。
 
 ### 14.1 目的
 
-* 業務ロジックが Wire/Normalized に侵入することを防ぐ
+* 業務ロジックが Raw/Normalized に侵入することを防ぐ
 * 必要なときだけ仕様観測・障害解析・差分調査を可能にする
 
 ### 14.2 提供形（明示的 opt-in）
@@ -533,14 +533,14 @@ Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・
 * `IExchangeClient` は通常、Contracts（Market/Trading/Account/Info）だけを提供する
 * Raw/Exchange へのアクセスを提供する場合は、次の **明示的インタフェース**を用いる
 
-  * `IHasRawAccess`：`Raw`（Wire / Raw API）を露出
+  * `IHasRawAccess`：`Raw`（Raw API / Raw DTO）を露出
   * `IHasExchangeAccess`：`Exchange`（Normalized API）を露出
 
 > 利用者はキャスト等により「覗く」意思を明示しなければならない。
 
 ### 14.3 禁止
 
-* Contracts の戻り値型として Wire/Normalized DTO を返すこと
+* Contracts の戻り値型として Raw/Normalized DTO を返すこと
 * Domain が Raw/Exchange を参照すること
 
 ---
@@ -553,7 +553,7 @@ Wire（Raw）や Normalized（Exchange）へのアクセスは **デバッグ・
 * `Domain -> Common`
 * `Contracts -> Common`
 * `Exchanges(Adapter) -> Contracts, Common`
-* `Exchanges(Wire/Normalize) -> Common`（必要な語彙のみ）
+* `Exchanges(Raw/Normalize) -> Common`（必要な語彙のみ）
 * `Composition -> *`（配線のみのため全参照可）
 
 ### 15.2 禁止
@@ -586,7 +586,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 #### 15.3.3 禁止
 
 * Domain が Exchanges（取引所実装）を参照すること
-* Domain が Wire/Normalized DTO を参照すること
+* Domain が Raw/Normalized DTO を参照すること
 * Domain が Composition（Factory/DI）を参照すること
 * Domain が契約 interface / 契約 DTO を新規に定義すること
 
@@ -599,13 +599,13 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 #### 15.4.1 Factory 名（入口）
 
-* Wire（spec）：`CreateRaw(...)`
+* Raw（spec）：`CreateRaw(...)`
 * Normalized（spec）：`CreateExchange(...)`
 * Contracts（cross-exchange）：`CreateClient(...)`
 
 #### 15.4.2 返り値の型名（層が一目で分かること）
 
-* Wire DTO：接頭辞 `Wire` を付ける（例：`WireTickerDto`）
+* Raw DTO：接頭辞 `Raw` を付ける（例：`RawTickerDto`）
 * Normalized DTO：接尾辞 `Normalized` を付ける（例：`BitflyerTickerNormalized`）
 * Contracts DTO：取引所名を含めない（例：`TickerDto`）
 
@@ -618,7 +618,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 #### 15.4.4 API グループ名とメソッド名（全層で同名）
 
-* グループ名（例：`Market.GetTickerAsync`）は Wire / Normalized / Contracts で揃える
+* グループ名（例：`Market.GetTickerAsync`）は Raw / Normalized / Contracts で揃える
 * メソッド名は揃え、**層の違いは返却 DTO の型で表現する**
 
 #### 15.4.5 公開面に出してよい語彙
@@ -651,7 +651,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 3. 時刻は、正規化以降すべて UTC 基準で扱うものとし、基準時刻系および精度は Common 層にて一意に定義されるものとする。
 
 4. シンボル（取引対象識別子）は、Contracts 層において単一の正規形を持つものとする。
-   Wire 層および Normalized 層における表現差異は、Contracts 層に到達する前に解消されなければならない。
+   Raw 層および Normalized 層における表現差異は、Contracts 層に到達する前に解消されなければならない。
 
 ---
 
@@ -659,7 +659,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ### 17.1 Converter
 
-* 対象：Wire 層のみ
+* 対象：Raw 層のみ
 * JSON を仕様どおり読めるかを保証
 * 失敗意味：取引所仕様不一致・破損
 
@@ -671,13 +671,13 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ### 17.3 サンプル JSON を正本とする運用規約
 
-本仕様において、Wire 層の正本はサンプル JSON とし、その運用について以下を定める。
+本仕様において、Raw 層の正本はサンプル JSON とし、その運用について以下を定める。
 
-1. サンプル JSON は、Wire 層仕様の正本であり、実装および Converter の正当性判断基準とする。
+1. サンプル JSON は、Raw 層仕様（鏡像）の正本であり、実装および Converter の正当性判断基準とする。
 
 2. サンプル JSON には、正常系のみならず、欠損フィールド、null 値、空配列、境界値、異常値等を含めるものとする。
 
-3. サンプル JSON の追加または変更は、Wire 層仕様の変更とみなし、対応する Converter および Mapper の検証を伴うものとする。
+3. サンプル JSON の追加または変更は、Raw 層仕様の変更とみなし、対応する Converter および Mapper の検証を伴うものとする。
 
 4. Converter がサンプル JSON を正しく処理できない場合、当該事象は仕様不整合または実装不備として扱うものとする。
 
@@ -685,7 +685,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 
 ## 18. 禁止事項（破壊防止ルール）
 
-* Wire/Normalized DTO を Contracts から返してはならない
+* Raw/Normalized DTO を Contracts から返してはならない
 * Contracts が取引所仕様を知ってはならない
 * Exchanges 同士が依存してはならない
 * Converter に意味判断を書いてはならない
@@ -697,7 +697,7 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 ## 19. 一文要約
 
 > **仕様は読む。意味は作る。**
-> **Wire/Normalize は仕様、Adapter 以降はドメイン。**
+> **Raw/Normalize は仕様、Adapter 以降はドメイン。**
 > **取引所横断の共通化は Interface / DTO / Type / Error の4種に限定する。**
 
 ---

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
-namespace ExchangeApi.Core.Extensions;
+namespace ExchangeApi.Domain.Extensions;
 
 /// <summary>OrderBook に対する共通ユーティリティ（両サイドを参照）。</summary>
 public static class OrderBookExtensions

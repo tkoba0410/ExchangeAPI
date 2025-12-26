@@ -12,7 +12,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Core.Services;
+using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
 using Xunit;
 

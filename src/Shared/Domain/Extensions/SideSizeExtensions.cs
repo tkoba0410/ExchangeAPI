@@ -1,7 +1,7 @@
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-namespace ExchangeApi.Core.Extensions;
+namespace ExchangeApi.Domain.Extensions;
 
 /// <summary>Side/Sizeを持つ型向けの符号付きサイズ計算。</summary>
 public static class SideSizeExtensions

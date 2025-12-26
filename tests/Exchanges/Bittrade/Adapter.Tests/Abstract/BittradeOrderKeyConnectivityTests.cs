@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Core.Services;
+using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
 using Xunit;
 

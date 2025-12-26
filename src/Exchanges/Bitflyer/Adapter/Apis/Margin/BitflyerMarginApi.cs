@@ -11,6 +11,7 @@ using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 
@@ -46,6 +47,10 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
                     amount: b.Amount,
                     available: b.Available))
                 .ToArray();
+        }
+        catch (TransportException ex)
+        {
+            throw BitflyerErrorMapper.FromTransportException(ex, _exchange, operation);
         }
         catch (ExchangeApiException ex)
         {
@@ -83,6 +88,10 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         {
             throw;
         }
+        catch (TransportException ex)
+        {
+            throw BitflyerErrorMapper.FromTransportException(ex, _exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
@@ -114,6 +123,10 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         {
             throw;
         }
+        catch (TransportException ex)
+        {
+            throw BitflyerErrorMapper.FromTransportException(ex, _exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
@@ -139,6 +152,10 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
                 .ConfigureAwait(false);
 
             return BitflyerMarginMapper.MapCollateral(raw);
+        }
+        catch (TransportException ex)
+        {
+            throw BitflyerErrorMapper.FromTransportException(ex, _exchange, operation);
         }
         catch (ExchangeApiException ex)
         {

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Clients.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Contracts.Interfaces;

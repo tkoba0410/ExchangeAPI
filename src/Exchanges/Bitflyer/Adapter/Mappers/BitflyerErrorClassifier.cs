@@ -1,5 +1,4 @@
 using System.Net;
-using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
@@ -9,8 +8,8 @@ internal sealed class BitflyerErrorClassifier : IExchangeErrorClassifier
 
     private BitflyerErrorClassifier() { }
 
-    public ExchangeErrorCategory? Classify(HttpStatusCode? statusCode, string? exchangeErrorCode)
+    public TransportErrorCategory? Classify(HttpStatusCode? statusCode, string? exchangeErrorCode)
     {
-        return BitflyerErrorMapper.MapErrorCategory(statusCode, exchangeErrorCode);
+        return BitflyerErrorMapper.MapTransportErrorCategory(statusCode, exchangeErrorCode);
     }
 }

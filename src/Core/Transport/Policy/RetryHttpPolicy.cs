@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Core.Transport.Policy;
 
 /// <summary>
@@ -93,9 +93,9 @@ public sealed class RetryHttpPolicy : IHttpPolicy
         {
             HttpRequestException => true,
             TaskCanceledException => true,
-            ExchangeApiException apiEx => apiEx.ErrorCategory is ExchangeErrorCategory.RateLimit
-                or ExchangeErrorCategory.Network
-                or ExchangeErrorCategory.Server,
+            TransportException apiEx => apiEx.ErrorCategory is TransportErrorCategory.RateLimit
+                or TransportErrorCategory.Network
+                or TransportErrorCategory.Server,
             _ => false
         };
     }

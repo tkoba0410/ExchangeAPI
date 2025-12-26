@@ -1,4 +1,3 @@
-using ExchangeApi.Common.Clients.Internal;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Contracts.Errors;
 

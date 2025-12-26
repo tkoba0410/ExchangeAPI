@@ -3,8 +3,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Core.Transport.Protocol;
 using Xunit;
 
 namespace ExchangeApi.Core.Transport.Tests.Policy;
@@ -70,13 +70,13 @@ public class HttpPolicyTests
         var request = new HttpRequestMessage(HttpMethod.Get, "https://example.com");
         var attempts = 0;
 
-        await Assert.ThrowsAsync<ExchangeApiException>(() =>
+        await Assert.ThrowsAsync<TransportException>(() =>
             policy.ExecuteAsync(
                 request,
                 _ =>
                 {
                     attempts++;
-                    throw new ExchangeApiException("bad request", errorCategory: ExchangeErrorCategory.Request);
+                    throw new TransportException("bad request", errorCategory: TransportErrorCategory.Request);
                 }));
 
         Assert.Equal(1, attempts); // no retry on Request category
@@ -89,7 +89,7 @@ public class HttpPolicyTests
                 attempts++;
                 if (attempts == 1)
                 {
-                    throw new ExchangeApiException("rate limit", errorCategory: ExchangeErrorCategory.RateLimit);
+                    throw new TransportException("rate limit", errorCategory: TransportErrorCategory.RateLimit);
                 }
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
             });

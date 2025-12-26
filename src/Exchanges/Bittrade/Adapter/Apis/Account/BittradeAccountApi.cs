@@ -48,6 +48,10 @@ internal sealed class BittradeAccountApi : IAccountApi
 
             return BittradeMapper.MapBalances(resp.Data);
         }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);

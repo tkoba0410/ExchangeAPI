@@ -38,6 +38,10 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
                 "v1/common/timestamp",
                 cancellationToken: cancellationToken).ConfigureAwait(false);
         }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
@@ -75,6 +79,10 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         {
             throw;
         }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
@@ -107,6 +115,10 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         catch (SymbolNotSupportedException)
         {
             throw;
+        }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
         }
         catch (ExchangeApiException ex)
         {
@@ -148,6 +160,10 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         catch (SymbolNotSupportedException)
         {
             throw;
+        }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
         }
         catch (ExchangeApiException ex)
         {

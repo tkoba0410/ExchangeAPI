@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Core.Transport.Policy;
 
 /// <summary>
@@ -117,12 +117,12 @@ public sealed class CircuitBreakerHttpPolicy : IHttpPolicy
     private static bool IsFailureException(Exception exception, CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested) return false;
-        if (exception is ExchangeApiException apiEx)
+        if (exception is TransportException apiEx)
         {
-            return apiEx.ErrorCategory is ExchangeErrorCategory.RateLimit
-                or ExchangeErrorCategory.Network
-                or ExchangeErrorCategory.Server
-                or ExchangeErrorCategory.Unknown;
+            return apiEx.ErrorCategory is TransportErrorCategory.RateLimit
+                or TransportErrorCategory.Network
+                or TransportErrorCategory.Server
+                or TransportErrorCategory.Unknown;
         }
 
         return exception is HttpRequestException or TaskCanceledException;

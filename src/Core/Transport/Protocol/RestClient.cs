@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Http;
@@ -100,19 +99,17 @@ namespace ExchangeApi.Core.Transport.Protocol
                 _logger.LogResponse(response, content);
                 _observer.OnResponse(context, response, content, DateTimeOffset.UtcNow - startedAt);
 
-                // ★ HTTP ステータス異常 → ExchangeApiException（E1）
+                // ★ HTTP ステータス異常 → TransportException
                 if (!response.IsSuccessStatusCode)
                 {
                     var payload = _errorPayloadParser.Parse(content);
                     var errorCode = payload.ErrorCode;
                     var category = _errorClassifier?.Classify(response.StatusCode, errorCode);
 
-                    var exception = new ExchangeApiException(
+                    var exception = new TransportException(
                         $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Error: {payload.ErrorMessage ?? content}",
-                        exchange: null,
-                        operation: null,
                         statusCode: response.StatusCode,
-                        exchangeErrorCode: errorCode,
+                        errorCode: errorCode,
                         errorCategory: category);
                     _observer.OnError(context, exception, DateTimeOffset.UtcNow - startedAt, response.StatusCode);
                     throw exception;
@@ -124,10 +121,10 @@ namespace ExchangeApi.Core.Transport.Protocol
 
                     if (result is null)
                     {
-                        var parseEx = new ExchangeApiException(
+                        var parseEx = new TransportException(
                             $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
                         _observer.OnError(context, parseEx, DateTimeOffset.UtcNow - startedAt);
-                        throw new ExchangeApiException(
+                        throw new TransportException(
                             $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
                     }
 
@@ -135,15 +132,15 @@ namespace ExchangeApi.Core.Transport.Protocol
                 }
                 catch (JsonException ex)
                 {
-                    // ★ JSON パース失敗 → ExchangeApiException
-                    var wrapped = new ExchangeApiException(
+                    // ★ JSON パース失敗 → TransportException
+                    var wrapped = new TransportException(
                         "Failed to deserialize JSON response.",
                         innerException: ex);
                     _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt);
                     throw wrapped;
                 }
             }
-            catch (ExchangeApiException ex)
+            catch (TransportException ex)
             {
                 // すでにラップ済みのものはそのまま上に投げる
                 _observer.OnError(context, ex, DateTimeOffset.UtcNow - startedAt, ex.StatusCode);
@@ -151,9 +148,9 @@ namespace ExchangeApi.Core.Transport.Protocol
             }
             catch (HttpRequestException ex)
             {
-                // 通信エラー → ExchangeApiException に詳細を引き継ぐ
-                var category = _errorClassifier?.Classify(ex.StatusCode, null) ?? ExchangeErrorCategory.Network;
-                var wrapped = new ExchangeApiException(
+                // 通信エラー → TransportException に詳細を引き継ぐ
+                var category = _errorClassifier?.Classify(ex.StatusCode, null) ?? TransportErrorCategory.Network;
+                var wrapped = new TransportException(
                     $"HTTP request failed for '{requestUri}'.",
                     statusCode: ex.StatusCode,
                     errorCategory: category,
@@ -165,9 +162,9 @@ namespace ExchangeApi.Core.Transport.Protocol
 
             catch (TaskCanceledException ex)
             {
-                // ★ タイムアウト or キャンセル → ExchangeApiException
-                var category = _errorClassifier?.Classify(null, null) ?? ExchangeErrorCategory.Network;
-                var wrapped = new ExchangeApiException(
+                // ★ タイムアウト or キャンセル → TransportException
+                var category = _errorClassifier?.Classify(null, null) ?? TransportErrorCategory.Network;
+                var wrapped = new TransportException(
                     "HTTP request timed out or was canceled.",
                     errorCategory: category,
                     innerException: ex);
@@ -234,12 +231,10 @@ namespace ExchangeApi.Core.Transport.Protocol
                     var errorCode = payload.ErrorCode;
                     var category = _errorClassifier?.Classify(response.StatusCode, errorCode);
 
-                    var exception = new ExchangeApiException(
+                    var exception = new TransportException(
                         $"Request to '{requestUri}' failed with status {(int)response.StatusCode} ({response.StatusCode}). Error: {payload.ErrorMessage ?? content}",
-                        exchange: null,
-                        operation: null,
                         statusCode: response.StatusCode,
-                        exchangeErrorCode: errorCode,
+                        errorCode: errorCode,
                         errorCategory: category);
                     _observer.OnError(context, exception, DateTimeOffset.UtcNow - startedAt, response.StatusCode);
                     throw exception;
@@ -250,10 +245,10 @@ namespace ExchangeApi.Core.Transport.Protocol
                     var result = JsonSerializer.Deserialize<TResponse>(content, _serializerOptions);
                     if (result is null)
                     {
-                        var parseEx = new ExchangeApiException(
+                        var parseEx = new TransportException(
                             $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
                         _observer.OnError(context, parseEx, DateTimeOffset.UtcNow - startedAt);
-                        throw new ExchangeApiException(
+                        throw new TransportException(
                             $"Failed to deserialize response from '{requestUri}' as {typeof(TResponse).Name}.");
                     }
 
@@ -261,22 +256,22 @@ namespace ExchangeApi.Core.Transport.Protocol
                 }
                 catch (JsonException ex)
                 {
-                    var wrapped = new ExchangeApiException(
+                    var wrapped = new TransportException(
                         "Failed to deserialize JSON response.",
                         innerException: ex);
                     _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt);
                     throw wrapped;
                 }
             }
-            catch (ExchangeApiException ex)
+            catch (TransportException ex)
             {
                 _observer.OnError(context, ex, DateTimeOffset.UtcNow - startedAt, ex.StatusCode);
                 throw;
             }
             catch (HttpRequestException ex)
             {
-                var category = _errorClassifier?.Classify(ex.StatusCode, null) ?? ExchangeErrorCategory.Network;
-                var wrapped = new ExchangeApiException(
+                var category = _errorClassifier?.Classify(ex.StatusCode, null) ?? TransportErrorCategory.Network;
+                var wrapped = new TransportException(
                     $"HTTP request failed for '{requestUri}'.",
                     statusCode: ex.StatusCode,
                     errorCategory: category,
@@ -287,8 +282,8 @@ namespace ExchangeApi.Core.Transport.Protocol
             }
             catch (TaskCanceledException ex)
             {
-                var category = _errorClassifier?.Classify(null, null) ?? ExchangeErrorCategory.Network;
-                var wrapped = new ExchangeApiException(
+                var category = _errorClassifier?.Classify(null, null) ?? TransportErrorCategory.Network;
+                var wrapped = new TransportException(
                     "HTTP request timed out or was canceled.",
                     errorCategory: category,
                     innerException: ex);

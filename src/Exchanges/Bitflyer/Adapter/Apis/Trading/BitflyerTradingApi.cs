@@ -12,6 +12,7 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
@@ -94,6 +95,10 @@ internal sealed class BitflyerTradingApi : ITradingApi
         {
             throw;
         }
+        catch (TransportException ex)
+        {
+            throw BitflyerErrorMapper.FromTransportException(ex, _exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
@@ -162,6 +167,10 @@ internal sealed class BitflyerTradingApi : ITradingApi
         catch (SymbolNotSupportedException)
         {
             throw;
+        }
+        catch (TransportException ex)
+        {
+            throw BitflyerErrorMapper.FromTransportException(ex, _exchange, operation);
         }
         catch (ExchangeApiException ex)
         {
@@ -232,6 +241,10 @@ internal sealed class BitflyerTradingApi : ITradingApi
         {
             throw;
         }
+        catch (TransportException ex)
+        {
+            throw BitflyerErrorMapper.FromTransportException(ex, _exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BitflyerErrorMapper.EnrichBitflyerException(ex, _exchange, operation);
@@ -301,6 +314,10 @@ internal sealed class BitflyerTradingApi : ITradingApi
         catch (SymbolNotSupportedException)
         {
             throw;
+        }
+        catch (TransportException ex)
+        {
+            throw BitflyerErrorMapper.FromTransportException(ex, _exchange, operation);
         }
         catch (ExchangeApiException ex)
         {

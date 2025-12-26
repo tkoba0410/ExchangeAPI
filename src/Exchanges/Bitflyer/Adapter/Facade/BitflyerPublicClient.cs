@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Clients.Internal;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;

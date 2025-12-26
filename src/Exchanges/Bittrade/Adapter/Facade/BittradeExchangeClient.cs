@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Clients.Internal;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;

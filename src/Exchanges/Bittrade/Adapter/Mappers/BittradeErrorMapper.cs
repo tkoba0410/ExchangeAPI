@@ -1,5 +1,6 @@
-using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
@@ -19,6 +20,11 @@ internal static class BittradeErrorMapper
         };
     }
 
+    public static TransportErrorCategory? MapTransportErrorCategory(System.Net.HttpStatusCode? statusCode, string? exchangeCode)
+    {
+        return ToTransportErrorCategory(MapErrorCategory(statusCode, exchangeCode));
+    }
+
     public static ExchangeApiException EnrichBittradeException(ExchangeApiException ex, ExchangeCode exchange, string operation)
     {
         if (ex.Exchange == exchange && ex.Operation == operation)
@@ -36,5 +42,49 @@ internal static class BittradeErrorMapper
             exchangeErrorCode: ex.ExchangeErrorCode,
             errorCategory: category,
             innerException: ex);
+    }
+
+    public static ExchangeApiException FromTransportException(TransportException ex, ExchangeCode exchange, string operation)
+    {
+        var category = ToExchangeErrorCategory(ex.ErrorCategory) ?? MapErrorCategory(ex.StatusCode, ex.ErrorCode);
+
+        return new ExchangeApiException(
+            message: ex.Message,
+            exchange: exchange,
+            operation: operation,
+            statusCode: ex.StatusCode,
+            exchangeErrorCode: ex.ErrorCode,
+            errorCategory: category,
+            innerException: ex);
+    }
+
+    private static TransportErrorCategory? ToTransportErrorCategory(ExchangeErrorCategory? category)
+    {
+        return category switch
+        {
+            null => null,
+            ExchangeErrorCategory.Request => TransportErrorCategory.Request,
+            ExchangeErrorCategory.Auth => TransportErrorCategory.Auth,
+            ExchangeErrorCategory.Balance => TransportErrorCategory.Balance,
+            ExchangeErrorCategory.RateLimit => TransportErrorCategory.RateLimit,
+            ExchangeErrorCategory.Network => TransportErrorCategory.Network,
+            ExchangeErrorCategory.Server => TransportErrorCategory.Server,
+            _ => TransportErrorCategory.Unknown,
+        };
+    }
+
+    private static ExchangeErrorCategory? ToExchangeErrorCategory(TransportErrorCategory? category)
+    {
+        return category switch
+        {
+            null => null,
+            TransportErrorCategory.Request => ExchangeErrorCategory.Request,
+            TransportErrorCategory.Auth => ExchangeErrorCategory.Auth,
+            TransportErrorCategory.Balance => ExchangeErrorCategory.Balance,
+            TransportErrorCategory.RateLimit => ExchangeErrorCategory.RateLimit,
+            TransportErrorCategory.Network => ExchangeErrorCategory.Network,
+            TransportErrorCategory.Server => ExchangeErrorCategory.Server,
+            _ => ExchangeErrorCategory.Unknown,
+        };
     }
 }

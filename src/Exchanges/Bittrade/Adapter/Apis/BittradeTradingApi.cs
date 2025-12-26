@@ -8,6 +8,7 @@ using ExchangeApi.Common.Types;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Models;
@@ -64,6 +65,10 @@ internal sealed class BittradeTradingApi : ITradingApi
         {
             throw;
         }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
@@ -89,6 +94,10 @@ internal sealed class BittradeTradingApi : ITradingApi
 
             return new CancelResult(true);
         }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
@@ -107,6 +116,10 @@ internal sealed class BittradeTradingApi : ITradingApi
         catch (SymbolNotSupportedException)
         {
             throw;
+        }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
         }
         catch (ExchangeApiException ex)
         {
@@ -143,6 +156,10 @@ internal sealed class BittradeTradingApi : ITradingApi
         catch (SymbolNotSupportedException)
         {
             throw;
+        }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
         }
         catch (ExchangeApiException ex)
         {

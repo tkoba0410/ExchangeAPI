@@ -38,6 +38,10 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
                 "v1/common/symbols",
                 cancellationToken: cancellationToken).ConfigureAwait(false);
         }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
@@ -61,6 +65,10 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
 
             var markets = response.Data.Select(MapSymbol).ToList();
             return new ExchangeInfoDto(markets, Features: null, RateLimits: null, Maintenance: null);
+        }
+        catch (TransportException ex)
+        {
+            throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
         }
         catch (ExchangeApiException ex)
         {

@@ -6,5 +6,5 @@ namespace ExchangeApi.Core.Transport.Protocol;
 /// </summary>
 public interface IExchangeErrorClassifier
 {
-    ExchangeApi.Core.Contracts.Errors.ExchangeErrorCategory? Classify(HttpStatusCode? statusCode, string? exchangeErrorCode);
+    TransportErrorCategory? Classify(HttpStatusCode? statusCode, string? exchangeErrorCode);
 }

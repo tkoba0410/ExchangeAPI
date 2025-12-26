@@ -14,7 +14,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Services;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;

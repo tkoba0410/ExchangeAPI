@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Public
 {
     /// <summary>
     /// bitFlyer Public REST API への Wire アクセスインターフェース。

@@ -4,9 +4,9 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
-using RawBoard = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Board;
-using RawExecutionPublicResponse = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.ExecutionPublicResponse;
-using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet.Ticker;
+using RawBoard = ExchangeApi.Exchanges.Bitflyer.Wire.Public.Board;
+using RawExecutionPublicResponse = ExchangeApi.Exchanges.Bitflyer.Wire.Public.ExecutionPublicResponse;
+using RawTicker = ExchangeApi.Exchanges.Bitflyer.Wire.Public.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class MarketMapper

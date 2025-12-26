@@ -8,7 +8,7 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using ExchangeApi.Core.Services;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;

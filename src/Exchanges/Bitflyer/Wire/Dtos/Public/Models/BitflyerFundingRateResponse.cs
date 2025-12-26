@@ -1,6 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 
 /// <summary>
 /// ファンディングレート (/v1/getfundingrate) のレスポンス DTO。

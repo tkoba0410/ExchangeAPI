@@ -16,6 +16,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Private;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
@@ -56,7 +57,7 @@ public static class BitflyerClientFactory
             errorClassifier: errorClassifier);
 
         var raw = new Raw.BitflyerRawApi(restClient);
-        var publicApi = new Raw.PublicGet.BitflyerPublicApi(raw.MarketData);
+        var publicApi = new BitflyerPublicApi(raw.MarketData);
         var wire = new BitflyerWireApi(
             marketData: publicApi,
             trading: new BitflyerWireTradingApiNotSupported(),
@@ -133,7 +134,7 @@ public static class BitflyerClientFactory
             errorClassifier: errorClassifier);
 
         var raw = new Raw.BitflyerRawApi(restClient);
-        var publicApi = new Raw.PublicGet.BitflyerPublicApi(raw.MarketData);
+        var publicApi = new BitflyerPublicApi(raw.MarketData);
         var privateApi = new Raw.PrivateGet.BitflyerPrivateApi(restClient);
         var privateTradingApi = new Raw.PrivatePost.BitflyerPrivateTradingApi(restClient);
         var wireTrading = new Wire.Private.BitflyerWireTradingApi(raw.Trading, privateTradingApi);

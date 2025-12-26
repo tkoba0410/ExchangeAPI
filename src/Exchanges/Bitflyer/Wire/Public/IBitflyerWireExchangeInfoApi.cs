@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 
 public interface IBitflyerWireExchangeInfoApi
 {

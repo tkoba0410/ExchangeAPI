@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
-
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Converters;
 
 internal static class BitflyerWireMapper
 {

@@ -4,9 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Converters;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PublicGet;
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Public;
 
 /// <summary>
 /// bitFlyer 公開 REST API の Wire 実装。

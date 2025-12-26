@@ -5,7 +5,6 @@ using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
-using RawBoard = ExchangeApi.Exchanges.Bitflyer.Wire.Public.Board;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class MarketMapper
@@ -21,17 +20,17 @@ internal static class MarketMapper
             Timestamp: normalized.Timestamp);
     }
 
-    public static OrderBook MapOrderBook(RawBoard rawBoard)
+    public static OrderBook MapOrderBook(BitflyerOrderBookNormalized normalized)
     {
-        if (rawBoard is null) throw new ArgumentNullException(nameof(rawBoard));
+        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
-        var bids = rawBoard.Bids?
+        var bids = normalized.Bids
             .Select(b => new OrderBookLevel(new Price(b.Price), new Size(b.Size)))
-            .ToArray() ?? Array.Empty<OrderBookLevel>();
+            .ToArray();
 
-        var asks = rawBoard.Asks?
+        var asks = normalized.Asks
             .Select(a => new OrderBookLevel(new Price(a.Price), new Size(a.Size)))
-            .ToArray() ?? Array.Empty<OrderBookLevel>();
+            .ToArray();
 
         return new OrderBook(ExchangeCode.Bitflyer, bids, asks);
     }

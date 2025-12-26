@@ -70,7 +70,8 @@ internal sealed class MarketApi : IMarketDataApi
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var rawBoard = await _marketData.GetBoardRawAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return MarketMapper.MapOrderBook(rawBoard);
+            var normalized = BitflyerOrderBookNormalizer.Normalize(rawBoard);
+            return MarketMapper.MapOrderBook(normalized);
         }
         catch (SymbolNotSupportedException)
         {

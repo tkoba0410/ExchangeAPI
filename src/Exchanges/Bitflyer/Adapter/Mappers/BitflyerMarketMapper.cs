@@ -48,4 +48,21 @@ internal static class MarketMapper
             Size: new Size(normalized.Size),
             ExecutedAt: normalized.ExecutedAt);
     }
+
+    public static HealthResponse MapHealth(BitflyerHealthNormalized normalized)
+    {
+        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
+
+        return new HealthResponse(normalized.Status);
+    }
+
+    public static BoardStateResponse MapBoardState(BitflyerBoardStateNormalized normalized)
+    {
+        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
+
+        return new BoardStateResponse(
+            Health: normalized.Health,
+            State: normalized.State,
+            Data: normalized.Data);
+    }
 }

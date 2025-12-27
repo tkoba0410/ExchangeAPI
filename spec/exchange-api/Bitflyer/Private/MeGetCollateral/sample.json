@@ -1,0 +1,8 @@
+{
+  "collateral": 100000,
+  "open_position_pnl": -715,
+  "require_collateral": 19857,
+  "keep_rate": 5.000,
+  "margin_call_amount": 1000000,
+  "margin_call_due_date": "2021-09-01T08:00:00"
+}

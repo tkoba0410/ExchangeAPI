@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1000108,
+    "trade_date": "2016-10-19T14:44:55.28",
+    "event_date": "2016-10-19T05:44:55.28",
+    "product_code": "BTC_USD",
+    "currency_code": "USD",
+    "trade_type": "SELL",
+    "price": 9999.99,
+    "amount": 99.99,
+    "quantity": 99.99,
+    "commission": 0,
+    "balance": 9999999.99,
+    "order_id": "JORYYYYMMDD‌-000000-000001X"
+  },
+  {
+    "id": 1000107,
+    "trade_date": "2016-10-19T14:41:35.23",
+    "event_date": "2016-10-19T05:41:35.23",
+    "product_code": "BTC_USD",
+    "currency_code": "USD",
+    "trade_type": "SELL",
+    "price": 9999.99,
+    "amount": 999.99,
+    "quantity": 99.99,
+    "commission": 0,
+    "balance": 9999999.99,
+    "order_id": "JORYYYYMMDD‌-000000-000000X"
+  }
+]

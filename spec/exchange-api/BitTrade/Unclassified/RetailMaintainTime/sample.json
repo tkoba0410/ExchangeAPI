@@ -1,0 +1,11 @@
+{
+    "code": 200,
+    "data": {
+        "start_time": "16:30:00",
+        "end_time": "17:00:00",
+        "ts": 150004343554,
+        "state": 0
+    },
+    "message": null,
+    "success": true
+}

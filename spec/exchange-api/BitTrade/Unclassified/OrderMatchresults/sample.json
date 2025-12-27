@@ -1,0 +1,23 @@
+{
+  "data": [
+    {
+      "created-at": 1633018402536,
+      "fee-currency": "xrp",
+      "fee-deduct-currency": "",
+      "fee-deduct-state": "done",
+      "filled-amount": "0.1",
+      "filled-fees": "0.00015",
+      "filled-points": "0.0",
+      "id": 372969482257005,
+      "match-id": 100554712526,
+      "order-id": 375977348044411,
+      "price": "104.74",
+      "role": "taker",
+      "source": "spot-api",
+      "symbol": "xrpjpy",
+      "trade-id": 100026336962,
+      "type": "buy-limit"
+    }
+  ],
+  "status": "ok"
+}

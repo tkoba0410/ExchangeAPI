@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "account-id": 12698099,
+      "amount": "2.000000000000000000",
+      "client-order-id": "",
+      "created-at": 1633016858283,
+      "filled-amount": "0.0",
+      "filled-cash-amount": "0.0",
+      "filled-fees": "0.0",
+      "id": 375977156321165,
+      "price": "1.000000000000000000",
+      "source": "api",
+      "state": "submitted",
+      "symbol": "xrpjpy",
+      "type": "buy-limit"
+    }
+  ],
+  "status": "ok"
+}

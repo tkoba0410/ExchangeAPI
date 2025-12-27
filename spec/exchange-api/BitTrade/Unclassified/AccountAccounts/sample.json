@@ -1,0 +1,11 @@
+{
+  "status": "ok",
+  "data": [
+    {
+      "id": 100009,
+      "type": "spot",
+      "state": "working",
+      "user-id": 1000
+    }
+  ]
+}

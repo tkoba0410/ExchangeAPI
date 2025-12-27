@@ -1,0 +1,31 @@
+{
+    "code": 200,
+    "data": [
+        {
+            "amount": "1",
+            "base_currency": "BTC",
+            "cash_amount": "473113.85",
+            "gmt_traded": 1556078181000,
+            "id": 1234567951,
+            "order_type": 1,
+            "price": "473113.85",
+            "state": 3,
+            "symbol": "BTCJPY",
+            "symbol_name": "BTC/JPY"
+        },
+        {
+            "amount": "1100",
+            "base_currency": "BTC",
+            "cash_amount": "425967300",
+            "gmt_traded": 1555668195000,
+            "id": 1234567942,
+            "order_type": 2,
+            "price": "387243",
+            "state": 4,
+            "symbol": "BTCJPY",
+            "symbol_name": "BTC/JPY"
+        }
+    ],
+    "message": null,
+    "success": true
+}

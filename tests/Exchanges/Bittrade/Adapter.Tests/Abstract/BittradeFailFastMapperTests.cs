@@ -32,8 +32,8 @@ public sealed class BittradeFailFastMapperTests
     public void ToOrderStatus_UnknownState_Throws()
     {
         var wire = new BittradeWireOrder(
-            OrderId: "1",
-            Symbol: "btcjpy",
+            RawOrderId: "1",
+            RawSymbol: "btcjpy",
             Side: "buy",
             Type: "buy-limit",
             State: "mystery",
@@ -49,8 +49,8 @@ public sealed class BittradeFailFastMapperTests
 
     private static BittradeWireOpenOrder CreateOpenOrder(string side, string type) =>
         new(
-            OrderId: "1",
-            Symbol: "btcjpy",
+            RawOrderId: "1",
+            RawSymbol: "btcjpy",
             Side: side,
             Type: type,
             State: "submitted",

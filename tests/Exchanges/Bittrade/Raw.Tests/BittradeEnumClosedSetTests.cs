@@ -27,7 +27,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var detail = JsonSerializer.Deserialize<OrderDetail>(json);
+        var detail = JsonSerializer.Deserialize<RawOrderDetail>(json);
 
         Assert.NotNull(detail);
         Assert.Equal(OrderState.Submitted, detail!.State);
@@ -55,7 +55,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<OrderDetail>(json));
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<RawOrderDetail>(json));
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<OrderDetail>(json));
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<RawOrderDetail>(json));
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<CreateRetailOrderRequest>(json));
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<RawCreateRetailOrderRequest>(json));
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var request = JsonSerializer.Deserialize<CancelOpenOrdersRequest>(json);
+        var request = JsonSerializer.Deserialize<RawCancelOpenOrdersRequest>(json);
 
         Assert.NotNull(request);
         Assert.Equal(OrderSide.Buy, request!.Side);

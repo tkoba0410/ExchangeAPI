@@ -10,10 +10,8 @@ using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Wire;
-using ExchangeApi.Exchanges.Bittrade.Wire.Public;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
@@ -41,19 +39,16 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
 
-        var exchangeInfo = new BittradeExchangeInfoApi(restClient);
+        var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient);
+        var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        _marketApi = new BittradeMarketDataApi(restClient, markets);
+        _marketApi = new BittradeMarketDataApi(normalizeBundle.MarketData, markets);
         _exchangeInfoApi = exchangeInfo;
         _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bittrade);
         _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
         _restClient = restClient;
-        var raw = new BittradeRawApi(_restClient);
-        _rawBundle = raw;
-        _wireBundle = new BittradeWireApi(
-            new BittradeWireMarketDataApi(raw.MarketData),
-            new BittradeWireTradingApiNotSupported(),
-            new BittradeWireCommonApi(raw));
+        _rawBundle = normalizeBundle.RawBundle;
+        _wireBundle = normalizeBundle.WireBundle;
     }
 
     public BittradePublicClient(IMarketDataApi marketApi, IExchangeInfoApi exchangeInfoApi)
@@ -67,7 +62,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     internal BittradePublicClient(BittradeApiBundle bundle)
     {
         if (bundle is null) throw new ArgumentNullException(nameof(bundle));
-        _marketApi = new BittradeMarketDataApi(bundle.RestClient, bundle.Markets);
+        _marketApi = new BittradeMarketDataApi(bundle.NormalizedMarketData, bundle.Markets);
         _exchangeInfoApi = bundle.ExchangeInfo;
         _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bittrade);
         _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
@@ -75,28 +70,6 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         _rawBundle = bundle.RawBundle;
         _wireBundle = bundle.WireBundle;
         ApiBundle = bundle;
-    }
-
-    [Obsolete("Use Wire.Common via IHasWireAccess for raw endpoints. This API will be removed in a future major release.")]
-    public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
-    {
-        if (!TryGetWire<BittradeWireApi>(out var wire))
-        {
-            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Timestamp");
-        }
-
-        return wire.Common.GetTimestampAsync(cancellationToken);
-    }
-
-    [Obsolete("Use Wire.Common via IHasWireAccess for raw endpoints. This API will be removed in a future major release.")]
-    public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
-    {
-        if (!TryGetWire<BittradeWireApi>(out var wire))
-        {
-            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Symbols");
-        }
-
-        return wire.Common.GetSymbolsAsync(cancellationToken);
     }
 
     public Task<Ticker> GetTickerAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>

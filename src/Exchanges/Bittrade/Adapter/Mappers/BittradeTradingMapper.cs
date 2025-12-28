@@ -25,7 +25,7 @@ internal static class BittradeTradingMapper
         var size = request.Size.Value;
 
         return new BittradeWireCreateOrderRequest(
-            Symbol: apiSymbol,
+            RawSymbol: apiSymbol,
             Side: side,
             Type: type,
             Price: price,
@@ -34,8 +34,8 @@ internal static class BittradeTradingMapper
 
     public static OrderResult ToOrderResult(BittradeWireOrder wire)
     {
-        var key = new OrderKey(OrderIdKind.ExchangeOrderId, wire.OrderId);
-        return new OrderResult(key, ExchangeOrderId: wire.OrderId);
+        var key = new OrderKey(OrderIdKind.ExchangeOrderId, wire.RawOrderId);
+        return new OrderResult(key, ExchangeOrderId: wire.RawOrderId);
     }
 
     public static OpenOrder ToOpenOrder(Symbol symbol, BittradeWireOpenOrder wire)
@@ -50,7 +50,7 @@ internal static class BittradeTradingMapper
         return new OpenOrder(
             ExchangeCode: Exchange,
             Symbol: symbol,
-            Key: new OrderKey(OrderIdKind.ExchangeOrderId, wire.OrderId),
+            Key: new OrderKey(OrderIdKind.ExchangeOrderId, wire.RawOrderId),
             Side: side,
             OrderType: type,
             Size: size,
@@ -61,7 +61,7 @@ internal static class BittradeTradingMapper
             UpdatedAt: null,
             StopPrice: null,
             Status: wire.State,
-            ExchangeOrderId: wire.OrderId);
+            ExchangeOrderId: wire.RawOrderId);
     }
 
     public static OrderStatus ToOrderStatus(string productCode, BittradeWireOrder wire, OrderKey key)

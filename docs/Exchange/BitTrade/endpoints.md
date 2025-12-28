@@ -42,7 +42,10 @@ Source URL:
 | bittrade:GET:/v1/order/matchresults | GET | /v1/order/matchresults | unclassified | official | https://api-doc.bittrade.co.jp/ (約定履歴の検索) | scope_unknown,needs_verification |
 | bittrade:POST:/v1/dw/withdraw/api/create | POST | /v1/dw/withdraw/api/create | private | official | https://api-doc.bittrade.co.jp/ (暗号資産の出金申請) |  |
 | bittrade:POST:/v1/dw/withdraw-virtual/{withdraw-id}/cancel | POST | /v1/dw/withdraw-virtual/{withdraw-id}/cancel | private | official | https://api-doc.bittrade.co.jp/ (暗号資産の出金のキャンセル) |  |
-| bittrade:GET:/v1/query/deposit-withdraw?currency=xrp&type=deposit&from=5&size=12 | GET | /v1/query/deposit-withdraw?currency=xrp&type=deposit&from=5&size=12 | private | official | https://api-doc.bittrade.co.jp/ (入出金記録) |  |
+| bittrade:GET:/v1/query/deposit-withdraw | GET | /v1/query/deposit-withdraw | private | official | https://api-doc.bittrade.co.jp/ (入出金記録) |  |
 | bittrade:POST:/v1/retail/order/place | POST | /v1/retail/order/place | private | official | https://api-doc.bittrade.co.jp/ (販売所での注文) |  |
 | bittrade:GET:/v1/retail/order/list | GET | /v1/retail/order/list | unclassified | official | https://api-doc.bittrade.co.jp/ (販売所注文履歴) | scope_unknown,needs_verification |
 | bittrade:GET:/v1/retail/maintain/time | GET | /v1/retail/maintain/time | unclassified | official | https://api-doc.bittrade.co.jp/ (販売所メンテナンス時間) | scope_unknown,needs_verification |
+
+Notes:
+- /v1/query/deposit-withdraw Query: currency=xrp&type=deposit&from=5&size=12

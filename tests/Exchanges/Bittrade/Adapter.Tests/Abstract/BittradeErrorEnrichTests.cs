@@ -6,8 +6,9 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -17,8 +18,7 @@ public sealed class BittradeErrorEnrichTests
     [Fact]
     public async Task GetTickerAsync_EnrichesExchangeAndOperation()
     {
-        var rest = new ThrowingRestClient();
-        var api = new BittradeMarketDataApi(rest, CreateResolver());
+        var api = new BittradeMarketDataApi(new ThrowingMarketDataApi(), CreateResolver());
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
             api.GetTickerAsync(new Symbol("BTC/JPY"), CancellationToken.None));
@@ -27,23 +27,16 @@ public sealed class BittradeErrorEnrichTests
         Assert.Equal("Bittrade.Market.GetTicker", ex.Operation);
     }
 
-    private sealed class ThrowingRestClient : IRestClient
+    private sealed class ThrowingMarketDataApi : IBittradeNormalizedMarketDataApi
     {
-        public Task<TResponse> GetAsync<TResponse>(
-            string path,
-            IReadOnlyDictionary<string, string?>? query = null,
-            CancellationToken cancellationToken = default)
-        {
+        public Task<BittradeTickerNormalized> GetTickerAsync(string symbol, CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
-        }
 
-        public Task<TResponse> PostAsync<TRequest, TResponse>(
-            string path,
-            TRequest body,
-            CancellationToken cancellationToken = default)
-        {
+        public Task<BittradeOrderBookNormalized> GetOrderBookAsync(string symbol, CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
-        }
+
+        public Task<IReadOnlyList<BittradeExecutionNormalized>> GetExecutionsAsync(string symbol, CancellationToken ct = default) =>
+            throw new ExchangeApiException("boom");
     }
 
     private static IExchangeMarketResolver CreateResolver() =>

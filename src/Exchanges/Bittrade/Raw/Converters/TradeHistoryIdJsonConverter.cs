@@ -4,11 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-internal sealed class TradeHistoryIdJsonConverter : JsonConverter<TradeHistoryId>
+internal sealed class TradeHistoryIdJsonConverter : JsonConverter<RawTradeHistoryId>
 {
-    public override TradeHistoryId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override RawTradeHistoryId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => new(IdJsonConverterHelpers.ReadStringOrNumber(ref reader));
 
-    public override void Write(Utf8JsonWriter writer, TradeHistoryId value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, RawTradeHistoryId value, JsonSerializerOptions options)
         => writer.WriteStringValue(value.Value);
 }

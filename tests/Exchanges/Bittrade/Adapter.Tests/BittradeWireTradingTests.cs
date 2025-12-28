@@ -20,7 +20,7 @@ public sealed class BittradeWireTradingTests
     {
         var raw = new FakeRawTradingApi
         {
-            PlaceOrderResponse = new PlaceOrderResponse("error", new OrderId("1"))
+            PlaceOrderResponse = new RawPlaceOrderResponse("error", new RawOrderId("1"))
         };
 
         var api = new BittradeWireTradingApi(raw, "account-id");
@@ -38,9 +38,9 @@ public sealed class BittradeWireTradingTests
     [Fact]
     public void GetOpenOrders_ParseError_IncludesFieldAndValue()
     {
-        var order = new OrderSummary(
-            Id: new OrderId("1"),
-            Symbol: Symbol.From("btcjpy"),
+        var order = new RawOrderSummary(
+            Id: new RawOrderId("1"),
+            RawSymbol: RawSymbol.From("btcjpy"),
             AccountId: "account-id",
             Amount: "bad",
             Price: "1",
@@ -52,7 +52,7 @@ public sealed class BittradeWireTradingTests
 
         var raw = new FakeRawTradingApi
         {
-            OpenOrdersResponse = new OpenOrdersResponse("ok", new[] { order })
+            OpenOrdersResponse = new RawOpenOrdersResponse("ok", new[] { order })
         };
 
         var api = new BittradeWireTradingApi(raw, "account-id");
@@ -70,28 +70,28 @@ public sealed class BittradeWireTradingTests
 
     private sealed class FakeRawTradingApi : IBittradeRawTradingApi
     {
-        public PlaceOrderResponse PlaceOrderResponse { get; init; } =
-            new("ok", new OrderId("1"));
+        public RawPlaceOrderResponse PlaceOrderResponse { get; init; } =
+            new("ok", new RawOrderId("1"));
 
-        public CancelOrderResponse CancelOrderResponse { get; init; } =
-            new("ok", new OrderId("1"));
+        public RawCancelOrderResponse CancelOrderResponse { get; init; } =
+            new("ok", new RawOrderId("1"));
 
-        public OpenOrdersResponse OpenOrdersResponse { get; init; } =
-            new("ok", Array.Empty<OrderSummary>());
+        public RawOpenOrdersResponse OpenOrdersResponse { get; init; } =
+            new("ok", Array.Empty<RawOrderSummary>());
 
-        public OrderDetailResponse OrderDetailResponse { get; init; } =
+        public RawOrderDetailResponse OrderDetailResponse { get; init; } =
             new("ok", null);
 
-        public Task<PlaceOrderResponse> CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken = default) =>
+        public Task<RawPlaceOrderResponse> CreateOrderAsync(RawCreateOrderRequest request, CancellationToken cancellationToken = default) =>
             Task.FromResult(PlaceOrderResponse);
 
-        public Task<CancelOrderResponse> CancelOrderAsync(OrderId orderId, CancellationToken cancellationToken = default) =>
+        public Task<RawCancelOrderResponse> CancelOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default) =>
             Task.FromResult(CancelOrderResponse);
 
-        public Task<OpenOrdersResponse> GetOpenOrdersAsync(Symbol symbol, string accountId, CancellationToken cancellationToken = default) =>
+        public Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default) =>
             Task.FromResult(OpenOrdersResponse);
 
-        public Task<OrderDetailResponse> GetOrderAsync(OrderId orderId, CancellationToken cancellationToken = default) =>
+        public Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default) =>
             Task.FromResult(OrderDetailResponse);
     }
 }

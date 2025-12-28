@@ -16,77 +16,77 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<PlaceOrderResponse> CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken = default)
+    public Task<RawPlaceOrderResponse> CreateOrderAsync(RawCreateOrderRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<CreateOrderRequest, PlaceOrderResponse>(
+        return _restClient.PostAsync<RawCreateOrderRequest, RawPlaceOrderResponse>(
             "v1/order/orders/place",
             request,
             cancellationToken);
     }
 
-    public Task<CancelOrderResponse> CancelOrderAsync(OrderId orderId, CancellationToken cancellationToken = default)
+    public Task<RawCancelOrderResponse> CancelOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(orderId.Value))
         {
             throw new ArgumentException("orderId is required.", nameof(orderId));
         }
 
-        return _restClient.PostAsync<object?, CancelOrderResponse>(
+        return _restClient.PostAsync<object?, RawCancelOrderResponse>(
             $"v1/order/orders/{orderId.Value}/submitcancel",
             body: null,
             cancellationToken: cancellationToken);
     }
 
-    public Task<CancelOrdersResponse> CancelOrdersAsync(CancelOrdersRequest request, CancellationToken cancellationToken = default)
+    public Task<RawCancelOrdersResponse> CancelOrdersAsync(RawCancelOrdersRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<CancelOrdersRequest, CancelOrdersResponse>(
+        return _restClient.PostAsync<RawCancelOrdersRequest, RawCancelOrdersResponse>(
             "v1/order/orders/batchcancel",
             request,
             cancellationToken);
     }
 
-    public Task<CancelOpenOrdersResponse> CancelOpenOrdersAsync(CancelOpenOrdersRequest request, CancellationToken cancellationToken = default)
+    public Task<RawCancelOpenOrdersResponse> CancelOpenOrdersAsync(RawCancelOpenOrdersRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<CancelOpenOrdersRequest, CancelOpenOrdersResponse>(
+        return _restClient.PostAsync<RawCancelOpenOrdersRequest, RawCancelOpenOrdersResponse>(
             "v1/order/orders/batchCancelOpenOrders",
             request,
             cancellationToken);
     }
 
-    public Task<CreateWithdrawResponse> CreateWithdrawAsync(CreateWithdrawRequest request, CancellationToken cancellationToken = default)
+    public Task<RawCreateWithdrawResponse> CreateWithdrawAsync(RawCreateWithdrawRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<CreateWithdrawRequest, CreateWithdrawResponse>(
+        return _restClient.PostAsync<RawCreateWithdrawRequest, RawCreateWithdrawResponse>(
             "v1/dw/withdraw/api/create",
             request,
             cancellationToken);
     }
 
-    public Task<CancelWithdrawResponse> CancelWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
+    public Task<RawCancelWithdrawResponse> CancelWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(withdrawId))
         {
             throw new ArgumentException("withdrawId is required.", nameof(withdrawId));
         }
 
-        return _restClient.PostAsync<object?, CancelWithdrawResponse>(
+        return _restClient.PostAsync<object?, RawCancelWithdrawResponse>(
             $"v1/dw/withdraw-virtual/{withdrawId}/cancel",
             body: null,
             cancellationToken: cancellationToken);
     }
 
-    public Task<RetailOrderResponse> CreateRetailOrderAsync(CreateRetailOrderRequest request, CancellationToken cancellationToken = default)
+    public Task<RawRetailOrderResponse> CreateRetailOrderAsync(RawCreateRetailOrderRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<CreateRetailOrderRequest, RetailOrderResponse>(
+        return _restClient.PostAsync<RawCreateRetailOrderRequest, RawRetailOrderResponse>(
             "v1/retail/order/place",
             request,
             cancellationToken);

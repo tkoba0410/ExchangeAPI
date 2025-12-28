@@ -15,15 +15,15 @@ internal sealed class BittradeRawTradingApi : IBittradeRawTradingApi
         _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
     }
 
-    public Task<PlaceOrderResponse> CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken = default) =>
+    public Task<RawPlaceOrderResponse> CreateOrderAsync(RawCreateOrderRequest request, CancellationToken cancellationToken = default) =>
         _privateTradingApi.CreateOrderAsync(request, cancellationToken);
 
-    public Task<CancelOrderResponse> CancelOrderAsync(OrderId orderId, CancellationToken cancellationToken = default) =>
+    public Task<RawCancelOrderResponse> CancelOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default) =>
         _privateTradingApi.CancelOrderAsync(orderId, cancellationToken);
 
-    public Task<OpenOrdersResponse> GetOpenOrdersAsync(Symbol symbol, string accountId, CancellationToken cancellationToken = default) =>
+    public Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default) =>
         _privateApi.GetOpenOrdersAsync(symbol, accountId, cancellationToken);
 
-    public Task<OrderDetailResponse> GetOrderAsync(OrderId orderId, CancellationToken cancellationToken = default) =>
+    public Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default) =>
         _privateApi.GetOrderAsync(orderId, cancellationToken);
 }

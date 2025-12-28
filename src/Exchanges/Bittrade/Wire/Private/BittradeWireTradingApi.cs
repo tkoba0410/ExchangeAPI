@@ -27,7 +27,7 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
     {
         var operation = BittradeWireOperations.Trading.PlaceOrder;
 
-        CreateOrderRequest rawRequest;
+        RawCreateOrderRequest rawRequest;
         try
         {
             rawRequest = BittradeWireTradingMapper.ToRaw(_accountId, request);
@@ -46,14 +46,14 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
     public async Task CancelOrderAsync(string orderId, CancellationToken ct = default)
     {
         var operation = BittradeWireOperations.Trading.CancelOrder;
-        var raw = await _raw.CancelOrderAsync(new OrderId(orderId), ct).ConfigureAwait(false);
+        var raw = await _raw.CancelOrderAsync(new RawOrderId(orderId), ct).ConfigureAwait(false);
         BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
     }
 
     public async Task<IReadOnlyList<BittradeWireOpenOrder>> GetOpenOrdersAsync(string symbol, CancellationToken ct = default)
     {
         var operation = BittradeWireOperations.Trading.GetOpenOrders;
-        var raw = await _raw.GetOpenOrdersAsync(Symbol.From(symbol), _accountId, ct).ConfigureAwait(false);
+        var raw = await _raw.GetOpenOrdersAsync(RawSymbol.From(symbol), _accountId, ct).ConfigureAwait(false);
         BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
 
         if (raw.Data is null)
@@ -67,7 +67,7 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
     public async Task<BittradeWireOrder> GetOrderAsync(string orderId, CancellationToken ct = default)
     {
         var operation = BittradeWireOperations.Trading.GetOrder;
-        var raw = await _raw.GetOrderAsync(new OrderId(orderId), ct).ConfigureAwait(false);
+        var raw = await _raw.GetOrderAsync(new RawOrderId(orderId), ct).ConfigureAwait(false);
         BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
 
         var data = raw.Data ?? throw BittradeWireErrors.Missing(operation, "data");
@@ -82,7 +82,7 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
         }
     }
 
-    private static BittradeWireOpenOrder MapOpenOrder(OrderSummary raw)
+    private static BittradeWireOpenOrder MapOpenOrder(RawOrderSummary raw)
     {
         try
         {

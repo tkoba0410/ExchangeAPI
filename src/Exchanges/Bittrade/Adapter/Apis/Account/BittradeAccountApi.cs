@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Types;
@@ -11,6 +10,7 @@ using ExchangeApi.Common.Enums;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 
@@ -19,14 +19,12 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 /// </summary>
 internal sealed class BittradeAccountApi : IAccountApi
 {
-    private readonly IRestClient _restClient;
-    private readonly string _accountId;
+    private readonly IBittradeNormalizedAccountApi _account;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public BittradeAccountApi(IRestClient restClient, string accountId)
+    public BittradeAccountApi(IBittradeNormalizedAccountApi account)
     {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-        _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
+        _account = account ?? throw new ArgumentNullException(nameof(account));
     }
 
     public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
@@ -34,19 +32,8 @@ internal sealed class BittradeAccountApi : IAccountApi
         const string operation = "Bittrade.Account.GetBalances";
         try
         {
-            var resp = await _restClient.GetAsync<BalancesResponse>(
-                $"v1/account/accounts/{_accountId}/balance",
-                cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            if (!string.Equals(resp.Status, "ok", StringComparison.OrdinalIgnoreCase) || resp.Data is null)
-            {
-                throw new ExchangeApiException(
-                    message: "Bittrade balance response invalid.",
-                    exchange: Exchange,
-                    operation: operation);
-            }
-
-            return BittradeMapper.MapBalances(resp.Data);
+            var normalized = await _account.GetBalancesAsync(cancellationToken).ConfigureAwait(false);
+            return BittradeMapper.MapBalances(normalized);
         }
         catch (TransportException ex)
         {

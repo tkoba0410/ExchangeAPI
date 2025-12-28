@@ -14,12 +14,12 @@ internal sealed class BittradeWireCommonApi : IBittradeWireCommonApi
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public Task<TimestampResponse> GetTimestampAsync(CancellationToken ct = default) =>
+    public Task<RawTimestampResponse> GetTimestampAsync(CancellationToken ct = default) =>
         _raw.GetTimestampAsync(ct);
 
-    public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken ct = default) =>
+    public Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken ct = default) =>
         _raw.GetSymbolsAsync(ct);
 
-    public Task<CurrenciesResponse> GetCurrenciesAsync(CancellationToken ct = default) =>
+    public Task<RawCurrenciesResponse> GetCurrenciesAsync(CancellationToken ct = default) =>
         _raw.GetCurrenciesAsync(ct);
 }

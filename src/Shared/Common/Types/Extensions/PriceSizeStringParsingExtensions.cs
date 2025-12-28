@@ -1,45 +1,30 @@
 using System;
-using System.Globalization;
 
 namespace ExchangeApi.Common.Types.Extensions;
 
 public static class PriceSizeStringParsingExtensions
 {
+    [Obsolete("Use Price.TryParsePrice(string, out Price) instead.")]
     public static bool TryParsePriceInvariant(this string text, out Price price)
     {
-        if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var v))
-        {
-            price = new Price(v);
-            return true;
-        }
-
-        price = default;
-        return false;
+        return Price.TryParsePrice(text, out price);
     }
 
+    [Obsolete("Use Size.TryParseSize(string, out Size) instead.")]
     public static bool TryParseSizeInvariant(this string text, out Size size)
     {
-        if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var v))
-        {
-            size = new Size(v);
-            return true;
-        }
-
-        size = default;
-        return false;
+        return Size.TryParseSize(text, out size);
     }
 
+    [Obsolete("Use Price.ParsePriceOrThrow(string) instead.")]
     public static Price ParsePriceInvariant(this string text)
     {
-        if (!text.TryParsePriceInvariant(out var p))
-            throw new FormatException($"Invalid price: '{text}'");
-        return p;
+        return Price.ParsePriceOrThrow(text);
     }
 
+    [Obsolete("Use Size.ParseSizeOrThrow(string) instead.")]
     public static Size ParseSizeInvariant(this string text)
     {
-        if (!text.TryParseSizeInvariant(out var s))
-            throw new FormatException($"Invalid size: '{text}'");
-        return s;
+        return Size.ParseSizeOrThrow(text);
     }
 }

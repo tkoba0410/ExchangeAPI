@@ -20,7 +20,7 @@ internal sealed class BittradeWireMarketDataApi : IBittradeWireMarketDataApi
     public async Task<BittradeWireTicker> GetTickerAsync(string symbol, CancellationToken ct = default)
     {
         var operation = BittradeWireOperations.MarketData.GetTicker;
-        var raw = await _raw.GetTickerAsync(Symbol.From(symbol), ct).ConfigureAwait(false);
+        var raw = await _raw.GetTickerAsync(RawSymbol.From(symbol), ct).ConfigureAwait(false);
         BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
 
         var tick = raw.Tick ?? throw BittradeWireErrors.Missing(operation, "tick");
@@ -39,7 +39,7 @@ internal sealed class BittradeWireMarketDataApi : IBittradeWireMarketDataApi
     public async Task<BittradeWireOrderBook> GetOrderBookAsync(string symbol, CancellationToken ct = default)
     {
         var operation = BittradeWireOperations.MarketData.GetOrderBook;
-        var raw = await _raw.GetOrderBookAsync(Symbol.From(symbol), cancellationToken: ct).ConfigureAwait(false);
+        var raw = await _raw.GetOrderBookAsync(RawSymbol.From(symbol), cancellationToken: ct).ConfigureAwait(false);
         BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
 
         var tick = raw.Tick ?? throw BittradeWireErrors.Missing(operation, "tick");

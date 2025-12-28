@@ -4,11 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-internal sealed class KlineIdJsonConverter : JsonConverter<KlineId>
+internal sealed class KlineIdJsonConverter : JsonConverter<RawKlineId>
 {
-    public override KlineId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override RawKlineId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => new(IdJsonConverterHelpers.ReadLong(ref reader));
 
-    public override void Write(Utf8JsonWriter writer, KlineId value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, RawKlineId value, JsonSerializerOptions options)
         => writer.WriteNumberValue(value.Value);
 }

@@ -12,6 +12,7 @@ using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Exchanges.Bittrade.Normalize;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -104,7 +105,8 @@ public class BittradeMarketDataApiTests
         var transport = new HttpTransport(client, disposeHttpClient: true);
         var restClient = new RestClient(client.BaseAddress!, transport);
         var markets = CreateResolver(new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot"));
-        return new BittradeMarketDataApi(restClient, markets);
+        var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient);
+        return new BittradeMarketDataApi(normalizeBundle.MarketData, markets);
     }
 
     private static IExchangeMarketResolver CreateResolver(params ExchangeMarketInfo[] markets) =>

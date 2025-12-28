@@ -15,7 +15,7 @@ public sealed class BittradePublicApi_Klines_Tests
         var fakeRest = new FakeRestClient();
         var api = new BittradePublicApi(fakeRest);
 
-        await api.GetKlinesAsync(new Symbol("BTC/JPY"), "1day", size: 2, cancellationToken: CancellationToken.None);
+        await api.GetKlinesAsync(new RawSymbol("BTC/JPY"), "1day", size: 2, cancellationToken: CancellationToken.None);
 
         Assert.Equal("market/history/kline?period=1day&symbol=btcjpy&size=2", fakeRest.LastPath);
     }

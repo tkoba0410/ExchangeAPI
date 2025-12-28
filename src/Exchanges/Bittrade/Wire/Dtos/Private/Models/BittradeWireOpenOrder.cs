@@ -3,8 +3,8 @@ using System;
 namespace ExchangeApi.Exchanges.Bittrade.Wire.Private.Models;
 
 public sealed record BittradeWireOpenOrder(
-    string OrderId,
-    string Symbol,
+    string RawOrderId,
+    string RawSymbol,
     string Side,
     string Type,
     string State,

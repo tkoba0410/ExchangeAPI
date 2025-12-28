@@ -10,19 +10,19 @@ namespace ExchangeApi.Exchanges.Bittrade.Wire.Converters;
 
 internal static class BittradeWireTradingMapper
 {
-    public static CreateOrderRequest ToRaw(string accountId, BittradeWireCreateOrderRequest wire) =>
+    public static RawCreateOrderRequest ToRaw(string accountId, BittradeWireCreateOrderRequest wire) =>
         new(
             AccountId: accountId,
-            Symbol: Symbol.From(wire.Symbol),
+            RawSymbol: RawSymbol.From(wire.RawSymbol),
             Type: ParseOrderType(wire.Type),
             Amount: FormatDecimal(wire.Size),
             Price: wire.Price is null ? null : FormatDecimal(wire.Price.Value),
             Source: null);
 
-    public static BittradeWireOrder ToWire(PlaceOrderResponse raw, BittradeWireCreateOrderRequest request)
+    public static BittradeWireOrder ToWire(RawPlaceOrderResponse raw, BittradeWireCreateOrderRequest request)
         => new(
-            OrderId: raw.OrderId.Value,
-            Symbol: request.Symbol,
+            RawOrderId: raw.RawOrderId.Value,
+            RawSymbol: request.RawSymbol,
             Side: request.Side,
             Type: request.Type,
             State: null,
@@ -32,15 +32,15 @@ internal static class BittradeWireTradingMapper
             OutstandingSize: null,
             CreatedAt: null);
 
-    public static BittradeWireOrder ToWire(OrderDetail raw)
+    public static BittradeWireOrder ToWire(RawOrderDetail raw)
     {
         var size = ParseRequiredDecimal(raw.Amount, "amount");
         var filled = ParseDecimalOrThrow(raw.FilledAmount, "field-amount") ?? 0m;
         var outstanding = Math.Max(0m, size - filled);
 
         return new BittradeWireOrder(
-            OrderId: raw.Id.Value,
-            Symbol: raw.Symbol.Value,
+            RawOrderId: raw.Id.Value,
+            RawSymbol: raw.RawSymbol.Value,
             Side: ToSide(raw.Type),
             Type: ToWireEnumValue(raw.Type),
             State: ToWireEnumValue(raw.State),
@@ -51,10 +51,10 @@ internal static class BittradeWireTradingMapper
             CreatedAt: raw.CreatedAt);
     }
 
-    public static BittradeWireOpenOrder ToWireOpenOrder(OrderSummary raw)
+    public static BittradeWireOpenOrder ToWireOpenOrder(RawOrderSummary raw)
         => new(
-            OrderId: raw.Id.Value,
-            Symbol: raw.Symbol.Value,
+            RawOrderId: raw.Id.Value,
+            RawSymbol: raw.RawSymbol.Value,
             Side: ToSide(raw.Type),
             Type: ToWireEnumValue(raw.Type),
             State: ToWireEnumValue(raw.State),

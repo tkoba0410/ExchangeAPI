@@ -4,9 +4,9 @@ using ExchangeApi.Exchanges.Bittrade.Raw;
 
 namespace ExchangeApi.Exchanges.Bittrade.Wire.Public;
 
-internal interface IBittradeWireCommonApi
+public interface IBittradeWireCommonApi
 {
-    Task<TimestampResponse> GetTimestampAsync(CancellationToken ct = default);
-    Task<SymbolsResponse> GetSymbolsAsync(CancellationToken ct = default);
-    Task<CurrenciesResponse> GetCurrenciesAsync(CancellationToken ct = default);
+    Task<RawTimestampResponse> GetTimestampAsync(CancellationToken ct = default);
+    Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken ct = default);
+    Task<RawCurrenciesResponse> GetCurrenciesAsync(CancellationToken ct = default);
 }

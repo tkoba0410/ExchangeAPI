@@ -13,13 +13,16 @@ internal sealed class BittradeRawMarketDataApi : IBittradeRawMarketDataApi
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
     }
 
-    public Task<MergedResponse> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<RawMergedResponse> GetTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default) =>
         _publicApi.GetMergedTickerAsync(EnsureSymbol(symbol), cancellationToken);
 
-    public Task<DepthResponse> GetOrderBookAsync(Symbol symbol, string? type = null, CancellationToken cancellationToken = default) =>
+    public Task<RawDepthResponse> GetOrderBookAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default) =>
         _publicApi.GetDepthAsync(EnsureSymbol(symbol), type, cancellationToken);
 
-    private static Symbol EnsureSymbol(Symbol symbol)
+    public Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default) =>
+        _publicApi.GetTradesAsync(EnsureSymbol(symbol), cancellationToken);
+
+    private static RawSymbol EnsureSymbol(RawSymbol symbol)
     {
         if (string.IsNullOrWhiteSpace(symbol.Value))
         {

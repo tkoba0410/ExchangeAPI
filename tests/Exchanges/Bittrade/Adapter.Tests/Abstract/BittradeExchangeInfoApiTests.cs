@@ -1,14 +1,10 @@
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -18,25 +14,7 @@ public class BittradeExchangeInfoApiTests
     [Fact]
     public async Task GetExchangeInfoAsync_MapsSymbols()
     {
-        var json = """
-        {
-          "status": "ok",
-          "data": [
-            {
-              "symbol": "btcjpy",
-              "base-currency": "btc",
-              "quote-currency": "jpy",
-              "price-precision": 2,
-              "amount-precision": 4,
-              "min-order-amt": "0.0001",
-              "min-order-value": "1000",
-              "state": "online"
-            }
-          ]
-        }
-        """;
-
-        var api = CreateApi("/v1/common/symbols", json);
+        var api = new BittradeExchangeInfoApi(new StubNormalizedExchangeInfoApi());
 
         var info = await api.GetExchangeInfoAsync();
 
@@ -51,38 +29,20 @@ public class BittradeExchangeInfoApiTests
         Assert.True(m.IsSupported);
     }
 
-    private static BittradeExchangeInfoApi CreateApi(string expectedPath, string responseJson)
+    private sealed class StubNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
     {
-        var handler = new StubHandler(expectedPath, responseJson);
-        var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost/") };
-        var transport = new HttpTransport(client, disposeHttpClient: true);
-        var restClient = new RestClient(client.BaseAddress!, transport);
-        return new BittradeExchangeInfoApi(restClient);
-    }
-
-    private sealed class StubHandler : HttpMessageHandler
-    {
-        private readonly string _expectedPath;
-        private readonly string _response;
-
-        public StubHandler(string expectedPath, string response)
-        {
-            _expectedPath = expectedPath;
-            _response = response;
-        }
-
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            if (!string.Equals(request.RequestUri?.PathAndQuery, _expectedPath, StringComparison.OrdinalIgnoreCase))
+        public Task<IReadOnlyList<BittradeSymbolNormalized>> GetSymbolsAsync(System.Threading.CancellationToken ct = default) =>
+            Task.FromResult<IReadOnlyList<BittradeSymbolNormalized>>(new[]
             {
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
-            }
-
-            var msg = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(_response)
-            };
-            return Task.FromResult(msg);
-        }
+                new BittradeSymbolNormalized(
+                    Symbol: "btcjpy",
+                    BaseCurrency: "btc",
+                    QuoteCurrency: "jpy",
+                    PricePrecision: 2,
+                    AmountPrecision: 4,
+                    MinOrderAmount: 0.0001m,
+                    MinOrderValue: 1000m,
+                    State: "online")
+            });
     }
 }

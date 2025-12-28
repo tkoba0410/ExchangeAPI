@@ -9,9 +9,9 @@ public sealed class BittradeCreateOrderRequestTests
     [Fact]
     public void CreateOrderRequest_SerializesWithExpectedKeys()
     {
-        var request = new CreateOrderRequest(
+        var request = new RawCreateOrderRequest(
             AccountId: "account-1",
-            Symbol: new Symbol("btcjpy"),
+            RawSymbol: new RawSymbol("btcjpy"),
             Type: OrderType.BuyLimit,
             Amount: "0.1",
             Price: "100",

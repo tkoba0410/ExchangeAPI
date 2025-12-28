@@ -7,23 +7,23 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// </summary>
 internal interface IBittradePublicApi
 {
-    Task<MergedResponse> GetMergedTickerAsync(Symbol symbol, CancellationToken cancellationToken = default);
+    Task<RawMergedResponse> GetMergedTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
 
-    Task<DepthResponse> GetDepthAsync(Symbol symbol, string? type = null, CancellationToken cancellationToken = default);
+    Task<RawDepthResponse> GetDepthAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default);
 
-    Task<TradeResponse> GetTradesAsync(Symbol symbol, CancellationToken cancellationToken = default);
+    Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
 
-    Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default);
+    Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default);
 
-    Task<CurrenciesResponse> GetCurrenciesAsync(CancellationToken cancellationToken = default);
+    Task<RawCurrenciesResponse> GetCurrenciesAsync(CancellationToken cancellationToken = default);
 
-    Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default);
+    Task<RawTimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default);
 
-    Task<KlinesResponse> GetKlinesAsync(Symbol symbol, string period, int? size = null, CancellationToken cancellationToken = default);
+    Task<RawKlinesResponse> GetKlinesAsync(RawSymbol symbol, string period, int? size = null, CancellationToken cancellationToken = default);
 
-    Task<TickersResponse> GetTickersAsync(CancellationToken cancellationToken = default);
+    Task<RawTickersResponse> GetTickersAsync(CancellationToken cancellationToken = default);
 
-    Task<TradeHistoryResponse> GetTradeHistoryAsync(Symbol symbol, CancellationToken cancellationToken = default);
+    Task<RawTradeHistoryResponse> GetTradeHistoryAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
 
-    Task<RetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default);
+    Task<RawRetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default);
 }

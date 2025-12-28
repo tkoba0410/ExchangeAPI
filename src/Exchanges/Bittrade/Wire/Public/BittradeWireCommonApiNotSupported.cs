@@ -11,12 +11,12 @@ internal sealed class BittradeWireCommonApiNotSupported : IBittradeWireCommonApi
     private static ExchangeFeatureNotSupportedException NotSupported() =>
         new(ExchangeCode.Bittrade, "WireCommon");
 
-    public Task<TimestampResponse> GetTimestampAsync(CancellationToken ct = default) =>
+    public Task<RawTimestampResponse> GetTimestampAsync(CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken ct = default) =>
+    public Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<CurrenciesResponse> GetCurrenciesAsync(CancellationToken ct = default) =>
+    public Task<RawCurrenciesResponse> GetCurrenciesAsync(CancellationToken ct = default) =>
         throw NotSupported();
 }

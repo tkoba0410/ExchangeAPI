@@ -1,0 +1,30 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+
+namespace ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+
+internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
+{
+    private readonly IBittradeRawApi _raw;
+
+    public BittradeNormalizedExchangeInfoApi(IBittradeRawApi raw)
+    {
+        _raw = raw ?? throw new ArgumentNullException(nameof(raw));
+    }
+
+    public async Task<IReadOnlyList<BittradeSymbolNormalized>> GetSymbolsAsync(CancellationToken ct = default)
+    {
+        var response = await _raw.GetSymbolsAsync(ct).ConfigureAwait(false);
+        if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Data is null)
+        {
+            throw new ExchangeApiException("Bittrade symbols response invalid.");
+        }
+
+        return BittradeNormalizer.NormalizeSymbols(response.Data);
+    }
+}

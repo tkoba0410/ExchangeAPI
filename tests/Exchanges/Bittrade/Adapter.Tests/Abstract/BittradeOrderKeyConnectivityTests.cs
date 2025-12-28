@@ -50,8 +50,8 @@ public sealed class BittradeOrderKeyConnectivityTests
 
     private static BittradeWireOrder CreateWireOrder(string id) =>
         new(
-            OrderId: id,
-            Symbol: "btcjpy",
+            RawOrderId: id,
+            RawSymbol: "btcjpy",
             Side: "buy",
             Type: "buy-limit",
             State: "filled",

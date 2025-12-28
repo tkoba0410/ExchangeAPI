@@ -11,10 +11,9 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Wire;
-using ExchangeApi.Exchanges.Bittrade.Wire.Public;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
@@ -58,9 +57,11 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
             throw new InvalidOperationException("BittradeApiBundle.AccountId is required to create BittradeExchangeClient.");
         }
 
-        _marketApi = new BittradeMarketDataApi(bundle.RestClient, bundle.Markets);
+        _marketApi = new BittradeMarketDataApi(bundle.NormalizedMarketData, bundle.Markets);
         _tradingApi = new BittradeTradingApi(bundle.Trading, bundle.Markets);
-        _accountApi = new BittradeAccountApi(bundle.RestClient, bundle.AccountId);
+        _accountApi = bundle.NormalizedAccount is null
+            ? new NotSupportedAccountApi(ExchangeCode.Bittrade)
+            : new BittradeAccountApi(bundle.NormalizedAccount);
         _exchangeInfoApi = bundle.ExchangeInfo;
         _restClient = bundle.RestClient;
         _rawBundle = bundle.RawBundle;
@@ -77,12 +78,9 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         : this(marketApi, tradingApi, accountApi, exchangeInfoApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-        var raw = new BittradeRawApi(_restClient);
-        _rawBundle = raw;
-        _wireBundle = new BittradeWireApi(
-            new BittradeWireMarketDataApi(raw.MarketData),
-            new BittradeWireTradingApiNotSupported(),
-            new BittradeWireCommonApi(raw));
+        var normalizeBundle = BittradeNormalizeFactory.FromRestClient(_restClient);
+        _rawBundle = normalizeBundle.RawBundle;
+        _wireBundle = normalizeBundle.WireBundle;
     }
 
     public BittradeExchangeClient(
@@ -95,34 +93,9 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         : this(marketApi, tradingApi, accountApi, exchangeInfoApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-        var raw = new BittradeRawApi(_restClient);
-        _rawBundle = raw;
-        _wireBundle = new BittradeWireApi(
-            new BittradeWireMarketDataApi(raw.MarketData),
-            new BittradeWireTradingApi(raw.Trading, accountId),
-            new BittradeWireCommonApi(raw));
-    }
-
-    [Obsolete("Use Wire.Common via IHasWireAccess for raw endpoints. This API will be removed in a future major release.")]
-    public Task<TimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
-    {
-        if (!TryGetWire<BittradeWireApi>(out var wire))
-        {
-            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Timestamp");
-        }
-
-        return wire.Common.GetTimestampAsync(cancellationToken);
-    }
-
-    [Obsolete("Use Wire.Common via IHasWireAccess for raw endpoints. This API will be removed in a future major release.")]
-    public Task<SymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
-    {
-        if (!TryGetWire<BittradeWireApi>(out var wire))
-        {
-            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Symbols");
-        }
-
-        return wire.Common.GetSymbolsAsync(cancellationToken);
+        var normalizeBundle = BittradeNormalizeFactory.FromRestClient(_restClient, accountId);
+        _rawBundle = normalizeBundle.RawBundle;
+        _wireBundle = normalizeBundle.WireBundle;
     }
 
     public Task<Ticker> GetTickerAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>

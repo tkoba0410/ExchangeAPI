@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="../../../../src/Shared/Common/Shared.Common.csproj" />
     <ProjectReference Include="../../../../src/Shared/Contracts/Shared.Contracts.csproj" />
+    <ProjectReference Include="../../../../src/Shared/Domain/Shared.Domain.csproj" />
     <ProjectReference Include="../../../../src/Core/Core.csproj" />
     <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Adapter/Exchange.Bitflyer.Adapter.csproj" />
   </ItemGroup>

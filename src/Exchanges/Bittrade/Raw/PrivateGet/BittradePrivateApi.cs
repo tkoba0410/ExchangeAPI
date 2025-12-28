@@ -18,18 +18,18 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<AccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<AccountsResponse>("v1/account/accounts", cancellationToken: cancellationToken);
+    public Task<RawAccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default) =>
+        _restClient.GetAsync<RawAccountsResponse>("v1/account/accounts", cancellationToken: cancellationToken);
 
-    public Task<BalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default)
+    public Task<RawBalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default)
     {
         EnsureRequired(accountId, nameof(accountId));
-        return _restClient.GetAsync<BalancesResponse>(
+        return _restClient.GetAsync<RawBalancesResponse>(
             $"v1/account/accounts/{accountId}/balance",
             cancellationToken: cancellationToken);
     }
 
-    public Task<OpenOrdersResponse> GetOpenOrdersAsync(Symbol symbol, string accountId, CancellationToken cancellationToken = default)
+    public Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
         EnsureRequired(accountId, nameof(accountId));
@@ -37,29 +37,29 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             ("symbol", ToApiSymbol(symbol)),
             ("account-id", accountId));
 
-        return _restClient.GetAsync<OpenOrdersResponse>(
+        return _restClient.GetAsync<RawOpenOrdersResponse>(
             $"v1/order/openOrders?{query}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<OrderDetailResponse> GetOrderAsync(OrderId orderId, CancellationToken cancellationToken = default)
+    public Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
         EnsureRequired(orderId.Value, nameof(orderId));
-        return _restClient.GetAsync<OrderDetailResponse>(
+        return _restClient.GetAsync<RawOrderDetailResponse>(
             $"v1/order/orders/{orderId.Value}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<OrderMatchResultsResponse> GetOrderMatchResultsAsync(OrderId orderId, CancellationToken cancellationToken = default)
+    public Task<RawOrderMatchResultsResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
         EnsureRequired(orderId.Value, nameof(orderId));
-        return _restClient.GetAsync<OrderMatchResultsResponse>(
+        return _restClient.GetAsync<RawOrderMatchResultsResponse>(
             $"v1/order/orders/{orderId.Value}/matchresults",
             cancellationToken: cancellationToken);
     }
 
-    public Task<OrdersResponse> GetOrdersAsync(
-        Symbol symbol,
+    public Task<RawOrdersResponse> GetOrdersAsync(
+        RawSymbol symbol,
         string states,
         string? startDate = null,
         string? endDate = null,
@@ -80,13 +80,13 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             ("direct", direct),
             ("size", size?.ToString()));
 
-        return _restClient.GetAsync<OrdersResponse>(
+        return _restClient.GetAsync<RawOrdersResponse>(
             $"v1/order/orders?{query}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<MatchResultsResponse> GetMatchResultsAsync(
-        Symbol? symbol = null,
+    public Task<RawMatchResultsResponse> GetMatchResultsAsync(
+        RawSymbol? symbol = null,
         string? types = null,
         string? startDate = null,
         string? endDate = null,
@@ -104,12 +104,12 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             ("direct", direct),
             ("size", size?.ToString()));
 
-        return _restClient.GetAsync<MatchResultsResponse>(
+        return _restClient.GetAsync<RawMatchResultsResponse>(
             $"v1/order/matchresults?{query}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<DepositWithdrawsResponse> GetDepositWithdrawsAsync(
+    public Task<RawDepositWithdrawsResponse> GetDepositWithdrawsAsync(
         string type,
         string? currency = null,
         long? from = null,
@@ -125,12 +125,12 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             ("size", size?.ToString()),
             ("direct", direct));
 
-        return _restClient.GetAsync<DepositWithdrawsResponse>(
+        return _restClient.GetAsync<RawDepositWithdrawsResponse>(
             $"v1/query/deposit-withdraw?{query}",
             cancellationToken: cancellationToken);
     }
 
-    public Task<RetailOrdersResponse> GetRetailOrdersAsync(
+    public Task<RawRetailOrdersResponse> GetRetailOrdersAsync(
         int direct,
         int? status = null,
         DateTimeOffset? startTime = null,
@@ -145,12 +145,12 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             ("start_time", startTimeMs?.ToString()),
             ("end_time", endTimeMs?.ToString()));
 
-        return _restClient.GetAsync<RetailOrdersResponse>(
+        return _restClient.GetAsync<RawRetailOrdersResponse>(
             $"v1/retail/order/list?{query}",
             cancellationToken: cancellationToken);
     }
 
-    private static string ToApiSymbol(Symbol symbol) =>
+    private static string ToApiSymbol(RawSymbol symbol) =>
         symbol.Value.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
 
     private static void EnsureRequired(string value, string name)
@@ -161,7 +161,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         }
     }
 
-    private static void EnsureSymbol(Symbol symbol)
+    private static void EnsureSymbol(RawSymbol symbol)
     {
         if (string.IsNullOrWhiteSpace(symbol.Value))
         {

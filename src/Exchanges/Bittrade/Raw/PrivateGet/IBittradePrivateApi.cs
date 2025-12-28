@@ -8,18 +8,18 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// </summary>
 internal interface IBittradePrivateApi
 {
-    Task<AccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default);
+    Task<RawAccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default);
 
-    Task<BalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default);
+    Task<RawBalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default);
 
-    Task<OpenOrdersResponse> GetOpenOrdersAsync(Symbol symbol, string accountId, CancellationToken cancellationToken = default);
+    Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default);
 
-    Task<OrderDetailResponse> GetOrderAsync(OrderId orderId, CancellationToken cancellationToken = default);
+    Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default);
 
-    Task<OrderMatchResultsResponse> GetOrderMatchResultsAsync(OrderId orderId, CancellationToken cancellationToken = default);
+    Task<RawOrderMatchResultsResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default);
 
-    Task<OrdersResponse> GetOrdersAsync(
-        Symbol symbol,
+    Task<RawOrdersResponse> GetOrdersAsync(
+        RawSymbol symbol,
         string states,
         string? startDate = null,
         string? endDate = null,
@@ -28,8 +28,8 @@ internal interface IBittradePrivateApi
         int? size = null,
         CancellationToken cancellationToken = default);
 
-    Task<MatchResultsResponse> GetMatchResultsAsync(
-        Symbol? symbol = null,
+    Task<RawMatchResultsResponse> GetMatchResultsAsync(
+        RawSymbol? symbol = null,
         string? types = null,
         string? startDate = null,
         string? endDate = null,
@@ -38,7 +38,7 @@ internal interface IBittradePrivateApi
         int? size = null,
         CancellationToken cancellationToken = default);
 
-    Task<DepositWithdrawsResponse> GetDepositWithdrawsAsync(
+    Task<RawDepositWithdrawsResponse> GetDepositWithdrawsAsync(
         string type,
         string? currency = null,
         long? from = null,
@@ -46,7 +46,7 @@ internal interface IBittradePrivateApi
         string? direct = null,
         CancellationToken cancellationToken = default);
 
-    Task<RetailOrdersResponse> GetRetailOrdersAsync(
+    Task<RawRetailOrdersResponse> GetRetailOrdersAsync(
         int direct,
         int? status = null,
         DateTimeOffset? startTime = null,

@@ -5,6 +5,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public interface IBittradeRawMarketDataApi
 {
-    Task<MergedResponse> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default);
-    Task<DepthResponse> GetOrderBookAsync(Symbol symbol, string? type = null, CancellationToken cancellationToken = default);
+    Task<RawMergedResponse> GetTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
+    Task<RawDepthResponse> GetOrderBookAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default);
+    Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
 }

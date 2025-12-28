@@ -1,7 +1,0 @@
-{
-    "status": "error",
-    "err-code": "order-orderstate-error",
-    "err-msg": "Incorrect order state",
-    "data": null,
-    "order-state": 7 
-}

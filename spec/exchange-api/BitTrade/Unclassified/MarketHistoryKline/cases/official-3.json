@@ -1,6 +1,0 @@
-{
-  "ts": 1490758221221,
-  "status": "error",
-  "err-code": "bad-request",
-  "err-msg": "invalid size, valid range: [1,2000]"
-}

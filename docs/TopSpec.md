@@ -77,7 +77,7 @@
 - [17. Converter / Mapper 規約](#17-converter-mapper-規約)
   - [17.1 Converter](#171-converter)
   - [17.2 Mapper](#172-mapper)
-  - [17.3 サンプル JSON を正本とする運用規約](#173-サンプル-json-を正本とする運用規約)
+- [17.3 公式 API 文書を正本とする運用規約](#173-公式-api-文書を正本とする運用規約)
 - [18. 禁止事項（破壊防止ルール）](#18-禁止事項破壊防止ルール)
 - [19. 一文要約](#19-一文要約)
 - [20. 運用および拡張に関する附則](#20-運用および拡張に関する附則)
@@ -200,19 +200,18 @@
 ### 5.2 Raw 層（仕様 / 鏡像）
 
 * 取引所 API の通信表現そのもの（鏡像）
-* 正本（fact）：**`spec/exchange-api/<Exchange>/<Group>/<Endpoint>/sample.json`（生レスポンス）**
+* **正本（source of truth）：各取引所の公式 API 文書**
 * JSON形・フィールド名・欠損をそのまま保持（意味判断は禁止）
 
 **変換手段：Converter**（＝JSONを読めることの保証）
 
-* `sample.json → rawDto`
+* 公式 API 文書に規定された JSON 形式 → rawDto
 * 意味判断は禁止
 
 補足（正本と実装の分離）：
 
-* `spec/exchange-api/**` は **規格（正本 / source of truth）** である。
 * `src/Exchanges/<Exchange>/Raw/**` は **実装（鏡像の具現化）** であり、必要に応じて
-  `spec/exchange-api/**` の内容を **ミラー**として配置してよい（ただし正本ではない）。
+  公式 API 文書に基づき実装される。
 
 
 ### 5.3 Normalized 層（仕様）
@@ -415,10 +414,29 @@ src/
 
 ## 10. 正本（source of truth）の所在
 
-* 取引所固有の仕様（規格表 / 正本）：`spec/exchange-api/**`
-  * 規格（人間が読む）：`spec/exchange-api/<Exchange>/<Group>/<Endpoint>/spec.md`
-  * 鏡像サンプル（fact の正本）：`spec/exchange-api/<Exchange>/<Group>/<Endpoint>/sample.json`
-  * 追加ケース（任意 / factではない）：`spec/exchange-api/<Exchange>/<Group>/<Endpoint>/cases/*.json`
+* 取引所固有の仕様の正本（source of truth）は、
+  **各取引所の公式 API 文書**のみとする。
+
+本リポジトリ内に、公式 API 文書の内容を
+仕様として再記述・固定化する文書は **用意しない**。
+
+公式文書を補助する目的で、次の文書のみを用意する。
+
+### 補助文書（API 台帳）
+
+* 各取引所について、公式 API 文書を補助するための
+  **API 一覧（エンドポイント台帳）** を次の場所に配置する。
+
+  * `docs/Exchange/<Exchange>/`
+
+* API 台帳は次を最低限含む。
+  * エンドポイント（path / method）
+  * グルーピング（Market / Trading / Account 等）
+  * 公開範囲（Public / Private / Unclassified 等）
+  * 公式 API 文書への参照（URL）
+
+* API 台帳は導線・網羅性確認を目的とする補助資料であり、
+  仕様の最終判断基準（source of truth）にはならない。
 
 * 取引所固有の実装：`src/Exchanges/*`
   * Raw 層は鏡像 spec を実装する層（Converter はここに存在する）。
@@ -707,17 +725,21 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 * 意味的変換・正規化
 * 失敗意味：解釈不能・前提違反
 
-### 17.3 サンプル JSON を正本とする運用規約
+### 17.3 公式 API 文書を正本とする運用規約
 
-本仕様において、Raw 層の正本はサンプル JSON とし、その運用について以下を定める。
+本仕様において、取引所 API 仕様の正本（source of truth）は
+**公式 API 文書**とし、その運用について以下を定める。
 
-1. サンプル JSON は、Raw 層仕様（鏡像）の正本であり、実装および Converter の正当性判断基準とする。
+1. 公式 API 文書は、Raw 層仕様（鏡像）の唯一の正本である。
 
-2. サンプル JSON には、正常系のみならず、欠損フィールド、null 値、空配列、境界値、異常値等を含めるものとする。
+2. 本リポジトリ内に、公式 API 文書の内容を
+   仕様として再記述・固定化する文書は存在しない。
 
-3. サンプル JSON の追加または変更は、Raw 層仕様の変更とみなし、対応する Converter および Mapper の検証を伴うものとする。
+3. 実装は、公式 API 文書の記述を直接参照して行うものとする。
+   API 台帳は補助資料であり、仕様判断の根拠とはならない。
 
-4. Converter がサンプル JSON を正しく処理できない場合、当該事象は仕様不整合または実装不備として扱うものとする。
+4. Converter が公式 API 文書に規定された形式を処理できない場合、
+   当該事象は仕様不整合または実装不備として扱うものとする。
 
 ---
 

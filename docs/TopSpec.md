@@ -213,6 +213,22 @@
 * `src/Exchanges/<Exchange>/Raw/**` は **実装（鏡像の具現化）** であり、必要に応じて
   公式 API 文書に基づき実装される。
 
+注記（Wire の扱い：Raw の内部詳細）：
+
+* **Wire は本仕様の論理階層（layer）ではない。**
+* Wire は `Raw` 層の **内部実装詳細**としてのみ許容され、責務は次に限定する。
+
+  * HTTP / 認証 / 署名 / リクエスト構築
+  * (de)serialize および transport レベルのエラー整形
+
+* Wire は次を行ってはならない（意味判断の禁止）。
+
+  * `Price` / `Size` 等のドメイン値へのパース・正規化
+  * シンボル正規化、欠損補完、丸め等の意味的変換
+  * `contractDto` の生成
+
+* 依存方向の原則：`Raw -> Wire` は許可し、`Normalize/Adapter/Contracts/Domain` から Wire 参照を禁止する。
+
 
 ### 5.3 Normalized 層（仕様）
 
@@ -619,6 +635,14 @@ Raw（鏡像 spec）や Normalized（Exchange）へのアクセスは **デバ�
 * `Common -> Exchanges`
 * `Domain -> Exchanges`
 * `Exchanges -> Exchanges`（取引所間依存）
+
+補足（Wire の参照禁止）：
+
+* Wire は Raw の内部詳細であり、次の参照を禁止する（ProjectReference を含む）。
+
+  * `Exchanges(Normalize) -> Wire`
+  * `Exchanges(Adapter) -> Wire`
+  * `Contracts/Common/Domain -> Wire`
 
 ---
 

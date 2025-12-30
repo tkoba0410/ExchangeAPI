@@ -3,7 +3,9 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
+using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -13,49 +15,60 @@ public sealed class BittradeFailFastMapperTests
     [Fact]
     public void ToOpenOrder_UnknownSide_Throws()
     {
-        var wire = CreateOpenOrder(side: "hold", type: "buy-limit");
+        var raw = CreateOpenOrdersResponse((RawOrderType)999);
 
         Assert.Throws<ExchangeApiException>(() =>
-            BittradeTradingMapper.ToOpenOrder(new Symbol("BTC/JPY"), wire));
+            BittradeTradingMapper.ToOpenOrders(new Symbol("BTC/JPY"), raw));
     }
 
     [Fact]
     public void ToOpenOrder_UnknownType_Throws()
     {
-        var wire = CreateOpenOrder(side: "buy", type: "mystery");
+        var raw = CreateOpenOrdersResponse((RawOrderType)999);
 
         Assert.Throws<ExchangeApiException>(() =>
-            BittradeTradingMapper.ToOpenOrder(new Symbol("BTC/JPY"), wire));
+            BittradeTradingMapper.ToOpenOrders(new Symbol("BTC/JPY"), raw));
     }
 
     [Fact]
     public void ToOrderStatus_UnknownState_Throws()
     {
-        var wire = new BittradeWireOrder(
-            RawOrderId: "1",
-            RawSymbol: "btcjpy",
-            Side: "buy",
-            Type: "buy-limit",
-            State: "mystery",
-            Price: 100m,
-            Size: 1m,
-            FilledSize: 0m,
-            OutstandingSize: 1m,
-            CreatedAt: DateTimeOffset.UtcNow);
+        var raw = new RawOrderDetailResponse(
+            Status: "ok",
+            Data: new RawOrderDetail(
+                Id: new RawOrderId("1"),
+                RawSymbol: RawSymbol.From("btcjpy"),
+                AccountId: "1",
+                Amount: "1",
+                Price: "100",
+                State: (RawOrderState)999,
+                Type: RawOrderType.BuyLimit,
+                ClientOrderId: null,
+                CreatedAt: DateTimeOffset.UtcNow,
+                FinishedAt: null,
+                FilledAmount: "0",
+                FilledCashAmount: "0",
+                Fees: "0"));
 
         Assert.Throws<ExchangeApiException>(() =>
-            BittradeTradingMapper.ToOrderStatus("BTC_JPY", wire, new OrderKey(OrderIdKind.ExchangeOrderId, "1")));
+            BittradeTradingMapper.ToOrderStatus("BTC_JPY", raw, new OrderKey(OrderIdKind.ExchangeOrderId, "1")));
     }
 
-    private static BittradeWireOpenOrder CreateOpenOrder(string side, string type) =>
+    private static RawOpenOrdersResponse CreateOpenOrdersResponse(RawOrderType type) =>
         new(
-            RawOrderId: "1",
-            RawSymbol: "btcjpy",
-            Side: side,
-            Type: type,
-            State: "submitted",
-            Price: 100m,
-            Size: 1m,
-            FilledSize: 0m,
-            CreatedAt: DateTimeOffset.UtcNow);
+            Status: "ok",
+            Data:
+            [
+                new RawOrderSummary(
+                    Id: new RawOrderId("1"),
+                    RawSymbol: RawSymbol.From("btcjpy"),
+                    AccountId: "1",
+                    Amount: "1",
+                    Price: "100",
+                    State: RawOrderState.Submitted,
+                    Type: type,
+                    ClientOrderId: null,
+                    CreatedAt: DateTimeOffset.UtcNow,
+                    FilledAmount: "0")
+            ]);
 }

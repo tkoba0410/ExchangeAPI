@@ -26,7 +26,6 @@
     <ProjectReference Include="../../../../src/Shared/Domain/Shared.Domain.csproj" />
     <ProjectReference Include="../../../../src/Core/Core.csproj" />
     <ProjectReference Include="../../../../src/Exchanges/Bittrade/Adapter/Exchange.Bittrade.Adapter.csproj" />
-    <ProjectReference Include="../../../../src/Exchanges/Bittrade/Wire/Exchange.Bittrade.Wire.csproj" />
   </ItemGroup>
 
 </Project>

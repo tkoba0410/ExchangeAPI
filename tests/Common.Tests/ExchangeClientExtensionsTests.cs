@@ -106,11 +106,4 @@ public sealed class ExchangeClientExtensionsTests
         var client = new DummyClient();
         Assert.Throws<ExchangeFeatureNotSupportedException>(() => client.Raw<object>());
     }
-
-    [Fact]
-    public void Wire_Throws_When_NotSupported()
-    {
-        var client = new DummyClient();
-        Assert.Throws<ExchangeFeatureNotSupportedException>(() => client.Wire<object>());
-    }
 }

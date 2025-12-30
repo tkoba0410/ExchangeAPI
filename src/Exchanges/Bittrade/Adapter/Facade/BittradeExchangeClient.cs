@@ -13,14 +13,13 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
-using ExchangeApi.Exchanges.Bittrade.Wire;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
 /// Bittrade 用のファサード。各 API 実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IMarginAccountApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess, IHasWireAccess
+public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IMarginAccountApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess
 {
     private readonly IMarketDataApi _marketApi;
     private readonly ITradingApi _tradingApi;
@@ -28,7 +27,6 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private readonly IExchangeInfoApi _exchangeInfoApi;
     private readonly IRestClient? _restClient;
     private readonly object? _rawBundle;
-    private readonly object? _wireBundle;
     internal BittradeApiBundle? ApiBundle { get; }
 
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bittrade;
@@ -58,14 +56,13 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         }
 
         _marketApi = new BittradeMarketDataApi(bundle.NormalizedMarketData, bundle.Markets);
-        _tradingApi = new BittradeTradingApi(bundle.Trading, bundle.Markets);
+        _tradingApi = new BittradeTradingApi(bundle.Trading, bundle.Markets, bundle.AccountId);
         _accountApi = bundle.NormalizedAccount is null
             ? new NotSupportedAccountApi(ExchangeCode.Bittrade)
             : new BittradeAccountApi(bundle.NormalizedAccount);
         _exchangeInfoApi = bundle.ExchangeInfo;
         _restClient = bundle.RestClient;
         _rawBundle = bundle.RawBundle;
-        _wireBundle = bundle.WireBundle;
         ApiBundle = bundle;
     }
 
@@ -80,7 +77,6 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(_restClient);
         _rawBundle = normalizeBundle.RawBundle;
-        _wireBundle = normalizeBundle.WireBundle;
     }
 
     public BittradeExchangeClient(
@@ -95,7 +91,6 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(_restClient, accountId);
         _rawBundle = normalizeBundle.RawBundle;
-        _wireBundle = normalizeBundle.WireBundle;
     }
 
     public Task<Ticker> GetTickerAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>
@@ -161,11 +156,5 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     {
         raw = _rawBundle as T ?? null!;
         return raw is not null;
-    }
-
-    public bool TryGetWire<T>(out T wire) where T : class
-    {
-        wire = _wireBundle as T ?? null!;
-        return wire is not null;
     }
 }

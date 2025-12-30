@@ -2,10 +2,9 @@ using System;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private.Requests;
-using System.Collections.Generic;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
+using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
 using System.Threading;
 using System.Threading.Tasks;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
@@ -21,16 +20,16 @@ public sealed class BittradeOrderKeyConnectivityTests
     [Fact]
     public async Task GetOrderAsync_UsesOrderKeyValue_WithAcceptanceId()
     {
-        var wire = new RecordingWireTradingApi
+        var trading = new RecordingRawTradingApi
         {
-            Order = CreateWireOrder("1001")
+            Order = CreateOrderDetail("1001")
         };
-        var api = new BittradeTradingApi(wire, CreateResolver());
+        var api = new BittradeTradingApi(trading, CreateResolver(), accountId: "acc-1");
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1001");
         var status = await api.GetOrderAsync(new CommonSymbol("BTC/JPY"), key);
 
-        Assert.Equal("1001", wire.LastOrderId);
+        Assert.Equal("1001", trading.LastOrderId);
         Assert.Equal(OrderIdKind.AcceptanceId, status.Key.Kind);
         Assert.Equal("1001", status.Key.Value);
     }
@@ -38,28 +37,33 @@ public sealed class BittradeOrderKeyConnectivityTests
     [Fact]
     public async Task CancelOrderAsync_UsesOrderKeyValue_WithAcceptanceId()
     {
-        var wire = new RecordingWireTradingApi();
-        var api = new BittradeTradingApi(wire, CreateResolver());
+        var trading = new RecordingRawTradingApi();
+        var api = new BittradeTradingApi(trading, CreateResolver(), accountId: "acc-1");
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1002");
         var result = await api.CancelOrderAsync(new CommonSymbol("BTC/JPY"), key);
 
         Assert.True(result.IsSuccess);
-        Assert.Equal("1002", wire.LastOrderId);
+        Assert.Equal("1002", trading.LastOrderId);
     }
 
-    private static BittradeWireOrder CreateWireOrder(string id) =>
+    private static RawOrderDetailResponse CreateOrderDetail(string id) =>
         new(
-            RawOrderId: id,
-            RawSymbol: "btcjpy",
-            Side: "buy",
-            Type: "buy-limit",
-            State: "filled",
-            Price: 100m,
-            Size: 0.01m,
-            FilledSize: 0.01m,
-            OutstandingSize: 0m,
-            CreatedAt: DateTimeOffset.FromUnixTimeMilliseconds(1));
+            Status: "ok",
+            Data: new RawOrderDetail(
+                Id: new RawOrderId(id),
+                RawSymbol: RawSymbol.From("btcjpy"),
+                AccountId: "acc-1",
+                Amount: "0.01",
+                Price: "100",
+                State: RawOrderState.Filled,
+                Type: RawOrderType.BuyLimit,
+                ClientOrderId: null,
+                CreatedAt: DateTimeOffset.FromUnixTimeMilliseconds(1),
+                FinishedAt: null,
+                FilledAmount: "0.01",
+                FilledCashAmount: "1",
+                Fees: "0"));
 
     private static IExchangeMarketResolver CreateResolver() =>
         new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
@@ -78,26 +82,26 @@ public sealed class BittradeOrderKeyConnectivityTests
             Task.FromResult(_info);
     }
 
-    private sealed class RecordingWireTradingApi : IBittradeWireTradingApi
+    private sealed class RecordingRawTradingApi : IBittradeRawTradingApi
     {
         public string? LastOrderId { get; private set; }
-        public BittradeWireOrder Order { get; init; } = CreateWireOrder("0");
+        public RawOrderDetailResponse Order { get; init; } = CreateOrderDetail("0");
 
-        public Task<BittradeWireOrder> PlaceOrderAsync(BittradeWireCreateOrderRequest request, CancellationToken ct = default) =>
-            Task.FromResult(Order);
+        public Task<RawPlaceOrderResponse> CreateOrderAsync(RawCreateOrderRequest request, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new RawPlaceOrderResponse("ok", new RawOrderId("0")));
 
-        public Task CancelOrderAsync(string orderId, CancellationToken ct = default)
+        public Task<RawCancelOrderResponse> CancelOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
         {
-            LastOrderId = orderId;
-            return Task.CompletedTask;
+            LastOrderId = orderId.Value;
+            return Task.FromResult(new RawCancelOrderResponse("ok", orderId));
         }
 
-        public Task<IReadOnlyList<BittradeWireOpenOrder>> GetOpenOrdersAsync(string symbol, CancellationToken ct = default) =>
-            Task.FromResult<IReadOnlyList<BittradeWireOpenOrder>>(new List<BittradeWireOpenOrder>());
+        public Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new RawOpenOrdersResponse("ok", Array.Empty<RawOrderSummary>()));
 
-        public Task<BittradeWireOrder> GetOrderAsync(string orderId, CancellationToken ct = default)
+        public Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
         {
-            LastOrderId = orderId;
+            LastOrderId = orderId.Value;
             return Task.FromResult(Order);
         }
     }

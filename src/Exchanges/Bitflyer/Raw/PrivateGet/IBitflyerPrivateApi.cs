@@ -8,6 +8,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 /// <summary>
 /// bitFlyer Private REST API への Raw アクセスインターフェース。
 /// </summary>
+#pragma warning disable CS0618
 internal interface IBitflyerPrivateApi : IBitflyerWireAccountApi
 {
     Task<IReadOnlyList<string>> GetPermissionsAsync(
@@ -74,3 +75,4 @@ internal interface IBitflyerPrivateApi : IBitflyerWireAccountApi
     Task<IReadOnlyList<JsonElement>> GetBankAccountsAsync(
         CancellationToken cancellationToken = default);
 }
+#pragma warning restore CS0618

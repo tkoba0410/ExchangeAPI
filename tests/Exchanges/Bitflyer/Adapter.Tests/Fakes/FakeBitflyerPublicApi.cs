@@ -1,14 +1,12 @@
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
-using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
 {
-    internal sealed class FakeBitflyerPublicApi : IBitflyerPublicApi
+    internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
     {
         private readonly Ticker _response;
         private readonly Board? _board;
@@ -19,7 +17,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
             _board = board;
         }
 
-        public Task<Ticker> GetTickerRawAsync(
+        public Task<Ticker> GetTickerAsync(
             RawProductCode productCode,
             bool useAliasPath = false,
             CancellationToken cancellationToken = default)
@@ -33,7 +31,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
             return Task.FromResult(_response);
         }
 
-        public Task<Board> GetBoardRawAsync(RawProductCode productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
+        public Task<Board> GetBoardAsync(RawProductCode productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
         {
             if (_board is null)
             {
@@ -48,7 +46,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
             return Task.FromResult(_board);
         }
 
-        public Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsRawAsync(
+        public Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsAsync(
             RawProductCode productCode,
             int? count = null,
             long? before = null,
@@ -67,7 +65,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
                 {
                     Id = 1,
                     ProductCode = new RawProductCode("BTC_JPY"),
-                    Side = RawSide.Buy,
+                    Side = "BUY",
                     Price = 100m,
                     Size = 0.01m,
                     ExecDate = System.DateTimeOffset.UtcNow,

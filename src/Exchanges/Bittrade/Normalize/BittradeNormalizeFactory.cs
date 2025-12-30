@@ -2,9 +2,6 @@ using System;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Wire;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private;
-using ExchangeApi.Exchanges.Bittrade.Wire.Public;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize;
 
@@ -38,21 +35,11 @@ internal static class BittradeNormalizeFactory
             ? null
             : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
 
-        var trading = normalizedAccountId is null
-            ? (IBittradeWireTradingApi)new BittradeWireTradingApiNotSupported()
-            : new BittradeWireTradingApi(raw.Trading, normalizedAccountId);
-
-        var wire = new BittradeWireApi(
-            new BittradeWireMarketDataApi(raw.MarketData),
-            trading,
-            new BittradeWireCommonApi(raw));
-
         return new BittradeNormalizeBundle(
             marketData: marketData,
             exchangeInfo: exchangeInfo,
             account: account,
-            trading: trading,
             rawBundle: raw,
-            wireBundle: wire);
+            accountId: normalizedAccountId);
     }
 }

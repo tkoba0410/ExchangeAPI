@@ -1,10 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private.Requests;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ContractOrderType = ExchangeApi.Common.Enums.OrderType;
+using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
+using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
@@ -12,69 +17,93 @@ internal static class BittradeTradingMapper
 {
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public static BittradeWireCreateOrderRequest ToWire(string apiSymbol, OrderRequest request)
+    public static RawCreateOrderRequest ToRaw(string accountId, string apiSymbol, OrderRequest request)
     {
+        if (string.IsNullOrWhiteSpace(accountId))
+        {
+            throw new ArgumentException("accountId is required.", nameof(accountId));
+        }
+
         if (string.IsNullOrWhiteSpace(apiSymbol))
         {
             throw new ArgumentException("apiSymbol is required.", nameof(apiSymbol));
         }
 
-        var side = MapSide(request.Side);
         var type = MapOrderType(request.Side, request.OrderType);
         var price = request.Price?.Value;
-        var size = request.Size.Value;
+        var size = FormatDecimal(request.Size.Value);
 
-        return new BittradeWireCreateOrderRequest(
-            RawSymbol: apiSymbol,
-            Side: side,
+        return new RawCreateOrderRequest(
+            AccountId: accountId,
+            RawSymbol: RawSymbol.From(apiSymbol),
             Type: type,
-            Price: price,
-            Size: size);
+            Amount: size,
+            Price: price is null ? null : FormatDecimal(price.Value),
+            Source: null);
     }
 
-    public static OrderResult ToOrderResult(BittradeWireOrder wire)
+    public static OrderResult ToOrderResult(RawPlaceOrderResponse raw)
     {
-        var key = new OrderKey(OrderIdKind.ExchangeOrderId, wire.RawOrderId);
-        return new OrderResult(key, ExchangeOrderId: wire.RawOrderId);
+        var orderId = raw.RawOrderId.Value;
+        var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
+        return new OrderResult(key, ExchangeOrderId: orderId);
     }
 
-    public static OpenOrder ToOpenOrder(Symbol symbol, BittradeWireOpenOrder wire)
+    public static IReadOnlyList<OpenOrder> ToOpenOrders(Symbol symbol, RawOpenOrdersResponse raw)
     {
-        var (side, type) = ParseSideAndType(wire.Side, wire.Type);
-        var status = ParseStatus(wire.State);
-        var price = wire.Price is null ? (Price?)null : new Price(wire.Price.Value);
-        var size = new Size(wire.Size);
-        var executed = new Size(wire.FilledSize);
-        var outstanding = new Size(Math.Max(0m, wire.Size - wire.FilledSize));
+        if (raw.Data is null || raw.Data.Count == 0)
+        {
+            return Array.Empty<OpenOrder>();
+        }
+
+        return raw.Data.Select(order => ToOpenOrder(symbol, order)).ToList();
+    }
+
+    private static OpenOrder ToOpenOrder(Symbol symbol, RawOrderSummary raw)
+    {
+        var (side, type) = MapSideAndType(raw.Type);
+        var status = MapStatus(raw.State);
+        var size = new Size(ParseRequiredDecimal(raw.Amount, "amount"));
+        var executed = new Size(ParseDecimalOrThrow(raw.FilledAmount, "field-amount") ?? 0m);
+        var outstanding = new Size(Math.Max(0m, size.Value - executed.Value));
+        var priceValue = ParseDecimalOrThrow(raw.Price, "price");
+        var price = priceValue is null ? (Price?)null : new Price(priceValue.Value);
 
         return new OpenOrder(
             ExchangeCode: Exchange,
             Symbol: symbol,
-            Key: new OrderKey(OrderIdKind.ExchangeOrderId, wire.RawOrderId),
+            Key: new OrderKey(OrderIdKind.ExchangeOrderId, raw.Id.Value),
             Side: side,
             OrderType: type,
             Size: size,
             OutstandingSize: outstanding,
             ExecutedSize: executed,
             Price: price,
-            OrderedAt: wire.CreatedAt,
+            OrderedAt: raw.CreatedAt,
             UpdatedAt: null,
             StopPrice: null,
-            Status: wire.State,
-            ExchangeOrderId: wire.RawOrderId);
+            Status: ToExchangeEnumValue(raw.State),
+            ExchangeOrderId: raw.Id.Value);
     }
 
-    public static OrderStatus ToOrderStatus(string productCode, BittradeWireOrder wire, OrderKey key)
+    public static OrderStatus ToOrderStatus(string productCode, RawOrderDetailResponse raw, OrderKey key)
     {
         if (string.IsNullOrWhiteSpace(productCode))
         {
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        var status = ParseStatus(wire.State);
-        var price = wire.Price is null ? (Price?)null : new Price(wire.Price.Value);
-        var executed = new Size(wire.FilledSize ?? 0m);
-        var outstanding = new Size(wire.OutstandingSize ?? wire.Size);
+        if (raw.Data is null)
+        {
+            throw new ExchangeApiException("Bittrade order response is missing data.", exchange: Exchange);
+        }
+
+        var status = MapStatus(raw.Data.State);
+        var priceValue = ParseDecimalOrThrow(raw.Data.Price, "price");
+        var price = priceValue is null ? (Price?)null : new Price(priceValue.Value);
+        var size = ParseRequiredDecimal(raw.Data.Amount, "amount");
+        var executed = new Size(ParseDecimalOrThrow(raw.Data.FilledAmount, "field-amount") ?? 0m);
+        var outstanding = new Size(Math.Max(0m, size - executed.Value));
 
         return new OrderStatus(
             productCode,
@@ -86,55 +115,91 @@ internal static class BittradeTradingMapper
             null);
     }
 
-    private static string MapSide(Side side) =>
-        side switch
-        {
-            Side.Buy => "buy",
-            Side.Sell => "sell",
-            _ => throw new ExchangeApiException($"Unsupported side: {side}.", exchange: Exchange)
-        };
-
-    private static string MapOrderType(Side side, OrderType type)
+    private static RawOrderType MapOrderType(Side side, ContractOrderType type)
     {
         return (side, type) switch
         {
-            (Side.Buy, OrderType.Market) => "buy-market",
-            (Side.Sell, OrderType.Market) => "sell-market",
-            (Side.Buy, OrderType.Limit) => "buy-limit",
-            (Side.Sell, OrderType.Limit) => "sell-limit",
+            (Side.Buy, ContractOrderType.Market) => RawOrderType.BuyMarket,
+            (Side.Sell, ContractOrderType.Market) => RawOrderType.SellMarket,
+            (Side.Buy, ContractOrderType.Limit) => RawOrderType.BuyLimit,
+            (Side.Sell, ContractOrderType.Limit) => RawOrderType.SellLimit,
             _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
         };
     }
 
-    private static (Side Side, OrderType OrderType) ParseSideAndType(string side, string type)
+    private static (Side Side, ContractOrderType OrderType) MapSideAndType(RawOrderType type)
     {
-        var parsedSide = side.ToLowerInvariant() switch
+        var parsedSide = type switch
         {
-            "buy" => Side.Buy,
-            "sell" => Side.Sell,
-            _ => throw new ExchangeApiException($"Unsupported side: {side}.", exchange: Exchange)
+            RawOrderType.BuyLimit or RawOrderType.BuyMarket or RawOrderType.BuyLimitMaker or RawOrderType.BuyIoc => Side.Buy,
+            RawOrderType.SellLimit or RawOrderType.SellMarket or RawOrderType.SellLimitMaker or RawOrderType.SellIoc => Side.Sell,
+            _ => throw new ExchangeApiException($"Unsupported order side: {type}.", exchange: Exchange)
         };
 
-        var parsedType = type.ToLowerInvariant() switch
+        var parsedType = type switch
         {
-            var value when value.Contains("market", StringComparison.OrdinalIgnoreCase) => OrderType.Market,
-            var value when value.Contains("limit", StringComparison.OrdinalIgnoreCase) => OrderType.Limit,
+            RawOrderType.BuyMarket or RawOrderType.SellMarket => ContractOrderType.Market,
+            RawOrderType.BuyLimit or RawOrderType.SellLimit => ContractOrderType.Limit,
             _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
         };
 
         return (parsedSide, parsedType);
     }
 
-    private static ExchangeApi.Common.Enums.OrderState ParseStatus(string? state)
+    private static ExchangeApi.Common.Enums.OrderState MapStatus(RawOrderState state)
     {
         return state switch
         {
-            "submitted" => ExchangeApi.Common.Enums.OrderState.Active,
-            "partial-filled" => ExchangeApi.Common.Enums.OrderState.Active,
-            "filled" => ExchangeApi.Common.Enums.OrderState.Completed,
-            "partial-canceled" => ExchangeApi.Common.Enums.OrderState.Canceled,
-            "canceled" => ExchangeApi.Common.Enums.OrderState.Canceled,
+            RawOrderState.Submitted => ExchangeApi.Common.Enums.OrderState.Active,
+            RawOrderState.PartialFilled => ExchangeApi.Common.Enums.OrderState.Active,
+            RawOrderState.Filled => ExchangeApi.Common.Enums.OrderState.Completed,
+            RawOrderState.PartialCanceled => ExchangeApi.Common.Enums.OrderState.Canceled,
+            RawOrderState.Canceled => ExchangeApi.Common.Enums.OrderState.Canceled,
             _ => throw new ExchangeApiException($"Unsupported order state: {state}.", exchange: Exchange)
         };
+    }
+
+    private static string FormatDecimal(decimal value) =>
+        value.ToString(CultureInfo.InvariantCulture);
+
+    private static decimal? ParseDecimalOrThrow(string? text, string field)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return null;
+        }
+
+        if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
+        {
+            return value;
+        }
+
+        throw new ExchangeApiException($"Invalid {field}: '{text}'.", exchange: Exchange);
+    }
+
+    private static decimal ParseRequiredDecimal(string? text, string field)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            throw new ExchangeApiException($"Missing {field}: <missing>.", exchange: Exchange);
+        }
+
+        if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
+        {
+            return value;
+        }
+
+        throw new ExchangeApiException($"Invalid {field}: '{text}'.", exchange: Exchange);
+    }
+
+    private static string ToExchangeEnumValue<T>(T value)
+        where T : struct, Enum
+    {
+        var name = Enum.GetName(value) ?? value.ToString();
+        var member = typeof(T).GetMember(name).FirstOrDefault();
+        var enumMember = member?.GetCustomAttributes(typeof(System.Runtime.Serialization.EnumMemberAttribute), false)
+            .OfType<System.Runtime.Serialization.EnumMemberAttribute>()
+            .FirstOrDefault();
+        return enumMember?.Value ?? name;
     }
 }

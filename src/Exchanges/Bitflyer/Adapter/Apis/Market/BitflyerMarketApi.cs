@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
@@ -21,12 +21,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 /// </summary>
 internal sealed class MarketApi : IMarketDataApi
 {
-    private readonly IBitflyerWireMarketDataApi _marketData;
+    private readonly IBitflyerRawMarketDataApi _marketData;
     private readonly IExchangeMarketResolver _markets;
     private readonly ExchangeCode _exchange;
 
     public MarketApi(
-        IBitflyerWireMarketDataApi marketData,
+        IBitflyerRawMarketDataApi marketData,
         IExchangeMarketResolver markets,
         ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
@@ -41,7 +41,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var raw = await _marketData.GetTickerRawAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var raw = await _marketData.GetTickerAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
             var normalized = BitflyerTickerNormalizer.Normalize(raw);
             return MarketMapper.MapTicker(symbol, normalized);
         }
@@ -74,7 +74,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var rawBoard = await _marketData.GetBoardRawAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var rawBoard = await _marketData.GetBoardAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
             var normalized = BitflyerOrderBookNormalizer.Normalize(rawBoard);
             return MarketMapper.MapOrderBook(normalized);
         }
@@ -107,7 +107,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var raw = await _marketData.GetExecutionsRawAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var raw = await _marketData.GetExecutionsAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             var mapped = raw
                 .Select(BitflyerExecutionNormalizer.Normalize)

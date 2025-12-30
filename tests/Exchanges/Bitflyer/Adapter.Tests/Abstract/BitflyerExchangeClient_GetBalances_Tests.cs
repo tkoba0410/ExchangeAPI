@@ -6,9 +6,9 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
-using RawTicker = ExchangeApi.Exchanges.Bitflyer.Wire.Public.Ticker;
+using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Ticker;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
 
@@ -40,7 +40,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
 
-            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi, fakePublicApi);
+            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
             // Act
             IReadOnlyList<Balance> result = await client.GetBalancesAsync();
@@ -69,7 +69,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
 
-            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi, fakePublicApi);
+            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
             // Act
             IReadOnlyList<Balance> result = await client.GetBalancesAsync();
@@ -78,7 +78,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             Assert.Empty(result);
         }
 
-        private static IBitflyerPublicApi CreateDummyPublicApi()
+        private static IBitflyerRawMarketDataApi CreateDummyPublicApi()
         {
             // 既存の Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
             var rawTicker = new RawTicker

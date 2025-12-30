@@ -7,7 +7,7 @@ using ExchangeApi.Core.Extensions;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Wire;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -20,7 +20,7 @@ public sealed class BittradePublicClientTests
         var json = """{ "status":"ok", "data": 1700000000000 }""";
         var client = CreateClient("/v1/common/timestamp", json);
 
-        var response = await client.Wire<BittradeWireApi>().Common.GetTimestampAsync();
+        var response = await client.Raw<BittradeRawApi>().GetTimestampAsync();
 
         Assert.Equal("ok", response.Status);
         Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1700000000000), response.Data);
@@ -49,7 +49,7 @@ public sealed class BittradePublicClientTests
         """;
         var client = CreateClient("/v1/common/symbols", json);
 
-        var response = await client.Wire<BittradeWireApi>().Common.GetSymbolsAsync();
+        var response = await client.Raw<BittradeRawApi>().GetSymbolsAsync();
 
         Assert.Equal("ok", response.Status);
         Assert.NotNull(response.Data);

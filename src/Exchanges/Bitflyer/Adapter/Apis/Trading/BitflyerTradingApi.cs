@@ -22,14 +22,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 /// </summary>
 internal sealed class BitflyerTradingApi : ITradingApi
 {
-    private readonly IBitflyerWireTradingApi _tradingApi;
-    private readonly IBitflyerWireAccountApi _accountApi;
+    private readonly IBitflyerRawPrivateTradingApi _tradingApi;
+    private readonly IBitflyerRawAccountApi _accountApi;
     private readonly IExchangeMarketResolver _markets;
     private readonly ExchangeCode _exchange;
 
     public BitflyerTradingApi(
-        IBitflyerWireTradingApi tradingApi,
-        IBitflyerWireAccountApi accountApi,
+        IBitflyerRawPrivateTradingApi tradingApi,
+        IBitflyerRawAccountApi accountApi,
         IExchangeMarketResolver markets,
         ExchangeCode exchange = ExchangeCode.Bitflyer)
     {

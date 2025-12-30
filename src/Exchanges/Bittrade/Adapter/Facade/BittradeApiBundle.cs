@@ -1,9 +1,7 @@
 using System;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
-using ExchangeApi.Exchanges.Bittrade.Wire;
-using ExchangeApi.Exchanges.Bittrade.Wire.Public;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Core.Transport.Protocol;
@@ -17,8 +15,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 /// </summary>
 internal sealed class BittradeApiBundle
 {
-    public IBittradeWireMarketDataApi MarketData { get; }
-    public IBittradeWireTradingApi Trading { get; }
+    public IBittradeRawTradingApi Trading { get; }
     public IBittradeNormalizedMarketDataApi NormalizedMarketData { get; }
     public IBittradeNormalizedAccountApi? NormalizedAccount { get; }
     public IExchangeInfoApi ExchangeInfo { get; }
@@ -26,21 +23,17 @@ internal sealed class BittradeApiBundle
     public IRestClient RestClient { get; }
     public string? AccountId { get; }
     public object? RawBundle { get; }
-    public object? WireBundle { get; }
 
     public BittradeApiBundle(
-        IBittradeWireMarketDataApi marketData,
-        IBittradeWireTradingApi trading,
+        IBittradeRawTradingApi trading,
         IBittradeNormalizedMarketDataApi normalizedMarketData,
         IBittradeNormalizedAccountApi? normalizedAccount,
         IExchangeInfoApi exchangeInfo,
         IExchangeMarketResolver markets,
         IRestClient restClient,
         string? accountId = null,
-        object? rawBundle = null,
-        object? wireBundle = null)
+        object? rawBundle = null)
     {
-        MarketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
         Trading = trading ?? throw new ArgumentNullException(nameof(trading));
         NormalizedMarketData = normalizedMarketData ?? throw new ArgumentNullException(nameof(normalizedMarketData));
         NormalizedAccount = normalizedAccount;
@@ -49,7 +42,6 @@ internal sealed class BittradeApiBundle
         RestClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
         AccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
         RawBundle = rawBundle;
-        WireBundle = wireBundle;
     }
 
     public static BittradeApiBundle FromRestClient(IRestClient restClient, string? accountId = null)
@@ -60,15 +52,13 @@ internal sealed class BittradeApiBundle
         var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         return new BittradeApiBundle(
-            marketData: normalizeBundle.WireBundle.MarketData,
-            trading: normalizeBundle.Trading,
+            trading: normalizeBundle.RawBundle.Trading,
             normalizedMarketData: normalizeBundle.MarketData,
             normalizedAccount: normalizeBundle.Account,
             exchangeInfo: exchangeInfo,
             markets: markets,
             restClient: restClient,
             accountId: normalizedAccountId,
-            rawBundle: normalizeBundle.RawBundle,
-            wireBundle: normalizeBundle.WireBundle);
+            rawBundle: normalizeBundle.RawBundle);
     }
 }

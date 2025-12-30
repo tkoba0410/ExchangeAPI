@@ -11,14 +11,13 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
-using ExchangeApi.Exchanges.Bittrade.Wire;
 using ExchangeApi.Core.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
 /// Bittrade の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess, IHasWireAccess
+public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess
 {
     private readonly IMarketDataApi _marketApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
@@ -26,7 +25,6 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     private readonly IAccountApi _accountApi;
     private readonly IRestClient? _restClient;
     private readonly object? _rawBundle;
-    private readonly object? _wireBundle;
     internal BittradeApiBundle? ApiBundle { get; }
 
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bittrade;
@@ -48,7 +46,6 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
         _restClient = restClient;
         _rawBundle = normalizeBundle.RawBundle;
-        _wireBundle = normalizeBundle.WireBundle;
     }
 
     public BittradePublicClient(IMarketDataApi marketApi, IExchangeInfoApi exchangeInfoApi)
@@ -68,7 +65,6 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
         _restClient = bundle.RestClient;
         _rawBundle = bundle.RawBundle;
-        _wireBundle = bundle.WireBundle;
         ApiBundle = bundle;
     }
 
@@ -91,11 +87,5 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     {
         raw = _rawBundle as T ?? null!;
         return raw is not null;
-    }
-
-    public bool TryGetWire<T>(out T wire) where T : class
-    {
-        wire = _wireBundle as T ?? null!;
-        return wire is not null;
     }
 }

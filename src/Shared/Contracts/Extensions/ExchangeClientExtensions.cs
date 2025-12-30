@@ -17,18 +17,6 @@ public static class ExchangeClientExtensions
             $"RawApi:{typeof(T).Name}");
     }
 
-    public static T Wire<T>(this IExchangeClient client) where T : class
-    {
-        if (client is IHasWireAccess wireAccess && wireAccess.TryGetWire<T>(out var wire))
-        {
-            return wire;
-        }
-
-        throw new ExchangeFeatureNotSupportedException(
-            client.ExchangeCode,
-            $"WireApi:{typeof(T).Name}");
-    }
-
     public static T As<T>(this IExchangeClient client) where T : class
     {
         if (client is T typed)

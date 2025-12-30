@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 

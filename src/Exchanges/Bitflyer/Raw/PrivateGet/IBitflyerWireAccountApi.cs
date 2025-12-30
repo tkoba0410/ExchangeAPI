@@ -6,7 +6,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
-public interface IBitflyerWireAccountApi
+public interface IBitflyerRawAccountApi
 {
     Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(
         CancellationToken cancellationToken = default);
@@ -41,4 +41,9 @@ public interface IBitflyerWireAccountApi
     Task<JsonElement> GetTradingCommissionAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default);
+}
+
+[Obsolete("Use IBitflyerRawAccountApi instead. This interface will be removed in a future major release.")]
+public interface IBitflyerWireAccountApi : IBitflyerRawAccountApi
+{
 }

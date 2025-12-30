@@ -17,12 +17,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 
 internal sealed class BitflyerMarginApi : IMarginAccountApi
 {
-    private readonly IBitflyerWireAccountApi _accountApi;
+    private readonly IBitflyerRawAccountApi _accountApi;
     private readonly IExchangeMarketResolver _markets;
     private readonly ExchangeCode _exchange;
 
     public BitflyerMarginApi(
-        IBitflyerWireAccountApi accountApi,
+        IBitflyerRawAccountApi accountApi,
         IExchangeMarketResolver markets,
         ExchangeCode exchange = ExchangeCode.Bitflyer)
     {

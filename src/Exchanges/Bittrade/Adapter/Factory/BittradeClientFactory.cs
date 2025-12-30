@@ -6,7 +6,6 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Common.Enums;
@@ -44,7 +43,7 @@ public static class BittradeClientFactory
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient, accountId);
         var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var trading = new BittradeTradingApi(normalizeBundle.Trading, markets);
+        var trading = new BittradeTradingApi(normalizeBundle.RawBundle.Trading, markets, accountId);
         IAccountApi account = normalizeBundle.Account is null
             ? new NotSupportedAccountApi(ExchangeCode.Bittrade)
             : new BittradeAccountApi(normalizeBundle.Account);

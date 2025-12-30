@@ -8,21 +8,20 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
 /// <summary>
 /// bitFlyer の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess, IHasWireAccess
+public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess
 {
     private readonly MarketApi _marketApi;
     private readonly IExchangeInfoApi _exchangeInfoApi;
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
     private readonly object? _rawBundle;
-    private readonly object? _wireBundle;
 
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bitflyer;
     public IMarketDataApi Market => _marketApi;
@@ -30,7 +29,7 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     public IAccountApi Account => _accountApi;
     public IExchangeInfoApi Info => _exchangeInfoApi;
 
-    internal BitflyerPublicClient(IBitflyerWireMarketDataApi marketData, object? rawBundle = null, object? wireBundle = null)
+    internal BitflyerPublicClient(IBitflyerRawMarketDataApi marketData, object? rawBundle = null)
     {
         if (marketData is null) throw new ArgumentNullException(nameof(marketData));
         _exchangeInfoApi = new BitflyerExchangeInfoApi();
@@ -39,7 +38,6 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bitflyer);
         _accountApi = new NotSupportedAccountApi(ExchangeCode.Bitflyer);
         _rawBundle = rawBundle;
-        _wireBundle = wireBundle;
     }
 
     public Task<CommonTicker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
@@ -67,11 +65,5 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     {
         raw = _rawBundle as T ?? null!;
         return raw is not null;
-    }
-
-    public bool TryGetWire<T>(out T wire) where T : class
-    {
-        wire = _wireBundle as T ?? null!;
-        return wire is not null;
     }
 }

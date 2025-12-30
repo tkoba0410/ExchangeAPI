@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
-public interface IBitflyerWireTradingApi
+public interface IBitflyerRawPrivateTradingApi
 {
     Task<CreateChildOrderResponse> CreateChildOrderAsync(
         CreateChildOrderRequest request,
@@ -28,4 +28,9 @@ public interface IBitflyerWireTradingApi
     Task<CreateWithdrawalResponse> CreateWithdrawalAsync(
         CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default);
+}
+
+[Obsolete("Use IBitflyerRawPrivateTradingApi instead. This interface will be removed in a future major release.")]
+public interface IBitflyerWireTradingApi : IBitflyerRawPrivateTradingApi
+{
 }

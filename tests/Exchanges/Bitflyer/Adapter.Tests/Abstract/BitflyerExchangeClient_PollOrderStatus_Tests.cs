@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 using RawChildOrderType = ExchangeApi.Exchanges.Bitflyer.Raw.ChildOrderType;
 using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
@@ -55,7 +55,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var publicApi = new FakeBitflyerPublicApi(new Ticker());
         var sequenceApi = new SequenceChildOrderApi(new[] { active }, new[] { completed });
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var client = new BitflyerExchangeClient(publicApi, sequenceApi, tradingApi, publicApi);
+        var client = new BitflyerExchangeClient(publicApi, sequenceApi, tradingApi);
 
         var status = await OrderPolling.WaitForOrderAsync(
             api: client,

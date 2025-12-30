@@ -5,9 +5,6 @@ using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Wire;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private;
-using ExchangeApi.Exchanges.Bittrade.Wire.Public;
 using ExchangeApi.Contracts.Interfaces;
 
 namespace ExchangeApi.Composition.Factory;
@@ -24,10 +21,7 @@ public static class BittradeFactory
         var settings = options ?? new BittradeFactoryOptions();
         var restClient = CreateRestClient(settings, requireCredentials: false);
 
-        return new BittradeRawApi(
-            new BittradePublicApi(restClient),
-            new BittradePrivateApi(restClient),
-            new BittradePrivateTradingApi(restClient));
+        return new BittradeRawApi(restClient);
     }
 
     public static IExchangeClient CreateClient(BittradeFactoryOptions? options = null)
@@ -41,20 +35,6 @@ public static class BittradeFactory
         var restClient = CreateRestClient(settings, requireCredentials: true);
         var bundle = BittradeApiBundle.FromRestClient(restClient, settings.AccountId);
         return new BittradeExchangeClient(bundle);
-    }
-
-    public static BittradeWireApi CreateExchange(BittradeFactoryOptions? options = null)
-    {
-        var settings = options ?? new BittradeFactoryOptions();
-        var restClient = CreateRestClient(settings, requireCredentials: false);
-        var raw = new BittradeRawApi(restClient);
-        var trading = string.IsNullOrWhiteSpace(settings.AccountId)
-            ? (IBittradeWireTradingApi)new BittradeWireTradingApiNotSupported()
-            : new BittradeWireTradingApi(raw.Trading, settings.AccountId);
-        return new BittradeWireApi(
-            new BittradeWireMarketDataApi(raw.MarketData),
-            trading,
-            new BittradeWireCommonApi(raw));
     }
 
     [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]

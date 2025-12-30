@@ -12,7 +12,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
 {
     private readonly IBittradeRawMarketDataApi _raw;
 
-    public BittradeNormalizedMarketDataApi(IBittradeRawMarketDataApi raw)
+    internal BittradeNormalizedMarketDataApi(IBittradeRawMarketDataApi raw)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }

@@ -1,6 +1,6 @@
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 
-internal sealed record BittradeSymbolNormalized(
+public sealed record BittradeSymbolNormalized(
     string Symbol,
     string BaseCurrency,
     string QuoteCurrency,

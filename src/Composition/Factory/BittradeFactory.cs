@@ -4,6 +4,7 @@ using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Contracts.Interfaces;
 
@@ -22,6 +23,19 @@ public static class BittradeFactory
         var restClient = CreateRestClient(settings, requireCredentials: false);
 
         return new BittradeRawApi(restClient);
+    }
+
+    /// <summary>
+    /// Bittrade の Normalized 入口を作成する。
+    /// Raw -> Normalize までを提供し、Contracts/Adapter は返さない。
+    /// </summary>
+    public static BittradeNormalizedApi CreateExchange(BittradeFactoryOptions? options = null)
+    {
+        var settings = options ?? new BittradeFactoryOptions();
+        var requireCredentials = !string.IsNullOrWhiteSpace(settings.AccountId);
+        var restClient = CreateRestClient(settings, requireCredentials: requireCredentials);
+
+        return BittradeNormalizedApi.FromRestClient(restClient, settings.AccountId);
     }
 
     public static IExchangeClient CreateClient(BittradeFactoryOptions? options = null)

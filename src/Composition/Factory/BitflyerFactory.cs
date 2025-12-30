@@ -4,6 +4,7 @@ using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Time;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
@@ -24,6 +25,17 @@ public static class BitflyerFactory
         var settings = options ?? new BitflyerFactoryOptions();
         var restClient = CreateRestClient(settings);
         return new Raw.BitflyerRawApi(restClient);
+    }
+
+    /// <summary>
+    /// bitFlyer の Normalized 入口を作成する。
+    /// Raw -> Normalize までを提供し、Contracts/Adapter は返さない。
+    /// </summary>
+    public static BitflyerNormalizedApi CreateExchange(BitflyerFactoryOptions? options = null)
+    {
+        var settings = options ?? new BitflyerFactoryOptions();
+        var restClient = CreateRestClient(settings);
+        return BitflyerNormalizedApi.FromRestClient(restClient);
     }
 
     public static IExchangeClient CreateClient(BitflyerFactoryOptions? options = null)

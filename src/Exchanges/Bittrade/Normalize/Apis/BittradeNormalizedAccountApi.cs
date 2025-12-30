@@ -13,7 +13,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
     private readonly IBittradeRawApi _raw;
     private readonly string _accountId;
 
-    public BittradeNormalizedAccountApi(IBittradeRawApi raw, string accountId)
+    internal BittradeNormalizedAccountApi(IBittradeRawApi raw, string accountId)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
         _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));

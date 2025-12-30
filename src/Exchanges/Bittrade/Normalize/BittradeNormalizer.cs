@@ -11,7 +11,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalize;
 
 internal static class BittradeNormalizer
 {
-    public static BittradeTickerNormalized NormalizeTicker(RawMergedTick tick, DateTimeOffset? responseTimestamp)
+    internal static BittradeTickerNormalized NormalizeTicker(RawMergedTick tick, DateTimeOffset? responseTimestamp)
     {
         if (tick is null) throw new ArgumentNullException(nameof(tick));
 
@@ -19,7 +19,7 @@ internal static class BittradeNormalizer
         return new BittradeTickerNormalized(tick.Close, timestamp);
     }
 
-    public static BittradeOrderBookNormalized NormalizeOrderBook(RawDepthTick tick)
+    internal static BittradeOrderBookNormalized NormalizeOrderBook(RawDepthTick tick)
     {
         if (tick is null) throw new ArgumentNullException(nameof(tick));
 
@@ -28,7 +28,7 @@ internal static class BittradeNormalizer
         return new BittradeOrderBookNormalized(bids, asks);
     }
 
-    public static IReadOnlyList<BittradeExecutionNormalized> NormalizeExecutions(IReadOnlyList<RawTradeEntry> entries)
+    internal static IReadOnlyList<BittradeExecutionNormalized> NormalizeExecutions(IReadOnlyList<RawTradeEntry> entries)
     {
         if (entries is null) throw new ArgumentNullException(nameof(entries));
 
@@ -42,7 +42,7 @@ internal static class BittradeNormalizer
             .ToList();
     }
 
-    public static IReadOnlyList<BittradeSymbolNormalized> NormalizeSymbols(IReadOnlyList<RawSymbolInfo> symbols)
+    internal static IReadOnlyList<BittradeSymbolNormalized> NormalizeSymbols(IReadOnlyList<RawSymbolInfo> symbols)
     {
         if (symbols is null) throw new ArgumentNullException(nameof(symbols));
 
@@ -59,7 +59,7 @@ internal static class BittradeNormalizer
             .ToList();
     }
 
-    public static IReadOnlyList<BittradeBalanceEntryNormalized> NormalizeBalances(RawBalanceData data)
+    internal static IReadOnlyList<BittradeBalanceEntryNormalized> NormalizeBalances(RawBalanceData data)
     {
         if (data is null) throw new ArgumentNullException(nameof(data));
 

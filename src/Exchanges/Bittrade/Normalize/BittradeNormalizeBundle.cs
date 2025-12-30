@@ -8,7 +8,7 @@ internal sealed class BittradeNormalizeBundle
     public IBittradeNormalizedMarketDataApi MarketData { get; }
     public IBittradeNormalizedExchangeInfoApi ExchangeInfo { get; }
     public IBittradeNormalizedAccountApi? Account { get; }
-    public IBittradeRawApi RawBundle { get; }
+    internal IBittradeRawApi RawBundle { get; }
     public string? AccountId { get; }
 
     public BittradeNormalizeBundle(

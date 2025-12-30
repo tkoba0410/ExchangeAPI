@@ -1,5 +1,5 @@
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 
-internal sealed record BittradeOrderBookLevelNormalized(
+public sealed record BittradeOrderBookLevelNormalized(
     decimal Price,
     decimal Size);

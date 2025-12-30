@@ -288,6 +288,9 @@ Composition は、利用者が「どの層を使うか」を誤らないため�
   * 取引所固有の仕様範囲でのユースケース（取引所固定のボット等）
   * Adapter 実装/デバッグで Normalized を確認したい
 
+* `CreateExchange(...)` は Raw → Normalized までを提供する入口であり、Contracts/Adapter は返さない
+* Normalized の公開 API は Raw/Wire 型を露出しない
+
 > `CreateExchange(...)` は「横断契約」ではなく「取引所固定の便利 API」である。
 
 ---

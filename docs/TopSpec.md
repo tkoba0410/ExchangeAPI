@@ -23,8 +23,10 @@
   - [4.2 非ゴール](#42-非ゴール)
 - [5. 論理階層（下層 → 上層）](#5-論理階層下層-上層)
   - [5.1 Core（実行基盤）](#51-core実行基盤)
-  - [5.2 Raw 層（仕様 / 鏡像）](#52-raw-層仕様--鏡像)
-  - [5.3 Normalized 層（仕様）](#53-normalized-層仕様)
+- [5.2 Raw 層（仕様 / 鏡像）](#52-raw-層仕様--鏡像)
+    - [5.2.1 RawCall（層内 Call 概念）](#521-rawcall層内-call-概念)
+- [5.3 Normalized 層（仕様）](#53-normalized-層仕様)
+    - [5.3.1 NormalizedCall（層内 Call 概念）](#531-normalizedcall層内-call-概念)
   - [5.4 Adapter 層（境界 / 翻訳関所）](#54-adapter-層境界-翻訳関所)
   - [5.5 Contracts（利用の契約 / ドメイン入口）](#55-contracts利用の契約-ドメイン入口)
   - [5.6 Domain（複数取引所抽象化の振る舞い）](#56-domain複数取引所抽象化の振る舞い)
@@ -32,6 +34,8 @@
 - [6. 公開エントリポイント（Factory）[確定]](#6-公開エントリポイントfactory確定)
   - [6.1 `CreateExchange(...)` の用途（混乱防止条文）](#61-createexchange-の用途混乱防止条文)
 - [7. Contracts 公開面（クライアント集約）[確定]](#7-contracts-公開面クライアント集約確定)
+  - [7.1 Call（要求と結果の不可分パッケージ）[確定]](#71-call要求と結果の不可分パッケージ確定)
+  - [7.2 CallOutcome（Success / Failure の排他）[確定]](#72-calloutcomesuccess--failure-の排他確定)
   - [7.1 Call（要求と結果の不可分パッケージ）[確定]](#71-call要求と結果の不可分パッケージ確定)
   - [7.2 CallOutcome（Success/Failure の排他）[確定]](#72-calloutcomesuccessfailure-の排他確定)
 - [8. Contracts DTO と Common 語彙の境界（旧 [Design-Step-04]）[確定]](#8-contracts-dto-と-common-語彙の境界旧-design-step-04確定)
@@ -232,6 +236,17 @@
 * 依存方向の原則：`Raw -> Wire` は許可し、`Normalize/Adapter/Contracts/Domain` から Wire 参照を禁止する。
 
 
+#### 5.2.1 RawCall（層内 Call 概念）
+
+Raw 層では、1 回の API 呼び出しを「要求（RawRequest）と結果（RawOutcome）」の不可分パッケージとして扱ってよい。
+
+* `RawCall<TRequest, TResponse>`
+  * `Request`：RawRequest（path / query / body の鏡像）
+  * `Outcome`：`RawOutcome<TResponse>`（Success / Failure）
+
+RawCall は **Raw 層内でのみ使用可能**とし、Normalized / Adapter / Contracts / Domain へ露出してはならない。
+
+
 ### 5.3 Normalized 層（仕様）
 
 * 取引所内で一貫した表現に整理した DTO
@@ -241,6 +256,17 @@
 
 * `rawDto → normalizedDto`
 * 意味判断は「取引所仕様の範囲」に限定
+
+#### 5.3.1 NormalizedCall（層内 Call 概念）
+
+Normalized 層では、正規化済み Request と結果を「要求（NormalizedRequest）と結果（NormalizedOutcome）」の不可分パッケージとして扱ってよい。
+
+* `NormalizedCall<TRequest, TResponse>`
+  * `Request`：取引所固定の正規化 Request
+  * `Outcome`：`NormalizedOutcome<TResponse>`（Success / Failure）
+
+NormalizedCall は **取引所内仕様の範囲**でのみ有効であり、Contracts / Domain へ露出してはならない。
+
 
 ### 5.4 Adapter 層（境界 / 翻訳関所）
 
@@ -334,23 +360,21 @@ Contracts は、必要に応じて API 呼び出しを **Call**（要求と結�
 
 * 取引所 API により、レスポンスが `symbol` を含まない/曖昧な場合でも、
   **Request 側の文脈（例：Symbol）と結び付けて結果を扱える**ようにする。
-* 上位層（Contracts/Domain）が、常に確定した文脈（特に Symbol）を扱えること。
 
 規約：
 
 * Call を採用する API において、**Request は必須**である。
 * Call は「戻り値」ではなく「事実」であり、**成功/失敗の両方を同一の枠組みで表現**する。
-* Call の導入を理由に Raw/Normalized/Wire の型を Contracts に露出してはならない（境界は 15 章に従う）。
+* Call の導入を理由に Raw / Normalized / Wire の型を Contracts に露出してはならない。
 
-### 7.2 CallOutcome（Success/Failure の排他）[確定]
+### 7.2 CallOutcome（Success / Failure の排他）[確定]
 
-CallOutcome は、Call の結果を **Success/Failure の排他**で表現するための契約である。
+CallOutcome は、Call の結果を **Success / Failure の排他**で表現するための契約である。
 
-* CallOutcome は次の 2 形のみを持つ。
-  * `Success(Response)`
-  * `Failure(ExchangeError)`
-* `Success` と `Failure` は **同時に成立してはならない**（排他）。
-* Failure が保持する Error は、Contracts/Domain が扱う共通語彙としての `ExchangeError`（Common）である。
+* `Success(Response)`
+* `Failure(ExchangeError)`
+
+`Success` と `Failure` は **同時に成立してはならない**。
 
 ---
 
@@ -673,6 +697,7 @@ Raw（鏡像 spec）や Normalized（Exchange）へのアクセスは **デバ�
 * `Common -> Exchanges`
 * `Domain -> Exchanges`
 * `Exchanges -> Exchanges`（取引所間依存）
+* RawCall / NormalizedCall 型を Contracts / Domain に漏らすこと
 
 補足（Wire の参照禁止）：
 
@@ -726,6 +751,14 @@ Domain は「取引所横断の主要ふるまい」を提供する層であり�
 * Raw DTO：接頭辞 `Raw` を付ける（例：`RawTickerDto`）
 * Normalized DTO：接尾辞 `Normalized` を付ける（例：`BitflyerTickerNormalized`）
 * Contracts DTO：取引所名を含めない（例：`TickerDto`）
+
+（A案）Call 型の命名も層ごとに分離する：
+
+* Raw 層：`RawCall<TReq, TRes>`
+* Normalized 層：`NormalizedCall<TReq, TRes>`
+* Contracts 層：`Call<TReq, TRes>`（公開契約）
+
+Call 概念は各層に存在してよいが、**Call 型を層を跨いで共有してはならない**。
 
 #### 15.4.3 クライアント型名（利用者が迷わないこと）
 

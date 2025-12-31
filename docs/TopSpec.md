@@ -32,6 +32,8 @@
 - [6. 公開エントリポイント（Factory）[確定]](#6-公開エントリポイントfactory確定)
   - [6.1 `CreateExchange(...)` の用途（混乱防止条文）](#61-createexchange-の用途混乱防止条文)
 - [7. Contracts 公開面（クライアント集約）[確定]](#7-contracts-公開面クライアント集約確定)
+  - [7.1 Call（要求と結果の不可分パッケージ）[確定]](#71-call要求と結果の不可分パッケージ確定)
+  - [7.2 CallOutcome（Success/Failure の排他）[確定]](#72-calloutcomesuccessfailure-の排他確定)
 - [8. Contracts DTO と Common 語彙の境界（旧 [Design-Step-04]）[確定]](#8-contracts-dto-と-common-語彙の境界旧-design-step-04確定)
   - [8.1 Contracts（DTO：入出力の形）](#81-contractsdto入出力の形)
   - [8.2 Common（語彙：値・分類・失敗・パース）](#82-common語彙値分類失敗パース)
@@ -316,6 +318,39 @@ Contracts は、横断利用における公開面を次の形で提供する。
     * `Info : IExchangeInfoApi`
 
 `CreateClient(...)` の返り値は `IExchangeClient` を正とする。
+
+### 7.1 Call（要求と結果の不可分パッケージ）[確定]
+
+Contracts は、必要に応じて API 呼び出しを **Call**（要求と結果の不可分パッケージ）として表現してよい。
+
+**Call の定義**：
+
+* **Call** は、次を不可分に束ねた「呼び出しの事実」である。
+  * **Request**（呼び出し入力）
+  * **Outcome**（成功または失敗のいずれか）
+* **Response が存在しない場合でも、Request と Error により Call は成立する**（Failure）。
+
+目的：
+
+* 取引所 API により、レスポンスが `symbol` を含まない/曖昧な場合でも、
+  **Request 側の文脈（例：Symbol）と結び付けて結果を扱える**ようにする。
+* 上位層（Contracts/Domain）が、常に確定した文脈（特に Symbol）を扱えること。
+
+規約：
+
+* Call を採用する API において、**Request は必須**である。
+* Call は「戻り値」ではなく「事実」であり、**成功/失敗の両方を同一の枠組みで表現**する。
+* Call の導入を理由に Raw/Normalized/Wire の型を Contracts に露出してはならない（境界は 15 章に従う）。
+
+### 7.2 CallOutcome（Success/Failure の排他）[確定]
+
+CallOutcome は、Call の結果を **Success/Failure の排他**で表現するための契約である。
+
+* CallOutcome は次の 2 形のみを持つ。
+  * `Success(Response)`
+  * `Failure(ExchangeError)`
+* `Success` と `Failure` は **同時に成立してはならない**（排他）。
+* Failure が保持する Error は、Contracts/Domain が扱う共通語彙としての `ExchangeError`（Common）である。
 
 ---
 

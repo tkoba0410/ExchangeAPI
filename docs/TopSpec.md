@@ -23,21 +23,20 @@
   - [4.2 非ゴール](#42-非ゴール)
 - [5. 論理階層（下層 → 上層）](#5-論理階層下層-上層)
   - [5.1 Core（実行基盤）](#51-core実行基盤)
-- [5.2 Raw 層（仕様 / 鏡像）](#52-raw-層仕様--鏡像)
-    - [5.2.1 RawCall（層内 Call 概念）](#521-rawcall層内-call-概念)
-- [5.3 Normalized 層（仕様）](#53-normalized-層仕様)
-    - [5.3.1 NormalizedCall（層内 Call 概念）](#531-normalizedcall層内-call-概念)
-  - [5.4 Adapter 層（境界 / 翻訳関所）](#54-adapter-層境界-翻訳関所)
-  - [5.5 Contracts（利用の契約 / ドメイン入口）](#55-contracts利用の契約-ドメイン入口)
-  - [5.6 Domain（複数取引所抽象化の振る舞い）](#56-domain複数取引所抽象化の振る舞い)
-  - [5.7 Composition（供給レイヤ）](#57-composition供給レイヤ)
+  - [5.2 Wire 層（仕様 / transport）](#52-wire-層仕様--transport)
+  - [5.3 Raw 層（仕様 / 鏡像）](#53-raw-層仕様--鏡像)
+    - [5.3.1 RawCall（層内 Call 概念）](#531-rawcall層内-call-概念)
+  - [5.4 Normalized 層（仕様）](#54-normalized-層仕様)
+    - [5.4.1 NormalizedCall（層内 Call 概念）](#541-normalizedcall層内-call-概念)
+  - [5.5 Adapter 層（境界 / 翻訳関所）](#55-adapter-層境界-翻訳関所)
+  - [5.6 Contracts（利用の契約 / ドメイン入口）](#56-contracts利用の契約-ドメイン入口)
+  - [5.7 Domain（複数取引所抽象化の振る舞い）](#57-domain複数取引所抽象化の振る舞い)
+  - [5.8 Composition（供給レイヤ）](#58-composition供給レイヤ)
 - [6. 公開エントリポイント（Factory）[確定]](#6-公開エントリポイントfactory確定)
   - [6.1 `CreateExchange(...)` の用途（混乱防止条文）](#61-createexchange-の用途混乱防止条文)
 - [7. Contracts 公開面（クライアント集約）[確定]](#7-contracts-公開面クライアント集約確定)
   - [7.1 Call（要求と結果の不可分パッケージ）[確定]](#71-call要求と結果の不可分パッケージ確定)
   - [7.2 CallOutcome（Success / Failure の排他）[確定]](#72-calloutcomesuccess--failure-の排他確定)
-  - [7.1 Call（要求と結果の不可分パッケージ）[確定]](#71-call要求と結果の不可分パッケージ確定)
-  - [7.2 CallOutcome（Success/Failure の排他）[確定]](#72-calloutcomesuccessfailure-の排他確定)
 - [8. Contracts DTO と Common 語彙の境界（旧 [Design-Step-04]）[確定]](#8-contracts-dto-と-common-語彙の境界旧-design-step-04確定)
   - [8.1 Contracts（DTO：入出力の形）](#81-contractsdto入出力の形)
   - [8.2 Common（語彙：値・分類・失敗・パース）](#82-common語彙値分類失敗パース)
@@ -183,9 +182,11 @@
 * 海外主要取引所の Public API（Market Data 等）への対応
 * 取引所 API を以下の層として整理し、仕様差分と責務を分離する
 
-1. **Raw 層（鏡像 spec）**（仕様）
-2. **Normalized 層**（仕様）
-3. **Adapter〜上位**（ドメイン）
+1. **Wire 層（transport spec）**（仕様）
+2. **Raw 層（鏡像 spec）**（仕様）
+3. **Normalized 層**（仕様）
+4. **Adapter 層**（ドメイン境界）
+5. **Contracts 層**（利用契約 / ドメイン入口）
 
 ### 4.2 非ゴール
 
@@ -199,11 +200,35 @@
 
 ### 5.1 Core（実行基盤）
 
-* HTTP / Retry / Clock / Signer / Serializer など
+* HTTP / Retry / Clock / Signer / Serializer など（ただし「取引所ごとの endpoint / 署名規約」は持たない）
 * 取引所・ドメインの概念を一切持たない
 * API を成立させる技術基盤
 
-### 5.2 Raw 層（仕様 / 鏡像）
+### 5.2 Wire 層（仕様 / transport）
+
+* 取引所 API の **transport 表現**を扱う層（HTTP・署名・認証・(de)serialize・transport レベルの失敗整形）
+* **正本（source of truth）：各取引所の公式 API 文書（endpoint / auth / sign / headers / status / error 形式）**
+* Wire は「意味」や「ドメイン値」を一切扱わず、あくまで transport の仕様に閉じる
+
+Wire の責務（許可）：
+
+* HTTP / 認証 / 署名 / リクエスト構築
+* (de)serialize
+* transport レベルのエラー整形（status code / network / timeout など）
+
+Wire の禁止（意味判断の禁止）：
+
+* `Price` / `Size` 等のドメイン値へのパース・正規化
+* シンボル正規化、欠損補完、丸め等の意味的変換
+* `contractDto` / `normalizedDto` の生成
+
+参照方向：
+
+* `Raw -> Wire` は許可する（Raw は Wire を利用して通信を行ってよい）
+* `Normalize/Adapter/Contracts/Domain -> Wire` は禁止する（Wire の越境禁止）
+
+
+### 5.3 Raw 層（仕様 / 鏡像）
 
 * 取引所 API の通信表現そのもの（鏡像）
 * **正本（source of truth）：各取引所の公式 API 文書**
@@ -219,24 +244,14 @@
 * `src/Exchanges/<Exchange>/Raw/**` は **実装（鏡像の具現化）** であり、必要に応じて
   公式 API 文書に基づき実装される。
 
-注記（Wire の扱い：Raw の内部詳細）：
+注記（層の数え方）：
 
-* **Wire は本仕様の論理階層（layer）ではない。**
-* Wire は `Raw` 層の **内部実装詳細**としてのみ許容され、責務は次に限定する。
-
-  * HTTP / 認証 / 署名 / リクエスト構築
-  * (de)serialize および transport レベルのエラー整形
-
-* Wire は次を行ってはならない（意味判断の禁止）。
-
-  * `Price` / `Size` 等のドメイン値へのパース・正規化
-  * シンボル正規化、欠損補完、丸め等の意味的変換
-  * `contractDto` の生成
-
-* 依存方向の原則：`Raw -> Wire` は許可し、`Normalize/Adapter/Contracts/Domain` から Wire 参照を禁止する。
+* 本仕様における **5層**は `Wire / Raw / Normalized / Adapter / Contracts` を指す。
+* `Core` は実行基盤であり、層（spec/domain 分離の主軸）には数えない。
+* `Domain` と `Composition` は上位横断・配線であり、層の数には含めない。
 
 
-#### 5.2.1 RawCall（層内 Call 概念）
+#### 5.3.1 RawCall（層内 Call 概念）
 
 Raw 層では、1 回の API 呼び出しを「要求（RawRequest）と結果（RawOutcome）」の不可分パッケージとして扱ってよい。
 
@@ -247,7 +262,7 @@ Raw 層では、1 回の API 呼び出しを「要求（RawRequest）と結果�
 RawCall は **Raw 層内でのみ使用可能**とし、Normalized / Adapter / Contracts / Domain へ露出してはならない。
 
 
-### 5.3 Normalized 層（仕様）
+### 5.4 Normalized 層（仕様）
 
 * 取引所内で一貫した表現に整理した DTO
 * 命名・型・精度・時刻表現を統一
@@ -257,7 +272,7 @@ RawCall は **Raw 層内でのみ使用可能**とし、Normalized / Adapter / C
 * `rawDto → normalizedDto`
 * 意味判断は「取引所仕様の範囲」に限定
 
-#### 5.3.1 NormalizedCall（層内 Call 概念）
+#### 5.4.1 NormalizedCall（層内 Call 概念）
 
 Normalized 層では、正規化済み Request と結果を「要求（NormalizedRequest）と結果（NormalizedOutcome）」の不可分パッケージとして扱ってよい。
 
@@ -268,7 +283,7 @@ Normalized 層では、正規化済み Request と結果を「要求（Normalize
 NormalizedCall は **取引所内仕様の範囲**でのみ有効であり、Contracts / Domain へ露出してはならない。
 
 
-### 5.4 Adapter 層（境界 / 翻訳関所）
+### 5.5 Adapter 層（境界 / 翻訳関所）
 
 > **仕様（spec）と言語（domain）を翻訳する唯一の関所**
 
@@ -276,19 +291,19 @@ NormalizedCall は **取引所内仕様の範囲**でのみ有効であり、Con
 * `normalizedDto → contractDto` を Mapper により変換
 * 取引所差分をここで完全に吸収
 
-### 5.5 Contracts（利用の契約 / ドメイン入口）
+### 5.6 Contracts（利用の契約 / ドメイン入口）
 
 * 利用者・上位アプリが依存してよい唯一の契約
 * interface と抽象 DTO（入出力）
 * 取引所を一切知らない
 
-### 5.6 Domain（複数取引所抽象化の振る舞い）
+### 5.7 Domain（複数取引所抽象化の振る舞い）
 
 * 複数取引所を横断して扱うための主要ふるまい
 * UseCase / Domain Service / Policy
 * **入力は Contracts（Interface/DTO）と Common（語彙）に限定**
 
-### 5.7 Composition（供給レイヤ）
+### 5.8 Composition（供給レイヤ）
 
 * Core / Exchanges を組み立てて提供
 * Factory / Options / Credential 注入
@@ -688,6 +703,7 @@ Raw（鏡像 spec）や Normalized（Exchange）へのアクセスは **デバ�
 * `Contracts -> Common`
 * `Exchanges(Adapter) -> Contracts, Common`
 * `Exchanges(Raw/Normalize) -> Common`（必要な語彙のみ）
+* `Exchanges(Raw) -> Exchanges(Wire)`（取引所内の下位層利用として許可）
 * `Composition -> *`（配線のみのため全参照可）
 
 ### 15.2 禁止
@@ -846,6 +862,8 @@ Call 概念は各層に存在してよいが、**Call 型を層を跨いで共�
 * Converter に意味判断を書いてはならない
 * Mapper に JSON 構文処理を書いてはならない
 * Adapter 以外で contractDto を生成してはならない
+* Wire に意味判断（Price/Size/Symbol 等の正規化）を書いてはならない
+* Wire が normalizedDto / contractDto を生成してはならない
 
 ---
 

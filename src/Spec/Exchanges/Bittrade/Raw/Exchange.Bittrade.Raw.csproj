@@ -13,4 +13,8 @@
     <ProjectReference Include="..\..\..\..\Core\Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Wire\**\*.cs" />
+  </ItemGroup>
+
 </Project>

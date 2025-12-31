@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 
@@ -24,7 +24,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
         var response = await _raw.GetAccountBalanceAsync(_accountId, ct).ConfigureAwait(false);
         if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Data is null)
         {
-            throw new ExchangeApiException("Bittrade balance response invalid.");
+            throw new BittradeNormalizedException("Bittrade balance response invalid.");
         }
 
         return BittradeNormalizer.NormalizeBalances(response.Data);

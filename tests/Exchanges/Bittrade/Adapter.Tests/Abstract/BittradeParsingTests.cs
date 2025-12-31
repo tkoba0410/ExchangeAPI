@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using Xunit;
 
@@ -20,7 +20,7 @@ public sealed class BittradeParsingTests
                 new RawBalanceEntry(Currency: "btc", Type: "trade", Balance: "bad")
             });
 
-        var ex = Assert.Throws<ExchangeApiException>(() => BittradeNormalizer.NormalizeBalances(data));
+        var ex = Assert.Throws<BittradeNormalizedException>(() => BittradeNormalizer.NormalizeBalances(data));
 
         Assert.Contains("RawBalanceEntry.balance", ex.Message);
         Assert.Contains("bad", ex.Message);

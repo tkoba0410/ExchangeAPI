@@ -12,6 +12,7 @@ using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 
 /// <summary>
@@ -46,6 +47,15 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         {
             throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
         }
+        catch (BittradeNormalizedException ex)
+        {
+            throw new ExchangeApiException(
+                message: ex.Message,
+                exchange: Exchange,
+                operation: operation,
+                statusCode: null,
+                innerException: ex);
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
@@ -69,6 +79,15 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         {
             throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
         }
+        catch (BittradeNormalizedException ex)
+        {
+            throw new ExchangeApiException(
+                message: ex.Message,
+                exchange: Exchange,
+                operation: operation,
+                statusCode: null,
+                innerException: ex);
+        }
         catch (ExchangeApiException ex)
         {
             throw BittradeErrorMapper.EnrichBittradeException(ex, Exchange, operation);
@@ -91,6 +110,15 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         catch (TransportException ex)
         {
             throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
+        }
+        catch (BittradeNormalizedException ex)
+        {
+            throw new ExchangeApiException(
+                message: ex.Message,
+                exchange: Exchange,
+                operation: operation,
+                statusCode: null,
+                innerException: ex);
         }
         catch (ExchangeApiException ex)
         {

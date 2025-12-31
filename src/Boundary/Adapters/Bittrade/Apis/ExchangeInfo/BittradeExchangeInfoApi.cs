@@ -11,6 +11,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
@@ -40,6 +41,15 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
         catch (TransportException ex)
         {
             throw BittradeErrorMapper.FromTransportException(ex, Exchange, operation);
+        }
+        catch (BittradeNormalizedException ex)
+        {
+            throw new ExchangeApiException(
+                message: ex.Message,
+                exchange: Exchange,
+                operation: operation,
+                statusCode: null,
+                innerException: ex);
         }
         catch (ExchangeApiException ex)
         {

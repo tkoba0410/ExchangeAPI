@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 
@@ -22,7 +22,7 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
         var response = await _raw.GetSymbolsAsync(ct).ConfigureAwait(false);
         if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Data is null)
         {
-            throw new ExchangeApiException("Bittrade symbols response invalid.");
+            throw new BittradeNormalizedException("Bittrade symbols response invalid.");
         }
 
         return BittradeNormalizer.NormalizeSymbols(response.Data);

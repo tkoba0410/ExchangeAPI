@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 
@@ -77,7 +77,7 @@ internal static class BittradeNormalizer
     {
         if (levels is null)
         {
-            throw new ExchangeApiException($"Bittrade order book missing {field}.");
+            throw new BittradeNormalizedException($"Bittrade order book missing {field}.");
         }
 
         return levels.Select(level => NormalizeLevel(level, field)).ToList();
@@ -87,7 +87,7 @@ internal static class BittradeNormalizer
     {
         if (level.Count < 2)
         {
-            throw new ExchangeApiException($"Bittrade order book {field} level is invalid.");
+            throw new BittradeNormalizedException($"Bittrade order book {field} level is invalid.");
         }
 
         return new BittradeOrderBookLevelNormalized(level[0], level[1]);
@@ -99,7 +99,7 @@ internal static class BittradeNormalizer
         {
             JsonValueKind.String => ParseDecimalOrThrow(element.GetString()!, field, "RawSymbolInfo"),
             JsonValueKind.Number => element.GetDecimal(),
-            _ => throw new ExchangeApiException($"Unexpected JSON type for RawSymbolInfo.{field}: {element.ValueKind}")
+            _ => throw new BittradeNormalizedException($"Unexpected JSON type for RawSymbolInfo.{field}: {element.ValueKind}")
         };
     }
 
@@ -122,6 +122,6 @@ internal static class BittradeNormalizer
             return value;
         }
 
-        throw new ExchangeApiException($"Invalid decimal for {dto}.{field}: '{s}'.");
+        throw new BittradeNormalizedException($"Invalid decimal for {dto}.{field}: '{s}'.");
     }
 }

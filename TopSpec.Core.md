@@ -33,20 +33,20 @@
 
 ### 4.1 ゴール
 
-1. 複数取引所間で抽象化可能な項目のみを Domain（Contracts / Common）として定義し、
+1. 第1の提供価値として、取引所ごとの API を前提に、
+   Wire / Raw / Normalized（spec）を第一級の API として提供すること。
+2. 第2の提供価値として、複数取引所間で抽象化可能な項目のみを
+   Cross-Exchange（Domain: Contracts / Common）として定義し、
    その意味論を安定させること。
-2. 取引所 API の利用を前提とし、取引所固有の仕様差異を
-   隠蔽または完全抽象化の対象としないこと。
 3. 公開入口（Factory）により、利用者が
-   Cross-Exchange（抽象化された API）と
-   Exchange-Specific（取引所固有 API）
+   Exchange-Specific（取引所固有）と Cross-Exchange（抽象化）
    の利用意図を一意に選択できること。
 
 ### 4.2 非ゴール
 
 1. 取引所 API 仕様の完全な写像（全 endpoint の網羅）。
 2. 取引所間仕様差異の完全な抽象化。
-3. 取引所固有 API の意味論を、Cross-Exchange と同一水準で
+3. spec（Wire / Raw / Normalized）を Cross-Exchange と同一水準で
    不変に保つこと。
 
 ---

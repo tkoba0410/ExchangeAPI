@@ -86,15 +86,16 @@ Split Candidate: DecisionLog
 
 ### 4.1 ゴールの解釈
 
+* 本プロジェクトの提供価値には優先順位がある。
+  * **第1：取引所ごとの API を前提に、Wire / Raw / Normalized（spec）を第一級の API として提供すること**
+  * **第2：複数取引所間で抽象化可能な項目のみを Cross-Exchange（Domain: Contracts / Common）として提供すること**
 * 本プロジェクトのゴールは「取引所差異を完全に隠蔽すること」ではない。
-* 取引所 API の利用を前提とし、複数取引所間で抽象化可能な項目のみを
-  Cross-Exchange（Domain: Contracts / Common）として定義し、その意味論を安定させる。
+  * 取引所にはそれぞれの仕様があり、完全抽象化は不可能／不適切である。
+* Cross-Exchange は **抽象化できる範囲に限定**し、意味論を安定させる。
   * 例：資産状況、注文状況 等
-* 取引所固有の仕様差異は、隠蔽または完全抽象化の対象としない。
-  代わりに、利用者が明示的に選択できる形で提供する（Exchange-Specific）。
 * 公開入口（Factory）は、利用者の意図を型で表現する：
-  * Cross-Exchange（抽象化された API）を使いたい
-  * Exchange-Specific（取引所固有 API）を使いたい
+  * Exchange-Specific（取引所固有：spec を直接利用）を使いたい
+  * Cross-Exchange（抽象化：Domain 契約）を使いたい
 
 ### 4.2 非ゴールの再確認
 
@@ -102,14 +103,14 @@ Split Candidate: DecisionLog
   * リポジトリ内に取引所ごとの `spec.md` / `sample.json` 等の写経を置かない方針とも整合する。
 * 「取引所間仕様差異の完全抽象化（差異を消すこと）」は非ゴールである。
   * 取引所固有の差異は現実に存在し、完全抽象化は不可能／不適切である。
-* 「取引所固有 API の意味論を Cross-Exchange と同一水準で不変に保つこと」は非ゴールである。
-  * 取引所固有 API は変化しうる前提で扱い、破壊は “固有側” に閉じ込める。
+* 「spec（Wire / Raw / Normalized）を Cross-Exchange と同一水準で不変に保つこと」は非ゴールである。
+  * spec は公式 API 変更に追随して破壊されうる前提で扱う（利用者が選択して追随する）。
 
 ### 4.3 よくある誤用（改訂後の注意点）
 
 * Cross-Exchange に取引所固有フィールドや transport 情報を混入させない。
   * それは §18「domain 内への transport 情報の流入」違反を誘発する。
-* Exchange-Specific は “何でも OK” ではない。
+* Exchange-Specific（spec 直利用）は “何でも OK” ではない。
   * Raw / Exchange への直接アクセスは明示的 opt-in を前提とする（Core §14）。
 * 「抽象化できる項目」の一覧は Core に固定せず、運用文書（Ops 等）で管理する。
   * Core は境界・責務・不変条件のみを決める（Core §1）。

@@ -3,7 +3,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 
-internal interface IBitflyerWireApi
+public interface IBitflyerWireApi
 {
     IBitflyerWireMarketDataApi MarketData { get; }
     IBitflyerWireTradingApi Trading { get; }

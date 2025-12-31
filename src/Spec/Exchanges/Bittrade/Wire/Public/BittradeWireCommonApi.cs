@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Core.Contracts.Transport;
+using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Public;
@@ -10,31 +12,46 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Public;
 internal sealed class BittradeWireCommonApi : IBittradeWireCommonApi
 {
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
-    private readonly BittradeRawApi _raw;
+    private readonly IRestClient _restClient;
 
-    public BittradeWireCommonApi(BittradeRawApi raw)
+    public BittradeWireCommonApi(IRestClient restClient)
     {
-        _raw = raw ?? throw new ArgumentNullException(nameof(raw));
+        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public async Task<WireResponse<RawTimestampResponse>> GetTimestampAsync(CancellationToken ct = default)
+    public async Task<WireResponse> GetTimestampAsync(CancellationToken ct = default)
     {
-        var raw = await _raw.GetTimestampAsync(ct).ConfigureAwait(false);
-        BittradeWireErrors.RequireOk(raw.Status, null, null, BittradeWireOperations.Common.GetTimestamp);
-        return new WireResponse<RawTimestampResponse>(Exchange, raw);
+        var meta = await _restClient.GetRawAsync("v1/common/timestamp", cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
     }
 
-    public async Task<WireResponse<RawSymbolsResponse>> GetSymbolsAsync(CancellationToken ct = default)
+    public async Task<WireResponse> GetSymbolsAsync(CancellationToken ct = default)
     {
-        var raw = await _raw.GetSymbolsAsync(ct).ConfigureAwait(false);
-        BittradeWireErrors.RequireOk(raw.Status, null, null, BittradeWireOperations.Common.GetSymbols);
-        return new WireResponse<RawSymbolsResponse>(Exchange, raw);
+        var meta = await _restClient.GetRawAsync("v1/common/symbols", cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
     }
 
-    public async Task<WireResponse<RawCurrenciesResponse>> GetCurrenciesAsync(CancellationToken ct = default)
+    public async Task<WireResponse> GetCurrenciesAsync(CancellationToken ct = default)
     {
-        var raw = await _raw.GetCurrenciesAsync(ct).ConfigureAwait(false);
-        BittradeWireErrors.RequireOk(raw.Status, null, null, BittradeWireOperations.Common.GetCurrencies);
-        return new WireResponse<RawCurrenciesResponse>(Exchange, raw);
+        var meta = await _restClient.GetRawAsync("v1/common/currencys", cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
+    }
+
+    public async Task<WireResponse> GetRetailMaintainTimeAsync(CancellationToken ct = default)
+    {
+        var meta = await _restClient.GetRawAsync("v1/retail/maintain/time", cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
+    }
+
+    private static WireResponse ToWire(HttpResponseMeta meta)
+    {
+        var headers = meta.Headers is null
+            ? null
+            : new Dictionary<string, string>(meta.Headers, StringComparer.OrdinalIgnoreCase);
+        return new WireResponse(
+            Exchange,
+            meta.StatusCode,
+            meta.Body ?? string.Empty,
+            headers);
     }
 }

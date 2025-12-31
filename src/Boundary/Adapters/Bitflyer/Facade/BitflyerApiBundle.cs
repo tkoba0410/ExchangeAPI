@@ -32,9 +32,10 @@ internal sealed class BitflyerApiBundle
     public static BitflyerApiBundle FromRestClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        var raw = new Raw.BitflyerRawApi(restClient);
-        var privateApi = new BitflyerPrivateApi(restClient);
-        var privateTradingApi = new BitflyerPrivateTradingApi(restClient);
+        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
+        var raw = new Raw.BitflyerRawApi(wire);
+        var privateApi = new BitflyerPrivateApi(wire.Account);
+        var privateTradingApi = new BitflyerPrivateTradingApi(wire.Trading);
         return new BitflyerApiBundle(
             marketData: raw.MarketData,
             account: privateApi,

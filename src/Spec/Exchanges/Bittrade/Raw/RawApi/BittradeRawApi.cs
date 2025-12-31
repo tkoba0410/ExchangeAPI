@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
@@ -15,11 +15,11 @@ public sealed class BittradeRawApi : IBittradeRawApi
     public IBittradeRawMarketDataApi MarketData { get; }
     public IBittradeRawTradingApi Trading { get; }
 
-    public BittradeRawApi(IRestClient restClient)
+    public BittradeRawApi(IBittradeWireApi wire)
         : this(
-            publicApi: new BittradePublicApi(restClient ?? throw new ArgumentNullException(nameof(restClient))),
-            privateApi: new BittradePrivateApi(restClient),
-            privateTradingApi: new BittradePrivateTradingApi(restClient))
+            publicApi: new BittradePublicApi(wire ?? throw new ArgumentNullException(nameof(wire))),
+            privateApi: new BittradePrivateApi(wire.Account),
+            privateTradingApi: new BittradePrivateTradingApi(wire.Trading))
     {
     }
 

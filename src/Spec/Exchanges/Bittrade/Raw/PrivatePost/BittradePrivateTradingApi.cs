@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Private;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
@@ -9,86 +9,72 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// </summary>
 internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
 {
-    private readonly IRestClient _restClient;
+    private readonly IBittradeWireTradingApi _wire;
 
-    public BittradePrivateTradingApi(IRestClient restClient)
+    public BittradePrivateTradingApi(IBittradeWireTradingApi wire)
     {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<RawPlaceOrderResponse> CreateOrderAsync(RawCreateOrderRequest request, CancellationToken cancellationToken = default)
+    public async Task<RawPlaceOrderResponse> CreateOrderAsync(RawCreateOrderRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<RawCreateOrderRequest, RawPlaceOrderResponse>(
-            "v1/order/orders/place",
-            request,
-            cancellationToken);
+        var response = await _wire.PlaceOrderAsync(request, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawPlaceOrderResponse>(response);
     }
 
-    public Task<RawCancelOrderResponse> CancelOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
+    public async Task<RawCancelOrderResponse> CancelOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(orderId.Value))
         {
             throw new ArgumentException("orderId is required.", nameof(orderId));
         }
 
-        return _restClient.PostAsync<object?, RawCancelOrderResponse>(
-            $"v1/order/orders/{orderId.Value}/submitcancel",
-            body: null,
-            cancellationToken: cancellationToken);
+        var response = await _wire.CancelOrderAsync(orderId.Value, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawCancelOrderResponse>(response);
     }
 
-    public Task<RawCancelOrdersResponse> CancelOrdersAsync(RawCancelOrdersRequest request, CancellationToken cancellationToken = default)
+    public async Task<RawCancelOrdersResponse> CancelOrdersAsync(RawCancelOrdersRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<RawCancelOrdersRequest, RawCancelOrdersResponse>(
-            "v1/order/orders/batchcancel",
-            request,
-            cancellationToken);
+        var response = await _wire.CancelOrdersAsync(request, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawCancelOrdersResponse>(response);
     }
 
-    public Task<RawCancelOpenOrdersResponse> CancelOpenOrdersAsync(RawCancelOpenOrdersRequest request, CancellationToken cancellationToken = default)
+    public async Task<RawCancelOpenOrdersResponse> CancelOpenOrdersAsync(RawCancelOpenOrdersRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<RawCancelOpenOrdersRequest, RawCancelOpenOrdersResponse>(
-            "v1/order/orders/batchCancelOpenOrders",
-            request,
-            cancellationToken);
+        var response = await _wire.CancelOpenOrdersAsync(request, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawCancelOpenOrdersResponse>(response);
     }
 
-    public Task<RawCreateWithdrawResponse> CreateWithdrawAsync(RawCreateWithdrawRequest request, CancellationToken cancellationToken = default)
+    public async Task<RawCreateWithdrawResponse> CreateWithdrawAsync(RawCreateWithdrawRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<RawCreateWithdrawRequest, RawCreateWithdrawResponse>(
-            "v1/dw/withdraw/api/create",
-            request,
-            cancellationToken);
+        var response = await _wire.CreateWithdrawAsync(request, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawCreateWithdrawResponse>(response);
     }
 
-    public Task<RawCancelWithdrawResponse> CancelWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
+    public async Task<RawCancelWithdrawResponse> CancelWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(withdrawId))
         {
             throw new ArgumentException("withdrawId is required.", nameof(withdrawId));
         }
 
-        return _restClient.PostAsync<object?, RawCancelWithdrawResponse>(
-            $"v1/dw/withdraw-virtual/{withdrawId}/cancel",
-            body: null,
-            cancellationToken: cancellationToken);
+        var response = await _wire.CancelWithdrawAsync(withdrawId, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawCancelWithdrawResponse>(response);
     }
 
-    public Task<RawRetailOrderResponse> CreateRetailOrderAsync(RawCreateRetailOrderRequest request, CancellationToken cancellationToken = default)
+    public async Task<RawRetailOrderResponse> CreateRetailOrderAsync(RawCreateRetailOrderRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        return _restClient.PostAsync<RawCreateRetailOrderRequest, RawRetailOrderResponse>(
-            "v1/retail/order/place",
-            request,
-            cancellationToken);
+        var response = await _wire.CreateRetailOrderAsync(request, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawRetailOrderResponse>(response);
     }
 }

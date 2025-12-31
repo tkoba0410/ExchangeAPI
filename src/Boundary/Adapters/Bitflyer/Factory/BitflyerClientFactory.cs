@@ -47,7 +47,8 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var raw = new Raw.BitflyerRawApi(restClient);
+        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
+        var raw = new Raw.BitflyerRawApi(wire);
         return new BitflyerPublicClient(raw.MarketData, rawBundle: raw);
     }
 
@@ -118,9 +119,10 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var raw = new Raw.BitflyerRawApi(restClient);
-        var privateApi = new Raw.PrivateGet.BitflyerPrivateApi(restClient);
-        var privateTradingApi = new Raw.PrivatePost.BitflyerPrivateTradingApi(restClient);
+        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
+        var raw = new Raw.BitflyerRawApi(wire);
+        var privateApi = new Raw.PrivateGet.BitflyerPrivateApi(wire.Account);
+        var privateTradingApi = new Raw.PrivatePost.BitflyerPrivateTradingApi(wire.Trading);
 
         return new BitflyerExchangeClient(
             marketData: raw.MarketData,

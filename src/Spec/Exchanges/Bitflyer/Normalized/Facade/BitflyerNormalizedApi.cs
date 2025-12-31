@@ -27,7 +27,8 @@ public sealed class BitflyerNormalizedApi
     public static BitflyerNormalizedApi FromRestClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        var raw = new BitflyerRawApi(restClient);
+        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
+        var raw = new BitflyerRawApi(wire);
 
         return new BitflyerNormalizedApi(
             marketData: new BitflyerNormalizedMarketDataFacade(raw.MarketData),

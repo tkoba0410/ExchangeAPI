@@ -1,88 +1,98 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Contracts.Transport;
+using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
-using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Public.Models;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Public;
 
 internal sealed class BittradeWireMarketDataApi : IBittradeWireMarketDataApi
 {
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
-    private readonly IBittradeRawMarketDataApi _raw;
+    private readonly IRestClient _restClient;
 
-    public BittradeWireMarketDataApi(IBittradeRawMarketDataApi raw)
+    public BittradeWireMarketDataApi(IRestClient restClient)
     {
-        _raw = raw ?? throw new ArgumentNullException(nameof(raw));
+        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public async Task<WireResponse<BittradeWireTicker>> GetTickerAsync(string symbol, CancellationToken ct = default)
+    public async Task<WireResponse> GetTickerAsync(string symbol, CancellationToken ct = default)
     {
-        var operation = BittradeWireOperations.MarketData.GetTicker;
-        var raw = await _raw.GetTickerAsync(RawSymbol.From(symbol), ct).ConfigureAwait(false);
-        BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
-
-        var tick = raw.Tick ?? throw BittradeWireErrors.Missing(operation, "tick");
-        var bestBid = GetBestPrice(tick.Bid, "bid", operation);
-        var bestAsk = GetBestPrice(tick.Ask, "ask", operation);
-        var timestamp = tick.Ts ?? raw.Ts ?? throw BittradeWireErrors.Missing(operation, "ts");
-
-        var response = new BittradeWireTicker(
-            BestBid: bestBid,
-            BestAsk: bestAsk,
-            Last: tick.Close,
-            Volume: tick.Volume,
-            Timestamp: timestamp);
-        return new WireResponse<BittradeWireTicker>(Exchange, response);
+        EnsureSymbol(symbol);
+        var path = $"market/detail/merged?symbol={ToApiSymbol(symbol)}";
+        var meta = await _restClient.GetRawAsync(path, cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
     }
 
-    public async Task<WireResponse<BittradeWireOrderBook>> GetOrderBookAsync(string symbol, CancellationToken ct = default)
+    public async Task<WireResponse> GetOrderBookAsync(string symbol, string? type = null, CancellationToken ct = default)
     {
-        var operation = BittradeWireOperations.MarketData.GetOrderBook;
-        var raw = await _raw.GetOrderBookAsync(RawSymbol.From(symbol), cancellationToken: ct).ConfigureAwait(false);
-        BittradeWireErrors.RequireOk(raw.Status, null, null, operation);
-
-        var tick = raw.Tick ?? throw BittradeWireErrors.Missing(operation, "tick");
-        var bids = MapLevels(tick.Bids, "bids", operation);
-        var asks = MapLevels(tick.Asks, "asks", operation);
-
-        return new WireResponse<BittradeWireOrderBook>(Exchange, new BittradeWireOrderBook(bids, asks));
+        EnsureSymbol(symbol);
+        var depthType = string.IsNullOrWhiteSpace(type) ? "step0" : type;
+        var path = $"market/depth?symbol={ToApiSymbol(symbol)}&type={depthType}";
+        var meta = await _restClient.GetRawAsync(path, cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
     }
 
-    private static decimal GetBestPrice(decimal[] values, string field, string operation)
+    public async Task<WireResponse> GetTradesAsync(string symbol, CancellationToken ct = default)
     {
-        if (values.Length < 2)
+        EnsureSymbol(symbol);
+        var path = $"market/trade?symbol={ToApiSymbol(symbol)}";
+        var meta = await _restClient.GetRawAsync(path, cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
+    }
+
+    public async Task<WireResponse> GetKlinesAsync(string symbol, string period, int? size = null, CancellationToken ct = default)
+    {
+        EnsureSymbol(symbol);
+        if (string.IsNullOrWhiteSpace(period))
         {
-            throw BittradeWireErrors.Unexpected(operation, field, "invalid-level");
+            throw new ArgumentException("period is required.", nameof(period));
         }
 
-        return values[0];
+        var sizeParam = size.HasValue ? $"&size={size.Value}" : string.Empty;
+        var path = $"market/history/kline?period={period}&symbol={ToApiSymbol(symbol)}{sizeParam}";
+        var meta = await _restClient.GetRawAsync(path, cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
     }
 
-    private static IReadOnlyList<BittradeWirePriceSize> MapLevels(
-        IReadOnlyList<IReadOnlyList<decimal>>? levels,
-        string field,
-        string operation)
+    public async Task<WireResponse> GetTickersAsync(CancellationToken ct = default)
     {
-        if (levels is null)
-        {
-            throw BittradeWireErrors.Missing(operation, field);
-        }
-
-        return levels.Select(level => MapLevel(level, field, operation)).ToArray();
+        var meta = await _restClient.GetRawAsync("market/tickers", cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
     }
 
-    private static BittradeWirePriceSize MapLevel(IReadOnlyList<decimal> level, string field, string operation)
+    public async Task<WireResponse> GetTradeHistoryAsync(string symbol, CancellationToken ct = default)
     {
-        if (level.Count < 2)
-        {
-            throw BittradeWireErrors.Unexpected(operation, field, "invalid-level");
-        }
+        EnsureSymbol(symbol);
+        var path = $"market/history/trade?symbol={ToApiSymbol(symbol)}";
+        var meta = await _restClient.GetRawAsync(path, cancellationToken: ct).ConfigureAwait(false);
+        return ToWire(meta);
+    }
 
-        return new BittradeWirePriceSize(level[0], level[1]);
+    private static string ToApiSymbol(string symbol) =>
+        symbol.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
+
+    private static void EnsureSymbol(string symbol)
+    {
+        if (string.IsNullOrWhiteSpace(symbol))
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+    }
+
+    private static WireResponse ToWire(HttpResponseMeta meta)
+    {
+        var headers = meta.Headers is null
+            ? null
+            : new Dictionary<string, string>(meta.Headers, StringComparer.OrdinalIgnoreCase);
+        return new WireResponse(
+            Exchange,
+            meta.StatusCode,
+            meta.Body ?? string.Empty,
+            headers);
     }
 }

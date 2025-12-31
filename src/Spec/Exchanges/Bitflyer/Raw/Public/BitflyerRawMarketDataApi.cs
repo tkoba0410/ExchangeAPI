@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
@@ -12,14 +11,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// </summary>
 internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
 {
-    private readonly IRestClient _restClient;
+    private readonly IBitflyerWireApi _wire;
 
-    public BitflyerRawMarketDataApi(IRestClient restClient)
+    public BitflyerRawMarketDataApi(IBitflyerWireApi wire)
     {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<Ticker> GetTickerAsync(
+    public async Task<Ticker> GetTickerAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
@@ -27,18 +26,13 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         if (string.IsNullOrWhiteSpace(productCode.Value))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        var path = useAliasPath ? BitflyerRawConstants.Paths.Ticker : BitflyerRawConstants.Paths.GetTicker;
-
-        IReadOnlyDictionary<string, string?> query =
-            new Dictionary<string, string?>(StringComparer.Ordinal)
-            {
-                [BitflyerRawConstants.QueryKeys.ProductCode] = productCode.Value,
-            };
-
-        return _restClient.GetAsync<Ticker>(path, query, cancellationToken);
+        var response = await _wire.MarketData
+            .GetTickerRawAsync(productCode, useAliasPath, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<Ticker>(response);
     }
 
-    public Task<Board> GetBoardAsync(
+    public async Task<Board> GetBoardAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
@@ -46,18 +40,13 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         if (string.IsNullOrWhiteSpace(productCode.Value))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        var path = useAliasPath ? BitflyerRawConstants.Paths.Board : BitflyerRawConstants.Paths.GetBoard;
-
-        IReadOnlyDictionary<string, string?> query =
-            new Dictionary<string, string?>(StringComparer.Ordinal)
-            {
-                [BitflyerRawConstants.QueryKeys.ProductCode] = productCode.Value,
-            };
-
-        return _restClient.GetAsync<Board>(path, query, cancellationToken);
+        var response = await _wire.MarketData
+            .GetBoardRawAsync(productCode, useAliasPath, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<Board>(response);
     }
 
-    public Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsAsync(
+    public async Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsAsync(
         RawProductCode productCode,
         int? count = null,
         long? before = null,
@@ -68,54 +57,35 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         if (string.IsNullOrWhiteSpace(productCode.Value))
             throw new ArgumentException("productCode is required.", nameof(productCode));
 
-        var path = useAliasPath ? BitflyerRawConstants.Paths.Executions : BitflyerRawConstants.Paths.GetExecutions;
-
-        IReadOnlyDictionary<string, string?> query =
-            new Dictionary<string, string?>(StringComparer.Ordinal)
-            {
-                [BitflyerRawConstants.QueryKeys.ProductCode] = productCode.Value,
-                [BitflyerRawConstants.QueryKeys.Count] = count?.ToString(),
-                [BitflyerRawConstants.QueryKeys.Before] = before?.ToString(),
-                [BitflyerRawConstants.QueryKeys.After] = after?.ToString(),
-            };
-
-        return _restClient.GetAsync<IReadOnlyList<ExecutionPublicResponse>>(path, query, cancellationToken);
+        var response = await _wire.MarketData
+            .GetExecutionsRawAsync(productCode, count, before, after, useAliasPath, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<IReadOnlyList<ExecutionPublicResponse>>(response);
     }
 
-    public Task<IReadOnlyList<Market>> GetMarketsAsync(
+    public async Task<IReadOnlyList<Market>> GetMarketsAsync(
         string? region = null,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
     {
-        var path = useAliasPath ? BitflyerRawConstants.Paths.Markets : BitflyerRawConstants.Paths.GetMarkets;
-        if (!string.IsNullOrWhiteSpace(region))
-        {
-            path = $"{path}/{region}";
-        }
-
-        return _restClient.GetAsync<IReadOnlyList<Market>>(path, query: null, cancellationToken);
+        var response = await _wire.ExchangeInfo
+            .GetMarketsAsync(region, useAliasPath, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<IReadOnlyList<Market>>(response);
     }
 
-    public Task<IReadOnlyList<Chat>> GetChatsAsync(
+    public async Task<IReadOnlyList<Chat>> GetChatsAsync(
         string? fromDate = null,
         string? region = null,
         CancellationToken cancellationToken = default)
     {
-        var path = BitflyerRawConstants.Paths.GetChats;
-        if (!string.IsNullOrWhiteSpace(region))
-        {
-            path = $"{path}/{region}";
-        }
-
-        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
-        {
-            [BitflyerRawConstants.QueryKeys.FromDate] = fromDate,
-        };
-
-        return _restClient.GetAsync<IReadOnlyList<Chat>>(path, query, cancellationToken);
+        var response = await _wire.ExchangeInfo
+            .GetChatsAsync(fromDate, region, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<IReadOnlyList<Chat>>(response);
     }
 
-    public Task<HealthResponse> GetHealthAsync(
+    public async Task<HealthResponse> GetHealthAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
@@ -124,16 +94,13 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = BitflyerRawConstants.Paths.GetHealth;
-        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
-        {
-            [BitflyerRawConstants.QueryKeys.ProductCode] = productCode.Value,
-        };
-
-        return _restClient.GetAsync<HealthResponse>(path, query, cancellationToken);
+        var response = await _wire.MarketData
+            .GetHealthAsync(productCode, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<HealthResponse>(response);
     }
 
-    public Task<BoardStateResponse> GetBoardStateAsync(
+    public async Task<BoardStateResponse> GetBoardStateAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
@@ -142,22 +109,21 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = BitflyerRawConstants.Paths.GetBoardState;
-        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
-        {
-            [BitflyerRawConstants.QueryKeys.ProductCode] = productCode.Value,
-        };
-
-        return _restClient.GetAsync<BoardStateResponse>(path, query, cancellationToken);
+        var response = await _wire.MarketData
+            .GetBoardStateAsync(productCode, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<BoardStateResponse>(response);
     }
 
-    public Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
+    public async Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
     {
-        const string path = BitflyerRawConstants.Paths.GetCorporateLeverage;
-        return _restClient.GetAsync<CorporateLeverageResponse>(path, query: null, cancellationToken);
+        var response = await _wire.MarketData
+            .GetCorporateLeverageAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<CorporateLeverageResponse>(response);
     }
 
-    public Task<FundingRateResponse> GetFundingRateAsync(
+    public async Task<FundingRateResponse> GetFundingRateAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
@@ -166,12 +132,9 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = BitflyerRawConstants.Paths.GetFundingRate;
-        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
-        {
-            [BitflyerRawConstants.QueryKeys.ProductCode] = productCode.Value,
-        };
-
-        return _restClient.GetAsync<FundingRateResponse>(path, query, cancellationToken);
+        var response = await _wire.MarketData
+            .GetFundingRateAsync(productCode, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<FundingRateResponse>(response);
     }
 }

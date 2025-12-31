@@ -6,19 +6,19 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Public;
 
-internal interface IBitflyerWireMarketDataApi
+public interface IBitflyerWireMarketDataApi
 {
-    Task<WireResponse<Ticker>> GetTickerRawAsync(
+    Task<WireResponse> GetTickerRawAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse<Board>> GetBoardRawAsync(
+    Task<WireResponse> GetBoardRawAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse<IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsRawAsync(
+    Task<WireResponse> GetExecutionsRawAsync(
         RawProductCode productCode,
         int? count = null,
         long? before = null,
@@ -26,17 +26,17 @@ internal interface IBitflyerWireMarketDataApi
         bool useAliasPath = false,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse<HealthResponse>> GetHealthAsync(
+    Task<WireResponse> GetHealthAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse<BoardStateResponse>> GetBoardStateAsync(
+    Task<WireResponse> GetBoardStateAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse<CorporateLeverageResponse>> GetCorporateLeverageAsync(CancellationToken cancellationToken = default);
+    Task<WireResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default);
 
-    Task<WireResponse<FundingRateResponse>> GetFundingRateAsync(
+    Task<WireResponse> GetFundingRateAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default);
 }

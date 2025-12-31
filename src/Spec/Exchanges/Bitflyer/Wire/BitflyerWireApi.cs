@@ -1,15 +1,13 @@
 using System;
 using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Public;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private;
-using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 
 /// <summary>
 /// bitFlyer の Wire API アクセス。正規化済みの詳細情報を返す用途向け。
 /// </summary>
-internal sealed class BitflyerWireApi : IBitflyerWireApi
+public sealed class BitflyerWireApi : IBitflyerWireApi
 {
     public IBitflyerWireMarketDataApi MarketData { get; }
     public IBitflyerWireTradingApi Trading { get; }
@@ -24,32 +22,12 @@ internal sealed class BitflyerWireApi : IBitflyerWireApi
     /// 署名や認証が不要な Public API のみを使う場合でも、呼び出し側で責務を分離します。
     /// </param>
     public BitflyerWireApi(IRestClient restClient)
-        : this(
-            raw: new Raw.BitflyerRawApi(restClient ?? throw new ArgumentNullException(nameof(restClient))),
-            restClient: restClient)
     {
-    }
-
-    internal BitflyerWireApi(Raw.IBitflyerRawApi raw, IRestClient restClient)
-        : this(
-            raw,
-            restClient,
-            new Private.BitflyerWireTradingApi(raw.Trading, new Raw.PrivatePost.BitflyerPrivateTradingApi(restClient)))
-    {
-    }
-
-    internal BitflyerWireApi(
-        Raw.IBitflyerRawApi raw,
-        IRestClient restClient,
-        IBitflyerWireTradingApi tradingApi)
-    {
-        if (raw is null) throw new ArgumentNullException(nameof(raw));
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        if (tradingApi is null) throw new ArgumentNullException(nameof(tradingApi));
 
-        var publicApi = new BitflyerPublicApi(raw.MarketData);
-        var privateApi = new Raw.PrivateGet.BitflyerPrivateApi(restClient);
-        var accountApi = new Private.BitflyerWireAccountApi(privateApi);
+        var publicApi = new BitflyerPublicApi(restClient);
+        var tradingApi = new Private.BitflyerWireTradingApi(restClient);
+        var accountApi = new Private.BitflyerWireAccountApi(restClient);
 
         MarketData = publicApi;
         Trading = tradingApi;

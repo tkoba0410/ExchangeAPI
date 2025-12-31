@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Core.Contracts.Transport;
 using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Http;
@@ -174,6 +175,21 @@ namespace ExchangeApi.Core.Transport.Protocol
             }
         }
 
+        public async Task<HttpResponseMeta> GetRawAsync(
+            string path,
+            IReadOnlyDictionary<string, string?>? query = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path must not be null or whitespace.", nameof(path));
+            }
+
+            var requestUri = BuildUri(path, query);
+            using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            return await SendRawAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+
         public async Task<TResponse> PostAsync<TRequest, TResponse>(
             string path,
             TRequest body,
@@ -273,6 +289,110 @@ namespace ExchangeApi.Core.Transport.Protocol
                 var category = _errorClassifier?.Classify(ex.StatusCode, null) ?? TransportErrorCategory.Network;
                 var wrapped = new TransportException(
                     $"HTTP request failed for '{requestUri}'.",
+                    statusCode: ex.StatusCode,
+                    errorCategory: category,
+                    innerException: ex);
+                _logger.LogError(wrapped, request);
+                _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt, ex.StatusCode);
+                throw wrapped;
+            }
+            catch (TaskCanceledException ex)
+            {
+                var category = _errorClassifier?.Classify(null, null) ?? TransportErrorCategory.Network;
+                var wrapped = new TransportException(
+                    "HTTP request timed out or was canceled.",
+                    errorCategory: category,
+                    innerException: ex);
+                _logger.LogError(wrapped, request);
+                _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt);
+                throw wrapped;
+            }
+        }
+
+        public async Task<HttpResponseMeta> PostRawAsync<TRequest>(
+            string path,
+            TRequest body,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path must not be null or whitespace.", nameof(path));
+            }
+
+            var requestUri = BuildUri(path, query: null);
+            var json = JsonSerializer.Serialize(body, _serializerOptions);
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+            };
+
+            return await SendRawAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<HttpResponseMeta> SendRawAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            _logger.LogRequest(request);
+            var context = new RestCallContext(request);
+            var startedAt = DateTimeOffset.UtcNow;
+            _observer.OnRequest(context);
+
+            if (!request.Headers.UserAgent.Any())
+            {
+                request.Headers.UserAgent.Add(DefaultUserAgent);
+            }
+
+            if (!request.Headers.Accept.Any())
+            {
+                request.Headers.Accept.Add(JsonMediaType);
+            }
+
+            try
+            {
+                if (_requestSigner is not null)
+                {
+                    await _requestSigner.SignAsync(request, cancellationToken).ConfigureAwait(false);
+                }
+
+                using var response = await _policy
+                    .ExecuteAsync(request, ct => _transport.SendAsync(request, ct), cancellationToken)
+                    .ConfigureAwait(false);
+
+                var content = response.Content is null
+                    ? string.Empty
+                    : await response.Content
+                        .ReadAsStringAsync(cancellationToken)
+                        .ConfigureAwait(false);
+
+                _logger.LogResponse(response, content);
+                _observer.OnResponse(context, response, content, DateTimeOffset.UtcNow - startedAt);
+
+                var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var header in response.Headers)
+                {
+                    headers[header.Key] = string.Join(",", header.Value);
+                }
+
+                if (response.Content?.Headers is not null)
+                {
+                    foreach (var header in response.Content.Headers)
+                    {
+                        headers[header.Key] = string.Join(",", header.Value);
+                    }
+                }
+
+                return new HttpResponseMeta(
+                    StatusCode: (int)response.StatusCode,
+                    Headers: headers.Count == 0 ? null : headers,
+                    Body: content);
+            }
+            catch (HttpRequestException ex)
+            {
+                var category = _errorClassifier?.Classify(ex.StatusCode, null) ?? TransportErrorCategory.Network;
+                var wrapped = new TransportException(
+                    "HTTP request failed.",
                     statusCode: ex.StatusCode,
                     errorCategory: category,
                     innerException: ex);

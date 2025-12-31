@@ -6,6 +6,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
 using ExchangeApi.Contracts.Interfaces;
 
 namespace ExchangeApi.Composition.Factory;
@@ -22,7 +23,8 @@ public static class BittradeFactory
         var settings = options ?? new BittradeFactoryOptions();
         var restClient = CreateRestClient(settings, requireCredentials: false);
 
-        return new BittradeRawApi(restClient);
+        var wire = new BittradeWireApi(restClient, settings.AccountId);
+        return new BittradeRawApi(wire);
     }
 
     /// <summary>

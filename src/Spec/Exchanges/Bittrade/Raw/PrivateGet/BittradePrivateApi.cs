@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Private;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
@@ -11,54 +9,44 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// </summary>
 internal sealed class BittradePrivateApi : IBittradePrivateApi
 {
-    private readonly IRestClient _restClient;
+    private readonly IBittradeWireAccountApi _wire;
 
-    public BittradePrivateApi(IRestClient restClient)
+    public BittradePrivateApi(IBittradeWireAccountApi wire)
     {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<RawAccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<RawAccountsResponse>("v1/account/accounts", cancellationToken: cancellationToken);
-
-    public Task<RawBalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default)
+    public async Task<RawAccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default)
     {
-        EnsureRequired(accountId, nameof(accountId));
-        return _restClient.GetAsync<RawBalancesResponse>(
-            $"v1/account/accounts/{accountId}/balance",
-            cancellationToken: cancellationToken);
+        var response = await _wire.GetAccountsAsync(cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawAccountsResponse>(response);
     }
 
-    public Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default)
+    public async Task<RawBalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default)
     {
-        EnsureSymbol(symbol);
-        EnsureRequired(accountId, nameof(accountId));
-        var query = BuildQuery(
-            ("symbol", ToApiSymbol(symbol)),
-            ("account-id", accountId));
-
-        return _restClient.GetAsync<RawOpenOrdersResponse>(
-            $"v1/order/openOrders?{query}",
-            cancellationToken: cancellationToken);
+        var response = await _wire.GetAccountBalanceAsync(accountId, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawBalancesResponse>(response);
     }
 
-    public Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
+    public async Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default)
     {
-        EnsureRequired(orderId.Value, nameof(orderId));
-        return _restClient.GetAsync<RawOrderDetailResponse>(
-            $"v1/order/orders/{orderId.Value}",
-            cancellationToken: cancellationToken);
+        var response = await _wire.GetOpenOrdersAsync(symbol, accountId, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawOpenOrdersResponse>(response);
     }
 
-    public Task<RawOrderMatchResultsResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
+    public async Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
-        EnsureRequired(orderId.Value, nameof(orderId));
-        return _restClient.GetAsync<RawOrderMatchResultsResponse>(
-            $"v1/order/orders/{orderId.Value}/matchresults",
-            cancellationToken: cancellationToken);
+        var response = await _wire.GetOrderAsync(orderId, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawOrderDetailResponse>(response);
     }
 
-    public Task<RawOrdersResponse> GetOrdersAsync(
+    public async Task<RawOrderMatchResultsResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
+    {
+        var response = await _wire.GetOrderMatchResultsAsync(orderId, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawOrderMatchResultsResponse>(response);
+    }
+
+    public async Task<RawOrdersResponse> GetOrdersAsync(
         RawSymbol symbol,
         string states,
         string? startDate = null,
@@ -68,24 +56,13 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         int? size = null,
         CancellationToken cancellationToken = default)
     {
-        EnsureSymbol(symbol);
-        EnsureRequired(states, nameof(states));
-
-        var query = BuildQuery(
-            ("symbol", ToApiSymbol(symbol)),
-            ("states", states),
-            ("start-date", startDate),
-            ("end-date", endDate),
-            ("from", from?.ToString()),
-            ("direct", direct),
-            ("size", size?.ToString()));
-
-        return _restClient.GetAsync<RawOrdersResponse>(
-            $"v1/order/orders?{query}",
-            cancellationToken: cancellationToken);
+        var response = await _wire
+            .GetOrdersAsync(symbol, states, startDate, endDate, from, direct, size, cancellationToken)
+            .ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawOrdersResponse>(response);
     }
 
-    public Task<RawMatchResultsResponse> GetMatchResultsAsync(
+    public async Task<RawMatchResultsResponse> GetMatchResultsAsync(
         RawSymbol? symbol = null,
         string? types = null,
         string? startDate = null,
@@ -95,21 +72,13 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         int? size = null,
         CancellationToken cancellationToken = default)
     {
-        var query = BuildQuery(
-            ("symbol", symbol.HasValue ? ToApiSymbol(symbol.Value) : null),
-            ("types", types),
-            ("start-date", startDate),
-            ("end-date", endDate),
-            ("from", from?.ToString()),
-            ("direct", direct),
-            ("size", size?.ToString()));
-
-        return _restClient.GetAsync<RawMatchResultsResponse>(
-            $"v1/order/matchresults?{query}",
-            cancellationToken: cancellationToken);
+        var response = await _wire
+            .GetMatchResultsAsync(symbol, types, startDate, endDate, from, direct, size, cancellationToken)
+            .ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawMatchResultsResponse>(response);
     }
 
-    public Task<RawDepositWithdrawsResponse> GetDepositWithdrawsAsync(
+    public async Task<RawDepositWithdrawsResponse> GetDepositWithdrawsAsync(
         string type,
         string? currency = null,
         long? from = null,
@@ -117,63 +86,22 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         string? direct = null,
         CancellationToken cancellationToken = default)
     {
-        EnsureRequired(type, nameof(type));
-        var query = BuildQuery(
-            ("type", type),
-            ("currency", currency),
-            ("from", from?.ToString()),
-            ("size", size?.ToString()),
-            ("direct", direct));
-
-        return _restClient.GetAsync<RawDepositWithdrawsResponse>(
-            $"v1/query/deposit-withdraw?{query}",
-            cancellationToken: cancellationToken);
+        var response = await _wire
+            .GetDepositWithdrawsAsync(type, currency, from, size, direct, cancellationToken)
+            .ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawDepositWithdrawsResponse>(response);
     }
 
-    public Task<RawRetailOrdersResponse> GetRetailOrdersAsync(
+    public async Task<RawRetailOrdersResponse> GetRetailOrdersAsync(
         int direct,
         int? status = null,
         DateTimeOffset? startTime = null,
         DateTimeOffset? endTime = null,
         CancellationToken cancellationToken = default)
     {
-        var startTimeMs = startTime?.ToUnixTimeMilliseconds();
-        var endTimeMs = endTime?.ToUnixTimeMilliseconds();
-        var query = BuildQuery(
-            ("direct", direct.ToString()),
-            ("status", status?.ToString()),
-            ("start_time", startTimeMs?.ToString()),
-            ("end_time", endTimeMs?.ToString()));
-
-        return _restClient.GetAsync<RawRetailOrdersResponse>(
-            $"v1/retail/order/list?{query}",
-            cancellationToken: cancellationToken);
-    }
-
-    private static string ToApiSymbol(RawSymbol symbol) =>
-        symbol.Value.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
-
-    private static void EnsureRequired(string value, string name)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new ArgumentException($"{name} is required.", name);
-        }
-    }
-
-    private static void EnsureSymbol(RawSymbol symbol)
-    {
-        if (string.IsNullOrWhiteSpace(symbol.Value))
-        {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
-        }
-    }
-
-    private static string BuildQuery(params (string Key, string? Value)[] items)
-    {
-        var parts = items
-            .Where(i => !string.IsNullOrWhiteSpace(i.Value))
-            .Select(i => $"{i.Key}={Uri.EscapeDataString(i.Value!)}");
-        return string.Join("&", parts);
+        var response = await _wire
+            .GetRetailOrdersAsync(direct, status, startTime, endTime, cancellationToken)
+            .ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawRetailOrdersResponse>(response);
     }
 }

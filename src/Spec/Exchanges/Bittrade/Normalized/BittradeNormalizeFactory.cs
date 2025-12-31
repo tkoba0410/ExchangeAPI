@@ -27,7 +27,8 @@ internal static class BittradeNormalizeFactory
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
 
         var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
-        var raw = new BittradeRawApi(restClient);
+        var wire = new Raw.Internal.Wire.BittradeWireApi(restClient, normalizedAccountId);
+        var raw = new BittradeRawApi(wire);
 
         var marketData = new BittradeNormalizedMarketDataApi(raw.MarketData);
         var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);

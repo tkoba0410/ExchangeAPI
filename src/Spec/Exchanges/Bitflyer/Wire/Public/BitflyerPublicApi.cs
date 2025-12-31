@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Contracts.Transport;
+using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Converters;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
-using WirePublic = ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Public;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Public;
 
@@ -18,93 +17,154 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Public;
 internal sealed class BitflyerPublicApi : IBitflyerPublicApi
 {
     private const ExchangeCode Exchange = ExchangeCode.Bitflyer;
-    private readonly Raw.IBitflyerRawMarketDataApi _raw;
+    private readonly IRestClient _restClient;
 
-    public BitflyerPublicApi(Raw.IBitflyerRawMarketDataApi raw)
+    public BitflyerPublicApi(IRestClient restClient)
     {
-        _raw = raw ?? throw new ArgumentNullException(nameof(raw));
+        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<WireResponse<Ticker>> GetTickerRawAsync(
+    public Task<WireResponse> GetTickerRawAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default) =>
-        MapAsync<Raw.Ticker, WirePublic.Ticker>(
-            _raw.GetTickerAsync(productCode, useAliasPath, cancellationToken),
-            BitflyerWireMapper.MapTicker);
+        GetAsync(
+            useAliasPath ? Raw.BitflyerRawConstants.Paths.Ticker : Raw.BitflyerRawConstants.Paths.GetTicker,
+            CreateProductCodeQuery(productCode),
+            cancellationToken);
 
-    public Task<WireResponse<Board>> GetBoardRawAsync(
+    public Task<WireResponse> GetBoardRawAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default) =>
-        MapAsync<Raw.Board, WirePublic.Board>(
-            _raw.GetBoardAsync(productCode, useAliasPath, cancellationToken),
-            BitflyerWireMapper.MapBoard);
+        GetAsync(
+            useAliasPath ? Raw.BitflyerRawConstants.Paths.Board : Raw.BitflyerRawConstants.Paths.GetBoard,
+            CreateProductCodeQuery(productCode),
+            cancellationToken);
 
-    public Task<WireResponse<IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsRawAsync(
+    public Task<WireResponse> GetExecutionsRawAsync(
         RawProductCode productCode,
         int? count = null,
         long? before = null,
         long? after = null,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default) =>
-        MapListAsync<Raw.ExecutionPublicResponse, WirePublic.ExecutionPublicResponse>(
-            _raw.GetExecutionsAsync(productCode, count, before, after, useAliasPath, cancellationToken),
-            BitflyerWireMapper.MapExecution);
+        GetAsync(
+            useAliasPath ? Raw.BitflyerRawConstants.Paths.Executions : Raw.BitflyerRawConstants.Paths.GetExecutions,
+            CreateExecutionsQuery(productCode, count, before, after),
+            cancellationToken);
 
-    public Task<WireResponse<IReadOnlyList<Market>>> GetMarketsAsync(
+    public Task<WireResponse> GetMarketsAsync(
         string? region = null,
         bool useAliasPath = false,
-        CancellationToken cancellationToken = default) =>
-        MapListAsync<Raw.Market, WirePublic.Market>(
-            _raw.GetMarketsAsync(region, useAliasPath, cancellationToken),
-            BitflyerWireMapper.MapMarket);
-
-    public Task<WireResponse<IReadOnlyList<Chat>>> GetChatsAsync(
-        string? fromDate = null,
-        string? region = null,
-        CancellationToken cancellationToken = default) =>
-        MapListAsync<Raw.Chat, WirePublic.Chat>(
-            _raw.GetChatsAsync(fromDate, region, cancellationToken),
-            BitflyerWireMapper.MapChat);
-
-    public Task<WireResponse<HealthResponse>> GetHealthAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default) =>
-        MapAsync<Raw.HealthResponse, WirePublic.HealthResponse>(
-            _raw.GetHealthAsync(productCode, cancellationToken),
-            BitflyerWireMapper.MapHealth);
-
-    public Task<WireResponse<BoardStateResponse>> GetBoardStateAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default) =>
-        MapAsync<Raw.BoardStateResponse, WirePublic.BoardStateResponse>(
-            _raw.GetBoardStateAsync(productCode, cancellationToken),
-            BitflyerWireMapper.MapBoardState);
-
-    public Task<WireResponse<CorporateLeverageResponse>> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
-        MapAsync<Raw.CorporateLeverageResponse, WirePublic.CorporateLeverageResponse>(
-            _raw.GetCorporateLeverageAsync(cancellationToken),
-            BitflyerWireMapper.MapCorporateLeverage);
-
-    public Task<WireResponse<FundingRateResponse>> GetFundingRateAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default) =>
-        MapAsync<Raw.FundingRateResponse, WirePublic.FundingRateResponse>(
-            _raw.GetFundingRateAsync(productCode, cancellationToken),
-            BitflyerWireMapper.MapFundingRate);
-
-    private static async Task<WireResponse<T>> MapAsync<TSource, T>(Task<TSource> sourceTask, Func<TSource, T> map)
+        CancellationToken cancellationToken = default)
     {
-        var source = await sourceTask.ConfigureAwait(false);
-        return new WireResponse<T>(Exchange, map(source));
+        var path = useAliasPath ? Raw.BitflyerRawConstants.Paths.Markets : Raw.BitflyerRawConstants.Paths.GetMarkets;
+        if (!string.IsNullOrWhiteSpace(region))
+        {
+            path = $"{path}/{region}";
+        }
+
+        return GetAsync(path, query: null, cancellationToken);
     }
 
-    private static async Task<WireResponse<IReadOnlyList<T>>> MapListAsync<TSource, T>(
-        Task<IReadOnlyList<TSource>> sourceTask,
-        Func<TSource, T> map)
+    public Task<WireResponse> GetChatsAsync(
+        string? fromDate = null,
+        string? region = null,
+        CancellationToken cancellationToken = default)
     {
-        var source = await sourceTask.ConfigureAwait(false);
-        return new WireResponse<IReadOnlyList<T>>(Exchange, source.Select(map).ToArray());
+        var path = Raw.BitflyerRawConstants.Paths.GetChats;
+        if (!string.IsNullOrWhiteSpace(region))
+        {
+            path = $"{path}/{region}";
+        }
+
+        IReadOnlyDictionary<string, string?> query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            [Raw.BitflyerRawConstants.QueryKeys.FromDate] = fromDate,
+        };
+
+        return GetAsync(path, query, cancellationToken);
+    }
+
+    public Task<WireResponse> GetHealthAsync(
+        RawProductCode productCode,
+        CancellationToken cancellationToken = default) =>
+        GetAsync(
+            Raw.BitflyerRawConstants.Paths.GetHealth,
+            CreateProductCodeQuery(productCode),
+            cancellationToken);
+
+    public Task<WireResponse> GetBoardStateAsync(
+        RawProductCode productCode,
+        CancellationToken cancellationToken = default) =>
+        GetAsync(
+            Raw.BitflyerRawConstants.Paths.GetBoardState,
+            CreateProductCodeQuery(productCode),
+            cancellationToken);
+
+    public Task<WireResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
+        GetAsync(Raw.BitflyerRawConstants.Paths.GetCorporateLeverage, query: null, cancellationToken);
+
+    public Task<WireResponse> GetFundingRateAsync(
+        RawProductCode productCode,
+        CancellationToken cancellationToken = default) =>
+        GetAsync(
+            Raw.BitflyerRawConstants.Paths.GetFundingRate,
+            CreateProductCodeQuery(productCode),
+            cancellationToken);
+
+    private async Task<WireResponse> GetAsync(
+        string path,
+        IReadOnlyDictionary<string, string?>? query,
+        CancellationToken cancellationToken)
+    {
+        var meta = await _restClient.GetRawAsync(path, query, cancellationToken).ConfigureAwait(false);
+        return ToWire(meta);
+    }
+
+    private static IReadOnlyDictionary<string, string?> CreateProductCodeQuery(RawProductCode productCode)
+    {
+        if (string.IsNullOrWhiteSpace(productCode.Value))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        return new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            [Raw.BitflyerRawConstants.QueryKeys.ProductCode] = productCode.Value,
+        };
+    }
+
+    private static IReadOnlyDictionary<string, string?> CreateExecutionsQuery(
+        RawProductCode productCode,
+        int? count,
+        long? before,
+        long? after)
+    {
+        if (string.IsNullOrWhiteSpace(productCode.Value))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
+        }
+
+        return new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            [Raw.BitflyerRawConstants.QueryKeys.ProductCode] = productCode.Value,
+            [Raw.BitflyerRawConstants.QueryKeys.Count] = count?.ToString(),
+            [Raw.BitflyerRawConstants.QueryKeys.Before] = before?.ToString(),
+            [Raw.BitflyerRawConstants.QueryKeys.After] = after?.ToString(),
+        };
+    }
+
+    private static WireResponse ToWire(HttpResponseMeta meta)
+    {
+        var headers = meta.Headers is null
+            ? null
+            : new Dictionary<string, string>(meta.Headers, StringComparer.OrdinalIgnoreCase);
+        return new WireResponse(
+            Exchange,
+            meta.StatusCode,
+            meta.Body ?? string.Empty,
+            headers);
     }
 }

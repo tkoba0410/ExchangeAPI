@@ -1,51 +1,48 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
 {
-    private readonly IRestClient _restClient;
+    private readonly IBitflyerWireApi _wire;
 
-    public BitflyerRawTradingApi(IRestClient restClient)
+    public BitflyerRawTradingApi(IBitflyerWireApi wire)
     {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<RawSendChildOrderResponse> SendChildOrderAsync(
+    public async Task<RawSendChildOrderResponse> SendChildOrderAsync(
         RawSendChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        const string path = BitflyerConstants.Paths.SendChildOrder;
-        return _restClient.PostAsync<RawSendChildOrderRequest, RawSendChildOrderResponse>(
-            path,
-            request,
-            cancellationToken);
+        var response = await _wire.Trading
+            .CreateChildOrderAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<RawSendChildOrderResponse>(response);
     }
 
-    public Task<RawCancelChildOrderResponse> CancelChildOrderAsync(
+    public async Task<RawCancelChildOrderResponse> CancelChildOrderAsync(
         RawCancelChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        const string path = BitflyerConstants.Paths.CancelChildOrder;
-        return _restClient.PostAsync<RawCancelChildOrderRequest, RawCancelChildOrderResponse>(
-            path,
-            request,
-            cancellationToken);
+        var response = await _wire.Trading
+            .CancelChildOrderAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<RawCancelChildOrderResponse>(response);
     }
 
-    public Task<IReadOnlyList<RawGetChildOrdersResponse>> GetChildOrdersAsync(
+    public async Task<IReadOnlyList<RawGetChildOrdersResponse>> GetChildOrdersAsync(
         RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
@@ -61,20 +58,19 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        const string path = BitflyerConstants.Paths.GetChildOrders;
-        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
-        {
-            [BitflyerConstants.QueryKeys.ProductCode] = productCode.Value,
-            [BitflyerConstants.QueryKeys.ChildOrderStatusState] = childOrderStatusState,
-            [BitflyerConstants.QueryKeys.ChildOrderAcceptanceId] = childOrderAcceptanceId,
-            [BitflyerConstants.QueryKeys.ChildOrderId] = childOrderId,
-            [BitflyerConstants.QueryKeys.ParentOrderId] = parentOrderId,
-            [BitflyerConstants.QueryKeys.Count] = count?.ToString(),
-            [BitflyerConstants.QueryKeys.Before] = before?.ToString(),
-            [BitflyerConstants.QueryKeys.After] = after?.ToString(),
-        };
-
-        return _restClient.GetAsync<IReadOnlyList<RawGetChildOrdersResponse>>(path, query, cancellationToken);
+        var response = await _wire.Account
+            .GetChildOrdersAsync(
+                productCode,
+                childOrderStatusState,
+                childOrderAcceptanceId,
+                childOrderId,
+                parentOrderId,
+                count,
+                before,
+                after,
+                cancellationToken)
+            .ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<IReadOnlyList<RawGetChildOrdersResponse>>(response);
     }
 
     public async Task<RawGetChildOrdersResponse?> GetChildOrderAsync(

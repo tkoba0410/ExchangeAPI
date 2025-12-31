@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
@@ -9,73 +9,78 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// </summary>
 internal sealed class BittradePublicApi : IBittradePublicApi
 {
-    private readonly IRestClient _restClient;
+    private readonly IBittradeWireApi _wire;
 
-    public BittradePublicApi(IRestClient restClient)
+    public BittradePublicApi(IBittradeWireApi wire)
     {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<RawMergedResponse> GetMergedTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        return _restClient.GetAsync<RawMergedResponse>(
-            $"market/detail/merged?symbol={ToApiSymbol(symbol)}",
-            cancellationToken: cancellationToken);
-    }
-
-    public Task<RawDepthResponse> GetDepthAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default)
+    public async Task<RawMergedResponse> GetMergedTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        var depthType = string.IsNullOrWhiteSpace(type) ? "step0" : type;
-        return _restClient.GetAsync<RawDepthResponse>(
-            $"market/depth?symbol={ToApiSymbol(symbol)}&type={depthType}",
-            cancellationToken: cancellationToken);
+        var response = await _wire.MarketData.GetTickerAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawMergedResponse>(response);
     }
 
-    public Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
+    public async Task<RawDepthResponse> GetDepthAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        return _restClient.GetAsync<RawTradeResponse>(
-            $"market/trade?symbol={ToApiSymbol(symbol)}",
-            cancellationToken: cancellationToken);
+        var response = await _wire.MarketData.GetOrderBookAsync(symbol.Value, type, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawDepthResponse>(response);
     }
 
-    public Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<RawSymbolsResponse>("v1/common/symbols", cancellationToken: cancellationToken);
+    public async Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
+    {
+        EnsureSymbol(symbol);
+        var response = await _wire.MarketData.GetTradesAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawTradeResponse>(response);
+    }
 
-    public Task<RawCurrenciesResponse> GetCurrenciesAsync(CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<RawCurrenciesResponse>("v1/common/currencys", cancellationToken: cancellationToken);
+    public async Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _wire.Common.GetSymbolsAsync(cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawSymbolsResponse>(response);
+    }
 
-    public Task<RawTimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<RawTimestampResponse>("v1/common/timestamp", cancellationToken: cancellationToken);
+    public async Task<RawCurrenciesResponse> GetCurrenciesAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _wire.Common.GetCurrenciesAsync(cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawCurrenciesResponse>(response);
+    }
 
-    public Task<RawKlinesResponse> GetKlinesAsync(RawSymbol symbol, string period, int? size = null, CancellationToken cancellationToken = default)
+    public async Task<RawTimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _wire.Common.GetTimestampAsync(cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawTimestampResponse>(response);
+    }
+
+    public async Task<RawKlinesResponse> GetKlinesAsync(RawSymbol symbol, string period, int? size = null, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
         if (string.IsNullOrWhiteSpace(period)) throw new ArgumentException("period is required.", nameof(period));
-        var sizeParam = size.HasValue ? $"&size={size.Value}" : string.Empty;
-        return _restClient.GetAsync<RawKlinesResponse>(
-            $"market/history/kline?period={period}&symbol={ToApiSymbol(symbol)}{sizeParam}",
-            cancellationToken: cancellationToken);
+        var response = await _wire.MarketData.GetKlinesAsync(symbol.Value, period, size, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawKlinesResponse>(response);
     }
 
-    public Task<RawTickersResponse> GetTickersAsync(CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<RawTickersResponse>("market/tickers", cancellationToken: cancellationToken);
+    public async Task<RawTickersResponse> GetTickersAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _wire.MarketData.GetTickersAsync(cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawTickersResponse>(response);
+    }
 
-    public Task<RawTradeHistoryResponse> GetTradeHistoryAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
+    public async Task<RawTradeHistoryResponse> GetTradeHistoryAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        return _restClient.GetAsync<RawTradeHistoryResponse>(
-            $"market/history/trade?symbol={ToApiSymbol(symbol)}",
-            cancellationToken: cancellationToken);
+        var response = await _wire.MarketData.GetTradeHistoryAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawTradeHistoryResponse>(response);
     }
 
-    public Task<RawRetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default) =>
-        _restClient.GetAsync<RawRetailMaintainTimeResponse>("v1/retail/maintain/time", cancellationToken: cancellationToken);
-
-    private static string ToApiSymbol(RawSymbol symbol) =>
-        symbol.Value.Replace("/", string.Empty, StringComparison.OrdinalIgnoreCase).ToLowerInvariant();
+    public async Task<RawRetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _wire.Common.GetRetailMaintainTimeAsync(cancellationToken).ConfigureAwait(false);
+        return BittradeRawJson.ParseOrThrow<RawRetailMaintainTimeResponse>(response);
+    }
 
     private static void EnsureSymbol(RawSymbol symbol)
     {

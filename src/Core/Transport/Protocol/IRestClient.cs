@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Core.Contracts.Transport;
 namespace ExchangeApi.Core.Transport.Protocol;
 
 /// <summary>
@@ -23,10 +24,26 @@ public interface IRestClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// 指定されたパスに対して HTTP GET を実行し、レスポンスの生データを返す。
+    /// </summary>
+    Task<HttpResponseMeta> GetRawAsync(
+        string path,
+        IReadOnlyDictionary<string, string?>? query = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 指定されたパスに対して HTTP POST を実行し、
     /// JSON レスポンスを <typeparamref name="TResponse"/> にデシリアライズする。
     /// </summary>
     Task<TResponse> PostAsync<TRequest, TResponse>(
+        string path,
+        TRequest body,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 指定されたパスに対して HTTP POST を実行し、レスポンスの生データを返す。
+    /// </summary>
+    Task<HttpResponseMeta> PostRawAsync<TRequest>(
         string path,
         TRequest body,
         CancellationToken cancellationToken = default);

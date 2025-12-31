@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
@@ -14,11 +12,11 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
     private static NotSupportedException NotSupported() =>
         new("Bitflyer wire account is not supported.");
 
-    public Task<WireResponse<IReadOnlyList<BalanceResponse>>> GetBalancesAsync(
+    public Task<WireResponse> GetBalancesAsync(
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse<IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsAsync(
+    public Task<WireResponse> GetExecutionsAsync(
         RawProductCode productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
@@ -28,16 +26,16 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse<IReadOnlyList<PositionResponse>>> GetPositionsAsync(
+    public Task<WireResponse> GetPositionsAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse<CollateralResponse>> GetCollateralAsync(
+    public Task<WireResponse> GetCollateralAsync(
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse<IReadOnlyList<ChildOrderResponse>>> GetChildOrdersAsync(
+    public Task<WireResponse> GetChildOrdersAsync(
         RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
@@ -49,8 +47,84 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse<JsonElement>> GetTradingCommissionAsync(
+    public Task<WireResponse> GetTradingCommissionAsync(
         RawProductCode productCode,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetPermissionsAsync(
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetCollateralAccountsAsync(
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetParentOrdersAsync(
+        RawProductCode productCode,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        string? parentOrderStatusState = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetParentOrderAsync(
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetBalanceHistoryAsync(
+        string? currencyCode = null,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetCollateralHistoryAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetAddressesAsync(
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetCoinInsAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetCoinOutsAsync(
+        string? messageId = null,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetDepositsAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetWithdrawalsAsync(
+        string? messageId = null,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported();
+
+    public Task<WireResponse> GetBankAccountsAsync(
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 }

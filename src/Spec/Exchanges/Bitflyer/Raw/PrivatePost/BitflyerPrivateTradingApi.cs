@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Converters;
+using WireTradingApi = ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private.IBitflyerWireTradingApi;
+
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
 /// <summary>
@@ -12,79 +11,69 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 /// </summary>
 internal sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
 {
-    private readonly IRestClient _restClient;
+    private readonly WireTradingApi _wire;
 
-    public BitflyerPrivateTradingApi(IRestClient restClient)
+    public BitflyerPrivateTradingApi(WireTradingApi wire)
     {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
+        _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<CreateChildOrderResponse> CreateChildOrderAsync(
+    public async Task<CreateChildOrderResponse> CreateChildOrderAsync(
         CreateChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        const string path = BitflyerConstants.Paths.SendChildOrder;
-
-        return _restClient.PostAsync<CreateChildOrderRequest, CreateChildOrderResponse>(
-            path,
-            request,
-            cancellationToken);
+        var wireRequest = BitflyerWireTradingMapper.MapSendChildOrderRequest(request);
+        var response = await _wire.CreateChildOrderAsync(wireRequest, cancellationToken).ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<CreateChildOrderResponse>(response);
     }
 
-    public Task<EmptyResponse> CancelChildOrderAsync(
+    public async Task<EmptyResponse> CancelChildOrderAsync(
         CancelChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        const string path = BitflyerConstants.Paths.CancelChildOrder;
-
-        return _restClient.PostAsync<CancelChildOrderRequest, EmptyResponse>(
-            path,
-            request,
-            cancellationToken);
+        var wireRequest = BitflyerWireTradingMapper.MapCancelChildOrderRequest(request);
+        var response = await _wire.CancelChildOrderAsync(wireRequest, cancellationToken).ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<EmptyResponse>(response);
     }
 
-    public Task<EmptyResponse> CancelAllChildOrdersAsync(
+    public async Task<EmptyResponse> CancelAllChildOrdersAsync(
         CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        const string path = BitflyerConstants.Paths.CancelAllChildOrders;
-
-        return _restClient.PostAsync<CancelAllChildOrdersRequest, EmptyResponse>(
-            path,
-            request,
-            cancellationToken);
+        var response = await _wire.CancelAllChildOrdersAsync(request, cancellationToken).ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<EmptyResponse>(response);
     }
 
-    public Task<CreateParentOrderResponse> CreateParentOrderAsync(
+    public async Task<CreateParentOrderResponse> CreateParentOrderAsync(
         CreateParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        const string path = BitflyerConstants.Paths.SendParentOrder;
-        return _restClient.PostAsync<CreateParentOrderRequest, CreateParentOrderResponse>(path, request, cancellationToken);
+        var response = await _wire.CreateParentOrderAsync(request, cancellationToken).ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<CreateParentOrderResponse>(response);
     }
 
-    public Task<EmptyResponse> CancelParentOrderAsync(
+    public async Task<EmptyResponse> CancelParentOrderAsync(
         CancelParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        const string path = BitflyerConstants.Paths.CancelParentOrder;
-        return _restClient.PostAsync<CancelParentOrderRequest, EmptyResponse>(path, request, cancellationToken);
+        var response = await _wire.CancelParentOrderAsync(request, cancellationToken).ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<EmptyResponse>(response);
     }
 
-    public Task<CreateWithdrawalResponse> CreateWithdrawalAsync(
+    public async Task<CreateWithdrawalResponse> CreateWithdrawalAsync(
         CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        const string path = BitflyerConstants.Paths.Withdraw;
-        return _restClient.PostAsync<CreateWithdrawalRequest, CreateWithdrawalResponse>(path, request, cancellationToken);
+        var response = await _wire.CreateWithdrawalAsync(request, cancellationToken).ConfigureAwait(false);
+        return BitflyerRawJson.ParseOrThrow<CreateWithdrawalResponse>(response);
     }
 }

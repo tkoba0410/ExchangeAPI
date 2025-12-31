@@ -24,7 +24,8 @@ public static class BitflyerFactory
     {
         var settings = options ?? new BitflyerFactoryOptions();
         var restClient = CreateRestClient(settings);
-        return new Raw.BitflyerRawApi(restClient);
+        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
+        return new Raw.BitflyerRawApi(wire);
     }
 
     /// <summary>
@@ -58,9 +59,10 @@ public static class BitflyerFactory
     private static BitflyerComponents CreateComponents(BitflyerFactoryOptions settings)
     {
         var restClient = CreateRestClient(settings);
-        var raw = new Raw.BitflyerRawApi(restClient);
-        var privateApi = new BitflyerPrivateApi(restClient);
-        var legacyTradingApi = new BitflyerPrivateTradingApi(restClient);
+        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
+        var raw = new Raw.BitflyerRawApi(wire);
+        var privateApi = new BitflyerPrivateApi(wire.Account);
+        var legacyTradingApi = new BitflyerPrivateTradingApi(wire.Trading);
         return new BitflyerComponents(
             RestClient: restClient,
             Raw: raw,

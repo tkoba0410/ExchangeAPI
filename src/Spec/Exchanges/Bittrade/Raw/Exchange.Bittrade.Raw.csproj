@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <Compile Include="..\Wire\**\*.cs" />
+    <Compile Include="..\..\..\Wire\WireResponse.cs" />
   </ItemGroup>
 
 </Project>

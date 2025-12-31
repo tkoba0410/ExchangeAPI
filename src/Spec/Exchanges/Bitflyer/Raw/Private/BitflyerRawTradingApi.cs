@@ -27,7 +27,17 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
         var response = await _wire.Trading
             .CreateChildOrderAsync(request, cancellationToken)
             .ConfigureAwait(false);
-        return BitflyerRawJson.ParseOrThrow<RawSendChildOrderResponse>(response);
+        if (response.StatusCode is >= 200 and < 300)
+        {
+            return BitflyerRawJson.DeserializeOrThrow<RawSendChildOrderResponse>(
+                response.Json,
+                "Bitflyer.CreateChildOrder");
+        }
+
+        throw BitflyerRawJson.CreateStatusException(
+            "Bitflyer.CreateChildOrder",
+            response.StatusCode,
+            response.Json);
     }
 
     public async Task<RawCancelChildOrderResponse> CancelChildOrderAsync(
@@ -39,7 +49,17 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
         var response = await _wire.Trading
             .CancelChildOrderAsync(request, cancellationToken)
             .ConfigureAwait(false);
-        return BitflyerRawJson.ParseOrThrow<RawCancelChildOrderResponse>(response);
+        if (response.StatusCode is >= 200 and < 300)
+        {
+            return BitflyerRawJson.DeserializeOrThrow<RawCancelChildOrderResponse>(
+                response.Json,
+                "Bitflyer.CancelChildOrder");
+        }
+
+        throw BitflyerRawJson.CreateStatusException(
+            "Bitflyer.CancelChildOrder",
+            response.StatusCode,
+            response.Json);
     }
 
     public async Task<IReadOnlyList<RawGetChildOrdersResponse>> GetChildOrdersAsync(
@@ -70,7 +90,17 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
                 after,
                 cancellationToken)
             .ConfigureAwait(false);
-        return BitflyerRawJson.ParseOrThrow<IReadOnlyList<RawGetChildOrdersResponse>>(response);
+        if (response.StatusCode is >= 200 and < 300)
+        {
+            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawGetChildOrdersResponse>>(
+                response.Json,
+                "Bitflyer.GetChildOrders");
+        }
+
+        throw BitflyerRawJson.CreateStatusException(
+            "Bitflyer.GetChildOrders",
+            response.StatusCode,
+            response.Json);
     }
 
     public async Task<RawGetChildOrdersResponse?> GetChildOrderAsync(

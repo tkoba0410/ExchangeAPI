@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using ExchangeApi.Common.Enums;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
+namespace ExchangeApi.Spec.Wire;
 
 public sealed record WireResponse(
     ExchangeCode Exchange,

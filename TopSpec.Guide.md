@@ -1,4 +1,4 @@
-# TopSpec.Guide（Core 章対応版）
+# TopSpec.Guide（Core 章対応版 / 案B 物理構成反映版）
 
 > **本書は TopSpec.Core を補足する唯一のガイド文書である。**
 > **本書は FIX ではない。**
@@ -110,7 +110,16 @@ Split Candidate: なし
 
 * Domain が持つべき責務と持ってはならない責務
 
-Split Candidate: AdapterNotes / DomainNotes
+### 5.4 層内 Call 概念（Raw / Normalized）に関する補足
+
+* Raw 層および Normalized 層においても、
+  **層内の便宜として Request と Outcome を不可分に扱う概念（Call）を導入してよい**。
+* これらの Call 概念は **当該層内でのみ有効**とし、
+  Contracts / Domain へ露出してはならない。
+* Contracts 層における Call は「公開契約」であり、
+  Raw / Normalized 層の Call とは **意味が異なる**。
+
+Split Candidate: AdapterNotes
 
 ---
 
@@ -200,17 +209,136 @@ Split Candidate: DecisionLog
 
 ---
 
-## 15. 物理構成と正本管理（Core 補完章）
+## 15. 物理構成と正本管理（Core 補完章 / 案B）
 
-* なぜ物理構成を規範にしないか
-* 正本を公式 API 文書に限定した理由
-* API 台帳の位置づけ
+> 本章は **非規範**である。
+> 本章は Core の論理境界（spec / domain / boundary / composition）を、
+> **安全に運用できる物理構成へ写像するための参照情報**を提供する。
+>
+> 本章を根拠として設計判断を完結させてはならない。
+> 迷った場合は常に TopSpec.Core の境界・依存方向・禁止事項に立ち戻る。
 
-Split Candidate: PhysicalLayout
+### 15.1 物理構成を規範にしない理由
+
+* 物理構成（フォルダ・プロジェクト分割）は、言語、CI、mono-repo / multi-repo、組織規模により変化する。
+* 物理構成を規範化すると、分割戦略の変更が **破壊的変更**へ誤転化しやすい。
+* 規範とすべき対象は常に **責務・依存方向・不変条件**である。
+
+### 15.2 案Bの目的（論理写像の最優先）
+
+案Bは、Core §5 の論理階層を「誤読しにくい形」で物理配置に写像する。
+
+* **Wire / Raw / Normalized は spec 側に閉じる**（domain から触れない）
+* **Adapter は境界（Boundary）として分離**する（Exchange 実装の一部に見せない）
+* **Contracts / Common / Domain(Behavior) を混在させない**
+* **Composition を依存の頂点**として明示する
+
+### 15.3 src/ 以下の推奨物理構成（案B）
+
+以下は「比較的安全に境界を保ちやすい」構成例であり、必須ではない。
+
+```text
+src/
+  Core/                          # 取引所概念を持たない実行基盤
+
+  Spec/                          # spec層（domainを認識しない）
+    Exchanges/
+      <Exchange>/
+        Wire/                    # transport 仕様（spec）
+        Raw/                     # 鏡像DTO（spec）
+        Normalized/              # 取引所内正規化DTO（spec）
+
+  Boundary/                      # 翻訳関所（境界）
+    Adapters/
+      <Exchange>/                # spec → contracts の翻訳のみ
+
+  Domain/                        # domain層（specを認識しない）
+    Contracts/                   # 公開契約（I/O構造）
+    Common/                      # 共通語彙（Value / Type / Error / Parsing）
+    Behavior/                    # 横断ふるまい（CoreのDomain）
+
+  Composition/                   # DI / Factory / 組み立て
+```
+
+#### 15.3.1 Wire / Raw / Normalized / Adapter の境界（よくある誤解）
+
+* Wire/Raw/Normalized は **spec 層の都合**で導入してよい（Core §5）。
+* Adapter は **翻訳関所**であり、判断・事業ロジックの置き場ではない。
+* Domain は横断的ふるまいであり、「再利用フォルダ」ではない。
+
+### 15.4 依存方向を CI で強制する（最小セット）
+
+物理構成は補助輪である。境界違反はレビューではなく CI で検出されるべきである。
+
+最低限、次の依存制約を機械的に検査する。
+
+* `Domain/**` → `Spec/**` を禁止
+* `Spec/**` → `Domain/**` を禁止
+* `Boundary/Adapters/**` → `Spec/**` を許可（Adapter が spec を読む）
+* `Boundary/Adapters/**` → `Domain/Contracts/**` を許可（翻訳先）
+* `Composition/**` → 全依存を許可（組み立て頂点）
+
+（推奨）`Spec/**` → `Boundary/**` を禁止（境界の一方向性を保つ）
+
+### 15.5 正本（source of truth）の扱い
+
+* 取引所 API 仕様の正本は **公式 API 文書**のみとする。
+* リポジトリ内に、取引所ごとの `spec.md` や `sample.json` 等の鏡像を置いてはならない。
+* ただし、開発者が迷わないために **endpoint 一覧（索引）**のみを文書として保持してよい。
+
+  * endpoint 一覧は仕様ではなく索引である。
+  * 実装時は常に公式文書へ遷移し、公式の記述を正として採用する。
+
+### 15.6 endpoint 一覧（索引）に含める最小情報
+
+endpoint 一覧は「仕様の代替」ではなく「入口」である。
+
+* グループ（Public / Private 等）
+* Method / Path（1行）
+* 目的（短い説明）
+* 公式文書への参照（リンクまたは参照ID）
+
+### 15.7 よくある誤用（物理構成が原因の事故）
+
+* Adapter が肥大化し、Domain を吸い込み始める（境界が実装本体化する）
+* Common に何でも集約し、境界が消える
+* Wire/Raw/Normalized を Domain だと誤認し、契約を混線させる
+
+Split Candidate: PhysicalLayout（構成例・CI・運用が増えた場合は独立文書へ）
 
 ---
 
-## 16. 分離された文書一覧（索引）
+## 16. 失敗の意味と責務帰属（運用視点補足）
+
+* **Converter の失敗**は、公式 API 文書と入力データの不整合、
+  もしくは取引所仕様の破壊を示す。
+* **Mapper の失敗**は、意味解釈不能または前提条件違反を示す。
+* **Adapter の失敗**は、Contracts への翻訳責務の失敗であり、
+  実装側の問題として扱う。
+
+これらの失敗は、同一の失敗として扱ってはならない。
+
+Split Candidate: ErrorDesign
+
+---
+
+## 17. 附則：将来拡張として検討済みの論点
+
+本章は規範ではない。
+過去に検討されたが、憲法（Core）には含めなかった論点を記録する。
+
+* エラー正規化方針
+* ページングの共通表現
+* レート制限の扱い
+* キャンセル／タイムアウト
+
+これらは将来、必要に応じて独立文書として詳細化してよい。
+
+Split Candidate: DecisionLog
+
+---
+
+## 18. 分離された文書一覧（索引）
 
 * TopSpec.DecisionLog.md : 設計判断の履歴
 * TopSpec.AdapterNotes.md : Adapter 専用補足

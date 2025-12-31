@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
 using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Private.Requests;
 
@@ -11,15 +13,15 @@ internal sealed class BittradeWireTradingApiNotSupported : IBittradeWireTradingA
     private static NotSupportedException NotSupported() =>
         new("Bittrade wire trading is not supported.");
 
-    public Task<BittradeWireOrder> PlaceOrderAsync(BittradeWireCreateOrderRequest request, CancellationToken ct = default) =>
+    public Task<WireResponse<BittradeWireOrder>> PlaceOrderAsync(BittradeWireCreateOrderRequest request, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task CancelOrderAsync(string orderId, CancellationToken ct = default) =>
+    public Task<WireResponse<bool>> CancelOrderAsync(string orderId, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<IReadOnlyList<BittradeWireOpenOrder>> GetOpenOrdersAsync(string symbol, CancellationToken ct = default) =>
+    public Task<WireResponse<IReadOnlyList<BittradeWireOpenOrder>>> GetOpenOrdersAsync(string symbol, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<BittradeWireOrder> GetOrderAsync(string orderId, CancellationToken ct = default) =>
+    public Task<WireResponse<BittradeWireOrder>> GetOrderAsync(string orderId, CancellationToken ct = default) =>
         throw NotSupported();
 }

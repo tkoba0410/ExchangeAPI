@@ -1,11 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
-#pragma warning disable CS0618
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private;
 
 internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountApi
@@ -13,11 +14,11 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
     private static NotSupportedException NotSupported() =>
         new("Bitflyer wire account is not supported.");
 
-    public Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(
+    public Task<WireResponse<IReadOnlyList<BalanceResponse>>> GetBalancesAsync(
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(
+    public Task<WireResponse<IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsAsync(
         RawProductCode productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
@@ -27,16 +28,16 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(
+    public Task<WireResponse<IReadOnlyList<PositionResponse>>> GetPositionsAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<CollateralResponse> GetCollateralAsync(
+    public Task<WireResponse<CollateralResponse>> GetCollateralAsync(
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
+    public Task<WireResponse<IReadOnlyList<ChildOrderResponse>>> GetChildOrdersAsync(
         RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
@@ -48,9 +49,8 @@ internal sealed class BitflyerWireAccountApiNotSupported : IBitflyerWireAccountA
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<JsonElement> GetTradingCommissionAsync(
+    public Task<WireResponse<JsonElement>> GetTradingCommissionAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 }
-#pragma warning restore CS0618

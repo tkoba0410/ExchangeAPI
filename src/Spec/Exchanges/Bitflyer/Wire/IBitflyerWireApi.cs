@@ -1,8 +1,6 @@
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private;
 
-#pragma warning disable CS0618
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 
 internal interface IBitflyerWireApi
@@ -12,4 +10,3 @@ internal interface IBitflyerWireApi
     IBitflyerWireAccountApi Account { get; }
     IBitflyerWireExchangeInfoApi ExchangeInfo { get; }
 }
-#pragma warning restore CS0618

@@ -1,10 +1,9 @@
 using System;
 using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
-#pragma warning disable CS0618
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 
 /// <summary>
@@ -49,11 +48,12 @@ internal sealed class BitflyerWireApi : IBitflyerWireApi
         if (tradingApi is null) throw new ArgumentNullException(nameof(tradingApi));
 
         var publicApi = new BitflyerPublicApi(raw.MarketData);
-        var privateApi = new BitflyerPrivateApi(restClient);
+        var privateApi = new Raw.PrivateGet.BitflyerPrivateApi(restClient);
+        var accountApi = new Private.BitflyerWireAccountApi(privateApi);
 
         MarketData = publicApi;
         Trading = tradingApi;
-        Account = privateApi;
+        Account = accountApi;
         ExchangeInfo = publicApi;
     }
 
@@ -69,4 +69,3 @@ internal sealed class BitflyerWireApi : IBitflyerWireApi
         ExchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
     }
 }
-#pragma warning restore CS0618

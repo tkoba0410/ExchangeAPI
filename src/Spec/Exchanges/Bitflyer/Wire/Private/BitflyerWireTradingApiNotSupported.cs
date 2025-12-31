@@ -1,8 +1,10 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
-#pragma warning disable CS0618
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private;
 
 internal sealed class BitflyerWireTradingApiNotSupported : IBitflyerWireTradingApi
@@ -10,34 +12,33 @@ internal sealed class BitflyerWireTradingApiNotSupported : IBitflyerWireTradingA
     private static NotSupportedException NotSupported() =>
         new("Bitflyer wire trading is not supported.");
 
-    public Task<CreateChildOrderResponse> CreateChildOrderAsync(
+    public Task<WireResponse<CreateChildOrderResponse>> CreateChildOrderAsync(
         CreateChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<EmptyResponse> CancelChildOrderAsync(
+    public Task<WireResponse<EmptyResponse>> CancelChildOrderAsync(
         CancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<EmptyResponse> CancelAllChildOrdersAsync(
+    public Task<WireResponse<EmptyResponse>> CancelAllChildOrdersAsync(
         CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<CreateParentOrderResponse> CreateParentOrderAsync(
+    public Task<WireResponse<CreateParentOrderResponse>> CreateParentOrderAsync(
         CreateParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<EmptyResponse> CancelParentOrderAsync(
+    public Task<WireResponse<EmptyResponse>> CancelParentOrderAsync(
         CancelParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<CreateWithdrawalResponse> CreateWithdrawalAsync(
+    public Task<WireResponse<CreateWithdrawalResponse>> CreateWithdrawalAsync(
         CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 }
-#pragma warning restore CS0618

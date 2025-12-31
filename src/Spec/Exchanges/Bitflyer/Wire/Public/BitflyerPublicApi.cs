@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Converters;
 using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 using WirePublic = ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Public;
@@ -15,6 +17,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Public;
 /// </summary>
 internal sealed class BitflyerPublicApi : IBitflyerPublicApi
 {
+    private const ExchangeCode Exchange = ExchangeCode.Bitflyer;
     private readonly Raw.IBitflyerRawMarketDataApi _raw;
 
     public BitflyerPublicApi(Raw.IBitflyerRawMarketDataApi raw)
@@ -22,7 +25,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public Task<Ticker> GetTickerRawAsync(
+    public Task<WireResponse<Ticker>> GetTickerRawAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default) =>
@@ -30,7 +33,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             _raw.GetTickerAsync(productCode, useAliasPath, cancellationToken),
             BitflyerWireMapper.MapTicker);
 
-    public Task<Board> GetBoardRawAsync(
+    public Task<WireResponse<Board>> GetBoardRawAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default) =>
@@ -38,7 +41,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             _raw.GetBoardAsync(productCode, useAliasPath, cancellationToken),
             BitflyerWireMapper.MapBoard);
 
-    public Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsRawAsync(
+    public Task<WireResponse<IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsRawAsync(
         RawProductCode productCode,
         int? count = null,
         long? before = null,
@@ -49,7 +52,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             _raw.GetExecutionsAsync(productCode, count, before, after, useAliasPath, cancellationToken),
             BitflyerWireMapper.MapExecution);
 
-    public Task<IReadOnlyList<Market>> GetMarketsAsync(
+    public Task<WireResponse<IReadOnlyList<Market>>> GetMarketsAsync(
         string? region = null,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default) =>
@@ -57,7 +60,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             _raw.GetMarketsAsync(region, useAliasPath, cancellationToken),
             BitflyerWireMapper.MapMarket);
 
-    public Task<IReadOnlyList<Chat>> GetChatsAsync(
+    public Task<WireResponse<IReadOnlyList<Chat>>> GetChatsAsync(
         string? fromDate = null,
         string? region = null,
         CancellationToken cancellationToken = default) =>
@@ -65,43 +68,43 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             _raw.GetChatsAsync(fromDate, region, cancellationToken),
             BitflyerWireMapper.MapChat);
 
-    public Task<HealthResponse> GetHealthAsync(
+    public Task<WireResponse<HealthResponse>> GetHealthAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         MapAsync<Raw.HealthResponse, WirePublic.HealthResponse>(
             _raw.GetHealthAsync(productCode, cancellationToken),
             BitflyerWireMapper.MapHealth);
 
-    public Task<BoardStateResponse> GetBoardStateAsync(
+    public Task<WireResponse<BoardStateResponse>> GetBoardStateAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         MapAsync<Raw.BoardStateResponse, WirePublic.BoardStateResponse>(
             _raw.GetBoardStateAsync(productCode, cancellationToken),
             BitflyerWireMapper.MapBoardState);
 
-    public Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
+    public Task<WireResponse<CorporateLeverageResponse>> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
         MapAsync<Raw.CorporateLeverageResponse, WirePublic.CorporateLeverageResponse>(
             _raw.GetCorporateLeverageAsync(cancellationToken),
             BitflyerWireMapper.MapCorporateLeverage);
 
-    public Task<FundingRateResponse> GetFundingRateAsync(
+    public Task<WireResponse<FundingRateResponse>> GetFundingRateAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         MapAsync<Raw.FundingRateResponse, WirePublic.FundingRateResponse>(
             _raw.GetFundingRateAsync(productCode, cancellationToken),
             BitflyerWireMapper.MapFundingRate);
 
-    private static async Task<T> MapAsync<TSource, T>(Task<TSource> sourceTask, Func<TSource, T> map)
+    private static async Task<WireResponse<T>> MapAsync<TSource, T>(Task<TSource> sourceTask, Func<TSource, T> map)
     {
         var source = await sourceTask.ConfigureAwait(false);
-        return map(source);
+        return new WireResponse<T>(Exchange, map(source));
     }
 
-    private static async Task<IReadOnlyList<T>> MapListAsync<TSource, T>(
+    private static async Task<WireResponse<IReadOnlyList<T>>> MapListAsync<TSource, T>(
         Task<IReadOnlyList<TSource>> sourceTask,
         Func<TSource, T> map)
     {
         var source = await sourceTask.ConfigureAwait(false);
-        return source.Select(map).ToArray();
+        return new WireResponse<IReadOnlyList<T>>(Exchange, source.Select(map).ToArray());
     }
 }

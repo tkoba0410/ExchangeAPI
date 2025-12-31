@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
 using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Public.Models;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Public;
 
 internal sealed class BittradeWireMarketDataApi : IBittradeWireMarketDataApi
 {
+    private const ExchangeCode Exchange = ExchangeCode.Bittrade;
     private readonly IBittradeRawMarketDataApi _raw;
 
     public BittradeWireMarketDataApi(IBittradeRawMarketDataApi raw)
@@ -17,7 +20,7 @@ internal sealed class BittradeWireMarketDataApi : IBittradeWireMarketDataApi
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<BittradeWireTicker> GetTickerAsync(string symbol, CancellationToken ct = default)
+    public async Task<WireResponse<BittradeWireTicker>> GetTickerAsync(string symbol, CancellationToken ct = default)
     {
         var operation = BittradeWireOperations.MarketData.GetTicker;
         var raw = await _raw.GetTickerAsync(RawSymbol.From(symbol), ct).ConfigureAwait(false);
@@ -28,15 +31,16 @@ internal sealed class BittradeWireMarketDataApi : IBittradeWireMarketDataApi
         var bestAsk = GetBestPrice(tick.Ask, "ask", operation);
         var timestamp = tick.Ts ?? raw.Ts ?? throw BittradeWireErrors.Missing(operation, "ts");
 
-        return new BittradeWireTicker(
+        var response = new BittradeWireTicker(
             BestBid: bestBid,
             BestAsk: bestAsk,
             Last: tick.Close,
             Volume: tick.Volume,
             Timestamp: timestamp);
+        return new WireResponse<BittradeWireTicker>(Exchange, response);
     }
 
-    public async Task<BittradeWireOrderBook> GetOrderBookAsync(string symbol, CancellationToken ct = default)
+    public async Task<WireResponse<BittradeWireOrderBook>> GetOrderBookAsync(string symbol, CancellationToken ct = default)
     {
         var operation = BittradeWireOperations.MarketData.GetOrderBook;
         var raw = await _raw.GetOrderBookAsync(RawSymbol.From(symbol), cancellationToken: ct).ConfigureAwait(false);
@@ -46,7 +50,7 @@ internal sealed class BittradeWireMarketDataApi : IBittradeWireMarketDataApi
         var bids = MapLevels(tick.Bids, "bids", operation);
         var asks = MapLevels(tick.Asks, "asks", operation);
 
-        return new BittradeWireOrderBook(bids, asks);
+        return new WireResponse<BittradeWireOrderBook>(Exchange, new BittradeWireOrderBook(bids, asks));
     }
 
     private static decimal GetBestPrice(decimal[] values, string field, string operation)

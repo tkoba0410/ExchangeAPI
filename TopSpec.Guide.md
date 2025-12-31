@@ -1,18 +1,19 @@
-# TopSpec.Guide
+# TopSpec.Guide（Core 章対応版）
 
-> **本書は TopSpec.Core を補足する唯一のガイド文書である。**  
-> **本書は FIX ではない。**  
+> **本書は TopSpec.Core を補足する唯一のガイド文書である。**
+> **本書は FIX ではない。**
 > **TopSpec.Core と矛盾する場合、常に TopSpec.Core を優先する。**
 
 ---
 
 ## 分離方針（運用規約）
 
-- TopSpec.Core は **不変の憲法**であり、境界・責務・依存方向・不変条件のみを定義する。
-- 本書（Guide）は Core を **理解・実装・運用するための補助文書**である。
-- 本書が肥大化した場合、以下のいずれかに該当する内容は **独立文書として分離**する。
+* TopSpec.Core は **不変の憲法**であり、境界・責務・依存方向・不変条件のみを定義する。
+* 本書（Guide）は Core を **理解・実装・運用するための補助文書**である。
+* 本書が肥大化した場合、以下のいずれかに該当する内容は **独立文書として分離**する。
 
 **分離トリガー**
+
 1. 時間軸（判断履歴・過去事例・経緯）を持ち始めた
 2. 手順・チェックリスト・運用方法が主体になった
 3. 特定レイヤ（Adapter / Domain / Error 等）専用の内容になった
@@ -22,116 +23,202 @@
 
 ---
 
-## 0. 本書の位置づけと読み方
+## 0. 本書の位置づけと読み方（Core 前提）
 
-- 本書は TopSpec.Core を前提として読む。
-- 本書は Core の再解釈や上書きを行わない。
-- 本書は「なぜそう決めたか」「どう誤用されやすいか」を記録する。
+* 本書は TopSpec.Core を前提として読む。
+* 本書は Core の再解釈や上書きを行わない。
+* 本書は「なぜそう決めたか」「どう誤用されやすいか」を記録する。
+
+### 0.1 なぜ Core は短くあるべきか
+
+* 憲法は短く、不変でなければ機能しない。
+* 理由・背景・運用を含めた瞬間に、変更圧が Core に流入する。
+* したがって Core は **規範のみ** を保持し、理解補助は必ず外部に置く。
 
 Split Candidate: なし（常設）
 
 ---
 
-## 1. TopSpec.Core の補足解釈指針（Why）
+## 1. 決定事項／非決定事項（Core §1 対応）
 
-### 1.1 spec と domain の分離思想
-- spec は事実の写像であり、判断を含めない。
-- domain は意味と振る舞いを定義する。
-- spec を解釈し始めた瞬間に層違反が起きる。
+### 1.1 Core が決めること
 
-### 1.2 最小共通化への警戒
-- 共通化は目的ではなく副作用である。
-- 揃えた瞬間に将来の変更コストが確定する。
+* 境界・責務・依存方向・不変条件のみを決定する理由
+* 仕様と実装の混線を防ぐための最小決定
 
-### 1.3 正本を公式 API 文書に限定した理由
-- リポジトリ内仕様は必ず陳腐化する。
-- 二重正本は必ず破綻する。
+### 1.2 Core が決めないこと
 
-Split Candidate: DecisionLog（設計判断が時系列化した場合）
+* 物理構成・運用・具体例を Core から排除した理由
+* それらを Guide に置く必然性
+
+Split Candidate: DecisionLog
 
 ---
 
-## 2. 論理構成と層設計の補足（How）
+## 2. 大原則の背景（Core §2 対応）
 
-### 2.1 各層の理解補足
-- Raw / Normalized は spec 層である。
-- Adapter は翻訳関所であり判断を持たない。
-- Domain は横断的ふるまいのみを持つ。
+### 2.1 公開境界を明示する理由
 
-### 2.2 Adapter が壊れ始める兆候
-- if(exchange) が増え始める。
-- 再試行・分岐・ポリシー判断が入る。
+* 境界が曖昧な API は破壊的変更を検知できない
+
+### 2.2 層跨ぎ禁止の意味
+
+* 層を跨ぐ責務混在が引き起こす破壊
+
+### 2.3 不変条件を破壊的変更扱いとする理由
+
+* 不変条件は利用者との契約そのものである
+
+Split Candidate: DecisionLog
+
+---
+
+## 3. FIX 宣言の運用上の意味（Core §3 対応）
+
+* なぜ Core の規則は FIX でなければならないか
+* FIX を変更する場合に発生するコスト
+
+Split Candidate: DecisionLog
+
+---
+
+## 4. ゴール／非ゴールの補足（Core §4 対応）
+
+### 4.1 ゴールの解釈
+
+* Domain 隔離が意味する設計上の利点
+
+### 4.2 非ゴールの再確認
+
+* 公式 API 仕様を写経しない理由
+
+Split Candidate: なし
+
+---
+
+## 5. 論理階層の理解補足（Core §5 対応）
+
+### 5.1 spec / domain 境界の思想
+
+* Raw / Normalized を spec に留める理由
+
+### 5.2 Adapter を翻訳関所とする理由
+
+* なぜ判断を Adapter に持ち込まないか
+
+### 5.3 Domain を肥大させない原則
+
+* Domain が持つべき責務と持ってはならない責務
 
 Split Candidate: AdapterNotes / DomainNotes
 
 ---
 
-## 3. 物理構成（フォルダ構成と正本管理）
+## 6. 公開入口（Factory）の設計意図（Core §6 対応）
 
-### 3.1 推奨物理構成の考え方
-- 物理構成は規範ではない。
-- 論理境界は参照制約で担保される。
+* Factory を入口に限定する理由
+* 利用意図を型で表現する設計思想
 
-### 3.2 正本管理
-- 正本は公式 API 文書のみとする。
-- spec ディレクトリは鏡像仕様の置き場である。
-- Raw/Samples はコピー可だが正本ではない。
-
-### 3.3 API 台帳の位置づけ
-- 台帳は導線・網羅性確認用資料である。
-- 仕様判断の根拠として使用してはならない。
-
-Split Candidate: PhysicalLayout（構成・運用詳細が増えた場合）
+Split Candidate: なし
 
 ---
 
-## 4. Call / Error / Value 設計の実務補足
+## 7. 公開契約（Contracts）の背景（Core §7–8 対応）
 
-### 4.1 Call / Outcome 採用理由
-- Request と Outcome を不可分に扱うため。
-- 文脈不足なレスポンスを補うため。
+### 7.1 Call / Outcome 採用理由
 
-### 4.2 エラー設計の背景
-- 利用者向け正規化と診断情報を分離する。
-- Retryability は判断材料であり結論ではない。
+* Request と結果を不可分に扱う理由
 
-### 4.3 数値・Value 設計
-- string を Common に流さない。
-- Try / OrThrow を併設する。
+### 7.2 Contracts と Common を分ける理由
+
+* 形と語彙を分離する設計判断
 
 Split Candidate: ErrorDesign / ValueDesign
 
 ---
 
-## 5. 運用・CI・破壊防止の知見
+## 8. Cross-Exchange 共通化の思想（Core §11 対応）
 
-- 参照制約は CI でのみ長期的に守れる。
-- 人手レビューは補助でしかない。
+### 8.1 なぜ共通化対象を 4 種に限定したか
 
-Split Candidate: Operations（手順・チェックリスト化した場合）
+* Interface / DTO / Type / Error 以外を共通化しない理由
 
----
-
-## 6. よくある誤解・事故・兆候（Anti-pattern）
-
-- Adapter の肥大化
-- Raw / Normalized DTO の漏洩
-- Debug 用コードの本番残留
-
-Split Candidate: AntiPatterns（事例が増えた場合）
+Split Candidate: DecisionLog
 
 ---
 
-## 7. 分離された文書一覧（索引）
+## 9. 責務分離と横断関心（Core §12–13 対応）
 
-- TopSpec.DecisionLog.md : 設計判断の履歴
-- TopSpec.AdapterNotes.md : Adapter 専用補足
-- TopSpec.DomainNotes.md : Domain 設計補足
-- TopSpec.PhysicalLayout.md : 物理構成詳細
-- TopSpec.ErrorDesign.md : エラー設計詳細
-- TopSpec.ValueDesign.md : Value 設計詳細
-- TopSpec.Operations.md : 運用・CI
-- TopSpec.AntiPatterns.md : 事故・誤用集
+* Contracts / Common / Domain の役割分離
+* 横断関心を Domain に集約する理由
+
+Split Candidate: DomainNotes
+
+---
+
+## 10. Raw / Exchange 明示アクセスの背景（Core §14 対応）
+
+* opt-in を強制する理由
+* 調査用途と業務用途の分離
+
+Split Candidate: Operations
+
+---
+
+## 11. 依存方向の設計理由（Core §15 対応）
+
+* なぜ依存方向を固定する必要があるか
+* 境界破壊が起きる典型パターン
+
+Split Candidate: AdapterNotes
+
+---
+
+## 12. 不変条件の補足解説（Core §16 対応）
+
+* 後方互換を絶対条件とする理由
+* Success / Failure 排他の意味
+
+Split Candidate: ValueDesign
+
+---
+
+## 13. 禁止事項の背景（Core §18 対応）
+
+* 各禁止事項が防いでいる事故
+
+Split Candidate: AntiPatterns
+
+---
+
+## 14. 変更の扱い（運用補足）
+
+* Core 変更を原則破壊的とみなす理由
+* 変更理由・影響範囲を明示する運用
+
+Split Candidate: DecisionLog
+
+---
+
+## 15. 物理構成と正本管理（Core 補完章）
+
+* なぜ物理構成を規範にしないか
+* 正本を公式 API 文書に限定した理由
+* API 台帳の位置づけ
+
+Split Candidate: PhysicalLayout
+
+---
+
+## 16. 分離された文書一覧（索引）
+
+* TopSpec.DecisionLog.md : 設計判断の履歴
+* TopSpec.AdapterNotes.md : Adapter 専用補足
+* TopSpec.DomainNotes.md : Domain 設計補足
+* TopSpec.PhysicalLayout.md : 物理構成詳細
+* TopSpec.ErrorDesign.md : エラー設計詳細
+* TopSpec.ValueDesign.md : Value 設計詳細
+* TopSpec.Operations.md : 運用・CI
+* TopSpec.AntiPatterns.md : 事故・誤用集
 
 Split Candidate: なし（索引章として常設）
-

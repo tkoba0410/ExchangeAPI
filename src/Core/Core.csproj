@@ -9,6 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Shared/Common/Shared.Common.csproj" />
+    <ProjectReference Include="../Domain/Common/Common/Shared.Common.csproj" />
   </ItemGroup>
 </Project>

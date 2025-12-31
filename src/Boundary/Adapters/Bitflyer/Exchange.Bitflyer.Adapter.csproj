@@ -10,14 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Common\Shared.Common.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Domain\Common\Common\Shared.Common.csproj" />
+    <ProjectReference Include="..\..\..\Domain\Contracts\Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\..\..\Core\Core.csproj" />
-    <ProjectReference Include="..\Raw\Exchange.Bitflyer.Raw.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\\Normalize\\**\\*.cs" />
+    <ProjectReference Include="..\..\..\Spec\Exchanges\Bitflyer\Raw\Exchange.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="..\..\..\Spec\Exchanges\Bitflyer\Normalized\Exchange.Bitflyer.Normalized.csproj" />
   </ItemGroup>
 
 </Project>

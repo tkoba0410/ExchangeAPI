@@ -13,6 +13,7 @@
     <Project Path="src/Boundary/Adapters/Bittrade/Exchange.Bittrade.Adapter.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Core.Tests/Core.Tests.csproj" />
     <Project Path="tests/Common.Tests/Common.Tests.csproj" />
     <Project Path="tests/Composition.Tests/Composition.Tests.csproj" />
     <Project Path="tests/Exchanges/Bitflyer/Adapter.Tests/Exchange.Bitflyer.Adapter.Tests.csproj" />

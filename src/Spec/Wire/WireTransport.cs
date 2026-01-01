@@ -8,6 +8,10 @@ using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Spec.Wire;
 
+/// <summary>
+/// Wire 層の送信実装。HTTP ステータス(4xx/5xx)は例外化せず Raw 層で判定する。
+/// 例外は transport レベル（接続失敗、タイムアウト、TLS、キャンセル等）のみ。
+/// </summary>
 public sealed class WireTransport : IWireTransport
 {
     private readonly IRestClient _restClient;
@@ -17,6 +21,9 @@ public sealed class WireTransport : IWireTransport
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
+    /// <summary>
+    /// WireCall を生成して返す。RequestId が取得できる場合は Meta に設定する。
+    /// </summary>
     public async Task<WireCall> SendAsync(
         ExchangeCode exchange,
         WireRequest request,

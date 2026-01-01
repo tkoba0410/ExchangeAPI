@@ -18,22 +18,28 @@ public sealed class BittradePublicApi_Klines_Tests
 
         await api.GetKlinesAsync("BTC/JPY", "1day", size: 2, ct: CancellationToken.None);
 
-        Assert.Equal("market/history/kline?period=1day&symbol=btcjpy&size=2", fakeRest.LastPath);
+        Assert.Equal("market/history/kline", fakeRest.LastPath);
+        Assert.Equal("1day", fakeRest.LastQuery?["period"]);
+        Assert.Equal("btcjpy", fakeRest.LastQuery?["symbol"]);
+        Assert.Equal("2", fakeRest.LastQuery?["size"]);
     }
 
     private sealed class FakeRestClient : IRestClient
     {
         public string? LastPath { get; private set; }
+        public IReadOnlyDictionary<string, string?>? LastQuery { get; private set; }
 
         public Task<TResponse> GetAsync<TResponse>(string path, IReadOnlyDictionary<string, string?>? query = null, CancellationToken cancellationToken = default)
         {
             LastPath = path;
+            LastQuery = query;
             return Task.FromResult(default(TResponse)!);
         }
 
         public Task<HttpResponseMeta> GetRawAsync(string path, IReadOnlyDictionary<string, string?>? query = null, CancellationToken cancellationToken = default)
         {
             LastPath = path;
+            LastQuery = query;
             return Task.FromResult(new HttpResponseMeta(200, Headers: null, Body: "{}"));
         }
 

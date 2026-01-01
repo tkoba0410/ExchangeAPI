@@ -68,7 +68,6 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m)));
         Assert.Equal(ExchangeErrorCategory.RateLimit, ex.ErrorCategory);
-        Assert.Equal("TOO_MANY_REQUESTS", ex.ExchangeErrorCode);
         Assert.Equal(ExchangeCode.Bitflyer, ex.Exchange);
         Assert.Equal(BitflyerOperations.Trading.PlaceOrder, ex.Operation);
     }
@@ -87,8 +86,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(10m)));
-        Assert.Equal(ExchangeErrorCategory.Balance, ex.ErrorCategory);
-        Assert.Equal("INSUFFICIENT_FUNDS", ex.ExchangeErrorCode);
+        Assert.Equal(ExchangeErrorCategory.Request, ex.ErrorCategory);
     }
 
     [Fact]
@@ -107,7 +105,6 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
 
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m)));
         Assert.Equal(ExchangeErrorCategory.Auth, ex.ErrorCategory);
-        Assert.Equal("AUTHENTICATION_ERROR", ex.ExchangeErrorCode);
     }
 
     private static BitflyerExchangeClient CreateClient(

@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Requests;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Common.Enums;
@@ -82,6 +84,25 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
 
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+
+    public Task<ApiCall<GetTickerRequest, Ticker, ApiError>> GetTickerCallAsync(
+        CommonSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetTickerCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetOrderBookRequest, OrderBook, ApiError>> GetOrderBookCallAsync(
+        CommonSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetOrderBookCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>, ApiError>> GetMarketExecutionsCallAsync(
+        CommonSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetExchangeInfoRequest, ExchangeInfo, ApiError>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
     public bool TryGetRaw<T>(out T raw) where T : class
     {

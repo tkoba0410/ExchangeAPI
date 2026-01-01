@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
@@ -144,6 +146,21 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(symbol, timescale, from, to, cancellationToken);
 
+    public Task<ApiCall<GetTickerRequest, CommonTicker, ApiError>> GetTickerCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetTickerCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetOrderBookRequest, OrderBook, ApiError>> GetOrderBookCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetOrderBookCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>, ApiError>> GetMarketExecutionsCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
+
     public Task<BitflyerHealthNormalized> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         GetMarketApi().GetHealthAsync(symbol, cancellationToken);
 
@@ -183,6 +200,46 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrderAsync(symbol, orderKey, cancellationToken);
 
+    public Task<ApiCall<PlaceLimitOrderRequest, OrderResult, ApiError>> PlaceLimitOrderCallAsync(
+        Symbol symbol,
+        ContractSide side,
+        Size size,
+        Price price,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.PlaceLimitOrderCallAsync(symbol, side, size, price, cancellationToken);
+
+    public Task<ApiCall<PlaceMarketOrderRequest, OrderResult, ApiError>> PlaceMarketOrderCallAsync(
+        Symbol symbol,
+        ContractSide side,
+        Size size,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.PlaceMarketOrderCallAsync(symbol, side, size, cancellationToken);
+
+    public Task<ApiCall<PlaceStopOrderRequest, OrderResult, ApiError>> PlaceStopOrderCallAsync(
+        Symbol symbol,
+        ContractSide side,
+        Size size,
+        Price triggerPrice,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.PlaceStopOrderCallAsync(symbol, side, size, triggerPrice, cancellationToken);
+
+    public Task<ApiCall<CancelOrderRequest, CancelResult, ApiError>> CancelOrderCallAsync(
+        Symbol symbol,
+        OrderKey orderKey,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.CancelOrderCallAsync(symbol, orderKey, cancellationToken);
+
+    public Task<ApiCall<GetOrdersRequest, IReadOnlyList<OpenOrder>, ApiError>> GetOrdersCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.GetOrdersCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetOrderRequest, OrderStatus, ApiError>> GetOrderCallAsync(
+        Symbol symbol,
+        OrderKey orderKey,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.GetOrderCallAsync(symbol, orderKey, cancellationToken);
+
     // Account/Margin
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesAsync(cancellationToken);
@@ -196,12 +253,34 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _accountApi.GetAccountExecutionsAsync(symbol, cancellationToken);
 
+    public Task<ApiCall<GetBalancesRequest, IReadOnlyList<Balance>, ApiError>> GetBalancesCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _accountApi.GetBalancesCallAsync(cancellationToken);
+
+    public Task<ApiCall<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>, ApiError>> GetAccountExecutionsCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _accountApi.GetAccountExecutionsCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetOpenPositionsRequest, IReadOnlyList<Position>, ApiError>> GetOpenPositionsCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marginApi.GetOpenPositionsCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetCollateralRequest, Collateral, ApiError>> GetCollateralCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _marginApi.GetCollateralCallAsync(cancellationToken);
+
     public Task<System.Text.Json.JsonElement> GetTradingCommissionAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         GetAccountApi().GetTradingCommissionAsync(symbol, cancellationToken);
 
     // ExchangeInfo
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+
+    public Task<ApiCall<GetExchangeInfoRequest, ExchangeInfo, ApiError>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
     private MarketApi GetMarketApi()
     {

@@ -1,7 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Domain.Services;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
@@ -47,5 +49,9 @@ internal static class BitflyerTestHelpers
 
         public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(_info);
+
+        public Task<ApiCall<GetExchangeInfoRequest, ExchangeInfo, ApiError>> GetExchangeInfoCallAsync(
+            CancellationToken cancellationToken = default) =>
+            throw new System.NotSupportedException();
     }
 }

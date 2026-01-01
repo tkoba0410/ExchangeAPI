@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Domain.UseCases;
 using ExchangeApi.Core.Contracts.Errors;
 using Xunit;
@@ -130,6 +132,46 @@ public sealed class OrderPollingTests
 
         public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
+
+        public Task<ApiCall<PlaceLimitOrderRequest, OrderResult, ApiError>> PlaceLimitOrderCallAsync(
+            Symbol symbol,
+            Side side,
+            Size size,
+            Price price,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<PlaceMarketOrderRequest, OrderResult, ApiError>> PlaceMarketOrderCallAsync(
+            Symbol symbol,
+            Side side,
+            Size size,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<PlaceStopOrderRequest, OrderResult, ApiError>> PlaceStopOrderCallAsync(
+            Symbol symbol,
+            Side side,
+            Size size,
+            Price triggerPrice,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<CancelOrderRequest, CancelResult, ApiError>> CancelOrderCallAsync(
+            Symbol symbol,
+            OrderKey orderKey,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<GetOrdersRequest, IReadOnlyList<OpenOrder>, ApiError>> GetOrdersCallAsync(
+            Symbol symbol,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<GetOrderRequest, OrderStatus, ApiError>> GetOrderCallAsync(
+            Symbol symbol,
+            OrderKey orderKey,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
     }
 
     private sealed class NotFoundTradingApi : ITradingApi
@@ -155,6 +197,46 @@ public sealed class OrderPollingTests
             throw new NotSupportedException();
 
         public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<PlaceLimitOrderRequest, OrderResult, ApiError>> PlaceLimitOrderCallAsync(
+            Symbol symbol,
+            Side side,
+            Size size,
+            Price price,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<PlaceMarketOrderRequest, OrderResult, ApiError>> PlaceMarketOrderCallAsync(
+            Symbol symbol,
+            Side side,
+            Size size,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<PlaceStopOrderRequest, OrderResult, ApiError>> PlaceStopOrderCallAsync(
+            Symbol symbol,
+            Side side,
+            Size size,
+            Price triggerPrice,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<CancelOrderRequest, CancelResult, ApiError>> CancelOrderCallAsync(
+            Symbol symbol,
+            OrderKey orderKey,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<GetOrdersRequest, IReadOnlyList<OpenOrder>, ApiError>> GetOrdersCallAsync(
+            Symbol symbol,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ApiCall<GetOrderRequest, OrderStatus, ApiError>> GetOrderCallAsync(
+            Symbol symbol,
+            OrderKey orderKey,
+            CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
 }

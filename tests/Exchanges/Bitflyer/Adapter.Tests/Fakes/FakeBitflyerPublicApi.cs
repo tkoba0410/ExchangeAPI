@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Spec.CallCommon;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
@@ -10,6 +12,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
     {
         private readonly Ticker _response;
         private readonly Board? _board;
+        private static readonly BitflyerRawRequest DefaultRequest =
+            new BitflyerRawRequest("test", new Dictionary<string, string?>());
 
         public FakeBitflyerPublicApi(Ticker response, Board? board = null)
         {
@@ -96,5 +100,90 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
 
         public Task<FundingRateResponse> GetFundingRateAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
             Task.FromResult(new FundingRateResponse(0m, System.DateTimeOffset.UtcNow));
+
+        public Task<BitflyerRawCall<Ticker, JsonElement>> GetTickerCallAsync(
+            RawProductCode productCode,
+            bool useAliasPath = false,
+            CancellationToken cancellationToken = default)
+        {
+            var response = GetTickerAsync(productCode, useAliasPath, cancellationToken);
+            return response.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        public Task<BitflyerRawCall<Board, JsonElement>> GetBoardCallAsync(
+            RawProductCode productCode,
+            bool useAliasPath = false,
+            CancellationToken cancellationToken = default)
+        {
+            var response = GetBoardAsync(productCode, useAliasPath, cancellationToken);
+            return response.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        public Task<BitflyerRawCall<IReadOnlyList<ExecutionPublicResponse>, JsonElement>> GetExecutionsCallAsync(
+            RawProductCode productCode,
+            int? count = null,
+            long? before = null,
+            long? after = null,
+            bool useAliasPath = false,
+            CancellationToken cancellationToken = default)
+        {
+            var response = GetExecutionsAsync(productCode, count, before, after, useAliasPath, cancellationToken);
+            return response.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        public Task<BitflyerRawCall<IReadOnlyList<Market>, JsonElement>> GetMarketsCallAsync(
+            string? region = null,
+            bool useAliasPath = false,
+            CancellationToken cancellationToken = default)
+        {
+            var response = GetMarketsAsync(region, useAliasPath, cancellationToken);
+            return response.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        public Task<BitflyerRawCall<IReadOnlyList<Chat>, JsonElement>> GetChatsCallAsync(
+            string? fromDate = null,
+            string? region = null,
+            CancellationToken cancellationToken = default)
+        {
+            var response = GetChatsAsync(fromDate, region, cancellationToken);
+            return response.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        public Task<BitflyerRawCall<HealthResponse, JsonElement>> GetHealthCallAsync(
+            RawProductCode productCode,
+            CancellationToken cancellationToken = default)
+        {
+            var response = GetHealthAsync(productCode, cancellationToken);
+            return response.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        public Task<BitflyerRawCall<BoardStateResponse, JsonElement>> GetBoardStateCallAsync(
+            RawProductCode productCode,
+            CancellationToken cancellationToken = default)
+        {
+            var response = GetBoardStateAsync(productCode, cancellationToken);
+            return response.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        public Task<BitflyerRawCall<CorporateLeverageResponse, JsonElement>> GetCorporateLeverageCallAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var response = GetCorporateLeverageAsync(cancellationToken);
+            return response.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        public Task<BitflyerRawCall<FundingRateResponse, JsonElement>> GetFundingRateCallAsync(
+            RawProductCode productCode,
+            CancellationToken cancellationToken = default)
+        {
+            var response = GetFundingRateAsync(productCode, cancellationToken);
+            return response.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        private static BitflyerRawCall<TResponse, JsonElement> MakeOkCall<TResponse>(TResponse response) =>
+            new(
+                DefaultRequest,
+                new Ok<TResponse, JsonElement>(response, 200),
+                new CallMeta(System.DateTimeOffset.UtcNow, System.TimeSpan.Zero, null));
     }
 }

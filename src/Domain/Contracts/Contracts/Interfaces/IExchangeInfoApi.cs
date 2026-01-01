@@ -1,7 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Contracts.Call;
+using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Requests;
 namespace ExchangeApi.Contracts.Interfaces;
 
 /// <summary>
@@ -10,4 +12,7 @@ namespace ExchangeApi.Contracts.Interfaces;
 public interface IExchangeInfoApi
 {
     Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default);
+
+    Task<ApiCall<GetExchangeInfoRequest, ExchangeInfo, ApiError>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default);
 }

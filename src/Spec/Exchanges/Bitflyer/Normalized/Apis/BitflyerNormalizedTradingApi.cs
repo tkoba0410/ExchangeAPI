@@ -308,36 +308,40 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         return CreateCall(
             rawCall,
             requestMeta,
-            rawOrders => rawOrders.Select(o =>
+            rawOrders =>
             {
-                var acceptanceId = string.IsNullOrWhiteSpace(o.ChildOrderAcceptanceId) ? null : o.ChildOrderAcceptanceId;
-                var exchangeOrderId = string.IsNullOrWhiteSpace(o.ChildOrderId) ? null : o.ChildOrderId;
-                var key = acceptanceId is not null
-                    ? new OrderKey(OrderIdKind.AcceptanceId, acceptanceId)
-                    : exchangeOrderId is not null
-                        ? new OrderKey(OrderIdKind.ExchangeOrderId, exchangeOrderId)
-                        : throw new ExchangeApiException(
-                            message: "bitFlyer order is missing both acceptanceId and exchangeOrderId.",
-                            exchange: ExchangeCode.Bitflyer,
-                            operation: "Bitflyer.GetOpenOrders");
+                IReadOnlyList<OpenOrder> mapped = rawOrders.Select(o =>
+                {
+                    var acceptanceId = string.IsNullOrWhiteSpace(o.ChildOrderAcceptanceId) ? null : o.ChildOrderAcceptanceId;
+                    var exchangeOrderId = string.IsNullOrWhiteSpace(o.ChildOrderId) ? null : o.ChildOrderId;
+                    var key = acceptanceId is not null
+                        ? new OrderKey(OrderIdKind.AcceptanceId, acceptanceId)
+                        : exchangeOrderId is not null
+                            ? new OrderKey(OrderIdKind.ExchangeOrderId, exchangeOrderId)
+                            : throw new ExchangeApiException(
+                                message: "bitFlyer order is missing both acceptanceId and exchangeOrderId.",
+                                exchange: ExchangeCode.Bitflyer,
+                                operation: "Bitflyer.GetOpenOrders");
 
-                return new OpenOrder(
-                    ExchangeCode: ExchangeCode.Bitflyer,
-                    Symbol: symbol,
-                    Key: key,
-                    Side: BitflyerCommonMapper.MapSide(o.Side),
-                    OrderType: BitflyerTradingMapper.MapOrderTypeFromExchange(o.ChildOrderType),
-                    Size: new Size(o.Size),
-                    OutstandingSize: new Size(o.OutstandingSize),
-                    ExecutedSize: new Size(o.ExecutedSize),
-                    Price: o.Price == 0 ? null : new Price(o.Price),
-                    OrderedAt: o.ChildOrderDate,
-                    UpdatedAt: null,
-                    StopPrice: null,
-                    Status: o.ChildOrderStatusState,
-                    ExchangeOrderId: exchangeOrderId,
-                    AcceptanceId: acceptanceId);
-            }).ToArray());
+                    return new OpenOrder(
+                        ExchangeCode: ExchangeCode.Bitflyer,
+                        Symbol: symbol,
+                        Key: key,
+                        Side: BitflyerCommonMapper.MapSide(o.Side),
+                        OrderType: BitflyerTradingMapper.MapOrderTypeFromExchange(o.ChildOrderType),
+                        Size: new Size(o.Size),
+                        OutstandingSize: new Size(o.OutstandingSize),
+                        ExecutedSize: new Size(o.ExecutedSize),
+                        Price: o.Price == 0 ? null : new Price(o.Price),
+                        OrderedAt: o.ChildOrderDate,
+                        UpdatedAt: null,
+                        StopPrice: null,
+                        Status: o.ChildOrderStatusState,
+                        ExchangeOrderId: exchangeOrderId,
+                        AcceptanceId: acceptanceId);
+                }).ToArray();
+                return mapped;
+            });
     }
 
     public async Task<BitflyerNormalizedCall<OrderStatus, JsonElement>> GetOrderCallAsync(

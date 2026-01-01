@@ -3,8 +3,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
@@ -53,6 +56,32 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
         _cached = info;
         _lastUpdated = DateTimeOffset.UtcNow;
         return Task.FromResult(info);
+    }
+
+    public async Task<ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetExchangeInfoRequest();
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var info = await GetExchangeInfoAsync(cancellationToken).ConfigureAwait(false);
+            var meta = ApiCallMapper.ToMeta(startedAt);
+            return new ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>(
+                ExchangeCode.Bitflyer,
+                request,
+                meta,
+                new ApiOk<ExchangeInfoDto, ApiError>(info, 200));
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(
+                ExchangeCode.Bitflyer,
+                request,
+                startedAt,
+                ex);
+        }
     }
 
     private static DateTimeOffset? GetNextDailyMaintenanceEndUtc()

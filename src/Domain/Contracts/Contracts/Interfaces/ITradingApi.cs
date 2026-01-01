@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Call;
+using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Requests;
 namespace ExchangeApi.Contracts.Interfaces;
 
 /// <summary>
@@ -40,6 +42,40 @@ public interface ITradingApi
     /// 注文の状態を単発で取得する。
     /// </summary>
     Task<OrderStatus> GetOrderAsync(
+        Symbol symbol,
+        OrderKey orderKey,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiCall<PlaceLimitOrderRequest, OrderResult, ApiError>> PlaceLimitOrderCallAsync(
+        Symbol symbol,
+        Side side,
+        Size size,
+        Price price,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiCall<PlaceMarketOrderRequest, OrderResult, ApiError>> PlaceMarketOrderCallAsync(
+        Symbol symbol,
+        Side side,
+        Size size,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiCall<PlaceStopOrderRequest, OrderResult, ApiError>> PlaceStopOrderCallAsync(
+        Symbol symbol,
+        Side side,
+        Size size,
+        Price triggerPrice,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiCall<CancelOrderRequest, CancelResult, ApiError>> CancelOrderCallAsync(
+        Symbol symbol,
+        OrderKey orderKey,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiCall<GetOrdersRequest, IReadOnlyList<OpenOrder>, ApiError>> GetOrdersCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiCall<GetOrderRequest, OrderStatus, ApiError>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);

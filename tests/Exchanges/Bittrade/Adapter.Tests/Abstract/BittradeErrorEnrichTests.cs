@@ -2,11 +2,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using Xunit;
@@ -37,6 +40,21 @@ public sealed class BittradeErrorEnrichTests
 
         public Task<IReadOnlyList<BittradeExecutionNormalized>> GetExecutionsAsync(string symbol, CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
+
+        public Task<BittradeNormalizedCall<BittradeTickerNormalized, System.Text.Json.JsonElement>> GetTickerCallAsync(
+            string symbol,
+            CancellationToken ct = default) =>
+            throw new ExchangeApiException("boom");
+
+        public Task<BittradeNormalizedCall<BittradeOrderBookNormalized, System.Text.Json.JsonElement>> GetOrderBookCallAsync(
+            string symbol,
+            CancellationToken ct = default) =>
+            throw new ExchangeApiException("boom");
+
+        public Task<BittradeNormalizedCall<IReadOnlyList<BittradeExecutionNormalized>, System.Text.Json.JsonElement>> GetExecutionsCallAsync(
+            string symbol,
+            CancellationToken ct = default) =>
+            throw new ExchangeApiException("boom");
     }
 
     private static IExchangeMarketResolver CreateResolver() =>
@@ -54,5 +72,9 @@ public sealed class BittradeErrorEnrichTests
 
         public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(_info);
+
+        public Task<ApiCall<GetExchangeInfoRequest, ExchangeInfo, ApiError>> GetExchangeInfoCallAsync(
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
     }
 }

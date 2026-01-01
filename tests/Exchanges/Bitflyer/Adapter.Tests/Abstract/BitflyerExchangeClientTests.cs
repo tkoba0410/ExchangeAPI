@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Spec.CallCommon;
 using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 using RawChildOrderType = ExchangeApi.Exchanges.Bitflyer.Raw.ChildOrderType;
 using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
@@ -292,23 +294,56 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
 
         private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi
         {
+            private static readonly BitflyerRawRequest DefaultRequest =
+                new BitflyerRawRequest("test", new Dictionary<string, string?>());
+
             public Task<CreateChildOrderResponse> CreateChildOrderAsync(CreateChildOrderRequest request, CancellationToken cancellationToken = default)
                 => Task.FromResult(new CreateChildOrderResponse());
+
+            public Task<BitflyerRawCall<CreateChildOrderResponse, JsonElement>> CreateChildOrderCallAsync(CreateChildOrderRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult(MakeOkCall(new CreateChildOrderResponse()));
 
             public Task<EmptyResponse> CancelChildOrderAsync(CancelChildOrderRequest request, CancellationToken cancellationToken = default)
                 => Task.FromResult<EmptyResponse>(null!);
 
+            public Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelChildOrderCallAsync(CancelChildOrderRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult(MakeErrCall<EmptyResponse>(500));
+
             public Task<EmptyResponse> CancelAllChildOrdersAsync(CancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
                 => Task.FromResult<EmptyResponse>(null!);
+
+            public Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelAllChildOrdersCallAsync(CancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult(MakeErrCall<EmptyResponse>(500));
 
             public Task<CreateParentOrderResponse> CreateParentOrderAsync(CreateParentOrderRequest request, CancellationToken cancellationToken = default) =>
                 Task.FromResult(new CreateParentOrderResponse());
 
+            public Task<BitflyerRawCall<CreateParentOrderResponse, JsonElement>> CreateParentOrderCallAsync(CreateParentOrderRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult(MakeOkCall(new CreateParentOrderResponse()));
+
             public Task<EmptyResponse> CancelParentOrderAsync(CancelParentOrderRequest request, CancellationToken cancellationToken = default) =>
                 Task.FromResult<EmptyResponse>(null!);
 
+            public Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelParentOrderCallAsync(CancelParentOrderRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult(MakeErrCall<EmptyResponse>(500));
+
             public Task<CreateWithdrawalResponse> CreateWithdrawalAsync(CreateWithdrawalRequest request, CancellationToken cancellationToken = default) =>
                 Task.FromResult(new CreateWithdrawalResponse());
+
+            public Task<BitflyerRawCall<CreateWithdrawalResponse, JsonElement>> CreateWithdrawalCallAsync(CreateWithdrawalRequest request, CancellationToken cancellationToken = default)
+                => Task.FromResult(MakeOkCall(new CreateWithdrawalResponse()));
+
+            private static BitflyerRawCall<TResponse, JsonElement> MakeOkCall<TResponse>(TResponse response)
+                => new(
+                    DefaultRequest,
+                    new Ok<TResponse, JsonElement>(response, 200),
+                    new CallMeta(DateTimeOffset.UtcNow, TimeSpan.Zero, null));
+
+            private static BitflyerRawCall<TResponse, JsonElement> MakeErrCall<TResponse>(int statusCode)
+                => new(
+                    DefaultRequest,
+                    new Err<TResponse, JsonElement>(JsonDocument.Parse("{}").RootElement, statusCode),
+                    new CallMeta(DateTimeOffset.UtcNow, TimeSpan.Zero, null));
         }
     }
 }

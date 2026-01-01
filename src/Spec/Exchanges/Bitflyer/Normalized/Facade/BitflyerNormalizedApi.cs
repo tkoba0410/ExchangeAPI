@@ -134,7 +134,16 @@ public sealed class BitflyerNormalizedMarketDataFacade
             ["after"] = after?.ToString(),
         });
 
-        return CreateCall(rawCall, request, raw => raw.Select(BitflyerExecutionNormalizer.Normalize).ToArray());
+        return CreateCall(
+            rawCall,
+            request,
+            raw =>
+            {
+                IReadOnlyList<BitflyerExecutionNormalized> mapped = raw
+                    .Select(BitflyerExecutionNormalizer.Normalize)
+                    .ToArray();
+                return mapped;
+            });
     }
 
     public async Task<BitflyerHealthNormalized> GetHealthAsync(
@@ -200,7 +209,16 @@ public sealed class BitflyerNormalizedMarketDataFacade
             ["region"] = region,
         });
 
-        return CreateCall(rawCall, request, raw => raw.Select(BitflyerChatNormalizer.Normalize).ToArray());
+        return CreateCall(
+            rawCall,
+            request,
+            raw =>
+            {
+                IReadOnlyList<BitflyerChatNormalized> mapped = raw
+                    .Select(BitflyerChatNormalizer.Normalize)
+                    .ToArray();
+                return mapped;
+            });
     }
 
     private static BitflyerNormalizedRequest CreateRequest(
@@ -255,7 +273,16 @@ public sealed class BitflyerNormalizedExchangeInfoFacade
             ["region"] = region,
         });
 
-        return CreateCall(rawCall, request, raw => raw.Select(BitflyerMarketNormalizer.Normalize).ToArray());
+        return CreateCall(
+            rawCall,
+            request,
+            raw =>
+            {
+                IReadOnlyList<BitflyerMarketNormalized> mapped = raw
+                    .Select(BitflyerMarketNormalizer.Normalize)
+                    .ToArray();
+                return mapped;
+            });
     }
 
     private static BitflyerNormalizedRequest CreateRequest(

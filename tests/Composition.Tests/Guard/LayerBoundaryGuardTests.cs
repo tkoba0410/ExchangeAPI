@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using ExchangeApi.Composition.Factory;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
@@ -41,6 +42,30 @@ public class LayerBoundaryGuardTests
         if (forbidden.Count > 0)
         {
             var message = "Facade public surface exposes Raw/Wire types:\n" + string.Join("\n", forbidden);
+            throw new Xunit.Sdk.XunitException(message);
+        }
+    }
+
+    [Fact]
+    public void Contracts_PublicSurface_DoesNotExposeRawWireOrJson()
+    {
+        var contracts = typeof(IExchangeClient).Assembly;
+        var forbidden = new List<string>();
+
+        foreach (var type in contracts.GetExportedTypes())
+        {
+            foreach (var signatureType in EnumeratePublicSignatureTypes(type))
+            {
+                if (IsForbiddenContractsType(signatureType))
+                {
+                    forbidden.Add($"{type.FullName}: {signatureType.FullName}");
+                }
+            }
+        }
+
+        if (forbidden.Count > 0)
+        {
+            var message = "Contracts public surface exposes forbidden types:\n" + string.Join("\n", forbidden);
             throw new Xunit.Sdk.XunitException(message);
         }
     }
@@ -135,5 +160,23 @@ public class LayerBoundaryGuardTests
         var ns = type.Namespace ?? string.Empty;
         return ns.Contains(".Raw", StringComparison.Ordinal)
             || ns.Contains(".Wire", StringComparison.Ordinal);
+    }
+
+    private static bool IsForbiddenContractsType(Type type)
+    {
+        if (type == typeof(void)) return false;
+
+        var ns = type.Namespace ?? string.Empty;
+        if (ns.Contains(".Raw", StringComparison.Ordinal) || ns.Contains(".Wire", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (type == typeof(JsonElement))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

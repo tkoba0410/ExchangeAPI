@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Call;
+using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Requests;
 namespace ExchangeApi.Contracts.Interfaces;
 
 /// <summary>
@@ -22,5 +24,17 @@ public interface IMarketDataApi
         TimeSpan timescale,
         DateTimeOffset? from = null,
         DateTimeOffset? to = null,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiCall<GetTickerRequest, Ticker, ApiError>> GetTickerCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiCall<GetOrderBookRequest, OrderBook, ApiError>> GetOrderBookCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiCall<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>, ApiError>> GetMarketExecutionsCallAsync(
+        Symbol symbol,
         CancellationToken cancellationToken = default);
 }

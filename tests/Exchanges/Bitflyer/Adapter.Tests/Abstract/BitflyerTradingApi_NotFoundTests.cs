@@ -10,8 +10,10 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Spec.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
@@ -30,7 +32,8 @@ public sealed class BitflyerTradingApi_NotFoundTests
         var key = new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-404");
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
             api.GetOrderAsync(new Symbol("BTC/JPY"), key));
-        Assert.IsType<ExchangeOrderNotFoundException>(ex.InnerException);
+        Assert.Contains("Order not found", ex.Message);
+        Assert.Null(ex.InnerException);
     }
 
     [Fact]
@@ -45,7 +48,8 @@ public sealed class BitflyerTradingApi_NotFoundTests
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, "JRF-404");
         var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
             api.GetOrderAsync(new Symbol("BTC/JPY"), key));
-        Assert.IsType<ExchangeOrderNotFoundException>(ex.InnerException);
+        Assert.Contains("Order not found", ex.Message);
+        Assert.Null(ex.InnerException);
 
         Assert.Equal(key.Value, privateApi.LastChildOrderId);
         Assert.Null(privateApi.LastChildOrderAcceptanceId);
@@ -54,6 +58,8 @@ public sealed class BitflyerTradingApi_NotFoundTests
     private sealed class RecordingPrivateApi : IBitflyerPrivateApi
     {
         private readonly IReadOnlyList<ChildOrderResponse> _orders;
+        private static readonly BitflyerRawRequest DefaultRequest =
+            new BitflyerRawRequest("test", new Dictionary<string, string?>());
 
         public string? LastChildOrderId { get; private set; }
         public string? LastChildOrderAcceptanceId { get; private set; }
@@ -140,6 +146,64 @@ public sealed class BitflyerTradingApi_NotFoundTests
 
         public Task<IReadOnlyList<JsonElement>> GetBankAccountsAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+
+        public Task<BitflyerRawCall<IReadOnlyList<BalanceResponse>, JsonElement>> GetBalancesCallAsync(
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(MakeOkCall<IReadOnlyList<BalanceResponse>>(Array.Empty<BalanceResponse>()));
+
+        public Task<BitflyerRawCall<IReadOnlyList<ExecutionPrivateResponse>, JsonElement>> GetExecutionsCallAsync(
+            RawProductCode productCode,
+            string? childOrderId = null,
+            string? childOrderAcceptanceId = null,
+            int? count = null,
+            long? before = null,
+            long? after = null,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(MakeOkCall<IReadOnlyList<ExecutionPrivateResponse>>(Array.Empty<ExecutionPrivateResponse>()));
+
+        public Task<BitflyerRawCall<IReadOnlyList<PositionResponse>, JsonElement>> GetPositionsCallAsync(
+            RawProductCode productCode,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(MakeOkCall<IReadOnlyList<PositionResponse>>(Array.Empty<PositionResponse>()));
+
+        public Task<BitflyerRawCall<CollateralResponse, JsonElement>> GetCollateralCallAsync(
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(MakeOkCall(new CollateralResponse()));
+
+        public Task<BitflyerRawCall<IReadOnlyList<ChildOrderResponse>, JsonElement>> GetChildOrdersCallAsync(
+            RawProductCode productCode,
+            string? childOrderStatusState = null,
+            string? childOrderAcceptanceId = null,
+            string? childOrderId = null,
+            string? parentOrderId = null,
+            int? count = null,
+            long? before = null,
+            long? after = null,
+            CancellationToken cancellationToken = default)
+        {
+            var result = GetChildOrdersAsync(
+                productCode,
+                childOrderStatusState,
+                childOrderAcceptanceId,
+                childOrderId,
+                parentOrderId,
+                count,
+                before,
+                after,
+                cancellationToken);
+            return result.ContinueWith(task => MakeOkCall(task.Result), cancellationToken);
+        }
+
+        public Task<BitflyerRawCall<JsonElement, JsonElement>> GetTradingCommissionCallAsync(
+            RawProductCode productCode,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(MakeOkCall(JsonDocument.Parse("{}").RootElement));
+
+        private static BitflyerRawCall<TResponse, JsonElement> MakeOkCall<TResponse>(TResponse response) =>
+            new(
+                DefaultRequest,
+                new Ok<TResponse, JsonElement>(response, 200),
+                new CallMeta(DateTimeOffset.UtcNow, TimeSpan.Zero, null));
     }
 
 }

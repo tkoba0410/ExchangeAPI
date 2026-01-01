@@ -250,6 +250,14 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         return CreateCall<RawTradeHistoryResponse>(request, wireCall, "Bittrade.GetTradeHistory");
     }
 
+    public async Task<BittradeRawCall<RawRetailMaintainTimeResponse, JsonElement>> GetRetailMaintainTimeCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var wireCall = await _wire.Common.GetRetailMaintainTimeAsync(cancellationToken).ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetRetailMaintainTime", new Dictionary<string, string?>());
+        return CreateCall<RawRetailMaintainTimeResponse>(request, wireCall, "Bittrade.GetRetailMaintainTime");
+    }
+
     private static BittradeRawRequest CreateRequest(
         string operation,
         IReadOnlyDictionary<string, string?> parameters) =>

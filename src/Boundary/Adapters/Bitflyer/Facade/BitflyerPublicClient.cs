@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Call;
+using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
@@ -61,6 +64,25 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
 
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+
+    public Task<ApiCall<GetTickerRequest, CommonTicker, ApiError>> GetTickerCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetTickerCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetOrderBookRequest, OrderBook, ApiError>> GetOrderBookCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetOrderBookCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>, ApiError>> GetMarketExecutionsCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
+
+    public Task<ApiCall<GetExchangeInfoRequest, ExchangeInfo, ApiError>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
     public bool TryGetRaw<T>(out T raw) where T : class
     {

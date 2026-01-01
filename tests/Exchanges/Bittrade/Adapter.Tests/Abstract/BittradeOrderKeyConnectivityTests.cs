@@ -6,7 +6,9 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Spec.CallCommon;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using Xunit;
 
@@ -59,6 +61,8 @@ public sealed class BittradeOrderKeyConnectivityTests
         public OrderKey? LastOrderKey { get; private set; }
         public Symbol? LastSymbol { get; private set; }
         public OrderStatus Order { get; init; } = CreateOrderStatus("default");
+        private static readonly BittradeNormalizedRequest DefaultRequest =
+            new BittradeNormalizedRequest("test", new Dictionary<string, string?>());
 
         public Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken ct = default) =>
             throw new System.NotSupportedException();
@@ -79,5 +83,41 @@ public sealed class BittradeOrderKeyConnectivityTests
             LastOrderKey = orderKey;
             return Task.FromResult(Order with { Key = orderKey });
         }
+
+        public Task<BittradeNormalizedCall<OrderResult, System.Text.Json.JsonElement>> PlaceOrderCallAsync(
+            OrderRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(new OrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
+
+        public Task<BittradeNormalizedCall<CancelResult, System.Text.Json.JsonElement>> CancelOrderCallAsync(
+            Symbol symbol,
+            OrderKey orderKey,
+            CancellationToken ct = default)
+        {
+            LastSymbol = symbol;
+            LastOrderKey = orderKey;
+            return Task.FromResult(MakeOkCall(new CancelResult(true)));
+        }
+
+        public Task<BittradeNormalizedCall<IReadOnlyList<OpenOrder>, System.Text.Json.JsonElement>> GetOpenOrdersCallAsync(
+            Symbol symbol,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall<IReadOnlyList<OpenOrder>>(Array.Empty<OpenOrder>()));
+
+        public Task<BittradeNormalizedCall<OrderStatus, System.Text.Json.JsonElement>> GetOrderCallAsync(
+            Symbol symbol,
+            OrderKey orderKey,
+            CancellationToken ct = default)
+        {
+            LastSymbol = symbol;
+            LastOrderKey = orderKey;
+            return Task.FromResult(MakeOkCall(Order with { Key = orderKey }));
+        }
+
+        private static BittradeNormalizedCall<TResponse, System.Text.Json.JsonElement> MakeOkCall<TResponse>(TResponse response) =>
+            new(
+                DefaultRequest,
+                new Ok<TResponse, System.Text.Json.JsonElement>(response, 200),
+                new CallMeta(DateTimeOffset.UtcNow, TimeSpan.Zero, null));
     }
 }

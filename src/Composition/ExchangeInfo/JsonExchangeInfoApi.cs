@@ -6,8 +6,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
@@ -52,6 +54,35 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
             _lastLoaded = DateTimeOffset.UtcNow;
             _latestWriteTimeUtc = GetLatestWriteTimeUtc();
             return Task.FromResult(info);
+        }
+    }
+
+    public async Task<ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetExchangeInfoRequest();
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var info = await GetExchangeInfoAsync(cancellationToken).ConfigureAwait(false);
+            var meta = new ApiCallMeta(startedAt, DateTimeOffset.UtcNow - startedAt, null);
+            return new ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>(
+                ExchangeCode.Unknown,
+                request,
+                meta,
+                new ApiOk<ExchangeInfoDto, ApiError>(info, 200));
+        }
+        catch (Exception ex)
+        {
+            var meta = new ApiCallMeta(startedAt, DateTimeOffset.UtcNow - startedAt, null);
+            return new ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>(
+                ExchangeCode.Unknown,
+                request,
+                meta,
+                new ApiErr<ExchangeInfoDto, ApiError>(
+                    new ApiError(ApiErrorKind.Unknown, ex.Message, 0),
+                    0));
         }
     }
 

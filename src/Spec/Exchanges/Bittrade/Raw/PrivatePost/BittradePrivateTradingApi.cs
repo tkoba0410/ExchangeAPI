@@ -191,7 +191,6 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
         var wireCall = await _wire.CancelOrdersAsync(request, cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bittrade.CancelOrders", new Dictionary<string, string?>
         {
-            ["accountId"] = request.AccountId,
             ["orderIds"] = string.Join(",", request.OrderIds),
         });
         return CreateCall<RawCancelOrdersResponse>(rawRequest, wireCall, "Bittrade.CancelOrders");
@@ -207,7 +206,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
         var rawRequest = CreateRequest("Bittrade.CancelOpenOrders", new Dictionary<string, string?>
         {
             ["accountId"] = request.AccountId,
-            ["symbol"] = request.RawSymbol.Value,
+            ["symbol"] = request.RawSymbol?.Value,
         });
         return CreateCall<RawCancelOpenOrdersResponse>(rawRequest, wireCall, "Bittrade.CancelOpenOrders");
     }
@@ -254,11 +253,11 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
         var wireCall = await _wire.CreateRetailOrderAsync(request, cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bittrade.CreateRetailOrder", new Dictionary<string, string?>
         {
-            ["accountId"] = request.AccountId,
             ["symbol"] = request.RawSymbol.Value,
-            ["orderType"] = request.OrderType.ToString(),
+            ["type"] = request.Type.ToString(),
             ["price"] = request.Price,
             ["amount"] = request.Amount,
+            ["cash_amount"] = request.CashAmount,
         });
         return CreateCall<RawRetailOrderResponse>(rawRequest, wireCall, "Bittrade.CreateRetailOrder");
     }

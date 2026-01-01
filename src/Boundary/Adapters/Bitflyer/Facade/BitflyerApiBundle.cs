@@ -1,9 +1,10 @@
 using System;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Normalize;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
 /// <summary>
@@ -12,19 +13,22 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 /// </summary>
 internal sealed class BitflyerApiBundle
 {
-    public IBitflyerRawMarketDataApi MarketData { get; }
-    public IBitflyerRawAccountApi Account { get; }
-    public IBitflyerRawPrivateTradingApi Trading { get; }
+    public BitflyerNormalizedMarketDataFacade MarketData { get; }
+    public IBitflyerNormalizedAccountApi Account { get; }
+    public IBitflyerNormalizedMarginApi Margin { get; }
+    public IBitflyerNormalizedTradingApi Trading { get; }
     public object? RawBundle { get; }
 
     public BitflyerApiBundle(
-        IBitflyerRawMarketDataApi marketData,
-        IBitflyerRawAccountApi account,
-        IBitflyerRawPrivateTradingApi trading,
+        BitflyerNormalizedMarketDataFacade marketData,
+        IBitflyerNormalizedAccountApi account,
+        IBitflyerNormalizedMarginApi margin,
+        IBitflyerNormalizedTradingApi trading,
         object? rawBundle = null)
     {
         MarketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
         Account = account ?? throw new ArgumentNullException(nameof(account));
+        Margin = margin ?? throw new ArgumentNullException(nameof(margin));
         Trading = trading ?? throw new ArgumentNullException(nameof(trading));
         RawBundle = rawBundle;
     }
@@ -32,14 +36,17 @@ internal sealed class BitflyerApiBundle
     public static BitflyerApiBundle FromRestClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
-        var raw = new Raw.BitflyerRawApi(wire);
-        var privateApi = new BitflyerPrivateApi(wire.Account);
-        var privateTradingApi = new BitflyerPrivateTradingApi(wire.Trading);
+        var normalized = BitflyerNormalizedApi.FromRestClient(restClient);
+        var exchangeInfo = new BitflyerExchangeInfoApi();
+        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        var privateApi = BitflyerNormalizeFactory.CreateAccountApi(restClient, markets);
+        var marginApi = BitflyerNormalizeFactory.CreateMarginApi(restClient, markets);
+        var tradingApi = BitflyerNormalizeFactory.CreateTradingApi(restClient, markets);
         return new BitflyerApiBundle(
-            marketData: raw.MarketData,
+            marketData: normalized.MarketData,
             account: privateApi,
-            trading: privateTradingApi,
-            rawBundle: raw);
+            margin: marginApi,
+            trading: tradingApi,
+            rawBundle: null);
     }
 }

@@ -40,7 +40,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
 
-            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
+            var client = CreateClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
             // Act
             IReadOnlyList<Balance> result = await client.GetBalancesAsync();
@@ -69,13 +69,27 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
 
-            var client = new BitflyerExchangeClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
+            var client = CreateClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
             // Act
             IReadOnlyList<Balance> result = await client.GetBalancesAsync();
 
             // Assert
             Assert.Empty(result);
+        }
+
+        private static BitflyerExchangeClient CreateClient(
+            IBitflyerRawMarketDataApi marketData,
+            IBitflyerRawAccountApi accountApi,
+            IBitflyerRawPrivateTradingApi tradingApi)
+        {
+            var markets = BitflyerTestHelpers.CreateResolver();
+            var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
+            var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
+            var normalizedMargin = BitflyerTestHelpers.CreateMarginApi(accountApi, markets);
+            var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);
+
+            return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedMargin, normalizedTrading);
         }
 
         private static IBitflyerRawMarketDataApi CreateDummyPublicApi()

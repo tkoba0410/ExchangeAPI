@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Globalization;
+using System.Linq;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
+
+namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 
 internal static class BitflyerAccountMapper
 {

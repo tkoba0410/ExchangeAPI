@@ -7,6 +7,6 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 /// <summary>
 /// bitFlyer Private Trading API のインターフェース。
 /// </summary>
-internal interface IBitflyerPrivateTradingApi : IBitflyerRawPrivateTradingApi
+public interface IBitflyerPrivateTradingApi : IBitflyerRawPrivateTradingApi
 {
 }

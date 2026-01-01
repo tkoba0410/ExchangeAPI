@@ -8,8 +8,8 @@ using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Raw;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 
 /// <summary>
@@ -17,18 +17,12 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 /// </summary>
 internal sealed class BittradeTradingApi : ITradingApi
 {
-    private readonly IBittradeRawTradingApi _trading;
-    private readonly IExchangeMarketResolver _markets;
-    private readonly string _accountId;
+    private readonly IBittradeNormalizedTradingApi _trading;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public BittradeTradingApi(IBittradeRawTradingApi trading, IExchangeMarketResolver markets, string accountId)
+    public BittradeTradingApi(IBittradeNormalizedTradingApi trading)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
-        _markets = markets ?? throw new ArgumentNullException(nameof(markets));
-        _accountId = string.IsNullOrWhiteSpace(accountId)
-            ? throw new ArgumentException("accountId is required.", nameof(accountId))
-            : accountId;
     }
 
     public Task<OrderResult> PlaceLimitOrderAsync(
@@ -58,10 +52,7 @@ internal sealed class BittradeTradingApi : ITradingApi
     {
         try
         {
-            var apiSymbol = await ToApiSymbolAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
-            var rawRequest = BittradeTradingMapper.ToRaw(_accountId, apiSymbol, request);
-            var raw = await _trading.CreateOrderAsync(rawRequest, cancellationToken).ConfigureAwait(false);
-            return BittradeTradingMapper.ToOrderResult(raw);
+            return await _trading.PlaceOrderAsync(request, cancellationToken).ConfigureAwait(false);
         }
         catch (SymbolNotSupportedException)
         {
@@ -92,9 +83,7 @@ internal sealed class BittradeTradingApi : ITradingApi
         const string operation = BittradeOperations.Trading.CancelOrder;
         try
         {
-            await _trading.CancelOrderAsync(RawOrderId.From(orderKey.Value), cancellationToken).ConfigureAwait(false);
-
-            return new CancelResult(true);
+            return await _trading.CancelOrderAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
         }
         catch (TransportException ex)
         {
@@ -111,9 +100,7 @@ internal sealed class BittradeTradingApi : ITradingApi
         const string operation = BittradeOperations.Trading.GetOpenOrders;
         try
         {
-            var apiSymbol = await ToApiSymbolAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var raw = await _trading.GetOpenOrdersAsync(RawSymbol.From(apiSymbol), _accountId, cancellationToken).ConfigureAwait(false);
-            return BittradeTradingMapper.ToOpenOrders(symbol, raw);
+            return await _trading.GetOpenOrdersAsync(symbol, cancellationToken).ConfigureAwait(false);
         }
         catch (SymbolNotSupportedException)
         {
@@ -147,13 +134,7 @@ internal sealed class BittradeTradingApi : ITradingApi
         const string operation = BittradeOperations.Trading.GetOrder;
         try
         {
-            var market = await _markets.ResolveAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var key = orderKey.Kind == OrderIdKind.AcceptanceId
-                ? new OrderKey(OrderIdKind.AcceptanceId, orderKey.Value)
-                : new OrderKey(OrderIdKind.ExchangeOrderId, orderKey.Value);
-
-            var raw = await _trading.GetOrderAsync(RawOrderId.From(orderKey.Value), cancellationToken).ConfigureAwait(false);
-            return BittradeTradingMapper.ToOrderStatus(market.ProductCode, raw, key);
+            return await _trading.GetOrderAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
         }
         catch (SymbolNotSupportedException)
         {
@@ -169,9 +150,4 @@ internal sealed class BittradeTradingApi : ITradingApi
         }
     }
 
-    private async Task<string> ToApiSymbolAsync(CommonSymbol symbol, CancellationToken ct)
-    {
-        var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return market.ProductCode.Replace("_", string.Empty, StringComparison.Ordinal).ToLowerInvariant();
-    }
 }

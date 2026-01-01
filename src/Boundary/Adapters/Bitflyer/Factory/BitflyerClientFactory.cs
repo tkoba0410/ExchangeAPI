@@ -8,8 +8,11 @@ using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Time;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Normalize;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
 
 /// <summary>
@@ -47,9 +50,8 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
-        var raw = new Raw.BitflyerRawApi(wire);
-        return new BitflyerPublicClient(raw.MarketData, rawBundle: raw);
+        var normalized = BitflyerNormalizedApi.FromRestClient(restClient);
+        return new BitflyerPublicClient(normalized.MarketData, rawBundle: null);
     }
 
     /// <summary>
@@ -108,7 +110,7 @@ public static class BitflyerClientFactory
         var observer = options.Observer;
         var errorClassifier = options.ErrorClassifier ?? BitflyerErrorClassifier.Instance;
 
-        IRequestSigner signer = new Raw.BitflyerRequestSigner(apiKey, apiSecret, clock);
+        IRequestSigner signer = new BitflyerRequestSigner(apiKey, apiSecret, clock);
 
         IRestClient restClient = new RestClient(
             BitflyerApiBaseUri,
@@ -119,16 +121,19 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
-        var raw = new Raw.BitflyerRawApi(wire);
-        var privateApi = new Raw.PrivateGet.BitflyerPrivateApi(wire.Account);
-        var privateTradingApi = new Raw.PrivatePost.BitflyerPrivateTradingApi(wire.Trading);
+        var normalized = BitflyerNormalizedApi.FromRestClient(restClient);
+        var exchangeInfo = new BitflyerExchangeInfoApi();
+        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        var accountApi = BitflyerNormalizeFactory.CreateAccountApi(restClient, markets);
+        var marginApi = BitflyerNormalizeFactory.CreateMarginApi(restClient, markets);
+        var tradingApi = BitflyerNormalizeFactory.CreateTradingApi(restClient, markets);
 
         return new BitflyerExchangeClient(
-            marketData: raw.MarketData,
-            account: privateApi,
-            trading: privateTradingApi,
-            rawBundle: raw);
+            marketData: normalized.MarketData,
+            account: accountApi,
+            margin: marginApi,
+            trading: tradingApi,
+            rawBundle: null);
     }
 
     /// <summary>

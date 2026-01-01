@@ -13,7 +13,6 @@
     <ProjectReference Include="..\..\..\Domain\Common\Common\Shared.Common.csproj" />
     <ProjectReference Include="..\..\..\Domain\Contracts\Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\..\..\Core\Core.csproj" />
-    <ProjectReference Include="..\..\..\Spec\Exchanges\Bittrade\Raw\Exchange.Bittrade.Raw.csproj" />
     <ProjectReference Include="..\..\..\Spec\Exchanges\Bittrade\Normalized\Exchange.Bittrade.Normalized.csproj" />
   </ItemGroup>
 

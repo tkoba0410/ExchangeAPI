@@ -39,11 +39,12 @@ public static class BittradeClientFactory
         string secretKey,
         string accountId)
     {
-        var restClient = CreateRestClient(BittradeNormalizeFactory.CreateRequestSigner(accessKey, secretKey));
+        var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient, accountId);
         var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var trading = new BittradeTradingApi(normalizeBundle.RawBundle.Trading, markets, accountId);
+        var tradingApi = BittradeNormalizeFactory.CreateTradingApi(restClient, markets, accountId);
+        var trading = new BittradeTradingApi(tradingApi);
         IAccountApi account = normalizeBundle.Account is null
             ? new NotSupportedAccountApi(ExchangeCode.Bittrade)
             : new BittradeAccountApi(normalizeBundle.Account);
@@ -55,7 +56,7 @@ public static class BittradeClientFactory
         string secretKey,
         string accountId)
     {
-        var restClient = CreateRestClient(BittradeNormalizeFactory.CreateRequestSigner(accessKey, secretKey));
+        var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
         var bundle = BittradeApiBundle.FromRestClient(restClient, accountId);
         return new BittradeExchangeClient(bundle);
     }

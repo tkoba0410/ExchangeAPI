@@ -8,7 +8,8 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 
@@ -29,7 +30,7 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     public IAccountApi Account => _accountApi;
     public IExchangeInfoApi Info => _exchangeInfoApi;
 
-    internal BitflyerPublicClient(IBitflyerRawMarketDataApi marketData, object? rawBundle = null)
+    internal BitflyerPublicClient(BitflyerNormalizedMarketDataFacade marketData, object? rawBundle = null)
     {
         if (marketData is null) throw new ArgumentNullException(nameof(marketData));
         _exchangeInfoApi = new BitflyerExchangeInfoApi();
@@ -52,10 +53,10 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(Symbol symbol, TimeSpan timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(symbol, timescale, from, to, cancellationToken);
 
-    public Task<HealthResponse> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<BitflyerHealthNormalized> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetHealthAsync(symbol, cancellationToken);
 
-    public Task<BoardStateResponse> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<BitflyerBoardStateNormalized> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         _marketApi.GetBoardStateAsync(symbol, cancellationToken);
 
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>

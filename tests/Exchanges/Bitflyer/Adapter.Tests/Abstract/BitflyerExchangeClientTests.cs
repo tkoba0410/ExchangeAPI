@@ -44,7 +44,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakeApi = new FakeBitflyerPublicApi(raw);
             var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
+            var client = CreateClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             // Act
         var ticker = await client.GetTickerAsync(new Symbol("BTC/JPY"));
@@ -77,7 +77,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakeApi = new FakeBitflyerPublicApi(raw);
             var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
+            var client = CreateClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
         await Assert.ThrowsAsync<SymbolNotSupportedException>(() =>
             client.GetTickerAsync(Symbol.Empty));
@@ -120,7 +120,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakeApi = new FakeBitflyerPublicApi(rawTicker, boardRaw);
             var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = new BitflyerExchangeClient(fakeApi, fakePrivateApi, fakeTradingApi);
+            var client = CreateClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             var board = await client.GetOrderBookAsync(new Symbol("BTC/JPY"));
 
@@ -156,7 +156,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
                 Array.Empty<BalanceResponse>(),
                 childOrders: childOrders);
             var fakeTrading = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = new BitflyerExchangeClient(fakePublic, fakePrivate, fakeTrading);
+            var client = CreateClient(fakePublic, fakePrivate, fakeTrading);
 
             var result = await client.GetOrdersAsync(new Symbol("BTC/JPY"));
 
@@ -182,7 +182,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var publicApi = new FakeBitflyerPublicApi(rawTicker);
             var privateApi = new FakeBitflyerPrivateApi(balances);
             var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
+            var client = CreateClient(publicApi, privateApi, tradingApi);
 
             var result = await client.GetBalancesAsync();
 
@@ -211,7 +211,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var publicApi = new FakeBitflyerPublicApi(rawTicker);
             var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>(), positions: positions);
             var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
+            var client = CreateClient(publicApi, privateApi, tradingApi);
 
             var result = await client.GetOpenPositionsAsync(new Symbol("BTC/JPY"));
 
@@ -239,7 +239,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var publicApi = new FakeBitflyerPublicApi(rawTicker);
             var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>(), collateral: collateral);
             var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
+            var client = CreateClient(publicApi, privateApi, tradingApi);
 
             var result = await client.GetCollateralAsync();
 
@@ -256,7 +256,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var publicApi = new FakeBitflyerPublicApi(rawTicker);
             var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
             var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = new BitflyerExchangeClient(publicApi, privateApi, tradingApi);
+            var client = CreateClient(publicApi, privateApi, tradingApi);
 
             var result = await client.GetTradingCommissionAsync(new Symbol("BTC/JPY"));
 
@@ -270,10 +270,24 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var publicApi = new FakeBitflyerPublicApi(rawTicker, new Board { Bids = Array.Empty<BoardEntry>(), Asks = Array.Empty<BoardEntry>() });
             var accountApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
             var tradingApi = new NullCancelTradingApi();
-            var client = new BitflyerExchangeClient(publicApi, accountApi, tradingApi);
+            var client = CreateClient(publicApi, accountApi, tradingApi);
 
             await Assert.ThrowsAsync<ExchangeApiException>(() =>
                 client.CancelOrderAsync(new Symbol("BTC/JPY"), new OrderKey(OrderIdKind.AcceptanceId, "id-1")));
+        }
+
+        private static BitflyerExchangeClient CreateClient(
+            IBitflyerRawMarketDataApi marketData,
+            IBitflyerRawAccountApi accountApi,
+            IBitflyerRawPrivateTradingApi tradingApi)
+        {
+            var markets = BitflyerTestHelpers.CreateResolver();
+            var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
+            var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
+            var normalizedMargin = BitflyerTestHelpers.CreateMarginApi(accountApi, markets);
+            var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);
+
+            return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedMargin, normalizedTrading);
         }
 
         private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi

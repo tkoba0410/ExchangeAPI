@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ExchangeApi.Composition.Factory;
+using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Facade;
 
@@ -11,13 +12,13 @@ namespace Composition.Tests.Guard;
 public class LayerBoundaryGuardTests
 {
     [Fact]
-    public void CreateExchange_ReturnsNormalizedFacade()
+    public void CreateClient_ReturnsExchangeClient()
     {
-        var bitflyerMethod = GetCreateExchangeMethod(typeof(BitflyerFactory));
-        var bittradeMethod = GetCreateExchangeMethod(typeof(BittradeFactory));
+        var bitflyerMethod = GetCreateClientMethod(typeof(BitflyerFactory));
+        var bittradeMethod = GetCreateClientMethod(typeof(BittradeFactory));
 
-        Assert.Equal(typeof(BitflyerNormalizedApi), bitflyerMethod.ReturnType);
-        Assert.Equal(typeof(BittradeNormalizedApi), bittradeMethod.ReturnType);
+        Assert.Equal(typeof(IExchangeClient), bitflyerMethod.ReturnType);
+        Assert.Equal(typeof(IExchangeClient), bittradeMethod.ReturnType);
     }
 
     [Fact]
@@ -44,11 +45,11 @@ public class LayerBoundaryGuardTests
         }
     }
 
-    private static MethodInfo GetCreateExchangeMethod(Type factoryType)
+    private static MethodInfo GetCreateClientMethod(Type factoryType)
     {
         return factoryType
             .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Single(m => m.Name == "CreateExchange");
+            .Single(m => m.Name == "CreateClient");
     }
 
     private static IEnumerable<Type> GetFacadeTypes()

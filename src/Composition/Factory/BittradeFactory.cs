@@ -4,41 +4,17 @@ using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Facade;
-using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Contracts.Interfaces;
 
 namespace ExchangeApi.Composition.Factory;
 
 /// <summary>
-/// Bittrade 用の標準配線ファクトリ。Raw を既定とし、Adapter は明示 opt-in。
+/// Bittrade 用の標準配線ファクトリ。Adapter を既定とし、Spec を参照しない。
 /// </summary>
 public static class BittradeFactory
 {
     private static readonly Uri DefaultBaseUri = new("https://api-cloud.bittrade.co.jp/");
-
-    public static BittradeRawApi CreateRaw(BittradeFactoryOptions? options = null)
-    {
-        var settings = options ?? new BittradeFactoryOptions();
-        var restClient = CreateRestClient(settings, requireCredentials: false);
-
-        var wire = new BittradeWireApi(restClient, settings.AccountId);
-        return new BittradeRawApi(wire);
-    }
-
-    /// <summary>
-    /// Bittrade の Normalized 入口を作成する。
-    /// Raw -> Normalize までを提供し、Contracts/Adapter は返さない。
-    /// </summary>
-    public static BittradeNormalizedApi CreateExchange(BittradeFactoryOptions? options = null)
-    {
-        var settings = options ?? new BittradeFactoryOptions();
-        var requireCredentials = !string.IsNullOrWhiteSpace(settings.AccountId);
-        var restClient = CreateRestClient(settings, requireCredentials: requireCredentials);
-
-        return BittradeNormalizedApi.FromRestClient(restClient, settings.AccountId);
-    }
 
     public static IExchangeClient CreateClient(BittradeFactoryOptions? options = null)
     {

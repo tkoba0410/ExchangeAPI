@@ -1,4 +1,5 @@
 using System;
+using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Raw;
@@ -7,21 +8,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalize;
 
 internal static class BittradeNormalizeFactory
 {
-    public static IRequestSigner CreateRequestSigner(string accessKey, string secretKey)
-    {
-        if (string.IsNullOrWhiteSpace(accessKey))
-        {
-            throw new ArgumentException("accessKey is required.", nameof(accessKey));
-        }
-
-        if (string.IsNullOrWhiteSpace(secretKey))
-        {
-            throw new ArgumentException("secretKey is required.", nameof(secretKey));
-        }
-
-        return new BittradeRequestSigner(accessKey, secretKey);
-    }
-
     public static BittradeNormalizeBundle FromRestClient(IRestClient restClient, string? accountId = null)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
@@ -42,5 +28,23 @@ internal static class BittradeNormalizeFactory
             account: account,
             rawBundle: raw,
             accountId: normalizedAccountId);
+    }
+
+    public static IBittradeNormalizedTradingApi CreateTradingApi(
+        IRestClient restClient,
+        IExchangeMarketResolver markets,
+        string accountId)
+    {
+        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+        if (markets is null) throw new ArgumentNullException(nameof(markets));
+
+        if (string.IsNullOrWhiteSpace(accountId))
+        {
+            throw new ArgumentException("accountId is required.", nameof(accountId));
+        }
+
+        var wire = new Raw.Internal.Wire.BittradeWireApi(restClient, accountId);
+        var raw = new BittradeRawApi(wire);
+        return new BittradeNormalizedTradingApi(raw.Trading, markets, accountId);
     }
 }

@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 /// <summary>
 /// bitFlyer Private Trading REST API の実装（発注・キャンセル系）。
 /// </summary>
-internal sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
+public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
 {
     private readonly WireTradingApi _wire;
 

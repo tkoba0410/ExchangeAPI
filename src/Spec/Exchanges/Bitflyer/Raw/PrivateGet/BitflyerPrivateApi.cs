@@ -12,7 +12,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 /// <summary>
 /// bitFlyer Private REST API（情報系）の実装。
 /// </summary>
-internal sealed class BitflyerPrivateApi : IBitflyerPrivateApi
+public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
 {
     private readonly WireAccountApi _wire;
 

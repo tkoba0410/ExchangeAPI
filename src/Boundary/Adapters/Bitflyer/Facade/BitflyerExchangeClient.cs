@@ -6,16 +6,18 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Normalize;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
@@ -42,21 +44,21 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public IExchangeInfoApi Info => _exchangeInfoApi;
 
     internal BitflyerExchangeClient(
-        IBitflyerRawMarketDataApi marketData,
-        IBitflyerRawAccountApi account,
-        IBitflyerRawPrivateTradingApi trading,
+        BitflyerNormalizedMarketDataFacade marketData,
+        IBitflyerNormalizedAccountApi account,
+        IBitflyerNormalizedMarginApi margin,
+        IBitflyerNormalizedTradingApi trading,
         ExchangeCode exchangeCode = ExchangeCode.Bitflyer,
-        string accountId = "default",
         object? rawBundle = null)
         : this(
             marketApi: CreateMarketApi(marketData),
-            tradingApi: CreateTradingApi(trading, account),
-            marginApi: CreateMarginApi(account),
+            tradingApi: CreateTradingApi(trading),
+            marginApi: CreateMarginApi(margin),
             accountApi: CreateAccountApi(account),
             exchangeInfoApi: new BitflyerExchangeInfoApi(),
             rawBundle: rawBundle)
     {
-        ApiBundle = new BitflyerApiBundle(marketData, account, trading, rawBundle);
+        ApiBundle = new BitflyerApiBundle(marketData, account, margin, trading, rawBundle);
     }
 
     public BitflyerExchangeClient(
@@ -80,8 +82,8 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
         : this(
             marketApi: CreateMarketApi(bundle.MarketData),
-            tradingApi: CreateTradingApi(bundle.Trading, bundle.Account),
-            marginApi: CreateMarginApi(bundle.Account),
+            tradingApi: CreateTradingApi(bundle.Trading),
+            marginApi: CreateMarginApi(bundle.Margin),
             accountApi: CreateAccountApi(bundle.Account),
             exchangeInfoApi: new BitflyerExchangeInfoApi(),
             rawBundle: bundle.RawBundle)
@@ -89,35 +91,40 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         ApiBundle = bundle;
     }
 
-    private static MarketApi CreateMarketApi(IBitflyerRawMarketDataApi marketData)
+    public static BitflyerExchangeClient FromRestClient(IRestClient restClient)
+    {
+        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+
+        var normalized = BitflyerNormalizedApi.FromRestClient(restClient);
+        var exchangeInfo = new BitflyerExchangeInfoApi();
+        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        var accountApi = BitflyerNormalizeFactory.CreateAccountApi(restClient, markets);
+        var marginApi = BitflyerNormalizeFactory.CreateMarginApi(restClient, markets);
+        var tradingApi = BitflyerNormalizeFactory.CreateTradingApi(restClient, markets);
+
+        return new BitflyerExchangeClient(
+            marketData: normalized.MarketData,
+            account: accountApi,
+            margin: marginApi,
+            trading: tradingApi,
+            rawBundle: null);
+    }
+
+    private static MarketApi CreateMarketApi(BitflyerNormalizedMarketDataFacade marketData)
     {
         var exchangeInfo = new BitflyerExchangeInfoApi();
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         return new MarketApi(marketData, markets, ExchangeCode.Bitflyer);
     }
 
-    private static BitflyerTradingApi CreateTradingApi(
-        IBitflyerRawPrivateTradingApi trading,
-        IBitflyerRawAccountApi account)
-    {
-        var exchangeInfo = new BitflyerExchangeInfoApi();
-        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        return new BitflyerTradingApi(trading, account, markets, ExchangeCode.Bitflyer);
-    }
+    private static BitflyerTradingApi CreateTradingApi(IBitflyerNormalizedTradingApi trading) =>
+        new(trading, ExchangeCode.Bitflyer);
 
-    private static BitflyerMarginApi CreateMarginApi(IBitflyerRawAccountApi account)
-    {
-        var exchangeInfo = new BitflyerExchangeInfoApi();
-        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        return new BitflyerMarginApi(account, markets, ExchangeCode.Bitflyer);
-    }
+    private static BitflyerMarginApi CreateMarginApi(IBitflyerNormalizedMarginApi account) =>
+        new(account, ExchangeCode.Bitflyer);
 
-    private static BitflyerAccountApi CreateAccountApi(IBitflyerRawAccountApi account)
-    {
-        var exchangeInfo = new BitflyerExchangeInfoApi();
-        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        return new BitflyerAccountApi(account, markets, ExchangeCode.Bitflyer);
-    }
+    private static BitflyerAccountApi CreateAccountApi(IBitflyerNormalizedAccountApi account) =>
+        new(account, ExchangeCode.Bitflyer);
 
     // Market
     public Task<CommonTicker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
@@ -137,10 +144,10 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(symbol, timescale, from, to, cancellationToken);
 
-    public Task<HealthResponse> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<BitflyerHealthNormalized> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         GetMarketApi().GetHealthAsync(symbol, cancellationToken);
 
-    public Task<BoardStateResponse> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+    public Task<BitflyerBoardStateNormalized> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
         GetMarketApi().GetBoardStateAsync(symbol, cancellationToken);
 
     // Trading

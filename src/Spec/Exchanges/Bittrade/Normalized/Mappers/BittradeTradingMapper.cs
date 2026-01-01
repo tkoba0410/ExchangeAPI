@@ -11,7 +11,7 @@ using ContractOrderType = ExchangeApi.Common.Enums.OrderType;
 using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
 using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 
 internal static class BittradeTradingMapper
 {

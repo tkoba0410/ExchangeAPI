@@ -56,7 +56,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         }
 
         _marketApi = new BittradeMarketDataApi(bundle.NormalizedMarketData, bundle.Markets);
-        _tradingApi = new BittradeTradingApi(bundle.Trading, bundle.Markets, bundle.AccountId);
+        _tradingApi = new BittradeTradingApi(bundle.Trading);
         _accountApi = bundle.NormalizedAccount is null
             ? new NotSupportedAccountApi(ExchangeCode.Bittrade)
             : new BittradeAccountApi(bundle.NormalizedAccount);

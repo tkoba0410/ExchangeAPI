@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using ExchangeApi.Core.Contracts.Errors;
@@ -17,7 +18,8 @@ public sealed class BitflyerPublicClientTests
     {
         var rawTicker = new Ticker { ProductCode = new RawProductCode("BTC_JPY") };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
-        var client = new BitflyerPublicClient(publicApi);
+        var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
+        var client = new BitflyerPublicClient(marketData);
 
         var result = await client.GetHealthAsync(new Symbol("BTC/JPY"));
 
@@ -29,7 +31,8 @@ public sealed class BitflyerPublicClientTests
     {
         var rawTicker = new Ticker { ProductCode = new RawProductCode("BTC_JPY") };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
-        var client = new BitflyerPublicClient(publicApi);
+        var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
+        var client = new BitflyerPublicClient(marketData);
 
         var result = await client.GetBoardStateAsync(new Symbol("BTC/JPY"));
 
@@ -43,7 +46,8 @@ public sealed class BitflyerPublicClientTests
     {
         var rawTicker = new Ticker { ProductCode = new RawProductCode("BTC_JPY") };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
-        var client = new BitflyerPublicClient(publicApi);
+        var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
+        var client = new BitflyerPublicClient(marketData);
 
         await Assert.ThrowsAsync<SymbolNotSupportedException>(() =>
             client.GetTickerAsync(new Symbol("ETH/JPY")));

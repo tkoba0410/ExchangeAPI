@@ -55,7 +55,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var publicApi = new FakeBitflyerPublicApi(new Ticker());
         var sequenceApi = new SequenceChildOrderApi(new[] { active }, new[] { completed });
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var client = new BitflyerExchangeClient(publicApi, sequenceApi, tradingApi);
+        var client = CreateClient(publicApi, sequenceApi, tradingApi);
 
         var status = await OrderPolling.WaitForOrderAsync(
             api: client,
@@ -67,6 +67,20 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         Assert.Equal(0m, status.OutstandingSize.Value);
         Assert.Equal(0.01m, status.ExecutedSize.Value);
         Assert.Equal(3000000m, status.AveragePrice!.Value.Value);
+    }
+
+    private static BitflyerExchangeClient CreateClient(
+        IBitflyerRawMarketDataApi marketData,
+        IBitflyerRawAccountApi accountApi,
+        IBitflyerRawPrivateTradingApi tradingApi)
+    {
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
+        var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
+        var normalizedMargin = BitflyerTestHelpers.CreateMarginApi(accountApi, markets);
+        var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);
+
+        return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedMargin, normalizedTrading);
     }
 
     private sealed class SequenceChildOrderApi : IBitflyerPrivateApi

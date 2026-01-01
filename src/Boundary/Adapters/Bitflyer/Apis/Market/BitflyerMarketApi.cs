@@ -3,9 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
@@ -14,6 +12,7 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 
 /// <summary>
@@ -21,12 +20,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 /// </summary>
 internal sealed class MarketApi : IMarketDataApi
 {
-    private readonly IBitflyerRawMarketDataApi _marketData;
+    private readonly BitflyerNormalizedMarketDataFacade _marketData;
     private readonly IExchangeMarketResolver _markets;
     private readonly ExchangeCode _exchange;
 
     public MarketApi(
-        IBitflyerRawMarketDataApi marketData,
+        BitflyerNormalizedMarketDataFacade marketData,
         IExchangeMarketResolver markets,
         ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
@@ -41,8 +40,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var raw = await _marketData.GetTickerAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            var normalized = BitflyerTickerNormalizer.Normalize(raw);
+            var normalized = await _marketData.GetTickerAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
             return MarketMapper.MapTicker(symbol, normalized);
         }
         catch (SymbolNotSupportedException)
@@ -74,8 +72,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var rawBoard = await _marketData.GetBoardAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            var normalized = BitflyerOrderBookNormalizer.Normalize(rawBoard);
+            var normalized = await _marketData.GetOrderBookAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
             return MarketMapper.MapOrderBook(normalized);
         }
         catch (SymbolNotSupportedException)
@@ -107,10 +104,9 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var raw = await _marketData.GetExecutionsAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var normalized = await _marketData.GetExecutionsAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
 
-            var mapped = raw
-                .Select(BitflyerExecutionNormalizer.Normalize)
+            var mapped = normalized
                 .Select(e => MarketMapper.MapExecution(symbol, e))
                 .ToArray();
 
@@ -150,7 +146,7 @@ internal sealed class MarketApi : IMarketDataApi
         throw new ExchangeFeatureNotSupportedException(_exchange, "Candlesticks");
     }
 
-    public async Task<HealthResponse> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    public async Task<BitflyerHealthNormalized> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var operation = BitflyerOperations.MarketData.GetHealth;
         if (symbol.IsEmpty)
@@ -161,9 +157,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var raw = await _marketData.GetHealthAsync(productCode, cancellationToken).ConfigureAwait(false);
-            var normalized = BitflyerHealthNormalizer.Normalize(raw);
-            return new HealthResponse(normalized.Status);
+            return await _marketData.GetHealthAsync(productCode, cancellationToken).ConfigureAwait(false);
         }
         catch (SymbolNotSupportedException)
         {
@@ -188,7 +182,7 @@ internal sealed class MarketApi : IMarketDataApi
         }
     }
 
-    public async Task<BoardStateResponse> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default)
+    public async Task<BitflyerBoardStateNormalized> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         var operation = BitflyerOperations.MarketData.GetBoardState;
         if (symbol.IsEmpty)
@@ -199,12 +193,7 @@ internal sealed class MarketApi : IMarketDataApi
         try
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var raw = await _marketData.GetBoardStateAsync(productCode, cancellationToken).ConfigureAwait(false);
-            var normalized = BitflyerBoardStateNormalizer.Normalize(raw);
-            return new BoardStateResponse(
-                Health: normalized.Health,
-                State: normalized.State,
-                Data: normalized.Data);
+            return await _marketData.GetBoardStateAsync(productCode, cancellationToken).ConfigureAwait(false);
         }
         catch (SymbolNotSupportedException)
         {
@@ -229,9 +218,9 @@ internal sealed class MarketApi : IMarketDataApi
         }
     }
 
-    private async Task<RawProductCode> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
+    private async Task<string> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
     {
         var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return new RawProductCode(market.ProductCode);
+        return market.ProductCode;
     }
 }

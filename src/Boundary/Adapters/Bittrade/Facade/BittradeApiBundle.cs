@@ -1,7 +1,6 @@
 using System;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
-using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Core.Transport.Protocol;
@@ -15,7 +14,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 /// </summary>
 internal sealed class BittradeApiBundle
 {
-    public IBittradeRawTradingApi Trading { get; }
+    public IBittradeNormalizedTradingApi Trading { get; }
     public IBittradeNormalizedMarketDataApi NormalizedMarketData { get; }
     public IBittradeNormalizedAccountApi? NormalizedAccount { get; }
     public IExchangeInfoApi ExchangeInfo { get; }
@@ -25,7 +24,7 @@ internal sealed class BittradeApiBundle
     public object? RawBundle { get; }
 
     public BittradeApiBundle(
-        IBittradeRawTradingApi trading,
+        IBittradeNormalizedTradingApi trading,
         IBittradeNormalizedMarketDataApi normalizedMarketData,
         IBittradeNormalizedAccountApi? normalizedAccount,
         IExchangeInfoApi exchangeInfo,
@@ -51,8 +50,11 @@ internal sealed class BittradeApiBundle
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient, normalizedAccountId);
         var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        var trading = normalizedAccountId is null
+            ? throw new InvalidOperationException("accountId is required to create Bittrade trading API.")
+            : BittradeNormalizeFactory.CreateTradingApi(restClient, markets, normalizedAccountId);
         return new BittradeApiBundle(
-            trading: normalizeBundle.RawBundle.Trading,
+            trading: trading,
             normalizedMarketData: normalizeBundle.MarketData,
             normalizedAccount: normalizeBundle.Account,
             exchangeInfo: exchangeInfo,

@@ -4,72 +4,29 @@ using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Time;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using Raw = ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Contracts.Interfaces;
 
 namespace ExchangeApi.Composition.Factory;
 
 /// <summary>
 /// bitFlyer 用の標準配線を提供するファクトリ。
-/// Raw を既定とし、Adapter は明示的に opt-in する。
+/// Adapter を既定とし、Spec を参照しない。
 /// </summary>
 public static class BitflyerFactory
 {
     private static readonly Uri DefaultBaseUri = new("https://api.bitflyer.com");
 
-    public static Raw.BitflyerRawApi CreateRaw(BitflyerFactoryOptions? options = null)
-    {
-        var settings = options ?? new BitflyerFactoryOptions();
-        var restClient = CreateRestClient(settings);
-        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
-        return new Raw.BitflyerRawApi(wire);
-    }
-
-    /// <summary>
-    /// bitFlyer の Normalized 入口を作成する。
-    /// Raw -> Normalize までを提供し、Contracts/Adapter は返さない。
-    /// </summary>
-    public static BitflyerNormalizedApi CreateExchange(BitflyerFactoryOptions? options = null)
-    {
-        var settings = options ?? new BitflyerFactoryOptions();
-        var restClient = CreateRestClient(settings);
-        return BitflyerNormalizedApi.FromRestClient(restClient);
-    }
-
     public static IExchangeClient CreateClient(BitflyerFactoryOptions? options = null)
     {
         var settings = options ?? new BitflyerFactoryOptions();
-        var components = CreateComponents(settings);
-
-        return new BitflyerExchangeClient(
-            components.MarketData,
-            components.PrivateApi,
-            components.TradingApi,
-            exchangeCode: settings.Exchange,
-            accountId: settings.AccountId);
+        var restClient = CreateRestClient(settings);
+        return BitflyerExchangeClient.FromRestClient(restClient);
     }
 
     [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]
     internal static BitflyerExchangeClient CreateAdapter(BitflyerFactoryOptions? options = null) =>
         (BitflyerExchangeClient)CreateClient(options);
-
-    private static BitflyerComponents CreateComponents(BitflyerFactoryOptions settings)
-    {
-        var restClient = CreateRestClient(settings);
-        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
-        var raw = new Raw.BitflyerRawApi(wire);
-        var privateApi = new BitflyerPrivateApi(wire.Account);
-        var legacyTradingApi = new BitflyerPrivateTradingApi(wire.Trading);
-        return new BitflyerComponents(
-            RestClient: restClient,
-            Raw: raw,
-            MarketData: raw.MarketData,
-            PrivateApi: privateApi,
-            TradingApi: legacyTradingApi);
-    }
 
     private static RestClient CreateRestClient(BitflyerFactoryOptions settings)
     {
@@ -98,13 +55,6 @@ public static class BitflyerFactory
         }
 
         var clock = settings.Clock ?? new SystemClock();
-        return new Raw.BitflyerRequestSigner(credentials.ApiKey, credentials.ApiSecret, clock);
+        return new BitflyerRequestSigner(credentials.ApiKey, credentials.ApiSecret, clock);
     }
-
-    private sealed record BitflyerComponents(
-        RestClient RestClient,
-        Raw.BitflyerRawApi Raw,
-        Raw.IBitflyerRawMarketDataApi MarketData,
-        BitflyerPrivateApi PrivateApi,
-        IBitflyerRawPrivateTradingApi TradingApi);
 }

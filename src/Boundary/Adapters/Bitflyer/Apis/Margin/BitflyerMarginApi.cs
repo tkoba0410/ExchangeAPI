@@ -1,33 +1,28 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Margin;
 
 internal sealed class BitflyerMarginApi : IMarginAccountApi
 {
-    private readonly IBitflyerRawAccountApi _accountApi;
-    private readonly IExchangeMarketResolver _markets;
+    private readonly IBitflyerNormalizedMarginApi _accountApi;
     private readonly ExchangeCode _exchange;
 
     public BitflyerMarginApi(
-        IBitflyerRawAccountApi accountApi,
-        IExchangeMarketResolver markets,
+        IBitflyerNormalizedMarginApi accountApi,
         ExchangeCode exchange = ExchangeCode.Bitflyer)
     {
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
-        _markets = markets ?? throw new ArgumentNullException(nameof(markets));
         _exchange = exchange;
     }
 
@@ -36,17 +31,9 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         var operation = BitflyerOperations.Margin.GetBalances;
         try
         {
-            var rawBalances = await _accountApi
+            return await _accountApi
                 .GetBalancesAsync(cancellationToken)
                 .ConfigureAwait(false);
-
-            return rawBalances
-                .Select(b => Balance.Create(
-                    exchange: ExchangeCode.Bitflyer,
-                    currency: b.CurrencyCode,
-                    amount: b.Amount,
-                    available: b.Available))
-                .ToArray();
         }
         catch (TransportException ex)
         {
@@ -77,12 +64,9 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
 
         try
         {
-            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var raw = await _accountApi
-                .GetExecutionsAsync(productCode, cancellationToken: cancellationToken)
+            return await _accountApi
+                .GetAccountExecutionsAsync(symbol, cancellationToken)
                 .ConfigureAwait(false);
-
-            return BitflyerAccountMapper.MapAccountExecutions(symbol, raw);
         }
         catch (SymbolNotSupportedException)
         {
@@ -112,12 +96,9 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         var operation = BitflyerOperations.Margin.GetOpenPositions;
         try
         {
-            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var raw = await _accountApi
-                .GetPositionsAsync(productCode, cancellationToken)
+            return await _accountApi
+                .GetOpenPositionsAsync(symbol, cancellationToken)
                 .ConfigureAwait(false);
-
-            return BitflyerMarginMapper.MapPositions(symbol, raw);
         }
         catch (SymbolNotSupportedException)
         {
@@ -147,11 +128,9 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         var operation = BitflyerOperations.Margin.GetCollateral;
         try
         {
-            var raw = await _accountApi
+            return await _accountApi
                 .GetCollateralAsync(cancellationToken)
                 .ConfigureAwait(false);
-
-            return BitflyerMarginMapper.MapCollateral(raw);
         }
         catch (TransportException ex)
         {
@@ -172,9 +151,4 @@ internal sealed class BitflyerMarginApi : IMarginAccountApi
         }
     }
 
-    private async Task<RawProductCode> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
-    {
-        var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return new RawProductCode(market.ProductCode);
-    }
 }

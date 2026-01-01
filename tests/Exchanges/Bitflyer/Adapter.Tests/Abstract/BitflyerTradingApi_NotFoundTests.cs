@@ -11,8 +11,6 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
 using Xunit;
 
@@ -25,11 +23,14 @@ public sealed class BitflyerTradingApi_NotFoundTests
     {
         var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var api = new BitflyerTradingApi(tradingApi, privateApi, CreateResolver());
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, privateApi, markets);
+        var api = new BitflyerTradingApi(normalized);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-404");
-        await Assert.ThrowsAsync<ExchangeOrderNotFoundException>(() =>
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
             api.GetOrderAsync(new Symbol("BTC/JPY"), key));
+        Assert.IsType<ExchangeOrderNotFoundException>(ex.InnerException);
     }
 
     [Fact]
@@ -37,11 +38,14 @@ public sealed class BitflyerTradingApi_NotFoundTests
     {
         var privateApi = new RecordingPrivateApi(Array.Empty<ChildOrderResponse>());
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var api = new BitflyerTradingApi(tradingApi, privateApi, CreateResolver());
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, privateApi, markets);
+        var api = new BitflyerTradingApi(normalized);
 
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, "JRF-404");
-        await Assert.ThrowsAsync<ExchangeOrderNotFoundException>(() =>
+        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
             api.GetOrderAsync(new Symbol("BTC/JPY"), key));
+        Assert.IsType<ExchangeOrderNotFoundException>(ex.InnerException);
 
         Assert.Equal(key.Value, privateApi.LastChildOrderId);
         Assert.Null(privateApi.LastChildOrderAcceptanceId);
@@ -138,20 +142,4 @@ public sealed class BitflyerTradingApi_NotFoundTests
             Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
     }
 
-    private static IExchangeMarketResolver CreateResolver() =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
-            new[] { new ExchangeMarketInfo("BTC/JPY", "BTC_JPY", "Spot") },
-            null,
-            null,
-            null)));
-
-    private sealed class StubExchangeInfoApi : IExchangeInfoApi
-    {
-        private readonly ExchangeInfo _info;
-
-        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
-
-        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(_info);
-    }
 }

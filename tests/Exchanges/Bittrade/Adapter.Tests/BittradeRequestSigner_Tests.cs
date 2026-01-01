@@ -1,8 +1,7 @@
-using System.Linq;
 using System.Net.Http;
 using System.Web;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;

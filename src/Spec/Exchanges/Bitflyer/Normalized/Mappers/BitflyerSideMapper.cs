@@ -2,7 +2,8 @@ using System;
 using ExchangeApi.Common.Enums;
 using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using ContractSide = ExchangeApi.Common.Enums.Side;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
+
+namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 
 /// <summary>bitFlyer のサイド文字列と enum のマッピング。</summary>
 internal static class BitflyerSideMapper

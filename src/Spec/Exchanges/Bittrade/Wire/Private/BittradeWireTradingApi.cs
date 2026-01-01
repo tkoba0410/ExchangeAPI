@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
@@ -23,88 +23,61 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
         _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
 
-    public async Task<WireResponse> PlaceOrderAsync(RawCreateOrderRequest request, CancellationToken ct = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var meta = await _restClient.PostRawAsync("v1/order/orders/place", request, ct).ConfigureAwait(false);
-        return ToWire(meta);
-    }
+    public Task<WireCall> PlaceOrderAsync(RawCreateOrderRequest request, CancellationToken ct = default) =>
+        PostAsync("v1/order/orders/place", request, ct);
 
-    public async Task<WireResponse> CancelOrderAsync(string orderId, CancellationToken ct = default)
+    public Task<WireCall> CancelOrderAsync(string orderId, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(orderId))
         {
             throw new ArgumentException("orderId is required.", nameof(orderId));
         }
 
-        var meta = await _restClient
-            .PostRawAsync<object?>($"v1/order/orders/{orderId}/submitcancel", body: null, ct)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        return PostAsync<object?>($"v1/order/orders/{orderId}/submitcancel", body: null, ct);
     }
 
-    public async Task<WireResponse> CancelOrdersAsync(RawCancelOrdersRequest request, CancellationToken ct = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var meta = await _restClient.PostRawAsync("v1/order/orders/batchcancel", request, ct).ConfigureAwait(false);
-        return ToWire(meta);
-    }
+    public Task<WireCall> CancelOrdersAsync(RawCancelOrdersRequest request, CancellationToken ct = default) =>
+        PostAsync("v1/order/orders/batchcancel", request, ct);
 
-    public async Task<WireResponse> CancelOpenOrdersAsync(RawCancelOpenOrdersRequest request, CancellationToken ct = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var meta = await _restClient.PostRawAsync("v1/order/orders/batchCancelOpenOrders", request, ct).ConfigureAwait(false);
-        return ToWire(meta);
-    }
+    public Task<WireCall> CancelOpenOrdersAsync(RawCancelOpenOrdersRequest request, CancellationToken ct = default) =>
+        PostAsync("v1/order/orders/batchCancelOpenOrders", request, ct);
 
-    public async Task<WireResponse> CreateWithdrawAsync(RawCreateWithdrawRequest request, CancellationToken ct = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var meta = await _restClient.PostRawAsync("v1/dw/withdraw/api/create", request, ct).ConfigureAwait(false);
-        return ToWire(meta);
-    }
+    public Task<WireCall> CreateWithdrawAsync(RawCreateWithdrawRequest request, CancellationToken ct = default) =>
+        PostAsync("v1/dw/withdraw/api/create", request, ct);
 
-    public async Task<WireResponse> CancelWithdrawAsync(string withdrawId, CancellationToken ct = default)
+    public Task<WireCall> CancelWithdrawAsync(string withdrawId, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(withdrawId))
         {
             throw new ArgumentException("withdrawId is required.", nameof(withdrawId));
         }
 
-        var meta = await _restClient
-            .PostRawAsync<object?>($"v1/dw/withdraw-virtual/{withdrawId}/cancel", body: null, ct)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        return PostAsync<object?>($"v1/dw/withdraw-virtual/{withdrawId}/cancel", body: null, ct);
     }
 
-    public async Task<WireResponse> CreateRetailOrderAsync(RawCreateRetailOrderRequest request, CancellationToken ct = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var meta = await _restClient.PostRawAsync("v1/retail/order/place", request, ct).ConfigureAwait(false);
-        return ToWire(meta);
-    }
+    public Task<WireCall> CreateRetailOrderAsync(RawCreateRetailOrderRequest request, CancellationToken ct = default) =>
+        PostAsync("v1/retail/order/place", request, ct);
 
-    public async Task<WireResponse> GetOpenOrdersAsync(string symbol, CancellationToken ct = default)
+    public Task<WireCall> GetOpenOrdersAsync(string symbol, CancellationToken ct = default)
     {
         EnsureSymbol(symbol);
-        var query = BuildQuery(
-            ("symbol", ToApiSymbol(symbol)),
-            ("account-id", _accountId));
-        var meta = await _restClient
-            .GetRawAsync($"v1/order/openOrders?{query}", cancellationToken: ct)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        var path = "v1/order/openOrders";
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["symbol"] = ToApiSymbol(symbol),
+            ["account-id"] = _accountId,
+        };
+        return GetAsync(path, query, ct);
     }
 
-    public async Task<WireResponse> GetOrderAsync(string orderId, CancellationToken ct = default)
+    public async Task<WireCall> GetOrderAsync(string orderId, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(orderId))
         {
             throw new ArgumentException("orderId is required.", nameof(orderId));
         }
 
-        var meta = await _restClient.GetRawAsync($"v1/order/orders/{orderId}", cancellationToken: ct).ConfigureAwait(false);
-        return ToWire(meta);
+        return await GetAsync($"v1/order/orders/{orderId}", query: null, ct).ConfigureAwait(false);
     }
 
     private static string ToApiSymbol(string symbol) =>
@@ -118,12 +91,55 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
         }
     }
 
-    private static string BuildQuery(params (string Key, string? Value)[] items)
+    private static string? BuildQuery(IReadOnlyDictionary<string, string?>? query)
     {
-        var parts = items
-            .Where(i => !string.IsNullOrWhiteSpace(i.Value))
-            .Select(i => $"{i.Key}={Uri.EscapeDataString(i.Value!)}");
-        return string.Join("&", parts);
+        if (query is null || query.Count == 0)
+        {
+            return null;
+        }
+
+        var parts = new List<string>();
+        foreach (var (key, value) in query)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                continue;
+            }
+
+            parts.Add($"{key}={Uri.EscapeDataString(value)}");
+        }
+
+        return parts.Count == 0 ? null : string.Join("&", parts);
+    }
+
+    private async Task<WireCall> GetAsync(
+        string path,
+        IReadOnlyDictionary<string, string?>? query,
+        CancellationToken ct)
+    {
+        var request = new WireRequest(
+            Method: "GET",
+            Path: path,
+            Query: BuildQuery(query));
+        var meta = await _restClient.GetRawAsync(path, query, cancellationToken: ct).ConfigureAwait(false);
+        var response = ToWire(meta);
+        return new WireCall(request, response, CreateMeta(response));
+    }
+
+    private async Task<WireCall> PostAsync<TRequest>(
+        string path,
+        TRequest? body,
+        CancellationToken ct)
+    {
+        var bodyJson = body is null ? null : JsonSerializer.Serialize(body);
+        var request = new WireRequest(
+            Method: "POST",
+            Path: path,
+            Query: null,
+            BodyJson: bodyJson);
+        var meta = await _restClient.PostRawAsync(path, body, ct).ConfigureAwait(false);
+        var response = ToWire(meta);
+        return new WireCall(request, response, CreateMeta(response));
     }
 
     private static WireResponse ToWire(HttpResponseMeta meta)
@@ -136,5 +152,12 @@ internal sealed class BittradeWireTradingApi : IBittradeWireTradingApi
             meta.StatusCode,
             meta.Body ?? string.Empty,
             headers);
+    }
+
+    private static CallMeta CreateMeta(WireResponse response)
+    {
+        var elapsed = response.ElapsedMs is { } ms ? TimeSpan.FromMilliseconds(ms) : TimeSpan.Zero;
+        var startedAt = DateTimeOffset.UtcNow - elapsed;
+        return new CallMeta(startedAt, elapsed, response.RequestId);
     }
 }

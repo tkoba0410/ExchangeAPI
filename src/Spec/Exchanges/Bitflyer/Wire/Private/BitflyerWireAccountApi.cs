@@ -21,11 +21,11 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<WireResponse> GetBalancesAsync(
+    public Task<WireCall> GetBalancesAsync(
         CancellationToken cancellationToken = default)
         => GetAsync(BitflyerConstants.Paths.GetBalance, query: null, cancellationToken);
 
-    public Task<WireResponse> GetExecutionsAsync(
+    public Task<WireCall> GetExecutionsAsync(
         RawProductCode productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
@@ -38,16 +38,16 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             CreateExecutionsQuery(productCode, childOrderId, childOrderAcceptanceId, count, before, after),
             cancellationToken);
 
-    public Task<WireResponse> GetPositionsAsync(
+    public Task<WireCall> GetPositionsAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         GetAsync(BitflyerConstants.Paths.GetPositions, CreateProductCodeQuery(productCode), cancellationToken);
 
-    public Task<WireResponse> GetCollateralAsync(
+    public Task<WireCall> GetCollateralAsync(
         CancellationToken cancellationToken = default)
         => GetAsync(BitflyerConstants.Paths.GetCollateral, query: null, cancellationToken);
 
-    public Task<WireResponse> GetChildOrdersAsync(
+    public Task<WireCall> GetChildOrdersAsync(
         RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
@@ -70,20 +70,20 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
                 after),
             cancellationToken);
 
-    public Task<WireResponse> GetTradingCommissionAsync(
+    public Task<WireCall> GetTradingCommissionAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         GetAsync(BitflyerConstants.Paths.GetTradingCommission, CreateProductCodeQuery(productCode), cancellationToken);
 
-    public Task<WireResponse> GetPermissionsAsync(
+    public Task<WireCall> GetPermissionsAsync(
         CancellationToken cancellationToken = default) =>
         GetAsync(BitflyerConstants.Paths.GetPermissions, query: null, cancellationToken);
 
-    public Task<WireResponse> GetCollateralAccountsAsync(
+    public Task<WireCall> GetCollateralAccountsAsync(
         CancellationToken cancellationToken = default) =>
         GetAsync(BitflyerConstants.Paths.GetCollateralAccounts, query: null, cancellationToken);
 
-    public Task<WireResponse> GetParentOrdersAsync(
+    public Task<WireCall> GetParentOrdersAsync(
         RawProductCode productCode,
         int? count = null,
         long? before = null,
@@ -95,7 +95,7 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             CreateParentOrdersQuery(productCode, count, before, after, parentOrderStatusState),
             cancellationToken);
 
-    public Task<WireResponse> GetParentOrderAsync(
+    public Task<WireCall> GetParentOrderAsync(
         string? parentOrderId = null,
         string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default) =>
@@ -104,7 +104,7 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             CreateParentOrderQuery(parentOrderId, parentOrderAcceptanceId),
             cancellationToken);
 
-    public Task<WireResponse> GetBalanceHistoryAsync(
+    public Task<WireCall> GetBalanceHistoryAsync(
         string? currencyCode = null,
         int? count = null,
         long? before = null,
@@ -115,7 +115,7 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             CreateBalanceHistoryQuery(currencyCode, count, before, after),
             cancellationToken);
 
-    public Task<WireResponse> GetCollateralHistoryAsync(
+    public Task<WireCall> GetCollateralHistoryAsync(
         int? count = null,
         long? before = null,
         long? after = null,
@@ -125,11 +125,11 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             CreateHistoryQuery(count, before, after),
             cancellationToken);
 
-    public Task<WireResponse> GetAddressesAsync(
+    public Task<WireCall> GetAddressesAsync(
         CancellationToken cancellationToken = default) =>
         GetAsync(BitflyerConstants.Paths.GetAddresses, query: null, cancellationToken);
 
-    public Task<WireResponse> GetCoinInsAsync(
+    public Task<WireCall> GetCoinInsAsync(
         int? count = null,
         long? before = null,
         long? after = null,
@@ -139,7 +139,7 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             CreateHistoryQuery(count, before, after),
             cancellationToken);
 
-    public Task<WireResponse> GetCoinOutsAsync(
+    public Task<WireCall> GetCoinOutsAsync(
         string? messageId = null,
         int? count = null,
         long? before = null,
@@ -150,7 +150,7 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             CreateCoinOutsQuery(messageId, count, before, after),
             cancellationToken);
 
-    public Task<WireResponse> GetDepositsAsync(
+    public Task<WireCall> GetDepositsAsync(
         int? count = null,
         long? before = null,
         long? after = null,
@@ -160,7 +160,7 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             CreateHistoryQuery(count, before, after),
             cancellationToken);
 
-    public Task<WireResponse> GetWithdrawalsAsync(
+    public Task<WireCall> GetWithdrawalsAsync(
         string? messageId = null,
         int? count = null,
         long? before = null,
@@ -171,17 +171,22 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             CreateCoinOutsQuery(messageId, count, before, after),
             cancellationToken);
 
-    public Task<WireResponse> GetBankAccountsAsync(
+    public Task<WireCall> GetBankAccountsAsync(
         CancellationToken cancellationToken = default) =>
         GetAsync(BitflyerConstants.Paths.GetBankAccounts, query: null, cancellationToken);
 
-    private async Task<WireResponse> GetAsync(
+    private async Task<WireCall> GetAsync(
         string path,
         IReadOnlyDictionary<string, string?>? query,
         CancellationToken cancellationToken)
     {
+        var request = new WireRequest(
+            Method: "GET",
+            Path: path,
+            Query: BuildQuery(query));
         var meta = await _restClient.GetRawAsync(path, query, cancellationToken).ConfigureAwait(false);
-        return ToWire(meta);
+        var response = ToWire(meta);
+        return new WireCall(request, response, CreateMeta(response));
     }
 
     private static IReadOnlyDictionary<string, string?> CreateProductCodeQuery(RawProductCode productCode)
@@ -327,5 +332,33 @@ internal sealed class BitflyerWireAccountApi : IBitflyerWireAccountApi
             meta.StatusCode,
             meta.Body ?? string.Empty,
             headers);
+    }
+
+    private static CallMeta CreateMeta(WireResponse response)
+    {
+        var elapsed = response.ElapsedMs is { } ms ? TimeSpan.FromMilliseconds(ms) : TimeSpan.Zero;
+        var startedAt = DateTimeOffset.UtcNow - elapsed;
+        return new CallMeta(startedAt, elapsed, response.RequestId);
+    }
+
+    private static string? BuildQuery(IReadOnlyDictionary<string, string?>? query)
+    {
+        if (query is null || query.Count == 0)
+        {
+            return null;
+        }
+
+        var parts = new List<string>();
+        foreach (var (key, value) in query)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                continue;
+            }
+
+            parts.Add($"{Uri.EscapeDataString(key)}={Uri.EscapeDataString(value)}");
+        }
+
+        return parts.Count == 0 ? null : string.Join("&", parts);
     }
 }

@@ -8,17 +8,17 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Private;
 
 public interface IBittradeWireAccountApi
 {
-    Task<WireResponse> GetAccountsAsync(CancellationToken cancellationToken = default);
+    Task<WireCall> GetAccountsAsync(CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default);
+    Task<WireCall> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default);
+    Task<WireCall> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default);
+    Task<WireCall> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default);
+    Task<WireCall> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetOrdersAsync(
+    Task<WireCall> GetOrdersAsync(
         RawSymbol symbol,
         string states,
         string? startDate = null,
@@ -28,7 +28,7 @@ public interface IBittradeWireAccountApi
         int? size = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetMatchResultsAsync(
+    Task<WireCall> GetMatchResultsAsync(
         RawSymbol? symbol = null,
         string? types = null,
         string? startDate = null,
@@ -38,7 +38,7 @@ public interface IBittradeWireAccountApi
         int? size = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetDepositWithdrawsAsync(
+    Task<WireCall> GetDepositWithdrawsAsync(
         string type,
         string? currency = null,
         long? from = null,
@@ -46,7 +46,7 @@ public interface IBittradeWireAccountApi
         string? direct = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetRetailOrdersAsync(
+    Task<WireCall> GetRetailOrdersAsync(
         int direct,
         int? status = null,
         DateTimeOffset? startTime = null,

@@ -10,10 +10,10 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private;
 
 public interface IBitflyerWireAccountApi
 {
-    Task<WireResponse> GetBalancesAsync(
+    Task<WireCall> GetBalancesAsync(
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetExecutionsAsync(
+    Task<WireCall> GetExecutionsAsync(
         RawProductCode productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
@@ -22,14 +22,14 @@ public interface IBitflyerWireAccountApi
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetPositionsAsync(
+    Task<WireCall> GetPositionsAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetCollateralAsync(
+    Task<WireCall> GetCollateralAsync(
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetChildOrdersAsync(
+    Task<WireCall> GetChildOrdersAsync(
         RawProductCode productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
@@ -40,17 +40,17 @@ public interface IBitflyerWireAccountApi
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetTradingCommissionAsync(
+    Task<WireCall> GetTradingCommissionAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetPermissionsAsync(
+    Task<WireCall> GetPermissionsAsync(
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetCollateralAccountsAsync(
+    Task<WireCall> GetCollateralAccountsAsync(
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetParentOrdersAsync(
+    Task<WireCall> GetParentOrdersAsync(
         RawProductCode productCode,
         int? count = null,
         long? before = null,
@@ -58,53 +58,53 @@ public interface IBitflyerWireAccountApi
         string? parentOrderStatusState = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetParentOrderAsync(
+    Task<WireCall> GetParentOrderAsync(
         string? parentOrderId = null,
         string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetBalanceHistoryAsync(
+    Task<WireCall> GetBalanceHistoryAsync(
         string? currencyCode = null,
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetCollateralHistoryAsync(
+    Task<WireCall> GetCollateralHistoryAsync(
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetAddressesAsync(
+    Task<WireCall> GetAddressesAsync(
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetCoinInsAsync(
+    Task<WireCall> GetCoinInsAsync(
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetCoinOutsAsync(
+    Task<WireCall> GetCoinOutsAsync(
         string? messageId = null,
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetDepositsAsync(
+    Task<WireCall> GetDepositsAsync(
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetWithdrawalsAsync(
+    Task<WireCall> GetWithdrawalsAsync(
         string? messageId = null,
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> GetBankAccountsAsync(
+    Task<WireCall> GetBankAccountsAsync(
         CancellationToken cancellationToken = default);
 }

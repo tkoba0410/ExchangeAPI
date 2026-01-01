@@ -12,30 +12,30 @@ internal sealed class BittradeWireTradingApiNotSupported : IBittradeWireTradingA
     private static NotSupportedException NotSupported() =>
         new("Bittrade wire trading is not supported.");
 
-    public Task<WireResponse> PlaceOrderAsync(RawCreateOrderRequest request, CancellationToken ct = default) =>
+    public Task<WireCall> PlaceOrderAsync(RawCreateOrderRequest request, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CancelOrderAsync(string orderId, CancellationToken ct = default) =>
+    public Task<WireCall> CancelOrderAsync(string orderId, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CancelOrdersAsync(RawCancelOrdersRequest request, CancellationToken ct = default) =>
+    public Task<WireCall> CancelOrdersAsync(RawCancelOrdersRequest request, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CancelOpenOrdersAsync(RawCancelOpenOrdersRequest request, CancellationToken ct = default) =>
+    public Task<WireCall> CancelOpenOrdersAsync(RawCancelOpenOrdersRequest request, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CreateWithdrawAsync(RawCreateWithdrawRequest request, CancellationToken ct = default) =>
+    public Task<WireCall> CreateWithdrawAsync(RawCreateWithdrawRequest request, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CancelWithdrawAsync(string withdrawId, CancellationToken ct = default) =>
+    public Task<WireCall> CancelWithdrawAsync(string withdrawId, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CreateRetailOrderAsync(RawCreateRetailOrderRequest request, CancellationToken ct = default) =>
+    public Task<WireCall> CreateRetailOrderAsync(RawCreateRetailOrderRequest request, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetOpenOrdersAsync(string symbol, CancellationToken ct = default) =>
+    public Task<WireCall> GetOpenOrdersAsync(string symbol, CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetOrderAsync(string orderId, CancellationToken ct = default) =>
+    public Task<WireCall> GetOrderAsync(string orderId, CancellationToken ct = default) =>
         throw NotSupported();
 }

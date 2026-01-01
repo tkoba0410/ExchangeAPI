@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
@@ -72,6 +73,15 @@ public sealed class BittradeRawApi : IBittradeRawApi
 
     public Task<RawBalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default) =>
         _privateApi.GetAccountBalanceAsync(accountId, cancellationToken);
+
+    public Task<BittradeRawCall<RawSymbolsResponse, JsonElement>> GetSymbolsCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _publicApi.GetSymbolsCallAsync(cancellationToken);
+
+    public Task<BittradeRawCall<RawBalancesResponse, JsonElement>> GetAccountBalanceCallAsync(
+        string accountId,
+        CancellationToken cancellationToken = default) =>
+        _privateApi.GetAccountBalanceCallAsync(accountId, cancellationToken);
 
     public Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default) =>
         _privateApi.GetOpenOrdersAsync(symbol, accountId, cancellationToken);

@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,6 +22,22 @@ internal sealed class BittradeRawMarketDataApi : IBittradeRawMarketDataApi
 
     public Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default) =>
         _publicApi.GetTradesAsync(EnsureSymbol(symbol), cancellationToken);
+
+    public Task<BittradeRawCall<RawMergedResponse, JsonElement>> GetTickerCallAsync(
+        RawSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _publicApi.GetMergedTickerCallAsync(EnsureSymbol(symbol), cancellationToken);
+
+    public Task<BittradeRawCall<RawDepthResponse, JsonElement>> GetOrderBookCallAsync(
+        RawSymbol symbol,
+        string? type = null,
+        CancellationToken cancellationToken = default) =>
+        _publicApi.GetDepthCallAsync(EnsureSymbol(symbol), type, cancellationToken);
+
+    public Task<BittradeRawCall<RawTradeResponse, JsonElement>> GetTradesCallAsync(
+        RawSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _publicApi.GetTradesCallAsync(EnsureSymbol(symbol), cancellationToken);
 
     private static RawSymbol EnsureSymbol(RawSymbol symbol)
     {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
@@ -22,62 +23,52 @@ internal sealed class BitflyerWireTradingApi : IBitflyerWireTradingApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public async Task<WireResponse> CreateChildOrderAsync(
+    public Task<WireCall> CreateChildOrderAsync(
         RawSendChildOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
+        CancellationToken cancellationToken = default) =>
+        PostAsync(BitflyerConstants.Paths.SendChildOrder, request, cancellationToken);
 
-        const string path = BitflyerConstants.Paths.SendChildOrder;
-        var meta = await _restClient.PostRawAsync(path, request, cancellationToken).ConfigureAwait(false);
-        return ToWire(meta);
-    }
-
-    public async Task<WireResponse> CancelChildOrderAsync(
+    public Task<WireCall> CancelChildOrderAsync(
         RawCancelChildOrderRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default) =>
+        PostAsync(BitflyerConstants.Paths.CancelChildOrder, request, cancellationToken);
+
+    public Task<WireCall> CancelAllChildOrdersAsync(
+        CancelAllChildOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        PostAsync(BitflyerConstants.Paths.CancelAllChildOrders, request, cancellationToken);
+
+    public Task<WireCall> CreateParentOrderAsync(
+        CreateParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        PostAsync(BitflyerConstants.Paths.SendParentOrder, request, cancellationToken);
+
+    public Task<WireCall> CancelParentOrderAsync(
+        CancelParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        PostAsync(BitflyerConstants.Paths.CancelParentOrder, request, cancellationToken);
+
+    public Task<WireCall> CreateWithdrawalAsync(
+        CreateWithdrawalRequest request,
+        CancellationToken cancellationToken = default) =>
+        PostAsync(BitflyerConstants.Paths.Withdraw, request, cancellationToken);
+
+    private async Task<WireCall> PostAsync<TRequest>(
+        string path,
+        TRequest request,
+        CancellationToken cancellationToken)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        const string path = BitflyerConstants.Paths.CancelChildOrder;
+        var requestJson = JsonSerializer.Serialize(request);
+        var wireRequest = new WireRequest(
+            Method: "POST",
+            Path: path,
+            Query: null,
+            BodyJson: requestJson);
         var meta = await _restClient.PostRawAsync(path, request, cancellationToken).ConfigureAwait(false);
-        return ToWire(meta);
-    }
-
-    public async Task<WireResponse> CancelAllChildOrdersAsync(
-        CancelAllChildOrdersRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        const string path = BitflyerConstants.Paths.CancelAllChildOrders;
-        var meta = await _restClient.PostRawAsync(path, request, cancellationToken).ConfigureAwait(false);
-        return ToWire(meta);
-    }
-
-    public async Task<WireResponse> CreateParentOrderAsync(
-        CreateParentOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        const string path = BitflyerConstants.Paths.SendParentOrder;
-        var meta = await _restClient.PostRawAsync(path, request, cancellationToken).ConfigureAwait(false);
-        return ToWire(meta);
-    }
-
-    public async Task<WireResponse> CancelParentOrderAsync(
-        CancelParentOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        const string path = BitflyerConstants.Paths.CancelParentOrder;
-        var meta = await _restClient.PostRawAsync(path, request, cancellationToken).ConfigureAwait(false);
-        return ToWire(meta);
-    }
-
-    public async Task<WireResponse> CreateWithdrawalAsync(
-        CreateWithdrawalRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        const string path = BitflyerConstants.Paths.Withdraw;
-        var meta = await _restClient.PostRawAsync(path, request, cancellationToken).ConfigureAwait(false);
-        return ToWire(meta);
+        var response = ToWire(meta);
+        return new WireCall(wireRequest, response, CreateMeta(response));
     }
 
     private static WireResponse ToWire(HttpResponseMeta meta)
@@ -90,5 +81,12 @@ internal sealed class BitflyerWireTradingApi : IBitflyerWireTradingApi
             meta.StatusCode,
             meta.Body ?? string.Empty,
             headers);
+    }
+
+    private static CallMeta CreateMeta(WireResponse response)
+    {
+        var elapsed = response.ElapsedMs is { } ms ? TimeSpan.FromMilliseconds(ms) : TimeSpan.Zero;
+        var startedAt = DateTimeOffset.UtcNow - elapsed;
+        return new CallMeta(startedAt, elapsed, response.RequestId);
     }
 }

@@ -10,15 +10,15 @@ internal sealed class BittradeWireCommonApiNotSupported : IBittradeWireCommonApi
     private static NotSupportedException NotSupported() =>
         new("Bittrade wire common is not supported.");
 
-    public Task<WireResponse> GetTimestampAsync(CancellationToken ct = default) =>
+    public Task<WireCall> GetTimestampAsync(CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetSymbolsAsync(CancellationToken ct = default) =>
+    public Task<WireCall> GetSymbolsAsync(CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetCurrenciesAsync(CancellationToken ct = default) =>
+    public Task<WireCall> GetCurrenciesAsync(CancellationToken ct = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetRetailMaintainTimeAsync(CancellationToken ct = default) =>
+    public Task<WireCall> GetRetailMaintainTimeAsync(CancellationToken ct = default) =>
         throw NotSupported();
 }

@@ -8,27 +8,27 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private;
 
 public interface IBitflyerWireTradingApi
 {
-    Task<WireResponse> CreateChildOrderAsync(
+    Task<WireCall> CreateChildOrderAsync(
         RawSendChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> CancelChildOrderAsync(
+    Task<WireCall> CancelChildOrderAsync(
         RawCancelChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> CancelAllChildOrdersAsync(
+    Task<WireCall> CancelAllChildOrdersAsync(
         CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> CreateParentOrderAsync(
+    Task<WireCall> CreateParentOrderAsync(
         CreateParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> CancelParentOrderAsync(
+    Task<WireCall> CancelParentOrderAsync(
         CancelParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<WireResponse> CreateWithdrawalAsync(
+    Task<WireCall> CreateWithdrawalAsync(
         CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default);
 }

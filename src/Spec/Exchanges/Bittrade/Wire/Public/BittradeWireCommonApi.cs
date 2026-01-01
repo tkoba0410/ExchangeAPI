@@ -19,28 +19,27 @@ internal sealed class BittradeWireCommonApi : IBittradeWireCommonApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public async Task<WireResponse> GetTimestampAsync(CancellationToken ct = default)
-    {
-        var meta = await _restClient.GetRawAsync("v1/common/timestamp", cancellationToken: ct).ConfigureAwait(false);
-        return ToWire(meta);
-    }
+    public Task<WireCall> GetTimestampAsync(CancellationToken ct = default) =>
+        GetAsync("v1/common/timestamp", ct);
 
-    public async Task<WireResponse> GetSymbolsAsync(CancellationToken ct = default)
-    {
-        var meta = await _restClient.GetRawAsync("v1/common/symbols", cancellationToken: ct).ConfigureAwait(false);
-        return ToWire(meta);
-    }
+    public Task<WireCall> GetSymbolsAsync(CancellationToken ct = default) =>
+        GetAsync("v1/common/symbols", ct);
 
-    public async Task<WireResponse> GetCurrenciesAsync(CancellationToken ct = default)
-    {
-        var meta = await _restClient.GetRawAsync("v1/common/currencys", cancellationToken: ct).ConfigureAwait(false);
-        return ToWire(meta);
-    }
+    public Task<WireCall> GetCurrenciesAsync(CancellationToken ct = default) =>
+        GetAsync("v1/common/currencys", ct);
 
-    public async Task<WireResponse> GetRetailMaintainTimeAsync(CancellationToken ct = default)
+    public Task<WireCall> GetRetailMaintainTimeAsync(CancellationToken ct = default) =>
+        GetAsync("v1/retail/maintain/time", ct);
+
+    private async Task<WireCall> GetAsync(string path, CancellationToken ct)
     {
-        var meta = await _restClient.GetRawAsync("v1/retail/maintain/time", cancellationToken: ct).ConfigureAwait(false);
-        return ToWire(meta);
+        var request = new WireRequest(
+            Method: "GET",
+            Path: path,
+            Query: null);
+        var meta = await _restClient.GetRawAsync(path, cancellationToken: ct).ConfigureAwait(false);
+        var response = ToWire(meta);
+        return new WireCall(request, response, CreateMeta(response));
     }
 
     private static WireResponse ToWire(HttpResponseMeta meta)
@@ -53,5 +52,12 @@ internal sealed class BittradeWireCommonApi : IBittradeWireCommonApi
             meta.StatusCode,
             meta.Body ?? string.Empty,
             headers);
+    }
+
+    private static CallMeta CreateMeta(WireResponse response)
+    {
+        var elapsed = response.ElapsedMs is { } ms ? TimeSpan.FromMilliseconds(ms) : TimeSpan.Zero;
+        var startedAt = DateTimeOffset.UtcNow - elapsed;
+        return new CallMeta(startedAt, elapsed, response.RequestId);
     }
 }

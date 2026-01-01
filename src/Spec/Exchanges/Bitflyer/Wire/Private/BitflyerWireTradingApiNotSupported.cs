@@ -12,32 +12,32 @@ internal sealed class BitflyerWireTradingApiNotSupported : IBitflyerWireTradingA
     private static NotSupportedException NotSupported() =>
         new("Bitflyer wire trading is not supported.");
 
-    public Task<WireResponse> CreateChildOrderAsync(
+    public Task<WireCall> CreateChildOrderAsync(
         RawSendChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CancelChildOrderAsync(
+    public Task<WireCall> CancelChildOrderAsync(
         RawCancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CancelAllChildOrdersAsync(
+    public Task<WireCall> CancelAllChildOrdersAsync(
         CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CreateParentOrderAsync(
+    public Task<WireCall> CreateParentOrderAsync(
         CreateParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CancelParentOrderAsync(
+    public Task<WireCall> CancelParentOrderAsync(
         CancelParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> CreateWithdrawalAsync(
+    public Task<WireCall> CreateWithdrawalAsync(
         CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default) =>
         throw NotSupported();

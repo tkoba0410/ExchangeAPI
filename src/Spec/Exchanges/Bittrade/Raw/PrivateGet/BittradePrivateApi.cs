@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Private;
@@ -18,7 +20,8 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
 
     public async Task<RawAccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _wire.GetAccountsAsync(cancellationToken).ConfigureAwait(false);
+        var call = await _wire.GetAccountsAsync(cancellationToken).ConfigureAwait(false);
+        var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
             return BittradeRawJson.DeserializeOrThrow<RawAccountsResponse>(response.Json, "Bittrade.GetAccounts");
@@ -29,7 +32,8 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
 
     public async Task<RawBalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default)
     {
-        var response = await _wire.GetAccountBalanceAsync(accountId, cancellationToken).ConfigureAwait(false);
+        var call = await _wire.GetAccountBalanceAsync(accountId, cancellationToken).ConfigureAwait(false);
+        var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
             return BittradeRawJson.DeserializeOrThrow<RawBalancesResponse>(
@@ -45,7 +49,8 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
 
     public async Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default)
     {
-        var response = await _wire.GetOpenOrdersAsync(symbol, accountId, cancellationToken).ConfigureAwait(false);
+        var call = await _wire.GetOpenOrdersAsync(symbol, accountId, cancellationToken).ConfigureAwait(false);
+        var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
             return BittradeRawJson.DeserializeOrThrow<RawOpenOrdersResponse>(
@@ -61,7 +66,8 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
 
     public async Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
-        var response = await _wire.GetOrderAsync(orderId, cancellationToken).ConfigureAwait(false);
+        var call = await _wire.GetOrderAsync(orderId, cancellationToken).ConfigureAwait(false);
+        var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
             return BittradeRawJson.DeserializeOrThrow<RawOrderDetailResponse>(response.Json, "Bittrade.GetOrder");
@@ -72,7 +78,8 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
 
     public async Task<RawOrderMatchResultsResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
-        var response = await _wire.GetOrderMatchResultsAsync(orderId, cancellationToken).ConfigureAwait(false);
+        var call = await _wire.GetOrderMatchResultsAsync(orderId, cancellationToken).ConfigureAwait(false);
+        var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
             return BittradeRawJson.DeserializeOrThrow<RawOrderMatchResultsResponse>(
@@ -96,9 +103,10 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         int? size = null,
         CancellationToken cancellationToken = default)
     {
-        var response = await _wire
+        var call = await _wire
             .GetOrdersAsync(symbol, states, startDate, endDate, from, direct, size, cancellationToken)
             .ConfigureAwait(false);
+        var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
             return BittradeRawJson.DeserializeOrThrow<RawOrdersResponse>(response.Json, "Bittrade.GetOrders");
@@ -117,9 +125,10 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         int? size = null,
         CancellationToken cancellationToken = default)
     {
-        var response = await _wire
+        var call = await _wire
             .GetMatchResultsAsync(symbol, types, startDate, endDate, from, direct, size, cancellationToken)
             .ConfigureAwait(false);
+        var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
             return BittradeRawJson.DeserializeOrThrow<RawMatchResultsResponse>(
@@ -141,9 +150,10 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         string? direct = null,
         CancellationToken cancellationToken = default)
     {
-        var response = await _wire
+        var call = await _wire
             .GetDepositWithdrawsAsync(type, currency, from, size, direct, cancellationToken)
             .ConfigureAwait(false);
+        var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
             return BittradeRawJson.DeserializeOrThrow<RawDepositWithdrawsResponse>(
@@ -164,9 +174,10 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         DateTimeOffset? endTime = null,
         CancellationToken cancellationToken = default)
     {
-        var response = await _wire
+        var call = await _wire
             .GetRetailOrdersAsync(direct, status, startTime, endTime, cancellationToken)
             .ConfigureAwait(false);
+        var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
             return BittradeRawJson.DeserializeOrThrow<RawRetailOrdersResponse>(
@@ -178,5 +189,201 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             "Bittrade.GetRetailOrders",
             response.StatusCode,
             response.Json);
+    }
+
+    public async Task<BittradeRawCall<RawAccountsResponse, JsonElement>> GetAccountsCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var wireCall = await _wire.Account.GetAccountsAsync(cancellationToken).ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetAccounts", new Dictionary<string, string?>());
+        return CreateCall<RawAccountsResponse>(request, wireCall, "Bittrade.GetAccounts");
+    }
+
+    public async Task<BittradeRawCall<RawAccountBalanceResponse, JsonElement>> GetAccountBalanceCallAsync(
+        string accountId,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureRequired(accountId, nameof(accountId));
+        var wireCall = await _wire.Account.GetAccountBalanceAsync(accountId, cancellationToken).ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetAccountBalance", new Dictionary<string, string?>
+        {
+            ["accountId"] = accountId,
+        });
+        return CreateCall<RawAccountBalanceResponse>(request, wireCall, "Bittrade.GetAccountBalance");
+    }
+
+    public async Task<BittradeRawCall<RawOpenOrdersResponse, JsonElement>> GetOpenOrdersCallAsync(
+        RawSymbol symbol,
+        string accountId,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureSymbol(symbol);
+        EnsureRequired(accountId, nameof(accountId));
+        var wireCall = await _wire.Account
+            .GetOpenOrdersAsync(symbol, accountId, cancellationToken)
+            .ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetOpenOrders", new Dictionary<string, string?>
+        {
+            ["symbol"] = symbol.Value,
+            ["accountId"] = accountId,
+        });
+        return CreateCall<RawOpenOrdersResponse>(request, wireCall, "Bittrade.GetOpenOrders");
+    }
+
+    public async Task<BittradeRawCall<RawOrderDetailResponse, JsonElement>> GetOrderCallAsync(
+        RawOrderId orderId,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureRequired(orderId.Value, nameof(orderId));
+        var wireCall = await _wire.Account.GetOrderAsync(orderId, cancellationToken).ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetOrder", new Dictionary<string, string?>
+        {
+            ["orderId"] = orderId.Value,
+        });
+        return CreateCall<RawOrderDetailResponse>(request, wireCall, "Bittrade.GetOrder");
+    }
+
+    public async Task<BittradeRawCall<RawOrderMatchResultsResponse, JsonElement>> GetOrderMatchResultsCallAsync(
+        RawOrderId orderId,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureRequired(orderId.Value, nameof(orderId));
+        var wireCall = await _wire.Account.GetOrderMatchResultsAsync(orderId, cancellationToken).ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetOrderMatchResults", new Dictionary<string, string?>
+        {
+            ["orderId"] = orderId.Value,
+        });
+        return CreateCall<RawOrderMatchResultsResponse>(request, wireCall, "Bittrade.GetOrderMatchResults");
+    }
+
+    public async Task<BittradeRawCall<RawOrdersResponse, JsonElement>> GetOrdersCallAsync(
+        RawSymbol symbol,
+        string states,
+        string? startDate = null,
+        string? endDate = null,
+        long? from = null,
+        string? direct = null,
+        int? size = null,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureSymbol(symbol);
+        EnsureRequired(states, nameof(states));
+        var wireCall = await _wire.Account
+            .GetOrdersAsync(symbol, states, startDate, endDate, from, direct, size, cancellationToken)
+            .ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetOrders", new Dictionary<string, string?>
+        {
+            ["symbol"] = symbol.Value,
+            ["states"] = states,
+            ["startDate"] = startDate,
+            ["endDate"] = endDate,
+            ["from"] = from?.ToString(),
+            ["direct"] = direct,
+            ["size"] = size?.ToString(),
+        });
+        return CreateCall<RawOrdersResponse>(request, wireCall, "Bittrade.GetOrders");
+    }
+
+    public async Task<BittradeRawCall<RawMatchResultsResponse, JsonElement>> GetMatchResultsCallAsync(
+        RawSymbol? symbol = null,
+        string? types = null,
+        string? startDate = null,
+        string? endDate = null,
+        long? from = null,
+        string? direct = null,
+        int? size = null,
+        CancellationToken cancellationToken = default)
+    {
+        var wireCall = await _wire.Account
+            .GetMatchResultsAsync(symbol, types, startDate, endDate, from, direct, size, cancellationToken)
+            .ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetMatchResults", new Dictionary<string, string?>
+        {
+            ["symbol"] = symbol?.Value,
+            ["types"] = types,
+            ["startDate"] = startDate,
+            ["endDate"] = endDate,
+            ["from"] = from?.ToString(),
+            ["direct"] = direct,
+            ["size"] = size?.ToString(),
+        });
+        return CreateCall<RawMatchResultsResponse>(request, wireCall, "Bittrade.GetMatchResults");
+    }
+
+    public async Task<BittradeRawCall<RawDepositWithdrawsResponse, JsonElement>> GetDepositWithdrawsCallAsync(
+        string type,
+        string? currency = null,
+        long? from = null,
+        int? size = null,
+        string? direct = null,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureRequired(type, nameof(type));
+        var wireCall = await _wire.Account
+            .GetDepositWithdrawsAsync(type, currency, from, size, direct, cancellationToken)
+            .ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetDepositWithdraws", new Dictionary<string, string?>
+        {
+            ["type"] = type,
+            ["currency"] = currency,
+            ["from"] = from?.ToString(),
+            ["size"] = size?.ToString(),
+            ["direct"] = direct,
+        });
+        return CreateCall<RawDepositWithdrawsResponse>(request, wireCall, "Bittrade.GetDepositWithdraws");
+    }
+
+    public async Task<BittradeRawCall<RawRetailOrdersResponse, JsonElement>> GetRetailOrdersCallAsync(
+        int direct,
+        int? status = null,
+        DateTimeOffset? startTime = null,
+        DateTimeOffset? endTime = null,
+        CancellationToken cancellationToken = default)
+    {
+        var wireCall = await _wire.Account
+            .GetRetailOrdersAsync(direct, status, startTime, endTime, cancellationToken)
+            .ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetRetailOrders", new Dictionary<string, string?>
+        {
+            ["direct"] = direct.ToString(),
+            ["status"] = status?.ToString(),
+            ["startTime"] = startTime?.ToString("O"),
+            ["endTime"] = endTime?.ToString("O"),
+        });
+        return CreateCall<RawRetailOrdersResponse>(request, wireCall, "Bittrade.GetRetailOrders");
+    }
+
+    private static BittradeRawRequest CreateRequest(
+        string operation,
+        IReadOnlyDictionary<string, string?> parameters) =>
+        new(operation, parameters);
+
+    private static BittradeRawCall<TOk, JsonElement> CreateCall<TOk>(
+        BittradeRawRequest request,
+        WireCall call,
+        string context)
+    {
+        var response = call.Response;
+        if (response.StatusCode is >= 200 and < 300)
+        {
+            var ok = BittradeRawJson.DeserializeOrThrow<TOk>(response.Json, context);
+            return new BittradeRawCall<TOk, JsonElement>(
+                request,
+                new Ok<TOk, JsonElement>(ok, response.StatusCode),
+                call.Meta);
+        }
+
+        if (BittradeRawJson.TryDeserialize<JsonElement>(response.Json, out var error, out _))
+        {
+            return new BittradeRawCall<TOk, JsonElement>(
+                request,
+                new Err<TOk, JsonElement>(error!, response.StatusCode),
+                call.Meta);
+        }
+
+        return new BittradeRawCall<TOk, JsonElement>(
+            request,
+            new Err<TOk, JsonElement>(default, response.StatusCode),
+            call.Meta);
     }
 }

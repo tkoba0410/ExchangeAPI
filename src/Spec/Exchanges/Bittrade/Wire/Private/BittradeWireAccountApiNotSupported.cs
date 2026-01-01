@@ -11,22 +11,22 @@ internal sealed class BittradeWireAccountApiNotSupported : IBittradeWireAccountA
     private static NotSupportedException NotSupported() =>
         new("Bittrade wire account is not supported.");
 
-    public Task<WireResponse> GetAccountsAsync(CancellationToken cancellationToken = default) =>
+    public Task<WireCall> GetAccountsAsync(CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default) =>
+    public Task<WireCall> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default) =>
+    public Task<WireCall> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default) =>
+    public Task<WireCall> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default) =>
+    public Task<WireCall> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetOrdersAsync(
+    public Task<WireCall> GetOrdersAsync(
         RawSymbol symbol,
         string states,
         string? startDate = null,
@@ -37,7 +37,7 @@ internal sealed class BittradeWireAccountApiNotSupported : IBittradeWireAccountA
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetMatchResultsAsync(
+    public Task<WireCall> GetMatchResultsAsync(
         RawSymbol? symbol = null,
         string? types = null,
         string? startDate = null,
@@ -48,7 +48,7 @@ internal sealed class BittradeWireAccountApiNotSupported : IBittradeWireAccountA
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetDepositWithdrawsAsync(
+    public Task<WireCall> GetDepositWithdrawsAsync(
         string type,
         string? currency = null,
         long? from = null,
@@ -57,7 +57,7 @@ internal sealed class BittradeWireAccountApiNotSupported : IBittradeWireAccountA
         CancellationToken cancellationToken = default) =>
         throw NotSupported();
 
-    public Task<WireResponse> GetRetailOrdersAsync(
+    public Task<WireCall> GetRetailOrdersAsync(
         int direct,
         int? status = null,
         DateTimeOffset? startTime = null,

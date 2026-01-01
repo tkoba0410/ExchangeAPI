@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
@@ -26,4 +27,42 @@ internal interface IBittradePublicApi
     Task<RawTradeHistoryResponse> GetTradeHistoryAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
 
     Task<RawRetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawMergedResponse, JsonElement>> GetMergedTickerCallAsync(
+        RawSymbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawDepthResponse, JsonElement>> GetDepthCallAsync(
+        RawSymbol symbol,
+        string? type = null,
+        CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawTradeResponse, JsonElement>> GetTradesCallAsync(
+        RawSymbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawSymbolsResponse, JsonElement>> GetSymbolsCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawCurrenciesResponse, JsonElement>> GetCurrenciesCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawTimestampResponse, JsonElement>> GetTimestampCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawKlinesResponse, JsonElement>> GetKlinesCallAsync(
+        RawSymbol symbol,
+        string period,
+        int? size = null,
+        CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawTickersResponse, JsonElement>> GetTickersCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawTradeHistoryResponse, JsonElement>> GetTradeHistoryCallAsync(
+        RawSymbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<BittradeRawCall<RawRetailMaintainTimeResponse, JsonElement>> GetRetailMaintainTimeCallAsync(
+        CancellationToken cancellationToken = default);
 }

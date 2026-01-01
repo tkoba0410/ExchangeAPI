@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,4 +27,25 @@ internal sealed class BittradeRawTradingApi : IBittradeRawTradingApi
 
     public Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default) =>
         _privateApi.GetOrderAsync(orderId, cancellationToken);
+
+    public Task<BittradeRawCall<RawPlaceOrderResponse, JsonElement>> CreateOrderCallAsync(
+        RawCreateOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.CreateOrderCallAsync(request, cancellationToken);
+
+    public Task<BittradeRawCall<RawCancelOrderResponse, JsonElement>> CancelOrderCallAsync(
+        RawOrderId orderId,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.CancelOrderCallAsync(orderId, cancellationToken);
+
+    public Task<BittradeRawCall<RawOpenOrdersResponse, JsonElement>> GetOpenOrdersCallAsync(
+        RawSymbol symbol,
+        string accountId,
+        CancellationToken cancellationToken = default) =>
+        _privateApi.GetOpenOrdersCallAsync(symbol, accountId, cancellationToken);
+
+    public Task<BittradeRawCall<RawOrderDetailResponse, JsonElement>> GetOrderCallAsync(
+        RawOrderId orderId,
+        CancellationToken cancellationToken = default) =>
+        _privateApi.GetOrderCallAsync(orderId, cancellationToken);
 }

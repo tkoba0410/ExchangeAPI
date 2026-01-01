@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
@@ -23,21 +25,11 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode.Value))
-            throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
-
-        var response = await _wire.MarketData
-            .GetTickerRawAsync(productCode, useAliasPath, cancellationToken)
-            .ConfigureAwait(false);
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<Ticker>(response.Json, "Bitflyer.GetTicker");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetTicker", response.StatusCode, response.Json);
+        var call = await GetTickerCallAsync(productCode, useAliasPath, cancellationToken).ConfigureAwait(false);
+        return UnwrapOk(call, "Bitflyer.GetTicker");
     }
 
-    public async Task<Board> GetBoardAsync(
+    public async Task<BitflyerRawCall<Ticker, JsonElement>> GetTickerCallAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
@@ -45,15 +37,43 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         if (string.IsNullOrWhiteSpace(productCode.Value))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        var response = await _wire.MarketData
+        var wireCall = await _wire.MarketData
+            .GetTickerRawAsync(productCode, useAliasPath, cancellationToken)
+            .ConfigureAwait(false);
+        var request = CreateRequest("Bitflyer.GetTicker", new Dictionary<string, string?>
+        {
+            ["productCode"] = productCode.Value,
+            ["useAliasPath"] = useAliasPath.ToString(),
+        });
+        return CreateCall<Ticker>(request, wireCall, "Bitflyer.GetTicker");
+    }
+
+    public async Task<Board> GetBoardAsync(
+        RawProductCode productCode,
+        bool useAliasPath = false,
+        CancellationToken cancellationToken = default)
+    {
+        var call = await GetBoardCallAsync(productCode, useAliasPath, cancellationToken).ConfigureAwait(false);
+        return UnwrapOk(call, "Bitflyer.GetBoard");
+    }
+
+    public async Task<BitflyerRawCall<Board, JsonElement>> GetBoardCallAsync(
+        RawProductCode productCode,
+        bool useAliasPath = false,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode.Value))
+            throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
+
+        var wireCall = await _wire.MarketData
             .GetBoardRawAsync(productCode, useAliasPath, cancellationToken)
             .ConfigureAwait(false);
-        if (response.StatusCode is >= 200 and < 300)
+        var request = CreateRequest("Bitflyer.GetBoard", new Dictionary<string, string?>
         {
-            return BitflyerRawJson.DeserializeOrThrow<Board>(response.Json, "Bitflyer.GetBoard");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetBoard", response.StatusCode, response.Json);
+            ["productCode"] = productCode.Value,
+            ["useAliasPath"] = useAliasPath.ToString(),
+        });
+        return CreateCall<Board>(request, wireCall, "Bitflyer.GetBoard");
     }
 
     public async Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsAsync(
@@ -64,20 +84,34 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
     {
+        var call = await GetExecutionsCallAsync(productCode, count, before, after, useAliasPath, cancellationToken)
+            .ConfigureAwait(false);
+        return UnwrapOk(call, "Bitflyer.GetExecutions");
+    }
+
+    public async Task<BitflyerRawCall<IReadOnlyList<ExecutionPublicResponse>, JsonElement>> GetExecutionsCallAsync(
+        RawProductCode productCode,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        bool useAliasPath = false,
+        CancellationToken cancellationToken = default)
+    {
         if (string.IsNullOrWhiteSpace(productCode.Value))
             throw new ArgumentException("productCode is required.", nameof(productCode));
 
-        var response = await _wire.MarketData
+        var wireCall = await _wire.MarketData
             .GetExecutionsRawAsync(productCode, count, before, after, useAliasPath, cancellationToken)
             .ConfigureAwait(false);
-        if (response.StatusCode is >= 200 and < 300)
+        var request = CreateRequest("Bitflyer.GetExecutions", new Dictionary<string, string?>
         {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPublicResponse>>(
-                response.Json,
-                "Bitflyer.GetExecutions");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetExecutions", response.StatusCode, response.Json);
+            ["productCode"] = productCode.Value,
+            ["count"] = count?.ToString(),
+            ["before"] = before?.ToString(),
+            ["after"] = after?.ToString(),
+            ["useAliasPath"] = useAliasPath.ToString(),
+        });
+        return CreateCall<IReadOnlyList<ExecutionPublicResponse>>(request, wireCall, "Bitflyer.GetExecutions");
     }
 
     public async Task<IReadOnlyList<Market>> GetMarketsAsync(
@@ -85,15 +119,24 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
     {
-        var response = await _wire.ExchangeInfo
+        var call = await GetMarketsCallAsync(region, useAliasPath, cancellationToken).ConfigureAwait(false);
+        return UnwrapOk(call, "Bitflyer.GetMarkets");
+    }
+
+    public async Task<BitflyerRawCall<IReadOnlyList<Market>, JsonElement>> GetMarketsCallAsync(
+        string? region = null,
+        bool useAliasPath = false,
+        CancellationToken cancellationToken = default)
+    {
+        var wireCall = await _wire.ExchangeInfo
             .GetMarketsAsync(region, useAliasPath, cancellationToken)
             .ConfigureAwait(false);
-        if (response.StatusCode is >= 200 and < 300)
+        var request = CreateRequest("Bitflyer.GetMarkets", new Dictionary<string, string?>
         {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Market>>(response.Json, "Bitflyer.GetMarkets");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetMarkets", response.StatusCode, response.Json);
+            ["region"] = region,
+            ["useAliasPath"] = useAliasPath.ToString(),
+        });
+        return CreateCall<IReadOnlyList<Market>>(request, wireCall, "Bitflyer.GetMarkets");
     }
 
     public async Task<IReadOnlyList<Chat>> GetChatsAsync(
@@ -101,76 +144,62 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         string? region = null,
         CancellationToken cancellationToken = default)
     {
-        var response = await _wire.ExchangeInfo
+        var call = await GetChatsCallAsync(fromDate, region, cancellationToken).ConfigureAwait(false);
+        return UnwrapOk(call, "Bitflyer.GetChats");
+    }
+
+    public async Task<BitflyerRawCall<IReadOnlyList<Chat>, JsonElement>> GetChatsCallAsync(
+        string? fromDate = null,
+        string? region = null,
+        CancellationToken cancellationToken = default)
+    {
+        var wireCall = await _wire.ExchangeInfo
             .GetChatsAsync(fromDate, region, cancellationToken)
             .ConfigureAwait(false);
-        if (response.StatusCode is >= 200 and < 300)
+        var request = CreateRequest("Bitflyer.GetChats", new Dictionary<string, string?>
         {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Chat>>(response.Json, "Bitflyer.GetChats");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetChats", response.StatusCode, response.Json);
+            ["fromDate"] = fromDate,
+            ["region"] = region,
+        });
+        return CreateCall<IReadOnlyList<Chat>>(request, wireCall, "Bitflyer.GetChats");
     }
 
     public async Task<HealthResponse> GetHealthAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
+        var call = await GetHealthCallAsync(productCode, cancellationToken).ConfigureAwait(false);
+        return UnwrapOk(call, "Bitflyer.GetHealth");
+    }
+
+    public async Task<BitflyerRawCall<HealthResponse, JsonElement>> GetHealthCallAsync(
+        RawProductCode productCode,
+        CancellationToken cancellationToken = default)
+    {
         if (string.IsNullOrWhiteSpace(productCode.Value))
         {
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        var response = await _wire.MarketData
+        var wireCall = await _wire.MarketData
             .GetHealthAsync(productCode, cancellationToken)
             .ConfigureAwait(false);
-        if (response.StatusCode is >= 200 and < 300)
+        var request = CreateRequest("Bitflyer.GetHealth", new Dictionary<string, string?>
         {
-            return BitflyerRawJson.DeserializeOrThrow<HealthResponse>(response.Json, "Bitflyer.GetHealth");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetHealth", response.StatusCode, response.Json);
+            ["productCode"] = productCode.Value,
+        });
+        return CreateCall<HealthResponse>(request, wireCall, "Bitflyer.GetHealth");
     }
 
     public async Task<BoardStateResponse> GetBoardStateAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(productCode.Value))
-        {
-            throw new ArgumentException("productCode is required.", nameof(productCode));
-        }
-
-        var response = await _wire.MarketData
-            .GetBoardStateAsync(productCode, cancellationToken)
-            .ConfigureAwait(false);
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<BoardStateResponse>(response.Json, "Bitflyer.GetBoardState");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetBoardState", response.StatusCode, response.Json);
+        var call = await GetBoardStateCallAsync(productCode, cancellationToken).ConfigureAwait(false);
+        return UnwrapOk(call, "Bitflyer.GetBoardState");
     }
 
-    public async Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
-    {
-        var response = await _wire.MarketData
-            .GetCorporateLeverageAsync(cancellationToken)
-            .ConfigureAwait(false);
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<CorporateLeverageResponse>(
-                response.Json,
-                "Bitflyer.GetCorporateLeverage");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.GetCorporateLeverage",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<FundingRateResponse> GetFundingRateAsync(
+    public async Task<BitflyerRawCall<BoardStateResponse, JsonElement>> GetBoardStateCallAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
@@ -179,19 +208,101 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        var response = await _wire.MarketData
-            .GetFundingRateAsync(productCode, cancellationToken)
+        var wireCall = await _wire.MarketData
+            .GetBoardStateAsync(productCode, cancellationToken)
             .ConfigureAwait(false);
-        if (response.StatusCode is >= 200 and < 300)
+        var request = CreateRequest("Bitflyer.GetBoardState", new Dictionary<string, string?>
         {
-            return BitflyerRawJson.DeserializeOrThrow<FundingRateResponse>(
-                response.Json,
-                "Bitflyer.GetFundingRate");
+            ["productCode"] = productCode.Value,
+        });
+        return CreateCall<BoardStateResponse>(request, wireCall, "Bitflyer.GetBoardState");
+    }
+
+    public async Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default)
+    {
+        var call = await GetCorporateLeverageCallAsync(cancellationToken).ConfigureAwait(false);
+        return UnwrapOk(call, "Bitflyer.GetCorporateLeverage");
+    }
+
+    public async Task<BitflyerRawCall<CorporateLeverageResponse, JsonElement>> GetCorporateLeverageCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var wireCall = await _wire.MarketData
+            .GetCorporateLeverageAsync(cancellationToken)
+            .ConfigureAwait(false);
+        var request = CreateRequest("Bitflyer.GetCorporateLeverage", new Dictionary<string, string?>());
+        return CreateCall<CorporateLeverageResponse>(request, wireCall, "Bitflyer.GetCorporateLeverage");
+    }
+
+    public async Task<FundingRateResponse> GetFundingRateAsync(
+        RawProductCode productCode,
+        CancellationToken cancellationToken = default)
+    {
+        var call = await GetFundingRateCallAsync(productCode, cancellationToken).ConfigureAwait(false);
+        return UnwrapOk(call, "Bitflyer.GetFundingRate");
+    }
+
+    public async Task<BitflyerRawCall<FundingRateResponse, JsonElement>> GetFundingRateCallAsync(
+        RawProductCode productCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(productCode.Value))
+        {
+            throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.GetFundingRate",
-            response.StatusCode,
-            response.Json);
+        var wireCall = await _wire.MarketData
+            .GetFundingRateAsync(productCode, cancellationToken)
+            .ConfigureAwait(false);
+        var request = CreateRequest("Bitflyer.GetFundingRate", new Dictionary<string, string?>
+        {
+            ["productCode"] = productCode.Value,
+        });
+        return CreateCall<FundingRateResponse>(request, wireCall, "Bitflyer.GetFundingRate");
+    }
+
+    private static T UnwrapOk<T>(BitflyerRawCall<T, JsonElement> call, string context)
+    {
+        return call.Result switch
+        {
+            Ok<T, JsonElement> ok => ok.Value,
+            Err<T, JsonElement> err => throw BitflyerRawJson.CreateStatusException(
+                context,
+                err.StatusCode,
+                err.Error.ValueKind == JsonValueKind.Undefined ? string.Empty : err.Error.GetRawText()),
+            _ => throw new InvalidOperationException("Unexpected call result.")
+        };
+    }
+
+    private static BitflyerRawRequest CreateRequest(string operation, IReadOnlyDictionary<string, string?> parameters) =>
+        new(operation, parameters);
+
+    private static BitflyerRawCall<TOk, JsonElement> CreateCall<TOk>(
+        BitflyerRawRequest request,
+        WireCall call,
+        string context)
+    {
+        var response = call.Response;
+        if (response.StatusCode is >= 200 and < 300)
+        {
+            var ok = BitflyerRawJson.DeserializeOrThrow<TOk>(response.Json, context);
+            return new BitflyerRawCall<TOk, JsonElement>(
+                request,
+                new Ok<TOk, JsonElement>(ok, response.StatusCode),
+                call.Meta);
+        }
+
+        if (BitflyerRawJson.TryDeserialize<JsonElement>(response.Json, out var error, out _))
+        {
+            return new BitflyerRawCall<TOk, JsonElement>(
+                request,
+                new Err<TOk, JsonElement>(error!, response.StatusCode),
+                call.Meta);
+        }
+
+        return new BitflyerRawCall<TOk, JsonElement>(
+            request,
+            new Err<TOk, JsonElement>(default, response.StatusCode),
+            call.Meta);
     }
 }

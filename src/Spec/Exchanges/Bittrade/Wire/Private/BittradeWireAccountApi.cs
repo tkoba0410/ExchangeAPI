@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
@@ -21,53 +20,40 @@ internal sealed class BittradeWireAccountApi : IBittradeWireAccountApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public async Task<WireResponse> GetAccountsAsync(CancellationToken cancellationToken = default)
-    {
-        var meta = await _restClient.GetRawAsync("v1/account/accounts", cancellationToken: cancellationToken).ConfigureAwait(false);
-        return ToWire(meta);
-    }
+    public Task<WireCall> GetAccountsAsync(CancellationToken cancellationToken = default) =>
+        GetAsync("v1/account/accounts", query: null, cancellationToken);
 
-    public async Task<WireResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default)
+    public Task<WireCall> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default)
     {
         EnsureRequired(accountId, nameof(accountId));
-        var meta = await _restClient
-            .GetRawAsync($"v1/account/accounts/{accountId}/balance", cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        return GetAsync($"v1/account/accounts/{accountId}/balance", query: null, cancellationToken);
     }
 
-    public async Task<WireResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default)
+    public Task<WireCall> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
         EnsureRequired(accountId, nameof(accountId));
-        var query = BuildQuery(
-            ("symbol", ToApiSymbol(symbol)),
-            ("account-id", accountId));
-        var meta = await _restClient
-            .GetRawAsync($"v1/order/openOrders?{query}", cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["symbol"] = ToApiSymbol(symbol),
+            ["account-id"] = accountId,
+        };
+        return GetAsync("v1/order/openOrders", query, cancellationToken);
     }
 
-    public async Task<WireResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
+    public Task<WireCall> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
         EnsureRequired(orderId.Value, nameof(orderId));
-        var meta = await _restClient
-            .GetRawAsync($"v1/order/orders/{orderId.Value}", cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        return GetAsync($"v1/order/orders/{orderId.Value}", query: null, cancellationToken);
     }
 
-    public async Task<WireResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
+    public Task<WireCall> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
         EnsureRequired(orderId.Value, nameof(orderId));
-        var meta = await _restClient
-            .GetRawAsync($"v1/order/orders/{orderId.Value}/matchresults", cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        return GetAsync($"v1/order/orders/{orderId.Value}/matchresults", query: null, cancellationToken);
     }
 
-    public async Task<WireResponse> GetOrdersAsync(
+    public Task<WireCall> GetOrdersAsync(
         RawSymbol symbol,
         string states,
         string? startDate = null,
@@ -79,22 +65,21 @@ internal sealed class BittradeWireAccountApi : IBittradeWireAccountApi
     {
         EnsureSymbol(symbol);
         EnsureRequired(states, nameof(states));
-        var query = BuildQuery(
-            ("symbol", ToApiSymbol(symbol)),
-            ("states", states),
-            ("start-date", startDate),
-            ("end-date", endDate),
-            ("from", from?.ToString()),
-            ("direct", direct),
-            ("size", size?.ToString()));
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["symbol"] = ToApiSymbol(symbol),
+            ["states"] = states,
+            ["start-date"] = startDate,
+            ["end-date"] = endDate,
+            ["from"] = from?.ToString(),
+            ["direct"] = direct,
+            ["size"] = size?.ToString(),
+        };
 
-        var meta = await _restClient
-            .GetRawAsync($"v1/order/orders?{query}", cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        return GetAsync("v1/order/orders", query, cancellationToken);
     }
 
-    public async Task<WireResponse> GetMatchResultsAsync(
+    public Task<WireCall> GetMatchResultsAsync(
         RawSymbol? symbol = null,
         string? types = null,
         string? startDate = null,
@@ -104,22 +89,21 @@ internal sealed class BittradeWireAccountApi : IBittradeWireAccountApi
         int? size = null,
         CancellationToken cancellationToken = default)
     {
-        var query = BuildQuery(
-            ("symbol", symbol.HasValue ? ToApiSymbol(symbol.Value) : null),
-            ("types", types),
-            ("start-date", startDate),
-            ("end-date", endDate),
-            ("from", from?.ToString()),
-            ("direct", direct),
-            ("size", size?.ToString()));
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["symbol"] = symbol.HasValue ? ToApiSymbol(symbol.Value) : null,
+            ["types"] = types,
+            ["start-date"] = startDate,
+            ["end-date"] = endDate,
+            ["from"] = from?.ToString(),
+            ["direct"] = direct,
+            ["size"] = size?.ToString(),
+        };
 
-        var meta = await _restClient
-            .GetRawAsync($"v1/order/matchresults?{query}", cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        return GetAsync("v1/order/matchresults", query, cancellationToken);
     }
 
-    public async Task<WireResponse> GetDepositWithdrawsAsync(
+    public Task<WireCall> GetDepositWithdrawsAsync(
         string type,
         string? currency = null,
         long? from = null,
@@ -128,20 +112,19 @@ internal sealed class BittradeWireAccountApi : IBittradeWireAccountApi
         CancellationToken cancellationToken = default)
     {
         EnsureRequired(type, nameof(type));
-        var query = BuildQuery(
-            ("type", type),
-            ("currency", currency),
-            ("from", from?.ToString()),
-            ("size", size?.ToString()),
-            ("direct", direct));
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["type"] = type,
+            ["currency"] = currency,
+            ["from"] = from?.ToString(),
+            ["size"] = size?.ToString(),
+            ["direct"] = direct,
+        };
 
-        var meta = await _restClient
-            .GetRawAsync($"v1/query/deposit-withdraw?{query}", cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        return GetAsync("v1/query/deposit-withdraw", query, cancellationToken);
     }
 
-    public async Task<WireResponse> GetRetailOrdersAsync(
+    public Task<WireCall> GetRetailOrdersAsync(
         int direct,
         int? status = null,
         DateTimeOffset? startTime = null,
@@ -150,16 +133,15 @@ internal sealed class BittradeWireAccountApi : IBittradeWireAccountApi
     {
         var startTimeMs = startTime?.ToUnixTimeMilliseconds();
         var endTimeMs = endTime?.ToUnixTimeMilliseconds();
-        var query = BuildQuery(
-            ("direct", direct.ToString()),
-            ("status", status?.ToString()),
-            ("start_time", startTimeMs?.ToString()),
-            ("end_time", endTimeMs?.ToString()));
+        var query = new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["direct"] = direct.ToString(),
+            ["status"] = status?.ToString(),
+            ["start_time"] = startTimeMs?.ToString(),
+            ["end_time"] = endTimeMs?.ToString(),
+        };
 
-        var meta = await _restClient
-            .GetRawAsync($"v1/retail/order/list?{query}", cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-        return ToWire(meta);
+        return GetAsync("v1/retail/order/list", query, cancellationToken);
     }
 
     private static string ToApiSymbol(RawSymbol symbol) =>
@@ -181,12 +163,39 @@ internal sealed class BittradeWireAccountApi : IBittradeWireAccountApi
         }
     }
 
-    private static string BuildQuery(params (string Key, string? Value)[] items)
+    private async Task<WireCall> GetAsync(
+        string path,
+        IReadOnlyDictionary<string, string?>? query,
+        CancellationToken cancellationToken)
     {
-        var parts = items
-            .Where(i => !string.IsNullOrWhiteSpace(i.Value))
-            .Select(i => $"{i.Key}={Uri.EscapeDataString(i.Value!)}");
-        return string.Join("&", parts);
+        var request = new WireRequest(
+            Method: "GET",
+            Path: path,
+            Query: BuildQuery(query));
+        var meta = await _restClient.GetRawAsync(path, query, cancellationToken: cancellationToken).ConfigureAwait(false);
+        var response = ToWire(meta);
+        return new WireCall(request, response, CreateMeta(response));
+    }
+
+    private static string? BuildQuery(IReadOnlyDictionary<string, string?>? query)
+    {
+        if (query is null || query.Count == 0)
+        {
+            return null;
+        }
+
+        var parts = new List<string>();
+        foreach (var (key, value) in query)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                continue;
+            }
+
+            parts.Add($"{key}={Uri.EscapeDataString(value)}");
+        }
+
+        return parts.Count == 0 ? null : string.Join("&", parts);
     }
 
     private static WireResponse ToWire(HttpResponseMeta meta)
@@ -199,5 +208,12 @@ internal sealed class BittradeWireAccountApi : IBittradeWireAccountApi
             meta.StatusCode,
             meta.Body ?? string.Empty,
             headers);
+    }
+
+    private static CallMeta CreateMeta(WireResponse response)
+    {
+        var elapsed = response.ElapsedMs is { } ms ? TimeSpan.FromMilliseconds(ms) : TimeSpan.Zero;
+        var startedAt = DateTimeOffset.UtcNow - elapsed;
+        return new CallMeta(startedAt, elapsed, response.RequestId);
     }
 }

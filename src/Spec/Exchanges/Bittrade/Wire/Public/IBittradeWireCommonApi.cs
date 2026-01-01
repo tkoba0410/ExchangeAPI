@@ -7,8 +7,8 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire.Public;
 
 public interface IBittradeWireCommonApi
 {
-    Task<WireResponse> GetTimestampAsync(CancellationToken ct = default);
-    Task<WireResponse> GetSymbolsAsync(CancellationToken ct = default);
-    Task<WireResponse> GetCurrenciesAsync(CancellationToken ct = default);
-    Task<WireResponse> GetRetailMaintainTimeAsync(CancellationToken ct = default);
+    Task<WireCall> GetTimestampAsync(CancellationToken ct = default);
+    Task<WireCall> GetSymbolsAsync(CancellationToken ct = default);
+    Task<WireCall> GetCurrenciesAsync(CancellationToken ct = default);
+    Task<WireCall> GetRetailMaintainTimeAsync(CancellationToken ct = default);
 }

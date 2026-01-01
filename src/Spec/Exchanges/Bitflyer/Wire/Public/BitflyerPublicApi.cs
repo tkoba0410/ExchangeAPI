@@ -24,7 +24,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public Task<WireResponse> GetTickerRawAsync(
+    public Task<WireCall> GetTickerRawAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default) =>
@@ -33,7 +33,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             CreateProductCodeQuery(productCode),
             cancellationToken);
 
-    public Task<WireResponse> GetBoardRawAsync(
+    public Task<WireCall> GetBoardRawAsync(
         RawProductCode productCode,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default) =>
@@ -42,7 +42,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             CreateProductCodeQuery(productCode),
             cancellationToken);
 
-    public Task<WireResponse> GetExecutionsRawAsync(
+    public Task<WireCall> GetExecutionsRawAsync(
         RawProductCode productCode,
         int? count = null,
         long? before = null,
@@ -54,7 +54,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             CreateExecutionsQuery(productCode, count, before, after),
             cancellationToken);
 
-    public Task<WireResponse> GetMarketsAsync(
+    public Task<WireCall> GetMarketsAsync(
         string? region = null,
         bool useAliasPath = false,
         CancellationToken cancellationToken = default)
@@ -68,7 +68,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
         return GetAsync(path, query: null, cancellationToken);
     }
 
-    public Task<WireResponse> GetChatsAsync(
+    public Task<WireCall> GetChatsAsync(
         string? fromDate = null,
         string? region = null,
         CancellationToken cancellationToken = default)
@@ -87,7 +87,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
         return GetAsync(path, query, cancellationToken);
     }
 
-    public Task<WireResponse> GetHealthAsync(
+    public Task<WireCall> GetHealthAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         GetAsync(
@@ -95,7 +95,7 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             CreateProductCodeQuery(productCode),
             cancellationToken);
 
-    public Task<WireResponse> GetBoardStateAsync(
+    public Task<WireCall> GetBoardStateAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         GetAsync(
@@ -103,10 +103,10 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             CreateProductCodeQuery(productCode),
             cancellationToken);
 
-    public Task<WireResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
+    public Task<WireCall> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
         GetAsync(Raw.BitflyerRawConstants.Paths.GetCorporateLeverage, query: null, cancellationToken);
 
-    public Task<WireResponse> GetFundingRateAsync(
+    public Task<WireCall> GetFundingRateAsync(
         RawProductCode productCode,
         CancellationToken cancellationToken = default) =>
         GetAsync(
@@ -114,13 +114,18 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             CreateProductCodeQuery(productCode),
             cancellationToken);
 
-    private async Task<WireResponse> GetAsync(
+    private async Task<WireCall> GetAsync(
         string path,
         IReadOnlyDictionary<string, string?>? query,
         CancellationToken cancellationToken)
     {
+        var request = new WireRequest(
+            Method: "GET",
+            Path: path,
+            Query: BuildQuery(query));
         var meta = await _restClient.GetRawAsync(path, query, cancellationToken).ConfigureAwait(false);
-        return ToWire(meta);
+        var response = ToWire(meta);
+        return new WireCall(request, response, CreateMeta(response));
     }
 
     private static IReadOnlyDictionary<string, string?> CreateProductCodeQuery(RawProductCode productCode)
@@ -166,5 +171,33 @@ internal sealed class BitflyerPublicApi : IBitflyerPublicApi
             meta.StatusCode,
             meta.Body ?? string.Empty,
             headers);
+    }
+
+    private static CallMeta CreateMeta(WireResponse response)
+    {
+        var elapsed = response.ElapsedMs is { } ms ? TimeSpan.FromMilliseconds(ms) : TimeSpan.Zero;
+        var startedAt = DateTimeOffset.UtcNow - elapsed;
+        return new CallMeta(startedAt, elapsed, response.RequestId);
+    }
+
+    private static string? BuildQuery(IReadOnlyDictionary<string, string?>? query)
+    {
+        if (query is null || query.Count == 0)
+        {
+            return null;
+        }
+
+        var parts = new List<string>();
+        foreach (var (key, value) in query)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                continue;
+            }
+
+            parts.Add($"{Uri.EscapeDataString(key)}={Uri.EscapeDataString(value)}");
+        }
+
+        return parts.Count == 0 ? null : string.Join("&", parts);
     }
 }

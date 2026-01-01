@@ -61,21 +61,20 @@ internal static class ApiCallMapper
 
     private static ApiError ToError(int statusCode, string? requestId, string? message)
     {
-        var kind = MapKind(statusCode);
+        var kind = Classify(statusCode, exchangeErrorCode: null, message);
         var resolved = string.IsNullOrWhiteSpace(message) ? DefaultMessage(kind) : message!;
         return new ApiError(kind, resolved, statusCode, requestId);
     }
 
-    private static ApiErrorKind MapKind(int statusCode) =>
+    public static ApiErrorKind Classify(int statusCode, string? exchangeErrorCode, string? message) =>
         statusCode switch
         {
+            400 or 422 => ApiErrorKind.Validation,
             401 or 403 => ApiErrorKind.Auth,
             404 => ApiErrorKind.NotFound,
             408 or 504 => ApiErrorKind.Timeout,
             429 => ApiErrorKind.RateLimit,
-            400 or 422 => ApiErrorKind.Validation,
-            499 => ApiErrorKind.Canceled,
-            >= 400 => ApiErrorKind.HttpError,
+            >= 500 and <= 599 => ApiErrorKind.HttpError,
             _ => ApiErrorKind.Unknown,
         };
 

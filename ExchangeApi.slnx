@@ -16,7 +16,9 @@
     <Project Path="tests/Common.Tests/Common.Tests.csproj" />
     <Project Path="tests/Composition.Tests/Composition.Tests.csproj" />
     <Project Path="tests/Exchanges/Bitflyer/Adapter.Tests/Exchange.Bitflyer.Adapter.Tests.csproj" />
+    <Project Path="tests/Exchanges/Bitflyer/Raw.Endpoints.Tests/Exchange.Bitflyer.Raw.Endpoints.Tests.csproj" />
     <Project Path="tests/Exchanges/Bittrade/Raw.Tests/Exchange.Bittrade.Raw.Tests.csproj" />
+    <Project Path="tests/Exchanges/Bittrade/Raw.Endpoints.Tests/Exchange.Bittrade.Raw.Endpoints.Tests.csproj" />
     <Project Path="tests/Exchanges/Bittrade/Adapter.Tests/Exchange.Bittrade.Adapter.Tests.csproj" />
     <Project Path="tests/Integration.Public.Tests/Integration.Public.Tests.csproj" />
   </Folder>

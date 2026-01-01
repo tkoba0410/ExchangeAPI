@@ -4,4 +4,5 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Exchange.Bittrade.Adapter")]
 [assembly: InternalsVisibleTo("Exchange.Bittrade.Adapter.Tests")]
 [assembly: InternalsVisibleTo("Exchange.Bittrade.Raw.Tests")]
+[assembly: InternalsVisibleTo("Exchange.Bittrade.Raw.Endpoints.Tests")]
 [assembly: InternalsVisibleTo("Composition")]

@@ -330,6 +330,40 @@ namespace ExchangeApi.Core.Transport.Protocol
             return await SendRawAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
+        public async Task<HttpResponseMeta> SendRawAsync(
+            string method,
+            string path,
+            string? query = null,
+            string? bodyJson = null,
+            IReadOnlyDictionary<string, string>? headers = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(method))
+            {
+                throw new ArgumentException("Method must not be null or whitespace.", nameof(method));
+            }
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path must not be null or whitespace.", nameof(path));
+            }
+
+            var requestUri = BuildUriWithQuery(path, query);
+            using var request = new HttpRequestMessage(new HttpMethod(method), requestUri);
+
+            if (!string.IsNullOrWhiteSpace(bodyJson))
+            {
+                request.Content = new StringContent(bodyJson, Encoding.UTF8, "application/json");
+            }
+
+            if (headers is not null)
+            {
+                ApplyHeaders(request, headers);
+            }
+
+            return await SendRawAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+
         private async Task<HttpResponseMeta> SendRawAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
@@ -459,6 +493,47 @@ namespace ExchangeApi.Core.Transport.Protocol
             }
 
             return builder.Uri;
+        }
+
+        private Uri BuildUriWithQuery(string path, string? query)
+        {
+            var baseUri = new Uri(_baseUri, path);
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return baseUri;
+            }
+
+            var builder = new UriBuilder(baseUri)
+            {
+                Query = query.StartsWith("?", StringComparison.Ordinal)
+                    ? query[1..]
+                    : query,
+            };
+            return builder.Uri;
+        }
+
+        private static void ApplyHeaders(HttpRequestMessage request, IReadOnlyDictionary<string, string> headers)
+        {
+            foreach (var (key, value) in headers)
+            {
+                if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+                {
+                    continue;
+                }
+
+                if (string.Equals(key, "Content-Type", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (request.Content is null)
+                    {
+                        continue;
+                    }
+
+                    request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(value);
+                    continue;
+                }
+
+                request.Headers.TryAddWithoutValidation(key, value);
+            }
         }
 
     }

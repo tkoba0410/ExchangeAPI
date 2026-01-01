@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Converters;
-using WireTradingApi = ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private.IBitflyerWireTradingApi;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
@@ -13,9 +13,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 /// </summary>
 public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
 {
-    private readonly WireTradingApi _wire;
+    private readonly IWireTransport _wire;
 
-    public BitflyerPrivateTradingApi(WireTradingApi wire)
+    public BitflyerPrivateTradingApi(IWireTransport wire)
     {
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
@@ -26,8 +26,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireRequest = BitflyerWireTradingMapper.MapSendChildOrderRequest(request);
-        var call = await _wire.CreateChildOrderAsync(wireRequest, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.CreateChildOrder(request), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -48,8 +47,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireRequest = BitflyerWireTradingMapper.MapCancelChildOrderRequest(request);
-        var call = await _wire.CancelChildOrderAsync(wireRequest, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.CancelChildOrder(request), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -70,7 +68,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var call = await _wire.CancelAllChildOrdersAsync(request, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.CancelAllChildOrders(request), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -90,7 +88,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var call = await _wire.CreateParentOrderAsync(request, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.CreateParentOrder(request), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -110,7 +108,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var call = await _wire.CancelParentOrderAsync(request, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.CancelParentOrder(request), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -130,7 +128,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var call = await _wire.CreateWithdrawalAsync(request, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.CreateWithdrawal(request), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -151,8 +149,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireRequest = BitflyerWireTradingMapper.MapSendChildOrderRequest(request);
-        var wireCall = await _wire.CreateChildOrderAsync(wireRequest, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.CreateChildOrder(request), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CreateChildOrder", new Dictionary<string, string?>
         {
             ["productCode"] = request.ProductCode.Value,
@@ -171,8 +168,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireRequest = BitflyerWireTradingMapper.MapCancelChildOrderRequest(request);
-        var wireCall = await _wire.CancelChildOrderAsync(wireRequest, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.CancelChildOrder(request), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CancelChildOrder", new Dictionary<string, string?>
         {
             ["productCode"] = request.ProductCode.Value,
@@ -188,7 +184,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await _wire.CancelAllChildOrdersAsync(request, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.CancelAllChildOrders(request), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CancelAllChildOrders", new Dictionary<string, string?>
         {
             ["productCode"] = request.ProductCode.Value,
@@ -202,7 +198,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await _wire.CreateParentOrderAsync(request, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.CreateParentOrder(request), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CreateParentOrder", new Dictionary<string, string?>
         {
             ["orderMethod"] = request.OrderMethod.ToString(),
@@ -217,7 +213,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await _wire.CancelParentOrderAsync(request, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.CancelParentOrder(request), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CancelParentOrder", new Dictionary<string, string?>
         {
             ["parentOrderId"] = request.ParentOrderId,
@@ -232,7 +228,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await _wire.CreateWithdrawalAsync(request, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.CreateWithdrawal(request), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CreateWithdrawal", new Dictionary<string, string?>
         {
             ["currencyCode"] = request.CurrencyCode,
@@ -274,4 +270,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
             new Err<TOk, JsonElement>(default, response.StatusCode),
             call.Meta);
     }
+
+    private Task<WireCall> SendAsync(WireRequest request, CancellationToken ct) =>
+        _wire.SendAsync(ExchangeCode.Bitflyer, request, ct);
 }

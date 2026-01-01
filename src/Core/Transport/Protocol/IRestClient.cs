@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Core.Contracts.Transport;
@@ -46,5 +47,16 @@ public interface IRestClient
     Task<HttpResponseMeta> PostRawAsync<TRequest>(
         string path,
         TRequest body,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 任意メソッドで HTTP を実行し、レスポンスの生データを返す。
+    /// </summary>
+    Task<HttpResponseMeta> SendRawAsync(
+        string method,
+        string path,
+        string? query = null,
+        string? bodyJson = null,
+        IReadOnlyDictionary<string, string>? headers = null,
         CancellationToken cancellationToken = default);
 }

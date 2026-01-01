@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw.Internal.Wire;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Spec.Wire;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
@@ -11,9 +12,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// </summary>
 internal sealed class BittradePublicApi : IBittradePublicApi
 {
-    private readonly IBittradeWireApi _wire;
+    private readonly IWireTransport _wire;
 
-    public BittradePublicApi(IBittradeWireApi wire)
+    public BittradePublicApi(IWireTransport wire)
     {
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
@@ -21,7 +22,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public async Task<RawMergedResponse> GetMergedTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        var call = await _wire.MarketData.GetTickerAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetTicker(symbol.Value), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -37,7 +38,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public async Task<RawDepthResponse> GetDepthAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        var call = await _wire.MarketData.GetOrderBookAsync(symbol.Value, type, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetOrderBook(symbol.Value, type), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -50,7 +51,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public async Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        var call = await _wire.MarketData.GetTradesAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetTrades(symbol.Value), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -62,7 +63,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
 
     public async Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
     {
-        var call = await _wire.Common.GetSymbolsAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetSymbols(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -74,7 +75,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
 
     public async Task<RawCurrenciesResponse> GetCurrenciesAsync(CancellationToken cancellationToken = default)
     {
-        var call = await _wire.Common.GetCurrenciesAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetCurrencies(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -86,7 +87,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
 
     public async Task<RawTimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
     {
-        var call = await _wire.Common.GetTimestampAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetTimestamp(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -100,7 +101,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     {
         EnsureSymbol(symbol);
         if (string.IsNullOrWhiteSpace(period)) throw new ArgumentException("period is required.", nameof(period));
-        var call = await _wire.MarketData.GetKlinesAsync(symbol.Value, period, size, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetKlines(symbol.Value, period, size), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -112,7 +113,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
 
     public async Task<RawTickersResponse> GetTickersAsync(CancellationToken cancellationToken = default)
     {
-        var call = await _wire.MarketData.GetTickersAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetTickers(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -125,7 +126,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public async Task<RawTradeHistoryResponse> GetTradeHistoryAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        var call = await _wire.MarketData.GetTradeHistoryAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetTradeHistory(symbol.Value), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -145,7 +146,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        var wireCall = await _wire.MarketData.GetTickerAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetTicker(symbol.Value), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetMergedTicker", new Dictionary<string, string?>
         {
             ["symbol"] = symbol.Value,
@@ -159,7 +160,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        var wireCall = await _wire.MarketData.GetOrderBookAsync(symbol.Value, type, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetOrderBook(symbol.Value, type), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetDepth", new Dictionary<string, string?>
         {
             ["symbol"] = symbol.Value,
@@ -173,7 +174,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        var wireCall = await _wire.MarketData.GetTradesAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetTrades(symbol.Value), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetTrades", new Dictionary<string, string?>
         {
             ["symbol"] = symbol.Value,
@@ -184,7 +185,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public async Task<BittradeRawCall<RawSymbolsResponse, JsonElement>> GetSymbolsCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.Common.GetSymbolsAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetSymbols(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetSymbols", new Dictionary<string, string?>());
         return CreateCall<RawSymbolsResponse>(request, wireCall, "Bittrade.GetSymbols");
     }
@@ -192,7 +193,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public async Task<BittradeRawCall<RawCurrenciesResponse, JsonElement>> GetCurrenciesCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.Common.GetCurrenciesAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetCurrencies(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetCurrencies", new Dictionary<string, string?>());
         return CreateCall<RawCurrenciesResponse>(request, wireCall, "Bittrade.GetCurrencies");
     }
@@ -200,7 +201,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public async Task<BittradeRawCall<RawTimestampResponse, JsonElement>> GetTimestampCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.Common.GetTimestampAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetTimestamp(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetTimestamp", new Dictionary<string, string?>());
         return CreateCall<RawTimestampResponse>(request, wireCall, "Bittrade.GetTimestamp");
     }
@@ -217,8 +218,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
             throw new ArgumentException("period is required.", nameof(period));
         }
 
-        var wireCall = await _wire.MarketData
-            .GetKlinesAsync(symbol.Value, period, size, cancellationToken)
+        var wireCall = await SendAsync(BittradeEndpoints.GetKlines(symbol.Value, period, size), cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetKlines", new Dictionary<string, string?>
         {
@@ -232,7 +232,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public async Task<BittradeRawCall<RawTickersResponse, JsonElement>> GetTickersCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.MarketData.GetTickersAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetTickers(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetTickers", new Dictionary<string, string?>());
         return CreateCall<RawTickersResponse>(request, wireCall, "Bittrade.GetTickers");
     }
@@ -242,7 +242,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         CancellationToken cancellationToken = default)
     {
         EnsureSymbol(symbol);
-        var wireCall = await _wire.MarketData.GetTradeHistoryAsync(symbol.Value, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetTradeHistory(symbol.Value), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetTradeHistory", new Dictionary<string, string?>
         {
             ["symbol"] = symbol.Value,
@@ -253,7 +253,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
     public async Task<BittradeRawCall<RawRetailMaintainTimeResponse, JsonElement>> GetRetailMaintainTimeCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.Common.GetRetailMaintainTimeAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetRetailMaintainTime(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetRetailMaintainTime", new Dictionary<string, string?>());
         return CreateCall<RawRetailMaintainTimeResponse>(request, wireCall, "Bittrade.GetRetailMaintainTime");
     }
@@ -294,7 +294,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
 
     public async Task<RawRetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default)
     {
-        var call = await _wire.Common.GetRetailMaintainTimeAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetRetailMaintainTime(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -316,4 +316,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
     }
+
+    private Task<WireCall> SendAsync(WireRequest request, CancellationToken ct) =>
+        _wire.SendAsync(ExchangeCode.Bittrade, request, ct);
 }

@@ -3,6 +3,7 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize;
 
@@ -13,7 +14,7 @@ internal static class BittradeNormalizeFactory
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
 
         var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
-        var wire = new Raw.Internal.Wire.BittradeWireApi(restClient, normalizedAccountId);
+        var wire = new WireTransport(restClient);
         var raw = new BittradeRawApi(wire);
 
         var marketData = new BittradeNormalizedMarketDataApi(raw.MarketData);
@@ -43,7 +44,7 @@ internal static class BittradeNormalizeFactory
             throw new ArgumentException("accountId is required.", nameof(accountId));
         }
 
-        var wire = new Raw.Internal.Wire.BittradeWireApi(restClient, accountId);
+        var wire = new WireTransport(restClient);
         var raw = new BittradeRawApi(wire);
         return new BittradeNormalizedTradingApi(raw.Trading, markets, accountId);
     }

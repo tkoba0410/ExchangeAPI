@@ -4,6 +4,7 @@ using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize;
 
@@ -14,8 +15,8 @@ internal static class BitflyerNormalizeFactory
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
         if (markets is null) throw new ArgumentNullException(nameof(markets));
 
-        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
-        var accountApi = new BitflyerPrivateApi(wire.Account);
+        var wire = new WireTransport(restClient);
+        var accountApi = new BitflyerPrivateApi(wire);
         return new BitflyerNormalizedAccountApi(accountApi, markets);
     }
 
@@ -24,8 +25,8 @@ internal static class BitflyerNormalizeFactory
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
         if (markets is null) throw new ArgumentNullException(nameof(markets));
 
-        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
-        var accountApi = new BitflyerPrivateApi(wire.Account);
+        var wire = new WireTransport(restClient);
+        var accountApi = new BitflyerPrivateApi(wire);
         return new BitflyerNormalizedMarginApi(accountApi, markets);
     }
 
@@ -34,9 +35,9 @@ internal static class BitflyerNormalizeFactory
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
         if (markets is null) throw new ArgumentNullException(nameof(markets));
 
-        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
-        var accountApi = new BitflyerPrivateApi(wire.Account);
-        var tradingApi = new BitflyerPrivateTradingApi(wire.Trading);
+        var wire = new WireTransport(restClient);
+        var accountApi = new BitflyerPrivateApi(wire);
+        var tradingApi = new BitflyerPrivateTradingApi(wire);
         return new BitflyerNormalizedTradingApi(tradingApi, accountApi, markets);
     }
 }

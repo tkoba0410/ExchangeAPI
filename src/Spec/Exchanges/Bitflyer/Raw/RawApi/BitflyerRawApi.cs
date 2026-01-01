@@ -1,6 +1,6 @@
 using System;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
@@ -12,7 +12,7 @@ public sealed class BitflyerRawApi : IBitflyerRawApi
     public IBitflyerRawMarketDataApi MarketData { get; }
     public IBitflyerRawTradingApi Trading { get; }
 
-    public BitflyerRawApi(IBitflyerWireApi wire)
+    public BitflyerRawApi(IWireTransport wire)
         : this(
             new BitflyerRawMarketDataApi(wire ?? throw new ArgumentNullException(nameof(wire))),
             new Private.BitflyerRawTradingApi(wire))

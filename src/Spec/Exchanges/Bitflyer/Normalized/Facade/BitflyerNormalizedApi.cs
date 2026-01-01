@@ -11,6 +11,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
 
@@ -30,7 +31,7 @@ public sealed class BitflyerNormalizedApi
     public static BitflyerNormalizedApi FromRestClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        var wire = new Raw.Internal.Wire.BitflyerWireApi(restClient);
+        var wire = new WireTransport(restClient);
         var raw = new BitflyerRawApi(wire);
 
         return new BitflyerNormalizedApi(

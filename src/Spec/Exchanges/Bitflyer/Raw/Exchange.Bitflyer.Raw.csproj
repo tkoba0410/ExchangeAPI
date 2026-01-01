@@ -19,6 +19,8 @@
     <Compile Include="..\..\..\Wire\WireResponse.cs" />
     <Compile Include="..\..\..\Wire\WireRequest.cs" />
     <Compile Include="..\..\..\Wire\WireCall.cs" />
+    <Compile Include="..\..\..\Wire\IWireTransport.cs" />
+    <Compile Include="..\..\..\Wire\WireTransport.cs" />
     <Compile Include="..\..\..\CallCommon\**\*.cs" />
   </ItemGroup>
 

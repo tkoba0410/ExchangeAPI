@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using WireAccountApi = ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Wire.Private.IBitflyerWireAccountApi;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
@@ -14,9 +15,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 /// </summary>
 public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
 {
-    private readonly WireAccountApi _wire;
+    private readonly IWireTransport _wire;
 
-    public BitflyerPrivateApi(WireAccountApi wire)
+    public BitflyerPrivateApi(IWireTransport wire)
     {
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
@@ -24,7 +25,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<IReadOnlyList<string>> GetPermissionsAsync(
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire.GetPermissionsAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetPermissions(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -39,7 +40,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire.GetBalancesAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetBalances(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -55,7 +56,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire.GetPositionsAsync(productCode, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetPositions(productCode), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -76,14 +77,14 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire
-            .GetExecutionsAsync(
-                productCode,
-                childOrderId,
-                childOrderAcceptanceId,
-                count,
-                before,
-                after,
+        var call = await SendAsync(
+                BitflyerEndpoints.GetExecutions(
+                    productCode,
+                    childOrderId,
+                    childOrderAcceptanceId,
+                    count,
+                    before,
+                    after),
                 cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
@@ -100,7 +101,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<CollateralResponse> GetCollateralAsync(
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire.GetCollateralAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetCollateral(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -115,7 +116,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<IReadOnlyList<CollateralAccount>> GetCollateralAccountsAsync(
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire.GetCollateralAccountsAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetCollateralAccounts(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -141,16 +142,16 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire
-            .GetChildOrdersAsync(
-                productCode,
-                childOrderStatusState,
-                childOrderAcceptanceId,
-                childOrderId,
-                parentOrderId,
-                count,
-                before,
-                after,
+        var call = await SendAsync(
+                BitflyerEndpoints.GetChildOrders(
+                    productCode,
+                    childOrderStatusState,
+                    childOrderAcceptanceId,
+                    childOrderId,
+                    parentOrderId,
+                    count,
+                    before,
+                    after),
                 cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
@@ -172,13 +173,13 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         string? parentOrderStatusState = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire
-            .GetParentOrdersAsync(
-                productCode,
-                count,
-                before,
-                after,
-                parentOrderStatusState,
+        var call = await SendAsync(
+                BitflyerEndpoints.GetParentOrders(
+                    productCode,
+                    count,
+                    before,
+                    after,
+                    parentOrderStatusState),
                 cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
@@ -197,8 +198,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire
-            .GetParentOrderAsync(parentOrderId, parentOrderAcceptanceId, cancellationToken)
+        var call = await SendAsync(
+                BitflyerEndpoints.GetParentOrder(parentOrderId, parentOrderAcceptanceId),
+                cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
@@ -218,8 +220,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire
-            .GetBalanceHistoryAsync(currencyCode, count, before, after, cancellationToken)
+        var call = await SendAsync(
+                BitflyerEndpoints.GetBalanceHistory(currencyCode, count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
@@ -239,7 +242,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire.GetTradingCommissionAsync(productCode, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetTradingCommission(productCode), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -260,8 +263,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire
-            .GetCollateralHistoryAsync(count, before, after, cancellationToken)
+        var call = await SendAsync(
+                BitflyerEndpoints.GetCollateralHistory(count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
@@ -280,7 +284,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<IReadOnlyList<JsonElement>> GetAddressesAsync(
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire.GetAddressesAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetAddresses(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -298,7 +302,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire.GetCoinInsAsync(count, before, after, cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetCoinIns(count, before, after), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -317,8 +321,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire
-            .GetCoinOutsAsync(messageId, count, before, after, cancellationToken)
+        var call = await SendAsync(
+                BitflyerEndpoints.GetCoinOuts(messageId, count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
@@ -337,8 +342,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire
-            .GetDepositsAsync(count, before, after, cancellationToken)
+        var call = await SendAsync(
+                BitflyerEndpoints.GetDeposits(count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
@@ -358,8 +364,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire
-            .GetWithdrawalsAsync(messageId, count, before, after, cancellationToken)
+        var call = await SendAsync(
+                BitflyerEndpoints.GetWithdrawals(messageId, count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
@@ -375,7 +382,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<IReadOnlyList<JsonElement>> GetBankAccountsAsync(
         CancellationToken cancellationToken = default)
     {
-        var call = await _wire.GetBankAccountsAsync(cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetBankAccounts(), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -390,7 +397,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<BitflyerRawCall<IReadOnlyList<string>, JsonElement>> GetPermissionsCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.GetPermissionsAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetPermissions(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetPermissions", new Dictionary<string, string?>());
         return CreateCall<IReadOnlyList<string>>(request, wireCall, "Bitflyer.GetPermissions");
     }
@@ -398,7 +405,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<BitflyerRawCall<IReadOnlyList<BalanceResponse>, JsonElement>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.GetBalancesAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetBalances(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetBalances", new Dictionary<string, string?>());
         return CreateCall<IReadOnlyList<BalanceResponse>>(request, wireCall, "Bitflyer.GetBalances");
     }
@@ -407,7 +414,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.GetPositionsAsync(productCode, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetPositions(productCode), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetPositions", new Dictionary<string, string?>
         {
             ["productCode"] = productCode.Value,
@@ -424,14 +431,14 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetExecutionsAsync(
-                productCode,
-                childOrderId,
-                childOrderAcceptanceId,
-                count,
-                before,
-                after,
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetExecutions(
+                    productCode,
+                    childOrderId,
+                    childOrderAcceptanceId,
+                    count,
+                    before,
+                    after),
                 cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetExecutions", new Dictionary<string, string?>
@@ -449,7 +456,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<BitflyerRawCall<CollateralResponse, JsonElement>> GetCollateralCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.GetCollateralAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetCollateral(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetCollateral", new Dictionary<string, string?>());
         return CreateCall<CollateralResponse>(request, wireCall, "Bitflyer.GetCollateral");
     }
@@ -457,7 +464,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<BitflyerRawCall<IReadOnlyList<CollateralAccount>, JsonElement>> GetCollateralAccountsCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.GetCollateralAccountsAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetCollateralAccounts(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetCollateralAccounts", new Dictionary<string, string?>());
         return CreateCall<IReadOnlyList<CollateralAccount>>(request, wireCall, "Bitflyer.GetCollateralAccounts");
     }
@@ -473,16 +480,16 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetChildOrdersAsync(
-                productCode,
-                childOrderStatusState,
-                childOrderAcceptanceId,
-                childOrderId,
-                parentOrderId,
-                count,
-                before,
-                after,
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetChildOrders(
+                    productCode,
+                    childOrderStatusState,
+                    childOrderAcceptanceId,
+                    childOrderId,
+                    parentOrderId,
+                    count,
+                    before,
+                    after),
                 cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetChildOrders", new Dictionary<string, string?>
@@ -507,13 +514,13 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         string? parentOrderStatusState = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetParentOrdersAsync(
-                productCode,
-                count,
-                before,
-                after,
-                parentOrderStatusState,
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetParentOrders(
+                    productCode,
+                    count,
+                    before,
+                    after,
+                    parentOrderStatusState),
                 cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetParentOrders", new Dictionary<string, string?>
@@ -532,8 +539,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetParentOrderAsync(parentOrderId, parentOrderAcceptanceId, cancellationToken)
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetParentOrder(parentOrderId, parentOrderAcceptanceId),
+                cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetParentOrder", new Dictionary<string, string?>
         {
@@ -550,8 +558,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetBalanceHistoryAsync(currencyCode, count, before, after, cancellationToken)
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetBalanceHistory(currencyCode, count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetBalanceHistory", new Dictionary<string, string?>
         {
@@ -567,7 +576,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.GetTradingCommissionAsync(productCode, cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetTradingCommission(productCode), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetTradingCommission", new Dictionary<string, string?>
         {
             ["productCode"] = productCode.Value,
@@ -581,8 +590,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetCollateralHistoryAsync(count, before, after, cancellationToken)
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetCollateralHistory(count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetCollateralHistory", new Dictionary<string, string?>
         {
@@ -596,7 +606,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetAddressesCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.GetAddressesAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetAddresses(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetAddresses", new Dictionary<string, string?>());
         return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetAddresses");
     }
@@ -607,8 +617,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetCoinInsAsync(count, before, after, cancellationToken)
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetCoinIns(count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetCoinIns", new Dictionary<string, string?>
         {
@@ -626,8 +637,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetCoinOutsAsync(messageId, count, before, after, cancellationToken)
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetCoinOuts(messageId, count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetCoinOuts", new Dictionary<string, string?>
         {
@@ -645,8 +657,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetDepositsAsync(count, before, after, cancellationToken)
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetDeposits(count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetDeposits", new Dictionary<string, string?>
         {
@@ -664,8 +677,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire
-            .GetWithdrawalsAsync(messageId, count, before, after, cancellationToken)
+        var wireCall = await SendAsync(
+                BitflyerEndpoints.GetWithdrawals(messageId, count, before, after),
+                cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetWithdrawals", new Dictionary<string, string?>
         {
@@ -680,7 +694,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetBankAccountsCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await _wire.GetBankAccountsAsync(cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetBankAccounts(), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetBankAccounts", new Dictionary<string, string?>());
         return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetBankAccounts");
     }
@@ -718,4 +732,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             new Err<TOk, JsonElement>(default, response.StatusCode),
             call.Meta);
     }
+
+    private Task<WireCall> SendAsync(WireRequest request, CancellationToken ct) =>
+        _wire.SendAsync(ExchangeCode.Bitflyer, request, ct);
 }

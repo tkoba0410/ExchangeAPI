@@ -10,6 +10,7 @@ using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Boundary.Adapters.Common.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;

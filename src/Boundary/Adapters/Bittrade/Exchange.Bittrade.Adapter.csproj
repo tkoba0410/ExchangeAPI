@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\..\Spec\Exchanges\Bittrade\Normalized\Exchange.Bittrade.Normalized.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Common\**\*.cs" />
+  </ItemGroup>
+
 </Project>

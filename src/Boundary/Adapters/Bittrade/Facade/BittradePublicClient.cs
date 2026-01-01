@@ -8,6 +8,7 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
+using ExchangeApi.Boundary.Adapters.Common.NotSupported;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Common.Enums;

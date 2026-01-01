@@ -6,6 +6,7 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Requests;
+using ExchangeApi.Boundary.Adapters.Common.NotSupported;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;

@@ -1,14 +1,16 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Requests;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Boundary.Adapters.Common.ApiCallMapping;
+
+namespace ExchangeApi.Boundary.Adapters.Common.NotSupported;
 
 internal sealed class NotSupportedTradingApi : ITradingApi
 {
@@ -98,8 +100,8 @@ internal sealed class NotSupportedTradingApi : ITradingApi
 
     private ApiCall<TReq, TOk, ApiError> NotSupportedCall<TReq, TOk>(TReq request)
     {
-        var meta = ApiCallMapper.ToMeta(System.DateTimeOffset.UtcNow);
-        return ApiCallMapper.Err<TReq, TOk>(_exchange, request, meta, 0, "Feature not supported.");
+        var meta = ApiCallMapperBase.ToMeta(System.DateTimeOffset.UtcNow);
+        return ApiCallMapperBase.Err<TReq, TOk>(_exchange, request, meta, 0, "Feature not supported.");
     }
 }
 
@@ -130,7 +132,7 @@ internal sealed class NotSupportedAccountApi : IAccountApi
 
     private ApiCall<TReq, TOk, ApiError> NotSupportedCall<TReq, TOk>(TReq request)
     {
-        var meta = ApiCallMapper.ToMeta(System.DateTimeOffset.UtcNow);
-        return ApiCallMapper.Err<TReq, TOk>(_exchange, request, meta, 0, "Feature not supported.");
+        var meta = ApiCallMapperBase.ToMeta(System.DateTimeOffset.UtcNow);
+        return ApiCallMapperBase.Err<TReq, TOk>(_exchange, request, meta, 0, "Feature not supported.");
     }
 }

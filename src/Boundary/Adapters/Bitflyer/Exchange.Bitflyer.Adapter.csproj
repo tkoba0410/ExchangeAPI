@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\..\Spec\Exchanges\Bitflyer\Normalized\Exchange.Bitflyer.Normalized.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Common\**\*.cs" />
+  </ItemGroup>
+
 </Project>

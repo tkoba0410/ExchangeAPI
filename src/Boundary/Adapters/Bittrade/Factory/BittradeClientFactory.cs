@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Boundary.Adapters.Common.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Core.Transport.Observability;

@@ -125,6 +125,15 @@ Split Candidate: なし
 
 * Raw / Normalized を spec に留める理由
 
+### 5.1.1 Wire を 2 段階で運用してよい（共通 Wire / 取引所 Wire）
+
+* Wire は次の 2 種に分離して運用してよい。
+  * **共通 Wire**：取引所概念を持たない transport 抽象（Request/Response/Transport 等）
+  * **取引所 Wire**：当該取引所の endpoint・署名・組み立て等、WireRequest へ落とすための固有ロジック
+* 共通 Wire は **DTO を持たない**（JSON 文字列/バイト列を運ぶのみ）。
+* 取引所 Wire も **DTO を持たない**（DTO は Raw に属する）。
+* 取引所 Wire は Raw の codec を呼び出してよい（Raw DTO ⇄ JSON 変換を利用するため）。
+
 ### 5.2 Adapter を翻訳関所とする理由
 
 * なぜ判断を Adapter に持ち込まないか
@@ -265,9 +274,11 @@ src/
   Core/                          # 取引所概念を持たない実行基盤
 
   Spec/                          # spec層（domainを認識しない）
+    Wire/                        # 共通 Wire（transport 抽象 / DTO は持たない）
+      Common/
     Exchanges/
       <Exchange>/
-        Wire/                    # transport 仕様（spec）
+        Wire/                    # 取引所 Wire（endpoint/署名/組立 / DTO は持たない）
         Raw/                     # 鏡像DTO（spec）
         Normalized/              # 取引所内正規化DTO（spec）
 
@@ -286,6 +297,10 @@ src/
 #### 15.3.1 Wire / Raw / Normalized / Adapter の境界（よくある誤解）
 
 * Wire/Raw/Normalized は **spec 層の都合**で導入してよい（Core §5）。
+  * Wire は **JSON 文字列（またはバイト列）の transport payload を運ぶだけ**であり、DTO を持たない。
+  * Raw は **鏡像 DTO と codec**（JSON payload ⇄ DTO）を担ってよい。
+  * Normalized は **単独取引所内**の正規化に限定し、取引所横断の抽象化を目的としない。
+  * Contracts は **取引所横断の抽象化 DTO**であり、transport 情報（path/header/query/json string 等）を持たない。
 * Adapter は **翻訳関所**であり、判断・事業ロジックの置き場ではない。
 * Domain は横断的ふるまいであり、「再利用フォルダ」ではない。
 

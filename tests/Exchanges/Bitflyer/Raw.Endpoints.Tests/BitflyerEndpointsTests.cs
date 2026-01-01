@@ -30,6 +30,18 @@ public sealed class BitflyerEndpointsTests
     }
 
     [Fact]
+    public void GetTicker_builds_request()
+    {
+        var req = BitflyerEndpoints.GetTicker(new RawProductCode("BTC_JPY"), useAliasPath: false);
+
+        WireRequestAssertions.AssertWireRequest(
+            req,
+            method: "GET",
+            path: "/v1/getticker",
+            query: "product_code=BTC_JPY");
+    }
+
+    [Fact]
     public void GetExecutions_builds_request_with_ordered_query()
     {
         var req = BitflyerEndpoints.GetExecutions(

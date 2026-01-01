@@ -26,6 +26,18 @@ public sealed class BittradeEndpointsTests
     }
 
     [Fact]
+    public void GetTicker_builds_request()
+    {
+        var req = BittradeEndpoints.GetTicker("BTC/JPY");
+
+        WireRequestAssertions.AssertWireRequest(
+            req,
+            method: "GET",
+            path: "market/detail/merged",
+            query: "symbol=btcjpy");
+    }
+
+    [Fact]
     public void PlaceOrder_builds_request_with_body_json()
     {
         var request = new RawCreateOrderRequest(

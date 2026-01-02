@@ -78,6 +78,9 @@
 ### 層の責務（精密化）
 
 1. **Wire は JSON 文字列（またはバイト列）を transport payload として保持してよいが、DTO を保持してはならない。**
+2. **Wire は転送（transport）成立のための情報のみを扱い、値の意味（妥当性）検証や正規化に関与してはならない。**
+   * Wire が扱ってよいのは method/path/query/header/body といった転送表現であり、これらは原則として string/bytes で表現される。
+   * 値の意味（例：product_code の形式、symbol の正当性、ID の構文）を保証する責務は、Raw/Normalized/Adapter のいずれかに属する。
 2. **Raw は取引所公式 API の鏡像 DTO を保持するものとし、鏡像 DTO と JSON payload の相互変換（codec）責務を許可する。**
 3. **Normalized は単独取引所内での正規化 DTO を保持するものとし、取引所間の抽象化を目的としてはならない。**
 4. **Contracts は複数取引所横断の抽象化 DTO を保持するものとし、transport 情報および JSON 文字列を保持してはならない。**

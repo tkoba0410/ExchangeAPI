@@ -134,6 +134,24 @@ Split Candidate: なし
 * 取引所 Wire も **DTO を持たない**（DTO は Raw に属する）。
 * 取引所 Wire は Raw の codec を呼び出してよい（Raw DTO ⇄ JSON 変換を利用するため）。
 
+### 5.1.3 Wire は「転送だけ」であり、内容に踏み込まない（文字列を許容する）
+
+* Wire の責務は **転送（transport）を成立させること**に限定される。
+  * method/path/query/header/body の組み立て、署名（認証）、送信、応答受領
+* Wire は値の意味（妥当性）に関与しない。
+  * product_code / symbol / id などの **意味検証や正規化は行わない**
+* したがって Wire の API（Endpoints 等）は、原則として **string/bytes** を引数に取り、文字列表現をそのまま転送表現として扱ってよい。
+  * bodyJson は string で受け取り、Raw 側の SerializeOrThrow を通した JSON を受け渡す
+  * query/path パラメータも string で受け取り、Wire で URL 表現へ組み立てる
+
+#### 5.1.3.1 意味検証はどこで行うか
+
+* 意味検証（TryParse/OrThrow）を行う層は、以下のいずれかに固定する：
+  * Raw（取引所鏡像・境界直下）
+  * Normalized（取引所内正規化）
+  * Adapter（spec→contracts の翻訳関所）
+* いずれの場合も、**Contracts には検証済みの強い型だけ**を渡し、文字列は持ち込まない。
+
 ### 5.1.2 下層は上層の名前空間を参照しない（Core §5「依存方向」）
 
 * 本プロジェクトでは、論理階層の順序に対して **依存方向を固定**する。
@@ -144,7 +162,8 @@ Split Candidate: なし
   * Raw は Normalized/Contracts を参照しない
   * Contracts は Domain/Composition に依存しない
 * 実装上、どうしても型が欲しくなった場合は「上層へ逃がさない」：
-  * Wire が必要とする型は Wire 自身（Wire/Common や Exchange/Wire）に定義する
+  * Wire が必要とする型は、原則として **導入しない**（string/bytes を転送表現として扱う）
+  * どうしても型が必要になった場合のみ、Wire 自身（Wire/Common や Exchange/Wire）に定義する
   * Raw の “鏡像 DTO” は Raw に閉じる（Wire へ漏らさない）
 
 ### 5.2 Adapter を翻訳関所とする理由
@@ -311,6 +330,7 @@ src/
 
 * Wire/Raw/Normalized は **spec 層の都合**で導入してよい（Core §5）。
 * Wire は **JSON 文字列（またはバイト列）の transport payload を運ぶだけ**であり、DTO を持たない。
+* Wire は **内容（意味）に踏み込まない**。query/path パラメータも含め、転送表現としての string/bytes を扱う。
 * Raw は **鏡像 DTO と codec**（JSON payload ⇄ DTO）を担ってよい。
 * Normalized は **単独取引所内**の正規化に限定し、取引所横断の抽象化を目的としない。
 * Contracts は **取引所横断の抽象化 DTO**であり、transport 情報（path/header/query/json string 等）を持たない。
@@ -322,6 +342,7 @@ src/
 * `using` / 参照の静的チェックで、以下を禁止する：
   * `Spec/Wire/**` が `Spec/Exchanges/**/Raw/**` を参照
   * `Spec/Exchanges/**/Raw/**` が `Normalized/**` や `Contracts/**` を参照
+* Wire においては、**string/bytes を転送表現として扱う**運用を基本とし、型導入は例外扱いとする。
 * CI では依存方向違反を **ビルド失敗**にするのが望ましい。
 
 ### 15.4 依存方向を CI で強制する（最小セット）

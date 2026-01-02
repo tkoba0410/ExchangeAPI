@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 
 /// <summary>bitFlyer 固有の定数（エンドポイントやキー名）。</summary>
 internal static class BitflyerConstants

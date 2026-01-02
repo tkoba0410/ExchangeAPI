@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 using ExchangeApi.Spec.Wire;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
@@ -23,7 +24,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var call = await SendAsync(BittradeEndpoints.PlaceOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
+        var call = await SendAsync(BittradeEndpoints.PlaceOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -54,7 +56,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var call = await SendAsync(BittradeEndpoints.CancelOrders(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CancelOrders");
+        var call = await SendAsync(BittradeEndpoints.CancelOrders(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -73,7 +76,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var call = await SendAsync(BittradeEndpoints.CancelOpenOrders(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CancelOpenOrders");
+        var call = await SendAsync(BittradeEndpoints.CancelOpenOrders(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -92,7 +96,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var call = await SendAsync(BittradeEndpoints.CreateWithdraw(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CreateWithdraw");
+        var call = await SendAsync(BittradeEndpoints.CreateWithdraw(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -133,7 +138,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var call = await SendAsync(BittradeEndpoints.CreateRetailOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CreateRetailOrder");
+        var call = await SendAsync(BittradeEndpoints.CreateRetailOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -154,7 +160,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BittradeEndpoints.PlaceOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
+        var wireCall = await SendAsync(BittradeEndpoints.PlaceOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bittrade.PlaceOrder", new Dictionary<string, string?>
         {
             ["accountId"] = request.AccountId,
@@ -189,7 +196,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BittradeEndpoints.CancelOrders(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CancelOrders");
+        var wireCall = await SendAsync(BittradeEndpoints.CancelOrders(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bittrade.CancelOrders", new Dictionary<string, string?>
         {
             ["orderIds"] = string.Join(",", request.OrderIds),
@@ -203,7 +211,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BittradeEndpoints.CancelOpenOrders(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CancelOpenOrders");
+        var wireCall = await SendAsync(BittradeEndpoints.CancelOpenOrders(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bittrade.CancelOpenOrders", new Dictionary<string, string?>
         {
             ["accountId"] = request.AccountId,
@@ -218,7 +227,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BittradeEndpoints.CreateWithdraw(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CreateWithdraw");
+        var wireCall = await SendAsync(BittradeEndpoints.CreateWithdraw(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bittrade.CreateWithdraw", new Dictionary<string, string?>
         {
             ["currency"] = request.Currency,
@@ -251,7 +261,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BittradeEndpoints.CreateRetailOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CreateRetailOrder");
+        var wireCall = await SendAsync(BittradeEndpoints.CreateRetailOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bittrade.CreateRetailOrder", new Dictionary<string, string?>
         {
             ["symbol"] = request.RawSymbol.Value,

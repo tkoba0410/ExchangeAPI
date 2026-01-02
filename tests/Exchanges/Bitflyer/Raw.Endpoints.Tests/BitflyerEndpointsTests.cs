@@ -1,5 +1,7 @@
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Endpoints.Tests;
 
@@ -72,7 +74,8 @@ public sealed class BitflyerEndpointsTests
             TimeInForce = "GTC",
         };
 
-        var req = BitflyerEndpoints.CreateChildOrder(request);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateChildOrder");
+        var req = BitflyerEndpoints.SendChildOrder(bodyJson);
 
         WireRequestAssertions.AssertWireRequest(
             req,

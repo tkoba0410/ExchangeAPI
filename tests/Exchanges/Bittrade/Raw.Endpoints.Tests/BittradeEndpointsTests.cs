@@ -1,3 +1,5 @@
+using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
+
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Endpoints.Tests;
 
 public sealed class BittradeEndpointsTests
@@ -48,7 +50,8 @@ public sealed class BittradeEndpointsTests
             Price: "3000000",
             Source: "api");
 
-        var req = BittradeEndpoints.PlaceOrder(request);
+        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
+        var req = BittradeEndpoints.PlaceOrder(bodyJson);
 
         WireRequestAssertions.AssertWireRequest(
             req,

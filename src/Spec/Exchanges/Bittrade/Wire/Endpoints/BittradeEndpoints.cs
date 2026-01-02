@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Spec.Wire;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 
 internal static class BittradeEndpoints
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
-
     public static WireRequest GetTicker(string symbol) =>
         Get("market/detail/merged", BuildQuery(
             ("symbol", ToApiSymbol(symbol))));
@@ -149,8 +147,8 @@ internal static class BittradeEndpoints
             ("end_time", endMs?.ToString())));
     }
 
-    public static WireRequest PlaceOrder(RawCreateOrderRequest request) =>
-        Post("v1/order/orders/place", SerializeBody(request));
+    public static WireRequest PlaceOrder(string bodyJson) =>
+        Post("v1/order/orders/place", bodyJson);
 
     public static WireRequest CancelOrder(string orderId)
     {
@@ -158,14 +156,14 @@ internal static class BittradeEndpoints
         return Post($"v1/order/orders/{orderId}/submitcancel", bodyJson: null);
     }
 
-    public static WireRequest CancelOrders(RawCancelOrdersRequest request) =>
-        Post("v1/order/orders/batchcancel", SerializeBody(request));
+    public static WireRequest CancelOrders(string bodyJson) =>
+        Post("v1/order/orders/batchcancel", bodyJson);
 
-    public static WireRequest CancelOpenOrders(RawCancelOpenOrdersRequest request) =>
-        Post("v1/order/orders/batchCancelOpenOrders", SerializeBody(request));
+    public static WireRequest CancelOpenOrders(string bodyJson) =>
+        Post("v1/order/orders/batchCancelOpenOrders", bodyJson);
 
-    public static WireRequest CreateWithdraw(RawCreateWithdrawRequest request) =>
-        Post("v1/dw/withdraw/api/create", SerializeBody(request));
+    public static WireRequest CreateWithdraw(string bodyJson) =>
+        Post("v1/dw/withdraw/api/create", bodyJson);
 
     public static WireRequest CancelWithdraw(string withdrawId)
     {
@@ -173,17 +171,14 @@ internal static class BittradeEndpoints
         return Post($"v1/dw/withdraw-virtual/{withdrawId}/cancel", bodyJson: null);
     }
 
-    public static WireRequest CreateRetailOrder(RawCreateRetailOrderRequest request) =>
-        Post("v1/retail/order/place", SerializeBody(request));
+    public static WireRequest CreateRetailOrder(string bodyJson) =>
+        Post("v1/retail/order/place", bodyJson);
 
     private static WireRequest Get(string path, string? query) =>
         new(Method: "GET", Path: path, Query: query);
 
     private static WireRequest Post(string path, string? bodyJson) =>
         new(Method: "POST", Path: path, Query: null, BodyJson: bodyJson);
-
-    private static string? SerializeBody<T>(T body) =>
-        body is null ? null : JsonSerializer.Serialize(body, JsonOptions);
 
     private static string? BuildQuery(params (string Key, string? Value)[] entries)
     {

@@ -1,18 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 using ExchangeApi.Spec.Wire;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 
 internal static class BitflyerEndpoints
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
-
     public static WireRequest GetTicker(RawProductCode productCode, bool useAliasPath) =>
         Get(useAliasPath ? BitflyerRawConstants.Paths.Ticker : BitflyerRawConstants.Paths.GetTicker,
             BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, EnsureProductCode(productCode))));
@@ -214,38 +209,29 @@ internal static class BitflyerEndpoints
     public static WireRequest GetBankAccounts() =>
         Get(BitflyerConstants.Paths.GetBankAccounts, query: null);
 
-    public static WireRequest CreateChildOrder(CreateChildOrderRequest request) =>
-        Post(BitflyerConstants.Paths.SendChildOrder, SerializeBody(MapSendChildOrderRequest(request)));
+    public static WireRequest SendChildOrder(string bodyJson) =>
+        Post(BitflyerConstants.Paths.SendChildOrder, bodyJson);
 
-    public static WireRequest CreateChildOrder(RawSendChildOrderRequest request) =>
-        Post(BitflyerConstants.Paths.SendChildOrder, SerializeBody(request));
+    public static WireRequest CancelChildOrder(string bodyJson) =>
+        Post(BitflyerConstants.Paths.CancelChildOrder, bodyJson);
 
-    public static WireRequest CancelChildOrder(CancelChildOrderRequest request) =>
-        Post(BitflyerConstants.Paths.CancelChildOrder, SerializeBody(MapCancelChildOrderRequest(request)));
+    public static WireRequest CancelAllChildOrders(string bodyJson) =>
+        Post(BitflyerConstants.Paths.CancelAllChildOrders, bodyJson);
 
-    public static WireRequest CancelChildOrder(RawCancelChildOrderRequest request) =>
-        Post(BitflyerConstants.Paths.CancelChildOrder, SerializeBody(request));
+    public static WireRequest SendParentOrder(string bodyJson) =>
+        Post(BitflyerConstants.Paths.SendParentOrder, bodyJson);
 
-    public static WireRequest CancelAllChildOrders(CancelAllChildOrdersRequest request) =>
-        Post(BitflyerConstants.Paths.CancelAllChildOrders, SerializeBody(request));
+    public static WireRequest CancelParentOrder(string bodyJson) =>
+        Post(BitflyerConstants.Paths.CancelParentOrder, bodyJson);
 
-    public static WireRequest CreateParentOrder(CreateParentOrderRequest request) =>
-        Post(BitflyerConstants.Paths.SendParentOrder, SerializeBody(request));
-
-    public static WireRequest CancelParentOrder(CancelParentOrderRequest request) =>
-        Post(BitflyerConstants.Paths.CancelParentOrder, SerializeBody(request));
-
-    public static WireRequest CreateWithdrawal(CreateWithdrawalRequest request) =>
-        Post(BitflyerConstants.Paths.Withdraw, SerializeBody(request));
+    public static WireRequest Withdraw(string bodyJson) =>
+        Post(BitflyerConstants.Paths.Withdraw, bodyJson);
 
     private static WireRequest Get(string path, string? query) =>
         new(Method: "GET", Path: path, Query: query);
 
     private static WireRequest Post(string path, string? bodyJson) =>
         new(Method: "POST", Path: path, Query: null, BodyJson: bodyJson);
-
-    private static string? SerializeBody<T>(T body) =>
-        body is null ? null : JsonSerializer.Serialize(body, JsonOptions);
 
     private static string? BuildQuery(params (string Key, string? Value)[] entries)
     {
@@ -273,52 +259,4 @@ internal static class BitflyerEndpoints
         return productCode.Value;
     }
 
-    private static RawSendChildOrderRequest MapSendChildOrderRequest(CreateChildOrderRequest request) => new()
-    {
-        ProductCode = MapProductCode(request.ProductCode),
-        ChildOrderType = MapChildOrderType(request.ChildOrderType),
-        Side = MapSide(request.Side),
-        Size = request.Size,
-        Price = request.Price,
-        MinuteToExpire = request.MinuteToExpire,
-        TimeInForce = request.TimeInForce is null ? null : MapTimeInForce(request.TimeInForce.Value),
-        TriggerPrice = request.TriggerPrice,
-    };
-
-    private static RawCancelChildOrderRequest MapCancelChildOrderRequest(CancelChildOrderRequest request) => new()
-    {
-        ProductCode = MapProductCode(request.ProductCode),
-        ChildOrderId = request.ChildOrderId,
-        ChildOrderAcceptanceId = request.ChildOrderAcceptanceId,
-    };
-
-    private static string MapProductCode(RawProductCode productCode) =>
-        string.IsNullOrWhiteSpace(productCode.Value)
-            ? throw new ArgumentOutOfRangeException(nameof(productCode), productCode, "Unsupported product_code.")
-            : productCode.Value;
-
-    private static string MapChildOrderType(ChildOrderType childOrderType) =>
-        childOrderType switch
-        {
-            ChildOrderType.Market => "MARKET",
-            ChildOrderType.Limit => "LIMIT",
-            _ => throw new ArgumentOutOfRangeException(nameof(childOrderType), childOrderType, "Unsupported child_order_type."),
-        };
-
-    private static string MapSide(Side side) =>
-        side switch
-        {
-            Side.Buy => "BUY",
-            Side.Sell => "SELL",
-            _ => throw new ArgumentOutOfRangeException(nameof(side), side, "Unsupported side."),
-        };
-
-    private static string MapTimeInForce(TimeInForce timeInForce) =>
-        timeInForce switch
-        {
-            TimeInForce.Gtc => "GTC",
-            TimeInForce.Ioc => "IOC",
-            TimeInForce.Fok => "FOK",
-            _ => throw new ArgumentOutOfRangeException(nameof(timeInForce), timeInForce, "Unsupported time_in_force."),
-        };
 }

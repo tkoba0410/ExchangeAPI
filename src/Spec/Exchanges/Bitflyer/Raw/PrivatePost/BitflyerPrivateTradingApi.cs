@@ -4,6 +4,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
@@ -26,7 +28,9 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var call = await SendAsync(BitflyerEndpoints.CreateChildOrder(request), cancellationToken).ConfigureAwait(false);
+        var raw = BitflyerRawMappers.MapSendChildOrderRequest(request);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(raw, "Bitflyer.CreateChildOrder");
+        var call = await SendAsync(BitflyerEndpoints.SendChildOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -47,7 +51,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var call = await SendAsync(BitflyerEndpoints.CancelChildOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelChildOrder");
+        var call = await SendAsync(BitflyerEndpoints.CancelChildOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -68,7 +73,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var call = await SendAsync(BitflyerEndpoints.CancelAllChildOrders(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelAllChildOrders");
+        var call = await SendAsync(BitflyerEndpoints.CancelAllChildOrders(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -88,7 +94,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var call = await SendAsync(BitflyerEndpoints.CreateParentOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateParentOrder");
+        var call = await SendAsync(BitflyerEndpoints.SendParentOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -108,7 +115,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var call = await SendAsync(BitflyerEndpoints.CancelParentOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelParentOrder");
+        var call = await SendAsync(BitflyerEndpoints.CancelParentOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -128,7 +136,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var call = await SendAsync(BitflyerEndpoints.CreateWithdrawal(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateWithdrawal");
+        var call = await SendAsync(BitflyerEndpoints.Withdraw(bodyJson), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -149,7 +158,9 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BitflyerEndpoints.CreateChildOrder(request), cancellationToken).ConfigureAwait(false);
+        var raw = BitflyerRawMappers.MapSendChildOrderRequest(request);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(raw, "Bitflyer.CreateChildOrder");
+        var wireCall = await SendAsync(BitflyerEndpoints.SendChildOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CreateChildOrder", new Dictionary<string, string?>
         {
             ["productCode"] = request.ProductCode.Value,
@@ -168,7 +179,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BitflyerEndpoints.CancelChildOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelChildOrder");
+        var wireCall = await SendAsync(BitflyerEndpoints.CancelChildOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CancelChildOrder", new Dictionary<string, string?>
         {
             ["productCode"] = request.ProductCode.Value,
@@ -184,7 +196,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BitflyerEndpoints.CancelAllChildOrders(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelAllChildOrders");
+        var wireCall = await SendAsync(BitflyerEndpoints.CancelAllChildOrders(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CancelAllChildOrders", new Dictionary<string, string?>
         {
             ["productCode"] = request.ProductCode.Value,
@@ -198,7 +211,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BitflyerEndpoints.CreateParentOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateParentOrder");
+        var wireCall = await SendAsync(BitflyerEndpoints.SendParentOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CreateParentOrder", new Dictionary<string, string?>
         {
             ["orderMethod"] = request.OrderMethod.ToString(),
@@ -213,7 +227,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BitflyerEndpoints.CancelParentOrder(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelParentOrder");
+        var wireCall = await SendAsync(BitflyerEndpoints.CancelParentOrder(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CancelParentOrder", new Dictionary<string, string?>
         {
             ["parentOrderId"] = request.ParentOrderId,
@@ -228,7 +243,8 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var wireCall = await SendAsync(BitflyerEndpoints.CreateWithdrawal(request), cancellationToken).ConfigureAwait(false);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateWithdrawal");
+        var wireCall = await SendAsync(BitflyerEndpoints.Withdraw(bodyJson), cancellationToken).ConfigureAwait(false);
         var rawRequest = CreateRequest("Bitflyer.CreateWithdrawal", new Dictionary<string, string?>
         {
             ["currencyCode"] = request.CurrencyCode,

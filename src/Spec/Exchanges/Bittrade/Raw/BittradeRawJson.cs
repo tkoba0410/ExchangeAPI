@@ -43,6 +43,19 @@ internal static class BittradeRawJson
             innerException: error);
     }
 
+    public static string SerializeOrThrow<T>(T value, string context)
+    {
+        if (value is null) throw new ArgumentNullException(nameof(value));
+        try
+        {
+            return JsonSerializer.Serialize(value, Options);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            throw new TransportException($"Failed to serialize {context}.", innerException: ex);
+        }
+    }
+
     public static TransportException CreateStatusException(string context, int statusCode, string json)
     {
         var payload = string.IsNullOrEmpty(json)

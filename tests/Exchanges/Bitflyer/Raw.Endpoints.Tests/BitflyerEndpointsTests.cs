@@ -1,5 +1,4 @@
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 
@@ -10,7 +9,7 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void GetHealth_builds_request()
     {
-        var req = BitflyerEndpoints.GetHealth(new RawProductCode("FX_BTC_JPY"));
+        var req = BitflyerEndpoints.GetHealth("FX_BTC_JPY");
 
         WireRequestAssertions.AssertWireRequest(
             req,
@@ -22,7 +21,7 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void GetBoardState_builds_request()
     {
-        var req = BitflyerEndpoints.GetBoardState(new RawProductCode("BTC_JPY"));
+        var req = BitflyerEndpoints.GetBoardState("BTC_JPY");
 
         WireRequestAssertions.AssertWireRequest(
             req,
@@ -34,7 +33,7 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void GetTicker_builds_request()
     {
-        var req = BitflyerEndpoints.GetTicker(new RawProductCode("BTC_JPY"), useAliasPath: false);
+        var req = BitflyerEndpoints.GetTicker("BTC_JPY", useAliasPath: false);
 
         WireRequestAssertions.AssertWireRequest(
             req,
@@ -47,7 +46,7 @@ public sealed class BitflyerEndpointsTests
     public void GetExecutions_builds_request_with_ordered_query()
     {
         var req = BitflyerEndpoints.GetExecutions(
-            new RawProductCode("BTC_JPY"),
+            "BTC_JPY",
             count: 100,
             before: 123,
             after: 456,
@@ -65,7 +64,7 @@ public sealed class BitflyerEndpointsTests
     {
         var request = new RawSendChildOrderRequest
         {
-            ProductCode = new RawProductCode("FX_BTC_JPY"),
+            ProductCode = "FX_BTC_JPY",
             ChildOrderType = "LIMIT",
             Side = "BUY",
             Size = 0.1m,

@@ -39,7 +39,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         if (string.IsNullOrWhiteSpace(productCode.Value))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        var wireCall = await SendAsync(BitflyerEndpoints.GetTicker(productCode, useAliasPath), cancellationToken)
+        var wireCall = await SendAsync(BitflyerEndpoints.GetTicker(productCode.Value, useAliasPath), cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetTicker", new Dictionary<string, string?>
         {
@@ -66,7 +66,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         if (string.IsNullOrWhiteSpace(productCode.Value))
             throw new ArgumentException("Product code must not be null or whitespace.", nameof(productCode));
 
-        var wireCall = await SendAsync(BitflyerEndpoints.GetBoard(productCode, useAliasPath), cancellationToken)
+        var wireCall = await SendAsync(BitflyerEndpoints.GetBoard(productCode.Value, useAliasPath), cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetBoard", new Dictionary<string, string?>
         {
@@ -101,7 +101,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
 
         var wireCall = await SendAsync(
-                BitflyerEndpoints.GetExecutions(productCode, count, before, after, useAliasPath),
+                BitflyerEndpoints.GetExecutions(productCode.Value, count, before, after, useAliasPath),
                 cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetExecutions", new Dictionary<string, string?>
@@ -180,7 +180,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        var wireCall = await SendAsync(BitflyerEndpoints.GetHealth(productCode), cancellationToken)
+        var wireCall = await SendAsync(BitflyerEndpoints.GetHealth(productCode.Value), cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetHealth", new Dictionary<string, string?>
         {
@@ -206,7 +206,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        var wireCall = await SendAsync(BitflyerEndpoints.GetBoardState(productCode), cancellationToken)
+        var wireCall = await SendAsync(BitflyerEndpoints.GetBoardState(productCode.Value), cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetBoardState", new Dictionary<string, string?>
         {
@@ -247,7 +247,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
 
-        var wireCall = await SendAsync(BitflyerEndpoints.GetFundingRate(productCode), cancellationToken)
+        var wireCall = await SendAsync(BitflyerEndpoints.GetFundingRate(productCode.Value), cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetFundingRate", new Dictionary<string, string?>
         {

@@ -84,7 +84,7 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
 
         var call = await SendAsync(
                 BitflyerEndpoints.GetChildOrders(
-                    productCode,
+                    productCode.Value,
                     childOrderStatusState,
                     childOrderAcceptanceId,
                     childOrderId,
@@ -182,7 +182,7 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
 
         var wireCall = await SendAsync(
                 BitflyerEndpoints.GetChildOrders(
-                    productCode,
+                    productCode.Value,
                     childOrderStatusState,
                     childOrderAcceptanceId,
                     childOrderId,

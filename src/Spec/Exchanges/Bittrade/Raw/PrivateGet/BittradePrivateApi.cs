@@ -52,7 +52,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
 
     public async Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default)
     {
-        var call = await SendAsync(BittradeEndpoints.GetOpenOrders(symbol, accountId), cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetOpenOrders(symbol.Value, accountId), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -69,7 +69,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
 
     public async Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
-        var call = await SendAsync(BittradeEndpoints.GetOrder(orderId), cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetOrder(orderId.Value), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -81,7 +81,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
 
     public async Task<RawOrderMatchResultsResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
     {
-        var call = await SendAsync(BittradeEndpoints.GetOrderMatchResults(orderId), cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BittradeEndpoints.GetOrderMatchResults(orderId.Value), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -107,7 +107,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         CancellationToken cancellationToken = default)
     {
         var call = await SendAsync(
-                BittradeEndpoints.GetOrders(symbol, states, startDate, endDate, from, direct, size),
+                BittradeEndpoints.GetOrders(symbol.Value, states, startDate, endDate, from, direct, size),
                 cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
@@ -130,7 +130,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         CancellationToken cancellationToken = default)
     {
         var call = await SendAsync(
-                BittradeEndpoints.GetMatchResults(symbol, types, startDate, endDate, from, direct, size),
+                BittradeEndpoints.GetMatchResults(symbol?.Value, types, startDate, endDate, from, direct, size),
                 cancellationToken)
             .ConfigureAwait(false);
         var response = call.Response;
@@ -226,7 +226,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
     {
         EnsureSymbol(symbol);
         EnsureRequired(accountId, nameof(accountId));
-        var wireCall = await SendAsync(BittradeEndpoints.GetOpenOrders(symbol, accountId), cancellationToken)
+        var wireCall = await SendAsync(BittradeEndpoints.GetOpenOrders(symbol.Value, accountId), cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetOpenOrders", new Dictionary<string, string?>
         {
@@ -241,7 +241,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         CancellationToken cancellationToken = default)
     {
         EnsureRequired(orderId.Value, nameof(orderId));
-        var wireCall = await SendAsync(BittradeEndpoints.GetOrder(orderId), cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetOrder(orderId.Value), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetOrder", new Dictionary<string, string?>
         {
             ["orderId"] = orderId.Value,
@@ -254,7 +254,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         CancellationToken cancellationToken = default)
     {
         EnsureRequired(orderId.Value, nameof(orderId));
-        var wireCall = await SendAsync(BittradeEndpoints.GetOrderMatchResults(orderId), cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BittradeEndpoints.GetOrderMatchResults(orderId.Value), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetOrderMatchResults", new Dictionary<string, string?>
         {
             ["orderId"] = orderId.Value,
@@ -275,7 +275,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         EnsureSymbol(symbol);
         EnsureRequired(states, nameof(states));
         var wireCall = await SendAsync(
-                BittradeEndpoints.GetOrders(symbol, states, startDate, endDate, from, direct, size),
+                BittradeEndpoints.GetOrders(symbol.Value, states, startDate, endDate, from, direct, size),
                 cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetOrders", new Dictionary<string, string?>
@@ -302,7 +302,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         CancellationToken cancellationToken = default)
     {
         var wireCall = await SendAsync(
-                BittradeEndpoints.GetMatchResults(symbol, types, startDate, endDate, from, direct, size),
+                BittradeEndpoints.GetMatchResults(symbol?.Value, types, startDate, endDate, from, direct, size),
                 cancellationToken)
             .ConfigureAwait(false);
         var request = CreateRequest("Bittrade.GetMatchResults", new Dictionary<string, string?>

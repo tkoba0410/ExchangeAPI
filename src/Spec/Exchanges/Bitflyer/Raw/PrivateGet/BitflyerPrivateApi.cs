@@ -57,7 +57,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        var call = await SendAsync(BitflyerEndpoints.GetPositions(productCode), cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetPositions(productCode.Value), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -80,7 +80,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     {
         var call = await SendAsync(
                 BitflyerEndpoints.GetExecutions(
-                    productCode,
+                    productCode.Value,
                     childOrderId,
                     childOrderAcceptanceId,
                     count,
@@ -145,7 +145,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     {
         var call = await SendAsync(
                 BitflyerEndpoints.GetChildOrders(
-                    productCode,
+                    productCode.Value,
                     childOrderStatusState,
                     childOrderAcceptanceId,
                     childOrderId,
@@ -176,7 +176,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     {
         var call = await SendAsync(
                 BitflyerEndpoints.GetParentOrders(
-                    productCode,
+                    productCode.Value,
                     count,
                     before,
                     after,
@@ -243,7 +243,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        var call = await SendAsync(BitflyerEndpoints.GetTradingCommission(productCode), cancellationToken).ConfigureAwait(false);
+        var call = await SendAsync(BitflyerEndpoints.GetTradingCommission(productCode.Value), cancellationToken).ConfigureAwait(false);
         var response = call.Response;
         if (response.StatusCode is >= 200 and < 300)
         {
@@ -415,7 +415,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetPositions(productCode), cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetPositions(productCode.Value), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetPositions", new Dictionary<string, string?>
         {
             ["productCode"] = productCode.Value,
@@ -434,7 +434,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     {
         var wireCall = await SendAsync(
                 BitflyerEndpoints.GetExecutions(
-                    productCode,
+                    productCode.Value,
                     childOrderId,
                     childOrderAcceptanceId,
                     count,
@@ -483,7 +483,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     {
         var wireCall = await SendAsync(
                 BitflyerEndpoints.GetChildOrders(
-                    productCode,
+                    productCode.Value,
                     childOrderStatusState,
                     childOrderAcceptanceId,
                     childOrderId,
@@ -517,7 +517,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
     {
         var wireCall = await SendAsync(
                 BitflyerEndpoints.GetParentOrders(
-                    productCode,
+                    productCode.Value,
                     count,
                     before,
                     after,
@@ -577,7 +577,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         RawProductCode productCode,
         CancellationToken cancellationToken = default)
     {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetTradingCommission(productCode), cancellationToken).ConfigureAwait(false);
+        var wireCall = await SendAsync(BitflyerEndpoints.GetTradingCommission(productCode.Value), cancellationToken).ConfigureAwait(false);
         var request = CreateRequest("Bitflyer.GetTradingCommission", new Dictionary<string, string?>
         {
             ["productCode"] = productCode.Value,

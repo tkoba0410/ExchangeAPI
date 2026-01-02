@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 using ExchangeApi.Spec.Wire;
 
@@ -8,16 +7,16 @@ namespace ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 
 internal static class BitflyerEndpoints
 {
-    public static WireRequest GetTicker(RawProductCode productCode, bool useAliasPath) =>
+    public static WireRequest GetTicker(string productCode, bool useAliasPath) =>
         Get(useAliasPath ? BitflyerRawConstants.Paths.Ticker : BitflyerRawConstants.Paths.GetTicker,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, EnsureProductCode(productCode))));
+            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
 
-    public static WireRequest GetBoard(RawProductCode productCode, bool useAliasPath) =>
+    public static WireRequest GetBoard(string productCode, bool useAliasPath) =>
         Get(useAliasPath ? BitflyerRawConstants.Paths.Board : BitflyerRawConstants.Paths.GetBoard,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, EnsureProductCode(productCode))));
+            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetExecutions(
-        RawProductCode productCode,
+        string productCode,
         int? count = null,
         long? before = null,
         long? after = null,
@@ -25,7 +24,7 @@ internal static class BitflyerEndpoints
     {
         var path = useAliasPath ? BitflyerRawConstants.Paths.Executions : BitflyerRawConstants.Paths.GetExecutions;
         return Get(path, BuildQuery(
-            (BitflyerRawConstants.QueryKeys.ProductCode, EnsureProductCode(productCode)),
+            (BitflyerRawConstants.QueryKeys.ProductCode, productCode),
             (BitflyerRawConstants.QueryKeys.Count, count?.ToString()),
             (BitflyerRawConstants.QueryKeys.Before, before?.ToString()),
             (BitflyerRawConstants.QueryKeys.After, after?.ToString())));
@@ -53,26 +52,26 @@ internal static class BitflyerEndpoints
         return Get(path, BuildQuery((BitflyerRawConstants.QueryKeys.FromDate, fromDate)));
     }
 
-    public static WireRequest GetHealth(RawProductCode productCode) =>
+    public static WireRequest GetHealth(string productCode) =>
         Get(BitflyerRawConstants.Paths.GetHealth,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, EnsureProductCode(productCode))));
+            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
 
-    public static WireRequest GetBoardState(RawProductCode productCode) =>
+    public static WireRequest GetBoardState(string productCode) =>
         Get(BitflyerRawConstants.Paths.GetBoardState,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, EnsureProductCode(productCode))));
+            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetCorporateLeverage() =>
         Get(BitflyerRawConstants.Paths.GetCorporateLeverage, query: null);
 
-    public static WireRequest GetFundingRate(RawProductCode productCode) =>
+    public static WireRequest GetFundingRate(string productCode) =>
         Get(BitflyerRawConstants.Paths.GetFundingRate,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, EnsureProductCode(productCode))));
+            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetBalances() =>
         Get(BitflyerConstants.Paths.GetBalance, query: null);
 
     public static WireRequest GetExecutions(
-        RawProductCode productCode,
+        string productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,
         int? count = null,
@@ -80,7 +79,7 @@ internal static class BitflyerEndpoints
         long? after = null)
     {
         return Get(BitflyerConstants.Paths.GetPrivateExecutions, BuildQuery(
-            (BitflyerConstants.QueryKeys.ProductCode, EnsureProductCode(productCode)),
+            (BitflyerConstants.QueryKeys.ProductCode, productCode),
             (BitflyerConstants.QueryKeys.ChildOrderId, childOrderId),
             (BitflyerConstants.QueryKeys.ChildOrderAcceptanceId, childOrderAcceptanceId),
             (BitflyerConstants.QueryKeys.Count, count?.ToString()),
@@ -88,15 +87,15 @@ internal static class BitflyerEndpoints
             (BitflyerConstants.QueryKeys.After, after?.ToString())));
     }
 
-    public static WireRequest GetPositions(RawProductCode productCode) =>
+    public static WireRequest GetPositions(string productCode) =>
         Get(BitflyerConstants.Paths.GetPositions,
-            BuildQuery((BitflyerConstants.QueryKeys.ProductCode, EnsureProductCode(productCode))));
+            BuildQuery((BitflyerConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetCollateral() =>
         Get(BitflyerConstants.Paths.GetCollateral, query: null);
 
     public static WireRequest GetChildOrders(
-        RawProductCode productCode,
+        string productCode,
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
@@ -106,7 +105,7 @@ internal static class BitflyerEndpoints
         long? after = null)
     {
         return Get(BitflyerConstants.Paths.GetChildOrders, BuildQuery(
-            (BitflyerConstants.QueryKeys.ProductCode, EnsureProductCode(productCode)),
+            (BitflyerConstants.QueryKeys.ProductCode, productCode),
             (BitflyerConstants.QueryKeys.ChildOrderStatusState, childOrderStatusState),
             (BitflyerConstants.QueryKeys.ChildOrderAcceptanceId, childOrderAcceptanceId),
             (BitflyerConstants.QueryKeys.ChildOrderId, childOrderId),
@@ -116,9 +115,9 @@ internal static class BitflyerEndpoints
             (BitflyerConstants.QueryKeys.After, after?.ToString())));
     }
 
-    public static WireRequest GetTradingCommission(RawProductCode productCode) =>
+    public static WireRequest GetTradingCommission(string productCode) =>
         Get(BitflyerConstants.Paths.GetTradingCommission,
-            BuildQuery((BitflyerConstants.QueryKeys.ProductCode, EnsureProductCode(productCode))));
+            BuildQuery((BitflyerConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetPermissions() =>
         Get(BitflyerConstants.Paths.GetPermissions, query: null);
@@ -127,14 +126,14 @@ internal static class BitflyerEndpoints
         Get(BitflyerConstants.Paths.GetCollateralAccounts, query: null);
 
     public static WireRequest GetParentOrders(
-        RawProductCode productCode,
+        string productCode,
         int? count = null,
         long? before = null,
         long? after = null,
         string? parentOrderStatusState = null)
     {
         return Get(BitflyerConstants.Paths.GetParentOrders, BuildQuery(
-            (BitflyerConstants.QueryKeys.ProductCode, EnsureProductCode(productCode)),
+            (BitflyerConstants.QueryKeys.ProductCode, productCode),
             (BitflyerConstants.QueryKeys.Count, count?.ToString()),
             (BitflyerConstants.QueryKeys.Before, before?.ToString()),
             (BitflyerConstants.QueryKeys.After, after?.ToString()),
@@ -143,11 +142,6 @@ internal static class BitflyerEndpoints
 
     public static WireRequest GetParentOrder(string? parentOrderId = null, string? parentOrderAcceptanceId = null)
     {
-        if (string.IsNullOrWhiteSpace(parentOrderId) && string.IsNullOrWhiteSpace(parentOrderAcceptanceId))
-        {
-            throw new ArgumentException("parentOrderId or parentOrderAcceptanceId is required.");
-        }
-
         return Get(BitflyerConstants.Paths.GetParentOrder, BuildQuery(
             (BitflyerConstants.QueryKeys.ParentOrderId, parentOrderId),
             (BitflyerConstants.QueryKeys.ParentOrderAcceptanceId, parentOrderAcceptanceId)));
@@ -247,16 +241,6 @@ internal static class BitflyerEndpoints
         }
 
         return parts.Count == 0 ? null : string.Join("&", parts);
-    }
-
-    private static string EnsureProductCode(RawProductCode productCode)
-    {
-        if (string.IsNullOrWhiteSpace(productCode.Value))
-        {
-            throw new ArgumentException("productCode is required.", nameof(productCode));
-        }
-
-        return productCode.Value;
     }
 
 }

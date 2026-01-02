@@ -20,7 +20,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void GetKlines_builds_request_with_ordered_query()
     {
-        var req = BittradeEndpoints.GetKlines("BTC/JPY", "1min", 200);
+        var req = BittradeEndpoints.GetKlines("btcjpy", "1min", 200);
 
         WireRequestAssertions.AssertWireRequest(
             req,
@@ -32,7 +32,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void GetTicker_builds_request()
     {
-        var req = BittradeEndpoints.GetTicker("BTC/JPY");
+        var req = BittradeEndpoints.GetTicker("btcjpy");
 
         WireRequestAssertions.AssertWireRequest(
             req,
@@ -46,7 +46,7 @@ public sealed class BittradeEndpointsTests
     {
         var request = new RawCreateOrderRequest(
             AccountId: "123",
-            RawSymbol: RawSymbol.From("btcjpy"),
+            RawSymbol: new RawSymbol("btcjpy"),
             Type: OrderType.BuyLimit,
             Amount: "0.1",
             Price: "3000000",

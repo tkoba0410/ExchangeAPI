@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 using ExchangeApi.Spec.Wire;
 

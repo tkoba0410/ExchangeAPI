@@ -6,7 +6,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using ExchangeApi.Core.Contracts.Errors;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.Types.RawProductCode;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 using ExchangeApi.Spec.Wire;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>

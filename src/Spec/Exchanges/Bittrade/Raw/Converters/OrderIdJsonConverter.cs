@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 

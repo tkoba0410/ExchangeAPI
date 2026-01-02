@@ -2,7 +2,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Types;
 
 [JsonConverter(typeof(RawProductCodeJsonConverter))]
 public readonly record struct RawProductCode(string Value)

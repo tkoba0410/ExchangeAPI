@@ -10,8 +10,9 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 

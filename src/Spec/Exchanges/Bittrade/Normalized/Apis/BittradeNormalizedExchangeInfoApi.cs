@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 

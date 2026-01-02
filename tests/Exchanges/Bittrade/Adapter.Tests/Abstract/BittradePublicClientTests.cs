@@ -5,9 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Core.Extensions;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;

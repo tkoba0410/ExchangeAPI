@@ -1,5 +1,5 @@
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Tests;

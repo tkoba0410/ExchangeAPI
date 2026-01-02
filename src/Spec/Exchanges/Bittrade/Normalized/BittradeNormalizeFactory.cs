@@ -2,8 +2,9 @@ using System;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 using ExchangeApi.Spec.Wire;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize;
 

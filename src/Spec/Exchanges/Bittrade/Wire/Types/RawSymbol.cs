@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Wire.Types;
 
 public readonly record struct RawSymbol(string Value)
 {

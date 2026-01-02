@@ -9,7 +9,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
 using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Spec.Wire;
 

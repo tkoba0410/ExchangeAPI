@@ -1,4 +1,6 @@
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Endpoints.Tests;
 

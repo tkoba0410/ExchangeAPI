@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 namespace ExchangeApi.Exchanges.Bittrade.Normalize;
 

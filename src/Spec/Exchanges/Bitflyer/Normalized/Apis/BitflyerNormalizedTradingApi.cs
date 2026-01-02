@@ -14,7 +14,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
 using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
 /// <summary>

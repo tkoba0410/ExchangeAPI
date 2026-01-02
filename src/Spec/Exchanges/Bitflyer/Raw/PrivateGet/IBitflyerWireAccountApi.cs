@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 

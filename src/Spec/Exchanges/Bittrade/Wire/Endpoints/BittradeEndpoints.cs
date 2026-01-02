@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;

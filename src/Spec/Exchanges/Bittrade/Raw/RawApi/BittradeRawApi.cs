@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Spec.Wire;
+using ExchangeApi.Exchanges.Bittrade.Wire.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>

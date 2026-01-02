@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 public sealed record Market(

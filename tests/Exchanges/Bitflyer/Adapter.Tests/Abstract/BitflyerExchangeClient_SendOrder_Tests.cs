@@ -7,7 +7,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.Types.RawProductCode;
 using RawChildOrderType = ExchangeApi.Exchanges.Bitflyer.Raw.ChildOrderType;
 using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using ContractSide = ExchangeApi.Common.Enums.Side;

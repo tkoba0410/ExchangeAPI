@@ -144,6 +144,19 @@ Split Candidate: なし
   * bodyJson は string で受け取り、Raw 側の SerializeOrThrow を通した JSON を受け渡す
   * query/path パラメータも string で受け取り、Wire で URL 表現へ組み立てる
 
+#### 5.1.3.2 「意味の段階」整理（Wire / Raw / Normalized / Contracts）
+
+本プロジェクトにおける「意味付け」は段階を持つ。各層の役割を次で固定する。
+
+* **Wire**：転送表現のみ（string/bytes）。意味なし。検証・正規化なし。
+* **Raw**：公式 API の鏡像＋codec。JSON 表現差を吸収する **構文意味（primitive/syntax）** のみ許可。
+* **Normalized**：単独取引所内の正規化。取引所の意味論に基づく解釈・統一（exchange semantics）。
+* **Contracts**：複数取引所横断の抽象化。横断語彙としての意味論（cross-exchange semantics）。
+
+誤用の典型：
+* Raw に注文状態の解釈や銘柄正規化など「取引所意味」を入れ始める（→ Normalized に寄せる）
+* Normalized に横断抽象（共通インターフェース都合）を入れ始める（→ Contracts に寄せる）
+
 #### 5.1.3.1 意味検証はどこで行うか
 
 * 意味検証（TryParse/OrThrow）を行う層は、以下のいずれかに固定する：

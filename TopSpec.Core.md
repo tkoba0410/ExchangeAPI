@@ -81,9 +81,13 @@
 2. **Wire は転送（transport）成立のための情報のみを扱い、値の意味（妥当性）検証や正規化に関与してはならない。**
    * Wire が扱ってよいのは method/path/query/header/body といった転送表現であり、これらは原則として string/bytes で表現される。
    * 値の意味（例：product_code の形式、symbol の正当性、ID の構文）を保証する責務は、Raw/Normalized/Adapter のいずれかに属する。
-2. **Raw は取引所公式 API の鏡像 DTO を保持するものとし、鏡像 DTO と JSON payload の相互変換（codec）責務を許可する。**
-3. **Normalized は単独取引所内での正規化 DTO を保持するものとし、取引所間の抽象化を目的としてはならない。**
-4. **Contracts は複数取引所横断の抽象化 DTO を保持するものとし、transport 情報および JSON 文字列を保持してはならない。**
+3. **Raw は取引所公式 API の鏡像 DTO を保持するものとし、鏡像 DTO と JSON payload の相互変換（codec）責務を許可する。**
+   * Raw における変換は、JSON 表現上の差（数値/文字列混在、null、日時表現等）を扱う **構文意味（syntax-level / primitive-level）** に限定される。
+   * Raw は取引所の意味論（例：注文状態の解釈、銘柄名の正規化、手数料体系の前提）を担ってはならない。
+4. **Normalized は単独取引所内での正規化 DTO を保持するものとし、当該取引所の意味論（exchange semantics）に基づく解釈・正規化を担う。**
+   * Normalized は取引所間の抽象化を目的としてはならない。
+5. **Contracts は複数取引所横断の抽象化 DTO を保持するものとし、横断的な意味論（cross-exchange semantics）を担う。**
+   * Contracts は transport 情報および JSON 文字列を保持してはならない。
 
 ---
 

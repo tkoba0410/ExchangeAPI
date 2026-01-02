@@ -134,6 +134,19 @@ Split Candidate: なし
 * 取引所 Wire も **DTO を持たない**（DTO は Raw に属する）。
 * 取引所 Wire は Raw の codec を呼び出してよい（Raw DTO ⇄ JSON 変換を利用するため）。
 
+### 5.1.2 下層は上層の名前空間を参照しない（Core §5「依存方向」）
+
+* 本プロジェクトでは、論理階層の順序に対して **依存方向を固定**する。
+  * **下層は上層を参照しない**
+  * 許可される参照は **同一層**または **下層**のみ
+* 代表例：
+  * **Wire は Raw を参照しない**（Wire は transport のみ。型（DTO/VO）を上層に求めない）
+  * Raw は Normalized/Contracts を参照しない
+  * Contracts は Domain/Composition に依存しない
+* 実装上、どうしても型が欲しくなった場合は「上層へ逃がさない」：
+  * Wire が必要とする型は Wire 自身（Wire/Common や Exchange/Wire）に定義する
+  * Raw の “鏡像 DTO” は Raw に閉じる（Wire へ漏らさない）
+
 ### 5.2 Adapter を翻訳関所とする理由
 
 * なぜ判断を Adapter に持ち込まないか
@@ -297,12 +310,19 @@ src/
 #### 15.3.1 Wire / Raw / Normalized / Adapter の境界（よくある誤解）
 
 * Wire/Raw/Normalized は **spec 層の都合**で導入してよい（Core §5）。
-  * Wire は **JSON 文字列（またはバイト列）の transport payload を運ぶだけ**であり、DTO を持たない。
-  * Raw は **鏡像 DTO と codec**（JSON payload ⇄ DTO）を担ってよい。
-  * Normalized は **単独取引所内**の正規化に限定し、取引所横断の抽象化を目的としない。
-  * Contracts は **取引所横断の抽象化 DTO**であり、transport 情報（path/header/query/json string 等）を持たない。
+* Wire は **JSON 文字列（またはバイト列）の transport payload を運ぶだけ**であり、DTO を持たない。
+* Raw は **鏡像 DTO と codec**（JSON payload ⇄ DTO）を担ってよい。
+* Normalized は **単独取引所内**の正規化に限定し、取引所横断の抽象化を目的としない。
+* Contracts は **取引所横断の抽象化 DTO**であり、transport 情報（path/header/query/json string 等）を持たない。
 * Adapter は **翻訳関所**であり、判断・事業ロジックの置き場ではない。
 * Domain は横断的ふるまいであり、「再利用フォルダ」ではない。
+
+#### 15.3.2 依存方向の運用（推奨チェック）
+
+* `using` / 参照の静的チェックで、以下を禁止する：
+  * `Spec/Wire/**` が `Spec/Exchanges/**/Raw/**` を参照
+  * `Spec/Exchanges/**/Raw/**` が `Normalized/**` や `Contracts/**` を参照
+* CI では依存方向違反を **ビルド失敗**にするのが望ましい。
 
 ### 15.4 依存方向を CI で強制する（最小セット）
 

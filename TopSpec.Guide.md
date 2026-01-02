@@ -402,6 +402,26 @@ Split Candidate: PhysicalLayout（構成例・CI・運用が増えた場合は�
 
 ## 16. 失敗の意味と責務帰属（運用視点補足）
 
+### 16.1 失敗種別と意味の段階
+
+本プロジェクトでは、失敗は「どの段階の意味が破綻したか」によって分類される。
+以下の対応表は、Wire / Raw / Normalized / Contracts における責務分離と整合する。
+
+| 失敗箇所 | 失敗内容の例 | 意味の段階 | 責務に属する層 |
+|---|---|---|---|
+| JSON Converter | 数値/文字列の不整合、必須フィールド欠落、日時形式不正 | 構文意味（syntax-level） | **Raw** |
+| Raw → Normalized Mapper | 状態値が未知、取引所仕様上あり得ない組合せ | 取引所意味（exchange semantics） | **Normalized** |
+| Normalized → Contracts Mapper | 横断語彙に対応できない、意味の縮約不能 | 横断意味（cross-exchange semantics） | **Contracts** |
+
+### 16.2 運用上の指針
+
+* **converter 失敗**は「構文意味の破綻」であり、Raw の責務として扱う。
+  * 例：`JsonException`、数値変換失敗、enum 非対応値の decode 失敗
+* **mapper 失敗**は「意味論の破綻」であり、正規化・抽象化を行う層の責務として扱う。
+  * Raw → Normalized の mapper 失敗は Normalized の責務
+  * Normalized → Contracts の mapper 失敗は Contracts の責務
+* Wire は意味を扱わないため、本節で定義する失敗分類の対象外とする（Wire は転送失敗のみを扱う）。
+
 * **Converter の失敗**は、公式 API 文書と入力データの不整合、
   もしくは取引所仕様の破壊を示す。
 * **Mapper の失敗**は、意味解釈不能または前提条件違反を示す。

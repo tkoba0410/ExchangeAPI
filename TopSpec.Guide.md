@@ -157,6 +157,37 @@ Split Candidate: なし
 * Raw に注文状態の解釈や銘柄正規化など「取引所意味」を入れ始める（→ Normalized に寄せる）
 * Normalized に横断抽象（共通インターフェース都合）を入れ始める（→ Contracts に寄せる）
 
+### 5.2 Call（呼出）結果の標準形（Core §5「Call」対応）
+
+本プロジェクトでは、各層の公開 API（Facade / Api）の標準返り値を `Call<Req, Res>` に統一する。
+
+#### 5.2.1 目的
+
+* **観測性の統一**：req/res/err が常に取得できる（デバッグ・監査・メトリクス）。
+* **失敗分類の統一**：converter/mapper 等の失敗を返り値の `err` で表現する。
+* **層境界の維持**：`Req/Res` は当該層の型のみ（下層の型を漏らさない）。
+
+#### 5.2.2 規範（迷いゼロ）
+
+1. 公開 API は **必ず** `Call<Req, Res>` を返す。
+2. `Req/Res` は **当該層の意味段階**に属する型のみを用いる。
+   * Wire：転送表現（string/bytes）
+   * Raw：鏡像 DTO / codec 入出力（構文意味）
+   * Normalized：取引所内正規化 DTO（取引所意味）
+   * Contracts：横断 DTO（抽象意味）
+3. 下層の `Call` を上層の返り値としてそのまま露出しない。
+   * 必要なら「親Call」が `meta.children` 等で参照（トレース）する。
+4. Response-only の補助関数は内部で許可するが、公開 API の正本は `Call<Req, Res>`。
+
+#### 5.2.3 最小モデル（例）
+
+* `Call` は少なくとも次を含む：
+  * `req`：要求（当該層の型）
+  * `res`：成功時の応答（当該層の型）
+  * `err`：失敗（分類可能であること）
+
+※ 実装詳細（時刻、相関ID、子Call参照、タグ等）はプロジェクトで拡張してよい。
+
 #### 5.1.3.1 意味検証はどこで行うか
 
 * 意味検証（TryParse/OrThrow）を行う層は、以下のいずれかに固定する：
@@ -423,6 +454,18 @@ Split Candidate: PhysicalLayout（構成例・CI・運用が増えた場合は�
 * Wire は意味を扱わないため、本節で定義する失敗分類の対象外とする（Wire は転送失敗のみを扱う）。
 
 ※ 失敗の意味と責務帰属に関する正本は、本節 16.1 および 16.2 に定義する対応表と指針とする。
+
+### 16.3 Call の err への割当（推奨）
+
+`Call<Req, Res>` の `err` は、本節の責務帰属と矛盾しない分類を持つことが望ましい。
+
+例（推奨分類）：
+* Wire：`Transport` / `Http`
+* Raw：`Codec`（converter/deserialize）
+* Normalized：`Mapping` または `Semantic`（Raw→Normalized）
+* Contracts：`Mapping` または `Semantic`（Normalized→Contracts）
+
+※ 分類名は実装に合わせてよいが、「converter失敗＝Raw」「mapper失敗＝Normalized/Contracts」の帰属は崩さない。
 
 これらの失敗は、同一の失敗として扱ってはならない。
 

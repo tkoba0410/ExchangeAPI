@@ -89,6 +89,15 @@
 5. **Contracts は複数取引所横断の抽象化 DTO を保持するものとし、横断的な意味論（cross-exchange semantics）を担う。**
    * Contracts は transport 情報および JSON 文字列を保持してはならない。
 
+### Call（呼出）結果の標準形
+
+1. **各層の公開 API（Facade / Api）の標準返り値は `Call<Req, Res>` とする。**
+   * `Req` と `Res` は **当該層の意味段階**に属する型のみを用いる（下層の Req/Res を漏らさない）。
+   * `Call` は `req`（要求）・`res`（応答）・`err`（失敗）を同一の枠で表現し、観測性と失敗分類を統一する。
+2. **内部実装では `Res` のみ（Response-only）を返す補助関数を持ってよいが、公開 API の返り値は `Call<Req, Res>` を正とする。**
+3. **Wire の `Req` は転送表現（method/path/query/header/bodyJson 等）であり、意味を持たない（string/bytes）。**
+4. **Raw の `err` は構文意味（codec/converter）失敗を表現できなければならない。Normalized/Contracts の `err` は意味論（mapper/解釈）失敗を表現できなければならない。**
+
 ---
 
 ## 6. 公開入口（Factory）

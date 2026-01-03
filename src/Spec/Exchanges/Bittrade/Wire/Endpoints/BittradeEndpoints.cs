@@ -13,7 +13,7 @@ internal static class BittradeEndpoints
     public static WireRequest GetOrderBook(string symbol, string? type) =>
         Get("market/depth", BuildQuery(
             ("symbol", symbol),
-            ("type", string.IsNullOrWhiteSpace(type) ? "step0" : type)));
+            ("type", type)));
 
     public static WireRequest GetTrades(string symbol) =>
         Get("market/trade", BuildQuery(

@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Spec.CallCommon;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.Types.RawProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
 {

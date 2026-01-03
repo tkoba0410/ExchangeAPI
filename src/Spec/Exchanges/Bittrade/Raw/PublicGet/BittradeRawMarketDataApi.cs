@@ -19,7 +19,7 @@ internal sealed class BittradeRawMarketDataApi : IBittradeRawMarketDataApi
         _publicApi.GetMergedTickerAsync(EnsureSymbol(symbol), cancellationToken);
 
     public Task<RawDepthResponse> GetOrderBookAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default) =>
-        _publicApi.GetDepthAsync(EnsureSymbol(symbol), type, cancellationToken);
+        _publicApi.GetDepthAsync(EnsureSymbol(symbol), NormalizeDepthType(type), cancellationToken);
 
     public Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default) =>
         _publicApi.GetTradesAsync(EnsureSymbol(symbol), cancellationToken);
@@ -33,7 +33,10 @@ internal sealed class BittradeRawMarketDataApi : IBittradeRawMarketDataApi
         RawSymbol symbol,
         string? type = null,
         CancellationToken cancellationToken = default) =>
-        _publicApi.GetDepthCallAsync(EnsureSymbol(symbol), type, cancellationToken);
+        _publicApi.GetDepthCallAsync(EnsureSymbol(symbol), NormalizeDepthType(type), cancellationToken);
+
+    private static string NormalizeDepthType(string? type) =>
+        string.IsNullOrWhiteSpace(type) ? "step0" : type;
 
     public Task<BittradeRawCall<RawTradeResponse, JsonElement>> GetTradesCallAsync(
         RawSymbol symbol,

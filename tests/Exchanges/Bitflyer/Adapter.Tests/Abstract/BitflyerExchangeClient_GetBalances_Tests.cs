@@ -7,7 +7,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.Types.RawProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Ticker;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;

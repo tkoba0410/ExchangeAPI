@@ -6,7 +6,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using ExchangeApi.Contracts.Dtos;
 using Xunit;

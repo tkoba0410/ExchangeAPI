@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Spec.CallCommon;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Wire.Types.RawProductCode;
+using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 using RawChildOrderType = ExchangeApi.Exchanges.Bitflyer.Raw.ChildOrderType;
 using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;

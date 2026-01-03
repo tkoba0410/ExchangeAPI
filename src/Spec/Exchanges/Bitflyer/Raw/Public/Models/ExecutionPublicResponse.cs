@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 public sealed class ExecutionPublicResponse

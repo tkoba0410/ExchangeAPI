@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Exchanges.Bittrade.Wire.Types;
+namespace ExchangeApi.Exchanges.Bittrade.Raw.Types;
 
 public readonly record struct RawOrderId(string Value)
 {

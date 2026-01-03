@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
-using ExchangeApi.Exchanges.Bittrade.Wire.Types;
+using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;

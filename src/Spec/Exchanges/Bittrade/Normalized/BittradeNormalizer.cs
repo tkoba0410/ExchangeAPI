@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
-using ExchangeApi.Exchanges.Bittrade.Wire.Types;
+using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize;

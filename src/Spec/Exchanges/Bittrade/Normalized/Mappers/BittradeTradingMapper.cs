@@ -6,7 +6,7 @@ using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bittrade.Wire.Types;
+using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ContractOrderType = ExchangeApi.Common.Enums.OrderType;
 using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
 using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;

@@ -8,12 +8,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 internal static class BitflyerEndpoints
 {
     public static WireRequest GetTicker(string productCode, bool useAliasPath) =>
-        Get(useAliasPath ? BitflyerRawConstants.Paths.Ticker : BitflyerRawConstants.Paths.GetTicker,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
+        Get(useAliasPath ? BitflyerConstants.Paths.Ticker : BitflyerConstants.Paths.GetTicker,
+            BuildQuery((BitflyerConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetBoard(string productCode, bool useAliasPath) =>
-        Get(useAliasPath ? BitflyerRawConstants.Paths.Board : BitflyerRawConstants.Paths.GetBoard,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
+        Get(useAliasPath ? BitflyerConstants.Paths.Board : BitflyerConstants.Paths.GetBoard,
+            BuildQuery((BitflyerConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetExecutions(
         string productCode,
@@ -22,17 +22,17 @@ internal static class BitflyerEndpoints
         long? after = null,
         bool useAliasPath = false)
     {
-        var path = useAliasPath ? BitflyerRawConstants.Paths.Executions : BitflyerRawConstants.Paths.GetExecutions;
+        var path = useAliasPath ? BitflyerConstants.Paths.Executions : BitflyerConstants.Paths.GetExecutions;
         return Get(path, BuildQuery(
-            (BitflyerRawConstants.QueryKeys.ProductCode, productCode),
-            (BitflyerRawConstants.QueryKeys.Count, count?.ToString()),
-            (BitflyerRawConstants.QueryKeys.Before, before?.ToString()),
-            (BitflyerRawConstants.QueryKeys.After, after?.ToString())));
+            (BitflyerConstants.QueryKeys.ProductCode, productCode),
+            (BitflyerConstants.QueryKeys.Count, count?.ToString()),
+            (BitflyerConstants.QueryKeys.Before, before?.ToString()),
+            (BitflyerConstants.QueryKeys.After, after?.ToString())));
     }
 
     public static WireRequest GetMarkets(string? region = null, bool useAliasPath = false)
     {
-        var path = useAliasPath ? BitflyerRawConstants.Paths.Markets : BitflyerRawConstants.Paths.GetMarkets;
+        var path = useAliasPath ? BitflyerConstants.Paths.Markets : BitflyerConstants.Paths.GetMarkets;
         if (!string.IsNullOrWhiteSpace(region))
         {
             path = $"{path}/{region}";
@@ -43,29 +43,29 @@ internal static class BitflyerEndpoints
 
     public static WireRequest GetChats(string? fromDate = null, string? region = null)
     {
-        var path = BitflyerRawConstants.Paths.GetChats;
+        var path = BitflyerConstants.Paths.GetChats;
         if (!string.IsNullOrWhiteSpace(region))
         {
             path = $"{path}/{region}";
         }
 
-        return Get(path, BuildQuery((BitflyerRawConstants.QueryKeys.FromDate, fromDate)));
+        return Get(path, BuildQuery((BitflyerConstants.QueryKeys.FromDate, fromDate)));
     }
 
     public static WireRequest GetHealth(string productCode) =>
-        Get(BitflyerRawConstants.Paths.GetHealth,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
+        Get(BitflyerConstants.Paths.GetHealth,
+            BuildQuery((BitflyerConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetBoardState(string productCode) =>
-        Get(BitflyerRawConstants.Paths.GetBoardState,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
+        Get(BitflyerConstants.Paths.GetBoardState,
+            BuildQuery((BitflyerConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetCorporateLeverage() =>
-        Get(BitflyerRawConstants.Paths.GetCorporateLeverage, query: null);
+        Get(BitflyerConstants.Paths.GetCorporateLeverage, query: null);
 
     public static WireRequest GetFundingRate(string productCode) =>
-        Get(BitflyerRawConstants.Paths.GetFundingRate,
-            BuildQuery((BitflyerRawConstants.QueryKeys.ProductCode, productCode)));
+        Get(BitflyerConstants.Paths.GetFundingRate,
+            BuildQuery((BitflyerConstants.QueryKeys.ProductCode, productCode)));
 
     public static WireRequest GetBalances() =>
         Get(BitflyerConstants.Paths.GetBalance, query: null);

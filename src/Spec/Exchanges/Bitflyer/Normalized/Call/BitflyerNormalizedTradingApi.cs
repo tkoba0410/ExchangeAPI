@@ -10,6 +10,7 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Normalize;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
@@ -17,7 +18,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 
 internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingApi
 {

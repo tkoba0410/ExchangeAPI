@@ -4,13 +4,14 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+namespace ExchangeApi.Exchanges.Bittrade.Normalize.Call;
 
 internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarketDataApi
 {

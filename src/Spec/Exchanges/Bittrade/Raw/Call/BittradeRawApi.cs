@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Spec.Wire;
 using ExchangeApi.Exchanges.Bittrade.Raw.Types;
-namespace ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Raw.Call;
 
 /// <summary>
 /// Bittrade の Raw API アクセス（Public/Private/Trading をまとめた単一入口）。

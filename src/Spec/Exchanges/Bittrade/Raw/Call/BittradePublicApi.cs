@@ -7,7 +7,7 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 using ExchangeApi.Spec.Wire;
 using ExchangeApi.Exchanges.Bittrade.Raw.Types;
-namespace ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Raw.Call;
 
 /// <summary>
 /// Bittrade Public REST API の Raw 実装。

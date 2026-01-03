@@ -2,7 +2,7 @@ using System;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Spec.Wire;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 
 /// <summary>
 /// bitFlyer の Mirror Raw API 入口。
@@ -15,7 +15,7 @@ public sealed class BitflyerRawApi : IBitflyerRawApi
     public BitflyerRawApi(IWireTransport wire)
         : this(
             new BitflyerRawMarketDataApi(wire ?? throw new ArgumentNullException(nameof(wire))),
-            new Private.BitflyerRawTradingApi(wire))
+            new BitflyerRawTradingApi(wire))
     {
     }
 

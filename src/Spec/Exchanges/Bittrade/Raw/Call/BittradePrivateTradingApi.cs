@@ -7,7 +7,7 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 using ExchangeApi.Spec.Wire;
 using ExchangeApi.Exchanges.Bittrade.Raw.Types;
-namespace ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Raw.Call;
 
 /// <summary>
 /// Bittrade Private REST API（取引系 POST）の Raw 実装。

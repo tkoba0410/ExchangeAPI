@@ -9,11 +9,12 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Spec.Wire;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 
 public sealed class BitflyerNormalizedApi
 {

@@ -9,12 +9,13 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+namespace ExchangeApi.Exchanges.Bittrade.Normalize.Call;
 
 internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingApi
 {

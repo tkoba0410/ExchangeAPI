@@ -7,20 +7,21 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 
-internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
+internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountApi
 {
     private readonly IBitflyerRawAccountApi _accountApi;
     private readonly IExchangeMarketResolver _markets;
 
-    public BitflyerNormalizedMarginApi(IBitflyerRawAccountApi accountApi, IExchangeMarketResolver markets)
+    public BitflyerNormalizedAccountApi(IBitflyerRawAccountApi accountApi, IExchangeMarketResolver markets)
     {
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
@@ -49,9 +50,7 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
         return BitflyerAccountMapper.MapAccountExecutions(symbol, raw);
     }
 
-    public async Task<IReadOnlyList<Position>> GetOpenPositionsAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default)
+    public async Task<JsonElement> GetTradingCommissionAsync(Symbol symbol, CancellationToken cancellationToken = default)
     {
         if (symbol.IsEmpty)
         {
@@ -59,14 +58,7 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
         }
 
         var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var raw = await _accountApi.GetPositionsAsync(productCode, cancellationToken).ConfigureAwait(false);
-        return BitflyerMarginMapper.MapPositions(symbol, raw);
-    }
-
-    public async Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default)
-    {
-        var raw = await _accountApi.GetCollateralAsync(cancellationToken).ConfigureAwait(false);
-        return BitflyerMarginMapper.MapCollateral(raw);
+        return await _accountApi.GetTradingCommissionAsync(productCode, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<BitflyerNormalizedCall<IReadOnlyList<Balance>, JsonElement>> GetBalancesCallAsync(
@@ -102,7 +94,7 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
             raw => BitflyerAccountMapper.MapAccountExecutions(symbol, raw));
     }
 
-    public async Task<BitflyerNormalizedCall<IReadOnlyList<Position>, JsonElement>> GetOpenPositionsCallAsync(
+    public async Task<BitflyerNormalizedCall<JsonElement, JsonElement>> GetTradingCommissionCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -112,25 +104,14 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
         }
 
         var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var rawCall = await _accountApi.GetPositionsCallAsync(productCode, cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetPositions", new Dictionary<string, string?>
+        var rawCall = await _accountApi.GetTradingCommissionCallAsync(productCode, cancellationToken).ConfigureAwait(false);
+        var request = CreateRequest("Bitflyer.GetTradingCommission", new Dictionary<string, string?>
         {
             ["symbol"] = symbol.ToString(),
             ["productCode"] = productCode.Value,
         });
 
-        return CreateCall(
-            rawCall,
-            request,
-            raw => BitflyerMarginMapper.MapPositions(symbol, raw));
-    }
-
-    public async Task<BitflyerNormalizedCall<Collateral, JsonElement>> GetCollateralCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var rawCall = await _accountApi.GetCollateralCallAsync(cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetCollateral", new Dictionary<string, string?>());
-        return CreateCall(rawCall, request, BitflyerMarginMapper.MapCollateral);
+        return CreateCall(rawCall, request, raw => raw);
     }
 
     private static BitflyerNormalizedRequest CreateRequest(

@@ -6,7 +6,7 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Domain.Services;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw;

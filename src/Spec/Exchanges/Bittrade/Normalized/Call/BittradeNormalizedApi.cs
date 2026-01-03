@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalize.Facade;
+namespace ExchangeApi.Exchanges.Bittrade.Normalize.Call;
 
 public sealed class BittradeNormalizedApi
 {

@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 using ExchangeApi.Spec.Wire;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 
 /// <summary>
 /// bitFlyer Public REST API の Mirror Raw 実装。

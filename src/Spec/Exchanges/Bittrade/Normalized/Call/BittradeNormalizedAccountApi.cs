@@ -4,39 +4,46 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+namespace ExchangeApi.Exchanges.Bittrade.Normalize.Call;
 
-internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
+internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountApi
 {
     private readonly IBittradeRawApi _raw;
+    private readonly string _accountId;
 
-    internal BittradeNormalizedExchangeInfoApi(IBittradeRawApi raw)
+    internal BittradeNormalizedAccountApi(IBittradeRawApi raw, string accountId)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
+        _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
 
-    public async Task<IReadOnlyList<BittradeSymbolNormalized>> GetSymbolsAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<BittradeBalanceEntryNormalized>> GetBalancesAsync(CancellationToken ct = default)
     {
-        var response = await _raw.GetSymbolsAsync(ct).ConfigureAwait(false);
+        var response = await _raw.GetAccountBalanceAsync(_accountId, ct).ConfigureAwait(false);
         if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Data is null)
         {
-            throw new BittradeNormalizedException("Bittrade symbols response invalid.");
+            throw new BittradeNormalizedException("Bittrade balance response invalid.");
         }
 
-        return BittradeNormalizer.NormalizeSymbols(response.Data);
+        return BittradeNormalizer.NormalizeBalances(response.Data);
     }
 
-    public async Task<BittradeNormalizedCall<IReadOnlyList<BittradeSymbolNormalized>, JsonElement>> GetSymbolsCallAsync(
+    public async Task<BittradeNormalizedCall<IReadOnlyList<BittradeBalanceEntryNormalized>, JsonElement>> GetBalancesCallAsync(
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.GetSymbolsCallAsync(ct).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetSymbols", new Dictionary<string, string?>());
+        var rawCall = await _raw.GetAccountBalanceCallAsync(_accountId, ct).ConfigureAwait(false);
+        var request = CreateRequest("Bittrade.GetAccountBalance", new Dictionary<string, string?>
+        {
+            ["accountId"] = _accountId,
+        });
+
         return CreateCall(
             rawCall,
             request,
@@ -44,10 +51,10 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase) || ok.Data is null)
                 {
-                    throw new BittradeNormalizedException("Bittrade symbols response invalid.");
+                    throw new BittradeNormalizedException("Bittrade balance response invalid.");
                 }
 
-                return BittradeNormalizer.NormalizeSymbols(ok.Data);
+                return BittradeNormalizer.NormalizeBalances(ok.Data);
             });
     }
 

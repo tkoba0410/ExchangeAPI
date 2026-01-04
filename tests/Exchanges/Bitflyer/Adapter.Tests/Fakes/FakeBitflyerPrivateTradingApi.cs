@@ -1,9 +1,8 @@
-using System.Collections.Generic;
-using System.Text.Json;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
@@ -12,15 +11,13 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
 {
     private readonly CreateChildOrderResponse _response;
     private readonly Exception? _exceptionToThrow;
-    private static readonly BitflyerRawRequest DefaultRequest =
-        new BitflyerRawRequest("test", new Dictionary<string, string?>());
 
-    public CreateChildOrderRequest? LastRequest { get; private set; }
-    public CancelChildOrderRequest? LastCancelRequest { get; private set; }
-    public CancelAllChildOrdersRequest? LastCancelAllRequest { get; private set; }
-    public CreateParentOrderRequest? LastParentOrderRequest { get; private set; }
-    public CancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
-    public CreateWithdrawalRequest? LastWithdrawRequest { get; private set; }
+    public RawRequests.CreateChildOrderRequest? LastRequest { get; private set; }
+    public RawRequests.CancelChildOrderRequest? LastCancelRequest { get; private set; }
+    public RawRequests.CancelAllChildOrdersRequest? LastCancelAllRequest { get; private set; }
+    public RawRequests.CreateParentOrderRequest? LastParentOrderRequest { get; private set; }
+    public RawRequests.CancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
+    public RawRequests.CreateWithdrawalRequest? LastWithdrawRequest { get; private set; }
 
     public FakeBitflyerPrivateTradingApi(
         CreateChildOrderResponse response,
@@ -30,123 +27,92 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task<CreateChildOrderResponse> CreateChildOrderAsync(CreateChildOrderRequest request, CancellationToken cancellationToken = default)
-    {
-        if (_exceptionToThrow is not null)
-        {
-            throw _exceptionToThrow;
-        }
-
-        LastRequest = request;
-        return Task.FromResult(_response);
-    }
-
-    public Task<EmptyResponse> CancelChildOrderAsync(CancelChildOrderRequest request, CancellationToken cancellationToken = default)
-    {
-        LastCancelRequest = request;
-        return Task.FromResult(new EmptyResponse());
-    }
-
-    public Task<EmptyResponse> CancelAllChildOrdersAsync(CancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)
-    {
-        LastCancelAllRequest = request;
-        return Task.FromResult(new EmptyResponse());
-    }
-
-    public Task<CreateParentOrderResponse> CreateParentOrderAsync(CreateParentOrderRequest request, CancellationToken cancellationToken = default)
-    {
-        LastParentOrderRequest = request;
-        return Task.FromResult(new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT" });
-    }
-
-    public Task<EmptyResponse> CancelParentOrderAsync(CancelParentOrderRequest request, CancellationToken cancellationToken = default)
-    {
-        LastCancelParentOrderRequest = request;
-        return Task.FromResult(new EmptyResponse());
-    }
-
-    public Task<CreateWithdrawalResponse> CreateWithdrawalAsync(CreateWithdrawalRequest request, CancellationToken cancellationToken = default)
-    {
-        LastWithdrawRequest = request;
-        return Task.FromResult(new CreateWithdrawalResponse { MessageId = "WITHDRAW" });
-    }
-
-    public Task<BitflyerRawCall<CreateChildOrderResponse, JsonElement>> CreateChildOrderCallAsync(
-        CreateChildOrderRequest request,
+    public Task<Call<RawRequests.CreateChildOrderRequest, CreateChildOrderResponse>> CreateChildOrderAsync(
+        RawRequests.CreateChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastRequest = request;
-        return Task.FromResult(MakeCall(_response));
+        return Task.FromResult(MakeCall(request, _response));
     }
 
-    public Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelChildOrderCallAsync(
-        CancelChildOrderRequest request,
+    public Task<Call<RawRequests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
+        RawRequests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastCancelRequest = request;
-        return Task.FromResult(MakeCall(new EmptyResponse()));
+        return Task.FromResult(MakeCall(request, new EmptyResponse()));
     }
 
-    public Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelAllChildOrdersCallAsync(
-        CancelAllChildOrdersRequest request,
+    public Task<Call<RawRequests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersAsync(
+        RawRequests.CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
         LastCancelAllRequest = request;
-        return Task.FromResult(MakeCall(new EmptyResponse()));
+        return Task.FromResult(MakeCall(request, new EmptyResponse()));
     }
 
-    public Task<BitflyerRawCall<CreateParentOrderResponse, JsonElement>> CreateParentOrderCallAsync(
-        CreateParentOrderRequest request,
+    public Task<Call<RawRequests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
+        RawRequests.CreateParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastParentOrderRequest = request;
-        return Task.FromResult(MakeCall(new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT" }));
+        return Task.FromResult(MakeCall(request, new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT" }));
     }
 
-    public Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelParentOrderCallAsync(
-        CancelParentOrderRequest request,
+    public Task<Call<RawRequests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
+        RawRequests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastCancelParentOrderRequest = request;
-        return Task.FromResult(MakeCall(new EmptyResponse()));
+        return Task.FromResult(MakeCall(request, new EmptyResponse()));
     }
 
-    public Task<BitflyerRawCall<CreateWithdrawalResponse, JsonElement>> CreateWithdrawalCallAsync(
-        CreateWithdrawalRequest request,
+    public Task<Call<RawRequests.CreateWithdrawalRequest, CreateWithdrawalResponse>> CreateWithdrawalAsync(
+        RawRequests.CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default)
     {
         LastWithdrawRequest = request;
-        return Task.FromResult(MakeCall(new CreateWithdrawalResponse { MessageId = "WITHDRAW" }));
+        return Task.FromResult(MakeCall(request, new CreateWithdrawalResponse { MessageId = "WITHDRAW" }));
     }
 
-    private BitflyerRawCall<TResponse, JsonElement> MakeCall<TResponse>(TResponse response)
+    private Call<TReq, TResponse> MakeCall<TReq, TResponse>(TReq request, TResponse response)
     {
+        var meta = new CallMeta(
+            Layer: "Raw",
+            Component: "FakeBitflyerPrivateTradingApi",
+            Tags: null,
+            Children: null);
+
         if (_exceptionToThrow is null)
         {
-            return MakeOkCall(response);
+            return new Call<TReq, TResponse>(
+                Id: CallId.New(),
+                StartedAt: DateTimeOffset.UtcNow,
+                Duration: TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<TResponse>.Ok(response),
+                Meta: meta);
         }
 
         if (_exceptionToThrow is ExchangeApi.Core.Contracts.Errors.ExchangeApiException ex)
         {
-            return MakeErrCall<TResponse>(ex);
+            var statusCode = ex.StatusCode.HasValue ? (int)ex.StatusCode.Value : (int?)null;
+            var error = new CallError(CallErrorKind.Http, ex.Message, ex, statusCode);
+            return new Call<TReq, TResponse>(
+                Id: CallId.New(),
+                StartedAt: DateTimeOffset.UtcNow,
+                Duration: TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<TResponse>.Err(error),
+                Meta: meta);
         }
 
-        return MakeErrCall<TResponse>(new ExchangeApi.Core.Contracts.Errors.ExchangeApiException(_exceptionToThrow.Message));
-    }
-
-    private static BitflyerRawCall<TResponse, JsonElement> MakeOkCall<TResponse>(TResponse response) =>
-        new(
-            DefaultRequest,
-            new Ok<TResponse, JsonElement>(response, 200),
-            new CallMeta(System.DateTimeOffset.UtcNow, System.TimeSpan.Zero, null));
-
-    private static BitflyerRawCall<TResponse, JsonElement> MakeErrCall<TResponse>(ExchangeApi.Core.Contracts.Errors.ExchangeApiException ex)
-    {
-        var statusCode = ex.StatusCode.HasValue ? (int)ex.StatusCode.Value : 400;
-        var error = JsonDocument.Parse("{}").RootElement;
-        return new BitflyerRawCall<TResponse, JsonElement>(
-            DefaultRequest,
-            new Err<TResponse, JsonElement>(error, statusCode),
-            new CallMeta(System.DateTimeOffset.UtcNow, System.TimeSpan.Zero, null));
+        return new Call<TReq, TResponse>(
+            Id: CallId.New(),
+            StartedAt: DateTimeOffset.UtcNow,
+            Duration: TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<TResponse>.Err(new CallError(CallErrorKind.Unknown, _exceptionToThrow.Message, _exceptionToThrow)),
+            Meta: meta);
     }
 }

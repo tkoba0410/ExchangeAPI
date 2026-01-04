@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
@@ -16,7 +15,6 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Spec.CallCommon;
-using System.Text.Json;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
 
 /// <summary>
@@ -94,7 +92,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
             .ConfigureAwait(false);
     }
 
-    public async Task<ApiCall<PlaceLimitOrderRequest, OrderResult, ApiError>> PlaceLimitOrderCallAsync(
+    public async Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         Symbol symbol,
         ContractSide side,
         Size size,
@@ -109,29 +107,19 @@ internal sealed class BitflyerTradingApi : ITradingApi
             var call = await _tradingApi
                 .PlaceOrderCallAsync(OrderRequest.Limit(symbol, side, size, price), cancellationToken)
                 .ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<OrderResult, JsonElement> ok => ApiCallMapper.Ok(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    ok.Value),
-                Err<OrderResult, JsonElement> err => ApiCallMapper.Err<PlaceLimitOrderRequest, OrderResult>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.PlaceOrder);
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<PlaceLimitOrderRequest, OrderResult>(_exchange, request, startedAt, ex);
+            return ApiCallMapper.FromException<PlaceLimitOrderRequest, OrderResult>(
+                request,
+                startedAt,
+                BitflyerOperations.Trading.PlaceOrder,
+                ex);
         }
     }
 
-    public async Task<ApiCall<PlaceMarketOrderRequest, OrderResult, ApiError>> PlaceMarketOrderCallAsync(
+    public async Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(
         Symbol symbol,
         ContractSide side,
         Size size,
@@ -145,29 +133,19 @@ internal sealed class BitflyerTradingApi : ITradingApi
             var call = await _tradingApi
                 .PlaceOrderCallAsync(OrderRequest.Market(symbol, side, size), cancellationToken)
                 .ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<OrderResult, JsonElement> ok => ApiCallMapper.Ok(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    ok.Value),
-                Err<OrderResult, JsonElement> err => ApiCallMapper.Err<PlaceMarketOrderRequest, OrderResult>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.PlaceOrder);
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<PlaceMarketOrderRequest, OrderResult>(_exchange, request, startedAt, ex);
+            return ApiCallMapper.FromException<PlaceMarketOrderRequest, OrderResult>(
+                request,
+                startedAt,
+                BitflyerOperations.Trading.PlaceOrder,
+                ex);
         }
     }
 
-    public Task<ApiCall<PlaceStopOrderRequest, OrderResult, ApiError>> PlaceStopOrderCallAsync(
+    public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
         Symbol symbol,
         ContractSide side,
         Size size,
@@ -175,16 +153,23 @@ internal sealed class BitflyerTradingApi : ITradingApi
         CancellationToken cancellationToken = default)
     {
         var request = new PlaceStopOrderRequest(symbol, side, size, triggerPrice);
-        var meta = ApiCallMapper.ToMeta(DateTimeOffset.UtcNow);
-        return Task.FromResult(ApiCallMapper.Err<PlaceStopOrderRequest, OrderResult>(
-            _exchange,
-            request,
-            meta,
-            0,
-            "Feature not supported."));
+        var now = DateTimeOffset.UtcNow;
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: BitflyerOperations.Trading.PlaceOrder,
+            Tags: null,
+            Children: null);
+        var call = new Call<PlaceStopOrderRequest, OrderResult>(
+            Id: CallId.New(),
+            StartedAt: now,
+            Duration: TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<OrderResult>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
+            Meta: meta);
+        return Task.FromResult(call);
     }
 
-    public async Task<ApiCall<CancelOrderRequest, CancelResult, ApiError>> CancelOrderCallAsync(
+    public async Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
@@ -195,29 +180,19 @@ internal sealed class BitflyerTradingApi : ITradingApi
         try
         {
             var call = await _tradingApi.CancelOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<CancelResult, JsonElement> ok => ApiCallMapper.Ok(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    ok.Value),
-                Err<CancelResult, JsonElement> err => ApiCallMapper.Err<CancelOrderRequest, CancelResult>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.CancelOrder);
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<CancelOrderRequest, CancelResult>(_exchange, request, startedAt, ex);
+            return ApiCallMapper.FromException<CancelOrderRequest, CancelResult>(
+                request,
+                startedAt,
+                BitflyerOperations.Trading.CancelOrder,
+                ex);
         }
     }
 
-    public async Task<ApiCall<GetOrdersRequest, IReadOnlyList<OpenOrder>, ApiError>> GetOrdersCallAsync(
+    public async Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -227,33 +202,19 @@ internal sealed class BitflyerTradingApi : ITradingApi
         try
         {
             var call = await _tradingApi.GetOpenOrdersCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<IReadOnlyList<OpenOrder>, JsonElement> ok => ApiCallMapper.Ok(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    ok.Value),
-                Err<IReadOnlyList<OpenOrder>, JsonElement> err => ApiCallMapper.Err<GetOrdersRequest, IReadOnlyList<OpenOrder>>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.GetOpenOrders);
         }
         catch (Exception ex)
         {
             return ApiCallMapper.FromException<GetOrdersRequest, IReadOnlyList<OpenOrder>>(
-                _exchange,
                 request,
                 startedAt,
+                BitflyerOperations.Trading.GetOpenOrders,
                 ex);
         }
     }
 
-    public async Task<ApiCall<GetOrderRequest, OrderStatus, ApiError>> GetOrderCallAsync(
+    public async Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
@@ -264,43 +225,37 @@ internal sealed class BitflyerTradingApi : ITradingApi
         try
         {
             var call = await _tradingApi.GetOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<OrderStatus, JsonElement> ok => ApiCallMapper.Ok(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    ok.Value),
-                Err<OrderStatus, JsonElement> err => ApiCallMapper.Err<GetOrderRequest, OrderStatus>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.GetOrder);
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetOrderRequest, OrderStatus>(_exchange, request, startedAt, ex);
+            return ApiCallMapper.FromException<GetOrderRequest, OrderStatus>(
+                request,
+                startedAt,
+                BitflyerOperations.Trading.GetOrder,
+                ex);
         }
     }
 
     private static async Task<TOk> UnwrapAsync<TReq, TOk>(
-        Task<ApiCall<TReq, TOk, ApiError>> callTask,
+        Task<Call<TReq, TOk>> callTask,
         string operation)
     {
         var call = await callTask.ConfigureAwait(false);
         return call.Result switch
         {
-            ApiOk<TOk, ApiError> ok => ok.Value,
-            ApiErr<TOk, ApiError> err => throw new ExchangeApiException(
+            CallResult<TOk>.Ok ok => ok.Response,
+            CallResult<TOk>.Err err => throw new ExchangeApiException(
                 message: err.Error.Message,
-                exchange: call.Exchange,
+                exchange: ExchangeCode.Bitflyer,
                 operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.StatusCode),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error.Kind)),
-            _ => throw new InvalidOperationException("Unsupported ApiCallResult type.")
+                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
+            _ => throw new ExchangeApiException(
+                message: "Unknown call result.",
+                exchange: ExchangeCode.Bitflyer,
+                operation: operation,
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
         };
     }
 

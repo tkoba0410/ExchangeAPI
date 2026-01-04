@@ -7,6 +7,8 @@ using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Call;
 
@@ -54,7 +56,7 @@ public sealed class BittradeNormalizedMarketDataFacade
     public Task<BittradeTickerNormalized> GetTickerAsync(string symbol, CancellationToken ct = default) =>
         _inner.GetTickerAsync(symbol, ct);
 
-    public Task<BittradeNormalizedCall<BittradeTickerNormalized, JsonElement>> GetTickerCallAsync(
+    public Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
         string symbol,
         CancellationToken ct = default) =>
         _inner.GetTickerCallAsync(symbol, ct);
@@ -62,7 +64,7 @@ public sealed class BittradeNormalizedMarketDataFacade
     public Task<BittradeOrderBookNormalized> GetOrderBookAsync(string symbol, CancellationToken ct = default) =>
         _inner.GetOrderBookAsync(symbol, ct);
 
-    public Task<BittradeNormalizedCall<BittradeOrderBookNormalized, JsonElement>> GetOrderBookCallAsync(
+    public Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
         string symbol,
         CancellationToken ct = default) =>
         _inner.GetOrderBookCallAsync(symbol, ct);
@@ -72,7 +74,7 @@ public sealed class BittradeNormalizedMarketDataFacade
         CancellationToken ct = default) =>
         _inner.GetExecutionsAsync(symbol, ct);
 
-    public Task<BittradeNormalizedCall<IReadOnlyList<BittradeExecutionNormalized>, JsonElement>> GetExecutionsCallAsync(
+    public Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
         string symbol,
         CancellationToken ct = default) =>
         _inner.GetExecutionsCallAsync(symbol, ct);
@@ -90,7 +92,7 @@ public sealed class BittradeNormalizedExchangeInfoFacade
     public Task<IReadOnlyList<BittradeSymbolNormalized>> GetSymbolsAsync(CancellationToken ct = default) =>
         _inner.GetSymbolsAsync(ct);
 
-    public Task<BittradeNormalizedCall<IReadOnlyList<BittradeSymbolNormalized>, JsonElement>> GetSymbolsCallAsync(
+    public Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
         CancellationToken ct = default) =>
         _inner.GetSymbolsCallAsync(ct);
 }
@@ -107,7 +109,7 @@ public sealed class BittradeNormalizedAccountFacade
     public Task<IReadOnlyList<BittradeBalanceEntryNormalized>> GetBalancesAsync(CancellationToken ct = default) =>
         _inner.GetBalancesAsync(ct);
 
-    public Task<BittradeNormalizedCall<IReadOnlyList<BittradeBalanceEntryNormalized>, JsonElement>> GetBalancesCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetBalancesCallAsync(
         CancellationToken ct = default) =>
         _inner.GetBalancesCallAsync(ct);
 }

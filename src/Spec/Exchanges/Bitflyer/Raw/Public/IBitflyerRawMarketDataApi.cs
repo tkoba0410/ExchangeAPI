@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
@@ -11,88 +11,39 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 /// </summary>
 public interface IBitflyerRawMarketDataApi
 {
-    Task<Ticker> GetTickerAsync(
-        RawProductCode productCode,
-        bool useAliasPath = false,
+    Task<Call<GetTickerRequest, Ticker>> GetTickerAsync(
+        GetTickerRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<Ticker, JsonElement>> GetTickerCallAsync(
-        RawProductCode productCode,
-        bool useAliasPath = false,
+    Task<Call<GetBoardRequest, Board>> GetBoardAsync(
+        GetBoardRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Board> GetBoardAsync(
-        RawProductCode productCode,
-        bool useAliasPath = false,
+    Task<Call<GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsAsync(
+        GetExecutionsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<Board, JsonElement>> GetBoardCallAsync(
-        RawProductCode productCode,
-        bool useAliasPath = false,
+    Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsAsync(
+        GetMarketsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsAsync(
-        RawProductCode productCode,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        bool useAliasPath = false,
+    Task<Call<GetChatsRequest, IReadOnlyList<Chat>>> GetChatsAsync(
+        GetChatsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<IReadOnlyList<ExecutionPublicResponse>, JsonElement>> GetExecutionsCallAsync(
-        RawProductCode productCode,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        bool useAliasPath = false,
+    Task<Call<GetHealthRequest, HealthResponse>> GetHealthAsync(
+        GetHealthRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<Market>> GetMarketsAsync(
-        string? region = null,
-        bool useAliasPath = false,
+    Task<Call<GetBoardStateRequest, BoardStateResponse>> GetBoardStateAsync(
+        GetBoardStateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<IReadOnlyList<Market>, JsonElement>> GetMarketsCallAsync(
-        string? region = null,
-        bool useAliasPath = false,
+    Task<Call<GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageAsync(
+        GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<Chat>> GetChatsAsync(
-        string? fromDate = null,
-        string? region = null,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<IReadOnlyList<Chat>, JsonElement>> GetChatsCallAsync(
-        string? fromDate = null,
-        string? region = null,
-        CancellationToken cancellationToken = default);
-
-    Task<HealthResponse> GetHealthAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<HealthResponse, JsonElement>> GetHealthCallAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default);
-
-    Task<BoardStateResponse> GetBoardStateAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<BoardStateResponse, JsonElement>> GetBoardStateCallAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default);
-
-    Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<CorporateLeverageResponse, JsonElement>> GetCorporateLeverageCallAsync(
-        CancellationToken cancellationToken = default);
-
-    Task<FundingRateResponse> GetFundingRateAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<FundingRateResponse, JsonElement>> GetFundingRateCallAsync(
-        RawProductCode productCode,
+    Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateAsync(
+        GetFundingRateRequest request,
         CancellationToken cancellationToken = default);
 }

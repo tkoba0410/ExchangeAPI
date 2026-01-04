@@ -4,12 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Spec.CallCommon;
 using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.ExchangeInfo;
 
@@ -58,7 +58,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
         return Task.FromResult(info);
     }
 
-    public async Task<ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>> GetExchangeInfoCallAsync(
+    public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetExchangeInfoRequest();
@@ -67,19 +67,25 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
         try
         {
             var info = await GetExchangeInfoAsync(cancellationToken).ConfigureAwait(false);
-            var meta = ApiCallMapper.ToMeta(startedAt);
-            return new ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>(
-                ExchangeCode.Bitflyer,
-                request,
-                meta,
-                new ApiOk<ExchangeInfoDto, ApiError>(info, 200));
+            var meta = new CallMeta(
+                Layer: "Contracts",
+                Component: BitflyerOperations.ExchangeInfo.GetExchangeInfo,
+                Tags: null,
+                Children: null);
+            return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+                Id: CallId.New(),
+                StartedAt: startedAt,
+                Duration: DateTimeOffset.UtcNow - startedAt,
+                Request: request,
+                Result: new CallResult<ExchangeInfoDto>.Ok(info),
+                Meta: meta);
         }
         catch (Exception ex)
         {
             return ApiCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(
-                ExchangeCode.Bitflyer,
                 request,
                 startedAt,
+                BitflyerOperations.ExchangeInfo.GetExchangeInfo,
                 ex);
         }
     }

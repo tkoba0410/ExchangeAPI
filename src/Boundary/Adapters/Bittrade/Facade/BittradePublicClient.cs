@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Boundary.Adapters.Common.NotSupported;
@@ -15,6 +14,7 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Spec.CallCommon;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
@@ -86,22 +86,22 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
 
-    public Task<ApiCall<GetTickerRequest, Ticker, ApiError>> GetTickerCallAsync(
+    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerCallAsync(symbol, cancellationToken);
 
-    public Task<ApiCall<GetOrderBookRequest, OrderBook, ApiError>> GetOrderBookCallAsync(
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetOrderBookCallAsync(symbol, cancellationToken);
 
-    public Task<ApiCall<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>, ApiError>> GetMarketExecutionsCallAsync(
+    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
 
-    public Task<ApiCall<GetExchangeInfoRequest, ExchangeInfo, ApiError>> GetExchangeInfoCallAsync(
+    public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 

@@ -1,15 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Spec.CallCommon;
+using RawRequests = ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Call;
 
@@ -26,27 +30,22 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
 
     public async Task<IReadOnlyList<BittradeBalanceEntryNormalized>> GetBalancesAsync(CancellationToken ct = default)
     {
-        var response = await _raw.GetAccountBalanceAsync(_accountId, ct).ConfigureAwait(false);
-        if (!string.Equals(response.Status, "ok", StringComparison.OrdinalIgnoreCase) || response.Data is null)
-        {
-            throw new BittradeNormalizedException("Bittrade balance response invalid.");
-        }
-
-        return BittradeNormalizer.NormalizeBalances(response.Data);
+        var call = await GetBalancesCallAsync(ct).ConfigureAwait(false);
+        return Unwrap(call, "Bittrade.GetAccountBalance");
     }
 
-    public async Task<BittradeNormalizedCall<IReadOnlyList<BittradeBalanceEntryNormalized>, JsonElement>> GetBalancesCallAsync(
+    public async Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetBalancesCallAsync(
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.GetAccountBalanceCallAsync(_accountId, ct).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetAccountBalance", new Dictionary<string, string?>
-        {
-            ["accountId"] = _accountId,
-        });
+        var rawCall = await _raw
+            .GetAccountBalanceAsync(new RawRequests.GetAccountBalanceRequest(_accountId), ct)
+            .ConfigureAwait(false);
+        var request = new GetBalancesRequest(_accountId);
 
         return CreateCall(
             rawCall,
             request,
+            "Bittrade.GetAccountBalance",
             ok =>
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase) || ok.Data is null)
@@ -58,26 +57,81 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
             });
     }
 
-    private static BittradeNormalizedRequest CreateRequest(
-        string operation,
-        IReadOnlyDictionary<string, string?> parameters) =>
-        new(operation, parameters);
-
-    private static BittradeNormalizedCall<TOk, JsonElement> CreateCall<TRaw, TOk>(
-        BittradeRawCall<TRaw, JsonElement> rawCall,
-        BittradeNormalizedRequest request,
+    private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
         Func<TRaw, TOk> mapper)
     {
+        var meta = new CallMeta(
+            Layer: "Normalized",
+            Component: component,
+            Tags: null,
+            Children: new[] { rawCall.Id });
+
         return rawCall.Result switch
         {
-            Ok<TRaw, JsonElement> ok => new BittradeNormalizedCall<TOk, JsonElement>(
-                request,
-                new Ok<TOk, JsonElement>(mapper(ok.Value), ok.StatusCode),
-                rawCall.Meta),
-            Err<TRaw, JsonElement> err => new BittradeNormalizedCall<TOk, JsonElement>(
-                request,
-                new Err<TOk, JsonElement>(err.Error, err.StatusCode),
-                rawCall.Meta),
+            CallResult<TRaw>.Err err => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(err.Error),
+                Meta: meta),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper, meta),
+            _ => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
+                Meta: meta)
+        };
+    }
+
+    private static Call<TReq, TOk> MapOk<TRawReq, TReq, TRaw, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
+        TRaw raw,
+        Func<TRaw, TOk> mapper,
+        CallMeta meta)
+    {
+        try
+        {
+            var mapped = mapper(raw);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Ok(mapped),
+                Meta: meta);
+        }
+        catch (Exception ex)
+        {
+            var error = new CallError(CallErrorKind.Mapping, $"{component} failed to map normalized response.", ex);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(error),
+                Meta: meta);
+        }
+    }
+
+    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
+    {
+        return call.Result switch
+        {
+            CallResult<TRes>.Ok ok => ok.Response,
+            CallResult<TRes>.Err err => throw new ExchangeApiException(
+                message: err.Error.Message,
+                exchange: ExchangeCode.Bittrade,
+                operation: operation,
+                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
+                innerException: err.Error.Exception),
             _ => throw new InvalidOperationException("Unsupported CallResult type.")
         };
     }

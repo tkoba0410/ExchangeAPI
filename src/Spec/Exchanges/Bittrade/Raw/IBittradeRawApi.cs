@@ -1,7 +1,8 @@
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
@@ -10,14 +11,15 @@ public interface IBittradeRawApi
     IBittradeRawMarketDataApi MarketData { get; }
     IBittradeRawTradingApi Trading { get; }
 
-    Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default);
-
-    Task<RawBalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default);
-
-    Task<BittradeRawCall<RawSymbolsResponse, JsonElement>> GetSymbolsCallAsync(
+    Task<Call<GetRawSymbolsRequest, RawSymbolsResponse>> GetSymbolsAsync(
+        GetRawSymbolsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawBalancesResponse, JsonElement>> GetAccountBalanceCallAsync(
-        string accountId,
+    Task<Call<GetRawTimestampRequest, RawTimestampResponse>> GetTimestampAsync(
+        GetRawTimestampRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountBalanceAsync(
+        GetAccountBalanceRequest request,
         CancellationToken cancellationToken = default);
 }

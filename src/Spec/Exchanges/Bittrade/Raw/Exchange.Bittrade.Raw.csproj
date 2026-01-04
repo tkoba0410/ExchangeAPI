@@ -12,16 +12,15 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Core.csproj" />
     <ProjectReference Include="..\..\..\..\Domain\Common\Common\Shared.Common.csproj" />
+    <ProjectReference Include="..\..\..\CallCommon\Spec.CallCommon.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Wire\**\*.cs" />
     <Compile Include="..\..\..\Wire\Common\WireResponse.cs" />
-    <Compile Include="..\..\..\Wire\Common\WireRequest.cs" />
-    <Compile Include="..\..\..\Wire\Common\WireCall.cs" />
+    <Compile Include="..\..\..\Wire\Common\WireCallSpec.cs" />
     <Compile Include="..\..\..\Wire\Common\IWireTransport.cs" />
     <Compile Include="..\..\..\Wire\Common\WireTransport.cs" />
-    <Compile Include="..\..\..\CallCommon\**\*.cs" />
   </ItemGroup>
 
 </Project>

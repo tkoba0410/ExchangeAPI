@@ -1,18 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Normalize;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Spec.Wire;
+using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 
@@ -54,46 +59,40 @@ public sealed class BitflyerNormalizedMarketDataFacade
         string productCode,
         CancellationToken ct = default)
     {
-        var raw = await _raw.GetTickerAsync(new RawProductCode(productCode), cancellationToken: ct)
-            .ConfigureAwait(false);
-        return BitflyerTickerNormalizer.Normalize(raw);
+        var call = await GetTickerCallAsync(productCode, ct).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetTicker");
     }
 
-    public async Task<BitflyerNormalizedCall<BitflyerTickerNormalized, JsonElement>> GetTickerCallAsync(
+    public async Task<Call<GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.GetTickerCallAsync(new RawProductCode(productCode), cancellationToken: ct)
+        var rawCall = await _raw
+            .GetTickerAsync(new RawRequests.GetTickerRequest(new RawProductCode(productCode)), ct)
             .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetTicker", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode,
-        });
+        var request = new GetTickerRequest(productCode);
 
-        return CreateCall(rawCall, request, BitflyerTickerNormalizer.Normalize);
+        return CreateCall(rawCall, request, "Bitflyer.GetTicker", BitflyerTickerNormalizer.Normalize);
     }
 
     public async Task<BitflyerOrderBookNormalized> GetOrderBookAsync(
         string productCode,
         CancellationToken ct = default)
     {
-        var raw = await _raw.GetBoardAsync(new RawProductCode(productCode), cancellationToken: ct)
-            .ConfigureAwait(false);
-        return BitflyerOrderBookNormalizer.Normalize(raw);
+        var call = await GetOrderBookCallAsync(productCode, ct).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetBoard");
     }
 
-    public async Task<BitflyerNormalizedCall<BitflyerOrderBookNormalized, JsonElement>> GetOrderBookCallAsync(
+    public async Task<Call<GetOrderBookRequest, BitflyerOrderBookNormalized>> GetOrderBookCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.GetBoardCallAsync(new RawProductCode(productCode), cancellationToken: ct)
+        var rawCall = await _raw
+            .GetBoardAsync(new RawRequests.GetBoardRequest(new RawProductCode(productCode)), ct)
             .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetBoard", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode,
-        });
+        var request = new GetOrderBookRequest(productCode);
 
-        return CreateCall(rawCall, request, BitflyerOrderBookNormalizer.Normalize);
+        return CreateCall(rawCall, request, "Bitflyer.GetBoard", BitflyerOrderBookNormalizer.Normalize);
     }
 
     public async Task<IReadOnlyList<BitflyerExecutionNormalized>> GetExecutionsAsync(
@@ -103,91 +102,69 @@ public sealed class BitflyerNormalizedMarketDataFacade
         long? after = null,
         CancellationToken ct = default)
     {
-        var raw = await _raw.GetExecutionsAsync(
-                new RawProductCode(productCode),
-                count,
-                before,
-                after,
-                cancellationToken: ct)
-            .ConfigureAwait(false);
-
-        return raw.Select(BitflyerExecutionNormalizer.Normalize).ToArray();
+        var call = await GetExecutionsCallAsync(productCode, count, before, after, ct).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetExecutions");
     }
 
-    public async Task<BitflyerNormalizedCall<IReadOnlyList<BitflyerExecutionNormalized>, JsonElement>> GetExecutionsCallAsync(
+    public async Task<Call<GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsCallAsync(
         string productCode,
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.GetExecutionsCallAsync(
-                new RawProductCode(productCode),
-                count,
-                before,
-                after,
-                cancellationToken: ct)
+        var rawCall = await _raw
+            .GetExecutionsAsync(new RawRequests.GetExecutionsRequest(new RawProductCode(productCode), count, before, after), ct)
             .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetExecutions", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-        });
+        var request = new GetExecutionsRequest(productCode, count, before, after);
 
         return CreateCall(
             rawCall,
             request,
-            raw =>
-            {
-                IReadOnlyList<BitflyerExecutionNormalized> mapped = raw
-                    .Select(BitflyerExecutionNormalizer.Normalize)
-                    .ToArray();
-                return mapped;
-            });
+            "Bitflyer.GetExecutions",
+            raw => (IReadOnlyList<BitflyerExecutionNormalized>)raw
+                .Select(BitflyerExecutionNormalizer.Normalize)
+                .ToArray());
     }
 
     public async Task<BitflyerHealthNormalized> GetHealthAsync(
         string productCode,
         CancellationToken ct = default)
     {
-        var raw = await _raw.GetHealthAsync(new RawProductCode(productCode), ct).ConfigureAwait(false);
-        return BitflyerHealthNormalizer.Normalize(raw);
+        var call = await GetHealthCallAsync(productCode, ct).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetHealth");
     }
 
-    public async Task<BitflyerNormalizedCall<BitflyerHealthNormalized, JsonElement>> GetHealthCallAsync(
+    public async Task<Call<GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.GetHealthCallAsync(new RawProductCode(productCode), ct).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetHealth", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode,
-        });
+        var rawCall = await _raw
+            .GetHealthAsync(new RawRequests.GetHealthRequest(new RawProductCode(productCode)), ct)
+            .ConfigureAwait(false);
+        var request = new GetHealthRequest(productCode);
 
-        return CreateCall(rawCall, request, BitflyerHealthNormalizer.Normalize);
+        return CreateCall(rawCall, request, "Bitflyer.GetHealth", BitflyerHealthNormalizer.Normalize);
     }
 
     public async Task<BitflyerBoardStateNormalized> GetBoardStateAsync(
         string productCode,
         CancellationToken ct = default)
     {
-        var raw = await _raw.GetBoardStateAsync(new RawProductCode(productCode), ct).ConfigureAwait(false);
-        return BitflyerBoardStateNormalizer.Normalize(raw);
+        var call = await GetBoardStateCallAsync(productCode, ct).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetBoardState");
     }
 
-    public async Task<BitflyerNormalizedCall<BitflyerBoardStateNormalized, JsonElement>> GetBoardStateCallAsync(
+    public async Task<Call<GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.GetBoardStateCallAsync(new RawProductCode(productCode), ct).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetBoardState", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode,
-        });
+        var rawCall = await _raw
+            .GetBoardStateAsync(new RawRequests.GetBoardStateRequest(new RawProductCode(productCode)), ct)
+            .ConfigureAwait(false);
+        var request = new GetBoardStateRequest(productCode);
 
-        return CreateCall(rawCall, request, BitflyerBoardStateNormalizer.Normalize);
+        return CreateCall(rawCall, request, "Bitflyer.GetBoardState", BitflyerBoardStateNormalizer.Normalize);
     }
 
     public async Task<IReadOnlyList<BitflyerChatNormalized>> GetChatsAsync(
@@ -195,54 +172,104 @@ public sealed class BitflyerNormalizedMarketDataFacade
         string? region = null,
         CancellationToken ct = default)
     {
-        var raw = await _raw.GetChatsAsync(fromDate, region, ct).ConfigureAwait(false);
-        return raw.Select(BitflyerChatNormalizer.Normalize).ToArray();
+        var call = await GetChatsCallAsync(fromDate, region, ct).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetChats");
     }
 
-    public async Task<BitflyerNormalizedCall<IReadOnlyList<BitflyerChatNormalized>, JsonElement>> GetChatsCallAsync(
+    public async Task<Call<GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
         string? fromDate = null,
         string? region = null,
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.GetChatsCallAsync(fromDate, region, ct).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetChats", new Dictionary<string, string?>
-        {
-            ["fromDate"] = fromDate,
-            ["region"] = region,
-        });
+        var rawCall = await _raw
+            .GetChatsAsync(new RawRequests.GetChatsRequest(fromDate, region), ct)
+            .ConfigureAwait(false);
+        var request = new GetChatsRequest(fromDate, region);
 
         return CreateCall(
             rawCall,
             request,
-            raw =>
-            {
-                IReadOnlyList<BitflyerChatNormalized> mapped = raw
-                    .Select(BitflyerChatNormalizer.Normalize)
-                    .ToArray();
-                return mapped;
-            });
+            "Bitflyer.GetChats",
+            raw => (IReadOnlyList<BitflyerChatNormalized>)raw
+                .Select(BitflyerChatNormalizer.Normalize)
+                .ToArray());
     }
 
-    private static BitflyerNormalizedRequest CreateRequest(
-        string operation,
-        IReadOnlyDictionary<string, string?> parameters) =>
-        new(operation, parameters);
-
-    private static BitflyerNormalizedCall<TOk, JsonElement> CreateCall<TRaw, TOk>(
-        BitflyerRawCall<TRaw, JsonElement> rawCall,
-        BitflyerNormalizedRequest request,
+    private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
         Func<TRaw, TOk> mapper)
     {
+        var meta = new CallMeta(
+            Layer: "Normalized",
+            Component: component,
+            Tags: null,
+            Children: new[] { rawCall.Id });
+
         return rawCall.Result switch
         {
-            Ok<TRaw, JsonElement> ok => new BitflyerNormalizedCall<TOk, JsonElement>(
-                request,
-                new Ok<TOk, JsonElement>(mapper(ok.Value), ok.StatusCode),
-                rawCall.Meta),
-            Err<TRaw, JsonElement> err => new BitflyerNormalizedCall<TOk, JsonElement>(
-                request,
-                new Err<TOk, JsonElement>(err.Error, err.StatusCode),
-                rawCall.Meta),
+            CallResult<TRaw>.Err err => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(err.Error),
+                Meta: meta),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper, meta),
+            _ => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
+                Meta: meta)
+        };
+    }
+
+    private static Call<TReq, TOk> MapOk<TRawReq, TReq, TRaw, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
+        TRaw raw,
+        Func<TRaw, TOk> mapper,
+        CallMeta meta)
+    {
+        try
+        {
+            var mapped = mapper(raw);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Ok(mapped),
+                Meta: meta);
+        }
+        catch (Exception ex)
+        {
+            var error = new CallError(CallErrorKind.Mapping, $"{component} failed to map normalized response.", ex);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(error),
+                Meta: meta);
+        }
+    }
+
+    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
+    {
+        return call.Result switch
+        {
+            CallResult<TRes>.Ok ok => ok.Response,
+            CallResult<TRes>.Err err => throw new ExchangeApiException(
+                message: err.Error.Message,
+                exchange: ExchangeCode.Bitflyer,
+                operation: operation,
+                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
+                innerException: err.Error.Exception),
             _ => throw new InvalidOperationException("Unsupported CallResult type.")
         };
     }
@@ -261,52 +288,103 @@ public sealed class BitflyerNormalizedExchangeInfoFacade
         string? region = null,
         CancellationToken ct = default)
     {
-        var raw = await _raw.GetMarketsAsync(region, cancellationToken: ct).ConfigureAwait(false);
-        return raw.Select(BitflyerMarketNormalizer.Normalize).ToArray();
+        var call = await GetMarketsCallAsync(region, ct).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetMarkets");
     }
 
-    public async Task<BitflyerNormalizedCall<IReadOnlyList<BitflyerMarketNormalized>, JsonElement>> GetMarketsCallAsync(
+    public async Task<Call<GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
         string? region = null,
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.GetMarketsCallAsync(region, cancellationToken: ct).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetMarkets", new Dictionary<string, string?>
-        {
-            ["region"] = region,
-        });
+        var rawCall = await _raw
+            .GetMarketsAsync(new RawRequests.GetMarketsRequest(region), ct)
+            .ConfigureAwait(false);
+        var request = new GetMarketsRequest(region);
 
         return CreateCall(
             rawCall,
             request,
-            raw =>
-            {
-                IReadOnlyList<BitflyerMarketNormalized> mapped = raw
-                    .Select(BitflyerMarketNormalizer.Normalize)
-                    .ToArray();
-                return mapped;
-            });
+            "Bitflyer.GetMarkets",
+            raw => (IReadOnlyList<BitflyerMarketNormalized>)raw
+                .Select(BitflyerMarketNormalizer.Normalize)
+                .ToArray());
     }
 
-    private static BitflyerNormalizedRequest CreateRequest(
-        string operation,
-        IReadOnlyDictionary<string, string?> parameters) =>
-        new(operation, parameters);
-
-    private static BitflyerNormalizedCall<TOk, JsonElement> CreateCall<TRaw, TOk>(
-        BitflyerRawCall<TRaw, JsonElement> rawCall,
-        BitflyerNormalizedRequest request,
+    private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
         Func<TRaw, TOk> mapper)
     {
+        var meta = new CallMeta(
+            Layer: "Normalized",
+            Component: component,
+            Tags: null,
+            Children: new[] { rawCall.Id });
+
         return rawCall.Result switch
         {
-            Ok<TRaw, JsonElement> ok => new BitflyerNormalizedCall<TOk, JsonElement>(
-                request,
-                new Ok<TOk, JsonElement>(mapper(ok.Value), ok.StatusCode),
-                rawCall.Meta),
-            Err<TRaw, JsonElement> err => new BitflyerNormalizedCall<TOk, JsonElement>(
-                request,
-                new Err<TOk, JsonElement>(err.Error, err.StatusCode),
-                rawCall.Meta),
+            CallResult<TRaw>.Err err => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(err.Error),
+                Meta: meta),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper, meta),
+            _ => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
+                Meta: meta)
+        };
+    }
+
+    private static Call<TReq, TOk> MapOk<TRawReq, TReq, TRaw, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
+        TRaw raw,
+        Func<TRaw, TOk> mapper,
+        CallMeta meta)
+    {
+        try
+        {
+            var mapped = mapper(raw);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Ok(mapped),
+                Meta: meta);
+        }
+        catch (Exception ex)
+        {
+            var error = new CallError(CallErrorKind.Mapping, $"{component} failed to map normalized response.", ex);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(error),
+                Meta: meta);
+        }
+    }
+
+    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
+    {
+        return call.Result switch
+        {
+            CallResult<TRes>.Ok ok => ok.Response,
+            CallResult<TRes>.Err err => throw new ExchangeApiException(
+                message: err.Error.Message,
+                exchange: ExchangeCode.Bitflyer,
+                operation: operation,
+                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
+                innerException: err.Error.Exception),
             _ => throw new InvalidOperationException("Unsupported CallResult type.")
         };
     }

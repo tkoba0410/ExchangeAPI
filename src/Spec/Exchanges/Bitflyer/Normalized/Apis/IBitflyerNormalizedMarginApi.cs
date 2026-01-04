@@ -4,7 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalize;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 
@@ -18,17 +19,17 @@ public interface IBitflyerNormalizedMarginApi
 
     Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<IReadOnlyList<Balance>, JsonElement>> GetBalancesCallAsync(
+    Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<IReadOnlyList<ExecutionAccount>, JsonElement>> GetAccountExecutionsCallAsync(
+    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<IReadOnlyList<Position>, JsonElement>> GetOpenPositionsCallAsync(
+    Task<Call<GetOpenPositionsRequest, IReadOnlyList<Position>>> GetOpenPositionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<Collateral, JsonElement>> GetCollateralCallAsync(
+    Task<Call<GetCollateralRequest, Collateral>> GetCollateralCallAsync(
         CancellationToken cancellationToken = default);
 }

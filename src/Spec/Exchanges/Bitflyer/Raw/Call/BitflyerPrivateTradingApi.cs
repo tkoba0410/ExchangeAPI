@@ -1,12 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using Requests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
+using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Call;
@@ -23,271 +23,189 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public async Task<CreateChildOrderResponse> CreateChildOrderAsync(
-        CreateChildOrderRequest request,
+    public Task<Call<Requests.CreateChildOrderRequest, CreateChildOrderResponse>> CreateChildOrderAsync(
+        Requests.CreateChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var raw = BitflyerRawMappers.MapSendChildOrderRequest(request);
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(raw, "Bitflyer.CreateChildOrder");
-        var call = await SendAsync(BitflyerEndpoints.SendChildOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<CreateChildOrderResponse>(
-                response.Json,
-                "Bitflyer.CreateChildOrder");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.CreateChildOrder",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<EmptyResponse> CancelChildOrderAsync(
-        CancelChildOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelChildOrder");
-        var call = await SendAsync(BitflyerEndpoints.CancelChildOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<EmptyResponse>(
-                response.Json,
-                "Bitflyer.CancelChildOrder");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.CancelChildOrder",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<EmptyResponse> CancelAllChildOrdersAsync(
-        CancelAllChildOrdersRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelAllChildOrders");
-        var call = await SendAsync(BitflyerEndpoints.CancelAllChildOrders(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<EmptyResponse>(
-                response.Json,
-                "Bitflyer.CancelAllChildOrders");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.CancelAllChildOrders",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<CreateParentOrderResponse> CreateParentOrderAsync(
-        CreateParentOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateParentOrder");
-        var call = await SendAsync(BitflyerEndpoints.SendParentOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<CreateParentOrderResponse>(
-                response.Json,
-                "Bitflyer.CreateParentOrder");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.CreateParentOrder",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<EmptyResponse> CancelParentOrderAsync(
-        CancelParentOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelParentOrder");
-        var call = await SendAsync(BitflyerEndpoints.CancelParentOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<EmptyResponse>(
-                response.Json,
-                "Bitflyer.CancelParentOrder");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.CancelParentOrder",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<CreateWithdrawalResponse> CreateWithdrawalAsync(
-        CreateWithdrawalRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateWithdrawal");
-        var call = await SendAsync(BitflyerEndpoints.Withdraw(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<CreateWithdrawalResponse>(
-                response.Json,
-                "Bitflyer.CreateWithdrawal");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.CreateWithdrawal",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<BitflyerRawCall<CreateChildOrderResponse, JsonElement>> CreateChildOrderCallAsync(
-        CreateChildOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var raw = BitflyerRawMappers.MapSendChildOrderRequest(request);
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(raw, "Bitflyer.CreateChildOrder");
-        var wireCall = await SendAsync(BitflyerEndpoints.SendChildOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bitflyer.CreateChildOrder", new Dictionary<string, string?>
-        {
-            ["productCode"] = request.ProductCode.Value,
-            ["childOrderType"] = request.ChildOrderType.ToString(),
-            ["side"] = request.Side.ToString(),
-            ["size"] = request.Size.ToString(),
-            ["price"] = request.Price?.ToString(),
-            ["timeInForce"] = request.TimeInForce?.ToString(),
-        });
-        return CreateCall<CreateChildOrderResponse>(rawRequest, wireCall, "Bitflyer.CreateChildOrder");
-    }
-
-    public async Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelChildOrderCallAsync(
-        CancelChildOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelChildOrder");
-        var wireCall = await SendAsync(BitflyerEndpoints.CancelChildOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bitflyer.CancelChildOrder", new Dictionary<string, string?>
-        {
-            ["productCode"] = request.ProductCode.Value,
-            ["childOrderId"] = request.ChildOrderId,
-            ["childOrderAcceptanceId"] = request.ChildOrderAcceptanceId,
-        });
-        return CreateCall<EmptyResponse>(rawRequest, wireCall, "Bitflyer.CancelChildOrder");
-    }
-
-    public async Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelAllChildOrdersCallAsync(
-        CancelAllChildOrdersRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelAllChildOrders");
-        var wireCall = await SendAsync(BitflyerEndpoints.CancelAllChildOrders(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bitflyer.CancelAllChildOrders", new Dictionary<string, string?>
-        {
-            ["productCode"] = request.ProductCode.Value,
-        });
-        return CreateCall<EmptyResponse>(rawRequest, wireCall, "Bitflyer.CancelAllChildOrders");
-    }
-
-    public async Task<BitflyerRawCall<CreateParentOrderResponse, JsonElement>> CreateParentOrderCallAsync(
-        CreateParentOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateParentOrder");
-        var wireCall = await SendAsync(BitflyerEndpoints.SendParentOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bitflyer.CreateParentOrder", new Dictionary<string, string?>
-        {
-            ["orderMethod"] = request.OrderMethod.ToString(),
-            ["timeInForce"] = request.TimeInForce?.ToString(),
-        });
-        return CreateCall<CreateParentOrderResponse>(rawRequest, wireCall, "Bitflyer.CreateParentOrder");
-    }
-
-    public async Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelParentOrderCallAsync(
-        CancelParentOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelParentOrder");
-        var wireCall = await SendAsync(BitflyerEndpoints.CancelParentOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bitflyer.CancelParentOrder", new Dictionary<string, string?>
-        {
-            ["parentOrderId"] = request.ParentOrderId,
-            ["parentOrderAcceptanceId"] = request.ParentOrderAcceptanceId,
-        });
-        return CreateCall<EmptyResponse>(rawRequest, wireCall, "Bitflyer.CancelParentOrder");
-    }
-
-    public async Task<BitflyerRawCall<CreateWithdrawalResponse, JsonElement>> CreateWithdrawalCallAsync(
-        CreateWithdrawalRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateWithdrawal");
-        var wireCall = await SendAsync(BitflyerEndpoints.Withdraw(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bitflyer.CreateWithdrawal", new Dictionary<string, string?>
-        {
-            ["currencyCode"] = request.CurrencyCode,
-            ["amount"] = request.Amount.ToString(),
-        });
-        return CreateCall<CreateWithdrawalResponse>(rawRequest, wireCall, "Bitflyer.CreateWithdrawal");
-    }
-
-    private static BitflyerRawRequest CreateRequest(
-        string operation,
-        IReadOnlyDictionary<string, string?> parameters) =>
-        new(operation, parameters);
-
-    private static BitflyerRawCall<TOk, JsonElement> CreateCall<TOk>(
-        BitflyerRawRequest request,
-        WireCall call,
-        string context)
-    {
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            var ok = BitflyerRawJson.DeserializeOrThrow<TOk>(response.Json, context);
-            return new BitflyerRawCall<TOk, JsonElement>(
-                request,
-                new Ok<TOk, JsonElement>(ok, response.StatusCode),
-                call.Meta);
-        }
-
-        if (BitflyerRawJson.TryDeserialize<JsonElement>(response.Json, out var error, out _))
-        {
-            return new BitflyerRawCall<TOk, JsonElement>(
-                request,
-                new Err<TOk, JsonElement>(error!, response.StatusCode),
-                call.Meta);
-        }
-
-        return new BitflyerRawCall<TOk, JsonElement>(
+        var raw = BitflyerRawMappers.MapSendChildOrderRequest(request.Body);
+        return SendAndParse(
             request,
-            new Err<TOk, JsonElement>(default, response.StatusCode),
-            call.Meta);
+            "Bitflyer.CreateChildOrder",
+            BitflyerEndpoints.SendChildOrder(BitflyerRawJson.SerializeOrThrow(raw, "Bitflyer.CreateChildOrder")),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<CreateChildOrderResponse>(
+                json,
+                "Bitflyer.CreateChildOrder"));
     }
 
-    private Task<WireCall> SendAsync(WireRequest request, CancellationToken ct) =>
-        _wire.SendAsync(ExchangeCode.Bitflyer, request, ct);
+    public Task<Call<Requests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
+        Requests.CancelChildOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.CancelChildOrder",
+            BitflyerEndpoints.CancelChildOrder(
+                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.CancelChildOrder")),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<EmptyResponse>(
+                json,
+                "Bitflyer.CancelChildOrder"));
+
+    public Task<Call<Requests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersAsync(
+        Requests.CancelAllChildOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.CancelAllChildOrders",
+            BitflyerEndpoints.CancelAllChildOrders(
+                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.CancelAllChildOrders")),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<EmptyResponse>(
+                json,
+                "Bitflyer.CancelAllChildOrders"));
+
+    public Task<Call<Requests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
+        Requests.CreateParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.CreateParentOrder",
+            BitflyerEndpoints.SendParentOrder(
+                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.CreateParentOrder")),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<CreateParentOrderResponse>(
+                json,
+                "Bitflyer.CreateParentOrder"));
+
+    public Task<Call<Requests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
+        Requests.CancelParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.CancelParentOrder",
+            BitflyerEndpoints.CancelParentOrder(
+                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.CancelParentOrder")),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<EmptyResponse>(
+                json,
+                "Bitflyer.CancelParentOrder"));
+
+    public Task<Call<Requests.CreateWithdrawalRequest, CreateWithdrawalResponse>> CreateWithdrawalAsync(
+        Requests.CreateWithdrawalRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.CreateWithdrawal",
+            BitflyerEndpoints.Withdraw(
+                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.CreateWithdrawal")),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<CreateWithdrawalResponse>(
+                json,
+                "Bitflyer.CreateWithdrawal"));
+
+    private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
+        TReq request,
+        string component,
+        WireCallSpec spec,
+        CancellationToken cancellationToken,
+        Func<string, TRes> parse)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        if (parse is null) throw new ArgumentNullException(nameof(parse));
+
+        var wireCall = await _wire.SendAsync(ExchangeCode.Bitflyer, spec, cancellationToken).ConfigureAwait(false);
+        return CreateCall(request, component, wireCall, parse);
+    }
+
+    private static Call<TReq, TRes> CreateCall<TReq, TRes>(
+        TReq request,
+        string component,
+        Call<WireCallSpec, WireResponse> wireCall,
+        Func<string, TRes> parse)
+    {
+        var meta = new CallMeta(
+            Layer: "Raw",
+            Component: component,
+            Tags: null,
+            Children: new[] { wireCall.Id });
+
+        return wireCall.Result switch
+        {
+            CallResult<WireResponse>.Err err => new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(err.Error),
+                Meta: meta),
+            CallResult<WireResponse>.Ok ok => CreateOkCall(request, component, ok.Response, wireCall, parse, meta),
+            _ => new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(new CallError(CallErrorKind.Unknown, "Wire call returned unknown result.")),
+                Meta: meta)
+        };
+    }
+
+    private static Call<TReq, TRes> CreateOkCall<TReq, TRes>(
+        TReq request,
+        string component,
+        WireResponse response,
+        Call<WireCallSpec, WireResponse> wireCall,
+        Func<string, TRes> parse,
+        CallMeta meta)
+    {
+        if (response.StatusCode is < 200 or >= 300)
+        {
+            var error = new CallError(
+                CallErrorKind.Http,
+                $"{component} failed with status {response.StatusCode}.",
+                HttpStatus: response.StatusCode,
+                BodySnippet: Snip(response.Json));
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(error),
+                Meta: meta);
+        }
+
+        try
+        {
+            var parsed = parse(response.Json);
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Ok(parsed),
+                Meta: meta);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            var error = new CallError(
+                CallErrorKind.Codec,
+                $"{component} failed to parse response.",
+                ex,
+                response.StatusCode,
+                Snip(response.Json));
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(error),
+                Meta: meta);
+        }
+    }
+
+    private static string? Snip(string? json)
+    {
+        if (string.IsNullOrEmpty(json)) return json;
+        return json.Length <= 512 ? json : json[..512];
+    }
 }

@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
@@ -48,7 +47,7 @@ internal sealed class BitflyerAccountApi : IAccountApi
         return Unwrap(call, BitflyerOperations.Account.GetAccountExecutions);
     }
 
-    public async Task<ApiCall<GetBalancesRequest, IReadOnlyList<Balance>, ApiError>> GetBalancesCallAsync(
+    public async Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetBalancesRequest();
@@ -57,33 +56,19 @@ internal sealed class BitflyerAccountApi : IAccountApi
         try
         {
             var call = await _accountApi.GetBalancesCallAsync(cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<IReadOnlyList<Balance>, JsonElement> ok => ApiCallMapper.Ok(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    ok.Value),
-                Err<IReadOnlyList<Balance>, JsonElement> err => ApiCallMapper.Err<GetBalancesRequest, IReadOnlyList<Balance>>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Account.GetBalances);
         }
         catch (Exception ex)
         {
             return ApiCallMapper.FromException<GetBalancesRequest, IReadOnlyList<Balance>>(
-                _exchange,
                 request,
                 startedAt,
+                BitflyerOperations.Account.GetBalances,
                 ex);
         }
     }
 
-    public async Task<ApiCall<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>, ApiError>> GetAccountExecutionsCallAsync(
+    public async Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -93,28 +78,14 @@ internal sealed class BitflyerAccountApi : IAccountApi
         try
         {
             var call = await _accountApi.GetAccountExecutionsCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<IReadOnlyList<ExecutionAccount>, JsonElement> ok => ApiCallMapper.Ok(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    ok.Value),
-                Err<IReadOnlyList<ExecutionAccount>, JsonElement> err => ApiCallMapper.Err<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Account.GetAccountExecutions);
         }
         catch (Exception ex)
         {
             return ApiCallMapper.FromException<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(
-                _exchange,
                 request,
                 startedAt,
+                BitflyerOperations.Account.GetAccountExecutions,
                 ex);
         }
     }
@@ -156,18 +127,22 @@ internal sealed class BitflyerAccountApi : IAccountApi
         }
     }
 
-    private static TOk Unwrap<TReq, TOk>(ApiCall<TReq, TOk, ApiError> call, string operation)
+    private static TOk Unwrap<TReq, TOk>(Call<TReq, TOk> call, string operation)
     {
         return call.Result switch
         {
-            ApiOk<TOk, ApiError> ok => ok.Value,
-            ApiErr<TOk, ApiError> err => throw new ExchangeApiException(
+            CallResult<TOk>.Ok ok => ok.Response,
+            CallResult<TOk>.Err err => throw new ExchangeApiException(
                 message: err.Error.Message,
-                exchange: call.Exchange,
+                exchange: ExchangeCode.Bitflyer,
                 operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.StatusCode),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error.Kind)),
-            _ => throw new InvalidOperationException("Unsupported ApiCallResult type.")
+                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
+            _ => throw new ExchangeApiException(
+                message: "Unknown call result.",
+                exchange: ExchangeCode.Bitflyer,
+                operation: operation,
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
         };
     }
 

@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
+using ExchangeApi.Spec.CallCommon;
 namespace ExchangeApi.Contracts.Interfaces;
 
 /// <summary>
@@ -46,36 +46,36 @@ public interface ITradingApi
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<PlaceLimitOrderRequest, OrderResult, ApiError>> PlaceLimitOrderCallAsync(
+    Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         Symbol symbol,
         Side side,
         Size size,
         Price price,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<PlaceMarketOrderRequest, OrderResult, ApiError>> PlaceMarketOrderCallAsync(
+    Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(
         Symbol symbol,
         Side side,
         Size size,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<PlaceStopOrderRequest, OrderResult, ApiError>> PlaceStopOrderCallAsync(
+    Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
         Symbol symbol,
         Side side,
         Size size,
         Price triggerPrice,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<CancelOrderRequest, CancelResult, ApiError>> CancelOrderCallAsync(
+    Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<GetOrdersRequest, IReadOnlyList<OpenOrder>, ApiError>> GetOrdersCallAsync(
+    Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<GetOrderRequest, OrderStatus, ApiError>> GetOrderCallAsync(
+    Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);

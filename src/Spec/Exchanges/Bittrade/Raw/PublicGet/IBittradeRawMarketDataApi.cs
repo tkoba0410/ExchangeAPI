@@ -1,26 +1,21 @@
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public interface IBittradeRawMarketDataApi
 {
-    Task<RawMergedResponse> GetTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
-    Task<RawDepthResponse> GetOrderBookAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default);
-    Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
-
-    Task<BittradeRawCall<RawMergedResponse, JsonElement>> GetTickerCallAsync(
-        RawSymbol symbol,
+    Task<Call<GetTickerRequest, RawMergedResponse>> GetTickerAsync(
+        GetTickerRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawDepthResponse, JsonElement>> GetOrderBookCallAsync(
-        RawSymbol symbol,
-        string? type = null,
+    Task<Call<GetOrderBookRequest, RawDepthResponse>> GetOrderBookAsync(
+        GetOrderBookRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawTradeResponse, JsonElement>> GetTradesCallAsync(
-        RawSymbol symbol,
+    Task<Call<GetMarketTradesRequest, RawTradeResponse>> GetTradesAsync(
+        GetMarketTradesRequest request,
         CancellationToken cancellationToken = default);
 }

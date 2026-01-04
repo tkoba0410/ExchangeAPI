@@ -1,7 +1,5 @@
 using System;
 using System.Net;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Spec.CallCommon;
 
@@ -9,115 +7,149 @@ namespace ExchangeApi.Boundary.Adapters.Common.ApiCallMapping;
 
 internal static class ApiCallMapperBase
 {
-    public static ApiCallMeta ToMeta(CallMeta meta) =>
-        new(meta.StartedAt, meta.Elapsed, meta.RequestId);
-
-    public static ApiCallMeta ToMeta(DateTimeOffset startedAt, string? requestId = null) =>
-        new(startedAt, DateTimeOffset.UtcNow - startedAt, requestId);
-
-    public static ApiCall<TReq, TOk, ApiError> Ok<TReq, TOk>(
-        ExchangeCode exchange,
+    public static Call<TReq, TOk> MapCall<TReq, TNormReq, TNormRes, TOk>(
         TReq request,
-        CallMeta meta,
-        int statusCode,
-        TOk value) =>
-        new(exchange, request, ToMeta(meta), new ApiOk<TOk, ApiError>(value, statusCode));
-
-    public static ApiCall<TReq, TOk, ApiError> Err<TReq, TOk>(
-        ExchangeCode exchange,
-        TReq request,
-        CallMeta meta,
-        int statusCode,
-        string? message = null,
-        string? exchangeErrorCode = null) =>
-        new(exchange, request, ToMeta(meta), new ApiErr<TOk, ApiError>(
-            ToApiError(statusCode, meta.RequestId, message, exchangeErrorCode),
-            statusCode));
-
-    public static ApiCall<TReq, TOk, ApiError> Err<TReq, TOk>(
-        ExchangeCode exchange,
-        TReq request,
-        ApiCallMeta meta,
-        int statusCode,
-        string? message = null,
-        string? exchangeErrorCode = null) =>
-        new(exchange, request, meta, new ApiErr<TOk, ApiError>(
-            ToApiError(statusCode, meta.RequestId, message, exchangeErrorCode),
-            statusCode));
-
-    public static ApiCall<TReq, TOk, ApiError> FromException<TReq, TOk>(
-        ExchangeCode exchange,
-        TReq request,
-        DateTimeOffset startedAt,
-        Exception ex) =>
-        new(exchange, request, ToMeta(startedAt), new ApiErr<TOk, ApiError>(
-            ToApiError(0, null, ex.Message, exchangeErrorCode: null),
-            0));
-
-    public static ExchangeErrorCategory? ToExchangeErrorCategory(ApiErrorKind kind) =>
-        kind switch
-        {
-            ApiErrorKind.Validation => ExchangeErrorCategory.Request,
-            ApiErrorKind.Auth => ExchangeErrorCategory.Auth,
-            ApiErrorKind.RateLimit => ExchangeErrorCategory.RateLimit,
-            ApiErrorKind.Timeout => ExchangeErrorCategory.Network,
-            ApiErrorKind.HttpError => ExchangeErrorCategory.Server,
-            _ => ExchangeErrorCategory.Unknown,
-        };
-
-    public static HttpStatusCode? ToStatusCode(int statusCode) =>
-        statusCode > 0 ? (HttpStatusCode)statusCode : null;
-
-    public static ApiCallResult<TOk, ApiError> MapResult<TOk, TErr>(
-        CallResult<TOk, TErr> result,
-        IExchangeErrorExtractor<TErr>? extractor,
-        string? requestId) =>
-        result switch
-        {
-            Ok<TOk, TErr> ok => new ApiOk<TOk, ApiError>(ok.Value, ok.StatusCode),
-            Err<TOk, TErr> err => new ApiErr<TOk, ApiError>(
-                ToApiError(
-                    err.StatusCode,
-                    requestId,
-                    extractor?.Summarize(err.Error),
-                    extractor?.TryGetExchangeErrorCode(err.Error)),
-                err.StatusCode),
-            _ => throw new InvalidOperationException("Unsupported CallResult type."),
-        };
-
-    public static ApiErrorKind Classify(int statusCode, string? exchangeErrorCode = null, string? message = null) =>
-        statusCode switch
-        {
-            400 or 422 => ApiErrorKind.Validation,
-            401 or 403 => ApiErrorKind.Auth,
-            404 => ApiErrorKind.NotFound,
-            408 or 504 => ApiErrorKind.Timeout,
-            429 => ApiErrorKind.RateLimit,
-            >= 500 and <= 599 => ApiErrorKind.HttpError,
-            _ => ApiErrorKind.Unknown,
-        };
-
-    public static ApiError ToApiError(
-        int statusCode,
-        string? requestId,
-        string? message,
-        string? exchangeErrorCode = null)
+        Call<TNormReq, TNormRes> normalizedCall,
+        string component,
+        Func<TNormRes, TOk> mapper)
     {
-        var kind = Classify(statusCode, exchangeErrorCode, message);
-        var resolved = string.IsNullOrWhiteSpace(message) ? DefaultMessage(kind) : message!;
-        return new ApiError(kind, resolved, statusCode, requestId);
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: component,
+            Tags: null,
+            Children: new[] { normalizedCall.Id });
+
+        return normalizedCall.Result switch
+        {
+            CallResult<TNormRes>.Err err => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: normalizedCall.StartedAt,
+                Duration: normalizedCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(err.Error),
+                Meta: meta),
+            CallResult<TNormRes>.Ok ok => MapOk(request, normalizedCall, component, ok.Response, mapper, meta),
+            _ => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: normalizedCall.StartedAt,
+                Duration: normalizedCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Normalized call returned unknown result.")),
+                Meta: meta)
+        };
     }
 
-    private static string DefaultMessage(ApiErrorKind kind) =>
-        kind switch
+    public static Call<TReq, TOk> FromCall<TReq, TOk, TNormReq>(
+        TReq request,
+        Call<TNormReq, TOk> normalizedCall,
+        string component)
+    {
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: component,
+            Tags: null,
+            Children: new[] { normalizedCall.Id });
+
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: normalizedCall.StartedAt,
+            Duration: normalizedCall.Duration,
+            Request: request,
+            Result: normalizedCall.Result,
+            Meta: meta);
+    }
+
+    public static Call<TReq, TOk> FromException<TReq, TOk>(
+        TReq request,
+        DateTimeOffset startedAt,
+        string component,
+        Exception ex)
+    {
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: component,
+            Tags: null,
+            Children: null);
+
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: startedAt,
+            Duration: DateTimeOffset.UtcNow - startedAt,
+            Request: request,
+            Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, ex.Message, ex)),
+            Meta: meta);
+    }
+
+    private static Call<TReq, TOk> MapOk<TReq, TNormReq, TNormRes, TOk>(
+        TReq request,
+        Call<TNormReq, TNormRes> normalizedCall,
+        string component,
+        TNormRes response,
+        Func<TNormRes, TOk> mapper,
+        CallMeta meta)
+    {
+        try
         {
-            ApiErrorKind.Auth => "Authentication failed.",
-            ApiErrorKind.NotFound => "Resource not found.",
-            ApiErrorKind.Timeout => "Request timed out.",
-            ApiErrorKind.RateLimit => "Rate limit exceeded.",
-            ApiErrorKind.Validation => "Request validation failed.",
-            ApiErrorKind.Canceled => "Request was canceled.",
-            ApiErrorKind.HttpError => "HTTP error.",
-            _ => "Unknown error.",
+            var mapped = mapper(response);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: normalizedCall.StartedAt,
+                Duration: normalizedCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Ok(mapped),
+                Meta: meta);
+        }
+        catch (Exception ex)
+        {
+            var error = new CallError(CallErrorKind.Mapping, $"{component} failed to map response.", ex);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: normalizedCall.StartedAt,
+                Duration: normalizedCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(error),
+                Meta: meta);
+        }
+    }
+
+    public static ExchangeErrorCategory? ToExchangeErrorCategory(CallError error)
+    {
+        if (error is null) return ExchangeErrorCategory.Unknown;
+
+        return error.Kind switch
+        {
+            CallErrorKind.Transport => ExchangeErrorCategory.Network,
+            CallErrorKind.Codec => ExchangeErrorCategory.Server,
+            CallErrorKind.Mapping => ExchangeErrorCategory.Request,
+            CallErrorKind.Semantic => ExchangeErrorCategory.Request,
+            CallErrorKind.Http => MapHttpErrorCategory(error),
+            _ => ExchangeErrorCategory.Unknown,
         };
+    }
+
+    private static ExchangeErrorCategory MapHttpErrorCategory(CallError error)
+    {
+        if (error.HttpStatus is int status)
+        {
+            return status switch
+            {
+                400 or 422 => ExchangeErrorCategory.Request,
+                401 or 403 => ExchangeErrorCategory.Auth,
+                404 => ExchangeErrorCategory.Request,
+                429 => ExchangeErrorCategory.RateLimit,
+                >= 500 => ExchangeErrorCategory.Server,
+                _ => ExchangeErrorCategory.Unknown,
+            };
+        }
+
+        if (error.Exception is ExchangeApiException { ExchangeErrorCode: not null })
+        {
+            return ExchangeErrorCategory.Request;
+        }
+
+        return ExchangeErrorCategory.Unknown;
+    }
+
+    public static HttpStatusCode? ToStatusCode(int? statusCode) =>
+        statusCode is > 0 ? (HttpStatusCode?)statusCode : null;
 }

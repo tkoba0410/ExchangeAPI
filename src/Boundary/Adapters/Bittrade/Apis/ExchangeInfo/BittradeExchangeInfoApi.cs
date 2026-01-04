@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Common.Enums;
@@ -18,7 +17,6 @@ using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 using ExchangeApi.Spec.CallCommon;
-using System.Text.Json;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 
 /// <summary>
@@ -40,7 +38,7 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
         return Unwrap(call, "Bittrade.ExchangeInfo.GetExchangeInfo");
     }
 
-    public async Task<ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>> GetExchangeInfoCallAsync(
+    public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetExchangeInfoRequest();
@@ -49,25 +47,19 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
         try
         {
             var call = await _normalized.GetSymbolsCallAsync(cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<IReadOnlyList<BittradeSymbolNormalized>, JsonElement> ok => ApiCallMapper.Ok(
-                    Exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    new ExchangeInfoDto(ok.Value.Select(MapSymbol).ToList(), Features: null, RateLimits: null, Maintenance: null)),
-                Err<IReadOnlyList<BittradeSymbolNormalized>, JsonElement> err => ApiCallMapper.Err<GetExchangeInfoRequest, ExchangeInfoDto>(
-                    Exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                "Bittrade.ExchangeInfo.GetExchangeInfo",
+                ok => new ExchangeInfoDto(ok.Select(MapSymbol).ToList(), Features: null, RateLimits: null, Maintenance: null));
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(Exchange, request, startedAt, ex);
+            return ApiCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(
+                request,
+                startedAt,
+                "Bittrade.ExchangeInfo.GetExchangeInfo",
+                ex);
         }
     }
 
@@ -101,18 +93,22 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
     private static decimal Pow10(int power) =>
         (decimal)Math.Pow(10, power);
 
-    private static TOk Unwrap<TReq, TOk>(ApiCall<TReq, TOk, ApiError> call, string operation)
+    private static TOk Unwrap<TReq, TOk>(Call<TReq, TOk> call, string operation)
     {
         return call.Result switch
         {
-            ApiOk<TOk, ApiError> ok => ok.Value,
-            ApiErr<TOk, ApiError> err => throw new ExchangeApiException(
+            CallResult<TOk>.Ok ok => ok.Response,
+            CallResult<TOk>.Err err => throw new ExchangeApiException(
                 message: err.Error.Message,
-                exchange: call.Exchange,
+                exchange: Exchange,
                 operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.StatusCode),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error.Kind)),
-            _ => throw new InvalidOperationException("Unsupported ApiCallResult type.")
+                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
+            _ => throw new ExchangeApiException(
+                message: "Unknown call result.",
+                exchange: Exchange,
+                operation: operation,
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
         };
     }
 }

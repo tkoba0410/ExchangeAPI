@@ -1,57 +1,34 @@
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Spec.CallCommon;
+using Requests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
 public interface IBitflyerRawPrivateTradingApi
 {
-    Task<CreateChildOrderResponse> CreateChildOrderAsync(
-        CreateChildOrderRequest request,
+    Task<Call<Requests.CreateChildOrderRequest, CreateChildOrderResponse>> CreateChildOrderAsync(
+        Requests.CreateChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<CreateChildOrderResponse, JsonElement>> CreateChildOrderCallAsync(
-        CreateChildOrderRequest request,
+    Task<Call<Requests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
+        Requests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<EmptyResponse> CancelChildOrderAsync(
-        CancelChildOrderRequest request,
+    Task<Call<Requests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersAsync(
+        Requests.CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelChildOrderCallAsync(
-        CancelChildOrderRequest request,
+    Task<Call<Requests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
+        Requests.CreateParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<EmptyResponse> CancelAllChildOrdersAsync(
-        CancelAllChildOrdersRequest request,
+    Task<Call<Requests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
+        Requests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelAllChildOrdersCallAsync(
-        CancelAllChildOrdersRequest request,
-        CancellationToken cancellationToken = default);
-
-    Task<CreateParentOrderResponse> CreateParentOrderAsync(
-        CreateParentOrderRequest request,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<CreateParentOrderResponse, JsonElement>> CreateParentOrderCallAsync(
-        CreateParentOrderRequest request,
-        CancellationToken cancellationToken = default);
-
-    Task<EmptyResponse> CancelParentOrderAsync(
-        CancelParentOrderRequest request,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<EmptyResponse, JsonElement>> CancelParentOrderCallAsync(
-        CancelParentOrderRequest request,
-        CancellationToken cancellationToken = default);
-
-    Task<CreateWithdrawalResponse> CreateWithdrawalAsync(
-        CreateWithdrawalRequest request,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<CreateWithdrawalResponse, JsonElement>> CreateWithdrawalCallAsync(
-        CreateWithdrawalRequest request,
+    Task<Call<Requests.CreateWithdrawalRequest, CreateWithdrawalResponse>> CreateWithdrawalAsync(
+        Requests.CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default);
 }
 

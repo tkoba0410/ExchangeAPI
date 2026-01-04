@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
@@ -18,7 +17,6 @@ using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Spec.CallCommon;
-using System.Text.Json;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Market;
 
 /// <summary>
@@ -91,7 +89,7 @@ internal sealed class MarketApi : IMarketDataApi
         return await _marketData.GetBoardStateAsync(productCode, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<ApiCall<GetTickerRequest, CommonTicker, ApiError>> GetTickerCallAsync(
+    public async Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -102,21 +100,11 @@ internal sealed class MarketApi : IMarketDataApi
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var call = await _marketData.GetTickerCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<BitflyerTickerNormalized, JsonElement> ok => ApiCallMapper.Ok(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    MarketMapper.MapTicker(symbol, ok.Value)),
-                Err<BitflyerTickerNormalized, JsonElement> err => ApiCallMapper.Err<GetTickerRequest, CommonTicker>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.MarketData.GetTicker,
+                ok => MarketMapper.MapTicker(symbol, ok));
         }
         catch (SymbolNotSupportedException)
         {
@@ -124,11 +112,15 @@ internal sealed class MarketApi : IMarketDataApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetTickerRequest, CommonTicker>(_exchange, request, startedAt, ex);
+            return ApiCallMapper.FromException<GetTickerRequest, CommonTicker>(
+                request,
+                startedAt,
+                BitflyerOperations.MarketData.GetTicker,
+                ex);
         }
     }
 
-    public async Task<ApiCall<GetOrderBookRequest, OrderBook, ApiError>> GetOrderBookCallAsync(
+    public async Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -139,21 +131,11 @@ internal sealed class MarketApi : IMarketDataApi
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var call = await _marketData.GetOrderBookCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<BitflyerOrderBookNormalized, JsonElement> ok => ApiCallMapper.Ok(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    MarketMapper.MapOrderBook(ok.Value)),
-                Err<BitflyerOrderBookNormalized, JsonElement> err => ApiCallMapper.Err<GetOrderBookRequest, OrderBook>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.MarketData.GetOrderBook,
+                MarketMapper.MapOrderBook);
         }
         catch (SymbolNotSupportedException)
         {
@@ -161,11 +143,15 @@ internal sealed class MarketApi : IMarketDataApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetOrderBookRequest, OrderBook>(_exchange, request, startedAt, ex);
+            return ApiCallMapper.FromException<GetOrderBookRequest, OrderBook>(
+                request,
+                startedAt,
+                BitflyerOperations.MarketData.GetOrderBook,
+                ex);
         }
     }
 
-    public async Task<ApiCall<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>, ApiError>> GetMarketExecutionsCallAsync(
+    public async Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -176,21 +162,11 @@ internal sealed class MarketApi : IMarketDataApi
         {
             var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
             var call = await _marketData.GetExecutionsCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<IReadOnlyList<BitflyerExecutionNormalized>, JsonElement> ok => ApiCallMapper.Ok<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    ToExecutionList(symbol, ok.Value)),
-                Err<IReadOnlyList<BitflyerExecutionNormalized>, JsonElement> err => ApiCallMapper.Err<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
-                    _exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.MarketData.GetExecutions,
+                ok => ToExecutionList(symbol, ok));
         }
         catch (SymbolNotSupportedException)
         {
@@ -199,9 +175,9 @@ internal sealed class MarketApi : IMarketDataApi
         catch (Exception ex)
         {
             return ApiCallMapper.FromException<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
-                _exchange,
                 request,
                 startedAt,
+                BitflyerOperations.MarketData.GetExecutions,
                 ex);
         }
     }
@@ -222,18 +198,22 @@ internal sealed class MarketApi : IMarketDataApi
         return mapped;
     }
 
-    private static TOk Unwrap<TReq, TOk>(ApiCall<TReq, TOk, ApiError> call, string operation)
+    private static TOk Unwrap<TReq, TOk>(Call<TReq, TOk> call, string operation)
     {
         return call.Result switch
         {
-            ApiOk<TOk, ApiError> ok => ok.Value,
-            ApiErr<TOk, ApiError> err => throw new ExchangeApiException(
+            CallResult<TOk>.Ok ok => ok.Response,
+            CallResult<TOk>.Err err => throw new ExchangeApiException(
                 message: err.Error.Message,
-                exchange: call.Exchange,
+                exchange: ExchangeCode.Bitflyer,
                 operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.StatusCode),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error.Kind)),
-            _ => throw new InvalidOperationException("Unsupported ApiCallResult type.")
+                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
+            _ => throw new ExchangeApiException(
+                message: "Unknown call result.",
+                exchange: ExchangeCode.Bitflyer,
+                operation: operation,
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
         };
     }
 }

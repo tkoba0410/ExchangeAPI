@@ -4,7 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalize;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 
@@ -16,14 +17,14 @@ public interface IBitflyerNormalizedAccountApi
 
     Task<JsonElement> GetTradingCommissionAsync(Symbol symbol, CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<IReadOnlyList<Balance>, JsonElement>> GetBalancesCallAsync(
+    Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<IReadOnlyList<ExecutionAccount>, JsonElement>> GetAccountExecutionsCallAsync(
+    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<JsonElement, JsonElement>> GetTradingCommissionCallAsync(
+    Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 }

@@ -1,22 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Normalize;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
+using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 
@@ -38,26 +40,8 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
 
     public async Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken cancellationToken = default)
     {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        BitflyerTradingMapper.ValidateOrderRequest(request);
-
-        var dto = new CreateChildOrderRequest
-        {
-            ProductCode = await ToProductCodeAsync(request.Symbol, cancellationToken).ConfigureAwait(false),
-            Side = BitflyerCommonMapper.MapSideToExchange(request.Side),
-            ChildOrderType = BitflyerTradingMapper.MapOrderType(request.OrderType, request.Price),
-            Size = request.Size.Value,
-            Price = request.Price?.Value,
-            TriggerPrice = request.TriggerPrice?.Value,
-            MinuteToExpire = request.MinuteToExpire,
-            TimeInForce = BitflyerTradingMapper.MapTimeInForce(request.TimeInForce),
-        };
-
-        var response = await _tradingApi.CreateChildOrderAsync(dto, cancellationToken).ConfigureAwait(false);
-        var acceptanceId = response.ChildOrderAcceptanceId;
-        var key = new OrderKey(OrderIdKind.AcceptanceId, acceptanceId);
-        return new OrderResult(key, AcceptanceId: acceptanceId);
+        var call = await PlaceOrderCallAsync(request, cancellationToken).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.CreateChildOrder");
     }
 
     public async Task<CancelResult> CancelOrderAsync(
@@ -65,92 +49,16 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
     {
-        if (symbol.IsEmpty)
-        {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
-        }
-
-        CancelChildOrderRequest dto;
-        var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        switch (orderKey.Kind)
-        {
-            case OrderIdKind.AcceptanceId:
-                dto = new CancelChildOrderRequest
-                {
-                    ProductCode = productCode,
-                    ChildOrderAcceptanceId = orderKey.Value,
-                };
-                break;
-            case OrderIdKind.ExchangeOrderId:
-                dto = new CancelChildOrderRequest
-                {
-                    ProductCode = productCode,
-                    ChildOrderId = orderKey.Value,
-                };
-                break;
-            default:
-                throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, $"CancelOrderBy{orderKey.Kind}");
-        }
-
-        var response = await _tradingApi.CancelChildOrderAsync(dto, cancellationToken).ConfigureAwait(false);
-        if (response is null)
-        {
-            throw new ExchangeApiException(
-                message: "bitFlyer cancelchildorder returned no response.",
-                exchange: ExchangeCode.Bitflyer,
-                operation: "Bitflyer.CancelChildOrder",
-                statusCode: null);
-        }
-
-        return new CancelResult(true);
+        var call = await CancelOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.CancelChildOrder");
     }
 
     public async Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        if (symbol.IsEmpty)
-        {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
-        }
-
-        var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var rawOrders = await _accountApi
-            .GetChildOrdersAsync(productCode, childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        var mapped = rawOrders.Select(o =>
-        {
-            var acceptanceId = string.IsNullOrWhiteSpace(o.ChildOrderAcceptanceId) ? null : o.ChildOrderAcceptanceId;
-            var exchangeOrderId = string.IsNullOrWhiteSpace(o.ChildOrderId) ? null : o.ChildOrderId;
-            var key = acceptanceId is not null
-                ? new OrderKey(OrderIdKind.AcceptanceId, acceptanceId)
-                : exchangeOrderId is not null
-                    ? new OrderKey(OrderIdKind.ExchangeOrderId, exchangeOrderId)
-                    : throw new ExchangeApiException(
-                        message: "bitFlyer order is missing both acceptanceId and exchangeOrderId.",
-                        exchange: ExchangeCode.Bitflyer,
-                        operation: "Bitflyer.GetOpenOrders");
-
-            return new OpenOrder(
-                ExchangeCode: ExchangeCode.Bitflyer,
-                Symbol: symbol,
-                Key: key,
-                Side: BitflyerCommonMapper.MapSide(o.Side),
-                OrderType: BitflyerTradingMapper.MapOrderTypeFromExchange(o.ChildOrderType),
-                Size: new Size(o.Size),
-                OutstandingSize: new Size(o.OutstandingSize),
-                ExecutedSize: new Size(o.ExecutedSize),
-                Price: o.Price == 0 ? null : new Price(o.Price),
-                OrderedAt: o.ChildOrderDate,
-                UpdatedAt: null,
-                StopPrice: null,
-                Status: o.ChildOrderStatusState,
-                ExchangeOrderId: exchangeOrderId,
-                AcceptanceId: acceptanceId);
-        }).ToArray();
-
-        return mapped;
+        var call = await GetOpenOrdersCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetOpenOrders");
     }
 
     public async Task<OrderStatus> GetOrderAsync(
@@ -158,51 +66,11 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
     {
-        if (symbol.IsEmpty)
-        {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
-        }
-
-        IReadOnlyList<ChildOrderResponse> orders;
-        var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        switch (orderKey.Kind)
-        {
-            case OrderIdKind.AcceptanceId:
-                orders = await _accountApi
-                    .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderAcceptanceId: orderKey.Value, cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
-                break;
-            case OrderIdKind.ExchangeOrderId:
-                orders = await _accountApi
-                    .GetChildOrdersAsync(productCode, childOrderStatusState: null, childOrderId: orderKey.Value, cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
-                break;
-            default:
-                throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, $"GetOrderBy{orderKey.Kind}");
-        }
-
-        var order = orders.FirstOrDefault();
-
-        if (order is null)
-        {
-            throw new ExchangeOrderNotFoundException(ExchangeCode.Bitflyer, "Bitflyer.GetOrder", symbol.ToString(), orderKey.ToString());
-        }
-
-        var status = BitflyerCommonMapper.MapOrderStatus(order.ChildOrderStatusState);
-        var resolvedKey = !string.IsNullOrWhiteSpace(order.ChildOrderAcceptanceId)
-            ? new OrderKey(OrderIdKind.AcceptanceId, order.ChildOrderAcceptanceId)
-            : new OrderKey(OrderIdKind.ExchangeOrderId, order.ChildOrderId);
-        return new OrderStatus(
-            ProductCode: productCode,
-            Key: resolvedKey,
-            Status: status,
-            ExecutedSize: new Size(order.ExecutedSize),
-            OutstandingSize: new Size(order.OutstandingSize),
-            Price: order.Price == 0 ? null : new Price(order.Price),
-            AveragePrice: order.AveragePrice == 0 ? null : new Price(order.AveragePrice));
+        var call = await GetOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetOrder");
     }
 
-    public async Task<BitflyerNormalizedCall<OrderResult, JsonElement>> PlaceOrderCallAsync(
+    public async Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
         OrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -222,20 +90,15 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             TimeInForce = BitflyerTradingMapper.MapTimeInForce(request.TimeInForce),
         };
 
-        var rawCall = await _tradingApi.CreateChildOrderCallAsync(dto, cancellationToken).ConfigureAwait(false);
-        var requestMeta = CreateRequest("Bitflyer.CreateChildOrder", new Dictionary<string, string?>
-        {
-            ["symbol"] = request.Symbol.ToString(),
-            ["side"] = request.Side.ToString(),
-            ["orderType"] = request.OrderType.ToString(),
-            ["size"] = request.Size.ToString(),
-            ["price"] = request.Price?.ToString(),
-            ["timeInForce"] = request.TimeInForce?.ToString(),
-        });
+        var rawCall = await _tradingApi
+            .CreateChildOrderAsync(new RawRequests.CreateChildOrderRequest(dto), cancellationToken)
+            .ConfigureAwait(false);
+        var callRequest = new PlaceOrderRequest(request);
 
         return CreateCall(
             rawCall,
-            requestMeta,
+            callRequest,
+            "Bitflyer.CreateChildOrder",
             ok =>
             {
                 var acceptanceId = ok.ChildOrderAcceptanceId;
@@ -244,7 +107,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             });
     }
 
-    public async Task<BitflyerNormalizedCall<CancelResult, JsonElement>> CancelOrderCallAsync(
+    public async Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
@@ -276,18 +139,15 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                 throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, $"CancelOrderBy{orderKey.Kind}");
         }
 
-        var rawCall = await _tradingApi.CancelChildOrderCallAsync(dto, cancellationToken).ConfigureAwait(false);
-        var requestMeta = CreateRequest("Bitflyer.CancelChildOrder", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.ToString(),
-            ["productCode"] = productCode.Value,
-            ["orderKey"] = orderKey.ToString(),
-        });
+        var rawCall = await _tradingApi
+            .CancelChildOrderAsync(new RawRequests.CancelChildOrderRequest(dto), cancellationToken)
+            .ConfigureAwait(false);
+        var callRequest = new CancelOrderRequest(symbol, orderKey);
 
-        return CreateCall(rawCall, requestMeta, _ => new CancelResult(true));
+        return CreateCall(rawCall, callRequest, "Bitflyer.CancelChildOrder", _ => new CancelResult(true));
     }
 
-    public async Task<BitflyerNormalizedCall<IReadOnlyList<OpenOrder>, JsonElement>> GetOpenOrdersCallAsync(
+    public async Task<Call<GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>> GetOpenOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -298,17 +158,19 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
 
         var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
         var rawCall = await _accountApi
-            .GetChildOrdersCallAsync(productCode, childOrderStatusState: "ACTIVE", childOrderAcceptanceId: null, cancellationToken: cancellationToken)
+            .GetChildOrdersAsync(
+                new RawRequests.GetChildOrdersRequest(
+                    productCode,
+                    ChildOrderStatusState: "ACTIVE",
+                    ChildOrderAcceptanceId: null),
+                cancellationToken)
             .ConfigureAwait(false);
-        var requestMeta = CreateRequest("Bitflyer.GetOpenOrders", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.ToString(),
-            ["productCode"] = productCode.Value,
-        });
+        var callRequest = new GetOpenOrdersRequest(symbol);
 
         return CreateCall(
             rawCall,
-            requestMeta,
+            callRequest,
+            "Bitflyer.GetOpenOrders",
             rawOrders =>
             {
                 IReadOnlyList<OpenOrder> mapped = rawOrders.Select(o =>
@@ -345,7 +207,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             });
     }
 
-    public async Task<BitflyerNormalizedCall<OrderStatus, JsonElement>> GetOrderCallAsync(
+    public async Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
@@ -359,24 +221,30 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         var rawCall = orderKey.Kind switch
         {
             OrderIdKind.AcceptanceId => await _accountApi
-                .GetChildOrdersCallAsync(productCode, childOrderStatusState: null, childOrderAcceptanceId: orderKey.Value, cancellationToken: cancellationToken)
+                .GetChildOrdersAsync(
+                    new RawRequests.GetChildOrdersRequest(
+                        productCode,
+                        ChildOrderStatusState: null,
+                        ChildOrderAcceptanceId: orderKey.Value),
+                    cancellationToken)
                 .ConfigureAwait(false),
             OrderIdKind.ExchangeOrderId => await _accountApi
-                .GetChildOrdersCallAsync(productCode, childOrderStatusState: null, childOrderId: orderKey.Value, cancellationToken: cancellationToken)
+                .GetChildOrdersAsync(
+                    new RawRequests.GetChildOrdersRequest(
+                        productCode,
+                        ChildOrderStatusState: null,
+                        ChildOrderId: orderKey.Value),
+                    cancellationToken)
                 .ConfigureAwait(false),
             _ => throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, $"GetOrderBy{orderKey.Kind}")
         };
 
-        var requestMeta = CreateRequest("Bitflyer.GetOrder", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.ToString(),
-            ["productCode"] = productCode.Value,
-            ["orderKey"] = orderKey.ToString(),
-        });
+        var callRequest = new GetOrderRequest(symbol, orderKey);
 
         return CreateCall(
             rawCall,
-            requestMeta,
+            callRequest,
+            "Bitflyer.GetOrder",
             orders =>
             {
                 var order = orders.FirstOrDefault();
@@ -400,33 +268,99 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             });
     }
 
-    private static BitflyerNormalizedRequest CreateRequest(
-        string operation,
-        IReadOnlyDictionary<string, string?> parameters) =>
-        new(operation, parameters);
-
-    private static BitflyerNormalizedCall<TOk, JsonElement> CreateCall<TRaw, TOk>(
-        BitflyerRawCall<TRaw, JsonElement> rawCall,
-        BitflyerNormalizedRequest request,
+    private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
         Func<TRaw, TOk> mapper)
     {
+        var meta = new CallMeta(
+            Layer: "Normalized",
+            Component: component,
+            Tags: null,
+            Children: new[] { rawCall.Id });
+
         return rawCall.Result switch
         {
-            Ok<TRaw, JsonElement> ok => new BitflyerNormalizedCall<TOk, JsonElement>(
-                request,
-                new Ok<TOk, JsonElement>(mapper(ok.Value), ok.StatusCode),
-                rawCall.Meta),
-            Err<TRaw, JsonElement> err => new BitflyerNormalizedCall<TOk, JsonElement>(
-                request,
-                new Err<TOk, JsonElement>(err.Error, err.StatusCode),
-                rawCall.Meta),
-            _ => throw new InvalidOperationException("Unsupported CallResult type.")
+            CallResult<TRaw>.Err err => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(err.Error),
+                Meta: meta),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper, meta),
+            _ => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
+                Meta: meta)
         };
+    }
+
+    private static Call<TReq, TOk> MapOk<TRawReq, TReq, TRaw, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
+        TRaw raw,
+        Func<TRaw, TOk> mapper,
+        CallMeta meta)
+    {
+        try
+        {
+            var mapped = mapper(raw);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Ok(mapped),
+                Meta: meta);
+        }
+        catch (ExchangeOrderNotFoundException ex)
+        {
+            var error = new CallError(CallErrorKind.Semantic, ex.Message, ex);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(error),
+                Meta: meta);
+        }
+        catch (Exception ex)
+        {
+            var error = new CallError(CallErrorKind.Mapping, $"{component} failed to map normalized response.", ex);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(error),
+                Meta: meta);
+        }
     }
 
     private async Task<RawProductCode> ToProductCodeAsync(Symbol symbol, CancellationToken ct)
     {
         var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
         return new RawProductCode(market.ProductCode);
+    }
+
+    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
+    {
+        return call.Result switch
+        {
+            CallResult<TRes>.Ok ok => ok.Response,
+            CallResult<TRes>.Err err => throw new ExchangeApiException(
+                message: err.Error.Message,
+                exchange: ExchangeCode.Bitflyer,
+                operation: operation,
+                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
+                innerException: err.Error.Exception),
+            _ => throw new InvalidOperationException("Unsupported CallResult type.")
+        };
     }
 }

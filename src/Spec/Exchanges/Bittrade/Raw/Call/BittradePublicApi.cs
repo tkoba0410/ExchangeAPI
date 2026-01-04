@@ -4,9 +4,12 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
-using ExchangeApi.Spec.Wire;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw.Types;
+using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
+using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Spec.Wire;
+
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Call;
 
 /// <summary>
@@ -21,304 +24,210 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public async Task<RawMergedResponse> GetMergedTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        var call = await SendAsync(BittradeEndpoints.GetTicker(symbol.Value), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawMergedResponse>(response.Json, "Bittrade.GetMergedTicker");
-        }
-
-        throw BittradeRawJson.CreateStatusException(
-            "Bittrade.GetMergedTicker",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<RawDepthResponse> GetDepthAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        var call = await SendAsync(BittradeEndpoints.GetOrderBook(symbol.Value, type), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawDepthResponse>(response.Json, "Bittrade.GetDepth");
-        }
-
-        throw BittradeRawJson.CreateStatusException("Bittrade.GetDepth", response.StatusCode, response.Json);
-    }
-
-    public async Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        var call = await SendAsync(BittradeEndpoints.GetTrades(symbol.Value), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawTradeResponse>(response.Json, "Bittrade.GetTrades");
-        }
-
-        throw BittradeRawJson.CreateStatusException("Bittrade.GetTrades", response.StatusCode, response.Json);
-    }
-
-    public async Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BittradeEndpoints.GetSymbols(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawSymbolsResponse>(response.Json, "Bittrade.GetSymbols");
-        }
-
-        throw BittradeRawJson.CreateStatusException("Bittrade.GetSymbols", response.StatusCode, response.Json);
-    }
-
-    public async Task<RawCurrenciesResponse> GetCurrenciesAsync(CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BittradeEndpoints.GetCurrencies(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawCurrenciesResponse>(response.Json, "Bittrade.GetCurrencies");
-        }
-
-        throw BittradeRawJson.CreateStatusException("Bittrade.GetCurrencies", response.StatusCode, response.Json);
-    }
-
-    public async Task<RawTimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BittradeEndpoints.GetTimestamp(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawTimestampResponse>(response.Json, "Bittrade.GetTimestamp");
-        }
-
-        throw BittradeRawJson.CreateStatusException("Bittrade.GetTimestamp", response.StatusCode, response.Json);
-    }
-
-    public async Task<RawKlinesResponse> GetKlinesAsync(RawSymbol symbol, string period, int? size = null, CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        if (string.IsNullOrWhiteSpace(period)) throw new ArgumentException("period is required.", nameof(period));
-        var call = await SendAsync(BittradeEndpoints.GetKlines(symbol.Value, period, size), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawKlinesResponse>(response.Json, "Bittrade.GetKlines");
-        }
-
-        throw BittradeRawJson.CreateStatusException("Bittrade.GetKlines", response.StatusCode, response.Json);
-    }
-
-    public async Task<RawTickersResponse> GetTickersAsync(CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BittradeEndpoints.GetTickers(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawTickersResponse>(response.Json, "Bittrade.GetTickers");
-        }
-
-        throw BittradeRawJson.CreateStatusException("Bittrade.GetTickers", response.StatusCode, response.Json);
-    }
-
-    public async Task<RawTradeHistoryResponse> GetTradeHistoryAsync(RawSymbol symbol, CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        var call = await SendAsync(BittradeEndpoints.GetTradeHistory(symbol.Value), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawTradeHistoryResponse>(
-                response.Json,
-                "Bittrade.GetTradeHistory");
-        }
-
-        throw BittradeRawJson.CreateStatusException(
-            "Bittrade.GetTradeHistory",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<BittradeRawCall<RawMergedResponse, JsonElement>> GetMergedTickerCallAsync(
-        RawSymbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        var wireCall = await SendAsync(BittradeEndpoints.GetTicker(symbol.Value), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetMergedTicker", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.Value,
-        });
-        return CreateCall<RawMergedResponse>(request, wireCall, "Bittrade.GetMergedTicker");
-    }
-
-    public async Task<BittradeRawCall<RawDepthResponse, JsonElement>> GetDepthCallAsync(
-        RawSymbol symbol,
-        string? type = null,
-        CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        var wireCall = await SendAsync(BittradeEndpoints.GetOrderBook(symbol.Value, type), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetDepth", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.Value,
-            ["type"] = type,
-        });
-        return CreateCall<RawDepthResponse>(request, wireCall, "Bittrade.GetDepth");
-    }
-
-    public async Task<BittradeRawCall<RawTradeResponse, JsonElement>> GetTradesCallAsync(
-        RawSymbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        var wireCall = await SendAsync(BittradeEndpoints.GetTrades(symbol.Value), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetTrades", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.Value,
-        });
-        return CreateCall<RawTradeResponse>(request, wireCall, "Bittrade.GetTrades");
-    }
-
-    public async Task<BittradeRawCall<RawSymbolsResponse, JsonElement>> GetSymbolsCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BittradeEndpoints.GetSymbols(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetSymbols", new Dictionary<string, string?>());
-        return CreateCall<RawSymbolsResponse>(request, wireCall, "Bittrade.GetSymbols");
-    }
-
-    public async Task<BittradeRawCall<RawCurrenciesResponse, JsonElement>> GetCurrenciesCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BittradeEndpoints.GetCurrencies(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetCurrencies", new Dictionary<string, string?>());
-        return CreateCall<RawCurrenciesResponse>(request, wireCall, "Bittrade.GetCurrencies");
-    }
-
-    public async Task<BittradeRawCall<RawTimestampResponse, JsonElement>> GetTimestampCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BittradeEndpoints.GetTimestamp(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetTimestamp", new Dictionary<string, string?>());
-        return CreateCall<RawTimestampResponse>(request, wireCall, "Bittrade.GetTimestamp");
-    }
-
-    public async Task<BittradeRawCall<RawKlinesResponse, JsonElement>> GetKlinesCallAsync(
-        RawSymbol symbol,
-        string period,
-        int? size = null,
-        CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        if (string.IsNullOrWhiteSpace(period))
-        {
-            throw new ArgumentException("period is required.", nameof(period));
-        }
-
-        var wireCall = await SendAsync(BittradeEndpoints.GetKlines(symbol.Value, period, size), cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetKlines", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.Value,
-            ["period"] = period,
-            ["size"] = size?.ToString(),
-        });
-        return CreateCall<RawKlinesResponse>(request, wireCall, "Bittrade.GetKlines");
-    }
-
-    public async Task<BittradeRawCall<RawTickersResponse, JsonElement>> GetTickersCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BittradeEndpoints.GetTickers(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetTickers", new Dictionary<string, string?>());
-        return CreateCall<RawTickersResponse>(request, wireCall, "Bittrade.GetTickers");
-    }
-
-    public async Task<BittradeRawCall<RawTradeHistoryResponse, JsonElement>> GetTradeHistoryCallAsync(
-        RawSymbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        EnsureSymbol(symbol);
-        var wireCall = await SendAsync(BittradeEndpoints.GetTradeHistory(symbol.Value), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetTradeHistory", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.Value,
-        });
-        return CreateCall<RawTradeHistoryResponse>(request, wireCall, "Bittrade.GetTradeHistory");
-    }
-
-    public async Task<BittradeRawCall<RawRetailMaintainTimeResponse, JsonElement>> GetRetailMaintainTimeCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BittradeEndpoints.GetRetailMaintainTime(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bittrade.GetRetailMaintainTime", new Dictionary<string, string?>());
-        return CreateCall<RawRetailMaintainTimeResponse>(request, wireCall, "Bittrade.GetRetailMaintainTime");
-    }
-
-    private static BittradeRawRequest CreateRequest(
-        string operation,
-        IReadOnlyDictionary<string, string?> parameters) =>
-        new(operation, parameters);
-
-    private static BittradeRawCall<TOk, JsonElement> CreateCall<TOk>(
-        BittradeRawRequest request,
-        WireCall call,
-        string context)
-    {
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            var ok = BittradeRawJson.DeserializeOrThrow<TOk>(response.Json, context);
-            return new BittradeRawCall<TOk, JsonElement>(
-                request,
-                new Ok<TOk, JsonElement>(ok, response.StatusCode),
-                call.Meta);
-        }
-
-        if (BittradeRawJson.TryDeserialize<JsonElement>(response.Json, out var error, out _))
-        {
-            return new BittradeRawCall<TOk, JsonElement>(
-                request,
-                new Err<TOk, JsonElement>(error!, response.StatusCode),
-                call.Meta);
-        }
-
-        return new BittradeRawCall<TOk, JsonElement>(
+    public Task<Call<GetMergedTickerRequest, RawMergedResponse>> GetMergedTickerAsync(
+        GetMergedTickerRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
             request,
-            new Err<TOk, JsonElement>(default, response.StatusCode),
-            call.Meta);
-    }
+            "Bittrade.GetMergedTicker",
+            BittradeEndpoints.GetTicker(request.Symbol.Value),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawMergedResponse>(json, "Bittrade.GetMergedTicker"));
 
-    public async Task<RawRetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BittradeEndpoints.GetRetailMaintainTime(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawRetailMaintainTimeResponse>(
-                response.Json,
-                "Bittrade.GetRetailMaintainTime");
-        }
+    public Task<Call<GetDepthRequest, RawDepthResponse>> GetDepthAsync(
+        GetDepthRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.GetDepth",
+            BittradeEndpoints.GetOrderBook(request.Symbol.Value, request.Type),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawDepthResponse>(json, "Bittrade.GetDepth"));
 
-        throw BittradeRawJson.CreateStatusException(
+    public Task<Call<GetTradesRequest, RawTradeResponse>> GetTradesAsync(
+        GetTradesRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.GetTrades",
+            BittradeEndpoints.GetTrades(request.Symbol.Value),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawTradeResponse>(json, "Bittrade.GetTrades"));
+
+    public Task<Call<GetSymbolsRequest, RawSymbolsResponse>> GetSymbolsAsync(
+        GetSymbolsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.GetSymbols",
+            BittradeEndpoints.GetSymbols(),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawSymbolsResponse>(json, "Bittrade.GetSymbols"));
+
+    public Task<Call<GetCurrenciesRequest, RawCurrenciesResponse>> GetCurrenciesAsync(
+        GetCurrenciesRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.GetCurrencies",
+            BittradeEndpoints.GetCurrencies(),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawCurrenciesResponse>(json, "Bittrade.GetCurrencies"));
+
+    public Task<Call<GetTimestampRequest, RawTimestampResponse>> GetTimestampAsync(
+        GetTimestampRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.GetTimestamp",
+            BittradeEndpoints.GetTimestamp(),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawTimestampResponse>(json, "Bittrade.GetTimestamp"));
+
+    public Task<Call<GetKlinesRequest, RawKlinesResponse>> GetKlinesAsync(
+        GetKlinesRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.GetKlines",
+            BittradeEndpoints.GetKlines(request.Symbol.Value, request.Period, request.Size),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawKlinesResponse>(json, "Bittrade.GetKlines"));
+
+    public Task<Call<GetTickersRequest, RawTickersResponse>> GetTickersAsync(
+        GetTickersRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.GetTickers",
+            BittradeEndpoints.GetTickers(),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawTickersResponse>(json, "Bittrade.GetTickers"));
+
+    public Task<Call<GetTradeHistoryRequest, RawTradeHistoryResponse>> GetTradeHistoryAsync(
+        GetTradeHistoryRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.GetTradeHistory",
+            BittradeEndpoints.GetTradeHistory(request.Symbol.Value),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawTradeHistoryResponse>(json, "Bittrade.GetTradeHistory"));
+
+    public Task<Call<GetRetailMaintainTimeRequest, RawRetailMaintainTimeResponse>> GetRetailMaintainTimeAsync(
+        GetRetailMaintainTimeRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
             "Bittrade.GetRetailMaintainTime",
-            response.StatusCode,
-            response.Json);
+            BittradeEndpoints.GetRetailMaintainTime(),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawRetailMaintainTimeResponse>(
+                json,
+                "Bittrade.GetRetailMaintainTime"));
+
+    private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
+        TReq request,
+        string component,
+        WireCallSpec spec,
+        CancellationToken cancellationToken,
+        Func<string, TRes> parse)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        if (parse is null) throw new ArgumentNullException(nameof(parse));
+
+        var wireCall = await _wire.SendAsync(ExchangeCode.Bittrade, spec, cancellationToken).ConfigureAwait(false);
+        return CreateCall(request, component, wireCall, parse);
     }
 
-    private static void EnsureSymbol(RawSymbol symbol)
+    private static Call<TReq, TRes> CreateCall<TReq, TRes>(
+        TReq request,
+        string component,
+        Call<WireCallSpec, WireResponse> wireCall,
+        Func<string, TRes> parse)
     {
-        if (string.IsNullOrWhiteSpace(symbol.Value))
+        var meta = new CallMeta(
+            Layer: "Raw",
+            Component: component,
+            Tags: null,
+            Children: new[] { wireCall.Id });
+
+        return wireCall.Result switch
         {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
+            CallResult<WireResponse>.Err err => new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(err.Error),
+                Meta: meta),
+            CallResult<WireResponse>.Ok ok => CreateOkCall(request, component, ok.Response, wireCall, parse, meta),
+            _ => new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(new CallError(CallErrorKind.Unknown, "Wire call returned unknown result.")),
+                Meta: meta)
+        };
+    }
+
+    private static Call<TReq, TRes> CreateOkCall<TReq, TRes>(
+        TReq request,
+        string component,
+        WireResponse response,
+        Call<WireCallSpec, WireResponse> wireCall,
+        Func<string, TRes> parse,
+        CallMeta meta)
+    {
+        if (response.StatusCode is < 200 or >= 300)
+        {
+            var error = new CallError(
+                CallErrorKind.Http,
+                $"{component} failed with status {response.StatusCode}.",
+                HttpStatus: response.StatusCode,
+                BodySnippet: Snip(response.Json));
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(error),
+                Meta: meta);
+        }
+
+        try
+        {
+            var parsed = parse(response.Json);
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Ok(parsed),
+                Meta: meta);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            var error = new CallError(
+                CallErrorKind.Codec,
+                $"{component} failed to parse response.",
+                ex,
+                response.StatusCode,
+                Snip(response.Json));
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(error),
+                Meta: meta);
         }
     }
 
-    private Task<WireCall> SendAsync(WireRequest request, CancellationToken ct) =>
-        _wire.SendAsync(ExchangeCode.Bittrade, request, ct);
+    private static string? Snip(string? json)
+    {
+        if (string.IsNullOrEmpty(json)) return json;
+        return json.Length <= 512 ? json : json[..512];
+    }
 }

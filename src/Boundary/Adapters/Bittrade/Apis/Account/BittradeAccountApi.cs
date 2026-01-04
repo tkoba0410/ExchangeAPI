@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Requests;
@@ -17,7 +16,6 @@ using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeApi.Spec.CallCommon;
-using System.Text.Json;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 
@@ -45,7 +43,7 @@ internal sealed class BittradeAccountApi : IAccountApi
         throw new ExchangeFeatureNotSupportedException(Exchange, "AccountExecutions");
     }
 
-    public async Task<ApiCall<GetBalancesRequest, IReadOnlyList<Balance>, ApiError>> GetBalancesCallAsync(
+    public async Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetBalancesRequest();
@@ -54,58 +52,58 @@ internal sealed class BittradeAccountApi : IAccountApi
         try
         {
             var call = await _account.GetBalancesCallAsync(cancellationToken).ConfigureAwait(false);
-            return call.Result switch
-            {
-                Ok<IReadOnlyList<BittradeBalanceEntryNormalized>, JsonElement> ok => ApiCallMapper.Ok(
-                    Exchange,
-                    request,
-                    call.Meta,
-                    ok.StatusCode,
-                    BittradeMapper.MapBalances(ok.Value)),
-                Err<IReadOnlyList<BittradeBalanceEntryNormalized>, JsonElement> err => ApiCallMapper.Err<GetBalancesRequest, IReadOnlyList<Balance>>(
-                    Exchange,
-                    request,
-                    call.Meta,
-                    err.StatusCode),
-                _ => throw new InvalidOperationException("Unsupported CallResult type.")
-            };
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                "Bittrade.Account.GetBalances",
+                BittradeMapper.MapBalances);
         }
         catch (Exception ex)
         {
             return ApiCallMapper.FromException<GetBalancesRequest, IReadOnlyList<Balance>>(
-                Exchange,
                 request,
                 startedAt,
+                "Bittrade.Account.GetBalances",
                 ex);
         }
     }
 
-    public Task<ApiCall<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>, ApiError>> GetAccountExecutionsCallAsync(
+    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default)
     {
         var request = new GetAccountExecutionsRequest(symbol);
-        var meta = ApiCallMapper.ToMeta(DateTimeOffset.UtcNow);
-        return Task.FromResult(ApiCallMapper.Err<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(
-            Exchange,
-            request,
-            meta,
-            0,
-            "Feature not supported."));
+        var now = DateTimeOffset.UtcNow;
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: "Bittrade.Account.GetAccountExecutions",
+            Tags: null,
+            Children: null);
+        return Task.FromResult(new Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(
+            Id: CallId.New(),
+            StartedAt: now,
+            Duration: TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<IReadOnlyList<ExecutionAccount>>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
+            Meta: meta));
     }
 
-    private static TOk Unwrap<TReq, TOk>(ApiCall<TReq, TOk, ApiError> call, string operation)
+    private static TOk Unwrap<TReq, TOk>(Call<TReq, TOk> call, string operation)
     {
         return call.Result switch
         {
-            ApiOk<TOk, ApiError> ok => ok.Value,
-            ApiErr<TOk, ApiError> err => throw new ExchangeApiException(
+            CallResult<TOk>.Ok ok => ok.Response,
+            CallResult<TOk>.Err err => throw new ExchangeApiException(
                 message: err.Error.Message,
-                exchange: call.Exchange,
+                exchange: Exchange,
                 operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.StatusCode),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error.Kind)),
-            _ => throw new InvalidOperationException("Unsupported ApiCallResult type.")
+                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
+            _ => throw new ExchangeApiException(
+                message: "Unknown call result.",
+                exchange: Exchange,
+                operation: operation,
+                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
         };
     }
 }

@@ -1,7 +1,7 @@
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Spec.CallCommon;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
@@ -9,61 +9,43 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// </summary>
 internal interface IBittradePublicApi
 {
-    Task<RawMergedResponse> GetMergedTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
-
-    Task<RawDepthResponse> GetDepthAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default);
-
-    Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
-
-    Task<RawSymbolsResponse> GetSymbolsAsync(CancellationToken cancellationToken = default);
-
-    Task<RawCurrenciesResponse> GetCurrenciesAsync(CancellationToken cancellationToken = default);
-
-    Task<RawTimestampResponse> GetTimestampAsync(CancellationToken cancellationToken = default);
-
-    Task<RawKlinesResponse> GetKlinesAsync(RawSymbol symbol, string period, int? size = null, CancellationToken cancellationToken = default);
-
-    Task<RawTickersResponse> GetTickersAsync(CancellationToken cancellationToken = default);
-
-    Task<RawTradeHistoryResponse> GetTradeHistoryAsync(RawSymbol symbol, CancellationToken cancellationToken = default);
-
-    Task<RawRetailMaintainTimeResponse> GetRetailMaintainTimeAsync(CancellationToken cancellationToken = default);
-
-    Task<BittradeRawCall<RawMergedResponse, JsonElement>> GetMergedTickerCallAsync(
-        RawSymbol symbol,
+    Task<Call<GetMergedTickerRequest, RawMergedResponse>> GetMergedTickerAsync(
+        GetMergedTickerRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawDepthResponse, JsonElement>> GetDepthCallAsync(
-        RawSymbol symbol,
-        string? type = null,
+    Task<Call<GetDepthRequest, RawDepthResponse>> GetDepthAsync(
+        GetDepthRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawTradeResponse, JsonElement>> GetTradesCallAsync(
-        RawSymbol symbol,
+    Task<Call<GetTradesRequest, RawTradeResponse>> GetTradesAsync(
+        GetTradesRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawSymbolsResponse, JsonElement>> GetSymbolsCallAsync(
+    Task<Call<GetSymbolsRequest, RawSymbolsResponse>> GetSymbolsAsync(
+        GetSymbolsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawCurrenciesResponse, JsonElement>> GetCurrenciesCallAsync(
+    Task<Call<GetCurrenciesRequest, RawCurrenciesResponse>> GetCurrenciesAsync(
+        GetCurrenciesRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawTimestampResponse, JsonElement>> GetTimestampCallAsync(
+    Task<Call<GetTimestampRequest, RawTimestampResponse>> GetTimestampAsync(
+        GetTimestampRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawKlinesResponse, JsonElement>> GetKlinesCallAsync(
-        RawSymbol symbol,
-        string period,
-        int? size = null,
+    Task<Call<GetKlinesRequest, RawKlinesResponse>> GetKlinesAsync(
+        GetKlinesRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawTickersResponse, JsonElement>> GetTickersCallAsync(
+    Task<Call<GetTickersRequest, RawTickersResponse>> GetTickersAsync(
+        GetTickersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawTradeHistoryResponse, JsonElement>> GetTradeHistoryCallAsync(
-        RawSymbol symbol,
+    Task<Call<GetTradeHistoryRequest, RawTradeHistoryResponse>> GetTradeHistoryAsync(
+        GetTradeHistoryRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawRetailMaintainTimeResponse, JsonElement>> GetRetailMaintainTimeCallAsync(
+    Task<Call<GetRetailMaintainTimeRequest, RawRetailMaintainTimeResponse>> GetRetailMaintainTimeAsync(
+        GetRetailMaintainTimeRequest request,
         CancellationToken cancellationToken = default);
 }

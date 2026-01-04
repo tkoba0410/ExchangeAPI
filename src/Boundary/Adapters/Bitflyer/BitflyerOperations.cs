@@ -33,4 +33,9 @@ internal static class BitflyerOperations
         public const string GetOpenPositions = "Bitflyer.Margin.GetOpenPositions";
         public const string GetCollateral = "Bitflyer.Margin.GetCollateral";
     }
+
+    internal static class ExchangeInfo
+    {
+        public const string GetExchangeInfo = "Bitflyer.ExchangeInfo.GetExchangeInfo";
+    }
 }

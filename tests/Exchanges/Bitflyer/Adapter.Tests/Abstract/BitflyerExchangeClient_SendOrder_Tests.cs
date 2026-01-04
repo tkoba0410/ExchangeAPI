@@ -33,10 +33,10 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         Assert.Equal(OrderIdKind.AcceptanceId, result.Key.Kind);
         Assert.Equal("ACCEPT-123", result.Key.Value);
         Assert.NotNull(fakeTrading.LastRequest);
-        Assert.Equal(new RawProductCode("BTC_JPY"), fakeTrading.LastRequest!.ProductCode);
-        Assert.Equal(RawSide.Buy, fakeTrading.LastRequest!.Side);
-        Assert.Equal(RawChildOrderType.Market, fakeTrading.LastRequest!.ChildOrderType);
-        Assert.Equal(0.01m, fakeTrading.LastRequest!.Size);
+        Assert.Equal(new RawProductCode("BTC_JPY"), fakeTrading.LastRequest!.Body.ProductCode);
+        Assert.Equal(RawSide.Buy, fakeTrading.LastRequest!.Body.Side);
+        Assert.Equal(RawChildOrderType.Market, fakeTrading.LastRequest!.Body.ChildOrderType);
+        Assert.Equal(0.01m, fakeTrading.LastRequest!.Body.Size);
     }
 
     [Fact]

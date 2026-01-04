@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 internal static class BitflyerRawMappers
 {
-    public static RawSendChildOrderRequest MapSendChildOrderRequest(CreateChildOrderRequest request) => new()
+    public static RawSendChildOrderRequest MapSendChildOrderRequest(PrivatePost.CreateChildOrderRequest request) => new()
     {
         ProductCode = MapProductCode(request.ProductCode),
         ChildOrderType = MapChildOrderType(request.ChildOrderType),

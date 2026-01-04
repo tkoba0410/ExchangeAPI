@@ -53,7 +53,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
         Assert.Equal(acceptanceId, result.Key.Value);
         Assert.Equal(OrderIdKind.AcceptanceId, status.Key.Kind);
         Assert.Equal(acceptanceId, status.Key.Value);
-        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.ChildOrderAcceptanceId);
+        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.Body.ChildOrderAcceptanceId);
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
 
         Assert.Equal(OrderIdKind.AcceptanceId, key.Kind);
         Assert.Equal(acceptanceId, key.Value);
-        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.ChildOrderAcceptanceId);
+        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.Body.ChildOrderAcceptanceId);
         Assert.Equal(acceptanceId, status.Key.Value);
     }
 

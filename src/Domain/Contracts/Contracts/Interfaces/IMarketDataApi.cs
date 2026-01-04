@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
+using ExchangeApi.Spec.CallCommon;
 namespace ExchangeApi.Contracts.Interfaces;
 
 /// <summary>
@@ -26,15 +26,15 @@ public interface IMarketDataApi
         DateTimeOffset? to = null,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<GetTickerRequest, Ticker, ApiError>> GetTickerCallAsync(
+    Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<GetOrderBookRequest, OrderBook, ApiError>> GetOrderBookCallAsync(
+    Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>, ApiError>> GetMarketExecutionsCallAsync(
+    Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 }

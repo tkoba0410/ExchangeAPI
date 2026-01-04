@@ -1,8 +1,9 @@
 using System;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw.Types;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Call;
 
@@ -15,41 +16,57 @@ internal sealed class BittradeRawMarketDataApi : IBittradeRawMarketDataApi
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
     }
 
-    public Task<RawMergedResponse> GetTickerAsync(RawSymbol symbol, CancellationToken cancellationToken = default) =>
-        _publicApi.GetMergedTickerAsync(EnsureSymbol(symbol), cancellationToken);
+    public async Task<Call<GetTickerRequest, RawMergedResponse>> GetTickerAsync(
+        GetTickerRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var publicCall = await _publicApi
+            .GetMergedTickerAsync(new GetMergedTickerRequest(request.Symbol), cancellationToken)
+            .ConfigureAwait(false);
+        return MapCall(request, "Bittrade.GetTicker", publicCall);
+    }
 
-    public Task<RawDepthResponse> GetOrderBookAsync(RawSymbol symbol, string? type = null, CancellationToken cancellationToken = default) =>
-        _publicApi.GetDepthAsync(EnsureSymbol(symbol), ApplyDefaultDepthType(type), cancellationToken);
+    public async Task<Call<GetOrderBookRequest, RawDepthResponse>> GetOrderBookAsync(
+        GetOrderBookRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var depthType = ApplyDefaultDepthType(request.Type);
+        var publicCall = await _publicApi
+            .GetDepthAsync(new GetDepthRequest(request.Symbol, depthType), cancellationToken)
+            .ConfigureAwait(false);
+        return MapCall(request, "Bittrade.GetOrderBook", publicCall);
+    }
 
-    public Task<RawTradeResponse> GetTradesAsync(RawSymbol symbol, CancellationToken cancellationToken = default) =>
-        _publicApi.GetTradesAsync(EnsureSymbol(symbol), cancellationToken);
+    public async Task<Call<GetMarketTradesRequest, RawTradeResponse>> GetTradesAsync(
+        GetMarketTradesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var publicCall = await _publicApi
+            .GetTradesAsync(new GetTradesRequest(request.Symbol), cancellationToken)
+            .ConfigureAwait(false);
+        return MapCall(request, "Bittrade.GetTrades", publicCall);
+    }
 
-    public Task<BittradeRawCall<RawMergedResponse, JsonElement>> GetTickerCallAsync(
-        RawSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        _publicApi.GetMergedTickerCallAsync(EnsureSymbol(symbol), cancellationToken);
+    private static Call<TReq, TRes> MapCall<TReq, TRes, TOtherReq>(
+        TReq request,
+        string component,
+        Call<TOtherReq, TRes> publicCall)
+    {
+        var meta = new CallMeta(
+            Layer: "Raw",
+            Component: component,
+            Tags: null,
+            Children: new[] { publicCall.Id });
 
-    public Task<BittradeRawCall<RawDepthResponse, JsonElement>> GetOrderBookCallAsync(
-        RawSymbol symbol,
-        string? type = null,
-        CancellationToken cancellationToken = default) =>
-        _publicApi.GetDepthCallAsync(EnsureSymbol(symbol), ApplyDefaultDepthType(type), cancellationToken);
+        return new Call<TReq, TRes>(
+            Id: CallId.New(),
+            StartedAt: publicCall.StartedAt,
+            Duration: publicCall.Duration,
+            Request: request,
+            Result: publicCall.Result,
+            Meta: meta);
+    }
 
     private static string ApplyDefaultDepthType(string? type) =>
         string.IsNullOrWhiteSpace(type) ? "step0" : type;
-
-    public Task<BittradeRawCall<RawTradeResponse, JsonElement>> GetTradesCallAsync(
-        RawSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        _publicApi.GetTradesCallAsync(EnsureSymbol(symbol), cancellationToken);
-
-    private static RawSymbol EnsureSymbol(RawSymbol symbol)
-    {
-        if (string.IsNullOrWhiteSpace(symbol.Value))
-        {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
-        }
-
-        return symbol;
-    }
 }

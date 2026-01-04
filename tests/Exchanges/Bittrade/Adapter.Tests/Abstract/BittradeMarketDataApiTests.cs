@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
@@ -15,6 +14,7 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
+using ExchangeApi.Spec.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -123,7 +123,7 @@ public class BittradeMarketDataApiTests
         public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(_info);
 
-        public Task<ApiCall<GetExchangeInfoRequest, ExchangeInfo, ApiError>> GetExchangeInfoCallAsync(
+        public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }

@@ -127,22 +127,28 @@ internal static class BitflyerEndpoints
 
     public static WireCallSpec GetParentOrders(
         string productCode,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
         int? count = null,
         long? before = null,
-        long? after = null,
-        string? parentOrderStatusState = null)
+        long? after = null)
     {
         return Get(BitflyerConstants.Paths.GetParentOrders, BuildQuery(
             (BitflyerConstants.QueryKeys.ProductCode, productCode),
+            (BitflyerConstants.QueryKeys.ParentOrderId, parentOrderId),
+            (BitflyerConstants.QueryKeys.ParentOrderAcceptanceId, parentOrderAcceptanceId),
             (BitflyerConstants.QueryKeys.Count, count?.ToString()),
             (BitflyerConstants.QueryKeys.Before, before?.ToString()),
-            (BitflyerConstants.QueryKeys.After, after?.ToString()),
-            (BitflyerConstants.QueryKeys.ParentOrderStatusState, parentOrderStatusState)));
+            (BitflyerConstants.QueryKeys.After, after?.ToString())));
     }
 
-    public static WireCallSpec GetParentOrder(string? parentOrderId = null, string? parentOrderAcceptanceId = null)
+    public static WireCallSpec GetParentOrder(
+        string productCode,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null)
     {
         return Get(BitflyerConstants.Paths.GetParentOrder, BuildQuery(
+            (BitflyerConstants.QueryKeys.ProductCode, productCode),
             (BitflyerConstants.QueryKeys.ParentOrderId, parentOrderId),
             (BitflyerConstants.QueryKeys.ParentOrderAcceptanceId, parentOrderAcceptanceId)));
     }

@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
 using ExchangeApi.Spec.CallCommon;
 using Xunit;
 
@@ -33,9 +33,6 @@ public class BittradeExchangeInfoApiTests
 
     private sealed class StubNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
     {
-        private static readonly BittradeNormalizedRequest DefaultRequest =
-            new BittradeNormalizedRequest("test", new Dictionary<string, string?>());
-
         public Task<IReadOnlyList<BittradeSymbolNormalized>> GetSymbolsAsync(System.Threading.CancellationToken ct = default) =>
             Task.FromResult<IReadOnlyList<BittradeSymbolNormalized>>(new[]
             {
@@ -50,22 +47,35 @@ public class BittradeExchangeInfoApiTests
                     State: "online")
             });
 
-        public Task<BittradeNormalizedCall<IReadOnlyList<BittradeSymbolNormalized>, System.Text.Json.JsonElement>> GetSymbolsCallAsync(
-            System.Threading.CancellationToken ct = default) =>
-            Task.FromResult(new BittradeNormalizedCall<IReadOnlyList<BittradeSymbolNormalized>, System.Text.Json.JsonElement>(
-                DefaultRequest,
-                new Ok<IReadOnlyList<BittradeSymbolNormalized>, System.Text.Json.JsonElement>(new[]
-                {
-                    new BittradeSymbolNormalized(
-                        Symbol: "btcjpy",
-                        BaseCurrency: "btc",
-                        QuoteCurrency: "jpy",
-                        PricePrecision: 2,
-                        AmountPrecision: 4,
-                        MinOrderAmount: 0.0001m,
-                        MinOrderValue: 1000m,
-                        State: "online")
-                }, 200),
-                new CallMeta(System.DateTimeOffset.UtcNow, System.TimeSpan.Zero, null)));
+        public Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
+            System.Threading.CancellationToken ct = default)
+        {
+            IReadOnlyList<BittradeSymbolNormalized> symbols = new[]
+            {
+                new BittradeSymbolNormalized(
+                    Symbol: "btcjpy",
+                    BaseCurrency: "btc",
+                    QuoteCurrency: "jpy",
+                    PricePrecision: 2,
+                    AmountPrecision: 4,
+                    MinOrderAmount: 0.0001m,
+                    MinOrderValue: 1000m,
+                    State: "online")
+            };
+            var request = new GetSymbolsRequest();
+            var meta = new CallMeta(
+                Layer: "Normalized",
+                Component: "StubNormalizedExchangeInfoApi",
+                Tags: null,
+                Children: null);
+            var call = new Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>(
+                Id: CallId.New(),
+                StartedAt: System.DateTimeOffset.UtcNow,
+                Duration: System.TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<IReadOnlyList<BittradeSymbolNormalized>>.Ok(symbols),
+                Meta: meta);
+            return Task.FromResult(call);
+        }
     }
 }

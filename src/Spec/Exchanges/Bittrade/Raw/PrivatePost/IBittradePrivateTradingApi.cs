@@ -1,7 +1,9 @@
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Spec.CallCommon;
+
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
@@ -9,45 +11,31 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// </summary>
 internal interface IBittradePrivateTradingApi
 {
-    Task<RawPlaceOrderResponse> CreateOrderAsync(RawCreateOrderRequest request, CancellationToken cancellationToken = default);
-
-    Task<RawCancelOrderResponse> CancelOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default);
-
-    Task<RawCancelOrdersResponse> CancelOrdersAsync(RawCancelOrdersRequest request, CancellationToken cancellationToken = default);
-
-    Task<RawCancelOpenOrdersResponse> CancelOpenOrdersAsync(RawCancelOpenOrdersRequest request, CancellationToken cancellationToken = default);
-
-    Task<RawCreateWithdrawResponse> CreateWithdrawAsync(RawCreateWithdrawRequest request, CancellationToken cancellationToken = default);
-
-    Task<RawCancelWithdrawResponse> CancelWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default);
-
-    Task<RawRetailOrderResponse> CreateRetailOrderAsync(RawCreateRetailOrderRequest request, CancellationToken cancellationToken = default);
-
-    Task<BittradeRawCall<RawPlaceOrderResponse, JsonElement>> CreateOrderCallAsync(
-        RawCreateOrderRequest request,
+    Task<Call<CreateOrderRequest, RawPlaceOrderResponse>> CreateOrderAsync(
+        CreateOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawCancelOrderResponse, JsonElement>> CancelOrderCallAsync(
-        RawOrderId orderId,
+    Task<Call<CancelOrderRequest, RawCancelOrderResponse>> CancelOrderAsync(
+        CancelOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawCancelOrdersResponse, JsonElement>> CancelOrdersCallAsync(
-        RawCancelOrdersRequest request,
+    Task<Call<CancelOrdersRequest, RawCancelOrdersResponse>> CancelOrdersAsync(
+        CancelOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawCancelOpenOrdersResponse, JsonElement>> CancelOpenOrdersCallAsync(
-        RawCancelOpenOrdersRequest request,
+    Task<Call<CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> CancelOpenOrdersAsync(
+        CancelOpenOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawCreateWithdrawResponse, JsonElement>> CreateWithdrawCallAsync(
-        RawCreateWithdrawRequest request,
+    Task<Call<CreateWithdrawRequest, RawCreateWithdrawResponse>> CreateWithdrawAsync(
+        CreateWithdrawRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawCancelWithdrawResponse, JsonElement>> CancelWithdrawCallAsync(
-        string withdrawId,
+    Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> CancelWithdrawAsync(
+        CancelWithdrawRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawRetailOrderResponse, JsonElement>> CreateRetailOrderCallAsync(
-        RawCreateRetailOrderRequest request,
+    Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> CreateRetailOrderAsync(
+        CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default);
 }

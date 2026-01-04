@@ -8,7 +8,9 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw.Types;
+using ExchangeApi.Spec.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -21,7 +23,8 @@ public sealed class BittradePublicClientTests
         var json = """{ "status":"ok", "data": 1700000000000 }""";
         var client = CreateClient("/v1/common/timestamp", json);
 
-        var response = await client.Raw<BittradeRawApi>().GetTimestampAsync();
+        var call = await client.Raw<BittradeRawApi>().GetTimestampAsync(new GetRawTimestampRequest());
+        var response = Unwrap(call, "Bittrade.GetTimestamp");
 
         Assert.Equal("ok", response.Status);
         Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1700000000000), response.Data);
@@ -50,12 +53,24 @@ public sealed class BittradePublicClientTests
         """;
         var client = CreateClient("/v1/common/symbols", json);
 
-        var response = await client.Raw<BittradeRawApi>().GetSymbolsAsync();
+        var call = await client.Raw<BittradeRawApi>().GetSymbolsAsync(new GetRawSymbolsRequest());
+        var response = Unwrap(call, "Bittrade.GetSymbols");
 
         Assert.Equal("ok", response.Status);
         Assert.NotNull(response.Data);
         Assert.Single(response.Data!);
         Assert.Equal("btcjpy", response.Data![0].RawSymbol.Value);
+    }
+
+    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
+    {
+        return call.Result switch
+        {
+            CallResult<TRes>.Ok ok => ok.Response,
+            CallResult<TRes>.Err err => throw new InvalidOperationException(
+                $"{operation} failed: {err.Error.Kind} {err.Error.Message}"),
+            _ => throw new InvalidOperationException($"{operation} returned unknown call result.")
+        };
     }
 
     private static BittradePublicClient CreateClient(string expectedPath, string responseJson)

@@ -6,12 +6,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Call;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Spec.CallCommon;
 using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 namespace ExchangeApi.Composition.ExchangeInfo;
 
@@ -57,7 +56,7 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
         }
     }
 
-    public async Task<ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>> GetExchangeInfoCallAsync(
+    public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetExchangeInfoRequest();
@@ -66,23 +65,34 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
         try
         {
             var info = await GetExchangeInfoAsync(cancellationToken).ConfigureAwait(false);
-            var meta = new ApiCallMeta(startedAt, DateTimeOffset.UtcNow - startedAt, null);
-            return new ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>(
-                ExchangeCode.Unknown,
-                request,
-                meta,
-                new ApiOk<ExchangeInfoDto, ApiError>(info, 200));
+            var meta = new CallMeta(
+                Layer: "Contracts",
+                Component: "JsonExchangeInfo",
+                Tags: null,
+                Children: null);
+            return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+                Id: CallId.New(),
+                StartedAt: startedAt,
+                Duration: DateTimeOffset.UtcNow - startedAt,
+                Request: request,
+                Result: new CallResult<ExchangeInfoDto>.Ok(info),
+                Meta: meta);
         }
         catch (Exception ex)
         {
-            var meta = new ApiCallMeta(startedAt, DateTimeOffset.UtcNow - startedAt, null);
-            return new ApiCall<GetExchangeInfoRequest, ExchangeInfoDto, ApiError>(
-                ExchangeCode.Unknown,
-                request,
-                meta,
-                new ApiErr<ExchangeInfoDto, ApiError>(
-                    new ApiError(ApiErrorKind.Unknown, ex.Message, 0),
-                    0));
+            var meta = new CallMeta(
+                Layer: "Contracts",
+                Component: "JsonExchangeInfo",
+                Tags: null,
+                Children: null);
+            return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+                Id: CallId.New(),
+                StartedAt: startedAt,
+                Duration: DateTimeOffset.UtcNow - startedAt,
+                Request: request,
+                Result: new CallResult<ExchangeInfoDto>.Err(
+                    new CallError(CallErrorKind.Unknown, ex.Message, ex)),
+                Meta: meta);
         }
     }
 

@@ -6,8 +6,8 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
 using ExchangeApi.Spec.CallCommon;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using Xunit;
@@ -61,8 +61,6 @@ public sealed class BittradeOrderKeyConnectivityTests
         public OrderKey? LastOrderKey { get; private set; }
         public Symbol? LastSymbol { get; private set; }
         public OrderStatus Order { get; init; } = CreateOrderStatus("default");
-        private static readonly BittradeNormalizedRequest DefaultRequest =
-            new BittradeNormalizedRequest("test", new Dictionary<string, string?>());
 
         public Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken ct = default) =>
             throw new System.NotSupportedException();
@@ -84,40 +82,50 @@ public sealed class BittradeOrderKeyConnectivityTests
             return Task.FromResult(Order with { Key = orderKey });
         }
 
-        public Task<BittradeNormalizedCall<OrderResult, System.Text.Json.JsonElement>> PlaceOrderCallAsync(
+        public Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
             OrderRequest request,
             CancellationToken ct = default) =>
-            Task.FromResult(MakeOkCall(new OrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
+            Task.FromResult(MakeOkCall(new PlaceOrderRequest(request), new OrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
 
-        public Task<BittradeNormalizedCall<CancelResult, System.Text.Json.JsonElement>> CancelOrderCallAsync(
+        public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
             CancellationToken ct = default)
         {
             LastSymbol = symbol;
             LastOrderKey = orderKey;
-            return Task.FromResult(MakeOkCall(new CancelResult(true)));
+            return Task.FromResult(MakeOkCall(new CancelOrderRequest(symbol, orderKey), new CancelResult(true)));
         }
 
-        public Task<BittradeNormalizedCall<IReadOnlyList<OpenOrder>, System.Text.Json.JsonElement>> GetOpenOrdersCallAsync(
+        public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>> GetOpenOrdersCallAsync(
             Symbol symbol,
             CancellationToken ct = default) =>
-            Task.FromResult(MakeOkCall<IReadOnlyList<OpenOrder>>(Array.Empty<OpenOrder>()));
+            Task.FromResult(MakeOkCall(new GetOpenOrdersRequest(symbol), (IReadOnlyList<OpenOrder>)Array.Empty<OpenOrder>()));
 
-        public Task<BittradeNormalizedCall<OrderStatus, System.Text.Json.JsonElement>> GetOrderCallAsync(
+        public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
             CancellationToken ct = default)
         {
             LastSymbol = symbol;
             LastOrderKey = orderKey;
-            return Task.FromResult(MakeOkCall(Order with { Key = orderKey }));
+            return Task.FromResult(MakeOkCall(new GetOrderRequest(symbol, orderKey), Order with { Key = orderKey }));
         }
 
-        private static BittradeNormalizedCall<TResponse, System.Text.Json.JsonElement> MakeOkCall<TResponse>(TResponse response) =>
-            new(
-                DefaultRequest,
-                new Ok<TResponse, System.Text.Json.JsonElement>(response, 200),
-                new CallMeta(DateTimeOffset.UtcNow, TimeSpan.Zero, null));
+        private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
+        {
+            var meta = new CallMeta(
+                Layer: "Normalized",
+                Component: "RecordingNormalizedTradingApi",
+                Tags: null,
+                Children: null);
+            return new Call<TReq, TResponse>(
+                Id: CallId.New(),
+                StartedAt: DateTimeOffset.UtcNow,
+                Duration: TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<TResponse>.Ok(response),
+                Meta: meta);
+        }
     }
 }

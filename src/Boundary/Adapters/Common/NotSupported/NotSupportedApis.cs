@@ -3,12 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Boundary.Adapters.Common.ApiCallMapping;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Boundary.Adapters.Common.NotSupported;
 
@@ -58,7 +57,7 @@ internal sealed class NotSupportedTradingApi : ITradingApi
         CancellationToken cancellationToken = default) =>
         throw NotSupported("Trading");
 
-    public Task<ApiCall<PlaceLimitOrderRequest, OrderResult, ApiError>> PlaceLimitOrderCallAsync(
+    public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         Symbol symbol,
         Side side,
         Size size,
@@ -66,14 +65,14 @@ internal sealed class NotSupportedTradingApi : ITradingApi
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<PlaceLimitOrderRequest, OrderResult>(new PlaceLimitOrderRequest(symbol, side, size, price)));
 
-    public Task<ApiCall<PlaceMarketOrderRequest, OrderResult, ApiError>> PlaceMarketOrderCallAsync(
+    public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(
         Symbol symbol,
         Side side,
         Size size,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<PlaceMarketOrderRequest, OrderResult>(new PlaceMarketOrderRequest(symbol, side, size)));
 
-    public Task<ApiCall<PlaceStopOrderRequest, OrderResult, ApiError>> PlaceStopOrderCallAsync(
+    public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
         Symbol symbol,
         Side side,
         Size size,
@@ -81,27 +80,38 @@ internal sealed class NotSupportedTradingApi : ITradingApi
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<PlaceStopOrderRequest, OrderResult>(new PlaceStopOrderRequest(symbol, side, size, triggerPrice)));
 
-    public Task<ApiCall<CancelOrderRequest, CancelResult, ApiError>> CancelOrderCallAsync(
+    public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<CancelOrderRequest, CancelResult>(new CancelOrderRequest(symbol, orderKey)));
 
-    public Task<ApiCall<GetOrdersRequest, IReadOnlyList<OpenOrder>, ApiError>> GetOrdersCallAsync(
+    public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<GetOrdersRequest, IReadOnlyList<OpenOrder>>(new GetOrdersRequest(symbol)));
 
-    public Task<ApiCall<GetOrderRequest, OrderStatus, ApiError>> GetOrderCallAsync(
+    public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<GetOrderRequest, OrderStatus>(new GetOrderRequest(symbol, orderKey)));
 
-    private ApiCall<TReq, TOk, ApiError> NotSupportedCall<TReq, TOk>(TReq request)
+    private Call<TReq, TOk> NotSupportedCall<TReq, TOk>(TReq request)
     {
-        var meta = ApiCallMapperBase.ToMeta(System.DateTimeOffset.UtcNow);
-        return ApiCallMapperBase.Err<TReq, TOk>(_exchange, request, meta, 0, "Feature not supported.");
+        var now = System.DateTimeOffset.UtcNow;
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: "NotSupported",
+            Tags: null,
+            Children: null);
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: now,
+            Duration: System.TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
+            Meta: meta);
     }
 }
 
@@ -121,18 +131,29 @@ internal sealed class NotSupportedAccountApi : IAccountApi
         CancellationToken cancellationToken = default) =>
         throw NotSupported("Account");
 
-    public Task<ApiCall<GetBalancesRequest, IReadOnlyList<Balance>, ApiError>> GetBalancesCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<GetBalancesRequest, IReadOnlyList<Balance>>(new GetBalancesRequest()));
 
-    public Task<ApiCall<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>, ApiError>> GetAccountExecutionsCallAsync(
+    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(new GetAccountExecutionsRequest(symbol)));
 
-    private ApiCall<TReq, TOk, ApiError> NotSupportedCall<TReq, TOk>(TReq request)
+    private Call<TReq, TOk> NotSupportedCall<TReq, TOk>(TReq request)
     {
-        var meta = ApiCallMapperBase.ToMeta(System.DateTimeOffset.UtcNow);
-        return ApiCallMapperBase.Err<TReq, TOk>(_exchange, request, meta, 0, "Feature not supported.");
+        var now = System.DateTimeOffset.UtcNow;
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: "NotSupported",
+            Tags: null,
+            Children: null);
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: now,
+            Duration: System.TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
+            Meta: meta);
     }
 }

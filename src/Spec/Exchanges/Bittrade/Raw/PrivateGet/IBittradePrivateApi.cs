@@ -1,8 +1,9 @@
-using System;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Spec.CallCommon;
+
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 /// <summary>
@@ -10,103 +11,39 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 /// </summary>
 internal interface IBittradePrivateApi
 {
-    Task<RawAccountsResponse> GetAccountsAsync(CancellationToken cancellationToken = default);
-
-    Task<RawBalancesResponse> GetAccountBalanceAsync(string accountId, CancellationToken cancellationToken = default);
-
-    Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default);
-
-    Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default);
-
-    Task<RawOrderMatchResultsResponse> GetOrderMatchResultsAsync(RawOrderId orderId, CancellationToken cancellationToken = default);
-
-    Task<RawOrdersResponse> GetOrdersAsync(
-        RawSymbol symbol,
-        string states,
-        string? startDate = null,
-        string? endDate = null,
-        long? from = null,
-        string? direct = null,
-        int? size = null,
+    Task<Call<GetAccountsRequest, RawAccountsResponse>> GetAccountsAsync(
+        GetAccountsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<RawMatchResultsResponse> GetMatchResultsAsync(
-        RawSymbol? symbol = null,
-        string? types = null,
-        string? startDate = null,
-        string? endDate = null,
-        long? from = null,
-        string? direct = null,
-        int? size = null,
+    Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountBalanceAsync(
+        GetAccountBalanceRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<RawDepositWithdrawsResponse> GetDepositWithdrawsAsync(
-        string type,
-        string? currency = null,
-        long? from = null,
-        int? size = null,
-        string? direct = null,
+    Task<Call<GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersAsync(
+        GetOpenOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<RawRetailOrdersResponse> GetRetailOrdersAsync(
-        int direct,
-        int? status = null,
-        DateTimeOffset? startTime = null,
-        DateTimeOffset? endTime = null,
+    Task<Call<GetOrderRequest, RawOrderDetailResponse>> GetOrderAsync(
+        GetOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawAccountsResponse, JsonElement>> GetAccountsCallAsync(
+    Task<Call<GetOrderMatchResultsRequest, RawOrderMatchResultsResponse>> GetOrderMatchResultsAsync(
+        GetOrderMatchResultsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawBalancesResponse, JsonElement>> GetAccountBalanceCallAsync(
-        string accountId,
+    Task<Call<GetOrdersRequest, RawOrdersResponse>> GetOrdersAsync(
+        GetOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawOpenOrdersResponse, JsonElement>> GetOpenOrdersCallAsync(
-        RawSymbol symbol,
-        string accountId,
+    Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsAsync(
+        GetMatchResultsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawOrderDetailResponse, JsonElement>> GetOrderCallAsync(
-        RawOrderId orderId,
+    Task<Call<GetDepositWithdrawsRequest, RawDepositWithdrawsResponse>> GetDepositWithdrawsAsync(
+        GetDepositWithdrawsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BittradeRawCall<RawOrderMatchResultsResponse, JsonElement>> GetOrderMatchResultsCallAsync(
-        RawOrderId orderId,
-        CancellationToken cancellationToken = default);
-
-    Task<BittradeRawCall<RawOrdersResponse, JsonElement>> GetOrdersCallAsync(
-        RawSymbol symbol,
-        string states,
-        string? startDate = null,
-        string? endDate = null,
-        long? from = null,
-        string? direct = null,
-        int? size = null,
-        CancellationToken cancellationToken = default);
-
-    Task<BittradeRawCall<RawMatchResultsResponse, JsonElement>> GetMatchResultsCallAsync(
-        RawSymbol? symbol = null,
-        string? types = null,
-        string? startDate = null,
-        string? endDate = null,
-        long? from = null,
-        string? direct = null,
-        int? size = null,
-        CancellationToken cancellationToken = default);
-
-    Task<BittradeRawCall<RawDepositWithdrawsResponse, JsonElement>> GetDepositWithdrawsCallAsync(
-        string type,
-        string? currency = null,
-        long? from = null,
-        int? size = null,
-        string? direct = null,
-        CancellationToken cancellationToken = default);
-
-    Task<BittradeRawCall<RawRetailOrdersResponse, JsonElement>> GetRetailOrdersCallAsync(
-        int direct,
-        int? status = null,
-        DateTimeOffset? startTime = null,
-        DateTimeOffset? endTime = null,
+    Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetRetailOrdersAsync(
+        GetRetailOrdersRequest request,
         CancellationToken cancellationToken = default);
 }

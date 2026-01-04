@@ -2,78 +2,35 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
 public interface IBitflyerRawAccountApi
 {
-    Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(
+    Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalancesAsync(
+        GetBalancesRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<IReadOnlyList<BalanceResponse>, JsonElement>> GetBalancesCallAsync(
+    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsAsync(
+        GetAccountExecutionsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(
-        RawProductCode productCode,
-        string? childOrderId = null,
-        string? childOrderAcceptanceId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
+    Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsAsync(
+        GetPositionsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<IReadOnlyList<ExecutionPrivateResponse>, JsonElement>> GetExecutionsCallAsync(
-        RawProductCode productCode,
-        string? childOrderId = null,
-        string? childOrderAcceptanceId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
+    Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralAsync(
+        GetCollateralRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(
-        RawProductCode productCode,
+    Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersAsync(
+        GetChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerRawCall<IReadOnlyList<PositionResponse>, JsonElement>> GetPositionsCallAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default);
-
-    Task<CollateralResponse> GetCollateralAsync(
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<CollateralResponse, JsonElement>> GetCollateralCallAsync(
-        CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-        RawProductCode productCode,
-        string? childOrderStatusState = null,
-        string? childOrderAcceptanceId = null,
-        string? childOrderId = null,
-        string? parentOrderId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<IReadOnlyList<ChildOrderResponse>, JsonElement>> GetChildOrdersCallAsync(
-        RawProductCode productCode,
-        string? childOrderStatusState = null,
-        string? childOrderAcceptanceId = null,
-        string? childOrderId = null,
-        string? parentOrderId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default);
-
-    Task<JsonElement> GetTradingCommissionAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerRawCall<JsonElement, JsonElement>> GetTradingCommissionCallAsync(
-        RawProductCode productCode,
+    Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionAsync(
+        GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default);
 }
 

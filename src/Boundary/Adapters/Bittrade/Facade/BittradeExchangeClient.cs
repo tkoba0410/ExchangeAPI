@@ -6,7 +6,6 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Core.Contracts.Errors;
@@ -14,9 +13,9 @@ using ExchangeApi.Boundary.Adapters.Common.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Spec.CallCommon;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
 
 /// <summary>
@@ -108,17 +107,17 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(CommonSymbol symbol, TimeSpan timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(symbol, timescale, from, to, cancellationToken);
 
-    public Task<ApiCall<GetTickerRequest, Ticker, ApiError>> GetTickerCallAsync(
+    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerCallAsync(symbol, cancellationToken);
 
-    public Task<ApiCall<GetOrderBookRequest, OrderBook, ApiError>> GetOrderBookCallAsync(
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetOrderBookCallAsync(symbol, cancellationToken);
 
-    public Task<ApiCall<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>, ApiError>> GetMarketExecutionsCallAsync(
+    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
@@ -126,7 +125,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesAsync(cancellationToken);
 
-    public Task<ApiCall<GetBalancesRequest, IReadOnlyList<Balance>, ApiError>> GetBalancesCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesCallAsync(cancellationToken);
 
@@ -162,7 +161,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<OrderStatus> GetOrderAsync(CommonSymbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrderAsync(symbol, orderKey, cancellationToken);
 
-    public Task<ApiCall<PlaceLimitOrderRequest, OrderResult, ApiError>> PlaceLimitOrderCallAsync(
+    public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         CommonSymbol symbol,
         Side side,
         Size size,
@@ -170,14 +169,14 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceLimitOrderCallAsync(symbol, side, size, price, cancellationToken);
 
-    public Task<ApiCall<PlaceMarketOrderRequest, OrderResult, ApiError>> PlaceMarketOrderCallAsync(
+    public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(
         CommonSymbol symbol,
         Side side,
         Size size,
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceMarketOrderCallAsync(symbol, side, size, cancellationToken);
 
-    public Task<ApiCall<PlaceStopOrderRequest, OrderResult, ApiError>> PlaceStopOrderCallAsync(
+    public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
         CommonSymbol symbol,
         Side side,
         Size size,
@@ -185,18 +184,18 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceStopOrderCallAsync(symbol, side, size, triggerPrice, cancellationToken);
 
-    public Task<ApiCall<CancelOrderRequest, CancelResult, ApiError>> CancelOrderCallAsync(
+    public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         CommonSymbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<ApiCall<GetOrdersRequest, IReadOnlyList<OpenOrder>, ApiError>> GetOrdersCallAsync(
+    public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrdersCallAsync(symbol, cancellationToken);
 
-    public Task<ApiCall<GetOrderRequest, OrderStatus, ApiError>> GetOrderCallAsync(
+    public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         CommonSymbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
@@ -205,7 +204,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(CommonSymbol symbol, CancellationToken cancellationToken = default) =>
         _accountApi.GetAccountExecutionsAsync(symbol, cancellationToken);
 
-    public Task<ApiCall<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>, ApiError>> GetAccountExecutionsCallAsync(
+    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _accountApi.GetAccountExecutionsCallAsync(symbol, cancellationToken);
@@ -216,19 +215,19 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default) =>
         throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "MarginCollateral");
 
-    public Task<ApiCall<GetOpenPositionsRequest, IReadOnlyList<Position>, ApiError>> GetOpenPositionsCallAsync(
+    public Task<Call<GetOpenPositionsRequest, IReadOnlyList<Position>>> GetOpenPositionsCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<GetOpenPositionsRequest, IReadOnlyList<Position>>(new GetOpenPositionsRequest(symbol)));
 
-    public Task<ApiCall<GetCollateralRequest, Collateral, ApiError>> GetCollateralCallAsync(
+    public Task<Call<GetCollateralRequest, Collateral>> GetCollateralCallAsync(
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<GetCollateralRequest, Collateral>(new GetCollateralRequest()));
 
     public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
 
-    public Task<ApiCall<GetExchangeInfoRequest, ExchangeInfo, ApiError>> GetExchangeInfoCallAsync(
+    public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
@@ -238,9 +237,20 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         return raw is not null;
     }
 
-    private static ApiCall<TReq, TOk, ApiError> NotSupportedCall<TReq, TOk>(TReq request)
+    private static Call<TReq, TOk> NotSupportedCall<TReq, TOk>(TReq request)
     {
-        var meta = ApiCallMapper.ToMeta(DateTimeOffset.UtcNow);
-        return ApiCallMapper.Err<TReq, TOk>(ExchangeCode.Bittrade, request, meta, 0, "Feature not supported.");
+        var now = DateTimeOffset.UtcNow;
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: "NotSupported",
+            Tags: null,
+            Children: null);
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: now,
+            Duration: TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
+            Meta: meta);
     }
 }

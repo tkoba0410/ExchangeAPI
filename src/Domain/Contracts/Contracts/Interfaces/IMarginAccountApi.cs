@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
+using ExchangeApi.Spec.CallCommon;
 namespace ExchangeApi.Contracts.Interfaces;
 
 /// <summary>
@@ -16,10 +16,10 @@ public interface IMarginAccountApi : IAccountApi
 
     Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default);
 
-    Task<ApiCall<GetOpenPositionsRequest, IReadOnlyList<Position>, ApiError>> GetOpenPositionsCallAsync(
+    Task<Call<GetOpenPositionsRequest, IReadOnlyList<Position>>> GetOpenPositionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<ApiCall<GetCollateralRequest, Collateral, ApiError>> GetCollateralCallAsync(
+    Task<Call<GetCollateralRequest, Collateral>> GetCollateralCallAsync(
         CancellationToken cancellationToken = default);
 }

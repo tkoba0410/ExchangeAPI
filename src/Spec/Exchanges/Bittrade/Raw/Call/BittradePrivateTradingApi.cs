@@ -1,12 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
+using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Spec.Wire;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
+
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Call;
 
 /// <summary>
@@ -21,294 +23,190 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public async Task<RawPlaceOrderResponse> CreateOrderAsync(RawCreateOrderRequest request, CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
-        var call = await SendAsync(BittradeEndpoints.PlaceOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawPlaceOrderResponse>(response.Json, "Bittrade.PlaceOrder");
-        }
-
-        throw BittradeRawJson.CreateStatusException("Bittrade.PlaceOrder", response.StatusCode, response.Json);
-    }
-
-    public async Task<RawCancelOrderResponse> CancelOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(orderId.Value))
-        {
-            throw new ArgumentException("orderId is required.", nameof(orderId));
-        }
-
-        var call = await SendAsync(BittradeEndpoints.CancelOrder(orderId.Value), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawCancelOrderResponse>(response.Json, "Bittrade.CancelOrder");
-        }
-
-        throw BittradeRawJson.CreateStatusException("Bittrade.CancelOrder", response.StatusCode, response.Json);
-    }
-
-    public async Task<RawCancelOrdersResponse> CancelOrdersAsync(RawCancelOrdersRequest request, CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CancelOrders");
-        var call = await SendAsync(BittradeEndpoints.CancelOrders(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawCancelOrdersResponse>(
-                response.Json,
-                "Bittrade.CancelOrders");
-        }
-
-        throw BittradeRawJson.CreateStatusException(
-            "Bittrade.CancelOrders",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<RawCancelOpenOrdersResponse> CancelOpenOrdersAsync(RawCancelOpenOrdersRequest request, CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CancelOpenOrders");
-        var call = await SendAsync(BittradeEndpoints.CancelOpenOrders(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawCancelOpenOrdersResponse>(
-                response.Json,
-                "Bittrade.CancelOpenOrders");
-        }
-
-        throw BittradeRawJson.CreateStatusException(
-            "Bittrade.CancelOpenOrders",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<RawCreateWithdrawResponse> CreateWithdrawAsync(RawCreateWithdrawRequest request, CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CreateWithdraw");
-        var call = await SendAsync(BittradeEndpoints.CreateWithdraw(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawCreateWithdrawResponse>(
-                response.Json,
-                "Bittrade.CreateWithdraw");
-        }
-
-        throw BittradeRawJson.CreateStatusException(
-            "Bittrade.CreateWithdraw",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<RawCancelWithdrawResponse> CancelWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(withdrawId))
-        {
-            throw new ArgumentException("withdrawId is required.", nameof(withdrawId));
-        }
-
-        var call = await SendAsync(BittradeEndpoints.CancelWithdraw(withdrawId), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawCancelWithdrawResponse>(
-                response.Json,
-                "Bittrade.CancelWithdraw");
-        }
-
-        throw BittradeRawJson.CreateStatusException(
-            "Bittrade.CancelWithdraw",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<RawRetailOrderResponse> CreateRetailOrderAsync(RawCreateRetailOrderRequest request, CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CreateRetailOrder");
-        var call = await SendAsync(BittradeEndpoints.CreateRetailOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BittradeRawJson.DeserializeOrThrow<RawRetailOrderResponse>(
-                response.Json,
-                "Bittrade.CreateRetailOrder");
-        }
-
-        throw BittradeRawJson.CreateStatusException(
-            "Bittrade.CreateRetailOrder",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<BittradeRawCall<RawPlaceOrderResponse, JsonElement>> CreateOrderCallAsync(
-        RawCreateOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
-        var wireCall = await SendAsync(BittradeEndpoints.PlaceOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bittrade.PlaceOrder", new Dictionary<string, string?>
-        {
-            ["accountId"] = request.AccountId,
-            ["symbol"] = request.RawSymbol.Value,
-            ["type"] = request.Type.ToString(),
-            ["amount"] = request.Amount,
-            ["price"] = request.Price,
-        });
-        return CreateCall<RawPlaceOrderResponse>(rawRequest, wireCall, "Bittrade.PlaceOrder");
-    }
-
-    public async Task<BittradeRawCall<RawCancelOrderResponse, JsonElement>> CancelOrderCallAsync(
-        RawOrderId orderId,
-        CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(orderId.Value))
-        {
-            throw new ArgumentException("orderId is required.", nameof(orderId));
-        }
-
-        var wireCall = await SendAsync(BittradeEndpoints.CancelOrder(orderId.Value), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bittrade.CancelOrder", new Dictionary<string, string?>
-        {
-            ["orderId"] = orderId.Value,
-        });
-        return CreateCall<RawCancelOrderResponse>(rawRequest, wireCall, "Bittrade.CancelOrder");
-    }
-
-    public async Task<BittradeRawCall<RawCancelOrdersResponse, JsonElement>> CancelOrdersCallAsync(
-        RawCancelOrdersRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CancelOrders");
-        var wireCall = await SendAsync(BittradeEndpoints.CancelOrders(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bittrade.CancelOrders", new Dictionary<string, string?>
-        {
-            ["orderIds"] = string.Join(",", request.OrderIds),
-        });
-        return CreateCall<RawCancelOrdersResponse>(rawRequest, wireCall, "Bittrade.CancelOrders");
-    }
-
-    public async Task<BittradeRawCall<RawCancelOpenOrdersResponse, JsonElement>> CancelOpenOrdersCallAsync(
-        RawCancelOpenOrdersRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CancelOpenOrders");
-        var wireCall = await SendAsync(BittradeEndpoints.CancelOpenOrders(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bittrade.CancelOpenOrders", new Dictionary<string, string?>
-        {
-            ["accountId"] = request.AccountId,
-            ["symbol"] = request.RawSymbol?.Value,
-        });
-        return CreateCall<RawCancelOpenOrdersResponse>(rawRequest, wireCall, "Bittrade.CancelOpenOrders");
-    }
-
-    public async Task<BittradeRawCall<RawCreateWithdrawResponse, JsonElement>> CreateWithdrawCallAsync(
-        RawCreateWithdrawRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CreateWithdraw");
-        var wireCall = await SendAsync(BittradeEndpoints.CreateWithdraw(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bittrade.CreateWithdraw", new Dictionary<string, string?>
-        {
-            ["currency"] = request.Currency,
-            ["amount"] = request.Amount,
-            ["address"] = request.Address,
-        });
-        return CreateCall<RawCreateWithdrawResponse>(rawRequest, wireCall, "Bittrade.CreateWithdraw");
-    }
-
-    public async Task<BittradeRawCall<RawCancelWithdrawResponse, JsonElement>> CancelWithdrawCallAsync(
-        string withdrawId,
-        CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(withdrawId))
-        {
-            throw new ArgumentException("withdrawId is required.", nameof(withdrawId));
-        }
-
-        var wireCall = await SendAsync(BittradeEndpoints.CancelWithdraw(withdrawId), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bittrade.CancelWithdraw", new Dictionary<string, string?>
-        {
-            ["withdrawId"] = withdrawId,
-        });
-        return CreateCall<RawCancelWithdrawResponse>(rawRequest, wireCall, "Bittrade.CancelWithdraw");
-    }
-
-    public async Task<BittradeRawCall<RawRetailOrderResponse, JsonElement>> CreateRetailOrderCallAsync(
-        RawCreateRetailOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.CreateRetailOrder");
-        var wireCall = await SendAsync(BittradeEndpoints.CreateRetailOrder(bodyJson), cancellationToken).ConfigureAwait(false);
-        var rawRequest = CreateRequest("Bittrade.CreateRetailOrder", new Dictionary<string, string?>
-        {
-            ["symbol"] = request.RawSymbol.Value,
-            ["type"] = request.Type.ToString(),
-            ["price"] = request.Price,
-            ["amount"] = request.Amount,
-            ["cash_amount"] = request.CashAmount,
-        });
-        return CreateCall<RawRetailOrderResponse>(rawRequest, wireCall, "Bittrade.CreateRetailOrder");
-    }
-
-    private static BittradeRawRequest CreateRequest(
-        string operation,
-        IReadOnlyDictionary<string, string?> parameters) =>
-        new(operation, parameters);
-
-    private static BittradeRawCall<TOk, JsonElement> CreateCall<TOk>(
-        BittradeRawRequest request,
-        WireCall call,
-        string context)
-    {
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            var ok = BittradeRawJson.DeserializeOrThrow<TOk>(response.Json, context);
-            return new BittradeRawCall<TOk, JsonElement>(
-                request,
-                new Ok<TOk, JsonElement>(ok, response.StatusCode),
-                call.Meta);
-        }
-
-        if (BittradeRawJson.TryDeserialize<JsonElement>(response.Json, out var error, out _))
-        {
-            return new BittradeRawCall<TOk, JsonElement>(
-                request,
-                new Err<TOk, JsonElement>(error!, response.StatusCode),
-                call.Meta);
-        }
-
-        return new BittradeRawCall<TOk, JsonElement>(
+    public Task<Call<CreateOrderRequest, RawPlaceOrderResponse>> CreateOrderAsync(
+        CreateOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
             request,
-            new Err<TOk, JsonElement>(default, response.StatusCode),
-            call.Meta);
+            "Bittrade.PlaceOrder",
+            BittradeEndpoints.PlaceOrder(BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PlaceOrder")),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawPlaceOrderResponse>(json, "Bittrade.PlaceOrder"));
+
+    public Task<Call<CancelOrderRequest, RawCancelOrderResponse>> CancelOrderAsync(
+        CancelOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.CancelOrder",
+            BittradeEndpoints.CancelOrder(request.OrderId.Value),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawCancelOrderResponse>(json, "Bittrade.CancelOrder"));
+
+    public Task<Call<CancelOrdersRequest, RawCancelOrdersResponse>> CancelOrdersAsync(
+        CancelOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.CancelOrders",
+            BittradeEndpoints.CancelOrders(BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.CancelOrders")),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawCancelOrdersResponse>(
+                json,
+                "Bittrade.CancelOrders"));
+
+    public Task<Call<CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> CancelOpenOrdersAsync(
+        CancelOpenOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.CancelOpenOrders",
+            BittradeEndpoints.CancelOpenOrders(
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.CancelOpenOrders")),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawCancelOpenOrdersResponse>(
+                json,
+                "Bittrade.CancelOpenOrders"));
+
+    public Task<Call<CreateWithdrawRequest, RawCreateWithdrawResponse>> CreateWithdrawAsync(
+        CreateWithdrawRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.CreateWithdraw",
+            BittradeEndpoints.CreateWithdraw(BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.CreateWithdraw")),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawCreateWithdrawResponse>(
+                json,
+                "Bittrade.CreateWithdraw"));
+
+    public Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> CancelWithdrawAsync(
+        CancelWithdrawRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.CancelWithdraw",
+            BittradeEndpoints.CancelWithdraw(request.WithdrawId),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawCancelWithdrawResponse>(
+                json,
+                "Bittrade.CancelWithdraw"));
+
+    public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> CreateRetailOrderAsync(
+        CreateRetailOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bittrade.CreateRetailOrder",
+            BittradeEndpoints.CreateRetailOrder(
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.CreateRetailOrder")),
+            cancellationToken,
+            json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderResponse>(
+                json,
+                "Bittrade.CreateRetailOrder"));
+
+    private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
+        TReq request,
+        string component,
+        WireCallSpec spec,
+        CancellationToken cancellationToken,
+        Func<string, TRes> parse)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        if (parse is null) throw new ArgumentNullException(nameof(parse));
+
+        var wireCall = await _wire.SendAsync(ExchangeCode.Bittrade, spec, cancellationToken).ConfigureAwait(false);
+        return CreateCall(request, component, wireCall, parse);
     }
 
-    private Task<WireCall> SendAsync(WireRequest request, CancellationToken ct) =>
-        _wire.SendAsync(ExchangeCode.Bittrade, request, ct);
+    private static Call<TReq, TRes> CreateCall<TReq, TRes>(
+        TReq request,
+        string component,
+        Call<WireCallSpec, WireResponse> wireCall,
+        Func<string, TRes> parse)
+    {
+        var meta = new CallMeta(
+            Layer: "Raw",
+            Component: component,
+            Tags: null,
+            Children: new[] { wireCall.Id });
+
+        return wireCall.Result switch
+        {
+            CallResult<WireResponse>.Err err => new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(err.Error),
+                Meta: meta),
+            CallResult<WireResponse>.Ok ok => CreateOkCall(request, component, ok.Response, wireCall, parse, meta),
+            _ => new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(new CallError(CallErrorKind.Unknown, "Wire call returned unknown result.")),
+                Meta: meta)
+        };
+    }
+
+    private static Call<TReq, TRes> CreateOkCall<TReq, TRes>(
+        TReq request,
+        string component,
+        WireResponse response,
+        Call<WireCallSpec, WireResponse> wireCall,
+        Func<string, TRes> parse,
+        CallMeta meta)
+    {
+        if (response.StatusCode is < 200 or >= 300)
+        {
+            var error = new CallError(
+                CallErrorKind.Http,
+                $"{component} failed with status {response.StatusCode}.",
+                HttpStatus: response.StatusCode,
+                BodySnippet: Snip(response.Json));
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(error),
+                Meta: meta);
+        }
+
+        try
+        {
+            var parsed = parse(response.Json);
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Ok(parsed),
+                Meta: meta);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            var error = new CallError(
+                CallErrorKind.Codec,
+                $"{component} failed to parse response.",
+                ex,
+                response.StatusCode,
+                Snip(response.Json));
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(error),
+                Meta: meta);
+        }
+    }
+
+    private static string? Snip(string? json)
+    {
+        if (string.IsNullOrEmpty(json)) return json;
+        return json.Length <= 512 ? json : json[..512];
+    }
 }

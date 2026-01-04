@@ -4,7 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalize;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 
@@ -18,20 +19,20 @@ public interface IBittradeNormalizedTradingApi
 
     Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken ct = default);
 
-    Task<BittradeNormalizedCall<OrderResult, JsonElement>> PlaceOrderCallAsync(
+    Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
         OrderRequest request,
         CancellationToken ct = default);
 
-    Task<BittradeNormalizedCall<CancelResult, JsonElement>> CancelOrderCallAsync(
+    Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default);
 
-    Task<BittradeNormalizedCall<IReadOnlyList<OpenOrder>, JsonElement>> GetOpenOrdersCallAsync(
+    Task<Call<GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>> GetOpenOrdersCallAsync(
         Symbol symbol,
         CancellationToken ct = default);
 
-    Task<BittradeNormalizedCall<OrderStatus, JsonElement>> GetOrderCallAsync(
+    Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default);

@@ -4,10 +4,10 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
+using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Call;
@@ -24,717 +24,355 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public async Task<IReadOnlyList<string>> GetPermissionsAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BitflyerEndpoints.GetPermissions(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<string>>(
-                response.Json,
-                "Bitflyer.GetPermissions");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetPermissions", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BitflyerEndpoints.GetBalances(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<BalanceResponse>>(
-                response.Json,
-                "Bitflyer.GetBalances");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetBalances", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BitflyerEndpoints.GetPositions(productCode.Value), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<PositionResponse>>(
-                response.Json,
-                "Bitflyer.GetPositions");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetPositions", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(
-        RawProductCode productCode,
-        string? childOrderId = null,
-        string? childOrderAcceptanceId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(
-                BitflyerEndpoints.GetExecutions(
-                    productCode.Value,
-                    childOrderId,
-                    childOrderAcceptanceId,
-                    count,
-                    before,
-                    after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPrivateResponse>>(
-                response.Json,
-                "Bitflyer.GetExecutions");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetExecutions", response.StatusCode, response.Json);
-    }
-
-    public async Task<CollateralResponse> GetCollateralAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BitflyerEndpoints.GetCollateral(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<CollateralResponse>(
-                response.Json,
-                "Bitflyer.GetCollateral");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetCollateral", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<CollateralAccount>> GetCollateralAccountsAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BitflyerEndpoints.GetCollateralAccounts(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<CollateralAccount>>(
-                response.Json,
-                "Bitflyer.GetCollateralAccounts");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.GetCollateralAccounts",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-        RawProductCode productCode,
-        string? childOrderStatusState = null,
-        string? childOrderAcceptanceId = null,
-        string? childOrderId = null,
-        string? parentOrderId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(
-                BitflyerEndpoints.GetChildOrders(
-                    productCode.Value,
-                    childOrderStatusState,
-                    childOrderAcceptanceId,
-                    childOrderId,
-                    parentOrderId,
-                    count,
-                    before,
-                    after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ChildOrderResponse>>(
-                response.Json,
-                "Bitflyer.GetChildOrders");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetChildOrders", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(
-        RawProductCode productCode,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        string? parentOrderStatusState = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(
-                BitflyerEndpoints.GetParentOrders(
-                    productCode.Value,
-                    count,
-                    before,
-                    after,
-                    parentOrderStatusState),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ParentOrderResponse>>(
-                response.Json,
-                "Bitflyer.GetParentOrders");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetParentOrders", response.StatusCode, response.Json);
-    }
-
-    public async Task<ParentOrderDetailResponse> GetParentOrderAsync(
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(
-                BitflyerEndpoints.GetParentOrder(parentOrderId, parentOrderAcceptanceId),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<ParentOrderDetailResponse>(
-                response.Json,
-                "Bitflyer.GetParentOrder");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetParentOrder", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<JsonElement>> GetBalanceHistoryAsync(
-        string? currencyCode = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(
-                BitflyerEndpoints.GetBalanceHistory(currencyCode, count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                response.Json,
-                "Bitflyer.GetBalanceHistory");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.GetBalanceHistory",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<JsonElement> GetTradingCommissionAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BitflyerEndpoints.GetTradingCommission(productCode.Value), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<JsonElement>(
-                response.Json,
-                "Bitflyer.GetTradingCommission");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.GetTradingCommission",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<IReadOnlyList<JsonElement>> GetCollateralHistoryAsync(
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(
-                BitflyerEndpoints.GetCollateralHistory(count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                response.Json,
-                "Bitflyer.GetCollateralHistory");
-        }
-
-        throw BitflyerRawJson.CreateStatusException(
-            "Bitflyer.GetCollateralHistory",
-            response.StatusCode,
-            response.Json);
-    }
-
-    public async Task<IReadOnlyList<JsonElement>> GetAddressesAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BitflyerEndpoints.GetAddresses(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                response.Json,
-                "Bitflyer.GetAddresses");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetAddresses", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<JsonElement>> GetCoinInsAsync(
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BitflyerEndpoints.GetCoinIns(count, before, after), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                response.Json,
-                "Bitflyer.GetCoinIns");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetCoinIns", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<JsonElement>> GetCoinOutsAsync(
-        string? messageId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(
-                BitflyerEndpoints.GetCoinOuts(messageId, count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                response.Json,
-                "Bitflyer.GetCoinOuts");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetCoinOuts", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<JsonElement>> GetDepositsAsync(
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(
-                BitflyerEndpoints.GetDeposits(count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                response.Json,
-                "Bitflyer.GetDeposits");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetDeposits", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<JsonElement>> GetWithdrawalsAsync(
-        string? messageId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(
-                BitflyerEndpoints.GetWithdrawals(messageId, count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                response.Json,
-                "Bitflyer.GetWithdrawals");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetWithdrawals", response.StatusCode, response.Json);
-    }
-
-    public async Task<IReadOnlyList<JsonElement>> GetBankAccountsAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var call = await SendAsync(BitflyerEndpoints.GetBankAccounts(), cancellationToken).ConfigureAwait(false);
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            return BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                response.Json,
-                "Bitflyer.GetBankAccounts");
-        }
-
-        throw BitflyerRawJson.CreateStatusException("Bitflyer.GetBankAccounts", response.StatusCode, response.Json);
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<string>, JsonElement>> GetPermissionsCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetPermissions(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetPermissions", new Dictionary<string, string?>());
-        return CreateCall<IReadOnlyList<string>>(request, wireCall, "Bitflyer.GetPermissions");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<BalanceResponse>, JsonElement>> GetBalancesCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetBalances(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetBalances", new Dictionary<string, string?>());
-        return CreateCall<IReadOnlyList<BalanceResponse>>(request, wireCall, "Bitflyer.GetBalances");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<PositionResponse>, JsonElement>> GetPositionsCallAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetPositions(productCode.Value), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetPositions", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode.Value,
-        });
-        return CreateCall<IReadOnlyList<PositionResponse>>(request, wireCall, "Bitflyer.GetPositions");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<ExecutionPrivateResponse>, JsonElement>> GetExecutionsCallAsync(
-        RawProductCode productCode,
-        string? childOrderId = null,
-        string? childOrderAcceptanceId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetExecutions(
-                    productCode.Value,
-                    childOrderId,
-                    childOrderAcceptanceId,
-                    count,
-                    before,
-                    after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetExecutions", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode.Value,
-            ["childOrderId"] = childOrderId,
-            ["childOrderAcceptanceId"] = childOrderAcceptanceId,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-        });
-        return CreateCall<IReadOnlyList<ExecutionPrivateResponse>>(request, wireCall, "Bitflyer.GetExecutions");
-    }
-
-    public async Task<BitflyerRawCall<CollateralResponse, JsonElement>> GetCollateralCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetCollateral(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetCollateral", new Dictionary<string, string?>());
-        return CreateCall<CollateralResponse>(request, wireCall, "Bitflyer.GetCollateral");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<CollateralAccount>, JsonElement>> GetCollateralAccountsCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetCollateralAccounts(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetCollateralAccounts", new Dictionary<string, string?>());
-        return CreateCall<IReadOnlyList<CollateralAccount>>(request, wireCall, "Bitflyer.GetCollateralAccounts");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<ChildOrderResponse>, JsonElement>> GetChildOrdersCallAsync(
-        RawProductCode productCode,
-        string? childOrderStatusState = null,
-        string? childOrderAcceptanceId = null,
-        string? childOrderId = null,
-        string? parentOrderId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetChildOrders(
-                    productCode.Value,
-                    childOrderStatusState,
-                    childOrderAcceptanceId,
-                    childOrderId,
-                    parentOrderId,
-                    count,
-                    before,
-                    after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetChildOrders", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode.Value,
-            ["childOrderStatusState"] = childOrderStatusState,
-            ["childOrderAcceptanceId"] = childOrderAcceptanceId,
-            ["childOrderId"] = childOrderId,
-            ["parentOrderId"] = parentOrderId,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-        });
-        return CreateCall<IReadOnlyList<ChildOrderResponse>>(request, wireCall, "Bitflyer.GetChildOrders");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<ParentOrderResponse>, JsonElement>> GetParentOrdersCallAsync(
-        RawProductCode productCode,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        string? parentOrderStatusState = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetParentOrders(
-                    productCode.Value,
-                    count,
-                    before,
-                    after,
-                    parentOrderStatusState),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetParentOrders", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode.Value,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-            ["parentOrderStatusState"] = parentOrderStatusState,
-        });
-        return CreateCall<IReadOnlyList<ParentOrderResponse>>(request, wireCall, "Bitflyer.GetParentOrders");
-    }
-
-    public async Task<BitflyerRawCall<ParentOrderDetailResponse, JsonElement>> GetParentOrderCallAsync(
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetParentOrder(parentOrderId, parentOrderAcceptanceId),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetParentOrder", new Dictionary<string, string?>
-        {
-            ["parentOrderId"] = parentOrderId,
-            ["parentOrderAcceptanceId"] = parentOrderAcceptanceId,
-        });
-        return CreateCall<ParentOrderDetailResponse>(request, wireCall, "Bitflyer.GetParentOrder");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetBalanceHistoryCallAsync(
-        string? currencyCode = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetBalanceHistory(currencyCode, count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetBalanceHistory", new Dictionary<string, string?>
-        {
-            ["currencyCode"] = currencyCode,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-        });
-        return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetBalanceHistory");
-    }
-
-    public async Task<BitflyerRawCall<JsonElement, JsonElement>> GetTradingCommissionCallAsync(
-        RawProductCode productCode,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetTradingCommission(productCode.Value), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetTradingCommission", new Dictionary<string, string?>
-        {
-            ["productCode"] = productCode.Value,
-        });
-        return CreateCall<JsonElement>(request, wireCall, "Bitflyer.GetTradingCommission");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetCollateralHistoryCallAsync(
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetCollateralHistory(count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetCollateralHistory", new Dictionary<string, string?>
-        {
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-        });
-        return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetCollateralHistory");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetAddressesCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetAddresses(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetAddresses", new Dictionary<string, string?>());
-        return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetAddresses");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetCoinInsCallAsync(
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetCoinIns(count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetCoinIns", new Dictionary<string, string?>
-        {
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-        });
-        return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetCoinIns");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetCoinOutsCallAsync(
-        string? messageId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetCoinOuts(messageId, count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetCoinOuts", new Dictionary<string, string?>
-        {
-            ["messageId"] = messageId,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-        });
-        return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetCoinOuts");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetDepositsCallAsync(
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetDeposits(count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetDeposits", new Dictionary<string, string?>
-        {
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-        });
-        return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetDeposits");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetWithdrawalsCallAsync(
-        string? messageId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(
-                BitflyerEndpoints.GetWithdrawals(messageId, count, before, after),
-                cancellationToken)
-            .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetWithdrawals", new Dictionary<string, string?>
-        {
-            ["messageId"] = messageId,
-            ["count"] = count?.ToString(),
-            ["before"] = before?.ToString(),
-            ["after"] = after?.ToString(),
-        });
-        return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetWithdrawals");
-    }
-
-    public async Task<BitflyerRawCall<IReadOnlyList<JsonElement>, JsonElement>> GetBankAccountsCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var wireCall = await SendAsync(BitflyerEndpoints.GetBankAccounts(), cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetBankAccounts", new Dictionary<string, string?>());
-        return CreateCall<IReadOnlyList<JsonElement>>(request, wireCall, "Bitflyer.GetBankAccounts");
-    }
-
-    private static BitflyerRawRequest CreateRequest(
-        string operation,
-        IReadOnlyDictionary<string, string?> parameters) =>
-        new(operation, parameters);
-
-    private static BitflyerRawCall<TOk, JsonElement> CreateCall<TOk>(
-        BitflyerRawRequest request,
-        WireCall call,
-        string context)
-    {
-        var response = call.Response;
-        if (response.StatusCode is >= 200 and < 300)
-        {
-            var ok = BitflyerRawJson.DeserializeOrThrow<TOk>(response.Json, context);
-            return new BitflyerRawCall<TOk, JsonElement>(
-                request,
-                new Ok<TOk, JsonElement>(ok, response.StatusCode),
-                call.Meta);
-        }
-
-        if (BitflyerRawJson.TryDeserialize<JsonElement>(response.Json, out var error, out _))
-        {
-            return new BitflyerRawCall<TOk, JsonElement>(
-                request,
-                new Err<TOk, JsonElement>(error!, response.StatusCode),
-                call.Meta);
-        }
-
-        return new BitflyerRawCall<TOk, JsonElement>(
+    public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsAsync(
+        GetPermissionsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
             request,
-            new Err<TOk, JsonElement>(default, response.StatusCode),
-            call.Meta);
+            "Bitflyer.GetPermissions",
+            BitflyerEndpoints.GetPermissions(),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<string>>(
+                json,
+                "Bitflyer.GetPermissions"));
+
+    public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalancesAsync(
+        GetBalancesRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetBalance",
+            BitflyerEndpoints.GetBalances(),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<BalanceResponse>>(
+                json,
+                "Bitflyer.GetBalance"));
+
+    public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsAsync(
+        GetPositionsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetPositions",
+            BitflyerEndpoints.GetPositions(request.ProductCode.Value),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<PositionResponse>>(
+                json,
+                "Bitflyer.GetPositions"));
+
+    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsAsync(
+        GetAccountExecutionsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetExecutions",
+            BitflyerEndpoints.GetExecutions(
+                request.ProductCode.Value,
+                request.ChildOrderId,
+                request.ChildOrderAcceptanceId,
+                request.Count,
+                request.Before,
+                request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPrivateResponse>>(
+                json,
+                "Bitflyer.GetExecutions"));
+
+    public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralAsync(
+        GetCollateralRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetCollateral",
+            BitflyerEndpoints.GetCollateral(),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<CollateralResponse>(
+                json,
+                "Bitflyer.GetCollateral"));
+
+    public Task<Call<GetCollateralAccountsRequest, IReadOnlyList<CollateralAccount>>> GetCollateralAccountsAsync(
+        GetCollateralAccountsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetCollateralAccounts",
+            BitflyerEndpoints.GetCollateralAccounts(),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<CollateralAccount>>(
+                json,
+                "Bitflyer.GetCollateralAccounts"));
+
+    public Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersAsync(
+        GetChildOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetChildOrders",
+            BitflyerEndpoints.GetChildOrders(
+                request.ProductCode.Value,
+                request.ChildOrderStatusState,
+                request.ChildOrderAcceptanceId,
+                request.ChildOrderId,
+                request.ParentOrderId,
+                request.Count,
+                request.Before,
+                request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ChildOrderResponse>>(
+                json,
+                "Bitflyer.GetChildOrders"));
+
+    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+        GetParentOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetParentOrders",
+            BitflyerEndpoints.GetParentOrders(
+                request.ProductCode.Value,
+                request.ParentOrderId,
+                request.ParentOrderAcceptanceId,
+                request.Count,
+                request.Before,
+                request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ParentOrderResponse>>(
+                json,
+                "Bitflyer.GetParentOrders"));
+
+    public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+        GetParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetParentOrder",
+            BitflyerEndpoints.GetParentOrder(
+                request.ProductCode.Value,
+                request.ParentOrderId,
+                request.ParentOrderAcceptanceId),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<ParentOrderDetailResponse>(
+                json,
+                "Bitflyer.GetParentOrder"));
+
+    public Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
+        GetBalanceHistoryRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetBalanceHistory",
+            BitflyerEndpoints.GetBalanceHistory(
+                request.CurrencyCode,
+                request.Count,
+                request.Before,
+                request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
+                json,
+                "Bitflyer.GetBalanceHistory"));
+
+    public Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionAsync(
+        GetTradingCommissionRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetTradingCommission",
+            BitflyerEndpoints.GetTradingCommission(request.ProductCode.Value),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<JsonElement>(
+                json,
+                "Bitflyer.GetTradingCommission"));
+
+    public Task<Call<GetCollateralHistoryRequest, IReadOnlyList<JsonElement>>> GetCollateralHistoryAsync(
+        GetCollateralHistoryRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetCollateralHistory",
+            BitflyerEndpoints.GetCollateralHistory(request.Count, request.Before, request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
+                json,
+                "Bitflyer.GetCollateralHistory"));
+
+    public Task<Call<GetAddressesRequest, IReadOnlyList<JsonElement>>> GetAddressesAsync(
+        GetAddressesRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetAddresses",
+            BitflyerEndpoints.GetAddresses(),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
+                json,
+                "Bitflyer.GetAddresses"));
+
+    public Task<Call<GetCoinInsRequest, IReadOnlyList<JsonElement>>> GetCoinInsAsync(
+        GetCoinInsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetCoinIns",
+            BitflyerEndpoints.GetCoinIns(request.Count, request.Before, request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
+                json,
+                "Bitflyer.GetCoinIns"));
+
+    public Task<Call<GetCoinOutsRequest, IReadOnlyList<JsonElement>>> GetCoinOutsAsync(
+        GetCoinOutsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetCoinOuts",
+            BitflyerEndpoints.GetCoinOuts(
+                request.MessageId,
+                request.Count,
+                request.Before,
+                request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
+                json,
+                "Bitflyer.GetCoinOuts"));
+
+    public Task<Call<GetDepositsRequest, IReadOnlyList<JsonElement>>> GetDepositsAsync(
+        GetDepositsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetDeposits",
+            BitflyerEndpoints.GetDeposits(request.Count, request.Before, request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
+                json,
+                "Bitflyer.GetDeposits"));
+
+    public Task<Call<GetWithdrawalsRequest, IReadOnlyList<JsonElement>>> GetWithdrawalsAsync(
+        GetWithdrawalsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetWithdrawals",
+            BitflyerEndpoints.GetWithdrawals(messageId: null, count: request.Count, before: request.Before, after: request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
+                json,
+                "Bitflyer.GetWithdrawals"));
+
+    public Task<Call<GetBankAccountsRequest, IReadOnlyList<JsonElement>>> GetBankAccountsAsync(
+        GetBankAccountsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetBankAccounts",
+            BitflyerEndpoints.GetBankAccounts(),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
+                json,
+                "Bitflyer.GetBankAccounts"));
+
+    private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
+        TReq request,
+        string component,
+        WireCallSpec spec,
+        CancellationToken cancellationToken,
+        Func<string, TRes> parse)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        if (parse is null) throw new ArgumentNullException(nameof(parse));
+
+        var wireCall = await _wire.SendAsync(ExchangeCode.Bitflyer, spec, cancellationToken).ConfigureAwait(false);
+        return CreateCall(request, component, wireCall, parse);
     }
 
-    private Task<WireCall> SendAsync(WireRequest request, CancellationToken ct) =>
-        _wire.SendAsync(ExchangeCode.Bitflyer, request, ct);
+    private static Call<TReq, TRes> CreateCall<TReq, TRes>(
+        TReq request,
+        string component,
+        Call<WireCallSpec, WireResponse> wireCall,
+        Func<string, TRes> parse)
+    {
+        var meta = new CallMeta(
+            Layer: "Raw",
+            Component: component,
+            Tags: null,
+            Children: new[] { wireCall.Id });
+
+        return wireCall.Result switch
+        {
+            CallResult<WireResponse>.Err err => new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(err.Error),
+                Meta: meta),
+            CallResult<WireResponse>.Ok ok => CreateOkCall(request, component, ok.Response, wireCall, parse, meta),
+            _ => new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(new CallError(CallErrorKind.Unknown, "Wire call returned unknown result.")),
+                Meta: meta)
+        };
+    }
+
+    private static Call<TReq, TRes> CreateOkCall<TReq, TRes>(
+        TReq request,
+        string component,
+        WireResponse response,
+        Call<WireCallSpec, WireResponse> wireCall,
+        Func<string, TRes> parse,
+        CallMeta meta)
+    {
+        if (response.StatusCode is < 200 or >= 300)
+        {
+            var error = new CallError(
+                CallErrorKind.Http,
+                $"{component} failed with status {response.StatusCode}.",
+                HttpStatus: response.StatusCode,
+                BodySnippet: Snip(response.Json));
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(error),
+                Meta: meta);
+        }
+
+        try
+        {
+            var parsed = parse(response.Json);
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Ok(parsed),
+                Meta: meta);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            var error = new CallError(
+                CallErrorKind.Codec,
+                $"{component} failed to parse response.",
+                ex,
+                response.StatusCode,
+                Snip(response.Json));
+            return new Call<TReq, TRes>(
+                Id: CallId.New(),
+                StartedAt: wireCall.StartedAt,
+                Duration: wireCall.Duration,
+                Request: request,
+                Result: new CallResult<TRes>.Err(error),
+                Meta: meta);
+        }
+    }
+
+    private static string? Snip(string? json)
+    {
+        if (string.IsNullOrEmpty(json)) return json;
+        return json.Length <= 512 ? json : json[..512];
+    }
 }

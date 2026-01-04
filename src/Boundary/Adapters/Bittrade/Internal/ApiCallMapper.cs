@@ -1,8 +1,6 @@
 using System;
 using System.Net;
 using ExchangeApi.Boundary.Adapters.Common.ApiCallMapping;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Contracts.Call;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Spec.CallCommon;
 
@@ -10,49 +8,29 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 
 internal static class ApiCallMapper
 {
-    public static ApiCallMeta ToMeta(CallMeta meta) =>
-        ApiCallMapperBase.ToMeta(meta);
-
-    public static ApiCallMeta ToMeta(DateTimeOffset startedAt, string? requestId = null) =>
-        ApiCallMapperBase.ToMeta(startedAt, requestId);
-
-    public static ApiCall<TReq, TOk, ApiError> Ok<TReq, TOk>(
-        ExchangeCode exchange,
+    public static Call<TReq, TOk> FromCall<TReq, TOk, TNormReq>(
         TReq request,
-        CallMeta meta,
-        int statusCode,
-        TOk value) =>
-        ApiCallMapperBase.Ok(exchange, request, meta, statusCode, value);
+        Call<TNormReq, TOk> normalizedCall,
+        string component) =>
+        ApiCallMapperBase.FromCall(request, normalizedCall, component);
 
-    public static ApiCall<TReq, TOk, ApiError> Err<TReq, TOk>(
-        ExchangeCode exchange,
+    public static Call<TReq, TOk> MapCall<TReq, TNormReq, TNormRes, TOk>(
         TReq request,
-        CallMeta meta,
-        int statusCode,
-        string? message = null) =>
-        ApiCallMapperBase.Err<TReq, TOk>(exchange, request, meta, statusCode, message);
+        Call<TNormReq, TNormRes> normalizedCall,
+        string component,
+        Func<TNormRes, TOk> mapper) =>
+        ApiCallMapperBase.MapCall(request, normalizedCall, component, mapper);
 
-    public static ApiCall<TReq, TOk, ApiError> Err<TReq, TOk>(
-        ExchangeCode exchange,
-        TReq request,
-        ApiCallMeta meta,
-        int statusCode,
-        string? message = null) =>
-        ApiCallMapperBase.Err<TReq, TOk>(exchange, request, meta, statusCode, message);
-
-    public static ApiCall<TReq, TOk, ApiError> FromException<TReq, TOk>(
-        ExchangeCode exchange,
+    public static Call<TReq, TOk> FromException<TReq, TOk>(
         TReq request,
         DateTimeOffset startedAt,
+        string component,
         Exception ex) =>
-        ApiCallMapperBase.FromException<TReq, TOk>(exchange, request, startedAt, ex);
+        ApiCallMapperBase.FromException<TReq, TOk>(request, startedAt, component, ex);
 
-    public static ExchangeErrorCategory? ToExchangeErrorCategory(ApiErrorKind kind) =>
-        ApiCallMapperBase.ToExchangeErrorCategory(kind);
+    public static ExchangeErrorCategory? ToExchangeErrorCategory(CallError error) =>
+        ApiCallMapperBase.ToExchangeErrorCategory(error);
 
-    public static HttpStatusCode? ToStatusCode(int statusCode) =>
+    public static HttpStatusCode? ToStatusCode(int? statusCode) =>
         ApiCallMapperBase.ToStatusCode(statusCode);
-
-    public static ApiErrorKind Classify(int statusCode, string? exchangeErrorCode, string? message) =>
-        ApiCallMapperBase.Classify(statusCode, exchangeErrorCode, message);
 }

@@ -4,7 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalize;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 
@@ -18,20 +19,20 @@ public interface IBitflyerNormalizedTradingApi
 
     Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<OrderResult, JsonElement>> PlaceOrderCallAsync(
+    Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
         OrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<CancelResult, JsonElement>> CancelOrderCallAsync(
+    Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<IReadOnlyList<OpenOrder>, JsonElement>> GetOpenOrdersCallAsync(
+    Task<Call<GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>> GetOpenOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<BitflyerNormalizedCall<OrderStatus, JsonElement>> GetOrderCallAsync(
+    Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);

@@ -1,18 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Normalize;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Spec.CallCommon;
+using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 
@@ -29,56 +34,43 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
 
     public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
     {
-        var rawBalances = await _accountApi.GetBalancesAsync(cancellationToken).ConfigureAwait(false);
-        return BitflyerAccountMapper.MapBalances(rawBalances);
+        var call = await GetBalancesCallAsync(cancellationToken).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetBalances");
     }
 
     public async Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        if (symbol.IsEmpty)
-        {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
-        }
-
-        var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var raw = await _accountApi
-            .GetExecutionsAsync(productCode, cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        return BitflyerAccountMapper.MapAccountExecutions(symbol, raw);
+        var call = await GetAccountExecutionsCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetExecutions");
     }
 
     public async Task<IReadOnlyList<Position>> GetOpenPositionsAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        if (symbol.IsEmpty)
-        {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
-        }
-
-        var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var raw = await _accountApi.GetPositionsAsync(productCode, cancellationToken).ConfigureAwait(false);
-        return BitflyerMarginMapper.MapPositions(symbol, raw);
+        var call = await GetOpenPositionsCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetPositions");
     }
 
     public async Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default)
     {
-        var raw = await _accountApi.GetCollateralAsync(cancellationToken).ConfigureAwait(false);
-        return BitflyerMarginMapper.MapCollateral(raw);
+        var call = await GetCollateralCallAsync(cancellationToken).ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetCollateral");
     }
 
-    public async Task<BitflyerNormalizedCall<IReadOnlyList<Balance>, JsonElement>> GetBalancesCallAsync(
+    public async Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var rawCall = await _accountApi.GetBalancesCallAsync(cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetBalances", new Dictionary<string, string?>());
-        return CreateCall(rawCall, request, BitflyerAccountMapper.MapBalances);
+        var rawCall = await _accountApi
+            .GetBalancesAsync(new RawRequests.GetBalancesRequest(), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new GetBalancesRequest();
+        return CreateCall(rawCall, request, "Bitflyer.GetBalances", BitflyerAccountMapper.MapBalances);
     }
 
-    public async Task<BitflyerNormalizedCall<IReadOnlyList<ExecutionAccount>, JsonElement>> GetAccountExecutionsCallAsync(
+    public async Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -89,21 +81,18 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
 
         var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
         var rawCall = await _accountApi
-            .GetExecutionsCallAsync(productCode, cancellationToken: cancellationToken)
+            .GetExecutionsAsync(new RawRequests.GetAccountExecutionsRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetExecutions", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.ToString(),
-            ["productCode"] = productCode.Value,
-        });
+        var request = new GetAccountExecutionsRequest(symbol);
 
         return CreateCall(
             rawCall,
             request,
+            "Bitflyer.GetExecutions",
             raw => BitflyerAccountMapper.MapAccountExecutions(symbol, raw));
     }
 
-    public async Task<BitflyerNormalizedCall<IReadOnlyList<Position>, JsonElement>> GetOpenPositionsCallAsync(
+    public async Task<Call<GetOpenPositionsRequest, IReadOnlyList<Position>>> GetOpenPositionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -113,54 +102,110 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
         }
 
         var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var rawCall = await _accountApi.GetPositionsCallAsync(productCode, cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetPositions", new Dictionary<string, string?>
-        {
-            ["symbol"] = symbol.ToString(),
-            ["productCode"] = productCode.Value,
-        });
+        var rawCall = await _accountApi
+            .GetPositionsAsync(new RawRequests.GetPositionsRequest(productCode), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new GetOpenPositionsRequest(symbol);
 
         return CreateCall(
             rawCall,
             request,
+            "Bitflyer.GetPositions",
             raw => BitflyerMarginMapper.MapPositions(symbol, raw));
     }
 
-    public async Task<BitflyerNormalizedCall<Collateral, JsonElement>> GetCollateralCallAsync(
+    public async Task<Call<GetCollateralRequest, Collateral>> GetCollateralCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var rawCall = await _accountApi.GetCollateralCallAsync(cancellationToken).ConfigureAwait(false);
-        var request = CreateRequest("Bitflyer.GetCollateral", new Dictionary<string, string?>());
-        return CreateCall(rawCall, request, BitflyerMarginMapper.MapCollateral);
-    }
-
-    private static BitflyerNormalizedRequest CreateRequest(
-        string operation,
-        IReadOnlyDictionary<string, string?> parameters) =>
-        new(operation, parameters);
-
-    private static BitflyerNormalizedCall<TOk, JsonElement> CreateCall<TRaw, TOk>(
-        BitflyerRawCall<TRaw, JsonElement> rawCall,
-        BitflyerNormalizedRequest request,
-        Func<TRaw, TOk> mapper)
-    {
-        return rawCall.Result switch
-        {
-            Ok<TRaw, JsonElement> ok => new BitflyerNormalizedCall<TOk, JsonElement>(
-                request,
-                new Ok<TOk, JsonElement>(mapper(ok.Value), ok.StatusCode),
-                rawCall.Meta),
-            Err<TRaw, JsonElement> err => new BitflyerNormalizedCall<TOk, JsonElement>(
-                request,
-                new Err<TOk, JsonElement>(err.Error, err.StatusCode),
-                rawCall.Meta),
-            _ => throw new InvalidOperationException("Unsupported CallResult type.")
-        };
+        var rawCall = await _accountApi
+            .GetCollateralAsync(new RawRequests.GetCollateralRequest(), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new GetCollateralRequest();
+        return CreateCall(rawCall, request, "Bitflyer.GetCollateral", BitflyerMarginMapper.MapCollateral);
     }
 
     private async Task<RawProductCode> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
     {
         var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
         return new RawProductCode(market.ProductCode);
+    }
+
+    private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
+        Func<TRaw, TOk> mapper)
+    {
+        var meta = new CallMeta(
+            Layer: "Normalized",
+            Component: component,
+            Tags: null,
+            Children: new[] { rawCall.Id });
+
+        return rawCall.Result switch
+        {
+            CallResult<TRaw>.Err err => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(err.Error),
+                Meta: meta),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper, meta),
+            _ => new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
+                Meta: meta)
+        };
+    }
+
+    private static Call<TReq, TOk> MapOk<TRawReq, TReq, TRaw, TOk>(
+        Call<TRawReq, TRaw> rawCall,
+        TReq request,
+        string component,
+        TRaw raw,
+        Func<TRaw, TOk> mapper,
+        CallMeta meta)
+    {
+        try
+        {
+            var mapped = mapper(raw);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Ok(mapped),
+                Meta: meta);
+        }
+        catch (Exception ex)
+        {
+            var error = new CallError(CallErrorKind.Mapping, $"{component} failed to map normalized response.", ex);
+            return new Call<TReq, TOk>(
+                Id: CallId.New(),
+                StartedAt: rawCall.StartedAt,
+                Duration: rawCall.Duration,
+                Request: request,
+                Result: new CallResult<TOk>.Err(error),
+                Meta: meta);
+        }
+    }
+
+    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
+    {
+        return call.Result switch
+        {
+            CallResult<TRes>.Ok ok => ok.Response,
+            CallResult<TRes>.Err err => throw new ExchangeApiException(
+                message: err.Error.Message,
+                exchange: ExchangeCode.Bitflyer,
+                operation: operation,
+                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
+                innerException: err.Error.Exception),
+            _ => throw new InvalidOperationException("Unsupported CallResult type.")
+        };
     }
 }

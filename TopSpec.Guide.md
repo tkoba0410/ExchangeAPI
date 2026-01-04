@@ -159,6 +159,11 @@ Split Candidate: なし
     * Read：JSON 表現ゆらぎ（数値/文字列混在、日時形式差等）の吸収
     * Write：出力表現の決定＝意味決定を伴うため、Raw の責務外
     * Write が必要な場合は、Normalized で意味決定済みのプリミティブ値を用いる
+  * JsonConverter の運用上の注意：
+    * Raw の JsonConverter は **Deserialize（Read）専用**とする（Serialize/Write は禁止）。
+    * JsonConverter は、数値・日時・ID 等の **表現ゆらぎ（string/number 混在など）吸収**に限定する。
+    * ID ごとに個別の JsonConverter を増やすのではなく、必要な場合は **汎用的なプリミティブ converter**を優先する。
+    * 参照されていない JsonConverter は削除対象とする（Raw に死んだ実装を残さない）。
 * **Normalized**：単独取引所内の正規化。取引所の意味論に基づく解釈・統一（exchange semantics）。
   * 注文種別・売買区分・状態・type 等の **意味づけ（列挙化）**、既定値注入、妥当性検証は Normalized の責務。
 * **Contracts**：複数取引所横断の抽象化。横断語彙としての意味論（cross-exchange semantics）。

@@ -11,7 +11,7 @@ public sealed class BittradeEndpointsTests
     {
         var req = BittradeEndpoints.GetSymbols();
 
-        WireRequestAssertions.AssertWireRequest(
+        WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "v1/common/symbols");
@@ -22,7 +22,7 @@ public sealed class BittradeEndpointsTests
     {
         var req = BittradeEndpoints.GetKlines("btcjpy", "1min", 200);
 
-        WireRequestAssertions.AssertWireRequest(
+        WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "market/history/kline",
@@ -34,7 +34,7 @@ public sealed class BittradeEndpointsTests
     {
         var req = BittradeEndpoints.GetTicker("btcjpy");
 
-        WireRequestAssertions.AssertWireRequest(
+        WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "market/detail/merged",
@@ -55,7 +55,7 @@ public sealed class BittradeEndpointsTests
         var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
         var req = BittradeEndpoints.PlaceOrder(bodyJson);
 
-        WireRequestAssertions.AssertWireRequest(
+        WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "POST",
             path: "v1/order/orders/place",

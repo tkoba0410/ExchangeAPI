@@ -11,7 +11,7 @@ public sealed class BitflyerEndpointsTests
     {
         var req = BitflyerEndpoints.GetHealth("FX_BTC_JPY");
 
-        WireRequestAssertions.AssertWireRequest(
+        WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "/v1/gethealth",
@@ -23,7 +23,7 @@ public sealed class BitflyerEndpointsTests
     {
         var req = BitflyerEndpoints.GetBoardState("BTC_JPY");
 
-        WireRequestAssertions.AssertWireRequest(
+        WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "/v1/getboardstate",
@@ -35,7 +35,7 @@ public sealed class BitflyerEndpointsTests
     {
         var req = BitflyerEndpoints.GetTicker("BTC_JPY", useAliasPath: false);
 
-        WireRequestAssertions.AssertWireRequest(
+        WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "/v1/getticker",
@@ -52,7 +52,7 @@ public sealed class BitflyerEndpointsTests
             after: 456,
             useAliasPath: false);
 
-        WireRequestAssertions.AssertWireRequest(
+        WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "/v1/getexecutions",
@@ -76,7 +76,7 @@ public sealed class BitflyerEndpointsTests
         var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateChildOrder");
         var req = BitflyerEndpoints.SendChildOrder(bodyJson);
 
-        WireRequestAssertions.AssertWireRequest(
+        WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "POST",
             path: "/v1/me/sendchildorder",

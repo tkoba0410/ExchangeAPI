@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Spec.Wire;
 
@@ -12,10 +13,10 @@ namespace ExchangeApi.Spec.Wire;
 public interface IWireTransport
 {
     /// <summary>
-    /// 送信結果を WireCall として返す。JSON のパースや成否判定は Raw の責務。
+    /// 送信結果を Call として返す。JSON のパースや成否判定は Raw の責務。
     /// </summary>
-    Task<WireCall> SendAsync(
+    Task<Call<WireCallSpec, WireResponse>> SendAsync(
         ExchangeCode exchange,
-        WireRequest request,
+        WireCallSpec request,
         CancellationToken ct = default);
 }

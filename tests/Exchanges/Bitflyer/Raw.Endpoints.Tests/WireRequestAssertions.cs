@@ -3,10 +3,10 @@ using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Endpoints.Tests;
 
-internal static class WireRequestAssertions
+internal static class WireCallSpecAssertions
 {
-    public static void AssertWireRequest(
-        WireRequest request,
+    public static void AssertWireCallSpec(
+        WireCallSpec request,
         string method,
         string path,
         string? query = null,

@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 
 namespace ExchangeApi.Spec.CallCommon;
 
 public sealed record CallMeta(
-    DateTimeOffset StartedAt,
-    TimeSpan Elapsed,
-    string? RequestId);
+    string Layer,
+    string Component,
+    IReadOnlyDictionary<string, string>? Tags = null,
+    IReadOnlyList<CallId>? Children = null);

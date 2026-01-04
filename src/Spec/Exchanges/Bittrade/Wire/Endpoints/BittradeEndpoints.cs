@@ -6,60 +6,60 @@ namespace ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 
 internal static class BittradeEndpoints
 {
-    public static WireRequest GetTicker(string symbol) =>
+    public static WireCallSpec GetTicker(string symbol) =>
         Get("market/detail/merged", BuildQuery(
             ("symbol", symbol)));
 
-    public static WireRequest GetOrderBook(string symbol, string? type) =>
+    public static WireCallSpec GetOrderBook(string symbol, string? type) =>
         Get("market/depth", BuildQuery(
             ("symbol", symbol),
             ("type", type)));
 
-    public static WireRequest GetTrades(string symbol) =>
+    public static WireCallSpec GetTrades(string symbol) =>
         Get("market/trade", BuildQuery(
             ("symbol", symbol)));
 
-    public static WireRequest GetKlines(string symbol, string period, int? size = null) =>
+    public static WireCallSpec GetKlines(string symbol, string period, int? size = null) =>
         Get("market/history/kline", BuildQuery(
             ("period", period),
             ("symbol", symbol),
             ("size", size?.ToString())));
 
-    public static WireRequest GetTickers() => Get("market/tickers", query: null);
+    public static WireCallSpec GetTickers() => Get("market/tickers", query: null);
 
-    public static WireRequest GetTradeHistory(string symbol) =>
+    public static WireCallSpec GetTradeHistory(string symbol) =>
         Get("market/history/trade", BuildQuery(
             ("symbol", symbol)));
 
-    public static WireRequest GetTimestamp() => Get("v1/common/timestamp", query: null);
+    public static WireCallSpec GetTimestamp() => Get("v1/common/timestamp", query: null);
 
-    public static WireRequest GetSymbols() => Get("v1/common/symbols", query: null);
+    public static WireCallSpec GetSymbols() => Get("v1/common/symbols", query: null);
 
-    public static WireRequest GetCurrencies() => Get("v1/common/currencys", query: null);
+    public static WireCallSpec GetCurrencies() => Get("v1/common/currencys", query: null);
 
-    public static WireRequest GetRetailMaintainTime() => Get("v1/retail/maintain/time", query: null);
+    public static WireCallSpec GetRetailMaintainTime() => Get("v1/retail/maintain/time", query: null);
 
-    public static WireRequest GetAccounts() => Get("v1/account/accounts", query: null);
+    public static WireCallSpec GetAccounts() => Get("v1/account/accounts", query: null);
 
-    public static WireRequest GetAccountBalance(string accountId)
+    public static WireCallSpec GetAccountBalance(string accountId)
     {
         return Get($"v1/account/accounts/{accountId}/balance", query: null);
     }
 
-    public static WireRequest GetOpenOrders(string symbol, string accountId)
+    public static WireCallSpec GetOpenOrders(string symbol, string accountId)
     {
         return Get("v1/order/openOrders", BuildQuery(
             ("symbol", symbol),
             ("account-id", accountId)));
     }
 
-    public static WireRequest GetOrder(string orderId) =>
+    public static WireCallSpec GetOrder(string orderId) =>
         Get($"v1/order/orders/{orderId}", query: null);
 
-    public static WireRequest GetOrderMatchResults(string orderId) =>
+    public static WireCallSpec GetOrderMatchResults(string orderId) =>
         Get($"v1/order/orders/{orderId}/matchresults", query: null);
 
-    public static WireRequest GetOrders(
+    public static WireCallSpec GetOrders(
         string symbol,
         string states,
         string? startDate = null,
@@ -78,7 +78,7 @@ internal static class BittradeEndpoints
             ("size", size?.ToString())));
     }
 
-    public static WireRequest GetMatchResults(
+    public static WireCallSpec GetMatchResults(
         string? symbol = null,
         string? types = null,
         string? startDate = null,
@@ -97,7 +97,7 @@ internal static class BittradeEndpoints
             ("size", size?.ToString())));
     }
 
-    public static WireRequest GetDepositWithdraws(
+    public static WireCallSpec GetDepositWithdraws(
         string type,
         string? currency = null,
         long? from = null,
@@ -112,7 +112,7 @@ internal static class BittradeEndpoints
             ("direct", direct)));
     }
 
-    public static WireRequest GetRetailOrders(
+    public static WireCallSpec GetRetailOrders(
         int direct,
         int? status = null,
         DateTimeOffset? startTime = null,
@@ -127,31 +127,31 @@ internal static class BittradeEndpoints
             ("end_time", endMs?.ToString())));
     }
 
-    public static WireRequest PlaceOrder(string bodyJson) =>
+    public static WireCallSpec PlaceOrder(string bodyJson) =>
         Post("v1/order/orders/place", bodyJson);
 
-    public static WireRequest CancelOrder(string orderId) =>
+    public static WireCallSpec CancelOrder(string orderId) =>
         Post($"v1/order/orders/{orderId}/submitcancel", bodyJson: null);
 
-    public static WireRequest CancelOrders(string bodyJson) =>
+    public static WireCallSpec CancelOrders(string bodyJson) =>
         Post("v1/order/orders/batchcancel", bodyJson);
 
-    public static WireRequest CancelOpenOrders(string bodyJson) =>
+    public static WireCallSpec CancelOpenOrders(string bodyJson) =>
         Post("v1/order/orders/batchCancelOpenOrders", bodyJson);
 
-    public static WireRequest CreateWithdraw(string bodyJson) =>
+    public static WireCallSpec CreateWithdraw(string bodyJson) =>
         Post("v1/dw/withdraw/api/create", bodyJson);
 
-    public static WireRequest CancelWithdraw(string withdrawId) =>
+    public static WireCallSpec CancelWithdraw(string withdrawId) =>
         Post($"v1/dw/withdraw-virtual/{withdrawId}/cancel", bodyJson: null);
 
-    public static WireRequest CreateRetailOrder(string bodyJson) =>
+    public static WireCallSpec CreateRetailOrder(string bodyJson) =>
         Post("v1/retail/order/place", bodyJson);
 
-    private static WireRequest Get(string path, string? query) =>
+    private static WireCallSpec Get(string path, string? query) =>
         new(Method: "GET", Path: path, Query: query);
 
-    private static WireRequest Post(string path, string? bodyJson) =>
+    private static WireCallSpec Post(string path, string? bodyJson) =>
         new(Method: "POST", Path: path, Query: null, BodyJson: bodyJson);
 
     private static string? BuildQuery(params (string Key, string? Value)[] entries)

@@ -1,7 +1,8 @@
 namespace ExchangeApi.Spec.CallCommon;
 
-public abstract record CallResult<TOk, TErr>(int StatusCode);
+public abstract record CallResult<TRes>
+{
+    public sealed record Ok(TRes Response) : CallResult<TRes>;
 
-public sealed record Ok<TOk, TErr>(TOk Value, int StatusCode) : CallResult<TOk, TErr>(StatusCode);
-
-public sealed record Err<TOk, TErr>(TErr Error, int StatusCode) : CallResult<TOk, TErr>(StatusCode);
+    public sealed record Err(CallError Error) : CallResult<TRes>;
+}

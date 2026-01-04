@@ -22,33 +22,80 @@ public sealed class WireTransport : IWireTransport
     }
 
     /// <summary>
-    /// WireCall を生成して返す。RequestId が取得できる場合は Meta に設定する。
+    /// Call を生成して返す。RequestId が取得できる場合は Meta に設定する。
     /// </summary>
-    public async Task<WireCall> SendAsync(
+    public async Task<Call<WireCallSpec, WireResponse>> SendAsync(
         ExchangeCode exchange,
-        WireRequest request,
+        WireCallSpec request,
         CancellationToken ct = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var startedAt = DateTimeOffset.UtcNow;
-        var responseMeta = await _restClient
-            .SendRawAsync(request.Method, request.Path, request.Query, request.BodyJson, request.Headers, ct)
-            .ConfigureAwait(false);
-        var elapsed = DateTimeOffset.UtcNow - startedAt;
+        try
+        {
+            var responseMeta = await _restClient
+                .SendRawAsync(request.Method, request.Path, request.Query, request.BodyJson, request.Headers, ct)
+                .ConfigureAwait(false);
+            var elapsed = DateTimeOffset.UtcNow - startedAt;
 
-        var headers = responseMeta.Headers is null
-            ? null
-            : new Dictionary<string, string>(responseMeta.Headers, StringComparer.OrdinalIgnoreCase);
-        var response = new WireResponse(
-            Exchange: exchange,
-            StatusCode: responseMeta.StatusCode,
-            Json: responseMeta.Body ?? string.Empty,
-            Headers: headers,
-            RequestId: null,
-            ElapsedMs: (long)elapsed.TotalMilliseconds);
-        var meta = new CallMeta(startedAt, elapsed, response.RequestId);
+            var headers = responseMeta.Headers is null
+                ? null
+                : new Dictionary<string, string>(responseMeta.Headers, StringComparer.OrdinalIgnoreCase);
+            var response = new WireResponse(
+                Exchange: exchange,
+                StatusCode: responseMeta.StatusCode,
+                Json: responseMeta.Body ?? string.Empty,
+                Headers: headers,
+                RequestId: null,
+                ElapsedMs: (long)elapsed.TotalMilliseconds);
+            var meta = new CallMeta(
+                Layer: "Wire",
+                Component: $"{exchange}.SendRawAsync",
+                Tags: null,
+                Children: null);
 
-        return new WireCall(request, response, meta);
+            return new Call<WireCallSpec, WireResponse>(
+                Id: CallId.New(),
+                StartedAt: startedAt,
+                Duration: elapsed,
+                Request: request,
+                Result: new CallResult<WireResponse>.Ok(response),
+                Meta: meta);
+        }
+        catch (OperationCanceledException)
+        {
+            var elapsed = DateTimeOffset.UtcNow - startedAt;
+            var error = new CallError(CallErrorKind.Transport, "Wire transport canceled.");
+            var meta = new CallMeta(
+                Layer: "Wire",
+                Component: $"{exchange}.SendRawAsync",
+                Tags: null,
+                Children: null);
+            return new Call<WireCallSpec, WireResponse>(
+                Id: CallId.New(),
+                StartedAt: startedAt,
+                Duration: elapsed,
+                Request: request,
+                Result: new CallResult<WireResponse>.Err(error),
+                Meta: meta);
+        }
+        catch (Exception ex)
+        {
+            var elapsed = DateTimeOffset.UtcNow - startedAt;
+            var error = new CallError(CallErrorKind.Transport, "Wire transport failed.", ex);
+            var meta = new CallMeta(
+                Layer: "Wire",
+                Component: $"{exchange}.SendRawAsync",
+                Tags: null,
+                Children: null);
+            return new Call<WireCallSpec, WireResponse>(
+                Id: CallId.New(),
+                StartedAt: startedAt,
+                Duration: elapsed,
+                Request: request,
+                Result: new CallResult<WireResponse>.Err(error),
+                Meta: meta);
+        }
     }
 }

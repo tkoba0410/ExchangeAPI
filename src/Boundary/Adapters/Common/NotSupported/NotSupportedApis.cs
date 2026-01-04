@@ -57,6 +57,20 @@ internal sealed class NotSupportedTradingApi : ITradingApi
         CancellationToken cancellationToken = default) =>
         throw NotSupported("Trading");
 
+    public Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported("Trading");
+
+    public Task<ParentOrderDetail> GetParentOrderAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        throw NotSupported("Trading");
+
     public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         Symbol symbol,
         Side side,
@@ -96,6 +110,22 @@ internal sealed class NotSupportedTradingApi : ITradingApi
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<GetOrderRequest, OrderStatus>(new GetOrderRequest(symbol, orderKey)));
+
+    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(NotSupportedCall<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>(
+            new GetParentOrdersRequest(symbol, parentOrderId, parentOrderAcceptanceId)));
+
+    public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(NotSupportedCall<GetParentOrderRequest, ParentOrderDetail>(
+            new GetParentOrderRequest(symbol, parentOrderId, parentOrderAcceptanceId)));
 
     private Call<TReq, TOk> NotSupportedCall<TReq, TOk>(TReq request)
     {

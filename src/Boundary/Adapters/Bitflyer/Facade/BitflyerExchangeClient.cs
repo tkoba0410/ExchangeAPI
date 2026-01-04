@@ -200,6 +200,20 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrderAsync(symbol, orderKey, cancellationToken);
 
+    public Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.GetParentOrdersAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken);
+
+    public Task<ParentOrderDetail> GetParentOrderAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.GetParentOrderAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken);
+
     public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         Symbol symbol,
         ContractSide side,
@@ -239,6 +253,20 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrderCallAsync(symbol, orderKey, cancellationToken);
+
+    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.GetParentOrdersCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken);
+
+    public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default) =>
+        _tradingApi.GetParentOrderCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken);
 
     // Account/Margin
     public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>

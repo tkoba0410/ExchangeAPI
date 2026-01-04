@@ -17,6 +17,8 @@ internal static class BitflyerOperations
         public const string CancelOrder = "Bitflyer.Trading.CancelOrder";
         public const string GetOpenOrders = "Bitflyer.Trading.GetOpenOrders";
         public const string GetOrder = "Bitflyer.Trading.GetOrder";
+        public const string GetParentOrders = "Bitflyer.Trading.GetParentOrders";
+        public const string GetParentOrder = "Bitflyer.Trading.GetParentOrder";
     }
 
     internal static class Account

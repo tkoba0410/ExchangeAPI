@@ -79,4 +79,28 @@ public interface ITradingApi
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default);
+
+    Task<ParentOrderDetail> GetParentOrderAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default);
 }

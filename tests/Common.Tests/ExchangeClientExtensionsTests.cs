@@ -86,6 +86,20 @@ public sealed class ExchangeClientExtensionsTests
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
+        public Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ParentOrderDetail> GetParentOrderAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
         public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
             Symbol symbol,
             Side side,
@@ -123,6 +137,20 @@ public sealed class ExchangeClientExtensionsTests
         public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }

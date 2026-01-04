@@ -92,6 +92,30 @@ internal sealed class BitflyerTradingApi : ITradingApi
             .ConfigureAwait(false);
     }
 
+    public async Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await UnwrapAsync(
+                GetParentOrdersCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken),
+                BitflyerOperations.Trading.GetParentOrders)
+            .ConfigureAwait(false);
+    }
+
+    public async Task<ParentOrderDetail> GetParentOrderAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await UnwrapAsync(
+                GetParentOrderCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken),
+                BitflyerOperations.Trading.GetParentOrder)
+            .ConfigureAwait(false);
+    }
+
     public async Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         Symbol symbol,
         ContractSide side,
@@ -233,6 +257,66 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 request,
                 startedAt,
                 BitflyerOperations.Trading.GetOrder,
+                ex);
+        }
+    }
+
+    public async Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetParentOrdersRequest(symbol, parentOrderId, parentOrderAcceptanceId);
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var call = await _tradingApi
+                .GetParentOrdersCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken)
+                .ConfigureAwait(false);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.Trading.GetParentOrders,
+                ok => (IReadOnlyList<ParentOrder>)ok.Select(o => BitflyerParentOrderMapper.Map(symbol, o)).ToArray());
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>(
+                request,
+                startedAt,
+                BitflyerOperations.Trading.GetParentOrders,
+                ex);
+        }
+    }
+
+    public async Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetParentOrderRequest(symbol, parentOrderId, parentOrderAcceptanceId);
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var call = await _tradingApi
+                .GetParentOrderCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken)
+                .ConfigureAwait(false);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.Trading.GetParentOrder,
+                BitflyerParentOrderMapper.MapDetail);
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<GetParentOrderRequest, ParentOrderDetail>(
+                request,
+                startedAt,
+                BitflyerOperations.Trading.GetParentOrder,
                 ex);
         }
     }

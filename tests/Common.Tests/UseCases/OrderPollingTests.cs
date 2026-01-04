@@ -118,6 +118,20 @@ public sealed class OrderPollingTests
             return Task.FromResult(_next(orderKey));
         }
 
+        public Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ParentOrderDetail> GetParentOrderAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
         public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
@@ -170,6 +184,20 @@ public sealed class OrderPollingTests
         public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
@@ -184,6 +212,20 @@ public sealed class OrderPollingTests
             throw new ExchangeOrderNotFoundException(ExchangeCode.Sandbox, "GetOrder", symbol.ToString(), orderKey.ToString());
         }
 
+        public Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<ParentOrderDetail> GetParentOrderAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
         public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
@@ -236,6 +278,20 @@ public sealed class OrderPollingTests
         public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
+            Symbol symbol,
+            string? parentOrderId = null,
+            string? parentOrderAcceptanceId = null,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }

@@ -8,7 +8,7 @@ internal static class BitflyerExecutionNormalizer
     public static BitflyerExecutionNormalized Normalize(ExecutionPublicResponse wire) =>
         new(
             Id: wire.Id,
-            Side: wire.Side,
+            Side: BitflyerSideMapper.ToExchangeSide(wire.Side),
             Price: wire.Price,
             Size: wire.Size,
             ExecutedAt: wire.ExecDate,

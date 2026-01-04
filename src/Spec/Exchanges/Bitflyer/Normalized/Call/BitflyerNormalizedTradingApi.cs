@@ -77,16 +77,18 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
 
         BitflyerTradingMapper.ValidateOrderRequest(request);
 
+        var childOrderType = BitflyerTradingMapper.MapOrderType(request.OrderType, request.Price);
+        var timeInForce = BitflyerTradingMapper.MapTimeInForce(request.TimeInForce);
         var dto = new CreateChildOrderRequest
         {
             ProductCode = await ToProductCodeAsync(request.Symbol, cancellationToken).ConfigureAwait(false),
             Side = BitflyerCommonMapper.MapSideToExchange(request.Side),
-            ChildOrderType = BitflyerTradingMapper.MapOrderType(request.OrderType, request.Price),
+            ChildOrderType = BitflyerTradingMapper.ToApiChildOrderType(childOrderType),
             Size = request.Size.Value,
             Price = request.Price?.Value,
             TriggerPrice = request.TriggerPrice?.Value,
             MinuteToExpire = request.MinuteToExpire,
-            TimeInForce = BitflyerTradingMapper.MapTimeInForce(request.TimeInForce),
+            TimeInForce = BitflyerTradingMapper.ToApiTimeInForce(timeInForce),
         };
 
         var rawCall = await _tradingApi
@@ -190,7 +192,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                         Symbol: symbol,
                         Key: key,
                         Side: BitflyerCommonMapper.MapSide(o.Side),
-                        OrderType: BitflyerTradingMapper.MapOrderTypeFromExchange(o.ChildOrderType),
+                        OrderType: BitflyerTradingMapper.ToOrderType(BitflyerTradingMapper.ParseChildOrderType(o.ChildOrderType)),
                         Size: new Size(o.Size),
                         OutstandingSize: new Size(o.OutstandingSize),
                         ExecutedSize: new Size(o.ExecutedSize),

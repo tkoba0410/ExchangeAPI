@@ -10,14 +10,14 @@ public sealed class BitflyerFailFastMapperTests
     [Fact]
     public void SideMapper_UnknownSide_Throws()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => BitflyerSideMapper.ToOrderSide("UNKNOWN"));
+        Assert.Throws<ArgumentOutOfRangeException>(() => BitflyerSideMapper.ToExchangeSide("UNKNOWN"));
     }
 
     [Fact]
     public void TradingMapper_UnknownChildOrderType_Throws()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            BitflyerTradingMapper.MapOrderTypeFromExchange("UNKNOWN"));
+            BitflyerTradingMapper.ParseChildOrderType("UNKNOWN"));
     }
 
     [Fact]

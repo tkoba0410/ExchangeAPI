@@ -2,34 +2,61 @@ using System;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Types;
 using ContractTimeInForce = ExchangeApi.Common.Enums.TimeInForce;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 
 internal static class BitflyerTradingMapper
 {
-    public static string MapOrderType(OrderType orderType, Price? price) =>
+    public static BitflyerChildOrderType MapOrderType(OrderType orderType, Price? price) =>
         orderType switch
         {
-            OrderType.Market => "MARKET",
-            OrderType.Limit => "LIMIT",
+            OrderType.Market => BitflyerChildOrderType.Market,
+            OrderType.Limit => BitflyerChildOrderType.Limit,
             _ => throw new ArgumentOutOfRangeException(nameof(orderType), orderType, "Unsupported child_order_type. Only LIMIT/MARKET are accepted."),
         };
 
-    public static OrderType MapOrderTypeFromExchange(string childOrderType) =>
-        (childOrderType ?? string.Empty).ToUpperInvariant() switch
+    public static string ToApiChildOrderType(BitflyerChildOrderType childOrderType) =>
+        childOrderType switch
         {
-            "LIMIT" => OrderType.Limit,
-            "MARKET" => OrderType.Market,
+            BitflyerChildOrderType.Market => "MARKET",
+            BitflyerChildOrderType.Limit => "LIMIT",
             _ => throw new ArgumentOutOfRangeException(nameof(childOrderType), childOrderType, "Unknown bitFlyer child_order_type"),
         };
 
-    public static string? MapTimeInForce(ContractTimeInForce? tif) =>
+    public static BitflyerChildOrderType ParseChildOrderType(string childOrderType) =>
+        (childOrderType ?? string.Empty).ToUpperInvariant() switch
+        {
+            "LIMIT" => BitflyerChildOrderType.Limit,
+            "MARKET" => BitflyerChildOrderType.Market,
+            _ => throw new ArgumentOutOfRangeException(nameof(childOrderType), childOrderType, "Unknown bitFlyer child_order_type"),
+        };
+
+    public static OrderType ToOrderType(BitflyerChildOrderType childOrderType) =>
+        childOrderType switch
+        {
+            BitflyerChildOrderType.Limit => OrderType.Limit,
+            BitflyerChildOrderType.Market => OrderType.Market,
+            _ => throw new ArgumentOutOfRangeException(nameof(childOrderType), childOrderType, "Unknown bitFlyer child_order_type"),
+        };
+
+    public static BitflyerTimeInForce? MapTimeInForce(ContractTimeInForce? tif) =>
         tif switch
         {
-            ContractTimeInForce.Gtc => "GTC",
-            ContractTimeInForce.Ioc => "IOC",
-            ContractTimeInForce.Fok => "FOK",
+            ContractTimeInForce.Gtc => BitflyerTimeInForce.Gtc,
+            ContractTimeInForce.Ioc => BitflyerTimeInForce.Ioc,
+            ContractTimeInForce.Fok => BitflyerTimeInForce.Fok,
+            null => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(tif), tif, "Unknown bitFlyer time_in_force"),
+        };
+
+    public static string? ToApiTimeInForce(BitflyerTimeInForce? tif) =>
+        tif switch
+        {
+            BitflyerTimeInForce.Gtc => "GTC",
+            BitflyerTimeInForce.Ioc => "IOC",
+            BitflyerTimeInForce.Fok => "FOK",
             null => null,
             _ => throw new ArgumentOutOfRangeException(nameof(tif), tif, "Unknown bitFlyer time_in_force"),
         };

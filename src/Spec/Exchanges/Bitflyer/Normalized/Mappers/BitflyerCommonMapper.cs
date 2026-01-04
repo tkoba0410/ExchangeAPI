@@ -1,6 +1,7 @@
 using System;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Types;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
@@ -8,10 +9,13 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 internal static class BitflyerCommonMapper
 {
     public static ContractSide MapSide(string side) =>
-        BitflyerSideMapper.ToOrderSide(side);
+        BitflyerSideMapper.ToContractSide(BitflyerSideMapper.ToExchangeSide(side));
+
+    public static ContractSide MapSide(BitflyerSide side) =>
+        BitflyerSideMapper.ToContractSide(side);
 
     public static string MapSideToExchange(ContractSide side) =>
-        BitflyerSideMapper.ToApi(side);
+        BitflyerSideMapper.ToApi(BitflyerSideMapper.FromContractSide(side));
 
     public static string ToApiProductCode(string productCode) =>
         string.IsNullOrWhiteSpace(productCode)

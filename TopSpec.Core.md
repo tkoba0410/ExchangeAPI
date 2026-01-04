@@ -84,6 +84,9 @@
 3. **Raw は取引所公式 API の鏡像 DTO を保持するものとし、鏡像 DTO と JSON payload の相互変換（codec）責務を許可する。**
    * Raw における変換は、JSON 表現上の差（数値/文字列混在、null、日時表現等）を扱う **構文意味（syntax-level / primitive-level）** に限定される。
    * Raw は取引所の意味論（例：注文状態の解釈、銘柄名の正規化、手数料体系の前提）を担ってはならない。
+   * **Raw における JsonConverter（codec）は、Deserialize（Read）専用とする。**
+     * Serialize（Write）は Raw の責務ではなく、実装してはならない。
+     * Raw が扱う Serialize 対象は、上位層（Normalized 等）で既に意味決定されたプリミティブ値とする。
    * **Raw が扱ってよい型は、プリミティブおよびコンテナに限定する（ホワイトリスト）。**
      * 許可：`string` / `bool` / 数値（`int` / `long` / `decimal` 等）/ `DateTimeOffset`（形式変換としてのみ）/ `TimeSpan`（必要時）/ `T?`（nullable）
      * 許可：`IReadOnlyList<T>` / `List<T>` / `T[]` / `IReadOnlyDictionary<string,T>`（動的応答が必要な場合のみ）

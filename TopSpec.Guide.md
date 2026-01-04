@@ -155,6 +155,10 @@ Split Candidate: なし
     * 許可：`List<T>` / `IReadOnlyList<T>` / `T[]` / `IReadOnlyDictionary<string,T>`（必要時のみ）
   * Raw では **enum・意味型・ラッパ型（RawProductCode 等）を定義しない**。
   * 既定値注入・妥当性検証・列挙化は Raw では行わない。
+  * **JsonConverter は Deserialize（Read）専用とする。**
+    * Read：JSON 表現ゆらぎ（数値/文字列混在、日時形式差等）の吸収
+    * Write：出力表現の決定＝意味決定を伴うため、Raw の責務外
+    * Write が必要な場合は、Normalized で意味決定済みのプリミティブ値を用いる
 * **Normalized**：単独取引所内の正規化。取引所の意味論に基づく解釈・統一（exchange semantics）。
   * 注文種別・売買区分・状態・type 等の **意味づけ（列挙化）**、既定値注入、妥当性検証は Normalized の責務。
 * **Contracts**：複数取引所横断の抽象化。横断語彙としての意味論（cross-exchange semantics）。

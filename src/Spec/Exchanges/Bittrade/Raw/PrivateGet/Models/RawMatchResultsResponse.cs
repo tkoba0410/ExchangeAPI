@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record RawMatchResultsResponse(
@@ -14,13 +13,13 @@ public sealed record RawOrderMatchResultsResponse(
 
 public sealed record RawMatchResultEntry(
     [property: JsonPropertyName("id")]
-    [property: JsonConverter(typeof(MatchResultIdJsonConverter))] RawMatchResultId Id,
+    [property: JsonConverter(typeof(MatchResultIdJsonConverter))] string Id,
     [property: JsonPropertyName("order-id")]
-    [property: JsonConverter(typeof(OrderIdJsonConverter))] RawOrderId RawOrderId,
+    [property: JsonConverter(typeof(OrderIdJsonConverter))] string OrderId,
     [property: JsonPropertyName("match-id")]
-    [property: JsonConverter(typeof(MatchIdJsonConverter))] RawMatchId RawMatchId,
+    [property: JsonConverter(typeof(MatchIdJsonConverter))] string MatchId,
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] RawSymbol RawSymbol,
+    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("price")] decimal Price,
     [property: JsonPropertyName("filled-amount")] decimal FilledAmount,

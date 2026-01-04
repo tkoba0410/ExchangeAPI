@@ -51,7 +51,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         SendAndParse(
             request,
             "Bittrade.GetOpenOrders",
-            BittradeEndpoints.GetOpenOrders(request.Symbol.Value, request.AccountId),
+            BittradeEndpoints.GetOpenOrders(request.Symbol, request.AccountId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawOpenOrdersResponse>(
                 json,
@@ -63,7 +63,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         SendAndParse(
             request,
             "Bittrade.GetOrder",
-            BittradeEndpoints.GetOrder(request.OrderId.Value),
+            BittradeEndpoints.GetOrder(request.OrderId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawOrderDetailResponse>(json, "Bittrade.GetOrder"));
 
@@ -73,7 +73,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
         SendAndParse(
             request,
             "Bittrade.GetOrderMatchResults",
-            BittradeEndpoints.GetOrderMatchResults(request.OrderId.Value),
+            BittradeEndpoints.GetOrderMatchResults(request.OrderId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawOrderMatchResultsResponse>(
                 json,
@@ -86,7 +86,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             request,
             "Bittrade.GetOrders",
             BittradeEndpoints.GetOrders(
-                request.Symbol.Value,
+                request.Symbol,
                 request.States,
                 request.StartDate,
                 request.EndDate,
@@ -103,7 +103,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             request,
             "Bittrade.GetMatchResults",
             BittradeEndpoints.GetMatchResults(
-                request.Symbol?.Value,
+                request.Symbol,
                 request.Types,
                 request.StartDate,
                 request.EndDate,

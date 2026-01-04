@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record RawTickersResponse(
@@ -9,7 +8,7 @@ public sealed record RawTickersResponse(
 
 public sealed record RawTickerEntry(
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] RawSymbol RawSymbol,
+    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
     [property: JsonPropertyName("open")] decimal Open,
     [property: JsonPropertyName("close")] decimal Close,
     [property: JsonPropertyName("low")] decimal Low,

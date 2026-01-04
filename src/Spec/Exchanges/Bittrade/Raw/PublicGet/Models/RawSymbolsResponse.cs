@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record RawSymbolsResponse(
@@ -10,7 +9,7 @@ public sealed record RawSymbolsResponse(
 
 public sealed record RawSymbolInfo(
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] RawSymbol RawSymbol,
+    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
     [property: JsonPropertyName("base-currency")] string BaseCurrency,
     [property: JsonPropertyName("quote-currency")] string QuoteCurrency,
     [property: JsonPropertyName("price-precision")] int PricePrecision,

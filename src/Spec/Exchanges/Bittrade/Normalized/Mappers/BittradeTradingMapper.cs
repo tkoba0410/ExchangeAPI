@@ -6,11 +6,9 @@ using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ContractOrderType = ExchangeApi.Common.Enums.OrderType;
-using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
-using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 
@@ -30,13 +28,13 @@ internal static class BittradeTradingMapper
             throw new ArgumentException("apiSymbol is required.", nameof(apiSymbol));
         }
 
-        var type = MapOrderType(request.Side, request.OrderType);
+        var type = ToRawOrderType(MapOrderType(request.Side, request.OrderType));
         var price = request.Price?.Value;
         var size = FormatDecimal(request.Size.Value);
 
         return new RawCreateOrderRequest(
             AccountId: accountId,
-            RawSymbol: RawSymbol.From(apiSymbol),
+            Symbol: apiSymbol,
             Type: type,
             Amount: size,
             Price: price is null ? null : FormatDecimal(price.Value),
@@ -45,7 +43,7 @@ internal static class BittradeTradingMapper
 
     public static OrderResult ToOrderResult(RawPlaceOrderResponse raw)
     {
-        var orderId = raw.RawOrderId.Value;
+        var orderId = raw.OrderId;
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
         return new OrderResult(key, ExchangeOrderId: orderId);
     }
@@ -73,7 +71,7 @@ internal static class BittradeTradingMapper
         return new OpenOrder(
             ExchangeCode: Exchange,
             Symbol: symbol,
-            Key: new OrderKey(OrderIdKind.ExchangeOrderId, raw.Id.Value),
+            Key: new OrderKey(OrderIdKind.ExchangeOrderId, raw.Id),
             Side: side,
             OrderType: type,
             Size: size,
@@ -83,8 +81,8 @@ internal static class BittradeTradingMapper
             OrderedAt: raw.CreatedAt,
             UpdatedAt: null,
             StopPrice: null,
-            Status: ToExchangeEnumValue(raw.State),
-            ExchangeOrderId: raw.Id.Value);
+            Status: raw.State,
+            ExchangeOrderId: raw.Id);
     }
 
     public static OrderStatus ToOrderStatus(string productCode, RawOrderDetailResponse raw, OrderKey key)
@@ -116,49 +114,89 @@ internal static class BittradeTradingMapper
             null);
     }
 
-    private static RawOrderType MapOrderType(Side side, ContractOrderType type)
+    private static BittradeOrderType MapOrderType(Side side, ContractOrderType type)
     {
         return (side, type) switch
         {
-            (Side.Buy, ContractOrderType.Market) => RawOrderType.BuyMarket,
-            (Side.Sell, ContractOrderType.Market) => RawOrderType.SellMarket,
-            (Side.Buy, ContractOrderType.Limit) => RawOrderType.BuyLimit,
-            (Side.Sell, ContractOrderType.Limit) => RawOrderType.SellLimit,
+            (Side.Buy, ContractOrderType.Market) => BittradeOrderType.BuyMarket,
+            (Side.Sell, ContractOrderType.Market) => BittradeOrderType.SellMarket,
+            (Side.Buy, ContractOrderType.Limit) => BittradeOrderType.BuyLimit,
+            (Side.Sell, ContractOrderType.Limit) => BittradeOrderType.SellLimit,
             _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
         };
     }
 
-    private static (Side Side, ContractOrderType OrderType) MapSideAndType(RawOrderType type)
+    private static (Side Side, ContractOrderType OrderType) MapSideAndType(string type)
     {
-        var parsedSide = type switch
+        var parsedType = ParseOrderType(type);
+        var parsedSide = parsedType switch
         {
-            RawOrderType.BuyLimit or RawOrderType.BuyMarket or RawOrderType.BuyLimitMaker or RawOrderType.BuyIoc => Side.Buy,
-            RawOrderType.SellLimit or RawOrderType.SellMarket or RawOrderType.SellLimitMaker or RawOrderType.SellIoc => Side.Sell,
+            BittradeOrderType.BuyLimit or BittradeOrderType.BuyMarket or BittradeOrderType.BuyLimitMaker or BittradeOrderType.BuyIoc => Side.Buy,
+            BittradeOrderType.SellLimit or BittradeOrderType.SellMarket or BittradeOrderType.SellLimitMaker or BittradeOrderType.SellIoc => Side.Sell,
             _ => throw new ExchangeApiException($"Unsupported order side: {type}.", exchange: Exchange)
         };
 
-        var parsedType = type switch
+        var orderType = parsedType switch
         {
-            RawOrderType.BuyMarket or RawOrderType.SellMarket => ContractOrderType.Market,
-            RawOrderType.BuyLimit or RawOrderType.SellLimit => ContractOrderType.Limit,
+            BittradeOrderType.BuyMarket or BittradeOrderType.SellMarket => ContractOrderType.Market,
+            BittradeOrderType.BuyLimit or BittradeOrderType.SellLimit => ContractOrderType.Limit,
             _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
         };
 
-        return (parsedSide, parsedType);
+        return (parsedSide, orderType);
     }
 
-    private static ExchangeApi.Common.Enums.OrderState MapStatus(RawOrderState state)
+    private static ExchangeApi.Common.Enums.OrderState MapStatus(string state)
     {
-        return state switch
+        return ParseOrderState(state) switch
         {
-            RawOrderState.Submitted => ExchangeApi.Common.Enums.OrderState.Active,
-            RawOrderState.PartialFilled => ExchangeApi.Common.Enums.OrderState.Active,
-            RawOrderState.Filled => ExchangeApi.Common.Enums.OrderState.Completed,
-            RawOrderState.PartialCanceled => ExchangeApi.Common.Enums.OrderState.Canceled,
-            RawOrderState.Canceled => ExchangeApi.Common.Enums.OrderState.Canceled,
+            BittradeOrderState.Submitted => ExchangeApi.Common.Enums.OrderState.Active,
+            BittradeOrderState.PartialFilled => ExchangeApi.Common.Enums.OrderState.Active,
+            BittradeOrderState.Filled => ExchangeApi.Common.Enums.OrderState.Completed,
+            BittradeOrderState.PartialCanceled => ExchangeApi.Common.Enums.OrderState.Canceled,
+            BittradeOrderState.Canceled => ExchangeApi.Common.Enums.OrderState.Canceled,
             _ => throw new ExchangeApiException($"Unsupported order state: {state}.", exchange: Exchange)
         };
     }
+
+    private static string ToRawOrderType(BittradeOrderType type) =>
+        type switch
+        {
+            BittradeOrderType.BuyLimit => "buy-limit",
+            BittradeOrderType.SellLimit => "sell-limit",
+            BittradeOrderType.BuyMarket => "buy-market",
+            BittradeOrderType.SellMarket => "sell-market",
+            BittradeOrderType.BuyLimitMaker => "buy-limit-maker",
+            BittradeOrderType.SellLimitMaker => "sell-limit-maker",
+            BittradeOrderType.BuyIoc => "buy-ioc",
+            BittradeOrderType.SellIoc => "sell-ioc",
+            _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
+        };
+
+    private static BittradeOrderType ParseOrderType(string type) =>
+        type switch
+        {
+            "buy-limit" => BittradeOrderType.BuyLimit,
+            "sell-limit" => BittradeOrderType.SellLimit,
+            "buy-market" => BittradeOrderType.BuyMarket,
+            "sell-market" => BittradeOrderType.SellMarket,
+            "buy-limit-maker" => BittradeOrderType.BuyLimitMaker,
+            "sell-limit-maker" => BittradeOrderType.SellLimitMaker,
+            "buy-ioc" => BittradeOrderType.BuyIoc,
+            "sell-ioc" => BittradeOrderType.SellIoc,
+            _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
+        };
+
+    private static BittradeOrderState ParseOrderState(string state) =>
+        state switch
+        {
+            "submitted" => BittradeOrderState.Submitted,
+            "partial-filled" => BittradeOrderState.PartialFilled,
+            "filled" => BittradeOrderState.Filled,
+            "partial-canceled" => BittradeOrderState.PartialCanceled,
+            "canceled" => BittradeOrderState.Canceled,
+            _ => throw new ExchangeApiException($"Unsupported order state: {state}.", exchange: Exchange)
+        };
 
     private static string FormatDecimal(decimal value) =>
         value.ToString(CultureInfo.InvariantCulture);
@@ -193,14 +231,4 @@ internal static class BittradeTradingMapper
         throw new ExchangeApiException($"Invalid {field}: '{text}'.", exchange: Exchange);
     }
 
-    private static string ToExchangeEnumValue<T>(T value)
-        where T : struct, Enum
-    {
-        var name = Enum.GetName(value) ?? value.ToString();
-        var member = typeof(T).GetMember(name).FirstOrDefault();
-        var enumMember = member?.GetCustomAttributes(typeof(System.Runtime.Serialization.EnumMemberAttribute), false)
-            .OfType<System.Runtime.Serialization.EnumMemberAttribute>()
-            .FirstOrDefault();
-        return enumMember?.Value ?? name;
-    }
 }

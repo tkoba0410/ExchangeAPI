@@ -55,7 +55,7 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
             request,
             "Bitflyer.GetChildOrders",
             BitflyerEndpoints.GetChildOrders(
-                request.ProductCode.Value,
+                request.ProductCode,
                 request.ChildOrderStatusState,
                 request.ChildOrderAcceptanceId,
                 request.ChildOrderId,

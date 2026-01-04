@@ -1,9 +1,8 @@
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 
-public sealed record GetTickerRequest(RawSymbol Symbol);
+public sealed record GetTickerRequest(string Symbol);
 
-public sealed record GetOrderBookRequest(RawSymbol Symbol, string? Type = null);
+public sealed record GetOrderBookRequest(string Symbol, string? Type = null);
 
-public sealed record GetMarketTradesRequest(RawSymbol Symbol);
+public sealed record GetMarketTradesRequest(string Symbol);

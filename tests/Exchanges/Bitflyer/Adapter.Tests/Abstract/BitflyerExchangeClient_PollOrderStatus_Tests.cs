@@ -9,9 +9,6 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Spec.CallCommon;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
-using RawChildOrderType = ExchangeApi.Exchanges.Bitflyer.Raw.ChildOrderType;
-using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
@@ -29,15 +26,15 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var acceptanceId = "ACCEPT-1";
         var active = new ChildOrderResponse
         {
-            ProductCode = new RawProductCode("BTC_JPY"),
+            ProductCode = "BTC_JPY",
             ChildOrderAcceptanceId = acceptanceId,
             ChildOrderStatusState = "ACTIVE",
             ExecutedSize = 0m,
             OutstandingSize = 0.01m,
             Price = 3000000m,
             AveragePrice = 0m,
-            Side = RawSide.Buy,
-            ChildOrderType = RawChildOrderType.Limit,
+            Side = "BUY",
+            ChildOrderType = "LIMIT",
             Size = 0.01m,
         };
         var completed = new ChildOrderResponse

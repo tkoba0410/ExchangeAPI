@@ -14,7 +14,6 @@ using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 
@@ -94,7 +93,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         }
 
         var rawCall = await _trading
-            .CancelOrderAsync(new RawRequests.CancelOrderRequest(new RawOrderId(orderKey.Value)), ct)
+            .CancelOrderAsync(new RawRequests.CancelOrderRequest(orderKey.Value), ct)
             .ConfigureAwait(false);
         var callRequest = new CancelOrderRequest(symbol, orderKey);
 
@@ -107,7 +106,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
     {
         var apiSymbol = await ToApiSymbolAsync(symbol, ct).ConfigureAwait(false);
         var rawCall = await _trading
-            .GetOpenOrdersAsync(new RawRequests.GetOpenOrdersRequest(RawSymbol.From(apiSymbol), _accountId), ct)
+            .GetOpenOrdersAsync(new RawRequests.GetOpenOrdersRequest(apiSymbol, _accountId), ct)
             .ConfigureAwait(false);
         var callRequest = new GetOpenOrdersRequest(symbol);
 
@@ -135,7 +134,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             : new OrderKey(OrderIdKind.ExchangeOrderId, orderKey.Value);
 
         var rawCall = await _trading
-            .GetOrderAsync(new RawRequests.GetOrderRequest(new RawOrderId(orderKey.Value)), ct)
+            .GetOrderAsync(new RawRequests.GetOrderRequest(orderKey.Value), ct)
             .ConfigureAwait(false);
         var callRequest = new GetOrderRequest(symbol, orderKey);
 

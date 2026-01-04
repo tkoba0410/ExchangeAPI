@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Spec.CallCommon;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 
@@ -61,7 +60,7 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
     public Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsAsync(
         GetMarketsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, (IReadOnlyList<Market>)new[] { new Market(new RawProductCode("BTC_JPY"), "BTC_JPY") }));
+        Task.FromResult(MakeOkCall(request, (IReadOnlyList<Market>)new[] { new Market("BTC_JPY", "BTC_JPY") }));
 
     public Task<Call<GetChatsRequest, IReadOnlyList<Chat>>> GetChatsAsync(
         GetChatsRequest request,

@@ -54,7 +54,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         SendAndParse(
             request,
             "Bitflyer.GetPositions",
-            BitflyerEndpoints.GetPositions(request.ProductCode.Value),
+            BitflyerEndpoints.GetPositions(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<PositionResponse>>(
                 json,
@@ -67,7 +67,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             request,
             "Bitflyer.GetExecutions",
             BitflyerEndpoints.GetExecutions(
-                request.ProductCode.Value,
+                request.ProductCode,
                 request.ChildOrderId,
                 request.ChildOrderAcceptanceId,
                 request.Count,
@@ -109,7 +109,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             request,
             "Bitflyer.GetChildOrders",
             BitflyerEndpoints.GetChildOrders(
-                request.ProductCode.Value,
+                request.ProductCode,
                 request.ChildOrderStatusState,
                 request.ChildOrderAcceptanceId,
                 request.ChildOrderId,
@@ -129,7 +129,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             request,
             "Bitflyer.GetParentOrders",
             BitflyerEndpoints.GetParentOrders(
-                request.ProductCode.Value,
+                request.ProductCode,
                 request.ParentOrderId,
                 request.ParentOrderAcceptanceId,
                 request.Count,
@@ -147,7 +147,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             request,
             "Bitflyer.GetParentOrder",
             BitflyerEndpoints.GetParentOrder(
-                request.ProductCode.Value,
+                request.ProductCode,
                 request.ParentOrderId,
                 request.ParentOrderAcceptanceId),
             cancellationToken,
@@ -177,7 +177,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         SendAndParse(
             request,
             "Bitflyer.GetTradingCommission",
-            BitflyerEndpoints.GetTradingCommission(request.ProductCode.Value),
+            BitflyerEndpoints.GetTradingCommission(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<JsonElement>(
                 json,

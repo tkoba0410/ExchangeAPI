@@ -1,6 +1,5 @@
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Endpoints.Tests;
 
@@ -46,8 +45,8 @@ public sealed class BittradeEndpointsTests
     {
         var request = new RawCreateOrderRequest(
             AccountId: "123",
-            RawSymbol: new RawSymbol("btcjpy"),
-            Type: OrderType.BuyLimit,
+            Symbol: "btcjpy",
+            Type: "buy-limit",
             Amount: "0.1",
             Price: "3000000",
             Source: "api");

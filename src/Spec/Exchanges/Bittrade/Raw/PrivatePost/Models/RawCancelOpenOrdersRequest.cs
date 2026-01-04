@@ -1,13 +1,12 @@
 using System;
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record RawCancelOpenOrdersRequest(
     [property: JsonPropertyName("account-id")] string? AccountId = null,
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] RawSymbol? RawSymbol = null,
-    [property: JsonPropertyName("side")] OrderSide? Side = null,
+    [property: JsonConverter(typeof(SymbolJsonConverter))] string? Symbol = null,
+    [property: JsonPropertyName("side")] string? Side = null,
     [property: JsonPropertyName("size")] string? Size = null,
     [property: JsonPropertyName("price")] string? Price = null,
     [property: JsonPropertyName("created-at")]

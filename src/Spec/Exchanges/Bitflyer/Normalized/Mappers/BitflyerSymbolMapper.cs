@@ -1,14 +1,12 @@
 using System;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 
 internal static class BitflyerSymbolMapper
 {
-    public static RawProductCode ToProductCode(Symbol symbol)
+    public static string ToProductCode(Symbol symbol)
     {
         if (symbol.IsEmpty)
         {
@@ -18,12 +16,12 @@ internal static class BitflyerSymbolMapper
         return ToProductCode(symbol.Value);
     }
 
-    public static RawProductCode ToProductCode(string symbol)
+    public static string ToProductCode(string symbol)
     {
         return BitflyerCommonMapper.ParseProductCode(symbol);
     }
 
-    public static string ToApiProductCode(RawProductCode productCode) =>
+    public static string ToApiProductCode(string productCode) =>
         BitflyerCommonMapper.ToApiProductCode(productCode);
 
     public static Symbol FromProductCode(string symbol)

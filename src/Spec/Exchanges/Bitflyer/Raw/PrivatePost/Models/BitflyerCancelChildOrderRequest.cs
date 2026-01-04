@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
 /// <summary>
@@ -8,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 /// </summary>
 public sealed class CancelChildOrderRequest
 {
-    [JsonPropertyName("product_code")] public RawProductCode ProductCode { get; init; }
+    [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
 
     /// <summary>
     /// child_order_acceptance_id を優先して使用する。

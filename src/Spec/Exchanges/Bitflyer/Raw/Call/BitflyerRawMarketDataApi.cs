@@ -29,7 +29,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         SendAndParse(
             request,
             "Bitflyer.GetTicker",
-            BitflyerEndpoints.GetTicker(request.ProductCode.Value, request.UseAliasPath),
+            BitflyerEndpoints.GetTicker(request.ProductCode, request.UseAliasPath),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Ticker>(json, "Bitflyer.GetTicker"));
 
@@ -39,7 +39,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         SendAndParse(
             request,
             "Bitflyer.GetBoard",
-            BitflyerEndpoints.GetBoard(request.ProductCode.Value, request.UseAliasPath),
+            BitflyerEndpoints.GetBoard(request.ProductCode, request.UseAliasPath),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Board>(json, "Bitflyer.GetBoard"));
 
@@ -50,7 +50,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             request,
             "Bitflyer.GetExecutions",
             BitflyerEndpoints.GetExecutions(
-                request.ProductCode.Value,
+                request.ProductCode,
                 request.Count,
                 request.Before,
                 request.After,
@@ -90,7 +90,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         SendAndParse(
             request,
             "Bitflyer.GetHealth",
-            BitflyerEndpoints.GetHealth(request.ProductCode.Value),
+            BitflyerEndpoints.GetHealth(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<HealthResponse>(json, "Bitflyer.GetHealth"));
 
@@ -100,7 +100,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         SendAndParse(
             request,
             "Bitflyer.GetBoardState",
-            BitflyerEndpoints.GetBoardState(request.ProductCode.Value),
+            BitflyerEndpoints.GetBoardState(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<BoardStateResponse>(
                 json,
@@ -124,7 +124,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         SendAndParse(
             request,
             "Bitflyer.GetFundingRate",
-            BitflyerEndpoints.GetFundingRate(request.ProductCode.Value),
+            BitflyerEndpoints.GetFundingRate(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<FundingRateResponse>(
                 json,

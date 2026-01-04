@@ -11,9 +11,9 @@ using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Types;
 using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using RawRequests = ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Call;
@@ -33,9 +33,12 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         return Unwrap(call, "Bittrade.GetTicker");
     }
 
-    public async Task<BittradeOrderBookNormalized> GetOrderBookAsync(string symbol, CancellationToken ct = default)
+    public async Task<BittradeOrderBookNormalized> GetOrderBookAsync(
+        string symbol,
+        BittradeDepthType? depthType = null,
+        CancellationToken ct = default)
     {
-        var call = await GetOrderBookCallAsync(symbol, ct).ConfigureAwait(false);
+        var call = await GetOrderBookCallAsync(symbol, depthType, ct).ConfigureAwait(false);
         return Unwrap(call, "Bittrade.GetOrderBook");
     }
 
@@ -50,7 +53,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetTickerAsync(new RawRequests.GetTickerRequest(RawSymbol.From(symbol)), ct)
+            .GetTickerAsync(new RawRequests.GetTickerRequest(symbol), ct)
             .ConfigureAwait(false);
         var request = new GetTickerRequest(symbol);
 
@@ -68,12 +71,14 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
 
     public async Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
         string symbol,
+        BittradeDepthType? depthType = null,
         CancellationToken ct = default)
     {
+        var normalizedDepthType = depthType ?? BittradeDepthType.Step0;
         var rawCall = await _raw
-            .GetOrderBookAsync(new RawRequests.GetOrderBookRequest(RawSymbol.From(symbol)), ct)
+            .GetOrderBookAsync(new RawRequests.GetOrderBookRequest(symbol, ToRawDepthType(normalizedDepthType)), ct)
             .ConfigureAwait(false);
-        var request = new GetOrderBookRequest(symbol);
+        var request = new GetOrderBookRequest(symbol, depthType);
 
         return CreateCall(
             rawCall,
@@ -92,7 +97,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetTradesAsync(new RawRequests.GetMarketTradesRequest(RawSymbol.From(symbol)), ct)
+            .GetTradesAsync(new RawRequests.GetMarketTradesRequest(symbol), ct)
             .ConfigureAwait(false);
         var request = new GetExecutionsRequest(symbol);
 
@@ -194,4 +199,16 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             throw new BittradeNormalizedException($"Bittrade {operation} response status invalid: {status}.");
         }
     }
+
+    private static string ToRawDepthType(BittradeDepthType depthType) =>
+        depthType switch
+        {
+            BittradeDepthType.Step0 => "step0",
+            BittradeDepthType.Step1 => "step1",
+            BittradeDepthType.Step2 => "step2",
+            BittradeDepthType.Step3 => "step3",
+            BittradeDepthType.Step4 => "step4",
+            BittradeDepthType.Step5 => "step5",
+            _ => throw new BittradeNormalizedException($"Unsupported depth type: {depthType}."),
+        };
 }

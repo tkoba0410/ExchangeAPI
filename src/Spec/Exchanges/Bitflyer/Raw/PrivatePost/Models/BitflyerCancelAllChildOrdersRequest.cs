@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
 /// <summary>
@@ -8,5 +7,5 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 /// </summary>
 public sealed class CancelAllChildOrdersRequest
 {
-    [JsonPropertyName("product_code")] public RawProductCode ProductCode { get; init; }
+    [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
 }

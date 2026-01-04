@@ -1,12 +1,11 @@
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record RawCreateOrderRequest(
     [property: JsonPropertyName("account-id")] string AccountId,
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] RawSymbol RawSymbol,
-    [property: JsonPropertyName("type")] OrderType Type,
+    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
+    [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("amount")] string Amount,
     [property: JsonPropertyName("price")] string? Price = null,
     [property: JsonPropertyName("source")] string? Source = null);

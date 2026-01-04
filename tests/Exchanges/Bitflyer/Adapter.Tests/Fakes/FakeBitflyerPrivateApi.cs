@@ -8,7 +8,6 @@ using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Spec.CallCommon;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 
@@ -98,17 +97,17 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         {
             Id = 1,
             ParentOrderId = request.ParentOrderId ?? "PARENT-ID",
-            OrderMethod = OrderMethod.Simple,
+            OrderMethod = "SIMPLE",
             ExpireDate = DateTimeOffset.UtcNow,
-            TimeInForce = TimeInForce.Gtc,
+            TimeInForce = "GTC",
             ParentOrderAcceptanceId = request.ParentOrderAcceptanceId ?? "PARENT-ACCEPT",
             Parameters = new[]
             {
                 new ParentOrderDetailParameter
                 {
                     ProductCode = request.ProductCode,
-                    ConditionType = ConditionType.Limit,
-                    Side = Side.Buy,
+                    ConditionType = "LIMIT",
+                    Side = "BUY",
                     Size = 0.1m,
                     Price = 30000m,
                     TriggerPrice = 0m,

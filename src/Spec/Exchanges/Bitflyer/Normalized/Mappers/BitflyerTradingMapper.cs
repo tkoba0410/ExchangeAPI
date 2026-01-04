@@ -1,37 +1,35 @@
 using System;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ContractTimeInForce = ExchangeApi.Common.Enums.TimeInForce;
-using RawTimeInForce = ExchangeApi.Exchanges.Bitflyer.Raw.TimeInForce;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 
 internal static class BitflyerTradingMapper
 {
-    public static ChildOrderType MapOrderType(OrderType orderType, Price? price) =>
+    public static string MapOrderType(OrderType orderType, Price? price) =>
         orderType switch
         {
-            OrderType.Market => ChildOrderType.Market,
-            OrderType.Limit => ChildOrderType.Limit,
+            OrderType.Market => "MARKET",
+            OrderType.Limit => "LIMIT",
             _ => throw new ArgumentOutOfRangeException(nameof(orderType), orderType, "Unsupported child_order_type. Only LIMIT/MARKET are accepted."),
         };
 
-    public static OrderType MapOrderTypeFromExchange(ChildOrderType childOrderType) =>
-        childOrderType switch
+    public static OrderType MapOrderTypeFromExchange(string childOrderType) =>
+        (childOrderType ?? string.Empty).ToUpperInvariant() switch
         {
-            ChildOrderType.Limit => OrderType.Limit,
-            ChildOrderType.Market => OrderType.Market,
+            "LIMIT" => OrderType.Limit,
+            "MARKET" => OrderType.Market,
             _ => throw new ArgumentOutOfRangeException(nameof(childOrderType), childOrderType, "Unknown bitFlyer child_order_type"),
         };
 
-    public static RawTimeInForce? MapTimeInForce(ContractTimeInForce? tif) =>
+    public static string? MapTimeInForce(ContractTimeInForce? tif) =>
         tif switch
         {
-            ContractTimeInForce.Gtc => RawTimeInForce.Gtc,
-            ContractTimeInForce.Ioc => RawTimeInForce.Ioc,
-            ContractTimeInForce.Fok => RawTimeInForce.Fok,
+            ContractTimeInForce.Gtc => "GTC",
+            ContractTimeInForce.Ioc => "IOC",
+            ContractTimeInForce.Fok => "FOK",
             null => null,
             _ => throw new ArgumentOutOfRangeException(nameof(tif), tif, "Unknown bitFlyer time_in_force"),
         };

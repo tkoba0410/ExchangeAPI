@@ -103,7 +103,7 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         try
         {
             var apiSymbol = await ToApiSymbolAsync(symbol, cancellationToken).ConfigureAwait(false);
-            var call = await _marketData.GetOrderBookCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
+            var call = await _marketData.GetOrderBookCallAsync(apiSymbol, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

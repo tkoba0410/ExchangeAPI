@@ -3,7 +3,6 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Call;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Spec.Wire;

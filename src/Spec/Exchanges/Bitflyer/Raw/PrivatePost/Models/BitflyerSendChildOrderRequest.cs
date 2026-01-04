@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
 /// <summary>
@@ -8,9 +7,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 /// </summary>
 public sealed class CreateChildOrderRequest
 {
-    [JsonPropertyName("product_code")] public RawProductCode ProductCode { get; init; }
-    [JsonPropertyName("child_order_type")] public ChildOrderType ChildOrderType { get; init; }
-    [JsonPropertyName("side")] public Side Side { get; init; }
+    [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
+    [JsonPropertyName("child_order_type")] public string ChildOrderType { get; init; } = string.Empty;
+    [JsonPropertyName("side")] public string Side { get; init; } = string.Empty;
     [JsonPropertyName("size")] public decimal Size { get; init; }
 
     [JsonPropertyName("price")]
@@ -23,7 +22,7 @@ public sealed class CreateChildOrderRequest
 
     [JsonPropertyName("time_in_force")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public TimeInForce? TimeInForce { get; init; }
+    public string? TimeInForce { get; init; }
 
     [JsonPropertyName("trigger_price")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

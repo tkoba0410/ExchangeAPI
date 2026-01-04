@@ -4,11 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
-internal sealed class CursorIdJsonConverter : JsonConverter<RawCursorId>
+internal sealed class CursorIdJsonConverter : JsonConverter<string>
 {
-    public override RawCursorId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        => new(IdJsonConverterHelpers.ReadLong(ref reader));
+    public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+        IdJsonConverterHelpers.ReadStringOrNumber(ref reader);
 
-    public override void Write(Utf8JsonWriter writer, RawCursorId value, JsonSerializerOptions options)
-        => writer.WriteNumberValue(value.Value);
+    public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options) =>
+        writer.WriteStringValue(value);
 }

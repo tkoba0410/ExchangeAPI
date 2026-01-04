@@ -36,7 +36,10 @@ public sealed class BittradeErrorEnrichTests
         public Task<BittradeTickerNormalized> GetTickerAsync(string symbol, CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<BittradeOrderBookNormalized> GetOrderBookAsync(string symbol, CancellationToken ct = default) =>
+        public Task<BittradeOrderBookNormalized> GetOrderBookAsync(
+            string symbol,
+            ExchangeApi.Exchanges.Bittrade.Normalize.Types.BittradeDepthType? depthType = null,
+            CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
 
         public Task<IReadOnlyList<BittradeExecutionNormalized>> GetExecutionsAsync(string symbol, CancellationToken ct = default) =>
@@ -49,6 +52,7 @@ public sealed class BittradeErrorEnrichTests
 
         public Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
             string symbol,
+            ExchangeApi.Exchanges.Bittrade.Normalize.Types.BittradeDepthType? depthType = null,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
 

@@ -1,18 +1,17 @@
 using System;
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record RawOrderSummary(
     [property: JsonPropertyName("id")]
-    [property: JsonConverter(typeof(OrderIdJsonConverter))] RawOrderId Id,
+    [property: JsonConverter(typeof(OrderIdJsonConverter))] string Id,
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] RawSymbol RawSymbol,
+    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
     [property: JsonPropertyName("account-id")] string AccountId,
     [property: JsonPropertyName("amount")] string Amount,
     [property: JsonPropertyName("price")] string? Price,
-    [property: JsonPropertyName("state")] OrderState State,
-    [property: JsonPropertyName("type")] OrderType Type,
+    [property: JsonPropertyName("state")] string State,
+    [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("client-order-id")] string? ClientOrderId,
     [property: JsonPropertyName("created-at")]
     [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset CreatedAt,

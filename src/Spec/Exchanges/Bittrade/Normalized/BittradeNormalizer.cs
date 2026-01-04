@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize;
@@ -49,7 +48,7 @@ internal static class BittradeNormalizer
 
         return symbols
             .Select(symbol => new BittradeSymbolNormalized(
-                Symbol: symbol.RawSymbol.Value,
+                Symbol: symbol.Symbol,
                 BaseCurrency: symbol.BaseCurrency,
                 QuoteCurrency: symbol.QuoteCurrency,
                 PricePrecision: symbol.PricePrecision,

@@ -39,7 +39,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
         SendAndParse(
             request,
             "Bittrade.CancelOrder",
-            BittradeEndpoints.CancelOrder(request.OrderId.Value),
+            BittradeEndpoints.CancelOrder(request.OrderId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCancelOrderResponse>(json, "Bittrade.CancelOrder"));
 

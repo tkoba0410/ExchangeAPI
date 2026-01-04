@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Tests;
@@ -16,7 +15,7 @@ public sealed class BittradeIdNormalizationTests
         var entry = JsonSerializer.Deserialize<RawTradeEntry>(json);
 
         Assert.NotNull(entry);
-        Assert.Equal("1", entry!.Id.Value);
+        Assert.Equal("1", entry!.Id);
     }
 
     [Fact]
@@ -29,7 +28,7 @@ public sealed class BittradeIdNormalizationTests
         var entry = JsonSerializer.Deserialize<RawTradeEntry>(json);
 
         Assert.NotNull(entry);
-        Assert.Equal("trade-1", entry!.Id.Value);
+        Assert.Equal("trade-1", entry!.Id);
     }
 
     [Fact]
@@ -53,9 +52,9 @@ public sealed class BittradeIdNormalizationTests
         var entry = JsonSerializer.Deserialize<RawMatchResultEntry>(json);
 
         Assert.NotNull(entry);
-        Assert.Equal("mr-1", entry!.Id.Value);
-        Assert.Equal("m-10", entry.RawMatchId.Value);
-        Assert.Equal("100", entry.RawOrderId.Value);
+        Assert.Equal("mr-1", entry!.Id);
+        Assert.Equal("m-10", entry.MatchId);
+        Assert.Equal("100", entry.OrderId);
     }
 
     [Fact]
@@ -77,7 +76,7 @@ public sealed class BittradeIdNormalizationTests
         var entry = JsonSerializer.Deserialize<RawDepositWithdrawEntry>(json);
 
         Assert.NotNull(entry);
-        Assert.Equal("200", entry!.Id.Value);
+        Assert.Equal("200", entry!.Id);
     }
 
     [Fact]
@@ -99,7 +98,7 @@ public sealed class BittradeIdNormalizationTests
         var entry = JsonSerializer.Deserialize<RawRetailOrderEntry>(json);
 
         Assert.NotNull(entry);
-        Assert.Equal("r-1", entry!.Id.Value);
+        Assert.Equal("r-1", entry!.Id);
     }
 
     [Fact]
@@ -121,7 +120,7 @@ public sealed class BittradeIdNormalizationTests
         Assert.NotNull(response);
         Assert.NotNull(response!.Data);
         Assert.Single(response.Data!);
-        Assert.Equal(1700000000, response.Data![0].Id.Value);
+        Assert.Equal("1700000000", response.Data![0].Id);
     }
 
     [Fact]
@@ -135,6 +134,6 @@ public sealed class BittradeIdNormalizationTests
 
         Assert.NotNull(response);
         Assert.NotNull(response!.Data);
-        Assert.Equal(10L, response.Data!.NextId!.Value.Value);
+        Assert.Equal("10", response.Data!.NextId);
     }
 }

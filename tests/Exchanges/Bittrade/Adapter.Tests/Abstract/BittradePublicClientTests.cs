@@ -9,7 +9,6 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 using Xunit;
 
@@ -59,7 +58,7 @@ public sealed class BittradePublicClientTests
         Assert.Equal("ok", response.Status);
         Assert.NotNull(response.Data);
         Assert.Single(response.Data!);
-        Assert.Equal("btcjpy", response.Data![0].RawSymbol.Value);
+        Assert.Equal("btcjpy", response.Data![0].Symbol);
     }
 
     private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)

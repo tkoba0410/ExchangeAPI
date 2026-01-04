@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Call;
@@ -30,9 +29,8 @@ internal sealed class BittradeRawMarketDataApi : IBittradeRawMarketDataApi
         GetOrderBookRequest request,
         CancellationToken cancellationToken = default)
     {
-        var depthType = ApplyDefaultDepthType(request.Type);
         var publicCall = await _publicApi
-            .GetDepthAsync(new GetDepthRequest(request.Symbol, depthType), cancellationToken)
+            .GetDepthAsync(new GetDepthRequest(request.Symbol, request.Type), cancellationToken)
             .ConfigureAwait(false);
         return MapCall(request, "Bittrade.GetOrderBook", publicCall);
     }
@@ -67,6 +65,4 @@ internal sealed class BittradeRawMarketDataApi : IBittradeRawMarketDataApi
             Meta: meta);
     }
 
-    private static string ApplyDefaultDepthType(string? type) =>
-        string.IsNullOrWhiteSpace(type) ? "step0" : type;
 }

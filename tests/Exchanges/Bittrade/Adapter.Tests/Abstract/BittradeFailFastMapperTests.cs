@@ -4,9 +4,6 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
-using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
-using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -16,7 +13,7 @@ public sealed class BittradeFailFastMapperTests
     [Fact]
     public void ToOpenOrder_UnknownSide_Throws()
     {
-        var raw = CreateOpenOrdersResponse((RawOrderType)999);
+        var raw = CreateOpenOrdersResponse("unknown-type");
 
         Assert.Throws<ExchangeApiException>(() =>
             BittradeTradingMapper.ToOpenOrders(new Symbol("BTC/JPY"), raw));
@@ -25,7 +22,7 @@ public sealed class BittradeFailFastMapperTests
     [Fact]
     public void ToOpenOrder_UnknownType_Throws()
     {
-        var raw = CreateOpenOrdersResponse((RawOrderType)999);
+        var raw = CreateOpenOrdersResponse("unknown-type");
 
         Assert.Throws<ExchangeApiException>(() =>
             BittradeTradingMapper.ToOpenOrders(new Symbol("BTC/JPY"), raw));
@@ -37,13 +34,13 @@ public sealed class BittradeFailFastMapperTests
         var raw = new RawOrderDetailResponse(
             Status: "ok",
             Data: new RawOrderDetail(
-                Id: new RawOrderId("1"),
-                RawSymbol: RawSymbol.From("btcjpy"),
+                Id: "1",
+                Symbol: "btcjpy",
                 AccountId: "1",
                 Amount: "1",
                 Price: "100",
-                State: (RawOrderState)999,
-                Type: RawOrderType.BuyLimit,
+                State: "mystery",
+                Type: "buy-limit",
                 ClientOrderId: null,
                 CreatedAt: DateTimeOffset.UtcNow,
                 FinishedAt: null,
@@ -55,18 +52,18 @@ public sealed class BittradeFailFastMapperTests
             BittradeTradingMapper.ToOrderStatus("BTC_JPY", raw, new OrderKey(OrderIdKind.ExchangeOrderId, "1")));
     }
 
-    private static RawOpenOrdersResponse CreateOpenOrdersResponse(RawOrderType type) =>
+    private static RawOpenOrdersResponse CreateOpenOrdersResponse(string type) =>
         new(
             Status: "ok",
             Data:
             [
                 new RawOrderSummary(
-                    Id: new RawOrderId("1"),
-                    RawSymbol: RawSymbol.From("btcjpy"),
+                    Id: "1",
+                    Symbol: "btcjpy",
                     AccountId: "1",
                     Amount: "1",
                     Price: "100",
-                    State: RawOrderState.Submitted,
+                    State: "submitted",
                     Type: type,
                     ClientOrderId: null,
                     CreatedAt: DateTimeOffset.UtcNow,

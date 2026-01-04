@@ -1,12 +1,11 @@
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 public sealed record GetPermissionsRequest;
 public sealed record GetBalancesRequest;
-public sealed record GetPositionsRequest(RawProductCode ProductCode);
+public sealed record GetPositionsRequest(string ProductCode);
 public sealed record GetAccountExecutionsRequest(
-    RawProductCode ProductCode,
+    string ProductCode,
     string? ChildOrderId = null,
     string? ChildOrderAcceptanceId = null,
     int? Count = null,
@@ -15,7 +14,7 @@ public sealed record GetAccountExecutionsRequest(
 public sealed record GetCollateralRequest;
 public sealed record GetCollateralAccountsRequest;
 public sealed record GetChildOrdersRequest(
-    RawProductCode ProductCode,
+    string ProductCode,
     string? ChildOrderStatusState = null,
     string? ChildOrderAcceptanceId = null,
     string? ChildOrderId = null,
@@ -24,14 +23,14 @@ public sealed record GetChildOrdersRequest(
     long? Before = null,
     long? After = null);
 public sealed record GetParentOrdersRequest(
-    RawProductCode ProductCode,
+    string ProductCode,
     string? ParentOrderId = null,
     string? ParentOrderAcceptanceId = null,
     int? Count = null,
     long? Before = null,
     long? After = null);
 public sealed record GetParentOrderRequest(
-    RawProductCode ProductCode,
+    string ProductCode,
     string? ParentOrderId = null,
     string? ParentOrderAcceptanceId = null);
 public sealed record GetBalanceHistoryRequest(
@@ -39,7 +38,7 @@ public sealed record GetBalanceHistoryRequest(
     int? Count = null,
     long? Before = null,
     long? After = null);
-public sealed record GetTradingCommissionRequest(RawProductCode ProductCode);
+public sealed record GetTradingCommissionRequest(string ProductCode);
 public sealed record GetCollateralHistoryRequest(int? Count = null, long? Before = null, long? After = null);
 public sealed record GetAddressesRequest;
 public sealed record GetCoinInsRequest(int? Count = null, long? Before = null, long? After = null);

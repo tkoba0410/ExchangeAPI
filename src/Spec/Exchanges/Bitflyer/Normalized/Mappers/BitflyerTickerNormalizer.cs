@@ -7,7 +7,7 @@ internal static class BitflyerTickerNormalizer
 {
     public static BitflyerTickerNormalized Normalize(Ticker wire) =>
         new(
-            ProductCode: wire.ProductCode.Value,
+            ProductCode: wire.ProductCode,
             LastTradedPrice: wire.LastTradedPrice,
             Timestamp: wire.Timestamp);
 }

@@ -7,6 +7,6 @@ internal static class BitflyerMarketNormalizer
 {
     public static BitflyerMarketNormalized Normalize(Market wire) =>
         new(
-            ProductCode: wire.ProductCode.Value,
+            ProductCode: wire.ProductCode,
             Alias: wire.Alias);
 }

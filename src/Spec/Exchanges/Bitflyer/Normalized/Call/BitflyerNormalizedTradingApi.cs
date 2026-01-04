@@ -16,7 +16,6 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Spec.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
@@ -343,10 +342,10 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         }
     }
 
-    private async Task<RawProductCode> ToProductCodeAsync(Symbol symbol, CancellationToken ct)
+    private async Task<string> ToProductCodeAsync(Symbol symbol, CancellationToken ct)
     {
         var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return new RawProductCode(market.ProductCode);
+        return market.ProductCode;
     }
 
     private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)

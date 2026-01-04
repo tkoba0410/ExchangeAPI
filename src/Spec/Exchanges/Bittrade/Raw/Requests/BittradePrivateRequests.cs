@@ -1,5 +1,4 @@
 using System;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 
@@ -7,14 +6,14 @@ public sealed record GetAccountsRequest;
 
 public sealed record GetAccountBalanceRequest(string AccountId);
 
-public sealed record GetOpenOrdersRequest(RawSymbol Symbol, string AccountId);
+public sealed record GetOpenOrdersRequest(string Symbol, string AccountId);
 
-public sealed record GetOrderRequest(RawOrderId OrderId);
+public sealed record GetOrderRequest(string OrderId);
 
-public sealed record GetOrderMatchResultsRequest(RawOrderId OrderId);
+public sealed record GetOrderMatchResultsRequest(string OrderId);
 
 public sealed record GetOrdersRequest(
-    RawSymbol Symbol,
+    string Symbol,
     string States,
     string? StartDate = null,
     string? EndDate = null,
@@ -23,7 +22,7 @@ public sealed record GetOrdersRequest(
     int? Size = null);
 
 public sealed record GetMatchResultsRequest(
-    RawSymbol? Symbol = null,
+    string? Symbol = null,
     string? Types = null,
     string? StartDate = null,
     string? EndDate = null,

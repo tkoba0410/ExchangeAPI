@@ -1,12 +1,11 @@
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
 /// <summary>/v1/me/cancelparentorder リクエスト DTO。</summary>
 public sealed class CancelParentOrderRequest
 {
-    [JsonPropertyName("product_code")] public RawProductCode ProductCode { get; init; }
+    [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
 
     [JsonPropertyName("parent_order_id")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

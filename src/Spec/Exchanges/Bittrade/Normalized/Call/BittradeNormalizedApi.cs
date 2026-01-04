@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Types;
 using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Call;
@@ -61,13 +62,17 @@ public sealed class BittradeNormalizedMarketDataFacade
         CancellationToken ct = default) =>
         _inner.GetTickerCallAsync(symbol, ct);
 
-    public Task<BittradeOrderBookNormalized> GetOrderBookAsync(string symbol, CancellationToken ct = default) =>
-        _inner.GetOrderBookAsync(symbol, ct);
+    public Task<BittradeOrderBookNormalized> GetOrderBookAsync(
+        string symbol,
+        BittradeDepthType? depthType = null,
+        CancellationToken ct = default) =>
+        _inner.GetOrderBookAsync(symbol, depthType, ct);
 
     public Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
         string symbol,
+        BittradeDepthType? depthType = null,
         CancellationToken ct = default) =>
-        _inner.GetOrderBookCallAsync(symbol, ct);
+        _inner.GetOrderBookCallAsync(symbol, depthType, ct);
 
     public Task<IReadOnlyList<BittradeExecutionNormalized>> GetExecutionsAsync(
         string symbol,

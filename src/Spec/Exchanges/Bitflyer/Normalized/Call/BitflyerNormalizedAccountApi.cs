@@ -14,7 +14,6 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Spec.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
@@ -102,10 +101,10 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         return CreateCall(rawCall, request, "Bitflyer.GetTradingCommission", raw => raw);
     }
 
-    private async Task<RawProductCode> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
+    private async Task<string> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
     {
         var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return new RawProductCode(market.ProductCode);
+        return market.ProductCode;
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(

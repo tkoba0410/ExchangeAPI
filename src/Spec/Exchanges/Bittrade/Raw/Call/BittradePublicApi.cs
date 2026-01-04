@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
-using ExchangeApi.Exchanges.Bittrade.Raw.Types;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 using ExchangeApi.Spec.CallCommon;
 using ExchangeApi.Spec.Wire;
@@ -30,7 +29,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         SendAndParse(
             request,
             "Bittrade.GetMergedTicker",
-            BittradeEndpoints.GetTicker(request.Symbol.Value),
+            BittradeEndpoints.GetTicker(request.Symbol),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawMergedResponse>(json, "Bittrade.GetMergedTicker"));
 
@@ -40,7 +39,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         SendAndParse(
             request,
             "Bittrade.GetDepth",
-            BittradeEndpoints.GetOrderBook(request.Symbol.Value, request.Type),
+            BittradeEndpoints.GetOrderBook(request.Symbol, request.Type),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawDepthResponse>(json, "Bittrade.GetDepth"));
 
@@ -50,7 +49,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         SendAndParse(
             request,
             "Bittrade.GetTrades",
-            BittradeEndpoints.GetTrades(request.Symbol.Value),
+            BittradeEndpoints.GetTrades(request.Symbol),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawTradeResponse>(json, "Bittrade.GetTrades"));
 
@@ -90,7 +89,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         SendAndParse(
             request,
             "Bittrade.GetKlines",
-            BittradeEndpoints.GetKlines(request.Symbol.Value, request.Period, request.Size),
+            BittradeEndpoints.GetKlines(request.Symbol, request.Period, request.Size),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawKlinesResponse>(json, "Bittrade.GetKlines"));
 
@@ -110,7 +109,7 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         SendAndParse(
             request,
             "Bittrade.GetTradeHistory",
-            BittradeEndpoints.GetTradeHistory(request.Symbol.Value),
+            BittradeEndpoints.GetTradeHistory(request.Symbol),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawTradeHistoryResponse>(json, "Bittrade.GetTradeHistory"));
 

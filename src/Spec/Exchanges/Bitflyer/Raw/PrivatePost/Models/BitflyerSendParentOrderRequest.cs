@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
 
 /// <summary>/v1/me/sendparentorder リクエスト DTO。</summary>
 public sealed class CreateParentOrderRequest
 {
-    [JsonPropertyName("order_method")] public OrderMethod OrderMethod { get; init; }
+    [JsonPropertyName("order_method")] public string OrderMethod { get; init; } = string.Empty;
 
     [JsonPropertyName("minute_to_expire")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -15,16 +14,16 @@ public sealed class CreateParentOrderRequest
 
     [JsonPropertyName("time_in_force")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public TimeInForce? TimeInForce { get; init; }
+    public string? TimeInForce { get; init; }
 
     [JsonPropertyName("parameters")] public IReadOnlyList<ParentOrderParameter> Parameters { get; init; } = new List<ParentOrderParameter>();
 }
 
 public sealed class ParentOrderParameter
 {
-    [JsonPropertyName("product_code")] public RawProductCode ProductCode { get; init; }
-    [JsonPropertyName("condition_type")] public ConditionType ConditionType { get; init; }
-    [JsonPropertyName("side")] public Side Side { get; init; }
+    [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
+    [JsonPropertyName("condition_type")] public string ConditionType { get; init; } = string.Empty;
+    [JsonPropertyName("side")] public string Side { get; init; } = string.Empty;
     [JsonPropertyName("size")] public decimal Size { get; init; }
 
     [JsonPropertyName("price")]

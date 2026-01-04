@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 public sealed record Market(
-    [property: JsonPropertyName("product_code")] RawProductCode ProductCode,
+    [property: JsonPropertyName("product_code")] string ProductCode,
     [property: JsonPropertyName("alias")] string? Alias);

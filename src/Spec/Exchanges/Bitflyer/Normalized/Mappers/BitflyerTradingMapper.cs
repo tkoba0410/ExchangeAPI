@@ -51,6 +51,15 @@ internal static class BitflyerTradingMapper
             _ => throw new ArgumentOutOfRangeException(nameof(tif), tif, "Unknown bitFlyer time_in_force"),
         };
 
+    public static BitflyerTimeInForce ParseTimeInForce(string tif) =>
+        (tif ?? string.Empty).ToUpperInvariant() switch
+        {
+            "GTC" => BitflyerTimeInForce.Gtc,
+            "IOC" => BitflyerTimeInForce.Ioc,
+            "FOK" => BitflyerTimeInForce.Fok,
+            _ => throw new ArgumentOutOfRangeException(nameof(tif), tif, "Unknown bitFlyer time_in_force"),
+        };
+
     public static string? ToApiTimeInForce(BitflyerTimeInForce? tif) =>
         tif switch
         {

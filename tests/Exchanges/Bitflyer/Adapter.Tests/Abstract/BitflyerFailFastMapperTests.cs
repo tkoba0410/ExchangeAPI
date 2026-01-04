@@ -26,4 +26,18 @@ public sealed class BitflyerFailFastMapperTests
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             BitflyerTradingMapper.MapTimeInForce((ExchangeApi.Common.Enums.TimeInForce)999));
     }
+
+    [Fact]
+    public void ParentOrderMapper_UnknownOrderMethod_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            BitflyerParentOrderMapper.ParseOrderMethod("UNKNOWN"));
+    }
+
+    [Fact]
+    public void ParentOrderMapper_UnknownParentOrderState_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            BitflyerParentOrderMapper.ParseParentOrderState("UNKNOWN"));
+    }
 }

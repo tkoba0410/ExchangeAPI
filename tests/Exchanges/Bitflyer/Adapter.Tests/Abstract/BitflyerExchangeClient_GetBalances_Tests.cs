@@ -79,7 +79,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
 
         private static BitflyerExchangeClient CreateClient(
             IBitflyerRawMarketDataApi marketData,
-            IBitflyerRawAccountApi accountApi,
+            IBitflyerPrivateApi accountApi,
             IBitflyerRawPrivateTradingApi tradingApi)
         {
             var markets = BitflyerTestHelpers.CreateResolver();

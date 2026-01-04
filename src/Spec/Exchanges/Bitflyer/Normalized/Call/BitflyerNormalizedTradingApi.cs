@@ -12,6 +12,7 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Normalize;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
@@ -24,16 +25,16 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingApi
 {
     private readonly IBitflyerRawPrivateTradingApi _tradingApi;
-    private readonly IBitflyerRawAccountApi _accountApi;
+    private readonly IBitflyerPrivateApi _privateApi;
     private readonly IExchangeMarketResolver _markets;
 
     public BitflyerNormalizedTradingApi(
         IBitflyerRawPrivateTradingApi tradingApi,
-        IBitflyerRawAccountApi accountApi,
+        IBitflyerPrivateApi privateApi,
         IExchangeMarketResolver markets)
     {
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
-        _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
+        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
@@ -67,6 +68,36 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
     {
         var call = await GetOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
         return Unwrap(call, "Bitflyer.GetOrder");
+    }
+
+    public async Task<IReadOnlyList<BitflyerParentOrderNormalized>> GetParentOrdersAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var call = await GetParentOrdersCallAsync(
+                symbol,
+                parentOrderId,
+                parentOrderAcceptanceId,
+                cancellationToken)
+            .ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetParentOrders");
+    }
+
+    public async Task<BitflyerParentOrderDetailNormalized> GetParentOrderAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var call = await GetParentOrderCallAsync(
+                symbol,
+                parentOrderId,
+                parentOrderAcceptanceId,
+                cancellationToken)
+            .ConfigureAwait(false);
+        return Unwrap(call, "Bitflyer.GetParentOrder");
     }
 
     public async Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
@@ -158,7 +189,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         }
 
         var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var rawCall = await _accountApi
+        var rawCall = await _privateApi
             .GetChildOrdersAsync(
                 new RawRequests.GetChildOrdersRequest(
                     productCode,
@@ -221,7 +252,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
         var rawCall = orderKey.Kind switch
         {
-            OrderIdKind.AcceptanceId => await _accountApi
+            OrderIdKind.AcceptanceId => await _privateApi
                 .GetChildOrdersAsync(
                     new RawRequests.GetChildOrdersRequest(
                         productCode,
@@ -229,7 +260,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                         ChildOrderAcceptanceId: orderKey.Value),
                     cancellationToken)
                 .ConfigureAwait(false),
-            OrderIdKind.ExchangeOrderId => await _accountApi
+            OrderIdKind.ExchangeOrderId => await _privateApi
                 .GetChildOrdersAsync(
                     new RawRequests.GetChildOrdersRequest(
                         productCode,
@@ -267,6 +298,66 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                     Price: order.Price == 0 ? null : new Price(order.Price),
                     AveragePrice: order.AveragePrice == 0 ? null : new Price(order.AveragePrice));
             });
+    }
+
+    public async Task<Call<GetParentOrdersRequest, IReadOnlyList<BitflyerParentOrderNormalized>>> GetParentOrdersCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (symbol.IsEmpty)
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+
+        var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
+        var rawCall = await _privateApi
+            .GetParentOrdersAsync(
+                new RawRequests.GetParentOrdersRequest(
+                    productCode,
+                    parentOrderId,
+                    parentOrderAcceptanceId),
+                cancellationToken)
+            .ConfigureAwait(false);
+        var callRequest = new GetParentOrdersRequest(symbol, parentOrderId, parentOrderAcceptanceId);
+
+        return CreateCall(
+            rawCall,
+            callRequest,
+            "Bitflyer.GetParentOrders",
+            raw => (IReadOnlyList<BitflyerParentOrderNormalized>)raw
+                .Select(BitflyerParentOrderNormalizer.Normalize)
+                .ToArray());
+    }
+
+    public async Task<Call<GetParentOrderRequest, BitflyerParentOrderDetailNormalized>> GetParentOrderCallAsync(
+        Symbol symbol,
+        string? parentOrderId = null,
+        string? parentOrderAcceptanceId = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (symbol.IsEmpty)
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+
+        var productCode = await ToProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
+        var rawCall = await _privateApi
+            .GetParentOrderAsync(
+                new RawRequests.GetParentOrderRequest(
+                    productCode,
+                    parentOrderId,
+                    parentOrderAcceptanceId),
+                cancellationToken)
+            .ConfigureAwait(false);
+        var callRequest = new GetParentOrderRequest(symbol, parentOrderId, parentOrderAcceptanceId);
+
+        return CreateCall(
+            rawCall,
+            callRequest,
+            "Bitflyer.GetParentOrder",
+            BitflyerParentOrderNormalizer.NormalizeDetail);
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(

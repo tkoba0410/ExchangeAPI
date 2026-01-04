@@ -68,13 +68,13 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         Assert.Equal(3000000m, status.AveragePrice!.Value.Value);
     }
 
-    private static BitflyerExchangeClient CreateClient(
-        IBitflyerRawMarketDataApi marketData,
-        IBitflyerRawAccountApi accountApi,
-        IBitflyerRawPrivateTradingApi tradingApi)
-    {
-        var markets = BitflyerTestHelpers.CreateResolver();
-        var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
+        private static BitflyerExchangeClient CreateClient(
+            IBitflyerRawMarketDataApi marketData,
+            IBitflyerPrivateApi accountApi,
+            IBitflyerRawPrivateTradingApi tradingApi)
+        {
+            var markets = BitflyerTestHelpers.CreateResolver();
+            var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
         var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
         var normalizedMargin = BitflyerTestHelpers.CreateMarginApi(accountApi, markets);
         var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);

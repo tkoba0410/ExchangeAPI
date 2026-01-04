@@ -30,7 +30,7 @@ internal static class BitflyerTestHelpers
 
     public static IBitflyerNormalizedTradingApi CreateTradingApi(
         IBitflyerRawPrivateTradingApi tradingApi,
-        IBitflyerRawAccountApi accountApi,
+        IBitflyerPrivateApi accountApi,
         IExchangeMarketResolver markets) =>
         new BitflyerNormalizedTradingApi(tradingApi, accountApi, markets);
 

@@ -84,8 +84,17 @@
 3. **Raw は取引所公式 API の鏡像 DTO を保持するものとし、鏡像 DTO と JSON payload の相互変換（codec）責務を許可する。**
    * Raw における変換は、JSON 表現上の差（数値/文字列混在、null、日時表現等）を扱う **構文意味（syntax-level / primitive-level）** に限定される。
    * Raw は取引所の意味論（例：注文状態の解釈、銘柄名の正規化、手数料体系の前提）を担ってはならない。
+   * **Raw が扱ってよい型は、プリミティブおよびコンテナに限定する（ホワイトリスト）。**
+     * 許可：`string` / `bool` / 数値（`int` / `long` / `decimal` 等）/ `DateTimeOffset`（形式変換としてのみ）/ `TimeSpan`（必要時）/ `T?`（nullable）
+     * 許可：`IReadOnlyList<T>` / `List<T>` / `T[]` / `IReadOnlyDictionary<string,T>`（動的応答が必要な場合のみ）
+   * **Raw は次に掲げる型・表現を定義または公開してはならない（ブラックリスト）。**
+     * `enum`（注文種別・売買区分・状態・type 等の意味型すべて）
+     * `RawProductCode` / `RawSymbol` / `RawOrderId` 等、意味を持つラッパ型（名前付き string を含む）
+     * Normalized / Contracts / Domain の型
+   * **Raw の Request/DTO は「JSON ↔ プリミティブ」変換のための入出力に限定し、意味づけ（列挙・既定値注入・妥当性検証）を持ち込んではならない。**
 4. **Normalized は単独取引所内での正規化 DTO を保持するものとし、当該取引所の意味論（exchange semantics）に基づく解釈・正規化を担う。**
    * Normalized は取引所間の抽象化を目的としてはならない。
+   * **注文種別・売買区分・状態・type 等の意味づけ（列挙化）、既定値注入、妥当性検証は Normalized の責務とする。**
 5. **Contracts は複数取引所横断の抽象化 DTO を保持するものとし、横断的な意味論（cross-exchange semantics）を担う。**
    * Contracts は transport 情報および JSON 文字列を保持してはならない。
 

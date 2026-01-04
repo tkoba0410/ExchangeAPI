@@ -150,11 +150,18 @@ Split Candidate: なし
 
 * **Wire**：転送表現のみ（string/bytes）。意味なし。検証・正規化なし。
 * **Raw**：公式 API の鏡像＋codec。JSON 表現差を吸収する **構文意味（primitive/syntax）** のみ許可。
+  * Raw が扱ってよい型はプリミティブとコンテナに限定する（Core §5）。
+    * 許可：`string` / `bool` / 数値（`int`/`long`/`decimal` 等）/ `DateTimeOffset`（形式変換としてのみ）/ `T?`
+    * 許可：`List<T>` / `IReadOnlyList<T>` / `T[]` / `IReadOnlyDictionary<string,T>`（必要時のみ）
+  * Raw では **enum・意味型・ラッパ型（RawProductCode 等）を定義しない**。
+  * 既定値注入・妥当性検証・列挙化は Raw では行わない。
 * **Normalized**：単独取引所内の正規化。取引所の意味論に基づく解釈・統一（exchange semantics）。
+  * 注文種別・売買区分・状態・type 等の **意味づけ（列挙化）**、既定値注入、妥当性検証は Normalized の責務。
 * **Contracts**：複数取引所横断の抽象化。横断語彙としての意味論（cross-exchange semantics）。
 
 誤用の典型：
 * Raw に注文状態の解釈や銘柄正規化など「取引所意味」を入れ始める（→ Normalized に寄せる）
+* Raw に enum や Raw* ラッパ型を導入し始める（→ Normalized の意味型へ寄せる / Raw は string のまま）
 * Normalized に横断抽象（共通インターフェース都合）を入れ始める（→ Contracts に寄せる）
 
 ### 5.2 Call（呼出）結果の標準形（Core §5「Call」対応）
@@ -447,11 +454,14 @@ Split Candidate: PhysicalLayout（構成例・CI・運用が増えた場合は�
 ### 16.2 運用上の指針
 
 * **converter 失敗**は「構文意味の破綻」であり、Raw の責務として扱う。
-  * 例：`JsonException`、数値変換失敗、enum 非対応値の decode 失敗
+  * 例：`JsonException`、必須フィールド欠落、数値/日時などプリミティブ変換失敗
 * **mapper 失敗**は「意味論の破綻」であり、正規化・抽象化を行う層の責務として扱う。
   * Raw → Normalized の mapper 失敗は Normalized の責務
   * Normalized → Contracts の mapper 失敗は Contracts の責務
 * Wire は意味を扱わないため、本節で定義する失敗分類の対象外とする（Wire は転送失敗のみを扱う）。
+
+補足：Raw では enum を持たないため、「未知の状態値」「type/side/status の未知値」等は Raw の converter ではなく、
+Normalized の解釈（mapper/意味づけ）段階で `Mapping` または `Semantic` として扱う。
 
 ※ 失敗の意味と責務帰属に関する正本は、本節 16.1 および 16.2 に定義する対応表と指針とする。
 

@@ -4,4 +4,4 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 public sealed record RawCancelOrderResponse(
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("data")]
-    [property: JsonConverter(typeof(OrderIdJsonConverter))] string OrderId);
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string OrderId);

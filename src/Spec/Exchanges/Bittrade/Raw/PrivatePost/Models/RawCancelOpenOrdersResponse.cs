@@ -9,4 +9,4 @@ public sealed record RawCancelOpenOrdersResult(
     [property: JsonPropertyName("success-count")] int SuccessCount,
     [property: JsonPropertyName("failed-count")] int FailedCount,
     [property: JsonPropertyName("next-id")]
-    [property: JsonConverter(typeof(CursorIdJsonConverter))] string? NextId);
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string? NextId);

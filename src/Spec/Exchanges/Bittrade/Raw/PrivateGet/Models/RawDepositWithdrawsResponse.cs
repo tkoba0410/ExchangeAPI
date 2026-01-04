@@ -9,7 +9,7 @@ public sealed record RawDepositWithdrawsResponse(
 
 public sealed record RawDepositWithdrawEntry(
     [property: JsonPropertyName("id")]
-    [property: JsonConverter(typeof(DepositWithdrawIdJsonConverter))] string Id,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Id,
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("currency")] string Currency,
     [property: JsonPropertyName("amount")] decimal Amount,

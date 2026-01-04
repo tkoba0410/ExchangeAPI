@@ -12,7 +12,7 @@ public sealed record RawTradeHistoryResponse(
 
 public sealed record RawTradeHistoryEntry(
     [property: JsonPropertyName("id")]
-    [property: JsonConverter(typeof(TradeHistoryIdJsonConverter))] string Id,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Id,
     [property: JsonPropertyName("ts")]
     [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset Ts,
     [property: JsonPropertyName("data")] IReadOnlyList<RawTradeEntry>? Data);

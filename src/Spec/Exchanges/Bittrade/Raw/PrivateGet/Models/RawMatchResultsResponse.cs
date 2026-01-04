@@ -13,13 +13,13 @@ public sealed record RawOrderMatchResultsResponse(
 
 public sealed record RawMatchResultEntry(
     [property: JsonPropertyName("id")]
-    [property: JsonConverter(typeof(MatchResultIdJsonConverter))] string Id,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Id,
     [property: JsonPropertyName("order-id")]
-    [property: JsonConverter(typeof(OrderIdJsonConverter))] string OrderId,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string OrderId,
     [property: JsonPropertyName("match-id")]
-    [property: JsonConverter(typeof(MatchIdJsonConverter))] string MatchId,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string MatchId,
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Symbol,
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("price")] decimal Price,
     [property: JsonPropertyName("filled-amount")] decimal FilledAmount,

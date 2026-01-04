@@ -12,7 +12,7 @@ public sealed record RawKlinesResponse(
 
 public sealed record RawKlineEntry(
     [property: JsonPropertyName("id")]
-    [property: JsonConverter(typeof(KlineIdJsonConverter))] string Id,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Id,
     [property: JsonPropertyName("open")] decimal Open,
     [property: JsonPropertyName("close")] decimal Close,
     [property: JsonPropertyName("low")] decimal Low,

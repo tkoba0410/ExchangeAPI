@@ -4,9 +4,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record RawOrderDetail(
     [property: JsonPropertyName("id")]
-    [property: JsonConverter(typeof(OrderIdJsonConverter))] string Id,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Id,
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Symbol,
     [property: JsonPropertyName("account-id")] string AccountId,
     [property: JsonPropertyName("amount")] string Amount,
     [property: JsonPropertyName("price")] string? Price,

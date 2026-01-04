@@ -11,9 +11,9 @@ public sealed record RawRetailOrdersResponse(
 
 public sealed record RawRetailOrderEntry(
     [property: JsonPropertyName("id")]
-    [property: JsonConverter(typeof(RetailOrderIdJsonConverter))] string Id,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Id,
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
+    [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Symbol,
     [property: JsonPropertyName("type")] int Type,
     [property: JsonPropertyName("price")] string? Price,
     [property: JsonPropertyName("amount")] string? Amount,

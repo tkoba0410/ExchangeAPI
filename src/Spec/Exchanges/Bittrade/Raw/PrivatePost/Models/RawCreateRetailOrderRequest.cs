@@ -3,7 +3,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 
 public sealed record RawCreateRetailOrderRequest(
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
+    string Symbol,
     [property: JsonPropertyName("type")] int Type,
     [property: JsonPropertyName("price")] string? Price = null,
     [property: JsonPropertyName("amount")] string? Amount = null,

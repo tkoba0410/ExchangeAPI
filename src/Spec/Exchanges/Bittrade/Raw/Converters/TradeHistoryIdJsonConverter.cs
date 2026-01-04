@@ -10,5 +10,6 @@ internal sealed class TradeHistoryIdJsonConverter : JsonConverter<string>
         IdJsonConverterHelpers.ReadStringOrNumber(ref reader);
 
     public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options) =>
-        writer.WriteStringValue(value);
+        throw new NotSupportedException(
+            "Raw JsonConverter is read-only (Deserialize only). Serialize is not allowed in Raw layer.");
 }

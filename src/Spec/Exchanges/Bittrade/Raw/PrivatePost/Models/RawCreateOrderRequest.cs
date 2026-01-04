@@ -4,7 +4,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw;
 public sealed record RawCreateOrderRequest(
     [property: JsonPropertyName("account-id")] string AccountId,
     [property: JsonPropertyName("symbol")]
-    [property: JsonConverter(typeof(SymbolJsonConverter))] string Symbol,
+    string Symbol,
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("amount")] string Amount,
     [property: JsonPropertyName("price")] string? Price = null,

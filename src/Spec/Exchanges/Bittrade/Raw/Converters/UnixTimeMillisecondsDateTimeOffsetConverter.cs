@@ -19,6 +19,7 @@ internal sealed class UnixTimeMillisecondsDateTimeOffsetConverter : JsonConverte
 
     public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
     {
-        writer.WriteNumberValue(value.ToUnixTimeMilliseconds());
+        throw new NotSupportedException(
+            "Raw JsonConverter is read-only (Deserialize only). Serialize is not allowed in Raw layer.");
     }
 }

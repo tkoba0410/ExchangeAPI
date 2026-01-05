@@ -54,7 +54,10 @@ internal sealed class BittradeRawMarketDataApi : IBittradeRawMarketDataApi
             Layer: "Raw",
             Component: component,
             Tags: null,
-            Children: new[] { publicCall.Id });
+            Children: new[] { publicCall.Id })
+        {
+            RawJson = publicCall.Meta.RawJson
+        };
 
         return new Call<TReq, TRes>(
             Id: CallId.New(),

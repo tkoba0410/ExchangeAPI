@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Types;
+using ExchangeApi.Spec.ValueCommon.ClosedSet;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
@@ -19,19 +21,21 @@ public sealed class BitflyerParentOrderMapperTests
             Id: 1,
             ParentOrderId: "PO-1",
             ProductCode: "BTC_JPY",
-            Side: BitflyerSide.Buy,
-            ParentOrderType: BitflyerParentOrderType.Ifd,
+            Side: Closed<BitflyerSide>.KnownValue(BitflyerSide.Buy),
+            ParentOrderType: Closed<BitflyerParentOrderType>.KnownValue(BitflyerParentOrderType.Ifd),
             Price: 123.45m,
             AveragePrice: 120.00m,
             Size: 0.5m,
-            ParentOrderState: BitflyerParentOrderState.Active,
+            ParentOrderState: Closed<BitflyerParentOrderState>.KnownValue(BitflyerParentOrderState.Active),
             ExpireDate: DateTimeOffset.UnixEpoch.AddHours(1),
             ParentOrderDate: DateTimeOffset.UnixEpoch,
             ParentOrderAcceptanceId: "PA-1",
             OutstandingSize: 0.2m,
             CancelSize: 0.1m,
             ExecutedSize: 0.3m,
-            TotalCommission: 0.01m);
+            TotalCommission: 0.01m,
+            RawSnapshot: EmptySnapshot(),
+            Extras: new Dictionary<string, JsonElement>());
 
         var mapped = BitflyerParentOrderMapper.Map(symbol, normalized);
 
@@ -60,8 +64,8 @@ public sealed class BitflyerParentOrderMapperTests
         {
             new(
                 ProductCode: "BTC_JPY",
-                ConditionType: BitflyerConditionType.StopLimit,
-                Side: BitflyerSide.Sell,
+                ConditionType: Closed<BitflyerConditionType>.KnownValue(BitflyerConditionType.StopLimit),
+                Side: Closed<BitflyerSide>.KnownValue(BitflyerSide.Sell),
                 Size: 1.2m,
                 Price: 0m,
                 TriggerPrice: 345.67m,
@@ -71,11 +75,13 @@ public sealed class BitflyerParentOrderMapperTests
         var normalized = new BitflyerParentOrderDetailNormalized(
             Id: 2,
             ParentOrderId: "PO-2",
-            OrderMethod: BitflyerOrderMethod.IfdOco,
+            OrderMethod: Closed<BitflyerOrderMethod>.KnownValue(BitflyerOrderMethod.IfdOco),
             ExpireDate: DateTimeOffset.UnixEpoch.AddDays(1),
-            TimeInForce: BitflyerTimeInForce.Gtc,
+            TimeInForce: Closed<BitflyerTimeInForce>.KnownValue(BitflyerTimeInForce.Gtc),
             Parameters: parameters,
-            ParentOrderAcceptanceId: "PA-2");
+            ParentOrderAcceptanceId: "PA-2",
+            RawSnapshot: EmptySnapshot(),
+            Extras: new Dictionary<string, JsonElement>());
 
         var mapped = BitflyerParentOrderMapper.MapDetail(normalized);
 
@@ -94,5 +100,11 @@ public sealed class BitflyerParentOrderMapperTests
         Assert.Null(parameter.Price);
         Assert.Equal(345.67m, parameter.TriggerPrice?.Value);
         Assert.Equal(0.5m, parameter.Offset);
+    }
+
+    private static JsonElement EmptySnapshot()
+    {
+        using var doc = JsonDocument.Parse("{}");
+        return doc.RootElement.Clone();
     }
 }

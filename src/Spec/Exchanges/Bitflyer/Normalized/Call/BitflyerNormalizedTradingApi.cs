@@ -327,7 +327,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             callRequest,
             "Bitflyer.GetParentOrders",
             raw => (IReadOnlyList<BitflyerParentOrderNormalized>)raw
-                .Select(BitflyerParentOrderNormalizer.Normalize)
+                .Select(item => BitflyerParentOrderNormalizer.Normalize(item, rawCall.Meta.RawJson))
                 .ToArray());
     }
 
@@ -357,7 +357,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             rawCall,
             callRequest,
             "Bitflyer.GetParentOrder",
-            BitflyerParentOrderNormalizer.NormalizeDetail);
+            raw => BitflyerParentOrderNormalizer.NormalizeDetail(raw, rawCall.Meta.RawJson));
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
@@ -370,7 +370,10 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             Layer: "Normalized",
             Component: component,
             Tags: null,
-            Children: new[] { rawCall.Id });
+            Children: new[] { rawCall.Id })
+        {
+            RawJson = rawCall.Meta.RawJson
+        };
 
         return rawCall.Result switch
         {

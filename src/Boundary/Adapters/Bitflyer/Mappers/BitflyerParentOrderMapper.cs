@@ -6,6 +6,8 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Types;
+using ExchangeApi.Spec.ValueCommon.ClosedSet;
 using NormalizedParentOrderMapper = ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers.BitflyerParentOrderMapper;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
@@ -18,9 +20,9 @@ internal static class BitflyerParentOrderMapper
             Symbol: symbol,
             ParentOrderId: normalized.ParentOrderId,
             ParentOrderAcceptanceId: normalized.ParentOrderAcceptanceId,
-            Side: BitflyerCommonMapper.MapSide(normalized.Side),
-            ParentOrderType: NormalizedParentOrderMapper.ToApiParentOrderType(normalized.ParentOrderType),
-            ParentOrderState: NormalizedParentOrderMapper.ToApiParentOrderState(normalized.ParentOrderState),
+            Side: BitflyerCommonMapper.MapSide(RequireKnown(normalized.Side, "side")),
+            ParentOrderType: ToApiOrRaw(normalized.ParentOrderType, NormalizedParentOrderMapper.ToApiParentOrderType),
+            ParentOrderState: ToApiOrRaw(normalized.ParentOrderState, NormalizedParentOrderMapper.ToApiParentOrderState),
             Price: normalized.Price == 0 ? null : new Price(normalized.Price),
             AveragePrice: normalized.AveragePrice == 0 ? null : new Price(normalized.AveragePrice),
             Size: new Size(normalized.Size),
@@ -36,8 +38,10 @@ internal static class BitflyerParentOrderMapper
             Exchange: ExchangeCode.Bitflyer,
             ParentOrderId: normalized.ParentOrderId,
             ParentOrderAcceptanceId: normalized.ParentOrderAcceptanceId,
-            OrderMethod: NormalizedParentOrderMapper.ToApiOrderMethod(normalized.OrderMethod),
-            TimeInForce: BitflyerTradingMapper.ToApiTimeInForce(normalized.TimeInForce) ?? string.Empty,
+            OrderMethod: ToApiOrRaw(normalized.OrderMethod, NormalizedParentOrderMapper.ToApiOrderMethod),
+            TimeInForce: ToApiOrRawOptional(
+                normalized.TimeInForce,
+                value => BitflyerTradingMapper.ToApiTimeInForce(value)) ?? string.Empty,
             Parameters: MapParameters(normalized.Parameters));
 
     private static IReadOnlyList<ParentOrderParameter> MapParameters(
@@ -46,12 +50,21 @@ internal static class BitflyerParentOrderMapper
         return parameters
             .Select(p => new ParentOrderParameter(
                 ProductCode: p.ProductCode,
-                ConditionType: NormalizedParentOrderMapper.ToApiConditionType(p.ConditionType),
-                Side: BitflyerCommonMapper.MapSide(p.Side),
+                ConditionType: ToApiOrRaw(p.ConditionType, NormalizedParentOrderMapper.ToApiConditionType),
+                Side: BitflyerCommonMapper.MapSide(RequireKnown(p.Side, "side")),
                 Size: new Size(p.Size),
                 Price: p.Price == 0 ? null : new Price(p.Price),
                 TriggerPrice: p.TriggerPrice == 0 ? null : new Price(p.TriggerPrice),
                 Offset: p.Offset))
             .ToArray();
     }
+
+    private static T RequireKnown<T>(Closed<T> value, string fieldName) =>
+        value.RequireKnown(fieldName);
+
+    private static string ToApiOrRaw<T>(Closed<T> value, Func<T, string> map) =>
+        value.IsKnown ? map(value.Known) : value.Unknown ?? string.Empty;
+
+    private static string? ToApiOrRawOptional<T>(Closed<T> value, Func<T, string?> map) =>
+        value.IsKnown ? map(value.Known) : value.Unknown;
 }

@@ -159,6 +159,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
         Func<string, TRes> parse,
         CallMeta meta)
     {
+        var metaWithRaw = meta with { RawJson = response.Json };
         if (response.StatusCode is < 200 or >= 300)
         {
             var error = new CallError(
@@ -172,7 +173,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
                 Duration: wireCall.Duration,
                 Request: request,
                 Result: new CallResult<TRes>.Err(error),
-                Meta: meta);
+                Meta: metaWithRaw);
         }
 
         try
@@ -184,7 +185,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
                 Duration: wireCall.Duration,
                 Request: request,
                 Result: new CallResult<TRes>.Ok(parsed),
-                Meta: meta);
+                Meta: metaWithRaw);
         }
         catch (Exception ex) when (ex is JsonException or NotSupportedException)
         {
@@ -200,7 +201,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
                 Duration: wireCall.Duration,
                 Request: request,
                 Result: new CallResult<TRes>.Err(error),
-                Meta: meta);
+                Meta: metaWithRaw);
         }
     }
 

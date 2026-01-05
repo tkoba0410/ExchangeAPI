@@ -7,4 +7,7 @@ public sealed record CallMeta(
     string Layer,
     string Component,
     IReadOnlyDictionary<string, string>? Tags = null,
-    IReadOnlyList<CallId>? Children = null);
+    IReadOnlyList<CallId>? Children = null)
+{
+    public string? RawJson { get; init; }
+}

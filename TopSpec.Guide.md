@@ -166,12 +166,20 @@ Split Candidate: なし
     * 参照されていない JsonConverter は削除対象とする（Raw に死んだ実装を残さない）。
 * **Normalized**：単独取引所内の正規化。取引所の意味論に基づく解釈・統一（exchange semantics）。
   * 注文種別・売買区分・状態・type 等の **意味づけ（列挙化）**、既定値注入、妥当性検証は Normalized の責務。
+  * **Normalized は原則として情報欠落のない（lossless）正規化を行う**（Core §5）。
+    * Raw に存在する情報は、Normalized DTO のいずれかに保持する（明示フィールド／退避領域）。
+    * 推奨：`RawSnapshot`（Raw 応答 JSON の保持）と `Extras`（未マップフィールドの保持）。
+    * 退避領域は JSON の表現保持のために用い、意味解釈は明示フィールド側で行う。
+  * **Closed set（列挙）化は Unknown 値を捨てない**。
+    * 推奨：`Known(enum)` / `Unknown(string raw)` のような構造で保持する。
+    * 例外として Unknown をエラーにする場合でも、`CallError` に元の raw 値を含める。
 * **Contracts**：複数取引所横断の抽象化。横断語彙としての意味論（cross-exchange semantics）。
 
 誤用の典型：
 * Raw に注文状態の解釈や銘柄正規化など「取引所意味」を入れ始める（→ Normalized に寄せる）
 * Raw に enum や Raw* ラッパ型を導入し始める（→ Normalized の意味型へ寄せる / Raw は string のまま）
 * Normalized に横断抽象（共通インターフェース都合）を入れ始める（→ Contracts に寄せる）
+* Normalized が「都合の悪いフィールド」を捨て始める（→ lossless ルール違反。RawSnapshot/Extras に退避する）
 
 ### 5.2 Call（呼出）結果の標準形（Core §5「Call」対応）
 
@@ -468,6 +476,20 @@ Split Candidate: PhysicalLayout（構成例・CI・運用が増えた場合は�
   * Raw → Normalized の mapper 失敗は Normalized の責務
   * Normalized → Contracts の mapper 失敗は Contracts の責務
 * Wire は意味を扱わないため、本節で定義する失敗分類の対象外とする（Wire は転送失敗のみを扱う）。
+
+#### 16.2.1 lossless 正規化と失敗の扱い
+
+* Normalized は lossless を原則とするため、未知値を **直ちに捨てない**。
+  * 推奨：Unknown を保持した上で、必要な API（例：発注）で `Known` を要求する。
+  * Unknown をエラーとする場合：`CallErrorKind.Mapping`（または `Semantic`）で返し、元の raw 値を必ず含める。
+* Contracts は横断抽象化のため、情報を落とし得る（仕様上許容）。
+  * ただしデバッグ容易性のために、必要なら `CallMeta` に RawSnapshot を残す運用を許容する。
+
+#### 16.2.2 推奨テスト
+
+* Normalizer の回帰防止として、代表 JSON fixture を用いたテストを推奨する。
+  * Raw → Normalized で `RawSnapshot` が保持されること
+  * Unknown 値が `Unknown(raw)` として保持される、または `CallError` に raw 値が含まれること
 
 補足：Raw では enum を持たないため、「未知の状態値」「type/side/status の未知値」等は Raw の converter ではなく、
 Normalized の解釈（mapper/意味づけ）段階で `Mapping` または `Semantic` として扱う。

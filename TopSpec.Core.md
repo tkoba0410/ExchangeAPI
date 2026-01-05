@@ -98,8 +98,27 @@
 4. **Normalized は単独取引所内での正規化 DTO を保持するものとし、当該取引所の意味論（exchange semantics）に基づく解釈・正規化を担う。**
    * Normalized は取引所間の抽象化を目的としてはならない。
    * **注文種別・売買区分・状態・type 等の意味づけ（列挙化）、既定値注入、妥当性検証は Normalized の責務とする。**
+   * **Normalized は原則として情報欠落のない（lossless）正規化を行う。**
+     * 正規化とは「意味づけ（解釈）と型付け」を指し、元データの削除を目的としない。
+     * Raw に存在する情報は、Normalized DTO のいずれかに保持されなければならない（明示フィールド／退避領域）。
+   * **lossless のために、Normalized DTO は Raw 由来の退避領域を持つことを推奨する。**
+     * 推奨：`RawSnapshot`（Raw 応答 JSON のスナップショット）
+     * 推奨：`Extras`（明示マップされないフィールドの保持）
+     * 退避領域は JSON の表現を保持するために用いる。意味解釈は明示フィールド側で行う。
+   * **Closed set（列挙）化に伴う未知値は、原則として捨てずに保持する。**
+     * 推奨：`Known(enum)` / `Unknown(string raw)` のような表現で未知値を保持する。
+     * 「未知値をエラーにする」場合でも、`CallError` に元の raw 値を含める。
+   * **「意味が同一な表現差」の変換は欠落扱いにしない。**
+     * 例：数値の JSON 表現差（string/number/指数表記）→ `decimal`、日時表現差（ISO/Unix 秒/ms）→ `DateTimeOffset`
 5. **Contracts は複数取引所横断の抽象化 DTO を保持するものとし、横断的な意味論（cross-exchange semantics）を担う。**
    * Contracts は transport 情報および JSON 文字列を保持してはならない。
+
+### lossless 正規化の定義
+
+* **lossless（情報欠落なし）**とは、Raw が保持する情報が Normalized のいずれかに残ることを意味する。
+  * ただし「意味が同一な表現差」の統一（例：日時/数値の形式統一）は欠落扱いにしない。
+* Normalized から Contracts への抽象化は、横断語彙のために情報を落とし得る（これは仕様）。
+  * その場合も、必要なら `CallMeta` 等のデバッグ情報に RawSnapshot を残す運用を許容する。
 
 ### Call（呼出）結果の標準形
 

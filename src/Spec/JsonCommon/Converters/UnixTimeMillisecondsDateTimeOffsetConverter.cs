@@ -2,9 +2,9 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Spec.JsonCommon.Converters;
 
-internal sealed class UnixTimeMillisecondsDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
+public sealed class UnixTimeMillisecondsDateTimeOffsetConverter : ReadOnlyJsonConverter<DateTimeOffset>
 {
     public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -17,9 +17,4 @@ internal sealed class UnixTimeMillisecondsDateTimeOffsetConverter : JsonConverte
         return DateTimeOffset.FromUnixTimeMilliseconds(value);
     }
 
-    public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
-    {
-        throw new NotSupportedException(
-            "Raw JsonConverter is read-only (Deserialize only). Serialize is not allowed in Raw layer.");
-    }
 }

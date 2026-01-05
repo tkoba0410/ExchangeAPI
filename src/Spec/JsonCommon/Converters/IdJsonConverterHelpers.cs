@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Text.Json;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Spec.JsonCommon.Converters;
 
 internal static class IdJsonConverterHelpers
 {

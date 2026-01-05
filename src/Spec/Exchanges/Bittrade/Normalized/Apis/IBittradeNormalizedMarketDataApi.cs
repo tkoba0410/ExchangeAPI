@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Types;
 using ExchangeApi.Spec.CallCommon;

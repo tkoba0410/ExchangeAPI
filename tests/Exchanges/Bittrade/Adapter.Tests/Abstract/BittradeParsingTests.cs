@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;

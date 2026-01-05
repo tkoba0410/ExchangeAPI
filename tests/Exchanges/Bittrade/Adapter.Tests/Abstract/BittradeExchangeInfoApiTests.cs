@@ -4,7 +4,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
 using ExchangeApi.Spec.CallCommon;
 using Xunit;

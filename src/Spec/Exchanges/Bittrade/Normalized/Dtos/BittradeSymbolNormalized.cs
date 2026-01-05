@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+namespace ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 
 public sealed record BittradeSymbolNormalized(
     string Symbol,

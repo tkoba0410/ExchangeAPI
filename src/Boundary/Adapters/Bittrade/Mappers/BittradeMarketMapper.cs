@@ -4,7 +4,7 @@ using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;

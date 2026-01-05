@@ -3,7 +3,7 @@ using System.Linq;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
 internal static class BittradeMapper

@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.Dtos;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
 
 public sealed class RawGetChildOrdersResponse
 {

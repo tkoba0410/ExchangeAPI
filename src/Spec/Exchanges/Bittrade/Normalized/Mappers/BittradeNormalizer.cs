@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Internal;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalize;
+namespace ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 
 internal static class BittradeNormalizer
 {

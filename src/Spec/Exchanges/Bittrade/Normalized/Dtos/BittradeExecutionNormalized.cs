@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalize.Models;
+namespace ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 
 public sealed record BittradeExecutionNormalized(
     string Id,

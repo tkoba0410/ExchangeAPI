@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 using ExchangeApi.Spec.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
@@ -7,57 +8,57 @@ namespace ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 internal static class BittradeEndpoints
 {
     public static WireCallSpec GetTicker(string symbol) =>
-        Get("market/detail/merged", BuildQuery(
+        Get(BittradeConstants.Paths.MarketMerged, BuildQuery(
             ("symbol", symbol)));
 
     public static WireCallSpec GetOrderBook(string symbol, string? type) =>
-        Get("market/depth", BuildQuery(
+        Get(BittradeConstants.Paths.MarketDepth, BuildQuery(
             ("symbol", symbol),
             ("type", type)));
 
     public static WireCallSpec GetTrades(string symbol) =>
-        Get("market/trade", BuildQuery(
+        Get(BittradeConstants.Paths.MarketTrade, BuildQuery(
             ("symbol", symbol)));
 
     public static WireCallSpec GetKlines(string symbol, string period, int? size = null) =>
-        Get("market/history/kline", BuildQuery(
+        Get(BittradeConstants.Paths.MarketKline, BuildQuery(
             ("period", period),
             ("symbol", symbol),
             ("size", size?.ToString())));
 
-    public static WireCallSpec GetTickers() => Get("market/tickers", query: null);
+    public static WireCallSpec GetTickers() => Get(BittradeConstants.Paths.MarketTickers, query: null);
 
     public static WireCallSpec GetTradeHistory(string symbol) =>
-        Get("market/history/trade", BuildQuery(
+        Get(BittradeConstants.Paths.MarketHistoryTrade, BuildQuery(
             ("symbol", symbol)));
 
-    public static WireCallSpec GetTimestamp() => Get("v1/common/timestamp", query: null);
+    public static WireCallSpec GetTimestamp() => Get(BittradeConstants.Paths.CommonTimestamp, query: null);
 
-    public static WireCallSpec GetSymbols() => Get("v1/common/symbols", query: null);
+    public static WireCallSpec GetSymbols() => Get(BittradeConstants.Paths.CommonSymbols, query: null);
 
-    public static WireCallSpec GetCurrencies() => Get("v1/common/currencys", query: null);
+    public static WireCallSpec GetCurrencies() => Get(BittradeConstants.Paths.CommonCurrencies, query: null);
 
-    public static WireCallSpec GetRetailMaintainTime() => Get("v1/retail/maintain/time", query: null);
+    public static WireCallSpec GetRetailMaintainTime() => Get(BittradeConstants.Paths.RetailMaintainTime, query: null);
 
-    public static WireCallSpec GetAccounts() => Get("v1/account/accounts", query: null);
+    public static WireCallSpec GetAccounts() => Get(BittradeConstants.Paths.Accounts, query: null);
 
     public static WireCallSpec GetAccountBalance(string accountId)
     {
-        return Get($"v1/account/accounts/{accountId}/balance", query: null);
+        return Get($"{BittradeConstants.Paths.Accounts}/{accountId}/balance", query: null);
     }
 
     public static WireCallSpec GetOpenOrders(string symbol, string accountId)
     {
-        return Get("v1/order/openOrders", BuildQuery(
+        return Get(BittradeConstants.Paths.OrdersOpen, BuildQuery(
             ("symbol", symbol),
             ("account-id", accountId)));
     }
 
     public static WireCallSpec GetOrder(string orderId) =>
-        Get($"v1/order/orders/{orderId}", query: null);
+        Get($"{BittradeConstants.Paths.Orders}/{orderId}", query: null);
 
     public static WireCallSpec GetOrderMatchResults(string orderId) =>
-        Get($"v1/order/orders/{orderId}/matchresults", query: null);
+        Get($"{BittradeConstants.Paths.Orders}/{orderId}/matchresults", query: null);
 
     public static WireCallSpec GetOrders(
         string symbol,
@@ -68,7 +69,7 @@ internal static class BittradeEndpoints
         string? direct = null,
         int? size = null)
     {
-        return Get("v1/order/orders", BuildQuery(
+        return Get(BittradeConstants.Paths.Orders, BuildQuery(
             ("symbol", symbol),
             ("states", states),
             ("start-date", startDate),
@@ -87,7 +88,7 @@ internal static class BittradeEndpoints
         string? direct = null,
         int? size = null)
     {
-        return Get("v1/order/matchresults", BuildQuery(
+        return Get(BittradeConstants.Paths.OrdersMatchResults, BuildQuery(
             ("symbol", symbol),
             ("types", types),
             ("start-date", startDate),
@@ -104,7 +105,7 @@ internal static class BittradeEndpoints
         int? size = null,
         string? direct = null)
     {
-        return Get("v1/query/deposit-withdraw", BuildQuery(
+        return Get(BittradeConstants.Paths.DepositWithdraw, BuildQuery(
             ("type", type),
             ("currency", currency),
             ("from", from?.ToString()),
@@ -120,7 +121,7 @@ internal static class BittradeEndpoints
     {
         var startMs = startTime?.ToUnixTimeMilliseconds();
         var endMs = endTime?.ToUnixTimeMilliseconds();
-        return Get("v1/retail/order/list", BuildQuery(
+        return Get(BittradeConstants.Paths.RetailOrderList, BuildQuery(
             ("direct", direct.ToString()),
             ("status", status?.ToString()),
             ("start_time", startMs?.ToString()),
@@ -128,25 +129,25 @@ internal static class BittradeEndpoints
     }
 
     public static WireCallSpec PlaceOrder(string bodyJson) =>
-        Post("v1/order/orders/place", bodyJson);
+        Post(BittradeConstants.Paths.OrdersPlace, bodyJson);
 
     public static WireCallSpec CancelOrder(string orderId) =>
-        Post($"v1/order/orders/{orderId}/submitcancel", bodyJson: null);
+        Post($"{BittradeConstants.Paths.Orders}/{orderId}/submitcancel", bodyJson: null);
 
     public static WireCallSpec CancelOrders(string bodyJson) =>
-        Post("v1/order/orders/batchcancel", bodyJson);
+        Post(BittradeConstants.Paths.OrdersBatchCancel, bodyJson);
 
     public static WireCallSpec CancelOpenOrders(string bodyJson) =>
-        Post("v1/order/orders/batchCancelOpenOrders", bodyJson);
+        Post(BittradeConstants.Paths.OrdersBatchCancelOpen, bodyJson);
 
     public static WireCallSpec CreateWithdraw(string bodyJson) =>
-        Post("v1/dw/withdraw/api/create", bodyJson);
+        Post(BittradeConstants.Paths.WithdrawCreate, bodyJson);
 
     public static WireCallSpec CancelWithdraw(string withdrawId) =>
-        Post($"v1/dw/withdraw-virtual/{withdrawId}/cancel", bodyJson: null);
+        Post($"{BittradeConstants.Paths.WithdrawVirtual}/{withdrawId}/cancel", bodyJson: null);
 
     public static WireCallSpec CreateRetailOrder(string bodyJson) =>
-        Post("v1/retail/order/place", bodyJson);
+        Post(BittradeConstants.Paths.RetailOrderPlace, bodyJson);
 
     private static WireCallSpec Get(string path, string? query) =>
         new(Method: "GET", Path: path, Query: query);

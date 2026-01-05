@@ -4,7 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Http;
-namespace ExchangeApi.Exchanges.Bitflyer.Raw;
+
+namespace ExchangeApi.Exchanges.Bitflyer.Wire;
 
 internal sealed class BitflyerSigningTransport : IHttpTransport
 {

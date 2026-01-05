@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 /// <summary>
 /// /v1/me/getcollateral のレスポンス DTO。

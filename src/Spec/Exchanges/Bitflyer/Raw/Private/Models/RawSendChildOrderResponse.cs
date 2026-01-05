@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 public sealed class RawSendChildOrderResponse
 {

@@ -13,7 +13,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Spec.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;

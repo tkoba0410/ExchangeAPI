@@ -1,9 +1,9 @@
 using System;
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-
-public sealed class RawGetChildOrdersResponse
+public sealed class ChildOrderResponse
 {
     [JsonPropertyName("id")] public long Id { get; init; }
     [JsonPropertyName("child_order_id")] public string ChildOrderId { get; init; } = string.Empty;

@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Spec.CallCommon;
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 /// <summary>
 /// bitFlyer Private REST API への Raw アクセスインターフェース。

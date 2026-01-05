@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 /// <summary>/v1/me/sendparentorder リクエスト DTO。</summary>
 public sealed class CreateParentOrderRequest

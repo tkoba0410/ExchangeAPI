@@ -4,8 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Spec.CallCommon;
@@ -13,7 +12,7 @@ using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Domain.UseCases;
-using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet.ExecutionPrivateResponse;
+using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.Private.ExecutionPrivateResponse;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;

@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Spec.CallCommon;
 

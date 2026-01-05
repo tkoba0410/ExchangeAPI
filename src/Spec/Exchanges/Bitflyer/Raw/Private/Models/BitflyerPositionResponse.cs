@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 /// <summary>
 /// /v1/me/getpositions のレスポンス DTO。

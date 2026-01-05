@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;

@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;

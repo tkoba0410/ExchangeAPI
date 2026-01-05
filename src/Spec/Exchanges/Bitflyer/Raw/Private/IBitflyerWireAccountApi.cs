@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Spec.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 public interface IBitflyerRawAccountApi
 {

@@ -1,11 +1,11 @@
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using PrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 
 internal static class BitflyerRawMappers
 {
-    public static RawSendChildOrderRequest MapSendChildOrderRequest(PrivatePost.CreateChildOrderRequest request) => new()
+    public static RawSendChildOrderRequest MapSendChildOrderRequest(PrivateModels.CreateChildOrderRequest request) => new()
     {
         ProductCode = request.ProductCode,
         ChildOrderType = request.ChildOrderType,

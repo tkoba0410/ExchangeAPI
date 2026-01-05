@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 /// <summary>
 /// /v1/me/sendchildorder のレスポンス DTO。

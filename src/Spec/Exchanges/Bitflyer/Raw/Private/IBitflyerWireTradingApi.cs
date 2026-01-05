@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Spec.CallCommon;
 using Requests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 public interface IBitflyerRawPrivateTradingApi
 {

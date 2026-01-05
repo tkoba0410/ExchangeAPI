@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Types;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Spec.ValueCommon.ClosedSet;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;

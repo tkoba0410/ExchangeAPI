@@ -264,6 +264,17 @@ Split Candidate: なし
 
 ---
 
+## Contracts
+
+### Call が正規の返り値
+
+- Contracts 層の抽象 API は、外部境界の観測可能性（RawJson / CallMeta / Closed / lossless 正規化）を保持するため、原則として `Call<TRequest, TResponse>` を正規の返り値とする。
+- `TResponse` 直返し（Response 返り値）の API は Contracts として提供しない（利便性が必要な場合は利用側の拡張メソッド等で対応する）。
+
+参照: `docs/contracts/interfaces.md`
+
+---
+
 ## 7. 公開契約（Contracts）の背景（Core §7–8 対応）
 
 ### 7.1 Call / Outcome 採用理由

@@ -6,7 +6,7 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;

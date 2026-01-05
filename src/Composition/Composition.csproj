@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Common\Common\Shared.Common.csproj" />
-    <ProjectReference Include="..\Domain\Contracts\Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\Domain\Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Boundary\Adapters\Bitflyer\Exchange.Bitflyer.Adapter.csproj" />
     <ProjectReference Include="..\Boundary\Adapters\Bittrade\Exchange.Bittrade.Adapter.csproj" />

@@ -10,7 +10,7 @@ using ExchangeApi.Domain.UseCases;
 using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Http;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Factory;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;

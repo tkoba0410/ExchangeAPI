@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;

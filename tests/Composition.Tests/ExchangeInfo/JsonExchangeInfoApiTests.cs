@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Composition.ExchangeInfo;
+using ExchangeApi.Composition.Providers.ExchangeInfo;
 using Xunit;
 
 namespace Composition.Tests.ExchangeInfo;

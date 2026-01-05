@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Composition.Credentials;
+using ExchangeApi.Composition.Providers.Credentials;
 
 namespace Composition.Tests.Credentials;
 

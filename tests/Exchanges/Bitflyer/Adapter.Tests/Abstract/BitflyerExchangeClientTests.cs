@@ -8,7 +8,7 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Spec.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ContractSide = ExchangeApi.Common.Enums.Side;

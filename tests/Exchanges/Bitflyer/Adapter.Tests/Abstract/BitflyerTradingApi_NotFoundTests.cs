@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;

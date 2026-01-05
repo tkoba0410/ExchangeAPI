@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Ticker;

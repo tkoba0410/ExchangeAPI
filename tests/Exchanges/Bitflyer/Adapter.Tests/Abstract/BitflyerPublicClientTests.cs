@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;

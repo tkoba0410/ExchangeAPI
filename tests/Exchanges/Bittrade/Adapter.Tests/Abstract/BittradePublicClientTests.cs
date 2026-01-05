@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Core.Extensions;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Core.Transport.Protocol;

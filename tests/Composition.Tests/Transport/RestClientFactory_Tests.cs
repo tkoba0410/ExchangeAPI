@@ -7,7 +7,7 @@ using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Http;
-using ExchangeApi.Composition.Transport;
+using ExchangeApi.Composition.Bootstrap.Transport;
 
 namespace Composition.Tests.Transport;
 

@@ -1,6 +1,6 @@
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Spec.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
 

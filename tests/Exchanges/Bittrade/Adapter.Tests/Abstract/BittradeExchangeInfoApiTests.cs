@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Apis.ExchangeInfo;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;

@@ -3,12 +3,13 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Operations;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 

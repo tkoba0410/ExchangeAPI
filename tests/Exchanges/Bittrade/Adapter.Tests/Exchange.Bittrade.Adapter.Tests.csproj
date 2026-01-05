@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../../src/Domain/Common/Common/Shared.Common.csproj" />
-    <ProjectReference Include="../../../../src/Domain/Contracts/Contracts/Shared.Contracts.csproj" />
+    <ProjectReference Include="../../../../src/Domain/Contracts/Shared.Contracts.csproj" />
     <ProjectReference Include="../../../../src/Domain/Behavior/Domain/Shared.Domain.csproj" />
     <ProjectReference Include="../../../../src/Core/Core.csproj" />
     <ProjectReference Include="../../../../src/Boundary/Adapters/Bittrade/Exchange.Bittrade.Adapter.csproj" />

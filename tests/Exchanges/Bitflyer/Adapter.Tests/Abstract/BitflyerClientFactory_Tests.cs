@@ -3,7 +3,7 @@ using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Core.Transport.Policy;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Factory;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;

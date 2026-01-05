@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using ExchangeApi.Composition.Factory;
+using ExchangeApi.Composition.Bootstrap.Factories;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Call;

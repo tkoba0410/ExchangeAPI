@@ -11,6 +11,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Raw\Exchange.Bittrade.Raw.csproj" />
     <ProjectReference Include="..\..\..\..\Core\Core.csproj" />
-    <ProjectReference Include="..\..\..\..\Domain\Contracts\Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\Domain\Contracts\Shared.Contracts.csproj" />
   </ItemGroup>
 </Project>

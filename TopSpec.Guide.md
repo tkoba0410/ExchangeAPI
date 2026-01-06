@@ -273,6 +273,12 @@ Split Candidate: なし
 
 参照: `docs/contracts/interfaces.md`
 
+### Call-only（Transport は対象外）
+
+- Contracts/Normalized/Adapter/Client/Facade の公開 API は `Call<TRequest,TResponse>` を唯一の返り値とする。
+- `TResponse` 直返し API は提供しない（値が必要な場合は `call.Response` を参照する）。
+- Transport（`src/Core/Transport/**`）は wire 層であり、この規約の対象外とする。
+
 ---
 
 ## 7. 公開契約（Contracts）の背景（Core §7–8 対応）

@@ -1,5 +1,8 @@
 # Contracts Abstract APIs (Interfaces)
 
+この一覧に記載する Contracts 抽象 API は `Call<TRequest,TResponse>` を唯一の返り値とする（Call-only）。
+Transport 層（`src/Core/Transport/**`）は対象外。
+
 この文書は `src/Domain/Contracts/Interfaces/` に存在する **抽象化インターフェース**の一覧です。
 
 ## Columns

@@ -42,9 +42,12 @@ public sealed class BitflyerOrderKeyConnectivityTests
         var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, privateApi, markets);
         var api = new BitflyerTradingApi(normalized);
 
-        var result = await api.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
-        var status = await api.GetOrderAsync(new Symbol("BTC/JPY"), result.Key);
-        await api.CancelOrderAsync(new Symbol("BTC/JPY"), result.Key);
+        var resultCall = await api.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
+        var result = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderResult>.Ok>(resultCall.Result).Response;
+        var statusCall = await api.GetOrderCallAsync(new Symbol("BTC/JPY"), result.Key);
+        var status = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderStatus>.Ok>(statusCall.Result).Response;
+        var cancelCall = await api.CancelOrderCallAsync(new Symbol("BTC/JPY"), result.Key);
+        Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<CancelResult>.Ok>(cancelCall.Result);
 
         Assert.Equal(OrderIdKind.AcceptanceId, result.Key.Kind);
         Assert.Equal(acceptanceId, result.Key.Value);
@@ -78,11 +81,14 @@ public sealed class BitflyerOrderKeyConnectivityTests
         var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, privateApi, markets);
         var api = new BitflyerTradingApi(normalized);
 
-        var openOrders = await api.GetOrdersAsync(new Symbol("BTC/JPY"));
+        var openOrdersCall = await api.GetOrdersCallAsync(new Symbol("BTC/JPY"));
+        var openOrders = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<IReadOnlyList<OpenOrder>>.Ok>(openOrdersCall.Result).Response;
         var key = openOrders[0].Key;
 
-        var status = await api.GetOrderAsync(new Symbol("BTC/JPY"), key);
-        await api.CancelOrderAsync(new Symbol("BTC/JPY"), key);
+        var statusCall = await api.GetOrderCallAsync(new Symbol("BTC/JPY"), key);
+        var status = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderStatus>.Ok>(statusCall.Result).Response;
+        var cancelCall = await api.CancelOrderCallAsync(new Symbol("BTC/JPY"), key);
+        Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<CancelResult>.Ok>(cancelCall.Result);
 
         Assert.Equal(OrderIdKind.AcceptanceId, key.Kind);
         Assert.Equal(acceptanceId, key.Value);

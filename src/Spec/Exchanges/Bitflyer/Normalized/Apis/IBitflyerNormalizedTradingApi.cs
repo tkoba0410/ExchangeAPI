@@ -12,26 +12,6 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 
 public interface IBitflyerNormalizedTradingApi
 {
-    Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken cancellationToken = default);
-
-    Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default);
-
-    Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<BitflyerParentOrderNormalized>> GetParentOrdersAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default);
-
-    Task<BitflyerParentOrderDetailNormalized> GetParentOrderAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default);
-
     Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
         OrderRequest request,
         CancellationToken cancellationToken = default);

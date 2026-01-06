@@ -18,7 +18,9 @@ public class BittradeExchangeInfoApiTests
     {
         var api = new BittradeExchangeInfoApi(new StubNormalizedExchangeInfoApi());
 
-        var info = await api.GetExchangeInfoAsync();
+        var call = await api.GetExchangeInfoCallAsync();
+        var ok = Assert.IsType<CallResult<ExchangeInfo>.Ok>(call.Result);
+        var info = ok.Response;
 
         Assert.Single(info.Markets);
         var m = info.Markets[0];
@@ -33,20 +35,6 @@ public class BittradeExchangeInfoApiTests
 
     private sealed class StubNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
     {
-        public Task<IReadOnlyList<BittradeSymbolNormalized>> GetSymbolsAsync(System.Threading.CancellationToken ct = default) =>
-            Task.FromResult<IReadOnlyList<BittradeSymbolNormalized>>(new[]
-            {
-                new BittradeSymbolNormalized(
-                    Symbol: "btcjpy",
-                    BaseCurrency: "btc",
-                    QuoteCurrency: "jpy",
-                    PricePrecision: 2,
-                    AmountPrecision: 4,
-                    MinOrderAmount: 0.0001m,
-                    MinOrderValue: 1000m,
-                    State: "online")
-            });
-
         public Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
             System.Threading.CancellationToken ct = default)
         {

@@ -26,27 +26,6 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<BittradeTickerNormalized> GetTickerAsync(string symbol, CancellationToken ct = default)
-    {
-        var call = await GetTickerCallAsync(symbol, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.GetTicker");
-    }
-
-    public async Task<BittradeOrderBookNormalized> GetOrderBookAsync(
-        string symbol,
-        BittradeDepthType? depthType = null,
-        CancellationToken ct = default)
-    {
-        var call = await GetOrderBookCallAsync(symbol, depthType, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.GetOrderBook");
-    }
-
-    public async Task<IReadOnlyList<BittradeExecutionNormalized>> GetExecutionsAsync(string symbol, CancellationToken ct = default)
-    {
-        var call = await GetExecutionsCallAsync(symbol, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.GetExecutions");
-    }
-
     public async Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
         string symbol,
         CancellationToken ct = default)
@@ -174,21 +153,6 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
                 Result: new CallResult<TOk>.Err(error),
                 Meta: meta);
         }
-    }
-
-    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
-    {
-        return call.Result switch
-        {
-            CallResult<TRes>.Ok ok => ok.Response,
-            CallResult<TRes>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: ExchangeCode.Bittrade,
-                operation: operation,
-                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
-                innerException: err.Error.Exception),
-            _ => throw new InvalidOperationException("Unsupported CallResult type.")
-        };
     }
 
     private static void RequireOk(string? status, string operation)

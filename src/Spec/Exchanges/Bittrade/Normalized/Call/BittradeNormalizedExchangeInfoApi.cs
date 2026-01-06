@@ -25,12 +25,6 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<IReadOnlyList<BittradeSymbolNormalized>> GetSymbolsAsync(CancellationToken ct = default)
-    {
-        var call = await GetSymbolsCallAsync(ct).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.GetSymbols");
-    }
-
     public async Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
         CancellationToken ct = default)
     {
@@ -118,18 +112,4 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
         }
     }
 
-    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
-    {
-        return call.Result switch
-        {
-            CallResult<TRes>.Ok ok => ok.Response,
-            CallResult<TRes>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: ExchangeCode.Bittrade,
-                operation: operation,
-                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
-                innerException: err.Error.Exception),
-            _ => throw new InvalidOperationException("Unsupported CallResult type.")
-        };
-    }
 }

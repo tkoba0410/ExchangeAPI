@@ -54,30 +54,16 @@ public sealed class BittradeNormalizedMarketDataFacade
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
     }
 
-    public Task<BittradeTickerNormalized> GetTickerAsync(string symbol, CancellationToken ct = default) =>
-        _inner.GetTickerAsync(symbol, ct);
-
     public Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
         string symbol,
         CancellationToken ct = default) =>
         _inner.GetTickerCallAsync(symbol, ct);
-
-    public Task<BittradeOrderBookNormalized> GetOrderBookAsync(
-        string symbol,
-        BittradeDepthType? depthType = null,
-        CancellationToken ct = default) =>
-        _inner.GetOrderBookAsync(symbol, depthType, ct);
 
     public Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
         string symbol,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default) =>
         _inner.GetOrderBookCallAsync(symbol, depthType, ct);
-
-    public Task<IReadOnlyList<BittradeExecutionNormalized>> GetExecutionsAsync(
-        string symbol,
-        CancellationToken ct = default) =>
-        _inner.GetExecutionsAsync(symbol, ct);
 
     public Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
         string symbol,
@@ -94,9 +80,6 @@ public sealed class BittradeNormalizedExchangeInfoFacade
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
     }
 
-    public Task<IReadOnlyList<BittradeSymbolNormalized>> GetSymbolsAsync(CancellationToken ct = default) =>
-        _inner.GetSymbolsAsync(ct);
-
     public Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
         CancellationToken ct = default) =>
         _inner.GetSymbolsCallAsync(ct);
@@ -110,9 +93,6 @@ public sealed class BittradeNormalizedAccountFacade
     {
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
     }
-
-    public Task<IReadOnlyList<BittradeBalanceEntryNormalized>> GetBalancesAsync(CancellationToken ct = default) =>
-        _inner.GetBalancesAsync(ct);
 
     public Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetBalancesCallAsync(
         CancellationToken ct = default) =>

@@ -34,34 +34,6 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public async Task<Ticker> GetTickerAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
-    {
-        var call = await GetTickerCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.Market.GetTicker");
-    }
-
-    public async Task<OrderBook> GetOrderBookAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
-    {
-        var call = await GetOrderBookCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.Market.GetOrderBook");
-    }
-
-    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
-    {
-        var call = await GetMarketExecutionsCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.Market.GetExecutions");
-    }
-
-    public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
-        CommonSymbol symbol,
-        TimeSpan timescale,
-        DateTimeOffset? from = null,
-        DateTimeOffset? to = null,
-        CancellationToken cancellationToken = default)
-    {
-        throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, "Candlesticks");
-    }
-
     public async Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default)
@@ -71,7 +43,21 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
 
         try
         {
-            var apiSymbol = await ToApiSymbolAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<GetTickerRequest, Ticker>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    "Bittrade.Market.GetTicker");
+            }
+
+            var apiSymbol = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
+                .Response
+                .ProductCode
+                .Replace("_", string.Empty, StringComparison.Ordinal)
+                .ToLowerInvariant();
             var call = await _marketData.GetTickerCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -102,7 +88,21 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
 
         try
         {
-            var apiSymbol = await ToApiSymbolAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<GetOrderBookRequest, OrderBook>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    "Bittrade.Market.GetOrderBook");
+            }
+
+            var apiSymbol = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
+                .Response
+                .ProductCode
+                .Replace("_", string.Empty, StringComparison.Ordinal)
+                .ToLowerInvariant();
             var call = await _marketData.GetOrderBookCallAsync(apiSymbol, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -133,7 +133,21 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
 
         try
         {
-            var apiSymbol = await ToApiSymbolAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    "Bittrade.Market.GetExecutions");
+            }
+
+            var apiSymbol = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
+                .Response
+                .ProductCode
+                .Replace("_", string.Empty, StringComparison.Ordinal)
+                .ToLowerInvariant();
             var call = await _marketData.GetExecutionsCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -155,12 +169,6 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         }
     }
 
-    private async Task<string> ToApiSymbolAsync(CommonSymbol symbol, CancellationToken ct)
-    {
-        var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return market.ProductCode.Replace("_", string.Empty, StringComparison.Ordinal).ToLowerInvariant();
-    }
-
     private static IReadOnlyList<ExecutionMarket> ToExecutionList(
         CommonSymbol symbol,
         IReadOnlyList<BittradeExecutionNormalized> executions)
@@ -171,22 +179,24 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
         return mapped;
     }
 
-    private static TOk Unwrap<TReq, TOk>(Call<TReq, TOk> call, string operation)
+    private static Call<TReq, TOk> MarketResolutionError<TReq, TOk>(
+        TReq request,
+        Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
+        CallError error,
+        string component)
     {
-        return call.Result switch
-        {
-            CallResult<TOk>.Ok ok => ok.Response,
-            CallResult<TOk>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: Exchange,
-                operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
-            _ => throw new ExchangeApiException(
-                message: "Unknown call result.",
-                exchange: Exchange,
-                operation: operation,
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
-        };
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: component,
+            Tags: null,
+            Children: new[] { marketCall.Id });
+
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: marketCall.StartedAt,
+            Duration: marketCall.Duration,
+            Request: request,
+            Result: new CallResult<TOk>.Err(error),
+            Meta: meta);
     }
 }

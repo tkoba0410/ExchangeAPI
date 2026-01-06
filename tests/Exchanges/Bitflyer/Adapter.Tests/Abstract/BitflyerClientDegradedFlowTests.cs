@@ -11,6 +11,7 @@ using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Factory;
+using ExchangeApi.Spec.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
@@ -42,52 +43,54 @@ public class BitflyerClientDegradedFlowTests
             errorClassifier: null);
 
         // 1. balances（初回429後に成功）
-        var balances = await client.GetBalancesAsync();
+        var balances = Unwrap(await client.GetBalancesCallAsync(), "GetBalances");
         Assert.NotEmpty(balances);
 
         // 2. send order（劣化環境だが成功）
-        var orderResult = await client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), Side.Buy, new Size(0.001m));
+        var orderResult = Unwrap(await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), Side.Buy, new Size(0.001m)), "PlaceMarketOrder");
         Assert.False(string.IsNullOrWhiteSpace(orderResult.Key.Value));
 
         // 3. poll status（初回429後にCOMPLETED）
-        var status = await OrderPolling.WaitForOrderAsync(
+        var statusCall = await OrderPolling.WaitForOrderAsync(
             api: client,
             symbol: new Symbol("BTC/JPY"),
             orderKey: orderResult.Key,
             options: new PollingOptions(TimeSpan.FromMilliseconds(10), 3));
 
+        var status = Unwrap(statusCall, "PollOrderStatus");
         Assert.Equal(OrderState.Completed, status.Status);
 
         // 4. executions（約定履歴）
-        var executions = await client.GetMarketExecutionsAsync(new Symbol("BTC/JPY"));
+        var executions = Unwrap(await client.GetMarketExecutionsCallAsync(new Symbol("BTC/JPY")), "GetMarketExecutions");
         Assert.NotEmpty(executions);
 
         // 5. child orders 履歴（完了済みの履歴が返る）
-        var childOrders = await client.GetOrdersAsync(new Symbol("BTC/JPY"));
+        var childOrders = Unwrap(await client.GetOrdersCallAsync(new Symbol("BTC/JPY")), "GetOrders");
         Assert.NotEmpty(childOrders);
 
         // 6. positions（建玉ありの確認）
-        var positionsBeforeClose = await client.GetOpenPositionsAsync(new Symbol("BTC/JPY"));
+        var positionsBeforeClose = Unwrap(await client.GetOpenPositionsCallAsync(new Symbol("BTC/JPY")), "GetOpenPositions");
         Assert.NotEmpty(positionsBeforeClose);
 
         // 7. close order（反対売買で決済）→ poll status
-        var closeOrderResult = await client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), Side.Sell, new Size(0.001m));
+        var closeOrderResult = Unwrap(await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), Side.Sell, new Size(0.001m)), "PlaceMarketOrder");
         Assert.False(string.IsNullOrWhiteSpace(closeOrderResult.Key.Value));
 
-        var closeStatus = await OrderPolling.WaitForOrderAsync(
+        var closeStatusCall = await OrderPolling.WaitForOrderAsync(
             api: client,
             symbol: new Symbol("BTC/JPY"),
             orderKey: closeOrderResult.Key,
             options: new PollingOptions(TimeSpan.FromMilliseconds(10), 3));
 
+        var closeStatus = Unwrap(closeStatusCall, "PollOrderStatus");
         Assert.Equal(OrderState.Completed, closeStatus.Status);
 
         // 8. positions（決済後に空）
-        var positionsAfterClose = await client.GetOpenPositionsAsync(new Symbol("BTC/JPY"));
+        var positionsAfterClose = Unwrap(await client.GetOpenPositionsCallAsync(new Symbol("BTC/JPY")), "GetOpenPositions");
         Assert.Empty(positionsAfterClose);
 
         // 9. collateral（口座状態確認）
-        var collateral = await client.GetCollateralAsync();
+        var collateral = Unwrap(await client.GetCollateralCallAsync(), "GetCollateral");
         Assert.True(collateral.Amount > 0);
 
         // 呼び出し回数が劣化環境を通ったことを確認
@@ -261,5 +264,16 @@ public class BitflyerClientDegradedFlowTests
                 Content = new StringContent("{}", Encoding.UTF8, "application/json")
             };
         }
+    }
+
+    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
+    {
+        return call.Result switch
+        {
+            CallResult<TRes>.Ok ok => ok.Response,
+            CallResult<TRes>.Err err => throw new InvalidOperationException(
+                $"{operation} failed: {err.Error.Kind} {err.Error.Message}"),
+            _ => throw new InvalidOperationException($"{operation} returned unknown call result.")
+        };
     }
 }

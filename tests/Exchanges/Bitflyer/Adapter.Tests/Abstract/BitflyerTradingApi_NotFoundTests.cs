@@ -28,10 +28,9 @@ public sealed class BitflyerTradingApi_NotFoundTests
         var api = new BitflyerTradingApi(normalized);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-404");
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
-            api.GetOrderAsync(new Symbol("BTC/JPY"), key));
-        Assert.Contains("Order not found", ex.Message);
-        Assert.Null(ex.InnerException);
+        var call = await api.GetOrderCallAsync(new Symbol("BTC/JPY"), key);
+        var err = Assert.IsType<CallResult<OrderStatus>.Err>(call.Result);
+        Assert.Contains("Order not found", err.Error.Message);
     }
 
     [Fact]
@@ -44,10 +43,9 @@ public sealed class BitflyerTradingApi_NotFoundTests
         var api = new BitflyerTradingApi(normalized);
 
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, "JRF-404");
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
-            api.GetOrderAsync(new Symbol("BTC/JPY"), key));
-        Assert.Contains("Order not found", ex.Message);
-        Assert.Null(ex.InnerException);
+        var call = await api.GetOrderCallAsync(new Symbol("BTC/JPY"), key);
+        var err = Assert.IsType<CallResult<OrderStatus>.Err>(call.Result);
+        Assert.Contains("Order not found", err.Error.Message);
 
         Assert.Equal(key.Value, privateApi.LastChildOrderId);
         Assert.Null(privateApi.LastChildOrderAcceptanceId);

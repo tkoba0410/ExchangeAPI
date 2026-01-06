@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Interfaces;
@@ -31,34 +29,6 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
-    {
-        var call = await GetBalancesCallAsync(cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetBalances");
-    }
-
-    public async Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await GetAccountExecutionsCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetExecutions");
-    }
-
-    public async Task<IReadOnlyList<Position>> GetOpenPositionsAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        var call = await GetOpenPositionsCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetPositions");
-    }
-
-    public async Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default)
-    {
-        var call = await GetCollateralCallAsync(cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetCollateral");
-    }
-
     public async Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default)
     {
@@ -78,11 +48,20 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
-        var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var rawCall = await _accountApi
-            .GetExecutionsAsync(new RawRequests.GetAccountExecutionsRequest(productCode), cancellationToken)
-            .ConfigureAwait(false);
         var request = new GetAccountExecutionsRequest(symbol);
+        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        if (!TryGetProductCode(marketCall, out var productCode, out var marketError))
+        {
+            return CreateCallError<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(
+                marketCall,
+                request,
+                "Bitflyer.GetExecutions",
+                marketError!);
+        }
+
+        var rawCall = await _accountApi
+            .GetExecutionsAsync(new RawRequests.GetAccountExecutionsRequest(productCode!), cancellationToken)
+            .ConfigureAwait(false);
 
         return CreateCall(
             rawCall,
@@ -100,11 +79,20 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
-        var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var rawCall = await _accountApi
-            .GetPositionsAsync(new RawRequests.GetPositionsRequest(productCode), cancellationToken)
-            .ConfigureAwait(false);
         var request = new GetOpenPositionsRequest(symbol);
+        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        if (!TryGetProductCode(marketCall, out var productCode, out var marketError))
+        {
+            return CreateCallError<GetOpenPositionsRequest, IReadOnlyList<Position>>(
+                marketCall,
+                request,
+                "Bitflyer.GetPositions",
+                marketError!);
+        }
+
+        var rawCall = await _accountApi
+            .GetPositionsAsync(new RawRequests.GetPositionsRequest(productCode!), cancellationToken)
+            .ConfigureAwait(false);
 
         return CreateCall(
             rawCall,
@@ -121,12 +109,6 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
             .ConfigureAwait(false);
         var request = new GetCollateralRequest();
         return CreateCall(rawCall, request, "Bitflyer.GetCollateral", BitflyerMarginMapper.MapCollateral);
-    }
-
-    private async Task<string> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
-    {
-        var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return market.ProductCode;
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
@@ -193,18 +175,50 @@ internal sealed class BitflyerNormalizedMarginApi : IBitflyerNormalizedMarginApi
         }
     }
 
-    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
+    private static bool TryGetProductCode(
+        Call<ExchangeApi.Contracts.Requests.ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
+        out string? productCode,
+        out CallError? error)
     {
-        return call.Result switch
+        if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
         {
-            CallResult<TRes>.Ok ok => ok.Response,
-            CallResult<TRes>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: ExchangeCode.Bitflyer,
-                operation: operation,
-                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
-                innerException: err.Error.Exception),
-            _ => throw new InvalidOperationException("Unsupported CallResult type.")
-        };
+            productCode = null;
+            error = err.Error;
+            return false;
+        }
+
+        if (marketCall.Result is CallResult<ExchangeMarketInfo>.Ok ok &&
+            !string.IsNullOrWhiteSpace(ok.Response.ProductCode))
+        {
+            productCode = ok.Response.ProductCode;
+            error = null;
+            return true;
+        }
+
+        productCode = null;
+        error = new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code.");
+        return false;
     }
+
+    private static Call<TReq, TOk> CreateCallError<TReq, TOk>(
+        Call<ExchangeApi.Contracts.Requests.ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
+        TReq request,
+        string component,
+        CallError error)
+    {
+        var meta = new CallMeta(
+            Layer: "Normalized",
+            Component: component,
+            Tags: null,
+            Children: new[] { marketCall.Id });
+
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: marketCall.StartedAt,
+            Duration: marketCall.Duration,
+            Request: request,
+            Result: new CallResult<TOk>.Err(error),
+            Meta: meta);
+    }
+
 }

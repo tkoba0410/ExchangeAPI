@@ -13,6 +13,13 @@ using ExchangeApi.Spec.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
+using ContractTicker = ExchangeApi.Contracts.Dtos.Ticker;
+using ContractOrderBook = ExchangeApi.Contracts.Dtos.OrderBook;
+using ContractOpenOrder = ExchangeApi.Contracts.Dtos.OpenOrder;
+using ContractBalance = ExchangeApi.Contracts.Dtos.Balance;
+using ContractPosition = ExchangeApi.Contracts.Dtos.Position;
+using ContractCollateral = ExchangeApi.Contracts.Dtos.Collateral;
+using ContractCancelResult = ExchangeApi.Contracts.Dtos.CancelResult;
 using Xunit;
 
 
@@ -46,11 +53,13 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var client = CreateClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
             // Act
-        var ticker = await client.GetTickerAsync(new Symbol("BTC/JPY"));
+            var call = await client.GetTickerCallAsync(new Symbol("BTC/JPY"));
+            var ok = Assert.IsType<CallResult<ContractTicker>.Ok>(call.Result);
+            ContractTicker ticker = ok.Response;
 
-        Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
-        Assert.Equal(new Price(raw.LastTradedPrice), ticker.LastTradedPrice);
-        Assert.Equal(raw.Timestamp /* 正規化 */, ticker.Timestamp);
+            Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
+            Assert.Equal(new Price(raw.LastTradedPrice), ticker.LastTradedPrice);
+            Assert.Equal(raw.Timestamp /* 正規化 */, ticker.Timestamp);
         }
 
         [Fact]
@@ -78,8 +87,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = CreateClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
-        await Assert.ThrowsAsync<SymbolNotSupportedException>(() =>
-            client.GetTickerAsync(Symbol.Empty));
+            var call = await client.GetTickerCallAsync(Symbol.Empty);
+            var err = Assert.IsType<CallResult<ContractTicker>.Err>(call.Result);
+            Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
 
 
         }
@@ -121,7 +131,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = CreateClient(fakeApi, fakePrivateApi, fakeTradingApi);
 
-            var board = await client.GetOrderBookAsync(new Symbol("BTC/JPY"));
+            var call = await client.GetOrderBookCallAsync(new Symbol("BTC/JPY"));
+            var ok = Assert.IsType<CallResult<ContractOrderBook>.Ok>(call.Result);
+            ContractOrderBook board = ok.Response;
 
             Assert.Single(board.Bids);
             Assert.Single(board.Asks);
@@ -157,7 +169,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var fakeTrading = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = CreateClient(fakePublic, fakePrivate, fakeTrading);
 
-            var result = await client.GetOrdersAsync(new Symbol("BTC/JPY"));
+            var call = await client.GetOrdersCallAsync(new Symbol("BTC/JPY"));
+            var ok = Assert.IsType<CallResult<IReadOnlyList<ContractOpenOrder>>.Ok>(call.Result);
+            IReadOnlyList<ContractOpenOrder> result = ok.Response;
 
             Assert.Single(result);
             var order = result[0];
@@ -183,7 +197,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = CreateClient(publicApi, privateApi, tradingApi);
 
-            var result = await client.GetBalancesAsync();
+            var call = await client.GetBalancesCallAsync();
+            var ok = Assert.IsType<CallResult<IReadOnlyList<ContractBalance>>.Ok>(call.Result);
+            IReadOnlyList<ContractBalance> result = ok.Response;
 
             Assert.Equal(2, result.Count);
             Assert.Contains(result, b => b.Currency == "JPY" && b.Amount == 10000m && b.Available == 8000m);
@@ -212,7 +228,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = CreateClient(publicApi, privateApi, tradingApi);
 
-            var result = await client.GetOpenPositionsAsync(new Symbol("BTC/JPY"));
+            var call = await client.GetOpenPositionsCallAsync(new Symbol("BTC/JPY"));
+            var ok = Assert.IsType<CallResult<IReadOnlyList<ContractPosition>>.Ok>(call.Result);
+            IReadOnlyList<ContractPosition> result = ok.Response;
 
             Assert.Single(result);
             var pos = result[0];
@@ -240,26 +258,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
             var client = CreateClient(publicApi, privateApi, tradingApi);
 
-            var result = await client.GetCollateralAsync();
+            var call = await client.GetCollateralCallAsync();
+            var ok = Assert.IsType<CallResult<ContractCollateral>.Ok>(call.Result);
+            ContractCollateral result = ok.Response;
 
             Assert.Equal(collateral.Collateral, result.Amount);
             Assert.Equal(collateral.OpenPositionPnl, result.OpenPositionPnl);
             Assert.Equal(collateral.RequireCollateral, result.RequireCollateral);
             Assert.Equal(collateral.KeepRate, result.KeepRate);
-        }
-
-        [Fact]
-        public async Task GetTradingCommissionAsync_ReturnsRawJson()
-        {
-            var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
-            var publicApi = new FakeBitflyerPublicApi(rawTicker);
-            var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
-            var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = CreateClient(publicApi, privateApi, tradingApi);
-
-            var result = await client.GetTradingCommissionAsync(new Symbol("BTC/JPY"));
-
-            Assert.Equal(JsonValueKind.Object, result.ValueKind);
         }
 
         [Fact]
@@ -271,8 +277,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var tradingApi = new NullCancelTradingApi();
             var client = CreateClient(publicApi, accountApi, tradingApi);
 
-            await Assert.ThrowsAsync<ExchangeApiException>(() =>
-                client.CancelOrderAsync(new Symbol("BTC/JPY"), new OrderKey(OrderIdKind.AcceptanceId, "id-1")));
+            var call = await client.CancelOrderCallAsync(new Symbol("BTC/JPY"), new OrderKey(OrderIdKind.AcceptanceId, "id-1"));
+            var err = Assert.IsType<CallResult<ContractCancelResult>.Err>(call.Result);
+            Assert.Equal(CallErrorKind.Http, err.Error.Kind);
         }
 
         private static BitflyerExchangeClient CreateClient(

@@ -17,23 +17,6 @@ public sealed class ExchangeClientExtensionsTests
 {
     private sealed class DummyMarketApi : IMarketDataApi
     {
-        public Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
-            Symbol symbol,
-            TimeSpan timescale,
-            DateTimeOffset? from = null,
-            DateTimeOffset? to = null,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
         public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
@@ -48,58 +31,6 @@ public sealed class ExchangeClientExtensionsTests
 
     private sealed class DummyTradingApi : ITradingApi
     {
-        public Task<OrderResult> PlaceLimitOrderAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            Price price,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderResult> PlaceMarketOrderAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderResult> PlaceStopOrderAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            Price triggerPrice,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<CancelResult> CancelOrderAsync(
-            Symbol symbol,
-            OrderKey orderKey,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderStatus> GetOrderAsync(
-            Symbol symbol,
-            OrderKey orderKey,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<ParentOrderDetail> GetParentOrderAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
         public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
             Symbol symbol,
             Side side,
@@ -157,14 +88,6 @@ public sealed class ExchangeClientExtensionsTests
 
     private sealed class DummyAccountApi : IAccountApi
     {
-        public Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(
-            Symbol symbol,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
         public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
@@ -177,9 +100,6 @@ public sealed class ExchangeClientExtensionsTests
 
     private sealed class DummyExchangeInfoApi : IExchangeInfoApi
     {
-        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
         public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();

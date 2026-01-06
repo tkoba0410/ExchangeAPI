@@ -9,7 +9,6 @@ using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
-using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
@@ -30,12 +29,6 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
     public BittradeExchangeInfoApi(IBittradeNormalizedExchangeInfoApi normalized)
     {
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
-    }
-
-    public async Task<ExchangeInfoDto> GetExchangeInfoAsync(CancellationToken cancellationToken = default)
-    {
-        var call = await GetExchangeInfoCallAsync(cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.ExchangeInfo.GetExchangeInfo");
     }
 
     public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
@@ -93,22 +86,4 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
     private static decimal Pow10(int power) =>
         (decimal)Math.Pow(10, power);
 
-    private static TOk Unwrap<TReq, TOk>(Call<TReq, TOk> call, string operation)
-    {
-        return call.Result switch
-        {
-            CallResult<TOk>.Ok ok => ok.Response,
-            CallResult<TOk>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: Exchange,
-                operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
-            _ => throw new ExchangeApiException(
-                message: "Unknown call result.",
-                exchange: Exchange,
-                operation: operation,
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
-        };
-    }
 }

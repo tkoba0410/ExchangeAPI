@@ -6,6 +6,8 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Contracts.Requests;
+using ExchangeApi.Spec.CallCommon;
 
 namespace ExchangeApi.Domain.UseCases;
 
@@ -14,7 +16,7 @@ namespace ExchangeApi.Domain.UseCases;
 /// </summary>
 public static class OrderPolling
 {
-    public static async Task<OrderStatus> WaitForOrderAsync(
+    public static async Task<Call<GetOrderRequest, OrderStatus>> WaitForOrderAsync(
         ITradingApi api,
         Symbol symbol,
         OrderKey orderKey,
@@ -38,27 +40,31 @@ public static class OrderPolling
             throw new ArgumentOutOfRangeException(nameof(options), "Interval must be non-negative.");
         }
 
-        OrderStatus? latest = null;
+        Call<GetOrderRequest, OrderStatus>? latest = null;
 
         for (var attempt = 0; attempt < resolvedOptions.MaxAttempts; attempt++)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            try
+            latest = await api.GetOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
+            if (latest.Result is CallResult<OrderStatus>.Err err)
             {
-                latest = await api.GetOrderAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
-            }
-            catch (ExchangeOrderNotFoundException) when (resolvedOptions.NotFoundPolicy == NotFoundPolicy.Continue)
-            {
-                if (attempt < resolvedOptions.MaxAttempts - 1 && resolvedOptions.Interval > TimeSpan.Zero)
+                if (err.Error.Exception is ExchangeOrderNotFoundException &&
+                    resolvedOptions.NotFoundPolicy == NotFoundPolicy.Continue)
                 {
-                    await Task.Delay(resolvedOptions.Interval, cancellationToken).ConfigureAwait(false);
+                    if (attempt < resolvedOptions.MaxAttempts - 1 && resolvedOptions.Interval > TimeSpan.Zero)
+                    {
+                        await Task.Delay(resolvedOptions.Interval, cancellationToken).ConfigureAwait(false);
+                    }
+
+                    continue;
                 }
 
-                continue;
+                return latest;
             }
 
-            if (IsTerminal(latest.Status))
+            if (latest.Result is CallResult<OrderStatus>.Ok ok &&
+                IsTerminal(ok.Response.Status))
             {
                 return latest;
             }

@@ -46,11 +46,22 @@ internal static class BitflyerTestHelpers
 
         public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
 
-        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(_info);
-
         public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
-            CancellationToken cancellationToken = default) =>
-            throw new System.NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            var meta = new CallMeta(
+                Layer: "Contracts",
+                Component: "StubExchangeInfoApi",
+                Tags: null,
+                Children: null);
+            var call = new Call<GetExchangeInfoRequest, ExchangeInfo>(
+                Id: CallId.New(),
+                StartedAt: System.DateTimeOffset.UtcNow,
+                Duration: System.TimeSpan.Zero,
+                Request: new GetExchangeInfoRequest(),
+                Result: new CallResult<ExchangeInfo>.Ok(_info),
+                Meta: meta);
+            return Task.FromResult(call);
+        }
     }
 }

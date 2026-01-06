@@ -27,67 +27,13 @@ internal sealed class MarketApi : IMarketDataApi
 {
     private readonly BitflyerNormalizedMarketDataFacade _marketData;
     private readonly IExchangeMarketResolver _markets;
-    private readonly ExchangeCode _exchange;
 
     public MarketApi(
         BitflyerNormalizedMarketDataFacade marketData,
-        IExchangeMarketResolver markets,
-        ExchangeCode exchange = ExchangeCode.Bitflyer)
+        IExchangeMarketResolver markets)
     {
         _marketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
-        _exchange = exchange;
-    }
-
-    public async Task<CommonTicker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default)
-    {
-        var call = await GetTickerCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, BitflyerOperations.MarketData.GetTicker);
-    }
-
-    public async Task<OrderBook> GetOrderBookAsync(Symbol symbol, CancellationToken cancellationToken = default)
-    {
-        var call = await GetOrderBookCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, BitflyerOperations.MarketData.GetOrderBook);
-    }
-
-    public async Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default)
-    {
-        var call = await GetMarketExecutionsCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, BitflyerOperations.MarketData.GetExecutions);
-    }
-
-    public Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(
-        Symbol symbol,
-        TimeSpan timescale,
-        DateTimeOffset? from = null,
-        DateTimeOffset? to = null,
-        CancellationToken cancellationToken = default)
-    {
-        // bitFlyer RESTでは未サポート。将来Raw経由で実装する場合はここを置き換える。
-        throw new ExchangeFeatureNotSupportedException(_exchange, "Candlesticks");
-    }
-
-    public async Task<BitflyerHealthNormalized> GetHealthAsync(Symbol symbol, CancellationToken cancellationToken = default)
-    {
-        if (symbol.IsEmpty)
-        {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
-        }
-
-        var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return await _marketData.GetHealthAsync(productCode, cancellationToken).ConfigureAwait(false);
-    }
-
-    public async Task<BitflyerBoardStateNormalized> GetBoardStateAsync(Symbol symbol, CancellationToken cancellationToken = default)
-    {
-        if (symbol.IsEmpty)
-        {
-            throw new ArgumentException("symbol is required.", nameof(symbol));
-        }
-
-        var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
-        return await _marketData.GetBoardStateAsync(productCode, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(
@@ -99,7 +45,17 @@ internal sealed class MarketApi : IMarketDataApi
 
         try
         {
-            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<GetTickerRequest, CommonTicker>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    BitflyerOperations.MarketData.GetTicker);
+            }
+
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _marketData.GetTickerCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -130,7 +86,17 @@ internal sealed class MarketApi : IMarketDataApi
 
         try
         {
-            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<GetOrderBookRequest, OrderBook>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    BitflyerOperations.MarketData.GetOrderBook);
+            }
+
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _marketData.GetOrderBookCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -161,7 +127,17 @@ internal sealed class MarketApi : IMarketDataApi
 
         try
         {
-            var productCode = await ToApiProductCodeAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    BitflyerOperations.MarketData.GetExecutions);
+            }
+
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _marketData.GetExecutionsCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -183,12 +159,6 @@ internal sealed class MarketApi : IMarketDataApi
         }
     }
 
-    private async Task<string> ToApiProductCodeAsync(Symbol symbol, CancellationToken ct)
-    {
-        var market = await _markets.ResolveAsync(symbol, ct).ConfigureAwait(false);
-        return market.ProductCode;
-    }
-
     private static IReadOnlyList<ExecutionMarket> ToExecutionList(
         Symbol symbol,
         IReadOnlyList<BitflyerExecutionNormalized> executions)
@@ -199,22 +169,24 @@ internal sealed class MarketApi : IMarketDataApi
         return mapped;
     }
 
-    private static TOk Unwrap<TReq, TOk>(Call<TReq, TOk> call, string operation)
+    private static Call<TReq, TOk> MarketResolutionError<TReq, TOk>(
+        TReq request,
+        Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
+        CallError error,
+        string component)
     {
-        return call.Result switch
-        {
-            CallResult<TOk>.Ok ok => ok.Response,
-            CallResult<TOk>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: ExchangeCode.Bitflyer,
-                operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
-            _ => throw new ExchangeApiException(
-                message: "Unknown call result.",
-                exchange: ExchangeCode.Bitflyer,
-                operation: operation,
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
-        };
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: component,
+            Tags: null,
+            Children: new[] { marketCall.Id });
+
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: marketCall.StartedAt,
+            Duration: marketCall.Duration,
+            Request: request,
+            Result: new CallResult<TOk>.Err(error),
+            Meta: meta);
     }
 }

@@ -9,7 +9,7 @@
 - member: シグネチャ（末尾 `;` は省略）
 - area: client / auth / info / market / trading / account / raw
 - source: 実体ファイルパス
-- flags: 補足タグ（例: `call_variant`, `lossless_hook`）
+- flags: 補足タグ（例: `lossless_hook`）
 
 ---
 
@@ -17,10 +17,8 @@
 
 | id | kind | member | area | source | flags |
 | -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IAccountApi:GetAccountExecutionsAsync | method | Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(Symbol symbol, CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IAccountApi.cs |  |
-| contracts:IAccountApi:GetAccountExecutionsCallAsync | method | Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IAccountApi.cs | call_variant |
-| contracts:IAccountApi:GetBalancesAsync | method | Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IAccountApi.cs |  |
-| contracts:IAccountApi:GetBalancesCallAsync | method | Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IAccountApi.cs | call_variant |
+| contracts:IAccountApi:GetAccountExecutionsCallAsync | method | Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IAccountApi.cs |  |
+| contracts:IAccountApi:GetBalancesCallAsync | method | Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IAccountApi.cs |  |
 
 ---
 
@@ -50,8 +48,7 @@
 
 | id | kind | member | area | source | flags |
 | -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IExchangeInfoApi:GetExchangeInfoAsync | method | Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) | info | src/Domain/Contracts/Interfaces/IExchangeInfoApi.cs |  |
-| contracts:IExchangeInfoApi:GetExchangeInfoCallAsync | method | Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(CancellationToken cancellationToken = default) | info | src/Domain/Contracts/Interfaces/IExchangeInfoApi.cs | call_variant |
+| contracts:IExchangeInfoApi:GetExchangeInfoCallAsync | method | Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(CancellationToken cancellationToken = default) | info | src/Domain/Contracts/Interfaces/IExchangeInfoApi.cs |  |
 
 ---
 
@@ -59,7 +56,7 @@
 
 | id | kind | member | area | source | flags |
 | -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IExchangeMarketResolver:ResolveAsync | method | Task<ExchangeMarketInfo> ResolveAsync(Symbol symbol, CancellationToken cancellationToken = default) | info | src/Domain/Contracts/Interfaces/IExchangeMarketResolver.cs |  |
+| contracts:IExchangeMarketResolver:ResolveCallAsync | method | Task<Call<ResolveExchangeMarketRequest, ExchangeMarketInfo>> ResolveCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | info | src/Domain/Contracts/Interfaces/IExchangeMarketResolver.cs |  |
 
 ---
 
@@ -83,10 +80,8 @@
 
 | id | kind | member | area | source | flags |
 | -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IMarginAccountApi:GetCollateralAsync | method | Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IMarginAccountApi.cs |  |
-| contracts:IMarginAccountApi:GetCollateralCallAsync | method | Task<Call<GetCollateralRequest, Collateral>> GetCollateralCallAsync(CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IMarginAccountApi.cs | call_variant |
-| contracts:IMarginAccountApi:GetOpenPositionsAsync | method | Task<IReadOnlyList<Position>> GetOpenPositionsAsync(Symbol symbol, CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IMarginAccountApi.cs |  |
-| contracts:IMarginAccountApi:GetOpenPositionsCallAsync | method | Task<Call<GetOpenPositionsRequest, IReadOnlyList<Position>>> GetOpenPositionsCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IMarginAccountApi.cs | call_variant |
+| contracts:IMarginAccountApi:GetCollateralCallAsync | method | Task<Call<GetCollateralRequest, Collateral>> GetCollateralCallAsync(CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IMarginAccountApi.cs |  |
+| contracts:IMarginAccountApi:GetOpenPositionsCallAsync | method | Task<Call<GetOpenPositionsRequest, IReadOnlyList<Position>>> GetOpenPositionsCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IMarginAccountApi.cs |  |
 
 ---
 
@@ -94,16 +89,9 @@
 
 | id | kind | member | area | source | flags |
 | -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IMarketDataApi:GetCandlestickColumnsAsync | method | Task<CandlestickColumnar> GetCandlestickColumnsAsync(Symbol symbol, Timescale timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
-| contracts:IMarketDataApi:GetCandlestickColumnsCallAsync | method | Task<Call<GetCandlestickColumnsRequest, CandlestickColumnar>> GetCandlestickColumnsCallAsync(Symbol symbol, Timescale timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs | call_variant |
-| contracts:IMarketDataApi:GetCandlesticksAsync | method | Task<IReadOnlyList<Candlestick>> GetCandlesticksAsync(Symbol symbol, Timescale timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
-| contracts:IMarketDataApi:GetCandlesticksCallAsync | method | Task<Call<GetCandlesticksRequest, IReadOnlyList<Candlestick>>> GetCandlesticksCallAsync(Symbol symbol, Timescale timescale, DateTimeOffset? from = null, DateTimeOffset? to = null, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs | call_variant |
-| contracts:IMarketDataApi:GetMarketExecutionsAsync | method | Task<IReadOnlyList<ExecutionMarket>> GetMarketExecutionsAsync(Symbol symbol, ExecutionQuery? query = null, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
-| contracts:IMarketDataApi:GetMarketExecutionsCallAsync | method | Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(Symbol symbol, ExecutionQuery? query = null, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs | call_variant |
-| contracts:IMarketDataApi:GetOrderBookAsync | method | Task<OrderBook> GetOrderBookAsync(Symbol symbol, OrderBookDepth depth = OrderBookDepth.Default, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
-| contracts:IMarketDataApi:GetOrderBookCallAsync | method | Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(Symbol symbol, OrderBookDepth depth = OrderBookDepth.Default, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs | call_variant |
-| contracts:IMarketDataApi:GetTickerAsync | method | Task<Ticker> GetTickerAsync(Symbol symbol, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
-| contracts:IMarketDataApi:GetTickerCallAsync | method | Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs | call_variant |
+| contracts:IMarketDataApi:GetMarketExecutionsCallAsync | method | Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
+| contracts:IMarketDataApi:GetOrderBookCallAsync | method | Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
+| contracts:IMarketDataApi:GetTickerCallAsync | method | Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
 
 ---
 
@@ -111,15 +99,11 @@
 
 | id | kind | member | area | source | flags |
 | -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:ITradingApi:CancelOrderAsync | method | Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:CancelOrderCallAsync | method | Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs | call_variant |
-| contracts:ITradingApi:GetOrderAsync | method | Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:GetOrderCallAsync | method | Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs | call_variant |
-| contracts:ITradingApi:GetOrdersAsync | method | Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:GetOrdersCallAsync | method | Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs | call_variant |
-| contracts:ITradingApi:PlaceLimitOrderAsync | method | Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, Size size, Price price, TimeInForce? timeInForce = null, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:PlaceLimitOrderCallAsync | method | Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(Symbol symbol, Side side, Size size, Price price, TimeInForce? timeInForce = null, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs | call_variant |
-| contracts:ITradingApi:PlaceMarketOrderAsync | method | Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:PlaceMarketOrderCallAsync | method | Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs | call_variant |
-| contracts:ITradingApi:PlaceStopOrderAsync | method | Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:PlaceStopOrderCallAsync | method | Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs | call_variant |
+| contracts:ITradingApi:CancelOrderCallAsync | method | Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
+| contracts:ITradingApi:GetOrderCallAsync | method | Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
+| contracts:ITradingApi:GetOrdersCallAsync | method | Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
+| contracts:ITradingApi:PlaceLimitOrderCallAsync | method | Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
+| contracts:ITradingApi:PlaceMarketOrderCallAsync | method | Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
+| contracts:ITradingApi:PlaceStopOrderCallAsync | method | Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
+| contracts:ITradingApi:GetParentOrdersCallAsync | method | Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
+| contracts:ITradingApi:GetParentOrderCallAsync | method | Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |

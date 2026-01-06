@@ -41,7 +41,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var client = CreateClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
             // Act
-            IReadOnlyList<Balance> result = await client.GetBalancesAsync();
+            var call = await client.GetBalancesCallAsync();
+            var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
+            IReadOnlyList<Balance> result = ok.Response;
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -70,7 +72,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var client = CreateClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
             // Act
-            IReadOnlyList<Balance> result = await client.GetBalancesAsync();
+            var call = await client.GetBalancesCallAsync();
+            var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
+            IReadOnlyList<Balance> result = ok.Response;
 
             // Assert
             Assert.Empty(result);

@@ -14,38 +14,6 @@ namespace ExchangeApi.Contracts.Interfaces;
 /// </summary>
 public interface ITradingApi
 {
-    Task<OrderResult> PlaceLimitOrderAsync(
-        Symbol symbol,
-        Side side,
-        Size size,
-        Price price,
-        CancellationToken cancellationToken = default);
-
-    Task<OrderResult> PlaceMarketOrderAsync(
-        Symbol symbol,
-        Side side,
-        Size size,
-        CancellationToken cancellationToken = default);
-
-    Task<OrderResult> PlaceStopOrderAsync(
-        Symbol symbol,
-        Side side,
-        Size size,
-        Price triggerPrice,
-        CancellationToken cancellationToken = default);
-
-    Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 注文の状態を単発で取得する。
-    /// </summary>
-    Task<OrderStatus> GetOrderAsync(
-        Symbol symbol,
-        OrderKey orderKey,
-        CancellationToken cancellationToken = default);
-
     Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         Symbol symbol,
         Side side,
@@ -78,18 +46,6 @@ public interface ITradingApi
     Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
-        CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default);
-
-    Task<ParentOrderDetail> GetParentOrderAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(

@@ -24,97 +24,11 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 internal sealed class BitflyerTradingApi : ITradingApi
 {
     private readonly IBitflyerNormalizedTradingApi _tradingApi;
-    private readonly ExchangeCode _exchange;
 
     public BitflyerTradingApi(
-        IBitflyerNormalizedTradingApi tradingApi,
-        ExchangeCode exchange = ExchangeCode.Bitflyer)
+        IBitflyerNormalizedTradingApi tradingApi)
     {
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
-        _exchange = exchange;
-    }
-
-    public Task<OrderResult> PlaceLimitOrderAsync(
-        Symbol symbol,
-        ContractSide side,
-        Size size,
-        Price price,
-        CancellationToken cancellationToken = default) =>
-        UnwrapAsync(
-            PlaceLimitOrderCallAsync(symbol, side, size, price, cancellationToken),
-            BitflyerOperations.Trading.PlaceOrder);
-
-    public Task<OrderResult> PlaceMarketOrderAsync(
-        Symbol symbol,
-        ContractSide side,
-        Size size,
-        CancellationToken cancellationToken = default) =>
-        UnwrapAsync(
-            PlaceMarketOrderCallAsync(symbol, side, size, cancellationToken),
-            BitflyerOperations.Trading.PlaceOrder);
-
-    public Task<OrderResult> PlaceStopOrderAsync(
-        Symbol symbol,
-        ContractSide side,
-        Size size,
-        Price triggerPrice,
-        CancellationToken cancellationToken = default) =>
-        throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, "StopOrder");
-
-    public async Task<CancelResult> CancelOrderAsync(
-        Symbol symbol,
-        OrderKey orderKey,
-        CancellationToken cancellationToken = default)
-    {
-        return await UnwrapAsync(
-                CancelOrderCallAsync(symbol, orderKey, cancellationToken),
-                BitflyerOperations.Trading.CancelOrder)
-            .ConfigureAwait(false);
-    }
-
-    public async Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        return await UnwrapAsync(
-                GetOrdersCallAsync(symbol, cancellationToken),
-                BitflyerOperations.Trading.GetOpenOrders)
-            .ConfigureAwait(false);
-    }
-
-    public async Task<OrderStatus> GetOrderAsync(
-        Symbol symbol,
-        OrderKey orderKey,
-        CancellationToken cancellationToken = default)
-    {
-        return await UnwrapAsync(
-                GetOrderCallAsync(symbol, orderKey, cancellationToken),
-                BitflyerOperations.Trading.GetOrder)
-            .ConfigureAwait(false);
-    }
-
-    public async Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default)
-    {
-        return await UnwrapAsync(
-                GetParentOrdersCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken),
-                BitflyerOperations.Trading.GetParentOrders)
-            .ConfigureAwait(false);
-    }
-
-    public async Task<ParentOrderDetail> GetParentOrderAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default)
-    {
-        return await UnwrapAsync(
-                GetParentOrderCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken),
-                BitflyerOperations.Trading.GetParentOrder)
-            .ConfigureAwait(false);
     }
 
     public async Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
@@ -320,28 +234,6 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 BitflyerOperations.Trading.GetParentOrder,
                 ex);
         }
-    }
-
-    private static async Task<TOk> UnwrapAsync<TReq, TOk>(
-        Task<Call<TReq, TOk>> callTask,
-        string operation)
-    {
-        var call = await callTask.ConfigureAwait(false);
-        return call.Result switch
-        {
-            CallResult<TOk>.Ok ok => ok.Response,
-            CallResult<TOk>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: ExchangeCode.Bitflyer,
-                operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
-            _ => throw new ExchangeApiException(
-                message: "Unknown call result.",
-                exchange: ExchangeCode.Bitflyer,
-                operation: operation,
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
-        };
     }
 
 }

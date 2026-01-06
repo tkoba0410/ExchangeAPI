@@ -27,12 +27,6 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
         _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
 
-    public async Task<IReadOnlyList<BittradeBalanceEntryNormalized>> GetBalancesAsync(CancellationToken ct = default)
-    {
-        var call = await GetBalancesCallAsync(ct).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.GetAccountBalance");
-    }
-
     public async Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetBalancesCallAsync(
         CancellationToken ct = default)
     {
@@ -120,18 +114,4 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
         }
     }
 
-    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
-    {
-        return call.Result switch
-        {
-            CallResult<TRes>.Ok ok => ok.Response,
-            CallResult<TRes>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: ExchangeCode.Bittrade,
-                operation: operation,
-                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
-                innerException: err.Error.Exception),
-            _ => throw new InvalidOperationException("Unsupported CallResult type.")
-        };
-    }
 }

@@ -24,27 +24,15 @@ public sealed class BittradeErrorEnrichTests
     {
         var api = new BittradeMarketDataApi(new ThrowingMarketDataApi(), CreateResolver());
 
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() =>
-            api.GetTickerAsync(new Symbol("BTC/JPY"), CancellationToken.None));
+        var call = await api.GetTickerCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
 
-        Assert.Equal(ExchangeApi.Common.Enums.ExchangeCode.Bittrade, ex.Exchange);
-        Assert.Equal("Bittrade.Market.GetTicker", ex.Operation);
+        var err = Assert.IsType<CallResult<Ticker>.Err>(call.Result);
+        Assert.Equal("Bittrade.Market.GetTicker", call.Meta.Component);
+        Assert.Equal("boom", err.Error.Message);
     }
 
     private sealed class ThrowingMarketDataApi : IBittradeNormalizedMarketDataApi
     {
-        public Task<BittradeTickerNormalized> GetTickerAsync(string symbol, CancellationToken ct = default) =>
-            throw new ExchangeApiException("boom");
-
-        public Task<BittradeOrderBookNormalized> GetOrderBookAsync(
-            string symbol,
-            ExchangeApi.Exchanges.Bittrade.Normalize.Types.BittradeDepthType? depthType = null,
-            CancellationToken ct = default) =>
-            throw new ExchangeApiException("boom");
-
-        public Task<IReadOnlyList<BittradeExecutionNormalized>> GetExecutionsAsync(string symbol, CancellationToken ct = default) =>
-            throw new ExchangeApiException("boom");
-
         public Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
             string symbol,
             CancellationToken ct = default) =>
@@ -75,11 +63,14 @@ public sealed class BittradeErrorEnrichTests
 
         public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
 
-        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(_info);
-
         public Task<Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
+            Task.FromResult(new Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfo>(
+                CallId.New(),
+                DateTimeOffset.UtcNow,
+                TimeSpan.Zero,
+                new ContractsRequests.GetExchangeInfoRequest(),
+                new CallResult<ExchangeInfo>.Ok(_info),
+                new CallMeta("Contracts", "StubExchangeInfo", null, null)));
     }
 }

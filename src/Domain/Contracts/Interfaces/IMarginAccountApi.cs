@@ -12,10 +12,6 @@ namespace ExchangeApi.Contracts.Interfaces;
 /// </summary>
 public interface IMarginAccountApi : IAccountApi
 {
-    Task<IReadOnlyList<Position>> GetOpenPositionsAsync(Symbol symbol, CancellationToken cancellationToken = default);
-
-    Task<Collateral> GetCollateralAsync(CancellationToken cancellationToken = default);
-
     Task<Call<GetOpenPositionsRequest, IReadOnlyList<Position>>> GetOpenPositionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);

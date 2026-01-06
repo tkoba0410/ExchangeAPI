@@ -50,7 +50,9 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
 
         var api = new JsonExchangeInfoApi(new[] { _basePath }, cacheTtl: TimeSpan.FromSeconds(1));
 
-        var info = await api.GetExchangeInfoAsync();
+        var call = await api.GetExchangeInfoCallAsync();
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var info = ok.Response;
 
         Assert.Single(info.Markets);
         var market = info.Markets[0];
@@ -81,7 +83,9 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
 
         var api = new JsonExchangeInfoApi(new[] { _basePath, _overlayPath }, cacheTtl: TimeSpan.FromSeconds(1));
 
-        var info = await api.GetExchangeInfoAsync();
+        var call = await api.GetExchangeInfoCallAsync();
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var info = ok.Response;
 
         Assert.Single(info.Markets);
         var market = info.Markets[0];

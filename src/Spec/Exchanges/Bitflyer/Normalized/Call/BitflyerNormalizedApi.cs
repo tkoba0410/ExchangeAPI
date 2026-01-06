@@ -54,14 +54,6 @@ public sealed class BitflyerNormalizedMarketDataFacade
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<BitflyerTickerNormalized> GetTickerAsync(
-        string productCode,
-        CancellationToken ct = default)
-    {
-        var call = await GetTickerCallAsync(productCode, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetTicker");
-    }
-
     public async Task<Call<GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
         string productCode,
         CancellationToken ct = default)
@@ -74,14 +66,6 @@ public sealed class BitflyerNormalizedMarketDataFacade
         return CreateCall(rawCall, request, "Bitflyer.GetTicker", BitflyerTickerNormalizer.Normalize);
     }
 
-    public async Task<BitflyerOrderBookNormalized> GetOrderBookAsync(
-        string productCode,
-        CancellationToken ct = default)
-    {
-        var call = await GetOrderBookCallAsync(productCode, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetBoard");
-    }
-
     public async Task<Call<GetOrderBookRequest, BitflyerOrderBookNormalized>> GetOrderBookCallAsync(
         string productCode,
         CancellationToken ct = default)
@@ -92,17 +76,6 @@ public sealed class BitflyerNormalizedMarketDataFacade
         var request = new GetOrderBookRequest(productCode);
 
         return CreateCall(rawCall, request, "Bitflyer.GetBoard", BitflyerOrderBookNormalizer.Normalize);
-    }
-
-    public async Task<IReadOnlyList<BitflyerExecutionNormalized>> GetExecutionsAsync(
-        string productCode,
-        int? count = null,
-        long? before = null,
-        long? after = null,
-        CancellationToken ct = default)
-    {
-        var call = await GetExecutionsCallAsync(productCode, count, before, after, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetExecutions");
     }
 
     public async Task<Call<GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsCallAsync(
@@ -126,14 +99,6 @@ public sealed class BitflyerNormalizedMarketDataFacade
                 .ToArray());
     }
 
-    public async Task<BitflyerHealthNormalized> GetHealthAsync(
-        string productCode,
-        CancellationToken ct = default)
-    {
-        var call = await GetHealthCallAsync(productCode, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetHealth");
-    }
-
     public async Task<Call<GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(
         string productCode,
         CancellationToken ct = default)
@@ -146,14 +111,6 @@ public sealed class BitflyerNormalizedMarketDataFacade
         return CreateCall(rawCall, request, "Bitflyer.GetHealth", BitflyerHealthNormalizer.Normalize);
     }
 
-    public async Task<BitflyerBoardStateNormalized> GetBoardStateAsync(
-        string productCode,
-        CancellationToken ct = default)
-    {
-        var call = await GetBoardStateCallAsync(productCode, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetBoardState");
-    }
-
     public async Task<Call<GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
         string productCode,
         CancellationToken ct = default)
@@ -164,15 +121,6 @@ public sealed class BitflyerNormalizedMarketDataFacade
         var request = new GetBoardStateRequest(productCode);
 
         return CreateCall(rawCall, request, "Bitflyer.GetBoardState", BitflyerBoardStateNormalizer.Normalize);
-    }
-
-    public async Task<IReadOnlyList<BitflyerChatNormalized>> GetChatsAsync(
-        string? fromDate = null,
-        string? region = null,
-        CancellationToken ct = default)
-    {
-        var call = await GetChatsCallAsync(fromDate, region, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetChats");
     }
 
     public async Task<Call<GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
@@ -258,20 +206,6 @@ public sealed class BitflyerNormalizedMarketDataFacade
         }
     }
 
-    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
-    {
-        return call.Result switch
-        {
-            CallResult<TRes>.Ok ok => ok.Response,
-            CallResult<TRes>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: ExchangeCode.Bitflyer,
-                operation: operation,
-                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
-                innerException: err.Error.Exception),
-            _ => throw new InvalidOperationException("Unsupported CallResult type.")
-        };
-    }
 }
 
 public sealed class BitflyerNormalizedExchangeInfoFacade
@@ -281,14 +215,6 @@ public sealed class BitflyerNormalizedExchangeInfoFacade
     internal BitflyerNormalizedExchangeInfoFacade(IBitflyerRawMarketDataApi raw)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
-    }
-
-    public async Task<IReadOnlyList<BitflyerMarketNormalized>> GetMarketsAsync(
-        string? region = null,
-        CancellationToken ct = default)
-    {
-        var call = await GetMarketsCallAsync(region, ct).ConfigureAwait(false);
-        return Unwrap(call, "Bitflyer.GetMarkets");
     }
 
     public async Task<Call<GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
@@ -373,18 +299,4 @@ public sealed class BitflyerNormalizedExchangeInfoFacade
         }
     }
 
-    private static TRes Unwrap<TReq, TRes>(Call<TReq, TRes> call, string operation)
-    {
-        return call.Result switch
-        {
-            CallResult<TRes>.Ok ok => ok.Response,
-            CallResult<TRes>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: ExchangeCode.Bitflyer,
-                operation: operation,
-                statusCode: err.Error.HttpStatus is int status ? (HttpStatusCode?)status : null,
-                innerException: err.Error.Exception),
-            _ => throw new InvalidOperationException("Unsupported CallResult type.")
-        };
-    }
 }

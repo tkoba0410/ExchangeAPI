@@ -26,7 +26,9 @@ public sealed class BittradeOrderKeyConnectivityTests
         var api = new BittradeTradingApi(trading);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1001");
-        var status = await api.GetOrderAsync(new CommonSymbol("BTC/JPY"), key);
+        var call = await api.GetOrderCallAsync(new CommonSymbol("BTC/JPY"), key);
+        var ok = Assert.IsType<CallResult<OrderStatus>.Ok>(call.Result);
+        var status = ok.Response;
 
         Assert.Equal("1001", trading.LastOrderKey?.Value);
         Assert.Equal(OrderIdKind.AcceptanceId, status.Key.Kind);
@@ -40,7 +42,9 @@ public sealed class BittradeOrderKeyConnectivityTests
         var api = new BittradeTradingApi(trading);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1002");
-        var result = await api.CancelOrderAsync(new CommonSymbol("BTC/JPY"), key);
+        var call = await api.CancelOrderCallAsync(new CommonSymbol("BTC/JPY"), key);
+        var ok = Assert.IsType<CallResult<CancelResult>.Ok>(call.Result);
+        var result = ok.Response;
 
         Assert.True(result.IsSuccess);
         Assert.Equal("1002", trading.LastOrderKey?.Value);
@@ -61,26 +65,6 @@ public sealed class BittradeOrderKeyConnectivityTests
         public OrderKey? LastOrderKey { get; private set; }
         public Symbol? LastSymbol { get; private set; }
         public OrderStatus Order { get; init; } = CreateOrderStatus("default");
-
-        public Task<OrderResult> PlaceOrderAsync(OrderRequest request, CancellationToken ct = default) =>
-            throw new System.NotSupportedException();
-
-        public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken ct = default)
-        {
-            LastSymbol = symbol;
-            LastOrderKey = orderKey;
-            return Task.FromResult(new CancelResult(true));
-        }
-
-        public Task<IReadOnlyList<OpenOrder>> GetOpenOrdersAsync(Symbol symbol, CancellationToken ct = default) =>
-            throw new System.NotSupportedException();
-
-        public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken ct = default)
-        {
-            LastSymbol = symbol;
-            LastOrderKey = orderKey;
-            return Task.FromResult(Order with { Key = orderKey });
-        }
 
         public Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
             OrderRequest request,

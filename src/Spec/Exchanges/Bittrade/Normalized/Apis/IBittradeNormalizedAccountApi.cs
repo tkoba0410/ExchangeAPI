@@ -10,8 +10,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 
 internal interface IBittradeNormalizedAccountApi
 {
-    Task<IReadOnlyList<BittradeBalanceEntryNormalized>> GetBalancesAsync(CancellationToken ct = default);
-
     Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetBalancesCallAsync(
         CancellationToken ct = default);
 }

@@ -32,17 +32,6 @@ internal sealed class BittradeAccountApi : IAccountApi
         _account = account ?? throw new ArgumentNullException(nameof(account));
     }
 
-    public async Task<IReadOnlyList<Balance>> GetBalancesAsync(CancellationToken cancellationToken = default)
-    {
-        var call = await GetBalancesCallAsync(cancellationToken).ConfigureAwait(false);
-        return Unwrap(call, "Bittrade.Account.GetBalances");
-    }
-
-    public Task<IReadOnlyList<ExecutionAccount>> GetAccountExecutionsAsync(CommonSymbol symbol, CancellationToken cancellationToken = default)
-    {
-        throw new ExchangeFeatureNotSupportedException(Exchange, "AccountExecutions");
-    }
-
     public async Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default)
     {
@@ -88,22 +77,4 @@ internal sealed class BittradeAccountApi : IAccountApi
             Meta: meta));
     }
 
-    private static TOk Unwrap<TReq, TOk>(Call<TReq, TOk> call, string operation)
-    {
-        return call.Result switch
-        {
-            CallResult<TOk>.Ok ok => ok.Response,
-            CallResult<TOk>.Err err => throw new ExchangeApiException(
-                message: err.Error.Message,
-                exchange: Exchange,
-                operation: operation,
-                statusCode: ApiCallMapper.ToStatusCode(err.Error.HttpStatus),
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(err.Error)),
-            _ => throw new ExchangeApiException(
-                message: "Unknown call result.",
-                exchange: Exchange,
-                operation: operation,
-                errorCategory: ApiCallMapper.ToExchangeErrorCategory(new CallError(CallErrorKind.Unknown, "Unknown call result.")))
-        };
-    }
 }

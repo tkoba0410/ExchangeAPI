@@ -10,8 +10,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 
 internal interface IBittradeNormalizedExchangeInfoApi
 {
-    Task<IReadOnlyList<BittradeSymbolNormalized>> GetSymbolsAsync(CancellationToken ct = default);
-
     Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
         CancellationToken ct = default);
 }

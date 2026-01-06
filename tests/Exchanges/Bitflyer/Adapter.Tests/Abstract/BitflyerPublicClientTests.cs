@@ -5,7 +5,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Spec.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
@@ -18,9 +18,10 @@ public sealed class BitflyerPublicClientTests
         var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
-        var client = new BitflyerPublicClient(marketData);
 
-        var result = await client.GetHealthAsync(new Symbol("BTC/JPY"));
+        var call = await marketData.GetHealthCallAsync("BTC_JPY");
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos.BitflyerHealthNormalized>.Ok>(call.Result);
+        var result = ok.Response;
 
         Assert.Equal("NORMAL", result.Status);
     }
@@ -31,9 +32,10 @@ public sealed class BitflyerPublicClientTests
         var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
-        var client = new BitflyerPublicClient(marketData);
 
-        var result = await client.GetBoardStateAsync(new Symbol("BTC/JPY"));
+        var call = await marketData.GetBoardStateCallAsync("BTC_JPY");
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos.BitflyerBoardStateNormalized>.Ok>(call.Result);
+        var result = ok.Response;
 
         Assert.Equal("NORMAL", result.Health);
         Assert.Equal("RUNNING", result.State);
@@ -48,7 +50,8 @@ public sealed class BitflyerPublicClientTests
         var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
         var client = new BitflyerPublicClient(marketData);
 
-        await Assert.ThrowsAsync<SymbolNotSupportedException>(() =>
-            client.GetTickerAsync(new Symbol("ETH/JPY")));
+        var call = await client.GetTickerCallAsync(new Symbol("ETH/JPY"));
+        var err = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.Ticker>.Err>(call.Result);
+        Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }
 }

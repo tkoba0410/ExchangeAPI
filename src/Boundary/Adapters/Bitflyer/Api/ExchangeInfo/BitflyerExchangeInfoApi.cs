@@ -24,41 +24,6 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
     private static ExchangeInfoDto? _cached;
     private static DateTimeOffset _lastUpdated;
 
-    public Task<ExchangeInfoDto> GetExchangeInfoAsync(CancellationToken cancellationToken = default)
-    {
-        if (_cached is { } cached && DateTimeOffset.UtcNow - _lastUpdated < CacheTtl)
-        {
-            return Task.FromResult(cached);
-        }
-
-        // 現状は REST 縦スライス対象の BTC/JPY のみを返す。
-        var markets = new List<ExchangeMarketInfo>
-        {
-            // bitFlyer Lightning BTC/JPY: 最小数量 0.001 BTC, 価格単位 1 円, 数量刻み 0.001 BTC を初期値とする。
-            new("BTC/JPY", "BTC_JPY", "Spot", MinSize: new Size(0.001m), PriceIncrement: new Price(1m), SizeIncrement: new Size(0.001m), FeeCurrency: "BTC"),
-        };
-
-        var features = new ExchangeFeatureFlags(
-            SupportsWebSocket: false,
-            SupportsMargin: true,
-            SupportsStopOrder: true,
-            SupportsParentOrder: true,
-            SupportsCandlestick: false,
-            SupportsOrderBookDelta: false,
-            SupportsRealtimeExecutions: false,
-            SupportsWithdraw: false);
-
-        var maintenance = new ExchangeMaintenance(
-            Status: ExchangeMaintenanceStatus.Planned,
-            PlannedUntil: GetNextDailyMaintenanceEndUtc(),
-            Message: "Daily maintenance 04:00-04:10 JST");
-
-        var info = BitflyerExchangeInfoMapper.MapExchangeInfo(markets, features, null, maintenance);
-        _cached = info;
-        _lastUpdated = DateTimeOffset.UtcNow;
-        return Task.FromResult(info);
-    }
-
     public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default)
     {
@@ -67,7 +32,46 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
 
         try
         {
-            var info = await GetExchangeInfoAsync(cancellationToken).ConfigureAwait(false);
+            if (_cached is { } cached && DateTimeOffset.UtcNow - _lastUpdated < CacheTtl)
+            {
+                return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+                    Id: CallId.New(),
+                    StartedAt: startedAt,
+                    Duration: DateTimeOffset.UtcNow - startedAt,
+                    Request: request,
+                    Result: new CallResult<ExchangeInfoDto>.Ok(cached),
+                    Meta: new CallMeta(
+                        Layer: "Contracts",
+                        Component: BitflyerOperations.ExchangeInfo.GetExchangeInfo,
+                        Tags: null,
+                        Children: null));
+            }
+
+            // 現状は REST 縦スライス対象の BTC/JPY のみを返す。
+            var markets = new List<ExchangeMarketInfo>
+            {
+                // bitFlyer Lightning BTC/JPY: 最小数量 0.001 BTC, 価格単位 1 円, 数量刻み 0.001 BTC を初期値とする。
+                new("BTC/JPY", "BTC_JPY", "Spot", MinSize: new Size(0.001m), PriceIncrement: new Price(1m), SizeIncrement: new Size(0.001m), FeeCurrency: "BTC"),
+            };
+
+            var features = new ExchangeFeatureFlags(
+                SupportsWebSocket: false,
+                SupportsMargin: true,
+                SupportsStopOrder: true,
+                SupportsParentOrder: true,
+                SupportsCandlestick: false,
+                SupportsOrderBookDelta: false,
+                SupportsRealtimeExecutions: false,
+                SupportsWithdraw: false);
+
+            var maintenance = new ExchangeMaintenance(
+                Status: ExchangeMaintenanceStatus.Planned,
+                PlannedUntil: GetNextDailyMaintenanceEndUtc(),
+                Message: "Daily maintenance 04:00-04:10 JST");
+
+            var info = BitflyerExchangeInfoMapper.MapExchangeInfo(markets, features, null, maintenance);
+            _cached = info;
+            _lastUpdated = DateTimeOffset.UtcNow;
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: BitflyerOperations.ExchangeInfo.GetExchangeInfo,

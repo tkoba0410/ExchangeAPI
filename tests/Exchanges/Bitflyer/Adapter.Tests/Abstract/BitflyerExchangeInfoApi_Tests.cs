@@ -11,7 +11,9 @@ public class BitflyerExchangeInfoApi_Tests
     {
         var api = new BitflyerExchangeInfoApi();
 
-        var info = await api.GetExchangeInfoAsync();
+        var call = await api.GetExchangeInfoCallAsync();
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var info = ok.Response;
 
         Assert.False(info.Features!.SupportsCandlestick);
         Assert.False(info.Features.SupportsOrderBookDelta);

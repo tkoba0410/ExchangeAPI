@@ -14,6 +14,8 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Domain.UseCases;
 using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.Private.ExecutionPrivateResponse;
 using Xunit;
+using ExchangeApi.Contracts.Dtos;
+using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Ticker;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
@@ -50,30 +52,31 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             Size = active.Size,
         };
 
-        var publicApi = new FakeBitflyerPublicApi(new Ticker());
+        var publicApi = new FakeBitflyerPublicApi(new RawTicker());
         var sequenceApi = new SequenceChildOrderApi(new[] { active }, new[] { completed });
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
         var client = CreateClient(publicApi, sequenceApi, tradingApi);
 
-        var status = await OrderPolling.WaitForOrderAsync(
+        var statusCall = await OrderPolling.WaitForOrderAsync(
             api: client,
             symbol: new Symbol("BTC/JPY"),
             orderKey: new OrderKey(OrderIdKind.AcceptanceId, acceptanceId),
             options: new PollingOptions(TimeSpan.FromMilliseconds(1), 5));
 
+        var status = Assert.IsType<CallResult<OrderStatus>.Ok>(statusCall.Result).Response;
         Assert.Equal(OrderState.Completed, status.Status);
         Assert.Equal(0m, status.OutstandingSize.Value);
         Assert.Equal(0.01m, status.ExecutedSize.Value);
         Assert.Equal(3000000m, status.AveragePrice!.Value.Value);
     }
 
-        private static BitflyerExchangeClient CreateClient(
-            IBitflyerRawMarketDataApi marketData,
-            IBitflyerPrivateApi accountApi,
-            IBitflyerRawPrivateTradingApi tradingApi)
-        {
-            var markets = BitflyerTestHelpers.CreateResolver();
-            var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
+    private static BitflyerExchangeClient CreateClient(
+        IBitflyerRawMarketDataApi marketData,
+        IBitflyerPrivateApi accountApi,
+        IBitflyerRawPrivateTradingApi tradingApi)
+    {
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
         var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
         var normalizedMargin = BitflyerTestHelpers.CreateMarginApi(accountApi, markets);
         var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);

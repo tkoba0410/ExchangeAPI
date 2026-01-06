@@ -39,23 +39,6 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
         _options = options ?? CreateDefaultOptions();
     }
 
-    public Task<ExchangeInfoDto> GetExchangeInfoAsync(CancellationToken cancellationToken = default)
-    {
-        lock (_sync)
-        {
-            if (_cached is { } cached && !IsStale())
-            {
-                return Task.FromResult(cached);
-            }
-
-            var info = LoadAndMerge();
-            _cached = info;
-            _lastLoaded = DateTimeOffset.UtcNow;
-            _latestWriteTimeUtc = GetLatestWriteTimeUtc();
-            return Task.FromResult(info);
-        }
-    }
-
     public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default)
     {
@@ -64,7 +47,7 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
 
         try
         {
-            var info = await GetExchangeInfoAsync(cancellationToken).ConfigureAwait(false);
+            var info = GetCachedInfo();
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: "JsonExchangeInfo",
@@ -93,6 +76,23 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
                 Result: new CallResult<ExchangeInfoDto>.Err(
                     new CallError(CallErrorKind.Unknown, ex.Message, ex)),
                 Meta: meta);
+        }
+    }
+
+    private ExchangeInfoDto GetCachedInfo()
+    {
+        lock (_sync)
+        {
+            if (_cached is { } cached && !IsStale())
+            {
+                return cached;
+            }
+
+            var info = LoadAndMerge();
+            _cached = info;
+            _lastLoaded = DateTimeOffset.UtcNow;
+            _latestWriteTimeUtc = GetLatestWriteTimeUtc();
+            return info;
         }
     }
 

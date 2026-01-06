@@ -11,8 +11,6 @@ namespace ExchangeApi.Contracts.Interfaces;
 /// </summary>
 public interface IExchangeInfoApi
 {
-    Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default);
-
     Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default);
 }

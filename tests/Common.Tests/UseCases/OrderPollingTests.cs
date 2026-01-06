@@ -36,7 +36,8 @@ public sealed class OrderPollingTests
             options,
             CancellationToken.None);
 
-        Assert.Equal(OrderState.Active, result.Status);
+        var ok = Assert.IsType<CallResult<OrderStatus>.Ok>(result.Result);
+        Assert.Equal(OrderState.Active, ok.Response.Status);
         Assert.Equal(3, api.CallCount);
     }
 
@@ -70,14 +71,15 @@ public sealed class OrderPollingTests
         var api = new NotFoundTradingApi();
         var options = new PollingOptions(TimeSpan.Zero, 3);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            OrderPolling.WaitForOrderAsync(
-                api,
-                new Symbol("BTC/JPY"),
-                new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
-                options,
-                CancellationToken.None));
+        var result = await OrderPolling.WaitForOrderAsync(
+            api,
+            new Symbol("BTC/JPY"),
+            new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
+            options,
+            CancellationToken.None);
 
+        var err = Assert.IsType<CallResult<OrderStatus>.Err>(result.Result);
+        Assert.IsType<ExchangeOrderNotFoundException>(err.Error.Exception);
         Assert.Equal(3, api.CallCount);
     }
 
@@ -90,14 +92,15 @@ public sealed class OrderPollingTests
             NotFoundPolicy = NotFoundPolicy.StopAsNotFound
         };
 
-        await Assert.ThrowsAsync<ExchangeOrderNotFoundException>(() =>
-            OrderPolling.WaitForOrderAsync(
-                api,
-                new Symbol("BTC/JPY"),
-                new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
-                options,
-                CancellationToken.None));
+        var result = await OrderPolling.WaitForOrderAsync(
+            api,
+            new Symbol("BTC/JPY"),
+            new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
+            options,
+            CancellationToken.None);
 
+        var err = Assert.IsType<CallResult<OrderStatus>.Err>(result.Result);
+        Assert.IsType<ExchangeOrderNotFoundException>(err.Error.Exception);
         Assert.Equal(1, api.CallCount);
     }
 
@@ -112,93 +115,37 @@ public sealed class OrderPollingTests
 
         public int CallCount { get; private set; }
 
-        public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default)
-        {
-            CallCount++;
-            return Task.FromResult(_next(orderKey));
-        }
-
-        public Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<ParentOrderDetail> GetParentOrderAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            Price price,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            Price triggerPrice,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
-            Symbol symbol,
-            OrderKey orderKey,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
-            Symbol symbol,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
         public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            CallCount++;
+            var request = new GetOrderRequest(symbol, orderKey);
+            var now = DateTimeOffset.UtcNow;
+            var meta = new CallMeta("Contracts", "Test.GetOrder", null, null);
+            return Task.FromResult(new Call<GetOrderRequest, OrderStatus>(
+                CallId.New(),
+                now,
+                TimeSpan.Zero,
+                request,
+                new CallResult<OrderStatus>.Ok(_next(orderKey)),
+                meta));
+        }
 
-        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
+        public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
-
-        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
+        public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
 
@@ -206,93 +153,41 @@ public sealed class OrderPollingTests
     {
         public int CallCount { get; private set; }
 
-        public Task<OrderStatus> GetOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default)
-        {
-            CallCount++;
-            throw new ExchangeOrderNotFoundException(ExchangeCode.Sandbox, "GetOrder", symbol.ToString(), orderKey.ToString());
-        }
-
-        public Task<IReadOnlyList<ParentOrder>> GetParentOrdersAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<ParentOrderDetail> GetParentOrderAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderResult> PlaceLimitOrderAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderResult> PlaceMarketOrderAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<OrderResult> PlaceStopOrderAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<CancelResult> CancelOrderAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<IReadOnlyList<OpenOrder>> GetOrdersAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            Price price,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            Price triggerPrice,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
-            Symbol symbol,
-            OrderKey orderKey,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
-            Symbol symbol,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
         public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            CallCount++;
+            var request = new GetOrderRequest(symbol, orderKey);
+            var now = DateTimeOffset.UtcNow;
+            var meta = new CallMeta("Contracts", "Test.GetOrder", null, null);
+            var error = new CallError(
+                CallErrorKind.Semantic,
+                "Order not found.",
+                new ExchangeOrderNotFoundException(ExchangeCode.Sandbox, "GetOrder", symbol.ToString(), orderKey.ToString()));
+            return Task.FromResult(new Call<GetOrderRequest, OrderStatus>(
+                CallId.New(),
+                now,
+                TimeSpan.Zero,
+                request,
+                new CallResult<OrderStatus>.Err(error),
+                meta));
+        }
 
-        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
+        public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
-
-        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
+        public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
 }

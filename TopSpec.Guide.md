@@ -279,6 +279,46 @@ Split Candidate: なし
 - `TResponse` 直返し API は提供しない（値が必要な場合は `call.Response` を参照する）。
 - Transport（`src/Core/Transport/**`）は wire 層であり、この規約の対象外とする。
 
+### Spot 最小 API（Contracts: Cross-Exchange）
+
+- Cross-Exchange（Contracts）の共通 API は **Spot（現物）を最小スコープ**として先に確定する。
+- 先物/信用/Margin は Cross-Exchange の非対象（後回し）とし、Contracts の公開面から除外する。
+
+#### Orders / Executions の意味
+
+- `GetOrders` は **Snapshot** とする。
+  - Open / Closed を区別せず「現時点で観測できる注文」を返す。
+  - 履歴の全件保証はしない。
+- `GetExecutions` は **History** とする。
+  - 約定（事象）の履歴を best-effort で返す。
+  - 全件取得や保持期間の保証はしない。
+
+#### Request の最小形
+
+- Orders/Executions の Request は次に限定する：
+  - `Market`
+  - `Limit?`（省略時 1000、最大 1000）
+  - `Cursor?`（opaque）
+- Since/Until 等の期間指定は提供しない。
+- TIF（TimeInForce）は提供しない。
+
+#### 1-call 原則
+
+- 実装は 1 回の呼び出しで取得できる範囲のみ返し、内部で複数回 API を叩いて limit を埋めない。
+
+#### Response Meta で制約を明示
+
+- 取得結果は `Items/HasMore/NextCursor/Meta` を返す。
+- `Meta` は少なくとも次を含む：
+  - `RequestedLimit` / `AppliedLimit` / `ReturnedCount` / `LimitClamped`
+  - `Completeness`（Exact / MayBePartial）
+  - `AsOf`（観測時刻）
+  - （可能なら）`PartialReason`
+
+#### 正本
+
+- 公開契約の一覧（現行のシグネチャ）は `docs/contracts/interfaces.md` を正とする。
+
 ---
 
 ## 7. 公開契約（Contracts）の背景（Core §7–8 対応）

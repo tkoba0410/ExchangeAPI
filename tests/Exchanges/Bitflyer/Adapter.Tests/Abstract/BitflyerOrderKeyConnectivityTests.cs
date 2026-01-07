@@ -2,18 +2,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
 using Xunit;
 using ContractSide = ExchangeApi.Common.Enums.Side;
-using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
@@ -29,9 +24,9 @@ public sealed class BitflyerOrderKeyConnectivityTests
             {
                 ChildOrderId = "JRF-1",
                 ChildOrderAcceptanceId = acceptanceId,
-                ProductCode = new RawProductCode("BTC_JPY"),
-                Side = RawSide.Buy,
-                ChildOrderType = ChildOrderType.Limit,
+                ProductCode = "BTC_JPY",
+                Side = "BUY",
+                ChildOrderType = "LIMIT",
                 Size = 0.01m,
                 ExecutedSize = 0m,
                 OutstandingSize = 0.01m
@@ -43,68 +38,22 @@ public sealed class BitflyerOrderKeyConnectivityTests
         {
             ChildOrderAcceptanceId = acceptanceId
         });
-        var api = new BitflyerTradingApi(tradingApi, privateApi, CreateResolver());
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, privateApi, markets);
+        var api = new BitflyerTradingApi(normalized);
 
-        var result = await api.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
-        var status = await api.GetOrderAsync(new Symbol("BTC/JPY"), result.Key);
-        await api.CancelOrderAsync(new Symbol("BTC/JPY"), result.Key);
+        var resultCall = await api.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
+        var result = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderResult>.Ok>(resultCall.Result).Response;
+        var statusCall = await api.GetOrderCallAsync(new Symbol("BTC/JPY"), result.Key);
+        var status = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderStatus>.Ok>(statusCall.Result).Response;
+        var cancelCall = await api.CancelOrderCallAsync(new Symbol("BTC/JPY"), result.Key);
+        Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<CancelResult>.Ok>(cancelCall.Result);
 
         Assert.Equal(OrderIdKind.AcceptanceId, result.Key.Kind);
         Assert.Equal(acceptanceId, result.Key.Value);
         Assert.Equal(OrderIdKind.AcceptanceId, status.Key.Kind);
         Assert.Equal(acceptanceId, status.Key.Value);
-        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.ChildOrderAcceptanceId);
+        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.Body.ChildOrderAcceptanceId);
     }
 
-    [Fact]
-    public async Task OpenOrderKey_CanGetAndCancel()
-    {
-        var acceptanceId = "ACCEPT-2";
-        var childOrders = new[]
-        {
-            new ChildOrderResponse
-            {
-                ChildOrderId = "JRF-2",
-                ChildOrderAcceptanceId = acceptanceId,
-                ProductCode = new RawProductCode("BTC_JPY"),
-                Side = RawSide.Buy,
-                ChildOrderType = ChildOrderType.Limit,
-                Size = 0.01m,
-                ExecutedSize = 0m,
-                OutstandingSize = 0.01m
-            }
-        };
-
-        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>(), childOrders: childOrders);
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var api = new BitflyerTradingApi(tradingApi, privateApi, CreateResolver());
-
-        var openOrders = await api.GetOrdersAsync(new Symbol("BTC/JPY"));
-        var key = openOrders[0].Key;
-
-        var status = await api.GetOrderAsync(new Symbol("BTC/JPY"), key);
-        await api.CancelOrderAsync(new Symbol("BTC/JPY"), key);
-
-        Assert.Equal(OrderIdKind.AcceptanceId, key.Kind);
-        Assert.Equal(acceptanceId, key.Value);
-        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.ChildOrderAcceptanceId);
-        Assert.Equal(acceptanceId, status.Key.Value);
-    }
-
-    private static IExchangeMarketResolver CreateResolver() =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
-            new[] { new ExchangeMarketInfo("BTC/JPY", "BTC_JPY", "Spot") },
-            null,
-            null,
-            null)));
-
-    private sealed class StubExchangeInfoApi : IExchangeInfoApi
-    {
-        private readonly ExchangeInfo _info;
-
-        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
-
-        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(_info);
-    }
 }

@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Apis.Trading;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Types;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Spec.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
@@ -25,11 +23,14 @@ public sealed class BitflyerTradingApi_NotFoundTests
     {
         var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var api = new BitflyerTradingApi(tradingApi, privateApi, CreateResolver());
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, privateApi, markets);
+        var api = new BitflyerTradingApi(normalized);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-404");
-        await Assert.ThrowsAsync<ExchangeOrderNotFoundException>(() =>
-            api.GetOrderAsync(new Symbol("BTC/JPY"), key));
+        var call = await api.GetOrderCallAsync(new Symbol("BTC/JPY"), key);
+        var err = Assert.IsType<CallResult<OrderStatus>.Err>(call.Result);
+        Assert.Contains("Order not found", err.Error.Message);
     }
 
     [Fact]
@@ -37,11 +38,14 @@ public sealed class BitflyerTradingApi_NotFoundTests
     {
         var privateApi = new RecordingPrivateApi(Array.Empty<ChildOrderResponse>());
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var api = new BitflyerTradingApi(tradingApi, privateApi, CreateResolver());
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, privateApi, markets);
+        var api = new BitflyerTradingApi(normalized);
 
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, "JRF-404");
-        await Assert.ThrowsAsync<ExchangeOrderNotFoundException>(() =>
-            api.GetOrderAsync(new Symbol("BTC/JPY"), key));
+        var call = await api.GetOrderCallAsync(new Symbol("BTC/JPY"), key);
+        var err = Assert.IsType<CallResult<OrderStatus>.Err>(call.Result);
+        Assert.Contains("Order not found", err.Error.Message);
 
         Assert.Equal(key.Value, privateApi.LastChildOrderId);
         Assert.Null(privateApi.LastChildOrderAcceptanceId);
@@ -49,109 +53,101 @@ public sealed class BitflyerTradingApi_NotFoundTests
 
     private sealed class RecordingPrivateApi : IBitflyerPrivateApi
     {
-        private readonly IReadOnlyList<ChildOrderResponse> _orders;
+        private readonly FakeBitflyerPrivateApi _inner;
 
         public string? LastChildOrderId { get; private set; }
         public string? LastChildOrderAcceptanceId { get; private set; }
 
         public RecordingPrivateApi(IReadOnlyList<ChildOrderResponse> orders)
         {
-            _orders = orders;
+            _inner = new FakeBitflyerPrivateApi(
+                Array.Empty<BalanceResponse>(),
+                childOrders: orders);
         }
 
-        public Task<IReadOnlyList<string>> GetPermissionsAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+        public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsAsync(
+            GetPermissionsRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetPermissionsAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<BalanceResponse>> GetBalancesAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<BalanceResponse>>(Array.Empty<BalanceResponse>());
+        public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalancesAsync(
+            GetBalancesRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetBalancesAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<PositionResponse>> GetPositionsAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<PositionResponse>>(Array.Empty<PositionResponse>());
+        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsAsync(
+            GetAccountExecutionsRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetExecutionsAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<ExecutionPrivateResponse>> GetExecutionsAsync(RawProductCode productCode, string? childOrderId = null, string? childOrderAcceptanceId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<ExecutionPrivateResponse>>(Array.Empty<ExecutionPrivateResponse>());
+        public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsAsync(
+            GetPositionsRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetPositionsAsync(request, cancellationToken);
 
-        public Task<CollateralResponse> GetCollateralAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(new CollateralResponse());
+        public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralAsync(
+            GetCollateralRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetCollateralAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<CollateralAccount>> GetCollateralAccountsAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<CollateralAccount>>(Array.Empty<CollateralAccount>());
+        public Task<Call<GetCollateralAccountsRequest, IReadOnlyList<CollateralAccount>>> GetCollateralAccountsAsync(
+            GetCollateralAccountsRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetCollateralAccountsAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<ChildOrderResponse>> GetChildOrdersAsync(
-            RawProductCode productCode,
-            string? childOrderStatusState = null,
-            string? childOrderAcceptanceId = null,
-            string? childOrderId = null,
-            string? parentOrderId = null,
-            int? count = null,
-            long? before = null,
-            long? after = null,
+        public Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersAsync(
+            GetChildOrdersRequest request,
             CancellationToken cancellationToken = default)
         {
-            LastChildOrderId = childOrderId;
-            LastChildOrderAcceptanceId = childOrderAcceptanceId;
-
-            if (!string.IsNullOrEmpty(childOrderAcceptanceId))
-            {
-                return Task.FromResult<IReadOnlyList<ChildOrderResponse>>(Array.Empty<ChildOrderResponse>());
-            }
-
-            if (!string.IsNullOrEmpty(childOrderId))
-            {
-                return Task.FromResult<IReadOnlyList<ChildOrderResponse>>(Array.Empty<ChildOrderResponse>());
-            }
-
-            return Task.FromResult(_orders);
+            LastChildOrderId = request.ChildOrderId;
+            LastChildOrderAcceptanceId = request.ChildOrderAcceptanceId;
+            return _inner.GetChildOrdersAsync(request, cancellationToken);
         }
 
-        public Task<IReadOnlyList<ParentOrderResponse>> GetParentOrdersAsync(RawProductCode productCode, int? count = null, long? before = null, long? after = null, string? parentOrderStatusState = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<ParentOrderResponse>>(Array.Empty<ParentOrderResponse>());
+        public Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
+            GetBalanceHistoryRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetBalanceHistoryAsync(request, cancellationToken);
 
-        public Task<ParentOrderDetailResponse> GetParentOrderAsync(string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new ParentOrderDetailResponse());
+        public Task<Call<GetCollateralHistoryRequest, IReadOnlyList<JsonElement>>> GetCollateralHistoryAsync(
+            GetCollateralHistoryRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetCollateralHistoryAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<JsonElement>> GetBalanceHistoryAsync(string? currencyCode = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionAsync(
+            GetTradingCommissionRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetTradingCommissionAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<JsonElement>> GetCollateralHistoryAsync(int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<Call<GetAddressesRequest, IReadOnlyList<JsonElement>>> GetAddressesAsync(
+            GetAddressesRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetAddressesAsync(request, cancellationToken);
 
-        public Task<JsonElement> GetTradingCommissionAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult(JsonDocument.Parse("{}").RootElement);
+        public Task<Call<GetCoinInsRequest, IReadOnlyList<JsonElement>>> GetCoinInsAsync(
+            GetCoinInsRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetCoinInsAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<JsonElement>> GetAddressesAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<Call<GetCoinOutsRequest, IReadOnlyList<JsonElement>>> GetCoinOutsAsync(
+            GetCoinOutsRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetCoinOutsAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<JsonElement>> GetCoinInsAsync(int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<Call<GetDepositsRequest, IReadOnlyList<JsonElement>>> GetDepositsAsync(
+            GetDepositsRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetDepositsAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<JsonElement>> GetCoinOutsAsync(string? messageId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<Call<GetWithdrawalsRequest, IReadOnlyList<JsonElement>>> GetWithdrawalsAsync(
+            GetWithdrawalsRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetWithdrawalsAsync(request, cancellationToken);
 
-        public Task<IReadOnlyList<JsonElement>> GetDepositsAsync(int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
-
-        public Task<IReadOnlyList<JsonElement>> GetWithdrawalsAsync(string? messageId = null, int? count = null, long? before = null, long? after = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
-
-        public Task<IReadOnlyList<JsonElement>> GetBankAccountsAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<JsonElement>>(Array.Empty<JsonElement>());
+        public Task<Call<GetBankAccountsRequest, IReadOnlyList<JsonElement>>> GetBankAccountsAsync(
+            GetBankAccountsRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetBankAccountsAsync(request, cancellationToken);
     }
 
-    private static IExchangeMarketResolver CreateResolver() =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
-            new[] { new ExchangeMarketInfo("BTC/JPY", "BTC_JPY", "Spot") },
-            null,
-            null,
-            null)));
-
-    private sealed class StubExchangeInfoApi : IExchangeInfoApi
-    {
-        private readonly ExchangeInfo _info;
-
-        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
-
-        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(_info);
-    }
 }

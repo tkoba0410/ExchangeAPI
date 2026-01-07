@@ -2,19 +2,24 @@
   <Folder Name="/src/">
     <Project Path="src/Core/Core.csproj" />
     <Project Path="src/Composition/Composition.csproj" />
-    <Project Path="src/Shared/Common/Shared.Common.csproj" />
-    <Project Path="src/Shared/Contracts/Shared.Contracts.csproj" />
-    <Project Path="src/Shared/Domain/Shared.Domain.csproj" />
-    <Project Path="src/Exchanges/Bitflyer/Raw/Exchange.Bitflyer.Raw.csproj" />
-    <Project Path="src/Exchanges/Bitflyer/Adapter/Exchange.Bitflyer.Adapter.csproj" />
-    <Project Path="src/Exchanges/Bittrade/Raw/Exchange.Bittrade.Raw.csproj" />
-    <Project Path="src/Exchanges/Bittrade/Adapter/Exchange.Bittrade.Adapter.csproj" />
+    <Project Path="src/Domain/Common/Common/Shared.Common.csproj" />
+    <Project Path="src/Domain/Contracts/Shared.Contracts.csproj" />
+    <Project Path="src/Domain/Behavior/Domain/Shared.Domain.csproj" />
+    <Project Path="src/Spec/Exchanges/Bitflyer/Raw/Exchange.Bitflyer.Raw.csproj" />
+    <Project Path="src/Spec/Exchanges/Bitflyer/Normalized/Exchange.Bitflyer.Normalized.csproj" />
+    <Project Path="src/Boundary/Adapters/Bitflyer/Exchange.Bitflyer.Adapter.csproj" />
+    <Project Path="src/Spec/Exchanges/Bittrade/Raw/Exchange.Bittrade.Raw.csproj" />
+    <Project Path="src/Spec/Exchanges/Bittrade/Normalized/Exchange.Bittrade.Normalized.csproj" />
+    <Project Path="src/Boundary/Adapters/Bittrade/Exchange.Bittrade.Adapter.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Core.Tests/Core.Tests.csproj" />
     <Project Path="tests/Common.Tests/Common.Tests.csproj" />
     <Project Path="tests/Composition.Tests/Composition.Tests.csproj" />
     <Project Path="tests/Exchanges/Bitflyer/Adapter.Tests/Exchange.Bitflyer.Adapter.Tests.csproj" />
+    <Project Path="tests/Exchanges/Bitflyer/Raw.Endpoints.Tests/Exchange.Bitflyer.Raw.Endpoints.Tests.csproj" />
     <Project Path="tests/Exchanges/Bittrade/Raw.Tests/Exchange.Bittrade.Raw.Tests.csproj" />
+    <Project Path="tests/Exchanges/Bittrade/Raw.Endpoints.Tests/Exchange.Bittrade.Raw.Endpoints.Tests.csproj" />
     <Project Path="tests/Exchanges/Bittrade/Adapter.Tests/Exchange.Bittrade.Adapter.Tests.csproj" />
     <Project Path="tests/Integration.Public.Tests/Integration.Public.Tests.csproj" />
   </Folder>

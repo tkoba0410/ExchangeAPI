@@ -3,16 +3,18 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
+using ExchangeApi.Spec.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -39,7 +41,9 @@ public class BittradeMarketDataApiTests
         """;
         var api = CreateApi("/market/detail/merged?symbol=btcjpy", json);
 
-        var ticker = await api.GetTickerAsync(new Symbol("BTC/JPY"));
+        var call = await api.GetTickerCallAsync(new Symbol("BTC/JPY"));
+        var ok = Assert.IsType<CallResult<Ticker>.Ok>(call.Result);
+        var ticker = ok.Response;
 
         Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
         Assert.Equal(new Price(100m), ticker.LastTradedPrice);
@@ -59,7 +63,9 @@ public class BittradeMarketDataApiTests
         """;
         var api = CreateApi("/market/depth?symbol=btcjpy&type=step0", json);
 
-        var book = await api.GetOrderBookAsync(new Symbol("BTC/JPY"));
+        var call = await api.GetOrderBookCallAsync(new Symbol("BTC/JPY"));
+        var ok = Assert.IsType<CallResult<OrderBook>.Ok>(call.Result);
+        var book = ok.Response;
 
         Assert.Equal(2, book.Bids.Count);
         Assert.Equal(2, book.Asks.Count);
@@ -82,7 +88,9 @@ public class BittradeMarketDataApiTests
         """;
         var api = CreateApi("/market/trade?symbol=btcjpy", json);
 
-        var executions = await api.GetMarketExecutionsAsync(new Symbol("BTC/JPY"));
+        var call = await api.GetMarketExecutionsCallAsync(new Symbol("BTC/JPY"));
+        var ok = Assert.IsType<CallResult<IReadOnlyList<ExecutionMarket>>.Ok>(call.Result);
+        var executions = ok.Response;
 
         Assert.Equal(2, executions.Count);
         Assert.Equal(Side.Buy, executions[0].Side);
@@ -95,7 +103,9 @@ public class BittradeMarketDataApiTests
     {
         var api = CreateApi("/market/detail/merged?symbol=btcjpy", "{}");
 
-        await Assert.ThrowsAsync<SymbolNotSupportedException>(() => api.GetTickerAsync(new Symbol("DOGE/JPY")));
+        var call = await api.GetTickerCallAsync(new Symbol("DOGE/JPY"));
+        var err = Assert.IsType<CallResult<Ticker>.Err>(call.Result);
+        Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }
 
     private static BittradeMarketDataApi CreateApi(string expectedPath, string responseJson)
@@ -118,8 +128,23 @@ public class BittradeMarketDataApiTests
 
         public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
 
-        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(_info);
+        public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var meta = new CallMeta(
+                Layer: "Contracts",
+                Component: "StubExchangeInfoApi",
+                Tags: null,
+                Children: null);
+            var call = new Call<GetExchangeInfoRequest, ExchangeInfo>(
+                Id: CallId.New(),
+                StartedAt: DateTimeOffset.UtcNow,
+                Duration: TimeSpan.Zero,
+                Request: new GetExchangeInfoRequest(),
+                Result: new CallResult<ExchangeInfo>.Ok(_info),
+                Meta: meta);
+            return Task.FromResult(call);
+        }
     }
 
     private sealed class StubHandler : HttpMessageHandler

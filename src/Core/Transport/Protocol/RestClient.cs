@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Core.Contracts.Transport;
 using ExchangeApi.Core.Transport.Observability;
 using ExchangeApi.Core.Transport.Policy;
 using ExchangeApi.Core.Transport.Http;
@@ -174,6 +175,21 @@ namespace ExchangeApi.Core.Transport.Protocol
             }
         }
 
+        public async Task<HttpResponseMeta> GetRawAsync(
+            string path,
+            IReadOnlyDictionary<string, string?>? query = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path must not be null or whitespace.", nameof(path));
+            }
+
+            var requestUri = BuildUri(path, query);
+            using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            return await SendRawAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+
         public async Task<TResponse> PostAsync<TRequest, TResponse>(
             string path,
             TRequest body,
@@ -292,6 +308,148 @@ namespace ExchangeApi.Core.Transport.Protocol
                 throw wrapped;
             }
         }
+
+        public async Task<HttpResponseMeta> PostRawAsync<TRequest>(
+            string path,
+            TRequest body,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path must not be null or whitespace.", nameof(path));
+            }
+
+            var requestUri = BuildUri(path, query: null);
+            var json = JsonSerializer.Serialize(body, _serializerOptions);
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+            };
+
+            return await SendRawAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// HTTP ステータス(4xx/5xx)では例外を投げず、Raw 層での解釈に委ねる。
+        /// 例外化するのは transport レベル（接続失敗、タイムアウト、TLS、キャンセル等）のみ。
+        /// </summary>
+        public async Task<HttpResponseMeta> SendRawAsync(
+            string method,
+            string path,
+            string? query = null,
+            string? bodyJson = null,
+            IReadOnlyDictionary<string, string>? headers = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(method))
+            {
+                throw new ArgumentException("Method must not be null or whitespace.", nameof(method));
+            }
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path must not be null or whitespace.", nameof(path));
+            }
+
+            var requestUri = BuildUriWithQuery(path, query);
+            using var request = new HttpRequestMessage(new HttpMethod(method), requestUri);
+
+            if (!string.IsNullOrWhiteSpace(bodyJson))
+            {
+                request.Content = new StringContent(bodyJson, Encoding.UTF8, "application/json");
+            }
+
+            if (headers is not null)
+            {
+                ApplyHeaders(request, headers);
+            }
+
+            return await SendRawAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<HttpResponseMeta> SendRawAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            _logger.LogRequest(request);
+            var context = new RestCallContext(request);
+            var startedAt = DateTimeOffset.UtcNow;
+            _observer.OnRequest(context);
+
+            if (!request.Headers.UserAgent.Any())
+            {
+                request.Headers.UserAgent.Add(DefaultUserAgent);
+            }
+
+            if (!request.Headers.Accept.Any())
+            {
+                request.Headers.Accept.Add(JsonMediaType);
+            }
+
+            try
+            {
+                if (_requestSigner is not null)
+                {
+                    await _requestSigner.SignAsync(request, cancellationToken).ConfigureAwait(false);
+                }
+
+                using var response = await _policy
+                    .ExecuteAsync(request, ct => _transport.SendAsync(request, ct), cancellationToken)
+                    .ConfigureAwait(false);
+
+                var content = response.Content is null
+                    ? string.Empty
+                    : await response.Content
+                        .ReadAsStringAsync(cancellationToken)
+                        .ConfigureAwait(false);
+
+                _logger.LogResponse(response, content);
+                _observer.OnResponse(context, response, content, DateTimeOffset.UtcNow - startedAt);
+
+                var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var header in response.Headers)
+                {
+                    headers[header.Key] = string.Join(",", header.Value);
+                }
+
+                if (response.Content?.Headers is not null)
+                {
+                    foreach (var header in response.Content.Headers)
+                    {
+                        headers[header.Key] = string.Join(",", header.Value);
+                    }
+                }
+
+                return new HttpResponseMeta(
+                    StatusCode: (int)response.StatusCode,
+                    Headers: headers.Count == 0 ? null : headers,
+                    Body: content);
+            }
+            catch (HttpRequestException ex)
+            {
+                var category = _errorClassifier?.Classify(ex.StatusCode, null) ?? TransportErrorCategory.Network;
+                var wrapped = new TransportException(
+                    "HTTP request failed.",
+                    statusCode: ex.StatusCode,
+                    errorCategory: category,
+                    innerException: ex);
+                _logger.LogError(wrapped, request);
+                _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt, ex.StatusCode);
+                throw wrapped;
+            }
+            catch (TaskCanceledException ex)
+            {
+                var category = _errorClassifier?.Classify(null, null) ?? TransportErrorCategory.Network;
+                var wrapped = new TransportException(
+                    "HTTP request timed out or was canceled.",
+                    errorCategory: category,
+                    innerException: ex);
+                _logger.LogError(wrapped, request);
+                _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt);
+                throw wrapped;
+            }
+        }
         private Uri BuildUri(string path, IReadOnlyDictionary<string, string?>? query)
         {
             var combined = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -339,6 +497,47 @@ namespace ExchangeApi.Core.Transport.Protocol
             }
 
             return builder.Uri;
+        }
+
+        private Uri BuildUriWithQuery(string path, string? query)
+        {
+            var baseUri = new Uri(_baseUri, path);
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return baseUri;
+            }
+
+            var builder = new UriBuilder(baseUri)
+            {
+                Query = query.StartsWith("?", StringComparison.Ordinal)
+                    ? query[1..]
+                    : query,
+            };
+            return builder.Uri;
+        }
+
+        private static void ApplyHeaders(HttpRequestMessage request, IReadOnlyDictionary<string, string> headers)
+        {
+            foreach (var (key, value) in headers)
+            {
+                if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+                {
+                    continue;
+                }
+
+                if (string.Equals(key, "Content-Type", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (request.Content is null)
+                    {
+                        continue;
+                    }
+
+                    request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(value);
+                    continue;
+                }
+
+                request.Headers.TryAddWithoutValidation(key, value);
+            }
         }
 
     }

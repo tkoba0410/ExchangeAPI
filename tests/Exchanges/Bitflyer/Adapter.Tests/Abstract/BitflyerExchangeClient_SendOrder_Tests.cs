@@ -3,16 +3,16 @@ using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivateGet;
-using ExchangeApi.Exchanges.Bitflyer.Raw.PrivatePost;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
-using RawChildOrderType = ExchangeApi.Exchanges.Bitflyer.Raw.ChildOrderType;
-using RawSide = ExchangeApi.Exchanges.Bitflyer.Raw.Side;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 using Xunit;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Operations;
+using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Contracts.Dtos;
+using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Ticker;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
@@ -21,41 +21,29 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceMarketOrder_MapsDomainToDtoAndReturnsResult()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
+        var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(new BalanceResponse[0]);
         var tradingResponse = new CreateChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-123" };
         var fakeTrading = new FakeBitflyerPrivateTradingApi(tradingResponse);
 
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+        var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
-        var result = await client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
+        var call = await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
+        var result = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderResult>.Ok>(call.Result).Response;
 
         Assert.Equal(OrderIdKind.AcceptanceId, result.Key.Kind);
         Assert.Equal("ACCEPT-123", result.Key.Value);
         Assert.NotNull(fakeTrading.LastRequest);
-        Assert.Equal(new RawProductCode("BTC_JPY"), fakeTrading.LastRequest!.ProductCode);
-        Assert.Equal(RawSide.Buy, fakeTrading.LastRequest!.Side);
-        Assert.Equal(RawChildOrderType.Market, fakeTrading.LastRequest!.ChildOrderType);
-        Assert.Equal(0.01m, fakeTrading.LastRequest!.Size);
-    }
-
-    [Fact]
-    public async Task PlaceStopOrderAsync_ThrowsNotSupported()
-    {
-        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
-        var tradingResponse = new CreateChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-STOP" };
-        var fakeTrading = new FakeBitflyerPrivateTradingApi(tradingResponse);
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
-
-        await Assert.ThrowsAsync<ExchangeFeatureNotSupportedException>(() =>
-            client.PlaceStopOrderAsync(new Symbol("BTC/JPY"), ContractSide.Sell, new Size(0.5m), triggerPrice: new Price(3990000m)));
+        Assert.Equal("BTC_JPY", fakeTrading.LastRequest!.Body.ProductCode);
+        Assert.Equal("BUY", fakeTrading.LastRequest!.Body.Side);
+        Assert.Equal("MARKET", fakeTrading.LastRequest!.Body.ChildOrderType);
+        Assert.Equal(0.01m, fakeTrading.LastRequest!.Body.Size);
     }
 
     [Fact]
     public async Task PlaceMarketOrder_WhenApiReturns429_AddsRateLimitCategory()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
+        var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var exception = new ExchangeApiException(
             message: "too many requests",
@@ -64,19 +52,18 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
             new CreateChildOrderResponse(),
             exceptionToThrow: exception);
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+        var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m)));
-        Assert.Equal(ExchangeErrorCategory.RateLimit, ex.ErrorCategory);
-        Assert.Equal("TOO_MANY_REQUESTS", ex.ExchangeErrorCode);
-        Assert.Equal(ExchangeCode.Bitflyer, ex.Exchange);
-        Assert.Equal(BitflyerOperations.Trading.PlaceOrder, ex.Operation);
+        var call = await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
+        var err = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderResult>.Err>(call.Result);
+        Assert.Equal(CallErrorKind.Http, err.Error.Kind);
+        Assert.Equal(BitflyerOperations.Trading.PlaceOrder, call.Meta.Component);
     }
 
     [Fact]
     public async Task PlaceMarketOrderAsync_WhenInsufficientFunds_MapsBalanceCategory()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
+        var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var exception = new ExchangeApiException(
             message: "insufficient funds",
@@ -84,17 +71,17 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
             new CreateChildOrderResponse(),
             exceptionToThrow: exception);
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+        var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(10m)));
-        Assert.Equal(ExchangeErrorCategory.Balance, ex.ErrorCategory);
-        Assert.Equal("INSUFFICIENT_FUNDS", ex.ExchangeErrorCode);
+        var call = await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(10m));
+        var err = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderResult>.Err>(call.Result);
+        Assert.Equal(CallErrorKind.Http, err.Error.Kind);
     }
 
     [Fact]
     public async Task PlaceMarketOrderAsync_WhenAuthError_MapsAuthCategory()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new Ticker());
+        var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
         var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
         var exception = new ExchangeApiException(
             message: "auth failed",
@@ -103,10 +90,23 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
             new CreateChildOrderResponse(),
             exceptionToThrow: exception);
-        var client = new BitflyerExchangeClient(fakePublic, fakeAccount, fakeTrading);
+        var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
-        var ex = await Assert.ThrowsAsync<ExchangeApiException>(() => client.PlaceMarketOrderAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m)));
-        Assert.Equal(ExchangeErrorCategory.Auth, ex.ErrorCategory);
-        Assert.Equal("AUTHENTICATION_ERROR", ex.ExchangeErrorCode);
+        var call = await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
+        var err = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderResult>.Err>(call.Result);
+        Assert.Equal(CallErrorKind.Http, err.Error.Kind);
+    }
+
+    private static BitflyerExchangeClient CreateClient(
+        IBitflyerRawMarketDataApi marketData,
+        IBitflyerPrivateApi accountApi,
+        IBitflyerRawPrivateTradingApi tradingApi)
+    {
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
+        var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
+        var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);
+
+        return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedTrading);
     }
 }

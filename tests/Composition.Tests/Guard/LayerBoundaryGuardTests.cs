@@ -2,22 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ExchangeApi.Composition.Factory;
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Facade;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Facade;
+using System.Text.Json;
+using ExchangeApi.Composition.Bootstrap.Factories;
+using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Call;
 
 namespace Composition.Tests.Guard;
 
 public class LayerBoundaryGuardTests
 {
     [Fact]
-    public void CreateExchange_ReturnsNormalizedFacade()
+    public void CreateClient_ReturnsExchangeClient()
     {
-        var bitflyerMethod = GetCreateExchangeMethod(typeof(BitflyerFactory));
-        var bittradeMethod = GetCreateExchangeMethod(typeof(BittradeFactory));
+        var bitflyerMethod = GetCreateClientMethod(typeof(BitflyerFactory));
+        var bittradeMethod = GetCreateClientMethod(typeof(BittradeFactory));
 
-        Assert.Equal(typeof(BitflyerNormalizedApi), bitflyerMethod.ReturnType);
-        Assert.Equal(typeof(BittradeNormalizedApi), bittradeMethod.ReturnType);
+        Assert.Equal(typeof(IExchangeClient), bitflyerMethod.ReturnType);
+        Assert.Equal(typeof(IExchangeClient), bittradeMethod.ReturnType);
     }
 
     [Fact]
@@ -44,11 +46,35 @@ public class LayerBoundaryGuardTests
         }
     }
 
-    private static MethodInfo GetCreateExchangeMethod(Type factoryType)
+    [Fact]
+    public void Contracts_PublicSurface_DoesNotExposeRawWireOrJson()
+    {
+        var contracts = typeof(IExchangeClient).Assembly;
+        var forbidden = new List<string>();
+
+        foreach (var type in contracts.GetExportedTypes())
+        {
+            foreach (var signatureType in EnumeratePublicSignatureTypes(type))
+            {
+                if (IsForbiddenContractsType(signatureType))
+                {
+                    forbidden.Add($"{type.FullName}: {signatureType.FullName}");
+                }
+            }
+        }
+
+        if (forbidden.Count > 0)
+        {
+            var message = "Contracts public surface exposes forbidden types:\n" + string.Join("\n", forbidden);
+            throw new Xunit.Sdk.XunitException(message);
+        }
+    }
+
+    private static MethodInfo GetCreateClientMethod(Type factoryType)
     {
         return factoryType
             .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Single(m => m.Name == "CreateExchange");
+            .Single(m => m.Name == "CreateClient");
     }
 
     private static IEnumerable<Type> GetFacadeTypes()
@@ -56,12 +82,12 @@ public class LayerBoundaryGuardTests
         var bitflyer = typeof(BitflyerNormalizedApi)
             .Assembly
             .GetExportedTypes()
-            .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bitflyer.Normalize.Facade");
+            .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bitflyer.Normalize.Call");
 
         var bittrade = typeof(BittradeNormalizedApi)
             .Assembly
             .GetExportedTypes()
-            .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bittrade.Normalize.Facade");
+            .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bittrade.Normalize.Call");
 
         return bitflyer.Concat(bittrade);
     }
@@ -134,5 +160,23 @@ public class LayerBoundaryGuardTests
         var ns = type.Namespace ?? string.Empty;
         return ns.Contains(".Raw", StringComparison.Ordinal)
             || ns.Contains(".Wire", StringComparison.Ordinal);
+    }
+
+    private static bool IsForbiddenContractsType(Type type)
+    {
+        if (type == typeof(void)) return false;
+
+        var ns = type.Namespace ?? string.Empty;
+        if (ns.Contains(".Raw", StringComparison.Ordinal) || ns.Contains(".Wire", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (type == typeof(JsonElement))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

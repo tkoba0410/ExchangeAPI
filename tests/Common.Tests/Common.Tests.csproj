@@ -21,9 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Shared/Common/Shared.Common.csproj" />
-    <ProjectReference Include="../../src/Shared/Contracts/Shared.Contracts.csproj" />
-    <ProjectReference Include="../../src/Shared/Domain/Shared.Domain.csproj" />
+    <ProjectReference Include="../../src/Domain/Common/Common/Shared.Common.csproj" />
+    <ProjectReference Include="../../src/Domain/Contracts/Shared.Contracts.csproj" />
+    <ProjectReference Include="../../src/Domain/Behavior/Domain/Shared.Domain.csproj" />
     <ProjectReference Include="../../src/Core/Core.csproj" />
   </ItemGroup>
 

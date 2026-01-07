@@ -1,16 +1,16 @@
 using System;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Apis;
-using ExchangeApi.Exchanges.Bittrade.Raw;
-using RawOrderState = ExchangeApi.Exchanges.Bittrade.Raw.OrderState;
-using RawOrderType = ExchangeApi.Exchanges.Bittrade.Raw.OrderType;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using CommonSymbol = ExchangeApi.Common.Types.Symbol;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Domain.Services;
+using ExchangeApi.Common.Enums;
+using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
+using ExchangeApi.Spec.CallCommon;
+using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Tests;
@@ -20,16 +20,18 @@ public sealed class BittradeOrderKeyConnectivityTests
     [Fact]
     public async Task GetOrderAsync_UsesOrderKeyValue_WithAcceptanceId()
     {
-        var trading = new RecordingRawTradingApi
+        var trading = new RecordingNormalizedTradingApi
         {
-            Order = CreateOrderDetail("1001")
+            Order = CreateOrderStatus("1001")
         };
-        var api = new BittradeTradingApi(trading, CreateResolver(), accountId: "acc-1");
+        var api = new BittradeTradingApi(trading);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1001");
-        var status = await api.GetOrderAsync(new CommonSymbol("BTC/JPY"), key);
+        var call = await api.GetOrderCallAsync(new CommonSymbol("BTC/JPY"), key);
+        var ok = Assert.IsType<CallResult<OrderStatus>.Ok>(call.Result);
+        var status = ok.Response;
 
-        Assert.Equal("1001", trading.LastOrderId);
+        Assert.Equal("1001", trading.LastOrderKey?.Value);
         Assert.Equal(OrderIdKind.AcceptanceId, status.Key.Kind);
         Assert.Equal("1001", status.Key.Value);
     }
@@ -37,72 +39,86 @@ public sealed class BittradeOrderKeyConnectivityTests
     [Fact]
     public async Task CancelOrderAsync_UsesOrderKeyValue_WithAcceptanceId()
     {
-        var trading = new RecordingRawTradingApi();
-        var api = new BittradeTradingApi(trading, CreateResolver(), accountId: "acc-1");
+        var trading = new RecordingNormalizedTradingApi();
+        var api = new BittradeTradingApi(trading);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1002");
-        var result = await api.CancelOrderAsync(new CommonSymbol("BTC/JPY"), key);
+        var call = await api.CancelOrderCallAsync(new CommonSymbol("BTC/JPY"), key);
+        var ok = Assert.IsType<CallResult<CancelResult>.Ok>(call.Result);
+        var result = ok.Response;
 
         Assert.True(result.IsSuccess);
-        Assert.Equal("1002", trading.LastOrderId);
+        Assert.Equal("1002", trading.LastOrderKey?.Value);
     }
 
-    private static RawOrderDetailResponse CreateOrderDetail(string id) =>
+    private static OrderStatus CreateOrderStatus(string id) =>
         new(
-            Status: "ok",
-            Data: new RawOrderDetail(
-                Id: new RawOrderId(id),
-                RawSymbol: RawSymbol.From("btcjpy"),
-                AccountId: "acc-1",
-                Amount: "0.01",
-                Price: "100",
-                State: RawOrderState.Filled,
-                Type: RawOrderType.BuyLimit,
-                ClientOrderId: null,
-                CreatedAt: DateTimeOffset.FromUnixTimeMilliseconds(1),
-                FinishedAt: null,
-                FilledAmount: "0.01",
-                FilledCashAmount: "1",
-                Fees: "0"));
+            ProductCode: "BTC_JPY",
+            Key: new OrderKey(OrderIdKind.AcceptanceId, id),
+            Status: OrderState.Completed,
+            ExecutedSize: new Size(0.01m),
+            OutstandingSize: new Size(0m),
+            Price: new Price(100m),
+            AveragePrice: new Price(100m));
 
-    private static IExchangeMarketResolver CreateResolver() =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
-            new[] { new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot") },
-            null,
-            null,
-            null)));
-
-    private sealed class StubExchangeInfoApi : IExchangeInfoApi
+    private sealed class RecordingNormalizedTradingApi : IBittradeNormalizedTradingApi
     {
-        private readonly ExchangeInfo _info;
+        public OrderKey? LastOrderKey { get; private set; }
+        public Symbol? LastSymbol { get; private set; }
+        public OrderStatus Order { get; init; } = CreateOrderStatus("default");
 
-        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
+        public Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
+            OrderRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(new PlaceOrderRequest(request), new OrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
 
-        public Task<ExchangeInfo> GetExchangeInfoAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(_info);
-    }
-
-    private sealed class RecordingRawTradingApi : IBittradeRawTradingApi
-    {
-        public string? LastOrderId { get; private set; }
-        public RawOrderDetailResponse Order { get; init; } = CreateOrderDetail("0");
-
-        public Task<RawPlaceOrderResponse> CreateOrderAsync(RawCreateOrderRequest request, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new RawPlaceOrderResponse("ok", new RawOrderId("0")));
-
-        public Task<RawCancelOrderResponse> CancelOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
+        public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
+            Symbol symbol,
+            OrderKey orderKey,
+            CancellationToken ct = default)
         {
-            LastOrderId = orderId.Value;
-            return Task.FromResult(new RawCancelOrderResponse("ok", orderId));
+            LastSymbol = symbol;
+            LastOrderKey = orderKey;
+            return Task.FromResult(MakeOkCall(new CancelOrderRequest(symbol, orderKey), new CancelResult(true)));
         }
 
-        public Task<RawOpenOrdersResponse> GetOpenOrdersAsync(RawSymbol symbol, string accountId, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new RawOpenOrdersResponse("ok", Array.Empty<RawOrderSummary>()));
+        public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>> GetOpenOrdersCallAsync(
+            Symbol symbol,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(new GetOpenOrdersRequest(symbol), (IReadOnlyList<OpenOrder>)Array.Empty<OpenOrder>()));
 
-        public Task<RawOrderDetailResponse> GetOrderAsync(RawOrderId orderId, CancellationToken cancellationToken = default)
+        public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
+            Symbol symbol,
+            OrderKey orderKey,
+            CancellationToken ct = default)
         {
-            LastOrderId = orderId.Value;
-            return Task.FromResult(Order);
+            LastSymbol = symbol;
+            LastOrderKey = orderKey;
+            return Task.FromResult(MakeOkCall(new GetOrderRequest(symbol, orderKey), Order with { Key = orderKey }));
+        }
+
+        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+            Symbol symbol,
+            int? limit = null,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(
+                new GetAccountExecutionsRequest(symbol, limit),
+                (IReadOnlyList<BittradeExecutionNormalized>)Array.Empty<BittradeExecutionNormalized>()));
+
+        private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
+        {
+            var meta = new CallMeta(
+                Layer: "Normalized",
+                Component: "RecordingNormalizedTradingApi",
+                Tags: null,
+                Children: null);
+            return new Call<TReq, TResponse>(
+                Id: CallId.New(),
+                StartedAt: DateTimeOffset.UtcNow,
+                Duration: TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<TResponse>.Ok(response),
+                Meta: meta);
         }
     }
 }

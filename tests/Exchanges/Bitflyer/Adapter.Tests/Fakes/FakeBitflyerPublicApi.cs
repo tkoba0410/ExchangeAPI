@@ -1,100 +1,109 @@
+using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using RawProductCode = ExchangeApi.Exchanges.Bitflyer.Raw.Types.RawProductCode;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Spec.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes
+namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
+
+internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
 {
-    internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
+    private readonly Ticker _response;
+    private readonly Board? _board;
+
+    public FakeBitflyerPublicApi(Ticker response, Board? board = null)
     {
-        private readonly Ticker _response;
-        private readonly Board? _board;
+        _response = response;
+        _board = board;
+    }
 
-        public FakeBitflyerPublicApi(Ticker response, Board? board = null)
+    public Task<Call<GetTickerRequest, Ticker>> GetTickerAsync(
+        GetTickerRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(MakeOkCall(request, _response));
+
+    public Task<Call<GetBoardRequest, Board>> GetBoardAsync(
+        GetBoardRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (_board is null)
         {
-            _response = response;
-            _board = board;
+            throw new InvalidOperationException("Board response is not configured.");
         }
 
-        public Task<Ticker> GetTickerAsync(
-            RawProductCode productCode,
-            bool useAliasPath = false,
-            CancellationToken cancellationToken = default)
+        return Task.FromResult(MakeOkCall(request, _board));
+    }
+
+    public Task<Call<GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsAsync(
+        GetExecutionsRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<ExecutionPublicResponse> executions = new[]
         {
-            // Stage1 では BTC_JPY のみ想定なので、簡単なガードだけ入れておく
-            if (productCode.Value != "BTC_JPY")
+            new ExecutionPublicResponse
             {
-                throw new System.ArgumentException($"Unexpected productCode: {productCode}", nameof(productCode));
+                Id = 1,
+                ProductCode = request.ProductCode,
+                Side = "BUY",
+                Price = 100m,
+                Size = 0.01m,
+                ExecDate = DateTimeOffset.UtcNow,
             }
+        };
 
-            return Task.FromResult(_response);
-        }
+        return Task.FromResult(MakeOkCall(request, executions));
+    }
 
-        public Task<Board> GetBoardAsync(RawProductCode productCode, bool useAliasPath = false, CancellationToken cancellationToken = default)
-        {
-            if (_board is null)
-            {
-                throw new System.InvalidOperationException("Board response is not configured.");
-            }
+    public Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsAsync(
+        GetMarketsRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(MakeOkCall(request, (IReadOnlyList<Market>)new[] { new Market("BTC_JPY", "BTC_JPY") }));
 
-            if (productCode.Value != "BTC_JPY")
-            {
-                throw new System.ArgumentException($"Unexpected productCode: {productCode}", nameof(productCode));
-            }
+    public Task<Call<GetChatsRequest, IReadOnlyList<Chat>>> GetChatsAsync(
+        GetChatsRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(MakeOkCall(request, (IReadOnlyList<Chat>)new[] { new Chat("n", "m", DateTimeOffset.UtcNow) }));
 
-            return Task.FromResult(_board);
-        }
+    public Task<Call<GetHealthRequest, HealthResponse>> GetHealthAsync(
+        GetHealthRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(MakeOkCall(request, new HealthResponse("NORMAL")));
 
-        public Task<IReadOnlyList<ExecutionPublicResponse>> GetExecutionsAsync(
-            RawProductCode productCode,
-            int? count = null,
-            long? before = null,
-            long? after = null,
-            bool useAliasPath = false,
-            CancellationToken cancellationToken = default)
-        {
-            if (productCode.Value != "BTC_JPY")
-            {
-                throw new System.ArgumentException($"Unexpected productCode: {productCode}", nameof(productCode));
-            }
+    public Task<Call<GetBoardStateRequest, BoardStateResponse>> GetBoardStateAsync(
+        GetBoardStateRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(MakeOkCall(request, new BoardStateResponse("NORMAL", "RUNNING", null)));
 
-            IReadOnlyList<ExecutionPublicResponse> executions = new[]
-            {
-                new ExecutionPublicResponse
-                {
-                    Id = 1,
-                    ProductCode = new RawProductCode("BTC_JPY"),
-                    Side = "BUY",
-                    Price = 100m,
-                    Size = 0.01m,
-                    ExecDate = System.DateTimeOffset.UtcNow,
-                }
-            };
+    public Task<Call<GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageAsync(
+        GetCorporateLeverageRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(MakeOkCall(request, new CorporateLeverageResponse(
+            CurrentMax: 7.7m,
+            CurrentStartDate: DateTimeOffset.UtcNow,
+            NextMax: 7.65m,
+            NextStartDate: DateTimeOffset.UtcNow.AddDays(7))));
 
-            return Task.FromResult(executions);
-        }
+    public Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateAsync(
+        GetFundingRateRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(MakeOkCall(request, new FundingRateResponse(0m, DateTimeOffset.UtcNow)));
 
-        public Task<IReadOnlyList<Market>> GetMarketsAsync(string? region = null, bool useAliasPath = false, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<Market>>(new[] { new Market(new RawProductCode("BTC_JPY"), "BTC_JPY") });
-
-        public Task<IReadOnlyList<Chat>> GetChatsAsync(string? fromDate = null, string? region = null, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<Chat>>(new[] { new Chat("n", "m", System.DateTimeOffset.UtcNow) });
-
-        public Task<HealthResponse> GetHealthAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new HealthResponse("NORMAL"));
-
-        public Task<BoardStateResponse> GetBoardStateAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new BoardStateResponse("NORMAL", "RUNNING", null));
-
-        public Task<CorporateLeverageResponse> GetCorporateLeverageAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(new CorporateLeverageResponse(
-                CurrentMax: 7.7m,
-                CurrentStartDate: System.DateTimeOffset.UtcNow,
-                NextMax: 7.65m,
-                NextStartDate: System.DateTimeOffset.UtcNow.AddDays(7)));
-
-        public Task<FundingRateResponse> GetFundingRateAsync(RawProductCode productCode, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new FundingRateResponse(0m, System.DateTimeOffset.UtcNow));
+    private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
+    {
+        var meta = new CallMeta(
+            Layer: "Raw",
+            Component: "FakeBitflyerPublicApi",
+            Tags: null,
+            Children: null);
+        return new Call<TReq, TResponse>(
+            Id: CallId.New(),
+            StartedAt: DateTimeOffset.UtcNow,
+            Duration: TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<TResponse>.Ok(response),
+            Meta: meta);
     }
 }

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bittrade.Raw;
 using Xunit;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Tests;
@@ -30,12 +29,12 @@ public sealed class BittradeEnumClosedSetTests
         var detail = JsonSerializer.Deserialize<RawOrderDetail>(json);
 
         Assert.NotNull(detail);
-        Assert.Equal(OrderState.Submitted, detail!.State);
-        Assert.Equal(OrderType.BuyLimit, detail.Type);
+        Assert.Equal("submitted", detail!.State);
+        Assert.Equal("buy-limit", detail.Type);
     }
 
     [Fact]
-    public void OrderDetail_UnknownState_Throws()
+    public void OrderDetail_UnknownState_Deserializes()
     {
         var json = """
         {
@@ -55,11 +54,13 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<RawOrderDetail>(json));
+        var detail = JsonSerializer.Deserialize<RawOrderDetail>(json);
+        Assert.NotNull(detail);
+        Assert.Equal("mystery", detail!.State);
     }
 
     [Fact]
-    public void OrderDetail_UnknownType_Throws()
+    public void OrderDetail_UnknownType_Deserializes()
     {
         var json = """
         {
@@ -79,11 +80,13 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<RawOrderDetail>(json));
+        var detail = JsonSerializer.Deserialize<RawOrderDetail>(json);
+        Assert.NotNull(detail);
+        Assert.Equal("buy-unknown", detail!.Type);
     }
 
     [Fact]
-    public void CreateRetailOrderRequest_UnknownType_Throws()
+    public void CreateRetailOrderRequest_UnknownType_Deserializes()
     {
         var json = """
         {
@@ -95,7 +98,9 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<RawCreateRetailOrderRequest>(json));
+        var request = JsonSerializer.Deserialize<RawCreateRetailOrderRequest>(json);
+        Assert.NotNull(request);
+        Assert.Equal(3, request!.Type);
     }
 
     [Fact]
@@ -110,6 +115,6 @@ public sealed class BittradeEnumClosedSetTests
         var request = JsonSerializer.Deserialize<RawCancelOpenOrdersRequest>(json);
 
         Assert.NotNull(request);
-        Assert.Equal(OrderSide.Buy, request!.Side);
+        Assert.Equal("buy", request!.Side);
     }
 }

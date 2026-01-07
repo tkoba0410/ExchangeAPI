@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Factory;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Facade;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 using ExchangeApi.Core.Transport.Http;
 using ExchangeApi.Core.Transport.Protocol;
 using System.Net.Http;
@@ -30,7 +30,9 @@ public class PublicApiLiveTests
         var client = BitflyerClientFactory.CreatePublic(options);
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var ticker = await client.GetTickerAsync(new Symbol("BTC/JPY"), cts.Token);
+        var call = await client.GetTickerCallAsync(new Symbol("BTC/JPY"), cts.Token);
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.Ticker>.Ok>(call.Result);
+        var ticker = ok.Response;
         var msg = $"bitFlyer Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
@@ -42,10 +44,12 @@ public class PublicApiLiveTests
     public async Task Bitflyer_PublicExchangeInfo_Works()
     {
         var options = new BitflyerClientOptions { Observer = _observer };
-        var client = BitflyerClientFactory.CreatePublic(options);
+        var infoApi = new ExchangeApi.Exchanges.Bitflyer.Adapter.Api.ExchangeInfo.BitflyerExchangeInfoApi();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var info = await client.GetExchangeInfoAsync(cts.Token);
+        var call = await infoApi.GetExchangeInfoCallAsync(cts.Token);
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var info = ok.Response;
         var msg = $"bitFlyer ExchangeInfo markets={info.Markets.Count}";
         Log(msg);
 
@@ -58,7 +62,9 @@ public class PublicApiLiveTests
         var client = CreateBittradePublicClient();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var ticker = await client.GetTickerAsync(new Symbol("BTC/JPY"), cts.Token);
+        var call = await client.GetTickerCallAsync(new Symbol("BTC/JPY"), cts.Token);
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.Ticker>.Ok>(call.Result);
+        var ticker = ok.Response;
         var msg = $"Bittrade Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
@@ -69,10 +75,14 @@ public class PublicApiLiveTests
     [LiveFact]
     public async Task Bittrade_PublicExchangeInfo_Works()
     {
-        var client = CreateBittradePublicClient();
+        #pragma warning disable CS0618
+        var infoApi = ExchangeApi.Exchanges.Bittrade.Adapter.Api.Factory.BittradeClientFactory.CreateExchangeInfo();
+        #pragma warning restore CS0618
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var info = await client.GetExchangeInfoAsync(cts.Token);
+        var call = await infoApi.GetExchangeInfoCallAsync(cts.Token);
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var info = ok.Response;
         var msg = $"Bittrade ExchangeInfo markets={info.Markets.Count}";
         Log(msg);
 

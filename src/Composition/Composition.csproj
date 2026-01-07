@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <RootNamespace>Composition</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Common\Common\Shared.Common.csproj" />
+    <ProjectReference Include="..\Domain\Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Boundary\Adapters\Bitflyer\Exchange.Bitflyer.Adapter.csproj" />
+    <ProjectReference Include="..\Boundary\Adapters\Bittrade\Exchange.Bittrade.Adapter.csproj" />
+  </ItemGroup>
+
+</Project>

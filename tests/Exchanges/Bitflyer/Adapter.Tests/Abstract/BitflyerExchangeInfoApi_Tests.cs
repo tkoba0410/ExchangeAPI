@@ -1,0 +1,22 @@
+using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.ExchangeInfo;
+using Xunit;
+
+namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+
+public class BitflyerExchangeInfoApi_Tests
+{
+    [Fact]
+    public async Task GetExchangeInfo_ReturnsFeatureFlags()
+    {
+        var api = new BitflyerExchangeInfoApi();
+
+        var call = await api.GetExchangeInfoCallAsync();
+        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var info = ok.Response;
+
+        Assert.False(info.Features!.SupportsCandlestick);
+        Assert.False(info.Features.SupportsOrderBookDelta);
+        Assert.False(info.Features.SupportsRealtimeExecutions);
+    }
+}

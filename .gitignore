@@ -79,3 +79,6 @@ Thumbs.db
 
 # OS依存
 .DS_Store
+
+# local-only docs
+local/

@@ -137,15 +137,9 @@ public sealed class OrderPollingTests
             throw new NotSupportedException();
         public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
-        public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
         public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
-        public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
+        public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
 
@@ -179,15 +173,9 @@ public sealed class OrderPollingTests
             throw new NotSupportedException();
         public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
-        public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(Symbol symbol, Side side, Size size, Price triggerPrice, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
         public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
-        public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(Symbol symbol, string? parentOrderId = null, string? parentOrderAcceptanceId = null, CancellationToken cancellationToken = default) =>
+        public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
 }

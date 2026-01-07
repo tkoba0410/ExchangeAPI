@@ -4,6 +4,5 @@ public enum OrderIdKind
 {
     AcceptanceId,
     ExchangeOrderId,
-    ClientOrderId,
-    ParentOrderId
+    ClientOrderId
 }

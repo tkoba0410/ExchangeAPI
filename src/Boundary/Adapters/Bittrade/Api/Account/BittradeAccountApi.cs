@@ -57,24 +57,4 @@ internal sealed class BittradeAccountApi : IAccountApi
         }
     }
 
-    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetAccountExecutionsRequest(symbol);
-        var now = DateTimeOffset.UtcNow;
-        var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: "Bittrade.Account.GetAccountExecutions",
-            Tags: null,
-            Children: null);
-        return Task.FromResult(new Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(
-            Id: CallId.New(),
-            StartedAt: now,
-            Duration: TimeSpan.Zero,
-            Request: request,
-            Result: new CallResult<IReadOnlyList<ExecutionAccount>>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
-            Meta: meta));
-    }
-
 }

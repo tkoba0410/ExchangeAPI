@@ -56,44 +56,4 @@ public sealed class BitflyerOrderKeyConnectivityTests
         Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.Body.ChildOrderAcceptanceId);
     }
 
-    [Fact]
-    public async Task OpenOrderKey_CanGetAndCancel()
-    {
-        var acceptanceId = "ACCEPT-2";
-        var childOrders = new[]
-        {
-            new ChildOrderResponse
-            {
-                ChildOrderId = "JRF-2",
-                ChildOrderAcceptanceId = acceptanceId,
-                ProductCode = "BTC_JPY",
-                Side = "BUY",
-                ChildOrderType = "LIMIT",
-                Size = 0.01m,
-                ExecutedSize = 0m,
-                OutstandingSize = 0.01m
-            }
-        };
-
-        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>(), childOrders: childOrders);
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-        var markets = BitflyerTestHelpers.CreateResolver();
-        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, privateApi, markets);
-        var api = new BitflyerTradingApi(normalized);
-
-        var openOrdersCall = await api.GetOrdersCallAsync(new Symbol("BTC/JPY"));
-        var openOrders = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<IReadOnlyList<OpenOrder>>.Ok>(openOrdersCall.Result).Response;
-        var key = openOrders[0].Key;
-
-        var statusCall = await api.GetOrderCallAsync(new Symbol("BTC/JPY"), key);
-        var status = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderStatus>.Ok>(statusCall.Result).Response;
-        var cancelCall = await api.CancelOrderCallAsync(new Symbol("BTC/JPY"), key);
-        Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<CancelResult>.Ok>(cancelCall.Result);
-
-        Assert.Equal(OrderIdKind.AcceptanceId, key.Kind);
-        Assert.Equal(acceptanceId, key.Value);
-        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.Body.ChildOrderAcceptanceId);
-        Assert.Equal(acceptanceId, status.Key.Value);
-    }
-
 }

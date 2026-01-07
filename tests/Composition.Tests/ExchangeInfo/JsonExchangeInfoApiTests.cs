@@ -42,7 +42,7 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
               "isSupported": true
             }
           ],
-          "features": { "supportsWebSocket": false, "supportsMargin": true, "supportsStopOrder": true, "supportsParentOrder": true, "supportsCandlestick": false, "supportsOrderBookDelta": false, "supportsRealtimeExecutions": false, "supportsWithdraw": false },
+          "features": { "supportsWebSocket": false, "supportsMargin": false, "supportsStopOrder": false, "supportsParentOrder": false, "supportsCandlestick": false, "supportsOrderBookDelta": false, "supportsRealtimeExecutions": false, "supportsWithdraw": false },
           "rateLimits": { "requestsPerMinute": 500, "ordersPerMinute": 100 },
           "maintenance": { "status": "Planned", "plannedUntil": "2025-01-01T04:10:00Z", "message": "daily" }
         }
@@ -69,14 +69,14 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
     {
         File.WriteAllText(_basePath, """
         { "markets": [ { "symbol": "BTC/JPY", "productCode": "BTC_JPY", "type": "Spot", "feeCurrency": "BTC", "makerFeeRate": 0.001, "takerFeeRate": 0.002, "feeType": "Percentage" } ],
-          "features": { "supportsWebSocket": false, "supportsMargin": true, "supportsStopOrder": true, "supportsParentOrder": true, "supportsCandlestick": false, "supportsOrderBookDelta": false, "supportsRealtimeExecutions": false, "supportsWithdraw": false },
+          "features": { "supportsWebSocket": false, "supportsMargin": false, "supportsStopOrder": false, "supportsParentOrder": false, "supportsCandlestick": false, "supportsOrderBookDelta": false, "supportsRealtimeExecutions": false, "supportsWithdraw": false },
           "rateLimits": { "requestsPerMinute": 500, "ordersPerMinute": 100 }
         }
         """);
 
         File.WriteAllText(_overlayPath, """
         { "markets": [ { "symbol": "BTC/JPY", "productCode": "BTC_JPY", "type": "Spot", "feeCurrency": "JPY", "makerFeeRate": 0.003, "takerFeeRate": 0.004, "feeType": "Flat" } ],
-          "features": { "supportsWebSocket": true, "supportsMargin": true, "supportsStopOrder": true, "supportsParentOrder": true, "supportsCandlestick": false, "supportsOrderBookDelta": false, "supportsRealtimeExecutions": false, "supportsWithdraw": false },
+          "features": { "supportsWebSocket": true, "supportsMargin": false, "supportsStopOrder": false, "supportsParentOrder": false, "supportsCandlestick": false, "supportsOrderBookDelta": false, "supportsRealtimeExecutions": false, "supportsWithdraw": false },
           "rateLimits": { "requestsPerMinute": 1000, "ordersPerMinute": 200 }
         }
         """);

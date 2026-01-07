@@ -8,10 +8,6 @@ public sealed record CancelChildOrderRequest(PrivateModels.CancelChildOrderReque
 
 public sealed record CancelAllChildOrdersRequest(PrivateModels.CancelAllChildOrdersRequest Body);
 
-public sealed record CreateParentOrderRequest(PrivateModels.CreateParentOrderRequest Body);
-
-public sealed record CancelParentOrderRequest(PrivateModels.CancelParentOrderRequest Body);
-
 public sealed record CreateWithdrawalRequest(PrivateModels.CreateWithdrawalRequest Body);
 
 public sealed record SendChildOrderRequest(RawSendChildOrderRequest Body);

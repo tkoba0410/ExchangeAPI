@@ -10,8 +10,8 @@ using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Account;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.ExchangeInfo;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Margin;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Market;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.History;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
@@ -22,19 +22,17 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using ContractSide = ExchangeApi.Common.Enums.Side;
 using ExchangeApi.Spec.CallCommon;
-using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IMarginAccountApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess
+public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IExchangeClient, IHasRawAccess
 {
     private readonly IMarketDataApi _marketApi;
     private readonly ITradingApi _tradingApi;
-    private readonly IMarginAccountApi _marginApi;
     private readonly IAccountApi _accountApi;
-    private readonly IExchangeInfoApi _exchangeInfoApi;
+    private readonly ISpotHistoryApi _historyApi;
     private readonly MarketApi? _marketApiConcrete;
     private readonly BitflyerAccountApi? _accountApiConcrete;
     internal BitflyerApiBundle? ApiBundle { get; }
@@ -44,39 +42,35 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public IMarketDataApi Market => _marketApi;
     public ITradingApi Trading => _tradingApi;
     public IAccountApi Account => _accountApi;
-    public IExchangeInfoApi Info => _exchangeInfoApi;
+    public ISpotHistoryApi History => _historyApi;
 
     internal BitflyerExchangeClient(
         BitflyerNormalizedMarketDataFacade marketData,
         IBitflyerNormalizedAccountApi account,
-        IBitflyerNormalizedMarginApi margin,
         IBitflyerNormalizedTradingApi trading,
         ExchangeCode exchangeCode = ExchangeCode.Bitflyer,
         object? rawBundle = null)
         : this(
             marketApi: CreateMarketApi(marketData),
             tradingApi: CreateTradingApi(trading),
-            marginApi: CreateMarginApi(margin),
             accountApi: CreateAccountApi(account),
-            exchangeInfoApi: new BitflyerExchangeInfoApi(),
+            historyApi: CreateSpotHistoryApi(trading, account),
             rawBundle: rawBundle)
     {
-        ApiBundle = new BitflyerApiBundle(marketData, account, margin, trading, rawBundle);
+        ApiBundle = new BitflyerApiBundle(marketData, account, trading, rawBundle);
     }
 
     public BitflyerExchangeClient(
         IMarketDataApi marketApi,
         ITradingApi tradingApi,
-        IMarginAccountApi marginApi,
         IAccountApi accountApi,
-        IExchangeInfoApi exchangeInfoApi,
+        ISpotHistoryApi historyApi,
         object? rawBundle = null)
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
-        _marginApi = marginApi ?? throw new ArgumentNullException(nameof(marginApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
-        _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
+        _historyApi = historyApi ?? throw new ArgumentNullException(nameof(historyApi));
         _marketApiConcrete = _marketApi as MarketApi;
         _accountApiConcrete = _accountApi as BitflyerAccountApi;
         _rawBundle = rawBundle;
@@ -86,9 +80,8 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         : this(
             marketApi: CreateMarketApi(bundle.MarketData),
             tradingApi: CreateTradingApi(bundle.Trading),
-            marginApi: CreateMarginApi(bundle.Margin),
             accountApi: CreateAccountApi(bundle.Account),
-            exchangeInfoApi: new BitflyerExchangeInfoApi(),
+            historyApi: CreateSpotHistoryApi(bundle.Trading, bundle.Account),
             rawBundle: bundle.RawBundle)
     {
         ApiBundle = bundle;
@@ -102,14 +95,14 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         var exchangeInfo = new BitflyerExchangeInfoApi();
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var accountApi = BitflyerNormalizeFactory.CreateAccountApi(restClient, markets);
-        var marginApi = BitflyerNormalizeFactory.CreateMarginApi(restClient, markets);
         var tradingApi = BitflyerNormalizeFactory.CreateTradingApi(restClient, markets);
+        var historyApi = CreateSpotHistoryApi(tradingApi, accountApi);
 
         return new BitflyerExchangeClient(
-            marketData: normalized.MarketData,
-            account: accountApi,
-            margin: marginApi,
-            trading: tradingApi,
+            marketApi: CreateMarketApi(normalized.MarketData),
+            tradingApi: CreateTradingApi(tradingApi),
+            accountApi: CreateAccountApi(accountApi),
+            historyApi: historyApi,
             rawBundle: null);
     }
 
@@ -123,11 +116,13 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private static BitflyerTradingApi CreateTradingApi(IBitflyerNormalizedTradingApi trading) =>
         new(trading);
 
-    private static BitflyerMarginApi CreateMarginApi(IBitflyerNormalizedMarginApi account) =>
-        new(account);
-
     private static BitflyerAccountApi CreateAccountApi(IBitflyerNormalizedAccountApi account) =>
         new(account);
+
+    private static ISpotHistoryApi CreateSpotHistoryApi(
+        IBitflyerNormalizedTradingApi trading,
+        IBitflyerNormalizedAccountApi account) =>
+        new BitflyerSpotHistoryApi(trading, account);
 
     // Market
     public Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(
@@ -161,24 +156,11 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceMarketOrderCallAsync(symbol, side, size, cancellationToken);
 
-    public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
-        Symbol symbol,
-        ContractSide side,
-        Size size,
-        Price triggerPrice,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceStopOrderCallAsync(symbol, side, size, triggerPrice, cancellationToken);
-
     public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderCallAsync(symbol, orderKey, cancellationToken);
-
-    public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOrdersCallAsync(symbol, cancellationToken);
 
     public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
@@ -186,43 +168,15 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrderCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
         Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.GetParentOrdersCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken);
+        _tradingApi.GetOpenOrdersCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.GetParentOrderCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken);
-
-    // Account/Margin
+    // Account
     public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesCallAsync(cancellationToken);
-
-    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default) =>
-        _accountApi.GetAccountExecutionsCallAsync(symbol, cancellationToken);
-
-    public Task<Call<GetOpenPositionsRequest, IReadOnlyList<Position>>> GetOpenPositionsCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default) =>
-        _marginApi.GetOpenPositionsCallAsync(symbol, cancellationToken);
-
-    public Task<Call<GetCollateralRequest, Collateral>> GetCollateralCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _marginApi.GetCollateralCallAsync(cancellationToken);
-
-    // ExchangeInfoDto
-    public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
     private MarketApi GetMarketApi()
     {

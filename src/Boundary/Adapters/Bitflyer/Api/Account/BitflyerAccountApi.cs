@@ -45,26 +45,4 @@ internal sealed class BitflyerAccountApi : IAccountApi
         }
     }
 
-    public async Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetAccountExecutionsRequest(symbol);
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _accountApi.GetAccountExecutionsCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Account.GetAccountExecutions);
-        }
-        catch (Exception ex)
-        {
-            return ApiCallMapper.FromException<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(
-                request,
-                startedAt,
-                BitflyerOperations.Account.GetAccountExecutions,
-                ex);
-        }
-    }
-
 }

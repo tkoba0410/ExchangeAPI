@@ -88,10 +88,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
             var markets = BitflyerTestHelpers.CreateResolver();
             var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
             var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
-            var normalizedMargin = BitflyerTestHelpers.CreateMarginApi(accountApi, markets);
             var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);
 
-            return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedMargin, normalizedTrading);
+            return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedTrading);
         }
 
         private static IBitflyerRawMarketDataApi CreateDummyPublicApi()

@@ -58,7 +58,6 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
                 request.ChildOrderStatusState,
                 request.ChildOrderAcceptanceId,
                 request.ChildOrderId,
-                request.ParentOrderId,
                 request.Count,
                 request.Before,
                 request.After),

@@ -41,20 +41,6 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     }
 
     [Fact]
-    public async Task PlaceStopOrderAsync_ThrowsNotSupported()
-    {
-        var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
-        var tradingResponse = new CreateChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-STOP" };
-        var fakeTrading = new FakeBitflyerPrivateTradingApi(tradingResponse);
-        var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
-
-        var call = await client.PlaceStopOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Sell, new Size(0.5m), triggerPrice: new Price(3990000m));
-        var err = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<OrderResult>.Err>(call.Result);
-        Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
-    }
-
-    [Fact]
     public async Task PlaceMarketOrder_WhenApiReturns429_AddsRateLimitCategory()
     {
         var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
@@ -111,17 +97,16 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         Assert.Equal(CallErrorKind.Http, err.Error.Kind);
     }
 
-        private static BitflyerExchangeClient CreateClient(
-            IBitflyerRawMarketDataApi marketData,
-            IBitflyerPrivateApi accountApi,
-            IBitflyerRawPrivateTradingApi tradingApi)
-        {
-            var markets = BitflyerTestHelpers.CreateResolver();
-            var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
+    private static BitflyerExchangeClient CreateClient(
+        IBitflyerRawMarketDataApi marketData,
+        IBitflyerPrivateApi accountApi,
+        IBitflyerRawPrivateTradingApi tradingApi)
+    {
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
         var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
-        var normalizedMargin = BitflyerTestHelpers.CreateMarginApi(accountApi, markets);
         var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);
 
-        return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedMargin, normalizedTrading);
+        return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedTrading);
     }
 }

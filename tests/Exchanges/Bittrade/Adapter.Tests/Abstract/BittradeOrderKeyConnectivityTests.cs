@@ -7,6 +7,7 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
 using ExchangeApi.Spec.CallCommon;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
@@ -95,6 +96,14 @@ public sealed class BittradeOrderKeyConnectivityTests
             LastOrderKey = orderKey;
             return Task.FromResult(MakeOkCall(new GetOrderRequest(symbol, orderKey), Order with { Key = orderKey }));
         }
+
+        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+            Symbol symbol,
+            int? limit = null,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(
+                new GetAccountExecutionsRequest(symbol, limit),
+                (IReadOnlyList<BittradeExecutionNormalized>)Array.Empty<BittradeExecutionNormalized>()));
 
         private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
         {

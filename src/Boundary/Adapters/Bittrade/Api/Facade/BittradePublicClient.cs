@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Contracts.Requests;
@@ -11,22 +10,22 @@ using ExchangeApi.Boundary.Adapters.Common.NotSupported;
 using CommonSymbol = ExchangeApi.Common.Types.Symbol;
 using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Common.Enums;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Spec.CallCommon;
-using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 
 /// <summary>
 /// Bittrade の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess
+public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient, IHasRawAccess
 {
     private readonly IMarketDataApi _marketApi;
-    private readonly IExchangeInfoApi _exchangeInfoApi;
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
+    private readonly ISpotHistoryApi _historyApi;
     private readonly IRestClient? _restClient;
     private readonly object? _rawBundle;
     internal BittradeApiBundle? ApiBundle { get; }
@@ -35,7 +34,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
     public IMarketDataApi Market => _marketApi;
     public ITradingApi Trading => _tradingApi;
     public IAccountApi Account => _accountApi;
-    public IExchangeInfoApi Info => _exchangeInfoApi;
+    public ISpotHistoryApi History => _historyApi;
 
     public BittradePublicClient(IRestClient restClient)
     {
@@ -45,28 +44,28 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         _marketApi = new BittradeMarketDataApi(normalizeBundle.MarketData, markets);
-        _exchangeInfoApi = exchangeInfo;
         _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bittrade);
         _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
+        _historyApi = new NotSupportedSpotHistoryApi();
         _restClient = restClient;
         _rawBundle = normalizeBundle.RawBundle;
     }
 
-    public BittradePublicClient(IMarketDataApi marketApi, IExchangeInfoApi exchangeInfoApi)
+    public BittradePublicClient(IMarketDataApi marketApi)
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
-        _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
         _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bittrade);
         _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
+        _historyApi = new NotSupportedSpotHistoryApi();
     }
 
     internal BittradePublicClient(BittradeApiBundle bundle)
     {
         if (bundle is null) throw new ArgumentNullException(nameof(bundle));
         _marketApi = new BittradeMarketDataApi(bundle.NormalizedMarketData, bundle.Markets);
-        _exchangeInfoApi = bundle.ExchangeInfo;
         _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bittrade);
         _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
+        _historyApi = new NotSupportedSpotHistoryApi();
         _restClient = bundle.RestClient;
         _rawBundle = bundle.RawBundle;
         ApiBundle = bundle;
@@ -86,10 +85,6 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
-
-    public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
     public bool TryGetRaw<T>(out T raw) where T : class
     {

@@ -20,16 +20,6 @@ internal static class BitflyerNormalizeFactory
         return new BitflyerNormalizedAccountApi(accountApi, markets);
     }
 
-    public static IBitflyerNormalizedMarginApi CreateMarginApi(IRestClient restClient, IExchangeMarketResolver markets)
-    {
-        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        if (markets is null) throw new ArgumentNullException(nameof(markets));
-
-        var wire = new WireTransport(restClient);
-        var accountApi = new BitflyerPrivateApi(wire);
-        return new BitflyerNormalizedMarginApi(accountApi, markets);
-    }
-
     public static IBitflyerNormalizedTradingApi CreateTradingApi(IRestClient restClient, IExchangeMarketResolver markets)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));

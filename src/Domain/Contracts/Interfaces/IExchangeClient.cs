@@ -7,6 +7,6 @@ public interface IExchangeClient
     IMarketDataApi Market { get; }
     ITradingApi Trading { get; }
     IAccountApi Account { get; }
-    IExchangeInfoApi Info { get; }
+    ISpotHistoryApi History { get; }
     ExchangeCode ExchangeCode { get; }
 }

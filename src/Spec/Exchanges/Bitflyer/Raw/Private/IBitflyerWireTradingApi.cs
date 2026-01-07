@@ -19,14 +19,6 @@ public interface IBitflyerRawPrivateTradingApi
         Requests.CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<Requests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
-        Requests.CreateParentOrderRequest request,
-        CancellationToken cancellationToken = default);
-
-    Task<Call<Requests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
-        Requests.CancelParentOrderRequest request,
-        CancellationToken cancellationToken = default);
-
     Task<Call<Requests.CreateWithdrawalRequest, CreateWithdrawalResponse>> CreateWithdrawalAsync(
         Requests.CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default);

@@ -11,7 +11,9 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
 using ExchangeApi.Spec.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bittrade.Raw.Requests;
@@ -142,6 +144,35 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             .ConfigureAwait(false);
 
         return CreateCall(rawCall, callRequest, "Bittrade.GetOrder", raw => BittradeTradingMapper.ToOrderStatus(market.ProductCode, raw, key));
+    }
+
+    public async Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+        Symbol symbol,
+        int? limit = null,
+        CancellationToken ct = default)
+    {
+        var callRequest = new GetAccountExecutionsRequest(symbol, limit);
+        var marketCall = await _markets.ResolveCallAsync(symbol, ct).ConfigureAwait(false);
+        if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
+        {
+            return CreateCallError<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
+                marketCall,
+                callRequest,
+                "Bittrade.GetExecutions",
+                marketError!);
+        }
+
+        var requestedLimit = limit ?? 1000;
+        var appliedLimit = Math.Min(requestedLimit, 1000);
+        var rawCall = await _trading
+            .GetMatchResultsAsync(new RawRequests.GetMatchResultsRequest(Symbol: apiSymbol, Size: appliedLimit), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            callRequest,
+            "Bittrade.GetExecutions",
+            raw => BittradeTradingMapper.ToExecutions(raw.Data ?? Array.Empty<RawMatchResultEntry>()));
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(

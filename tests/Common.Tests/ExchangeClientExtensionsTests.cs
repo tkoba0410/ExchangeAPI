@@ -46,22 +46,9 @@ public sealed class ExchangeClientExtensionsTests
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
-        public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
-            Symbol symbol,
-            Side side,
-            Size size,
-            Price triggerPrice,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
         public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
-            Symbol symbol,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
@@ -71,17 +58,8 @@ public sealed class ExchangeClientExtensionsTests
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
-        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+        public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
             Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
-            Symbol symbol,
-            string? parentOrderId = null,
-            string? parentOrderAcceptanceId = null,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
@@ -91,16 +69,17 @@ public sealed class ExchangeClientExtensionsTests
         public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
-
-        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
-            Symbol symbol,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
     }
 
-    private sealed class DummyExchangeInfoApi : IExchangeInfoApi
+    private sealed class DummyHistoryApi : ISpotHistoryApi
     {
-        public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        public Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
+            MarketLimitCursorRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsCallAsync(
+            MarketLimitCursorRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
@@ -110,7 +89,7 @@ public sealed class ExchangeClientExtensionsTests
         public IMarketDataApi Market { get; } = new DummyMarketApi();
         public ITradingApi Trading { get; } = new DummyTradingApi();
         public IAccountApi Account { get; } = new DummyAccountApi();
-        public IExchangeInfoApi Info { get; } = new DummyExchangeInfoApi();
+        public ISpotHistoryApi History { get; } = new DummyHistoryApi();
         public ExchangeCode ExchangeCode => ExchangeCode.Bitflyer;
     }
 

@@ -78,10 +78,9 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
         var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
-        var normalizedMargin = BitflyerTestHelpers.CreateMarginApi(accountApi, markets);
         var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);
 
-        return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedMargin, normalizedTrading);
+        return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedTrading);
     }
 
     private sealed class SequenceChildOrderApi : IBitflyerPrivateApi
@@ -147,16 +146,6 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             GetCollateralAccountsRequest request,
             CancellationToken cancellationToken = default) =>
             _inner.GetCollateralAccountsAsync(request, cancellationToken);
-
-        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
-            GetParentOrdersRequest request,
-            CancellationToken cancellationToken = default) =>
-            _inner.GetParentOrdersAsync(request, cancellationToken);
-
-        public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
-            GetParentOrderRequest request,
-            CancellationToken cancellationToken = default) =>
-            _inner.GetParentOrderAsync(request, cancellationToken);
 
         public Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
             GetBalanceHistoryRequest request,

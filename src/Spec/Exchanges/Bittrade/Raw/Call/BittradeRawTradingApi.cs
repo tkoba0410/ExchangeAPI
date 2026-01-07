@@ -64,4 +64,9 @@ internal sealed class BittradeRawTradingApi : IBittradeRawTradingApi
         GetOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetOrderAsync(request, cancellationToken);
+
+    public Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsAsync(
+        GetMatchResultsRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateApi.GetMatchResultsAsync(request, cancellationToken);
 }

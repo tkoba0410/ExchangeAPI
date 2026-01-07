@@ -84,30 +84,6 @@ internal sealed class BitflyerTradingApi : ITradingApi
         }
     }
 
-    public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
-        Symbol symbol,
-        ContractSide side,
-        Size size,
-        Price triggerPrice,
-        CancellationToken cancellationToken = default)
-    {
-        var request = new PlaceStopOrderRequest(symbol, side, size, triggerPrice);
-        var now = DateTimeOffset.UtcNow;
-        var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: BitflyerOperations.Trading.PlaceOrder,
-            Tags: null,
-            Children: null);
-        var call = new Call<PlaceStopOrderRequest, OrderResult>(
-            Id: CallId.New(),
-            StartedAt: now,
-            Duration: TimeSpan.Zero,
-            Request: request,
-            Result: new CallResult<OrderResult>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
-            Meta: meta);
-        return Task.FromResult(call);
-    }
-
     public async Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
@@ -127,28 +103,6 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 request,
                 startedAt,
                 BitflyerOperations.Trading.CancelOrder,
-                ex);
-        }
-    }
-
-    public async Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetOrdersRequest(symbol);
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _tradingApi.GetOpenOrdersCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.GetOpenOrders);
-        }
-        catch (Exception ex)
-        {
-            return ApiCallMapper.FromException<GetOrdersRequest, IReadOnlyList<OpenOrder>>(
-                request,
-                startedAt,
-                BitflyerOperations.Trading.GetOpenOrders,
                 ex);
         }
     }
@@ -176,64 +130,51 @@ internal sealed class BitflyerTradingApi : ITradingApi
         }
     }
 
-    public async Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+    public async Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
         Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetParentOrdersRequest(symbol, parentOrderId, parentOrderAcceptanceId);
+        var request = new GetOpenOrdersRequest(symbol);
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
-            var call = await _tradingApi
-                .GetParentOrdersCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken)
-                .ConfigureAwait(false);
+            var call = await _tradingApi.GetOpenOrdersCallAsync(symbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                BitflyerOperations.Trading.GetParentOrders,
-                ok => (IReadOnlyList<ParentOrder>)ok.Select(o => BitflyerParentOrderMapper.Map(symbol, o)).ToArray());
+                BitflyerOperations.Trading.GetOpenOrders,
+                ok => (IReadOnlyList<OrderSnapshotItem>)ok.Select(MapSnapshot).ToArray());
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>(
+            return ApiCallMapper.FromException<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>(
                 request,
                 startedAt,
-                BitflyerOperations.Trading.GetParentOrders,
+                BitflyerOperations.Trading.GetOpenOrders,
                 ex);
         }
     }
 
-    public async Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default)
+    private static OrderSnapshotItem MapSnapshot(OpenOrder order)
     {
-        var request = new GetParentOrderRequest(symbol, parentOrderId, parentOrderAcceptanceId);
-        var startedAt = DateTimeOffset.UtcNow;
+        var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
+        var orderType = order.OrderType switch
+        {
+            OrderType.Limit => OrderSnapshotType.Limit,
+            OrderType.Market => OrderSnapshotType.Market,
+            _ => OrderSnapshotType.Unknown,
+        };
 
-        try
-        {
-            var call = await _tradingApi
-                .GetParentOrderCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken)
-                .ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
-                request,
-                call,
-                BitflyerOperations.Trading.GetParentOrder,
-                BitflyerParentOrderMapper.MapDetail);
-        }
-        catch (Exception ex)
-        {
-            return ApiCallMapper.FromException<GetParentOrderRequest, ParentOrderDetail>(
-                request,
-                startedAt,
-                BitflyerOperations.Trading.GetParentOrder,
-                ex);
-        }
+        return new OrderSnapshotItem(
+            CreatedAt: createdAt,
+            OrderId: order.Key.Value,
+            Market: order.Symbol,
+            Side: order.Side,
+            OrderType: orderType,
+            Price: order.Price,
+            Size: order.Size,
+            Status: OrderSnapshotStatus.Open);
     }
 
 }

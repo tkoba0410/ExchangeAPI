@@ -56,9 +56,9 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
 
             var features = new ExchangeFeatureFlags(
                 SupportsWebSocket: false,
-                SupportsMargin: true,
-                SupportsStopOrder: true,
-                SupportsParentOrder: true,
+                SupportsMargin: false,
+                SupportsStopOrder: false,
+                SupportsParentOrder: false,
                 SupportsCandlestick: false,
                 SupportsOrderBookDelta: false,
                 SupportsRealtimeExecutions: false,

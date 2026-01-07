@@ -27,20 +27,9 @@ public interface ITradingApi
         Size size,
         CancellationToken cancellationToken = default);
 
-    Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
-        Symbol symbol,
-        Side side,
-        Size size,
-        Price triggerPrice,
-        CancellationToken cancellationToken = default);
-
     Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
-        CancellationToken cancellationToken = default);
-
-    Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
-        Symbol symbol,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
@@ -48,15 +37,7 @@ public interface ITradingApi
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+    Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
         Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default);
-
-    Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default);
 }

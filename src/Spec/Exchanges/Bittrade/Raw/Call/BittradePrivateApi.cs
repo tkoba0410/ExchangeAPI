@@ -79,23 +79,6 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
                 json,
                 "Bittrade.GetOrderMatchResults"));
 
-    public Task<Call<GetOrdersRequest, RawOrdersResponse>> GetOrdersAsync(
-        GetOrdersRequest request,
-        CancellationToken cancellationToken = default) =>
-        SendAndParse(
-            request,
-            "Bittrade.GetOrders",
-            BittradeEndpoints.GetOrders(
-                request.Symbol,
-                request.States,
-                request.StartDate,
-                request.EndDate,
-                request.From,
-                request.Direct,
-                request.Size),
-            cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawOrdersResponse>(json, "Bittrade.GetOrders"));
-
     public Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsAsync(
         GetMatchResultsRequest request,
         CancellationToken cancellationToken = default) =>

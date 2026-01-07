@@ -8,6 +8,7 @@ using ExchangeApi.Common.Types;
 using ExchangeApi.Core.Contracts.Errors;
 using ContractOrderType = ExchangeApi.Common.Enums.OrderType;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
@@ -112,6 +113,24 @@ internal static class BittradeTradingMapper
             outstanding,
             price,
             null);
+    }
+
+    public static IReadOnlyList<BittradeExecutionNormalized> ToExecutions(
+        IReadOnlyList<RawMatchResultEntry> entries)
+    {
+        if (entries is null || entries.Count == 0)
+        {
+            return Array.Empty<BittradeExecutionNormalized>();
+        }
+
+        return entries
+            .Select(entry => new BittradeExecutionNormalized(
+                Id: string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId,
+                Side: entry.Type,
+                Price: entry.Price,
+                Size: entry.FilledAmount,
+                Timestamp: entry.CreatedAt))
+            .ToList();
     }
 
     private static BittradeOrderType MapOrderType(Side side, ContractOrderType type)

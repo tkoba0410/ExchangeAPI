@@ -60,25 +60,6 @@ internal static class BittradeEndpoints
     public static WireCallSpec GetOrderMatchResults(string orderId) =>
         Get($"{BittradeConstants.Paths.Orders}/{orderId}/matchresults", query: null);
 
-    public static WireCallSpec GetOrders(
-        string symbol,
-        string states,
-        string? startDate = null,
-        string? endDate = null,
-        long? from = null,
-        string? direct = null,
-        int? size = null)
-    {
-        return Get(BittradeConstants.Paths.Orders, BuildQuery(
-            ("symbol", symbol),
-            ("states", states),
-            ("start-date", startDate),
-            ("end-date", endDate),
-            ("from", from?.ToString()),
-            ("direct", direct),
-            ("size", size?.ToString())));
-    }
-
     public static WireCallSpec GetMatchResults(
         string? symbol = null,
         string? types = null,

@@ -20,15 +20,13 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     private readonly IReadOnlyList<ChildOrderResponse> _childOrders;
     private readonly IReadOnlyList<CollateralAccount> _collateralAccounts;
     private readonly IReadOnlyList<JsonElement> _genericList = Array.Empty<JsonElement>();
-    private readonly IReadOnlyList<ParentOrderResponse> _parentOrders = Array.Empty<ParentOrderResponse>();
 
     public FakeBitflyerPrivateApi(
         IReadOnlyList<BalanceResponse> response,
         IReadOnlyList<PositionResponse>? positions = null,
         IReadOnlyList<ExecutionPrivateResponse>? executions = null,
         CollateralResponse? collateral = null,
-        IReadOnlyList<ChildOrderResponse>? childOrders = null,
-        IReadOnlyList<ParentOrderResponse>? parentOrders = null)
+        IReadOnlyList<ChildOrderResponse>? childOrders = null)
     {
         _response = response;
         _positions = positions ?? Array.Empty<PositionResponse>();
@@ -36,7 +34,6 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         _collateral = collateral ?? new CollateralResponse();
         _childOrders = childOrders ?? Array.Empty<ChildOrderResponse>();
         _collateralAccounts = Array.Empty<CollateralAccount>();
-        _parentOrders = parentOrders ?? Array.Empty<ParentOrderResponse>();
     }
 
     public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsAsync(
@@ -82,40 +79,6 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         }
 
         return Task.FromResult(MakeOkCall(request, _childOrders));
-    }
-
-    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
-        GetParentOrdersRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _parentOrders));
-
-    public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
-        GetParentOrderRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        var response = new ParentOrderDetailResponse
-        {
-            Id = 1,
-            ParentOrderId = request.ParentOrderId ?? "PARENT-ID",
-            OrderMethod = "SIMPLE",
-            ExpireDate = DateTimeOffset.UtcNow,
-            TimeInForce = "GTC",
-            ParentOrderAcceptanceId = request.ParentOrderAcceptanceId ?? "PARENT-ACCEPT",
-            Parameters = new[]
-            {
-                new ParentOrderDetailParameter
-                {
-                    ProductCode = request.ProductCode,
-                    ConditionType = "LIMIT",
-                    Side = "BUY",
-                    Size = 0.1m,
-                    Price = 30000m,
-                    TriggerPrice = 0m,
-                    Offset = 0m,
-                }
-            }
-        };
-        return Task.FromResult(MakeOkCall(request, response));
     }
 
     public Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(

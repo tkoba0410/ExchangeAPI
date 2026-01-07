@@ -83,29 +83,6 @@ internal sealed class BittradeTradingApi : ITradingApi
         }
     }
 
-    public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
-        CommonSymbol symbol,
-        Side side,
-        Size size,
-        Price triggerPrice,
-        CancellationToken cancellationToken = default)
-    {
-        var request = new PlaceStopOrderRequest(symbol, side, size, triggerPrice);
-        var now = DateTimeOffset.UtcNow;
-        var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: BittradeOperations.Trading.PlaceOrder,
-            Tags: null,
-            Children: null);
-        return Task.FromResult(new Call<PlaceStopOrderRequest, OrderResult>(
-            Id: CallId.New(),
-            StartedAt: now,
-            Duration: TimeSpan.Zero,
-            Request: request,
-            Result: new CallResult<OrderResult>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
-            Meta: meta));
-    }
-
     public async Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         CommonSymbol symbol,
         OrderKey orderKey,
@@ -125,28 +102,6 @@ internal sealed class BittradeTradingApi : ITradingApi
                 request,
                 startedAt,
                 BittradeOperations.Trading.CancelOrder,
-                ex);
-        }
-    }
-
-    public async Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetOrdersRequest(symbol);
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _trading.GetOpenOrdersCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BittradeOperations.Trading.GetOpenOrders);
-        }
-        catch (Exception ex)
-        {
-            return ApiCallMapper.FromException<GetOrdersRequest, IReadOnlyList<OpenOrder>>(
-                request,
-                startedAt,
-                BittradeOperations.Trading.GetOpenOrders,
                 ex);
         }
     }
@@ -174,45 +129,51 @@ internal sealed class BittradeTradingApi : ITradingApi
         }
     }
 
-    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+    public async Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
         CommonSymbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetParentOrdersRequest(symbol, parentOrderId, parentOrderAcceptanceId);
-        return Task.FromResult(NotSupported<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>(
-            request,
-            BittradeOperations.Trading.GetParentOrders));
+        var request = new GetOpenOrdersRequest(symbol);
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var call = await _trading.GetOpenOrdersCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BittradeOperations.Trading.GetOpenOrders,
+                ok => (IReadOnlyList<OrderSnapshotItem>)ok.Select(MapSnapshot).ToArray());
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>(
+                request,
+                startedAt,
+                BittradeOperations.Trading.GetOpenOrders,
+                ex);
+        }
     }
 
-    public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
-        CommonSymbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default)
+    private static OrderSnapshotItem MapSnapshot(OpenOrder order)
     {
-        var request = new GetParentOrderRequest(symbol, parentOrderId, parentOrderAcceptanceId);
-        return Task.FromResult(NotSupported<GetParentOrderRequest, ParentOrderDetail>(
-            request,
-            BittradeOperations.Trading.GetParentOrder));
-    }
+        var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
+        var orderType = order.OrderType switch
+        {
+            OrderType.Limit => OrderSnapshotType.Limit,
+            OrderType.Market => OrderSnapshotType.Market,
+            _ => OrderSnapshotType.Unknown,
+        };
 
-    private static Call<TReq, TOk> NotSupported<TReq, TOk>(TReq request, string operation)
-    {
-        var now = DateTimeOffset.UtcNow;
-        var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: operation,
-            Tags: null,
-            Children: null);
-        return new Call<TReq, TOk>(
-            Id: CallId.New(),
-            StartedAt: now,
-            Duration: TimeSpan.Zero,
-            Request: request,
-            Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
-            Meta: meta);
+        return new OrderSnapshotItem(
+            CreatedAt: createdAt,
+            OrderId: order.Key.Value,
+            Market: order.Symbol,
+            Side: order.Side,
+            OrderType: orderType,
+            Price: order.Price,
+            Size: order.Size,
+            Status: OrderSnapshotStatus.Open);
     }
 
 }

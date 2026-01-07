@@ -121,19 +121,7 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var normalized = BitflyerNormalizedApi.FromRestClient(restClient);
-        var exchangeInfo = new BitflyerExchangeInfoApi();
-        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var accountApi = BitflyerNormalizeFactory.CreateAccountApi(restClient, markets);
-        var marginApi = BitflyerNormalizeFactory.CreateMarginApi(restClient, markets);
-        var tradingApi = BitflyerNormalizeFactory.CreateTradingApi(restClient, markets);
-
-        return new BitflyerExchangeClient(
-            marketData: normalized.MarketData,
-            account: accountApi,
-            margin: marginApi,
-            trading: tradingApi,
-            rawBundle: null);
+        return BitflyerExchangeClient.FromRestClient(restClient);
     }
 
     /// <summary>

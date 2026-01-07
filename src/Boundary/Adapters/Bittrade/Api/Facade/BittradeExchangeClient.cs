@@ -12,22 +12,21 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Boundary.Adapters.Common.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Account;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Spec.CallCommon;
-using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 
 /// <summary>
 /// Bittrade 用のファサード。各 API 実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IMarginAccountApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess
+public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IExchangeClient, IHasRawAccess
 {
     private readonly IMarketDataApi _marketApi;
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
-    private readonly IExchangeInfoApi _exchangeInfoApi;
+    private readonly ISpotHistoryApi _historyApi;
     private readonly IRestClient? _restClient;
     private readonly object? _rawBundle;
     internal BittradeApiBundle? ApiBundle { get; }
@@ -36,18 +35,18 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public IMarketDataApi Market => _marketApi;
     public ITradingApi Trading => _tradingApi;
     public IAccountApi Account => _accountApi;
-    public IExchangeInfoApi Info => _exchangeInfoApi;
+    public ISpotHistoryApi History => _historyApi;
 
     public BittradeExchangeClient(
         IMarketDataApi marketApi,
         ITradingApi tradingApi,
         IAccountApi accountApi,
-        IExchangeInfoApi exchangeInfoApi)
+        ISpotHistoryApi historyApi)
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
-        _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
+        _historyApi = historyApi ?? throw new ArgumentNullException(nameof(historyApi));
     }
 
     internal BittradeExchangeClient(BittradeApiBundle bundle)
@@ -63,7 +62,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _accountApi = bundle.NormalizedAccount is null
             ? new NotSupportedAccountApi(ExchangeCode.Bittrade)
             : new BittradeAccountApi(bundle.NormalizedAccount);
-        _exchangeInfoApi = bundle.ExchangeInfo;
+        _historyApi = new BittradeSpotHistoryApi(bundle.Trading, bundle.AccountId);
         _restClient = bundle.RestClient;
         _rawBundle = bundle.RawBundle;
         ApiBundle = bundle;
@@ -73,9 +72,9 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         IMarketDataApi marketApi,
         ITradingApi tradingApi,
         IAccountApi accountApi,
-        IExchangeInfoApi exchangeInfoApi,
+        ISpotHistoryApi historyApi,
         IRestClient restClient)
-        : this(marketApi, tradingApi, accountApi, exchangeInfoApi)
+        : this(marketApi, tradingApi, accountApi, historyApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(_restClient);
@@ -86,10 +85,10 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         IMarketDataApi marketApi,
         ITradingApi tradingApi,
         IAccountApi accountApi,
-        IExchangeInfoApi exchangeInfoApi,
+        ISpotHistoryApi historyApi,
         IRestClient restClient,
         string accountId)
-        : this(marketApi, tradingApi, accountApi, exchangeInfoApi)
+        : this(marketApi, tradingApi, accountApi, historyApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(_restClient, accountId);
@@ -130,24 +129,11 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.PlaceMarketOrderCallAsync(symbol, side, size, cancellationToken);
 
-    public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
-        CommonSymbol symbol,
-        Side side,
-        Size size,
-        Price triggerPrice,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceStopOrderCallAsync(symbol, side, size, triggerPrice, cancellationToken);
-
     public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         CommonSymbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderCallAsync(symbol, orderKey, cancellationToken);
-
-    public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOrdersCallAsync(symbol, cancellationToken);
 
     public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         CommonSymbol symbol,
@@ -155,37 +141,10 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.GetOrderCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
-        CommonSymbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.GetParentOrdersCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken);
-
-    public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
-        CommonSymbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.GetParentOrderCallAsync(symbol, parentOrderId, parentOrderAcceptanceId, cancellationToken);
-
-    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
+    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        _accountApi.GetAccountExecutionsCallAsync(symbol, cancellationToken);
-
-    public Task<Call<GetOpenPositionsRequest, IReadOnlyList<Position>>> GetOpenPositionsCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(NotSupportedCall<GetOpenPositionsRequest, IReadOnlyList<Position>>(new GetOpenPositionsRequest(symbol)));
-
-    public Task<Call<GetCollateralRequest, Collateral>> GetCollateralCallAsync(
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(NotSupportedCall<GetCollateralRequest, Collateral>(new GetCollateralRequest()));
-
-    public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
+        _tradingApi.GetOpenOrdersCallAsync(symbol, cancellationToken);
 
     public bool TryGetRaw<T>(out T raw) where T : class
     {

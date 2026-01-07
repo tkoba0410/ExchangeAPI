@@ -31,24 +31,11 @@ internal sealed class NotSupportedTradingApi : ITradingApi
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<PlaceMarketOrderRequest, OrderResult>(new PlaceMarketOrderRequest(symbol, side, size)));
 
-    public Task<Call<PlaceStopOrderRequest, OrderResult>> PlaceStopOrderCallAsync(
-        Symbol symbol,
-        Side side,
-        Size size,
-        Price triggerPrice,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(NotSupportedCall<PlaceStopOrderRequest, OrderResult>(new PlaceStopOrderRequest(symbol, side, size, triggerPrice)));
-
     public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<CancelOrderRequest, CancelResult>(new CancelOrderRequest(symbol, orderKey)));
-
-    public Task<Call<GetOrdersRequest, IReadOnlyList<OpenOrder>>> GetOrdersCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(NotSupportedCall<GetOrdersRequest, IReadOnlyList<OpenOrder>>(new GetOrdersRequest(symbol)));
 
     public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
@@ -56,21 +43,11 @@ internal sealed class NotSupportedTradingApi : ITradingApi
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<GetOrderRequest, OrderStatus>(new GetOrderRequest(symbol, orderKey)));
 
-    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>> GetParentOrdersCallAsync(
+    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
         Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(NotSupportedCall<GetParentOrdersRequest, IReadOnlyList<ParentOrder>>(
-            new GetParentOrdersRequest(symbol, parentOrderId, parentOrderAcceptanceId)));
-
-    public Task<Call<GetParentOrderRequest, ParentOrderDetail>> GetParentOrderCallAsync(
-        Symbol symbol,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(NotSupportedCall<GetParentOrderRequest, ParentOrderDetail>(
-            new GetParentOrderRequest(symbol, parentOrderId, parentOrderAcceptanceId)));
+        Task.FromResult(NotSupportedCall<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>(
+            new GetOpenOrdersRequest(symbol)));
 
     private Call<TReq, TOk> NotSupportedCall<TReq, TOk>(TReq request)
     {
@@ -100,12 +77,37 @@ internal sealed class NotSupportedAccountApi : IAccountApi
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall<GetBalancesRequest, IReadOnlyList<Balance>>(new GetBalancesRequest()));
 
-    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(NotSupportedCall<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(new GetAccountExecutionsRequest(symbol)));
-
     private Call<TReq, TOk> NotSupportedCall<TReq, TOk>(TReq request)
+    {
+        var now = System.DateTimeOffset.UtcNow;
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: "NotSupported",
+            Tags: null,
+            Children: null);
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: now,
+            Duration: System.TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
+            Meta: meta);
+    }
+}
+
+internal sealed class NotSupportedSpotHistoryApi : ISpotHistoryApi
+{
+    public Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
+        MarketLimitCursorRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(NotSupportedCall<MarketLimitCursorRequest, Page<OrderSnapshotItem>>(request));
+
+    public Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsCallAsync(
+        MarketLimitCursorRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(NotSupportedCall<MarketLimitCursorRequest, Page<ExecutionItem>>(request));
+
+    private static Call<TReq, TOk> NotSupportedCall<TReq, TOk>(TReq request)
     {
         var now = System.DateTimeOffset.UtcNow;
         var meta = new CallMeta(

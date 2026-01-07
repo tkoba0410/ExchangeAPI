@@ -15,34 +15,33 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Dtos.Ticker;
 using ExchangeApi.Spec.CallCommon;
-using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 
 /// <summary>
 /// bitFlyer の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IExchangeClient, IHasRawAccess
+public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeClient, IHasRawAccess
 {
     private readonly MarketApi _marketApi;
-    private readonly IExchangeInfoApi _exchangeInfoApi;
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
+    private readonly ISpotHistoryApi _historyApi;
     private readonly object? _rawBundle;
 
     public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bitflyer;
     public IMarketDataApi Market => _marketApi;
     public ITradingApi Trading => _tradingApi;
     public IAccountApi Account => _accountApi;
-    public IExchangeInfoApi Info => _exchangeInfoApi;
+    public ISpotHistoryApi History => _historyApi;
 
     internal BitflyerPublicClient(BitflyerNormalizedMarketDataFacade marketData, object? rawBundle = null)
     {
         if (marketData is null) throw new ArgumentNullException(nameof(marketData));
-        _exchangeInfoApi = new BitflyerExchangeInfoApi();
-        var markets = new ExchangeInfoMarketResolver(_exchangeInfoApi);
+        var markets = new ExchangeInfoMarketResolver(new BitflyerExchangeInfoApi());
         _marketApi = new MarketApi(marketData, markets);
         _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bitflyer);
         _accountApi = new NotSupportedAccountApi(ExchangeCode.Bitflyer);
+        _historyApi = new NotSupportedSpotHistoryApi();
         _rawBundle = rawBundle;
     }
 
@@ -60,10 +59,6 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeInfoApi, IEx
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
-
-    public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
     public bool TryGetRaw<T>(out T raw) where T : class
     {

@@ -17,27 +17,22 @@ internal static class BitflyerOperations
         public const string CancelOrder = "Bitflyer.Trading.CancelOrder";
         public const string GetOpenOrders = "Bitflyer.Trading.GetOpenOrders";
         public const string GetOrder = "Bitflyer.Trading.GetOrder";
-        public const string GetParentOrders = "Bitflyer.Trading.GetParentOrders";
-        public const string GetParentOrder = "Bitflyer.Trading.GetParentOrder";
     }
 
     internal static class Account
     {
         public const string GetBalances = "Bitflyer.Account.GetBalances";
-        public const string GetAccountExecutions = "Bitflyer.Account.GetAccountExecutions";
         public const string GetTradingCommission = "Bitflyer.Account.GetTradingCommission";
-    }
-
-    internal static class Margin
-    {
-        public const string GetBalances = "Bitflyer.Margin.GetBalances";
-        public const string GetAccountExecutions = "Bitflyer.Margin.GetAccountExecutions";
-        public const string GetOpenPositions = "Bitflyer.Margin.GetOpenPositions";
-        public const string GetCollateral = "Bitflyer.Margin.GetCollateral";
     }
 
     internal static class ExchangeInfo
     {
         public const string GetExchangeInfo = "Bitflyer.ExchangeInfo.GetExchangeInfo";
+    }
+
+    internal static class History
+    {
+        public const string GetOrders = "Bitflyer.History.GetOrders";
+        public const string GetExecutions = "Bitflyer.History.GetExecutions";
     }
 }

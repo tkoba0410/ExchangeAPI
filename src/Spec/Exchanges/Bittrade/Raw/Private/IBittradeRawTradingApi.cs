@@ -43,4 +43,8 @@ public interface IBittradeRawTradingApi
     Task<Call<GetOrderRequest, RawOrderDetailResponse>> GetOrderAsync(
         GetOrderRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsAsync(
+        GetMatchResultsRequest request,
+        CancellationToken cancellationToken = default);
 }

@@ -14,8 +14,4 @@ public interface IAccountApi
 {
     Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default);
-
-    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default);
 }

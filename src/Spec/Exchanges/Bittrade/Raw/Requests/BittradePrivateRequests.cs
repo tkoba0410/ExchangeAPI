@@ -12,15 +12,6 @@ public sealed record GetOrderRequest(string OrderId);
 
 public sealed record GetOrderMatchResultsRequest(string OrderId);
 
-public sealed record GetOrdersRequest(
-    string Symbol,
-    string States,
-    string? StartDate = null,
-    string? EndDate = null,
-    long? From = null,
-    string? Direct = null,
-    int? Size = null);
-
 public sealed record GetMatchResultsRequest(
     string? Symbol = null,
     string? Types = null,

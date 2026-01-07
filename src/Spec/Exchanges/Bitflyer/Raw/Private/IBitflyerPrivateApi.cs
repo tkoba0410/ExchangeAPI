@@ -19,14 +19,6 @@ public interface IBitflyerPrivateApi : IBitflyerRawAccountApi
         GetCollateralAccountsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
-        GetParentOrdersRequest request,
-        CancellationToken cancellationToken = default);
-
-    Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
-        GetParentOrderRequest request,
-        CancellationToken cancellationToken = default);
-
     Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default);

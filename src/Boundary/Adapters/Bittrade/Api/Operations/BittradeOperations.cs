@@ -8,7 +8,11 @@ internal static class BittradeOperations
         public const string CancelOrder = "Bittrade.Trading.CancelOrder";
         public const string GetOpenOrders = "Bittrade.Trading.GetOpenOrders";
         public const string GetOrder = "Bittrade.Trading.GetOrder";
-        public const string GetParentOrders = "Bittrade.Trading.GetParentOrders";
-        public const string GetParentOrder = "Bittrade.Trading.GetParentOrder";
+    }
+
+    internal static class History
+    {
+        public const string GetOrders = "Bittrade.History.GetOrders";
+        public const string GetExecutions = "Bittrade.History.GetExecutions";
     }
 }

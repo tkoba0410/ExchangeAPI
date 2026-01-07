@@ -99,7 +99,6 @@ internal static class BitflyerEndpoints
         string? childOrderStatusState = null,
         string? childOrderAcceptanceId = null,
         string? childOrderId = null,
-        string? parentOrderId = null,
         int? count = null,
         long? before = null,
         long? after = null)
@@ -109,7 +108,6 @@ internal static class BitflyerEndpoints
             (BitflyerConstants.QueryKeys.ChildOrderStatusState, childOrderStatusState),
             (BitflyerConstants.QueryKeys.ChildOrderAcceptanceId, childOrderAcceptanceId),
             (BitflyerConstants.QueryKeys.ChildOrderId, childOrderId),
-            (BitflyerConstants.QueryKeys.ParentOrderId, parentOrderId),
             (BitflyerConstants.QueryKeys.Count, count?.ToString()),
             (BitflyerConstants.QueryKeys.Before, before?.ToString()),
             (BitflyerConstants.QueryKeys.After, after?.ToString())));
@@ -124,34 +122,6 @@ internal static class BitflyerEndpoints
 
     public static WireCallSpec GetCollateralAccounts() =>
         Get(BitflyerConstants.Paths.GetCollateralAccounts, query: null);
-
-    public static WireCallSpec GetParentOrders(
-        string productCode,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null,
-        int? count = null,
-        long? before = null,
-        long? after = null)
-    {
-        return Get(BitflyerConstants.Paths.GetParentOrders, BuildQuery(
-            (BitflyerConstants.QueryKeys.ProductCode, productCode),
-            (BitflyerConstants.QueryKeys.ParentOrderId, parentOrderId),
-            (BitflyerConstants.QueryKeys.ParentOrderAcceptanceId, parentOrderAcceptanceId),
-            (BitflyerConstants.QueryKeys.Count, count?.ToString()),
-            (BitflyerConstants.QueryKeys.Before, before?.ToString()),
-            (BitflyerConstants.QueryKeys.After, after?.ToString())));
-    }
-
-    public static WireCallSpec GetParentOrder(
-        string productCode,
-        string? parentOrderId = null,
-        string? parentOrderAcceptanceId = null)
-    {
-        return Get(BitflyerConstants.Paths.GetParentOrder, BuildQuery(
-            (BitflyerConstants.QueryKeys.ProductCode, productCode),
-            (BitflyerConstants.QueryKeys.ParentOrderId, parentOrderId),
-            (BitflyerConstants.QueryKeys.ParentOrderAcceptanceId, parentOrderAcceptanceId)));
-    }
 
     public static WireCallSpec GetBalanceHistory(
         string? currencyCode = null,
@@ -217,12 +187,6 @@ internal static class BitflyerEndpoints
 
     public static WireCallSpec CancelAllChildOrders(string bodyJson) =>
         Post(BitflyerConstants.Paths.CancelAllChildOrders, bodyJson);
-
-    public static WireCallSpec SendParentOrder(string bodyJson) =>
-        Post(BitflyerConstants.Paths.SendParentOrder, bodyJson);
-
-    public static WireCallSpec CancelParentOrder(string bodyJson) =>
-        Post(BitflyerConstants.Paths.CancelParentOrder, bodyJson);
 
     public static WireCallSpec Withdraw(string bodyJson) =>
         Post(BitflyerConstants.Paths.Withdraw, bodyJson);

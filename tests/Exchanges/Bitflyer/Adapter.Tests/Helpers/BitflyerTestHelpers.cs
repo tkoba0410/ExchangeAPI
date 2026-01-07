@@ -22,11 +22,6 @@ internal static class BitflyerTestHelpers
         IExchangeMarketResolver markets) =>
         new BitflyerNormalizedAccountApi(accountApi, markets);
 
-    public static IBitflyerNormalizedMarginApi CreateMarginApi(
-        IBitflyerRawAccountApi accountApi,
-        IExchangeMarketResolver markets) =>
-        new BitflyerNormalizedMarginApi(accountApi, markets);
-
     public static IBitflyerNormalizedTradingApi CreateTradingApi(
         IBitflyerRawPrivateTradingApi tradingApi,
         IBitflyerPrivateApi accountApi,

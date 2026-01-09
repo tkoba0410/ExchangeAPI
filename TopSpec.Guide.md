@@ -190,7 +190,7 @@ Split Candidate: なし
 **どの段階の意味が付与されているか（意味段階）**を含む。
 
 * **Wire（transport format）**：転送表現（string/bytes）。意味なし。検証・正規化なし。
-* **Raw（syntax/primitive format）**：公式 API の鏡像 DTO＋codec。JSON 表現ゆらぎ（数値/文字列混在、日時形式差等）の吸収に限定。
+* **Raw（syntax/primitive format）**：公式 API の返り値（out）を鏡像 DTO として受け取り、JSON 表現ゆらぎ（数値/文字列混在、日時形式差等）を吸収する（Deserialize 中心）。
   * Raw は取引所意味（enum/ClosedSet/既定値/妥当性検証）を担わない。
 * **Normalized（exchange semantic format）**：単独取引所内の意味付け・統一（Closed set / 既定値 / 妥当性検証）を行う。
   * Normalized は原則 lossless（Raw に存在する情報は RawSnapshot/Extras 等へ保持）。
@@ -199,17 +199,21 @@ Split Candidate: なし
 この理解により「どの型をどこに置くか」は、
 「その型がどの形式（どの意味段階）に属するか」で決定できる。
 
+次の意味段階（境界）へデータ形式を変換していく。
+
 #### 5.1.3.4 送信（Encode/Write）の置き場（運用の固定）
 
-受信（Decode/Read）は Raw の codec（Deserialize）を中心に成立するが、
-送信（Encode/Write）は Raw の責務として固定しない。
+各 API 境界では、通信方向（送信／受信）ではなく、
+引数（in）および返り値（out）のデータ形式として責務を定義する。
+
+この境界では、引数（in）と返り値（out）の形式のみを規定する。
 
 送信時は、Contracts/Adapter により選択された取引所意味（Normalized）で意味を最終決定し、
 **Normalized 内部のエンコード（internal な JSON shape / builder）**により bodyJson（string）を生成し、
 Wire はそれを転送表現として送る。
 
-送信用の JSON shape は実装上必要になり得るが、
-それは公開 API の型として露出せず、internal/private な実装詳細として扱う。
+送信時の JSON shape は Normalized 境界内部の実装詳細とし、
+公開 API の引数や返り値として露出させない。
 
 ### 5.2 Call（呼出）結果の標準形（Core §5「Call」対応）
 

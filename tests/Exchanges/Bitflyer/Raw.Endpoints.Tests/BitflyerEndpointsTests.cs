@@ -1,6 +1,6 @@
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
+using PrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Endpoints.Tests;
 
@@ -62,7 +62,7 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void CreateChildOrder_builds_request_with_body_json()
     {
-        var request = new RawSendChildOrderRequest
+        var request = new PrivateModels.CreateChildOrderRequest
         {
             ProductCode = "FX_BTC_JPY",
             ChildOrderType = "LIMIT",
@@ -73,7 +73,8 @@ public sealed class BitflyerEndpointsTests
             TimeInForce = "GTC",
         };
 
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CreateChildOrder");
+        var shape = BitflyerRawMappers.MapSendChildOrderRequest(request);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(shape, "Bitflyer.CreateChildOrder");
         var req = BitflyerEndpoints.SendChildOrder(bodyJson);
 
         WireCallSpecAssertions.AssertWireCallSpec(

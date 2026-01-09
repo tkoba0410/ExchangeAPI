@@ -39,4 +39,20 @@ internal static class BitflyerRawMappers
             Parameters = parameters,
         };
     }
+
+    public static RawCancelChildOrderRequest MapCancelChildOrderRequest(PrivateModels.CancelChildOrderRequest request) =>
+        new()
+        {
+            ProductCode = request.ProductCode,
+            ChildOrderAcceptanceId = request.ChildOrderAcceptanceId,
+            ChildOrderId = request.ChildOrderId,
+        };
+
+    public static RawCancelParentOrderRequest MapCancelParentOrderRequest(PrivateModels.CancelParentOrderRequest request) =>
+        new()
+        {
+            ProductCode = request.ProductCode,
+            ParentOrderAcceptanceId = request.ParentOrderAcceptanceId,
+            ParentOrderId = request.ParentOrderId,
+        };
 }

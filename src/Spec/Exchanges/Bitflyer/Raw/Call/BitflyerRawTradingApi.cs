@@ -21,60 +21,68 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<Call<SendChildOrderRequest, RawSendChildOrderResponse>> SendChildOrderAsync(
-        SendChildOrderRequest request,
+    public Task<Call<Requests.CreateChildOrderRequest, RawSendChildOrderResponse>> SendChildOrderAsync(
+        Requests.CreateChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.SendChildOrder",
             BitflyerEndpoints.SendChildOrder(
-                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.SendChildOrder")),
+                BitflyerRawJson.SerializeOrThrow(
+                    BitflyerRawMappers.MapSendChildOrderRequest(request.Body),
+                    "Bitflyer.SendChildOrder")),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawSendChildOrderResponse>(
                 json,
                 "Bitflyer.SendChildOrder"));
 
-    public Task<Call<SendParentOrderRequest, RawSendParentOrderResponse>> SendParentOrderAsync(
-        SendParentOrderRequest request,
+    public Task<Call<Requests.CreateParentOrderRequest, RawSendParentOrderResponse>> SendParentOrderAsync(
+        Requests.CreateParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.SendParentOrder",
             BitflyerEndpoints.SendParentOrder(
-                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.SendParentOrder")),
+                BitflyerRawJson.SerializeOrThrow(
+                    BitflyerRawMappers.MapSendParentOrderRequest(request.Body),
+                    "Bitflyer.SendParentOrder")),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawSendParentOrderResponse>(
                 json,
                 "Bitflyer.SendParentOrder"));
 
-    public Task<Call<CancelChildOrderRawRequest, RawCancelChildOrderResponse>> CancelChildOrderAsync(
-        CancelChildOrderRawRequest request,
+    public Task<Call<Requests.CancelChildOrderRequest, RawCancelChildOrderResponse>> CancelChildOrderAsync(
+        Requests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.CancelChildOrder",
             BitflyerEndpoints.CancelChildOrder(
-                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.CancelChildOrder")),
+                BitflyerRawJson.SerializeOrThrow(
+                    BitflyerRawMappers.MapCancelChildOrderRequest(request.Body),
+                    "Bitflyer.CancelChildOrder")),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawCancelChildOrderResponse>(
                 json,
                 "Bitflyer.CancelChildOrder"));
 
-    public Task<Call<CancelParentOrderRawRequest, RawCancelParentOrderResponse>> CancelParentOrderAsync(
-        CancelParentOrderRawRequest request,
+    public Task<Call<Requests.CancelParentOrderRequest, RawCancelParentOrderResponse>> CancelParentOrderAsync(
+        Requests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.CancelParentOrder",
             BitflyerEndpoints.CancelParentOrder(
-                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.CancelParentOrder")),
+                BitflyerRawJson.SerializeOrThrow(
+                    BitflyerRawMappers.MapCancelParentOrderRequest(request.Body),
+                    "Bitflyer.CancelParentOrder")),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawCancelParentOrderResponse>(
                 json,
                 "Bitflyer.CancelParentOrder"));
 
-    public Task<Call<GetChildOrdersRequest, IReadOnlyList<RawGetChildOrdersResponse>>> GetChildOrdersAsync(
-        GetChildOrdersRequest request,
+    public Task<Call<Requests.GetChildOrdersRequest, IReadOnlyList<RawGetChildOrdersResponse>>> GetChildOrdersAsync(
+        Requests.GetChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
@@ -93,8 +101,8 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
                 json,
                 "Bitflyer.GetChildOrders"));
 
-    public Task<Call<GetParentOrdersRequest, IReadOnlyList<RawGetParentOrdersResponse>>> GetParentOrdersAsync(
-        GetParentOrdersRequest request,
+    public Task<Call<Requests.GetParentOrdersRequest, IReadOnlyList<RawGetParentOrdersResponse>>> GetParentOrdersAsync(
+        Requests.GetParentOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
@@ -110,8 +118,8 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
                 json,
                 "Bitflyer.GetParentOrders"));
 
-    public Task<Call<GetParentOrderRequest, RawGetParentOrderResponse>> GetParentOrderAsync(
-        GetParentOrderRequest request,
+    public Task<Call<Requests.GetParentOrderRequest, RawGetParentOrderResponse>> GetParentOrderAsync(
+        Requests.GetParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,

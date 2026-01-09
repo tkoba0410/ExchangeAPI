@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
-public sealed class RawCancelChildOrderRequest
+internal sealed class RawCancelChildOrderRequest
 {
     [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
 

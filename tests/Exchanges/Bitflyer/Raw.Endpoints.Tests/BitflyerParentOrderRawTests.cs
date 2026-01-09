@@ -1,6 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Endpoints.Tests;
 
@@ -9,14 +8,14 @@ public sealed class BitflyerParentOrderRawTests
     [Fact]
     public void SendParentOrder_serializes_request_body()
     {
-        var request = new RawSendParentOrderRequest
+        var request = new CreateParentOrderRequest
         {
             OrderMethod = "IFDOCO",
             MinuteToExpire = 10000,
             TimeInForce = "GTC",
             Parameters = new[]
             {
-                new RawSendParentOrderParameter
+                new CreateParentOrderParameter
                 {
                     ProductCode = "BTC_JPY",
                     ConditionType = "LIMIT",
@@ -24,7 +23,7 @@ public sealed class BitflyerParentOrderRawTests
                     Size = 0.1m,
                     Price = 30000m
                 },
-                new RawSendParentOrderParameter
+                new CreateParentOrderParameter
                 {
                     ProductCode = "BTC_JPY",
                     ConditionType = "LIMIT",
@@ -32,7 +31,7 @@ public sealed class BitflyerParentOrderRawTests
                     Size = 0.1m,
                     Price = 32000m
                 },
-                new RawSendParentOrderParameter
+                new CreateParentOrderParameter
                 {
                     ProductCode = "BTC_JPY",
                     ConditionType = "STOP_LIMIT",
@@ -44,7 +43,8 @@ public sealed class BitflyerParentOrderRawTests
             }
         };
 
-        var json = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.SendParentOrder");
+        var shape = BitflyerRawMappers.MapSendParentOrderRequest(request);
+        var json = BitflyerRawJson.SerializeOrThrow(shape, "Bitflyer.SendParentOrder");
 
         Assert.Equal(
             "{\"order_method\":\"IFDOCO\",\"minute_to_expire\":10000,\"time_in_force\":\"GTC\",\"parameters\":[{\"product_code\":\"BTC_JPY\",\"condition_type\":\"LIMIT\",\"side\":\"BUY\",\"size\":0.1,\"price\":30000},{\"product_code\":\"BTC_JPY\",\"condition_type\":\"LIMIT\",\"side\":\"SELL\",\"size\":0.1,\"price\":32000},{\"product_code\":\"BTC_JPY\",\"condition_type\":\"STOP_LIMIT\",\"side\":\"SELL\",\"size\":0.1,\"price\":28800,\"trigger_price\":29000}]}",

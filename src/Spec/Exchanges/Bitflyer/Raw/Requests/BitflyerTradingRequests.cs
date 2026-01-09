@@ -14,10 +14,4 @@ public sealed record CancelAllChildOrdersRequest(PrivateModels.CancelAllChildOrd
 
 public sealed record CreateWithdrawalRequest(PrivateModels.CreateWithdrawalRequest Body);
 
-public sealed record SendChildOrderRequest(RawSendChildOrderRequest Body);
-
-public sealed record CancelChildOrderRawRequest(RawCancelChildOrderRequest Body);
-
-public sealed record SendParentOrderRequest(RawSendParentOrderRequest Body);
-
-public sealed record CancelParentOrderRawRequest(RawCancelParentOrderRequest Body);
+// send/cancel 送信用 JSON shape は internal 実装詳細として扱う

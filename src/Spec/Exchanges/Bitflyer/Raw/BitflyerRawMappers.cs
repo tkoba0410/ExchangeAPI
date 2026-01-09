@@ -1,3 +1,4 @@
+using System.Linq;
 using PrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
@@ -16,4 +17,26 @@ internal static class BitflyerRawMappers
         TimeInForce = request.TimeInForce,
         TriggerPrice = request.TriggerPrice,
     };
+
+    public static RawSendParentOrderRequest MapSendParentOrderRequest(PrivateModels.CreateParentOrderRequest request)
+    {
+        var parameters = request.Parameters.Select(p => new RawSendParentOrderParameter
+        {
+            ProductCode = p.ProductCode,
+            ConditionType = p.ConditionType,
+            Side = p.Side,
+            Price = p.Price,
+            Size = p.Size,
+            TriggerPrice = p.TriggerPrice,
+            Offset = p.Offset,
+        }).ToArray();
+
+        return new RawSendParentOrderRequest
+        {
+            OrderMethod = request.OrderMethod,
+            MinuteToExpire = request.MinuteToExpire,
+            TimeInForce = request.TimeInForce,
+            Parameters = parameters,
+        };
+    }
 }

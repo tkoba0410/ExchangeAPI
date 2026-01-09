@@ -29,6 +29,14 @@ public interface IBitflyerRawAccountApi
         GetChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
+    Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+        GetParentOrdersRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+        GetParentOrderRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default);

@@ -104,6 +104,16 @@ public sealed class BitflyerTradingApi_NotFoundTests
             return _inner.GetChildOrdersAsync(request, cancellationToken);
         }
 
+        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+            GetParentOrdersRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetParentOrdersAsync(request, cancellationToken);
+
+        public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+            GetParentOrderRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetParentOrderAsync(request, cancellationToken);
+
         public Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
             GetBalanceHistoryRequest request,
             CancellationToken cancellationToken = default) =>

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
 using ExchangeApi.Spec.CallCommon;
 
@@ -26,6 +27,22 @@ public interface IBitflyerNormalizedTradingApi
     Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<SendParentOrderRequest, BitflyerParentOrderAcceptance>> SendParentOrderCallAsync(
+        SendParentOrderRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<CancelParentOrderRequest, BitflyerParentOrderCancelResult>> CancelParentOrderCallAsync(
+        CancelParentOrderRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetParentOrdersRequest, IReadOnlyList<BitflyerParentOrderNormalized>>> GetParentOrdersCallAsync(
+        GetParentOrdersRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetParentOrderRequest, BitflyerParentOrderDetailNormalized>> GetParentOrderCallAsync(
+        GetParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
 }

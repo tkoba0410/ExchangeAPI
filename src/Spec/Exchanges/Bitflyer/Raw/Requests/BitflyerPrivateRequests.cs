@@ -18,9 +18,19 @@ public sealed record GetChildOrdersRequest(
     string? ChildOrderStatusState = null,
     string? ChildOrderAcceptanceId = null,
     string? ChildOrderId = null,
+    string? ParentOrderId = null,
     int? Count = null,
     long? Before = null,
     long? After = null);
+public sealed record GetParentOrdersRequest(
+    string ProductCode,
+    string? ParentOrderState = null,
+    int? Count = null,
+    long? Before = null,
+    long? After = null);
+public sealed record GetParentOrderRequest(
+    string? ParentOrderId = null,
+    string? ParentOrderAcceptanceId = null);
 public sealed record GetBalanceHistoryRequest(
     string? CurrencyCode = null,
     int? Count = null,

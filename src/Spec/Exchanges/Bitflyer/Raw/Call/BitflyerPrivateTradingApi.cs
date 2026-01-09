@@ -39,6 +39,22 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
                 "Bitflyer.CreateChildOrder"));
     }
 
+    public Task<Call<Requests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
+        Requests.CreateParentOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        var raw = BitflyerRawMappers.MapSendParentOrderRequest(request.Body);
+        return SendAndParse(
+            request,
+            "Bitflyer.CreateParentOrder",
+            BitflyerEndpoints.SendParentOrder(BitflyerRawJson.SerializeOrThrow(raw, "Bitflyer.CreateParentOrder")),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<CreateParentOrderResponse>(
+                json,
+                "Bitflyer.CreateParentOrder"));
+    }
+
     public Task<Call<Requests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
         Requests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
@@ -51,6 +67,19 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
             json => BitflyerRawJson.DeserializeOrThrow<EmptyResponse>(
                 json,
                 "Bitflyer.CancelChildOrder"));
+
+    public Task<Call<Requests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
+        Requests.CancelParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.CancelParentOrder",
+            BitflyerEndpoints.CancelParentOrder(
+                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.CancelParentOrder")),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<EmptyResponse>(
+                json,
+                "Bitflyer.CancelParentOrder"));
 
     public Task<Call<Requests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersAsync(
         Requests.CancelAllChildOrdersRequest request,

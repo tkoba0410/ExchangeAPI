@@ -12,9 +12,10 @@ using ExchangeApi.Core.Contracts.Errors;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Normalize;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+using RawPrivate = ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Spec.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
@@ -22,13 +23,13 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
 
 internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingApi
 {
-    private readonly IBitflyerRawPrivateTradingApi _tradingApi;
-    private readonly IBitflyerPrivateApi _privateApi;
+    private readonly RawPrivate.IBitflyerRawPrivateTradingApi _tradingApi;
+    private readonly RawPrivate.IBitflyerPrivateApi _privateApi;
     private readonly IExchangeMarketResolver _markets;
 
     public BitflyerNormalizedTradingApi(
-        IBitflyerRawPrivateTradingApi tradingApi,
-        IBitflyerPrivateApi privateApi,
+        RawPrivate.IBitflyerRawPrivateTradingApi tradingApi,
+        RawPrivate.IBitflyerPrivateApi privateApi,
         IExchangeMarketResolver markets)
     {
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
@@ -56,7 +57,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         }
 
         var childOrderType = BitflyerTradingMapper.MapOrderType(request.OrderType, request.Price);
-        var dto = new CreateChildOrderRequest
+        var dto = new RawPrivate.CreateChildOrderRequest
         {
             ProductCode = productCode!,
             Side = BitflyerCommonMapper.MapSideToExchange(request.Side),
@@ -102,18 +103,18 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                 marketError!);
         }
 
-        CancelChildOrderRequest dto;
+        RawPrivate.CancelChildOrderRequest dto;
         switch (orderKey.Kind)
         {
             case OrderIdKind.AcceptanceId:
-                dto = new CancelChildOrderRequest
+                dto = new RawPrivate.CancelChildOrderRequest
                 {
                     ProductCode = productCode!,
                     ChildOrderAcceptanceId = orderKey.Value,
                 };
                 break;
             case OrderIdKind.ExchangeOrderId:
-                dto = new CancelChildOrderRequest
+                dto = new RawPrivate.CancelChildOrderRequest
                 {
                     ProductCode = productCode!,
                     ChildOrderId = orderKey.Value,
@@ -266,6 +267,121 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                     Price: order.Price == 0 ? null : new Price(order.Price),
                     AveragePrice: order.AveragePrice == 0 ? null : new Price(order.AveragePrice));
             });
+    }
+
+    public async Task<Call<SendParentOrderRequest, BitflyerParentOrderAcceptance>> SendParentOrderCallAsync(
+        SendParentOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var callRequest = request;
+        var rawParameters = request.Parameters.Select(p => new RawPrivate.CreateParentOrderParameter
+        {
+            ProductCode = p.ProductCode,
+            ConditionType = BitflyerParentOrderMapper.ToApiConditionType(p.ConditionType),
+            Side = BitflyerSideMapper.ToApi(p.Side),
+            Price = p.Price?.Value,
+            Size = p.Size.Value,
+            TriggerPrice = p.TriggerPrice?.Value,
+            Offset = p.Offset,
+        }).ToArray();
+
+        var rawRequest = new RawPrivate.CreateParentOrderRequest
+        {
+            OrderMethod = request.OrderMethod.HasValue
+                ? BitflyerParentOrderMapper.ToApiOrderMethod(request.OrderMethod.Value)
+                : null,
+            MinuteToExpire = request.MinuteToExpire,
+            TimeInForce = request.TimeInForce.HasValue
+                ? BitflyerParentOrderMapper.ToApiTimeInForce(request.TimeInForce.Value)
+                : null,
+            Parameters = rawParameters
+        };
+
+        var rawCall = await _tradingApi
+            .CreateParentOrderAsync(new RawRequests.CreateParentOrderRequest(rawRequest), cancellationToken)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            callRequest,
+            "Bitflyer.CreateParentOrder",
+            ok => new BitflyerParentOrderAcceptance(ok.ParentOrderAcceptanceId));
+    }
+
+    public async Task<Call<CancelParentOrderRequest, BitflyerParentOrderCancelResult>> CancelParentOrderCallAsync(
+        CancelParentOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var callRequest = request;
+        var rawRequest = new RawPrivate.CancelParentOrderRequest
+        {
+            ProductCode = request.ProductCode,
+            ParentOrderId = request.ParentOrderId,
+            ParentOrderAcceptanceId = request.ParentOrderAcceptanceId,
+        };
+
+        var rawCall = await _tradingApi
+            .CancelParentOrderAsync(new RawRequests.CancelParentOrderRequest(rawRequest), cancellationToken)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            callRequest,
+            "Bitflyer.CancelParentOrder",
+            _ => new BitflyerParentOrderCancelResult(true));
+    }
+
+    public async Task<Call<GetParentOrdersRequest, IReadOnlyList<BitflyerParentOrderNormalized>>> GetParentOrdersCallAsync(
+        GetParentOrdersRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var callRequest = request;
+        var rawRequest = new RawRequests.GetParentOrdersRequest(
+            request.ProductCode,
+            request.ParentOrderState.HasValue
+                ? BitflyerParentOrderMapper.ToApiParentOrderState(request.ParentOrderState.Value)
+                : null,
+            request.Count,
+            request.Before,
+            request.After);
+
+        var rawCall = await _privateApi
+            .GetParentOrdersAsync(rawRequest, cancellationToken)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            callRequest,
+            "Bitflyer.GetParentOrders",
+            ok => BitflyerParentOrderNormalizer.NormalizeList(ok, rawCall.Meta.RawJson));
+    }
+
+    public async Task<Call<GetParentOrderRequest, BitflyerParentOrderDetailNormalized>> GetParentOrderCallAsync(
+        GetParentOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var callRequest = request;
+        var rawRequest = new RawRequests.GetParentOrderRequest(
+            request.ParentOrderId,
+            request.ParentOrderAcceptanceId);
+
+        var rawCall = await _privateApi
+            .GetParentOrderAsync(rawRequest, cancellationToken)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            callRequest,
+            "Bitflyer.GetParentOrder",
+            ok => BitflyerParentOrderNormalizer.NormalizeDetail(ok, rawCall.Meta.RawJson));
     }
 
 

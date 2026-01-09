@@ -13,7 +13,9 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     private readonly Exception? _exceptionToThrow;
 
     public RawRequests.CreateChildOrderRequest? LastRequest { get; private set; }
+    public RawRequests.CreateParentOrderRequest? LastParentOrderRequest { get; private set; }
     public RawRequests.CancelChildOrderRequest? LastCancelRequest { get; private set; }
+    public RawRequests.CancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
     public RawRequests.CancelAllChildOrdersRequest? LastCancelAllRequest { get; private set; }
     public RawRequests.CreateWithdrawalRequest? LastWithdrawRequest { get; private set; }
 
@@ -33,11 +35,29 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return Task.FromResult(MakeCall(request, _response));
     }
 
+    public Task<Call<RawRequests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
+        RawRequests.CreateParentOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        LastParentOrderRequest = request;
+        return Task.FromResult(MakeCall(
+            request,
+            new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
+    }
+
     public Task<Call<RawRequests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
         RawRequests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastCancelRequest = request;
+        return Task.FromResult(MakeCall(request, new EmptyResponse()));
+    }
+
+    public Task<Call<RawRequests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
+        RawRequests.CancelParentOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        LastCancelParentOrderRequest = request;
         return Task.FromResult(MakeCall(request, new EmptyResponse()));
     }
 

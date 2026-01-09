@@ -115,11 +115,43 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 request.ChildOrderId,
                 request.Count,
                 request.Before,
-                request.After),
+                request.After,
+                request.ParentOrderId),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ChildOrderResponse>>(
                 json,
                 "Bitflyer.GetChildOrders"));
+
+    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+        GetParentOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetParentOrders",
+            BitflyerEndpoints.GetParentOrders(
+                request.ProductCode,
+                request.ParentOrderState,
+                request.Count,
+                request.Before,
+                request.After),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ParentOrderResponse>>(
+                json,
+                "Bitflyer.GetParentOrders"));
+
+    public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+        GetParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.GetParentOrder",
+            BitflyerEndpoints.GetParentOrder(
+                request.ParentOrderId,
+                request.ParentOrderAcceptanceId),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<ParentOrderDetailResponse>(
+                json,
+                "Bitflyer.GetParentOrder"));
 
     public Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
         GetBalanceHistoryRequest request,

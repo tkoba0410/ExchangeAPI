@@ -81,6 +81,16 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         return Task.FromResult(MakeOkCall(request, _childOrders));
     }
 
+    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+        GetParentOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(MakeOkCall(request, (IReadOnlyList<ParentOrderResponse>)Array.Empty<ParentOrderResponse>()));
+
+    public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+        GetParentOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(MakeOkCall(request, new ParentOrderDetailResponse()));
+
     public Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default) =>

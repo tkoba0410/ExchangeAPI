@@ -199,10 +199,20 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
                 CancellationToken cancellationToken = default) =>
                 Task.FromResult(OkCall(request, new CreateChildOrderResponse()));
 
+            public Task<Call<RawRequests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
+                RawRequests.CreateParentOrderRequest request,
+                CancellationToken cancellationToken = default) =>
+                Task.FromResult(OkCall(request, new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
+
             public Task<Call<RawRequests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
                 RawRequests.CancelChildOrderRequest request,
                 CancellationToken cancellationToken = default) =>
                 Task.FromResult(ErrCall<RawRequests.CancelChildOrderRequest, EmptyResponse>(request, 500));
+
+            public Task<Call<RawRequests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
+                RawRequests.CancelParentOrderRequest request,
+                CancellationToken cancellationToken = default) =>
+                Task.FromResult(ErrCall<RawRequests.CancelParentOrderRequest, EmptyResponse>(request, 500));
 
             public Task<Call<RawRequests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersAsync(
                 RawRequests.CancelAllChildOrdersRequest request,

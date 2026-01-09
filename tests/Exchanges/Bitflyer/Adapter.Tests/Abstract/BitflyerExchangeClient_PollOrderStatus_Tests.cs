@@ -117,6 +117,16 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             return Task.FromResult(call);
         }
 
+        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+            GetParentOrdersRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetParentOrdersAsync(request, cancellationToken);
+
+        public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+            GetParentOrderRequest request,
+            CancellationToken cancellationToken = default) =>
+            _inner.GetParentOrderAsync(request, cancellationToken);
+
         public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsAsync(
             GetPermissionsRequest request,
             CancellationToken cancellationToken = default) =>

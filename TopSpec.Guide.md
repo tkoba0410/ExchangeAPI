@@ -181,6 +181,36 @@ Split Candidate: なし
 * Normalized に横断抽象（共通インターフェース都合）を入れ始める（→ Contracts に寄せる）
 * Normalized が「都合の悪いフィールド」を捨て始める（→ lossless ルール違反。RawSnapshot/Extras に退避する）
 
+#### 5.1.3.3 「層＝対象データ形式（意味段階）への変換」として理解する
+
+本プロジェクトの Wire / Raw / Normalized / Contracts は、
+フォルダ階層や実装レイヤではなく、**対象のデータ形式（meaning format）への変換境界**として理解する。
+
+ここでいう「形式」は JSON 形状のような物理形式だけではなく、
+**どの段階の意味が付与されているか（意味段階）**を含む。
+
+* **Wire（transport format）**：転送表現（string/bytes）。意味なし。検証・正規化なし。
+* **Raw（syntax/primitive format）**：公式 API の鏡像 DTO＋codec。JSON 表現ゆらぎ（数値/文字列混在、日時形式差等）の吸収に限定。
+  * Raw は取引所意味（enum/ClosedSet/既定値/妥当性検証）を担わない。
+* **Normalized（exchange semantic format）**：単独取引所内の意味付け・統一（Closed set / 既定値 / 妥当性検証）を行う。
+  * Normalized は原則 lossless（Raw に存在する情報は RawSnapshot/Extras 等へ保持）。
+* **Contracts（cross-exchange semantic format）**：複数取引所横断の抽象化語彙としての意味論（cross-exchange semantics）。
+
+この理解により「どの型をどこに置くか」は、
+「その型がどの形式（どの意味段階）に属するか」で決定できる。
+
+#### 5.1.3.4 送信（Encode/Write）の置き場（運用の固定）
+
+受信（Decode/Read）は Raw の codec（Deserialize）を中心に成立するが、
+送信（Encode/Write）は Raw の責務として固定しない。
+
+送信時は、Contracts/Adapter により選択された取引所意味（Normalized）で意味を最終決定し、
+**Normalized 内部のエンコード（internal な JSON shape / builder）**により bodyJson（string）を生成し、
+Wire はそれを転送表現として送る。
+
+送信用の JSON shape は実装上必要になり得るが、
+それは公開 API の型として露出せず、internal/private な実装詳細として扱う。
+
 ### 5.2 Call（呼出）結果の標準形（Core §5「Call」対応）
 
 本プロジェクトでは、各層の公開 API（Facade / Api）の標準返り値を `Call<Req, Res>` に統一する。

@@ -83,7 +83,9 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
         IReadOnlyList<OpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
-        var meta = BuildMeta(request, items.Count, Completeness.MayBePartial, PartialReason.Unknown);
+        var (requestedLimit, appliedLimit) = GetLimits(request);
+        items = items.Take(appliedLimit).ToList();
+        var meta = BuildMeta(requestedLimit, appliedLimit, items.Count, Completeness.MayBePartial, PartialReason.Unknown);
         return new Page<OrderSnapshotItem>(items, HasMore: false, NextCursor: null, Meta: meta);
     }
 
@@ -99,7 +101,9 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
             Price: e.Price,
             Size: e.Size)).ToList();
 
-        var meta = BuildMeta(request, items.Count, Completeness.MayBePartial, PartialReason.Unknown);
+        var (requestedLimit, appliedLimit) = GetLimits(request);
+        items = items.Take(appliedLimit).ToList();
+        var meta = BuildMeta(requestedLimit, appliedLimit, items.Count, Completeness.MayBePartial, PartialReason.Unknown);
         return new Page<ExecutionItem>(items, HasMore: false, NextCursor: null, Meta: meta);
     }
 
@@ -124,14 +128,20 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
             Status: OrderSnapshotStatus.Open);
     }
 
+    private static (int RequestedLimit, int AppliedLimit) GetLimits(MarketLimitCursorRequest request)
+    {
+        var requestedLimit = request.Limit ?? 1000;
+        var appliedLimit = Math.Min(requestedLimit, 1000);
+        return (requestedLimit, appliedLimit);
+    }
+
     private static PageMeta BuildMeta(
-        MarketLimitCursorRequest request,
+        int requestedLimit,
+        int appliedLimit,
         int returnedCount,
         Completeness completeness,
         PartialReason? reason)
     {
-        var requestedLimit = request.Limit ?? 1000;
-        var appliedLimit = Math.Min(requestedLimit, 1000);
         var clamped = appliedLimit != requestedLimit;
 
         return new PageMeta(

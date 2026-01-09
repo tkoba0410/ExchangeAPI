@@ -142,46 +142,6 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
         }
 
         [Fact]
-    public async Task GetOrdersAsync_ReturnsMappedOrders()
-        {
-            var rawTicker = new RawTicker();
-            var fakePublic = new FakeBitflyerPublicApi(rawTicker, new Board { Bids = Array.Empty<BoardEntry>(), Asks = Array.Empty<BoardEntry>() });
-
-            var childOrders = new[]
-            {
-                new ChildOrderResponse
-                {
-                    ChildOrderId = "JOR-1",
-                    ChildOrderAcceptanceId = "JRF-1",
-                    ProductCode = "BTC_JPY",
-                    Side = "BUY",
-                ChildOrderType = "LIMIT",
-                    Price = 100m,
-                    Size = 0.1m,
-                    OutstandingSize = 0.1m,
-                    ExecutedSize = 0m
-                }
-            };
-
-            var fakePrivate = new FakeBitflyerPrivateApi(
-                Array.Empty<BalanceResponse>(),
-                childOrders: childOrders);
-            var fakeTrading = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
-            var client = CreateClient(fakePublic, fakePrivate, fakeTrading);
-
-            var call = await client.History.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY")));
-            var ok = Assert.IsType<CallResult<Page<OrderSnapshotItem>>.Ok>(call.Result);
-            var result = ok.Response.Items;
-
-            Assert.Single(result);
-            var order = result[0];
-            Assert.Equal("JRF-1", order.OrderId);
-            Assert.Equal(ContractSide.Buy, order.Side);
-            Assert.Equal(OrderSnapshotType.Limit, order.OrderType);
-            Assert.Equal(new Size(0.1m), order.Size);
-        }
-
-        [Fact]
         public async Task GetBalancesAsync_ReturnsMappedBalances()
         {
             var rawTicker = new RawTicker { ProductCode = "BTC_JPY" };

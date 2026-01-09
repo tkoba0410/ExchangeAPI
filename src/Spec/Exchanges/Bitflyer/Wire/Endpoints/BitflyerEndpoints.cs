@@ -101,7 +101,8 @@ internal static class BitflyerEndpoints
         string? childOrderId = null,
         int? count = null,
         long? before = null,
-        long? after = null)
+        long? after = null,
+        string? parentOrderId = null)
     {
         return Get(BitflyerConstants.Paths.GetChildOrders, BuildQuery(
             (BitflyerConstants.QueryKeys.ProductCode, productCode),
@@ -110,7 +111,30 @@ internal static class BitflyerEndpoints
             (BitflyerConstants.QueryKeys.ChildOrderId, childOrderId),
             (BitflyerConstants.QueryKeys.Count, count?.ToString()),
             (BitflyerConstants.QueryKeys.Before, before?.ToString()),
+            (BitflyerConstants.QueryKeys.After, after?.ToString()),
+            (BitflyerConstants.QueryKeys.ParentOrderId, parentOrderId)));
+    }
+
+    public static WireCallSpec GetParentOrders(
+        string productCode,
+        string? parentOrderState = null,
+        int? count = null,
+        long? before = null,
+        long? after = null)
+    {
+        return Get(BitflyerConstants.Paths.GetParentOrders, BuildQuery(
+            (BitflyerConstants.QueryKeys.ProductCode, productCode),
+            (BitflyerConstants.QueryKeys.ParentOrderState, parentOrderState),
+            (BitflyerConstants.QueryKeys.Count, count?.ToString()),
+            (BitflyerConstants.QueryKeys.Before, before?.ToString()),
             (BitflyerConstants.QueryKeys.After, after?.ToString())));
+    }
+
+    public static WireCallSpec GetParentOrder(string? parentOrderId = null, string? parentOrderAcceptanceId = null)
+    {
+        return Get(BitflyerConstants.Paths.GetParentOrder, BuildQuery(
+            (BitflyerConstants.QueryKeys.ParentOrderId, parentOrderId),
+            (BitflyerConstants.QueryKeys.ParentOrderAcceptanceId, parentOrderAcceptanceId)));
     }
 
     public static WireCallSpec GetTradingCommission(string productCode) =>
@@ -182,8 +206,14 @@ internal static class BitflyerEndpoints
     public static WireCallSpec SendChildOrder(string bodyJson) =>
         Post(BitflyerConstants.Paths.SendChildOrder, bodyJson);
 
+    public static WireCallSpec SendParentOrder(string bodyJson) =>
+        Post(BitflyerConstants.Paths.SendParentOrder, bodyJson);
+
     public static WireCallSpec CancelChildOrder(string bodyJson) =>
         Post(BitflyerConstants.Paths.CancelChildOrder, bodyJson);
+
+    public static WireCallSpec CancelParentOrder(string bodyJson) =>
+        Post(BitflyerConstants.Paths.CancelParentOrder, bodyJson);
 
     public static WireCallSpec CancelAllChildOrders(string bodyJson) =>
         Post(BitflyerConstants.Paths.CancelAllChildOrders, bodyJson);

@@ -25,6 +25,8 @@ internal static class BitflyerConstants
         public const string GetCollateral = "/v1/me/getcollateral";
         public const string GetCollateralAccounts = "/v1/me/getcollateralaccounts";
         public const string GetChildOrders = "/v1/me/getchildorders";
+        public const string GetParentOrders = "/v1/me/getparentorders";
+        public const string GetParentOrder = "/v1/me/getparentorder";
         public const string GetPrivateExecutions = "/v1/me/getexecutions";
         public const string GetBalanceHistory = "/v1/me/getbalancehistory";
         public const string GetPositions = "/v1/me/getpositions";
@@ -39,7 +41,9 @@ internal static class BitflyerConstants
 
         // Private POST
         public const string SendChildOrder = "/v1/me/sendchildorder";
+        public const string SendParentOrder = "/v1/me/sendparentorder";
         public const string CancelChildOrder = "/v1/me/cancelchildorder";
+        public const string CancelParentOrder = "/v1/me/cancelparentorder";
         public const string CancelAllChildOrders = "/v1/me/cancelallchildorders";
         public const string Withdraw = "/v1/me/withdraw";
     }
@@ -53,6 +57,9 @@ internal static class BitflyerConstants
         public const string ChildOrderStatusState = "child_order_state";
         public const string ChildOrderAcceptanceId = "child_order_acceptance_id";
         public const string ChildOrderId = "child_order_id";
+        public const string ParentOrderId = "parent_order_id";
+        public const string ParentOrderAcceptanceId = "parent_order_acceptance_id";
+        public const string ParentOrderState = "parent_order_state";
         public const string CurrencyCode = "currency_code";
         public const string MessageId = "message_id";
         public const string FromDate = "from_date";

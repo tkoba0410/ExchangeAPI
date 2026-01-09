@@ -82,4 +82,59 @@ public sealed class BitflyerEndpointsTests
             path: "/v1/me/sendchildorder",
             bodyJson: "{\"product_code\":\"FX_BTC_JPY\",\"child_order_type\":\"LIMIT\",\"side\":\"BUY\",\"size\":0.1,\"price\":5000000,\"minute_to_expire\":1,\"time_in_force\":\"GTC\"}");
     }
+
+    [Fact]
+    public void SendParentOrder_builds_request_with_body_json()
+    {
+        var bodyJson = "{\"dummy\":\"payload\"}";
+        var req = BitflyerEndpoints.SendParentOrder(bodyJson);
+
+        WireCallSpecAssertions.AssertWireCallSpec(
+            req,
+            method: "POST",
+            path: "/v1/me/sendparentorder",
+            bodyJson: bodyJson);
+    }
+
+    [Fact]
+    public void CancelParentOrder_builds_request_with_body_json()
+    {
+        var bodyJson = "{\"dummy\":\"payload\"}";
+        var req = BitflyerEndpoints.CancelParentOrder(bodyJson);
+
+        WireCallSpecAssertions.AssertWireCallSpec(
+            req,
+            method: "POST",
+            path: "/v1/me/cancelparentorder",
+            bodyJson: bodyJson);
+    }
+
+    [Fact]
+    public void GetParentOrders_builds_request_with_query()
+    {
+        var req = BitflyerEndpoints.GetParentOrders(
+            "BTC_JPY",
+            parentOrderState: "ACTIVE",
+            count: 10,
+            before: 100,
+            after: 50);
+
+        WireCallSpecAssertions.AssertWireCallSpec(
+            req,
+            method: "GET",
+            path: "/v1/me/getparentorders",
+            query: "product_code=BTC_JPY&parent_order_state=ACTIVE&count=10&before=100&after=50");
+    }
+
+    [Fact]
+    public void GetParentOrder_builds_request_with_acceptance_id()
+    {
+        var req = BitflyerEndpoints.GetParentOrder(parentOrderAcceptanceId: "JRF-1");
+
+        WireCallSpecAssertions.AssertWireCallSpec(
+            req,
+            method: "GET",
+            path: "/v1/me/getparentorder",
+            query: "parent_order_acceptance_id=JRF-1");
+    }
 }

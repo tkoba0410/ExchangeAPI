@@ -137,11 +137,11 @@ Split Candidate: なし
 ### 5.1.3 Wire は「転送だけ」であり、内容に踏み込まない（文字列を許容する）
 
 * Wire の責務は **転送（transport）を成立させること**に限定される。
-  * method/path/query/header/body の組み立て、署名（認証）、送信、応答受領
+  * method/path/query/header/body の組み立て、署名（認証）、リクエスト実行、応答取得
 * Wire は値の意味（妥当性）に関与しない。
   * product_code / symbol / id などの **意味検証や正規化は行わない**
 * したがって Wire の API（Endpoints 等）は、原則として **string/bytes** を引数に取り、文字列表現をそのまま転送表現として扱ってよい。
-  * bodyJson は string で受け取り、Raw 側の SerializeOrThrow を通した JSON を受け渡す
+  * bodyJson は string で扱い、Normalized 境界内部で生成した JSON を Wire が転送表現として扱う
   * query/path パラメータも string で受け取り、Wire で URL 表現へ組み立てる
 
 #### 5.1.3.2 「意味の段階」整理（Wire / Raw / Normalized / Contracts）
@@ -201,18 +201,18 @@ Split Candidate: なし
 
 次の意味段階（境界）へデータ形式を変換していく。
 
-#### 5.1.3.4 送信（Encode/Write）の置き場（運用の固定）
+#### 5.1.3.4 Encode/Write の置き場（運用の固定）
 
-各 API 境界では、通信方向（送信／受信）ではなく、
+各 API 境界では、通信方向ではなく（いわゆる送信/受信の区別ではなく）、
 引数（in）および返り値（out）のデータ形式として責務を定義する。
 
 この境界では、引数（in）と返り値（out）の形式のみを規定する。
 
-送信時は、Contracts/Adapter により選択された取引所意味（Normalized）で意味を最終決定し、
+引数（in）の形成は、Contracts/Adapter により選択された取引所意味（Normalized）で意味を最終決定し、
 **Normalized 内部のエンコード（internal な JSON shape / builder）**により bodyJson（string）を生成し、
-Wire はそれを転送表現として送る。
+Wire はそれを転送表現として扱う。
 
-送信時の JSON shape は Normalized 境界内部の実装詳細とし、
+in で使う JSON shape は Normalized 境界内部の実装詳細とし、
 公開 API の引数や返り値として露出させない。
 
 ### 5.2 Call（呼出）結果の標準形（Core §5「Call」対応）

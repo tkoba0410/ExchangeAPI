@@ -19,7 +19,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void GetKlines_builds_request_with_ordered_query()
     {
-        var req = BittradeEndpoints.GetKlines("btcjpy", "1min", 200);
+        var req = BittradeEndpoints.GetKlines("btcjpy", "1min", "200");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,

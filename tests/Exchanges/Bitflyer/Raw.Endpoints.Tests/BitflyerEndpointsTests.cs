@@ -47,9 +47,9 @@ public sealed class BitflyerEndpointsTests
     {
         var req = BitflyerEndpoints.GetExecutions(
             "BTC_JPY",
-            count: 100,
-            before: 123,
-            after: 456,
+            count: "100",
+            before: "123",
+            after: "456",
             useAliasPath: false);
 
         WireCallSpecAssertions.AssertWireCallSpec(
@@ -110,9 +110,9 @@ public sealed class BitflyerEndpointsTests
         var req = BitflyerEndpoints.GetParentOrders(
             "BTC_JPY",
             parentOrderState: "ACTIVE",
-            count: 10,
-            before: 100,
-            after: 50);
+            count: "10",
+            before: "100",
+            after: "50");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,

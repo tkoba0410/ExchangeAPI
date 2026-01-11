@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -88,9 +89,9 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
                 request.ChildOrderStatusState,
                 request.ChildOrderAcceptanceId,
                 request.ChildOrderId,
-                request.Count,
-                request.Before,
-                request.After,
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture),
                 request.ParentOrderId),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawGetChildOrdersResponse>>(
@@ -106,9 +107,9 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
             BitflyerEndpoints.GetParentOrders(
                 request.ProductCode,
                 request.ParentOrderState,
-                request.Count,
-                request.Before,
-                request.After),
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawGetParentOrdersResponse>>(
                 json,

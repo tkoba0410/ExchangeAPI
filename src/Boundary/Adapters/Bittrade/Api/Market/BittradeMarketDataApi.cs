@@ -16,6 +16,7 @@ using ExchangeApi.Core.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Types;
 using ExchangeApi.Spec.CallCommon;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 
@@ -53,11 +54,12 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
                     "Bittrade.Market.GetTicker");
             }
 
-            var apiSymbol = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
+            var apiSymbolText = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
                 .Response
                 .ProductCode
                 .Replace("_", string.Empty, StringComparison.Ordinal)
                 .ToLowerInvariant();
+            var apiSymbol = BittradeSymbol.ParseOrThrow(apiSymbolText);
             var call = await _marketData.GetTickerCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -98,11 +100,12 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
                     "Bittrade.Market.GetOrderBook");
             }
 
-            var apiSymbol = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
+            var apiSymbolText = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
                 .Response
                 .ProductCode
                 .Replace("_", string.Empty, StringComparison.Ordinal)
                 .ToLowerInvariant();
+            var apiSymbol = BittradeSymbol.ParseOrThrow(apiSymbolText);
             var call = await _marketData.GetOrderBookCallAsync(apiSymbol, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -143,11 +146,12 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
                     "Bittrade.Market.GetExecutions");
             }
 
-            var apiSymbol = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
+            var apiSymbolText = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
                 .Response
                 .ProductCode
                 .Replace("_", string.Empty, StringComparison.Ordinal)
                 .ToLowerInvariant();
+            var apiSymbol = BittradeSymbol.ParseOrThrow(apiSymbolText);
             var call = await _marketData.GetExecutionsCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,

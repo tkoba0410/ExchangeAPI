@@ -25,11 +25,12 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
     }
 
     public async Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
-        string symbol,
+        BittradeSymbol symbol,
         CancellationToken ct = default)
     {
+        var symbolText = symbol.ToString();
         var rawCall = await _raw
-            .GetTickerAsync(new RawRequests.GetTickerRequest(symbol), ct)
+            .GetTickerAsync(new RawRequests.GetTickerRequest(symbolText), ct)
             .ConfigureAwait(false);
         var request = new GetTickerRequest(symbol);
 
@@ -45,13 +46,14 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
     }
 
     public async Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
-        string symbol,
+        BittradeSymbol symbol,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default)
     {
         var normalizedDepthType = depthType ?? BittradeDepthType.Step0;
+        var symbolText = symbol.ToString();
         var rawCall = await _raw
-            .GetOrderBookAsync(new RawRequests.GetOrderBookRequest(symbol, ToRawDepthType(normalizedDepthType)), ct)
+            .GetOrderBookAsync(new RawRequests.GetOrderBookRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
             .ConfigureAwait(false);
         var request = new GetOrderBookRequest(symbol, depthType);
 
@@ -68,11 +70,12 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
     }
 
     public async Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
-        string symbol,
+        BittradeSymbol symbol,
         CancellationToken ct = default)
     {
+        var symbolText = symbol.ToString();
         var rawCall = await _raw
-            .GetTradesAsync(new RawRequests.GetMarketTradesRequest(symbol), ct)
+            .GetTradesAsync(new RawRequests.GetMarketTradesRequest(symbolText), ct)
             .ConfigureAwait(false);
         var request = new GetExecutionsRequest(symbol);
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
@@ -89,7 +90,10 @@ internal sealed class BittradePublicApi : IBittradePublicApi
         SendAndParse(
             request,
             "Bittrade.GetKlines",
-            BittradeEndpoints.GetKlines(request.Symbol, request.Period, request.Size),
+            BittradeEndpoints.GetKlines(
+                request.Symbol,
+                request.Period,
+                request.Size?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawKlinesResponse>(json, "Bittrade.GetKlines"));
 

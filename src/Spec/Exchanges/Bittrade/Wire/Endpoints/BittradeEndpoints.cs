@@ -20,11 +20,11 @@ internal static class BittradeEndpoints
         Get(BittradeConstants.Paths.MarketTrade, BuildQuery(
             ("symbol", symbol)));
 
-    public static WireCallSpec GetKlines(string symbol, string period, int? size = null) =>
+    public static WireCallSpec GetKlines(string symbol, string period, string? size = null) =>
         Get(BittradeConstants.Paths.MarketKline, BuildQuery(
             ("period", period),
             ("symbol", symbol),
-            ("size", size?.ToString())));
+            ("size", size)));
 
     public static WireCallSpec GetTickers() => Get(BittradeConstants.Paths.MarketTickers, query: null);
 
@@ -65,48 +65,46 @@ internal static class BittradeEndpoints
         string? types = null,
         string? startDate = null,
         string? endDate = null,
-        long? from = null,
+        string? from = null,
         string? direct = null,
-        int? size = null)
+        string? size = null)
     {
         return Get(BittradeConstants.Paths.OrdersMatchResults, BuildQuery(
             ("symbol", symbol),
             ("types", types),
             ("start-date", startDate),
             ("end-date", endDate),
-            ("from", from?.ToString()),
+            ("from", from),
             ("direct", direct),
-            ("size", size?.ToString())));
+            ("size", size)));
     }
 
     public static WireCallSpec GetDepositWithdraws(
         string type,
         string? currency = null,
-        long? from = null,
-        int? size = null,
+        string? from = null,
+        string? size = null,
         string? direct = null)
     {
         return Get(BittradeConstants.Paths.DepositWithdraw, BuildQuery(
             ("type", type),
             ("currency", currency),
-            ("from", from?.ToString()),
-            ("size", size?.ToString()),
+            ("from", from),
+            ("size", size),
             ("direct", direct)));
     }
 
     public static WireCallSpec GetRetailOrders(
-        int direct,
-        int? status = null,
-        DateTimeOffset? startTime = null,
-        DateTimeOffset? endTime = null)
+        string direct,
+        string? status = null,
+        string? startTime = null,
+        string? endTime = null)
     {
-        var startMs = startTime?.ToUnixTimeMilliseconds();
-        var endMs = endTime?.ToUnixTimeMilliseconds();
         return Get(BittradeConstants.Paths.RetailOrderList, BuildQuery(
-            ("direct", direct.ToString()),
-            ("status", status?.ToString()),
-            ("start_time", startMs?.ToString()),
-            ("end_time", endMs?.ToString())));
+            ("direct", direct),
+            ("status", status),
+            ("start_time", startTime),
+            ("end_time", endTime)));
     }
 
     public static WireCallSpec PlaceOrder(string bodyJson) =>

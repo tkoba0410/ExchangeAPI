@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
@@ -90,9 +91,9 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
                 request.Types,
                 request.StartDate,
                 request.EndDate,
-                request.From,
+                request.From?.ToString(CultureInfo.InvariantCulture),
                 request.Direct,
-                request.Size),
+                request.Size?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawMatchResultsResponse>(
                 json,
@@ -107,8 +108,8 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             BittradeEndpoints.GetDepositWithdraws(
                 request.Type,
                 request.Currency,
-                request.From,
-                request.Size,
+                request.From?.ToString(CultureInfo.InvariantCulture),
+                request.Size?.ToString(CultureInfo.InvariantCulture),
                 request.Direct),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawDepositWithdrawsResponse>(
@@ -122,10 +123,10 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
             request,
             "Bittrade.GetRetailOrders",
             BittradeEndpoints.GetRetailOrders(
-                request.Direct,
-                request.Status,
-                request.StartTime,
-                request.EndTime),
+                request.Direct.ToString(CultureInfo.InvariantCulture),
+                request.Status?.ToString(CultureInfo.InvariantCulture),
+                request.StartTime?.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture),
+                request.EndTime?.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrdersResponse>(
                 json,

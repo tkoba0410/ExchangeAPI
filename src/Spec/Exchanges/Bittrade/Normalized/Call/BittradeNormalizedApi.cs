@@ -55,18 +55,18 @@ public sealed class BittradeNormalizedMarketDataFacade
     }
 
     public Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
-        string symbol,
+        BittradeSymbol symbol,
         CancellationToken ct = default) =>
         _inner.GetTickerCallAsync(symbol, ct);
 
     public Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
-        string symbol,
+        BittradeSymbol symbol,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default) =>
         _inner.GetOrderBookCallAsync(symbol, depthType, ct);
 
     public Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
-        string symbol,
+        BittradeSymbol symbol,
         CancellationToken ct = default) =>
         _inner.GetExecutionsCallAsync(symbol, ct);
 }

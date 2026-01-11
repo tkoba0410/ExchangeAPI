@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,9 +71,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 request.ProductCode,
                 request.ChildOrderId,
                 request.ChildOrderAcceptanceId,
-                request.Count,
-                request.Before,
-                request.After),
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPrivateResponse>>(
                 json,
@@ -113,9 +114,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 request.ChildOrderStatusState,
                 request.ChildOrderAcceptanceId,
                 request.ChildOrderId,
-                request.Count,
-                request.Before,
-                request.After,
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture),
                 request.ParentOrderId),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ChildOrderResponse>>(
@@ -131,9 +132,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             BitflyerEndpoints.GetParentOrders(
                 request.ProductCode,
                 request.ParentOrderState,
-                request.Count,
-                request.Before,
-                request.After),
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ParentOrderResponse>>(
                 json,
@@ -161,9 +162,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             "Bitflyer.GetBalanceHistory",
             BitflyerEndpoints.GetBalanceHistory(
                 request.CurrencyCode,
-                request.Count,
-                request.Before,
-                request.After),
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
                 json,
@@ -187,7 +188,10 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         SendAndParse(
             request,
             "Bitflyer.GetCollateralHistory",
-            BitflyerEndpoints.GetCollateralHistory(request.Count, request.Before, request.After),
+            BitflyerEndpoints.GetCollateralHistory(
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
                 json,
@@ -211,7 +215,10 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         SendAndParse(
             request,
             "Bitflyer.GetCoinIns",
-            BitflyerEndpoints.GetCoinIns(request.Count, request.Before, request.After),
+            BitflyerEndpoints.GetCoinIns(
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
                 json,
@@ -225,9 +232,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             "Bitflyer.GetCoinOuts",
             BitflyerEndpoints.GetCoinOuts(
                 request.MessageId,
-                request.Count,
-                request.Before,
-                request.After),
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
                 json,
@@ -239,7 +246,10 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         SendAndParse(
             request,
             "Bitflyer.GetDeposits",
-            BitflyerEndpoints.GetDeposits(request.Count, request.Before, request.After),
+            BitflyerEndpoints.GetDeposits(
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
                 json,
@@ -251,7 +261,11 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         SendAndParse(
             request,
             "Bitflyer.GetWithdrawals",
-            BitflyerEndpoints.GetWithdrawals(messageId: null, count: request.Count, before: request.Before, after: request.After),
+            BitflyerEndpoints.GetWithdrawals(
+                messageId: null,
+                count: request.Count?.ToString(CultureInfo.InvariantCulture),
+                before: request.Before?.ToString(CultureInfo.InvariantCulture),
+                after: request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
                 json,

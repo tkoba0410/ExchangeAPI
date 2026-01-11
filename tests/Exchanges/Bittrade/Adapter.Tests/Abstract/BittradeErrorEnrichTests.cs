@@ -10,6 +10,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalize;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalize.Types;
 using ContractsRequests = ExchangeApi.Contracts.Requests;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
 using ExchangeApi.Spec.CallCommon;
@@ -34,18 +35,18 @@ public sealed class BittradeErrorEnrichTests
     private sealed class ThrowingMarketDataApi : IBittradeNormalizedMarketDataApi
     {
         public Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
-            string symbol,
+            BittradeSymbol symbol,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
 
         public Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
-            string symbol,
-            ExchangeApi.Exchanges.Bittrade.Normalize.Types.BittradeDepthType? depthType = null,
+            BittradeSymbol symbol,
+            BittradeDepthType? depthType = null,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
 
         public Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
-            string symbol,
+            BittradeSymbol symbol,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,9 +52,9 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             "Bitflyer.GetExecutions",
             BitflyerEndpoints.GetExecutions(
                 request.ProductCode,
-                request.Count,
-                request.Before,
-                request.After,
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture),
                 request.UseAliasPath),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPublicResponse>>(

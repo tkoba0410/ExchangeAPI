@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 
 internal sealed class RawSendChildOrderRequest
 {

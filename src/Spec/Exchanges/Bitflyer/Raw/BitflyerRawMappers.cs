@@ -1,6 +1,6 @@
 using System.Linq;
 using PrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 

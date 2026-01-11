@@ -59,7 +59,7 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
             "Bitflyer.CancelChildOrder",
             BitflyerEndpoints.CancelChildOrder(
                 BitflyerRawJson.SerializeOrThrow(
-                    BitflyerRawMappers.MapCancelChildOrderRequest(request.Body),
+                    request.Body,
                     "Bitflyer.CancelChildOrder")),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawCancelChildOrderResponse>(
@@ -74,7 +74,7 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
             "Bitflyer.CancelParentOrder",
             BitflyerEndpoints.CancelParentOrder(
                 BitflyerRawJson.SerializeOrThrow(
-                    BitflyerRawMappers.MapCancelParentOrderRequest(request.Body),
+                    request.Body,
                     "Bitflyer.CancelParentOrder")),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawCancelParentOrderResponse>(

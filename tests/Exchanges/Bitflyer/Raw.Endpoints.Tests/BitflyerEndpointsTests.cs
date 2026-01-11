@@ -100,7 +100,13 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void CancelParentOrder_builds_request_with_body_json()
     {
-        var bodyJson = "{\"dummy\":\"payload\"}";
+        var request = new PrivateModels.CancelParentOrderRequest
+        {
+            ProductCode = "BTC_JPY",
+            ParentOrderAcceptanceId = "JRF-1",
+        };
+
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelParentOrder");
         var req = BitflyerEndpoints.CancelParentOrder(bodyJson);
 
         WireCallSpecAssertions.AssertWireCallSpec(

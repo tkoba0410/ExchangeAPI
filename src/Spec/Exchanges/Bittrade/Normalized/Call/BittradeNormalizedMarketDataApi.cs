@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
@@ -42,8 +40,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             ok =>
             {
                 RequireOk(ok.Status, "ticker");
-                var tick = ok.Tick ?? throw new BittradeNormalizedException("Bittrade ticker response missing tick.");
-                return BittradeNormalizer.NormalizeTicker(tick, ok.Ts);
+                return BittradeNormalizer.NormalizeTicker(ok, rawCall.Meta.RawJson);
             });
     }
 
@@ -87,7 +84,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             {
                 RequireOk(ok.Status, "trades");
                 var entries = ok.Tick?.Data ?? throw new BittradeNormalizedException("Bittrade trades response missing data.");
-                return BittradeNormalizer.NormalizeExecutions(entries);
+                return BittradeNormalizer.NormalizeExecutions(entries, rawCall.Meta.RawJson);
             });
     }
 

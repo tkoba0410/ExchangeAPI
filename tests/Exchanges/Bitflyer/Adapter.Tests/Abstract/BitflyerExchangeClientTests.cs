@@ -194,15 +194,15 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
 
         private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi
         {
-            public Task<Call<RawRequests.CreateChildOrderRequest, CreateChildOrderResponse>> CreateChildOrderAsync(
-                RawRequests.CreateChildOrderRequest request,
+            public Task<Call<string, CreateChildOrderResponse>> CreateChildOrderAsync(
+                string bodyJson,
                 CancellationToken cancellationToken = default) =>
-                Task.FromResult(OkCall(request, new CreateChildOrderResponse()));
+                Task.FromResult(OkCall(bodyJson, new CreateChildOrderResponse()));
 
-            public Task<Call<RawRequests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
-                RawRequests.CreateParentOrderRequest request,
+            public Task<Call<string, CreateParentOrderResponse>> CreateParentOrderAsync(
+                string bodyJson,
                 CancellationToken cancellationToken = default) =>
-                Task.FromResult(OkCall(request, new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
+                Task.FromResult(OkCall(bodyJson, new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
 
             public Task<Call<RawRequests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
                 RawRequests.CancelChildOrderRequest request,

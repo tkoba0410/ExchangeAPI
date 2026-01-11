@@ -63,7 +63,11 @@ public sealed class BitflyerNormalizedMarketDataFacade
             .ConfigureAwait(false);
         var request = new GetTickerRequest(productCode);
 
-        return CreateCall(rawCall, request, "Bitflyer.GetTicker", BitflyerTickerNormalizer.Normalize);
+        return CreateCall(
+            rawCall,
+            request,
+            "Bitflyer.GetTicker",
+            raw => BitflyerTickerNormalizer.Normalize(raw, rawCall.Meta.RawJson));
     }
 
     public async Task<Call<GetOrderBookRequest, BitflyerOrderBookNormalized>> GetOrderBookCallAsync(
@@ -94,9 +98,9 @@ public sealed class BitflyerNormalizedMarketDataFacade
             rawCall,
             request,
             "Bitflyer.GetExecutions",
-            raw => (IReadOnlyList<BitflyerExecutionNormalized>)raw
-                .Select(BitflyerExecutionNormalizer.Normalize)
-                .ToArray());
+            raw => (IReadOnlyList<BitflyerExecutionNormalized>)BitflyerExecutionNormalizer.NormalizeList(
+                raw,
+                rawCall.Meta.RawJson));
     }
 
     public async Task<Call<GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(

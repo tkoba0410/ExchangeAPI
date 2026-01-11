@@ -2,8 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Spec.CallCommon;
+using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
 
@@ -12,8 +12,8 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
     private readonly CreateChildOrderResponse _response;
     private readonly Exception? _exceptionToThrow;
 
-    public RawRequests.CreateChildOrderRequest? LastRequest { get; private set; }
-    public RawRequests.CreateParentOrderRequest? LastParentOrderRequest { get; private set; }
+    public string? LastBodyJson { get; private set; }
+    public string? LastParentOrderBodyJson { get; private set; }
     public RawRequests.CancelChildOrderRequest? LastCancelRequest { get; private set; }
     public RawRequests.CancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
     public RawRequests.CancelAllChildOrdersRequest? LastCancelAllRequest { get; private set; }
@@ -27,21 +27,21 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task<Call<RawRequests.CreateChildOrderRequest, CreateChildOrderResponse>> CreateChildOrderAsync(
-        RawRequests.CreateChildOrderRequest request,
+    public Task<Call<string, CreateChildOrderResponse>> CreateChildOrderAsync(
+        string bodyJson,
         CancellationToken cancellationToken = default)
     {
-        LastRequest = request;
-        return Task.FromResult(MakeCall(request, _response));
+        LastBodyJson = bodyJson;
+        return Task.FromResult(MakeCall(bodyJson, _response));
     }
 
-    public Task<Call<RawRequests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
-        RawRequests.CreateParentOrderRequest request,
+    public Task<Call<string, CreateParentOrderResponse>> CreateParentOrderAsync(
+        string bodyJson,
         CancellationToken cancellationToken = default)
     {
-        LastParentOrderRequest = request;
+        LastParentOrderBodyJson = bodyJson;
         return Task.FromResult(MakeCall(
-            request,
+            bodyJson,
             new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
     }
 

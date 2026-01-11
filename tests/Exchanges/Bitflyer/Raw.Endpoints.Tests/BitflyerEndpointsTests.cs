@@ -62,26 +62,14 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void CreateChildOrder_builds_request_with_body_json()
     {
-        var request = new PrivateModels.CreateChildOrderRequest
-        {
-            ProductCode = "FX_BTC_JPY",
-            ChildOrderType = "LIMIT",
-            Side = "BUY",
-            Size = 0.1m,
-            Price = 5000000m,
-            MinuteToExpire = 1,
-            TimeInForce = "GTC",
-        };
-
-        var shape = BitflyerRawMappers.MapSendChildOrderRequest(request);
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(shape, "Bitflyer.CreateChildOrder");
+        var bodyJson = "{\"dummy\":true}";
         var req = BitflyerEndpoints.SendChildOrder(bodyJson);
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "POST",
             path: "/v1/me/sendchildorder",
-            bodyJson: "{\"product_code\":\"FX_BTC_JPY\",\"child_order_type\":\"LIMIT\",\"side\":\"BUY\",\"size\":0.1,\"price\":5000000,\"minute_to_expire\":1,\"time_in_force\":\"GTC\"}");
+            bodyJson: bodyJson);
     }
 
     [Fact]

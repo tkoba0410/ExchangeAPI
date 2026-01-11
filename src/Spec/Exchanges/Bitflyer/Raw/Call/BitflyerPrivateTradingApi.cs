@@ -23,32 +23,30 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<Call<Requests.CreateChildOrderRequest, CreateChildOrderResponse>> CreateChildOrderAsync(
-        Requests.CreateChildOrderRequest request,
+    public Task<Call<string, CreateChildOrderResponse>> CreateChildOrderAsync(
+        string bodyJson,
         CancellationToken cancellationToken = default)
     {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var raw = BitflyerRawMappers.MapSendChildOrderRequest(request.Body);
+        if (bodyJson is null) throw new ArgumentNullException(nameof(bodyJson));
         return SendAndParse(
-            request,
+            bodyJson,
             "Bitflyer.CreateChildOrder",
-            BitflyerEndpoints.SendChildOrder(BitflyerRawJson.SerializeOrThrow(raw, "Bitflyer.CreateChildOrder")),
+            BitflyerEndpoints.SendChildOrder(bodyJson),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<CreateChildOrderResponse>(
                 json,
                 "Bitflyer.CreateChildOrder"));
     }
 
-    public Task<Call<Requests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
-        Requests.CreateParentOrderRequest request,
+    public Task<Call<string, CreateParentOrderResponse>> CreateParentOrderAsync(
+        string bodyJson,
         CancellationToken cancellationToken = default)
     {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        var raw = BitflyerRawMappers.MapSendParentOrderRequest(request.Body);
+        if (bodyJson is null) throw new ArgumentNullException(nameof(bodyJson));
         return SendAndParse(
-            request,
+            bodyJson,
             "Bitflyer.CreateParentOrder",
-            BitflyerEndpoints.SendParentOrder(BitflyerRawJson.SerializeOrThrow(raw, "Bitflyer.CreateParentOrder")),
+            BitflyerEndpoints.SendParentOrder(bodyJson),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<CreateParentOrderResponse>(
                 json,

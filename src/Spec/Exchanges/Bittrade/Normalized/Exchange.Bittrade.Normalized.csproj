@@ -12,5 +12,6 @@
     <ProjectReference Include="..\Raw\Exchange.Bittrade.Raw.csproj" />
     <ProjectReference Include="..\..\..\..\Core\Core.csproj" />
     <ProjectReference Include="..\..\..\..\Domain\Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\ValueCommon\Spec.ValueCommon.csproj" />
   </ItemGroup>
 </Project>

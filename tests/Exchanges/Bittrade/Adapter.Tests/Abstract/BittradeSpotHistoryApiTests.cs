@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
@@ -57,10 +58,25 @@ public sealed class BittradeSpotHistoryApiTests
     [Fact]
     public async Task GetExecutionsAsync_LimitApplied()
     {
+        var snapshot = EmptySnapshot();
         var executions = new[]
         {
-            new BittradeExecutionNormalized("1", "buy", 100m, 0.1m, DateTimeOffset.UtcNow.AddMinutes(-1)),
-            new BittradeExecutionNormalized("2", "sell", 101m, 0.2m, DateTimeOffset.UtcNow)
+            new BittradeExecutionNormalized(
+                "1",
+                "buy",
+                100m,
+                0.1m,
+                DateTimeOffset.UtcNow.AddMinutes(-1),
+                snapshot,
+                new Dictionary<string, JsonElement>()),
+            new BittradeExecutionNormalized(
+                "2",
+                "sell",
+                101m,
+                0.2m,
+                DateTimeOffset.UtcNow,
+                snapshot,
+                new Dictionary<string, JsonElement>())
         };
         var trading = new StubNormalizedTradingApi(Array.Empty<OpenOrder>(), executions);
         var api = new BittradeSpotHistoryApi(trading, accountId: "account");
@@ -142,5 +158,11 @@ public sealed class BittradeSpotHistoryApiTests
                 Result: new CallResult<TResponse>.Ok(response),
                 Meta: meta);
         }
+    }
+
+    private static JsonElement EmptySnapshot()
+    {
+        using var doc = JsonDocument.Parse("{}");
+        return doc.RootElement.Clone();
     }
 }

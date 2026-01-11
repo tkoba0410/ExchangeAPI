@@ -10,12 +10,20 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 
 internal static class BittradeNormalizer
 {
-    internal static BittradeTickerNormalized NormalizeTicker(RawMergedTick tick, DateTimeOffset? responseTimestamp)
-    {
-        if (tick is null) throw new ArgumentNullException(nameof(tick));
+    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
-        var timestamp = tick.Ts ?? responseTimestamp ?? DateTimeOffset.UtcNow;
-        return new BittradeTickerNormalized(tick.Close, timestamp);
+    internal static BittradeTickerNormalized NormalizeTicker(RawMergedResponse response, string? rawJson)
+    {
+        if (response is null) throw new ArgumentNullException(nameof(response));
+
+        var tick = response.Tick ?? throw new ArgumentNullException(nameof(response.Tick));
+        var timestamp = tick.Ts ?? response.Ts ?? DateTimeOffset.UtcNow;
+        var snapshot = ExtractSnapshot(rawJson ?? Serialize(response));
+        return new BittradeTickerNormalized(
+            tick.Close,
+            timestamp,
+            snapshot,
+            new Dictionary<string, JsonElement>());
     }
 
     internal static BittradeOrderBookNormalized NormalizeOrderBook(RawDepthTick tick)
@@ -27,17 +35,22 @@ internal static class BittradeNormalizer
         return new BittradeOrderBookNormalized(bids, asks);
     }
 
-    internal static IReadOnlyList<BittradeExecutionNormalized> NormalizeExecutions(IReadOnlyList<RawTradeEntry> entries)
+    internal static IReadOnlyList<BittradeExecutionNormalized> NormalizeExecutions(
+        IReadOnlyList<RawTradeEntry> entries,
+        string? rawJson)
     {
         if (entries is null) throw new ArgumentNullException(nameof(entries));
 
+        var snapshots = ExtractTradeSnapshots(rawJson, entries);
         return entries
-            .Select(entry => new BittradeExecutionNormalized(
+            .Select((entry, idx) => new BittradeExecutionNormalized(
                 entry.Id.ToString(),
                 entry.Direction,
                 entry.Price,
                 entry.Amount,
-                entry.Ts))
+                entry.Ts,
+                snapshots[idx],
+                new Dictionary<string, JsonElement>()))
             .ToList();
     }
 
@@ -123,4 +136,77 @@ internal static class BittradeNormalizer
 
         throw new BittradeNormalizedException($"Invalid decimal for {dto}.{field}: '{s}'.");
     }
+
+    private static IReadOnlyList<JsonElement> ExtractTradeSnapshots(
+        string? rawJson,
+        IReadOnlyList<RawTradeEntry> entries)
+    {
+        if (entries.Count == 0)
+        {
+            return Array.Empty<JsonElement>();
+        }
+
+        if (!string.IsNullOrWhiteSpace(rawJson))
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(rawJson);
+                if (doc.RootElement.ValueKind == JsonValueKind.Object
+                    && doc.RootElement.TryGetProperty("tick", out var tick)
+                    && tick.ValueKind == JsonValueKind.Object
+                    && tick.TryGetProperty("data", out var data)
+                    && data.ValueKind == JsonValueKind.Array)
+                {
+                    var snapshots = new List<JsonElement>(entries.Count);
+                    for (var i = 0; i < entries.Count; i++)
+                    {
+                        if (i < data.GetArrayLength())
+                        {
+                            snapshots.Add(data[i].Clone());
+                        }
+                        else
+                        {
+                            snapshots.Add(EmptySnapshot());
+                        }
+                    }
+
+                    return snapshots;
+                }
+            }
+            catch (JsonException)
+            {
+            }
+        }
+
+        return entries
+            .Select(entry => ExtractSnapshot(Serialize(entry)))
+            .ToArray();
+    }
+
+    private static JsonElement ExtractSnapshot(string? rawJson)
+    {
+        if (string.IsNullOrWhiteSpace(rawJson))
+        {
+            return EmptySnapshot();
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(rawJson);
+            return doc.RootElement.Clone();
+        }
+        catch (JsonException)
+        {
+            return EmptySnapshot();
+        }
+    }
+
+    private static JsonElement EmptySnapshot()
+    {
+        using var doc = JsonDocument.Parse("{}");
+        return doc.RootElement.Clone();
+    }
+
+    private static string Serialize<T>(T value) =>
+        JsonSerializer.Serialize(value, SerializerOptions);
 }

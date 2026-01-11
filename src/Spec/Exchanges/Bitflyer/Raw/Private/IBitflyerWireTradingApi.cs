@@ -7,12 +7,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 public interface IBitflyerRawPrivateTradingApi
 {
-    Task<Call<Requests.CreateChildOrderRequest, CreateChildOrderResponse>> CreateChildOrderAsync(
-        Requests.CreateChildOrderRequest request,
+    Task<Call<string, CreateChildOrderResponse>> CreateChildOrderAsync(
+        string bodyJson,
         CancellationToken cancellationToken = default);
 
-    Task<Call<Requests.CreateParentOrderRequest, CreateParentOrderResponse>> CreateParentOrderAsync(
-        Requests.CreateParentOrderRequest request,
+    Task<Call<string, CreateParentOrderResponse>> CreateParentOrderAsync(
+        string bodyJson,
         CancellationToken cancellationToken = default);
 
     Task<Call<Requests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(

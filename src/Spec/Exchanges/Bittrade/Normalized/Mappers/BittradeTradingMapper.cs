@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using ExchangeApi.Contracts.Dtos;
 using ExchangeApi.Common.Enums;
 using ExchangeApi.Common.Types;
@@ -16,6 +17,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
 internal static class BittradeTradingMapper
 {
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
+    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
     public static RawCreateOrderRequest ToRaw(string accountId, string apiSymbol, OrderRequest request)
     {
@@ -123,15 +125,48 @@ internal static class BittradeTradingMapper
             return Array.Empty<BittradeExecutionNormalized>();
         }
 
+        var snapshots = entries
+            .Select(entry => ExtractSnapshot(Serialize(entry)))
+            .ToArray();
+
         return entries
-            .Select(entry => new BittradeExecutionNormalized(
+            .Select((entry, idx) => new BittradeExecutionNormalized(
                 Id: string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId,
                 Side: entry.Type,
                 Price: entry.Price,
                 Size: entry.FilledAmount,
-                Timestamp: entry.CreatedAt))
+                Timestamp: entry.CreatedAt,
+                RawSnapshot: snapshots[idx],
+                Extras: new Dictionary<string, JsonElement>()))
             .ToList();
     }
+
+    private static JsonElement ExtractSnapshot(string? rawJson)
+    {
+        if (string.IsNullOrWhiteSpace(rawJson))
+        {
+            return EmptySnapshot();
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(rawJson);
+            return doc.RootElement.Clone();
+        }
+        catch (JsonException)
+        {
+            return EmptySnapshot();
+        }
+    }
+
+    private static JsonElement EmptySnapshot()
+    {
+        using var doc = JsonDocument.Parse("{}");
+        return doc.RootElement.Clone();
+    }
+
+    private static string Serialize<T>(T value) =>
+        JsonSerializer.Serialize(value, SerializerOptions);
 
     private static BittradeOrderType MapOrderType(Side side, ContractOrderType type)
     {

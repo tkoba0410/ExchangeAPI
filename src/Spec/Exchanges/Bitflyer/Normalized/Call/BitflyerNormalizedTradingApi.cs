@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Enums;
@@ -66,8 +65,9 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             Price = request.Price?.Value,
         };
 
+        var bodyJson = BitflyerOrderEncoder.BuildChildOrderBodyJson(dto);
         var rawCall = await _tradingApi
-            .CreateChildOrderAsync(new RawRequests.CreateChildOrderRequest(dto), cancellationToken)
+            .CreateChildOrderAsync(bodyJson, cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -299,8 +299,9 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             Parameters = rawParameters
         };
 
+        var bodyJson = BitflyerOrderEncoder.BuildParentOrderBodyJson(rawRequest);
         var rawCall = await _tradingApi
-            .CreateParentOrderAsync(new RawRequests.CreateParentOrderRequest(rawRequest), cancellationToken)
+            .CreateParentOrderAsync(bodyJson, cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

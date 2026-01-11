@@ -21,31 +21,27 @@ internal sealed class BitflyerRawTradingApi : IBitflyerRawTradingApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<Call<Requests.CreateChildOrderRequest, RawSendChildOrderResponse>> SendChildOrderAsync(
-        Requests.CreateChildOrderRequest request,
+    public Task<Call<string, RawSendChildOrderResponse>> SendChildOrderAsync(
+        string bodyJson,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
-            request,
+            bodyJson,
             "Bitflyer.SendChildOrder",
             BitflyerEndpoints.SendChildOrder(
-                BitflyerRawJson.SerializeOrThrow(
-                    BitflyerRawMappers.MapSendChildOrderRequest(request.Body),
-                    "Bitflyer.SendChildOrder")),
+                bodyJson),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawSendChildOrderResponse>(
                 json,
                 "Bitflyer.SendChildOrder"));
 
-    public Task<Call<Requests.CreateParentOrderRequest, RawSendParentOrderResponse>> SendParentOrderAsync(
-        Requests.CreateParentOrderRequest request,
+    public Task<Call<string, RawSendParentOrderResponse>> SendParentOrderAsync(
+        string bodyJson,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
-            request,
+            bodyJson,
             "Bitflyer.SendParentOrder",
             BitflyerEndpoints.SendParentOrder(
-                BitflyerRawJson.SerializeOrThrow(
-                    BitflyerRawMappers.MapSendParentOrderRequest(request.Body),
-                    "Bitflyer.SendParentOrder")),
+                bodyJson),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawSendParentOrderResponse>(
                 json,

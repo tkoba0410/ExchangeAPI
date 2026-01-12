@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Common.Types;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
 using ExchangeApi.Spec.CallCommon;
 
@@ -18,7 +18,7 @@ public interface IBitflyerNormalizedAccountApi
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionCallAsync(
+    Task<Call<GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>> GetTradingCommissionCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 }

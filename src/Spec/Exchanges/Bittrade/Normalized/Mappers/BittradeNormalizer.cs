@@ -105,26 +105,24 @@ internal static class BittradeNormalizer
         return new BittradeOrderBookLevelNormalized(level[0], level[1]);
     }
 
-    private static decimal ParseDecimalFlexible(JsonElement element, string field)
+    private static decimal ParseDecimalFlexible(string? value, string field)
     {
-        return element.ValueKind switch
+        if (string.IsNullOrWhiteSpace(value))
         {
-            JsonValueKind.String => ParseDecimalOrThrow(element.GetString()!, field, "RawSymbolInfo"),
-            JsonValueKind.Number => element.GetDecimal(),
-            _ => throw new BittradeNormalizedException($"Unexpected JSON type for RawSymbolInfo.{field}: {element.ValueKind}")
-        };
-    }
-
-    private static decimal? ParseNullableDecimalFlexible(JsonElement element, string field)
-    {
-        if (element.ValueKind == JsonValueKind.Null || element.ValueKind == JsonValueKind.Undefined) return null;
-        if (element.ValueKind == JsonValueKind.String)
-        {
-            var value = element.GetString();
-            return string.IsNullOrWhiteSpace(value) ? null : ParseDecimalOrThrow(value, field, "RawSymbolInfo");
+            throw new BittradeNormalizedException($"RawSymbolInfo.{field} is empty.");
         }
 
-        return element.ValueKind == JsonValueKind.Number ? element.GetDecimal() : null;
+        return ParseDecimalOrThrow(value, field, "RawSymbolInfo");
+    }
+
+    private static decimal? ParseNullableDecimalFlexible(string? value, string field)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return ParseDecimalOrThrow(value, field, "RawSymbolInfo");
     }
 
     private static decimal ParseDecimalOrThrow(string s, string field, string dto)

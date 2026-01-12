@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
@@ -19,7 +18,8 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
     private readonly CollateralResponse _collateral;
     private readonly IReadOnlyList<ChildOrderResponse> _childOrders;
     private readonly IReadOnlyList<CollateralAccount> _collateralAccounts;
-    private readonly IReadOnlyList<JsonElement> _genericList = Array.Empty<JsonElement>();
+    private readonly RawJsonResponse _rawJsonList = new("[]");
+    private readonly RawJsonResponse _rawJsonObject = new("{}");
 
     public FakeBitflyerPrivateApi(
         IReadOnlyList<BalanceResponse> response,
@@ -91,50 +91,50 @@ public sealed class FakeBitflyerPrivateApi : IBitflyerPrivateApi
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, new ParentOrderDetailResponse()));
 
-    public Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
+    public Task<Call<GetBalanceHistoryRequest, RawJsonResponse>> GetBalanceHistoryAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _genericList));
+        Task.FromResult(MakeOkCall(request, _rawJsonList));
 
-    public Task<Call<GetCollateralHistoryRequest, IReadOnlyList<JsonElement>>> GetCollateralHistoryAsync(
+    public Task<Call<GetCollateralHistoryRequest, RawJsonResponse>> GetCollateralHistoryAsync(
         GetCollateralHistoryRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _genericList));
+        Task.FromResult(MakeOkCall(request, _rawJsonList));
 
-    public Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionAsync(
+    public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, JsonDocument.Parse("{}").RootElement));
+        Task.FromResult(MakeOkCall(request, _rawJsonObject));
 
-    public Task<Call<GetAddressesRequest, IReadOnlyList<JsonElement>>> GetAddressesAsync(
+    public Task<Call<GetAddressesRequest, RawJsonResponse>> GetAddressesAsync(
         GetAddressesRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _genericList));
+        Task.FromResult(MakeOkCall(request, _rawJsonList));
 
-    public Task<Call<GetCoinInsRequest, IReadOnlyList<JsonElement>>> GetCoinInsAsync(
+    public Task<Call<GetCoinInsRequest, RawJsonResponse>> GetCoinInsAsync(
         GetCoinInsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _genericList));
+        Task.FromResult(MakeOkCall(request, _rawJsonList));
 
-    public Task<Call<GetCoinOutsRequest, IReadOnlyList<JsonElement>>> GetCoinOutsAsync(
+    public Task<Call<GetCoinOutsRequest, RawJsonResponse>> GetCoinOutsAsync(
         GetCoinOutsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _genericList));
+        Task.FromResult(MakeOkCall(request, _rawJsonList));
 
-    public Task<Call<GetDepositsRequest, IReadOnlyList<JsonElement>>> GetDepositsAsync(
+    public Task<Call<GetDepositsRequest, RawJsonResponse>> GetDepositsAsync(
         GetDepositsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _genericList));
+        Task.FromResult(MakeOkCall(request, _rawJsonList));
 
-    public Task<Call<GetWithdrawalsRequest, IReadOnlyList<JsonElement>>> GetWithdrawalsAsync(
+    public Task<Call<GetWithdrawalsRequest, RawJsonResponse>> GetWithdrawalsAsync(
         GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _genericList));
+        Task.FromResult(MakeOkCall(request, _rawJsonList));
 
-    public Task<Call<GetBankAccountsRequest, IReadOnlyList<JsonElement>>> GetBankAccountsAsync(
+    public Task<Call<GetBankAccountsRequest, RawJsonResponse>> GetBankAccountsAsync(
         GetBankAccountsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _genericList));
+        Task.FromResult(MakeOkCall(request, _rawJsonList));
 
     private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
     {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalize;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalize.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Core.Contracts.Errors;
@@ -82,7 +84,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
             raw => BitflyerAccountMapper.MapAccountExecutions(symbol, raw));
     }
 
-    public async Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionCallAsync(
+    public async Task<Call<GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>> GetTradingCommissionCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -95,7 +97,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         var request = new GetTradingCommissionRequest(symbol);
         if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err marketError)
         {
-            return CreateCallError<GetTradingCommissionRequest, JsonElement>(
+            return CreateCallError<GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
                 marketCall,
                 request,
                 "Bitflyer.GetTradingCommission",
@@ -107,7 +109,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
             : null;
         if (string.IsNullOrEmpty(productCode))
         {
-            return CreateCallError<GetTradingCommissionRequest, JsonElement>(
+            return CreateCallError<GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
                 marketCall,
                 request,
                 "Bitflyer.GetTradingCommission",
@@ -118,7 +120,11 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
             .GetTradingCommissionAsync(new RawRequests.GetTradingCommissionRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
-        return CreateCall(rawCall, request, "Bitflyer.GetTradingCommission", raw => raw);
+        return CreateCall(
+            rawCall,
+            request,
+            "Bitflyer.GetTradingCommission",
+            raw => ParseTradingCommission(raw.RawJson, productCode));
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
@@ -151,6 +157,59 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
                 Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
                 Meta: meta)
         };
+    }
+
+    private static BitflyerTradingCommissionNormalized ParseTradingCommission(string? rawJson, string productCode)
+    {
+        if (string.IsNullOrWhiteSpace(rawJson))
+        {
+            throw new InvalidOperationException("Trading commission response is empty.");
+        }
+
+        using var doc = JsonDocument.Parse(rawJson);
+        var root = doc.RootElement;
+        string? parsedProductCode = null;
+        decimal? commissionRate = null;
+
+        if (root.ValueKind == JsonValueKind.Object)
+        {
+            if (root.TryGetProperty("product_code", out var productCodeElement)
+                && productCodeElement.ValueKind == JsonValueKind.String)
+            {
+                parsedProductCode = productCodeElement.GetString();
+            }
+
+            if (root.TryGetProperty("commission_rate", out var commissionElement))
+            {
+                commissionRate = TryParseDecimal(commissionElement);
+            }
+        }
+
+        return new BitflyerTradingCommissionNormalized(
+            ProductCode: parsedProductCode ?? productCode,
+            CommissionRate: commissionRate);
+    }
+
+    private static decimal? TryParseDecimal(JsonElement element)
+    {
+        return element.ValueKind switch
+        {
+            JsonValueKind.Number => element.GetDecimal(),
+            JsonValueKind.String => TryParseDecimalString(element.GetString()),
+            _ => null
+        };
+    }
+
+    private static decimal? TryParseDecimalString(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed)
+            ? parsed
+            : null;
     }
 
     private static Call<TReq, TOk> MapOk<TRawReq, TReq, TRaw, TOk>(

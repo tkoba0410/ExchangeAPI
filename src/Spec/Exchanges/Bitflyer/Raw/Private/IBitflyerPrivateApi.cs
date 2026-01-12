@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
@@ -19,35 +18,35 @@ public interface IBitflyerPrivateApi : IBitflyerRawAccountApi
         GetCollateralAccountsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
+    Task<Call<GetBalanceHistoryRequest, RawJsonResponse>> GetBalanceHistoryAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCollateralHistoryRequest, IReadOnlyList<JsonElement>>> GetCollateralHistoryAsync(
+    Task<Call<GetCollateralHistoryRequest, RawJsonResponse>> GetCollateralHistoryAsync(
         GetCollateralHistoryRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetAddressesRequest, IReadOnlyList<JsonElement>>> GetAddressesAsync(
+    Task<Call<GetAddressesRequest, RawJsonResponse>> GetAddressesAsync(
         GetAddressesRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCoinInsRequest, IReadOnlyList<JsonElement>>> GetCoinInsAsync(
+    Task<Call<GetCoinInsRequest, RawJsonResponse>> GetCoinInsAsync(
         GetCoinInsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCoinOutsRequest, IReadOnlyList<JsonElement>>> GetCoinOutsAsync(
+    Task<Call<GetCoinOutsRequest, RawJsonResponse>> GetCoinOutsAsync(
         GetCoinOutsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetDepositsRequest, IReadOnlyList<JsonElement>>> GetDepositsAsync(
+    Task<Call<GetDepositsRequest, RawJsonResponse>> GetDepositsAsync(
         GetDepositsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetWithdrawalsRequest, IReadOnlyList<JsonElement>>> GetWithdrawalsAsync(
+    Task<Call<GetWithdrawalsRequest, RawJsonResponse>> GetWithdrawalsAsync(
         GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBankAccountsRequest, IReadOnlyList<JsonElement>>> GetBankAccountsAsync(
+    Task<Call<GetBankAccountsRequest, RawJsonResponse>> GetBankAccountsAsync(
         GetBankAccountsRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
@@ -37,7 +36,7 @@ public interface IBitflyerRawAccountApi
         GetParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionAsync(
+    Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default);
 }

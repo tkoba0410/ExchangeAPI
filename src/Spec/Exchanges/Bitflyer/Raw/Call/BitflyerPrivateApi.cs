@@ -154,7 +154,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 json,
                 "Bitflyer.GetParentOrder"));
 
-    public Task<Call<GetBalanceHistoryRequest, IReadOnlyList<JsonElement>>> GetBalanceHistoryAsync(
+    public Task<Call<GetBalanceHistoryRequest, RawJsonResponse>> GetBalanceHistoryAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -166,11 +166,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                json,
-                "Bitflyer.GetBalanceHistory"));
+            json => new RawJsonResponse(json));
 
-    public Task<Call<GetTradingCommissionRequest, JsonElement>> GetTradingCommissionAsync(
+    public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -178,11 +176,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             "Bitflyer.GetTradingCommission",
             BitflyerEndpoints.GetTradingCommission(request.ProductCode),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<JsonElement>(
-                json,
-                "Bitflyer.GetTradingCommission"));
+            json => new RawJsonResponse(json));
 
-    public Task<Call<GetCollateralHistoryRequest, IReadOnlyList<JsonElement>>> GetCollateralHistoryAsync(
+    public Task<Call<GetCollateralHistoryRequest, RawJsonResponse>> GetCollateralHistoryAsync(
         GetCollateralHistoryRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -193,11 +189,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                json,
-                "Bitflyer.GetCollateralHistory"));
+            json => new RawJsonResponse(json));
 
-    public Task<Call<GetAddressesRequest, IReadOnlyList<JsonElement>>> GetAddressesAsync(
+    public Task<Call<GetAddressesRequest, RawJsonResponse>> GetAddressesAsync(
         GetAddressesRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -205,11 +199,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             "Bitflyer.GetAddresses",
             BitflyerEndpoints.GetAddresses(),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                json,
-                "Bitflyer.GetAddresses"));
+            json => new RawJsonResponse(json));
 
-    public Task<Call<GetCoinInsRequest, IReadOnlyList<JsonElement>>> GetCoinInsAsync(
+    public Task<Call<GetCoinInsRequest, RawJsonResponse>> GetCoinInsAsync(
         GetCoinInsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -220,11 +212,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                json,
-                "Bitflyer.GetCoinIns"));
+            json => new RawJsonResponse(json));
 
-    public Task<Call<GetCoinOutsRequest, IReadOnlyList<JsonElement>>> GetCoinOutsAsync(
+    public Task<Call<GetCoinOutsRequest, RawJsonResponse>> GetCoinOutsAsync(
         GetCoinOutsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -236,11 +226,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                json,
-                "Bitflyer.GetCoinOuts"));
+            json => new RawJsonResponse(json));
 
-    public Task<Call<GetDepositsRequest, IReadOnlyList<JsonElement>>> GetDepositsAsync(
+    public Task<Call<GetDepositsRequest, RawJsonResponse>> GetDepositsAsync(
         GetDepositsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -251,11 +239,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                json,
-                "Bitflyer.GetDeposits"));
+            json => new RawJsonResponse(json));
 
-    public Task<Call<GetWithdrawalsRequest, IReadOnlyList<JsonElement>>> GetWithdrawalsAsync(
+    public Task<Call<GetWithdrawalsRequest, RawJsonResponse>> GetWithdrawalsAsync(
         GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -267,11 +253,9 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 before: request.Before?.ToString(CultureInfo.InvariantCulture),
                 after: request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                json,
-                "Bitflyer.GetWithdrawals"));
+            json => new RawJsonResponse(json));
 
-    public Task<Call<GetBankAccountsRequest, IReadOnlyList<JsonElement>>> GetBankAccountsAsync(
+    public Task<Call<GetBankAccountsRequest, RawJsonResponse>> GetBankAccountsAsync(
         GetBankAccountsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -279,9 +263,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             "Bitflyer.GetBankAccounts",
             BitflyerEndpoints.GetBankAccounts(),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<JsonElement>>(
-                json,
-                "Bitflyer.GetBankAccounts"));
+            json => new RawJsonResponse(json));
 
     private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
         TReq request,

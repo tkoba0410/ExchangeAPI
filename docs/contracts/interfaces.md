@@ -22,7 +22,7 @@
 
 * Public / Normalized / Adapter / Raw 各層の公開インターフェース
 * 層間で受け渡し可能な型の範囲
-* RawJson の保持・通過が許される範囲
+* RawJson の保持・通過に関する境界
 
 以下は対象外とする。
 
@@ -60,7 +60,7 @@ ExchangeAPI は、概ね以下の層構造を持つ。
 
 ### 4.2 Call-only Policy
 
-層を越えて公開される API は、原則として **Call<T>** を返す。
+層を越えて公開される API は、**Call<T>** を返す。
 
 * Response / Result の直返しは禁止する
 * Transport 層は本ポリシーの例外とする
@@ -72,7 +72,7 @@ ExchangeAPI は、概ね以下の層構造を持つ。
 * 層境界で string を直接受け渡さない
 * 値オブジェクト・enum・専用型に変換してから上位層へ渡す
 
-string の流入は **Entry Point のみ**で許可される。
+string の流入は **Entry Point のみ**に限定される。
 
 ---
 
@@ -149,7 +149,7 @@ Public / Facade 層は、利用者向けの **最終入口**である。
 
 * Public API は安定性を最優先する
 * 利用者に Raw / Adapter の概念を露出しない
-* 破壊的変更は原則禁止とする
+* 破壊的変更は禁止とする
 
 ---
 
@@ -157,9 +157,7 @@ Public / Facade 層は、利用者向けの **最終入口**である。
 
 * RawJson の保持は Raw / Normalized 内部に限定する
 * Public / Contracts への RawJson 露出は禁止する
-* lossless 目的の場合のみ、明示的に例外を認める
-
-例外は必ず `docs/exceptions.md` に記録する。
+* 原則からの逸脱が必要な場合は、必ず `docs/exceptions.md` に記録する
 
 ---
 

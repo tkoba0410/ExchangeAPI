@@ -1,99 +1,187 @@
-# Contracts Abstract APIs (Interfaces)
+# Interfaces
 
-この一覧に記載する Contracts 抽象 API は `Call<TRequest,TResponse>` を唯一の返り値とする（Call-only）。
-Transport 層（`src/Core/Transport/**`）は対象外。
+## 1. Purpose
 
-この文書は `src/Domain/Contracts/Interfaces/` に存在する **抽象化インターフェース**の一覧です。
+本ドキュメントは、ExchangeAPI における **層間インターフェース（Interfaces）と責務境界** を定義する。
 
-## Columns
+ここでいう Interface とは、
 
-- id: `contracts:<Interface>:<Member>`
-- kind: method / property
-- member: シグネチャ（末尾 `;` は省略）
-- area: client / auth / info / market / trading / account / raw
-- source: 実体ファイルパス
-- flags: 補足タグ（例: `lossless_hook`）
+* 実装言語上の interface / public API
+* 層を越えて公開される型・戻り値・責務
 
----
+を指し、**どこまでが許され、どこからが越境か**を固定することを目的とする。
 
-## IExchangeClient
-
-| id | kind | member | area | source | flags |
-| -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IExchangeClient:Market | property | IMarketDataApi Market { get; } | client | src/Domain/Contracts/Interfaces/IExchangeClient.cs |  |
-| contracts:IExchangeClient:Trading | property | ITradingApi Trading { get; } | client | src/Domain/Contracts/Interfaces/IExchangeClient.cs |  |
-| contracts:IExchangeClient:Account | property | IAccountApi Account { get; } | client | src/Domain/Contracts/Interfaces/IExchangeClient.cs |  |
-| contracts:IExchangeClient:History | property | ISpotHistoryApi History { get; } | client | src/Domain/Contracts/Interfaces/IExchangeClient.cs |  |
-| contracts:IExchangeClient:ExchangeCode | property | ExchangeCode ExchangeCode { get; } | client | src/Domain/Contracts/Interfaces/IExchangeClient.cs |  |
+本書は「何ができるか」を列挙する文書ではなく、
+**「何をしてはいけないか」を明確にするための文書**である。
 
 ---
 
-## IMarketDataApi
+## 2. Scope
 
-| id | kind | member | area | source | flags |
-| -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IMarketDataApi:GetTickerCallAsync | method | Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
-| contracts:IMarketDataApi:GetOrderBookCallAsync | method | Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
-| contracts:IMarketDataApi:GetMarketExecutionsCallAsync | method | Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | market | src/Domain/Contracts/Interfaces/IMarketDataApi.cs |  |
+本ドキュメントの対象は以下に限定する。
 
----
+* Public / Normalized / Adapter / Raw 各層の公開インターフェース
+* 層間で受け渡し可能な型の範囲
+* RawJson の保持・通過が許される範囲
 
-## ITradingApi
+以下は対象外とする。
 
-| id | kind | member | area | source | flags |
-| -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:ITradingApi:PlaceLimitOrderCallAsync | method | Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:PlaceMarketOrderCallAsync | method | Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:CancelOrderCallAsync | method | Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:GetOrderCallAsync | method | Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
-| contracts:ITradingApi:GetOpenOrdersCallAsync | method | Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | trading | src/Domain/Contracts/Interfaces/ITradingApi.cs |  |
+* 実装クラスの内部構造
+* private / internal API
+* メソッドの処理内容
+* テスト専用 API
 
 ---
 
-## IAccountApi
+## 3. Layer Model
 
-| id | kind | member | area | source | flags |
-| -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IAccountApi:GetBalancesCallAsync | method | Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/IAccountApi.cs |  |
+ExchangeAPI は、概ね以下の層構造を持つ。
 
----
+* Public / Facade
+* Normalized
+* Adapter
+* Raw
+* Transport（対象外）
 
-## ISpotHistoryApi
-
-| id | kind | member | area | source | flags |
-| -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:ISpotHistoryApi:GetOrdersCallAsync | method | Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(MarketLimitCursorRequest request, CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/ISpotHistoryApi.cs |  |
-| contracts:ISpotHistoryApi:GetExecutionsCallAsync | method | Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsCallAsync(MarketLimitCursorRequest request, CancellationToken cancellationToken = default) | account | src/Domain/Contracts/Interfaces/ISpotHistoryApi.cs |  |
+本ドキュメントでは、**Transport 層は設計判断の対象外**とする。
 
 ---
 
-## IExchangeInfoApi
+## 4. General Boundary Rules
 
-| id | kind | member | area | source | flags |
-| -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IExchangeInfoApi:GetExchangeInfoCallAsync | method | Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(CancellationToken cancellationToken = default) | info | src/Domain/Contracts/Interfaces/IExchangeInfoApi.cs |  |
+### 4.1 Direction of Dependency
 
----
+* 上位層は下位層にのみ依存する
+* 下位層は上位層を参照してはならない
 
-## IExchangeMarketResolver
-
-| id | kind | member | area | source | flags |
-| -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IExchangeMarketResolver:ResolveCallAsync | method | Task<Call<ResolveExchangeMarketRequest, ExchangeMarketInfo>> ResolveCallAsync(Symbol symbol, CancellationToken cancellationToken = default) | info | src/Domain/Contracts/Interfaces/IExchangeMarketResolver.cs |  |
+特に、Raw / Adapter 層から Normalized / Public 層への依存は禁止する。
 
 ---
 
-## IApiCredentialProvider
+### 4.2 Call-only Policy
 
-| id | kind | member | area | source | flags |
-| -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IApiCredentialProvider:Get | method | ApiCredentials Get(ExchangeCode exchange, string accountId) | auth | src/Domain/Contracts/Interfaces/IApiCredentialProvider.cs |  |
+層を越えて公開される API は、原則として **Call<T>** を返す。
+
+* Response / Result の直返しは禁止する
+* Transport 層は本ポリシーの例外とする
 
 ---
 
-## RawWireAccess
+### 4.3 Type Safety at Boundaries
 
-| id | kind | member | area | source | flags |
-| -- | ---- | ------ | ---- | ------ | ----- |
-| contracts:IHasRawAccess:TryGetRaw | method | bool TryGetRaw<T>(out T raw) where T : class | raw | src/Domain/Contracts/Interfaces/RawWireAccess.cs | lossless_hook |
-| contracts:IHasExchangeAccess:TryGetExchange | method | bool TryGetExchange<T>(out T exchange) where T : class | raw | src/Domain/Contracts/Interfaces/RawWireAccess.cs | lossless_hook |
+* 層境界で string を直接受け渡さない
+* 値オブジェクト・enum・専用型に変換してから上位層へ渡す
+
+string の流入は **Entry Point のみ**で許可される。
+
+---
+
+## 5. Raw Layer Interfaces
+
+### 5.1 Responsibilities
+
+Raw 層は、公式 API 仕様を **そのまま**扱う責務を持つ。
+
+* HTTP endpoint との直接通信
+* 公式仕様に基づく request / response の受信
+* RawJson の保持
+
+---
+
+### 5.2 Interface Rules
+
+* 戻り値は Raw DTO または JsonElement を含んでよい
+* RawJson は Raw 層内、または Normalized 変換直前までに閉じる
+* Raw API は公開契約（Contracts）を直接返さない
+
+---
+
+## 6. Adapter Layer Interfaces
+
+### 6.1 Responsibilities
+
+Adapter 層は、Raw 層と Normalized 層の **変換境界**である。
+
+* Raw DTO → Normalized DTO への変換
+* Exchange 固有差分の吸収
+
+---
+
+### 6.2 Interface Rules
+
+* Adapter は Raw API を直接公開しない
+* Adapter から RawJson を漏らさない
+* Adapter は公開用 DTO を再定義しない
+
+---
+
+## 7. Normalized Layer Interfaces
+
+### 7.1 Responsibilities
+
+Normalized 層は、Exchange 非依存の **意味論的 API** を提供する。
+
+* 複数取引所で共通に扱える概念を提供する
+* Exchange 固有差分を持ち込まない
+
+---
+
+### 7.2 Interface Rules
+
+* Normalized API は Raw / Adapter の存在を隠蔽する
+* RawJson / JsonElement を公開しない
+* Exchange 固有 enum / 型を公開しない
+
+---
+
+## 8. Public / Facade Interfaces
+
+### 8.1 Responsibilities
+
+Public / Facade 層は、利用者向けの **最終入口**である。
+
+* Normalized API を集約・再編する
+* 利用者に最小限の選択肢を提供する
+
+---
+
+### 8.2 Interface Rules
+
+* Public API は安定性を最優先する
+* 利用者に Raw / Adapter の概念を露出しない
+* 破壊的変更は原則禁止とする
+
+---
+
+## 9. RawJson Handling Rules
+
+* RawJson の保持は Raw / Normalized 内部に限定する
+* Public / Contracts への RawJson 露出は禁止する
+* lossless 目的の場合のみ、明示的に例外を認める
+
+例外は必ず `docs/exceptions.md` に記録する。
+
+---
+
+## 10. Interface Evolution Rules
+
+Interface を変更する場合は、以下を満たすこと。
+
+* 境界の責務が明確である
+* 上位層への影響を説明できる
+* 原則からの逸脱がある場合、例外台帳に記録する
+
+---
+
+## 11. Authority
+
+本ドキュメントは、層間インターフェースおよび境界判断において
+`docs/contracts/` 配下の正本である。
+
+判断に迷った場合は、
+
+* TopSpec Guide
+* Documentation Policy
+
+を参照し、それでも解決しない場合は
+**境界を越えない選択**を優先する。

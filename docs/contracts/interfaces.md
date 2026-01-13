@@ -76,6 +76,17 @@ string の流入は **Entry Point のみ**に限定される。
 
 ---
 
+### 4.4 Data Shape by Layer
+
+境界を越えて流れてよいデータ形状は、次に固定する。
+
+- wire：text のみ
+- raw：RawJson 鏡像（プリミティブDTO）
+- normalized：正規化（enum/type DTO）
+- contracts：取引所間抽象化（enum/type DTO）
+
+---
+
 ## 5. Raw Layer Interfaces
 
 ### 5.1 Responsibilities
@@ -90,9 +101,22 @@ Raw 層は、公式 API 仕様を **そのまま**扱う責務を持つ。
 
 ### 5.2 Interface Rules
 
-* 戻り値は Raw DTO または JsonElement を含んでよい
+* 戻り値は Raw DTO に限定する（JsonElement は Raw 層内の処理に限る）
 * RawJson は Raw 層内、または Normalized 変換直前までに閉じる
 * Raw API は公開契約（Contracts）を直接返さない
+
+RawJson 鏡像は、プリミティブDTO（RawValue）として扱う。
+RawValue は次の閉じた集合に限定する。
+
+- string
+- bool
+- long
+- decimal
+- null
+- IReadOnlyList<RawValue>
+- IReadOnlyDictionary<string, RawValue>
+
+数値・日時・列挙などの意味論的な解釈（enum/type DTO 化）は Normalized 層が行う。
 
 ---
 

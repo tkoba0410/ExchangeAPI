@@ -63,6 +63,13 @@
 6. **Domain**：横断的なふるまい
 7. **Composition**：供給および組立
 
+## Data Shape by Layer
+
+- wire：text のみ
+- raw：RawJson 鏡像（プリミティブDTO）
+- normalized：正規化（enum/type DTO）
+- contracts：取引所間抽象化（enum/type DTO）
+
 ### 規範
 
 1. Raw および Normalized は、spec 層に属するものとする。

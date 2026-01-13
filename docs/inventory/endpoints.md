@@ -63,6 +63,8 @@ API仕様の正本は、常に各取引所の公式ドキュメントとする�
 
 ## 5. Example
 
+例は 1 件までとする。実エントリを追加し始めたら、Example セクション自体を削除する。
+
 ### bitFlyer / Market / Ticker
 
 * Method: GET

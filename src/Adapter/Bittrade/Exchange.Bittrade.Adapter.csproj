@@ -10,14 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Contracts\Common\DomainCommon\Shared.Common.csproj" />
-    <ProjectReference Include="..\..\..\Contracts\Shared.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Core\Core.csproj" />
-    <ProjectReference Include="..\..\..\Normalized\Bittrade\Exchange.Bittrade.Normalized.csproj" />
+    <ProjectReference Include="..\..\Contracts\Common\DomainCommon\Shared.Common.csproj" />
+    <ProjectReference Include="..\..\Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\Core\Core.csproj" />
+    <ProjectReference Include="..\..\Normalized\Bittrade\Exchange.Bittrade.Normalized.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Common\**\*.cs" />
+    <Compile Include="..\..\Boundary\Adapters\Common\**\*.cs" />
   </ItemGroup>
 
 </Project>

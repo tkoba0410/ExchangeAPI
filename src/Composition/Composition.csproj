@@ -14,7 +14,7 @@
     <ProjectReference Include="..\Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Adapter\Bitflyer\Exchange.Bitflyer.Adapter.csproj" />
-    <ProjectReference Include="..\Boundary\Adapters\Bittrade\Exchange.Bittrade.Adapter.csproj" />
+    <ProjectReference Include="..\Adapter\Bittrade\Exchange.Bittrade.Adapter.csproj" />
   </ItemGroup>
 
 </Project>

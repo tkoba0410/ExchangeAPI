@@ -11,28 +11,24 @@
 
 ---
 
-## 設計（Why / What）
+## 規範（Normative）
 
-* **TopSpec**（設計原則・全体俯瞰）：[`topspec.md`](./topspec.md)
-* **TopSpec Guide**（読み方・誤用防止）：[`topspec-guide.md`](./topspec-guide.md)
-
----
-
-## 境界（Rules）
-
-* **Boundaries**（層境界の正本）：[`boundaries.md`](./boundaries.md)
+* **TopSpec**（最上位規範）：[`topspec.md`](./topspec.md)
+* **Contracts**（横断契約の規範）：[`contracts.md`](./contracts.md)
 
 ---
 
-## 契約（Shape / Semantics）
-
-* **Contracts**（DTO 形状・意味論）：[`contracts.md`](./contracts.md)
-
----
-
-## 一覧（Fact）
+## 一覧（Inventory / Fact）
 
 * **Endpoints Inventory**（API エンドポイント一覧・最小形）：[`endpoints.md`](./endpoints.md)
+* **Inventory: Bitflyer**：[`inventory-bitflyer.md`](./inventory-bitflyer.md)
+* **Inventory: Bittrade**：[`inventory-bittrade.md`](./inventory-bittrade.md)
+
+---
+
+## 例外（Decisions）
+
+* **Exceptions Ledger**（設計逸脱の台帳）：[`exceptions.md`](./exceptions.md)
 
 ---
 
@@ -42,17 +38,19 @@
 
 ---
 
-## 例外（Decision）
+## 参考（Reference / Legacy）
 
-* **Exceptions Ledger**（設計逸脱の台帳）：[`exceptions.md`](./exceptions.md)
+* 旧文書は互換のため `docs/_references/` に保管する（Normative ではない）。
+* `docs/_references/boundaries-legacy.md`
+* `docs/_references/topspec-guide-legacy.md`
 
 ---
 
 ## 読み進め方の指針
 
-* 設計思想や全体像を把握したい場合：**TopSpec → Boundaries → Contracts**
-* 実装・変更時の判断に迷った場合：**Boundaries / Contracts / Review Checklist**
-* 特定の API 利用有無を確認したい場合：**Endpoints Inventory**
+* 最上位の判断（禁止/許可）を確認したい：**TopSpec → Contracts**
+* 実装・変更時の判断に迷った場合：**TopSpec / Contracts / Review Checklist**
+* 特定の API 利用有無を確認したい：**Endpoints / Inventory**
 * 原則からの逸脱が必要な場合：**Exceptions Ledger**
 
 ---

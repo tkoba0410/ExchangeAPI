@@ -1,0 +1,122 @@
+<Project>
+
+  <!--
+    Phase2-3: Enforce layer adjacency rules by failing build on forbidden ProjectReference.
+
+    Layers (by folder):
+      Wire        : src/Wire/**
+      Raw         : src/Raw/**
+      Normalized  : src/Normalized/**
+      Adapter     : src/Adapter/**
+      Contracts   : src/Contracts/**   (treated as "top"/shared)
+      Core        : src/Core/**        (infra/shared)
+      Composition : src/Composition/**
+
+    Allowed (minimal, conservative):
+      Wire        -> Core, Contracts(Common)
+      Raw         -> Wire, Core, Contracts(Common)
+      Normalized  -> Raw, Core, Contracts
+      Adapter     -> Normalized, Core, Contracts
+      Composition -> Adapter, Core, Contracts
+
+    Notes:
+      - This checks ProjectReference only (not Compile Include). Phase2 already removes cross-layer Compile Include.
+      - Tests are excluded by default.
+      - Path checks are written to work on both Windows and non-Windows MSBuild.
+  -->
+
+  <PropertyGroup>
+    <!-- Opt-out switch (rarely needed) -->
+    <EnforceLayerReferences Condition="'$(EnforceLayerReferences)'==''">true</EnforceLayerReferences>
+  </PropertyGroup>
+
+  <Target Name="ValidateLayerReferences"
+          BeforeTargets="PrepareForBuild"
+          Condition="'$(EnforceLayerReferences)'=='true' and '$(MSBuildProjectDirectory)'!=''">
+
+    <!-- Determine current layer by project directory -->
+    <PropertyGroup>
+      <_Dir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)'))</_Dir>
+
+      <!-- Exclude tests robustly -->
+      <_IsTests Condition="$(_Dir.Contains('\tests\')) Or $(_Dir.Contains('/tests/'))">true</_IsTests>
+
+      <!-- Apply only to src -->
+      <_IsInSrc Condition="$(_Dir.Contains('\src\')) Or $(_Dir.Contains('/src/'))">true</_IsInSrc>
+
+      <_IsWire Condition="$(_Dir.Contains('\src\Wire\')) Or $(_Dir.Contains('/src/Wire/'))">true</_IsWire>
+      <_IsRaw Condition="$(_Dir.Contains('\src\Raw\')) Or $(_Dir.Contains('/src/Raw/'))">true</_IsRaw>
+      <_IsNormalized Condition="$(_Dir.Contains('\src\Normalized\')) Or $(_Dir.Contains('/src/Normalized/'))">true</_IsNormalized>
+      <_IsAdapter Condition="$(_Dir.Contains('\src\Adapter\')) Or $(_Dir.Contains('/src/Adapter/'))">true</_IsAdapter>
+      <_IsContracts Condition="$(_Dir.Contains('\src\Contracts\')) Or $(_Dir.Contains('/src/Contracts/'))">true</_IsContracts>
+      <_IsCore Condition="$(_Dir.Contains('\src\Core\')) Or $(_Dir.Contains('/src/Core/'))">true</_IsCore>
+      <_IsComposition Condition="$(_Dir.Contains('\src\Composition\')) Or $(_Dir.Contains('/src/Composition/'))">true</_IsComposition>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(_IsInSrc)'=='true' and '$(_IsTests)'!='true'">
+      <_PR Include="@(ProjectReference)" />
+    </ItemGroup>
+
+    <!-- Helper: classify each referenced path -->
+    <ItemGroup Condition="'$(_IsInSrc)'=='true' and '$(_IsTests)'!='true'">
+      <_PR_Wire Include="@(_PR)"
+                Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Wire\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Wire/'))" />
+      <_PR_Raw Include="@(_PR)"
+               Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Raw\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Raw/'))" />
+      <_PR_Normalized Include="@(_PR)"
+                      Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Normalized\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Normalized/'))" />
+      <_PR_Adapter Include="@(_PR)"
+                   Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Adapter\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Adapter/'))" />
+      <_PR_Contracts Include="@(_PR)"
+                     Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Contracts\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Contracts/'))" />
+      <_PR_Core Include="@(_PR)"
+                Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Core\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Core/'))" />
+      <_PR_Composition Include="@(_PR)"
+                       Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Composition\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Composition/'))" />
+    </ItemGroup>
+
+    <!-- WIRE: must not reference Raw/Normalized/Adapter/Composition -->
+    <Error Condition="'$(_IsWire)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Raw)'!=''"
+           Text="[LayerRules] Wire project must not reference Raw: @(_PR_Raw->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsWire)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Normalized)'!=''"
+           Text="[LayerRules] Wire project must not reference Normalized: @(_PR_Normalized->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsWire)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Adapter)'!=''"
+           Text="[LayerRules] Wire project must not reference Adapter: @(_PR_Adapter->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsWire)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Composition)'!=''"
+           Text="[LayerRules] Wire project must not reference Composition: @(_PR_Composition->'%(Identity)', ', ')" />
+
+    <!-- RAW: must not reference Normalized/Adapter/Composition -->
+    <Error Condition="'$(_IsRaw)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Normalized)'!=''"
+           Text="[LayerRules] Raw project must not reference Normalized: @(_PR_Normalized->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsRaw)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Adapter)'!=''"
+           Text="[LayerRules] Raw project must not reference Adapter: @(_PR_Adapter->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsRaw)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Composition)'!=''"
+           Text="[LayerRules] Raw project must not reference Composition: @(_PR_Composition->'%(Identity)', ', ')" />
+
+    <!-- NORMALIZED: must not reference Wire/Adapter/Composition -->
+    <Error Condition="'$(_IsNormalized)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Wire)'!=''"
+           Text="[LayerRules] Normalized project must not reference Wire: @(_PR_Wire->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsNormalized)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Adapter)'!=''"
+           Text="[LayerRules] Normalized project must not reference Adapter: @(_PR_Adapter->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsNormalized)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Composition)'!=''"
+           Text="[LayerRules] Normalized project must not reference Composition: @(_PR_Composition->'%(Identity)', ', ')" />
+
+    <!-- ADAPTER: must not reference Wire/Raw/Composition -->
+    <Error Condition="'$(_IsAdapter)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Wire)'!=''"
+           Text="[LayerRules] Adapter project must not reference Wire: @(_PR_Wire->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsAdapter)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Raw)'!=''"
+           Text="[LayerRules] Adapter project must not reference Raw: @(_PR_Raw->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsAdapter)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Composition)'!=''"
+           Text="[LayerRules] Adapter project must not reference Composition: @(_PR_Composition->'%(Identity)', ', ')" />
+
+    <!-- COMPOSITION: must not reference Wire/Raw/Normalized -->
+    <Error Condition="'$(_IsComposition)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Wire)'!=''"
+           Text="[LayerRules] Composition project must not reference Wire: @(_PR_Wire->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsComposition)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Raw)'!=''"
+           Text="[LayerRules] Composition project must not reference Raw: @(_PR_Raw->'%(Identity)', ', ')" />
+    <Error Condition="'$(_IsComposition)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Normalized)'!=''"
+           Text="[LayerRules] Composition project must not reference Normalized: @(_PR_Normalized->'%(Identity)', ', ')" />
+
+  </Target>
+
+</Project>

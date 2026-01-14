@@ -9,6 +9,15 @@
     <RootNamespace>ExchangeApi</RootNamespace>
   </PropertyGroup>
 
+  <!-- IMPORTANT:
+       core.transport is still compiled by Core/Core.csproj (Phase1 behavior-keep).
+       If Wire also compiles core.transport, downstream projects that reference both Core and Wire
+       can hit CS0433 (type exists in both assemblies). Exclude it here. -->
+  <ItemGroup>
+    <Compile Remove="Common\core.transport\**\*.cs" />
+    <Compile Remove="Common/core.transport/**/*.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Contracts\Common\DomainCommon\Shared.Common.csproj" />

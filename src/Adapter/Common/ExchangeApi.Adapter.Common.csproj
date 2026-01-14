@@ -6,15 +6,14 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisLevel>latest</AnalysisLevel>
-    <RootNamespace>Exchange.Bittrade</RootNamespace>
+    <RootNamespace>ExchangeApi</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Contracts\Common\DomainCommon\Shared.Common.csproj" />
     <ProjectReference Include="..\..\Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\Contracts\Common\CallCommon\Spec.CallCommon.csproj" />
     <ProjectReference Include="..\..\Core\Core.csproj" />
-    <ProjectReference Include="..\..\Normalized\Bittrade\Exchange.Bittrade.Normalized.csproj" />
-    <ProjectReference Include="..\Common\ExchangeApi.Adapter.Common.csproj" />
   </ItemGroup>
 
 </Project>

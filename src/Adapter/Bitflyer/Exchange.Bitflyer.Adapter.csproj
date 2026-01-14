@@ -15,10 +15,7 @@
     <ProjectReference Include="..\..\Core\Core.csproj" />
     <ProjectReference Include="..\..\Normalized\Bitflyer\Exchange.Bitflyer.Normalized.csproj" />
     <ProjectReference Include="..\..\Contracts\Common\ValueCommon\Spec.ValueCommon.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\Common\**\*.cs" />
+    <ProjectReference Include="..\Common\ExchangeApi.Adapter.Common.csproj" />
   </ItemGroup>
 
 </Project>

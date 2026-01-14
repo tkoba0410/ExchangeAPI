@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Raw\Bittrade\Exchange.Bittrade.Raw.csproj" />
-    <ProjectReference Include="..\..\..\..\Core\Core.csproj" />
-    <ProjectReference Include="..\..\..\..\Contracts\Shared.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\..\Contracts\Common\ValueCommon\Spec.ValueCommon.csproj" />
+    <ProjectReference Include="..\..\Raw\Bittrade\Exchange.Bittrade.Raw.csproj" />
+    <ProjectReference Include="..\..\Core\Core.csproj" />
+    <ProjectReference Include="..\..\Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\Contracts\Common\ValueCommon\Spec.ValueCommon.csproj" />
   </ItemGroup>
 </Project>

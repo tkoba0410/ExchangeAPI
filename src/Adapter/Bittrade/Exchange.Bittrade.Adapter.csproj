@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\Boundary\Adapters\Common\**\*.cs" />
+    <Compile Include="..\Common\**\*.cs" />
   </ItemGroup>
 
 </Project>

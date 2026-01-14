@@ -3,7 +3,7 @@
     <Project Path="src/Core/Core.csproj" />
     <Project Path="src/Composition/Composition.csproj" />
     <Project Path="src/Domain/Common/Common/Shared.Common.csproj" />
-    <Project Path="src/Domain/Contracts/Shared.Contracts.csproj" />
+    <Project Path="src/Contracts/Shared.Contracts.csproj" />
     <Project Path="src/Domain/Behavior/Domain/Shared.Domain.csproj" />
     <Project Path="src/Spec/Exchanges/Bitflyer/Raw/Exchange.Bitflyer.Raw.csproj" />
     <Project Path="src/Spec/Exchanges/Bitflyer/Normalized/Exchange.Bitflyer.Normalized.csproj" />

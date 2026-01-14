@@ -69,10 +69,11 @@ ExchangeAPI は、概ね以下の層構造を持つ。
 
 ### 4.3 Type Safety at Boundaries
 
-* 層境界で string を直接受け渡さない
+* **Contracts / Domain 側へ** string を直接受け渡さない
 * 値オブジェクト・enum・専用型に変換してから上位層へ渡す
 
 string の流入は **Entry Point のみ**に限定される。
+ただし Wire は transport 層であり、Wire 境界の in/out は text（string/bytes）を許可する。
 
 ---
 
@@ -87,19 +88,44 @@ string の流入は **Entry Point のみ**に限定される。
 
 ---
 
-## 5. Raw Layer Interfaces
+## 5. Wire Layer Interfaces
 
 ### 5.1 Responsibilities
 
-Raw 層は、公式 API 仕様を **そのまま**扱う責務を持つ。
+Wire 層は、**転送（transport）を成立させる**責務を持つ。
 
-* HTTP endpoint との直接通信
-* 公式仕様に基づく request / response の受信
-* RawJson の保持
+* HTTP/WS 等のリクエスト組み立て（method/path/query/header/body）
+* 署名（認証）・送信・受信
+* ステータスコード・ヘッダ等の transport 情報の保持
+
+Wire は値の意味（妥当性）検証や正規化に関与してはならない。
 
 ---
 
 ### 5.2 Interface Rules
+
+* Wire の in/out は **text（string/bytes）** に限定する
+* Wire は JSON を **パースしない**（DTO 化しない）
+* Wire は Raw/Normalized/Contracts の DTO を返してはならない
+  * DTO 化は Raw（鏡像）以降で行う
+
+---
+
+## 6. Raw Layer Interfaces
+
+### 6.1 Responsibilities
+
+Raw 層は、公式 API 仕様を **そのまま**扱う責務を持つ。
+
+* 公式仕様に基づく **鏡像 DTO（Raw）** の保持
+* JSON payload ⇄ 鏡像 DTO の相互変換（codec）
+* RawJson の保持
+
+Raw は HTTP endpoint と直接通信しない（transport は Wire の責務）。
+
+---
+
+### 6.2 Interface Rules
 
 * 戻り値は Raw DTO に限定する（JsonElement は Raw 層内の処理に限る）
 * RawJson は Raw 層内、または Normalized 変換直前までに閉じる
@@ -120,9 +146,9 @@ RawValue は次の閉じた集合に限定する。
 
 ---
 
-## 6. Adapter Layer Interfaces
+## 7. Adapter Layer Interfaces
 
-### 6.1 Responsibilities
+### 7.1 Responsibilities
 
 Adapter 層は、Raw 層と Normalized 層の **変換境界**である。
 
@@ -131,7 +157,7 @@ Adapter 層は、Raw 層と Normalized 層の **変換境界**である。
 
 ---
 
-### 6.2 Interface Rules
+### 7.2 Interface Rules
 
 * Adapter は Raw API を直接公開しない
 * Adapter から RawJson を漏らさない
@@ -139,9 +165,9 @@ Adapter 層は、Raw 層と Normalized 層の **変換境界**である。
 
 ---
 
-## 7. Normalized Layer Interfaces
+## 8. Normalized Layer Interfaces
 
-### 7.1 Responsibilities
+### 8.1 Responsibilities
 
 Normalized 層は、Exchange 非依存の **意味論的 API** を提供する。
 
@@ -150,7 +176,7 @@ Normalized 層は、Exchange 非依存の **意味論的 API** を提供する�
 
 ---
 
-### 7.2 Interface Rules
+### 8.2 Interface Rules
 
 * Normalized API は Raw / Adapter の存在を隠蔽する
 * RawJson / JsonElement を公開しない
@@ -158,9 +184,9 @@ Normalized 層は、Exchange 非依存の **意味論的 API** を提供する�
 
 ---
 
-## 8. Public / Facade Interfaces
+## 9. Public / Facade Interfaces
 
-### 8.1 Responsibilities
+### 9.1 Responsibilities
 
 Public / Facade 層は、利用者向けの **最終入口**である。
 
@@ -169,7 +195,7 @@ Public / Facade 層は、利用者向けの **最終入口**である。
 
 ---
 
-### 8.2 Interface Rules
+### 9.2 Interface Rules
 
 * Public API は安定性を最優先する
 * 利用者に Raw / Adapter の概念を露出しない
@@ -177,7 +203,7 @@ Public / Facade 層は、利用者向けの **最終入口**である。
 
 ---
 
-## 9. RawJson Handling Rules
+## 10. RawJson Handling Rules
 
 * RawJson の保持は Raw / Normalized 内部に限定する
 * Public / Contracts への RawJson 露出は禁止する
@@ -185,7 +211,7 @@ Public / Facade 層は、利用者向けの **最終入口**である。
 
 ---
 
-## 10. Interface Evolution Rules
+## 11. Interface Evolution Rules
 
 Interface を変更する場合は、以下を満たすこと。
 
@@ -195,7 +221,7 @@ Interface を変更する場合は、以下を満たすこと。
 
 ---
 
-## 11. Authority
+## 12. Authority
 
 本ドキュメントは、層間インターフェースおよび境界判断において
 `docs/boundaries.md` を正本とする。

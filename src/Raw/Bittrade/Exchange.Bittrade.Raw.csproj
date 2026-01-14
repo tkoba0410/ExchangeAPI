@@ -17,14 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- NOTE: Wire is still located under src/Spec until Commit 6. -->
-    <Compile Include="..\..\Spec\Exchanges\Bittrade\Wire\**\*.cs" />
+    <!-- NOTE: Bittrade wire moved to src/Wire/Bittrade (Commit 6). -->
+    <Compile Include="..\..\Wire\Bittrade\**\*.cs" />
 
-    <!-- Wire/Common files are still located under src/Spec/Wire/Common until Commit 6. -->
-    <Compile Include="..\..\Spec\Wire\Common\WireResponse.cs" />
-    <Compile Include="..\..\Spec\Wire\Common\WireCallSpec.cs" />
-    <Compile Include="..\..\Spec\Wire\Common\IWireTransport.cs" />
-    <Compile Include="..\..\Spec\Wire\Common\WireTransport.cs" />
+    <!-- Wire/Common moved to src/Wire/Common (Commit 6). -->
+    <Compile Include="..\..\Wire\Common\Common\WireResponse.cs" />
+    <Compile Include="..\..\Wire\Common\Common\WireCallSpec.cs" />
+    <Compile Include="..\..\Wire\Common\Common\IWireTransport.cs" />
+    <Compile Include="..\..\Wire\Common\Common\WireTransport.cs" />
   </ItemGroup>
 
 </Project>

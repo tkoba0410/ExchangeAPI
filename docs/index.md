@@ -1,67 +1,60 @@
-# Documentation Index
+# Docs Index
 
-このディレクトリは、ExchangeAPI プロジェクトにおける  
-**設計・契約・運用判断を固定するための文書群**を管理する。
-
-文書の配置・粒度・更新ルールについては、  
-以下の文書を正とする。
-
-- [Documentation Policy](./documentation-policy.md)
+このディレクトリ（`docs/`）は、本リポジトリにおける**設計判断・契約・運用ルールの正本**を集約した場所である。
+迷った場合は、必ず本ページから辿ること。
 
 ---
 
-## Design Principles
+## はじめに
 
-- [TopSpec Guide](./topspec/guide.md)  
-  覆さない設計原則・判断理由（Why）
-
-- [TopSpec Core](./topspec/core.md)  
-  全体構造・層構成の要約（Where / What）
+* 文書化の方針・ルール（最優先）：[`documentation-policy.md`](./documentation-policy.md)
 
 ---
 
-## Contracts and Boundaries
+## 設計（Why / What）
 
-- [Interfaces](./contracts/interfaces.md)  
-  層境界・公開インターフェースの定義
-
-- [Contracts](./contracts/contracts.md)  
-  DTO、命名規約、共通契約（Page / Cursor 等）
+* **TopSpec**（設計原則・全体俯瞰）：[`topspec.md`](./topspec.md)
+* **TopSpec Guide**（読み方・誤用防止）：[`topspec-guide.md`](./topspec-guide.md)
 
 ---
 
-## API Inventory
+## 境界（Rules）
 
-- [Endpoints (Human-readable)](./inventory/endpoints.md)  
-  使用している API の一覧（仕様は記載しない）
-
-- [Endpoints (Machine-readable)](./inventory/endpoints.yaml)  
-  上記の機械可読版（将来用途）
+* **Boundaries**（層境界の正本）：[`boundaries.md`](./boundaries.md)
 
 ---
 
-## Checklists
+## 契約（Shape / Semantics）
 
-- [New Exchange](./checklists/new-exchange.md)  
-  取引所追加時の確認項目
-
-- [New Endpoint](./checklists/new-endpoint.md)  
-  エンドポイント追加時の確認項目
-
-- [Review](./checklists/review.md)  
-  PR / レビュー時の自己確認
+* **Contracts**（DTO 形状・意味論）：[`contracts.md`](./contracts.md)
 
 ---
 
-## Exceptions
+## 一覧（Fact）
 
-- [Exceptions Ledger](./exceptions.md)  
-  意図的な設計原則逸脱の記録
+* **Endpoints Inventory**（API エンドポイント一覧・最小形）：[`endpoints.md`](./endpoints.md)
 
 ---
 
-## Notes
+## 運用（Process）
 
-- 本ディレクトリ配下の文書は、README に内容を重複させない
-- API仕様の詳細は公式ドキュメントを正本とする
-- 文書を追加・変更する際は、Documentation Policy に従う
+* **Review Checklist**（PR 最終判断装置）：[`review-checklist.md`](./review-checklist.md)
+
+---
+
+## 例外（Decision）
+
+* **Exceptions Ledger**（設計逸脱の台帳）：[`exceptions.md`](./exceptions.md)
+
+---
+
+## 読み進め方の指針
+
+* 設計思想や全体像を把握したい場合：**TopSpec → Boundaries → Contracts**
+* 実装・変更時の判断に迷った場合：**Boundaries / Contracts / Review Checklist**
+* 特定の API 利用有無を確認したい場合：**Endpoints Inventory**
+* 原則からの逸脱が必要な場合：**Exceptions Ledger**
+
+---
+
+※ 本ページ自体は判断を定義しない。判断の正本は各リンク先文書とする。

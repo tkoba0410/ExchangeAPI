@@ -25,6 +25,7 @@
     <ProjectReference Include="../../src/Contracts/Shared.Contracts.csproj" />
     <ProjectReference Include="../../src/Domain/Behavior/Domain/Shared.Domain.csproj" />
     <ProjectReference Include="../../src/Core/Core.csproj" />
+    <ProjectReference Include="../../src/Wire/ExchangeApi.Wire.csproj" />
   </ItemGroup>
 
 </Project>

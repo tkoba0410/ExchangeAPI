@@ -11,19 +11,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.csproj" />
+    <ProjectReference Include="..\..\Wire\ExchangeApi.Wire.csproj" />
     <ProjectReference Include="..\..\Contracts\Common\DomainCommon\Shared.Common.csproj" />
     <ProjectReference Include="..\..\Contracts\Common\CallCommon\Spec.CallCommon.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- NOTE: Bitflyer wire moved to src/Wire/Bitflyer (Commit 6). -->
-    <Compile Include="..\..\Wire\Bitflyer\**\*.cs" />
-
-    <!-- Wire/Common moved to src/Wire/Common (Commit 6). -->
-    <Compile Include="..\..\Wire\Common\Common\WireResponse.cs" />
-    <Compile Include="..\..\Wire\Common\Common\WireCallSpec.cs" />
-    <Compile Include="..\..\Wire\Common\Common\IWireTransport.cs" />
-    <Compile Include="..\..\Wire\Common\Common\WireTransport.cs" />
   </ItemGroup>
 
 </Project>

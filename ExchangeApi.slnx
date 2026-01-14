@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Core/Core.csproj" />
+    <Project Path="src/Wire/ExchangeApi.Wire.csproj" />
     <Project Path="src/Composition/Composition.csproj" />
     <Project Path="src/Contracts/Common/DomainCommon/Shared.Common.csproj" />
     <Project Path="src/Contracts/Shared.Contracts.csproj" />

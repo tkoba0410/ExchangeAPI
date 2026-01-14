@@ -25,6 +25,22 @@ PR 作成者・レビュー担当者の双方が、
 
 ---
 
+## 必須（Merge 前に必ず確認）
+
+### 境界（Wire/Raw/Normalized/Contracts）
+
+- [ ] Wire が JSON をパースしていない / DTO を返していない（text/bytes のみ）
+- [ ] Raw DTO に enum/type（意味型）が混入していない（RawValue の閉集合のみ）
+- [ ] Raw が HTTP/WS を直接叩いていない（transport は Wire）
+- [ ] Normalized に横断抽象（Contracts 相当）が入っていない
+- [ ] Contracts に取引所固有要素が混入していない（必要なら例外台帳へ）
+
+### 例外（Exceptions Ledger）
+
+- [ ] 原則からの逸脱がある場合、`docs/exceptions.md` に **記録がある**（未登録の例外は禁止）
+
+---
+
 ## 1. Scope Check
 
 * [ ] この PR は **設計原則・境界・契約**に影響するか

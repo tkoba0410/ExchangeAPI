@@ -187,6 +187,25 @@ Adapter 層は、Raw 層と Normalized 層の **変換境界**である。
 
 ### 8.1 Responsibilities
 
+Normalized 層は、**単独取引所内**での意味確定（exchange semantics）を担う。
+
+#### Meaning（この層が保証すること）
+
+- Raw（鏡像）から **enum/type DTO** へ正規化する（意味論の確定）
+- 数値/日時等の表現ゆらぎを意味として確定する（Try/OrThrow の方針に従う）
+- 原則として lossless（必要なら退避領域を持つ）
+
+#### Exchange-specific（取引所固有に属するもの）
+
+- 取引所固有の状態体系・種別の解釈（注文状態、キャンセル理由など）
+- 取引所固有フィールドの意味付け（公式仕様に依存する振る舞い）
+- unknown 値の保持/エラー化などの適用（取引所内の都合）
+
+#### Cross-exchange / Common（取引所横断に属するもの）
+
+- 正規化の作法（Try/OrThrow、unknown を捨てない等）の共通方針
+- 共通の基礎型ポリシー（例：Price/Size 等。置き場所が Contracts の場合は参照のみ）
+
 Normalized 層は、Exchange 非依存の **意味論的 API** を提供する。
 
 * 複数取引所で共通に扱える概念を提供する
@@ -195,6 +214,12 @@ Normalized 層は、Exchange 非依存の **意味論的 API** を提供する�
 ---
 
 ### 8.2 Interface Rules
+
+Normalized は **Contracts（横断抽象）を定義しない**。
+
+- Normalized で作る enum/type は「当該取引所内で閉じる」
+- 複数取引所で同一意味として扱える語彙が必要になった場合は Contracts に移す
+- 取引所間で同一意味にできない差異は Normalized（取引所固有）に留める
 
 * Normalized API は Raw / Adapter の存在を隠蔽する
 * RawJson / JsonElement を公開しない
@@ -251,3 +276,31 @@ Interface を変更する場合は、以下を満たすこと。
 
 を参照し、それでも解決しない場合は
 **境界を越えない選択**を優先する。
+
+---
+
+## Appendix: Contracts Layer Clarification
+
+### Meaning（Contracts が保証すること）
+
+- **複数取引所で同じ意味になる部分だけ**を抽象化する（cross-exchange semantics）
+- 公開契約として長期安定する語彙を提供する
+- transport 文字列や RawJson を持たない
+
+### Exchange-specific（取引所固有）
+
+- 原則として **入れない**
+- 必要になった場合は `docs/exceptions.md` に例外として記録し、最終的に解消（撤回）する
+
+### Cross-exchange / Common（取引所横断）
+
+- Contracts DTO 群（enum/type DTO）そのもの
+- 横断の値オブジェクト群（Price/Size 等）
+
+### Admission Rule（Contracts に入れる条件）
+
+次の全条件を満たす場合のみ Contracts に追加してよい：
+
+1) 2 つ以上の取引所で **同じ意味**にできる
+2) その意味が将来も安定すると説明できる（破壊的変更を招きにくい）
+3) 取引所固有の例外（exceptions）を増やさずに運用できる

@@ -8,4 +8,10 @@
     <RootNamespace>Core</RootNamespace>
   </PropertyGroup>
 
+  <!-- Phase1: keep behavior by letting Core continue to compile transport sources,
+       even though they are physically moved under src/Wire/Common/core.transport. -->
+  <ItemGroup>
+    <Compile Include="..\Wire\Common\core.transport\**\*.cs" />
+  </ItemGroup>
+
 </Project>

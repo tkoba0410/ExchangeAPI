@@ -28,6 +28,7 @@
   <PropertyGroup>
     <!-- Opt-out switch (rarely needed) -->
     <EnforceLayerReferences Condition="'$(EnforceLayerReferences)'==''">true</EnforceLayerReferences>
+    <EnforcePhysicalLayout Condition="'$(EnforcePhysicalLayout)'==''">true</EnforcePhysicalLayout>
   </PropertyGroup>
 
   <Target Name="ValidateLayerReferences"
@@ -116,6 +117,35 @@
            Text="[LayerRules] Composition project must not reference Raw: @(_PR_Raw->'%(Identity)', ', ')" />
     <Error Condition="'$(_IsComposition)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Normalized)'!=''"
            Text="[LayerRules] Composition project must not reference Normalized: @(_PR_Normalized->'%(Identity)', ', ')" />
+
+  </Target>
+
+  <Target Name="ValidatePhysicalLayout"
+          BeforeTargets="PrepareForBuild"
+          Condition="'$(EnforcePhysicalLayout)'=='true'">
+
+    <PropertyGroup>
+      <_RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</_RepoRoot>
+      <_SrcRoot>$([System.IO.Path]::Combine('$(_RepoRoot)', 'src'))</_SrcRoot>
+      <_SrcRootExists>$([System.IO.Directory]::Exists('$(_SrcRoot)'))</_SrcRootExists>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(_SrcRootExists)'=='true'">
+      <_TopDirs Include="$([System.IO.Directory]::GetDirectories('$(_SrcRoot)'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Wire'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Raw'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Normalized'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Contracts'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Adapter'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Core'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Composition'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Domain'))" />
+      <_ExtraTopDirs Include="@(_TopDirs)" />
+      <_ExtraTopDirs Remove="@(_AllowedTopDirs)" />
+    </ItemGroup>
+
+    <Error Condition="'@(_ExtraTopDirs)'!=''"
+           Text="[LayoutRules] src/ contains disallowed folders: @(_ExtraTopDirs->'%(Filename)', ', ')" />
 
   </Target>
 

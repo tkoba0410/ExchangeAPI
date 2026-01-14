@@ -115,6 +115,35 @@ RawJson は Normalized 内部に閉じ、Adapter 以外へは露出しない。
 
 ---
 
+## Transport temporarily remains under Wire (migration exception)
+
+### Summary
+Transport が正本（`src/Shared/Transport/`）ではなく Wire 配下に残っている。
+
+### Reason
+移行フェーズ中であり、段階的な移設を優先しているため。
+
+### Affected Area
+- Exchange: common
+- Layer: Transport
+- API / Type: src/Wire/Common/core.transport/**
+
+### Impact
+物理構成規範と実装が一時的に不一致になる。
+
+### Mitigation
+例外台帳で差分を明示し、移設完了まで監視する。
+
+### Future Plan
+Transport を `src/Shared/Transport/` に移動し、このエントリを削除する。
+
+### Status
+- [x] Temporary
+- [ ] Accepted
+- [ ] To be removed
+
+---
+
 ## Authority
 
 本台帳は、例外的判断に関する **唯一の正本**である。

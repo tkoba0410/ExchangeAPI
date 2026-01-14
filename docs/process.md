@@ -68,6 +68,7 @@
 
 - 規範（設計判断・境界・契約）を変更した場合：
   → `docs/topspec.md` / `docs/contracts.md`
+- 物理構成の方針は `docs/topspec.md` を参照する。
 - 外部 API を追加・削除・差し替えた場合：
   → `docs/endpoints.md` / `docs/inventory-*.md`
 - 原則からの逸脱が必要になった場合：

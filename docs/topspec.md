@@ -116,8 +116,9 @@ Wire → Raw → Normalized → Contracts
 
 ## 7. 固有／横断（Variation）
 
-- 取引所固有要素と取引所横断要素は **どの層にも存在し得る**（MUST）。
-- 横断要素は Common / Core に集約し、固有要素は取引所単位に閉じる（MUST）。
+- 横断要素は配置として Shared に集約する（MUST）。
+- 固有要素は Exchanges/<Exchange> に閉じる（MUST）。
+- Contracts は最上位の共通（公開契約）として独立する（MUST）。
 
 ---
 
@@ -131,26 +132,46 @@ Wire → Raw → Normalized → Contracts
 
 ```
 src/
-  Wire/
-  Raw/
-  Normalized/
+  Shared/
+  Exchanges/
+    <ExchangeName>/
+      Wire/
+      Raw/
+      Normalized/
+      Adapter/
   Contracts/
 ```
 
-### 8.3 固有／横断の配置規則
+### 8.3 配置規範
 
-```
-src/<Layer>/
-  Common/        # 取引所横断
-  <Exchange>/    # 取引所固有
-```
+取引所固有コードは常に `src/Exchanges/<Exchange>/...` に配置する。  
+取引所横断の実装基盤は常に `src/Shared/...` に配置する。  
+公開契約（Contracts）は `src/Contracts/...` に配置する（最上位の共通であり Shared には含めない）。  
+この規範に例外を設けてはならない。
+
+### 8.4 物理は Exchange 主導 / アセンブリは Layer 主導
+
+物理構成は Exchange 主導とする。  
+アセンブリ（csproj）は Layer 主導とし、`src/Exchanges/*/<Layer>` を束ねる。  
+例外は禁止する。
+
+### 8.5 Namespace 規則（例外禁止）
+
+すべての C# ソースコードは物理ディレクトリ構成と一致する namespace を持たなければならない。  
+例外は禁止する。
+
+例:
+- src/Exchanges/Bitflyer/Wire/... → ExchangeApi.Exchanges.Bitflyer.Wire...
+- src/Shared/Transport/... → ExchangeApi.Shared.Transport...
+- src/Contracts/... → ExchangeApi.Contracts...
 
 ---
 
-## 9. Wire 内部構造（core.transport）
+## 9. Transport
 
-- Wire 層には取引所概念を持たない共通 transport（例：`core.transport`）を内包してよい（MUST）。
-- `core.transport` は **text/bytes の意味段階**を越えて JSON を解釈してはならない（MUST NOT）。
+Transport（HTTP/JSON/Retry 等の横断的通信基盤）は Shared の責務とする。  
+Transport は `src/Shared/Transport/` に配置する。  
+Wire は Transport を内包しない。例外は禁止する。
 
 ---
 

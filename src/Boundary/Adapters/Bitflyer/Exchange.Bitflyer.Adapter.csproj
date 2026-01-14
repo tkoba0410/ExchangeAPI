@@ -14,7 +14,7 @@
     <ProjectReference Include="..\..\..\Domain\Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\..\..\Core\Core.csproj" />
     <ProjectReference Include="..\..\..\Spec\Exchanges\Bitflyer\Normalized\Exchange.Bitflyer.Normalized.csproj" />
-    <ProjectReference Include="..\..\..\Spec\ValueCommon\Spec.ValueCommon.csproj" />
+    <ProjectReference Include="..\..\..\Contracts\Common\ValueCommon\Spec.ValueCommon.csproj" />
   </ItemGroup>
 
   <ItemGroup>

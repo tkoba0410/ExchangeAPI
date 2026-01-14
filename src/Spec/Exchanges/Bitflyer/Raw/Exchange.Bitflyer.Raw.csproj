@@ -12,7 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Core.csproj" />
     <ProjectReference Include="..\..\..\..\Domain\Common\Common\Shared.Common.csproj" />
-    <ProjectReference Include="..\..\..\CallCommon\Spec.CallCommon.csproj" />
+    <ProjectReference Include="..\..\..\..\Contracts\Common\CallCommon\Spec.CallCommon.csproj" />
   </ItemGroup>
 
   <ItemGroup>

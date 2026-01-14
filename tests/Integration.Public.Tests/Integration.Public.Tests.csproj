@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Boundary/Adapters/Bitflyer/Exchange.Bitflyer.Adapter.csproj" />
+    <ProjectReference Include="../../src/Adapter/Bitflyer/Exchange.Bitflyer.Adapter.csproj" />
     <ProjectReference Include="../../src/Boundary/Adapters/Bittrade/Exchange.Bittrade.Adapter.csproj" />
   </ItemGroup>
 

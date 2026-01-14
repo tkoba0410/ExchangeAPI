@@ -1,54 +1,50 @@
 # ExchangeAPI
 
-このリポジトリは **ExchangeAPI** プロジェクトを管理します。
+ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基盤です。
 
-設計判断・契約・API一覧・運用ルールなどの文書は、README には記載せず、すべて `docs/` 配下に集約しています。
-
----
-
-## ドキュメント
-
-本プロジェクトに関する設計・契約・運用判断は、以下を正本とします。
-
-* **ドキュメント索引**: `docs/index.md`
-
-`docs/index.md` は、次の文書群への唯一の入口です。
-
-* 設計原則（TopSpec）
-* 層境界・公開契約（Contracts / Interfaces）
-* APIインベントリ（使用中エンドポイント一覧）
-* チェックリスト（判断装置）
-* 例外台帳
-
-README には、これらの内容を重複して記載しません。
+本 README は **設計判断・仕様説明を含みません**。  
+判断の正本は `docs/` 配下の文書を参照してください。
 
 ---
 
-## ステージ別ドキュメント
+## Docs（必ずここから読む）
 
-開発ステージごとの目的・方針・見通しは、独立した Markdown ファイルとして管理します。
+### 規範（Normative）
 
-* **Stage 8 ドキュメント**: `stage8.md`
+- **TopSpec**（最上位規範・禁止事項・層モデル）  
+  `docs/topspec.md`
 
-これらのステージ文書は、進行状況や背景を説明するためのものであり、
-設計ルールや契約の正本ではありません。
-
----
-
-## ビルド・テスト
-
-```bash
-dotnet build
-
-dotnet test
-```
-
-（Integration テストは構成により SKIP される場合があります）
+- **Contracts**（横断契約・公開 API の形状）  
+  `docs/contracts.md`
 
 ---
 
-## 注意事項
+### 運用（Process）
 
-* API仕様の正本は、各取引所の公式ドキュメントです。
-* 設計・契約・運用に関する判断は、必ず `docs/index.md` から辿ってください。
-* README は入口専用とし、詳細な設計説明は記載しません。
+- **Process**（文書化・レビュー・例外運用）  
+  `docs/process.md`
+
+---
+
+### 例外（Decisions）
+
+- **Exceptions Ledger**（原則からの逸脱と理由）  
+  `docs/exceptions.md`
+
+---
+
+### 一覧（Inventory / Fact）
+
+- **Endpoints Inventory**  
+  `docs/endpoints.md`
+
+- **Exchange Inventories**  
+  `docs/inventory-bitflyer.md`  
+  `docs/inventory-bittrade.md`
+
+---
+
+## Reference
+
+過去の設計文書・補足資料は `docs/_references/` に保管されています。  
+これらは **Normative ではありません**。

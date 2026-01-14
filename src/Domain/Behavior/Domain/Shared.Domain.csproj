@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../Common/Common/Shared.Common.csproj" />
+    <ProjectReference Include="../../../Contracts/Common/DomainCommon/Shared.Common.csproj" />
     <ProjectReference Include="..\..\..\Contracts\Shared.Contracts.csproj" />
   </ItemGroup>
 

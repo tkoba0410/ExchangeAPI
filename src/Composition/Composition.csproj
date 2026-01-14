@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Common\Common\Shared.Common.csproj" />
+    <ProjectReference Include="..\Contracts\Common\DomainCommon\Shared.Common.csproj" />
     <ProjectReference Include="..\Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Boundary\Adapters\Bitflyer\Exchange.Bitflyer.Adapter.csproj" />

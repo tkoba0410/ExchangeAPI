@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Common\Common\Shared.Common.csproj" />
+    <ProjectReference Include="Common/DomainCommon/Shared.Common.csproj" />
     <ProjectReference Include="Common\CallCommon\Spec.CallCommon.csproj" />
   </ItemGroup>
 

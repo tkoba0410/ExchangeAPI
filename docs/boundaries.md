@@ -198,7 +198,7 @@ Interface を変更する場合は、以下を満たすこと。
 ## 11. Authority
 
 本ドキュメントは、層間インターフェースおよび境界判断において
-`docs/contracts/` 配下の正本である。
+`docs/boundaries.md` を正本とする。
 
 判断に迷った場合は、
 

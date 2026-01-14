@@ -66,9 +66,9 @@
 
 ## 4. 参照先（迷ったらここ）
 
-- 境界（層間の許可/禁止）：`docs/contracts/interfaces.md`
-- 公開契約（DTO 形状・意味論）：`docs/contracts/contracts.md`
-- endpoint 一覧（索引）：`docs/inventory/endpoints.md`
+- 境界（層間の許可/禁止）：`docs/boundaries.md`
+- 公開契約（DTO 形状・意味論）：`docs/contracts.md`
+- endpoint 一覧（索引）：`docs/endpoints.md`
 - 例外台帳：`docs/exceptions.md`
 
 ---

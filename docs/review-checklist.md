@@ -36,7 +36,7 @@ PR 作成者・レビュー担当者の双方が、
 
 ## 2. Principle Check (TopSpec)
 
-* [ ] 変更内容は `docs/topspec/guide.md` の原則に反していない
+* [ ] 変更内容は `docs/topspec-guide.md` の原則に反していない
 * [ ] 新しい原則を、文書化せずにコードへ持ち込んでいない
 * [ ] 原則変更が必要な場合、TopSpec に明示的に反映している
 
@@ -53,7 +53,7 @@ PR 作成者・レビュー担当者の双方が、
 
 ## 4. Contract Check
 
-* [ ] 公開 DTO の形状・命名が `docs/contracts/contracts.md` に準拠している
+* [ ] 公開 DTO の形状・命名が `docs/contracts.md` に準拠している
 * [ ] Nullable の導入理由を説明できる
 * [ ] Page / Cursor / Limit の意味論を破っていない
 * [ ] Response / Result の直返しをしていない（Call-only）
@@ -62,7 +62,7 @@ PR 作成者・レビュー担当者の双方が、
 
 ## 5. API Inventory Check
 
-* [ ] 新規・変更された外部 API が `docs/inventory/endpoints.md` に記載されている
+* [ ] 新規・変更された外部 API が `docs/endpoints.md` に記載されている
 * [ ] Official Reference（公式ドキュメント）が明示されている
 * [ ] Internal Mapping（Raw / Normalized）が一致している
 

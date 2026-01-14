@@ -10,10 +10,10 @@
 本書が決めること：目的・大原則・層の俯瞰（論理階層）
 
 本書が決めないこと：
-- 境界の詳細規則（`docs/contracts/interfaces.md`）
-- DTO の形状・命名・Nullable 等（`docs/contracts/contracts.md`）
+- 境界の詳細規則（`docs/boundaries.md`）
+- DTO の形状・命名・Nullable 等（`docs/contracts.md`）
 - 取引所 API の仕様（公式文書が正本）
-- endpoint 一覧（`docs/inventory/endpoints.md`）
+- endpoint 一覧（`docs/endpoints.md`）
 - 例外（`docs/exceptions.md`）
 
 ## 2. Principles
@@ -59,13 +59,13 @@ TopSpec は短く保ち、追加より編集（削除/統合）を優先する�
 - raw：RawJson 鏡像（プリミティブDTO）
 - normalized：正規化（enum/type DTO）
 - contracts：取引所間抽象化（enum/type DTO）
-境界ルールの詳細は `docs/contracts/interfaces.md` を正本とする。
+境界ルールの詳細は `docs/boundaries.md` を正本とする。
 
 ## 6. Authority / References
 
 迷った場合の正本：
 
-- 境界（層間の許可/禁止）：`docs/contracts/interfaces.md`
-- 公開契約（DTO 形状・意味論）：`docs/contracts/contracts.md`
-- endpoint 一覧（索引）：`docs/inventory/endpoints.md`
+- 境界（層間の許可/禁止）：`docs/boundaries.md`
+- 公開契約（DTO 形状・意味論）：`docs/contracts.md`
+- endpoint 一覧（索引）：`docs/endpoints.md`
 - 例外台帳：`docs/exceptions.md`

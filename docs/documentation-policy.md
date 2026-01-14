@@ -49,24 +49,24 @@
 本リポジトリで管理する文書の種類は、以下に限定する。
 
 ### 4.1 Design Principles
-- 位置: `docs/topspec/guide.md`
+- 位置: `docs/topspec-guide.md`
 - 役割: 覆さない設計原則・判断理由（Why）
 
 ### 4.2 Structural Overview
-- 位置: `docs/topspec/core.md`
+- 位置: `docs/topspec.md`
 - 役割: 全体構造・層構成の要約（Where / What）
 
 ### 4.3 Contracts and Boundaries
-- 位置: `docs/contracts/`
+- 位置: `docs/boundaries.md` / `docs/contracts.md`
 - 役割: 公開境界、DTO形状、命名規約、共通契約
 
 ### 4.4 API Inventory
-- 位置: `docs/inventory/`
+- 位置: `docs/endpoints.md`
 - 役割: 使用しているAPIの一覧（棚卸し）
 - 注意: API仕様の再記述は行わない
 
 ### 4.5 Checklists
-- 位置: `docs/checklists/`
+- 位置: `docs/review-checklist.md`
 - 役割: 追加・変更・レビュー時の判断基準
 
 ### 4.6 Exceptions
@@ -105,19 +105,19 @@
 文書は以下の場合にのみ更新する。
 
 - 設計原則が変わった場合  
-  → `docs/topspec/guide.md`
+  → `docs/topspec-guide.md`
 
 - 層の責務や公開境界が変わった場合  
-  → `docs/contracts/`
+  → `docs/boundaries.md`
 
 - APIを追加・削除・差し替えた場合  
-  → `docs/inventory/`
+  → `docs/endpoints.md`
 
 - 例外的な実装・判断を行った場合  
   → `docs/exceptions.md`
 
 - PRを作成する場合  
-  → `docs/checklists/review.md` を自己確認する
+  → `docs/review-checklist.md` を自己確認する
 
 ---
 

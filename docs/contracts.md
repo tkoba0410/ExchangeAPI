@@ -155,7 +155,7 @@ Contracts を変更する場合は、以下を満たすこと。
 ## 10. Authority
 
 本ドキュメントは、Contracts に関する判断において  
-`docs/contracts/` 配下の正本である。
+`docs/contracts.md` を正本とする。
 
 判断に迷った場合は、
 - TopSpec Guide

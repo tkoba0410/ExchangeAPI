@@ -61,6 +61,19 @@ TopSpec は短く保ち、追加より編集（削除/統合）を優先する�
 - contracts：取引所間抽象化（enum/type DTO）
 境界ルールの詳細は `docs/boundaries.md` を正本とする。
 
+## Two-Axis Model: Layer × Variation
+
+本プロジェクトでは、次の 2 軸を直交させて考える。
+
+1) **層（Layer）**：意味段階（data shape）
+2) **変種（Variation）**：取引所固有（exchange-specific） / 取引所横断（cross-exchange, common）
+
+各層は「固有」と「横断」の要素を持ち得る。
+例として Wire 層の横断要素は、取引所概念を持たない共通 transport（`core.transport`）である。
+一方、Wire 層の取引所固有要素は、endpoint 組み立て・署名等を担う exchange wire である。
+
+※ いずれも Wire の意味段階（text/bytes のみ）を越えて JSON を解釈しない。
+
 ## 6. Authority / References
 
 迷った場合の正本：

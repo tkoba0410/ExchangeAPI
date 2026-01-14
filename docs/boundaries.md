@@ -102,12 +102,30 @@ Wire は値の意味（妥当性）検証や正規化に関与してはならな
 
 ---
 
+### 5.1.1 Internal Structure: core.transport within Wire
+
+Wire 層は、次の 2 つの要素から構成される。
+
+- **共通 transport（`core.transport`）**：取引所概念を持たない。HTTP/WS 実行・共通の転送処理を担う。
+- **exchange wire**：取引所固有。endpoint 組み立て・署名・送信パラメータ整形を担う。
+
+依存方向は **exchange wire → core.transport** のみ許可する。
+`core.transport` は exchange wire（取引所固有）を参照してはならない。
+
+---
+
 ### 5.2 Interface Rules
 
 * Wire の in/out は **text（string/bytes）** に限定する
 * Wire は JSON を **パースしない**（DTO 化しない）
 * Wire は Raw/Normalized/Contracts の DTO を返してはならない
   * DTO 化は Raw（鏡像）以降で行う
+
+`core.transport` は次を禁止する。
+
+- 取引所固有概念（product/symbol/order state 等）の導入
+- JSON の解釈（パース、enum/type 化）
+- Contracts/Domain 型の取り扱い
 
 ---
 

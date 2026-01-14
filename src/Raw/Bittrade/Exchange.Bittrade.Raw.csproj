@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <RootNamespace>Exchange.Bittrade</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Core.csproj" />
+    <ProjectReference Include="..\..\Contracts\Common\DomainCommon\Shared.Common.csproj" />
+    <ProjectReference Include="..\..\Contracts\Common\CallCommon\Spec.CallCommon.csproj" />
+    <ProjectReference Include="..\..\Contracts\Common\JsonCommon\Spec.JsonCommon.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- NOTE: Wire is still located under src/Spec until Commit 6. -->
+    <Compile Include="..\..\Spec\Exchanges\Bittrade\Wire\**\*.cs" />
+
+    <!-- Wire/Common files are still located under src/Spec/Wire/Common until Commit 6. -->
+    <Compile Include="..\..\Spec\Wire\Common\WireResponse.cs" />
+    <Compile Include="..\..\Spec\Wire\Common\WireCallSpec.cs" />
+    <Compile Include="..\..\Spec\Wire\Common\IWireTransport.cs" />
+    <Compile Include="..\..\Spec\Wire\Common\WireTransport.cs" />
+  </ItemGroup>
+
+</Project>

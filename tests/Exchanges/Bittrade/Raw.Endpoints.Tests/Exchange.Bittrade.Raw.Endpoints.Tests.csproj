@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Spec/Exchanges/Bittrade/Raw/Exchange.Bittrade.Raw.csproj" />
+    <ProjectReference Include="../../../../src/Raw/Bittrade/Exchange.Bittrade.Raw.csproj" />
   </ItemGroup>
 
 </Project>

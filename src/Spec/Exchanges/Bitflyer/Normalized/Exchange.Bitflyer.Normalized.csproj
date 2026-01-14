@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Raw\Exchange.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="..\..\..\..\Raw\Bitflyer\Exchange.Bitflyer.Raw.csproj" />
     <ProjectReference Include="..\..\..\..\Core\Core.csproj" />
     <ProjectReference Include="..\..\..\..\Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\..\..\..\Contracts\Common\ValueCommon\Spec.ValueCommon.csproj" />

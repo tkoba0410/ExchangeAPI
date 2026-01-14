@@ -1,8 +1,8 @@
 using System;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 
-namespace ExchangeApi.Contracts.Dtos;
+namespace ExchangeApi.Contracts.Dtos.Trading;
 
 public sealed record ExecutionItem(
     DateTimeOffset Timestamp,

@@ -3,27 +3,40 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
 using ExchangeApi.Contracts.Requests;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Contracts.Common.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
-using ContractSide = ExchangeApi.Common.Enums.Side;
-using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using ContractTicker = ExchangeApi.Contracts.Dtos.Ticker;
-using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Ticker;
-using ContractOrderBook = ExchangeApi.Contracts.Dtos.OrderBook;
-using ContractBalance = ExchangeApi.Contracts.Dtos.Balance;
-using ContractCancelResult = ExchangeApi.Contracts.Dtos.CancelResult;
+using ContractSide = ExchangeApi.Contracts.Common.DomainCommon.Enums.Side;
+using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
+using ContractTicker = ExchangeApi.Contracts.Dtos.Market.Ticker;
+using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models.Ticker;
+using ContractOrderBook = ExchangeApi.Contracts.Dtos.Market.OrderBook;
+using ContractBalance = ExchangeApi.Contracts.Dtos.Account.Balance;
+using ContractCancelResult = ExchangeApi.Contracts.Dtos.Trading.CancelResult;
 using Xunit;
 
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 {
     public class BitflyerExchangeClientTests
     {

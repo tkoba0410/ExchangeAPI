@@ -1,8 +1,8 @@
 using System;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Contracts.Errors;
 using Xunit;
 
-namespace Common.Tests.Contracts;
+namespace ExchangeApi.Tests.Common.Tests.Contracts;
 
 public class ExchangeApiExceptionTests
 {

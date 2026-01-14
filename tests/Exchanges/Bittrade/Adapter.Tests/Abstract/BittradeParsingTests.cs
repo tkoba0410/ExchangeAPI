@@ -1,10 +1,16 @@
 using System.Collections.Generic;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Normalize;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Raw.Call;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Exchanges.Bittrade.Normalized;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public sealed class BittradeParsingTests
 {

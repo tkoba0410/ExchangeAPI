@@ -1,4 +1,4 @@
-namespace ExchangeApi.Spec.CallCommon;
+namespace ExchangeApi.Contracts.Common.CallCommon;
 
 public abstract record CallResult<TRes>
 {

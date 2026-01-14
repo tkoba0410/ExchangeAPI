@@ -1,8 +1,8 @@
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 using Xunit;
 
-namespace Common.Tests;
+namespace ExchangeApi.Tests.Common.Tests;
 
 public sealed class ExchangeCodeNormalizationTests
 {

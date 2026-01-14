@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using ExchangeApi.Common.Types;
-namespace ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
+namespace ExchangeApi.Contracts.Dtos.ExchangeInfo;
 
 public sealed record ExchangeInfo(
     IReadOnlyList<ExchangeMarketInfo> Markets,

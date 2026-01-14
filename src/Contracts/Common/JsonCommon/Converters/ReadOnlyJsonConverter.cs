@@ -2,7 +2,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Spec.JsonCommon.Converters;
+namespace ExchangeApi.Contracts.Common.JsonCommon.Converters;
 
 public abstract class ReadOnlyJsonConverter<T> : JsonConverter<T>
 {

@@ -1,6 +1,6 @@
-using ExchangeApi.Common.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
 
-namespace ExchangeApi.Core.Contracts.Errors;
+namespace ExchangeApi.Contracts.Errors;
 
 public sealed class ExchangeOrderNotFoundException : ExchangeApiException
 {

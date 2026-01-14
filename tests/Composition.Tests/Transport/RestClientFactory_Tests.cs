@@ -4,13 +4,13 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Observability;
-using ExchangeApi.Core.Transport.Policy;
-using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Core.Transport.Http;
-using ExchangeApi.Composition.Bootstrap.Transport;
+using ExchangeApi.Shared.Transport.Observability;
+using ExchangeApi.Shared.Transport.Policy;
+using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Shared.Transport.Http;
+using ExchangeApi.Shared.Composition.Bootstrap.Transport;
 
-namespace Composition.Tests.Transport;
+namespace ExchangeApi.Tests.Composition.Tests.Transport;
 
 public class RestClientFactory_Tests
 {

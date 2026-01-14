@@ -2,10 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Contracts.Common.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
 public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
 {
@@ -96,7 +96,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
                 Meta: meta);
         }
 
-        if (_exceptionToThrow is ExchangeApi.Core.Contracts.Errors.ExchangeApiException ex)
+        if (_exceptionToThrow is ExchangeApi.Contracts.Errors.ExchangeApiException ex)
         {
             var statusCode = ex.StatusCode.HasValue ? (int)ex.StatusCode.Value : (int?)null;
             var error = new CallError(CallErrorKind.Http, ex.Message, ex, statusCode);

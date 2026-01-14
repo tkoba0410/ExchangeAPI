@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 using ExchangeApi.Contracts.Requests;
-using ExchangeApi.Domain.UseCases;
-using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Shared.Domain.UseCases;
+using ExchangeApi.Contracts.Errors;
+using ExchangeApi.Contracts.Common.CallCommon;
 using Xunit;
 
-namespace Common.Tests.UseCases;
+namespace ExchangeApi.Tests.Common.Tests.UseCases;
 
 public sealed class OrderPollingTests
 {

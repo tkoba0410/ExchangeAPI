@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Common.Types.Extensions;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Types.Extensions;
 
 public static class PriceSizeStringParsingExtensions
 {

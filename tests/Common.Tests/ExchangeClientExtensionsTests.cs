@@ -2,16 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Requests;
-using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Core.Extensions;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Contracts.Errors;
+using ExchangeApi.Contracts.Extensions;
+using ExchangeApi.Contracts.Common.CallCommon;
 
-namespace ExchangeApi.Common.Tests;
+namespace ExchangeApi.Tests.Common.Tests;
 
 public sealed class ExchangeClientExtensionsTests
 {

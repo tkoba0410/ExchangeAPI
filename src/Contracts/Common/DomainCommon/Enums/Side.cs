@@ -1,4 +1,4 @@
-namespace ExchangeApi.Common.Enums;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Enums;
 
 /// <summary>売買方向を表す列挙。</summary>
 public enum Side

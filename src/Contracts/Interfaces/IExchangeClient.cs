@@ -1,4 +1,4 @@
-using ExchangeApi.Common.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
 
 namespace ExchangeApi.Contracts.Interfaces;
 

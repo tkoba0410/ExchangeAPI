@@ -1,7 +1,7 @@
 using System;
-using ExchangeApi.Common.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
 
-namespace ExchangeApi.Common.Types;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Types;
 
 public static class ExchangeCodeParser
 {

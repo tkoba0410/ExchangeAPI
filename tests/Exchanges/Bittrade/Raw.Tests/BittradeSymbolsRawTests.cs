@@ -1,7 +1,13 @@
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Call;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
 public sealed class BittradeSymbolsRawTests
 {

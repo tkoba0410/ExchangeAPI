@@ -1,7 +1,7 @@
 using System;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
-namespace ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
+namespace ExchangeApi.Contracts.Dtos.Market;
 
 /// <summary>市場全体の約定（歩み値）。</summary>
 public sealed record ExecutionMarket(

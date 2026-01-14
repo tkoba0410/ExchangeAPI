@@ -1,0 +1,26 @@
+using System;
+using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+
+/// <summary>
+/// /v1/me/getpositions のレスポンス DTO。
+/// </summary>
+public sealed class PositionResponse
+{
+    [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
+    [JsonPropertyName("side")] public string Side { get; init; } = string.Empty;
+    [JsonPropertyName("size")] public decimal Size { get; init; }
+    [JsonPropertyName("price")] public decimal Price { get; init; }
+    [JsonPropertyName("pnl")] public decimal Pnl { get; init; }
+    [JsonPropertyName("open_date")] public DateTimeOffset OpenDate { get; init; }
+}

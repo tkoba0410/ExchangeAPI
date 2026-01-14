@@ -1,12 +1,23 @@
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Raw.Call;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public sealed class BittradeFailFastMapperTests
 {

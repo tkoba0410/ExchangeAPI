@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Common.Types;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Types;
 
 public readonly record struct OrderKey
 {

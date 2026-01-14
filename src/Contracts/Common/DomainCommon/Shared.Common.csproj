@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisLevel>latest</AnalysisLevel>
-    <RootNamespace>ExchangeApi.Common</RootNamespace>
+    <RootNamespace>ExchangeApi.Contracts.Common.DomainCommon</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

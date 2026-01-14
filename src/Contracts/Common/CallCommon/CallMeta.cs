@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ExchangeApi.Spec.CallCommon;
+namespace ExchangeApi.Contracts.Common.CallCommon;
 
 public sealed record CallMeta(
     string Layer,

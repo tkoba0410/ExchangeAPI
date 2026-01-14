@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
 using ExchangeApi.Contracts.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Contracts.Common.CallCommon;
 using Xunit;
-using NormalizeRequests = ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
+using NormalizeRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public sealed class BittradeSpotHistoryApiTests
 {

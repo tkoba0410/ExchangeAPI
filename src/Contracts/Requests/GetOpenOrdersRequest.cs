@@ -1,4 +1,4 @@
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 
 namespace ExchangeApi.Contracts.Requests;
 

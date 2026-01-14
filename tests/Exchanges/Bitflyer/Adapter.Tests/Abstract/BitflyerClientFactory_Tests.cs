@@ -1,12 +1,17 @@
 using System;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Core.Transport.Policy;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Shared.Transport.Policy;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Factory;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
     public class BitflyerClientFactory_Tests
     {

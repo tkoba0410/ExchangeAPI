@@ -1,9 +1,15 @@
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Call;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public sealed class BittradeTickerNormalizedTests
 {

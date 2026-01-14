@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Text.Json;
 
-namespace ExchangeApi.Spec.JsonCommon.Converters;
+namespace ExchangeApi.Contracts.Common.JsonCommon.Converters;
 
 internal static class IdJsonConverterHelpers
 {

@@ -1,7 +1,7 @@
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
 public sealed class BittradePublicApi_Klines_Tests
 {

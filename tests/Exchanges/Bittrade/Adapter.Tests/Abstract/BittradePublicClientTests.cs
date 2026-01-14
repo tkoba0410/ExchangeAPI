@@ -3,16 +3,16 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Extensions;
+using ExchangeApi.Contracts.Extensions;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Core.Transport.Http;
-using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Shared.Transport.Http;
+using ExchangeApi.Shared.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Contracts.Common.CallCommon;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public sealed class BittradePublicClientTests
 {

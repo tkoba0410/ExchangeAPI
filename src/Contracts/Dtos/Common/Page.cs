@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ExchangeApi.Contracts.Dtos;
+namespace ExchangeApi.Contracts.Dtos.Common;
 
 public sealed record Page<TItem>(
     IReadOnlyList<TItem> Items,

@@ -1,8 +1,8 @@
 using System;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public sealed class BittradeSymbolTests
 {

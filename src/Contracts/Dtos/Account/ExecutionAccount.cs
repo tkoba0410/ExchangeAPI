@@ -1,7 +1,7 @@
 using System;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
-namespace ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
+namespace ExchangeApi.Contracts.Dtos.Account;
 
 /// <summary>
 /// 口座の約定履歴（シンボル＋注文IDベース）。

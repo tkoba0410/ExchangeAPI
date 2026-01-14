@@ -1,6 +1,6 @@
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 
-namespace ExchangeApi.Contracts.Dtos;
+namespace ExchangeApi.Contracts.Dtos.Trading;
 
 /// <summary>
 /// 抽象注文レスポンス。

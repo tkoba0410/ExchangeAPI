@@ -1,7 +1,7 @@
 using System.Linq;
-using ExchangeApi.Spec.Wire;
+using ExchangeApi.Shared.Wire;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.Endpoints.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Raw.Endpoints.Tests;
 
 internal static class WireCallSpecAssertions
 {

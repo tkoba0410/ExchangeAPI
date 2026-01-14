@@ -1,4 +1,4 @@
-namespace ExchangeApi.Common.Enums;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Enums;
 
 public enum OrderState
 {

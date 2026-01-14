@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <RootNamespace>ExchangeApi</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Raw\ExchangeApi.Raw.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\..\Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\Contracts\Common\DomainCommon\Shared.Common.csproj" />
+    <ProjectReference Include="..\..\Contracts\Common\ValueCommon\Spec.ValueCommon.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Exchanges\*\Normalized\**\*.cs" />
+  </ItemGroup>
+
+</Project>

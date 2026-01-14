@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace ExchangeApi.Common.Types;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Types;
 
 public readonly record struct Price(decimal Value)
 {

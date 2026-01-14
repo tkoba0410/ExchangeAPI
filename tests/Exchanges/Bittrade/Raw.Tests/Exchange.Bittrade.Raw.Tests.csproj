@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Core/Core.csproj" />
-    <ProjectReference Include="../../../../src/Raw/Bittrade/Exchange.Bittrade.Raw.csproj" />
+    <ProjectReference Include="../../../../src/Shared/Core/Core.csproj" />
+    <ProjectReference Include="../../../../src/Shared/Raw/ExchangeApi.Raw.csproj" />
   </ItemGroup>
 
 </Project>

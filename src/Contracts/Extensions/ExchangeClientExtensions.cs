@@ -1,7 +1,7 @@
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Contracts.Errors;
 
-namespace ExchangeApi.Core.Extensions;
+namespace ExchangeApi.Contracts.Extensions;
 
 public static class ExchangeClientExtensions
 {

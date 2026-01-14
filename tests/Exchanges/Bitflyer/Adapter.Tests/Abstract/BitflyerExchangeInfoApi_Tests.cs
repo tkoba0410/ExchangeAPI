@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.ExchangeInfo;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
 public class BitflyerExchangeInfoApi_Tests
 {
@@ -12,7 +12,7 @@ public class BitflyerExchangeInfoApi_Tests
         var api = new BitflyerExchangeInfoApi();
 
         var call = await api.GetExchangeInfoCallAsync();
-        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
 
         Assert.False(info.Features!.SupportsCandlestick);

@@ -4,13 +4,13 @@
     Phase2-3: Enforce layer adjacency rules by failing build on forbidden ProjectReference.
 
     Layers (by folder):
-      Wire        : src/Wire/**
-      Raw         : src/Raw/**
-      Normalized  : src/Normalized/**
-      Adapter     : src/Adapter/**
-      Contracts   : src/Contracts/**   (treated as "top"/shared)
-      Core        : src/Core/**        (infra/shared)
-      Composition : src/Composition/**
+      Wire        : src/Shared/Wire/**
+      Raw         : src/Shared/Raw/**
+      Normalized  : src/Shared/Normalized/**
+      Adapter     : src/Shared/Adapter/**
+      Contracts   : src/Contracts/**   (top-level common)
+      Core        : src/Shared/Core/** (infra/shared)
+      Composition : src/Shared/Composition/**
 
     Allowed (minimal, conservative):
       Wire        -> Core, Contracts(Common)
@@ -45,13 +45,13 @@
       <!-- Apply only to src -->
       <_IsInSrc Condition="$(_Dir.Contains('\src\')) Or $(_Dir.Contains('/src/'))">true</_IsInSrc>
 
-      <_IsWire Condition="$(_Dir.Contains('\src\Wire\')) Or $(_Dir.Contains('/src/Wire/'))">true</_IsWire>
-      <_IsRaw Condition="$(_Dir.Contains('\src\Raw\')) Or $(_Dir.Contains('/src/Raw/'))">true</_IsRaw>
-      <_IsNormalized Condition="$(_Dir.Contains('\src\Normalized\')) Or $(_Dir.Contains('/src/Normalized/'))">true</_IsNormalized>
-      <_IsAdapter Condition="$(_Dir.Contains('\src\Adapter\')) Or $(_Dir.Contains('/src/Adapter/'))">true</_IsAdapter>
+      <_IsWire Condition="$(_Dir.Contains('\src\Shared\Wire\')) Or $(_Dir.Contains('/src/Shared/Wire/'))">true</_IsWire>
+      <_IsRaw Condition="$(_Dir.Contains('\src\Shared\Raw\')) Or $(_Dir.Contains('/src/Shared/Raw/'))">true</_IsRaw>
+      <_IsNormalized Condition="$(_Dir.Contains('\src\Shared\Normalized\')) Or $(_Dir.Contains('/src/Shared/Normalized/'))">true</_IsNormalized>
+      <_IsAdapter Condition="$(_Dir.Contains('\src\Shared\Adapter\')) Or $(_Dir.Contains('/src/Shared/Adapter/'))">true</_IsAdapter>
       <_IsContracts Condition="$(_Dir.Contains('\src\Contracts\')) Or $(_Dir.Contains('/src/Contracts/'))">true</_IsContracts>
-      <_IsCore Condition="$(_Dir.Contains('\src\Core\')) Or $(_Dir.Contains('/src/Core/'))">true</_IsCore>
-      <_IsComposition Condition="$(_Dir.Contains('\src\Composition\')) Or $(_Dir.Contains('/src/Composition/'))">true</_IsComposition>
+      <_IsCore Condition="$(_Dir.Contains('\src\Shared\Core\')) Or $(_Dir.Contains('/src/Shared/Core/'))">true</_IsCore>
+      <_IsComposition Condition="$(_Dir.Contains('\src\Shared\Composition\')) Or $(_Dir.Contains('/src/Shared/Composition/'))">true</_IsComposition>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(_IsInSrc)'=='true' and '$(_IsTests)'!='true'">
@@ -61,19 +61,19 @@
     <!-- Helper: classify each referenced path -->
     <ItemGroup Condition="'$(_IsInSrc)'=='true' and '$(_IsTests)'!='true'">
       <_PR_Wire Include="@(_PR)"
-                Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Wire\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Wire/'))" />
+                Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Wire\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Wire/'))" />
       <_PR_Raw Include="@(_PR)"
-               Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Raw\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Raw/'))" />
+               Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Raw\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Raw/'))" />
       <_PR_Normalized Include="@(_PR)"
-                      Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Normalized\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Normalized/'))" />
+                      Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Normalized\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Normalized/'))" />
       <_PR_Adapter Include="@(_PR)"
-                   Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Adapter\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Adapter/'))" />
+                   Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Adapter\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Adapter/'))" />
       <_PR_Contracts Include="@(_PR)"
                      Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Contracts\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Contracts/'))" />
       <_PR_Core Include="@(_PR)"
-                Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Core\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Core/'))" />
+                Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Core\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Core/'))" />
       <_PR_Composition Include="@(_PR)"
-                       Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Composition\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Composition/'))" />
+                       Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Composition\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Composition/'))" />
     </ItemGroup>
 
     <!-- WIRE: must not reference Raw/Normalized/Adapter/Composition -->
@@ -132,14 +132,9 @@
 
     <ItemGroup Condition="'$(_SrcRootExists)'=='true'">
       <_TopDirs Include="$([System.IO.Directory]::GetDirectories('$(_SrcRoot)'))" />
-      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Wire'))" />
-      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Raw'))" />
-      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Normalized'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Shared'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Exchanges'))" />
       <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Contracts'))" />
-      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Adapter'))" />
-      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Core'))" />
-      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Composition'))" />
-      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Domain'))" />
       <_ExtraTopDirs Include="@(_TopDirs)" />
       <_ExtraTopDirs Remove="@(_AllowedTopDirs)" />
     </ItemGroup>

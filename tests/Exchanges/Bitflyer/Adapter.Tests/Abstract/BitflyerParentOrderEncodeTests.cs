@@ -1,8 +1,8 @@
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
 public sealed class BitflyerParentOrderEncodeTests
 {

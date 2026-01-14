@@ -2,10 +2,15 @@ using System;
 using System.Collections.Generic;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Composition.Providers.Credentials;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Shared.Composition.Providers.Credentials;
 
-namespace Composition.Tests.Credentials;
+namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 
 public class CompositeCredentialProvider_Tests
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Spec.CallCommon;
+namespace ExchangeApi.Contracts.Common.CallCommon;
 
 public readonly record struct CallId(Guid Value)
 {

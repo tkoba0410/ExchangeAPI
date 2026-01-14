@@ -1,5 +1,10 @@
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
 namespace ExchangeApi.Contracts.Interfaces;
 
 /// <summary>

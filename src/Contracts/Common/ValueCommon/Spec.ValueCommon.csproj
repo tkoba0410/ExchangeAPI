@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RootNamespace>ExchangeApi.Spec</RootNamespace>
+    <RootNamespace>ExchangeApi.Contracts.Common.ValueCommon</RootNamespace>
   </PropertyGroup>
 
 </Project>

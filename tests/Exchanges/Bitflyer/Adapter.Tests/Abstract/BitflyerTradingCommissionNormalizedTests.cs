@@ -2,15 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Contracts.Common.CallCommon;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
 public sealed class BitflyerTradingCommissionNormalizedTests
 {

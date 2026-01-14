@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Composition.Providers.Credentials;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Shared.Composition.Providers.Credentials;
 
-namespace Composition.Tests.Credentials;
+namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 
 public class FileApiCredentialProvider_Tests
 {

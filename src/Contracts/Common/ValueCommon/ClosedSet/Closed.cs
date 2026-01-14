@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Spec.ValueCommon.ClosedSet;
+namespace ExchangeApi.Contracts.Common.ValueCommon.ClosedSet;
 
 public readonly record struct Closed<T>(bool IsKnown, T Known, string? Unknown)
 {

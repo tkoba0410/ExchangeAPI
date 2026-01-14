@@ -1,4 +1,4 @@
-namespace ExchangeApi.Common.Types;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Types;
 
 public enum OrderIdKind
 {

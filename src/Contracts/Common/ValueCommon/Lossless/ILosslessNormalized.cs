@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace ExchangeApi.Spec.ValueCommon.Lossless;
+namespace ExchangeApi.Contracts.Common.ValueCommon.Lossless;
 
 public interface ILosslessNormalized
 {

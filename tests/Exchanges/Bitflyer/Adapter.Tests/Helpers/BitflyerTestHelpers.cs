@@ -1,16 +1,29 @@
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
 using ExchangeApi.Contracts.Interfaces;
 using ExchangeApi.Contracts.Requests;
-using ExchangeApi.Domain.Services;
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Apis;
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
+using ExchangeApi.Shared.Domain.Services;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Contracts.Common.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Helpers;
 
 internal static class BitflyerTestHelpers
 {

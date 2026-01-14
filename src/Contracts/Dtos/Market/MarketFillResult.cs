@@ -1,6 +1,6 @@
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 
-namespace ExchangeApi.Contracts.Dtos;
+namespace ExchangeApi.Contracts.Dtos.Market;
 
 /// <summary>約定見積（フィル見積）。</summary>
 public sealed record FillEstimate(

@@ -2,14 +2,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using ExchangeApi.Contracts.Common.CallCommon;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public class BittradeExchangeInfoApiTests
 {

@@ -1,10 +1,15 @@
 using System.Collections.Generic;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Domain.Extensions;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Shared.Domain.Extensions;
 using Xunit;
 
-namespace Common.Tests.Contracts.Extensions;
+namespace ExchangeApi.Tests.Common.Tests.Contracts.Extensions;
 
 public class ExchangeInfoExtensionsTests
 {

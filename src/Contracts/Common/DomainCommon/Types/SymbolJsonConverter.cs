@@ -2,7 +2,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Common.Types;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Types;
 
 public sealed class SymbolJsonConverter : JsonConverter<Symbol>
 {

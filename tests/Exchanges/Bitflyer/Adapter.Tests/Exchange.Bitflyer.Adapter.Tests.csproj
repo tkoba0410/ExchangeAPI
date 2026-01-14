@@ -23,9 +23,9 @@
   <ItemGroup>
     <ProjectReference Include="../../../../src/Contracts/Common/DomainCommon/Shared.Common.csproj" />
     <ProjectReference Include="../../../../src/Contracts/Shared.Contracts.csproj" />
-    <ProjectReference Include="../../../../src/Domain/Behavior/Domain/Shared.Domain.csproj" />
-    <ProjectReference Include="../../../../src/Core/Core.csproj" />
-    <ProjectReference Include="../../../../src/Adapter/Bitflyer/Exchange.Bitflyer.Adapter.csproj" />
+    <ProjectReference Include="../../../../src/Shared/Domain/Shared.Domain.csproj" />
+    <ProjectReference Include="../../../../src/Shared/Core/Core.csproj" />
+    <ProjectReference Include="../../../../src/Shared/Adapter/ExchangeApi.Adapter.csproj" />
   </ItemGroup>
 
 </Project>

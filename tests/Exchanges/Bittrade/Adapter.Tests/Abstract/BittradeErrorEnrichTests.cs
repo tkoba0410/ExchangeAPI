@@ -1,22 +1,28 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Domain.Services;
+using ExchangeApi.Shared.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalize;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Types;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
+using ExchangeApi.Exchanges.Bittrade.Normalized;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ContractsRequests = ExchangeApi.Contracts.Requests;
-using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
-using ExchangeApi.Spec.CallCommon;
+using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using ExchangeApi.Contracts.Common.CallCommon;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public sealed class BittradeErrorEnrichTests
 {

@@ -4,10 +4,10 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Http;
-using ExchangeApi.Core.Transport.Protocol;
+using ExchangeApi.Shared.Transport.Http;
+using ExchangeApi.Shared.Transport.Protocol;
 
-namespace ExchangeApi.Core.Tests;
+namespace ExchangeApi.Tests.Core.Tests;
 
 public sealed class RestClientSendRawAsyncTests
 {

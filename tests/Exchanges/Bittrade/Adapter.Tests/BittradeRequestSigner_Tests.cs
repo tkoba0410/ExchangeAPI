@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests;
 
 public sealed class BittradeRequestSigner_Tests
 {

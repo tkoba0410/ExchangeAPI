@@ -1,7 +1,13 @@
 using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Call;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw.Endpoints.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
 
 public sealed class BittradeEndpointsTests
 {

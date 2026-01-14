@@ -4,12 +4,12 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Policy;
-using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Shared.Transport.Policy;
+using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Shared.Transport.Http;
 using Xunit;
 
-namespace ExchangeApi.Core.Transport.Tests;
+namespace ExchangeApi.Tests.Common.Tests.Transport;
 
 public class RestClientFaultInjectionTests
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
-using ExchangeApi.Common.Enums;
-namespace ExchangeApi.Core.Contracts.Errors;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+namespace ExchangeApi.Contracts.Errors;
 
 /// <summary>
 /// 取引所 API 呼び出し時の例外を表す共通例外クラス。

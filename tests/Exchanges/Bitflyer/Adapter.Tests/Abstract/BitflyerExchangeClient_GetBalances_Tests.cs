@@ -2,15 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Ticker;
-using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models.Ticker;
+using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 {
     public class BitflyerExchangeClient_GetBalances_Tests
     {
@@ -42,7 +55,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
 
             // Act
             var call = await client.GetBalancesCallAsync();
-            var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
+            var ok = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
             IReadOnlyList<Balance> result = ok.Response;
 
             // Assert
@@ -73,7 +86,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests
 
             // Act
             var call = await client.GetBalancesCallAsync();
-            var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
+            var ok = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
             IReadOnlyList<Balance> result = ok.Response;
 
             // Assert

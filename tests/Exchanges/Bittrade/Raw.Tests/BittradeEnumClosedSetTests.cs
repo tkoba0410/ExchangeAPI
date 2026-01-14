@@ -1,7 +1,8 @@
 using System.Text.Json;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
 public sealed class BittradeEnumClosedSetTests
 {

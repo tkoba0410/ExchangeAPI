@@ -5,18 +5,30 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
-using ExchangeApi.Spec.CallCommon;
-using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Domain.UseCases;
-using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.Private.ExecutionPrivateResponse;
+using ExchangeApi.Contracts.Common.CallCommon;
+using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Shared.Domain.UseCases;
+using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models.ExecutionPrivateResponse;
 using Xunit;
 using ExchangeApi.Contracts.Dtos;
-using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Ticker;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models.Ticker;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
 public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
 {

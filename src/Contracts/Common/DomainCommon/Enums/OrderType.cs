@@ -1,4 +1,4 @@
-namespace ExchangeApi.Common.Enums;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Enums;
 
 /// <summary>注文種別。</summary>
 public enum OrderType

@@ -1,4 +1,4 @@
-namespace ExchangeApi.Contracts.Dtos;
+namespace ExchangeApi.Contracts.Dtos.Common;
 
 public enum PartialReason
 {

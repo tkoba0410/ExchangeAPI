@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace ExchangeApi.Common.Types;
+namespace ExchangeApi.Contracts.Common.DomainCommon.Types;
 
 [JsonConverter(typeof(SymbolJsonConverter))]
 public readonly record struct Symbol

@@ -1,0 +1,12 @@
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
+
+/// <summary>
+/// bitFlyer Raw API のバンドル。
+/// </summary>
+public interface IBitflyerRawApi
+{
+    IBitflyerRawMarketDataApi MarketData { get; }
+    IBitflyerRawTradingApi Trading { get; }
+}

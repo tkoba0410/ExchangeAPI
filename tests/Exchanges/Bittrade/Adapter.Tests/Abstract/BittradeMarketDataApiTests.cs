@@ -4,20 +4,26 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.DomainCommon.Types;
 using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Domain.Services;
+using ExchangeApi.Shared.Domain.Services;
 using ExchangeApi.Contracts.Dtos;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
 using ExchangeApi.Contracts.Requests;
-using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Core.Transport.Http;
-using ExchangeApi.Exchanges.Bittrade.Normalize;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Contracts.Errors;
+using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Shared.Transport.Http;
+using ExchangeApi.Exchanges.Bittrade.Normalized;
+using ExchangeApi.Contracts.Common.CallCommon;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public class BittradeMarketDataApiTests
 {

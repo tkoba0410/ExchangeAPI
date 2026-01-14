@@ -2,11 +2,16 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Composition.Providers.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Account;
+using ExchangeApi.Contracts.Dtos.Common;
+using ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Dtos.Market;
+using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Shared.Composition.Providers.ExchangeInfo;
 using Xunit;
 
-namespace Composition.Tests.ExchangeInfo;
+namespace ExchangeApi.Tests.Composition.Tests.ExchangeInfo;
 
 public class JsonExchangeInfoApiTests : IAsyncLifetime
 {
@@ -51,7 +56,7 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
         var api = new JsonExchangeInfoApi(new[] { _basePath }, cacheTtl: TimeSpan.FromSeconds(1));
 
         var call = await api.GetExchangeInfoCallAsync();
-        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
 
         Assert.Single(info.Markets);
@@ -84,7 +89,7 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
         var api = new JsonExchangeInfoApi(new[] { _basePath, _overlayPath }, cacheTtl: TimeSpan.FromSeconds(1));
 
         var call = await api.GetExchangeInfoCallAsync();
-        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
 
         Assert.Single(info.Markets);

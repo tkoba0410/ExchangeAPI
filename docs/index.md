@@ -43,6 +43,7 @@
 * 旧文書は互換のため `docs/_references/` に保管する（Normative ではない）。
 * `docs/_references/boundaries-legacy.md`
 * `docs/_references/topspec-guide-legacy.md`
+* `docs/_references/contracts-legacy.md`
 
 ---
 

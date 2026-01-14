@@ -1,165 +1,126 @@
-# Contracts
+# Contracts（横断契約）
 
-## 1. Purpose
-
-本ドキュメントは、ExchangeAPI における **公開契約（Contracts）** を定義する。
-
-ここでいう契約とは、
-- API の**振る舞い**ではなく
-- 外部に公開される **型・形状・意味論** を指す。
-
-本書の目的は、DTO や公開型の追加・変更時に  
-**命名・粒度・責務の揺れを防ぐ**ことである。
+本書は、本リポジトリにおける **公開契約（Contract）** を定義する最上位規範（Normative）である。  
+ここに記載された MUST / MUST NOT は拘束力を持ち、実装都合よりも優先される。
 
 ---
 
-## 2. Scope
+## 1. 目的
 
-本ドキュメントの対象は、以下に限定する。
-
-- Public / Normalized API で公開される DTO
-- ページング・カーソル・リミット等の共通契約
-- 命名規約・型の粒度ルール
-- Nullable / Optional の扱い方針
-
-以下は対象外とする。
-
-- API仕様（パラメータ・レスポンス詳細）
-- Exchange 固有の生JSON構造
-- 実装詳細・変換ロジック
-- テスト観点
+- Contracts 層は、取引所をまたいで共通に利用できる **公開 API の契約**を提供する（MUST）。
+- Contracts は **振る舞い（Behavior）ではなく、型・形状・意味論（Shape/Semantics）** を定義する（MUST）。
+- 網羅性よりも安定性を優先し、必要最小限のみを追加する（MUST）。
 
 ---
 
-## 3. General Principles
+## 2. 適用範囲
 
-### 3.1 Contracts are Shape, not Behavior
-
-Contracts は **形状と意味論のみ**を定義する。
-
-- 「どう処理するか」は定義しない
-- 「どの型が、どの責務を持つか」だけを固定する
+- 本書は `src/Contracts/` 配下の型・インターフェイス・公開 API 仕様に適用される（MUST）。
+- Contracts は **取引所非依存**でなければならない（MUST）。
 
 ---
 
-### 3.2 Stability over Completeness
+## 3. 取引所非依存（横断性）
 
-Contracts は網羅性よりも安定性を優先する。
-
-- 将来使うか不明な項目は追加しない
-- 必要になった時点で最小限を追加する
-
----
-
-### 3.3 No Exchange-Specific Leakage
-
-Contracts に取引所固有の概念・型・命名を持ち込まない。
-
-- Exchange 固有要素は Raw / Adapter 層で閉じる
-- Normalized / Public Contracts は中立であること
+- Contracts の型・名前空間・識別子に **取引所名を含めてはならない**（MUST NOT）。
+- Contracts に置いてよいのは、取引所横断の **Abstract DTO / Request / Response / Error / Result** のみである（MUST）。
+- 取引所固有の差分は Contracts で表現してはならない（MUST NOT）。差分は Normalized/Adapter 側で吸収し、必要なら Decisions（Exceptions）に記録する（MUST）。
 
 ---
 
-## 4. Naming Conventions
+## 4. API 返却形式（Call-only）
 
-### 4.1 DTO Naming
-
-- 名詞 + Context（例: `OrderSnapshot`, `ExecutionHistoryItem`）
-- 意味の異なる DTO を suffix だけで区別しない
-- Raw / Normalized / Adapter の区別は namespace / フォルダで行う
+- 公開 API は **Call を唯一の返却形式**とする（MUST）。
+- Response（DTO）を直接返してはならない（MUST NOT）。
+- Call は **成功/失敗/メタ情報**を一体として表現できなければならない（MUST）。
 
 ---
 
-### 4.2 Property Naming
+## 5. エラーとメタ情報
 
-- PascalCase
-- 略語は一般的なもののみ使用する（Id, Url 等）
-- Exchange 固有の語彙をそのまま転記しない
-
----
-
-## 5. Nullable / Optional Policy
-
-### 5.1 Nullable を許可する条件
-
-以下の場合のみ Nullable を許可する。
-
-- 公式API上、常に欠落する可能性がある
-- Exchange によって意味が異なる
-- 将来的な拡張余地として意図的に空を許容する
-
-Nullable は **設計上の判断**であり、  
-「たまたま無い」ことを理由にしてはならない。
+- エラーは Call のメタ情報（例：CallMeta）に集約する（MUST）。
+- 例外（throw）は、エントリポイント（例：OrThrow / ParseOrThrow 等）以外では使用してはならない（MUST NOT）。
+- エラー表現は **分類レベル**（例：通信失敗 / 認証失敗 / 業務的失敗）までに留め、詳細コード体系を契約に含めない（MUST）。
+- リトライ可否・HTTP ステータス・レート制限などの運用情報は、必要に応じて Call のメタで表現する（MUST）。
 
 ---
 
-### 5.2 Non-nullable の原則
+## 6. 型の所有権
 
-- 常に存在する概念は Non-nullable とする
-- 値が不明な場合は、別の状態・型で表現する
-
----
-
-## 6. Page / Cursor / Limit Contracts
-
-### 6.1 Page
-
-- Page は「1回の取得結果」を表す
-- 戻り値の件数と、要求した limit は区別される
-
-### 6.2 Limit
-
-- Limit は「要求」であり、保証ではない
-- 実際に適用された limit は Meta 情報として保持する
-
-### 6.3 Cursor
-
-- Cursor はページング状態を表す opaque な値とする
-- Cursor の内部構造や生成方法は契約に含めない
+- Abstract DTO（公開契約の型）は **Contracts 層が定義元（オーナー）**である（MUST）。
+- Normalized 層は Contracts の型を返す。Normalized 独自の抽象型を公開してはならない（MUST NOT）。
 
 ---
 
-## 7. Error Representation (High-level)
+## 7. 層境界の型制約
 
-Contracts では、エラーの **分類レベル**のみを扱う。
-
-- 通信失敗
-- 認証失敗
-- 業務的失敗
-
-エラーコードや詳細分類は、契約に含めない。
+- Contracts の公開メソッド（インターフェイス）は、Contracts で許可された型のみを in/out に用いる（MUST）。
+- Raw DTO / Exchange DTO / Wire string を Contracts の in/out に含めてはならない（MUST NOT）。
 
 ---
 
-## 8. Evolution Rules
+## 8. 命名規約
 
-Contracts を変更する場合は、以下を満たすこと。
+### 8.1 DTO 命名
 
-- 既存利用者の意味論を壊さない
-- 破壊的変更は禁止とする
-- 破壊的変更が必要な場合は、必ず `docs/exceptions.md` に記録する
+- 型名は **名詞 + Context** を基本とする（MUST）。
+  例：`OrderSnapshot`, `ExecutionHistoryItem`
+  （※例は規範ではなく参考）
+- 意味の異なる DTO を suffix だけで区別してはならない（MUST NOT）。
+- Raw / Normalized / Adapter の区別を型名 suffix で表現してはならない（MUST NOT）。区別は namespace / フォルダで行う（MUST）。
 
----
+### 8.2 プロパティ命名
 
-## 9. Anti-Rules
-
-以下は禁止とする。
-
-- 公式API仕様の写経
-- フィールド単位の詳細説明
-- Exchange ごとの差分説明
-- 実装都合による一時的 DTO の公開
+- 公開プロパティは PascalCase とする（MUST）。
+- 略語は一般的なもののみ使用する（例：Id, Url 等）（MUST）。
+- 取引所固有の語彙をそのまま転記してはならない（MUST NOT）。
 
 ---
 
-## 10. Authority
+## 9. Nullable / Optional ポリシー
 
-本ドキュメントは、Contracts に関する判断において  
-`docs/contracts.md` を正本とする。
+- Nullable を許可するのは、次の場合に限る（MUST）。
+  - 公式 API 上、常に欠落する可能性がある
+  - 取引所によって意味が異なる
+  - 将来的な拡張余地として意図的に空を許容する
+- Nullable は設計上の判断であり、「たまたま無い」ことを理由にしてはならない（MUST NOT）。
+- 常に存在する概念は Non-nullable とする（MUST）。
+- 値が不明な場合は Nullable に逃がさず、別の状態・型で表現する（MUST）。
 
-判断に迷った場合は、
-- TopSpec Guide
-- Documentation Policy
+---
 
-を参照し、それでも解決しない場合は  
-Contracts を拡張しない選択を優先する。
+## 10. Page / Cursor / Limit 契約
+
+- Page は「1回の取得結果」を表す（MUST）。
+- 戻り値の件数と要求した limit は区別される（MUST）。
+  - Limit は「要求」であり、保証ではない（MUST）
+  - 実際に適用された limit は Meta 情報として保持する（MUST）
+- Cursor はページング状態を表す **opaque な値**とする（MUST）。
+  Cursor の内部構造や生成方法は契約に含めない（MUST NOT）。
+
+---
+
+## 11. 互換性（Evolution / Breaking Change）
+
+- Contracts の変更は利用者に影響するため、後方互換性を原則維持する（MUST）。
+- 破壊的変更は禁止する（MUST NOT）。
+- 破壊的変更が必要な場合は、互換レイヤ（新旧共存）またはメジャーバージョンで表現し、Decisions（Exceptions）に理由を記録する（MUST）。
+
+---
+
+## 12. Anti-Rules（禁止事項）
+
+- 公式 API 仕様の写経をしてはならない（MUST NOT）。
+- フィールド単位の詳細説明を契約に含めてはならない（MUST NOT）。
+- 取引所ごとの差分説明を契約に含めてはならない（MUST NOT）。
+- 実装都合による一時的 DTO を公開してはならない（MUST NOT）。
+
+---
+
+## 13. 例外の扱い
+
+- 本書の規範に従えない場合は Decisions（Exceptions）に理由を記録しなければならない（MUST）。
+- 例外として認められるのは、次の場合に限る（MUST）。
+  - 公式 API 仕様による不可避な制約
+  - 後方互換性維持のための必要性
+  - セキュリティ・性能・法令上の理由

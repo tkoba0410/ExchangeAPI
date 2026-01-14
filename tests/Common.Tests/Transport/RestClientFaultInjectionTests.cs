@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Core.Transport.Policy;
@@ -40,9 +41,10 @@ public class RestClientFaultInjectionTests
             transport,
             policy: HttpPolicyFactory.CreateDefault(options));
 
-        var result = await rest.GetAsync<TestDto>("/api");
+        var raw = await rest.SendRawAsync("GET", "/api");
+        var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);
 
-        Assert.Equal("ok", result.Value);
+        Assert.Equal("ok", result!.Value);
         Assert.Equal(2, transport.SendCount);
     }
 
@@ -70,9 +72,10 @@ public class RestClientFaultInjectionTests
             transport,
             policy: HttpPolicyFactory.CreateDefault(options));
 
-        var result = await rest.GetAsync<TestDto>("/api");
+        var raw = await rest.SendRawAsync("GET", "/api");
+        var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);
 
-        Assert.Equal("ok", result.Value);
+        Assert.Equal("ok", result!.Value);
         Assert.Equal(2, transport.SendCount);
     }
 
@@ -96,7 +99,7 @@ public class RestClientFaultInjectionTests
             transport,
             policy: HttpPolicyFactory.CreateDefault(options));
 
-        await Assert.ThrowsAsync<TransportException>(() => rest.GetAsync<TestDto>("/api"));
+        await Assert.ThrowsAsync<TransportException>(() => rest.SendRawAsync("GET", "/api"));
         Assert.Equal(1, transport.SendCount);
     }
 
@@ -120,10 +123,10 @@ public class RestClientFaultInjectionTests
             transport,
             policy: policy);
 
-        var ex1 = await Assert.ThrowsAsync<TransportException>(() => rest.GetAsync<TestDto>("/api"));
-        Assert.Equal(HttpStatusCode.InternalServerError, ex1.StatusCode);
+        var raw = await rest.SendRawAsync("GET", "/api");
+        Assert.Equal((int)HttpStatusCode.InternalServerError, raw.StatusCode);
 
-        var ex2 = await Assert.ThrowsAsync<TransportException>(() => rest.GetAsync<TestDto>("/api"));
+        var ex2 = await Assert.ThrowsAsync<TransportException>(() => rest.SendRawAsync("GET", "/api"));
         Assert.Equal(HttpStatusCode.ServiceUnavailable, ex2.StatusCode); // CB opens
         Assert.Equal(1, transport.SendCount); // second call short-circuited
     }

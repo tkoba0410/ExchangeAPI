@@ -7,7 +7,7 @@
 
 ## はじめに
 
-* 文書化の方針・ルール（最優先）：[`documentation-policy.md`](./documentation-policy.md)
+* 運用ルール（文書化・レビュー・例外）：[`process.md`](./process.md)
 
 ---
 
@@ -41,6 +41,8 @@
 ## 参考（Reference / Legacy）
 
 * 旧文書は互換のため `docs/_references/` に保管する（Normative ではない）。
+* `docs/_references/documentation-policy-legacy.md`
+* `docs/_references/review-checklist-legacy.md`
 * `docs/_references/boundaries-legacy.md`
 * `docs/_references/topspec-guide-legacy.md`
 * `docs/_references/contracts-legacy.md`

@@ -62,3 +62,14 @@
 ---
 
 ※ 本ページ自体は判断を定義しない。判断の正本は各リンク先文書とする。
+
+## 参考（Legacy）
+
+- [boundaries-legacy.md](./_legacy/boundaries-legacy.md)
+- [contracts-legacy.md](./_legacy/contracts-legacy.md)
+- [documentation-design-notes.md](./_legacy/documentation-design-notes.md)
+- [documentation-policy-legacy.md](./_legacy/documentation-policy-legacy.md)
+- [review-checklist-legacy.md](./_legacy/review-checklist-legacy.md)
+- [topspec-guide-legacy.md](./_legacy/topspec-guide-legacy.md)
+
+> これらは旧版であり、正本ではない。

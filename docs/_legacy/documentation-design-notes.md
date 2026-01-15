@@ -1,3 +1,13 @@
+> ⚠️ Legacy / 参考資料
+> この文書は旧版であり **正本ではない**。実装・判断の拘束力を持たない。
+> 正本（Normative）は以下：
+> - docs/topspec.md
+> - docs/contracts.md
+> - docs/process.md
+> - docs/exceptions.md
+> - docs/endpoints.md
+> - docs/inventory-*.md
+
 # 文書設計ノート（参考）
 
 ## 0. 本文書の位置づけ（非仕様・参考）

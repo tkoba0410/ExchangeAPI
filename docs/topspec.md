@@ -116,9 +116,9 @@ Wire → Raw → Normalized → Contracts
 
 ## 7. 固有／横断（Variation）
 
-- 横断要素は配置として Shared に集約する（MUST）。
-- 固有要素は Exchanges/<Exchange> に閉じる（MUST）。
-- Contracts は最上位の共通（公開契約）として独立する（MUST）。
+- 横断基盤は **概念単位の最上位フォルダ**に配置する（MUST）。
+- 取引所固有コードは常に `src/Exchanges/<Exchange>/...` に閉じる（MUST）。
+- Shared という物理カテゴリは使用してはならない（MUST NOT）。
 
 ---
 
@@ -128,32 +128,33 @@ Wire → Raw → Normalized → Contracts
 - `src/` 配下の物理ディレクトリ構成は **仕様の一部（正本）**である（MUST）。
 - 文書と物理構成が矛盾した場合は、原則として文書を修正する（MUST）。
 
-### 8.2 最小骨格（Skeleton）
+### 8.2 Skeleton（正本）
 
 ```
 src/
-  Shared/
+  Transport/
+  Primitives/
+  Contracts/
+    Common/
+    Facade/
   Exchanges/
-    <ExchangeName>/
+    <Exchange>/
       Wire/
       Raw/
       Normalized/
       Adapter/
-  Contracts/
 ```
 
 ### 8.3 配置規範
 
-取引所固有コードは常に `src/Exchanges/<Exchange>/...` に配置する。  
-取引所横断の実装基盤は常に `src/Shared/...` に配置する。  
-公開契約（Contracts）は `src/Contracts/...` に配置する（最上位の共通であり Shared には含めない）。  
-この規範に例外を設けてはならない。
+- 各物理フォルダは **1 つの概念・責務のみ**を持つ（MUST）。
+- 各フォルダ直下に 1 csproj を置き、当該フォルダ配下のみを Compile する（MUST）。
+- csproj が他フォルダのソースを Compile してはならない（MUST NOT）。
 
-### 8.4 物理は Exchange 主導 / アセンブリは Layer 主導
+### 8.4 アセンブリ境界
 
-物理構成は Exchange 主導とする。  
-アセンブリ（csproj）は Layer 主導とし、`src/Exchanges/*/<Layer>` を束ねる。  
-例外は禁止する。
+- アセンブリ境界は物理フォルダ境界と一致させる（MUST）。
+- glob による複数 Exchange / Layer の集約アセンブリを作成してはならない（MUST NOT）。
 
 ### 8.5 Namespace 規則（例外禁止）
 
@@ -161,17 +162,19 @@ src/
 例外は禁止する。
 
 例:
-- src/Exchanges/Bitflyer/Wire/... → ExchangeApi.Exchanges.Bitflyer.Wire...
-- src/Shared/Transport/... → ExchangeApi.Shared.Transport...
-- src/Contracts/... → ExchangeApi.Contracts...
+- src/Transport/... → ExchangeApi.Transport...
+- src/Primitives/... → ExchangeApi.Primitives...
+- src/Contracts/Common/... → ExchangeApi.Contracts.Common...
+- src/Contracts/Facade/... → ExchangeApi.Contracts.Facade...
+- src/Exchanges/Bitflyer/Raw/... → ExchangeApi.Exchanges.Bitflyer.Raw...
 
 ---
 
 ## 9. Transport
 
-Transport（HTTP/JSON/Retry 等の横断的通信基盤）は Shared の責務とする。  
-Transport は `src/Shared/Transport/` に配置する。  
-Wire は Transport を内包しない。例外は禁止する。
+Transport（HTTP/JSON/Retry 等の横断的通信基盤）は層ではなく、横断的通信基盤である。  
+Transport は `src/Transport/` に配置する。  
+Wire は Transport を参照するが内包してはならない（MUST）。
 
 ---
 

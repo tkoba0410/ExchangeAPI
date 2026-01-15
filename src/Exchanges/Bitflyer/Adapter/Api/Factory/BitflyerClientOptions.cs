@@ -1,7 +1,7 @@
 using System.Net.Http;
-using ExchangeApi.Shared.Transport.Observability;
-using ExchangeApi.Shared.Transport.Policy;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Transport.Observability;
+using ExchangeApi.Transport.Policy;
+using ExchangeApi.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Factory;
 
 /// <summary>

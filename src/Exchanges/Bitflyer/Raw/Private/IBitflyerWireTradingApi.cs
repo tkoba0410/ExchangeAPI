@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.CallCommon;
+using ExchangeApi.Primitives.CallCommon;
 using Requests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;

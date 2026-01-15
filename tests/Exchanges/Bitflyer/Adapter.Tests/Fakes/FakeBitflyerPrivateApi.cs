@@ -13,7 +13,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
-using ExchangeApi.Contracts.Common.CallCommon;
+using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 

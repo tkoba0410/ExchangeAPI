@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <RootNamespace>ExchangeApi.Exchanges.Bitflyer.Normalized</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Raw\ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
+    <ProjectReference Include="..\..\..\Contracts\Common\ExchangeApi.Contracts.Common.csproj" />
+    <ProjectReference Include="..\..\..\Application\ExchangeApi.Application.csproj" />
+  </ItemGroup>
+
+</Project>

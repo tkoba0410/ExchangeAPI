@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Shared/Adapter/ExchangeApi.Adapter.csproj" />
+    <ProjectReference Include="../../src/Composition/ExchangeApi.Composition.csproj" />
   </ItemGroup>
 
 </Project>

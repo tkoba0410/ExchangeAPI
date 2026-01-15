@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using ExchangeApi.Contracts.Common.ValueCommon.Lossless;
+using ExchangeApi.Primitives.ValueCommon.Lossless;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
 

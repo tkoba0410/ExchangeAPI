@@ -3,7 +3,7 @@ using System.Diagnostics.Metrics;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ExchangeApi.Shared.Transport.Observability;
+using ExchangeApi.Transport.Observability;
 using Xunit;
 
 namespace ExchangeApi.Tests.Common.Tests.Transport.Logging;

@@ -4,16 +4,16 @@ using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Dtos.Account;
-using ExchangeApi.Contracts.Dtos.Common;
-using ExchangeApi.Contracts.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos.Market;
-using ExchangeApi.Contracts.Dtos.Trading;
-using ExchangeApi.Contracts.Errors;
-using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.Trading;
+using ExchangeApi.Contracts.Common.Errors;
+using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
@@ -24,7 +24,7 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Private;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
-using ExchangeApi.Contracts.Common.CallCommon;
+using ExchangeApi.Primitives.CallCommon;
 using RawRequests = ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Call;
@@ -249,7 +249,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
     }
 
     private static bool TryGetApiSymbol(
-        Call<ExchangeApi.Contracts.Requests.ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
+        Call<ExchangeApi.Contracts.Facade.Requests.ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
         out string? apiSymbol,
         out CallError? error)
     {
@@ -273,7 +273,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
     }
 
     private static Call<TReq, TOk> CreateCallError<TReq, TOk>(
-        Call<ExchangeApi.Contracts.Requests.ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
+        Call<ExchangeApi.Contracts.Facade.Requests.ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
         TReq request,
         string component,
         CallError error)

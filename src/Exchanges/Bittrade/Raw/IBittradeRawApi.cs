@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
 using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
-using ExchangeApi.Contracts.Common.CallCommon;
+using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw;
 

@@ -4,8 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Shared.Transport.Protocol;
-using ExchangeApi.Shared.Transport.Time;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Time;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 

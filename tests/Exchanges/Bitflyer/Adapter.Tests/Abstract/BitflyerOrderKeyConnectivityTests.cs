@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
@@ -14,14 +14,14 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Dtos.Account;
-using ExchangeApi.Contracts.Dtos.Common;
-using ExchangeApi.Contracts.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos.Market;
-using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.Trading;
 using Xunit;
-using ContractSide = ExchangeApi.Contracts.Common.DomainCommon.Enums.Side;
+using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
@@ -56,11 +56,11 @@ public sealed class BitflyerOrderKeyConnectivityTests
         var api = new BitflyerTradingApi(normalized);
 
         var resultCall = await api.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
-        var result = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<OrderResult>.Ok>(resultCall.Result).Response;
+        var result = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<OrderResult>.Ok>(resultCall.Result).Response;
         var statusCall = await api.GetOrderCallAsync(new Symbol("BTC/JPY"), result.Key);
-        var status = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<OrderStatus>.Ok>(statusCall.Result).Response;
+        var status = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<OrderStatus>.Ok>(statusCall.Result).Response;
         var cancelCall = await api.CancelOrderCallAsync(new Symbol("BTC/JPY"), result.Key);
-        Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<CancelResult>.Ok>(cancelCall.Result);
+        Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<CancelResult>.Ok>(cancelCall.Result);
 
         Assert.Equal(OrderIdKind.AcceptanceId, result.Key.Kind);
         Assert.Equal(acceptanceId, result.Key.Value);

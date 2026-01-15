@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Dtos.Account;
-using ExchangeApi.Contracts.Dtos.Common;
-using ExchangeApi.Contracts.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos.Market;
-using ExchangeApi.Contracts.Dtos.Trading;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.Trading;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class BitflyerExchangeInfoMapper

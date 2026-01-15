@@ -1,7 +1,7 @@
 using System;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
-using ContractSide = ExchangeApi.Contracts.Common.DomainCommon.Enums.Side;
+using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 

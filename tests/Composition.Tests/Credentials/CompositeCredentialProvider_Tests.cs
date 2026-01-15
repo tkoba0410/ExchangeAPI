@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Dtos.Account;
-using ExchangeApi.Contracts.Dtos.Common;
-using ExchangeApi.Contracts.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos.Market;
-using ExchangeApi.Contracts.Dtos.Trading;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
-using ExchangeApi.Shared.Composition.Providers.Credentials;
+using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.Trading;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Composition.Providers.Credentials;
 
 namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 

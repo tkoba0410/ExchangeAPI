@@ -1,5 +1,5 @@
 using System;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;

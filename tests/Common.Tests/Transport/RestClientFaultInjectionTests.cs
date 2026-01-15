@@ -4,9 +4,9 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Shared.Transport.Policy;
-using ExchangeApi.Shared.Transport.Protocol;
-using ExchangeApi.Shared.Transport.Http;
+using ExchangeApi.Transport.Policy;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Http;
 using Xunit;
 
 namespace ExchangeApi.Tests.Common.Tests.Transport;

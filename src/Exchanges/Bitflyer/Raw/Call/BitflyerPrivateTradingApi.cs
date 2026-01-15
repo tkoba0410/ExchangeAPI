@@ -2,12 +2,12 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using Requests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
-using ExchangeApi.Contracts.Common.CallCommon;
-using ExchangeApi.Shared.Wire;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 

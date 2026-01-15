@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Shared.Transport.Http;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Transport.Http;
+using ExchangeApi.Transport.Protocol;
 
 namespace ExchangeApi.Tests.Core.Tests;
 

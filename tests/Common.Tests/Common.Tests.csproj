@@ -21,11 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Contracts/Common/DomainCommon/Shared.Common.csproj" />
-    <ProjectReference Include="../../src/Contracts/Shared.Contracts.csproj" />
-    <ProjectReference Include="../../src/Shared/Domain/Shared.Domain.csproj" />
-    <ProjectReference Include="../../src/Shared/Core/Core.csproj" />
-    <ProjectReference Include="../../src/Shared/Wire/ExchangeApi.Wire.csproj" />
+    <ProjectReference Include="../../src/Primitives/ExchangeApi.Primitives.csproj" />
+    <ProjectReference Include="../../src/Contracts/Common/ExchangeApi.Contracts.Common.csproj" />
+    <ProjectReference Include="../../src/Application/ExchangeApi.Application.csproj" />
+    <ProjectReference Include="../../src/Transport/ExchangeApi.Transport.csproj" />
   </ItemGroup>
 
 </Project>

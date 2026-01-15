@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Dtos.Account;
-using ExchangeApi.Contracts.Dtos.Common;
-using ExchangeApi.Contracts.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos.Market;
-using ExchangeApi.Contracts.Dtos.Trading;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.Trading;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
-using ExchangeApi.Contracts.Common.CallCommon;
+using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;

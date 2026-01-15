@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("ExchangeApi.Adapter")]
-[assembly: InternalsVisibleTo("Exchange.Bitflyer.Adapter.Tests")]
+[assembly: InternalsVisibleTo("ExchangeApi.Exchanges.Bittrade.Adapter")]
 [assembly: InternalsVisibleTo("Exchange.Bittrade.Adapter.Tests")]
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Properties;

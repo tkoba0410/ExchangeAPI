@@ -1,6 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
-using ExchangeApi.Contracts.Common.JsonCommon.Converters;
+using ExchangeApi.Primitives.JsonCommon.Converters;
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 
 public sealed record RawOrderSummary(

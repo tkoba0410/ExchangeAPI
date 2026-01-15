@@ -8,20 +8,20 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Shared.Adapter.NotSupported;
+using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Application.Adapter.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
-using ExchangeApi.Shared.Transport.Observability;
-using ExchangeApi.Shared.Transport.Policy;
-using ExchangeApi.Shared.Transport.Protocol;
-using ExchangeApi.Shared.Transport.Http;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Transport.Observability;
+using ExchangeApi.Transport.Policy;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Http;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Factory;
 
 /// <summary>
 /// Bittrade API クライアントを構築するファクトリ。
 /// </summary>
-[Obsolete("Use ExchangeApi.Shared.Composition.Bootstrap.Factories.BittradeFactory. This factory will be removed in a future major release.")]
+[Obsolete("Use ExchangeApi.Composition.Bootstrap.Factories.BittradeFactory. This factory will be removed in a future major release.")]
 public static class BittradeClientFactory
 {
     private static readonly Uri BaseUri = new("https://api-cloud.bittrade.co.jp/");

@@ -3,8 +3,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Shared.Transport.Policy;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Transport.Policy;
+using ExchangeApi.Transport.Protocol;
 using Xunit;
 
 namespace ExchangeApi.Tests.Common.Tests.Transport.Policy;

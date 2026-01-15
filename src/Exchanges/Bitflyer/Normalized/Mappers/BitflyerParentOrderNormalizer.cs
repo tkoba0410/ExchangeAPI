@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Contracts.Common.ValueCommon.ClosedSet;
+using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 

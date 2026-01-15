@@ -1,6 +1,6 @@
 using System;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 using ExchangeApi.Exchanges.Bittrade.Raw;
@@ -9,7 +9,7 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Private;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
-using ExchangeApi.Shared.Wire;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized;
 

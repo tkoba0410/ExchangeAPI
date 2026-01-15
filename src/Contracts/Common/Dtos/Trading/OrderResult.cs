@@ -1,0 +1,14 @@
+using ExchangeApi.Primitives.DomainCommon.Types;
+
+namespace ExchangeApi.Contracts.Common.Dtos.Trading;
+
+/// <summary>
+/// 抽象注文レスポンス。
+/// </summary>
+/// <summary>
+/// 注文結果。
+/// </summary>
+public sealed record OrderResult(
+    OrderKey Key,
+    string? ExchangeOrderId = null,
+    string? AcceptanceId = null);

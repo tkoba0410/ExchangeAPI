@@ -1,16 +1,16 @@
 using System;
 using System.Linq;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Dtos.Account;
-using ExchangeApi.Contracts.Dtos.Common;
-using ExchangeApi.Contracts.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos.Market;
-using ExchangeApi.Contracts.Dtos.Trading;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
-using ExchangeApi.Contracts.Errors;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.Trading;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
-using CommonSymbol = ExchangeApi.Contracts.Common.DomainCommon.Types.Symbol;
+using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
-using ExchangeApi.Shared.Wire;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 

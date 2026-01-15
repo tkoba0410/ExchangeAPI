@@ -7,9 +7,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Shared.Transport.Observability;
-using ExchangeApi.Shared.Transport.Protocol;
-using ExchangeApi.Shared.Transport.Http;
+using ExchangeApi.Transport.Observability;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Http;
 using Xunit;
 
 namespace ExchangeApi.Tests.Common.Tests.Transport;

@@ -3,21 +3,25 @@
   <!--
     Phase2-3: Enforce layer adjacency rules by failing build on forbidden ProjectReference.
 
-    Layers (by folder):
-      Wire        : src/Shared/Wire/**
-      Raw         : src/Shared/Raw/**
-      Normalized  : src/Shared/Normalized/**
-      Adapter     : src/Shared/Adapter/**
-      Contracts   : src/Contracts/**   (top-level common)
-      Core        : src/Shared/Core/** (infra/shared)
-      Composition : src/Shared/Composition/**
+    Categories (by folder):
+      Transport   : src/Transport/**
+      Primitives  : src/Primitives/**
+      Application : src/Application/**
+      Composition : src/Composition/**
+      Contracts   : src/Contracts/Common/**, src/Contracts/Facade/**
+      Exchanges   : src/Exchanges/<Exchange>/<Layer>/**
 
     Allowed (minimal, conservative):
-      Wire        -> Core, Contracts(Common)
-      Raw         -> Wire, Core, Contracts(Common)
-      Normalized  -> Raw, Core, Contracts
-      Adapter     -> Normalized, Core, Contracts
-      Composition -> Adapter, Core, Contracts
+      Transport     -> Primitives
+      Primitives    -> (no constraints)
+      Application   -> Contracts.Common, Primitives
+      Composition   -> Contracts.Facade, Application, Transport, Primitives, Exchange Adapter
+      Contracts.Facade -> Contracts.Common
+      Contracts.Common -> Primitives
+      Exchange Wire -> Transport, Primitives
+      Exchange Raw  -> Exchange Wire, Contracts.Common, Primitives
+      Exchange Normalized -> Exchange Raw, Contracts.Common, Primitives, Application
+      Exchange Adapter -> Exchange Normalized, Contracts.Facade, Primitives, Application, Transport
 
     Notes:
       - This checks ProjectReference only (not Compile Include). Phase2 already removes cross-layer Compile Include.
@@ -45,13 +49,16 @@
       <!-- Apply only to src -->
       <_IsInSrc Condition="$(_Dir.Contains('\src\')) Or $(_Dir.Contains('/src/'))">true</_IsInSrc>
 
-      <_IsWire Condition="$(_Dir.Contains('\src\Shared\Wire\')) Or $(_Dir.Contains('/src/Shared/Wire/'))">true</_IsWire>
-      <_IsRaw Condition="$(_Dir.Contains('\src\Shared\Raw\')) Or $(_Dir.Contains('/src/Shared/Raw/'))">true</_IsRaw>
-      <_IsNormalized Condition="$(_Dir.Contains('\src\Shared\Normalized\')) Or $(_Dir.Contains('/src/Shared/Normalized/'))">true</_IsNormalized>
-      <_IsAdapter Condition="$(_Dir.Contains('\src\Shared\Adapter\')) Or $(_Dir.Contains('/src/Shared/Adapter/'))">true</_IsAdapter>
-      <_IsContracts Condition="$(_Dir.Contains('\src\Contracts\')) Or $(_Dir.Contains('/src/Contracts/'))">true</_IsContracts>
-      <_IsCore Condition="$(_Dir.Contains('\src\Shared\Core\')) Or $(_Dir.Contains('/src/Shared/Core/'))">true</_IsCore>
-      <_IsComposition Condition="$(_Dir.Contains('\src\Shared\Composition\')) Or $(_Dir.Contains('/src/Shared/Composition/'))">true</_IsComposition>
+      <_IsTransport Condition="$(_Dir.Contains('\src\Transport\')) Or $(_Dir.Contains('/src/Transport/'))">true</_IsTransport>
+      <_IsPrimitives Condition="$(_Dir.Contains('\src\Primitives\')) Or $(_Dir.Contains('/src/Primitives/'))">true</_IsPrimitives>
+      <_IsApplication Condition="$(_Dir.Contains('\src\Application\')) Or $(_Dir.Contains('/src/Application/'))">true</_IsApplication>
+      <_IsComposition Condition="$(_Dir.Contains('\src\Composition\')) Or $(_Dir.Contains('/src/Composition/'))">true</_IsComposition>
+      <_IsContractsCommon Condition="$(_Dir.Contains('\src\Contracts\Common\')) Or $(_Dir.Contains('/src/Contracts/Common/'))">true</_IsContractsCommon>
+      <_IsContractsFacade Condition="$(_Dir.Contains('\src\Contracts\Facade\')) Or $(_Dir.Contains('/src/Contracts/Facade/'))">true</_IsContractsFacade>
+      <_IsExchangeWire Condition="$(_Dir.Contains('\src\Exchanges\')) and ($(_Dir.Contains('\Wire\')) Or $(_Dir.Contains('/Wire/')))">true</_IsExchangeWire>
+      <_IsExchangeRaw Condition="$(_Dir.Contains('\src\Exchanges\')) and ($(_Dir.Contains('\Raw\')) Or $(_Dir.Contains('/Raw/')))">true</_IsExchangeRaw>
+      <_IsExchangeNormalized Condition="$(_Dir.Contains('\src\Exchanges\')) and ($(_Dir.Contains('\Normalized\')) Or $(_Dir.Contains('/Normalized/')))">true</_IsExchangeNormalized>
+      <_IsExchangeAdapter Condition="$(_Dir.Contains('\src\Exchanges\')) and ($(_Dir.Contains('\Adapter\')) Or $(_Dir.Contains('/Adapter/')))">true</_IsExchangeAdapter>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(_IsInSrc)'=='true' and '$(_IsTests)'!='true'">
@@ -60,63 +67,67 @@
 
     <!-- Helper: classify each referenced path -->
     <ItemGroup Condition="'$(_IsInSrc)'=='true' and '$(_IsTests)'!='true'">
-      <_PR_Wire Include="@(_PR)"
-                Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Wire\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Wire/'))" />
-      <_PR_Raw Include="@(_PR)"
-               Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Raw\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Raw/'))" />
-      <_PR_Normalized Include="@(_PR)"
-                      Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Normalized\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Normalized/'))" />
-      <_PR_Adapter Include="@(_PR)"
-                   Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Adapter\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Adapter/'))" />
-      <_PR_Contracts Include="@(_PR)"
-                     Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Contracts\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Contracts/'))" />
-      <_PR_Core Include="@(_PR)"
-                Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Core\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Core/'))" />
+      <_PR_Transport Include="@(_PR)"
+                     Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Transport\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Transport/'))" />
+      <_PR_Primitives Include="@(_PR)"
+                      Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Primitives\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Primitives/'))" />
+      <_PR_Application Include="@(_PR)"
+                       Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Application\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Application/'))" />
       <_PR_Composition Include="@(_PR)"
-                       Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Shared\Composition\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Shared/Composition/'))" />
+                       Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Composition\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Composition/'))" />
+      <_PR_ContractsCommon Include="@(_PR)"
+                           Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Contracts\Common\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Contracts/Common/'))" />
+      <_PR_ContractsFacade Include="@(_PR)"
+                           Condition="$([System.String]::Copy('%(_PR.Identity)').Contains('\src\Contracts\Facade\')) Or $([System.String]::Copy('%(_PR.Identity)').Contains('/src/Contracts/Facade/'))" />
+      <_PR_ExchangeWire Include="@(_PR)"
+                        Condition="($([System.String]::Copy('%(_PR.Identity)').Contains('\src\Exchanges\')) and ($([System.String]::Copy('%(_PR.Identity)').Contains('\Wire\')))) Or ($([System.String]::Copy('%(_PR.Identity)').Contains('/src/Exchanges/')) and ($([System.String]::Copy('%(_PR.Identity)').Contains('/Wire/'))))" />
+      <_PR_ExchangeRaw Include="@(_PR)"
+                       Condition="($([System.String]::Copy('%(_PR.Identity)').Contains('\src\Exchanges\')) and ($([System.String]::Copy('%(_PR.Identity)').Contains('\Raw\')))) Or ($([System.String]::Copy('%(_PR.Identity)').Contains('/src/Exchanges/')) and ($([System.String]::Copy('%(_PR.Identity)').Contains('/Raw/'))))" />
+      <_PR_ExchangeNormalized Include="@(_PR)"
+                              Condition="($([System.String]::Copy('%(_PR.Identity)').Contains('\src\Exchanges\')) and ($([System.String]::Copy('%(_PR.Identity)').Contains('\Normalized\')))) Or ($([System.String]::Copy('%(_PR.Identity)').Contains('/src/Exchanges/')) and ($([System.String]::Copy('%(_PR.Identity)').Contains('/Normalized/'))))" />
+      <_PR_ExchangeAdapter Include="@(_PR)"
+                           Condition="($([System.String]::Copy('%(_PR.Identity)').Contains('\src\Exchanges\')) and ($([System.String]::Copy('%(_PR.Identity)').Contains('\Adapter\')))) Or ($([System.String]::Copy('%(_PR.Identity)').Contains('/src/Exchanges/')) and ($([System.String]::Copy('%(_PR.Identity)').Contains('/Adapter/'))))" />
     </ItemGroup>
 
-    <!-- WIRE: must not reference Raw/Normalized/Adapter/Composition -->
-    <Error Condition="'$(_IsWire)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Raw)'!=''"
-           Text="[LayerRules] Wire project must not reference Raw: @(_PR_Raw->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsWire)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Normalized)'!=''"
-           Text="[LayerRules] Wire project must not reference Normalized: @(_PR_Normalized->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsWire)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Adapter)'!=''"
-           Text="[LayerRules] Wire project must not reference Adapter: @(_PR_Adapter->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsWire)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Composition)'!=''"
-           Text="[LayerRules] Wire project must not reference Composition: @(_PR_Composition->'%(Identity)', ', ')" />
+    <!-- TRANSPORT: must not reference Application/Composition/Contracts/Exchanges -->
+    <Error Condition="'$(_IsTransport)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_Application)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsCommon)'!='' or '@(_PR_ContractsFacade)'!='' or '@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='')"
+           Text="[LayerRules] Transport project must only reference Primitives." />
 
-    <!-- RAW: must not reference Normalized/Adapter/Composition -->
-    <Error Condition="'$(_IsRaw)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Normalized)'!=''"
-           Text="[LayerRules] Raw project must not reference Normalized: @(_PR_Normalized->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsRaw)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Adapter)'!=''"
-           Text="[LayerRules] Raw project must not reference Adapter: @(_PR_Adapter->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsRaw)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Composition)'!=''"
-           Text="[LayerRules] Raw project must not reference Composition: @(_PR_Composition->'%(Identity)', ', ')" />
+    <!-- PRIMITIVES: must not reference other categories -->
+    <Error Condition="'$(_IsPrimitives)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_Transport)'!='' or '@(_PR_Application)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsCommon)'!='' or '@(_PR_ContractsFacade)'!='' or '@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='')"
+           Text="[LayerRules] Primitives project must not reference other categories." />
 
-    <!-- NORMALIZED: must not reference Wire/Adapter/Composition -->
-    <Error Condition="'$(_IsNormalized)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Wire)'!=''"
-           Text="[LayerRules] Normalized project must not reference Wire: @(_PR_Wire->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsNormalized)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Adapter)'!=''"
-           Text="[LayerRules] Normalized project must not reference Adapter: @(_PR_Adapter->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsNormalized)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Composition)'!=''"
-           Text="[LayerRules] Normalized project must not reference Composition: @(_PR_Composition->'%(Identity)', ', ')" />
+    <!-- APPLICATION: must not reference Transport/Composition/Exchanges -->
+    <Error Condition="'$(_IsApplication)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_Transport)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='')"
+           Text="[LayerRules] Application project may reference only Contracts.Common, Contracts.Facade, and Primitives." />
 
-    <!-- ADAPTER: must not reference Wire/Raw/Composition -->
-    <Error Condition="'$(_IsAdapter)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Wire)'!=''"
-           Text="[LayerRules] Adapter project must not reference Wire: @(_PR_Wire->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsAdapter)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Raw)'!=''"
-           Text="[LayerRules] Adapter project must not reference Raw: @(_PR_Raw->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsAdapter)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Composition)'!=''"
-           Text="[LayerRules] Adapter project must not reference Composition: @(_PR_Composition->'%(Identity)', ', ')" />
+    <!-- CONTRACTS.COMMON: must not reference Application/Composition/Exchanges/Contracts.Facade -->
+    <Error Condition="'$(_IsContractsCommon)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_Application)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsFacade)'!='' or '@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='')"
+           Text="[LayerRules] Contracts.Common may reference only Primitives." />
 
-    <!-- COMPOSITION: must not reference Wire/Raw/Normalized -->
-    <Error Condition="'$(_IsComposition)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Wire)'!=''"
-           Text="[LayerRules] Composition project must not reference Wire: @(_PR_Wire->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsComposition)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Raw)'!=''"
-           Text="[LayerRules] Composition project must not reference Raw: @(_PR_Raw->'%(Identity)', ', ')" />
-    <Error Condition="'$(_IsComposition)'=='true' and '$(_IsTests)'!='true' and '@(_PR_Normalized)'!=''"
-           Text="[LayerRules] Composition project must not reference Normalized: @(_PR_Normalized->'%(Identity)', ', ')" />
+    <!-- CONTRACTS.FACADE: must not reference Application/Composition/Exchanges/Transport -->
+    <Error Condition="'$(_IsContractsFacade)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_Transport)'!='' or '@(_PR_Application)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='')"
+           Text="[LayerRules] Contracts.Facade may reference only Contracts.Common." />
+
+    <!-- EXCHANGE WIRE: must not reference Raw/Normalized/Adapter/Composition -->
+    <Error Condition="'$(_IsExchangeWire)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsCommon)'!='' or '@(_PR_ContractsFacade)'!='')"
+           Text="[LayerRules] Exchange Wire may reference only Transport and Primitives." />
+
+    <!-- EXCHANGE RAW: must not reference Normalized/Adapter/Composition/Transport -->
+    <Error Condition="'$(_IsExchangeRaw)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='' or '@(_PR_Composition)'!='' or '@(_PR_Transport)'!='')"
+           Text="[LayerRules] Exchange Raw may reference only Exchange Wire, Contracts.Common, and Primitives." />
+
+    <!-- EXCHANGE NORMALIZED: must not reference Wire/Adapter/Composition/Contracts.Facade -->
+    <Error Condition="'$(_IsExchangeNormalized)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeAdapter)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsFacade)'!='')"
+           Text="[LayerRules] Exchange Normalized may reference only Exchange Raw, Contracts.Common, Primitives, and Application." />
+
+    <!-- EXCHANGE ADAPTER: must not reference Wire/Raw/Composition/Contracts.Common -->
+    <Error Condition="'$(_IsExchangeAdapter)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsCommon)'!='')"
+           Text="[LayerRules] Exchange Adapter may reference only Exchange Normalized, Contracts.Facade, Primitives, Application, and Transport." />
+
+    <!-- COMPOSITION: must not reference Exchange Wire/Raw/Normalized -->
+    <Error Condition="'$(_IsComposition)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='')"
+           Text="[LayerRules] Composition must not reference Exchange Wire/Raw/Normalized." />
 
   </Target>
 
@@ -132,7 +143,10 @@
 
     <ItemGroup Condition="'$(_SrcRootExists)'=='true'">
       <_TopDirs Include="$([System.IO.Directory]::GetDirectories('$(_SrcRoot)'))" />
-      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Shared'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Transport'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Primitives'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Application'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Composition'))" />
       <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Exchanges'))" />
       <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Contracts'))" />
       <_ExtraTopDirs Include="@(_TopDirs)" />

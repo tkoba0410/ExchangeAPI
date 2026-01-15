@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Shared/Raw/ExchangeApi.Raw.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Raw/ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
   </ItemGroup>
 
 </Project>

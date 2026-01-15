@@ -1,5 +1,5 @@
 using System;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using Xunit;
 
 namespace ExchangeApi.Tests.Common.Tests;

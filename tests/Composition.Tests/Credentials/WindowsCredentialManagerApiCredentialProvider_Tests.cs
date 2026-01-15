@@ -1,6 +1,6 @@
 using System;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
-using ExchangeApi.Shared.Composition.Providers.Credentials;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Composition.Providers.Credentials;
 
 namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 

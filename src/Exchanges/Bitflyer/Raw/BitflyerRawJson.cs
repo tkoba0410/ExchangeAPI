@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 using System.Text.Json;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Transport.Protocol;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw;
 

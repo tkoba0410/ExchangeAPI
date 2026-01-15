@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;

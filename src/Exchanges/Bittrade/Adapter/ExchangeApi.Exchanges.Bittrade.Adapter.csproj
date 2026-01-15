@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <RootNamespace>ExchangeApi.Exchanges.Bittrade.Adapter</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Normalized\ExchangeApi.Exchanges.Bittrade.Normalized.csproj" />
+    <ProjectReference Include="..\..\..\Contracts\Facade\ExchangeApi.Contracts.Facade.csproj" />
+    <ProjectReference Include="..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
+    <ProjectReference Include="..\..\..\Application\ExchangeApi.Application.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
-using ExchangeApi.Contracts.Common.ValueCommon.ClosedSet;
-using ExchangeApi.Contracts.Common.ValueCommon.Lossless;
+using ExchangeApi.Primitives.ValueCommon.ClosedSet;
+using ExchangeApi.Primitives.ValueCommon.Lossless;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 

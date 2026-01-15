@@ -1,14 +1,19 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/Shared/Core/Core.csproj" />
-    <Project Path="src/Shared/Wire/ExchangeApi.Wire.csproj" />
-    <Project Path="src/Shared/Raw/ExchangeApi.Raw.csproj" />
-    <Project Path="src/Shared/Normalized/ExchangeApi.Normalized.csproj" />
-    <Project Path="src/Shared/Adapter/ExchangeApi.Adapter.csproj" />
-    <Project Path="src/Shared/Composition/Composition.csproj" />
-    <Project Path="src/Contracts/Common/DomainCommon/Shared.Common.csproj" />
-    <Project Path="src/Contracts/Shared.Contracts.csproj" />
-    <Project Path="src/Shared/Domain/Shared.Domain.csproj" />
+    <Project Path="src/Transport/ExchangeApi.Transport.csproj" />
+    <Project Path="src/Primitives/ExchangeApi.Primitives.csproj" />
+    <Project Path="src/Application/ExchangeApi.Application.csproj" />
+    <Project Path="src/Composition/ExchangeApi.Composition.csproj" />
+    <Project Path="src/Contracts/Common/ExchangeApi.Contracts.Common.csproj" />
+    <Project Path="src/Contracts/Facade/ExchangeApi.Contracts.Facade.csproj" />
+    <Project Path="src/Exchanges/Bitflyer/Wire/ExchangeApi.Exchanges.Bitflyer.Wire.csproj" />
+    <Project Path="src/Exchanges/Bitflyer/Raw/ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
+    <Project Path="src/Exchanges/Bitflyer/Normalized/ExchangeApi.Exchanges.Bitflyer.Normalized.csproj" />
+    <Project Path="src/Exchanges/Bitflyer/Adapter/ExchangeApi.Exchanges.Bitflyer.Adapter.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Wire/ExchangeApi.Exchanges.Bittrade.Wire.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Raw/ExchangeApi.Exchanges.Bittrade.Raw.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Normalized/ExchangeApi.Exchanges.Bittrade.Normalized.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Adapter/ExchangeApi.Exchanges.Bittrade.Adapter.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Core.Tests/Core.Tests.csproj" />

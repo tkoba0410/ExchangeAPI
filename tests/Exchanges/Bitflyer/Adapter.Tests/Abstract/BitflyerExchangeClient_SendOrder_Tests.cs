@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
-using ExchangeApi.Contracts.Errors;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
@@ -14,17 +14,17 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
-using ContractSide = ExchangeApi.Contracts.Common.DomainCommon.Enums.Side;
+using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using Xunit;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Operations;
-using ExchangeApi.Contracts.Common.CallCommon;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Dtos.Account;
-using ExchangeApi.Contracts.Dtos.Common;
-using ExchangeApi.Contracts.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos.Market;
-using ExchangeApi.Contracts.Dtos.Trading;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.Trading;
 using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models.Ticker;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -42,7 +42,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
         var call = await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
-        var result = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<OrderResult>.Ok>(call.Result).Response;
+        var result = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<OrderResult>.Ok>(call.Result).Response;
 
         Assert.Equal(OrderIdKind.AcceptanceId, result.Key.Kind);
         Assert.Equal("ACCEPT-123", result.Key.Value);
@@ -68,7 +68,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
         var call = await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
-        var err = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<OrderResult>.Err>(call.Result);
+        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<OrderResult>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Http, err.Error.Kind);
         Assert.Equal(BitflyerOperations.Trading.PlaceOrder, call.Meta.Component);
     }
@@ -87,7 +87,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
         var call = await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(10m));
-        var err = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<OrderResult>.Err>(call.Result);
+        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<OrderResult>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Http, err.Error.Kind);
     }
 
@@ -106,7 +106,7 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
         var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
         var call = await client.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
-        var err = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<OrderResult>.Err>(call.Result);
+        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<OrderResult>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Http, err.Error.Kind);
     }
 

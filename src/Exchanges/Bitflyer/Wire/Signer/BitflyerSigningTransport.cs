@@ -2,8 +2,8 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Shared.Transport.Protocol;
-using ExchangeApi.Shared.Transport.Http;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Http;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Signer;
 

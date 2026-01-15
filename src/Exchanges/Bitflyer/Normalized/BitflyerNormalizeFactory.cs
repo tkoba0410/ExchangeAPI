@@ -1,10 +1,10 @@
 using System;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
-using ExchangeApi.Shared.Wire;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized;
 

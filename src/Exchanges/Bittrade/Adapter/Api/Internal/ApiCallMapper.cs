@@ -1,8 +1,8 @@
 using System;
 using System.Net;
-using ExchangeApi.Shared.Adapter.ApiCallMapping;
-using ExchangeApi.Contracts.Errors;
-using ExchangeApi.Contracts.Common.CallCommon;
+using ExchangeApi.Application.Adapter.ApiCallMapping;
+using ExchangeApi.Contracts.Common.Errors;
+using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 

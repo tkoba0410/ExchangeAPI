@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Dtos.Account;
-using ExchangeApi.Contracts.Dtos.Common;
-using ExchangeApi.Contracts.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos.Market;
-using ExchangeApi.Contracts.Dtos.Trading;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
-using ExchangeApi.Contracts.Errors;
-using ContractOrderType = ExchangeApi.Contracts.Common.DomainCommon.Enums.OrderType;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.Trading;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Contracts.Common.Errors;
+using ContractOrderType = ExchangeApi.Primitives.DomainCommon.Enums.OrderType;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
@@ -210,15 +210,15 @@ internal static class BittradeTradingMapper
         return (parsedSide, orderType);
     }
 
-    private static ExchangeApi.Contracts.Common.DomainCommon.Enums.OrderState MapStatus(string state)
+    private static ExchangeApi.Primitives.DomainCommon.Enums.OrderState MapStatus(string state)
     {
         return ParseOrderState(state) switch
         {
-            BittradeOrderState.Submitted => ExchangeApi.Contracts.Common.DomainCommon.Enums.OrderState.Active,
-            BittradeOrderState.PartialFilled => ExchangeApi.Contracts.Common.DomainCommon.Enums.OrderState.Active,
-            BittradeOrderState.Filled => ExchangeApi.Contracts.Common.DomainCommon.Enums.OrderState.Completed,
-            BittradeOrderState.PartialCanceled => ExchangeApi.Contracts.Common.DomainCommon.Enums.OrderState.Canceled,
-            BittradeOrderState.Canceled => ExchangeApi.Contracts.Common.DomainCommon.Enums.OrderState.Canceled,
+            BittradeOrderState.Submitted => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Active,
+            BittradeOrderState.PartialFilled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Active,
+            BittradeOrderState.Filled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Completed,
+            BittradeOrderState.PartialCanceled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Canceled,
+            BittradeOrderState.Canceled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Canceled,
             _ => throw new ExchangeApiException($"Unsupported order state: {state}.", exchange: Exchange)
         };
     }

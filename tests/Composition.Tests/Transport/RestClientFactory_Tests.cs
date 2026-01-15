@@ -4,11 +4,11 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Shared.Transport.Observability;
-using ExchangeApi.Shared.Transport.Policy;
-using ExchangeApi.Shared.Transport.Protocol;
-using ExchangeApi.Shared.Transport.Http;
-using ExchangeApi.Shared.Composition.Bootstrap.Transport;
+using ExchangeApi.Transport.Observability;
+using ExchangeApi.Transport.Policy;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Http;
+using ExchangeApi.Composition.Bootstrap.Transport;
 
 namespace ExchangeApi.Tests.Composition.Tests.Transport;
 

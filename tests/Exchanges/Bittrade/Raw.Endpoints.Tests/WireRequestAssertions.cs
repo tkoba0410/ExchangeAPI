@@ -1,5 +1,5 @@
 using System.Linq;
-using ExchangeApi.Shared.Wire;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
 

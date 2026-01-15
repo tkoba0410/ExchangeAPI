@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 using BitflyerRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
-using ExchangeApi.Contracts.Common.CallCommon;
+using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Public;
 

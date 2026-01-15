@@ -1,6 +1,6 @@
 using System;
-using ExchangeApi.Contracts.Common.DomainCommon.Types;
-using ExchangeApi.Contracts.Errors;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Contracts.Common.Errors;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 

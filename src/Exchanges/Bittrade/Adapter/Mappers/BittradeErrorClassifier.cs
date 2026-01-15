@@ -1,5 +1,5 @@
 using System.Net;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
 /// <summary>

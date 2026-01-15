@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Shared.Wire;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 

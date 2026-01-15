@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Dtos.Account;
-using ExchangeApi.Contracts.Dtos.Common;
-using ExchangeApi.Contracts.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos.Market;
-using ExchangeApi.Contracts.Dtos.Trading;
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.Trading;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
@@ -55,7 +55,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
             // Act
             var call = await client.GetBalancesCallAsync();
-            var ok = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
+            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
             IReadOnlyList<Balance> result = ok.Response;
 
             // Assert
@@ -86,7 +86,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
             // Act
             var call = await client.GetBalancesCallAsync();
-            var ok = Assert.IsType<ExchangeApi.Contracts.Common.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
+            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
             IReadOnlyList<Balance> result = ok.Response;
 
             // Assert

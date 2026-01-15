@@ -1,9 +1,9 @@
 using System;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
-using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;

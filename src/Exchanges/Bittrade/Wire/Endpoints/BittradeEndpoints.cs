@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
-using ExchangeApi.Shared.Wire;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 

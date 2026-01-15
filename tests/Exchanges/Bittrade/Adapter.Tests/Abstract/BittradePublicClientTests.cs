@@ -3,13 +3,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Extensions;
+using ExchangeApi.Contracts.Facade.Extensions;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Shared.Transport.Http;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Transport.Http;
+using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
-using ExchangeApi.Contracts.Common.CallCommon;
+using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;

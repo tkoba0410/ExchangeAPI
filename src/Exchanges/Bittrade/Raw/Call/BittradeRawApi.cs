@@ -8,8 +8,8 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
-using ExchangeApi.Contracts.Common.CallCommon;
-using ExchangeApi.Shared.Wire;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Call;
 

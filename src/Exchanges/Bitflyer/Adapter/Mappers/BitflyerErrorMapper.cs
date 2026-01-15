@@ -1,6 +1,6 @@
-using ExchangeApi.Contracts.Common.DomainCommon.Enums;
-using ExchangeApi.Contracts.Errors;
-using ExchangeApi.Shared.Transport.Protocol;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Contracts.Common.Errors;
+using ExchangeApi.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 
 internal static class BitflyerErrorMapper

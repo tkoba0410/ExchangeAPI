@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
-using ExchangeApi.Contracts.Common.ValueCommon.Lossless;
+using ExchangeApi.Primitives.ValueCommon.Lossless;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 

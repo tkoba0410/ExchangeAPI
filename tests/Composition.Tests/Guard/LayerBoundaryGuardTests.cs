@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using ExchangeApi.Shared.Composition.Bootstrap.Factories;
-using ExchangeApi.Contracts.Interfaces;
+using ExchangeApi.Composition.Bootstrap.Factories;
+using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 

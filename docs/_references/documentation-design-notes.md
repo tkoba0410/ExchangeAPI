@@ -1,8 +1,10 @@
-> ⚠️ Legacy / 参考資料
-> この文書は旧版であり **正本ではない**。実装・判断の拘束力を持たない。
+> ✅ Reference / Frozen
+> この文書は「文書体系をどう設計したか」の **設計ノート**（背景・経緯）であり、正本ではない。
+> 実装・設計判断の拘束力を持たない。
 > 正本（Normative）は以下：
 > - docs/topspec.md
 > - docs/contracts.md
+> 運用と裁定は以下：
 > - docs/process.md
 > - docs/exceptions.md
 > - docs/endpoints.md
@@ -43,8 +45,8 @@
 ### 1.5.2 取引所固有・横断の扱い
 
 * 取引所固有要素と取引所横断要素は**どの層にも存在し得る**こと
-* 横断要素は Common / Core として集約されること
-* 取引所固有要素は取引所単位の名前空間に閉じること
+* 横断要素は **概念単位の最上位フォルダ**に集約されること（Transport / Primitives / Application / Composition）
+* 取引所固有要素は `src/Exchanges/<Exchange>/...` に閉じること
 
 ### 1.5.2.1 各層が持つ型（型カテゴリの整理）
 
@@ -105,21 +107,26 @@
 
 ```
 src/
-  Wire/
-  Raw/
-  Normalized/
+  Transport/
+  Primitives/
+  Application/
+  Composition/
   Contracts/
+    Common/
+    Facade/
+  Exchanges/
+    <Exchange>/
+      Wire/
+      Raw/
+      Normalized/
+      Adapter/
 ```
 
-#### 1.5.3.2 固有／横断の配置規則（各層に共通）
+#### 1.5.3.2 固有／横断の配置規則（全体に共通）
 
-各層配下では、取引所横断要素と取引所固有要素を次の規則で分離する。
-
-```
-src/<Layer>/
-  Common/        # cross-exchange
-  <Exchange>/    # exchange-specific (e.g. Bitflyer, Bittrade)
-```
+- 取引所固有コードは `src/Exchanges/<Exchange>/...` に閉じる
+- 横断基盤は `src/<Concept>/...`（Transport / Primitives / Application / Composition）へ配置する
+- `Shared` のような横断カテゴリは使用しない（現行 TopSpec に従う）
 
 ※ 例外（この規則に従えない配置）が発生した場合は、構造説明を増やすのではなく **Decisions に理由と差分を記録**する。
 
@@ -147,12 +154,11 @@ docs/
   index.md            # 入口・思想・ナビゲーション
   topspec.md          # Normative（全体憲法）
   contracts.md        # Normative（横断 Contract）
-  decisions.md        # 例外台帳
+  exceptions.md       # 例外台帳
   process.md          # 運用・編集規律
-  endpoints/
-    README.md         # Inventory 書式定義
-    bitflyer.md
-    bittrade.md
+  endpoints.md        # Inventory（横断の一覧）
+  inventory-bitflyer.md
+  inventory-bittrade.md
 ```
 
 ### 2.2 基本原則
@@ -161,6 +167,9 @@ docs/
 * 仕様の正本は **各取引所の公式 API 文書**である
 * **src 配下の物理構成は仕様の一部（正本）**として扱う
 * 説明文よりも **拘束（MUST/NG）・構造・テスト**を優先する
+
+> このノートは背景説明であり、新しい規範は追加しない。
+> 規範は必ず TopSpec / Contracts / Exceptions / Process にのみ追加する。
 
 ---
 

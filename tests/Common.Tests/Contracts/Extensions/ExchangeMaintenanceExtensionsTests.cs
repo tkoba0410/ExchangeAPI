@@ -6,7 +6,7 @@ using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Application.Extensions;
+using ExchangeApi.Composition.Extensions;
 using Xunit;
 
 namespace ExchangeApi.Tests.Common.Tests.Contracts.Extensions;

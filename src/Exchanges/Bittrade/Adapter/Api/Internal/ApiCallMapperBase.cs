@@ -3,7 +3,7 @@ using System.Net;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Application.Adapter.ApiCallMapping;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 
 internal static class ApiCallMapperBase
 {

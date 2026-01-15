@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Application.Services;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;

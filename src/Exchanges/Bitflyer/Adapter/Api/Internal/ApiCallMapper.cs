@@ -1,6 +1,5 @@
 using System;
 using System.Net;
-using ExchangeApi.Application.Adapter.ApiCallMapping;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Primitives.CallCommon;
 

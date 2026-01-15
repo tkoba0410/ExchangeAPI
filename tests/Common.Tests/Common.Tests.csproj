@@ -25,6 +25,7 @@
     <ProjectReference Include="../../src/Contracts/Common/ExchangeApi.Contracts.Common.csproj" />
     <ProjectReference Include="../../src/Application/ExchangeApi.Application.csproj" />
     <ProjectReference Include="../../src/Transport/ExchangeApi.Transport.csproj" />
+    <ProjectReference Include="../../src/Composition/ExchangeApi.Composition.csproj" />
   </ItemGroup>
 
 </Project>

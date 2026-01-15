@@ -13,7 +13,6 @@
     <ProjectReference Include="..\Normalized\ExchangeApi.Exchanges.Bitflyer.Normalized.csproj" />
     <ProjectReference Include="..\..\..\Contracts\Facade\ExchangeApi.Contracts.Facade.csproj" />
     <ProjectReference Include="..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
-    <ProjectReference Include="..\..\..\Application\ExchangeApi.Application.csproj" />
   </ItemGroup>
 
 </Project>

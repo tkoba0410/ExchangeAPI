@@ -8,7 +8,8 @@ using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Types;
-namespace ExchangeApi.Application.Extensions;
+
+namespace ExchangeApi.Composition.Extensions;
 
 /// <summary>OrderBook に対する共通ユーティリティ（両サイドを参照）。</summary>
 public static class OrderBookExtensions

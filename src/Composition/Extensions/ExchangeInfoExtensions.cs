@@ -7,7 +7,8 @@ using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-namespace ExchangeApi.Application.Extensions;
+
+namespace ExchangeApi.Composition.Extensions;
 
 /// <summary>
 /// ExchangeInfo の検索ヘルパ。

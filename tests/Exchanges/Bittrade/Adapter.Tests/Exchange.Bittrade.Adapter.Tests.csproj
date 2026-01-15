@@ -24,7 +24,6 @@
     <ProjectReference Include="../../../../src/Exchanges/Bittrade/Adapter/ExchangeApi.Exchanges.Bittrade.Adapter.csproj" />
     <ProjectReference Include="../../../../src/Contracts/Common/ExchangeApi.Contracts.Common.csproj" />
     <ProjectReference Include="../../../../src/Contracts/Facade/ExchangeApi.Contracts.Facade.csproj" />
-    <ProjectReference Include="../../../../src/Application/ExchangeApi.Application.csproj" />
     <ProjectReference Include="../../../../src/Primitives/ExchangeApi.Primitives.csproj" />
   </ItemGroup>
 

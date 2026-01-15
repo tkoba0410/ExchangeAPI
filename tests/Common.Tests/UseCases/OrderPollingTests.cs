@@ -2,18 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
+using ExchangeApi.Application.Errors;
+using ExchangeApi.Application.Interfaces;
+using ExchangeApi.Application.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Application.UseCases;
-using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 
@@ -24,7 +18,7 @@ public sealed class OrderPollingTests
     [Fact]
     public async Task WaitForOrderAsync_ReturnsLastStatus_WhenMaxAttemptsReached()
     {
-        var api = new FakeTradingApi(_ => new OrderStatus(
+        var api = new FakeTradingApi(_ => new OrderStatusSnapshot(
             ProductCode: "BTC_JPY",
             Key: new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
             Status: OrderState.Active,
@@ -41,7 +35,7 @@ public sealed class OrderPollingTests
             options,
             CancellationToken.None);
 
-        var ok = Assert.IsType<CallResult<OrderStatus>.Ok>(result.Result);
+        var ok = Assert.IsType<CallResult<OrderStatusSnapshot>.Ok>(result.Result);
         Assert.Equal(OrderState.Active, ok.Response.Status);
         Assert.Equal(3, api.CallCount);
     }
@@ -49,7 +43,7 @@ public sealed class OrderPollingTests
     [Fact]
     public async Task WaitForOrderAsync_CancelsDuringDelay()
     {
-        var api = new FakeTradingApi(_ => new OrderStatus(
+        var api = new FakeTradingApi(_ => new OrderStatusSnapshot(
             ProductCode: "BTC_JPY",
             Key: new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
             Status: OrderState.Active,
@@ -83,8 +77,8 @@ public sealed class OrderPollingTests
             options,
             CancellationToken.None);
 
-        var err = Assert.IsType<CallResult<OrderStatus>.Err>(result.Result);
-        Assert.IsType<ExchangeOrderNotFoundException>(err.Error.Exception);
+        var err = Assert.IsType<CallResult<OrderStatusSnapshot>.Err>(result.Result);
+        Assert.IsType<OrderNotFoundException>(err.Error.Exception);
         Assert.Equal(3, api.CallCount);
     }
 
@@ -104,83 +98,61 @@ public sealed class OrderPollingTests
             options,
             CancellationToken.None);
 
-        var err = Assert.IsType<CallResult<OrderStatus>.Err>(result.Result);
-        Assert.IsType<ExchangeOrderNotFoundException>(err.Error.Exception);
+        var err = Assert.IsType<CallResult<OrderStatusSnapshot>.Err>(result.Result);
+        Assert.IsType<OrderNotFoundException>(err.Error.Exception);
         Assert.Equal(1, api.CallCount);
     }
 
-    private sealed class FakeTradingApi : ITradingApi
+    private sealed class FakeTradingApi : IOrderQueryApi
     {
-        private readonly Func<OrderKey, OrderStatus> _next;
+        private readonly Func<OrderKey, OrderStatusSnapshot> _next;
 
-        public FakeTradingApi(Func<OrderKey, OrderStatus> next)
+        public FakeTradingApi(Func<OrderKey, OrderStatusSnapshot> next)
         {
             _next = next;
         }
 
         public int CallCount { get; private set; }
 
-        public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
-            Symbol symbol,
-            OrderKey orderKey,
+        public Task<Call<GetOrderQuery, OrderStatusSnapshot>> GetOrderCallAsync(
+            GetOrderQuery request,
             CancellationToken cancellationToken = default)
         {
             CallCount++;
-            var request = new GetOrderRequest(symbol, orderKey);
             var now = DateTimeOffset.UtcNow;
             var meta = new CallMeta("Contracts", "Test.GetOrder", null, null);
-            return Task.FromResult(new Call<GetOrderRequest, OrderStatus>(
+            return Task.FromResult(new Call<GetOrderQuery, OrderStatusSnapshot>(
                 CallId.New(),
                 now,
                 TimeSpan.Zero,
                 request,
-                new CallResult<OrderStatus>.Ok(_next(orderKey)),
+                new CallResult<OrderStatusSnapshot>.Ok(_next(request.OrderKey)),
                 meta));
         }
-
-        public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
     }
 
-    private sealed class NotFoundTradingApi : ITradingApi
+    private sealed class NotFoundTradingApi : IOrderQueryApi
     {
         public int CallCount { get; private set; }
 
-        public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
-            Symbol symbol,
-            OrderKey orderKey,
+        public Task<Call<GetOrderQuery, OrderStatusSnapshot>> GetOrderCallAsync(
+            GetOrderQuery request,
             CancellationToken cancellationToken = default)
         {
             CallCount++;
-            var request = new GetOrderRequest(symbol, orderKey);
             var now = DateTimeOffset.UtcNow;
             var meta = new CallMeta("Contracts", "Test.GetOrder", null, null);
             var error = new CallError(
                 CallErrorKind.Semantic,
                 "Order not found.",
-                new ExchangeOrderNotFoundException(ExchangeCode.Sandbox, "GetOrder", symbol.ToString(), orderKey.ToString()));
-            return Task.FromResult(new Call<GetOrderRequest, OrderStatus>(
+                new OrderNotFoundException(ExchangeCode.Sandbox, "GetOrder", request.Symbol, request.OrderKey));
+            return Task.FromResult(new Call<GetOrderQuery, OrderStatusSnapshot>(
                 CallId.New(),
                 now,
                 TimeSpan.Zero,
                 request,
-                new CallResult<OrderStatus>.Err(error),
+                new CallResult<OrderStatusSnapshot>.Err(error),
                 meta));
         }
-
-        public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(Symbol symbol, Side side, Size size, Price price, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(Symbol symbol, Side side, Size size, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(Symbol symbol, OrderKey orderKey, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-        public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(Symbol symbol, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
     }
 }

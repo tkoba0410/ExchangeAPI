@@ -1,17 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Application.Errors;
+using ExchangeApi.Application.Interfaces;
+using ExchangeApi.Application.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
-using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Contracts.Common.Errors;
-using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Application.UseCases;
@@ -21,8 +15,8 @@ namespace ExchangeApi.Application.UseCases;
 /// </summary>
 public static class OrderPolling
 {
-    public static async Task<Call<GetOrderRequest, OrderStatus>> WaitForOrderAsync(
-        ITradingApi api,
+    public static async Task<Call<GetOrderQuery, OrderStatusSnapshot>> WaitForOrderAsync(
+        IOrderQueryApi api,
         Symbol symbol,
         OrderKey orderKey,
         PollingOptions? options = null,
@@ -45,16 +39,17 @@ public static class OrderPolling
             throw new ArgumentOutOfRangeException(nameof(options), "Interval must be non-negative.");
         }
 
-        Call<GetOrderRequest, OrderStatus>? latest = null;
+        Call<GetOrderQuery, OrderStatusSnapshot>? latest = null;
+        var request = new GetOrderQuery(symbol, orderKey);
 
         for (var attempt = 0; attempt < resolvedOptions.MaxAttempts; attempt++)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            latest = await api.GetOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
-            if (latest.Result is CallResult<OrderStatus>.Err err)
+            latest = await api.GetOrderCallAsync(request, cancellationToken).ConfigureAwait(false);
+            if (latest.Result is CallResult<OrderStatusSnapshot>.Err err)
             {
-                if (err.Error.Exception is ExchangeOrderNotFoundException &&
+                if (err.Error.Exception is OrderNotFoundException &&
                     resolvedOptions.NotFoundPolicy == NotFoundPolicy.Continue)
                 {
                     if (attempt < resolvedOptions.MaxAttempts - 1 && resolvedOptions.Interval > TimeSpan.Zero)
@@ -68,7 +63,7 @@ public static class OrderPolling
                 return latest;
             }
 
-            if (latest.Result is CallResult<OrderStatus>.Ok ok &&
+            if (latest.Result is CallResult<OrderStatusSnapshot>.Ok ok &&
                 IsTerminal(ok.Response.Status))
             {
                 return latest;

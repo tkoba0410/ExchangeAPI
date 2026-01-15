@@ -9,7 +9,6 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Application.Adapter.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Observability;

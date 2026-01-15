@@ -14,7 +14,7 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Contracts.Common.Errors;
-using ExchangeApi.Application.Adapter.NotSupported;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;

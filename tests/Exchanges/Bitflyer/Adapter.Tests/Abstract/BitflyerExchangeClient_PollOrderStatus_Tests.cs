@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Application.Interfaces;
+using ExchangeApi.Application.Trading;
+using ExchangeApi.Composition.Adapters.Application;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
@@ -20,12 +23,6 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Application.UseCases;
 using ExecutionResponse = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models.ExecutionPrivateResponse;
 using Xunit;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models.Ticker;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -68,13 +65,14 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
         var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
         var client = CreateClient(publicApi, sequenceApi, tradingApi);
 
+        IOrderQueryApi orderQueryApi = new TradingApiOrderQueryAdapter(client);
         var statusCall = await OrderPolling.WaitForOrderAsync(
-            api: client,
+            api: orderQueryApi,
             symbol: new Symbol("BTC/JPY"),
             orderKey: new OrderKey(OrderIdKind.AcceptanceId, acceptanceId),
             options: new PollingOptions(TimeSpan.FromMilliseconds(1), 5));
 
-        var status = Assert.IsType<CallResult<OrderStatus>.Ok>(statusCall.Result).Response;
+        var status = Assert.IsType<CallResult<OrderStatusSnapshot>.Ok>(statusCall.Result).Response;
         Assert.Equal(OrderState.Completed, status.Status);
         Assert.Equal(0m, status.OutstandingSize.Value);
         Assert.Equal(0.01m, status.ExecutedSize.Value);

@@ -8,7 +8,7 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Application.Services;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;

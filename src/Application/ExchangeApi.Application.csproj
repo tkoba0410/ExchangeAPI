@@ -11,8 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Primitives\ExchangeApi.Primitives.csproj" />
-    <ProjectReference Include="..\Contracts\Common\ExchangeApi.Contracts.Common.csproj" />
-    <ProjectReference Include="..\Contracts\Facade\ExchangeApi.Contracts.Facade.csproj" />
   </ItemGroup>
 
 </Project>

@@ -14,13 +14,13 @@
     Allowed (minimal, conservative):
       Transport     -> Primitives
       Primitives    -> (no constraints)
-      Application   -> Contracts.Common, Primitives
+      Application   -> Primitives
       Composition   -> Contracts.Facade, Application, Transport, Primitives, Exchange Adapter
       Contracts.Facade -> Contracts.Common
       Contracts.Common -> Primitives
       Exchange Wire -> Transport, Primitives
       Exchange Raw  -> Exchange Wire, Contracts.Common, Primitives
-      Exchange Normalized -> Exchange Raw, Contracts.Common, Primitives, Application
+      Exchange Normalized -> Exchange Raw, Contracts.Common, Contracts.Facade, Primitives, Application
       Exchange Adapter -> Exchange Normalized, Contracts.Facade, Primitives, Application, Transport
 
     Notes:
@@ -97,9 +97,9 @@
     <Error Condition="'$(_IsPrimitives)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_Transport)'!='' or '@(_PR_Application)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsCommon)'!='' or '@(_PR_ContractsFacade)'!='' or '@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='')"
            Text="[LayerRules] Primitives project must not reference other categories." />
 
-    <!-- APPLICATION: must not reference Transport/Composition/Exchanges -->
-    <Error Condition="'$(_IsApplication)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_Transport)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='')"
-           Text="[LayerRules] Application project may reference only Contracts.Common, Contracts.Facade, and Primitives." />
+    <!-- APPLICATION: must not reference Transport/Composition/Contracts/Exchanges -->
+    <Error Condition="'$(_IsApplication)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_Transport)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsCommon)'!='' or '@(_PR_ContractsFacade)'!='' or '@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='')"
+           Text="[LayerRules] Application project may reference only Primitives." />
 
     <!-- CONTRACTS.COMMON: must not reference Application/Composition/Exchanges/Contracts.Facade -->
     <Error Condition="'$(_IsContractsCommon)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_Application)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsFacade)'!='' or '@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='')"
@@ -117,9 +117,9 @@
     <Error Condition="'$(_IsExchangeRaw)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_ExchangeNormalized)'!='' or '@(_PR_ExchangeAdapter)'!='' or '@(_PR_Composition)'!='' or '@(_PR_Transport)'!='')"
            Text="[LayerRules] Exchange Raw may reference only Exchange Wire, Contracts.Common, and Primitives." />
 
-    <!-- EXCHANGE NORMALIZED: must not reference Wire/Adapter/Composition/Contracts.Facade -->
-    <Error Condition="'$(_IsExchangeNormalized)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeAdapter)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsFacade)'!='')"
-           Text="[LayerRules] Exchange Normalized may reference only Exchange Raw, Contracts.Common, Primitives, and Application." />
+    <!-- EXCHANGE NORMALIZED: must not reference Wire/Adapter/Composition -->
+    <Error Condition="'$(_IsExchangeNormalized)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeAdapter)'!='' or '@(_PR_Composition)'!='')"
+           Text="[LayerRules] Exchange Normalized may reference only Exchange Raw, Contracts.Common, Contracts.Facade, Primitives, and Application." />
 
     <!-- EXCHANGE ADAPTER: must not reference Wire/Raw/Composition/Contracts.Common -->
     <Error Condition="'$(_IsExchangeAdapter)'=='true' and '$(_IsTests)'!='true' and ('@(_PR_ExchangeWire)'!='' or '@(_PR_ExchangeRaw)'!='' or '@(_PR_Composition)'!='' or '@(_PR_ContractsCommon)'!='')"

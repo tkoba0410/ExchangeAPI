@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -12,8 +10,10 @@ using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Application.Adapter.NotSupported;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 
 internal sealed class NotSupportedTradingApi : ITradingApi
 {

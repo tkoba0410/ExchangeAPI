@@ -116,6 +116,10 @@ Decisions に記録できるのは、次のいずれかのみ。
 - [ ] Raw が lossless であり、意味確定（単位換算・時刻統一・解釈・デフォルト補完）をしていない
 - [ ] Raw DTO / RawJson が公開面（Contracts）へ漏れていない
 
+#### A2. 非層カテゴリ（TopSpec）
+- [ ] `Application` は横断ユースケースの置き場であり、Contracts に振る舞いを持ち込んでいない
+- [ ] `Composition` は組み立ての終端であり、実装都合が Contracts/層へ逆流していない
+
 #### B. 契約（Contracts）
 - [ ] 公開 API が Call-only（Response直返し禁止）
 - [ ] Contracts に取引所名・取引所固有要素が混入していない

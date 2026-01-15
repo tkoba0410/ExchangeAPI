@@ -34,6 +34,8 @@
 
 ```
 Wire → Raw → Normalized → Contracts
+
+※ `Application` / `Composition` は層ではない（後述）。層モデルの外側に置く。
 ```
 
 ### 3.2 層を跨ぐ呼び出しの禁止
@@ -43,6 +45,11 @@ Wire → Raw → Normalized → Contracts
 ### 3.3 Adapter の位置づけ
 - Adapter は「層」ではなく、**Normalized（取引所内の意味確定）→ Contracts（横断契約）への翻訳境界**である。
 - Adapter は Contracts を実装・返却するが、Contracts の意味論を変更してはならない（MUST NOT）。
+
+### 3.4 Application / Composition の位置づけ
+- `Application` は取引所横断の **ユースケース（振る舞い）** を置く。層ではない。
+- `Composition` は DI / Factory / Provider 等の **組み立て（配線）** を置く。層ではない。
+- `Contracts` は Shape/Semantics のみであり、Application/Composition を含めてはならない（MUST NOT）。
 
 ---
 
@@ -120,6 +127,13 @@ Wire → Raw → Normalized → Contracts
 - 取引所固有コードは常に `src/Exchanges/<Exchange>/...` に閉じる（MUST）。
 - Shared という物理カテゴリは使用してはならない（MUST NOT）。
 
+補足（カテゴリ固定）：
+- `Transport`：通信基盤（HTTP/JSON/Retry/署名/共通Wire入出力の枠など）
+- `Primitives`：横断の基礎型・パーサ・小さな純粋関数（ユースケース禁止）
+- `Application`：横断ユースケース（例：MarketResolver / Polling 等）
+- `Composition`：組み立て（Factory/CredentialProvider/JsonExchangeInfoApi 等）
+- `Contracts`：公開契約（Shape/Semantics）※振る舞い禁止
+
 ---
 
 ## 8. 物理構成（src）
@@ -134,6 +148,8 @@ Wire → Raw → Normalized → Contracts
 src/
   Transport/
   Primitives/
+  Application/
+  Composition/
   Contracts/
     Common/
     Facade/
@@ -164,6 +180,8 @@ src/
 例:
 - src/Transport/... → ExchangeApi.Transport...
 - src/Primitives/... → ExchangeApi.Primitives...
+- src/Application/... → ExchangeApi.Application...
+- src/Composition/... → ExchangeApi.Composition...
 - src/Contracts/Common/... → ExchangeApi.Contracts.Common...
 - src/Contracts/Facade/... → ExchangeApi.Contracts.Facade...
 - src/Exchanges/Bitflyer/Raw/... → ExchangeApi.Exchanges.Bitflyer.Raw...
@@ -175,6 +193,20 @@ src/
 Transport（HTTP/JSON/Retry 等の横断的通信基盤）は層ではなく、横断的通信基盤である。  
 Transport は `src/Transport/` に配置する。  
 Wire は Transport を参照するが内包してはならない（MUST）。
+
+### 9.1 Transport に置くもの（例）
+- 共通の Wire 入出力枠：`IWireTransport` / `WireTransport` / `WireCallSpec` / `WireResponse`
+- HTTP クライアント、署名、リトライ、JSON 低レベル処理（意味解釈をしない）
+
+## 9.2 Application
+Application は `src/Application/` に配置する。  
+取引所横断のユースケース（例：MarketResolver / OrderPolling 等）を置く。  
+Application は Contracts の Shape/Semantics を利用できるが、Contracts に振る舞いを持ち込んではならない（MUST NOT）。
+
+## 9.3 Composition
+Composition は `src/Composition/` に配置する。  
+DI/Factory/CredentialProvider/JsonExchangeInfoApi 等の「組み立て（配線）」を置く。  
+Composition は実行側の都合を集約する“終端”であり、他のカテゴリへ実装都合を逆流させてはならない（MUST NOT）。
 
 ---
 

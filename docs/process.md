@@ -117,7 +117,8 @@ Decisions に記録できるのは、次のいずれかのみ。
 - [ ] Raw DTO / RawJson が公開面（Contracts）へ漏れていない
 
 #### A2. 非層カテゴリ（TopSpec）
-- [ ] `Application` は横断ユースケースの置き場であり、Contracts に振る舞いを持ち込んでいない
+- [ ] `Application` は横断ユースケースの置き場であり、`Contracts.*` を参照していない
+- [ ] Facade の Request/Interface を `Application` に直接流していない（Composition で変換している）
 - [ ] `Composition` は組み立ての終端であり、実装都合が Contracts/層へ逆流していない
 
 #### B. 契約（Contracts）

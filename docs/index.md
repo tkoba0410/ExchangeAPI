@@ -17,6 +17,7 @@
 * **Contracts**（横断契約の規範）：[`contracts.md`](./contracts.md)
 * 物理構成方針（Shared 廃止後の正本）: TopSpec（`docs/topspec.md`）
 * Application / Composition の配置規範も TopSpec に含まれる
+* Application は Contracts を参照しない（詳細は TopSpec）
 
 ---
 

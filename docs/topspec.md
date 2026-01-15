@@ -50,6 +50,8 @@ Wire → Raw → Normalized → Contracts
 - `Application` は取引所横断の **ユースケース（振る舞い）** を置く。層ではない。
 - `Composition` は DI / Factory / Provider 等の **組み立て（配線）** を置く。層ではない。
 - `Contracts` は Shape/Semantics のみであり、Application/Composition を含めてはならない（MUST NOT）。
+- `Application` は `Contracts.*` を参照してはならない（MUST NOT）。
+  - 公開 I/F（Facade）の型は `Composition` が受け取り、`Application` 独自の入出力型へ変換する。
 
 ---
 
@@ -201,12 +203,18 @@ Wire は Transport を参照するが内包してはならない（MUST）。
 ## 9.2 Application
 Application は `src/Application/` に配置する。  
 取引所横断のユースケース（例：MarketResolver / OrderPolling 等）を置く。  
-Application は Contracts の Shape/Semantics を利用できるが、Contracts に振る舞いを持ち込んではならない（MUST NOT）。
+Application は `Contracts.*` を参照してはならない（MUST NOT）。
+Application の入出力は `Application.*` 配下の型（Command/Query/Result 等）として定義する。
+
+## 9.2.1 公開契約との接続（変換責務）
+`Composition` は Facade（公開 I/F）と `Application` の間の変換を担う（MUST）。
+Facade の Request/Interface を `Application` に直接流してはならない（MUST NOT）。
 
 ## 9.3 Composition
 Composition は `src/Composition/` に配置する。  
 DI/Factory/CredentialProvider/JsonExchangeInfoApi 等の「組み立て（配線）」を置く。  
 Composition は実行側の都合を集約する“終端”であり、他のカテゴリへ実装都合を逆流させてはならない（MUST NOT）。
+Composition は Facade 型 ⇄ Application 型の変換を内包し、契約都合を Application へ逆流させてはならない（MUST NOT）。
 
 ---
 

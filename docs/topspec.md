@@ -74,6 +74,14 @@ Wire → Raw → Normalized → Contracts
 - 単位換算・時刻統一・売買方向/注文種別の解釈などの意味確定。
 - 意味のあるデフォルト補完。
 
+### RawJson / ClosedSet に関する判断について
+
+RawJson の保持有無や ClosedSet の拡張可否といった判断は、
+**TopSpec や Contracts では行わない**。
+
+これらは取引所ごとの差異として **inventory 文書にのみ記録・判断される**。
+共通契約やレイヤ責務へ逆流させてはならない。
+
 ### 4.3 Normalized
 **責務（MUST）**
 - 取引所内で意味を確定し、表現差分を統一する（正規化）。

@@ -29,6 +29,8 @@
 |---------|----------|--------|------|--------------------|
 | bitFlyer | Public | GET | /v1/markets | https://lightning.bitflyer.com/docs |
 | bitFlyer | Public | GET | /v1/board | https://lightning.bitflyer.com/docs |
+| bittrade | Public | GET | /v1/common/symbols | https://api-cloud.bittrade.co.jp/ |
+| bittrade | Public | GET | /market/depth | https://api-cloud.bittrade.co.jp/ |
 
 ---
 
@@ -37,6 +39,7 @@
 | Exchange | Category | Method | Path | Official Reference |
 |---------|----------|--------|------|--------------------|
 | bitFlyer | Private | GET | /v1/me/getbalance | https://lightning.bitflyer.com/docs |
+| bittrade | Private | GET | /v1/account/accounts/{account-id}/balance | https://api-cloud.bittrade.co.jp/ |
 
 ---
 

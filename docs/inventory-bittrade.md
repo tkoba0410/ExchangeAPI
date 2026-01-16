@@ -20,8 +20,8 @@ Contracts や TopSpec における必須要件を定義するものではない�
 
 | Endpoint | Implemented | Notes |
 |----------|-------------|-------|
-| GET /api/v1/symbols | Yes |  |
-| GET /api/v1/depth  | Yes |  |
+| GET /v1/common/symbols | Yes |  |
+| GET /market/depth | Yes |  |
 
 ---
 
@@ -29,7 +29,7 @@ Contracts や TopSpec における必須要件を定義するものではない�
 
 | Endpoint | Implemented | Notes |
 |----------|-------------|-------|
-| GET /api/v1/user/assets | Yes |  |
+| GET /v1/account/accounts/{account-id}/balance | Yes |  |
 
 ---
 

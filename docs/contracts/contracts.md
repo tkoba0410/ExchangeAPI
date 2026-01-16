@@ -44,15 +44,6 @@
 - エラー表現は **分類レベル**（例：通信失敗 / 認証失敗 / 業務的失敗）までに留め、詳細コード体系を契約に含めない（MUST）。
 - リトライ可否・HTTP ステータス・レート制限などの運用情報は、必要に応じて Call のメタで表現する（MUST）。
 
-### 5.1 NotSupported（未対応機能）の最小表現
-
-- 未対応機能は例外（throw）ではなく Call の失敗として表現する（MUST）。
-- `CallError.Kind` は `Semantic` とする（MUST）。
-- `CallError.Message` は先頭に `NotSupported:` を付与する（MUST）。
-- リトライ可否は `CallMeta.Tags` に `Retryable=false` として表現する（MUST）。
-
----
-
 ## 6. 型の所有権
 
 - Abstract DTO（公開契約の型）は **Contracts 層が定義元（オーナー）**である（MUST）。
@@ -72,15 +63,13 @@
 ### 8.1 DTO 命名
 
 - 型名は **名詞 + Context** を基本とする（MUST）。
-  例：`OrderSnapshot`, `ExecutionHistoryItem`
-  （※例は規範ではなく参考）
 - 意味の異なる DTO を suffix だけで区別してはならない（MUST NOT）。
 - Raw / Normalized / Adapter の区別を型名 suffix で表現してはならない（MUST NOT）。区別は namespace / フォルダで行う（MUST）。
 
 ### 8.2 プロパティ命名
 
 - 公開プロパティは PascalCase とする（MUST）。
-- 略語は一般的なもののみ使用する（例：Id, Url 等）（MUST）。
+- 略語は一般的なもののみ使用する（MUST）。
 - 取引所固有の語彙をそのまま転記してはならない（MUST NOT）。
 
 ---

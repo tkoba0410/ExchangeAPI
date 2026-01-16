@@ -45,6 +45,12 @@
 * 失敗は `Call` の失敗として表現され、例外は制御フローとして用いてはならない。
 * `NotSupported` は **capability 不足を示す場合にのみ**使用される。
 * `NotSupported` を通常制御フロー（取引所判別・分岐）として利用することは禁止される。
+* 未対応機能は NoOp 実装として `Call` の失敗を返し、`NotSupported` として表現される。
+* `NotSupported` の最小表現は次に固定する。
+  * `CallResult` は Err である
+  * `CallError.Kind` は `Semantic` である
+  * `CallError.Message` は先頭に `NotSupported:` を付与する
+  * `CallMeta.Tags` に `Retryable=false` を含める
 
 ---
 

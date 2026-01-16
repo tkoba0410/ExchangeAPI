@@ -67,20 +67,11 @@ internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
 
         if (string.IsNullOrWhiteSpace(_accountId))
         {
-            var meta = new CallMeta(
-                Layer: "Contracts",
-                Component: BittradeOperations.History.GetExecutions,
-                Tags: null,
-                Children: null);
-            return new Call<MarketLimitCursorRequest, Page<ExecutionItem>>(
-                Id: CallId.New(),
-                StartedAt: startedAt,
-                Duration: TimeSpan.Zero,
-                Request: request,
-                Result: new CallResult<Page<ExecutionItem>>.Err(new CallError(
-                    CallErrorKind.Semantic,
-                    "Bittrade accountId is required to access executions.")),
-                Meta: meta);
+            return NotSupportedCall.Create<MarketLimitCursorRequest, Page<ExecutionItem>>(
+                "Contracts",
+                BittradeOperations.History.GetExecutions,
+                request,
+                "AccountIdRequired");
         }
 
         try

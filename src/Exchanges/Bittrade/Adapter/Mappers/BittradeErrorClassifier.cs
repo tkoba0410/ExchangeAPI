@@ -5,8 +5,14 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 /// <summary>
 /// Bittrade エラーをカテゴリに正規化する。
 /// </summary>
-public sealed class BittradeErrorClassifier : IExchangeErrorClassifier
+internal sealed class BittradeErrorClassifier : IExchangeErrorClassifier
 {
+    public static readonly BittradeErrorClassifier Instance = new();
+
+    private BittradeErrorClassifier()
+    {
+    }
+
     public TransportErrorCategory? Classify(HttpStatusCode? statusCode, string? exchangeErrorCode)
     {
         if (statusCode is null) return TransportErrorCategory.Unknown;

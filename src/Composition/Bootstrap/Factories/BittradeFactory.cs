@@ -2,7 +2,6 @@ using System;
 using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -45,7 +44,7 @@ public static class BittradeFactory
             policy: policy,
             logger: settings.Logger,
             observer: settings.Observer,
-            errorClassifier: settings.ErrorClassifier ?? new BittradeErrorClassifier(),
+            errorClassifier: settings.ErrorClassifier,
             httpClient: settings.HttpClient);
     }
 

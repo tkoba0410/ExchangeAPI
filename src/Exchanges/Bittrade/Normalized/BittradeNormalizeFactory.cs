@@ -3,6 +3,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Call;
+using ExchangeApi.Exchanges.Bittrade.Normalized.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
@@ -25,8 +26,8 @@ internal static class BittradeNormalizeFactory
 
         var marketData = new BittradeNormalizedMarketDataApi(raw.MarketData);
         var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
-        var account = normalizedAccountId is null
-            ? null
+        IBittradeNormalizedAccountApi account = normalizedAccountId is null
+            ? new BittradeNotSupportedNormalizedAccountApi(string.Empty)
             : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
 
         return new BittradeNormalizeBundle(

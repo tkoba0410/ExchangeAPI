@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Factory;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Protocol;
@@ -103,8 +102,7 @@ public class PublicApiLiveTests
         var restClient = new RestClient(
             baseUri,
             transport,
-            observer: _observer,
-            errorClassifier: new BittradeErrorClassifier());
+            observer: _observer);
         return new BittradePublicClient(restClient);
     }
 }

@@ -5,17 +5,12 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Contracts.Common.Dtos;
+using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Contracts.Common.Errors;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
@@ -66,9 +61,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
 
         _marketApi = new BittradeMarketDataApi(bundle.NormalizedMarketData, bundle.Markets);
         _tradingApi = new BittradeTradingApi(bundle.Trading);
-        _accountApi = bundle.NormalizedAccount is null
-            ? new NotSupportedAccountApi(ExchangeCode.Bittrade)
-            : new BittradeAccountApi(bundle.NormalizedAccount);
+        _accountApi = new BittradeAccountApi(bundle.NormalizedAccount);
         _historyApi = new BittradeSpotHistoryApi(bundle.Trading, bundle.AccountId);
         _restClient = bundle.RestClient;
         _rawBundle = bundle.RawBundle;
@@ -157,22 +150,5 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     {
         raw = _rawBundle as T ?? null!;
         return raw is not null;
-    }
-
-    private static Call<TReq, TOk> NotSupportedCall<TReq, TOk>(TReq request)
-    {
-        var now = DateTimeOffset.UtcNow;
-        var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: "NotSupported",
-            Tags: null,
-            Children: null);
-        return new Call<TReq, TOk>(
-            Id: CallId.New(),
-            StartedAt: now,
-            Duration: TimeSpan.Zero,
-            Request: request,
-            Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Semantic, "Feature not supported.")),
-            Meta: meta);
     }
 }

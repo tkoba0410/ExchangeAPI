@@ -1,16 +1,14 @@
 using System;
 using System.Net.Http;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
@@ -47,9 +45,7 @@ public static class BittradeClientFactory
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var tradingApi = BittradeNormalizeFactory.CreateTradingApi(restClient, markets, accountId);
         var trading = new BittradeTradingApi(tradingApi);
-        IAccountApi account = normalizeBundle.Account is null
-            ? new NotSupportedAccountApi(ExchangeCode.Bittrade)
-            : new BittradeAccountApi(normalizeBundle.Account);
+        IAccountApi account = new BittradeAccountApi(normalizeBundle.Account);
         return (new BittradeMarketDataApi(normalizeBundle.MarketData, markets), trading, account, exchangeInfo, normalizeBundle.RawBundle);
     }
 
@@ -76,7 +72,7 @@ public static class BittradeClientFactory
             BaseUri,
             transport,
             policy: policy,
-            errorClassifier: new BittradeErrorClassifier(),
+            errorClassifier: BittradeErrorClassifier.Instance,
             requestSigner: signer,
             observer: observer,
             logger: logger);

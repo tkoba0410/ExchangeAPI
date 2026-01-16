@@ -2,23 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
-using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Account;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
+using ExchangeApi.Exchanges.Bittrade.Normalized.NotSupported;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
@@ -50,9 +46,10 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient, IHas
         var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         _marketApi = new BittradeMarketDataApi(normalizeBundle.MarketData, markets);
-        _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bittrade);
-        _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
-        _historyApi = new NotSupportedSpotHistoryApi();
+        var tradingNormalized = new BittradeNotSupportedNormalizedTradingApi();
+        _tradingApi = new BittradeTradingApi(tradingNormalized);
+        _accountApi = new BittradeAccountApi(normalizeBundle.Account);
+        _historyApi = new BittradeSpotHistoryApi(tradingNormalized, normalizeBundle.AccountId);
         _restClient = restClient;
         _rawBundle = normalizeBundle.RawBundle;
     }
@@ -60,18 +57,21 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient, IHas
     public BittradePublicClient(IMarketDataApi marketApi)
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
-        _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bittrade);
-        _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
-        _historyApi = new NotSupportedSpotHistoryApi();
+        var tradingNormalized = new BittradeNotSupportedNormalizedTradingApi();
+        var accountNormalized = new BittradeNotSupportedNormalizedAccountApi(string.Empty);
+        _tradingApi = new BittradeTradingApi(tradingNormalized);
+        _accountApi = new BittradeAccountApi(accountNormalized);
+        _historyApi = new BittradeSpotHistoryApi(tradingNormalized, null);
     }
 
     internal BittradePublicClient(BittradeApiBundle bundle)
     {
         if (bundle is null) throw new ArgumentNullException(nameof(bundle));
         _marketApi = new BittradeMarketDataApi(bundle.NormalizedMarketData, bundle.Markets);
-        _tradingApi = new NotSupportedTradingApi(ExchangeCode.Bittrade);
-        _accountApi = new NotSupportedAccountApi(ExchangeCode.Bittrade);
-        _historyApi = new NotSupportedSpotHistoryApi();
+        var tradingNormalized = new BittradeNotSupportedNormalizedTradingApi();
+        _tradingApi = new BittradeTradingApi(tradingNormalized);
+        _accountApi = new BittradeAccountApi(bundle.NormalizedAccount);
+        _historyApi = new BittradeSpotHistoryApi(tradingNormalized, bundle.AccountId);
         _restClient = bundle.RestClient;
         _rawBundle = bundle.RawBundle;
         ApiBundle = bundle;

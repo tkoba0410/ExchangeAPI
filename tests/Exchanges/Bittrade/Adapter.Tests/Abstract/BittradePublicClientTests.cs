@@ -22,7 +22,7 @@ public sealed class BittradePublicClientTests
         var json = """{ "status":"ok", "data": 1700000000000 }""";
         var client = CreateClient("/v1/common/timestamp", json);
 
-        var call = await client.Raw<BittradeRawApi>().GetTimestampAsync(new GetRawTimestampRequest());
+        var call = await client.Raw<BittradeRawApi>().ExchangeInfo.GetTimestampAsync(new GetRawTimestampRequest());
         var response = Unwrap(call, "Bittrade.GetTimestamp");
 
         Assert.Equal("ok", response.Status);
@@ -52,7 +52,7 @@ public sealed class BittradePublicClientTests
         """;
         var client = CreateClient("/v1/common/symbols", json);
 
-        var call = await client.Raw<BittradeRawApi>().GetSymbolsAsync(new GetRawSymbolsRequest());
+        var call = await client.Raw<BittradeRawApi>().ExchangeInfo.GetSymbolsAsync(new GetRawSymbolsRequest());
         var response = Unwrap(call, "Bittrade.GetSymbols");
 
         Assert.Equal("ok", response.Status);

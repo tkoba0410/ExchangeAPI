@@ -1,14 +1,6 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
-using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Call;
@@ -24,6 +16,8 @@ public sealed class BittradeRawApi : IBittradeRawApi
 
     public IBittradeRawMarketDataApi MarketData { get; }
     public IBittradeRawTradingApi Trading { get; }
+    public IBittradeRawExchangeInfoApi ExchangeInfo { get; }
+    public IBittradeRawAccountApi Account { get; }
 
     public BittradeRawApi(IWireTransport wire)
         : this(
@@ -43,54 +37,7 @@ public sealed class BittradeRawApi : IBittradeRawApi
         _privateTradingApi = privateTradingApi ?? throw new ArgumentNullException(nameof(privateTradingApi));
         MarketData = new BittradeRawMarketDataApi(_publicApi);
         Trading = new BittradeRawTradingApi(_privateApi, _privateTradingApi);
-    }
-
-    public async Task<Call<GetRawSymbolsRequest, RawSymbolsResponse>> GetSymbolsAsync(
-        GetRawSymbolsRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        var inner = await _publicApi.GetSymbolsAsync(new GetSymbolsRequest(), cancellationToken).ConfigureAwait(false);
-        return MapCall(request, "Bittrade.GetSymbols", inner);
-    }
-
-    public async Task<Call<GetRawTimestampRequest, RawTimestampResponse>> GetTimestampAsync(
-        GetRawTimestampRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        var inner = await _publicApi.GetTimestampAsync(new GetTimestampRequest(), cancellationToken).ConfigureAwait(false);
-        return MapCall(request, "Bittrade.GetTimestamp", inner);
-    }
-
-    public async Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountBalanceAsync(
-        GetAccountBalanceRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        var inner = await _privateApi
-            .GetAccountBalanceAsync(new GetAccountBalanceRequest(request.AccountId), cancellationToken)
-            .ConfigureAwait(false);
-        return MapCall(request, "Bittrade.GetAccountBalance", inner);
-    }
-
-    private static Call<TReq, TRes> MapCall<TReq, TRes, TOtherReq>(
-        TReq request,
-        string component,
-        Call<TOtherReq, TRes> inner)
-    {
-        var meta = new CallMeta(
-            Layer: "Raw",
-            Component: component,
-            Tags: null,
-            Children: new[] { inner.Id })
-        {
-            RawJson = inner.Meta.RawJson
-        };
-
-        return new Call<TReq, TRes>(
-            Id: CallId.New(),
-            StartedAt: inner.StartedAt,
-            Duration: inner.Duration,
-            Request: request,
-            Result: inner.Result,
-            Meta: meta);
+        ExchangeInfo = new BittradeRawExchangeInfoApi(_publicApi);
+        Account = new BittradeRawAccountApi(_privateApi);
     }
 }

@@ -16,7 +16,7 @@ internal sealed class BittradeApiBundle
 {
     public IBittradeNormalizedTradingApi Trading { get; }
     public IBittradeNormalizedMarketDataApi NormalizedMarketData { get; }
-    public IBittradeNormalizedAccountApi? NormalizedAccount { get; }
+    public IBittradeNormalizedAccountApi NormalizedAccount { get; }
     public IExchangeInfoApi ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
     public IRestClient RestClient { get; }
@@ -26,7 +26,7 @@ internal sealed class BittradeApiBundle
     public BittradeApiBundle(
         IBittradeNormalizedTradingApi trading,
         IBittradeNormalizedMarketDataApi normalizedMarketData,
-        IBittradeNormalizedAccountApi? normalizedAccount,
+        IBittradeNormalizedAccountApi normalizedAccount,
         IExchangeInfoApi exchangeInfo,
         IExchangeMarketResolver markets,
         IRestClient restClient,
@@ -35,7 +35,7 @@ internal sealed class BittradeApiBundle
     {
         Trading = trading ?? throw new ArgumentNullException(nameof(trading));
         NormalizedMarketData = normalizedMarketData ?? throw new ArgumentNullException(nameof(normalizedMarketData));
-        NormalizedAccount = normalizedAccount;
+        NormalizedAccount = normalizedAccount ?? throw new ArgumentNullException(nameof(normalizedAccount));
         ExchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
         Markets = markets ?? throw new ArgumentNullException(nameof(markets));
         RestClient = restClient ?? throw new ArgumentNullException(nameof(restClient));

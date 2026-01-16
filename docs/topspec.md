@@ -144,6 +144,30 @@ RawJson の保持有無や ClosedSet の拡張可否といった判断は、
 - `Composition`：組み立て（Factory/CredentialProvider/JsonExchangeInfoApi 等）
 - `Contracts`：公開契約（Shape/Semantics）※振る舞い禁止
 
+### 7.1 取引所間共通実装の正規形（Canon）
+
+本節は、**取引所追加時に必ず従う実装形（構造の正規形）**を定義する。
+ここに定義された形は、取引所間で一致させなければならない（MUST）。
+
+#### 7.1.1 Raw API の正規形
+- Raw の bundle（例：`I<Exchange>RawApi`）は **Sub-API のみ**を公開する（MUST）。
+- Raw bundle 直下に利便メソッド（直メソッド）を追加してはならない（MUST NOT）。
+
+#### 7.1.2 Normalized API の正規形
+- Normalized の factory は **Bundle を 1 つ返す**形に統一する（MUST）。
+- Bundle の構造（どの Sub-API を持つか）は取引所間で同型に保つ（MUST）。
+- **Bundle メンバ（Sub-API）の optional を `null` で表現してはならない**（MUST NOT）。
+  - 未対応機能は「NoOp 実装」を返し、Call を `NotSupported` として失敗させる（MUST）。
+
+#### 7.1.3 認証（署名）注入点の正規形
+- 署名（認証）は **RestClient の requestSigner（単一注入点）**で行う（MUST）。
+- 署名を `IHttpTransport` の wrapper として別系統で提供してはならない（MUST NOT）。
+
+#### 7.1.4 Error 分類の正規形
+- ErrorClassifier は Adapter 内部の変換規則である。
+- ErrorClassifier は `internal` とし、外部へ公開してはならない（MUST NOT）。
+- ErrorClassifier の利用は共有インスタンス（singleton 等）に統一する（MUST）。
+
 ---
 
 ## 8. 物理構成（src）

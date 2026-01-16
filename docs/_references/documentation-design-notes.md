@@ -3,11 +3,11 @@
 > 実装・設計判断の拘束力を持たない。
 > 正本（Normative）は以下：
 > - docs/topspec.md
-> - docs/contracts.md
+> - docs/contracts/contracts.md
 > 運用と裁定は以下：
 > - docs/process.md
 > - docs/exceptions.md
-> - docs/endpoints.md
+> - docs/inventory/endpoints.md
 > - docs/inventory-*.md
 
 # 文書設計ノート（参考）
@@ -16,7 +16,7 @@
 
 * 本文書は**仕様（Normative）ではなく、文書設計に関する判断と検討結果を残すための参考資料**である。
 * 文書量を抑えつつ実装時の揺らぎを止める、という目的のもとで行った設計判断を記録する。
-* 本文書自体は規範的拘束力を持たず、仕様判断は `topspec.md` / `contracts.md` を正とする。
+* 本文書自体は規範的拘束力を持たず、仕様判断は `topspec.md` / `contracts/contracts.md` を正とする。
 * 将来の見直しや第三者理解のために残すが、**日常的な参照や実装判断の根拠として直接用いることは想定しない**。
 
 ---
@@ -153,12 +153,12 @@ src/
 docs/
   index.md            # 入口・思想・ナビゲーション
   topspec.md          # Normative（全体憲法）
-  contracts.md        # Normative（横断 Contract）
+  contracts/contracts.md        # Normative（横断 Contract）
   exceptions.md       # 例外台帳
   process.md          # 運用・編集規律
-  endpoints.md        # Inventory（横断の一覧）
-  inventory-bitflyer.md
-  inventory-bittrade.md
+  inventory/endpoints.md        # Inventory（横断の一覧）
+  inventory/inventory-bitflyer.md
+  inventory/inventory-bittrade.md
 ```
 
 ### 2.2 基本原則
@@ -216,7 +216,7 @@ docs/
   * 各層の責務と禁止事項
   * 取引所固有 / 横断の原則
   * src 構成が正本であることの宣言
-* contracts.md
+* contracts/contracts.md
 
   * Call-only 原則
   * 公開 API 境界
@@ -282,7 +282,7 @@ docs/
 
 ## 6. 本文書を役割完了とみなす条件
 
-* 文書構成および設計思想が `index.md` / `topspec.md` / `contracts.md` に反映されている
+* 文書構成および設計思想が `index.md` / `topspec.md` / `contracts/contracts.md` に反映されている
 * src 構成と Normative 文書の整合が取れている
 * 抽象DTOの定義元、型制約、例外運用などの重要判断が Normative に条文化されている
 
@@ -309,7 +309,7 @@ docs/
 
 ### 8.1 移行の前提
 
-* 新たに定義された `topspec.md` / `contracts.md`（最小条文化・日本語）を **正（canonical）** とする
+* 新たに定義された `topspec.md` / `contracts/contracts.md`（最小条文化・日本語）を **正（canonical）** とする
 * 既存文書は段階的に参照対象から外す
 * Inventory（endpoints）および Decisions（exceptions）は継続利用する
 * 移行期間中であっても、新規実装は常に **新 TopSpec / Contracts 準拠** とする

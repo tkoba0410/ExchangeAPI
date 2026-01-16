@@ -151,6 +151,32 @@ RawJson の保持有無や ClosedSet の拡張可否といった判断は、
 
 NOTE: 本リポジトリには Canon 未達の実装が残る場合がある。Canon は常に目標形であり、未達は移行タスクとして扱う。
 
+#### 7.1.X Canon: 同名 Contracts API の前提条件差を作らない
+
+- **同名の Contracts API は、取引所間で呼び出し前提条件差を持たない。**
+- 認証・口座情報・ID 等の前提条件が必要な場合、差異は次のいずれかで吸収する。
+  1. **Composition が前提条件を自動解決**し、利用者に追加入力を要求しない。
+  2. 前提条件が満たせない構築形態では、当該 API を **capability（TryGet/Has 系など）として提供しない**（利用者は事前判定できる）。
+- **前提条件不足を理由に NotSupported を返すことを禁止する。**
+  - NotSupported は capability 不足にのみ用いる（利用者契約に従う）。
+
+#### 7.1.Y Canon: API 投入用 Market/Symbol 表現の責務位置
+
+- Market 解決（ExchangeInfo / Resolver 等）の結果は、**その取引所の API 呼び出しに直接投入できる Market/Symbol 表現**を含まなければならない。
+- API 投入のための表記変換（例：`BTC_JPY` → `btcjpy`）は、
+  **Market 解決の段階で完了**し、Contracts / Adapter の呼び出し直前で追加加工してはならない。
+
+#### 7.1.Z Canon: ExecutionItem.Market の設定元を固定する
+
+- `ExecutionItem.Market` は常に **request に含まれる Market** を設定する。
+- レスポンス側の市場識別子を参照してはならない。
+
+#### 7.1.W Canon: NotSupported の `<feature>` を capability 名に固定する
+
+- `NotSupported:<feature>` の `<feature>` は、利用者が事前判定に用いる **capability 名（操作名）と一致**しなければならない。
+- `AccountIdRequired` 等の「内部理由」を `<feature>` にしてはならない。
+  - 内部理由は必要なら `Message` の追記等（`NotSupported:<feature> ...`）に留め、feature 自体は不変とする。
+
 #### 7.1.1 Raw API の正規形
 - Raw の bundle（例：`I<Exchange>RawApi`）は **Sub-API のみ**を公開する（MUST）。
 - Raw bundle 直下に利便メソッド（直メソッド）を追加してはならない（MUST NOT）。

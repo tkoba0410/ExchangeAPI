@@ -44,6 +44,13 @@
 - エラー表現は **分類レベル**（例：通信失敗 / 認証失敗 / 業務的失敗）までに留め、詳細コード体系を契約に含めない（MUST）。
 - リトライ可否・HTTP ステータス・レート制限などの運用情報は、必要に応じて Call のメタで表現する（MUST）。
 
+### 5.1 NotSupported（未対応機能）の最小表現
+
+- 未対応機能は例外（throw）ではなく Call の失敗として表現する（MUST）。
+- `CallError.Kind` は `Semantic` とする（MUST）。
+- `CallError.Message` は先頭に `NotSupported:` を付与する（MUST）。
+- リトライ可否は `CallMeta.Tags` に `Retryable=false` として表現する（MUST）。
+
 ---
 
 ## 6. 型の所有権

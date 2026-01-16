@@ -158,6 +158,13 @@ RawJson の保持有無や ClosedSet の拡張可否といった判断は、
 - Bundle の構造（どの Sub-API を持つか）は取引所間で同型に保つ（MUST）。
 - **Bundle メンバ（Sub-API）の optional を `null` で表現してはならない**（MUST NOT）。
   - 未対応機能は「NoOp 実装」を返し、Call を `NotSupported` として失敗させる（MUST）。
+  - NoOp 実装は `src/Exchanges/<Exchange>/Normalized/` 配下に配置する（MUST）。
+    - Adapter / Contracts / Composition に NoOp を置いてはならない（MUST NOT）。
+  - `NotSupported` の最小表現は次に固定する（MUST）。
+    - `CallResult` は Err である
+    - `CallError.Kind` は `Semantic` である
+    - `CallError.Message` は先頭に `NotSupported:` を付与する
+    - `CallMeta` の `Tags` に `Retryable=false` を含める（MUST）
 
 #### 7.1.3 認証（署名）注入点の正規形
 - 署名（認証）は **RestClient の requestSigner（単一注入点）**で行う（MUST）。

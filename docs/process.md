@@ -1,7 +1,7 @@
 # Process（運用ルール）
 
 本書は、ExchangeAPI における **文書化・レビュー・例外運用**の手順と判断装置を定義する。
-本書は **Normative（規範）ではない**。規範は `topspec.md` / `contracts.md` を正本とする。
+本書は **Normative（規範）ではない**。規範は `topspec.md` / `contracts/contracts.md` を正本とする。
 
 本書の目的は、運用上の迷いを減らし、**文書を増やさずに揺らぎを止める**ことである。
 
@@ -21,11 +21,11 @@
 
 ### 2.1 Normative（規範）
 - `docs/topspec.md`：最上位規範（層・境界・禁止事項）
-- `docs/contracts.md`：横断契約（公開契約の規範）
+- `docs/contracts/contracts.md`：横断契約（公開契約の規範）
 
 ### 2.2 Inventory（事実一覧）
-- `docs/endpoints.md`：エンドポイント一覧（棚卸し）
-- `docs/inventory-*.md`：取引所別インベントリ
+- `docs/inventory/endpoints.md`：エンドポイント一覧（棚卸し）
+- `docs/inventory/inventory-*.md`：取引所別インベントリ
 
 ※ Inventory に仕様本文（公式APIの写経）を書いてはならない。
 
@@ -67,10 +67,10 @@
 ## 5. 更新ルール（いつ、どれを更新するか）
 
 - 規範（設計判断・境界・契約）を変更した場合：
-  → `docs/topspec.md` / `docs/contracts.md`
+  → `docs/topspec.md` / `docs/contracts/contracts.md`
 - 物理構成の方針は `docs/topspec.md` を参照する。
 - 外部 API を追加・削除・差し替えた場合：
-  → `docs/endpoints.md` / `docs/inventory-*.md`
+  → `docs/inventory/endpoints.md` / `docs/inventory/inventory-*.md`
 - 原則からの逸脱が必要になった場合：
   → `docs/exceptions.md`（差分と理由を記録）
 - PR を作成する場合：
@@ -127,7 +127,7 @@ Decisions に記録できるのは、次のいずれかのみ。
 - [ ] DTO の命名、Nullable、Page/Cursor/Limit の規範を破っていない
 
 #### C. Inventory（事実一覧）
-- [ ] 外部 API の追加/変更がある場合、`docs/endpoints.md` / `docs/inventory-*.md` に反映されている
+- [ ] 外部 API の追加/変更がある場合、`docs/inventory/endpoints.md` / `docs/inventory/inventory-*.md` に反映されている
 - [ ] Official Reference（公式ドキュメントへの参照）が明示されている
 
 #### D. 例外（Decisions）

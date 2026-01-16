@@ -11,10 +11,17 @@
 
 ---
 
+## Plan
+
+* 文書整備計画：[`document-plan.md`](./document-plan.md)
+
+---
+
 ## 規範（Normative）
 
 * **TopSpec**（最上位規範）：[`topspec.md`](./topspec.md)
-* **Contracts**（横断契約の規範）：[`contracts.md`](./contracts.md)
+* **Contracts Overview**：[`contracts/overview.md`](./contracts/overview.md)
+* **Contracts**（横断契約の規範）：[`contracts/contracts.md`](./contracts/contracts.md)
 * 物理構成方針（Shared 廃止後の正本）: TopSpec（`docs/topspec.md`）
 * Application / Composition の配置規範も TopSpec に含まれる
 * Application は Contracts を参照しない（詳細は TopSpec）
@@ -23,9 +30,9 @@
 
 ## 一覧（Inventory / Fact）
 
-* **Endpoints Inventory**（API エンドポイント一覧・最小形）：[`endpoints.md`](./endpoints.md)
-* **Inventory: Bitflyer**：[`inventory-bitflyer.md`](./inventory-bitflyer.md)
-* **Inventory: Bittrade**：[`inventory-bittrade.md`](./inventory-bittrade.md)
+* **Endpoints Inventory**（API エンドポイント一覧・最小形）：[`inventory/endpoints.md`](./inventory/endpoints.md)
+* **Inventory: Bitflyer**：[`inventory/inventory-bitflyer.md`](./inventory/inventory-bitflyer.md)
+* **Inventory: Bittrade**：[`inventory/inventory-bittrade.md`](./inventory/inventory-bittrade.md)
 
 ---
 

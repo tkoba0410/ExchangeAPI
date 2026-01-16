@@ -3,6 +3,7 @@
 > 実装・設計判断の拘束力を持たない。
 > 正本（Normative）は以下：
 > - docs/topspec.md
+> - docs/contracts/overview.md
 > - docs/contracts/contracts.md
 > 運用と裁定は以下：
 > - docs/process.md

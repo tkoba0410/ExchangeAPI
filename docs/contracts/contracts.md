@@ -44,6 +44,16 @@
 - エラー表現は **分類レベル**（例：通信失敗 / 認証失敗 / 業務的失敗）までに留め、詳細コード体系を契約に含めない（MUST）。
 - リトライ可否・HTTP ステータス・レート制限などの運用情報は、必要に応じて Call のメタで表現する（MUST）。
 
+## NotSupported（Shape / Semantics）
+
+NotSupported は、Contracts API における **capability 不足**を示す標準的な失敗表現である。
+
+- CallErrorKind: Semantic
+- Tags:
+  - Retryable = false
+- Message:
+  - "NotSupported:<feature>"
+
 ## 6. 型の所有権
 
 - Abstract DTO（公開契約の型）は **Contracts 層が定義元（オーナー）**である（MUST）。
@@ -97,14 +107,7 @@
 
 ---
 
-## 11. 互換性（Evolution / Breaking Change）
-
-- Contracts の変更は利用者に影響するため、後方互換性を原則維持する（MUST）。
-- **破壊的変更を行う場合は、必ず Decisions（Exceptions）に差分と理由を記録する（MUST）。**
-- 互換レイヤ（新旧共存）やメジャーバージョン等の手段は推奨だが必須ではない。
-  ただし、利用者影響がある場合は影響範囲を Decisions に明記しなければならない（MUST）。
-
----
+<!-- 運用・進化方針は process.md / exceptions.md に移設済み -->
 
 ## 12. Anti-Rules（禁止事項）
 
@@ -114,11 +117,3 @@
 - 実装都合による一時的 DTO を公開してはならない（MUST NOT）。
 
 ---
-
-## 13. 例外の扱い
-
-- 本書の規範に従えない場合は Decisions（Exceptions）に理由を記録しなければならない（MUST）。
-- 例外として認められるのは、次の場合に限る（MUST）。
-  - 公式 API 仕様による不可避な制約
-  - 後方互換性維持のための必要性
-  - セキュリティ・性能・法令上の理由

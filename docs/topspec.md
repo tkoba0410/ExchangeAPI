@@ -20,10 +20,10 @@
 
 ### 2.2 文書の優先順位
 1. TopSpec（本書）
-2. Contracts（公開契約の規範）
-3. Decisions / Exceptions（例外台帳）
-4. Inventory / Endpoints（索引）
-5. その他の文書（Guide / Policy / Checklist など）
+2. Contracts Overview（利用者契約）
+3. Contracts（Shape / Semantics）
+4. Exceptions
+5. Inventory / Endpoints
 
 ---
 

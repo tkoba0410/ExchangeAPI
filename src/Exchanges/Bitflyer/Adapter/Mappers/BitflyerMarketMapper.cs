@@ -20,7 +20,6 @@ internal static class MarketMapper
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
         return new CommonTicker(
-            Exchange: ExchangeCode.Bitflyer,
             Symbol: symbol,
             LastTradedPrice: new Price(normalized.LastTradedPrice),
             Timestamp: normalized.Timestamp);

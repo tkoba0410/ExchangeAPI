@@ -85,7 +85,10 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
 
         if (orderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
         {
-            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, $"CancelOrderBy{orderKey.Kind}");
+            throw new ExchangeFeatureNotSupportedException(
+                ExchangeCode.Bittrade,
+                feature: "CancelOrder",
+                reason: $"orderKey.Kind={orderKey.Kind}");
         }
 
         var rawCall = await _trading
@@ -130,7 +133,10 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
 
         if (orderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
         {
-            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bittrade, $"GetOrderBy{orderKey.Kind}");
+        throw new ExchangeFeatureNotSupportedException(
+            ExchangeCode.Bittrade,
+            feature: "GetOrder",
+            reason: $"orderKey.Kind={orderKey.Kind}");
         }
 
         var callRequest = new GetOrderRequest(symbol, orderKey);

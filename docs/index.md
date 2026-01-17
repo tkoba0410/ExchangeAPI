@@ -32,6 +32,9 @@
 
 * **Exchanges 配下の実装統一ルール**：[`governance/exchanges-code-unification.md`](./governance/exchanges-code-unification.md)
 
+> 注：`docs/governance/` は **新しい文書カテゴリではない**。
+> `process.md` が定めるとおり、Governance は **Process（運用）の一部（配置のみ）**として扱う。
+
 ---
 
 ## 一覧（Inventory / Fact）

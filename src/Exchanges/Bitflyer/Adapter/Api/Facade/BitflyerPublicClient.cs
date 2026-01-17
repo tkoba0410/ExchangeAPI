@@ -22,15 +22,13 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 /// <summary>
 /// bitFlyer の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeClient, IHasRawAccess
+public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
     private readonly ISpotHistoryApi _historyApi;
-    private readonly object? _rawBundle;
 
-    public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bitflyer;
     public IMarketDataApi Market => _marketApi;
     public ITradingApi Trading => _tradingApi;
     public IAccountApi Account => _accountApi;
@@ -46,7 +44,6 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeClient, IHas
         _tradingApi = new BitflyerTradingApi(tradingNormalized);
         _accountApi = new BitflyerAccountApi(accountNormalized);
         _historyApi = new BitflyerSpotHistoryApi(tradingNormalized, accountNormalized);
-        _rawBundle = rawBundle;
     }
 
     public Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(
@@ -64,9 +61,5 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeClient, IHas
         CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
 
-    public bool TryGetRaw<T>(out T raw) where T : class
-    {
-        raw = _rawBundle as T ?? null!;
-        return raw is not null;
-    }
+    // Raw access removed from public facade.
 }

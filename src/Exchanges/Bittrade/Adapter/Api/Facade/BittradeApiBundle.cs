@@ -21,7 +21,6 @@ internal sealed class BittradeApiBundle
     public IExchangeMarketResolver Markets { get; }
     public IRestClient RestClient { get; }
     public string? AccountId { get; }
-    public object? RawBundle { get; }
 
     public BittradeApiBundle(
         IBittradeNormalizedTradingApi trading,
@@ -30,8 +29,7 @@ internal sealed class BittradeApiBundle
         IExchangeInfoApi exchangeInfo,
         IExchangeMarketResolver markets,
         IRestClient restClient,
-        string? accountId = null,
-        object? rawBundle = null)
+        string? accountId = null)
     {
         Trading = trading ?? throw new ArgumentNullException(nameof(trading));
         NormalizedMarketData = normalizedMarketData ?? throw new ArgumentNullException(nameof(normalizedMarketData));
@@ -40,7 +38,6 @@ internal sealed class BittradeApiBundle
         Markets = markets ?? throw new ArgumentNullException(nameof(markets));
         RestClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
         AccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
-        RawBundle = rawBundle;
     }
 
     public static BittradeApiBundle FromRestClient(IRestClient restClient, string? accountId = null)
@@ -60,7 +57,6 @@ internal sealed class BittradeApiBundle
             exchangeInfo: exchangeInfo,
             markets: markets,
             restClient: restClient,
-            accountId: normalizedAccountId,
-            rawBundle: normalizeBundle.RawBundle);
+            accountId: normalizedAccountId);
     }
 }

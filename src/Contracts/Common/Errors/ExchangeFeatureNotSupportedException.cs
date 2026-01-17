@@ -9,11 +9,23 @@ public sealed class ExchangeFeatureNotSupportedException : ExchangeApiException
 {
     public ExchangeCode ExchangeCode { get; }
     public string Feature { get; }
+    public string? Reason { get; }
 
     public ExchangeFeatureNotSupportedException(ExchangeCode exchange, string feature)
-        : base($"Feature '{feature}' is not supported by exchange '{exchange}'.", exchange: exchange, operation: feature)
+        : this(exchange, feature, reason: null)
+    {
+    }
+
+    public ExchangeFeatureNotSupportedException(ExchangeCode exchange, string feature, string? reason)
+        : base(
+            message: reason is null
+                ? $"Feature '{feature}' is not supported by exchange '{exchange}'."
+                : $"Feature '{feature}' is not supported by exchange '{exchange}'. Reason: {reason}",
+            exchange: exchange,
+            operation: feature)
     {
         ExchangeCode = exchange;
         Feature = feature;
+        Reason = reason;
     }
 }

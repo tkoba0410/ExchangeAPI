@@ -16,18 +16,15 @@ internal sealed class BitflyerApiBundle
     public BitflyerNormalizedMarketDataFacade MarketData { get; }
     public IBitflyerNormalizedAccountApi Account { get; }
     public IBitflyerNormalizedTradingApi Trading { get; }
-    public object? RawBundle { get; }
 
     public BitflyerApiBundle(
         BitflyerNormalizedMarketDataFacade marketData,
         IBitflyerNormalizedAccountApi account,
-        IBitflyerNormalizedTradingApi trading,
-        object? rawBundle = null)
+        IBitflyerNormalizedTradingApi trading)
     {
         MarketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
         Account = account ?? throw new ArgumentNullException(nameof(account));
         Trading = trading ?? throw new ArgumentNullException(nameof(trading));
-        RawBundle = rawBundle;
     }
 
     public static BitflyerApiBundle FromRestClient(IRestClient restClient)
@@ -41,7 +38,6 @@ internal sealed class BitflyerApiBundle
         return new BitflyerApiBundle(
             marketData: normalized.MarketData,
             account: privateApi,
-            trading: tradingApi,
-            rawBundle: null);
+            trading: tradingApi);
     }
 }

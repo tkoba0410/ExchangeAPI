@@ -32,18 +32,13 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IExchangeClient, IHasRawAccess
+public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IExchangeClient
 {
     private readonly IMarketDataApi _marketApi;
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
     private readonly ISpotHistoryApi _historyApi;
-    private readonly MarketApi? _marketApiConcrete;
-    private readonly BitflyerAccountApi? _accountApiConcrete;
     internal BitflyerApiBundle? ApiBundle { get; }
-    private readonly object? _rawBundle;
-
-    public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bitflyer;
     public IMarketDataApi Market => _marketApi;
     public ITradingApi Trading => _tradingApi;
     public IAccountApi Account => _accountApi;
@@ -59,10 +54,9 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
             marketApi: CreateMarketApi(marketData),
             tradingApi: CreateTradingApi(trading),
             accountApi: CreateAccountApi(account),
-            historyApi: CreateSpotHistoryApi(trading, account),
-            rawBundle: rawBundle)
+            historyApi: CreateSpotHistoryApi(trading, account))
     {
-        ApiBundle = new BitflyerApiBundle(marketData, account, trading, rawBundle);
+        ApiBundle = new BitflyerApiBundle(marketData, account, trading);
     }
 
     public BitflyerExchangeClient(
@@ -76,9 +70,6 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _historyApi = historyApi ?? throw new ArgumentNullException(nameof(historyApi));
-        _marketApiConcrete = _marketApi as MarketApi;
-        _accountApiConcrete = _accountApi as BitflyerAccountApi;
-        _rawBundle = rawBundle;
     }
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
@@ -86,8 +77,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
             marketApi: CreateMarketApi(bundle.MarketData),
             tradingApi: CreateTradingApi(bundle.Trading),
             accountApi: CreateAccountApi(bundle.Account),
-            historyApi: CreateSpotHistoryApi(bundle.Trading, bundle.Account),
-            rawBundle: bundle.RawBundle)
+            historyApi: CreateSpotHistoryApi(bundle.Trading, bundle.Account))
     {
         ApiBundle = bundle;
     }
@@ -107,8 +97,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
             marketApi: CreateMarketApi(normalized.MarketData),
             tradingApi: CreateTradingApi(tradingApi),
             accountApi: CreateAccountApi(accountApi),
-            historyApi: historyApi,
-            rawBundle: null);
+            historyApi: historyApi);
     }
 
     private static MarketApi CreateMarketApi(BitflyerNormalizedMarketDataFacade marketData)
@@ -183,29 +172,5 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesCallAsync(cancellationToken);
 
-    private MarketApi GetMarketApi()
-    {
-        if (_marketApiConcrete is null)
-        {
-            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, "MarketRawAccess");
-        }
-
-        return _marketApiConcrete;
-    }
-
-    private BitflyerAccountApi GetAccountApi()
-    {
-        if (_accountApiConcrete is null)
-        {
-            throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, "AccountRawAccess");
-        }
-
-        return _accountApiConcrete;
-    }
-
-    public bool TryGetRaw<T>(out T raw) where T : class
-    {
-        raw = _rawBundle as T ?? null!;
-        return raw is not null;
-    }
+    // Raw access removed from public facade.
 }

@@ -127,7 +127,10 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                 };
                 break;
             default:
-                throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, $"CancelOrderBy{orderKey.Kind}");
+                throw new ExchangeFeatureNotSupportedException(
+                    ExchangeCode.Bitflyer,
+                    feature: "CancelOrder",
+                    reason: $"orderKey.Kind={orderKey.Kind}");
         }
 
         var rawCall = await _tradingApi
@@ -245,7 +248,10 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                         ChildOrderId: orderKey.Value),
                     cancellationToken)
                 .ConfigureAwait(false),
-            _ => throw new ExchangeFeatureNotSupportedException(ExchangeCode.Bitflyer, $"GetOrderBy{orderKey.Kind}")
+            _ => throw new ExchangeFeatureNotSupportedException(
+                ExchangeCode.Bitflyer,
+                feature: "GetOrder",
+                reason: $"orderKey.Kind={orderKey.Kind}")
         };
 
         return CreateCall(

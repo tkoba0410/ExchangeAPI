@@ -22,17 +22,15 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 /// <summary>
 /// Bittrade の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient, IHasRawAccess
+public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient
 {
     private readonly IMarketDataApi _marketApi;
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
     private readonly ISpotHistoryApi _historyApi;
     private readonly IRestClient? _restClient;
-    private readonly object? _rawBundle;
     internal BittradeApiBundle? ApiBundle { get; }
 
-    public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bittrade;
     public IMarketDataApi Market => _marketApi;
     public ITradingApi Trading => _tradingApi;
     public IAccountApi Account => _accountApi;
@@ -51,7 +49,6 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient, IHas
         _accountApi = new BittradeAccountApi(normalizeBundle.Account);
         _historyApi = new BittradeSpotHistoryApi(tradingNormalized, normalizeBundle.AccountId);
         _restClient = restClient;
-        _rawBundle = normalizeBundle.RawBundle;
     }
 
     public BittradePublicClient(IMarketDataApi marketApi)
@@ -73,7 +70,6 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient, IHas
         _accountApi = new BittradeAccountApi(bundle.NormalizedAccount);
         _historyApi = new BittradeSpotHistoryApi(tradingNormalized, bundle.AccountId);
         _restClient = bundle.RestClient;
-        _rawBundle = bundle.RawBundle;
         ApiBundle = bundle;
     }
 
@@ -92,9 +88,5 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient, IHas
         CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
 
-    public bool TryGetRaw<T>(out T raw) where T : class
-    {
-        raw = _rawBundle as T ?? null!;
-        return raw is not null;
-    }
+    // Raw access removed from public facade.
 }

@@ -22,7 +22,6 @@ internal static class BittradeMarketMapper
     public static Ticker MapTicker(CommonSymbol symbol, BittradeTickerNormalized normalized)
     {
         return new Ticker(
-            Exchange: Exchange,
             Symbol: symbol,
             LastTradedPrice: new Price(normalized.LastTradedPrice),
             Timestamp: normalized.Timestamp);

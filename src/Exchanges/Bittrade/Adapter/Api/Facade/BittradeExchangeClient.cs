@@ -23,17 +23,15 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
 /// <summary>
 /// Bittrade 用のファサード。各 API 実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IExchangeClient, IHasRawAccess
+public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IExchangeClient
 {
     private readonly IMarketDataApi _marketApi;
     private readonly ITradingApi _tradingApi;
     private readonly IAccountApi _accountApi;
     private readonly ISpotHistoryApi _historyApi;
     private readonly IRestClient? _restClient;
-    private readonly object? _rawBundle;
     internal BittradeApiBundle? ApiBundle { get; }
 
-    public ExchangeCode ExchangeCode { get; } = ExchangeCode.Bittrade;
     public IMarketDataApi Market => _marketApi;
     public ITradingApi Trading => _tradingApi;
     public IAccountApi Account => _accountApi;
@@ -64,7 +62,6 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _accountApi = new BittradeAccountApi(bundle.NormalizedAccount);
         _historyApi = new BittradeSpotHistoryApi(bundle.Trading, bundle.AccountId);
         _restClient = bundle.RestClient;
-        _rawBundle = bundle.RawBundle;
         ApiBundle = bundle;
     }
 
@@ -77,8 +74,6 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         : this(marketApi, tradingApi, accountApi, historyApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-        var normalizeBundle = BittradeNormalizeFactory.FromRestClient(_restClient);
-        _rawBundle = normalizeBundle.RawBundle;
     }
 
     public BittradeExchangeClient(
@@ -91,8 +86,6 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         : this(marketApi, tradingApi, accountApi, historyApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-        var normalizeBundle = BittradeNormalizeFactory.FromRestClient(_restClient, accountId);
-        _rawBundle = normalizeBundle.RawBundle;
     }
 
     public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
@@ -146,9 +139,5 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.GetOpenOrdersCallAsync(symbol, cancellationToken);
 
-    public bool TryGetRaw<T>(out T raw) where T : class
-    {
-        raw = _rawBundle as T ?? null!;
-        return raw is not null;
-    }
+    // Raw access removed from public facade.
 }

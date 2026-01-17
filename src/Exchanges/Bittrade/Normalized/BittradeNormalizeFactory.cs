@@ -34,7 +34,6 @@ internal static class BittradeNormalizeFactory
             marketData: marketData,
             exchangeInfo: exchangeInfo,
             account: account,
-            rawBundle: raw,
             accountId: normalizedAccountId);
     }
 

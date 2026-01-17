@@ -1,5 +1,3 @@
-using ExchangeApi.Primitives.DomainCommon.Enums;
-
 namespace ExchangeApi.Contracts.Facade.Interfaces;
 
 public interface IExchangeClient
@@ -8,5 +6,4 @@ public interface IExchangeClient
     ITradingApi Trading { get; }
     IAccountApi Account { get; }
     ISpotHistoryApi History { get; }
-    ExchangeCode ExchangeCode { get; }
 }

@@ -10,6 +10,7 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
@@ -51,11 +52,11 @@ internal static class BittradeMarketMapper
             normalized.Timestamp);
     }
 
-    private static Side MapSide(string direction) =>
-        direction switch
+    private static Side MapSide(BittradeOrderSide side) =>
+        side switch
         {
-            var value when string.Equals(value, "buy", StringComparison.OrdinalIgnoreCase) => Side.Buy,
-            var value when string.Equals(value, "sell", StringComparison.OrdinalIgnoreCase) => Side.Sell,
-            _ => throw new ExchangeApiException($"Unsupported side: {direction}.", exchange: Exchange)
+            BittradeOrderSide.Buy => Side.Buy,
+            BittradeOrderSide.Sell => Side.Sell,
+            _ => throw new ExchangeApiException($"Unsupported side: {side}.", exchange: Exchange)
         };
 }

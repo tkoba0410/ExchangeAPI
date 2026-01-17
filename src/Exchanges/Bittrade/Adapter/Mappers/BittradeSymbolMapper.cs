@@ -1,5 +1,6 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
@@ -39,7 +40,7 @@ internal static class BittradeSymbolMapper
         }
 
         var productCode = ToProductCode(symbol);
-        return productCode.Replace("_", string.Empty, StringComparison.Ordinal).ToLowerInvariant();
+        return BittradeSymbol.Normalize(productCode);
     }
 
 }

@@ -30,14 +30,19 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
     }
 
     public async Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
-        BittradeSymbol symbol,
+        string productCode,
         CancellationToken ct = default)
     {
-        var symbolText = symbol.ToString();
+        var request = new GetTickerRequest(productCode);
+        var startedAt = DateTimeOffset.UtcNow;
+        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        {
+            return CreateCallError<GetTickerRequest, BittradeTickerNormalized>(request, "Bittrade.GetTicker", error!, startedAt);
+        }
+
         var rawCall = await _raw
             .GetTickerAsync(new RawRequests.GetTickerRequest(symbolText), ct)
             .ConfigureAwait(false);
-        var request = new GetTickerRequest(symbol);
 
         return CreateCall(
             rawCall,
@@ -51,16 +56,21 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
     }
 
     public async Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
-        BittradeSymbol symbol,
+        string productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default)
     {
         var normalizedDepthType = depthType ?? BittradeDepthType.Step0;
-        var symbolText = symbol.ToString();
+        var request = new GetOrderBookRequest(productCode, depthType);
+        var startedAt = DateTimeOffset.UtcNow;
+        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        {
+            return CreateCallError<GetOrderBookRequest, BittradeOrderBookNormalized>(request, "Bittrade.GetOrderBook", error!, startedAt);
+        }
+
         var rawCall = await _raw
             .GetOrderBookAsync(new RawRequests.GetOrderBookRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
             .ConfigureAwait(false);
-        var request = new GetOrderBookRequest(symbol, depthType);
 
         return CreateCall(
             rawCall,
@@ -75,14 +85,19 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
     }
 
     public async Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
-        BittradeSymbol symbol,
+        string productCode,
         CancellationToken ct = default)
     {
-        var symbolText = symbol.ToString();
+        var request = new GetExecutionsRequest(productCode);
+        var startedAt = DateTimeOffset.UtcNow;
+        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        {
+            return CreateCallError<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(request, "Bittrade.GetExecutions", error!, startedAt);
+        }
+
         var rawCall = await _raw
             .GetTradesAsync(new RawRequests.GetMarketTradesRequest(symbolText), ct)
             .ConfigureAwait(false);
-        var request = new GetExecutionsRequest(symbol);
 
         return CreateCall(
             rawCall,
@@ -126,6 +141,48 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
                 Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
                 Meta: meta)
         };
+    }
+
+    private static bool TryGetApiSymbol(string? productCode, out string apiSymbol, out CallError? error)
+    {
+        if (string.IsNullOrWhiteSpace(productCode))
+        {
+            apiSymbol = string.Empty;
+            error = new CallError(CallErrorKind.Unknown, "ProductCode is required.");
+            return false;
+        }
+
+        if (!BittradeSymbol.TryParse(productCode, out var symbol))
+        {
+            apiSymbol = string.Empty;
+            error = new CallError(CallErrorKind.Semantic, $"Invalid product code: {productCode}.");
+            return false;
+        }
+
+        apiSymbol = symbol.Value;
+        error = null;
+        return true;
+    }
+
+    private static Call<TReq, TOk> CreateCallError<TReq, TOk>(
+        TReq request,
+        string component,
+        CallError error,
+        DateTimeOffset startedAt)
+    {
+        var meta = new CallMeta(
+            Layer: "Normalized",
+            Component: component,
+            Tags: null,
+            Children: null);
+
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: startedAt,
+            Duration: DateTimeOffset.UtcNow - startedAt,
+            Request: request,
+            Result: new CallResult<TOk>.Err(error),
+            Meta: meta);
     }
 
     private static Call<TReq, TOk> MapOk<TRawReq, TReq, TRaw, TOk>(

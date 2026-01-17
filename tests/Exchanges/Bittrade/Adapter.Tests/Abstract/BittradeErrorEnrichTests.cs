@@ -41,18 +41,18 @@ public sealed class BittradeErrorEnrichTests
     private sealed class ThrowingMarketDataApi : IBittradeNormalizedMarketDataApi
     {
         public Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
-            BittradeSymbol symbol,
+            string productCode,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
 
         public Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
-            BittradeSymbol symbol,
+            string productCode,
             BittradeDepthType? depthType = null,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
 
         public Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
-            BittradeSymbol symbol,
+            string productCode,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
     }

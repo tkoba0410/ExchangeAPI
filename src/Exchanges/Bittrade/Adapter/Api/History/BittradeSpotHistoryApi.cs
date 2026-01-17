@@ -17,6 +17,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;
@@ -114,9 +115,12 @@ internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
             Timestamp: e.Timestamp,
             ExecutionId: e.Id,
             Market: request.Market,
-            Side: string.Equals(e.Side, "buy", StringComparison.OrdinalIgnoreCase)
-                ? Side.Buy
-                : Side.Sell,
+            Side: e.Side switch
+            {
+                BittradeOrderSide.Buy => Side.Buy,
+                BittradeOrderSide.Sell => Side.Sell,
+                _ => throw new InvalidOperationException($"Unsupported side: {e.Side}.")
+            },
             Price: new Price(e.Price),
             Size: new Size(e.Size))).ToList();
 

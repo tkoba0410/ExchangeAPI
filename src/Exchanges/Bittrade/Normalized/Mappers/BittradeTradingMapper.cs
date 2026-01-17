@@ -142,7 +142,7 @@ internal static class BittradeTradingMapper
         return entries
             .Select((entry, idx) => new BittradeExecutionNormalized(
                 Id: string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId,
-                Side: entry.Type,
+                Side: MapSide(entry.Type),
                 Price: entry.Price,
                 Size: entry.FilledAmount,
                 Timestamp: entry.CreatedAt,
@@ -177,6 +177,18 @@ internal static class BittradeTradingMapper
 
     private static string Serialize<T>(T value) =>
         JsonSerializer.Serialize(value, SerializerOptions);
+
+    private static BittradeOrderSide MapSide(string? side)
+    {
+        try
+        {
+            return BittradeOrderSideParser.ParseOrThrow(side, "execution");
+        }
+        catch (ArgumentException ex)
+        {
+            throw new ExchangeApiException(ex.Message, exchange: Exchange);
+        }
+    }
 
     private static BittradeOrderType MapOrderType(Side side, ContractOrderType type)
     {

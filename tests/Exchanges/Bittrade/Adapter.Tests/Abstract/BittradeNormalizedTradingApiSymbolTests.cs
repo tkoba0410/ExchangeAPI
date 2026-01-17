@@ -22,7 +22,6 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    [InlineData("BTC_JPY")]
     [InlineData("btc-jpy")]
     public async Task TryGetApiSymbol_invalid_product_code_returns_error(string productCode)
     {
@@ -35,9 +34,21 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
         Assert.NotNull(err.Error);
     }
 
-    private static BittradeNormalizedTradingApi CreateApi(string productCode)
+    [Fact]
+    public async Task TryGetApiSymbol_normalizes_product_code_and_invokes_raw()
     {
-        var raw = new ThrowingRawTradingApi();
+        var raw = new RecordingRawTradingApi();
+        var api = CreateApi("BTC_JPY", raw);
+        var request = OrderRequest.Market(new Symbol("BTC/JPY"), Side.Buy, new Size(1m));
+
+        await api.PlaceOrderCallAsync(request, CancellationToken.None);
+
+        Assert.True(raw.WasCalled);
+    }
+
+    private static BittradeNormalizedTradingApi CreateApi(string productCode, IBittradeRawTradingApi? raw = null)
+    {
+        raw ??= new ThrowingRawTradingApi();
         var markets = new StubMarketResolver(productCode);
         return new BittradeNormalizedTradingApi(raw, markets, accountId: "account");
     }
@@ -48,6 +59,60 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
 
         public Task<Call<RawRequests.CreateOrderRequest, RawPlaceOrderResponse>> CreateOrderAsync(RawRequests.CreateOrderRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
+
+        public Task<Call<RawRequests.CancelOrderRequest, RawCancelOrderResponse>> CancelOrderAsync(RawRequests.CancelOrderRequest request, CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public Task<Call<RawRequests.CancelOrdersRequest, RawCancelOrdersResponse>> CancelOrdersAsync(RawRequests.CancelOrdersRequest request, CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public Task<Call<RawRequests.CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> CancelOpenOrdersAsync(RawRequests.CancelOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public Task<Call<RawRequests.CreateWithdrawRequest, RawCreateWithdrawResponse>> CreateWithdrawAsync(RawRequests.CreateWithdrawRequest request, CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public Task<Call<RawRequests.CancelWithdrawRequest, RawCancelWithdrawResponse>> CancelWithdrawAsync(RawRequests.CancelWithdrawRequest request, CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public Task<Call<RawRequests.CreateRetailOrderRequest, RawRetailOrderResponse>> CreateRetailOrderAsync(RawRequests.CreateRetailOrderRequest request, CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public Task<Call<RawRequests.GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersAsync(RawRequests.GetOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public Task<Call<RawRequests.GetOrderRequest, RawOrderDetailResponse>> GetOrderAsync(RawRequests.GetOrderRequest request, CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public Task<Call<RawRequests.GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsAsync(RawRequests.GetMatchResultsRequest request, CancellationToken cancellationToken = default) =>
+            throw CreateException();
+    }
+
+    private sealed class RecordingRawTradingApi : IBittradeRawTradingApi
+    {
+        private static Exception CreateException() => new InvalidOperationException("Unexpected raw API call.");
+
+        public bool WasCalled { get; private set; }
+
+        public Task<Call<RawRequests.CreateOrderRequest, RawPlaceOrderResponse>> CreateOrderAsync(
+            RawRequests.CreateOrderRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            WasCalled = true;
+            var meta = new CallMeta(
+                Layer: "Tests",
+                Component: "RecordingRawTradingApi",
+                Tags: null,
+                Children: null);
+            return Task.FromResult(new Call<RawRequests.CreateOrderRequest, RawPlaceOrderResponse>(
+                Id: CallId.New(),
+                StartedAt: DateTimeOffset.UtcNow,
+                Duration: TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<RawPlaceOrderResponse>.Err(
+                    new CallError(CallErrorKind.Unknown, "raw-error")),
+                Meta: meta));
+        }
 
         public Task<Call<RawRequests.CancelOrderRequest, RawCancelOrderResponse>> CancelOrderAsync(RawRequests.CancelOrderRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();

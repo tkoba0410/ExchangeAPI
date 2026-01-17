@@ -12,15 +12,15 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 internal interface IBittradeNormalizedMarketDataApi
 {
     Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
-        BittradeSymbol symbol,
+        string productCode,
         CancellationToken ct = default);
 
     Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
-        BittradeSymbol symbol,
+        string productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default);
 
     Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
-        BittradeSymbol symbol,
+        string productCode,
         CancellationToken ct = default);
 }

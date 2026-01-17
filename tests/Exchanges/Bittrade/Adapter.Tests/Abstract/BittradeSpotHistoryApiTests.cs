@@ -15,6 +15,7 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 using NormalizeRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
@@ -68,7 +69,7 @@ public sealed class BittradeSpotHistoryApiTests
         {
             new BittradeExecutionNormalized(
                 "1",
-                "buy",
+                BittradeOrderSide.Buy,
                 100m,
                 0.1m,
                 DateTimeOffset.UtcNow.AddMinutes(-1),
@@ -76,7 +77,7 @@ public sealed class BittradeSpotHistoryApiTests
                 new Dictionary<string, JsonElement>()),
             new BittradeExecutionNormalized(
                 "2",
-                "sell",
+                BittradeOrderSide.Sell,
                 101m,
                 0.2m,
                 DateTimeOffset.UtcNow,

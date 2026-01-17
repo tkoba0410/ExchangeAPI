@@ -63,13 +63,13 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
         }
     }
 
-    internal static BittradeSymbol ToApiSymbol(ExchangeMarketInfo market) =>
-        BittradeSymbol.ParseOrThrow(market.ProductCode);
+    internal static string ToApiSymbol(ExchangeMarketInfo market) =>
+        BittradeSymbol.Normalize(market.ProductCode);
 
     private static ExchangeMarketInfo MapSymbol(BittradeSymbolNormalized s)
     {
         var symbol = $"{s.BaseCurrency.ToUpperInvariant()}/{s.QuoteCurrency.ToUpperInvariant()}";
-        var product = NormalizeProductCode(s.Symbol);
+        var product = BittradeSymbol.Normalize(s.Symbol);
         var priceIncrement = Pow10(-s.PricePrecision);
         var sizeIncrement = Pow10(-s.AmountPrecision);
         var minSize = s.MinOrderAmount;
@@ -92,11 +92,6 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
             IsSupported: supported,
             StatusNote: s.State);
     }
-
-    private static string NormalizeProductCode(string symbol) =>
-        symbol
-            .Replace("_", string.Empty, StringComparison.Ordinal)
-            .ToLowerInvariant();
 
     private static decimal Pow10(int power) =>
         (decimal)Math.Pow(10, power);

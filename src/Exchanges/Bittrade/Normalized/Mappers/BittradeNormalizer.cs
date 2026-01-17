@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
@@ -50,7 +51,7 @@ internal static class BittradeNormalizer
         return entries
             .Select((entry, idx) => new BittradeExecutionNormalized(
                 entry.Id.ToString(),
-                entry.Direction,
+                MapSide(entry.Direction),
                 entry.Price,
                 entry.Amount,
                 entry.Ts,
@@ -212,4 +213,16 @@ internal static class BittradeNormalizer
 
     private static string Serialize<T>(T value) =>
         JsonSerializer.Serialize(value, SerializerOptions);
+
+    private static BittradeOrderSide MapSide(string? direction)
+    {
+        try
+        {
+            return BittradeOrderSideParser.ParseOrThrow(direction, "trade");
+        }
+        catch (ArgumentException ex)
+        {
+            throw new BittradeNormalizedException(ex.Message);
+        }
+    }
 }

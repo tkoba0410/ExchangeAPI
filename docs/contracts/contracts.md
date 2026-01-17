@@ -109,7 +109,7 @@ NotSupported は、Contracts API における **capability 不足**を示す標�
 
 <!-- 運用・進化方針は process.md / exceptions.md に移設済み -->
 
-## 12. Anti-Rules（禁止事項）
+## 11. Anti-Rules（禁止事項）
 
 - 公式 API 仕様の写経をしてはならない（MUST NOT）。
 - フィールド単位の詳細説明を契約に含めてはならない（MUST NOT）。

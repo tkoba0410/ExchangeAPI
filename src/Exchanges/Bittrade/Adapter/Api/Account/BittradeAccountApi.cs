@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -49,7 +50,7 @@ internal sealed class BittradeAccountApi : IAccountApi
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                "Bittrade.Account.GetBalances",
+                BittradeOperations.Account.GetBalances,
                 BittradeMapper.MapBalances);
         }
         catch (Exception ex)
@@ -57,7 +58,7 @@ internal sealed class BittradeAccountApi : IAccountApi
             return ApiCallMapper.FromException<GetBalancesRequest, IReadOnlyList<Balance>>(
                 request,
                 startedAt,
-                "Bittrade.Account.GetBalances",
+                BittradeOperations.Account.GetBalances,
                 ex);
         }
     }

@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
@@ -21,20 +23,19 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
 
 /// <summary>
 /// Bittrade の Public REST 実装（Ticker/OrderBook/Executions）。
 /// </summary>
-internal sealed class BittradeMarketDataApi : IMarketDataApi
+internal sealed class MarketApi : IMarketDataApi
 {
     private readonly IBittradeNormalizedMarketDataApi _marketData;
     private readonly IExchangeMarketResolver _markets;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public BittradeMarketDataApi(IBittradeNormalizedMarketDataApi marketData, IExchangeMarketResolver markets)
+    public MarketApi(IBittradeNormalizedMarketDataApi marketData, IExchangeMarketResolver markets)
     {
         _marketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
@@ -56,20 +57,16 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
                     request,
                     marketCall,
                     err.Error,
-                    "Bittrade.Market.GetTicker");
+                    BittradeOperations.MarketData.GetTicker);
             }
 
-            var apiSymbolText = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
-                .Response
-                .ProductCode
-                .Replace("_", string.Empty, StringComparison.Ordinal)
-                .ToLowerInvariant();
-            var apiSymbol = BittradeSymbol.ParseOrThrow(apiSymbolText);
+            var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
+                ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
             var call = await _marketData.GetTickerCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                "Bittrade.Market.GetTicker",
+                BittradeOperations.MarketData.GetTicker,
                 ok => BittradeMarketMapper.MapTicker(symbol, ok));
         }
         catch (SymbolNotSupportedException)
@@ -81,7 +78,7 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
             return ApiCallMapper.FromException<GetTickerRequest, Ticker>(
                 request,
                 startedAt,
-                "Bittrade.Market.GetTicker",
+                BittradeOperations.MarketData.GetTicker,
                 ex);
         }
     }
@@ -102,20 +99,16 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
                     request,
                     marketCall,
                     err.Error,
-                    "Bittrade.Market.GetOrderBook");
+                    BittradeOperations.MarketData.GetOrderBook);
             }
 
-            var apiSymbolText = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
-                .Response
-                .ProductCode
-                .Replace("_", string.Empty, StringComparison.Ordinal)
-                .ToLowerInvariant();
-            var apiSymbol = BittradeSymbol.ParseOrThrow(apiSymbolText);
+            var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
+                ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
             var call = await _marketData.GetOrderBookCallAsync(apiSymbol, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                "Bittrade.Market.GetOrderBook",
+                BittradeOperations.MarketData.GetOrderBook,
                 BittradeMarketMapper.MapOrderBook);
         }
         catch (SymbolNotSupportedException)
@@ -127,7 +120,7 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
             return ApiCallMapper.FromException<GetOrderBookRequest, OrderBook>(
                 request,
                 startedAt,
-                "Bittrade.Market.GetOrderBook",
+                BittradeOperations.MarketData.GetOrderBook,
                 ex);
         }
     }
@@ -148,20 +141,16 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
                     request,
                     marketCall,
                     err.Error,
-                    "Bittrade.Market.GetExecutions");
+                    BittradeOperations.MarketData.GetExecutions);
             }
 
-            var apiSymbolText = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result)
-                .Response
-                .ProductCode
-                .Replace("_", string.Empty, StringComparison.Ordinal)
-                .ToLowerInvariant();
-            var apiSymbol = BittradeSymbol.ParseOrThrow(apiSymbolText);
+            var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
+                ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
             var call = await _marketData.GetExecutionsCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                "Bittrade.Market.GetExecutions",
+                BittradeOperations.MarketData.GetExecutions,
                 ok => ToExecutionList(symbol, ok));
         }
         catch (SymbolNotSupportedException)
@@ -173,7 +162,7 @@ internal sealed class BittradeMarketDataApi : IMarketDataApi
             return ApiCallMapper.FromException<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
                 request,
                 startedAt,
-                "Bittrade.Market.GetExecutions",
+                BittradeOperations.MarketData.GetExecutions,
                 ex);
         }
     }

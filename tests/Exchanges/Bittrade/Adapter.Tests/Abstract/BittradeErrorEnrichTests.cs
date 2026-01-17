@@ -29,7 +29,7 @@ public sealed class BittradeErrorEnrichTests
     [Fact]
     public async Task GetTickerAsync_EnrichesExchangeAndOperation()
     {
-        var api = new BittradeMarketDataApi(new ThrowingMarketDataApi(), CreateResolver());
+        var api = new MarketApi(new ThrowingMarketDataApi(), CreateResolver());
 
         var call = await api.GetTickerCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
 

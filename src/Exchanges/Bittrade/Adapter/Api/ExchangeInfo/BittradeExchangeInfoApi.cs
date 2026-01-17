@@ -16,9 +16,11 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
@@ -26,12 +28,12 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
 /// <summary>
 /// Bittrade の ExchangeInfo API 実装（/v1/common/symbols を使用）。
 /// </summary>
-internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
+public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
 {
     private readonly IBittradeNormalizedExchangeInfoApi _normalized;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public BittradeExchangeInfoApi(IBittradeNormalizedExchangeInfoApi normalized)
+    internal BittradeExchangeInfoApi(IBittradeNormalizedExchangeInfoApi normalized)
     {
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
@@ -48,7 +50,7 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                "Bittrade.ExchangeInfo.GetExchangeInfo",
+                BittradeOperations.ExchangeInfo.GetExchangeInfo,
                 ok => new ExchangeInfoDto(ok.Select(MapSymbol).ToList(), Features: null, RateLimits: null, Maintenance: null));
         }
         catch (Exception ex)
@@ -56,15 +58,18 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
             return ApiCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(
                 request,
                 startedAt,
-                "Bittrade.ExchangeInfo.GetExchangeInfo",
+                BittradeOperations.ExchangeInfo.GetExchangeInfo,
                 ex);
         }
     }
 
+    internal static BittradeSymbol ToApiSymbol(ExchangeMarketInfo market) =>
+        BittradeSymbol.ParseOrThrow(market.ProductCode);
+
     private static ExchangeMarketInfo MapSymbol(BittradeSymbolNormalized s)
     {
         var symbol = $"{s.BaseCurrency.ToUpperInvariant()}/{s.QuoteCurrency.ToUpperInvariant()}";
-        var product = s.Symbol.ToLowerInvariant();
+        var product = NormalizeProductCode(s.Symbol);
         var priceIncrement = Pow10(-s.PricePrecision);
         var sizeIncrement = Pow10(-s.AmountPrecision);
         var minSize = s.MinOrderAmount;
@@ -87,6 +92,11 @@ internal sealed class BittradeExchangeInfoApi : IExchangeInfoApi
             IsSupported: supported,
             StatusNote: s.State);
     }
+
+    private static string NormalizeProductCode(string symbol) =>
+        symbol
+            .Replace("_", string.Empty, StringComparison.Ordinal)
+            .ToLowerInvariant();
 
     private static decimal Pow10(int power) =>
         (decimal)Math.Pow(10, power);

@@ -45,7 +45,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient, IHas
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient);
         var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        _marketApi = new BittradeMarketDataApi(normalizeBundle.MarketData, markets);
+        _marketApi = new MarketApi(normalizeBundle.MarketData, markets);
         var tradingNormalized = new BittradeNotSupportedNormalizedTradingApi();
         _tradingApi = new BittradeTradingApi(tradingNormalized);
         _accountApi = new BittradeAccountApi(normalizeBundle.Account);
@@ -67,7 +67,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient, IHas
     internal BittradePublicClient(BittradeApiBundle bundle)
     {
         if (bundle is null) throw new ArgumentNullException(nameof(bundle));
-        _marketApi = new BittradeMarketDataApi(bundle.NormalizedMarketData, bundle.Markets);
+        _marketApi = new MarketApi(bundle.NormalizedMarketData, bundle.Markets);
         var tradingNormalized = new BittradeNotSupportedNormalizedTradingApi();
         _tradingApi = new BittradeTradingApi(tradingNormalized);
         _accountApi = new BittradeAccountApi(bundle.NormalizedAccount);

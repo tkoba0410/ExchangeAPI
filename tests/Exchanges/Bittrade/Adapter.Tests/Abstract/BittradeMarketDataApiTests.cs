@@ -25,7 +25,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public class BittradeMarketDataApiTests
+public class BittradeMarketApiTests
 {
     [Fact]
     public async Task GetTickerAsync_MapsMergedResponse()
@@ -114,7 +114,7 @@ public class BittradeMarketDataApiTests
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }
 
-    private static BittradeMarketDataApi CreateApi(string expectedPath, string responseJson)
+    private static MarketApi CreateApi(string expectedPath, string responseJson)
     {
         var handler = new StubHandler(expectedPath, responseJson);
         var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost/") };
@@ -122,7 +122,7 @@ public class BittradeMarketDataApiTests
         var restClient = new RestClient(client.BaseAddress!, transport);
         var markets = CreateResolver(new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot"));
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient);
-        return new BittradeMarketDataApi(normalizeBundle.MarketData, markets);
+        return new MarketApi(normalizeBundle.MarketData, markets);
     }
 
     private static IExchangeMarketResolver CreateResolver(params ExchangeMarketInfo[] markets) =>

@@ -144,6 +144,25 @@ RawJson の保持有無や ClosedSet の拡張可否といった判断は、
 - `Composition`：組み立て（Factory/CredentialProvider/JsonExchangeInfoApi 等）
 - `Contracts`：公開契約（Shape/Semantics）※振る舞い禁止
 
+### 7.2 Reference Implementation（実装規範の参照元）
+
+本リポジトリでは、取引所間の実装格差を抑制するため、
+**bitFlyer の実装を Reference Implementation** と定める（MUST）。
+
+Reference Implementation は ExchangeAPI 内での **実装上の規範**であり、
+公式 API 仕様の正本に代わるものではない（MUST NOT）。
+
+新規取引所の追加および既存実装の修正は、原則として bitFlyer 実装の
+**構造・責務分離・戻り値契約**に倣わなければならない（MUST）。
+
+bitFlyer 実装からの逸脱は、**取引所仕様差による場合のみ**許容する。
+逸脱する場合は、理由を明示し差分を最小化しなければならない（MUST）。
+実装都合による独自解釈や拡張は認めない（MUST NOT）。
+
+適用範囲（初期）：
+- Spot MarketData
+- Spot Trading
+
 ### 7.1 取引所間共通実装の正規形（Canon）
 
 本節は、**取引所追加時に必ず従う実装形（構造の正規形）**を定義する。

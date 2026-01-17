@@ -18,6 +18,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
@@ -262,7 +263,21 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
 
         if (marketCall.Result is CallResult<ExchangeMarketInfo>.Ok ok)
         {
-            apiSymbol = ok.Response.ProductCode.Replace("_", string.Empty, StringComparison.Ordinal).ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(ok.Response.ProductCode))
+            {
+                apiSymbol = null;
+                error = new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code.");
+                return false;
+            }
+
+            if (!BittradeSymbol.TryParse(ok.Response.ProductCode, out var symbol))
+            {
+                apiSymbol = null;
+                error = new CallError(CallErrorKind.Semantic, $"Market resolution returned invalid product code: {ok.Response.ProductCode}.");
+                return false;
+            }
+
+            apiSymbol = symbol.Value;
             error = null;
             return true;
         }

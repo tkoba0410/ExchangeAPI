@@ -28,6 +28,12 @@
 
 ---
 
+## ガバナンス（Governance）
+
+* **Exchanges 配下の実装統一ルール**：[`governance/exchanges-code-unification.md`](./governance/exchanges-code-unification.md)
+
+---
+
 ## 一覧（Inventory / Fact）
 
 * **Endpoints Inventory**（API エンドポイント一覧・最小形）：[`inventory/endpoints.md`](./inventory/endpoints.md)

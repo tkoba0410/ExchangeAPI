@@ -30,9 +30,11 @@
 * `Wire/` : 外部 API との I/O 境界
 * `Raw/` : 外部 JSON 表現を lossless に型へ落とす層
 * `Normalized/` : 取引所差を吸収し、意味を確定する層
-* `Adapter/` : Normalized を公開契約へ写像する層
+* `Adapter/` : Normalized を公開契約へ写像する境界
 
-ここで固定するのは **層の箱のみ**であり、具体的なクラス構成や実装詳細はコードに委ねる。
+（Adapter の意味論的定義は TopSpec を正本とし、本書では再定義しない。）
+
+ここで固定するのは **構成の箱のみ**であり、具体的なクラス構成や実装詳細はコードに委ねる。
 
 ## 4. 名前空間（Namespace）規約
 
@@ -60,7 +62,8 @@ Exchanges.<Ex>.Adapter.*
 
 ## 6. 論理責務について
 
-Wire / Raw / Normalized / Adapter の**責務・禁止事項の定義は TopSpec を正本**とする。
+Wire / Raw / Normalized の**責務・禁止事項の定義は TopSpec を正本**とする。
+Adapter の意味定義も TopSpec に委譲し、本書では再定義しない。
 本書では再定義しない。
 
 ## 7. 例外の扱い

@@ -54,10 +54,11 @@ NotSupported は、Contracts API における **capability 不足**を示す標�
 - Message:
   - "NotSupported:<feature>"
 
-## 6. 型の所有権
+## 6. 型の所有権と返却責務
 
 - Abstract DTO（公開契約の型）は **Contracts 層が定義元（オーナー）**である（MUST）。
-- Normalized 層は Contracts の型を返す。Normalized 独自の抽象型を公開してはならない（MUST NOT）。
+- Contracts で定義された型を **返却する責務を持つのは Adapter（および Contracts 実装）** である（MUST）。
+- Normalized 層は取引所固有の意味確定 DTO を返し、Adapter が受け取り Contracts 型へ写像する（MUST）。
 
 ---
 

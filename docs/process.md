@@ -21,7 +21,8 @@
 
 ### 2.1 Normative（規範）
 - `docs/topspec.md`：最上位規範（層・境界・禁止事項）
-- `docs/contracts/contracts.md`：横断契約（公開契約の規範）
+- `docs/contracts/contracts.md`：取引所横断契約（型・責務）
+- `docs/contracts/overview.md`：Contracts 全体の規範的概要
 
 ### 2.2 Inventory（事実一覧）
 - `docs/inventory/endpoints.md`：エンドポイント一覧（棚卸し）

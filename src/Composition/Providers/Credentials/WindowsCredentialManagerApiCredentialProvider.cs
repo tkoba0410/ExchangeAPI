@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;

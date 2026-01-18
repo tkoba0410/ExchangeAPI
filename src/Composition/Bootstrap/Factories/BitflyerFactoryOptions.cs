@@ -6,7 +6,7 @@ using ExchangeApi.Contracts.Common.Dtos.Common;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
-using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Observability;

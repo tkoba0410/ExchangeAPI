@@ -1,7 +1,5 @@
 using System;
 using System.Net.Http;
-using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
@@ -122,35 +120,5 @@ public static class BitflyerClientFactory
             errorClassifier: errorClassifier);
 
         return BitflyerExchangeClient.FromRestClient(restClient);
-    }
-
-    /// <summary>
-    /// Create bitFlyer client using a credential provider to retrieve API key/secret.
-    /// </summary>
-    public static BitflyerExchangeClient Create(
-        IApiCredentialProvider provider,
-        ExchangeCode exchange,
-        string accountId,
-        IHttpPolicy? policy = null,
-        IRestClientLogger? logger = null,
-        IRestCallObserver? observer = null,
-        IExchangeErrorClassifier? errorClassifier = null,
-        HttpClient? httpClient = null)
-    {
-        if (provider is null)
-        {
-            throw new ArgumentNullException(nameof(provider));
-        }
-
-        var credentials = provider.Get(exchange, accountId);
-        var options = new BitflyerClientOptions
-        {
-            Policy = policy,
-            Logger = logger,
-            Observer = observer,
-            ErrorClassifier = errorClassifier,
-            HttpClient = httpClient
-        };
-        return Create(credentials.ApiKey, credentials.ApiSecret, options);
     }
 }

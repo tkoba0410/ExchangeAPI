@@ -53,6 +53,11 @@
 * `NotSupported` は **capability 不足を示す場合にのみ**使用される。
 * `NotSupported` を通常制御フロー（取引所判別・分岐）として利用することは禁止される。
 
+#### 3.2.1 CallAsync 命名（Call-only）
+
+* Contracts の公開 I/F は Call-only で提供されるため、I/O を伴う公開メソッド名は末尾を **`CallAsync`** とする。
+* `Async` のみ（例：`GetBalanceAsync`）は使用しない。
+
 ---
 
 ### 3.3 意味論の統一

@@ -115,6 +115,11 @@ RawJson の保持有無や ClosedSet の拡張可否といった判断は、
 - 公開 API の返却形式は **Call** に統一する（MUST）。
 - Response DTO を直接返してはならない（MUST NOT）。
 
+#### 5.1.1 CallAsync 命名（Call-only）
+- I/O を伴う公開 API は非同期で提供し、戻り値は `Task<Call<T>>` または `ValueTask<Call<T>>` とする（MUST）。
+- 上記の公開メソッド名は末尾を **`CallAsync`** とする（MUST）。
+- `Async` のみ（例：`GetBalanceAsync`）は使用してはならない（MUST NOT）。
+
 ### 5.2 型安全（in/out の固定）
 - 層の型の統一は、**メソッドの in/out（入力/出力）**で合わせる（MUST）。
 - 各層の公開メソッドは、その層で許可された型のみを in/out に用いる（MUST）。
@@ -138,6 +143,10 @@ RawJson の保持有無や ClosedSet の拡張可否といった判断は、
 ### 6.3 命名規約（機械判定）
 - Exchange DTO は型名または名前空間に取引所名を必須とする（MUST）。
 - 横断型（Abstract/Contract）は型名・名前空間に取引所名を含めてはならない（MUST NOT）。
+
+（Call-only）
+- 公開 I/O メソッド（`Task<Call<T>>` / `ValueTask<Call<T>>`）は `CallAsync` で終えなければならない（MUST）。
+- `Async` のみの命名は禁止する（MUST NOT）。
 
 ---
 

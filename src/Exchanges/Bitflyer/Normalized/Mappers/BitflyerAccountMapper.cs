@@ -3,43 +3,33 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 
 internal static class BitflyerAccountMapper
 {
-    private const ExchangeCode Exchange = ExchangeCode.Bitflyer;
-
-    public static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BalanceResponse> rawBalances)
+    public static IReadOnlyList<BitflyerBalanceEntryNormalized> MapBalances(IReadOnlyList<BalanceResponse> rawBalances)
     {
         if (rawBalances is null) throw new ArgumentNullException(nameof(rawBalances));
 
         return rawBalances
-            .Select(b => Balance.Create(
-                exchange: Exchange,
-                currency: b.CurrencyCode,
-                amount: b.Amount,
-                available: b.Available))
+            .Select(b => new BitflyerBalanceEntryNormalized(
+                Currency: b.CurrencyCode,
+                Amount: b.Amount,
+                Available: b.Available))
             .ToArray();
     }
 
-    public static IReadOnlyList<ExecutionAccount> MapAccountExecutions(
+    public static IReadOnlyList<BitflyerExecutionAccountNormalized> MapAccountExecutions(
         Symbol symbol,
         IReadOnlyList<ExecutionPrivateResponse> rawExecutions)
     {
         if (rawExecutions is null) throw new ArgumentNullException(nameof(rawExecutions));
 
         return rawExecutions
-            .Select(e => new ExecutionAccount(
-                ExchangeCode: ExchangeCode.Bitflyer,
+            .Select(e => new BitflyerExecutionAccountNormalized(
                 Symbol: symbol,
                 OrderId: e.Id.ToString(CultureInfo.InvariantCulture),
                 Side: BitflyerCommonMapper.MapSide(e.Side),

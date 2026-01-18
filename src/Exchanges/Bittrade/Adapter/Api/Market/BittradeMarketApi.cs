@@ -69,9 +69,13 @@ internal sealed class MarketApi : IMarketDataApi
                 BittradeOperations.MarketData.GetTicker,
                 ok => BittradeMarketMapper.MapTicker(symbol, ok));
         }
-        catch (SymbolNotSupportedException)
+        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            throw;
+            return SymbolNotSupported<GetTickerRequest, Ticker>(
+                request,
+                startedAt,
+                BittradeOperations.MarketData.GetTicker,
+                ex);
         }
         catch (Exception ex)
         {
@@ -111,9 +115,13 @@ internal sealed class MarketApi : IMarketDataApi
                 BittradeOperations.MarketData.GetOrderBook,
                 BittradeMarketMapper.MapOrderBook);
         }
-        catch (SymbolNotSupportedException)
+        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            throw;
+            return SymbolNotSupported<GetOrderBookRequest, OrderBook>(
+                request,
+                startedAt,
+                BittradeOperations.MarketData.GetOrderBook,
+                ex);
         }
         catch (Exception ex)
         {
@@ -153,9 +161,13 @@ internal sealed class MarketApi : IMarketDataApi
                 BittradeOperations.MarketData.GetExecutions,
                 ok => ToExecutionList(symbol, ok));
         }
-        catch (SymbolNotSupportedException)
+        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            throw;
+            return SymbolNotSupported<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
+                request,
+                startedAt,
+                BittradeOperations.MarketData.GetExecutions,
+                ex);
         }
         catch (Exception ex)
         {
@@ -193,6 +205,28 @@ internal sealed class MarketApi : IMarketDataApi
             Id: CallId.New(),
             StartedAt: marketCall.StartedAt,
             Duration: marketCall.Duration,
+            Request: request,
+            Result: new CallResult<TOk>.Err(error),
+            Meta: meta);
+    }
+
+    private static Call<TReq, TOk> SymbolNotSupported<TReq, TOk>(
+        TReq request,
+        DateTimeOffset startedAt,
+        string component,
+        Exception ex)
+    {
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: component,
+            Tags: null,
+            Children: null);
+        var error = new CallError(CallErrorKind.Semantic, ex.Message, ex);
+
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: startedAt,
+            Duration: DateTimeOffset.UtcNow - startedAt,
             Request: request,
             Result: new CallResult<TOk>.Err(error),
             Meta: meta);

@@ -17,6 +17,8 @@ using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
+using BittradeOrderRequest = ExchangeApi.Exchanges.Bittrade.Normalized.Requests.BittradeOrderRequest;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
@@ -28,7 +30,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
 internal sealed class BittradeTradingApi : ITradingApi
 {
     private readonly IBittradeNormalizedTradingApi _trading;
-    private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
     public BittradeTradingApi(IBittradeNormalizedTradingApi trading)
     {
@@ -48,9 +49,20 @@ internal sealed class BittradeTradingApi : ITradingApi
         try
         {
             var call = await _trading
-                .PlaceOrderCallAsync(OrderRequest.Limit(symbol, side, size, price), cancellationToken)
+                .PlaceOrderCallAsync(
+                    new BittradeOrderRequest(
+                        Symbol: symbol,
+                        Side: side,
+                        OrderType: OrderType.Limit,
+                        Size: size,
+                        Price: price),
+                    cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BittradeOperations.Trading.PlaceOrder);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BittradeOperations.Trading.PlaceOrder,
+                MapOrderResult);
         }
         catch (Exception ex)
         {
@@ -74,9 +86,20 @@ internal sealed class BittradeTradingApi : ITradingApi
         try
         {
             var call = await _trading
-                .PlaceOrderCallAsync(OrderRequest.Market(symbol, side, size), cancellationToken)
+                .PlaceOrderCallAsync(
+                    new BittradeOrderRequest(
+                        Symbol: symbol,
+                        Side: side,
+                        OrderType: OrderType.Market,
+                        Size: size,
+                        Price: null),
+                    cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BittradeOperations.Trading.PlaceOrder);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BittradeOperations.Trading.PlaceOrder,
+                MapOrderResult);
         }
         catch (Exception ex)
         {
@@ -99,7 +122,11 @@ internal sealed class BittradeTradingApi : ITradingApi
         try
         {
             var call = await _trading.CancelOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BittradeOperations.Trading.CancelOrder);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BittradeOperations.Trading.CancelOrder,
+                ok => new CancelResult(ok.IsSuccess));
         }
         catch (Exception ex)
         {
@@ -122,7 +149,11 @@ internal sealed class BittradeTradingApi : ITradingApi
         try
         {
             var call = await _trading.GetOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BittradeOperations.Trading.GetOrder);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BittradeOperations.Trading.GetOrder,
+                MapOrderStatus);
         }
         catch (Exception ex)
         {
@@ -160,7 +191,7 @@ internal sealed class BittradeTradingApi : ITradingApi
         }
     }
 
-    private static OrderSnapshotItem MapSnapshot(OpenOrder order)
+    private static OrderSnapshotItem MapSnapshot(BittradeOpenOrder order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch
@@ -180,5 +211,21 @@ internal sealed class BittradeTradingApi : ITradingApi
             Size: order.Size,
             Status: OrderSnapshotStatus.Open);
     }
+
+    private static OrderResult MapOrderResult(BittradeOrderResult result) =>
+        new(
+            Key: result.Key,
+            ExchangeOrderId: result.ExchangeOrderId,
+            AcceptanceId: result.AcceptanceId);
+
+    private static OrderStatus MapOrderStatus(BittradeOrderStatus status) =>
+        new(
+            ProductCode: status.ProductCode,
+            Key: status.Key,
+            Status: status.Status,
+            ExecutedSize: status.ExecutedSize,
+            OutstandingSize: status.OutstandingSize,
+            Price: status.Price,
+            AveragePrice: status.AveragePrice);
 
 }

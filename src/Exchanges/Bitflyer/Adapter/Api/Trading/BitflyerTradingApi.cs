@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Trading;
+using BitflyerOrderRequest = ExchangeApi.Exchanges.Bitflyer.Normalized.Requests.BitflyerOrderRequest;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
@@ -48,10 +50,20 @@ internal sealed class BitflyerTradingApi : ITradingApi
 
         try
         {
+            var normalizedRequest = new BitflyerOrderRequest(
+                Symbol: symbol,
+                Side: side,
+                OrderType: OrderType.Limit,
+                Size: size,
+                Price: price);
             var call = await _tradingApi
-                .PlaceOrderCallAsync(OrderRequest.Limit(symbol, side, size, price), cancellationToken)
+                .PlaceOrderCallAsync(normalizedRequest, cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.PlaceOrder);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.Trading.PlaceOrder,
+                MapOrderResult);
         }
         catch (Exception ex)
         {
@@ -74,10 +86,20 @@ internal sealed class BitflyerTradingApi : ITradingApi
 
         try
         {
+            var normalizedRequest = new BitflyerOrderRequest(
+                Symbol: symbol,
+                Side: side,
+                OrderType: OrderType.Market,
+                Size: size,
+                Price: null);
             var call = await _tradingApi
-                .PlaceOrderCallAsync(OrderRequest.Market(symbol, side, size), cancellationToken)
+                .PlaceOrderCallAsync(normalizedRequest, cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.PlaceOrder);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.Trading.PlaceOrder,
+                MapOrderResult);
         }
         catch (Exception ex)
         {
@@ -100,7 +122,11 @@ internal sealed class BitflyerTradingApi : ITradingApi
         try
         {
             var call = await _tradingApi.CancelOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.CancelOrder);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.Trading.CancelOrder,
+                ok => new CancelResult(ok.IsSuccess));
         }
         catch (Exception ex)
         {
@@ -123,7 +149,11 @@ internal sealed class BitflyerTradingApi : ITradingApi
         try
         {
             var call = await _tradingApi.GetOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Trading.GetOrder);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.Trading.GetOrder,
+                MapOrderStatus);
         }
         catch (Exception ex)
         {
@@ -161,7 +191,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
         }
     }
 
-    private static OrderSnapshotItem MapSnapshot(OpenOrder order)
+    private static OrderSnapshotItem MapSnapshot(BitflyerOpenOrder order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch
@@ -181,5 +211,21 @@ internal sealed class BitflyerTradingApi : ITradingApi
             Size: order.Size,
             Status: OrderSnapshotStatus.Open);
     }
+
+    private static OrderResult MapOrderResult(BitflyerOrderResult result) =>
+        new(
+            Key: result.Key,
+            ExchangeOrderId: result.ExchangeOrderId,
+            AcceptanceId: result.AcceptanceId);
+
+    private static OrderStatus MapOrderStatus(BitflyerOrderStatus status) =>
+        new(
+            ProductCode: status.ProductCode,
+            Key: status.Key,
+            Status: status.Status,
+            ExecutedSize: status.ExecutedSize,
+            OutstandingSize: status.OutstandingSize,
+            Price: status.Price,
+            AveragePrice: status.AveragePrice);
 
 }

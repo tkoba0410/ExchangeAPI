@@ -11,6 +11,7 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
@@ -32,21 +33,24 @@ internal static class BitflyerTestHelpers
 
     public static IBitflyerNormalizedAccountApi CreateAccountApi(
         IBitflyerRawAccountApi accountApi,
-        IExchangeMarketResolver markets) =>
+        IBitflyerMarketResolver markets) =>
         new BitflyerNormalizedAccountApi(accountApi, markets);
 
     public static IBitflyerNormalizedTradingApi CreateTradingApi(
         IBitflyerRawPrivateTradingApi tradingApi,
         IBitflyerPrivateApi accountApi,
-        IExchangeMarketResolver markets) =>
+        IBitflyerMarketResolver markets) =>
         new BitflyerNormalizedTradingApi(tradingApi, accountApi, markets);
 
-    public static IExchangeMarketResolver CreateResolver() =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
+    public static IBitflyerMarketResolver CreateResolver()
+    {
+        var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
             new[] { new ExchangeMarketInfo("BTC/JPY", "BTC_JPY", "Spot") },
             null,
             null,
             null)));
+        return new BitflyerNormalizedMarketResolver(resolver);
+    }
 
     private sealed class StubExchangeInfoApi : IExchangeInfoApi
     {

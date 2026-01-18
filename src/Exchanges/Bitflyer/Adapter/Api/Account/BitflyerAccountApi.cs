@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
@@ -11,6 +13,7 @@ using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
@@ -38,7 +41,11 @@ internal sealed class BitflyerAccountApi : IAccountApi
         try
         {
             var call = await _accountApi.GetBalancesCallAsync(cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.FromCall(request, call, BitflyerOperations.Account.GetBalances);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.Account.GetBalances,
+                MapBalances);
         }
         catch (Exception ex)
         {
@@ -49,5 +56,14 @@ internal sealed class BitflyerAccountApi : IAccountApi
                 ex);
         }
     }
+
+    private static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BitflyerBalanceEntryNormalized> balances) =>
+        balances
+            .Select(b => Balance.Create(
+                exchange: ExchangeCode.Bitflyer,
+                currency: b.Currency,
+                amount: b.Amount,
+                available: b.Available))
+            .ToArray();
 
 }

@@ -1,12 +1,7 @@
 using System;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
@@ -45,7 +40,7 @@ internal static class BitflyerTradingMapper
             _ => throw new ArgumentOutOfRangeException(nameof(childOrderType), childOrderType, "Unknown bitFlyer child_order_type"),
         };
 
-    public static void ValidateOrderRequest(OrderRequest request)
+    public static void ValidateOrderRequest(BitflyerOrderRequest request)
     {
         if (request.Symbol.IsEmpty)
             throw new ArgumentException("Symbol is required.", nameof(request));

@@ -55,7 +55,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
         var tradingNormalized = new BittradeNotSupportedNormalizedTradingApi();
-        var accountNormalized = new BittradeNotSupportedNormalizedAccountApi(string.Empty);
+        var accountNormalized = new BittradePreconditionMissingNormalizedAccountApi(string.Empty);
         _tradingApi = new BittradeTradingApi(tradingNormalized);
         _accountApi = new BittradeAccountApi(accountNormalized);
         _historyApi = new BittradeSpotHistoryApi(tradingNormalized, null);

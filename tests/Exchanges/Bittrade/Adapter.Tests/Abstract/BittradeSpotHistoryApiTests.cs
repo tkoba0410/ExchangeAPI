@@ -15,6 +15,8 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
@@ -29,26 +31,24 @@ public sealed class BittradeSpotHistoryApiTests
     {
         var orders = new[]
         {
-            new OpenOrder(
-                ExchangeCode.Bittrade,
-                new Symbol("BTC/JPY"),
-                new OrderKey(OrderIdKind.AcceptanceId, "id-1"),
-                Side.Buy,
-                OrderType.Limit,
-                new Size(0.1m),
-                new Size(0.1m),
-                new Size(0m),
-                new Price(100m)),
-            new OpenOrder(
-                ExchangeCode.Bittrade,
-                new Symbol("BTC/JPY"),
-                new OrderKey(OrderIdKind.AcceptanceId, "id-2"),
-                Side.Sell,
-                OrderType.Limit,
-                new Size(0.2m),
-                new Size(0.2m),
-                new Size(0m),
-                new Price(101m))
+            new BittradeOpenOrder(
+                Symbol: new Symbol("BTC/JPY"),
+                Key: new OrderKey(OrderIdKind.AcceptanceId, "id-1"),
+                Side: Side.Buy,
+                OrderType: OrderType.Limit,
+                Size: new Size(0.1m),
+                OutstandingSize: new Size(0.1m),
+                ExecutedSize: new Size(0m),
+                Price: new Price(100m)),
+            new BittradeOpenOrder(
+                Symbol: new Symbol("BTC/JPY"),
+                Key: new OrderKey(OrderIdKind.AcceptanceId, "id-2"),
+                Side: Side.Sell,
+                OrderType: OrderType.Limit,
+                Size: new Size(0.2m),
+                OutstandingSize: new Size(0.2m),
+                ExecutedSize: new Size(0m),
+                Price: new Price(101m))
         };
         var trading = new StubNormalizedTradingApi(orders, Array.Empty<BittradeExecutionNormalized>());
         var api = new BittradeSpotHistoryApi(trading, accountId: "account");
@@ -84,7 +84,7 @@ public sealed class BittradeSpotHistoryApiTests
                 snapshot,
                 new Dictionary<string, JsonElement>())
         };
-        var trading = new StubNormalizedTradingApi(Array.Empty<OpenOrder>(), executions);
+        var trading = new StubNormalizedTradingApi(Array.Empty<BittradeOpenOrder>(), executions);
         var api = new BittradeSpotHistoryApi(trading, accountId: "account");
 
         var call = await api.GetExecutionsCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
@@ -97,44 +97,44 @@ public sealed class BittradeSpotHistoryApiTests
 
     private sealed class StubNormalizedTradingApi : IBittradeNormalizedTradingApi
     {
-        private readonly IReadOnlyList<OpenOrder> _openOrders;
+        private readonly IReadOnlyList<BittradeOpenOrder> _openOrders;
         private readonly IReadOnlyList<BittradeExecutionNormalized> _executions;
 
         public StubNormalizedTradingApi(
-            IReadOnlyList<OpenOrder> openOrders,
+            IReadOnlyList<BittradeOpenOrder> openOrders,
             IReadOnlyList<BittradeExecutionNormalized> executions)
         {
             _openOrders = openOrders;
             _executions = executions;
         }
 
-        public Task<Call<NormalizeRequests.PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
-            OrderRequest request,
+        public Task<Call<NormalizeRequests.PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
+            BittradeOrderRequest request,
             CancellationToken ct = default) =>
             Task.FromResult(MakeOkCall(
                 new NormalizeRequests.PlaceOrderRequest(request),
-                new OrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
+                new BittradeOrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
 
-        public Task<Call<NormalizeRequests.CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
+        public Task<Call<NormalizeRequests.CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
             CancellationToken ct = default) =>
             Task.FromResult(MakeOkCall(
                 new NormalizeRequests.CancelOrderRequest(symbol, orderKey),
-                new CancelResult(true)));
+                new BittradeCancelResult(true)));
 
-        public Task<Call<NormalizeRequests.GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>> GetOpenOrdersCallAsync(
+        public Task<Call<NormalizeRequests.GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>> GetOpenOrdersCallAsync(
             Symbol symbol,
             CancellationToken ct = default) =>
             Task.FromResult(MakeOkCall(new NormalizeRequests.GetOpenOrdersRequest(symbol), _openOrders));
 
-        public Task<Call<NormalizeRequests.GetOrderRequest, OrderStatus>> GetOrderCallAsync(
+        public Task<Call<NormalizeRequests.GetOrderRequest, BittradeOrderStatus>> GetOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
             CancellationToken ct = default) =>
             Task.FromResult(MakeOkCall(
                 new NormalizeRequests.GetOrderRequest(symbol, orderKey),
-                new OrderStatus(
+                new BittradeOrderStatus(
                     ProductCode: "BTC_JPY",
                     Key: orderKey,
                     Status: OrderState.Active,

@@ -1,11 +1,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
-using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Call;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Markets;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
 using RawRequests = ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
@@ -26,11 +25,11 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
     public async Task TryGetApiSymbol_invalid_product_code_returns_error(string productCode)
     {
         var api = CreateApi(productCode);
-        var request = OrderRequest.Market(new Symbol("BTC/JPY"), Side.Buy, new Size(1m));
+        var request = new BittradeOrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m));
 
         var call = await api.PlaceOrderCallAsync(request, CancellationToken.None);
 
-        var err = Assert.IsType<CallResult<OrderResult>.Err>(call.Result);
+        var err = Assert.IsType<CallResult<BittradeOrderResult>.Err>(call.Result);
         Assert.NotNull(err.Error);
     }
 
@@ -39,7 +38,7 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
     {
         var raw = new RecordingRawTradingApi();
         var api = CreateApi("BTC_JPY", raw);
-        var request = OrderRequest.Market(new Symbol("BTC/JPY"), Side.Buy, new Size(1m));
+        var request = new BittradeOrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m));
 
         await api.PlaceOrderCallAsync(request, CancellationToken.None);
 
@@ -142,33 +141,32 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
             throw CreateException();
     }
 
-    private sealed class StubMarketResolver : IExchangeMarketResolver
+    private sealed class StubMarketResolver : IBittradeMarketResolver
     {
-        private readonly ExchangeMarketInfo _market;
+        private readonly BittradeMarketInfo _market;
 
         public StubMarketResolver(string productCode)
         {
-            _market = new ExchangeMarketInfo(
-                Symbol: "BTC/JPY",
-                ProductCode: productCode,
-                Type: "Spot");
+            _market = new BittradeMarketInfo(new Symbol("BTC/JPY"), productCode);
         }
 
-        public Task<Call<ResolveExchangeMarketRequest, ExchangeMarketInfo>> ResolveCallAsync(Symbol symbol, CancellationToken ct = default)
+        public Task<Call<ResolveBittradeMarketRequest, BittradeMarketInfo>> ResolveCallAsync(
+            Symbol symbol,
+            CancellationToken ct = default)
         {
-            var request = new ResolveExchangeMarketRequest(symbol);
+            var request = new ResolveBittradeMarketRequest(symbol);
             var meta = new CallMeta(
-                Layer: "Tests",
+                Layer: "Normalized",
                 Component: "StubMarketResolver",
                 Tags: null,
                 Children: null);
 
-            return Task.FromResult(new Call<ResolveExchangeMarketRequest, ExchangeMarketInfo>(
+            return Task.FromResult(new Call<ResolveBittradeMarketRequest, BittradeMarketInfo>(
                 Id: CallId.New(),
                 StartedAt: DateTimeOffset.UtcNow,
                 Duration: TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<ExchangeMarketInfo>.Ok(_market),
+                Result: new CallResult<BittradeMarketInfo>.Ok(_market),
                 Meta: meta));
         }
     }

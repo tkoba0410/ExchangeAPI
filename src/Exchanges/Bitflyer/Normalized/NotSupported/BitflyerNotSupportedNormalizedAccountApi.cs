@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
@@ -15,18 +15,18 @@ internal sealed class BitflyerNotSupportedNormalizedAccountApi : IBitflyerNormal
     private const string Layer = "Normalized";
     private const string Component = "Bitflyer.NotSupported";
 
-    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(NotSupportedCall.Create<GetBalancesRequest, IReadOnlyList<Balance>>(
+        Task.FromResult(NotSupportedCall.Create<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>(
             Layer,
             Component,
             new GetBalancesRequest(),
             "Account.GetBalances"));
 
-    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>> GetAccountExecutionsCallAsync(
+    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetAccountExecutionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(NotSupportedCall.Create<GetAccountExecutionsRequest, IReadOnlyList<ExecutionAccount>>(
+        Task.FromResult(NotSupportedCall.Create<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
             Layer,
             Component,
             new GetAccountExecutionsRequest(symbol),

@@ -14,6 +14,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
@@ -57,7 +58,7 @@ public sealed class BittradeOrderKeyConnectivityTests
         Assert.Equal("1002", trading.LastOrderKey?.Value);
     }
 
-    private static OrderStatus CreateOrderStatus(string id) =>
+    private static BittradeOrderStatus CreateOrderStatus(string id) =>
         new(
             ProductCode: "BTC_JPY",
             Key: new OrderKey(OrderIdKind.AcceptanceId, id),
@@ -71,29 +72,29 @@ public sealed class BittradeOrderKeyConnectivityTests
     {
         public OrderKey? LastOrderKey { get; private set; }
         public Symbol? LastSymbol { get; private set; }
-        public OrderStatus Order { get; init; } = CreateOrderStatus("default");
+        public BittradeOrderStatus Order { get; init; } = CreateOrderStatus("default");
 
-        public Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
-            OrderRequest request,
+        public Task<Call<PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
+            BittradeOrderRequest request,
             CancellationToken ct = default) =>
-            Task.FromResult(MakeOkCall(new PlaceOrderRequest(request), new OrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
+            Task.FromResult(MakeOkCall(new PlaceOrderRequest(request), new BittradeOrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
 
-        public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
+        public Task<Call<CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
             CancellationToken ct = default)
         {
             LastSymbol = symbol;
             LastOrderKey = orderKey;
-            return Task.FromResult(MakeOkCall(new CancelOrderRequest(symbol, orderKey), new CancelResult(true)));
+            return Task.FromResult(MakeOkCall(new CancelOrderRequest(symbol, orderKey), new BittradeCancelResult(true)));
         }
 
-        public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>> GetOpenOrdersCallAsync(
+        public Task<Call<GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>> GetOpenOrdersCallAsync(
             Symbol symbol,
             CancellationToken ct = default) =>
-            Task.FromResult(MakeOkCall(new GetOpenOrdersRequest(symbol), (IReadOnlyList<OpenOrder>)Array.Empty<OpenOrder>()));
+            Task.FromResult(MakeOkCall(new GetOpenOrdersRequest(symbol), (IReadOnlyList<BittradeOpenOrder>)Array.Empty<BittradeOpenOrder>()));
 
-        public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
+        public Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
             CancellationToken ct = default)

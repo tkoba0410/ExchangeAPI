@@ -30,14 +30,13 @@ internal sealed class BitflyerApiBundle
     public static BitflyerApiBundle FromRestClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        var normalized = BitflyerNormalizedApi.FromRestClient(restClient);
         var exchangeInfo = new BitflyerExchangeInfoApi();
-        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var privateApi = BitflyerNormalizeFactory.CreateAccountApi(restClient, markets);
-        var tradingApi = BitflyerNormalizeFactory.CreateTradingApi(restClient, markets);
+        var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
+        var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
+        var normalized = BitflyerNormalizeFactory.FromRestClient(restClient, markets);
         return new BitflyerApiBundle(
             marketData: normalized.MarketData,
-            account: privateApi,
-            trading: tradingApi);
+            account: normalized.Account,
+            trading: normalized.Trading);
     }
 }

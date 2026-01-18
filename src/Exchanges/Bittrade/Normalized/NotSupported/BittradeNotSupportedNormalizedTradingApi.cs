@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
@@ -16,39 +15,39 @@ internal sealed class BittradeNotSupportedNormalizedTradingApi : IBittradeNormal
     private const string Layer = "Normalized";
     private const string Component = "Bittrade.NotSupported";
 
-    public Task<Call<PlaceOrderRequest, OrderResult>> PlaceOrderCallAsync(
-        OrderRequest request,
+    public Task<Call<PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
+        BittradeOrderRequest request,
         CancellationToken ct = default) =>
-        Task.FromResult(NotSupportedCall.Create<PlaceOrderRequest, OrderResult>(
+        Task.FromResult(NotSupportedCall.Create<PlaceOrderRequest, BittradeOrderResult>(
             Layer,
             Component,
             new PlaceOrderRequest(request),
             "Trading.PlaceOrder"));
 
-    public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
+    public Task<Call<CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default) =>
-        Task.FromResult(NotSupportedCall.Create<CancelOrderRequest, CancelResult>(
+        Task.FromResult(NotSupportedCall.Create<CancelOrderRequest, BittradeCancelResult>(
             Layer,
             Component,
             new CancelOrderRequest(symbol, orderKey),
             "Trading.CancelOrder"));
 
-    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>> GetOpenOrdersCallAsync(
+    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>> GetOpenOrdersCallAsync(
         Symbol symbol,
         CancellationToken ct = default) =>
-        Task.FromResult(NotSupportedCall.Create<GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>(
+        Task.FromResult(NotSupportedCall.Create<GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>(
             Layer,
             Component,
             new GetOpenOrdersRequest(symbol),
             "Trading.GetOpenOrders"));
 
-    public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
+    public Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default) =>
-        Task.FromResult(NotSupportedCall.Create<GetOrderRequest, OrderStatus>(
+        Task.FromResult(NotSupportedCall.Create<GetOrderRequest, BittradeOrderStatus>(
             Layer,
             Component,
             new GetOrderRequest(symbol, orderKey),

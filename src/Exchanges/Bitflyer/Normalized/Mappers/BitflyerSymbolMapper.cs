@@ -1,6 +1,5 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Contracts.Common.Errors;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 
@@ -10,7 +9,7 @@ internal static class BitflyerSymbolMapper
     {
         if (symbol.IsEmpty)
         {
-            throw new SymbolNotSupportedException(symbol.ToString());
+            throw new InvalidOperationException($"SymbolNotSupported:{symbol}");
         }
 
         return ToProductCode(symbol.Value);
@@ -28,7 +27,7 @@ internal static class BitflyerSymbolMapper
     {
         if (string.IsNullOrWhiteSpace(symbol))
         {
-            throw new SymbolNotSupportedException(symbol ?? string.Empty);
+            throw new InvalidOperationException($"SymbolNotSupported:{symbol ?? string.Empty}");
         }
 
         return new Symbol(symbol);

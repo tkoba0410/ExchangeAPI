@@ -1,8 +1,8 @@
 using System;
-using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Call;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Markets;
 using ExchangeApi.Exchanges.Bittrade.Normalized.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
@@ -27,7 +27,7 @@ internal static class BittradeNormalizeFactory
         var marketData = new BittradeNormalizedMarketDataApi(raw.MarketData);
         var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
         IBittradeNormalizedAccountApi account = normalizedAccountId is null
-            ? new BittradeNotSupportedNormalizedAccountApi(string.Empty)
+            ? new BittradePreconditionMissingNormalizedAccountApi(string.Empty)
             : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
 
         return new BittradeNormalizeBundle(
@@ -39,7 +39,7 @@ internal static class BittradeNormalizeFactory
 
     public static IBittradeNormalizedTradingApi CreateTradingApi(
         IRestClient restClient,
-        IExchangeMarketResolver markets,
+        IBittradeMarketResolver markets,
         string accountId)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));

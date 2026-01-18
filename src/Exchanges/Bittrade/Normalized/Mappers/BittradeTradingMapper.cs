@@ -3,16 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Contracts.Common.Errors;
-using ContractOrderType = ExchangeApi.Primitives.DomainCommon.Enums.OrderType;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
@@ -20,16 +12,17 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 
 internal static class BittradeTradingMapper
 {
-    private const ExchangeCode Exchange = ExchangeCode.Bittrade;
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
-    public static RawCreateOrderRequest ToRaw(string accountId, string apiSymbol, OrderRequest request)
+    public static RawCreateOrderRequest ToRaw(string accountId, string apiSymbol, BittradeOrderRequest request)
     {
         if (string.IsNullOrWhiteSpace(accountId))
         {
@@ -54,24 +47,24 @@ internal static class BittradeTradingMapper
             Source: null);
     }
 
-    public static OrderResult ToOrderResult(RawPlaceOrderResponse raw)
+    public static BittradeOrderResult ToOrderResult(RawPlaceOrderResponse raw)
     {
         var orderId = raw.OrderId;
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
-        return new OrderResult(key, ExchangeOrderId: orderId);
+        return new BittradeOrderResult(key, ExchangeOrderId: orderId);
     }
 
-    public static IReadOnlyList<OpenOrder> ToOpenOrders(Symbol symbol, RawOpenOrdersResponse raw)
+    public static IReadOnlyList<BittradeOpenOrder> ToOpenOrders(Symbol symbol, RawOpenOrdersResponse raw)
     {
         if (raw.Data is null || raw.Data.Count == 0)
         {
-            return Array.Empty<OpenOrder>();
+            return Array.Empty<BittradeOpenOrder>();
         }
 
         return raw.Data.Select(order => ToOpenOrder(symbol, order)).ToList();
     }
 
-    private static OpenOrder ToOpenOrder(Symbol symbol, RawOrderSummary raw)
+    private static BittradeOpenOrder ToOpenOrder(Symbol symbol, RawOrderSummary raw)
     {
         var (side, type) = MapSideAndType(raw.Type);
         var status = MapStatus(raw.State);
@@ -81,8 +74,7 @@ internal static class BittradeTradingMapper
         var priceValue = ParseDecimalOrThrow(raw.Price, "price");
         var price = priceValue is null ? (Price?)null : new Price(priceValue.Value);
 
-        return new OpenOrder(
-            ExchangeCode: Exchange,
+        return new BittradeOpenOrder(
             Symbol: symbol,
             Key: new OrderKey(OrderIdKind.ExchangeOrderId, raw.Id),
             Side: side,
@@ -98,7 +90,7 @@ internal static class BittradeTradingMapper
             ExchangeOrderId: raw.Id);
     }
 
-    public static OrderStatus ToOrderStatus(string productCode, RawOrderDetailResponse raw, OrderKey key)
+    public static BittradeOrderStatus ToOrderStatus(string productCode, RawOrderDetailResponse raw, OrderKey key)
     {
         if (string.IsNullOrWhiteSpace(productCode))
         {
@@ -107,7 +99,7 @@ internal static class BittradeTradingMapper
 
         if (raw.Data is null)
         {
-            throw new ExchangeApiException("Bittrade order response is missing data.", exchange: Exchange);
+            throw new InvalidOperationException("Bittrade order response is missing data.");
         }
 
         var status = MapStatus(raw.Data.State);
@@ -117,7 +109,7 @@ internal static class BittradeTradingMapper
         var executed = new Size(ParseDecimalOrThrow(raw.Data.FilledAmount, "field-amount") ?? 0m);
         var outstanding = new Size(Math.Max(0m, size - executed.Value));
 
-        return new OrderStatus(
+        return new BittradeOrderStatus(
             productCode,
             key,
             status,
@@ -180,43 +172,36 @@ internal static class BittradeTradingMapper
 
     private static BittradeOrderSide MapSide(string? side)
     {
-        try
-        {
-            return BittradeOrderSideParser.ParseOrThrow(side, "execution");
-        }
-        catch (ArgumentException ex)
-        {
-            throw new ExchangeApiException(ex.Message, exchange: Exchange);
-        }
+        return BittradeOrderSideParser.ParseOrThrow(side, "execution");
     }
 
-    private static BittradeOrderType MapOrderType(Side side, ContractOrderType type)
+    private static BittradeOrderType MapOrderType(Side side, OrderType type)
     {
         return (side, type) switch
         {
-            (Side.Buy, ContractOrderType.Market) => BittradeOrderType.BuyMarket,
-            (Side.Sell, ContractOrderType.Market) => BittradeOrderType.SellMarket,
-            (Side.Buy, ContractOrderType.Limit) => BittradeOrderType.BuyLimit,
-            (Side.Sell, ContractOrderType.Limit) => BittradeOrderType.SellLimit,
-            _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
+            (Side.Buy, OrderType.Market) => BittradeOrderType.BuyMarket,
+            (Side.Sell, OrderType.Market) => BittradeOrderType.SellMarket,
+            (Side.Buy, OrderType.Limit) => BittradeOrderType.BuyLimit,
+            (Side.Sell, OrderType.Limit) => BittradeOrderType.SellLimit,
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unsupported order type.")
         };
     }
 
-    private static (Side Side, ContractOrderType OrderType) MapSideAndType(string type)
+    private static (Side Side, OrderType OrderType) MapSideAndType(string type)
     {
         var parsedType = ParseOrderType(type);
         var parsedSide = parsedType switch
         {
             BittradeOrderType.BuyLimit or BittradeOrderType.BuyMarket or BittradeOrderType.BuyLimitMaker or BittradeOrderType.BuyIoc => Side.Buy,
             BittradeOrderType.SellLimit or BittradeOrderType.SellMarket or BittradeOrderType.SellLimitMaker or BittradeOrderType.SellIoc => Side.Sell,
-            _ => throw new ExchangeApiException($"Unsupported order side: {type}.", exchange: Exchange)
+            _ => throw new InvalidOperationException($"Unsupported order side: {type}.")
         };
 
         var orderType = parsedType switch
         {
-            BittradeOrderType.BuyMarket or BittradeOrderType.SellMarket => ContractOrderType.Market,
-            BittradeOrderType.BuyLimit or BittradeOrderType.SellLimit => ContractOrderType.Limit,
-            _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
+            BittradeOrderType.BuyMarket or BittradeOrderType.SellMarket => OrderType.Market,
+            BittradeOrderType.BuyLimit or BittradeOrderType.SellLimit => OrderType.Limit,
+            _ => throw new InvalidOperationException($"Unsupported order type: {type}.")
         };
 
         return (parsedSide, orderType);
@@ -231,7 +216,7 @@ internal static class BittradeTradingMapper
             BittradeOrderState.Filled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Completed,
             BittradeOrderState.PartialCanceled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Canceled,
             BittradeOrderState.Canceled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Canceled,
-            _ => throw new ExchangeApiException($"Unsupported order state: {state}.", exchange: Exchange)
+            _ => throw new InvalidOperationException($"Unsupported order state: {state}.")
         };
     }
 
@@ -246,7 +231,7 @@ internal static class BittradeTradingMapper
             BittradeOrderType.SellLimitMaker => "sell-limit-maker",
             BittradeOrderType.BuyIoc => "buy-ioc",
             BittradeOrderType.SellIoc => "sell-ioc",
-            _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
+            _ => throw new InvalidOperationException($"Unsupported order type: {type}.")
         };
 
     private static BittradeOrderType ParseOrderType(string type) =>
@@ -260,7 +245,7 @@ internal static class BittradeTradingMapper
             "sell-limit-maker" => BittradeOrderType.SellLimitMaker,
             "buy-ioc" => BittradeOrderType.BuyIoc,
             "sell-ioc" => BittradeOrderType.SellIoc,
-            _ => throw new ExchangeApiException($"Unsupported order type: {type}.", exchange: Exchange)
+            _ => throw new InvalidOperationException($"Unsupported order type: {type}.")
         };
 
     private static BittradeOrderState ParseOrderState(string state) =>
@@ -271,7 +256,7 @@ internal static class BittradeTradingMapper
             "filled" => BittradeOrderState.Filled,
             "partial-canceled" => BittradeOrderState.PartialCanceled,
             "canceled" => BittradeOrderState.Canceled,
-            _ => throw new ExchangeApiException($"Unsupported order state: {state}.", exchange: Exchange)
+            _ => throw new InvalidOperationException($"Unsupported order state: {state}.")
         };
 
     private static string FormatDecimal(decimal value) =>
@@ -289,14 +274,14 @@ internal static class BittradeTradingMapper
             return value;
         }
 
-        throw new ExchangeApiException($"Invalid {field}: '{text}'.", exchange: Exchange);
+        throw new InvalidOperationException($"Invalid {field}: '{text}'.");
     }
 
     private static decimal ParseRequiredDecimal(string? text, string field)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
-            throw new ExchangeApiException($"Missing {field}: <missing>.", exchange: Exchange);
+            throw new InvalidOperationException($"Missing {field}: <missing>.");
         }
 
         if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
@@ -304,7 +289,7 @@ internal static class BittradeTradingMapper
             return value;
         }
 
-        throw new ExchangeApiException($"Invalid {field}: '{text}'.", exchange: Exchange);
+        throw new InvalidOperationException($"Invalid {field}: '{text}'.");
     }
 
 }

@@ -6,7 +6,7 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Contracts.Common.Errors;
+using System;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Call;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private;
@@ -26,7 +26,7 @@ public sealed class BittradeFailFastMapperTests
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        Assert.Throws<ExchangeApiException>(() =>
+        Assert.Throws<InvalidOperationException>(() =>
             BittradeTradingMapper.ToOpenOrders(new Symbol("BTC/JPY"), raw));
     }
 
@@ -35,7 +35,7 @@ public sealed class BittradeFailFastMapperTests
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        Assert.Throws<ExchangeApiException>(() =>
+        Assert.Throws<InvalidOperationException>(() =>
             BittradeTradingMapper.ToOpenOrders(new Symbol("BTC/JPY"), raw));
     }
 
@@ -59,7 +59,7 @@ public sealed class BittradeFailFastMapperTests
                 FilledCashAmount: "0",
                 Fees: "0"));
 
-        Assert.Throws<ExchangeApiException>(() =>
+        Assert.Throws<InvalidOperationException>(() =>
             BittradeTradingMapper.ToOrderStatus("BTC_JPY", raw, new OrderKey(OrderIdKind.ExchangeOrderId, "1")));
     }
 

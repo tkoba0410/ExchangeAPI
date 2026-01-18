@@ -43,7 +43,8 @@ public static class BittradeClientFactory
         var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient, accountId);
         var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var tradingApi = BittradeNormalizeFactory.CreateTradingApi(restClient, markets, accountId);
+        var normalizedMarkets = new BittradeNormalizedMarketResolver(markets);
+        var tradingApi = BittradeNormalizeFactory.CreateTradingApi(restClient, normalizedMarkets, accountId);
         var trading = new BittradeTradingApi(tradingApi);
         IAccountApi account = new BittradeAccountApi(normalizeBundle.Account);
         return (new MarketApi(normalizeBundle.MarketData, markets), trading, account, exchangeInfo);

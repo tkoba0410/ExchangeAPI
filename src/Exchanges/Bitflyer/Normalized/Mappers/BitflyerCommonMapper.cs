@@ -1,6 +1,5 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 
@@ -19,14 +18,14 @@ internal static class BitflyerCommonMapper
 
     public static string ToApiProductCode(string productCode) =>
         string.IsNullOrWhiteSpace(productCode)
-            ? throw new SymbolNotSupportedException(productCode ?? string.Empty)
+            ? throw new InvalidOperationException($"SymbolNotSupported:{productCode ?? string.Empty}")
             : productCode;
 
     public static string ParseProductCode(string productCode)
     {
         if (string.IsNullOrWhiteSpace(productCode))
         {
-            throw new SymbolNotSupportedException(productCode ?? string.Empty);
+            throw new InvalidOperationException($"SymbolNotSupported:{productCode ?? string.Empty}");
         }
 
         return productCode;

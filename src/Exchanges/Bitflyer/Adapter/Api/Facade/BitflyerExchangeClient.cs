@@ -85,18 +85,16 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public static BitflyerExchangeClient FromRestClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-
-        var normalized = BitflyerNormalizedApi.FromRestClient(restClient);
         var exchangeInfo = new BitflyerExchangeInfoApi();
-        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var accountApi = BitflyerNormalizeFactory.CreateAccountApi(restClient, markets);
-        var tradingApi = BitflyerNormalizeFactory.CreateTradingApi(restClient, markets);
-        var historyApi = CreateSpotHistoryApi(tradingApi, accountApi);
+        var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
+        var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
+        var normalized = BitflyerNormalizeFactory.FromRestClient(restClient, markets);
+        var historyApi = CreateSpotHistoryApi(normalized.Trading, normalized.Account);
 
         return new BitflyerExchangeClient(
             marketApi: CreateMarketApi(normalized.MarketData),
-            tradingApi: CreateTradingApi(tradingApi),
-            accountApi: CreateAccountApi(accountApi),
+            tradingApi: CreateTradingApi(normalized.Trading),
+            accountApi: CreateAccountApi(normalized.Account),
             historyApi: historyApi);
     }
 

@@ -17,6 +17,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Primitives.CallCommon;
 
@@ -98,7 +99,7 @@ internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
 
     private static Page<OrderSnapshotItem> BuildOrderPage(
         MarketLimitCursorRequest request,
-        IReadOnlyList<OpenOrder> orders)
+        IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading.BittradeOpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
         var (requestedLimit, appliedLimit) = GetLimits(request);
@@ -130,7 +131,7 @@ internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
         return new Page<ExecutionItem>(items, HasMore: false, NextCursor: null, Meta: meta);
     }
 
-    private static OrderSnapshotItem MapSnapshot(OpenOrder order)
+    private static OrderSnapshotItem MapSnapshot(ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading.BittradeOpenOrder order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch

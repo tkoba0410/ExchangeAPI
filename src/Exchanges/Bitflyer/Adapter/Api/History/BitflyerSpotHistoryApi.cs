@@ -15,6 +15,8 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Operations;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Trading;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.History;
@@ -85,7 +87,7 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
 
     private static Page<OrderSnapshotItem> BuildOrderPage(
         MarketLimitCursorRequest request,
-        IReadOnlyList<OpenOrder> orders)
+        IReadOnlyList<BitflyerOpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
         var (requestedLimit, appliedLimit) = GetLimits(request);
@@ -96,7 +98,7 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
 
     private static Page<ExecutionItem> BuildExecutionPage(
         MarketLimitCursorRequest request,
-        IReadOnlyList<ExecutionAccount> executions)
+        IReadOnlyList<BitflyerExecutionAccountNormalized> executions)
     {
         var items = executions.Select(e => new ExecutionItem(
             Timestamp: e.ExecutedAt,
@@ -112,7 +114,7 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
         return new Page<ExecutionItem>(items, HasMore: false, NextCursor: null, Meta: meta);
     }
 
-    private static OrderSnapshotItem MapSnapshot(OpenOrder order)
+    private static OrderSnapshotItem MapSnapshot(BitflyerOpenOrder order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch

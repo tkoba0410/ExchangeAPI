@@ -6,19 +6,17 @@ using ExchangeApi.Contracts.Common.Dtos.Common;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
 internal static class BittradeMarketMapper
 {
-    private const ExchangeCode Exchange = ExchangeCode.Bittrade;
-
     public static Ticker MapTicker(CommonSymbol symbol, BittradeTickerNormalized normalized)
     {
         return new Ticker(
@@ -36,13 +34,12 @@ internal static class BittradeMarketMapper
             .Select(level => new OrderBookLevel(new Price(level.Price), new Size(level.Size)))
             .ToList();
 
-        return new OrderBook(Exchange, bids, asks);
+        return new OrderBook(bids, asks);
     }
 
     public static ExecutionMarket MapExecution(CommonSymbol symbol, BittradeExecutionNormalized normalized)
     {
         return new ExecutionMarket(
-            Exchange,
             symbol,
             normalized.Id,
             MapSide(normalized.Side),
@@ -56,6 +53,6 @@ internal static class BittradeMarketMapper
         {
             BittradeOrderSide.Buy => Side.Buy,
             BittradeOrderSide.Sell => Side.Sell,
-            _ => throw new ExchangeApiException($"Unsupported side: {side}.", exchange: Exchange)
+            _ => throw new ExchangeApiException($"Unsupported side: {side}.")
         };
 }

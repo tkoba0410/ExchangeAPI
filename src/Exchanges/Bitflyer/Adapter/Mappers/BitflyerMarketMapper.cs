@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -37,7 +36,7 @@ internal static class MarketMapper
             .Select(a => new OrderBookLevel(new Price(a.Price), new Size(a.Size)))
             .ToArray();
 
-        return new OrderBook(ExchangeCode.Bitflyer, bids, asks);
+        return new OrderBook(bids, asks);
     }
 
     public static ExecutionMarket MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)
@@ -45,7 +44,6 @@ internal static class MarketMapper
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
         return new ExecutionMarket(
-            ExchangeCode: ExchangeCode.Bitflyer,
             Symbol: symbol,
             OrderId: normalized.Id.ToString(),
             Side: BitflyerCommonMapper.MapSide(normalized.Side),

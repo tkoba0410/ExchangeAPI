@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Contracts.Common.Dtos.Market;
 
@@ -10,13 +9,11 @@ namespace ExchangeApi.Contracts.Common.Dtos.Market;
 /// </summary>
 public sealed record OrderBook
 {
-    public ExchangeCode ExchangeCode { get; init; }
     public IReadOnlyList<OrderBookLevel> Bids { get; init; }
     public IReadOnlyList<OrderBookLevel> Asks { get; init; }
 
-    public OrderBook(ExchangeCode exchangeCode, IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks)
+    public OrderBook(IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks)
     {
-        ExchangeCode = exchangeCode;
         if (bids is null) throw new ArgumentNullException(nameof(bids));
         if (asks is null) throw new ArgumentNullException(nameof(asks));
 

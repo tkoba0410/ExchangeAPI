@@ -1,4 +1,3 @@
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Transport.Protocol;
 
@@ -25,18 +24,12 @@ internal static class BittradeErrorMapper
         return ToTransportErrorCategory(MapErrorCategory(statusCode, exchangeCode));
     }
 
-    public static ExchangeApiException EnrichBittradeException(ExchangeApiException ex, ExchangeCode exchange, string operation)
+    public static ExchangeApiException EnrichBittradeException(ExchangeApiException ex, string operation)
     {
-        if (ex.Exchange == exchange && ex.Operation == operation)
-        {
-            return ex;
-        }
-
         var category = MapErrorCategory(ex.StatusCode, ex.ExchangeErrorCode);
 
         return new ExchangeApiException(
             message: ex.Message,
-            exchange: exchange,
             operation: operation,
             statusCode: ex.StatusCode,
             exchangeErrorCode: ex.ExchangeErrorCode,
@@ -44,13 +37,12 @@ internal static class BittradeErrorMapper
             innerException: ex);
     }
 
-    public static ExchangeApiException FromTransportException(TransportException ex, ExchangeCode exchange, string operation)
+    public static ExchangeApiException FromTransportException(TransportException ex, string operation)
     {
         var category = ToExchangeErrorCategory(ex.ErrorCategory) ?? MapErrorCategory(ex.StatusCode, ex.ErrorCode);
 
         return new ExchangeApiException(
             message: ex.Message,
-            exchange: exchange,
             operation: operation,
             statusCode: ex.StatusCode,
             exchangeErrorCode: ex.ErrorCode,

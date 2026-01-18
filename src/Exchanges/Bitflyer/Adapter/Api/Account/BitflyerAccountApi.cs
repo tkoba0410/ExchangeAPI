@@ -60,7 +60,6 @@ internal sealed class BitflyerAccountApi : IAccountApi
     private static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BitflyerBalanceEntryNormalized> balances) =>
         balances
             .Select(b => Balance.Create(
-                exchange: ExchangeCode.Bitflyer,
                 currency: b.Currency,
                 amount: b.Amount,
                 available: b.Available))

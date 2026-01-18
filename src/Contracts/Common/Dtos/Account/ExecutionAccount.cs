@@ -7,7 +7,6 @@ namespace ExchangeApi.Contracts.Common.Dtos.Account;
 /// 口座の約定履歴（シンボル＋注文IDベース）。
 /// </summary>
 public sealed record ExecutionAccount(
-    ExchangeCode ExchangeCode,
     Symbol Symbol,
     string OrderId,
     Side Side,

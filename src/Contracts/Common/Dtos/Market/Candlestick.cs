@@ -1,5 +1,4 @@
 using System;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Contracts.Common.Dtos.Market;
 
@@ -10,7 +9,6 @@ namespace ExchangeApi.Contracts.Common.Dtos.Market;
 /// Stage6 の bitFlyer 実装では REST 取得を提供しないため、利用側で NotSupported を受け取る前提で使用する。
 /// </remarks>
 public sealed record Candlestick(
-    ExchangeCode ExchangeCode,
     Symbol Symbol,
     TimeSpan Timescale,
     DateTimeOffset OpenTime,

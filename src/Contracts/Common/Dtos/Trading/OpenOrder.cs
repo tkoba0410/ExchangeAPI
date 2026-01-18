@@ -7,7 +7,6 @@ namespace ExchangeApi.Contracts.Common.Dtos.Trading;
 /// オープンな子注文の概要（受付IDなし、Exchange/時刻を含む）。
 /// </summary>
 public sealed record OpenOrder(
-    ExchangeCode ExchangeCode,
     Symbol Symbol,
     OrderKey Key,
     Side Side,

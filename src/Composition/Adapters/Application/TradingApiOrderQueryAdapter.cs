@@ -86,7 +86,7 @@ public sealed class TradingApiOrderQueryAdapter : IOrderQueryApi
             Tags: null,
             Children: new[] { call.Id });
 
-        var mappedError = MapError(error, request.Symbol, request.OrderKey);
+        var mappedError = MapError(error);
         return new Call<GetOrderQuery, OrderStatusSnapshot>(
             Id: CallId.New(),
             StartedAt: call.StartedAt,
@@ -116,24 +116,8 @@ public sealed class TradingApiOrderQueryAdapter : IOrderQueryApi
             Meta: meta);
     }
 
-    private static CallError MapError(CallError error, Symbol symbol, OrderKey orderKey)
+    private static CallError MapError(CallError error)
     {
-        if (error.Exception is ExchangeOrderNotFoundException notFound)
-        {
-            var operation = string.IsNullOrWhiteSpace(notFound.Operation)
-                ? "GetOrder"
-                : notFound.Operation;
-            return error with
-            {
-                Exception = new OrderNotFoundException(
-                    notFound.ExchangeCode,
-                    operation,
-                    symbol,
-                    orderKey,
-                    notFound)
-            };
-        }
-
         return error;
     }
 }

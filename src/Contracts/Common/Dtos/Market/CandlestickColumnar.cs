@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Contracts.Common.Dtos.Market;
 
@@ -9,7 +8,6 @@ namespace ExchangeApi.Contracts.Common.Dtos.Market;
 /// </summary>
 public sealed class CandlestickColumnar
 {
-    public ExchangeCode ExchangeCode { get; }
     public Symbol Symbol { get; }
     public TimeSpan Timescale { get; }
     public int Count { get; }
@@ -25,7 +23,6 @@ public sealed class CandlestickColumnar
     public long?[] NumberOfTrades { get; }
 
     private CandlestickColumnar(
-        ExchangeCode exchangeCode,
         Symbol symbol,
         TimeSpan timescale,
         int count,
@@ -40,7 +37,6 @@ public sealed class CandlestickColumnar
         decimal?[] quoteVolume,
         long?[] numberOfTrades)
     {
-        ExchangeCode = exchangeCode;
         Symbol = symbol;
         Timescale = timescale;
         Count = count;
@@ -64,7 +60,6 @@ public sealed class CandlestickColumnar
         }
 
         var count = rows.Count;
-        var exchangeCode = rows[0].ExchangeCode;
         var symbol = rows[0].Symbol;
         var timescale = rows[0].Timescale;
 
@@ -82,9 +77,9 @@ public sealed class CandlestickColumnar
         for (var i = 0; i < count; i++)
         {
             var c = rows[i];
-            if (c.ExchangeCode != exchangeCode || c.Symbol != symbol || c.Timescale != timescale)
+            if (c.Symbol != symbol || c.Timescale != timescale)
             {
-                throw new ArgumentException("Mixed exchange, symbol or timescale in candlesticks.", nameof(rows));
+                throw new ArgumentException("Mixed symbol or timescale in candlesticks.", nameof(rows));
             }
 
             openTimes[i] = c.OpenTime;
@@ -100,7 +95,6 @@ public sealed class CandlestickColumnar
         }
 
         return new CandlestickColumnar(
-            exchangeCode,
             symbol,
             timescale,
             count,
@@ -122,7 +116,6 @@ public sealed class CandlestickColumnar
         for (var i = 0; i < Count; i++)
         {
             rows[i] = new Candlestick(
-                ExchangeCode,
                 Symbol,
                 Timescale,
                 OpenTimes[i],

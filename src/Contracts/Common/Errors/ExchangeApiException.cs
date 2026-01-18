@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 namespace ExchangeApi.Contracts.Common.Errors;
 
 /// <summary>
@@ -10,11 +9,6 @@ namespace ExchangeApi.Contracts.Common.Errors;
 /// </summary>
 public class ExchangeApiException : Exception
 {
-    /// <summary>
-    /// 取引所を識別するコード。（例: ExchangeCode.Bitflyer）
-    /// </summary>
-    public ExchangeCode? Exchange { get; }
-
     /// <summary>
     /// 抽象クライアント上の操作名。（例: "GetTicker", "GetBalances"）
     /// </summary>
@@ -40,7 +34,6 @@ public class ExchangeApiException : Exception
     /// </summary>
     public ExchangeApiException(
         string message,
-        ExchangeCode? exchange = null,
         string? operation = null,
         HttpStatusCode? statusCode = null,
         string? exchangeErrorCode = null,
@@ -48,7 +41,6 @@ public class ExchangeApiException : Exception
         Exception? innerException = null)
         : base(message, innerException)
     {
-        Exchange = exchange;
         Operation = operation;
         StatusCode = statusCode;
         ExchangeErrorCode = exchangeErrorCode;
@@ -59,7 +51,7 @@ public class ExchangeApiException : Exception
     /// 従来互換用のコンストラクタ（メッセージのみ）。
     /// </summary>
     public ExchangeApiException(string message)
-        : this(message, null, null, null, null, null, null)
+        : this(message, null, null, null, null, null)
     {
     }
 
@@ -67,7 +59,7 @@ public class ExchangeApiException : Exception
     /// 従来互換用のコンストラクタ（メッセージ + 内部例外）。
     /// </summary>
     public ExchangeApiException(string message, Exception innerException)
-        : this(message, null, null, null, null, null, innerException)
+        : this(message, null, null, null, null, innerException)
     {
     }
 }

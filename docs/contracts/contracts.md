@@ -40,6 +40,19 @@ Contracts は **取引所非依存**であり、Contracts の公開型（Contrac
 取引所の選択・識別・束ねは Contracts の責務ではない。
 それらは `Composition` / `Application`（利用者境界）側で完結させなければならない（MUST）。
 
+### 3.2 資格情報取得の非責務（Credential Provider）
+
+Contracts は、API 資格情報（API Key / Secret 等）の **取得方法・保存方法・解決方法**を
+責務としてはならない（MUST NOT）。
+
+資格情報の取得・解決は、実行環境や配線に依存するため、
+**Composition（DI / Factory / Provider）層の責務**とする（MUST）。
+
+そのため、以下は Contracts に含めてはならない：
+
+- 資格情報取得用インターフェース（例：`IApiCredentialProvider`）
+- 環境変数・ファイル・OS 依存の認証情報解決ロジック
+
 ---
 
 ## 4. API 返却形式（Call-only）

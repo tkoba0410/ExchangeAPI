@@ -56,6 +56,11 @@ Wire → Raw → Normalized → Contracts
 - 取引所の選択・束ね・識別（例：`ExchangeCode`）は `Composition` / 利用者境界の責務である。
   Contracts（公開契約）に取引所識別情報を流入させてはならない（MUST NOT）。
 
+- API 資格情報の取得・解決（Credential Provider）は、
+  **Composition の配線責務**であり、公開契約（Contracts）には含めない。
+- 実行環境依存（環境変数 / ファイル / OS）の要素は、
+  すべて Composition 側で完結させる。
+
 ---
 
 ## 4. 層の責務と禁止事項
@@ -100,6 +105,7 @@ RawJson の保持有無や ClosedSet の拡張可否といった判断は、
 - 取引所名を含む型・名前空間を定義する。
 - 取引所固有差分を契約に持ち込む。
 - 取引所識別情報（例：`ExchangeCode`）を ContractDTO/Request/Response に含める。
+- 資格情報取得用インターフェースや実装（Credential Provider）を Contracts に含める。
 
 ---
 

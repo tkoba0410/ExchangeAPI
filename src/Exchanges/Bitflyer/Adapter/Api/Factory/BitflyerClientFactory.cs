@@ -49,7 +49,7 @@ public static class BitflyerClientFactory
             errorClassifier: errorClassifier);
 
         var normalized = BitflyerNormalizedApi.FromRestClient(restClient);
-        return new BitflyerPublicClient(normalized.MarketData, rawBundle: null);
+        return new BitflyerPublicClient(normalized.MarketData);
     }
 
     /// <summary>

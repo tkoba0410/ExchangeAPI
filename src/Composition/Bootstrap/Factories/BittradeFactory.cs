@@ -18,12 +18,16 @@ public static class BittradeFactory
     public static IExchangeClient CreateClient(BittradeFactoryOptions? options = null)
     {
         var settings = options ?? new BittradeFactoryOptions();
-        if (string.IsNullOrWhiteSpace(settings.AccountId))
+        // 認証や AccountId が無い場合は PublicClient を返し、未対応 capability は null とする。
+        var hasAccountId = !string.IsNullOrWhiteSpace(settings.AccountId);
+        var signer = settings.RequestSigner ?? CreateSigner(settings, requireCredentials: false);
+        var restClient = CreateRestClient(settings, signer);
+
+        if (!hasAccountId || signer is null)
         {
-            throw new InvalidOperationException("BittradeFactoryOptions.AccountId must be specified to create a client.");
+            return new BittradePublicClient(restClient);
         }
 
-        var restClient = CreateRestClient(settings, requireCredentials: true);
         var bundle = BittradeApiBundle.FromRestClient(restClient, settings.AccountId);
         return new BittradeExchangeClient(bundle);
     }
@@ -32,7 +36,7 @@ public static class BittradeFactory
     internal static BittradeExchangeClient CreateAdapter(BittradeFactoryOptions? options = null) =>
         (BittradeExchangeClient)CreateClient(options);
 
-    private static RestClient CreateRestClient(BittradeFactoryOptions settings, bool requireCredentials)
+    private static RestClient CreateRestClient(BittradeFactoryOptions settings, IRequestSigner? signer)
     {
         var baseUri = settings.BaseUri ?? DefaultBaseUri;
         var policy = settings.Policy ?? HttpPolicyFactory.CreateDefault(settings.PolicyOptions);
@@ -40,7 +44,7 @@ public static class BittradeFactory
         return RestClientFactory.Create(
             baseUri,
             transport: settings.Transport,
-            signer: settings.RequestSigner ?? CreateSigner(settings, requireCredentials),
+            signer: signer,
             policy: policy,
             logger: settings.Logger,
             observer: settings.Observer,

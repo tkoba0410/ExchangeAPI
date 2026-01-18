@@ -9,12 +9,8 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Account;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.History;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Market;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.NotSupported;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
@@ -25,25 +21,23 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
-    private readonly ITradingApi _tradingApi;
-    private readonly IAccountApi _accountApi;
-    private readonly ISpotHistoryApi _historyApi;
+    private readonly ITradingApi? _tradingApi;
+    private readonly IAccountApi? _accountApi;
+    private readonly ISpotHistoryApi? _historyApi;
 
-    public IMarketDataApi Market => _marketApi;
-    public ITradingApi Trading => _tradingApi;
-    public IAccountApi Account => _accountApi;
-    public ISpotHistoryApi History => _historyApi;
+    public IMarketDataApi? Market => _marketApi;
+    public ITradingApi? Trading => _tradingApi;
+    public IAccountApi? Account => _accountApi;
+    public ISpotHistoryApi? History => _historyApi;
 
-    internal BitflyerPublicClient(BitflyerNormalizedMarketDataFacade marketData, object? rawBundle = null)
+    internal BitflyerPublicClient(BitflyerNormalizedMarketDataFacade marketData)
     {
         if (marketData is null) throw new ArgumentNullException(nameof(marketData));
         var markets = new ExchangeInfoMarketResolver(new BitflyerExchangeInfoApi());
         _marketApi = new MarketApi(marketData, markets);
-        var tradingNormalized = new BitflyerNotSupportedNormalizedTradingApi();
-        var accountNormalized = new BitflyerNotSupportedNormalizedAccountApi();
-        _tradingApi = new BitflyerTradingApi(tradingNormalized);
-        _accountApi = new BitflyerAccountApi(accountNormalized);
-        _historyApi = new BitflyerSpotHistoryApi(tradingNormalized, accountNormalized);
+        _tradingApi = null;
+        _accountApi = null;
+        _historyApi = null;
     }
 
     public Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(

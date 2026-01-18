@@ -32,10 +32,11 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private readonly IRestClient? _restClient;
     internal BittradeApiBundle? ApiBundle { get; }
 
-    public IMarketDataApi Market => _marketApi;
-    public ITradingApi Trading => _tradingApi;
-    public IAccountApi Account => _accountApi;
-    public ISpotHistoryApi History => _historyApi;
+    // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
+    public IMarketDataApi? Market => _marketApi;
+    public ITradingApi? Trading => _tradingApi;
+    public IAccountApi? Account => _accountApi;
+    public ISpotHistoryApi? History => _historyApi;
 
     public BittradeExchangeClient(
         IMarketDataApi marketApi,

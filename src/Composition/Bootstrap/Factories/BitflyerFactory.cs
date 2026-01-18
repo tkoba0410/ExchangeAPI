@@ -5,6 +5,7 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 using ExchangeApi.Contracts.Facade.Interfaces;
 
 namespace ExchangeApi.Composition.Bootstrap.Factories;
@@ -20,7 +21,15 @@ public static class BitflyerFactory
     public static IExchangeClient CreateClient(BitflyerFactoryOptions? options = null)
     {
         var settings = options ?? new BitflyerFactoryOptions();
-        var restClient = CreateRestClient(settings);
+        // 署名（認証）が無い場合は PublicClient を返し、未対応 capability は null とする。
+        var signer = settings.RequestSigner ?? CreateSigner(settings);
+        var restClient = CreateRestClient(settings, signer);
+        if (signer is null)
+        {
+            var normalized = BitflyerNormalizedApi.FromRestClient(restClient);
+            return new BitflyerPublicClient(normalized.MarketData);
+        }
+
         return BitflyerExchangeClient.FromRestClient(restClient);
     }
 
@@ -28,7 +37,7 @@ public static class BitflyerFactory
     internal static BitflyerExchangeClient CreateAdapter(BitflyerFactoryOptions? options = null) =>
         (BitflyerExchangeClient)CreateClient(options);
 
-    private static RestClient CreateRestClient(BitflyerFactoryOptions settings)
+    private static RestClient CreateRestClient(BitflyerFactoryOptions settings, IRequestSigner? signer)
     {
         var baseUri = settings.BaseUri ?? DefaultBaseUri;
         var policy = settings.Policy ?? HttpPolicyFactory.CreateDefault(settings.PolicyOptions);
@@ -36,7 +45,7 @@ public static class BitflyerFactory
         return RestClientFactory.Create(
             baseUri,
             transport: settings.Transport,
-            signer: settings.RequestSigner ?? CreateSigner(settings),
+            signer: signer,
             policy: policy,
             logger: settings.Logger,
             observer: settings.Observer,

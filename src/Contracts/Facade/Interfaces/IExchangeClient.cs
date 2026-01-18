@@ -2,8 +2,9 @@ namespace ExchangeApi.Contracts.Facade.Interfaces;
 
 public interface IExchangeClient
 {
-    IMarketDataApi Market { get; }
-    ITradingApi Trading { get; }
-    IAccountApi Account { get; }
-    ISpotHistoryApi History { get; }
+    // Facade capability は nullable。未対応は null でのみ表現する。
+    IMarketDataApi? Market { get; }
+    ITradingApi? Trading { get; }
+    IAccountApi? Account { get; }
+    ISpotHistoryApi? History { get; }
 }

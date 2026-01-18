@@ -27,6 +27,19 @@
 - Contracts に置いてよいのは、取引所横断の **Abstract DTO / Request / Response / Error / Result** のみである（MUST）。
 - 取引所固有の差分は Contracts で表現してはならない（MUST NOT）。差分は Normalized/Adapter 側で吸収し、必要なら Decisions（Exceptions）に記録する（MUST）。
 
+### 3.1 取引所識別情報の禁止（ExchangeCode 等）
+
+Contracts は **取引所非依存**であり、Contracts の公開型（ContractDTO/Request/Response 等）に
+取引所識別情報を含めてはならない（MUST NOT）。
+
+禁止対象（例）：
+
+- `ExchangeCode` / `ExchangeId` / `ExchangeName` 等の取引所識別子
+- 「どの取引所から取得されたか」を表すフィールド全般
+
+取引所の選択・識別・束ねは Contracts の責務ではない。
+それらは `Composition` / `Application`（利用者境界）側で完結させなければならない（MUST）。
+
 ---
 
 ## 4. API 返却形式（Call-only）

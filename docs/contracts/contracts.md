@@ -72,7 +72,9 @@ Contracts は、API 資格情報（API Key / Secret 等）の **取得方法・�
 
 ## NotSupported（Shape / Semantics）
 
-NotSupported は、Contracts API における **capability 不足**を示す標準的な失敗表現である。
+NotSupported は、Contracts API における **capability 不足**を示す語彙として予約する。
+ただし、未対応 capability は Facade の nullable capability により **事前に判定可能**でなければならず、
+NotSupported を通常制御フローとして常用してはならない（原則使用しない）。
 
 - CallErrorKind: Semantic
 - Tags:

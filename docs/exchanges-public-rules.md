@@ -147,10 +147,10 @@ Normalized は、**取引所内で意味を確定する層**である。
 
 ---
 
-## 6. 共通API（Optional Capability Interface）
+## 6. 共通API（Optional Capability）
 
 本プロジェクトでは、取引所横断で利用可能な API を
-**Optional Capability Interface**（Capability）として提供することを許可する。
+**Optional Capability**（Capability）として提供することを許可する。
 
 ### 6.1 基本方針
 
@@ -158,23 +158,31 @@ Normalized は、**取引所内で意味を確定する層**である。
 - 利用者の一次入口（正本）は、常に `ExchangeApi.Exchanges.<Ex>.Normalized` とする。
 - Capability は「利便性のための補助」であり、正本ではない。
 
-### 6.2 Capability Interface 方式
+### 6.2 Facade の capability は nullable コンテナで公開する
 
-Capability は **機能単位**の Interface として定義する。
+Capability は **Facade（capability コンテナ）**として公開する。
 
-- 取引所が対応していない機能は、Interface を **実装しない**。
-- 未対応機能を `NotSupportedException` 等で表現する運用（常用）を禁止する。
-- 取引所差異が大きい場合は Interface をさらに細分化してよい（巨大化を禁止）。
+- Facade の capability は **nullable** とする。
+- 未対応 capability は **null でのみ**表現する（NotSupported による穴埋めを禁止）。
+- 利用者は try/catch による分岐を行わず、**null 判定で事前に判定**できなければならない。
 
-### 6.3 実装と責務
+### 6.3 “一部未対応” の扱い（capability 分割）
 
-- Capability の実装は、必ず各取引所の Normalized API を内部で呼び出す。
-- Capability は transport / wire / raw を直接参照してはならない。
-- Capability は ExchangeCode を引数に取ってはならない。
+- “一部未対応” を `NotSupported` 等で表現することを原則禁止する。
+- “一部未対応” が実在する場合は、**capability を分割**して吸収する。
+  - 例: `Trading` を `SpotTrading` / `MarginTrading` / `ParentOrderTrading` 等へ分割
+  - 分割後、未対応は **該当 capability が null** となる。
 
-### 6.4 戻り値と共通化の範囲
+### 6.4 Facade の責務（束ねるだけ）
 
-- Capability の戻り値は、原則として `Call<T>` を用いる（Call-only）。
+- Facade は **束ねるだけ**とし、差異の隠蔽・意味統一を目的とした共通化を禁止する（嘘の共通化排除）。
+- Facade 実装は、内部で各取引所の Normalized API を呼び出す。
+- Facade は transport / wire / raw を直接参照してはならない。
+- Facade は ExchangeCode を引数に取ってはならない。
+
+### 6.5 戻り値と共通化の範囲
+
+- Facade の戻り値は、原則として `Call<T>` を用いる（Call-only）。
 - `T` は次のいずれかに限定する:
   - 取引所 Normalized DTO（取引所内で意味が確定しているもの）
   - 必要最小の共通DTO（取引所間で意味が一致する範囲のみ）
@@ -182,13 +190,13 @@ Capability は **機能単位**の Interface として定義する。
 共通DTOは **強制しない**。共通化は利用者の要請に応じて段階的に行い、
 意味が一致しない情報を無理に共通DTOへ取り込むことを禁止する。
 
-### 6.5 禁止事項
+### 6.6 禁止事項
 
 - Capability を正本として扱うこと
 - 巨大な横断 Interface を定義すること
 - 取引所差異を隠蔽する目的での共通化
 
-### 6.6 代表例（参考）: Ticker / OrderBook / Trades
+### 6.7 代表例（参考）: Ticker / OrderBook / Trades
 
 Ticker / OrderBook / Trades（Executions）は、横断需要が高く
 最小フィールドへ落とし込みやすい代表例である。

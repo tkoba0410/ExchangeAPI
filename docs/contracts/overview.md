@@ -50,8 +50,8 @@
 
 * Contracts API の戻り値は常に `Call<TRequest, TResponse>` である。
 * 失敗は `Call` の失敗として表現され、例外は制御フローとして用いてはならない。
-* `NotSupported` は **capability 不足を示す場合にのみ**使用される。
-* `NotSupported` を通常制御フロー（取引所判別・分岐）として利用することは禁止される。
+* 未対応 capability は **Facade の nullable capability により事前に判定可能**でなければならない。
+* `NotSupported` を通常制御フロー（取引所判別・分岐）として利用することは禁止される（原則使用しない）。
 
 #### 3.2.1 CallAsync 命名（Call-only）
 
@@ -81,7 +81,7 @@
 ### 4.1 機能の有無
 
 * 取引所によって提供されない機能が存在し得る。
-* 利用可否は capability により **事前に判定可能でなければならない**。
+* 利用可否は Facade の capability（nullable）により **事前に判定可能でなければならない**。
 * 利用可否判定を `NotSupported` の捕捉に依存してはならない。
 
 ---

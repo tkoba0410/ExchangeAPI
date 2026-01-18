@@ -194,7 +194,7 @@ NOTE: 本リポジトリには Canon 未達の実装が残る場合がある。C
 - **同名の Contracts API は、取引所間で呼び出し前提条件差を持たない。**
 - 認証・口座情報・ID 等の前提条件が必要な場合、差異は次のいずれかで吸収する。
   1. **Composition が前提条件を自動解決**し、利用者に追加入力を要求しない。
-  2. 前提条件が満たせない構築形態では、当該 API を **capability（TryGet/Has 系など）として提供しない**（利用者は事前判定できる）。
+  2. 前提条件が満たせない構築形態では、当該 API を **Facade の capability（nullable）として提供しない（null）**（利用者は事前判定できる）。
 - **前提条件不足を理由に NotSupported を返すことを禁止する。**
   - NotSupported は capability 不足にのみ用いる（利用者契約に従う）。
 
@@ -208,12 +208,6 @@ NOTE: 本リポジトリには Canon 未達の実装が残る場合がある。C
 
 - `ExecutionItem.Market` は常に **request に含まれる Market** を設定する。
 - レスポンス側の市場識別子を参照してはならない。
-
-#### 7.2.W Canon: NotSupported の `<feature>` を capability 名に固定する
-
-- `NotSupported:<feature>` の `<feature>` は、利用者が事前判定に用いる **capability 名（操作名）と一致**しなければならない。
-- `AccountIdRequired` 等の「内部理由」を `<feature>` にしてはならない。
-  - 内部理由は必要なら `Message` の追記等（`NotSupported:<feature> ...`）に留め、feature 自体は不変とする。
 
 #### 7.2.1 Raw API の正規形
 - Raw の bundle（例：`I<Exchange>RawApi`）は **Sub-API のみ**を公開する（MUST）。

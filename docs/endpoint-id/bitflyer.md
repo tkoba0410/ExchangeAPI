@@ -16,9 +16,12 @@
 本節は、common（EndpointId 規範）で定義された要素（Path / Method / Scope）と形式（PascalCase / スラッシュ排除）を前提に、
 bitFlyer の EndpointId を **機械的に再構成可能**とするための規則を定義する。
 
-※ EndpointId の構成要素および表記制約は、common.md の共通ルールに準拠する。
+### 2.1 前提（common 参照）
 
-### 2.1 EndpointIdの生成（bitFlyer 規則）
+* EndpointId の構成要素・表記制約は **common.md に準拠**する
+* 一般単語境界の定義は **common.md に定義されたものを使用**する
+
+### 2.2 EndpointIdの生成（bitFlyer 規則）
 
 本節は inventory 生成時の手順を示す。
 bitFlyer の EndpointId は、Path から **機械的に**次の手順で導出する。

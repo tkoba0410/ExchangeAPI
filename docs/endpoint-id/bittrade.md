@@ -21,7 +21,7 @@
 * EndpointId の構成要素・表記制約は **common.md に準拠**する
 * 一般単語境界の定義は **common.md に定義されたものを使用**する
 
-### 2.2 Path / Method → EndpointId（bitTrade 規則）
+### 2.2 EndpointIdの生成（bitTrade 規則）
 
 bitTrade の EndpointId は、(Method, Path) から **機械的に**次の手順で導出する。
 

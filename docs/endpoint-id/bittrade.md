@@ -1,104 +1,57 @@
-# EndpointId 命名規則: Bittrade
+# Bittrade EndpointId 運用ノート
 
-## 位置づけ
+## 目的
 
-本書は、Bittrade における **EndpointId（Constants）の命名規則**および
-**Endpoint 一覧（Public / Private × 種類別）**を定める。
+本書は、Bittrade における EndpointId 運用上の **例外規則と命名裁定**を記載する。
 
-* 正本: `ExchangeApi.Exchanges.Bittrade.Wire.Constants.BittradeEndpoints`
-* EndpointId は **公式 API endpoint を一意に識別する識別子**である
-* API 名・メソッド名は EndpointId から共通派生規則で生成される
+Endpoint の列挙や仕様の正本は、公式 API ドキュメントおよび endpoint inventory に委ねる。
 
 ---
 
-## 命名規則（Bittrade）
+## 同一 Path に複数 Method が存在する Endpoint
 
-Bittrade では、同一 path に対して GET / POST が存在するため、
-**EndpointId に HTTP Method を含める**。
+* Bittrade API では、**同一 Path に GET / POST 等が割り当てられるケース**が存在する
+* この場合、EndpointId の一意性を保つため、**Method を含めた命名を必須**とする
 
-```
-<Method><PascalCase(PathWithoutVersion)>
-```
+例：
 
-### 規則
+* `OrdersGet`
+* `OrdersPost`
 
-1. HTTP Method を必ず先頭に含める（Get / Post）
-2. `/v1` は EndpointId に含めない
-3. パス残部を英単語境界で分割し PascalCase とする
-4. EndpointId は Bittrade 内で一意でなければならない
+これは common の衝突回避規則の適用例である。
 
 ---
 
-## Public API
+## cancel / submitcancel 等の Path 表現について
 
-### Market
+* Bittrade API では、操作の意味が Path 名に直接現れない場合がある
+* EndpointId は Path 名を直訳せず、**操作の意味を優先して命名**する
 
-| Method | Path                 | EndpointId            |
-| ------ | -------------------- | --------------------- |
-| GET    | market/detail/merged | GetMarketDetailMerged |
-| GET    | market/depth         | GetMarketDepth        |
-| GET    | market/trade         | GetMarketTrade        |
-| GET    | market/history/kline | GetMarketHistoryKline |
-| GET    | market/tickers       | GetMarketTickers      |
-| GET    | market/history/trade | GetMarketHistoryTrade |
+例：
+
+* `/orders/{id}/submitcancel` → `OrdersCancel`
+
+この裁定理由は inventory の Notes に残す。
 
 ---
 
-### Common
+## pagination / limit の補足
 
-| Method | Path                    | EndpointId            |
-| ------ | ----------------------- | --------------------- |
-| GET    | v1/common/timestamp     | GetCommonTimestamp    |
-| GET    | v1/common/symbols       | GetCommonSymbols      |
-| GET    | v1/common/currencys     | GetCommonCurrencies   |
-| GET    | v1/retail/maintain/time | GetRetailMaintainTime |
+* Bittrade API では endpoint ごとに pagination / limit の挙動が異なる
+* 実装依存の詳細は公式ドキュメントを参照する
+* inventory の Notes には、
 
----
+  * cursor 有無
+  * limit の上限
 
-## Private API
-
-### Account
-
-| Method | Path                | EndpointId         |
-| ------ | ------------------- | ------------------ |
-| GET    | v1/account/accounts | GetAccountAccounts |
+など、識別に必要な最小情報のみを記載する。
 
 ---
 
-### Order
+## 運用上の注意
 
-| Method | Path                                  | EndpointId                           |
-| ------ | ------------------------------------- | ------------------------------------ |
-| GET    | v1/order/openOrders                   | GetOrderOpenOrders                   |
-| GET    | v1/order/orders                       | GetOrderOrders                       |
-| GET    | v1/order/matchresults                 | GetOrderMatchResults                 |
-| POST   | v1/order/orders/place                 | PostOrderOrdersPlace                 |
-| POST   | v1/order/orders/batchcancel           | PostOrderOrdersBatchCancel           |
-| POST   | v1/order/orders/batchCancelOpenOrders | PostOrderOrdersBatchCancelOpenOrders |
+* Bittrade 側で API が追加・変更された場合
 
----
-
-### Retail
-
-| Method | Path                  | EndpointId           |
-| ------ | --------------------- | -------------------- |
-| GET    | v1/retail/order/list  | GetRetailOrderList   |
-| POST   | v1/retail/order/place | PostRetailOrderPlace |
-
----
-
-### Finance (Deposit / Withdraw)
-
-| Method | Path                      | EndpointId              |
-| ------ | ------------------------- | ----------------------- |
-| GET    | v1/query/deposit-withdraw | GetQueryDepositWithdraw |
-| POST   | v1/dw/withdraw/api/create | PostDwWithdrawApiCreate |
-| POST   | v1/dw/withdraw-virtual    | PostDwWithdrawVirtual   |
-
----
-
-## 注記
-
-* 本一覧は Wire.Constants に存在する endpoint のみを列挙している
-* HTTP Method は公式仕様および Wire 実装を正とする
-* EndpointId からの派生規則は `endpoint-id/common.md` を参照
+  * 公式ドキュメントを確認
+  * inventory を更新
+  * 命名に迷いがあれば本書に裁定理由を追記

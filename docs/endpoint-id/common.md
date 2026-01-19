@@ -26,7 +26,7 @@
 
 * EndpointId は **文字列値そのものではなく、識別子（定数名・enum 名・静的メンバ名）として扱う**
 
-* **EndpointId が正本であり、HTTP Method や Path は EndpointId から導出される**
+* **HTTP Method や Path は EndpointId から導出される**
 
 EndpointId は、少なくとも以下を満たさなければならない。
 
@@ -177,4 +177,4 @@ EndpointId から以下を機械的に派生させることは、**将来の実�
 
 * 新しい endpoint を扱う場合、**最初に inventory を更新**する
 * inventory に記載されていない endpoint は、本リポジトリでは未定義とみなす
-* 命名に迷いがある場合は、取引所ルールまたは Notes に裁定理由を残す
+* 命名に迷いがある場合は、取引所ルール節に裁定理由を明示する。

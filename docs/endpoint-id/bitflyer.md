@@ -16,18 +16,9 @@
 本節は、common（EndpointId 規範）で定義された要素（Path / Method / Scope）と形式（PascalCase / スラッシュ排除）を前提に、
 bitFlyer の EndpointId を **機械的に再構成可能**とするための規則を定義する。
 
-### 2.1 入力（共通要素）
+※ EndpointId の構成要素および表記制約は、common.md の共通ルールに準拠する。
 
-* Path: 公式 API ドキュメントに記載された path（例：`/v1/me/getbalance`）
-* Method: HTTP Method（GET / POST / DELETE / etc）
-* Scope: Public / Private
-
-### 2.2 正規化（共通形式）
-
-* EndpointId は **PascalCase** とする
-* EndpointId には **`/` を含めない**
-
-### 2.3 EndpointIdの生成（bitFlyer 規則）
+### 2.1 EndpointIdの生成（bitFlyer 規則）
 
 本節は inventory 生成時の手順を示す。
 bitFlyer の EndpointId は、Path から **機械的に**次の手順で導出する。

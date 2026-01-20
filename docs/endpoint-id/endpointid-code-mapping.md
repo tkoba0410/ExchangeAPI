@@ -2,6 +2,7 @@
 
 本書は、EndpointId を **文書（inventory）とコードの双方で一貫して扱うための最終規約**を定義する。
 本規約は、取引所ごとの実装差を許容しつつ、命名揺れ・重複・手動裁定を排除することを目的とする。
+また、EndpointId を CallMeta に埋め込み、観測・診断・追跡に耐える最低限のメタ情報として扱う。
 
 ---
 
@@ -26,6 +27,7 @@
 1. EndpointId は **取引所配下**にのみ定義する。
 2. 共通層（Contracts / Core / Common）に EndpointId の文字列定義を置いてはならない。
 3. 取引所ごとに `*EndpointIds` クラスを設け、各 EndpointId を `public const string` として定義する。
+4. `*EndpointIds` は原則として **Wire 層に閉じる**（`src/Exchanges/<Ex>/Wire/Constants`）。
 
 例：
 
@@ -45,6 +47,7 @@
 
 1. Path は取引所ごとに `*Paths` クラスを設け、`public const string` として定義する。
 2. Path 定数は取引所実装内に閉じ、共通層へ公開しない。
+3. `*Paths` は原則として **Wire 層に閉じる**（`src/Exchanges/<Ex>/Wire/Constants`）。
 
 ### 3.2 命名規則
 
@@ -65,11 +68,10 @@
 2. `CallMeta` には少なくとも次の情報を含める。
 
    * EndpointId
-   * Method
-   * Path
-   * Scope
 3. `CallMeta.EndpointId` は `*EndpointIds` の定数を参照して設定する。
 4. 文字列リテラルによる EndpointId の設定を禁止する。
+5. **Endpoint 呼び出しに対応しない内部処理**は `CallMeta.InternalEndpointId`（例：`"Internal"`）を用いる。
+6. 内部処理の `CallMeta` は `CallMeta.CreateInternal(...)`（または同等のヘルパ）で生成することを推奨する。
 
 ---
 
@@ -107,6 +109,7 @@
 1. EndpointId を文字列リテラルとして直接記述してはならない。
 2. inventory に存在しない EndpointId をコード側に追加してはならない。
 3. `*EndpointIds` に定義されている EndpointId が inventory に存在しない状態を許容してはならない。
+4. Raw / Normalized 層で `CallMeta` を新規生成して EndpointId を落とす実装を推奨しない（原則：上流 `Meta` を伝播する）。
 
 ---
 
@@ -115,6 +118,7 @@
 1. 取引所別 inventory の EndpointId 列と、`*EndpointIds` の定数一覧が完全一致することをテストで検証する。
 2. `*EndpointIds` 内で EndpointId の重複が存在しないことを検証する。
 3. これらの検証は CI に組み込むことを推奨する。
+4. 追加で、`WireCallSpec.EndpointId` が常に非 null / 非空であることをテストで検証することを推奨する。
 
 ---
 

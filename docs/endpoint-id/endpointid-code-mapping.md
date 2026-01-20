@@ -94,6 +94,12 @@
 2. 同一 EndpointId に対して、Wire / Raw / Normalized のすべての層で **同一のメソッド名**を使用する。
 3. 層ごとの差異は、戻り値の DTO 型および内部実装に限定する。
 
+### 5.3 エイリアス Endpoint の扱い
+
+1. エイリアス endpoint は inventory 上で **独立した EndpointId** として定義する。
+2. Wire / Raw / Normalized は **EndpointId ごとに別メソッド**を定義する。
+3. EndpointId / Path を切り替える **分岐フラグ** を Wire に持ち込まない。
+
 ---
 
 ## 6. Contracts 層での扱い

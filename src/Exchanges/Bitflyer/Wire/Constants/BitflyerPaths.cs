@@ -1,5 +1,5 @@
-// Exchanges/Bitflyer/Constants/BitflyerPaths.cs
-namespace ExchangeApi.Exchanges.Bitflyer.Constants;
+// Exchanges/Bitflyer/Wire/Constants/BitflyerPaths.cs
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 
 internal static class BitflyerPaths
 {

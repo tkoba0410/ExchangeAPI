@@ -1,5 +1,5 @@
-// Exchanges/Bitflyer/Constants/BitflyerEndpointIds.cs
-namespace ExchangeApi.Exchanges.Bitflyer.Constants;
+// Exchanges/Bitflyer/Wire/Constants/BitflyerEndpointIds.cs
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 
 internal static class BitflyerEndpointIds
 {
@@ -43,4 +43,3 @@ internal static class BitflyerEndpointIds
     public const string GetCollateralHistory = "GetCollateralHistory";
     public const string GetTradingCommission = "GetTradingCommission";
 }
-

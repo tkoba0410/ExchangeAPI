@@ -34,7 +34,22 @@
 
 （Adapter の意味論的定義は TopSpec を正本とし、本書では再定義しない。）
 
-ここで固定するのは **構成の箱のみ**であり、具体的なクラス構成や実装詳細はコードに委ねる。
+ここで固定するのは **構成の箱**と、差異が増殖しやすい箇所（Raw の配置・粒度）の **最小限の形**のみである。
+
+### 3.1 Raw 配下の最小サブ構成
+
+Raw は、取引所間差異の増殖を抑えるため、次のサブ構成を **必須**とする。
+
+* `Raw/Public/` : 未認証 endpoint 群
+* `Raw/Private/` : 認証が必要な endpoint 群
+* `Raw/Internal/` : Raw の lossless 実装に必要な内部要素（encoding / query 整形 / JSON helper 等）
+
+補足:
+
+* `RawApi/` のような別名フォルダは使用しない。
+* `Internal` は「Raw の責務（lossless / semantic-free）を維持するために必要な最小実装」に限定し、意味解釈は持ち込まない。
+
+Raw の詳細な正規形（Canon）は TopSpec を正本とする（本書では再定義しない）。
 
 ## 4. 名前空間（Namespace）規約
 
@@ -67,15 +82,28 @@ Exchanges.<Ex>.Adapter.*
 
 ## 7. エイリアス Endpoint の表現
 
+エイリアス endpoint は「I/O 経路（Wire）」と「DTO 形状（Raw）」で意味が異なるため、層ごとに扱いを固定する。
+
+### 7.1 Wire
+
 * 取引所がエイリアス endpoint を持つ場合は、**別 EndpointId / 別メソッド**として定義する。
 * EndpointId / Path を切り替えるための **分岐フラグ（例: useAliasPath）** を Wire に持ち込まない。
-* エイリアスの有無は仕様差として許容し、**実装差は「別メソッド化」で吸収**する。
+
+### 7.2 Raw
+
+* Raw は endpoint の I/O 経路差を吸収しない（Wire の責務）。
+* Raw の公開 API にエイリアス由来の **同義メソッドを増殖させない**。
+  * 互換維持が必要な場合のみ、`[Obsolete]` を付けた **forwarding（委譲）** として残してよい。
+  * forwarding は EndpointId の分岐・意味変更を含んではならない（lossless のまま Wire を呼ぶだけ）。
 
 ## 8. 論理責務について
 
 Wire / Raw / Normalized の**責務・禁止事項の定義は TopSpec を正本**とする。
 Adapter の意味定義も TopSpec に委譲し、本書では再定義しない。
 本書では再定義しない。
+
+本書で追記した Raw 配下サブ構成・alias 取り扱いは、
+差異が増殖しやすい箇所に限って「配置ルール」を固定するための例外的最小規約である。
 
 ## 9. 例外の扱い
 

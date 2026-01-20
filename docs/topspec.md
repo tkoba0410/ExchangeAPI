@@ -189,6 +189,13 @@ bitFlyer 実装からの逸脱は、**取引所仕様差による場合のみ**�
 
 NOTE: 本リポジトリには Canon 未達の実装が残る場合がある。Canon は常に目標形であり、未達は移行タスクとして扱う。
 
+規範の優先順位:
+
+1. Canon（本節）
+2. Reference Implementation（7.1）
+
+両者が矛盾する場合、**Canon を優先**し、Reference 実装は将来の移行対象として扱う（MUST）。
+
 #### 7.2.X Canon: 同名 Contracts API の前提条件差を作らない
 
 - **同名の Contracts API は、取引所間で呼び出し前提条件差を持たない。**
@@ -212,6 +219,48 @@ NOTE: 本リポジトリには Canon 未達の実装が残る場合がある。C
 #### 7.2.1 Raw API の正規形
 - Raw の bundle（例：`I<Exchange>RawApi`）は **Sub-API のみ**を公開する（MUST）。
 - Raw bundle 直下に利便メソッド（直メソッド）を追加してはならない（MUST NOT）。
+
+##### 7.2.1.1 物理配置（Raw）
+
+Raw は次の物理配置を **必須**とする（MUST）。
+
+```
+src/Exchanges/<Ex>/Raw/
+  Public/
+    Api/
+    Models/
+  Private/
+    Api/
+    Models/
+  Internal/
+```
+
+* `RawApi/` 等の別名フォルダは使用してはならない（MUST NOT）。
+
+##### 7.2.1.2 公開 API 粒度（Raw Sub-API）
+
+Raw の Sub-API は、取引所間の統一語彙として次を正とする（MUST）。
+
+- Public
+  - `I<Ex>RawMarketDataApi`
+  - `I<Ex>RawExchangeInfoApi`
+- Private
+  - `I<Ex>RawAccountApi`
+  - `I<Ex>RawTradingApi`
+
+取引所仕様上存在しない Sub-API は、空実装で埋めず、bundle の構造（継承/プロパティ）から **欠落**として表現する（MUST）。
+
+##### 7.2.1.3 エイリアス endpoint の扱い（Raw）
+
+* endpoint の I/O 経路差（Path / Query / Method）は Wire の責務である（MUST）。
+* Raw は alias 由来の同義メソッドを増殖させてはならない（MUST NOT）。
+  * 互換維持が必要な場合のみ、`[Obsolete]` 付き forwarding として残してよい（MAY）。
+  * forwarding は Wire のどの EndpointId を呼ぶかを **固定**し、フラグ分岐を持ち込まない（MUST）。
+
+##### 7.2.1.4 Internal 実装の配置（Raw）
+
+* Raw の lossless 実装のための encoding / query 整形 / JSON helper は `Raw/Internal/` に閉じ込める（MUST）。
+* `Raw/Internal/` に意味解釈（単位換算、時刻統一、売買方向の解釈、デフォルト補完等）を持ち込んではならない（MUST NOT）。
 
 #### 7.2.2 Normalized API の正規形
 - Normalized の factory は **Bundle を 1 つ返す**形に統一する（MUST）。

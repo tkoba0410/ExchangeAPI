@@ -26,12 +26,12 @@
 
 * EndpointId は **文字列値そのものではなく、識別子（定数名・enum 名・静的メンバ名）として扱う**
 
-* **HTTP Method や Path は EndpointId から導出される**
+* **HTTP Method や Path は inventory を通じて EndpointId に対応付けられる**
 
 EndpointId は、少なくとも以下を満たさなければならない。
 
-* EndpointId から **HTTP Method** が一意に定まること
-* EndpointId から **公式 API の Path** が一意に定まること
+* EndpointId は、当該取引所の inventory における定義を通じて **HTTP Method** が一意に定まること
+* EndpointId は、当該取引所の inventory における定義を通じて **公式 API の Path** が一意に定まること
 * 取引所内で EndpointId が衝突しないこと
 
 ---
@@ -170,6 +170,12 @@ EndpointId から以下を機械的に派生させることは、**将来の実�
 * Wire / Raw / Normalized 各層での共通命名
 
 ただし、**現時点では必須要件ではない**。
+
+### （参考）コード実装への反映
+
+EndpointId をコードへ反映する際の具体的な命名規則、配置、および検証方法については、
+本書では規定せず、別途定めるコード反映規約に委ねる。
+詳細は `docs/governance/endpointid-code-mapping.md` を参照すること。
 
 ---
 

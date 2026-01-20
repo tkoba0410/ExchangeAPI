@@ -7,44 +7,76 @@ namespace ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 
 internal static class BitflyerEndpoints
 {
-    public static WireCallSpec GetTicker(string productCode, bool useAliasPath) =>
+    public static WireCallSpec GetTicker(string productCode) =>
         Get(
-            useAliasPath ? BitflyerEndpointIds.Ticker : BitflyerEndpointIds.GetTicker,
-            useAliasPath ? BitflyerPaths.TickerPath : BitflyerPaths.GetTickerPath,
+            BitflyerEndpointIds.GetTicker,
+            BitflyerPaths.GetTickerPath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
-    public static WireCallSpec GetBoard(string productCode, bool useAliasPath) =>
+    public static WireCallSpec Ticker(string productCode) =>
         Get(
-            useAliasPath ? BitflyerEndpointIds.Board : BitflyerEndpointIds.GetBoard,
-            useAliasPath ? BitflyerPaths.BoardPath : BitflyerPaths.GetBoardPath,
+            BitflyerEndpointIds.Ticker,
+            BitflyerPaths.TickerPath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
-    public static WireCallSpec GetExecutions(
+    public static WireCallSpec GetBoard(string productCode) =>
+        Get(
+            BitflyerEndpointIds.GetBoard,
+            BitflyerPaths.GetBoardPath,
+            BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
+
+    public static WireCallSpec Board(string productCode) =>
+        Get(
+            BitflyerEndpointIds.Board,
+            BitflyerPaths.BoardPath,
+            BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
+
+    public static WireCallSpec GetExecutionsPublic(
         string productCode,
         string? count = null,
         string? before = null,
-        string? after = null,
-        bool useAliasPath = false)
+        string? after = null)
     {
-        var endpointId = useAliasPath ? BitflyerEndpointIds.Executions : BitflyerEndpointIds.GetExecutionsPublic;
-        var path = useAliasPath ? BitflyerPaths.ExecutionsPath : BitflyerPaths.GetExecutionsPublicPath;
-        return Get(endpointId, path, BuildQuery(
+        return Get(BitflyerEndpointIds.GetExecutionsPublic, BitflyerPaths.GetExecutionsPublicPath, BuildQuery(
             (BitflyerQueryKeys.ProductCode, productCode),
             (BitflyerQueryKeys.Count, count),
             (BitflyerQueryKeys.Before, before),
             (BitflyerQueryKeys.After, after)));
     }
 
-    public static WireCallSpec GetMarkets(string? region = null, bool useAliasPath = false)
+    public static WireCallSpec Executions(
+        string productCode,
+        string? count = null,
+        string? before = null,
+        string? after = null)
     {
-        var endpointId = useAliasPath ? BitflyerEndpointIds.Markets : BitflyerEndpointIds.GetMarkets;
-        var path = useAliasPath ? BitflyerPaths.MarketsPath : BitflyerPaths.GetMarketsPath;
+        return Get(BitflyerEndpointIds.Executions, BitflyerPaths.ExecutionsPath, BuildQuery(
+            (BitflyerQueryKeys.ProductCode, productCode),
+            (BitflyerQueryKeys.Count, count),
+            (BitflyerQueryKeys.Before, before),
+            (BitflyerQueryKeys.After, after)));
+    }
+
+    public static WireCallSpec GetMarkets(string? region = null)
+    {
+        var path = BitflyerPaths.GetMarketsPath;
         if (!string.IsNullOrWhiteSpace(region))
         {
             path = $"{path}/{region}";
         }
 
-        return Get(endpointId, path, query: null);
+        return Get(BitflyerEndpointIds.GetMarkets, path, query: null);
+    }
+
+    public static WireCallSpec Markets(string? region = null)
+    {
+        var path = BitflyerPaths.MarketsPath;
+        if (!string.IsNullOrWhiteSpace(region))
+        {
+            path = $"{path}/{region}";
+        }
+
+        return Get(BitflyerEndpointIds.Markets, path, query: null);
     }
 
     public static WireCallSpec GetChats(string? fromDate = null, string? region = null)

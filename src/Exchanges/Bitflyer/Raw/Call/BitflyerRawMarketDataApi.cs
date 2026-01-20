@@ -31,7 +31,9 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         SendAndParse(
             request,
             "Bitflyer.GetTicker",
-            BitflyerEndpoints.GetTicker(request.ProductCode, request.UseAliasPath),
+            request.UseAliasPath
+                ? BitflyerEndpoints.Ticker(request.ProductCode)
+                : BitflyerEndpoints.GetTicker(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Ticker>(json, "Bitflyer.GetTicker"));
 
@@ -41,7 +43,9 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         SendAndParse(
             request,
             "Bitflyer.GetBoard",
-            BitflyerEndpoints.GetBoard(request.ProductCode, request.UseAliasPath),
+            request.UseAliasPath
+                ? BitflyerEndpoints.Board(request.ProductCode)
+                : BitflyerEndpoints.GetBoard(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Board>(json, "Bitflyer.GetBoard"));
 
@@ -51,12 +55,17 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         SendAndParse(
             request,
             "Bitflyer.GetExecutions",
-            BitflyerEndpoints.GetExecutions(
-                request.ProductCode,
-                request.Count?.ToString(CultureInfo.InvariantCulture),
-                request.Before?.ToString(CultureInfo.InvariantCulture),
-                request.After?.ToString(CultureInfo.InvariantCulture),
-                request.UseAliasPath),
+            request.UseAliasPath
+                ? BitflyerEndpoints.Executions(
+                    request.ProductCode,
+                    request.Count?.ToString(CultureInfo.InvariantCulture),
+                    request.Before?.ToString(CultureInfo.InvariantCulture),
+                    request.After?.ToString(CultureInfo.InvariantCulture))
+                : BitflyerEndpoints.GetExecutionsPublic(
+                    request.ProductCode,
+                    request.Count?.ToString(CultureInfo.InvariantCulture),
+                    request.Before?.ToString(CultureInfo.InvariantCulture),
+                    request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPublicResponse>>(
                 json,
@@ -68,7 +77,9 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         SendAndParse(
             request,
             "Bitflyer.GetMarkets",
-            BitflyerEndpoints.GetMarkets(request.Region, request.UseAliasPath),
+            request.UseAliasPath
+                ? BitflyerEndpoints.Markets(request.Region)
+                : BitflyerEndpoints.GetMarkets(request.Region),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Market>>(
                 json,

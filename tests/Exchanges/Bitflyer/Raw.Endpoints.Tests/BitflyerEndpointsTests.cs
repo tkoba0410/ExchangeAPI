@@ -45,7 +45,7 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void GetTicker_builds_request()
     {
-        var req = BitflyerEndpoints.GetTicker("BTC_JPY", useAliasPath: false);
+        var req = BitflyerEndpoints.GetTicker("BTC_JPY");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
@@ -58,12 +58,11 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void GetExecutions_builds_request_with_ordered_query()
     {
-        var req = BitflyerEndpoints.GetExecutions(
+        var req = BitflyerEndpoints.GetExecutionsPublic(
             "BTC_JPY",
             count: "100",
             before: "123",
-            after: "456",
-            useAliasPath: false);
+            after: "456");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,

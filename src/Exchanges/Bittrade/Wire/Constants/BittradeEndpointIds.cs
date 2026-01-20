@@ -1,3 +1,4 @@
+// Exchanges/Bittrade/Wire/Constants/BittradeEndpointIds.cs
 namespace ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 
 internal static class BittradeEndpointIds

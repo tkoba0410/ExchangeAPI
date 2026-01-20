@@ -85,14 +85,15 @@
 
 ### 5.2 命名規則
 
-1. 各層における endpoint 呼び出しメソッド名は、次の形式で統一する。
+1. 各層における endpoint 呼び出しのメソッド名は、EndpointId を基底とする。
+2. Wire 層は HTTP 呼び出しを行わず WireCallSpec を生成するだけなので、Async/CallAsync を付与しない。
+3. Raw / Normalized 層は HTTP 呼び出し（またはその結果の正規化）を行うため、`CallAsync` を付与する。
 
 ```
-<EndpointId>CallAsync
+Wire: <EndpointId>
+Raw: <EndpointId>CallAsync
+Normalized: <EndpointId>CallAsync
 ```
-
-2. 同一 EndpointId に対して、Wire / Raw / Normalized のすべての層で **同一のメソッド名**を使用する。
-3. 層ごとの差異は、戻り値の DTO 型および内部実装に限定する。
 
 ### 5.3 エイリアス Endpoint の扱い
 

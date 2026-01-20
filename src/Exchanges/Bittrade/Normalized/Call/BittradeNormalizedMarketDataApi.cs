@@ -28,7 +28,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
+    public async Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
@@ -40,7 +40,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetTickerAsync(new RawRequests.GetTickerRequest(symbolText), ct)
+            .GetDetailMergedCallAsync(new RawRequests.GetTickerRequest(symbolText), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -54,7 +54,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             });
     }
 
-    public async Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
+    public async Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
         string productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default)
@@ -68,7 +68,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetOrderBookAsync(new RawRequests.GetOrderBookRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
+            .GetDepthCallAsync(new RawRequests.GetOrderBookRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -83,7 +83,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             });
     }
 
-    public async Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+    public async Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
@@ -95,7 +95,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetTradesAsync(new RawRequests.GetMarketTradesRequest(symbolText), ct)
+            .GetTradeCallAsync(new RawRequests.GetMarketTradesRequest(symbolText), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

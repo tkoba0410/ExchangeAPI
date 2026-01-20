@@ -28,7 +28,7 @@ namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 public class BittradeMarketApiTests
 {
     [Fact]
-    public async Task GetTickerAsync_MapsMergedResponse()
+    public async Task GetDetailMergedCallAsync_MapsMergedResponse()
     {
         var json = """
         { "status":"ok", "ts":1700000000000,
@@ -47,7 +47,7 @@ public class BittradeMarketApiTests
         """;
         var api = CreateApi("/market/detail/merged?symbol=btcjpy", json);
 
-        var call = await api.GetTickerCallAsync(new Symbol("BTC/JPY"));
+        var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"));
         var ok = Assert.IsType<CallResult<Ticker>.Ok>(call.Result);
         var ticker = ok.Response;
 
@@ -57,7 +57,7 @@ public class BittradeMarketApiTests
     }
 
     [Fact]
-    public async Task GetOrderBookAsync_MapsDepth()
+    public async Task GetDepthCallAsync_MapsDepth()
     {
         var json = """
         { "status":"ok",
@@ -69,7 +69,7 @@ public class BittradeMarketApiTests
         """;
         var api = CreateApi("/market/depth?symbol=btcjpy&type=step0", json);
 
-        var call = await api.GetOrderBookCallAsync(new Symbol("BTC/JPY"));
+        var call = await api.GetDepthCallAsync(new Symbol("BTC/JPY"));
         var ok = Assert.IsType<CallResult<OrderBook>.Ok>(call.Result);
         var book = ok.Response;
 
@@ -105,11 +105,11 @@ public class BittradeMarketApiTests
     }
 
     [Fact]
-    public async Task GetTickerAsync_UnknownSymbol_Throws()
+    public async Task GetDetailMergedCallAsync_UnknownSymbol_Throws()
     {
         var api = CreateApi("/market/detail/merged?symbol=btcjpy", "{}");
 
-        var call = await api.GetTickerCallAsync(new Symbol("DOGE/JPY"));
+        var call = await api.GetDetailMergedCallAsync(new Symbol("DOGE/JPY"));
         var err = Assert.IsType<CallResult<Ticker>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }

@@ -28,12 +28,17 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
         _board = board;
     }
 
-    public Task<Call<GetTickerRequest, Ticker>> GetTickerAsync(
+    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
         GetTickerRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, _response));
 
-    public Task<Call<GetBoardRequest, Board>> GetBoardAsync(
+    public Task<Call<GetTickerRequest, Ticker>> TickerCallAsync(
+        GetTickerRequest request,
+        CancellationToken cancellationToken = default) =>
+        GetTickerCallAsync(request, cancellationToken);
+
+    public Task<Call<GetBoardRequest, Board>> GetBoardCallAsync(
         GetBoardRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -45,7 +50,12 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
         return Task.FromResult(MakeOkCall(request, _board));
     }
 
-    public Task<Call<GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsAsync(
+    public Task<Call<GetBoardRequest, Board>> BoardCallAsync(
+        GetBoardRequest request,
+        CancellationToken cancellationToken = default) =>
+        GetBoardCallAsync(request, cancellationToken);
+
+    public Task<Call<GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
         GetExecutionsRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -65,27 +75,37 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
         return Task.FromResult(MakeOkCall(request, executions));
     }
 
-    public Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsAsync(
+    public Task<Call<GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> ExecutionsCallAsync(
+        GetExecutionsRequest request,
+        CancellationToken cancellationToken = default) =>
+        GetExecutionsPublicCallAsync(request, cancellationToken);
+
+    public Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsCallAsync(
         GetMarketsRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, (IReadOnlyList<Market>)new[] { new Market("BTC_JPY", "BTC_JPY") }));
 
-    public Task<Call<GetChatsRequest, IReadOnlyList<Chat>>> GetChatsAsync(
+    public Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> MarketsCallAsync(
+        GetMarketsRequest request,
+        CancellationToken cancellationToken = default) =>
+        GetMarketsCallAsync(request, cancellationToken);
+
+    public Task<Call<GetChatsRequest, IReadOnlyList<Chat>>> GetChatsCallAsync(
         GetChatsRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, (IReadOnlyList<Chat>)new[] { new Chat("n", "m", DateTimeOffset.UtcNow) }));
 
-    public Task<Call<GetHealthRequest, HealthResponse>> GetHealthAsync(
+    public Task<Call<GetHealthRequest, HealthResponse>> GetHealthCallAsync(
         GetHealthRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, new HealthResponse("NORMAL")));
 
-    public Task<Call<GetBoardStateRequest, BoardStateResponse>> GetBoardStateAsync(
+    public Task<Call<GetBoardStateRequest, BoardStateResponse>> GetBoardStateCallAsync(
         GetBoardStateRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, new BoardStateResponse("NORMAL", "RUNNING", null)));
 
-    public Task<Call<GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageAsync(
+    public Task<Call<GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
         GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, new CorporateLeverageResponse(
@@ -94,7 +114,7 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
             NextMax: 7.65m,
             NextStartDate: DateTimeOffset.UtcNow.AddDays(7))));
 
-    public Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateAsync(
+    public Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateCallAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, new FundingRateResponse(0m, DateTimeOffset.UtcNow)));

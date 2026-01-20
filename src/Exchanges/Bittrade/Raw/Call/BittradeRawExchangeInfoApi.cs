@@ -17,22 +17,22 @@ internal sealed class BittradeRawExchangeInfoApi : IBittradeRawExchangeInfoApi
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
     }
 
-    public async Task<Call<GetRawSymbolsRequest, RawSymbolsResponse>> GetSymbolsAsync(
+    public async Task<Call<GetRawSymbolsRequest, RawSymbolsResponse>> GetSymbolsCallAsync(
         GetRawSymbolsRequest request,
         CancellationToken cancellationToken = default)
     {
         var publicCall = await _publicApi
-            .GetSymbolsAsync(new GetSymbolsRequest(), cancellationToken)
+            .GetSymbolsCallAsync(new GetSymbolsRequest(), cancellationToken)
             .ConfigureAwait(false);
         return MapCall(request, "Bittrade.GetSymbols", publicCall);
     }
 
-    public async Task<Call<GetRawTimestampRequest, RawTimestampResponse>> GetTimestampAsync(
+    public async Task<Call<GetRawTimestampRequest, RawTimestampResponse>> GetTimestampCallAsync(
         GetRawTimestampRequest request,
         CancellationToken cancellationToken = default)
     {
         var publicCall = await _publicApi
-            .GetTimestampAsync(new GetTimestampRequest(), cancellationToken)
+            .GetTimestampCallAsync(new GetTimestampRequest(), cancellationToken)
             .ConfigureAwait(false);
         return MapCall(request, "Bittrade.GetTimestamp", publicCall);
     }

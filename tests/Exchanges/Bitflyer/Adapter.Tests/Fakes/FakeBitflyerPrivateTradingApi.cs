@@ -27,7 +27,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task<Call<string, CreateChildOrderResponse>> CreateChildOrderAsync(
+    public Task<Call<string, CreateChildOrderResponse>> SendChildOrderCallAsync(
         string bodyJson,
         CancellationToken cancellationToken = default)
     {
@@ -35,7 +35,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return Task.FromResult(MakeCall(bodyJson, _response));
     }
 
-    public Task<Call<string, CreateParentOrderResponse>> CreateParentOrderAsync(
+    public Task<Call<string, CreateParentOrderResponse>> SendParentOrderCallAsync(
         string bodyJson,
         CancellationToken cancellationToken = default)
     {
@@ -45,7 +45,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
             new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
     }
 
-    public Task<Call<RawRequests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
+    public Task<Call<RawRequests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderCallAsync(
         RawRequests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -53,7 +53,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return Task.FromResult(MakeCall(request, new EmptyResponse()));
     }
 
-    public Task<Call<RawRequests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
+    public Task<Call<RawRequests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderCallAsync(
         RawRequests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -61,7 +61,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return Task.FromResult(MakeCall(request, new EmptyResponse()));
     }
 
-    public Task<Call<RawRequests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersAsync(
+    public Task<Call<RawRequests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersCallAsync(
         RawRequests.CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -69,7 +69,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         return Task.FromResult(MakeCall(request, new EmptyResponse()));
     }
 
-    public Task<Call<RawRequests.CreateWithdrawalRequest, CreateWithdrawalResponse>> CreateWithdrawalAsync(
+    public Task<Call<RawRequests.CreateWithdrawalRequest, CreateWithdrawalResponse>> WithdrawCallAsync(
         RawRequests.CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default)
     {

@@ -27,11 +27,11 @@ namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 public sealed class BittradeErrorEnrichTests
 {
     [Fact]
-    public async Task GetTickerAsync_EnrichesExchangeAndOperation()
+    public async Task GetDetailMergedCallAsync_EnrichesExchangeAndOperation()
     {
         var api = new MarketApi(new ThrowingMarketDataApi(), CreateResolver());
 
-        var call = await api.GetTickerCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
+        var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
 
         var err = Assert.IsType<CallResult<Ticker>.Err>(call.Result);
         Assert.Equal("Bittrade.Market.GetTicker", call.Meta.Component);
@@ -40,18 +40,18 @@ public sealed class BittradeErrorEnrichTests
 
     private sealed class ThrowingMarketDataApi : IBittradeNormalizedMarketDataApi
     {
-        public Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
+        public Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
             string productCode,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
+        public Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
             string productCode,
             BittradeDepthType? depthType = null,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+        public Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
             string productCode,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");

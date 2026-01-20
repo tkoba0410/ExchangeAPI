@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Private;
 
 public interface IBittradeRawAccountApi
 {
-    Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountBalanceAsync(
+    Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountsBalanceByAccountIdCallAsync(
         GetAccountBalanceRequest request,
         CancellationToken cancellationToken = default);
 }

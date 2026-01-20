@@ -56,34 +56,34 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
     {
         private static Exception CreateException() => new InvalidOperationException("Raw API should not be called.");
 
-        public Task<Call<RawRequests.CreateOrderRequest, RawPlaceOrderResponse>> CreateOrderAsync(RawRequests.CreateOrderRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CreateOrderRequest, RawPlaceOrderResponse>> PostOrdersPlaceCallAsync(RawRequests.CreateOrderRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CancelOrderRequest, RawCancelOrderResponse>> CancelOrderAsync(RawRequests.CancelOrderRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CancelOrderRequest, RawCancelOrderResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(RawRequests.CancelOrderRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CancelOrdersRequest, RawCancelOrdersResponse>> CancelOrdersAsync(RawRequests.CancelOrdersRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CancelOrdersRequest, RawCancelOrdersResponse>> PostOrdersBatchCancelCallAsync(RawRequests.CancelOrdersRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> CancelOpenOrdersAsync(RawRequests.CancelOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(RawRequests.CancelOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CreateWithdrawRequest, RawCreateWithdrawResponse>> CreateWithdrawAsync(RawRequests.CreateWithdrawRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CreateWithdrawRequest, RawCreateWithdrawResponse>> PostWithdrawApiCreateCallAsync(RawRequests.CreateWithdrawRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CancelWithdrawRequest, RawCancelWithdrawResponse>> CancelWithdrawAsync(RawRequests.CancelWithdrawRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualCancelByWithdrawIdCallAsync(RawRequests.CancelWithdrawRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CreateRetailOrderRequest, RawRetailOrderResponse>> CreateRetailOrderAsync(RawRequests.CreateRetailOrderRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CreateRetailOrderRequest, RawRetailOrderResponse>> PostOrderPlaceCallAsync(RawRequests.CreateRetailOrderRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersAsync(RawRequests.GetOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersCallAsync(RawRequests.GetOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.GetOrderRequest, RawOrderDetailResponse>> GetOrderAsync(RawRequests.GetOrderRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.GetOrderRequest, RawOrderDetailResponse>> GetOrdersByOrderIdCallAsync(RawRequests.GetOrderRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsAsync(RawRequests.GetMatchResultsRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsCallAsync(RawRequests.GetMatchResultsRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
     }
 
@@ -93,7 +93,7 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
 
         public bool WasCalled { get; private set; }
 
-        public Task<Call<RawRequests.CreateOrderRequest, RawPlaceOrderResponse>> CreateOrderAsync(
+        public Task<Call<RawRequests.CreateOrderRequest, RawPlaceOrderResponse>> PostOrdersPlaceCallAsync(
             RawRequests.CreateOrderRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -109,31 +109,31 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
                 Meta: meta));
         }
 
-        public Task<Call<RawRequests.CancelOrderRequest, RawCancelOrderResponse>> CancelOrderAsync(RawRequests.CancelOrderRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CancelOrderRequest, RawCancelOrderResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(RawRequests.CancelOrderRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CancelOrdersRequest, RawCancelOrdersResponse>> CancelOrdersAsync(RawRequests.CancelOrdersRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CancelOrdersRequest, RawCancelOrdersResponse>> PostOrdersBatchCancelCallAsync(RawRequests.CancelOrdersRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> CancelOpenOrdersAsync(RawRequests.CancelOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(RawRequests.CancelOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CreateWithdrawRequest, RawCreateWithdrawResponse>> CreateWithdrawAsync(RawRequests.CreateWithdrawRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CreateWithdrawRequest, RawCreateWithdrawResponse>> PostWithdrawApiCreateCallAsync(RawRequests.CreateWithdrawRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CancelWithdrawRequest, RawCancelWithdrawResponse>> CancelWithdrawAsync(RawRequests.CancelWithdrawRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualCancelByWithdrawIdCallAsync(RawRequests.CancelWithdrawRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.CreateRetailOrderRequest, RawRetailOrderResponse>> CreateRetailOrderAsync(RawRequests.CreateRetailOrderRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.CreateRetailOrderRequest, RawRetailOrderResponse>> PostOrderPlaceCallAsync(RawRequests.CreateRetailOrderRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersAsync(RawRequests.GetOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersCallAsync(RawRequests.GetOpenOrdersRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.GetOrderRequest, RawOrderDetailResponse>> GetOrderAsync(RawRequests.GetOrderRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.GetOrderRequest, RawOrderDetailResponse>> GetOrdersByOrderIdCallAsync(RawRequests.GetOrderRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public Task<Call<RawRequests.GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsAsync(RawRequests.GetMatchResultsRequest request, CancellationToken cancellationToken = default) =>
+        public Task<Call<RawRequests.GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsCallAsync(RawRequests.GetMatchResultsRequest request, CancellationToken cancellationToken = default) =>
             throw CreateException();
     }
 

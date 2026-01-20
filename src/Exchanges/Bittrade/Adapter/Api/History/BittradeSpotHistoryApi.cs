@@ -79,7 +79,7 @@ internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
         try
         {
             var call = await _trading
-                .GetExecutionsCallAsync(request.Market, request.Limit, cancellationToken)
+                .GetMatchResultsCallAsync(request.Market, request.Limit, cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,

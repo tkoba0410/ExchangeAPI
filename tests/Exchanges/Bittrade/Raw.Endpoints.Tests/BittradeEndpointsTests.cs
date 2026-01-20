@@ -27,7 +27,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void GetKlines_builds_request_with_ordered_query()
     {
-        var req = BittradeEndpoints.GetKlines("btcjpy", "1min", "200");
+        var req = BittradeEndpoints.GetHistoryKline("btcjpy", "1min", "200");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
@@ -40,7 +40,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void GetTicker_builds_request()
     {
-        var req = BittradeEndpoints.GetTicker("btcjpy");
+        var req = BittradeEndpoints.GetDetailMerged("btcjpy");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
@@ -62,7 +62,7 @@ public sealed class BittradeEndpointsTests
             Source: "api");
 
         var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
-        var req = BittradeEndpoints.PlaceOrder(bodyJson);
+        var req = BittradeEndpoints.PostOrdersPlace(bodyJson);
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,

@@ -106,7 +106,7 @@ internal sealed class MarketApi : IMarketDataApi
             }
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _marketData.GetOrderBookCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
+            var call = await _marketData.GetBoardCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -151,7 +151,7 @@ internal sealed class MarketApi : IMarketDataApi
             }
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _marketData.GetExecutionsCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
+            var call = await _marketData.GetExecutionsPublicCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

@@ -16,35 +16,35 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Private;
 /// </summary>
 internal interface IBittradePrivateApi
 {
-    Task<Call<GetAccountsRequest, RawAccountsResponse>> GetAccountsAsync(
+    Task<Call<GetAccountsRequest, RawAccountsResponse>> GetAccountsCallAsync(
         GetAccountsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountBalanceAsync(
+    Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountsBalanceByAccountIdCallAsync(
         GetAccountBalanceRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersAsync(
+    Task<Call<GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersCallAsync(
         GetOpenOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetOrderRequest, RawOrderDetailResponse>> GetOrderAsync(
+    Task<Call<GetOrderRequest, RawOrderDetailResponse>> GetOrdersByOrderIdCallAsync(
         GetOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetOrderMatchResultsRequest, RawOrderMatchResultsResponse>> GetOrderMatchResultsAsync(
+    Task<Call<GetOrderMatchResultsRequest, RawOrderMatchResultsResponse>> GetOrdersMatchResultsByOrderIdCallAsync(
         GetOrderMatchResultsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsAsync(
+    Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsCallAsync(
         GetMatchResultsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetDepositWithdrawsRequest, RawDepositWithdrawsResponse>> GetDepositWithdrawsAsync(
+    Task<Call<GetDepositWithdrawsRequest, RawDepositWithdrawsResponse>> GetDepositWithdrawCallAsync(
         GetDepositWithdrawsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetRetailOrdersAsync(
+    Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetOrderListCallAsync(
         GetRetailOrdersRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -24,12 +24,12 @@ public interface IBittradeNormalizedTradingApi
         Symbol symbol,
         CancellationToken ct = default);
 
-    Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrderCallAsync(
+    Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default);
 
-    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
         Symbol symbol,
         int? limit = null,
         CancellationToken ct = default);

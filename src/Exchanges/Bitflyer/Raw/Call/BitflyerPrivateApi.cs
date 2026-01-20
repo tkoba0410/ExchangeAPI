@@ -25,7 +25,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsAsync(
+    public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
         GetPermissionsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -37,19 +37,19 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 json,
                 "Bitflyer.GetPermissions"));
 
-    public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalancesAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalanceCallAsync(
         GetBalancesRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.GetBalance",
-            BitflyerEndpoints.GetBalances(),
+            BitflyerEndpoints.GetBalance(),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<BalanceResponse>>(
                 json,
                 "Bitflyer.GetBalance"));
 
-    public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsAsync(
+    public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsCallAsync(
         GetPositionsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -61,13 +61,13 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 json,
                 "Bitflyer.GetPositions"));
 
-    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsAsync(
+    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
         GetAccountExecutionsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.GetExecutions",
-            BitflyerEndpoints.GetExecutions(
+            BitflyerEndpoints.GetExecutionsPrivate(
                 request.ProductCode,
                 request.ChildOrderId,
                 request.ChildOrderAcceptanceId,
@@ -79,7 +79,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 json,
                 "Bitflyer.GetExecutions"));
 
-    public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralAsync(
+    public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralCallAsync(
         GetCollateralRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -91,7 +91,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 json,
                 "Bitflyer.GetCollateral"));
 
-    public Task<Call<GetCollateralAccountsRequest, IReadOnlyList<CollateralAccount>>> GetCollateralAccountsAsync(
+    public Task<Call<GetCollateralAccountsRequest, IReadOnlyList<CollateralAccount>>> GetCollateralAccountsCallAsync(
         GetCollateralAccountsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -103,7 +103,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 json,
                 "Bitflyer.GetCollateralAccounts"));
 
-    public Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersAsync(
+    public Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersCallAsync(
         GetChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -123,7 +123,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 json,
                 "Bitflyer.GetChildOrders"));
 
-    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+    public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersCallAsync(
         GetParentOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -140,7 +140,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 json,
                 "Bitflyer.GetParentOrders"));
 
-    public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+    public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderCallAsync(
         GetParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -154,7 +154,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
                 json,
                 "Bitflyer.GetParentOrder"));
 
-    public Task<Call<GetBalanceHistoryRequest, RawJsonResponse>> GetBalanceHistoryAsync(
+    public Task<Call<GetBalanceHistoryRequest, RawJsonResponse>> GetBalanceHistoryCallAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -168,7 +168,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken,
             json => new RawJsonResponse(json));
 
-    public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionAsync(
+    public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionCallAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -178,7 +178,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken,
             json => new RawJsonResponse(json));
 
-    public Task<Call<GetCollateralHistoryRequest, RawJsonResponse>> GetCollateralHistoryAsync(
+    public Task<Call<GetCollateralHistoryRequest, RawJsonResponse>> GetCollateralHistoryCallAsync(
         GetCollateralHistoryRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -191,7 +191,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken,
             json => new RawJsonResponse(json));
 
-    public Task<Call<GetAddressesRequest, RawJsonResponse>> GetAddressesAsync(
+    public Task<Call<GetAddressesRequest, RawJsonResponse>> GetAddressesCallAsync(
         GetAddressesRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -201,7 +201,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken,
             json => new RawJsonResponse(json));
 
-    public Task<Call<GetCoinInsRequest, RawJsonResponse>> GetCoinInsAsync(
+    public Task<Call<GetCoinInsRequest, RawJsonResponse>> GetCoinInsCallAsync(
         GetCoinInsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -214,7 +214,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken,
             json => new RawJsonResponse(json));
 
-    public Task<Call<GetCoinOutsRequest, RawJsonResponse>> GetCoinOutsAsync(
+    public Task<Call<GetCoinOutsRequest, RawJsonResponse>> GetCoinOutsCallAsync(
         GetCoinOutsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -228,7 +228,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken,
             json => new RawJsonResponse(json));
 
-    public Task<Call<GetDepositsRequest, RawJsonResponse>> GetDepositsAsync(
+    public Task<Call<GetDepositsRequest, RawJsonResponse>> GetDepositsCallAsync(
         GetDepositsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -241,7 +241,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken,
             json => new RawJsonResponse(json));
 
-    public Task<Call<GetWithdrawalsRequest, RawJsonResponse>> GetWithdrawalsAsync(
+    public Task<Call<GetWithdrawalsRequest, RawJsonResponse>> GetWithdrawalsCallAsync(
         GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -255,7 +255,7 @@ public sealed class BitflyerPrivateApi : IBitflyerPrivateApi
             cancellationToken,
             json => new RawJsonResponse(json));
 
-    public Task<Call<GetBankAccountsRequest, RawJsonResponse>> GetBankAccountsAsync(
+    public Task<Call<GetBankAccountsRequest, RawJsonResponse>> GetBankAccountsCallAsync(
         GetBankAccountsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(

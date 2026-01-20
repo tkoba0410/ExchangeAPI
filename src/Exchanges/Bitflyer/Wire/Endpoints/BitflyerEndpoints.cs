@@ -105,10 +105,10 @@ internal static class BitflyerEndpoints
         Get(BitflyerEndpointIds.GetFundingRate, BitflyerPaths.GetFundingRatePath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
-    public static WireCallSpec GetBalances() =>
+    public static WireCallSpec GetBalance() =>
         Get(BitflyerEndpointIds.GetBalance, BitflyerPaths.GetBalancePath, query: null);
 
-    public static WireCallSpec GetExecutions(
+    public static WireCallSpec GetExecutionsPrivate(
         string productCode,
         string? childOrderId = null,
         string? childOrderAcceptanceId = null,

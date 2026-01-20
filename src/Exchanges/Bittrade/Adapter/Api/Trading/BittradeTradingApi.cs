@@ -36,6 +36,12 @@ internal sealed class BittradeTradingApi : ITradingApi
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
     }
 
+    public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
+        CommonSymbol symbol,
+        OrderKey orderKey,
+        CancellationToken cancellationToken = default) =>
+        GetOrdersByOrderIdCallAsync(symbol, orderKey, cancellationToken);
+
     public async Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         CommonSymbol symbol,
         Side side,
@@ -138,7 +144,7 @@ internal sealed class BittradeTradingApi : ITradingApi
         }
     }
 
-    public async Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
+    public async Task<Call<GetOrderRequest, OrderStatus>> GetOrdersByOrderIdCallAsync(
         CommonSymbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
@@ -148,7 +154,7 @@ internal sealed class BittradeTradingApi : ITradingApi
 
         try
         {
-            var call = await _trading.GetOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
+            var call = await _trading.GetOrdersByOrderIdCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

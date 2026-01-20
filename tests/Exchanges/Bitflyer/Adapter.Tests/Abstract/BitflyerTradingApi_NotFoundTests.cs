@@ -69,99 +69,99 @@ public sealed class BitflyerTradingApi_NotFoundTests
                 childOrders: orders);
         }
 
-        public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsAsync(
+        public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
             GetPermissionsRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetPermissionsAsync(request, cancellationToken);
+            _inner.GetPermissionsCallAsync(request, cancellationToken);
 
-        public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalancesAsync(
+        public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalanceCallAsync(
             GetBalancesRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetBalancesAsync(request, cancellationToken);
+            _inner.GetBalanceCallAsync(request, cancellationToken);
 
-        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsAsync(
+        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
             GetAccountExecutionsRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetExecutionsAsync(request, cancellationToken);
+            _inner.GetExecutionsPrivateCallAsync(request, cancellationToken);
 
-        public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsAsync(
+        public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsCallAsync(
             GetPositionsRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetPositionsAsync(request, cancellationToken);
+            _inner.GetPositionsCallAsync(request, cancellationToken);
 
-        public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralAsync(
+        public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralCallAsync(
             GetCollateralRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetCollateralAsync(request, cancellationToken);
+            _inner.GetCollateralCallAsync(request, cancellationToken);
 
-        public Task<Call<GetCollateralAccountsRequest, IReadOnlyList<CollateralAccount>>> GetCollateralAccountsAsync(
+        public Task<Call<GetCollateralAccountsRequest, IReadOnlyList<CollateralAccount>>> GetCollateralAccountsCallAsync(
             GetCollateralAccountsRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetCollateralAccountsAsync(request, cancellationToken);
+            _inner.GetCollateralAccountsCallAsync(request, cancellationToken);
 
-        public Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersAsync(
+        public Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersCallAsync(
             GetChildOrdersRequest request,
             CancellationToken cancellationToken = default)
         {
             LastChildOrderId = request.ChildOrderId;
             LastChildOrderAcceptanceId = request.ChildOrderAcceptanceId;
-            return _inner.GetChildOrdersAsync(request, cancellationToken);
+            return _inner.GetChildOrdersCallAsync(request, cancellationToken);
         }
 
-        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersCallAsync(
             GetParentOrdersRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetParentOrdersAsync(request, cancellationToken);
+            _inner.GetParentOrdersCallAsync(request, cancellationToken);
 
-        public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+        public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderCallAsync(
             GetParentOrderRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetParentOrderAsync(request, cancellationToken);
+            _inner.GetParentOrderCallAsync(request, cancellationToken);
 
-        public Task<Call<GetBalanceHistoryRequest, RawJsonResponse>> GetBalanceHistoryAsync(
+        public Task<Call<GetBalanceHistoryRequest, RawJsonResponse>> GetBalanceHistoryCallAsync(
             GetBalanceHistoryRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetBalanceHistoryAsync(request, cancellationToken);
+            _inner.GetBalanceHistoryCallAsync(request, cancellationToken);
 
-        public Task<Call<GetCollateralHistoryRequest, RawJsonResponse>> GetCollateralHistoryAsync(
+        public Task<Call<GetCollateralHistoryRequest, RawJsonResponse>> GetCollateralHistoryCallAsync(
             GetCollateralHistoryRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetCollateralHistoryAsync(request, cancellationToken);
+            _inner.GetCollateralHistoryCallAsync(request, cancellationToken);
 
-        public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionAsync(
+        public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionCallAsync(
             GetTradingCommissionRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetTradingCommissionAsync(request, cancellationToken);
+            _inner.GetTradingCommissionCallAsync(request, cancellationToken);
 
-        public Task<Call<GetAddressesRequest, RawJsonResponse>> GetAddressesAsync(
+        public Task<Call<GetAddressesRequest, RawJsonResponse>> GetAddressesCallAsync(
             GetAddressesRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetAddressesAsync(request, cancellationToken);
+            _inner.GetAddressesCallAsync(request, cancellationToken);
 
-        public Task<Call<GetCoinInsRequest, RawJsonResponse>> GetCoinInsAsync(
+        public Task<Call<GetCoinInsRequest, RawJsonResponse>> GetCoinInsCallAsync(
             GetCoinInsRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetCoinInsAsync(request, cancellationToken);
+            _inner.GetCoinInsCallAsync(request, cancellationToken);
 
-        public Task<Call<GetCoinOutsRequest, RawJsonResponse>> GetCoinOutsAsync(
+        public Task<Call<GetCoinOutsRequest, RawJsonResponse>> GetCoinOutsCallAsync(
             GetCoinOutsRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetCoinOutsAsync(request, cancellationToken);
+            _inner.GetCoinOutsCallAsync(request, cancellationToken);
 
-        public Task<Call<GetDepositsRequest, RawJsonResponse>> GetDepositsAsync(
+        public Task<Call<GetDepositsRequest, RawJsonResponse>> GetDepositsCallAsync(
             GetDepositsRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetDepositsAsync(request, cancellationToken);
+            _inner.GetDepositsCallAsync(request, cancellationToken);
 
-        public Task<Call<GetWithdrawalsRequest, RawJsonResponse>> GetWithdrawalsAsync(
+        public Task<Call<GetWithdrawalsRequest, RawJsonResponse>> GetWithdrawalsCallAsync(
             GetWithdrawalsRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetWithdrawalsAsync(request, cancellationToken);
+            _inner.GetWithdrawalsCallAsync(request, cancellationToken);
 
-        public Task<Call<GetBankAccountsRequest, RawJsonResponse>> GetBankAccountsAsync(
+        public Task<Call<GetBankAccountsRequest, RawJsonResponse>> GetBankAccountsCallAsync(
             GetBankAccountsRequest request,
             CancellationToken cancellationToken = default) =>
-            _inner.GetBankAccountsAsync(request, cancellationToken);
+            _inner.GetBankAccountsCallAsync(request, cancellationToken);
     }
 
 }

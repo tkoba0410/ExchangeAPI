@@ -41,7 +41,17 @@ internal sealed class MarketApi : IMarketDataApi
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public async Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
+    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
+        CommonSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        GetDetailMergedCallAsync(symbol, cancellationToken);
+
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
+        CommonSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        GetDepthCallAsync(symbol, cancellationToken);
+
+    public async Task<Call<GetTickerRequest, Ticker>> GetDetailMergedCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -62,7 +72,7 @@ internal sealed class MarketApi : IMarketDataApi
 
             var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
                 ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
-            var call = await _marketData.GetTickerCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
+            var call = await _marketData.GetDetailMergedCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -87,7 +97,7 @@ internal sealed class MarketApi : IMarketDataApi
         }
     }
 
-    public async Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
+    public async Task<Call<GetOrderBookRequest, OrderBook>> GetDepthCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -108,7 +118,7 @@ internal sealed class MarketApi : IMarketDataApi
 
             var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
                 ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
-            var call = await _marketData.GetOrderBookCallAsync(apiSymbol, ct: cancellationToken).ConfigureAwait(false);
+            var call = await _marketData.GetDepthCallAsync(apiSymbol, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -154,7 +164,7 @@ internal sealed class MarketApi : IMarketDataApi
 
             var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
                 ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
-            var call = await _marketData.GetExecutionsCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
+            var call = await _marketData.GetTradeCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

@@ -61,7 +61,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
 
         var rawRequest = BittradeTradingMapper.ToRaw(_accountId, apiSymbol!, request);
         var rawCall = await _trading
-            .CreateOrderAsync(new RawRequests.CreateOrderRequest(rawRequest), ct)
+            .PostOrdersPlaceCallAsync(new RawRequests.CreateOrderRequest(rawRequest), ct)
             .ConfigureAwait(false);
 
         return CreateCall(rawCall, callRequest, "Bittrade.PlaceOrder", BittradeTradingMapper.ToOrderResult);
@@ -89,7 +89,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         }
 
         var rawCall = await _trading
-            .CancelOrderAsync(new RawRequests.CancelOrderRequest(orderKey.Value), ct)
+            .PostOrdersSubmitCancelByOrderIdCallAsync(new RawRequests.CancelOrderRequest(orderKey.Value), ct)
             .ConfigureAwait(false);
 
         return CreateCall(rawCall, callRequest, "Bittrade.CancelOrder", _ => new BittradeCancelResult(true));
@@ -111,13 +111,13 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         }
 
         var rawCall = await _trading
-            .GetOpenOrdersAsync(new RawRequests.GetOpenOrdersRequest(apiSymbol!, _accountId), ct)
+            .GetOpenOrdersCallAsync(new RawRequests.GetOpenOrdersRequest(apiSymbol!, _accountId), ct)
             .ConfigureAwait(false);
 
         return CreateCall(rawCall, callRequest, "Bittrade.GetOpenOrders", raw => BittradeTradingMapper.ToOpenOrders(symbol, raw));
     }
 
-    public async Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrderCallAsync(
+    public async Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default)
@@ -153,13 +153,13 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             : new OrderKey(OrderIdKind.ExchangeOrderId, orderKey.Value);
 
         var rawCall = await _trading
-            .GetOrderAsync(new RawRequests.GetOrderRequest(orderKey.Value), ct)
+            .GetOrdersByOrderIdCallAsync(new RawRequests.GetOrderRequest(orderKey.Value), ct)
             .ConfigureAwait(false);
 
         return CreateCall(rawCall, callRequest, "Bittrade.GetOrder", raw => BittradeTradingMapper.ToOrderStatus(market.ProductCode, raw, key));
     }
 
-    public async Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+    public async Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
         Symbol symbol,
         int? limit = null,
         CancellationToken ct = default)
@@ -178,7 +178,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         var requestedLimit = limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);
         var rawCall = await _trading
-            .GetMatchResultsAsync(new RawRequests.GetMatchResultsRequest(Symbol: apiSymbol, Size: appliedLimit), ct)
+            .GetMatchResultsCallAsync(new RawRequests.GetMatchResultsRequest(Symbol: apiSymbol, Size: appliedLimit), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

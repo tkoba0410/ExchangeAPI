@@ -23,7 +23,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<Call<string, CreateChildOrderResponse>> CreateChildOrderAsync(
+    public Task<Call<string, CreateChildOrderResponse>> SendChildOrderCallAsync(
         string bodyJson,
         CancellationToken cancellationToken = default)
     {
@@ -38,7 +38,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
                 "Bitflyer.CreateChildOrder"));
     }
 
-    public Task<Call<string, CreateParentOrderResponse>> CreateParentOrderAsync(
+    public Task<Call<string, CreateParentOrderResponse>> SendParentOrderCallAsync(
         string bodyJson,
         CancellationToken cancellationToken = default)
     {
@@ -53,7 +53,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
                 "Bitflyer.CreateParentOrder"));
     }
 
-    public Task<Call<Requests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
+    public Task<Call<Requests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderCallAsync(
         Requests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -66,7 +66,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
                 json,
                 "Bitflyer.CancelChildOrder"));
 
-    public Task<Call<Requests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
+    public Task<Call<Requests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderCallAsync(
         Requests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -79,7 +79,7 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
                 json,
                 "Bitflyer.CancelParentOrder"));
 
-    public Task<Call<Requests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersAsync(
+    public Task<Call<Requests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersCallAsync(
         Requests.CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -92,18 +92,18 @@ public sealed class BitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
                 json,
                 "Bitflyer.CancelAllChildOrders"));
 
-    public Task<Call<Requests.CreateWithdrawalRequest, CreateWithdrawalResponse>> CreateWithdrawalAsync(
+    public Task<Call<Requests.CreateWithdrawalRequest, CreateWithdrawalResponse>> WithdrawCallAsync(
         Requests.CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
-            "Bitflyer.CreateWithdrawal",
+            "Bitflyer.Withdraw",
             BitflyerEndpoints.Withdraw(
-                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.CreateWithdrawal")),
+                BitflyerRawJson.SerializeOrThrow(request.Body, "Bitflyer.Withdraw")),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<CreateWithdrawalResponse>(
                 json,
-                "Bitflyer.CreateWithdrawal"));
+                "Bitflyer.Withdraw"));
 
     private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
         TReq request,

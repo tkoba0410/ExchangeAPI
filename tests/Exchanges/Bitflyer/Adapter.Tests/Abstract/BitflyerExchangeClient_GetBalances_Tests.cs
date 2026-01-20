@@ -28,7 +28,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
     public class BitflyerExchangeClient_GetBalances_Tests
     {
         [Fact]
-        public async Task GetBalancesAsync_ReturnsMappedBalanceList()
+        public async Task GetBalanceCallAsync_ReturnsMappedBalanceList()
         {
             // Arrange
             var rawBalances = new[]
@@ -73,7 +73,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         }
 
         [Fact]
-        public async Task GetBalancesAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
+        public async Task GetBalanceCallAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
         {
             // Arrange
             var rawBalances = Array.Empty<BalanceResponse>();

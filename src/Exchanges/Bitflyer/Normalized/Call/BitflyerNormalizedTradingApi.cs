@@ -67,7 +67,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
 
         var bodyJson = BitflyerOrderEncoder.BuildChildOrderBodyJson(dto);
         var rawCall = await _tradingApi
-            .CreateChildOrderAsync(bodyJson, cancellationToken)
+            .SendChildOrderCallAsync(bodyJson, cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -130,13 +130,13 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         }
 
         var rawCall = await _tradingApi
-            .CancelChildOrderAsync(new RawRequests.CancelChildOrderRequest(dto), cancellationToken)
+            .CancelChildOrderCallAsync(new RawRequests.CancelChildOrderRequest(dto), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(rawCall, callRequest, "Bitflyer.CancelChildOrder", _ => new BitflyerCancelResult(true));
     }
 
-    public async Task<Call<GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetOpenOrdersCallAsync(
+    public async Task<Call<GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -157,7 +157,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         }
 
         var rawCall = await _privateApi
-            .GetChildOrdersAsync(
+            .GetChildOrdersCallAsync(
                 new RawRequests.GetChildOrdersRequest(
                     productCode!,
                     ChildOrderStatusState: "ACTIVE",
@@ -202,7 +202,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             });
     }
 
-    public async Task<Call<GetOrderRequest, BitflyerOrderStatus>> GetOrderCallAsync(
+    public async Task<Call<GetOrderRequest, BitflyerOrderStatus>> GetChildOrdersCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
@@ -235,7 +235,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
 
         var rawCall = orderKey.Kind == OrderIdKind.AcceptanceId
             ? await _privateApi
-                .GetChildOrdersAsync(
+                .GetChildOrdersCallAsync(
                     new RawRequests.GetChildOrdersRequest(
                         productCode!,
                         ChildOrderStatusState: null,
@@ -243,7 +243,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                     cancellationToken)
                 .ConfigureAwait(false)
             : await _privateApi
-                .GetChildOrdersAsync(
+                .GetChildOrdersCallAsync(
                     new RawRequests.GetChildOrdersRequest(
                         productCode!,
                         ChildOrderStatusState: null,
@@ -311,7 +311,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
 
         var bodyJson = BitflyerOrderEncoder.BuildParentOrderBodyJson(rawRequest);
         var rawCall = await _tradingApi
-            .CreateParentOrderAsync(bodyJson, cancellationToken)
+            .SendParentOrderCallAsync(bodyJson, cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -336,7 +336,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         };
 
         var rawCall = await _tradingApi
-            .CancelParentOrderAsync(new RawRequests.CancelParentOrderRequest(rawRequest), cancellationToken)
+            .CancelParentOrderCallAsync(new RawRequests.CancelParentOrderRequest(rawRequest), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -363,7 +363,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             request.After);
 
         var rawCall = await _privateApi
-            .GetParentOrdersAsync(rawRequest, cancellationToken)
+            .GetParentOrdersCallAsync(rawRequest, cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -385,7 +385,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             request.ParentOrderAcceptanceId);
 
         var rawCall = await _privateApi
-            .GetParentOrderAsync(rawRequest, cancellationToken)
+            .GetParentOrderCallAsync(rawRequest, cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

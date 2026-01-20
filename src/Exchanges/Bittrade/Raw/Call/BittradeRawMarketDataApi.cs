@@ -16,32 +16,32 @@ internal sealed class BittradeRawMarketDataApi : IBittradeRawMarketDataApi
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
     }
 
-    public async Task<Call<BittradeRequests.GetTickerRequest, RawMergedResponse>> GetTickerAsync(
+    public async Task<Call<BittradeRequests.GetTickerRequest, RawMergedResponse>> GetDetailMergedCallAsync(
         BittradeRequests.GetTickerRequest request,
         CancellationToken cancellationToken = default)
     {
         var publicCall = await _publicApi
-            .GetMergedTickerAsync(new GetMergedTickerRequest(request.Symbol), cancellationToken)
+            .GetDetailMergedCallAsync(new GetMergedTickerRequest(request.Symbol), cancellationToken)
             .ConfigureAwait(false);
         return MapCall(request, "Bittrade.GetTicker", publicCall);
     }
 
-    public async Task<Call<BittradeRequests.GetOrderBookRequest, RawDepthResponse>> GetOrderBookAsync(
+    public async Task<Call<BittradeRequests.GetOrderBookRequest, RawDepthResponse>> GetDepthCallAsync(
         BittradeRequests.GetOrderBookRequest request,
         CancellationToken cancellationToken = default)
     {
         var publicCall = await _publicApi
-            .GetDepthAsync(new GetDepthRequest(request.Symbol, request.Type), cancellationToken)
+            .GetDepthCallAsync(new GetDepthRequest(request.Symbol, request.Type), cancellationToken)
             .ConfigureAwait(false);
         return MapCall(request, "Bittrade.GetOrderBook", publicCall);
     }
 
-    public async Task<Call<BittradeRequests.GetMarketTradesRequest, RawTradeResponse>> GetTradesAsync(
+    public async Task<Call<BittradeRequests.GetMarketTradesRequest, RawTradeResponse>> GetTradeCallAsync(
         BittradeRequests.GetMarketTradesRequest request,
         CancellationToken cancellationToken = default)
     {
         var publicCall = await _publicApi
-            .GetTradesAsync(new GetTradesRequest(request.Symbol), cancellationToken)
+            .GetTradeCallAsync(new GetTradesRequest(request.Symbol), cancellationToken)
             .ConfigureAwait(false);
         return MapCall(request, "Bittrade.GetTrades", publicCall);
     }

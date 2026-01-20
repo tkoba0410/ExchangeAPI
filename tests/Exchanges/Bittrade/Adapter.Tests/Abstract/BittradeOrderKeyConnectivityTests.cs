@@ -25,7 +25,7 @@ namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 public sealed class BittradeOrderKeyConnectivityTests
 {
     [Fact]
-    public async Task GetOrderAsync_UsesOrderKeyValue_WithAcceptanceId()
+    public async Task GetOrdersByOrderIdCallAsync_UsesOrderKeyValue_WithAcceptanceId()
     {
         var trading = new RecordingNormalizedTradingApi
         {
@@ -34,7 +34,7 @@ public sealed class BittradeOrderKeyConnectivityTests
         var api = new BittradeTradingApi(trading);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "1001");
-        var call = await api.GetOrderCallAsync(new CommonSymbol("BTC/JPY"), key);
+        var call = await api.GetOrdersByOrderIdCallAsync(new CommonSymbol("BTC/JPY"), key);
         var ok = Assert.IsType<CallResult<OrderStatus>.Ok>(call.Result);
         var status = ok.Response;
 
@@ -94,7 +94,7 @@ public sealed class BittradeOrderKeyConnectivityTests
             CancellationToken ct = default) =>
             Task.FromResult(MakeOkCall(new GetOpenOrdersRequest(symbol), (IReadOnlyList<BittradeOpenOrder>)Array.Empty<BittradeOpenOrder>()));
 
-        public Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrderCallAsync(
+        public Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
             Symbol symbol,
             OrderKey orderKey,
             CancellationToken ct = default)
@@ -104,7 +104,7 @@ public sealed class BittradeOrderKeyConnectivityTests
             return Task.FromResult(MakeOkCall(new GetOrderRequest(symbol, orderKey), Order with { Key = orderKey }));
         }
 
-        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
             Symbol symbol,
             int? limit = null,
             CancellationToken ct = default) =>

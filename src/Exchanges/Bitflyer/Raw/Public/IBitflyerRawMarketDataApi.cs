@@ -12,39 +12,55 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Public;
 /// </summary>
 public interface IBitflyerRawMarketDataApi
 {
-    Task<Call<BitflyerRequests.GetTickerRequest, Ticker>> GetTickerAsync(
+    Task<Call<BitflyerRequests.GetTickerRequest, Ticker>> GetTickerCallAsync(
         BitflyerRequests.GetTickerRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<BitflyerRequests.GetBoardRequest, Board>> GetBoardAsync(
+    Task<Call<BitflyerRequests.GetTickerRequest, Ticker>> TickerCallAsync(
+        BitflyerRequests.GetTickerRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<BitflyerRequests.GetBoardRequest, Board>> GetBoardCallAsync(
         BitflyerRequests.GetBoardRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<BitflyerRequests.GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsAsync(
+    Task<Call<BitflyerRequests.GetBoardRequest, Board>> BoardCallAsync(
+        BitflyerRequests.GetBoardRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<BitflyerRequests.GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
         BitflyerRequests.GetExecutionsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<BitflyerRequests.GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsAsync(
+    Task<Call<BitflyerRequests.GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> ExecutionsCallAsync(
+        BitflyerRequests.GetExecutionsRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<BitflyerRequests.GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsCallAsync(
         BitflyerRequests.GetMarketsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<BitflyerRequests.GetChatsRequest, IReadOnlyList<Chat>>> GetChatsAsync(
+    Task<Call<BitflyerRequests.GetMarketsRequest, IReadOnlyList<Market>>> MarketsCallAsync(
+        BitflyerRequests.GetMarketsRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<BitflyerRequests.GetChatsRequest, IReadOnlyList<Chat>>> GetChatsCallAsync(
         BitflyerRequests.GetChatsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<BitflyerRequests.GetHealthRequest, HealthResponse>> GetHealthAsync(
+    Task<Call<BitflyerRequests.GetHealthRequest, HealthResponse>> GetHealthCallAsync(
         BitflyerRequests.GetHealthRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<BitflyerRequests.GetBoardStateRequest, BoardStateResponse>> GetBoardStateAsync(
+    Task<Call<BitflyerRequests.GetBoardStateRequest, BoardStateResponse>> GetBoardStateCallAsync(
         BitflyerRequests.GetBoardStateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<BitflyerRequests.GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageAsync(
+    Task<Call<BitflyerRequests.GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
         BitflyerRequests.GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateAsync(
+    Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateCallAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -43,7 +43,7 @@ internal sealed class BittradeNotSupportedNormalizedTradingApi : IBittradeNormal
             new GetOpenOrdersRequest(symbol),
             "Trading.GetOpenOrders"));
 
-    public Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrderCallAsync(
+    public Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default) =>
@@ -53,7 +53,7 @@ internal sealed class BittradeNotSupportedNormalizedTradingApi : IBittradeNormal
             new GetOrderRequest(symbol, orderKey),
             "Trading.GetOrder"));
 
-    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
         Symbol symbol,
         int? limit = null,
         CancellationToken ct = default) =>

@@ -128,7 +128,7 @@ public sealed class BittradeSpotHistoryApiTests
             CancellationToken ct = default) =>
             Task.FromResult(MakeOkCall(new NormalizeRequests.GetOpenOrdersRequest(symbol), _openOrders));
 
-        public Task<Call<NormalizeRequests.GetOrderRequest, BittradeOrderStatus>> GetOrderCallAsync(
+        public Task<Call<NormalizeRequests.GetOrderRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
             Symbol symbol,
             OrderKey orderKey,
             CancellationToken ct = default) =>
@@ -143,7 +143,7 @@ public sealed class BittradeSpotHistoryApiTests
                     Price: new Price(100m),
                     AveragePrice: new Price(100m))));
 
-        public Task<Call<NormalizeRequests.GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+        public Task<Call<NormalizeRequests.GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
             Symbol symbol,
             int? limit = null,
             CancellationToken ct = default) =>

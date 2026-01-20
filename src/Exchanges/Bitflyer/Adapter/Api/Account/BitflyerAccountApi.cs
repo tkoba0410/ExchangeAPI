@@ -40,7 +40,7 @@ internal sealed class BitflyerAccountApi : IAccountApi
 
         try
         {
-            var call = await _accountApi.GetBalancesCallAsync(cancellationToken).ConfigureAwait(false);
+            var call = await _accountApi.GetBalanceCallAsync(cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

@@ -20,11 +20,11 @@ public interface IBitflyerNormalizedTradingApi
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetOpenOrdersCallAsync(
+    Task<Call<GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetOrderRequest, BitflyerOrderStatus>> GetOrderCallAsync(
+    Task<Call<GetOrderRequest, BitflyerOrderStatus>> GetChildOrdersCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);

@@ -22,7 +22,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 public sealed class BitflyerPublicClientTests
 {
     [Fact]
-    public async Task GetHealthAsync_ReturnsRawHealth()
+    public async Task GetHealthCallAsync_ReturnsRawHealth()
     {
         var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
@@ -36,7 +36,7 @@ public sealed class BitflyerPublicClientTests
     }
 
     [Fact]
-    public async Task GetBoardStateAsync_ReturnsRawBoardState()
+    public async Task GetBoardStateCallAsync_ReturnsRawBoardState()
     {
         var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
@@ -52,7 +52,7 @@ public sealed class BitflyerPublicClientTests
     }
 
     [Fact]
-    public async Task GetTickerAsync_UnknownSymbol_Throws()
+    public async Task GetTickerCallAsync_UnknownSymbol_Throws()
     {
         var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);

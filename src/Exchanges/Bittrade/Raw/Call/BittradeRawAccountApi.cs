@@ -17,12 +17,12 @@ internal sealed class BittradeRawAccountApi : IBittradeRawAccountApi
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
     }
 
-    public async Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountBalanceAsync(
+    public async Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountsBalanceByAccountIdCallAsync(
         GetAccountBalanceRequest request,
         CancellationToken cancellationToken = default)
     {
         var privateCall = await _privateApi
-            .GetAccountBalanceAsync(request, cancellationToken)
+            .GetAccountsBalanceByAccountIdCallAsync(request, cancellationToken)
             .ConfigureAwait(false);
         return MapCall(request, "Bittrade.GetAccountBalance", privateCall);
     }

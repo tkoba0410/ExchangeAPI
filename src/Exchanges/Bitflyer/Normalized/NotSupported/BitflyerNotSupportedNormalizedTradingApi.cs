@@ -34,7 +34,7 @@ internal sealed class BitflyerNotSupportedNormalizedTradingApi : IBitflyerNormal
             new CancelOrderRequest(symbol, orderKey),
             "Trading.CancelOrder"));
 
-    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetOpenOrdersCallAsync(
+    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall.Create<GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>(
@@ -43,7 +43,7 @@ internal sealed class BitflyerNotSupportedNormalizedTradingApi : IBitflyerNormal
             new GetOpenOrdersRequest(symbol),
             "Trading.GetOpenOrders"));
 
-    public Task<Call<GetOrderRequest, BitflyerOrderStatus>> GetOrderCallAsync(
+    public Task<Call<GetOrderRequest, BitflyerOrderStatus>> GetChildOrdersCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>

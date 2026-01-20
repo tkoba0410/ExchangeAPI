@@ -42,7 +42,7 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
 
         try
         {
-            var call = await _trading.GetOpenOrdersCallAsync(request.Market, cancellationToken).ConfigureAwait(false);
+            var call = await _trading.GetChildOrdersCallAsync(request.Market, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -67,7 +67,7 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
 
         try
         {
-            var call = await _account.GetAccountExecutionsCallAsync(request.Market, cancellationToken)
+            var call = await _account.GetExecutionsPrivateCallAsync(request.Market, cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,

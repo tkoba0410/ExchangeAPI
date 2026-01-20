@@ -23,11 +23,11 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
         _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
 
-    public async Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetBalancesCallAsync(
+    public async Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default)
     {
         var rawCall = await _raw.Account
-            .GetAccountBalanceAsync(new RawRequests.GetAccountBalanceRequest(_accountId), ct)
+            .GetAccountsBalanceByAccountIdCallAsync(new RawRequests.GetAccountBalanceRequest(_accountId), ct)
             .ConfigureAwait(false);
         var request = new GetBalancesRequest(_accountId);
 

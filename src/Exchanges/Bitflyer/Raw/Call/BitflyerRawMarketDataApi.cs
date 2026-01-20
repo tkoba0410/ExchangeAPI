@@ -25,67 +25,103 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }
 
-    public Task<Call<BitflyerRequests.GetTickerRequest, Ticker>> GetTickerAsync(
+    public Task<Call<BitflyerRequests.GetTickerRequest, Ticker>> GetTickerCallAsync(
         BitflyerRequests.GetTickerRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.GetTicker",
-            request.UseAliasPath
-                ? BitflyerEndpoints.Ticker(request.ProductCode)
-                : BitflyerEndpoints.GetTicker(request.ProductCode),
+            BitflyerEndpoints.GetTicker(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Ticker>(json, "Bitflyer.GetTicker"));
 
-    public Task<Call<BitflyerRequests.GetBoardRequest, Board>> GetBoardAsync(
+    public Task<Call<BitflyerRequests.GetTickerRequest, Ticker>> TickerCallAsync(
+        BitflyerRequests.GetTickerRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.Ticker",
+            BitflyerEndpoints.Ticker(request.ProductCode),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<Ticker>(json, "Bitflyer.Ticker"));
+
+    public Task<Call<BitflyerRequests.GetBoardRequest, Board>> GetBoardCallAsync(
         BitflyerRequests.GetBoardRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.GetBoard",
-            request.UseAliasPath
-                ? BitflyerEndpoints.Board(request.ProductCode)
-                : BitflyerEndpoints.GetBoard(request.ProductCode),
+            BitflyerEndpoints.GetBoard(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Board>(json, "Bitflyer.GetBoard"));
 
-    public Task<Call<BitflyerRequests.GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsAsync(
+    public Task<Call<BitflyerRequests.GetBoardRequest, Board>> BoardCallAsync(
+        BitflyerRequests.GetBoardRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.Board",
+            BitflyerEndpoints.Board(request.ProductCode),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<Board>(json, "Bitflyer.Board"));
+
+    public Task<Call<BitflyerRequests.GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
         BitflyerRequests.GetExecutionsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.GetExecutions",
-            request.UseAliasPath
-                ? BitflyerEndpoints.Executions(
-                    request.ProductCode,
-                    request.Count?.ToString(CultureInfo.InvariantCulture),
-                    request.Before?.ToString(CultureInfo.InvariantCulture),
-                    request.After?.ToString(CultureInfo.InvariantCulture))
-                : BitflyerEndpoints.GetExecutionsPublic(
-                    request.ProductCode,
-                    request.Count?.ToString(CultureInfo.InvariantCulture),
-                    request.Before?.ToString(CultureInfo.InvariantCulture),
-                    request.After?.ToString(CultureInfo.InvariantCulture)),
+            BitflyerEndpoints.GetExecutionsPublic(
+                request.ProductCode,
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPublicResponse>>(
                 json,
                 "Bitflyer.GetExecutions"));
 
-    public Task<Call<BitflyerRequests.GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsAsync(
+    public Task<Call<BitflyerRequests.GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> ExecutionsCallAsync(
+        BitflyerRequests.GetExecutionsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.Executions",
+            BitflyerEndpoints.Executions(
+                request.ProductCode,
+                request.Count?.ToString(CultureInfo.InvariantCulture),
+                request.Before?.ToString(CultureInfo.InvariantCulture),
+                request.After?.ToString(CultureInfo.InvariantCulture)),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPublicResponse>>(
+                json,
+                "Bitflyer.Executions"));
+
+    public Task<Call<BitflyerRequests.GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsCallAsync(
         BitflyerRequests.GetMarketsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             "Bitflyer.GetMarkets",
-            request.UseAliasPath
-                ? BitflyerEndpoints.Markets(request.Region)
-                : BitflyerEndpoints.GetMarkets(request.Region),
+            BitflyerEndpoints.GetMarkets(request.Region),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Market>>(
                 json,
                 "Bitflyer.GetMarkets"));
 
-    public Task<Call<BitflyerRequests.GetChatsRequest, IReadOnlyList<Chat>>> GetChatsAsync(
+    public Task<Call<BitflyerRequests.GetMarketsRequest, IReadOnlyList<Market>>> MarketsCallAsync(
+        BitflyerRequests.GetMarketsRequest request,
+        CancellationToken cancellationToken = default) =>
+        SendAndParse(
+            request,
+            "Bitflyer.Markets",
+            BitflyerEndpoints.Markets(request.Region),
+            cancellationToken,
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Market>>(
+                json,
+                "Bitflyer.Markets"));
+
+    public Task<Call<BitflyerRequests.GetChatsRequest, IReadOnlyList<Chat>>> GetChatsCallAsync(
         BitflyerRequests.GetChatsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -97,7 +133,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
                 json,
                 "Bitflyer.GetChats"));
 
-    public Task<Call<BitflyerRequests.GetHealthRequest, HealthResponse>> GetHealthAsync(
+    public Task<Call<BitflyerRequests.GetHealthRequest, HealthResponse>> GetHealthCallAsync(
         BitflyerRequests.GetHealthRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -107,7 +143,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<HealthResponse>(json, "Bitflyer.GetHealth"));
 
-    public Task<Call<BitflyerRequests.GetBoardStateRequest, BoardStateResponse>> GetBoardStateAsync(
+    public Task<Call<BitflyerRequests.GetBoardStateRequest, BoardStateResponse>> GetBoardStateCallAsync(
         BitflyerRequests.GetBoardStateRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -119,7 +155,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
                 json,
                 "Bitflyer.GetBoardState"));
 
-    public Task<Call<BitflyerRequests.GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageAsync(
+    public Task<Call<BitflyerRequests.GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
         BitflyerRequests.GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -131,7 +167,7 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
                 json,
                 "Bitflyer.GetCorporateLeverage"));
 
-    public Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateAsync(
+    public Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateCallAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(

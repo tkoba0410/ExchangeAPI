@@ -16,31 +16,31 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Private;
 /// </summary>
 internal interface IBittradePrivateTradingApi
 {
-    Task<Call<CreateOrderRequest, RawPlaceOrderResponse>> CreateOrderAsync(
+    Task<Call<CreateOrderRequest, RawPlaceOrderResponse>> PostOrdersPlaceCallAsync(
         CreateOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelOrderRequest, RawCancelOrderResponse>> CancelOrderAsync(
+    Task<Call<CancelOrderRequest, RawCancelOrderResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
         CancelOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelOrdersRequest, RawCancelOrdersResponse>> CancelOrdersAsync(
+    Task<Call<CancelOrdersRequest, RawCancelOrdersResponse>> PostOrdersBatchCancelCallAsync(
         CancelOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> CancelOpenOrdersAsync(
+    Task<Call<CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
         CancelOpenOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CreateWithdrawRequest, RawCreateWithdrawResponse>> CreateWithdrawAsync(
+    Task<Call<CreateWithdrawRequest, RawCreateWithdrawResponse>> PostWithdrawApiCreateCallAsync(
         CreateWithdrawRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> CancelWithdrawAsync(
+    Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualCancelByWithdrawIdCallAsync(
         CancelWithdrawRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> CreateRetailOrderAsync(
+    Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostOrderPlaceCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default);
 }

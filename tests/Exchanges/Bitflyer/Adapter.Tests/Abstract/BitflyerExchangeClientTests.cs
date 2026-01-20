@@ -41,7 +41,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
     public class BitflyerExchangeClientTests
     {
         [Fact]
-        public async Task GetTickerAsync_BtcJpy_ReturnsMappedTicker()
+        public async Task GetTickerCallAsync_BtcJpy_ReturnsMappedTicker()
         {
             // Arrange
             var raw = new RawTicker
@@ -76,7 +76,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         }
 
         [Fact]
-        public async Task GetTickerAsync_UnsupportedSymbol_ThrowsSymbolNotSupportedException()
+        public async Task GetTickerCallAsync_UnsupportedSymbol_ThrowsSymbolNotSupportedException()
         {
             // Arrange
             var raw = new RawTicker
@@ -155,7 +155,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         }
 
         [Fact]
-        public async Task GetBalancesAsync_ReturnsMappedBalances()
+        public async Task GetBalanceCallAsync_ReturnsMappedBalances()
         {
             var rawTicker = new RawTicker { ProductCode = "BTC_JPY" };
             var balances = new[]
@@ -207,32 +207,32 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
         private sealed class NullCancelTradingApi : IBitflyerPrivateTradingApi
         {
-            public Task<Call<string, CreateChildOrderResponse>> CreateChildOrderAsync(
+            public Task<Call<string, CreateChildOrderResponse>> SendChildOrderCallAsync(
                 string bodyJson,
                 CancellationToken cancellationToken = default) =>
                 Task.FromResult(OkCall(bodyJson, new CreateChildOrderResponse()));
 
-            public Task<Call<string, CreateParentOrderResponse>> CreateParentOrderAsync(
+            public Task<Call<string, CreateParentOrderResponse>> SendParentOrderCallAsync(
                 string bodyJson,
                 CancellationToken cancellationToken = default) =>
                 Task.FromResult(OkCall(bodyJson, new CreateParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
 
-            public Task<Call<RawRequests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
+            public Task<Call<RawRequests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderCallAsync(
                 RawRequests.CancelChildOrderRequest request,
                 CancellationToken cancellationToken = default) =>
                 Task.FromResult(ErrCall<RawRequests.CancelChildOrderRequest, EmptyResponse>(request, 500));
 
-            public Task<Call<RawRequests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderAsync(
+            public Task<Call<RawRequests.CancelParentOrderRequest, EmptyResponse>> CancelParentOrderCallAsync(
                 RawRequests.CancelParentOrderRequest request,
                 CancellationToken cancellationToken = default) =>
                 Task.FromResult(ErrCall<RawRequests.CancelParentOrderRequest, EmptyResponse>(request, 500));
 
-            public Task<Call<RawRequests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersAsync(
+            public Task<Call<RawRequests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersCallAsync(
                 RawRequests.CancelAllChildOrdersRequest request,
                 CancellationToken cancellationToken = default) =>
                 Task.FromResult(ErrCall<RawRequests.CancelAllChildOrdersRequest, EmptyResponse>(request, 500));
 
-            public Task<Call<RawRequests.CreateWithdrawalRequest, CreateWithdrawalResponse>> CreateWithdrawalAsync(
+            public Task<Call<RawRequests.CreateWithdrawalRequest, CreateWithdrawalResponse>> WithdrawCallAsync(
                 RawRequests.CreateWithdrawalRequest request,
                 CancellationToken cancellationToken = default) =>
                 Task.FromResult(OkCall(request, new CreateWithdrawalResponse()));

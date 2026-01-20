@@ -41,42 +41,42 @@ public sealed class BitflyerTradingCommissionNormalizedTests
 
         public StubAccountApi(string json) => _json = json;
 
-        public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionAsync(
+        public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionCallAsync(
             GetTradingCommissionRequest request,
             CancellationToken cancellationToken = default) =>
             Task.FromResult(MakeOkCall(request, new RawJsonResponse(_json)));
 
-        public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalancesAsync(
+        public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalanceCallAsync(
             GetBalancesRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsAsync(
+        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
             GetAccountExecutionsRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsAsync(
+        public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsCallAsync(
             GetPositionsRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralAsync(
+        public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralCallAsync(
             GetCollateralRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersAsync(
+        public Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersCallAsync(
             GetChildOrdersRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersCallAsync(
             GetParentOrdersRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+        public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderCallAsync(
             GetParentOrderRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();

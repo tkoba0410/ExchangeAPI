@@ -8,11 +8,11 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Public;
 
 public interface IBittradeRawExchangeInfoApi
 {
-    Task<Call<GetRawSymbolsRequest, RawSymbolsResponse>> GetSymbolsAsync(
+    Task<Call<GetRawSymbolsRequest, RawSymbolsResponse>> GetSymbolsCallAsync(
         GetRawSymbolsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetRawTimestampRequest, RawTimestampResponse>> GetTimestampAsync(
+    Task<Call<GetRawTimestampRequest, RawTimestampResponse>> GetTimestampCallAsync(
         GetRawTimestampRequest request,
         CancellationToken cancellationToken = default);
 }

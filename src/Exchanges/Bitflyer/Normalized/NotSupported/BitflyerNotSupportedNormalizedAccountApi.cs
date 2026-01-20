@@ -15,7 +15,7 @@ internal sealed class BitflyerNotSupportedNormalizedAccountApi : IBitflyerNormal
     private const string Layer = "Normalized";
     private const string Component = "Bitflyer.NotSupported";
 
-    public Task<Call<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalancesCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall.Create<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>(
             Layer,
@@ -23,7 +23,7 @@ internal sealed class BitflyerNotSupportedNormalizedAccountApi : IBitflyerNormal
             new GetBalancesRequest(),
             "Account.GetBalances"));
 
-    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetAccountExecutionsCallAsync(
+    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(NotSupportedCall.Create<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(

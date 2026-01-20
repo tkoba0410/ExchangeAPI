@@ -69,9 +69,19 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient
     public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerCallAsync(symbol, cancellationToken);
+        GetDetailMergedCallAsync(symbol, cancellationToken);
 
     public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
+        CommonSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        GetDepthCallAsync(symbol, cancellationToken);
+
+    public Task<Call<GetTickerRequest, Ticker>> GetDetailMergedCallAsync(
+        CommonSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetTickerCallAsync(symbol, cancellationToken);
+
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetDepthCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetOrderBookCallAsync(symbol, cancellationToken);

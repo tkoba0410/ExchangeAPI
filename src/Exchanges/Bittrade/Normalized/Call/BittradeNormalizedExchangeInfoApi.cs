@@ -25,7 +25,7 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
         CancellationToken ct = default)
     {
         var rawCall = await _raw.ExchangeInfo
-            .GetSymbolsAsync(new RawRequests.GetRawSymbolsRequest(), ct)
+            .GetSymbolsCallAsync(new RawRequests.GetRawSymbolsRequest(), ct)
             .ConfigureAwait(false);
         var request = new GetSymbolsRequest();
 

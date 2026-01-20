@@ -54,21 +54,21 @@ public sealed class BittradeNormalizedMarketDataFacade
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
     }
 
-    public Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
+    public Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
         string productCode,
         CancellationToken ct = default) =>
-        _inner.GetTickerCallAsync(productCode, ct);
+        _inner.GetDetailMergedCallAsync(productCode, ct);
 
-    public Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
+    public Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
         string productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default) =>
-        _inner.GetOrderBookCallAsync(productCode, depthType, ct);
+        _inner.GetDepthCallAsync(productCode, depthType, ct);
 
-    public Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
+    public Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
         string productCode,
         CancellationToken ct = default) =>
-        _inner.GetExecutionsCallAsync(productCode, ct);
+        _inner.GetTradeCallAsync(productCode, ct);
 }
 
 public sealed class BittradeNormalizedExchangeInfoFacade
@@ -94,7 +94,7 @@ public sealed class BittradeNormalizedAccountFacade
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
     }
 
-    public Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetBalancesCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default) =>
-        _inner.GetBalancesCallAsync(ct);
+        _inner.GetAccountsBalanceByAccountIdCallAsync(ct);
 }

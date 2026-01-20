@@ -8,35 +8,35 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private;
 
 public interface IBitflyerRawAccountApi
 {
-    Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalancesAsync(
+    Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalanceCallAsync(
         GetBalancesRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsAsync(
+    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
         GetAccountExecutionsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsAsync(
+    Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsCallAsync(
         GetPositionsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralAsync(
+    Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralCallAsync(
         GetCollateralRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersAsync(
+    Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersCallAsync(
         GetChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersAsync(
+    Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersCallAsync(
         GetParentOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderAsync(
+    Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderCallAsync(
         GetParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionAsync(
+    Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionCallAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default);
 }

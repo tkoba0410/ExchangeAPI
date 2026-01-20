@@ -20,7 +20,7 @@ internal sealed class BittradePreconditionMissingNormalizedAccountApi : IBittrad
         _accountId = accountId;
     }
 
-    public Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetBalancesCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default) =>
         Task.FromResult(CreatePreconditionMissing<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>(
             new GetBalancesRequest(_accountId)));

@@ -37,17 +37,17 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public async Task<Call<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalancesCallAsync(
+    public async Task<Call<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _accountApi
-            .GetBalancesAsync(new RawRequests.GetBalancesRequest(), cancellationToken)
+            .GetBalanceCallAsync(new RawRequests.GetBalancesRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new GetBalancesRequest();
         return CreateCall(rawCall, request, "Bitflyer.GetBalances", BitflyerAccountMapper.MapBalances);
     }
 
-    public async Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetAccountExecutionsCallAsync(
+    public async Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -80,7 +80,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         }
 
         var rawCall = await _accountApi
-            .GetExecutionsAsync(new RawRequests.GetAccountExecutionsRequest(productCode), cancellationToken)
+            .GetExecutionsPrivateCallAsync(new RawRequests.GetAccountExecutionsRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -123,7 +123,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         }
 
         var rawCall = await _accountApi
-            .GetTradingCommissionAsync(new RawRequests.GetTradingCommissionRequest(productCode), cancellationToken)
+            .GetTradingCommissionCallAsync(new RawRequests.GetTradingCommissionRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

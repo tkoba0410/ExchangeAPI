@@ -54,6 +54,7 @@ public sealed class TradingApiOrderQueryAdapter : IOrderQueryApi
         var meta = new CallMeta(
             Layer: "Composition",
             Component: "TradingApiOrderQueryAdapter",
+            EndpointId: call.Meta.EndpointId,
             Tags: null,
             Children: new[] { call.Id });
 
@@ -83,6 +84,7 @@ public sealed class TradingApiOrderQueryAdapter : IOrderQueryApi
         var meta = new CallMeta(
             Layer: "Composition",
             Component: "TradingApiOrderQueryAdapter",
+            EndpointId: call.Meta.EndpointId,
             Tags: null,
             Children: new[] { call.Id });
 
@@ -103,6 +105,7 @@ public sealed class TradingApiOrderQueryAdapter : IOrderQueryApi
         var meta = new CallMeta(
             Layer: "Composition",
             Component: "TradingApiOrderQueryAdapter",
+            EndpointId: call.Meta.EndpointId,
             Tags: null,
             Children: new[] { call.Id });
 

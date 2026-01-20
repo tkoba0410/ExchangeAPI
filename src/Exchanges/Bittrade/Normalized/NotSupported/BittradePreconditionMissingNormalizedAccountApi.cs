@@ -28,7 +28,7 @@ internal sealed class BittradePreconditionMissingNormalizedAccountApi : IBittrad
     private static Call<TReq, TOk> CreatePreconditionMissing<TReq, TOk>(TReq request)
     {
         var error = new CallError(CallErrorKind.Semantic, "PreconditionMissing:accountId");
-        var meta = new CallMeta(Layer, Component, Tags: null, Children: null);
+        var meta = CallMeta.CreateInternal(Layer, Component);
 
         return new Call<TReq, TOk>(
             Id: CallId.New(),

@@ -111,11 +111,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
                 ? Array.Empty<ChildOrderResponse>()
                 : _queue.Dequeue();
 
-            var meta = new CallMeta(
-                Layer: "Raw",
-                Component: "SequenceChildOrderApi",
-                Tags: null,
-                Children: null);
+            var meta = CallMeta.CreateInternal("Raw", "SequenceChildOrderApi");
             var call = new Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>(
                 Id: CallId.New(),
                 StartedAt: DateTimeOffset.UtcNow,

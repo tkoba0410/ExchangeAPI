@@ -52,8 +52,12 @@ public sealed class WireTransport : IWireTransport
             var meta = new CallMeta(
                 Layer: "Wire",
                 Component: $"{exchange}.SendRawAsync",
+                EndpointId: request.EndpointId,
                 Tags: null,
-                Children: null);
+                Children: null)
+            {
+                RawJson = responseMeta.Body
+            };
 
             return new Call<WireCallSpec, WireResponse>(
                 Id: CallId.New(),
@@ -70,6 +74,7 @@ public sealed class WireTransport : IWireTransport
             var meta = new CallMeta(
                 Layer: "Wire",
                 Component: $"{exchange}.SendRawAsync",
+                EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null);
             return new Call<WireCallSpec, WireResponse>(
@@ -87,6 +92,7 @@ public sealed class WireTransport : IWireTransport
             var meta = new CallMeta(
                 Layer: "Wire",
                 Component: $"{exchange}.SendRawAsync",
+                EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null);
             return new Call<WireCallSpec, WireResponse>(

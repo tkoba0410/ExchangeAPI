@@ -16,6 +16,7 @@ internal static class ApiCallMapperBase
         var meta = new CallMeta(
             Layer: "Contracts",
             Component: component,
+            EndpointId: normalizedCall.Meta.EndpointId,
             Tags: null,
             Children: new[] { normalizedCall.Id });
 
@@ -47,6 +48,7 @@ internal static class ApiCallMapperBase
         var meta = new CallMeta(
             Layer: "Contracts",
             Component: component,
+            EndpointId: normalizedCall.Meta.EndpointId,
             Tags: null,
             Children: new[] { normalizedCall.Id });
 
@@ -68,6 +70,7 @@ internal static class ApiCallMapperBase
         var meta = new CallMeta(
             Layer: "Contracts",
             Component: component,
+            EndpointId: CallMeta.InternalEndpointId,
             Tags: null,
             Children: null);
 

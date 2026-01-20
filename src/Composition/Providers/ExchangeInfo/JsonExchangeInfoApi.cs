@@ -56,6 +56,7 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: "JsonExchangeInfo",
+                EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
             return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
@@ -71,6 +72,7 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: "JsonExchangeInfo",
+                EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
             return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(

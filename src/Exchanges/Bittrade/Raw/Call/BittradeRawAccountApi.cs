@@ -32,21 +32,12 @@ internal sealed class BittradeRawAccountApi : IBittradeRawAccountApi
         string component,
         Call<TOtherReq, TRes> privateCall)
     {
-        var meta = new CallMeta(
-            Layer: "Raw",
-            Component: component,
-            Tags: null,
-            Children: new[] { privateCall.Id })
-        {
-            RawJson = privateCall.Meta.RawJson
-        };
-
         return new Call<TReq, TRes>(
             Id: CallId.New(),
             StartedAt: privateCall.StartedAt,
             Duration: privateCall.Duration,
             Request: request,
             Result: privateCall.Result,
-            Meta: meta);
+            Meta: privateCall.Meta);
     }
 }

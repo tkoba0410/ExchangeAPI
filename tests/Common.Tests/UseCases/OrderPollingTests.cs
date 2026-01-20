@@ -120,7 +120,7 @@ public sealed class OrderPollingTests
         {
             CallCount++;
             var now = DateTimeOffset.UtcNow;
-            var meta = new CallMeta("Contracts", "Test.GetOrder", null, null);
+            var meta = CallMeta.CreateInternal("Contracts", "Test.GetOrder");
             return Task.FromResult(new Call<GetOrderQuery, OrderStatusSnapshot>(
                 CallId.New(),
                 now,
@@ -141,7 +141,7 @@ public sealed class OrderPollingTests
         {
             CallCount++;
             var now = DateTimeOffset.UtcNow;
-            var meta = new CallMeta("Contracts", "Test.GetOrder", null, null);
+            var meta = CallMeta.CreateInternal("Contracts", "Test.GetOrder");
             var error = new CallError(
                 CallErrorKind.Semantic,
                 "Order not found.",

@@ -19,7 +19,7 @@ public static class NotSupportedCall
         if (feature is null) throw new ArgumentNullException(nameof(feature));
 
         var now = DateTimeOffset.UtcNow;
-        var meta = new CallMeta(layer, component, NonRetryableTags, null);
+        var meta = new CallMeta(layer, component, CallMeta.InternalEndpointId, NonRetryableTags, null);
         var error = new CallError(CallErrorKind.Semantic, $"NotSupported:{feature}");
 
         return new Call<TReq, TOk>(

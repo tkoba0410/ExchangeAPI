@@ -48,6 +48,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
                     Meta: new CallMeta(
                         Layer: "Contracts",
                         Component: BitflyerOperations.ExchangeInfo.GetExchangeInfo,
+                        EndpointId: CallMeta.InternalEndpointId,
                         Tags: null,
                         Children: null));
             }
@@ -80,6 +81,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: BitflyerOperations.ExchangeInfo.GetExchangeInfo,
+                EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
             return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(

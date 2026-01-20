@@ -158,12 +158,6 @@ public sealed class BitflyerNormalizedMarketDataFacade
         string component,
         Func<TRaw, TOk> mapper)
     {
-        var meta = new CallMeta(
-            Layer: "Normalized",
-            Component: component,
-            Tags: null,
-            Children: new[] { rawCall.Id });
-
         return rawCall.Result switch
         {
             CallResult<TRaw>.Err err => new Call<TReq, TOk>(
@@ -172,15 +166,15 @@ public sealed class BitflyerNormalizedMarketDataFacade
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Err(err.Error),
-                Meta: meta),
-            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper, meta),
+                Meta: rawCall.Meta),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper),
             _ => new Call<TReq, TOk>(
                 Id: CallId.New(),
                 StartedAt: rawCall.StartedAt,
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
-                Meta: meta)
+                Meta: rawCall.Meta)
         };
     }
 
@@ -189,8 +183,7 @@ public sealed class BitflyerNormalizedMarketDataFacade
         TReq request,
         string component,
         TRaw raw,
-        Func<TRaw, TOk> mapper,
-        CallMeta meta)
+        Func<TRaw, TOk> mapper)
     {
         try
         {
@@ -201,7 +194,7 @@ public sealed class BitflyerNormalizedMarketDataFacade
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Ok(mapped),
-                Meta: meta);
+                Meta: rawCall.Meta);
         }
         catch (Exception ex)
         {
@@ -212,7 +205,7 @@ public sealed class BitflyerNormalizedMarketDataFacade
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Err(error),
-                Meta: meta);
+                Meta: rawCall.Meta);
         }
     }
 
@@ -251,12 +244,6 @@ public sealed class BitflyerNormalizedExchangeInfoFacade
         string component,
         Func<TRaw, TOk> mapper)
     {
-        var meta = new CallMeta(
-            Layer: "Normalized",
-            Component: component,
-            Tags: null,
-            Children: new[] { rawCall.Id });
-
         return rawCall.Result switch
         {
             CallResult<TRaw>.Err err => new Call<TReq, TOk>(
@@ -265,15 +252,15 @@ public sealed class BitflyerNormalizedExchangeInfoFacade
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Err(err.Error),
-                Meta: meta),
-            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper, meta),
+                Meta: rawCall.Meta),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper),
             _ => new Call<TReq, TOk>(
                 Id: CallId.New(),
                 StartedAt: rawCall.StartedAt,
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
-                Meta: meta)
+                Meta: rawCall.Meta)
         };
     }
 
@@ -282,8 +269,7 @@ public sealed class BitflyerNormalizedExchangeInfoFacade
         TReq request,
         string component,
         TRaw raw,
-        Func<TRaw, TOk> mapper,
-        CallMeta meta)
+        Func<TRaw, TOk> mapper)
     {
         try
         {
@@ -294,7 +280,7 @@ public sealed class BitflyerNormalizedExchangeInfoFacade
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Ok(mapped),
-                Meta: meta);
+                Meta: rawCall.Meta);
         }
         catch (Exception ex)
         {
@@ -305,7 +291,7 @@ public sealed class BitflyerNormalizedExchangeInfoFacade
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Err(error),
-                Meta: meta);
+                Meta: rawCall.Meta);
         }
     }
 

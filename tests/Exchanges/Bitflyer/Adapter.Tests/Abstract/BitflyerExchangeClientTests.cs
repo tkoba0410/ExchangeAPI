@@ -239,11 +239,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
             private static Call<TReq, TResponse> OkCall<TReq, TResponse>(TReq request, TResponse response)
             {
-                var meta = new CallMeta(
-                    Layer: "Raw",
-                    Component: "NullCancelTradingApi",
-                    Tags: null,
-                    Children: null);
+                var meta = CallMeta.CreateInternal("Raw", "NullCancelTradingApi");
                 return new Call<TReq, TResponse>(
                     Id: CallId.New(),
                     StartedAt: DateTimeOffset.UtcNow,
@@ -255,11 +251,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
             private static Call<TReq, TResponse> ErrCall<TReq, TResponse>(TReq request, int statusCode)
             {
-                var meta = new CallMeta(
-                    Layer: "Raw",
-                    Component: "NullCancelTradingApi",
-                    Tags: null,
-                    Children: null);
+                var meta = CallMeta.CreateInternal("Raw", "NullCancelTradingApi");
                 var error = new CallError(CallErrorKind.Http, "Test error.", null, statusCode);
                 return new Call<TReq, TResponse>(
                     Id: CallId.New(),

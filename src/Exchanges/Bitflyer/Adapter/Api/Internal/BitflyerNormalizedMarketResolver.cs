@@ -50,6 +50,7 @@ internal sealed class BitflyerNormalizedMarketResolver : IBitflyerMarketResolver
         var meta = new CallMeta(
             Layer: "Adapter",
             Component: "BitflyerNormalizedMarketResolver",
+            EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
 
@@ -70,6 +71,7 @@ internal sealed class BitflyerNormalizedMarketResolver : IBitflyerMarketResolver
         var meta = new CallMeta(
             Layer: "Adapter",
             Component: "BitflyerNormalizedMarketResolver",
+            EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
 

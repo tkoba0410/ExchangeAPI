@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 using PrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 
@@ -24,6 +25,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "GET",
             path: "/v1/gethealth",
+            endpointId: BitflyerEndpointIds.GetHealth,
             query: "product_code=FX_BTC_JPY");
     }
 
@@ -36,6 +38,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "GET",
             path: "/v1/getboardstate",
+            endpointId: BitflyerEndpointIds.GetBoardState,
             query: "product_code=BTC_JPY");
     }
 
@@ -48,6 +51,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "GET",
             path: "/v1/getticker",
+            endpointId: BitflyerEndpointIds.GetTicker,
             query: "product_code=BTC_JPY");
     }
 
@@ -65,6 +69,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "GET",
             path: "/v1/getexecutions",
+            endpointId: BitflyerEndpointIds.GetExecutionsPublic,
             query: "product_code=BTC_JPY&count=100&before=123&after=456");
     }
 
@@ -78,6 +83,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "POST",
             path: "/v1/me/sendchildorder",
+            endpointId: BitflyerEndpointIds.SendChildOrder,
             bodyJson: bodyJson);
     }
 
@@ -91,6 +97,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "POST",
             path: "/v1/me/sendparentorder",
+            endpointId: BitflyerEndpointIds.SendParentOrder,
             bodyJson: bodyJson);
     }
 
@@ -110,6 +117,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "POST",
             path: "/v1/me/cancelparentorder",
+            endpointId: BitflyerEndpointIds.CancelParentOrder,
             bodyJson: bodyJson);
     }
 
@@ -127,6 +135,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "GET",
             path: "/v1/me/getparentorders",
+            endpointId: BitflyerEndpointIds.GetParentOrders,
             query: "product_code=BTC_JPY&parent_order_state=ACTIVE&count=10&before=100&after=50");
     }
 
@@ -139,6 +148,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "GET",
             path: "/v1/me/getparentorder",
+            endpointId: BitflyerEndpointIds.GetParentOrder,
             query: "parent_order_acceptance_id=JRF-1");
     }
 }

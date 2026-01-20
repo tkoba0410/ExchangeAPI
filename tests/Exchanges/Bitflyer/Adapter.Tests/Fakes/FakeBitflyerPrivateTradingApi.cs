@@ -79,11 +79,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
 
     private Call<TReq, TResponse> MakeCall<TReq, TResponse>(TReq request, TResponse response)
     {
-        var meta = new CallMeta(
-            Layer: "Raw",
-            Component: "FakeBitflyerPrivateTradingApi",
-            Tags: null,
-            Children: null);
+        var meta = CallMeta.CreateInternal("Raw", "FakeBitflyerPrivateTradingApi");
 
         if (_exceptionToThrow is null)
         {

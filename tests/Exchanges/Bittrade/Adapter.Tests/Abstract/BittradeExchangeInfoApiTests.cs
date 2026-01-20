@@ -56,11 +56,7 @@ public class BittradeExchangeInfoApiTests
                     State: "online")
             };
             var request = new GetSymbolsRequest();
-            var meta = new CallMeta(
-                Layer: "Normalized",
-                Component: "StubNormalizedExchangeInfoApi",
-                Tags: null,
-                Children: null);
+            var meta = CallMeta.CreateInternal("Normalized", "StubNormalizedExchangeInfoApi");
             var call = new Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,

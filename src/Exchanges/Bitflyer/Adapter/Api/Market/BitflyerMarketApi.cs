@@ -195,6 +195,7 @@ internal sealed class MarketApi : IMarketDataApi
         var meta = new CallMeta(
             Layer: "Contracts",
             Component: component,
+            EndpointId: marketCall.Meta.EndpointId,
             Tags: null,
             Children: new[] { marketCall.Id });
 
@@ -216,6 +217,7 @@ internal sealed class MarketApi : IMarketDataApi
         var meta = new CallMeta(
             Layer: "Contracts",
             Component: component,
+            EndpointId: CallMeta.InternalEndpointId,
             Tags: null,
             Children: null);
         var error = new CallError(CallErrorKind.Semantic, ex.Message, ex);

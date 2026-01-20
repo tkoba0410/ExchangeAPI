@@ -101,11 +101,7 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
 
     private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
     {
-        var meta = new CallMeta(
-            Layer: "Raw",
-            Component: "FakeBitflyerPublicApi",
-            Tags: null,
-            Children: null);
+        var meta = CallMeta.CreateInternal("Raw", "FakeBitflyerPublicApi");
         return new Call<TReq, TResponse>(
             Id: CallId.New(),
             StartedAt: DateTimeOffset.UtcNow,

@@ -84,7 +84,8 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
                 callRequest,
                 component: "Bittrade.Trading",
                 feature: "CancelOrder",
-                reason: $"orderKey.Kind={orderKey.Kind}");
+                reason: $"orderKey.Kind={orderKey.Kind}",
+                meta: CallMeta.CreateInternal("Normalized", "Bittrade.Trading"));
         }
 
         var rawCall = await _trading
@@ -133,7 +134,8 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
                 callRequest,
                 component: "Bittrade.Trading",
                 feature: "GetOrder",
-                reason: $"orderKey.Kind={orderKey.Kind}");
+                reason: $"orderKey.Kind={orderKey.Kind}",
+                meta: CallMeta.CreateInternal("Normalized", "Bittrade.Trading"));
         }
         var marketCall = await _markets.ResolveCallAsync(symbol, ct).ConfigureAwait(false);
         if (marketCall.Result is CallResult<BittradeMarketInfo>.Err marketError)
@@ -192,12 +194,6 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         string component,
         Func<TRaw, TOk> mapper)
     {
-        var meta = new CallMeta(
-            Layer: "Normalized",
-            Component: component,
-            Tags: null,
-            Children: new[] { rawCall.Id });
-
         return rawCall.Result switch
         {
             CallResult<TRaw>.Err err => new Call<TReq, TOk>(
@@ -206,15 +202,15 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Err(err.Error),
-                Meta: meta),
-            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper, meta),
+                Meta: rawCall.Meta),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper),
             _ => new Call<TReq, TOk>(
                 Id: CallId.New(),
                 StartedAt: rawCall.StartedAt,
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Err(new CallError(CallErrorKind.Unknown, "Raw call returned unknown result.")),
-                Meta: meta)
+                Meta: rawCall.Meta)
         };
     }
 
@@ -223,8 +219,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         TReq request,
         string component,
         TRaw raw,
-        Func<TRaw, TOk> mapper,
-        CallMeta meta)
+        Func<TRaw, TOk> mapper)
     {
         try
         {
@@ -235,7 +230,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Ok(mapped),
-                Meta: meta);
+                Meta: rawCall.Meta);
         }
         catch (Exception ex)
         {
@@ -246,7 +241,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Err(error),
-                Meta: meta);
+                Meta: rawCall.Meta);
         }
     }
 
@@ -294,33 +289,26 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         string component,
         CallError error)
     {
-        var meta = new CallMeta(
-            Layer: "Normalized",
-            Component: component,
-            Tags: null,
-            Children: new[] { marketCall.Id });
-
         return new Call<TReq, TOk>(
             Id: CallId.New(),
             StartedAt: marketCall.StartedAt,
             Duration: marketCall.Duration,
             Request: request,
             Result: new CallResult<TOk>.Err(error),
-            Meta: meta);
+            Meta: marketCall.Meta);
     }
 
     private static Call<TReq, TOk> CreateNotSupported<TReq, TOk>(
         TReq request,
         string component,
         string feature,
-        string? reason)
+        string? reason,
+        CallMeta meta)
     {
-        var tags = new Dictionary<string, string> { ["Retryable"] = "false" };
         var message = reason is null
             ? $"NotSupported:{feature}"
             : $"NotSupported:{feature}. reason={reason}";
         var error = new CallError(CallErrorKind.Semantic, message);
-        var meta = new CallMeta("Normalized", component, tags, null);
 
         return new Call<TReq, TOk>(
             Id: CallId.New(),

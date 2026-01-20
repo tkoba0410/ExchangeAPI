@@ -61,11 +61,7 @@ internal static class BitflyerTestHelpers
         public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default)
         {
-            var meta = new CallMeta(
-                Layer: "Contracts",
-                Component: "StubExchangeInfoApi",
-                Tags: null,
-                Children: null);
+            var meta = CallMeta.CreateInternal("Contracts", "StubExchangeInfoApi");
             var call = new Call<GetExchangeInfoRequest, ExchangeInfo>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,

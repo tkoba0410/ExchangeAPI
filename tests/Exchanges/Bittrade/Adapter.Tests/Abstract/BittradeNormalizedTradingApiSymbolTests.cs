@@ -98,11 +98,7 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
             CancellationToken cancellationToken = default)
         {
             WasCalled = true;
-            var meta = new CallMeta(
-                Layer: "Tests",
-                Component: "RecordingRawTradingApi",
-                Tags: null,
-                Children: null);
+            var meta = CallMeta.CreateInternal("Tests", "RecordingRawTradingApi");
             return Task.FromResult(new Call<RawRequests.CreateOrderRequest, RawPlaceOrderResponse>(
                 Id: CallId.New(),
                 StartedAt: DateTimeOffset.UtcNow,
@@ -155,11 +151,7 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
             CancellationToken ct = default)
         {
             var request = new ResolveBittradeMarketRequest(symbol);
-            var meta = new CallMeta(
-                Layer: "Normalized",
-                Component: "StubMarketResolver",
-                Tags: null,
-                Children: null);
+            var meta = CallMeta.CreateInternal("Normalized", "StubMarketResolver");
 
             return Task.FromResult(new Call<ResolveBittradeMarketRequest, BittradeMarketInfo>(
                 Id: CallId.New(),

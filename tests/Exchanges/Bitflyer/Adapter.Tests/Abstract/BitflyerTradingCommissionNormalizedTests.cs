@@ -84,11 +84,7 @@ public sealed class BitflyerTradingCommissionNormalizedTests
 
     private static Call<TReq, TRes> MakeOkCall<TReq, TRes>(TReq request, TRes response)
     {
-        var meta = new CallMeta(
-            Layer: "Raw",
-            Component: "StubAccountApi",
-            Tags: null,
-            Children: null);
+        var meta = CallMeta.CreateInternal("Raw", "StubAccountApi");
 
         return new Call<TReq, TRes>(
             Id: CallId.New(),

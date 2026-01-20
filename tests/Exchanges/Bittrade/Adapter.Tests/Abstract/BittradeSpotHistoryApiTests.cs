@@ -151,11 +151,7 @@ public sealed class BittradeSpotHistoryApiTests
 
         private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
         {
-            var meta = new CallMeta(
-                Layer: "Normalized",
-                Component: "StubNormalizedTradingApi",
-                Tags: null,
-                Children: null);
+            var meta = CallMeta.CreateInternal("Normalized", "StubNormalizedTradingApi");
             return new Call<TReq, TResponse>(
                 Id: CallId.New(),
                 StartedAt: DateTimeOffset.UtcNow,

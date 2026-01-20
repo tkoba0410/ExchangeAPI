@@ -71,6 +71,7 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         var meta = new CallMeta(
             Layer: "Contracts",
             Component: "ExchangeInfoMarketResolver",
+            EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
 
@@ -91,6 +92,7 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         var meta = new CallMeta(
             Layer: "Contracts",
             Component: "ExchangeInfoMarketResolver",
+            EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
 
@@ -111,6 +113,7 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         var meta = new CallMeta(
             Layer: "Contracts",
             Component: "ExchangeInfoMarketResolver",
+            EndpointId: CallMeta.InternalEndpointId,
             Tags: null,
             Children: null);
 

@@ -5,6 +5,7 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
@@ -19,7 +20,8 @@ public sealed class BittradeEndpointsTests
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
-            path: "v1/common/symbols");
+            path: "v1/common/symbols",
+            endpointId: BittradeEndpointIds.GetSymbols);
     }
 
     [Fact]
@@ -31,6 +33,7 @@ public sealed class BittradeEndpointsTests
             req,
             method: "GET",
             path: "market/history/kline",
+            endpointId: BittradeEndpointIds.GetHistoryKline,
             query: "period=1min&symbol=btcjpy&size=200");
     }
 
@@ -43,6 +46,7 @@ public sealed class BittradeEndpointsTests
             req,
             method: "GET",
             path: "market/detail/merged",
+            endpointId: BittradeEndpointIds.GetDetailMerged,
             query: "symbol=btcjpy");
     }
 
@@ -64,6 +68,7 @@ public sealed class BittradeEndpointsTests
             req,
             method: "POST",
             path: "v1/order/orders/place",
+            endpointId: BittradeEndpointIds.PostOrdersPlace,
             bodyJson: "{\"account-id\":\"123\",\"symbol\":\"btcjpy\",\"type\":\"buy-limit\",\"amount\":\"0.1\",\"price\":\"3000000\",\"source\":\"api\"}");
     }
 }

@@ -78,6 +78,6 @@ public sealed class BittradeErrorEnrichTests
                 TimeSpan.Zero,
                 new ContractsRequests.GetExchangeInfoRequest(),
                 new CallResult<ExchangeInfo>.Ok(_info),
-                new CallMeta("Contracts", "StubExchangeInfo", null, null)));
+                CallMeta.CreateInternal("Contracts", "StubExchangeInfo")));
     }
 }

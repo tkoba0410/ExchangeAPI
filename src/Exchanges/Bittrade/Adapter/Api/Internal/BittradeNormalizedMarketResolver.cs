@@ -50,6 +50,7 @@ internal sealed class BittradeNormalizedMarketResolver : IBittradeMarketResolver
         var meta = new CallMeta(
             Layer: "Adapter",
             Component: "BittradeNormalizedMarketResolver",
+            EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
 
@@ -70,6 +71,7 @@ internal sealed class BittradeNormalizedMarketResolver : IBittradeMarketResolver
         var meta = new CallMeta(
             Layer: "Adapter",
             Component: "BittradeNormalizedMarketResolver",
+            EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
 

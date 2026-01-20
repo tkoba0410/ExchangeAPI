@@ -9,11 +9,13 @@ internal static class WireCallSpecAssertions
         WireCallSpec request,
         string method,
         string path,
+        string endpointId,
         string? query = null,
         string? bodyJson = null)
     {
         Assert.Equal(method, request.Method);
         Assert.Equal(path, request.Path);
+        Assert.Equal(endpointId, request.EndpointId);
         Assert.Equal(query, request.Query);
         Assert.Equal(NormalizeJson(bodyJson), NormalizeJson(request.BodyJson));
     }

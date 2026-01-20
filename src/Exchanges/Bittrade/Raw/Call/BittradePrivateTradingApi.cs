@@ -130,12 +130,6 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
         Call<WireCallSpec, WireResponse> wireCall,
         Func<string, TRes> parse)
     {
-        var meta = new CallMeta(
-            Layer: "Raw",
-            Component: component,
-            Tags: null,
-            Children: new[] { wireCall.Id });
-
         return wireCall.Result switch
         {
             CallResult<WireResponse>.Err err => new Call<TReq, TRes>(
@@ -144,15 +138,15 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
                 Duration: wireCall.Duration,
                 Request: request,
                 Result: new CallResult<TRes>.Err(err.Error),
-                Meta: meta),
-            CallResult<WireResponse>.Ok ok => CreateOkCall(request, component, ok.Response, wireCall, parse, meta),
+                Meta: wireCall.Meta),
+            CallResult<WireResponse>.Ok ok => CreateOkCall(request, component, ok.Response, wireCall, parse),
             _ => new Call<TReq, TRes>(
                 Id: CallId.New(),
                 StartedAt: wireCall.StartedAt,
                 Duration: wireCall.Duration,
                 Request: request,
                 Result: new CallResult<TRes>.Err(new CallError(CallErrorKind.Unknown, "Wire call returned unknown result.")),
-                Meta: meta)
+                Meta: wireCall.Meta)
         };
     }
 
@@ -161,10 +155,8 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
         string component,
         WireResponse response,
         Call<WireCallSpec, WireResponse> wireCall,
-        Func<string, TRes> parse,
-        CallMeta meta)
+        Func<string, TRes> parse)
     {
-        var metaWithRaw = meta with { RawJson = response.Json };
         if (response.StatusCode is < 200 or >= 300)
         {
             var error = new CallError(
@@ -178,7 +170,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
                 Duration: wireCall.Duration,
                 Request: request,
                 Result: new CallResult<TRes>.Err(error),
-                Meta: metaWithRaw);
+                Meta: wireCall.Meta);
         }
 
         try
@@ -190,7 +182,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
                 Duration: wireCall.Duration,
                 Request: request,
                 Result: new CallResult<TRes>.Ok(parsed),
-                Meta: metaWithRaw);
+                Meta: wireCall.Meta);
         }
         catch (Exception ex) when (ex is JsonException or NotSupportedException)
         {
@@ -206,7 +198,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
                 Duration: wireCall.Duration,
                 Request: request,
                 Result: new CallResult<TRes>.Err(error),
-                Meta: metaWithRaw);
+                Meta: wireCall.Meta);
         }
     }
 

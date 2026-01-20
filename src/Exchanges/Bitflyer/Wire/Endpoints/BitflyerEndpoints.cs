@@ -8,11 +8,15 @@ namespace ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 internal static class BitflyerEndpoints
 {
     public static WireCallSpec GetTicker(string productCode, bool useAliasPath) =>
-        Get(useAliasPath ? BitflyerPaths.TickerPath : BitflyerPaths.GetTickerPath,
+        Get(
+            useAliasPath ? BitflyerEndpointIds.Ticker : BitflyerEndpointIds.GetTicker,
+            useAliasPath ? BitflyerPaths.TickerPath : BitflyerPaths.GetTickerPath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
     public static WireCallSpec GetBoard(string productCode, bool useAliasPath) =>
-        Get(useAliasPath ? BitflyerPaths.BoardPath : BitflyerPaths.GetBoardPath,
+        Get(
+            useAliasPath ? BitflyerEndpointIds.Board : BitflyerEndpointIds.GetBoard,
+            useAliasPath ? BitflyerPaths.BoardPath : BitflyerPaths.GetBoardPath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
     public static WireCallSpec GetExecutions(
@@ -22,8 +26,9 @@ internal static class BitflyerEndpoints
         string? after = null,
         bool useAliasPath = false)
     {
+        var endpointId = useAliasPath ? BitflyerEndpointIds.Executions : BitflyerEndpointIds.GetExecutionsPublic;
         var path = useAliasPath ? BitflyerPaths.ExecutionsPath : BitflyerPaths.GetExecutionsPublicPath;
-        return Get(path, BuildQuery(
+        return Get(endpointId, path, BuildQuery(
             (BitflyerQueryKeys.ProductCode, productCode),
             (BitflyerQueryKeys.Count, count),
             (BitflyerQueryKeys.Before, before),
@@ -32,13 +37,14 @@ internal static class BitflyerEndpoints
 
     public static WireCallSpec GetMarkets(string? region = null, bool useAliasPath = false)
     {
+        var endpointId = useAliasPath ? BitflyerEndpointIds.Markets : BitflyerEndpointIds.GetMarkets;
         var path = useAliasPath ? BitflyerPaths.MarketsPath : BitflyerPaths.GetMarketsPath;
         if (!string.IsNullOrWhiteSpace(region))
         {
             path = $"{path}/{region}";
         }
 
-        return Get(path, query: null);
+        return Get(endpointId, path, query: null);
     }
 
     public static WireCallSpec GetChats(string? fromDate = null, string? region = null)
@@ -49,26 +55,26 @@ internal static class BitflyerEndpoints
             path = $"{path}/{region}";
         }
 
-        return Get(path, BuildQuery((BitflyerQueryKeys.FromDate, fromDate)));
+        return Get(BitflyerEndpointIds.GetChats, path, BuildQuery((BitflyerQueryKeys.FromDate, fromDate)));
     }
 
     public static WireCallSpec GetHealth(string productCode) =>
-        Get(BitflyerPaths.GetHealthPath,
+        Get(BitflyerEndpointIds.GetHealth, BitflyerPaths.GetHealthPath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
     public static WireCallSpec GetBoardState(string productCode) =>
-        Get(BitflyerPaths.GetBoardStatePath,
+        Get(BitflyerEndpointIds.GetBoardState, BitflyerPaths.GetBoardStatePath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
     public static WireCallSpec GetCorporateLeverage() =>
-        Get(BitflyerPaths.GetCorporateLeveragePath, query: null);
+        Get(BitflyerEndpointIds.GetCorporateLeverage, BitflyerPaths.GetCorporateLeveragePath, query: null);
 
     public static WireCallSpec GetFundingRate(string productCode) =>
-        Get(BitflyerPaths.GetFundingRatePath,
+        Get(BitflyerEndpointIds.GetFundingRate, BitflyerPaths.GetFundingRatePath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
     public static WireCallSpec GetBalances() =>
-        Get(BitflyerPaths.GetBalancePath, query: null);
+        Get(BitflyerEndpointIds.GetBalance, BitflyerPaths.GetBalancePath, query: null);
 
     public static WireCallSpec GetExecutions(
         string productCode,
@@ -78,7 +84,7 @@ internal static class BitflyerEndpoints
         string? before = null,
         string? after = null)
     {
-        return Get(BitflyerPaths.GetExecutionsPrivatePath, BuildQuery(
+        return Get(BitflyerEndpointIds.GetExecutionsPrivate, BitflyerPaths.GetExecutionsPrivatePath, BuildQuery(
             (BitflyerQueryKeys.ProductCode, productCode),
             (BitflyerQueryKeys.ChildOrderId, childOrderId),
             (BitflyerQueryKeys.ChildOrderAcceptanceId, childOrderAcceptanceId),
@@ -88,11 +94,11 @@ internal static class BitflyerEndpoints
     }
 
     public static WireCallSpec GetPositions(string productCode) =>
-        Get(BitflyerPaths.GetPositionsPath,
+        Get(BitflyerEndpointIds.GetPositions, BitflyerPaths.GetPositionsPath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
     public static WireCallSpec GetCollateral() =>
-        Get(BitflyerPaths.GetCollateralPath, query: null);
+        Get(BitflyerEndpointIds.GetCollateral, BitflyerPaths.GetCollateralPath, query: null);
 
     public static WireCallSpec GetChildOrders(
         string productCode,
@@ -104,7 +110,7 @@ internal static class BitflyerEndpoints
         string? after = null,
         string? parentOrderId = null)
     {
-        return Get(BitflyerPaths.GetChildOrdersPath, BuildQuery(
+        return Get(BitflyerEndpointIds.GetChildOrders, BitflyerPaths.GetChildOrdersPath, BuildQuery(
             (BitflyerQueryKeys.ProductCode, productCode),
             (BitflyerQueryKeys.ChildOrderStatusState, childOrderStatusState),
             (BitflyerQueryKeys.ChildOrderAcceptanceId, childOrderAcceptanceId),
@@ -122,7 +128,7 @@ internal static class BitflyerEndpoints
         string? before = null,
         string? after = null)
     {
-        return Get(BitflyerPaths.GetParentOrdersPath, BuildQuery(
+        return Get(BitflyerEndpointIds.GetParentOrders, BitflyerPaths.GetParentOrdersPath, BuildQuery(
             (BitflyerQueryKeys.ProductCode, productCode),
             (BitflyerQueryKeys.ParentOrderState, parentOrderState),
             (BitflyerQueryKeys.Count, count),
@@ -132,20 +138,20 @@ internal static class BitflyerEndpoints
 
     public static WireCallSpec GetParentOrder(string? parentOrderId = null, string? parentOrderAcceptanceId = null)
     {
-        return Get(BitflyerPaths.GetParentOrderPath, BuildQuery(
+        return Get(BitflyerEndpointIds.GetParentOrder, BitflyerPaths.GetParentOrderPath, BuildQuery(
             (BitflyerQueryKeys.ParentOrderId, parentOrderId),
             (BitflyerQueryKeys.ParentOrderAcceptanceId, parentOrderAcceptanceId)));
     }
 
     public static WireCallSpec GetTradingCommission(string productCode) =>
-        Get(BitflyerPaths.GetTradingCommissionPath,
+        Get(BitflyerEndpointIds.GetTradingCommission, BitflyerPaths.GetTradingCommissionPath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
     public static WireCallSpec GetPermissions() =>
-        Get(BitflyerPaths.GetPermissionsPath, query: null);
+        Get(BitflyerEndpointIds.GetPermissions, BitflyerPaths.GetPermissionsPath, query: null);
 
     public static WireCallSpec GetCollateralAccounts() =>
-        Get(BitflyerPaths.GetCollateralAccountsPath, query: null);
+        Get(BitflyerEndpointIds.GetCollateralAccounts, BitflyerPaths.GetCollateralAccountsPath, query: null);
 
     public static WireCallSpec GetBalanceHistory(
         string? currencyCode = null,
@@ -153,7 +159,7 @@ internal static class BitflyerEndpoints
         string? before = null,
         string? after = null)
     {
-        return Get(BitflyerPaths.GetBalanceHistoryPath, BuildQuery(
+        return Get(BitflyerEndpointIds.GetBalanceHistory, BitflyerPaths.GetBalanceHistoryPath, BuildQuery(
             (BitflyerQueryKeys.CurrencyCode, currencyCode),
             (BitflyerQueryKeys.Count, count),
             (BitflyerQueryKeys.Before, before),
@@ -165,67 +171,67 @@ internal static class BitflyerEndpoints
         string? before = null,
         string? after = null)
     {
-        return Get(BitflyerPaths.GetCollateralHistoryPath, BuildQuery(
+        return Get(BitflyerEndpointIds.GetCollateralHistory, BitflyerPaths.GetCollateralHistoryPath, BuildQuery(
             (BitflyerQueryKeys.Count, count),
             (BitflyerQueryKeys.Before, before),
             (BitflyerQueryKeys.After, after)));
     }
 
     public static WireCallSpec GetAddresses() =>
-        Get(BitflyerPaths.GetAddressesPath, query: null);
+        Get(BitflyerEndpointIds.GetAddresses, BitflyerPaths.GetAddressesPath, query: null);
 
     public static WireCallSpec GetCoinIns(string? count = null, string? before = null, string? after = null) =>
-        Get(BitflyerPaths.GetCoinInsPath, BuildQuery(
+        Get(BitflyerEndpointIds.GetCoinIns, BitflyerPaths.GetCoinInsPath, BuildQuery(
             (BitflyerQueryKeys.Count, count),
             (BitflyerQueryKeys.Before, before),
             (BitflyerQueryKeys.After, after)));
 
     public static WireCallSpec GetCoinOuts(string? messageId = null, string? count = null, string? before = null, string? after = null) =>
-        Get(BitflyerPaths.GetCoinOutsPath, BuildQuery(
+        Get(BitflyerEndpointIds.GetCoinOuts, BitflyerPaths.GetCoinOutsPath, BuildQuery(
             (BitflyerQueryKeys.MessageId, messageId),
             (BitflyerQueryKeys.Count, count),
             (BitflyerQueryKeys.Before, before),
             (BitflyerQueryKeys.After, after)));
 
     public static WireCallSpec GetDeposits(string? count = null, string? before = null, string? after = null) =>
-        Get(BitflyerPaths.GetDepositsPath, BuildQuery(
+        Get(BitflyerEndpointIds.GetDeposits, BitflyerPaths.GetDepositsPath, BuildQuery(
             (BitflyerQueryKeys.Count, count),
             (BitflyerQueryKeys.Before, before),
             (BitflyerQueryKeys.After, after)));
 
     public static WireCallSpec GetWithdrawals(string? messageId = null, string? count = null, string? before = null, string? after = null) =>
-        Get(BitflyerPaths.GetWithdrawalsPath, BuildQuery(
+        Get(BitflyerEndpointIds.GetWithdrawals, BitflyerPaths.GetWithdrawalsPath, BuildQuery(
             (BitflyerQueryKeys.MessageId, messageId),
             (BitflyerQueryKeys.Count, count),
             (BitflyerQueryKeys.Before, before),
             (BitflyerQueryKeys.After, after)));
 
     public static WireCallSpec GetBankAccounts() =>
-        Get(BitflyerPaths.GetBankAccountsPath, query: null);
+        Get(BitflyerEndpointIds.GetBankAccounts, BitflyerPaths.GetBankAccountsPath, query: null);
 
     public static WireCallSpec SendChildOrder(string bodyJson) =>
-        Post(BitflyerPaths.SendChildOrderPath, bodyJson);
+        Post(BitflyerEndpointIds.SendChildOrder, BitflyerPaths.SendChildOrderPath, bodyJson);
 
     public static WireCallSpec SendParentOrder(string bodyJson) =>
-        Post(BitflyerPaths.SendParentOrderPath, bodyJson);
+        Post(BitflyerEndpointIds.SendParentOrder, BitflyerPaths.SendParentOrderPath, bodyJson);
 
     public static WireCallSpec CancelChildOrder(string bodyJson) =>
-        Post(BitflyerPaths.CancelChildOrderPath, bodyJson);
+        Post(BitflyerEndpointIds.CancelChildOrder, BitflyerPaths.CancelChildOrderPath, bodyJson);
 
     public static WireCallSpec CancelParentOrder(string bodyJson) =>
-        Post(BitflyerPaths.CancelParentOrderPath, bodyJson);
+        Post(BitflyerEndpointIds.CancelParentOrder, BitflyerPaths.CancelParentOrderPath, bodyJson);
 
     public static WireCallSpec CancelAllChildOrders(string bodyJson) =>
-        Post(BitflyerPaths.CancelAllChildOrdersPath, bodyJson);
+        Post(BitflyerEndpointIds.CancelAllChildOrders, BitflyerPaths.CancelAllChildOrdersPath, bodyJson);
 
     public static WireCallSpec Withdraw(string bodyJson) =>
-        Post(BitflyerPaths.WithdrawPath, bodyJson);
+        Post(BitflyerEndpointIds.Withdraw, BitflyerPaths.WithdrawPath, bodyJson);
 
-    private static WireCallSpec Get(string path, string? query) =>
-        new(Method: "GET", Path: path, Query: query);
+    private static WireCallSpec Get(string endpointId, string path, string? query) =>
+        new(Method: "GET", Path: path, EndpointId: endpointId, Query: query);
 
-    private static WireCallSpec Post(string path, string? bodyJson) =>
-        new(Method: "POST", Path: path, Query: null, BodyJson: bodyJson);
+    private static WireCallSpec Post(string endpointId, string path, string? bodyJson) =>
+        new(Method: "POST", Path: path, EndpointId: endpointId, Query: null, BodyJson: bodyJson);
 
     private static string? BuildQuery(params (string Key, string? Value)[] entries)
     {

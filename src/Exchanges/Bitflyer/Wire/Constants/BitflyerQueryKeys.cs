@@ -6,7 +6,7 @@ internal static class BitflyerQueryKeys
     public const string Count = "count";
     public const string Before = "before";
     public const string After = "after";
-    public const string ChildOrderStatusState = "child_order_state";
+    public const string ChildOrderState = "child_order_state";
     public const string ChildOrderAcceptanceId = "child_order_acceptance_id";
     public const string ChildOrderId = "child_order_id";
     public const string ParentOrderId = "parent_order_id";

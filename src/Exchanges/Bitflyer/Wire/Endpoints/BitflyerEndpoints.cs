@@ -144,7 +144,7 @@ internal static class BitflyerEndpoints
     {
         return Get(BitflyerEndpointIds.GetChildOrders, BitflyerPaths.GetChildOrdersPath, BuildQuery(
             (BitflyerQueryKeys.ProductCode, productCode),
-            (BitflyerQueryKeys.ChildOrderStatusState, childOrderStatusState),
+            (BitflyerQueryKeys.ChildOrderState, childOrderStatusState),
             (BitflyerQueryKeys.ChildOrderAcceptanceId, childOrderAcceptanceId),
             (BitflyerQueryKeys.ChildOrderId, childOrderId),
             (BitflyerQueryKeys.Count, count),

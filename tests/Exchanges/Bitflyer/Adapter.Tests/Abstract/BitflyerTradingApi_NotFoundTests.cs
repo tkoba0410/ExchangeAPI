@@ -6,7 +6,6 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
@@ -27,7 +26,7 @@ public sealed class BitflyerTradingApi_NotFoundTests
         var privateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
         var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
         var markets = BitflyerTestHelpers.CreateResolver();
-        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets);
+        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets, privateApi);
         var api = new BitflyerTradingApi(normalized);
 
         var key = new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-404");
@@ -42,7 +41,7 @@ public sealed class BitflyerTradingApi_NotFoundTests
         var privateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
         var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
         var markets = BitflyerTestHelpers.CreateResolver();
-        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets);
+        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets, privateApi);
         var api = new BitflyerTradingApi(normalized);
 
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, "JRF-404");

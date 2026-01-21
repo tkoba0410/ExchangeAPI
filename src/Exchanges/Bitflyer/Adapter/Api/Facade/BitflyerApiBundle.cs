@@ -3,8 +3,7 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 
 /// <summary>
@@ -13,18 +12,11 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 /// </summary>
 internal sealed class BitflyerApiBundle
 {
-    public BitflyerNormalizedMarketDataFacade MarketData { get; }
-    public IBitflyerNormalizedAccountApi Account { get; }
-    public IBitflyerNormalizedTradingApi Trading { get; }
+    public IBitflyerNormalizedApi Normalized { get; }
 
-    public BitflyerApiBundle(
-        BitflyerNormalizedMarketDataFacade marketData,
-        IBitflyerNormalizedAccountApi account,
-        IBitflyerNormalizedTradingApi trading)
+    public BitflyerApiBundle(IBitflyerNormalizedApi normalized)
     {
-        MarketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
-        Account = account ?? throw new ArgumentNullException(nameof(account));
-        Trading = trading ?? throw new ArgumentNullException(nameof(trading));
+        Normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
     public static BitflyerApiBundle FromRestClient(IRestClient restClient)
@@ -34,9 +26,6 @@ internal sealed class BitflyerApiBundle
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
         var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
         var normalized = BitflyerNormalizeFactory.FromRestClient(restClient, markets);
-        return new BitflyerApiBundle(
-            marketData: normalized.MarketData,
-            account: normalized.Account,
-            trading: normalized.Trading);
+        return new BitflyerApiBundle(normalized);
     }
 }

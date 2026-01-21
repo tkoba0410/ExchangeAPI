@@ -1,8 +1,6 @@
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Raw.Endpoints.Tests;
 
 public sealed class BitflyerParentOrderRawTests

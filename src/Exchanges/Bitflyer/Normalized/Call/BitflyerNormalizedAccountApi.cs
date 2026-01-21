@@ -6,33 +6,32 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
 using NormalizedRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 
-internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountApi
+internal sealed class BitflyerNormalizedAccountApi
 {
-    private readonly IBitflyerRawAccountApi _accountApi;
+    private readonly IBitflyerRawApi _raw;
     private readonly IBitflyerMarketResolver _markets;
 
-    public BitflyerNormalizedAccountApi(IBitflyerRawAccountApi accountApi, IBitflyerMarketResolver markets)
+    public BitflyerNormalizedAccountApi(IBitflyerRawApi raw, IBitflyerMarketResolver markets)
     {
-        _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
+        _raw = raw ?? throw new ArgumentNullException(nameof(raw));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
     public async Task<Call<NormalizedRequests.GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var rawCall = await _accountApi
+        var rawCall = await _raw
             .GetBalanceCallAsync(new RawPrivateModels.GetBalancesRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetBalancesRequest();
@@ -71,7 +70,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
                 new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
         }
 
-        var rawCall = await _accountApi
+        var rawCall = await _raw
             .GetExecutionsPrivateCallAsync(new RawPrivateModels.GetAccountExecutionsRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
@@ -114,7 +113,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
                 new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
         }
 
-        var rawCall = await _accountApi
+        var rawCall = await _raw
             .GetTradingCommissionCallAsync(new RawPrivateModels.GetTradingCommissionRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 

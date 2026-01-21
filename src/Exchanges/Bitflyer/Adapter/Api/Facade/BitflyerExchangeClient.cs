@@ -21,8 +21,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
@@ -46,18 +45,16 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public ISpotHistoryApi? History => _historyApi;
 
     internal BitflyerExchangeClient(
-        BitflyerNormalizedMarketDataFacade marketData,
-        IBitflyerNormalizedAccountApi account,
-        IBitflyerNormalizedTradingApi trading,
+        IBitflyerNormalizedApi normalized,
         ExchangeCode exchangeCode = ExchangeCode.Bitflyer,
         object? rawBundle = null)
         : this(
-            marketApi: CreateMarketApi(marketData),
-            tradingApi: CreateTradingApi(trading),
-            accountApi: CreateAccountApi(account),
-            historyApi: CreateSpotHistoryApi(trading, account))
+            marketApi: CreateMarketApi(normalized),
+            tradingApi: CreateTradingApi(normalized),
+            accountApi: CreateAccountApi(normalized),
+            historyApi: CreateSpotHistoryApi(normalized))
     {
-        ApiBundle = new BitflyerApiBundle(marketData, account, trading);
+        ApiBundle = new BitflyerApiBundle(normalized);
     }
 
     public BitflyerExchangeClient(
@@ -75,10 +72,10 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
         : this(
-            marketApi: CreateMarketApi(bundle.MarketData),
-            tradingApi: CreateTradingApi(bundle.Trading),
-            accountApi: CreateAccountApi(bundle.Account),
-            historyApi: CreateSpotHistoryApi(bundle.Trading, bundle.Account))
+            marketApi: CreateMarketApi(bundle.Normalized),
+            tradingApi: CreateTradingApi(bundle.Normalized),
+            accountApi: CreateAccountApi(bundle.Normalized),
+            historyApi: CreateSpotHistoryApi(bundle.Normalized))
     {
         ApiBundle = bundle;
     }
@@ -90,32 +87,29 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
         var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
         var normalized = BitflyerNormalizeFactory.FromRestClient(restClient, markets);
-        var historyApi = CreateSpotHistoryApi(normalized.Trading, normalized.Account);
 
         return new BitflyerExchangeClient(
-            marketApi: CreateMarketApi(normalized.MarketData),
-            tradingApi: CreateTradingApi(normalized.Trading),
-            accountApi: CreateAccountApi(normalized.Account),
-            historyApi: historyApi);
+            marketApi: CreateMarketApi(normalized),
+            tradingApi: CreateTradingApi(normalized),
+            accountApi: CreateAccountApi(normalized),
+            historyApi: CreateSpotHistoryApi(normalized));
     }
 
-    private static MarketApi CreateMarketApi(BitflyerNormalizedMarketDataFacade marketData)
+    private static MarketApi CreateMarketApi(IBitflyerNormalizedApi normalized)
     {
         var exchangeInfo = new BitflyerExchangeInfoApi();
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        return new MarketApi(marketData, markets);
+        return new MarketApi(normalized, markets);
     }
 
-    private static BitflyerTradingApi CreateTradingApi(IBitflyerNormalizedTradingApi trading) =>
-        new(trading);
+    private static BitflyerTradingApi CreateTradingApi(IBitflyerNormalizedApi normalized) =>
+        new(normalized);
 
-    private static BitflyerAccountApi CreateAccountApi(IBitflyerNormalizedAccountApi account) =>
-        new(account);
+    private static BitflyerAccountApi CreateAccountApi(IBitflyerNormalizedApi normalized) =>
+        new(normalized);
 
-    private static ISpotHistoryApi CreateSpotHistoryApi(
-        IBitflyerNormalizedTradingApi trading,
-        IBitflyerNormalizedAccountApi account) =>
-        new BitflyerSpotHistoryApi(trading, account);
+    private static ISpotHistoryApi CreateSpotHistoryApi(IBitflyerNormalizedApi normalized) =>
+        new BitflyerSpotHistoryApi(normalized);
 
     // Market
     public Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(

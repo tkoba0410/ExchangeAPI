@@ -2,15 +2,15 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
-public sealed class FakeBitflyerPrivateTradingApi : IBitflyerRawTradingApi
+public sealed class FakeBitflyerPrivateTradingApi
 {
     private readonly RawPrivateModels.RawSendChildOrderResponse _response;
     private readonly IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse> _childOrders;
+    private readonly Queue<IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>>? _childOrderSnapshots;
     private readonly Exception? _exceptionToThrow;
 
     public string? LastBodyJson { get; private set; }
@@ -22,10 +22,13 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerRawTradingApi
     public FakeBitflyerPrivateTradingApi(
         RawPrivateModels.RawSendChildOrderResponse response,
         IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>? childOrders = null,
+        IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>[]? snapshots = null,
         Exception? exceptionToThrow = null)
     {
         _response = response;
         _childOrders = childOrders ?? Array.Empty<RawPrivateModels.RawGetChildOrdersResponse>();
+        _childOrderSnapshots = snapshots is null ? null : new Queue<IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>>(
+            snapshots);
         _exceptionToThrow = exceptionToThrow;
     }
 
@@ -68,6 +71,12 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerRawTradingApi
         CancellationToken cancellationToken = default)
     {
         LastGetChildOrdersRequest = request;
+        if (_childOrderSnapshots is not null && _childOrderSnapshots.Count > 0)
+        {
+            var snapshot = _childOrderSnapshots.Dequeue();
+            return Task.FromResult(MakeCall(request, snapshot));
+        }
+
         IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse> response;
         if (!string.IsNullOrWhiteSpace(request.ChildOrderAcceptanceId))
         {

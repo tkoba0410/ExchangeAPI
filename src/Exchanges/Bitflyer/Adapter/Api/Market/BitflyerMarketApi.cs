@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
@@ -30,14 +30,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Market;
 /// </summary>
 internal sealed class MarketApi : IMarketDataApi
 {
-    private readonly BitflyerNormalizedMarketDataFacade _marketData;
+    private readonly IBitflyerNormalizedApi _normalized;
     private readonly IExchangeMarketResolver _markets;
 
     public MarketApi(
-        BitflyerNormalizedMarketDataFacade marketData,
+        IBitflyerNormalizedApi normalized,
         IExchangeMarketResolver markets)
     {
-        _marketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
+        _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
@@ -61,7 +61,7 @@ internal sealed class MarketApi : IMarketDataApi
             }
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _marketData.GetTickerCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
+            var call = await _normalized.GetTickerCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -106,7 +106,7 @@ internal sealed class MarketApi : IMarketDataApi
             }
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _marketData.GetBoardCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
+            var call = await _normalized.GetBoardCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -151,7 +151,7 @@ internal sealed class MarketApi : IMarketDataApi
             }
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _marketData.GetExecutionsPublicCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
+            var call = await _normalized.GetExecutionsPublicCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

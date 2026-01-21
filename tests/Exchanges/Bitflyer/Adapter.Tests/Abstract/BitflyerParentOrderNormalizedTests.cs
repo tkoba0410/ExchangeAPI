@@ -6,8 +6,6 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;

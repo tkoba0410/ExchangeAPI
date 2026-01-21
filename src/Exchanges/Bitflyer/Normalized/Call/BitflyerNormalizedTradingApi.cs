@@ -7,29 +7,28 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
 using NormalizedRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 
-internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingApi
+internal sealed class BitflyerNormalizedTradingApi
 {
-    private readonly IBitflyerRawTradingApi _tradingApi;
+    private readonly IBitflyerRawApi _raw;
     private readonly IBitflyerMarketResolver _markets;
 
     public BitflyerNormalizedTradingApi(
-        IBitflyerRawTradingApi tradingApi,
+        IBitflyerRawApi raw,
         IBitflyerMarketResolver markets)
     {
-        _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
+        _raw = raw ?? throw new ArgumentNullException(nameof(raw));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
@@ -63,7 +62,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         };
 
         var bodyJson = BitflyerOrderEncoder.BuildChildOrderBodyJson(dto);
-        var rawCall = await _tradingApi
+        var rawCall = await _raw
             .SendChildOrderCallAsync(bodyJson, cancellationToken)
             .ConfigureAwait(false);
 
@@ -126,7 +125,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                     meta: marketCall.Meta);
         }
 
-        var rawCall = await _tradingApi
+        var rawCall = await _raw
             .CancelChildOrderCallAsync(dto, cancellationToken)
             .ConfigureAwait(false);
 
@@ -153,7 +152,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                 marketError!);
         }
 
-        var rawCall = await _tradingApi
+        var rawCall = await _raw
             .GetChildOrdersCallAsync(
                 new RawPrivateModels.GetChildOrdersRequest(
                     productCode!,
@@ -231,7 +230,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         }
 
         var rawCall = orderKey.Kind == OrderIdKind.AcceptanceId
-            ? await _tradingApi
+            ? await _raw
                 .GetChildOrdersCallAsync(
                     new RawPrivateModels.GetChildOrdersRequest(
                         productCode!,
@@ -239,7 +238,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
                         ChildOrderAcceptanceId: orderKey.Value),
                     cancellationToken)
                 .ConfigureAwait(false)
-            : await _tradingApi
+            : await _raw
                 .GetChildOrdersCallAsync(
                     new RawPrivateModels.GetChildOrdersRequest(
                         productCode!,
@@ -307,7 +306,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
         };
 
         var bodyJson = BitflyerOrderEncoder.BuildParentOrderBodyJson(rawRequest);
-        var rawCall = await _tradingApi
+        var rawCall = await _raw
             .SendParentOrderCallAsync(bodyJson, cancellationToken)
             .ConfigureAwait(false);
 
@@ -332,7 +331,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             ParentOrderAcceptanceId = request.ParentOrderAcceptanceId,
         };
 
-        var rawCall = await _tradingApi
+        var rawCall = await _raw
             .CancelParentOrderCallAsync(rawRequest, cancellationToken)
             .ConfigureAwait(false);
 
@@ -359,7 +358,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             request.Before,
             request.After);
 
-        var rawCall = await _tradingApi
+        var rawCall = await _raw
             .GetParentOrdersCallAsync(rawRequest, cancellationToken)
             .ConfigureAwait(false);
 
@@ -381,7 +380,7 @@ internal sealed class BitflyerNormalizedTradingApi : IBitflyerNormalizedTradingA
             request.ParentOrderId,
             request.ParentOrderAcceptanceId);
 
-        var rawCall = await _tradingApi
+        var rawCall = await _raw
             .GetParentOrderCallAsync(rawRequest, cancellationToken)
             .ConfigureAwait(false);
 

@@ -9,32 +9,39 @@ using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
+using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Helpers;
 
 internal static class BitflyerTestHelpers
 {
-    public static BitflyerNormalizedMarketDataFacade CreateMarketData(IBitflyerRawMarketDataApi raw) =>
-        new(raw);
+    public static IBitflyerNormalizedApi CreateNormalizedApi(IBitflyerRawApi raw, IBitflyerMarketResolver markets) =>
+        BitflyerNormalizedApi.FromRaw(raw, markets);
 
-    public static IBitflyerNormalizedAccountApi CreateAccountApi(
-        IBitflyerRawAccountApi accountApi,
-        IBitflyerMarketResolver markets) =>
-        new BitflyerNormalizedAccountApi(accountApi, markets);
+    public static IBitflyerNormalizedApi CreateNormalizedApi(
+        RawPublicModels.Ticker ticker,
+        IBitflyerMarketResolver markets,
+        RawPublicModels.Board? board = null,
+        FakeBitflyerPrivateApi? privateApi = null,
+        FakeBitflyerPrivateTradingApi? tradingApi = null)
+    {
+        var raw = new FakeBitflyerPublicApi(ticker, board, privateApi, tradingApi);
+        return BitflyerNormalizedApi.FromRaw(raw, markets);
+    }
 
-    public static IBitflyerNormalizedTradingApi CreateTradingApi(
-        IBitflyerRawTradingApi tradingApi,
-        IBitflyerMarketResolver markets) =>
-        new BitflyerNormalizedTradingApi(tradingApi, markets);
+    public static IBitflyerNormalizedApi CreateTradingApi(
+        FakeBitflyerPrivateTradingApi tradingApi,
+        IBitflyerMarketResolver markets,
+        FakeBitflyerPrivateApi? privateApi = null) =>
+        CreateNormalizedApi(
+            new RawPublicModels.Ticker { ProductCode = "BTC_JPY" },
+            markets,
+            privateApi: privateApi,
+            tradingApi: tradingApi);
 
     public static IBitflyerMarketResolver CreateResolver()
     {

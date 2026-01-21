@@ -10,7 +10,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Market;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
@@ -30,11 +30,11 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeClient
     public IAccountApi? Account => _accountApi;
     public ISpotHistoryApi? History => _historyApi;
 
-    internal BitflyerPublicClient(BitflyerNormalizedMarketDataFacade marketData)
+    internal BitflyerPublicClient(IBitflyerNormalizedApi normalized)
     {
-        if (marketData is null) throw new ArgumentNullException(nameof(marketData));
+        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         var markets = new ExchangeInfoMarketResolver(new BitflyerExchangeInfoApi());
-        _marketApi = new MarketApi(marketData, markets);
+        _marketApi = new MarketApi(normalized, markets);
         _tradingApi = null;
         _accountApi = null;
         _historyApi = null;

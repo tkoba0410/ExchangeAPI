@@ -14,7 +14,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Operations;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Trading;
 using ExchangeApi.Primitives.CallCommon;
@@ -23,15 +23,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.History;
 
 internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
 {
-    private readonly IBitflyerNormalizedTradingApi _trading;
-    private readonly IBitflyerNormalizedAccountApi _account;
+    private readonly IBitflyerNormalizedApi _normalized;
 
     public BitflyerSpotHistoryApi(
-        IBitflyerNormalizedTradingApi trading,
-        IBitflyerNormalizedAccountApi account)
+        IBitflyerNormalizedApi normalized)
     {
-        _trading = trading ?? throw new ArgumentNullException(nameof(trading));
-        _account = account ?? throw new ArgumentNullException(nameof(account));
+        _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
     public async Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
@@ -42,7 +39,7 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
 
         try
         {
-            var call = await _trading.GetChildOrdersCallAsync(request.Market, cancellationToken).ConfigureAwait(false);
+            var call = await _normalized.GetChildOrdersCallAsync(request.Market, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -67,7 +64,7 @@ internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
 
         try
         {
-            var call = await _account.GetExecutionsPrivateCallAsync(request.Market, cancellationToken)
+            var call = await _normalized.GetExecutionsPrivateCallAsync(request.Market, cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,

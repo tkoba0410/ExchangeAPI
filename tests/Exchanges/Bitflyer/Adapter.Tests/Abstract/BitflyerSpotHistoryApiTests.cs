@@ -10,11 +10,7 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using Xunit;
@@ -28,8 +24,6 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         public async Task GetOrdersAsync_ReturnsMappedOrders()
         {
             var rawTicker = new RawPublicModels.Ticker();
-            var fakePublic = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() });
-
             var childOrders = new[]
             {
                 new RawPrivateModels.RawGetChildOrdersResponse
@@ -51,7 +45,8 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var fakeTrading = new FakeBitflyerPrivateTradingApi(
                 new RawPrivateModels.RawSendChildOrderResponse(),
                 childOrders);
-            var client = CreateClient(fakePublic, fakePrivate, fakeTrading);
+            var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() }, fakePrivate, fakeTrading);
+            var client = CreateClient(raw);
 
             var call = await client.History!.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY")));
             var ok = Assert.IsType<CallResult<Page<OrderSnapshotItem>>.Ok>(call.Result);
@@ -69,8 +64,6 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         public async Task GetOrders_Limit1_SlicesItemsAndAlignsMeta()
         {
             var rawTicker = new RawPublicModels.Ticker();
-            var fakePublic = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() });
-
             var childOrders = new[]
             {
                 new RawPrivateModels.RawGetChildOrdersResponse
@@ -102,7 +95,8 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var fakeTrading = new FakeBitflyerPrivateTradingApi(
                 new RawPrivateModels.RawSendChildOrderResponse(),
                 childOrders);
-            var client = CreateClient(fakePublic, fakePrivate, fakeTrading);
+            var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() }, fakePrivate, fakeTrading);
+            var client = CreateClient(raw);
 
             var call = await client.History!.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
             var ok = Assert.IsType<CallResult<Page<OrderSnapshotItem>>.Ok>(call.Result);
@@ -117,8 +111,6 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         public async Task GetExecutions_Limit1_SlicesItemsAndAlignsMeta()
         {
             var rawTicker = new RawPublicModels.Ticker();
-            var fakePublic = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() });
-
             var executions = new[]
             {
                 new RawPrivateModels.ExecutionPrivateResponse
@@ -145,7 +137,8 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                 Array.Empty<RawPrivateModels.BalanceResponse>(),
                 executions: executions);
             var fakeTrading = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
-            var client = CreateClient(fakePublic, fakePrivate, fakeTrading);
+            var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() }, fakePrivate, fakeTrading);
+            var client = CreateClient(raw);
 
             var call = await client.History!.GetExecutionsCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
             var ok = Assert.IsType<CallResult<Page<ExecutionItem>>.Ok>(call.Result);
@@ -156,17 +149,11 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             Assert.Equal(1, ok.Response.Meta.ReturnedCount);
         }
 
-        private static BitflyerExchangeClient CreateClient(
-            IBitflyerRawMarketDataApi marketData,
-            IBitflyerPrivateApi accountApi,
-            IBitflyerRawTradingApi tradingApi)
+        private static BitflyerExchangeClient CreateClient(IBitflyerRawApi raw)
         {
             var markets = BitflyerTestHelpers.CreateResolver();
-            var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
-            var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
-            var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets);
-
-            return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedTrading);
+            var normalized = BitflyerTestHelpers.CreateNormalizedApi(raw, markets);
+            return new BitflyerExchangeClient(normalized);
         }
 
     }

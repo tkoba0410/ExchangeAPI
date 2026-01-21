@@ -6,8 +6,6 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
@@ -47,7 +45,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
             ChildOrderAcceptanceId = acceptanceId
         }, childOrders);
         var markets = BitflyerTestHelpers.CreateResolver();
-        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets);
+        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets, privateApi);
         var api = new BitflyerTradingApi(normalized);
 
         var resultCall = await api.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));

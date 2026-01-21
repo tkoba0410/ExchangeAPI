@@ -9,11 +9,7 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using Xunit;
 
@@ -41,11 +37,11 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                 },
             };
 
-            var fakePublicApi = CreateDummyPublicApi();
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
 
-            var client = CreateClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
+            var raw = CreateDummyPublicApi(fakePrivateApi, fakeTradingApi);
+            var client = CreateClient(raw);
 
             // Act
             var call = await client.GetBalancesCallAsync();
@@ -72,11 +68,11 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             // Arrange
             var rawBalances = Array.Empty<RawPrivateModels.BalanceResponse>();
 
-            var fakePublicApi = CreateDummyPublicApi();
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
 
-            var client = CreateClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
+            var raw = CreateDummyPublicApi(fakePrivateApi, fakeTradingApi);
+            var client = CreateClient(raw);
 
             // Act
             var call = await client.GetBalancesCallAsync();
@@ -87,20 +83,16 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             Assert.Empty(result);
         }
 
-        private static BitflyerExchangeClient CreateClient(
-            IBitflyerRawMarketDataApi marketData,
-            IBitflyerPrivateApi accountApi,
-            IBitflyerRawTradingApi tradingApi)
+        private static BitflyerExchangeClient CreateClient(IBitflyerRawApi raw)
         {
             var markets = BitflyerTestHelpers.CreateResolver();
-            var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
-            var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
-            var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets);
-
-            return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedTrading);
+            var normalized = BitflyerTestHelpers.CreateNormalizedApi(raw, markets);
+            return new BitflyerExchangeClient(normalized);
         }
 
-        private static IBitflyerRawMarketDataApi CreateDummyPublicApi()
+        private static IBitflyerRawApi CreateDummyPublicApi(
+            FakeBitflyerPrivateApi privateApi,
+            FakeBitflyerPrivateTradingApi tradingApi)
         {
             // 既存の RawPublicModels.Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
             var rawTicker = new RawPublicModels.Ticker
@@ -119,7 +111,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                 VolumeByProduct = 0m,
             };
 
-            return new FakeBitflyerPublicApi(rawTicker);
+            return new FakeBitflyerPublicApi(rawTicker, privateApi: privateApi, tradingApi: tradingApi);
         }
     }
 }

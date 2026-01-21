@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
@@ -25,11 +25,11 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Account;
 
 internal sealed class BitflyerAccountApi : IAccountApi
 {
-    private readonly IBitflyerNormalizedAccountApi _accountApi;
+    private readonly IBitflyerNormalizedApi _normalized;
     public BitflyerAccountApi(
-        IBitflyerNormalizedAccountApi accountApi)
+        IBitflyerNormalizedApi normalized)
     {
-        _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
+        _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
     public async Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
@@ -40,7 +40,7 @@ internal sealed class BitflyerAccountApi : IAccountApi
 
         try
         {
-            var call = await _accountApi.GetBalanceCallAsync(cancellationToken).ConfigureAwait(false);
+            var call = await _normalized.GetBalanceCallAsync(cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

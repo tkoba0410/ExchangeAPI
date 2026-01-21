@@ -6,11 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Errors;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
@@ -53,10 +49,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                 VolumeByProduct = 200.0m
             };
 
-            var fakeApi = new FakeBitflyerPublicApi(raw);
             var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
-            var client = CreateClient(fakeApi, fakePrivateApi, fakeTradingApi);
+            var rawApi = new FakeBitflyerPublicApi(raw, privateApi: fakePrivateApi, tradingApi: fakeTradingApi);
+            var client = CreateClient(rawApi);
 
             // Act
             var call = await client.GetTickerCallAsync(new Symbol("BTC/JPY"));
@@ -88,10 +84,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                 VolumeByProduct = 200.0m
             };
 
-            var fakeApi = new FakeBitflyerPublicApi(raw);
             var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
-            var client = CreateClient(fakeApi, fakePrivateApi, fakeTradingApi);
+            var rawApi = new FakeBitflyerPublicApi(raw, privateApi: fakePrivateApi, tradingApi: fakeTradingApi);
+            var client = CreateClient(rawApi);
 
             var call = await client.GetTickerCallAsync(Symbol.Empty);
             var err = Assert.IsType<CallResult<ContractTicker>.Err>(call.Result);
@@ -132,10 +128,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                 }
             };
 
-            var fakeApi = new FakeBitflyerPublicApi(rawTicker, boardRaw);
             var fakePrivateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
-            var client = CreateClient(fakeApi, fakePrivateApi, fakeTradingApi);
+            var rawApi = new FakeBitflyerPublicApi(rawTicker, boardRaw, fakePrivateApi, fakeTradingApi);
+            var client = CreateClient(rawApi);
 
             var call = await client.GetOrderBookCallAsync(new Symbol("BTC/JPY"));
             var ok = Assert.IsType<CallResult<ContractOrderBook>.Ok>(call.Result);
@@ -157,10 +153,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                 new RawPrivateModels.BalanceResponse { CurrencyCode = "BTC", Amount = 1.5m, Available = 1.2m },
             };
 
-            var publicApi = new FakeBitflyerPublicApi(rawTicker);
             var privateApi = new FakeBitflyerPrivateApi(balances);
             var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
-            var client = CreateClient(publicApi, privateApi, tradingApi);
+            var rawApi = new FakeBitflyerPublicApi(rawTicker, privateApi: privateApi, tradingApi: tradingApi);
+            var client = CreateClient(rawApi);
 
             var call = await client.GetBalancesCallAsync();
             var ok = Assert.IsType<CallResult<IReadOnlyList<ContractBalance>>.Ok>(call.Result);
@@ -175,103 +171,27 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         public async Task CancelOrderAsync_NullResponse_Throws()
         {
             var rawTicker = new RawPublicModels.Ticker { ProductCode = "BTC_JPY" };
-            var publicApi = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() });
             var accountApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
-            var tradingApi = new NullCancelTradingApi();
-            var client = CreateClient(publicApi, accountApi, tradingApi);
+            var exception = new ExchangeApiException(
+                message: "cancel failed",
+                statusCode: System.Net.HttpStatusCode.InternalServerError,
+                exchangeErrorCode: "INTERNAL_SERVER_ERROR");
+            var tradingApi = new FakeBitflyerPrivateTradingApi(
+                new RawPrivateModels.RawSendChildOrderResponse(),
+                exceptionToThrow: exception);
+            var rawApi = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() }, accountApi, tradingApi);
+            var client = CreateClient(rawApi);
 
             var call = await client.CancelOrderCallAsync(new Symbol("BTC/JPY"), new OrderKey(OrderIdKind.AcceptanceId, "id-1"));
             var err = Assert.IsType<CallResult<ContractCancelResult>.Err>(call.Result);
             Assert.Equal(CallErrorKind.Http, err.Error.Kind);
         }
 
-        private static BitflyerExchangeClient CreateClient(
-            IBitflyerRawMarketDataApi marketData,
-            IBitflyerPrivateApi accountApi,
-            IBitflyerRawTradingApi tradingApi)
+        private static BitflyerExchangeClient CreateClient(IBitflyerRawApi raw)
         {
             var markets = BitflyerTestHelpers.CreateResolver();
-            var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
-            var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
-            var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets);
-
-            return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedTrading);
-        }
-
-        private sealed class NullCancelTradingApi : IBitflyerRawTradingApi
-        {
-            public Task<Call<string, RawPrivateModels.RawSendChildOrderResponse>> SendChildOrderCallAsync(
-                string bodyJson,
-                CancellationToken cancellationToken = default) =>
-                Task.FromResult(OkCall(bodyJson, new RawPrivateModels.RawSendChildOrderResponse()));
-
-            public Task<Call<string, RawPrivateModels.RawSendParentOrderResponse>> SendParentOrderCallAsync(
-                string bodyJson,
-                CancellationToken cancellationToken = default) =>
-                Task.FromResult(OkCall(bodyJson, new RawPrivateModels.RawSendParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
-
-            public Task<Call<RawPrivateModels.CancelChildOrderRequest, RawPrivateModels.RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
-                RawPrivateModels.CancelChildOrderRequest request,
-                CancellationToken cancellationToken = default) =>
-                Task.FromResult(ErrCall<RawPrivateModels.CancelChildOrderRequest, RawPrivateModels.RawCancelChildOrderResponse>(request, 500));
-
-            public Task<Call<RawPrivateModels.CancelParentOrderRequest, RawPrivateModels.RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
-                RawPrivateModels.CancelParentOrderRequest request,
-                CancellationToken cancellationToken = default) =>
-                Task.FromResult(ErrCall<RawPrivateModels.CancelParentOrderRequest, RawPrivateModels.RawCancelParentOrderResponse>(request, 500));
-
-            public Task<Call<RawPrivateModels.GetChildOrdersRequest, IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
-                RawPrivateModels.GetChildOrdersRequest request,
-                CancellationToken cancellationToken = default) =>
-                Task.FromResult(ErrCallList<RawPrivateModels.GetChildOrdersRequest, RawPrivateModels.RawGetChildOrdersResponse>(request, 500));
-
-            public Task<Call<RawPrivateModels.GetParentOrdersRequest, IReadOnlyList<RawPrivateModels.RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
-                RawPrivateModels.GetParentOrdersRequest request,
-                CancellationToken cancellationToken = default) =>
-                Task.FromResult(ErrCallList<RawPrivateModels.GetParentOrdersRequest, RawPrivateModels.RawGetParentOrdersResponse>(request, 500));
-
-            public Task<Call<RawPrivateModels.GetParentOrderRequest, RawPrivateModels.RawGetParentOrderResponse>> GetParentOrderCallAsync(
-                RawPrivateModels.GetParentOrderRequest request,
-                CancellationToken cancellationToken = default) =>
-                Task.FromResult(ErrCall<RawPrivateModels.GetParentOrderRequest, RawPrivateModels.RawGetParentOrderResponse>(request, 500));
-
-            private static Call<TReq, TResponse> OkCall<TReq, TResponse>(TReq request, TResponse response)
-            {
-                var meta = CallMeta.CreateInternal("Raw", "NullCancelTradingApi");
-                return new Call<TReq, TResponse>(
-                    Id: CallId.New(),
-                    StartedAt: DateTimeOffset.UtcNow,
-                    Duration: TimeSpan.Zero,
-                    Request: request,
-                    Result: new CallResult<TResponse>.Ok(response),
-                    Meta: meta);
-            }
-
-            private static Call<TReq, TResponse> ErrCall<TReq, TResponse>(TReq request, int statusCode)
-            {
-                var meta = CallMeta.CreateInternal("Raw", "NullCancelTradingApi");
-                var error = new CallError(CallErrorKind.Http, "Test error.", null, statusCode);
-                return new Call<TReq, TResponse>(
-                    Id: CallId.New(),
-                    StartedAt: DateTimeOffset.UtcNow,
-                    Duration: TimeSpan.Zero,
-                    Request: request,
-                    Result: new CallResult<TResponse>.Err(error),
-                    Meta: meta);
-            }
-
-            private static Call<TReq, IReadOnlyList<TItem>> ErrCallList<TReq, TItem>(TReq request, int statusCode)
-            {
-                var meta = CallMeta.CreateInternal("Raw", "NullCancelTradingApi");
-                var error = new CallError(CallErrorKind.Http, "Test error.", null, statusCode);
-                return new Call<TReq, IReadOnlyList<TItem>>(
-                    Id: CallId.New(),
-                    StartedAt: DateTimeOffset.UtcNow,
-                    Duration: TimeSpan.Zero,
-                    Request: request,
-                    Result: new CallResult<IReadOnlyList<TItem>>.Err(error),
-                    Meta: meta);
-            }
+            var normalized = BitflyerTestHelpers.CreateNormalizedApi(raw, markets);
+            return new BitflyerExchangeClient(normalized);
         }
     }
 }

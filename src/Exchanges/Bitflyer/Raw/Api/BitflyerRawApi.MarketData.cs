@@ -1,30 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 using BitflyerRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Transport.Wire;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 
-/// <summary>
-/// bitFlyer Public REST API の Mirror Raw 実装。
-/// </summary>
-internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
+public sealed partial class BitflyerRawApi
 {
-    private readonly IWireTransport _wire;
-
-    public BitflyerRawMarketDataApi(IWireTransport wire)
-    {
-        _wire = wire ?? throw new ArgumentNullException(nameof(wire));
-    }
-
     public Task<Call<BitflyerRequests.GetTickerRequest, Ticker>> GetTickerCallAsync(
         BitflyerRequests.GetTickerRequest request,
         CancellationToken cancellationToken = default) =>
@@ -130,102 +116,4 @@ internal sealed class BitflyerRawMarketDataApi : IBitflyerRawMarketDataApi
             json => BitflyerRawJson.DeserializeOrThrow<FundingRateResponse>(
                 json,
                 "Bitflyer.GetFundingRate"));
-
-    private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
-        TReq request,
-        string component,
-        WireCallSpec spec,
-        CancellationToken cancellationToken,
-        Func<string, TRes> parse)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        if (parse is null) throw new ArgumentNullException(nameof(parse));
-
-        var wireCall = await _wire.SendAsync(ExchangeCode.Bitflyer, spec, cancellationToken).ConfigureAwait(false);
-        return CreateCall(request, component, wireCall, parse);
-    }
-
-    private static Call<TReq, TRes> CreateCall<TReq, TRes>(
-        TReq request,
-        string component,
-        Call<WireCallSpec, WireResponse> wireCall,
-        Func<string, TRes> parse)
-    {
-        return wireCall.Result switch
-        {
-            CallResult<WireResponse>.Err err => new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Err(err.Error),
-                Meta: wireCall.Meta),
-            CallResult<WireResponse>.Ok ok => CreateOkCall(request, component, ok.Response, wireCall, parse),
-            _ => new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Err(new CallError(CallErrorKind.Unknown, "Wire call returned unknown result.")),
-                Meta: wireCall.Meta)
-        };
-    }
-
-    private static Call<TReq, TRes> CreateOkCall<TReq, TRes>(
-        TReq request,
-        string component,
-        WireResponse response,
-        Call<WireCallSpec, WireResponse> wireCall,
-        Func<string, TRes> parse)
-    {
-        if (response.StatusCode is < 200 or >= 300)
-        {
-            var error = new CallError(
-                CallErrorKind.Http,
-                $"{component} failed with status {response.StatusCode}.",
-                HttpStatus: response.StatusCode,
-                BodySnippet: Snip(response.Json));
-            return new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Err(error),
-                Meta: wireCall.Meta);
-        }
-
-        try
-        {
-            var parsed = parse(response.Json);
-            return new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Ok(parsed),
-                Meta: wireCall.Meta);
-        }
-        catch (Exception ex) when (ex is JsonException or NotSupportedException)
-        {
-            var error = new CallError(
-                CallErrorKind.Codec,
-                $"{component} failed to parse response.",
-                ex,
-                response.StatusCode,
-                Snip(response.Json));
-            return new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Err(error),
-                Meta: wireCall.Meta);
-        }
-    }
-
-    private static string? Snip(string? json)
-    {
-        if (string.IsNullOrEmpty(json)) return json;
-        return json.Length <= 512 ? json : json[..512];
-    }
 }

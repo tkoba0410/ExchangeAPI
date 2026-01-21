@@ -4,15 +4,10 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -45,7 +40,7 @@ public sealed class BitflyerParentOrderNormalizedTests
         ]
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ParentOrderResponse>>(
+        var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPrivateModels.RawGetParentOrdersResponse>>(
             json,
             "Bitflyer.GetParentOrders");
         var normalized = BitflyerParentOrderNormalizer.NormalizeList(raw, json);
@@ -79,7 +74,7 @@ public sealed class BitflyerParentOrderNormalizedTests
         }
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<ParentOrderDetailResponse>(
+        var raw = BitflyerRawJson.DeserializeOrThrow<RawPrivateModels.RawGetParentOrderResponse>(
             json,
             "Bitflyer.GetParentOrder");
         var normalized = BitflyerParentOrderNormalizer.NormalizeDetail(raw, json);

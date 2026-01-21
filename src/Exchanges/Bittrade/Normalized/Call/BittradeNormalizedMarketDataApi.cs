@@ -6,16 +6,11 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
-using RawRequests = ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 
@@ -28,19 +23,23 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
+    public async Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
-        var request = new GetTickerRequest(productCode);
+        var request = new NormalizedRequests.GetTickerRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
         {
-            return CreateCallError<GetTickerRequest, BittradeTickerNormalized>(request, "Bittrade.GetTicker", error!, startedAt);
+            return CreateCallError<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>(
+                request,
+                "Bittrade.GetTicker",
+                error!,
+                startedAt);
         }
 
         var rawCall = await _raw
-            .GetDetailMergedCallAsync(new RawRequests.GetTickerRequest(symbolText), ct)
+            .GetDetailMergedCallAsync(new RawPublicModels.GetTickerRequest(symbolText), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -54,21 +53,25 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             });
     }
 
-    public async Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
+    public async Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
         string productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default)
     {
         var normalizedDepthType = depthType ?? BittradeDepthType.Step0;
-        var request = new GetOrderBookRequest(productCode, depthType);
+        var request = new NormalizedRequests.GetOrderBookRequest(productCode, depthType);
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
         {
-            return CreateCallError<GetOrderBookRequest, BittradeOrderBookNormalized>(request, "Bittrade.GetOrderBook", error!, startedAt);
+            return CreateCallError<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>(
+                request,
+                "Bittrade.GetOrderBook",
+                error!,
+                startedAt);
         }
 
         var rawCall = await _raw
-            .GetDepthCallAsync(new RawRequests.GetOrderBookRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
+            .GetDepthCallAsync(new RawPublicModels.GetOrderBookRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -83,19 +86,23 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             });
     }
 
-    public async Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
+    public async Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
-        var request = new GetExecutionsRequest(productCode);
+        var request = new NormalizedRequests.GetExecutionsRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
         {
-            return CreateCallError<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(request, "Bittrade.GetExecutions", error!, startedAt);
+            return CreateCallError<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
+                request,
+                "Bittrade.GetExecutions",
+                error!,
+                startedAt);
         }
 
         var rawCall = await _raw
-            .GetTradeCallAsync(new RawRequests.GetMarketTradesRequest(symbolText), ct)
+            .GetTradeCallAsync(new RawPublicModels.GetMarketTradesRequest(symbolText), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

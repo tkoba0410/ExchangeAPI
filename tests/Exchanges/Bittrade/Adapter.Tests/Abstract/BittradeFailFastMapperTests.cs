@@ -8,12 +8,8 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using System;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using Xunit;
 
@@ -42,9 +38,9 @@ public sealed class BittradeFailFastMapperTests
     [Fact]
     public void ToOrderStatus_UnknownState_Throws()
     {
-        var raw = new RawOrderDetailResponse(
+        var raw = new RawPrivateModels.RawOrderDetailResponse(
             Status: "ok",
-            Data: new RawOrderDetail(
+            Data: new RawPrivateModels.RawOrderDetail(
                 Id: "1",
                 Symbol: "btcjpy",
                 AccountId: "1",
@@ -63,12 +59,12 @@ public sealed class BittradeFailFastMapperTests
             BittradeTradingMapper.ToOrderStatus("BTC_JPY", raw, new OrderKey(OrderIdKind.ExchangeOrderId, "1")));
     }
 
-    private static RawOpenOrdersResponse CreateOpenOrdersResponse(string type) =>
+    private static RawPrivateModels.RawOpenOrdersResponse CreateOpenOrdersResponse(string type) =>
         new(
             Status: "ok",
             Data:
             [
-                new RawOrderSummary(
+                new RawPrivateModels.RawOrderSummary(
                     Id: "1",
                     Symbol: "btcjpy",
                     AccountId: "1",

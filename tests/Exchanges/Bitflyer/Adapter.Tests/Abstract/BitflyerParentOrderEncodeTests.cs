@@ -1,5 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -9,7 +9,7 @@ public sealed class BitflyerParentOrderEncodeTests
     [Fact]
     public void BuildBodyJson_contains_expected_keys_for_send_child_order()
     {
-        var request = new CreateChildOrderRequest
+        var request = new RawPrivateModels.CreateChildOrderRequest
         {
             ProductCode = "FX_BTC_JPY",
             ChildOrderType = "LIMIT",
@@ -30,14 +30,14 @@ public sealed class BitflyerParentOrderEncodeTests
     [Fact]
     public void BuildBodyJson_contains_expected_keys_for_send_parent_order()
     {
-        var request = new CreateParentOrderRequest
+        var request = new RawPrivateModels.CreateParentOrderRequest
         {
             OrderMethod = "IFDOCO",
             MinuteToExpire = 10000,
             TimeInForce = "GTC",
             Parameters = new[]
             {
-                new CreateParentOrderParameter
+                new RawPrivateModels.CreateParentOrderParameter
                 {
                     ProductCode = "BTC_JPY",
                     ConditionType = "LIMIT",

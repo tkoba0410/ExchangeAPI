@@ -1,16 +1,10 @@
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
-using PrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Raw.Endpoints.Tests;
 
@@ -103,7 +97,7 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void CancelParentOrder_builds_request_with_body_json()
     {
-        var request = new PrivateModels.CancelParentOrderRequest
+        var request = new RawPrivateModels.CancelParentOrderRequest
         {
             ProductCode = "BTC_JPY",
             ParentOrderAcceptanceId = "JRF-1",

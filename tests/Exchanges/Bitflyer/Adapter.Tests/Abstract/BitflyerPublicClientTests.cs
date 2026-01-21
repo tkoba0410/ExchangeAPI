@@ -4,15 +4,10 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
@@ -24,7 +19,7 @@ public sealed class BitflyerPublicClientTests
     [Fact]
     public async Task GetHealthCallAsync_ReturnsRawHealth()
     {
-        var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicModels.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
 
@@ -38,7 +33,7 @@ public sealed class BitflyerPublicClientTests
     [Fact]
     public async Task GetBoardStateCallAsync_ReturnsRawBoardState()
     {
-        var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicModels.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
 
@@ -54,7 +49,7 @@ public sealed class BitflyerPublicClientTests
     [Fact]
     public async Task GetTickerCallAsync_UnknownSymbol_Throws()
     {
-        var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicModels.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
         var client = new BitflyerPublicClient(marketData);

@@ -5,31 +5,31 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Primitives.CallCommon;
-using RawRequests = ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 
 internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountApi
 {
-    private readonly IBittradeRawApi _raw;
+    private readonly IBittradeRawAccountApi _account;
     private readonly string _accountId;
 
-    internal BittradeNormalizedAccountApi(IBittradeRawApi raw, string accountId)
+    internal BittradeNormalizedAccountApi(IBittradeRawAccountApi raw, string accountId)
     {
-        _raw = raw ?? throw new ArgumentNullException(nameof(raw));
+        _account = raw ?? throw new ArgumentNullException(nameof(raw));
         _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
     }
 
-    public async Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
+    public async Task<Call<NormalizedRequests.GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.Account
-            .GetAccountsBalanceByAccountIdCallAsync(new RawRequests.GetAccountBalanceRequest(_accountId), ct)
+        var rawCall = await _account
+            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateModels.GetAccountBalanceRequest(_accountId), ct)
             .ConfigureAwait(false);
-        var request = new GetBalancesRequest(_accountId);
+        var request = new NormalizedRequests.GetBalancesRequest(_accountId);
 
         return CreateCall(
             rawCall,

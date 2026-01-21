@@ -4,16 +4,11 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using Xunit;
@@ -25,7 +20,6 @@ using ExchangeApi.Contracts.Common.Dtos.Common;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
-using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models.Ticker;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
@@ -34,9 +28,9 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceMarketOrder_MapsDomainToDtoAndReturnsResult()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(new BalanceResponse[0]);
-        var tradingResponse = new CreateChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-123" };
+        var fakePublic = new FakeBitflyerPublicApi(new RawPublicModels.Ticker());
+        var fakeAccount = new FakeBitflyerPrivateApi(new RawPrivateModels.BalanceResponse[0]);
+        var tradingResponse = new RawPrivateModels.RawSendChildOrderResponse { ChildOrderAcceptanceId = "ACCEPT-123" };
         var fakeTrading = new FakeBitflyerPrivateTradingApi(tradingResponse);
 
         var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
@@ -56,14 +50,14 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceMarketOrder_WhenApiReturns429_AddsRateLimitCategory()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
+        var fakePublic = new FakeBitflyerPublicApi(new RawPublicModels.Ticker());
+        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
         var exception = new ExchangeApiException(
             message: "too many requests",
             statusCode: (System.Net.HttpStatusCode)429,
             exchangeErrorCode: "TOO_MANY_REQUESTS");
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
-            new CreateChildOrderResponse(),
+            new RawPrivateModels.RawSendChildOrderResponse(),
             exceptionToThrow: exception);
         var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
@@ -76,13 +70,13 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceMarketOrderAsync_WhenInsufficientFunds_MapsBalanceCategory()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
+        var fakePublic = new FakeBitflyerPublicApi(new RawPublicModels.Ticker());
+        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
         var exception = new ExchangeApiException(
             message: "insufficient funds",
             exchangeErrorCode: "INSUFFICIENT_FUNDS");
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
-            new CreateChildOrderResponse(),
+            new RawPrivateModels.RawSendChildOrderResponse(),
             exceptionToThrow: exception);
         var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
@@ -94,14 +88,14 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     [Fact]
     public async Task PlaceMarketOrderAsync_WhenAuthError_MapsAuthCategory()
     {
-        var fakePublic = new FakeBitflyerPublicApi(new RawTicker());
-        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>());
+        var fakePublic = new FakeBitflyerPublicApi(new RawPublicModels.Ticker());
+        var fakeAccount = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
         var exception = new ExchangeApiException(
             message: "auth failed",
             statusCode: System.Net.HttpStatusCode.Unauthorized,
             exchangeErrorCode: "AUTHENTICATION_ERROR");
         var fakeTrading = new FakeBitflyerPrivateTradingApi(
-            new CreateChildOrderResponse(),
+            new RawPrivateModels.RawSendChildOrderResponse(),
             exceptionToThrow: exception);
         var client = CreateClient(fakePublic, fakeAccount, fakeTrading);
 
@@ -113,12 +107,12 @@ public sealed class BitflyerExchangeClient_SendOrder_Tests
     private static BitflyerExchangeClient CreateClient(
         IBitflyerRawMarketDataApi marketData,
         IBitflyerPrivateApi accountApi,
-        IBitflyerRawPrivateTradingApi tradingApi)
+        IBitflyerRawTradingApi tradingApi)
     {
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
         var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
-        var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);
+        var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets);
 
         return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedTrading);
     }

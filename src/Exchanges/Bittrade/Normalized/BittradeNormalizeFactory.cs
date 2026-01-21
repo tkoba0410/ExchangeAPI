@@ -5,11 +5,8 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Markets;
 using ExchangeApi.Exchanges.Bittrade.Normalized.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized;
@@ -25,10 +22,10 @@ internal static class BittradeNormalizeFactory
         var raw = new BittradeRawApi(wire);
 
         var marketData = new BittradeNormalizedMarketDataApi(raw.MarketData);
-        var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
+        var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw.ExchangeInfo);
         IBittradeNormalizedAccountApi account = normalizedAccountId is null
             ? new BittradePreconditionMissingNormalizedAccountApi(string.Empty)
-            : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
+            : new BittradeNormalizedAccountApi(raw.Account, normalizedAccountId);
 
         return new BittradeNormalizeBundle(
             marketData: marketData,

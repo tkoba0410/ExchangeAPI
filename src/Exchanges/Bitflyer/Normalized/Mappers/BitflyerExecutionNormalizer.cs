@@ -3,15 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
+using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 
@@ -19,7 +11,7 @@ internal static class BitflyerExecutionNormalizer
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
     public static IReadOnlyList<BitflyerExecutionNormalized> NormalizeList(
-        IReadOnlyList<ExecutionPublicResponse> raw,
+        IReadOnlyList<RawPublicModels.ExecutionPublicResponse> raw,
         string? rawJson)
     {
         var snapshots = ExtractSnapshots(rawJson, raw);
@@ -28,7 +20,7 @@ internal static class BitflyerExecutionNormalizer
             .ToArray();
     }
 
-    private static BitflyerExecutionNormalized Normalize(ExecutionPublicResponse wire, JsonElement snapshot) =>
+    private static BitflyerExecutionNormalized Normalize(RawPublicModels.ExecutionPublicResponse wire, JsonElement snapshot) =>
         new(
             Id: wire.Id,
             Side: BitflyerSideMapper.ToExchangeSide(wire.Side),
@@ -41,7 +33,7 @@ internal static class BitflyerExecutionNormalizer
 
     private static IReadOnlyList<JsonElement> ExtractSnapshots(
         string? rawJson,
-        IReadOnlyList<ExecutionPublicResponse> raw)
+        IReadOnlyList<RawPublicModels.ExecutionPublicResponse> raw)
     {
         if (raw.Count == 0)
         {

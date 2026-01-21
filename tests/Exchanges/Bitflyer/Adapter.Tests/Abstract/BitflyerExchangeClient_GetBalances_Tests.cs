@@ -9,17 +9,11 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
-using RawTicker = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models.Ticker;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using Xunit;
 
@@ -33,13 +27,13 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             // Arrange
             var rawBalances = new[]
             {
-                new BalanceResponse
+                new RawPrivateModels.BalanceResponse
                 {
                     CurrencyCode = "JPY",
                     Amount = 100000m,
                     Available = 80000m,
                 },
-                new BalanceResponse
+                new RawPrivateModels.BalanceResponse
                 {
                     CurrencyCode = "BTC",
                     Amount = 0.01m,
@@ -49,7 +43,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
             var fakePublicApi = CreateDummyPublicApi();
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
 
             var client = CreateClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
@@ -76,11 +70,11 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         public async Task GetBalanceCallAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
         {
             // Arrange
-            var rawBalances = Array.Empty<BalanceResponse>();
+            var rawBalances = Array.Empty<RawPrivateModels.BalanceResponse>();
 
             var fakePublicApi = CreateDummyPublicApi();
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
 
             var client = CreateClient(fakePublicApi, fakePrivateApi, fakeTradingApi);
 
@@ -96,20 +90,20 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         private static BitflyerExchangeClient CreateClient(
             IBitflyerRawMarketDataApi marketData,
             IBitflyerPrivateApi accountApi,
-            IBitflyerRawPrivateTradingApi tradingApi)
+            IBitflyerRawTradingApi tradingApi)
         {
             var markets = BitflyerTestHelpers.CreateResolver();
             var normalizedMarket = BitflyerTestHelpers.CreateMarketData(marketData);
             var normalizedAccount = BitflyerTestHelpers.CreateAccountApi(accountApi, markets);
-            var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, accountApi, markets);
+            var normalizedTrading = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets);
 
             return new BitflyerExchangeClient(normalizedMarket, normalizedAccount, normalizedTrading);
         }
 
         private static IBitflyerRawMarketDataApi CreateDummyPublicApi()
         {
-            // 既存の Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
-            var rawTicker = new RawTicker
+            // 既存の RawPublicModels.Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
+            var rawTicker = new RawPublicModels.Ticker
             {
                 ProductCode = "BTC_JPY",
                 Timestamp = DateTimeOffset.UnixEpoch,

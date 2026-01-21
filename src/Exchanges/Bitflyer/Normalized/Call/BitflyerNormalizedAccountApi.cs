@@ -9,20 +9,12 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
+using NormalizedRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Primitives.CallCommon;
-using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 
@@ -37,17 +29,17 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public async Task<Call<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
+    public async Task<Call<NormalizedRequests.GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _accountApi
-            .GetBalanceCallAsync(new RawRequests.GetBalancesRequest(), cancellationToken)
+            .GetBalanceCallAsync(new RawPrivateModels.GetBalancesRequest(), cancellationToken)
             .ConfigureAwait(false);
-        var request = new GetBalancesRequest();
+        var request = new NormalizedRequests.GetBalancesRequest();
         return CreateCall(rawCall, request, "Bitflyer.GetBalances", BitflyerAccountMapper.MapBalances);
     }
 
-    public async Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
+    public async Task<Call<NormalizedRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -57,10 +49,10 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         }
 
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var request = new GetAccountExecutionsRequest(symbol);
+        var request = new NormalizedRequests.GetAccountExecutionsRequest(symbol);
         if (marketCall.Result is CallResult<BitflyerMarketInfo>.Err marketError)
         {
-            return CreateCallError<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
+            return CreateCallError<NormalizedRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
                 "Bitflyer.GetExecutions",
@@ -72,7 +64,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
             : null;
         if (string.IsNullOrEmpty(productCode))
         {
-            return CreateCallError<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
+            return CreateCallError<NormalizedRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
                 "Bitflyer.GetExecutions",
@@ -80,7 +72,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         }
 
         var rawCall = await _accountApi
-            .GetExecutionsPrivateCallAsync(new RawRequests.GetAccountExecutionsRequest(productCode), cancellationToken)
+            .GetExecutionsPrivateCallAsync(new RawPrivateModels.GetAccountExecutionsRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -90,7 +82,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
             raw => BitflyerAccountMapper.MapAccountExecutions(symbol, raw));
     }
 
-    public async Task<Call<GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>> GetTradingCommissionCallAsync(
+    public async Task<Call<NormalizedRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>> GetTradingCommissionCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -100,10 +92,10 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         }
 
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-        var request = new GetTradingCommissionRequest(symbol);
+        var request = new NormalizedRequests.GetTradingCommissionRequest(symbol);
         if (marketCall.Result is CallResult<BitflyerMarketInfo>.Err marketError)
         {
-            return CreateCallError<GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
+            return CreateCallError<NormalizedRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
                 marketCall,
                 request,
                 "Bitflyer.GetTradingCommission",
@@ -115,7 +107,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
             : null;
         if (string.IsNullOrEmpty(productCode))
         {
-            return CreateCallError<GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
+            return CreateCallError<NormalizedRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
                 marketCall,
                 request,
                 "Bitflyer.GetTradingCommission",
@@ -123,7 +115,7 @@ internal sealed class BitflyerNormalizedAccountApi : IBitflyerNormalizedAccountA
         }
 
         var rawCall = await _accountApi
-            .GetTradingCommissionCallAsync(new RawRequests.GetTradingCommissionRequest(productCode), cancellationToken)
+            .GetTradingCommissionCallAsync(new RawPrivateModels.GetTradingCommissionRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

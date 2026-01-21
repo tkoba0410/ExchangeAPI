@@ -5,29 +5,29 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 using ExchangeApi.Primitives.CallCommon;
-using RawRequests = ExchangeApi.Exchanges.Bittrade.Raw.Requests;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 
 internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
 {
-    private readonly IBittradeRawApi _raw;
+    private readonly IBittradeRawExchangeInfoApi _exchangeInfo;
 
-    internal BittradeNormalizedExchangeInfoApi(IBittradeRawApi raw)
+    internal BittradeNormalizedExchangeInfoApi(IBittradeRawExchangeInfoApi raw)
     {
-        _raw = raw ?? throw new ArgumentNullException(nameof(raw));
+        _exchangeInfo = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
+    public async Task<Call<NormalizedRequests.GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
         CancellationToken ct = default)
     {
-        var rawCall = await _raw.ExchangeInfo
-            .GetSymbolsCallAsync(new RawRequests.GetRawSymbolsRequest(), ct)
+        var rawCall = await _exchangeInfo
+            .GetSymbolsCallAsync(new RawPublicModels.GetRawSymbolsRequest(), ct)
             .ConfigureAwait(false);
-        var request = new GetSymbolsRequest();
+        var request = new NormalizedRequests.GetSymbolsRequest();
 
         return CreateCall(
             rawCall,

@@ -5,12 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
@@ -22,7 +17,7 @@ internal static class BittradeTradingMapper
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
-    public static RawCreateOrderRequest ToRaw(string accountId, string apiSymbol, BittradeOrderRequest request)
+    public static RawPrivateModels.RawCreateOrderRequest ToRaw(string accountId, string apiSymbol, BittradeOrderRequest request)
     {
         if (string.IsNullOrWhiteSpace(accountId))
         {
@@ -38,7 +33,7 @@ internal static class BittradeTradingMapper
         var price = request.Price?.Value;
         var size = FormatDecimal(request.Size.Value);
 
-        return new RawCreateOrderRequest(
+        return new RawPrivateModels.RawCreateOrderRequest(
             AccountId: accountId,
             Symbol: apiSymbol,
             Type: type,
@@ -47,14 +42,14 @@ internal static class BittradeTradingMapper
             Source: null);
     }
 
-    public static BittradeOrderResult ToOrderResult(RawPlaceOrderResponse raw)
+    public static BittradeOrderResult ToOrderResult(RawPrivateModels.RawPlaceOrderResponse raw)
     {
         var orderId = raw.OrderId;
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
         return new BittradeOrderResult(key, ExchangeOrderId: orderId);
     }
 
-    public static IReadOnlyList<BittradeOpenOrder> ToOpenOrders(Symbol symbol, RawOpenOrdersResponse raw)
+    public static IReadOnlyList<BittradeOpenOrder> ToOpenOrders(Symbol symbol, RawPrivateModels.RawOpenOrdersResponse raw)
     {
         if (raw.Data is null || raw.Data.Count == 0)
         {
@@ -64,7 +59,7 @@ internal static class BittradeTradingMapper
         return raw.Data.Select(order => ToOpenOrder(symbol, order)).ToList();
     }
 
-    private static BittradeOpenOrder ToOpenOrder(Symbol symbol, RawOrderSummary raw)
+    private static BittradeOpenOrder ToOpenOrder(Symbol symbol, RawPrivateModels.RawOrderSummary raw)
     {
         var (side, type) = MapSideAndType(raw.Type);
         var status = MapStatus(raw.State);
@@ -90,7 +85,7 @@ internal static class BittradeTradingMapper
             ExchangeOrderId: raw.Id);
     }
 
-    public static BittradeOrderStatus ToOrderStatus(string productCode, RawOrderDetailResponse raw, OrderKey key)
+    public static BittradeOrderStatus ToOrderStatus(string productCode, RawPrivateModels.RawOrderDetailResponse raw, OrderKey key)
     {
         if (string.IsNullOrWhiteSpace(productCode))
         {
@@ -120,7 +115,7 @@ internal static class BittradeTradingMapper
     }
 
     public static IReadOnlyList<BittradeExecutionNormalized> ToExecutions(
-        IReadOnlyList<RawMatchResultEntry> entries)
+        IReadOnlyList<RawPrivateModels.RawMatchResultEntry> entries)
     {
         if (entries is null || entries.Count == 0)
         {

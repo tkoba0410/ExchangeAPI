@@ -3,7 +3,7 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized;
@@ -34,7 +34,7 @@ internal static class BitflyerNormalizeFactory
         if (markets is null) throw new ArgumentNullException(nameof(markets));
 
         var wire = new WireTransport(restClient);
-        var accountApi = new BitflyerPrivateApi(wire);
+        var accountApi = new BitflyerRawAccountApi(wire);
         return new BitflyerNormalizedAccountApi(accountApi, markets);
     }
 
@@ -44,8 +44,7 @@ internal static class BitflyerNormalizeFactory
         if (markets is null) throw new ArgumentNullException(nameof(markets));
 
         var wire = new WireTransport(restClient);
-        var accountApi = new BitflyerPrivateApi(wire);
-        var tradingApi = new BitflyerPrivateTradingApi(wire);
-        return new BitflyerNormalizedTradingApi(tradingApi, accountApi, markets);
+        var tradingApi = new BitflyerRawTradingApi(wire);
+        return new BitflyerNormalizedTradingApi(tradingApi, markets);
     }
 }

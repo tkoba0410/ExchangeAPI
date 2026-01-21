@@ -12,16 +12,11 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Apis;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Helpers;
@@ -37,10 +32,9 @@ internal static class BitflyerTestHelpers
         new BitflyerNormalizedAccountApi(accountApi, markets);
 
     public static IBitflyerNormalizedTradingApi CreateTradingApi(
-        IBitflyerRawPrivateTradingApi tradingApi,
-        IBitflyerPrivateApi accountApi,
+        IBitflyerRawTradingApi tradingApi,
         IBitflyerMarketResolver markets) =>
-        new BitflyerNormalizedTradingApi(tradingApi, accountApi, markets);
+        new BitflyerNormalizedTradingApi(tradingApi, markets);
 
     public static IBitflyerMarketResolver CreateResolver()
     {

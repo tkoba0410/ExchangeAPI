@@ -5,15 +5,10 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 
@@ -41,43 +36,43 @@ public sealed class BitflyerTradingCommissionNormalizedTests
 
         public StubAccountApi(string json) => _json = json;
 
-        public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionCallAsync(
-            GetTradingCommissionRequest request,
+        public Task<Call<RawPrivateModels.GetTradingCommissionRequest, RawPrivateModels.RawJsonResponse>> GetTradingCommissionCallAsync(
+            RawPrivateModels.GetTradingCommissionRequest request,
             CancellationToken cancellationToken = default) =>
-            Task.FromResult(MakeOkCall(request, new RawJsonResponse(_json)));
+            Task.FromResult(MakeOkCall(request, new RawPrivateModels.RawJsonResponse(_json)));
 
-        public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalanceCallAsync(
-            GetBalancesRequest request,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
-
-        public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
-            GetAccountExecutionsRequest request,
+        public Task<Call<RawPrivateModels.GetBalancesRequest, IReadOnlyList<RawPrivateModels.BalanceResponse>>> GetBalanceCallAsync(
+            RawPrivateModels.GetBalancesRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsCallAsync(
-            GetPositionsRequest request,
+        public Task<Call<RawPrivateModels.GetAccountExecutionsRequest, IReadOnlyList<RawPrivateModels.ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
+            RawPrivateModels.GetAccountExecutionsRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralCallAsync(
-            GetCollateralRequest request,
+        public Task<Call<RawPrivateModels.GetPositionsRequest, IReadOnlyList<RawPrivateModels.PositionResponse>>> GetPositionsCallAsync(
+            RawPrivateModels.GetPositionsRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetChildOrdersRequest, IReadOnlyList<ChildOrderResponse>>> GetChildOrdersCallAsync(
-            GetChildOrdersRequest request,
+        public Task<Call<RawPrivateModels.GetCollateralRequest, RawPrivateModels.CollateralResponse>> GetCollateralCallAsync(
+            RawPrivateModels.GetCollateralRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderResponse>>> GetParentOrdersCallAsync(
-            GetParentOrdersRequest request,
+        public Task<Call<RawPrivateModels.GetChildOrdersRequest, IReadOnlyList<RawPrivateModels.ChildOrderResponse>>> GetChildOrdersCallAsync(
+            RawPrivateModels.GetChildOrdersRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Call<GetParentOrderRequest, ParentOrderDetailResponse>> GetParentOrderCallAsync(
-            GetParentOrderRequest request,
+        public Task<Call<RawPrivateModels.GetParentOrdersRequest, IReadOnlyList<RawPrivateModels.ParentOrderResponse>>> GetParentOrdersCallAsync(
+            RawPrivateModels.GetParentOrdersRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public Task<Call<RawPrivateModels.GetParentOrderRequest, RawPrivateModels.ParentOrderDetailResponse>> GetParentOrderCallAsync(
+            RawPrivateModels.GetParentOrderRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
     }

@@ -1,11 +1,7 @@
 using System.Collections.Generic;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using Xunit;
@@ -17,13 +13,13 @@ public sealed class BittradeParsingTests
     [Fact]
     public void MapBalances_InvalidBalance_ThrowsWithContext()
     {
-        var data = new RawBalanceData(
+        var data = new RawPrivateModels.RawBalanceData(
             Id: "1",
             Type: "spot",
             State: "working",
-            List: new List<RawBalanceEntry>
+            List: new List<RawPrivateModels.RawBalanceEntry>
             {
-                new RawBalanceEntry(Currency: "btc", Type: "trade", Balance: "bad")
+                new RawPrivateModels.RawBalanceEntry(Currency: "btc", Type: "trade", Balance: "bad")
             });
 
         var ex = Assert.Throws<BittradeNormalizedException>(() => BittradeNormalizer.NormalizeBalances(data));

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
@@ -9,7 +8,7 @@ public sealed class BittradeCreateOrderRequestTests
     [Fact]
     public void CreateOrderRequest_SerializesWithExpectedKeys()
     {
-        var request = new RawCreateOrderRequest(
+        var request = new RawPrivateModels.RawCreateOrderRequest(
             AccountId: "account-1",
             Symbol: "btcjpy",
             Type: "buy-limit",

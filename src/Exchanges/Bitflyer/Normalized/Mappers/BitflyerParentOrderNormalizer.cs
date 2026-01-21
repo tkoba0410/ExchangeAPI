@@ -5,7 +5,7 @@ using System.Text.Json;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
@@ -13,7 +13,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 internal static class BitflyerParentOrderNormalizer
 {
     public static IReadOnlyList<BitflyerParentOrderNormalized> NormalizeList(
-        IReadOnlyList<ParentOrderResponse> raw,
+        IReadOnlyList<RawPrivateModels.RawGetParentOrdersResponse> raw,
         string? rawJson)
     {
         var snapshots = ExtractSnapshots(rawJson, raw.Count);
@@ -23,7 +23,7 @@ internal static class BitflyerParentOrderNormalizer
     }
 
     public static BitflyerParentOrderDetailNormalized NormalizeDetail(
-        ParentOrderDetailResponse raw,
+        RawPrivateModels.RawGetParentOrderResponse raw,
         string? rawJson)
     {
         var snapshot = ExtractSnapshot(rawJson);
@@ -44,7 +44,7 @@ internal static class BitflyerParentOrderNormalizer
     }
 
     private static BitflyerParentOrderNormalized NormalizeSummary(
-        ParentOrderResponse raw,
+        RawPrivateModels.RawGetParentOrdersResponse raw,
         JsonElement snapshot)
     {
         return new BitflyerParentOrderNormalized(
@@ -68,7 +68,7 @@ internal static class BitflyerParentOrderNormalizer
             Extras: new Dictionary<string, JsonElement>());
     }
 
-    private static BitflyerParentOrderParameterNormalized NormalizeParameter(ParentOrderParameterResponse raw)
+    private static BitflyerParentOrderParameterNormalized NormalizeParameter(RawPrivateModels.ParentOrderParameterResponse raw)
     {
         return new BitflyerParentOrderParameterNormalized(
             ProductCode: raw.ProductCode,

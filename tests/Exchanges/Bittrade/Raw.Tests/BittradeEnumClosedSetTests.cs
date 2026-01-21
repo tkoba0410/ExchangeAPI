@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
@@ -27,7 +26,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var detail = JsonSerializer.Deserialize<RawOrderDetail>(json);
+        var detail = JsonSerializer.Deserialize<RawPrivateModels.RawOrderDetail>(json);
 
         Assert.NotNull(detail);
         Assert.Equal("submitted", detail!.State);
@@ -55,7 +54,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var detail = JsonSerializer.Deserialize<RawOrderDetail>(json);
+        var detail = JsonSerializer.Deserialize<RawPrivateModels.RawOrderDetail>(json);
         Assert.NotNull(detail);
         Assert.Equal("mystery", detail!.State);
     }
@@ -81,7 +80,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var detail = JsonSerializer.Deserialize<RawOrderDetail>(json);
+        var detail = JsonSerializer.Deserialize<RawPrivateModels.RawOrderDetail>(json);
         Assert.NotNull(detail);
         Assert.Equal("buy-unknown", detail!.Type);
     }
@@ -99,7 +98,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var request = JsonSerializer.Deserialize<RawCreateRetailOrderRequest>(json);
+        var request = JsonSerializer.Deserialize<RawPrivateModels.RawCreateRetailOrderRequest>(json);
         Assert.NotNull(request);
         Assert.Equal(3, request!.Type);
     }
@@ -113,7 +112,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var request = JsonSerializer.Deserialize<RawCancelOpenOrdersRequest>(json);
+        var request = JsonSerializer.Deserialize<RawPrivateModels.RawCancelOpenOrdersRequest>(json);
 
         Assert.NotNull(request);
         Assert.Equal("buy", request!.Side);

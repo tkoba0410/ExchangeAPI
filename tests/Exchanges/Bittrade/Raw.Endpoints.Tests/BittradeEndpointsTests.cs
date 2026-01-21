@@ -1,10 +1,7 @@
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal;
 using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
 
@@ -53,7 +50,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void PlaceOrder_builds_request_with_body_json()
     {
-        var request = new RawCreateOrderRequest(
+        var request = new RawPrivateModels.RawCreateOrderRequest(
             AccountId: "123",
             Symbol: "btcjpy",
             Type: "buy-limit",

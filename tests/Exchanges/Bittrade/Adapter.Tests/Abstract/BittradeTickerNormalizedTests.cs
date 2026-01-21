@@ -1,12 +1,9 @@
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Requests;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
@@ -34,7 +31,7 @@ public sealed class BittradeTickerNormalizedTests
         }
         """;
 
-        var raw = BittradeRawJson.DeserializeOrThrow<RawMergedResponse>(json, "Bittrade.GetTicker");
+        var raw = BittradeRawJson.DeserializeOrThrow<RawPublicModels.RawMergedResponse>(json, "Bittrade.GetTicker");
         var normalized = BittradeNormalizer.NormalizeTicker(raw, json);
 
         Assert.Equal(JsonValueKind.Object, normalized.RawSnapshot.ValueKind);

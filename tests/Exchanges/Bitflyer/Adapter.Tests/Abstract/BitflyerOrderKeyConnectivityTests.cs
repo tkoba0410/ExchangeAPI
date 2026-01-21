@@ -4,15 +4,10 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
@@ -33,7 +28,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
         var acceptanceId = "ACCEPT-1";
         var childOrders = new[]
         {
-            new ChildOrderResponse
+            new RawPrivateModels.RawGetChildOrdersResponse
             {
                 ChildOrderId = "JRF-1",
                 ChildOrderAcceptanceId = acceptanceId,
@@ -46,13 +41,13 @@ public sealed class BitflyerOrderKeyConnectivityTests
             }
         };
 
-        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<BalanceResponse>(), childOrders: childOrders);
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new CreateChildOrderResponse
+        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
+        var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse
         {
             ChildOrderAcceptanceId = acceptanceId
-        });
+        }, childOrders);
         var markets = BitflyerTestHelpers.CreateResolver();
-        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, privateApi, markets);
+        var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets);
         var api = new BitflyerTradingApi(normalized);
 
         var resultCall = await api.PlaceMarketOrderCallAsync(new Symbol("BTC/JPY"), ContractSide.Buy, new Size(0.01m));
@@ -66,7 +61,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
         Assert.Equal(acceptanceId, result.Key.Value);
         Assert.Equal(OrderIdKind.AcceptanceId, status.Key.Kind);
         Assert.Equal(acceptanceId, status.Key.Value);
-        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.Body.ChildOrderAcceptanceId);
+        Assert.Equal(acceptanceId, tradingApi.LastCancelRequest!.ChildOrderAcceptanceId);
     }
 
 }

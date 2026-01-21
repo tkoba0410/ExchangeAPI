@@ -4,64 +4,59 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
 internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
 {
-    private readonly Ticker _response;
-    private readonly Board? _board;
+    private readonly RawPublicModels.Ticker _response;
+    private readonly RawPublicModels.Board? _board;
 
-    public FakeBitflyerPublicApi(Ticker response, Board? board = null)
+    public FakeBitflyerPublicApi(RawPublicModels.Ticker response, RawPublicModels.Board? board = null)
     {
         _response = response;
         _board = board;
     }
 
-    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
-        GetTickerRequest request,
+    public Task<Call<RawPublicModels.GetTickerRequest, RawPublicModels.Ticker>> GetTickerCallAsync(
+        RawPublicModels.GetTickerRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, _response));
 
-    public Task<Call<GetTickerRequest, Ticker>> TickerCallAsync(
-        GetTickerRequest request,
+    public Task<Call<RawPublicModels.GetTickerRequest, RawPublicModels.Ticker>> TickerCallAsync(
+        RawPublicModels.GetTickerRequest request,
         CancellationToken cancellationToken = default) =>
         GetTickerCallAsync(request, cancellationToken);
 
-    public Task<Call<GetBoardRequest, Board>> GetBoardCallAsync(
-        GetBoardRequest request,
+    public Task<Call<RawPublicModels.GetBoardRequest, RawPublicModels.Board>> GetBoardCallAsync(
+        RawPublicModels.GetBoardRequest request,
         CancellationToken cancellationToken = default)
     {
         if (_board is null)
         {
-            throw new InvalidOperationException("Board response is not configured.");
+            throw new InvalidOperationException("RawPublicModels.Board response is not configured.");
         }
 
         return Task.FromResult(MakeOkCall(request, _board));
     }
 
-    public Task<Call<GetBoardRequest, Board>> BoardCallAsync(
-        GetBoardRequest request,
+    public Task<Call<RawPublicModels.GetBoardRequest, RawPublicModels.Board>> BoardCallAsync(
+        RawPublicModels.GetBoardRequest request,
         CancellationToken cancellationToken = default) =>
         GetBoardCallAsync(request, cancellationToken);
 
-    public Task<Call<GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
-        GetExecutionsRequest request,
+    public Task<Call<RawPublicModels.GetExecutionsRequest, IReadOnlyList<RawPublicModels.ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
+        RawPublicModels.GetExecutionsRequest request,
         CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<ExecutionPublicResponse> executions = new[]
+        IReadOnlyList<RawPublicModels.ExecutionPublicResponse> executions = new[]
         {
-            new ExecutionPublicResponse
+            new RawPublicModels.ExecutionPublicResponse
             {
                 Id = 1,
                 ProductCode = request.ProductCode,
@@ -75,49 +70,49 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawMarketDataApi
         return Task.FromResult(MakeOkCall(request, executions));
     }
 
-    public Task<Call<GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> ExecutionsCallAsync(
-        GetExecutionsRequest request,
+    public Task<Call<RawPublicModels.GetExecutionsRequest, IReadOnlyList<RawPublicModels.ExecutionPublicResponse>>> ExecutionsCallAsync(
+        RawPublicModels.GetExecutionsRequest request,
         CancellationToken cancellationToken = default) =>
         GetExecutionsPublicCallAsync(request, cancellationToken);
 
-    public Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsCallAsync(
-        GetMarketsRequest request,
+    public Task<Call<RawPublicModels.GetMarketsRequest, IReadOnlyList<RawPublicModels.Market>>> GetMarketsCallAsync(
+        RawPublicModels.GetMarketsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, (IReadOnlyList<Market>)new[] { new Market("BTC_JPY", "BTC_JPY") }));
+        Task.FromResult(MakeOkCall(request, (IReadOnlyList<RawPublicModels.Market>)new[] { new RawPublicModels.Market("BTC_JPY", "BTC_JPY") }));
 
-    public Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> MarketsCallAsync(
-        GetMarketsRequest request,
+    public Task<Call<RawPublicModels.GetMarketsRequest, IReadOnlyList<RawPublicModels.Market>>> MarketsCallAsync(
+        RawPublicModels.GetMarketsRequest request,
         CancellationToken cancellationToken = default) =>
         GetMarketsCallAsync(request, cancellationToken);
 
-    public Task<Call<GetChatsRequest, IReadOnlyList<Chat>>> GetChatsCallAsync(
-        GetChatsRequest request,
+    public Task<Call<RawPublicModels.GetChatsRequest, IReadOnlyList<RawPublicModels.Chat>>> GetChatsCallAsync(
+        RawPublicModels.GetChatsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, (IReadOnlyList<Chat>)new[] { new Chat("n", "m", DateTimeOffset.UtcNow) }));
+        Task.FromResult(MakeOkCall(request, (IReadOnlyList<RawPublicModels.Chat>)new[] { new RawPublicModels.Chat("n", "m", DateTimeOffset.UtcNow) }));
 
-    public Task<Call<GetHealthRequest, HealthResponse>> GetHealthCallAsync(
-        GetHealthRequest request,
+    public Task<Call<RawPublicModels.GetHealthRequest, RawPublicModels.HealthResponse>> GetHealthCallAsync(
+        RawPublicModels.GetHealthRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, new HealthResponse("NORMAL")));
+        Task.FromResult(MakeOkCall(request, new RawPublicModels.HealthResponse("NORMAL")));
 
-    public Task<Call<GetBoardStateRequest, BoardStateResponse>> GetBoardStateCallAsync(
-        GetBoardStateRequest request,
+    public Task<Call<RawPublicModels.GetBoardStateRequest, RawPublicModels.BoardStateResponse>> GetBoardStateCallAsync(
+        RawPublicModels.GetBoardStateRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, new BoardStateResponse("NORMAL", "RUNNING", null)));
+        Task.FromResult(MakeOkCall(request, new RawPublicModels.BoardStateResponse("NORMAL", "RUNNING", null)));
 
-    public Task<Call<GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
-        GetCorporateLeverageRequest request,
+    public Task<Call<RawPublicModels.GetCorporateLeverageRequest, RawPublicModels.CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
+        RawPublicModels.GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, new CorporateLeverageResponse(
+        Task.FromResult(MakeOkCall(request, new RawPublicModels.CorporateLeverageResponse(
             CurrentMax: 7.7m,
             CurrentStartDate: DateTimeOffset.UtcNow,
             NextMax: 7.65m,
             NextStartDate: DateTimeOffset.UtcNow.AddDays(7))));
 
-    public Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateCallAsync(
-        GetFundingRateRequest request,
+    public Task<Call<RawPublicModels.GetFundingRateRequest, RawPublicModels.FundingRateResponse>> GetFundingRateCallAsync(
+        RawPublicModels.GetFundingRateRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, new FundingRateResponse(0m, DateTimeOffset.UtcNow)));
+        Task.FromResult(MakeOkCall(request, new RawPublicModels.FundingRateResponse(0m, DateTimeOffset.UtcNow)));
 
     private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
     {

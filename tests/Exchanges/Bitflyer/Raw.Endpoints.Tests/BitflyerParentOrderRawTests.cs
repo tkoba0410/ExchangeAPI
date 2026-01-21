@@ -1,12 +1,8 @@
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Raw.Endpoints.Tests;
 
 public sealed class BitflyerParentOrderRawTests
@@ -37,7 +33,7 @@ public sealed class BitflyerParentOrderRawTests
         ]
         """;
 
-        var result = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawGetParentOrdersResponse>>(
+        var result = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPrivateModels.RawGetParentOrdersResponse>>(
             json,
             "Bitflyer.GetParentOrders");
 
@@ -69,7 +65,7 @@ public sealed class BitflyerParentOrderRawTests
         }
         """;
 
-        var result = BitflyerRawJson.DeserializeOrThrow<RawGetParentOrderResponse>(
+        var result = BitflyerRawJson.DeserializeOrThrow<RawPrivateModels.RawGetParentOrderResponse>(
             json,
             "Bitflyer.GetParentOrder");
 

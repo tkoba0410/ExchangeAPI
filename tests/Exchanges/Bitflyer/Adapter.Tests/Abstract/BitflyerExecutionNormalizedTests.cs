@@ -2,15 +2,10 @@ using System.Collections.Generic;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Call;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.RawApi;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -34,7 +29,7 @@ public sealed class BitflyerExecutionNormalizedTests
         ]
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPublicResponse>>(
+        var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPublicModels.ExecutionPublicResponse>>(
             json,
             "Bitflyer.GetExecutions");
         var normalized = BitflyerExecutionNormalizer.NormalizeList(raw, json);

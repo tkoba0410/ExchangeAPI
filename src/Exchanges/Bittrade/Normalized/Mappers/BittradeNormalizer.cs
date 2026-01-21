@@ -5,12 +5,8 @@ using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
-using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Call;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
+using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 
@@ -18,7 +14,7 @@ internal static class BittradeNormalizer
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
-    internal static BittradeTickerNormalized NormalizeTicker(RawMergedResponse response, string? rawJson)
+    internal static BittradeTickerNormalized NormalizeTicker(RawPublicModels.RawMergedResponse response, string? rawJson)
     {
         if (response is null) throw new ArgumentNullException(nameof(response));
 
@@ -32,7 +28,7 @@ internal static class BittradeNormalizer
             new Dictionary<string, JsonElement>());
     }
 
-    internal static BittradeOrderBookNormalized NormalizeOrderBook(RawDepthTick tick)
+    internal static BittradeOrderBookNormalized NormalizeOrderBook(RawPublicModels.RawDepthTick tick)
     {
         if (tick is null) throw new ArgumentNullException(nameof(tick));
 
@@ -42,7 +38,7 @@ internal static class BittradeNormalizer
     }
 
     internal static IReadOnlyList<BittradeExecutionNormalized> NormalizeExecutions(
-        IReadOnlyList<RawTradeEntry> entries,
+        IReadOnlyList<RawPublicModels.RawTradeEntry> entries,
         string? rawJson)
     {
         if (entries is null) throw new ArgumentNullException(nameof(entries));
@@ -60,7 +56,7 @@ internal static class BittradeNormalizer
             .ToList();
     }
 
-    internal static IReadOnlyList<BittradeSymbolNormalized> NormalizeSymbols(IReadOnlyList<RawSymbolInfo> symbols)
+    internal static IReadOnlyList<BittradeSymbolNormalized> NormalizeSymbols(IReadOnlyList<RawPublicModels.RawSymbolInfo> symbols)
     {
         if (symbols is null) throw new ArgumentNullException(nameof(symbols));
 
@@ -77,7 +73,7 @@ internal static class BittradeNormalizer
             .ToList();
     }
 
-    internal static IReadOnlyList<BittradeBalanceEntryNormalized> NormalizeBalances(RawBalanceData data)
+    internal static IReadOnlyList<BittradeBalanceEntryNormalized> NormalizeBalances(RawPrivateModels.RawBalanceData data)
     {
         if (data is null) throw new ArgumentNullException(nameof(data));
 
@@ -143,7 +139,7 @@ internal static class BittradeNormalizer
 
     private static IReadOnlyList<JsonElement> ExtractTradeSnapshots(
         string? rawJson,
-        IReadOnlyList<RawTradeEntry> entries)
+        IReadOnlyList<RawPublicModels.RawTradeEntry> entries)
     {
         if (entries.Count == 0)
         {

@@ -2,37 +2,21 @@
 
 ## 1. 目的
 
-本書は、本リポジトリにおける **EndpointId の定義と運用を共通規範として固定**し、
-取引所間および実装間の揺らぎを排除することを目的とする。
+本書は、本リポジトリにおける **EndpointId** の意味と最小運用ルールを定義する。
 
-本リポジトリでは **公式 API ドキュメントを仕様の正本**とし、本書および関連文書はそれを置き換えない。
-本書で定義するのは、あくまで次の点に限定される。
-
-* EndpointId という識別子の意味と責務
-* EndpointId と公式 API（HTTP Method / Path）との対応関係
-* EndpointId を列挙・管理するための最小ルール
+- 設計・層責務・公開範囲・Call 抽象などの規範は **TopSpec（docs/topspec.md）** を正本とする。
+- 公式 API 文書を仕様の正本とし、本リポジトリでは公式を置き換えない。
+- 本書は EndpointId を「一覧（inventory）」と結びつけるための **最小の共通取り決め**のみを扱う。
 
 ---
 
-## 2. EndpointId の位置付け（正本宣言）
+## 2. EndpointId の定義
 
-* **EndpointId は、取引所ごとの API Endpoint を一意に識別するための ID である**
+EndpointId は、**取引所ごとの API Endpoint を一意に識別するための識別子**である。
 
-* EndpointId は **取引所内で一意でなければならない**
-
-* EndpointId は **機械的に決定可能でなければならない**
-
-* 上記を満たしたうえで、**可能な限り人間にとって分かりやすい識別子であること**を求める
-
-* EndpointId は **文字列値そのものではなく、識別子（定数名・enum 名・静的メンバ名）として扱う**
-
-* **HTTP Method や Path は inventory を通じて EndpointId に対応付けられる**
-
-EndpointId は、少なくとも以下を満たさなければならない。
-
-* EndpointId は、当該取引所の inventory における定義を通じて **HTTP Method** が一意に定まること
-* EndpointId は、当該取引所の inventory における定義を通じて **公式 API の Path** が一意に定まること
-* 取引所内で EndpointId が衝突しないこと
+- EndpointId は **取引所内で一意**でなければならない。
+- EndpointId は **文字列そのものではなく識別子（定数名 / enum 名 / 静的メンバ名）**として扱う。
+- EndpointId は、仕様詳細（Request/Response、paging、error 等）を表現しない。
 
 ---
 
@@ -40,147 +24,71 @@ EndpointId は、少なくとも以下を満たさなければならない。
 
 ### 3.1 責務
 
-EndpointId の責務は、**endpoint を識別し、公式 API 上の endpoint と対応付けること**に限定される。
+EndpointId の責務は、次に限定される。
 
-### 3.2 非責務（保証しないもの）
+- endpoint を識別する
+- 公式 API 上の endpoint（Method/Path/Scope）と対応付ける
+
+### 3.2 非責務（保証しない）
 
 EndpointId は以下を保証しない。
 
-* Request / Response の構造や型
-* paging / cursor / limit 等の振る舞い
-* Capability として提供されるか否か
-* 上位 API（Facade / Application）における統一インターフェースの存在
+- Request / Response の構造や型
+- paging / cursor / limit 等の振る舞い
+- Capability として提供されるか否か
+- 上位 API（Facade / Application 等）の存在
 
-これらは、各層（Wire / Raw / Normalized / Contracts）および Capability 定義の責務である。
-
----
-
-## 4. 共通ルールと取引所ルール
-
-EndpointId は、**共通ルール**と**取引所ルール**の二層構造で定義する。
-
-* 共通ルール：EndpointId を構成するための要素と形式を定める
-* 取引所ルール：共通ルールで定義された要素を、どのように組み合わせるかを定める
-
-この分離により、EndpointId を機械的に決定可能としつつ、
-取引所ごとの差異を命名規則として明示化する。
+これらは TopSpec に定義された各層および Contract（Capability/DTO）の責務である。
 
 ---
 
-## 5. 共通ルール（構成要素と形式）
+## 4. inventory との対応（一覧）
 
-### 5.1 構成要素
+本リポジトリでは、取引所ごとの endpoint 一覧（inventory）を管理する。
 
-共通ルールでは、EndpointId を構成するために用いられる **要素** を定義する。
+- 公式 API 文書が正本
+- inventory は **対応関係の一覧**であり、規範ではない
 
-* **Path**：公式 API ドキュメントに記載された path
-* **HTTP Method**：GET / POST / DELETE / etc
-* **Scope**：Public / Private
+### 4.1 inventory に記載する最小項目
 
-### 5.2 表記制約
+各 endpoint は少なくとも以下で列挙される。
 
-共通ルールでは、EndpointId の表記に関する最小限の制約を定める。
+- Scope（public/private）
+- Method（HTTP Method）
+- Path（公式 API の path）
+- EndpointId（本リポジトリの識別子）
 
-* EndpointId は **PascalCase** とする
-* EndpointId には **スラッシュ（`/`）を含めない**
+inventory の置き場所（推奨）：
 
-  * Path をそのまま文字列として埋め込むことはしない
+- `docs/inventory/endpoints-<exchange>.md`
 
-### 5.3 一般単語境界（共通定義）
-
-一般単語境界とは、英字↔数字の切替、英大文字↔小文字の切替、`-` / `_` 等の記号、
-および **英字のみからなる連続列に対する英単語境界** を指す。
-
-共通ルールは、**要素と形式を定義するのみであり、要素の並び順や省略規則は定義しない**。
+※ inventory には詳細仕様説明や設計判断を記載しない。設計規範は TopSpec を参照すること。
 
 ---
 
-## 6. 取引所ルール（組み立て規則）
+## 5. 表記の最小制約
 
-取引所ルールでは、共通ルールで定義された要素（Path / Method / Scope）と形式を前提に、
-**それらをどのように組み合わせて EndpointId を構成するか**を定める。
+EndpointId の表記は次の最小制約を満たす。
 
-取引所ルールで定める事項には、少なくとも次を含む。
+- PascalCase
+- `/` を含めない（Path をそのまま埋め込まない）
 
-* 要素の並び順
-* 要素の連結方法
-* 要素の省略可否
-* 衝突回避のための補助要素の扱い
-
-これにより、
-
-* EndpointId を機械的に決定可能とする
-* 取引所内での命名の一貫性を保つ
-* 取引所間の差異を命名規則として明確化する
-
-ことを目的とする。
+取引所ごとの命名上の流儀（単語境界の細かさ、Method を含める/含めない等）は、
+各取引所の補助資料（例：`docs/endpoint-id/endpointid-<exchange>.md`）に委ねる。
+ただし、命名規範の正本は TopSpec を参照すること。
 
 ---
 
-## 7. Endpoint 定義モデル（inventory）
+## 6. 追加・変更の運用原則
 
-inventory は、**endpoint の列挙情報と、その列挙を成立させる取引所ルールを併せて保持する文書**である。
-
-EndpointId は、取引所別の inventory において、以下の情報と組で定義される。
-
-### 7.1 Endpoint 列挙（必須・固定）
-
-* EndpointId
-* Method（HTTP Method）
-* Path（公式 API の path）
-* Scope（Public / Private）
-
-この 4 項目の列挙のみが、本リポジトリにおける **endpoint 定義の正本**である。
-
-### 7.2 取引所ルール（必須）
-
-inventory には、その取引所における **EndpointId の組み立て規則（取引所ルール）**を必ず含める。
-
-取引所ルールでは、共通ルールで定義された要素（Path / Method / Scope）と形式を前提に、
-少なくとも以下を明示する。
-
-* 要素の並び順
-* 要素の連結方法
-* 要素の省略規則
-* 衝突回避のための補助要素の扱い
-
-取引所ルールは、当該 inventory に記載された EndpointId が
-**機械的に再構成可能であること**を保証しなければならない。
+- 新しい endpoint を扱う場合、まず inventory を更新する。
+- inventory に列挙されていない endpoint は、本リポジトリでは未定義として扱う。
+- EndpointId の命名に迷いが生じた場合は、当該取引所の endpoint-id 補助資料に判断理由を記録してよい（MAY）。
+  ただし、設計規範（層責務・公開範囲等）は TopSpec に従う。
 
 ---
 
-## 8. inventory の運用原則
+## 7. 派生（参考）
 
-* inventory は **取引所ごとに 1 ファイル**とする
-* inventory には、**取引所ルールと endpoint 列挙の両方**を含める
-* inventory に記載された EndpointId は、取引所ルールに基づき **機械的に再構成可能**でなければならない
-* inventory には endpoint の列挙と規則のみを記載し、詳細仕様説明は含めない
-* 詳細仕様（request / response / error 等）は **必ず公式 API ドキュメントを参照**する
-
-inventory は、コード生成や実装検証の基点となり得るが、
-本書では実装方式を規定しない。
-
----
-
-## 9. 派生規則（将来方針）
-
-EndpointId から以下を機械的に派生させることは、**将来の実装方針として想定**している。
-
-* API メソッド名（例：`<EndpointId>CallAsync`）
-* Wire / Raw / Normalized 各層での共通命名
-
-ただし、**現時点では必須要件ではない**。
-
-### （参考）コード実装への反映
-
-EndpointId をコードへ反映する際の具体的な命名規則、配置、および検証方法については、
-本書では規定せず、別途定めるコード反映規約に委ねる。
-詳細は `docs/governance/endpointid-code-mapping.md` を参照すること。
-
----
-
-## 10. endpoint 追加・変更時の原則
-
-* 新しい endpoint を扱う場合、**最初に inventory を更新**する
-* inventory に記載されていない endpoint は、本リポジトリでは未定義とみなす
-* 命名に迷いがある場合は、取引所ルール節に裁定理由を明示する。
+EndpointId から API メソッド名や各層の命名を機械的に派生させることは可能である。
+具体規則は TopSpec およびコード反映規約（該当文書）に委ねる。

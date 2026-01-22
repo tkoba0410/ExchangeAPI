@@ -1,383 +1,246 @@
-# TopSpec（統合版）
+# TopSpec — Exchange API Architecture Specification
 
-本書は ExchangeAPI リポジトリの **最上位規範（Normative）** である。  
-ここに記載された MUST / MUST NOT は拘束力を持ち、他の文書・コメント・慣習よりも優先される。
+## 1. 目的と設計原則
 
----
+本仕様は、複数取引所 API を統一的に扱うための
+**論理的に一貫した層構造と API 契約**を定義する。
 
-## 1. 目的
+本プロジェクトは以下を最優先とする。
 
-- 文書量を増やさずに、実装時の判断余地（揺らぎ）を最小化する。
-- 層の責務、境界、データ形状、依存方向を固定し、取引所追加・変更時も迷いなく維持できるようにする。
-
----
-
-## 2. 正本と権威（Authority）
-
-### 2.1 正本
-- 各取引所の API 仕様の正本は **公式 API 文書**である（MUST）。
-- 本リポジトリは公式仕様の意味的仕様を再定義しない（MUST NOT）。
-
-### 2.2 文書の優先順位
-1. TopSpec（本書）
-2. Contracts Overview（利用者契約）
-3. Contracts（Shape / Semantics）
-4. Exceptions
-5. Inventory / Endpoints
+* **論理性を最優先**する
+* 揺らぎを排し、実装の自由度より **一貫性と検証可能性**を重視する
+* 必要であれば **破壊的変更を容認**する
+* 文書とコードの乖離を許容しない
 
 ---
 
-## 3. 層モデル（Layer Model）
+## 2. 全体構造
 
-### 3.1 必須の 4 層
-本システムは次の **4 層構成**を必須とする（MUST）。
+本ライブラリは、以下の **4 層構造**を採用する。
 
 ```
-Wire → Raw → Normalized → Contracts
-
-※ `Application` / `Composition` は層ではない（後述）。層モデルの外側に置く。
+Contract
+  ↓
+Normalized
+  ↓
+Raw
+  ↓
+Wire
 ```
 
-### 3.2 層を跨ぐ呼び出しの禁止
-- 依存・呼び出しは **隣接層間に限定**する（MUST）。
-- 層を飛び越えた参照・呼び出しは禁止する（MUST NOT）。
+### 2.1 依存関係
 
-### 3.3 Adapter の位置づけ
-- Adapter は「層」ではなく、**Normalized（取引所内の意味確定）→ Contracts（横断契約）への翻訳境界**である。
-- Adapter は Contracts を実装・返却するが、Contracts の意味論を変更してはならない（MUST NOT）。
-
-### 3.4 Application / Composition の位置づけ
-- `Application` は取引所横断の **ユースケース（振る舞い）** を置く。層ではない。
-- `Composition` は DI / Factory / Provider 等の **組み立て（配線）** を置く。層ではない。
-- `Contracts` は Shape/Semantics のみであり、Application/Composition を含めてはならない（MUST NOT）。
-- `Application` は `Contracts.*` を参照してはならない（MUST NOT）。
-  - 公開 I/F（Facade）の型は `Composition` が受け取り、`Application` 独自の入出力型へ変換する。
-
-- 取引所の選択・束ね・識別（例：`ExchangeCode`）は `Composition` / 利用者境界の責務である。
-  Contracts（公開契約）に取引所識別情報を流入させてはならない（MUST NOT）。
-
-- API 資格情報の取得・解決（Credential Provider）は、
-  **Composition の配線責務**であり、公開契約（Contracts）には含めない。
-- 実行環境依存（環境変数 / ファイル / OS）の要素は、
-  すべて Composition 側で完結させる。
+* 依存は **一方向のみ**とする
+* 上位層は直下層のみを呼び出す
+* 逆方向・横断参照は禁止する
 
 ---
 
-## 4. 層の責務と禁止事項
+## 3. 各層の責務
 
-### 4.1 Wire
-**責務（MUST）**
-- 外部 I/O（HTTP Path / Query / Header / Body など）の入口となる。
-- 入口の文字列・バイト列を、下流に流してよい形へ変換する。
+### 3.1 Wire 層（I/O / Transport）
 
-**禁止（MUST NOT）**
-- JSON の意味解釈を行う。
-- Wire 以外の層へ `string` をそのまま流す。
+**責務**
 
-### 4.2 Raw
-**責務（MUST）**
-- 外部 JSON の表現を **lossless** に保持する（型混在・欠損・null を含む）。
+* 外部との **送受信を行う唯一の層**
+* HTTP / WebSocket / 認証 / 署名 / 再送制御
 
-**禁止（MUST NOT）**
-- 単位換算・時刻統一・売買方向/注文種別の解釈などの意味確定。
-- 意味のあるデフォルト補完。
+**禁止事項（MUST NOT）**
 
-### RawJson / ClosedSet に関する判断について
+* 意味解釈
+* 値の正規化
+* 単位変換
+* 取引所仕様の吸収
 
-RawJson の保持有無や ClosedSet の拡張可否といった判断は、
-**TopSpec や Contracts では行わない**。
+**API 特性**
 
-これらは取引所ごとの差異として **inventory 文書にのみ記録・判断される**。
-共通契約やレイヤ責務へ逆流させてはならない。
-
-### 4.3 Normalized
-**責務（MUST）**
-- 取引所内で意味を確定し、表現差分を統一する（正規化）。
-
-**禁止（MUST NOT）**
-- Raw DTO（外部表現）を公開面へ露出する。
-
-### 4.4 Contracts
-**責務（MUST）**
-- 取引所横断の公開契約（語彙・型）を提供する。
-
-**禁止（MUST NOT）**
-- 取引所名を含む型・名前空間を定義する。
-- 取引所固有差分を契約に持ち込む。
-- 取引所識別情報（例：`ExchangeCode`）を ContractDTO/Request/Response に含める。
-- 資格情報取得用インターフェースや実装（Credential Provider）を Contracts に含める。
+* I/O 実体を持つ
+* Response は text 表現を返す
 
 ---
 
-## 5. 境界ポリシー（Boundary Rules）
+### 3.2 Raw 層（表現 / Primitive JSON）
 
-### 5.1 Call-only
-- 公開 API の返却形式は **Call** に統一する（MUST）。
-- Response DTO を直接返してはならない（MUST NOT）。
+**責務**
 
-#### 5.1.1 CallAsync 命名（Call-only）
-- I/O を伴う公開 API は非同期で提供し、戻り値は `Task<Call<T>>` または `ValueTask<Call<T>>` とする（MUST）。
-- 上記の公開メソッド名は末尾を **`CallAsync`** とする（MUST）。
-- `Async` のみ（例：`GetBalanceAsync`）は使用してはならない（MUST NOT）。
+* 外部 API の JSON 表現差を吸収する
+* プリミティブ JSON として表現を保持する
 
-### 5.2 型安全（in/out の固定）
-- 層の型の統一は、**メソッドの in/out（入力/出力）**で合わせる（MUST）。
-- 各層の公開メソッドは、その層で許可された型のみを in/out に用いる（MUST）。
+**許可事項（MAY）**
 
----
+* string / number 混在の吸収
+* null 許容
+* フィールド名の写像
+* RawJson の保持
 
-## 6. データ形状（Data Shape）
+**禁止事項（MUST NOT）**
 
-### 6.1 型カテゴリ
-- **Wire string**：外部 I/O 由来の文字列表現
-- **Primitive DTO**：プリミティブ型のみで構成された DTO（意味付けをしない）
-- **Exchange DTO**：取引所固有の DTO（取引所名を含む）
-- **Abstract DTO**：取引所横断の抽象 DTO（公開契約）
-
-### 6.2 層ごとの許可型
-- Wire：Wire string（入口のみ）
-- Raw：Primitive DTO / Exchange DTO（lossless）
-- Normalized：Exchange DTO（意味確定済み）および Contracts への変換材料
-- Contracts：Abstract DTO（公開契約）のみ
-
-### 6.3 命名規約（機械判定）
-- Exchange DTO は型名または名前空間に取引所名を必須とする（MUST）。
-- 横断型（Abstract/Contract）は型名・名前空間に取引所名を含めてはならない（MUST NOT）。
-
-（Call-only）
-- 公開 I/O メソッド（`Task<Call<T>>` / `ValueTask<Call<T>>`）は `CallAsync` で終えなければならない（MUST）。
-- `Async` のみの命名は禁止する（MUST NOT）。
+* 意味の確定
+* 単位変換
+* 列挙値の解釈
+* デフォルト補完
 
 ---
 
-## 7. 固有／横断（Variation）
+### 3.3 Normalized 層（取引所内正規化）
 
-- 横断基盤は **概念単位の最上位フォルダ**に配置する（MUST）。
-- 取引所固有コードは常に `src/Exchanges/<Exchange>/...` に閉じる（MUST）。
-- Shared という物理カテゴリは使用してはならない（MUST NOT）。
+**責務**
 
-補足（カテゴリ固定）：
-- `Transport`：通信基盤（HTTP/JSON/Retry/署名/共通Wire入出力の枠など）
-- `Primitives`：横断の基礎型・パーサ・小さな純粋関数（ユースケース禁止）
-- `Application`：横断ユースケース（例：MarketResolver / Polling 等）
-- `Composition`：組み立て（Factory/CredentialProvider/JsonExchangeInfoApi 等）
-- `Contracts`：公開契約（Shape/Semantics）※振る舞い禁止
+* 取引所 **内部での意味を確定**する
+* 型・単位・列挙値・時刻の正規化
 
-### 7.1 Reference Implementation（実装規範の参照元）
+**特性**
 
-本リポジトリでは、取引所間の実装格差を抑制するため、
-**bitFlyer の実装を Reference Implementation** と定める（MUST）。
+* 正規化は **取引所内に閉じる**
+* 他取引所との統一は行わない
 
-Reference Implementation は ExchangeAPI 内での **実装上の規範**であり、
-公式 API 仕様の正本に代わるものではない（MUST NOT）。
+**重要**
 
-新規取引所の追加および既存実装の修正は、原則として bitFlyer 実装の
-**構造・責務分離・戻り値契約**に倣わなければならない（MUST）。
+* Normalized 層は **公開安定契約ではない**
+* 外部利用者に対する互換性保証は行わない
 
-bitFlyer 実装からの逸脱は、**取引所仕様差による場合のみ**許容する。
-逸脱する場合は、理由を明示し差分を最小化しなければならない（MUST）。
-実装都合による独自解釈や拡張は認めない（MUST NOT）。
+---
 
-適用範囲（初期）：
-- Spot MarketData
-- Spot Trading
+### 3.4 Contract 層（取引所横断契約）
 
-### 7.2 取引所間共通実装の正規形（Canon）
+**責務**
 
-本節は、**取引所追加時に必ず従う実装形（構造の正規形）**を定義する。
-ここに定義された形は、取引所間で一致させなければならない（MUST）。
+* 取引所横断で通用する **公開契約**を定義する
+* Capability / 共通 DTO / 共通エラーを提供する
 
-NOTE: 本リポジトリには Canon 未達の実装が残る場合がある。Canon は常に目標形であり、未達は移行タスクとして扱う。
+**特性**
 
-規範の優先順位:
+* 本ライブラリの **公開安定面**
+* 取引所追加・仕様変更時も契約を守る責任を持つ
 
-1. Canon（本節）
-2. Reference Implementation（7.1）
+**方針**
 
-両者が矛盾する場合、**Canon を優先**し、Reference 実装は将来の移行対象として扱う（MUST）。
+* 無理な共通化は禁止
+* 共通化できるもののみ Contract に含める
+* 差異・欠損は Contract で明示的に表現する
 
-#### 7.2.X Canon: 同名 Contracts API の前提条件差を作らない
+---
 
-- **同名の Contracts API は、取引所間で呼び出し前提条件差を持たない。**
-- 認証・口座情報・ID 等の前提条件が必要な場合、差異は次のいずれかで吸収する。
-  1. **Composition が前提条件を自動解決**し、利用者に追加入力を要求しない。
-  2. 前提条件が満たせない構築形態では、当該 API を **Facade の capability（nullable）として提供しない（null）**（利用者は事前判定できる）。
-- **前提条件不足を理由に NotSupported を返すことを禁止する。**
-  - NotSupported は capability 不足にのみ用いる（利用者契約に従う）。
+## 4. API サーフェス規則
 
-#### 7.2.Y Canon: API 投入用 Market/Symbol 表現の責務位置
+### 4.1 各層は API を呼び出せる形を持つ（MUST）
 
-- Market 解決（ExchangeInfo / Resolver 等）の結果は、**その取引所の API 呼び出しに直接投入できる Market/Symbol 表現**を含まなければならない。
-- API 投入のための表記変換（例：`BTC_JPY` → `btcjpy`）は、
-  **Market 解決の段階で完了**し、Contracts / Adapter の呼び出し直前で追加加工してはならない。
+* Wire / Raw / Normalized / Contract の **全層に API I/F を持つ**
+* 各層は直下層を呼び、変換のみを行う
 
-#### 7.2.Z Canon: ExecutionItem.Market の設定元を固定する
+### 4.2 I/O は Wire のみ（MUST）
 
-- `ExecutionItem.Market` は常に **request に含まれる Market** を設定する。
-- レスポンス側の市場識別子を参照してはならない。
+* Raw / Normalized / Contract は I/O を行ってはならない
+* 外部通信は必ず Wire 層を経由する
 
-#### 7.2.1 Raw API の正規形
-- Raw の bundle（例：`I<Exchange>RawApi`）は **Sub-API のみ**を公開する（MUST）。
-- Raw bundle 直下に利便メソッド（直メソッド）を追加してはならない（MUST NOT）。
+---
 
-##### 7.2.1.1 物理配置（Raw）
+## 5. Call 抽象
 
-Raw は次の物理配置を **必須**とする（MUST）。
+### 5.1 Call の定義
+
+本ライブラリの API は、**例外ではなく Call により結果を返す**。
 
 ```
-src/Exchanges/<Ex>/Raw/
-  Public/
-    Api/
-    Models/
-  Private/
-    Api/
-    Models/
-  Internal/
+Call<TRequest, TResponse>
 ```
 
-* `RawApi/` 等の別名フォルダは使用してはならない（MUST NOT）。
+Call は以下を表現する。
 
-##### 7.2.1.2 公開 API 粒度（Raw Sub-API）
+* 成功 / 失敗
+* 対応する Request / Response
+* 構造化された失敗理由
 
-Raw の Sub-API は、取引所間の統一語彙として次を正とする（MUST）。
+### 5.2 Call-only 規則（MUST）
 
-- Public
-  - `I<Ex>RawMarketDataApi`
-  - `I<Ex>RawExchangeInfoApi`
-- Private
-  - `I<Ex>RawAccountApi`
-  - `I<Ex>RawTradingApi`
+* 各層の公開 API は **必ず Call を返す**
+* 例外は以下の場合に限定する
 
-取引所仕様上存在しない Sub-API は、空実装で埋めず、bundle の構造（継承/プロパティ）から **欠落**として表現する（MUST）。
-
-##### 7.2.1.3 エイリアス endpoint の扱い（Raw）
-
-* endpoint の I/O 経路差（Path / Query / Method）は Wire の責務である（MUST）。
-* Raw は alias 由来の同義メソッドを増殖させてはならない（MUST NOT）。
-  * 互換維持が必要な場合のみ、`[Obsolete]` 付き forwarding として残してよい（MAY）。
-  * forwarding は Wire のどの EndpointId を呼ぶかを **固定**し、フラグ分岐を持ち込まない（MUST）。
-
-##### 7.2.1.4 Internal 実装の配置（Raw）
-
-* Raw の lossless 実装のための encoding / query 整形 / JSON helper は `Raw/Internal/` に閉じ込める（MUST）。
-* `Raw/Internal/` に意味解釈（単位換算、時刻統一、売買方向の解釈、デフォルト補完等）を持ち込んではならない（MUST NOT）。
-
-#### 7.2.2 Normalized API の正規形
-- Normalized の factory は **Bundle を 1 つ返す**形に統一する（MUST）。
-- Bundle の構造（どの Sub-API を持つか）は取引所間で同型に保つ（MUST）。
-- **Bundle メンバ（Sub-API）の optional を `null` で表現してはならない**（MUST NOT）。
-  - NoOp 実装は `src/Exchanges/<Exchange>/Normalized/` 配下に配置する（MUST）。
-    - Adapter / Contracts / Composition に NoOp を置いてはならない（MUST NOT）。
-
-#### 7.2.3 認証（署名）注入点の正規形
-- 署名（認証）は **RestClient の requestSigner（単一注入点）**で行う（MUST）。
-- 署名を `IHttpTransport` の wrapper として別系統で提供してはならない（MUST NOT）。
-
-#### 7.2.4 Error 分類の正規形
-- ErrorClassifier は Adapter 内部の変換規則である。
-- ErrorClassifier は `internal` とし、外部へ公開してはならない（MUST NOT）。
-- ErrorClassifier の利用は共有インスタンス（singleton 等）に統一する（MUST）。
+  * プログラミングエラー
+  * 設定不備
+  * プロセス継続不能な内部不整合
 
 ---
 
-## 8. 物理構成（src）
+## 6. Request / Response の扱い
 
-### 8.1 正本宣言
-- `src/` 配下の物理ディレクトリ構成は **仕様の一部（正本）**である（MUST）。
-- 文書と物理構成が矛盾した場合は、原則として文書を修正する（MUST）。
+### 6.1 Response（返り値）
 
-### 8.2 Skeleton（正本）
+**Response 表現は層ごとに固定する（MUST）**
 
-```
-src/
-  Transport/
-  Primitives/
-  Application/
-  Composition/
-  Contracts/
-    Common/
-    Facade/
-  Exchanges/
-    <Exchange>/
-      Wire/
-      Raw/
-      Normalized/
-      Adapter/
-```
-
-### 8.3 配置規範
-
-- 各物理フォルダは **1 つの概念・責務のみ**を持つ（MUST）。
-- 各フォルダ直下に 1 csproj を置き、当該フォルダ配下のみを Compile する（MUST）。
-- csproj が他フォルダのソースを Compile してはならない（MUST NOT）。
-
-### 8.4 アセンブリ境界
-
-- アセンブリ境界は物理フォルダ境界と一致させる（MUST）。
-- glob による複数 Exchange / Layer の集約アセンブリを作成してはならない（MUST NOT）。
-
-### 8.5 Namespace 規則（例外禁止）
-
-すべての C# ソースコードは物理ディレクトリ構成と一致する namespace を持たなければならない。  
-例外は禁止する。
-
-例:
-- src/Transport/... → ExchangeApi.Transport...
-- src/Primitives/... → ExchangeApi.Primitives...
-- src/Application/... → ExchangeApi.Application...
-- src/Composition/... → ExchangeApi.Composition...
-- src/Contracts/Common/... → ExchangeApi.Contracts.Common...
-- src/Contracts/Facade/... → ExchangeApi.Contracts.Facade...
-- src/Exchanges/Bitflyer/Raw/... → ExchangeApi.Exchanges.Bitflyer.Raw...
+| 層          | Response 表現    |
+| ---------- | -------------- |
+| Wire       | text           |
+| Raw        | primitive JSON |
+| Normalized | 正規化型           |
+| Contract   | 契約型            |
 
 ---
 
-## 9. Transport
+### 6.2 Request（引数）
 
-Transport（HTTP/JSON/Retry 等の横断的通信基盤）は層ではなく、横断的通信基盤である。  
-Transport は `src/Transport/` に配置する。  
-Wire は Transport を参照するが内包してはならない（MUST）。
+**Request 表現は Response と一致する必要はない（MAY）**
 
-### 9.1 Transport に置くもの（例）
-- 共通の Wire 入出力枠：`IWireTransport` / `WireTransport` / `WireCallSpec` / `WireResponse`
-- HTTP クライアント、署名、リトライ、JSON 低レベル処理（意味解釈をしない）
+ただし以下を満たすこと（MUST）。
 
-## 9.2 Application
-Application は `src/Application/` に配置する。  
-取引所横断のユースケース（例：MarketResolver / OrderPolling 等）を置く。  
-Application は `Contracts.*` を参照してはならない（MUST NOT）。
-Application の入出力は `Application.*` 配下の型（Command/Query/Result 等）として定義する。
+1. 層の責務を越えない
+2. 直下層の Request へ **機械的に変換可能**
+3. 意味判断を行わない
 
-## 9.2.1 公開契約との接続（変換責務）
-`Composition` は Facade（公開 I/F）と `Application` の間の変換を担う（MUST）。
-Facade の Request/Interface を `Application` に直接流してはならない（MUST NOT）。
+#### 各層の Request の指針
 
-## 9.3 Composition
-Composition は `src/Composition/` に配置する。  
-DI/Factory/CredentialProvider/JsonExchangeInfoApi 等の「組み立て（配線）」を置く。  
-Composition は実行側の都合を集約する“終端”であり、他のカテゴリへ実装都合を逆流させてはならない（MUST NOT）。
-Composition は Facade 型 ⇄ Application 型の変換を内包し、契約都合を Application へ逆流させてはならない（MUST NOT）。
+* Wire：HTTP 表現（method / path / query / header / bodyText）
+* Raw：primitive JSON に投影可能な表現
+* Normalized：取引所内意味確定型
+* Contract：取引所横断契約語彙
 
 ---
 
-## 10. RawJson の扱い
+## 7. Request 変換規則
 
-- RawJson は Raw の結果として保持し、必要に応じて下流へ伝播してよい（MUST）。
-- RawJson の解釈（意味確定）は Normalized 以降でのみ行う（MUST）。
+* 上位層 → 下位層の Request 変換は
+  **EndpointId に基づく定義に従う**
+* if / else による意味判断は禁止
+* Wire は Raw Request を query / header / body(text) に
+  **機械的に投影するのみ**
+
+### 7.1 JSON パースと JsonConverter（Raw 実装規約）
+
+* Wire→Raw の変換における JSON パースは、実装手段として `System.Text.Json` の `JsonSerializer` / `JsonConverter` を用いてよい（MAY）。
+* `JsonConverter` が担ってよいのは **表現差の吸収**に限る（MUST）。例：型揺れ（string/number）、null/欠損、フィールド名揺れ、Raw DTO への機械的マッピング。
+* `JsonConverter` は **意味確定を行ってはならない**（MUST NOT）。例：単位換算、時刻規約の統一、列挙値の意味解釈、デフォルト補完、取引所横断の統一。
+* `JsonConverter` / JSON パースで発生した例外は、上位層へ例外として漏らさず `Call.Fail` に変換する（MUST）。
 
 ---
 
-## 11. 契約の進化（Interface Evolution）
+## 8. EndpointId
 
-- 公開契約（Contracts）の破壊的変更は原則禁止し、必要な場合は互換レイヤまたはメジャーバージョンで表現する（MUST）。
-- 境界（in/out 型、Call-only、層ジャンプ禁止）を破る変更は **例外**として扱い、Decisions に理由を記録しなければならない（MUST）。
+* EndpointId は API の **唯一の識別子**
+* 各 EndpointId に対し、各層の API が 1:1 対応する
+* EndpointId の一覧は inventory 文書に定義する
 
 ---
 
-## 12. 例外
+## 9. エラーと失敗の扱い
 
-- 本書の規範に従えない場合は Decisions / Exceptions に理由を記録しなければならない（MUST）。
-- 例外として認められるのは次の場合に限る。
-  - 公式 API 仕様による不可避な制約
-  - 後方互換性維持のための必要性
-  - セキュリティ・性能・法令上の理由
+* 通信失敗
+* パース失敗
+* 未対応機能
+* 仕様差異
+
+これらは **例外ではなく Call.Fail として返す**。
+
+---
+
+## 10. 公開範囲
+
+* 外部利用者に対する公開安定 API は **Contract 層のみ**
+* Raw / Normalized / Wire は内部または高度利用向けとする
+
+---
+
+## 11. 本仕様の位置づけ
+
+* 本文書は **唯一の規範（Normative）**である
+* 他文書は本仕様を参照する補助文書とする
+* 本仕様と矛盾する記述は無効とする

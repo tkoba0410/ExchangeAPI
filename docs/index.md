@@ -1,77 +1,95 @@
-# Docs Index
-
-このディレクトリ（`docs/`）は、本リポジトリにおける**設計判断・契約・運用ルールの正本**を集約した場所である。
-迷った場合は、必ず本ページから辿ること。
-
----
+# Documentation Index
 
 ## はじめに
 
-* 運用ルール（文書化・レビュー・例外）：[`process.md`](./process.md)
+本リポジトリの設計・仕様に関する**唯一の正本（Normative）**は、以下の文書です。
+
+* **`docs/topspec.md`**
+
+以降に配置されている文書は、すべて **TopSpec を参照する補助文書（Informative / Reference）** です。
+本リポジトリの設計判断・層責務・API 契約については、必ず TopSpec を基準にしてください。
 
 ---
 
-## Plan
+## 1. 設計仕様（Normative）
 
-* 文書整備計画：[`document-plan.md`](./document-plan.md)
+### TopSpec（正本）
 
----
-
-## 規範（Normative）
-
-* **TopSpec**（最上位規範）：[`topspec.md`](./topspec.md)
-* **Contracts Overview**：[`contracts/overview.md`](./contracts/overview.md)
-* **Contracts**（横断契約の規範）：[`contracts/contracts.md`](./contracts/contracts.md)
-* 物理構成方針（Shared 廃止後の正本）: TopSpec（`docs/topspec.md`）
-* Application / Composition の配置規範も TopSpec に含まれる
-* Application は Contracts を参照しない（詳細は TopSpec）
+* **`docs/topspec.md`**
+  本ライブラリの層構造、責務分離、API サーフェス規則、Call 抽象、公開範囲を定義する唯一の規範文書。
 
 ---
 
-## ガバナンス（Governance）
+## 2. 利用者向け契約（Contracts）
 
-* **Exchanges 配下の実装統一ルール**：[`governance/exchanges-code-unification.md`](./governance/exchanges-code-unification.md)
+以下の文書は、**外部利用者に公開される安定 API（Contract 層）**の語彙・契約を定義します。
 
-> 注：`docs/governance/` は **新しい文書カテゴリではない**。
-> `process.md` が定めるとおり、Governance は **Process（運用）の一部（配置のみ）**として扱う。
+* `docs/contracts/overview.md`
+  利用者向け契約の概要。公開安定面は Contract 層のみであることを説明。
 
----
+* `docs/contracts/contracts.md`
+  共通 DTO、Capability I/F、契約上の意味論を定義。
 
-## 一覧（Inventory / Fact）
-
-* **Endpoints Inventory**（API エンドポイント一覧・最小形）：[`inventory/endpoints.md`](./inventory/endpoints.md)
-* **Inventory: Bitflyer**：[`inventory/inventory-bitflyer.md`](./inventory/inventory-bitflyer.md)
-* **Inventory: Bittrade**：[`inventory/inventory-bittrade.md`](./inventory/inventory-bittrade.md)
+※ Raw / Normalized / Wire 層は内部実装または高度利用向けであり、公開安定 API ではありません。
 
 ---
 
-## 例外（Decisions）
+## 3. Endpoint 一覧（Inventory）
 
-* **Exceptions Ledger**（設計逸脱の台帳）：[`exceptions.md`](./exceptions.md)
+取引所公式 API 文書を正本とし、本リポジトリでは **Endpoint の一覧（inventory）** のみを管理します。
 
----
+* `docs/inventory/`（作成予定）
 
-## 運用（Process）
+  * `endpoints-bitflyer.md`
+  * `endpoints-bittrade.md`
 
-* **Process**（文書化・レビュー・例外運用）：[`process.md`](./process.md)
-
----
-
-## 参考（Reference）
-
-- [documentation-design-notes.md](./_references/documentation-design-notes.md)
-
-> これらは背景資料であり、正本ではない。
+※ inventory には規範や設計判断は記載しません。仕様判断は TopSpec を参照してください。
 
 ---
 
-## 読み進め方の指針
+## 4. EndpointId（対応・一覧）
 
-* 最上位の判断（禁止/許可）を確認したい：**TopSpec → Contracts**
-* 実装・変更時の判断に迷った場合：**TopSpec / Contracts / Review Checklist**
-* 特定の API 利用有無を確認したい：**Endpoints / Inventory**
-* 原則からの逸脱が必要な場合：**Exceptions Ledger**
+以下の文書は、EndpointId の命名および既存エンドポイントとの対応関係を示す一覧・補助資料です。
+
+* `docs/endpoint-id/endpointid-common.md`
+* `docs/endpoint-id/endpointid-bitflyer.md`
+* `docs/endpoint-id/endpointid-bittrade.md`
+* `docs/endpoint-id/endpointid-code-mapping.md`
+
+※ EndpointId に関する設計規範は TopSpec に従います。
 
 ---
 
-※ 本ページ自体は判断を定義しない。判断の正本は各リンク先文書とする。
+## 5. エラー・例外
+
+* `docs/exceptions.md`
+  Call 抽象を前提としたエラー／失敗の分類と扱い方を定義。
+
+---
+
+## 6. 運用・ガバナンス（参考）
+
+以下は設計正本ではなく、**運用・補助・参考資料**です。
+
+* `docs/governance/exchanges-code-unification.md`
+* `docs/process.md`
+* `docs/document-plan.md`
+
+これらの文書は TopSpec に反しない範囲でのみ有効です。
+
+---
+
+## 7. 参考資料
+
+* `docs/_references/`
+
+過去の設計検討や参考用文書を格納します。正本ではありません。
+
+---
+
+## 読み進め方（推奨）
+
+1. **TopSpec を読む**（必須）
+2. Contracts 文書で公開 API を確認
+3. inventory / endpoint-id で対応エンドポイントを把握
+4. 必要に応じて例外・運用文書を参照

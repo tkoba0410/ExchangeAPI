@@ -1,135 +1,96 @@
-# EndpointId のコード反映規約
+# EndpointId Code Mapping（Reference）
 
-本書は、EndpointId を **文書（inventory）とコードの双方で一貫して扱うための最終規約**を定義する。
-本規約は、取引所ごとの実装差を許容しつつ、命名揺れ・重複・手動裁定を排除することを目的とする。
-また、EndpointId を CallMeta に埋め込み、観測・診断・追跡に耐える最低限のメタ情報として扱う。
+## 1. 目的
 
----
+本書は、**EndpointId をコードへ反映する際の実装上の対応関係**を整理するための補助資料である。
 
-## 1. 正本と責務分離
-
-1. EndpointId の正本は、取引所別 inventory（`docs/inventory/endpoints-*.md`）である。
-2. inventory は次の 4 列のみを持つ。
-
-   * EndpointId
-   * Method
-   * Path
-   * Scope
-3. コードは inventory を正本として参照し、EndpointId を **定数および CallMeta** に反映する。
-4. Contracts 層では EndpointId を **Call 名として使用しない**。
+* 層構造・責務・公開範囲・Call 抽象などの設計規範は **TopSpec（docs/topspec.md）** を正本とする。
+* 本書は規範（Normative）ではなく、**実装指針（Reference）**に位置付けられる。
 
 ---
 
-## 2. EndpointId 定数の扱い
+## 2. EndpointId とコードの関係
 
-### 2.1 定義場所
+EndpointId は、取引所ごとの API Endpoint を一意に識別する識別子である。
+コード上では、EndpointId を以下の目的で利用する。
 
-1. EndpointId は **取引所配下**にのみ定義する。
-2. 共通層（Contracts / Core / Common）に EndpointId の文字列定義を置いてはならない。
-3. 取引所ごとに `*EndpointIds` クラスを設け、各 EndpointId を `public const string` として定義する。
-4. `*EndpointIds` は原則として **Wire 層に閉じる**（`src/Exchanges/<Ex>/Wire/Constants`）。
+* API メソッド名の基底
+* Call メタデータへの埋め込み
+* inventory（一覧）との対応付け
+
+EndpointId 自体は、Request / Response の構造や振る舞いを規定しない。
+
+---
+
+## 3. 各層 API と EndpointId
+
+### 3.1 共通原則
+
+* 各層（Wire / Raw / Normalized / Contract）は API 呼び出し点を持つ。
+* 各層の API メソッドは、**同一の EndpointId に対応**する。
+* 上位層は直下層を呼び、変換のみを行う（I/O は Wire のみ）。
+
+※ 層責務の正本定義は TopSpec を参照すること。
+
+---
+
+### 3.2 API メソッド名
+
+API メソッド名は、EndpointId を基底として派生させる。
 
 例：
 
-* `BitflyerEndpointIds`
-* `BittradeEndpointIds`
+* EndpointId: `GetTicker`
 
-### 2.2 命名規則
+  * Wire: `GetTickerCallAsync`
+  * Raw: `GetTickerCallAsync`
+  * Normalized: `GetTickerCallAsync`
+  * Contract: `GetTickerCallAsync`
 
-1. 定数名は inventory の EndpointId と **完全一致**させる。
-2. EndpointId はコード内で直接記述せず、必ず `*EndpointIds` を参照する。
-
----
-
-## 3. Path 定数の扱い
-
-### 3.1 定義場所
-
-1. Path は取引所ごとに `*Paths` クラスを設け、`public const string` として定義する。
-2. Path 定数は取引所実装内に閉じ、共通層へ公開しない。
-3. `*Paths` は原則として **Wire 層に閉じる**（`src/Exchanges/<Ex>/Wire/Constants`）。
-
-### 3.2 命名規則
-
-1. Path 定数の変数名は EndpointId から **機械的に導出**する。
-2. 形式は次の通りとする。
-
-```
-<EndpointId>Path
-```
-
-3. 定数の値は inventory に記載された Path を **そのまま**使用する（`{parameter}` を含む）。
+※ Method（GET/POST 等）を含めるか否か、単語境界の粒度などは
+取引所ごとの補助資料に委ねる。
 
 ---
 
-## 4. CallMeta における利用
+## 4. Call と EndpointId
 
-1. Wire / Raw / Normalized 各層の Call は `CallMeta` を保持する。
-2. `CallMeta` には少なくとも次の情報を含める。
+### 4.1 Call メタデータ
 
-   * EndpointId
-3. `CallMeta.EndpointId` は `*EndpointIds` の定数を参照して設定する。
-4. 文字列リテラルによる EndpointId の設定を禁止する。
-5. **Endpoint 呼び出しに対応しない内部処理**は `CallMeta.InternalEndpointId`（例：`"Internal"`）を用いる。
-6. 内部処理の `CallMeta` は `CallMeta.CreateInternal(...)`（または同等のヘルパ）で生成することを推奨する。
+各層の API 呼び出しは `Call<TRequest, TResponse>` を返す。
 
----
+Call には、対応する EndpointId をメタデータとして保持してよい（MAY）。
 
-## 5. 各層における Call 命名
+* 例：
 
-### 5.1 対象層
+  * `CallMeta.EndpointId = EndpointId.GetTicker`
 
-* Wire 層
-* Raw 層
-* Normalized 層
-
-### 5.2 命名規則
-
-1. 各層における endpoint 呼び出しのメソッド名は、EndpointId を基底とする。
-2. Wire 層は HTTP 呼び出しを行わず WireCallSpec を生成するだけなので、Async/CallAsync を付与しない。
-3. Raw / Normalized 層は HTTP 呼び出し（またはその結果の正規化）を行うため、`CallAsync` を付与する。
-
-```
-Wire: <EndpointId>
-Raw: <EndpointId>CallAsync
-Normalized: <EndpointId>CallAsync
-```
-
-### 5.3 エイリアス Endpoint の扱い
-
-1. エイリアス endpoint は inventory 上で **独立した EndpointId** として定義する。
-2. Wire / Raw / Normalized は **EndpointId ごとに別メソッド**を定義する。
-3. EndpointId / Path を切り替える **分岐フラグ** を Wire に持ち込まない。
+これにより、ログ・トレース・テスト時の識別が容易になる。
 
 ---
 
-## 6. Contracts 層での扱い
+## 5. inventory との関係
 
-1. Contracts 層の API 名（Capability I/F 等）には EndpointId を使用しない。
-2. Contracts 層はドメイン語彙による API 名を採用する。
-3. EndpointId は Adapter / Exchange 実装内部でのみ使用される。
-
----
-
-## 7. 禁止事項
-
-1. EndpointId を文字列リテラルとして直接記述してはならない。
-2. inventory に存在しない EndpointId をコード側に追加してはならない。
-3. `*EndpointIds` に定義されている EndpointId が inventory に存在しない状態を許容してはならない。
-4. Raw / Normalized 層で `CallMeta` を新規生成して EndpointId を落とす実装を推奨しない（原則：上流 `Meta` を伝播する）。
+* inventory（`docs/inventory/endpoints-<exchange>.md`）は、
+  EndpointId と公式 API Endpoint（Method / Path / Scope）の対応関係を列挙する一覧である。
+* inventory は規範ではなく、**対応関係の可視化**を目的とする。
+* inventory に記載のない EndpointId は、本リポジトリでは未定義として扱う。
 
 ---
 
-## 8. 整合性検証（推奨）
+## 6. 禁止事項
 
-1. 取引所別 inventory の EndpointId 列と、`*EndpointIds` の定数一覧が完全一致することをテストで検証する。
-2. `*EndpointIds` 内で EndpointId の重複が存在しないことを検証する。
-3. これらの検証は CI に組み込むことを推奨する。
-4. 追加で、`WireCallSpec.EndpointId` が常に非 null / 非空であることをテストで検証することを推奨する。
+本書は以下を規定しない。
+
+* 層構造や責務の再定義
+* 公開 API の範囲
+* Request / Response の意味論
+* Capability の提供可否
+
+これらはすべて TopSpec および Contract 文書の責務である。
 
 ---
 
-## 9. 本規約の位置付け
+## 7. 位置付けの再確認
 
-本規約は、EndpointId の命名およびコード反映に関する **最終判断基準**である。
-取引所追加・API 追加時は、本規約および inventory を同時に更新しなければならない。
+* 本書は **Reference** であり、Normative ではない。
+* 設計判断に迷いが生じた場合は、必ず TopSpec を参照すること。

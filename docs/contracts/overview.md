@@ -1,5 +1,15 @@
 # Contracts Overview
 
+## 公開安定面（重要）
+
+本リポジトリにおける外部利用者向けの **公開安定 API** は **Contract 層のみ**である。
+
+- **Contract 層**：外部公開（安定契約）。本ディレクトリ配下の文書において、語彙・DTO・意味論を定義する。
+- **Normalized / Raw / Wire 層**：内部実装（または高度利用向け）。外部互換性は保証しない。
+
+設計規範（層責務、Call 抽象、公開範囲、JsonConverter の位置付け等）の正本は  
+**TopSpec（docs/topspec.md）** とする。
+
 ## 1. Purpose
 
 本書は、本ライブラリにおける **利用者向け契約（User-facing Contract）** の正本である。

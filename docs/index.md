@@ -36,14 +36,15 @@
 
 ## 3. Endpoint 一覧（Inventory）
 
-取引所公式 API 文書を正本とし、本リポジトリでは **Endpoint の一覧（inventory）** のみを管理します。
+取引所公式 API 文書を正本とし、本リポジトリでは **Endpoint の対応関係一覧（inventory）** のみを管理します。
 
-* `docs/inventory/`（作成予定）
+* `docs/inventory/`
 
   * `endpoints-bitflyer.md`
   * `endpoints-bittrade.md`
 
-※ inventory には規範や設計判断は記載しません。仕様判断は TopSpec を参照してください。
+※ inventory には規範や設計判断は記載しません。  
+※ 層構造・公開範囲・API 契約に関する判断は **TopSpec（docs/topspec.md）** を参照してください。
 
 ---
 

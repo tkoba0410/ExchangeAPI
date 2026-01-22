@@ -1,7 +1,10 @@
 # Process（運用ルール）
 
-本書は、ExchangeAPI における **文書化・レビュー・例外運用**の手順と判断装置を定義する。
-本書は **Normative（規範）ではない**。規範は `topspec.md` / `contracts/contracts.md` を正本とする。
+本書は、開発および文書整備の進め方を示す **参考文書**である。
+設計規範・層責務・公開範囲・API 契約の正本は  
+**TopSpec（docs/topspec.md）** とする。
+
+本書に記載された手順や判断は、TopSpec に反しない範囲でのみ有効とする。
 
 本書の目的は、運用上の迷いを減らし、**文書を増やさずに揺らぎを止める**ことである。
 
@@ -25,8 +28,7 @@
 - `docs/contracts/overview.md`：Contracts 全体の規範的概要
 
 ### 2.2 Inventory（事実一覧）
-- `docs/inventory/endpoints.md`：エンドポイント一覧（棚卸し）
-- `docs/inventory/inventory-*.md`：取引所別インベントリ
+- `docs/inventory/endpoints-<exchange>.md`：取引所別インベントリ
 
 ※ Inventory に仕様本文（公式APIの写経）を書いてはならない。
 

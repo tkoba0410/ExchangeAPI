@@ -7,12 +7,12 @@
 - **Contract 層**：外部公開（安定契約）。本ディレクトリ配下の文書において、語彙・DTO・意味論を定義する。
 - **Normalized / Raw / Wire 層**：内部実装（または高度利用向け）。外部互換性は保証しない。
 
-設計規範（層責務、Call 抽象、公開範囲、JsonConverter の位置付け等）の正本は  
-**TopSpec（docs/topspec.md）** とする。
-
 ## 1. Purpose
 
-本書は、本ライブラリにおける **利用者向け契約（User-facing Contract）** の正本である。
+本書は Contract 層における **公開安定 API の契約文書**である。
+
+設計規範（層構造、Call 抽象、公開範囲等）の正本は  
+**TopSpec（docs/topspec.md）** とする。
 
 本書の目的は次の 2 点に限定される。
 

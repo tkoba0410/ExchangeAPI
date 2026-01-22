@@ -1,3 +1,14 @@
+# 注意
+
+本書は、Exchange 配下における API 分類・整理を目的とした **補助文書（Governance）** である。
+設計規範・層責務・公開範囲・Call 抽象などの正本は  
+**TopSpec（docs/topspec.md）** とする。
+
+本書の内容は、TopSpec に反しない範囲でのみ有効であり、
+本書単体で設計判断を行ってはならない。
+
+---
+
 ## Exchanges API 分類ルール（Wire / Raw / Normalized / Constants）【Normalized も分類しない】
 
 ### 0. 目的と位置付け

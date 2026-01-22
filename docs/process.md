@@ -27,8 +27,6 @@
 
 ### 2.1 Normative（規範）
 - `docs/topspec.md`：最上位規範（層・境界・禁止事項）
-- `docs/contracts/contracts.md`：取引所横断契約（型・責務）
-- `docs/contracts/overview.md`：Contracts 全体の規範的概要
 
 ### 2.2 Inventory（事実一覧）
 - `docs/inventory/endpoints-<exchange>.md`：取引所別インベントリ
@@ -79,7 +77,7 @@
 ## 5. 更新ルール（いつ、どれを更新するか）
 
 - 規範（設計判断・境界・契約）を変更した場合：
-  → `docs/topspec.md` / `docs/contracts/contracts.md`
+  → `docs/topspec.md`
 - 物理構成の方針は `docs/topspec.md` を参照する。
 - 外部 API を追加・削除・差し替えた場合：
   → `docs/inventory/endpoints-<exchange>.md`

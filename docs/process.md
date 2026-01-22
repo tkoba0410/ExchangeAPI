@@ -4,6 +4,9 @@
 設計規範・層責務・公開範囲・API 契約の正本は  
 **TopSpec（docs/topspec.md）** とする。
 
+なお、`docs/contracts/*` は外部公開向けの **契約文書（公開安定 API の説明）** であり、
+設計規範（Normative）ではない。
+
 本書に記載された手順や判断は、TopSpec に反しない範囲でのみ有効とする。
 
 本書の目的は、運用上の迷いを減らし、**文書を増やさずに揺らぎを止める**ことである。
@@ -42,7 +45,7 @@
 `docs/governance/` は **新しい文書カテゴリではない**。Process（運用）の一部として扱う。
 
 - 目的：特定スコープの「揺らぎ止め」を、短いルールで固定する（例：Exchanges 配下のみの統一）
-- 禁止：仕様本文の写経、実装手順の解説、TopSpec/Contracts の代替
+- 禁止：仕様本文の写経、実装手順の解説、TopSpec の代替
 - 必須：対象スコープを明示し、スコープ外へ波及させない
 
 ---
@@ -58,7 +61,7 @@
 
 ### 4.1 書いてよいこと
 
-- MUST / MUST NOT による規範（TopSpec / Contracts）
+- MUST / MUST NOT による規範（TopSpec）
 - 境界や責務の固定（層・依存方向・型の in/out）
 - API の存在一覧（method / path / 参照元リンク）
 - 例外（逸脱）とその理由（Decisions）
@@ -79,7 +82,7 @@
   → `docs/topspec.md` / `docs/contracts/contracts.md`
 - 物理構成の方針は `docs/topspec.md` を参照する。
 - 外部 API を追加・削除・差し替えた場合：
-  → `docs/inventory/endpoints.md` / `docs/inventory/inventory-*.md`
+  → `docs/inventory/endpoints-<exchange>.md`
 - 原則からの逸脱が必要になった場合：
   → `docs/exceptions.md`（差分と理由を記録）
 - PR を作成する場合：
@@ -106,7 +109,7 @@ Decisions に記録できるのは、次のいずれかのみ。
 ## 7. レビュー・チェックリスト（PR 最終判断装置）
 
 本チェックリストの目的は、実装の良し悪しの議論ではなく、
-**規範（TopSpec / Contracts）が守られているか**を機械的に確認することにある。
+**規範（TopSpec）が守られているか**を機械的に確認することにある。
 
 ### 7.1 使い方
 - PR 作成者は提出前に自己確認する。
@@ -136,7 +139,7 @@ Decisions に記録できるのは、次のいずれかのみ。
 - [ ] DTO の命名、Nullable、Page/Cursor/Limit の規範を破っていない
 
 #### C. Inventory（事実一覧）
-- [ ] 外部 API の追加/変更がある場合、`docs/inventory/endpoints.md` / `docs/inventory/inventory-*.md` に反映されている
+- [ ] 外部 API の追加/変更がある場合、`docs/inventory/endpoints-<exchange>.md` に反映されている
 - [ ] Official Reference（公式ドキュメントへの参照）が明示されている
 
 #### D. 例外（Decisions）

@@ -340,7 +340,7 @@ docs/
 
 ---
 
-### 10.6 `docs/inventory/endpoints.md`
+### 10.6 `docs/inventory/`
 
 **区分**: 既存（現状維持）
 
@@ -358,7 +358,7 @@ docs/
 
 ---
 
-### 10.7 `docs/inventory/inventory-bitflyer.md`
+### 10.7 `docs/inventory/endpoints-bitflyer.md`
 
 **区分**: 既存（現状維持）
 
@@ -376,7 +376,7 @@ docs/
 
 ---
 
-### 10.8 `docs/inventory/inventory-bittrade.md`
+### 10.8 `docs/inventory/endpoints-bittrade.md`
 
 **区分**: 既存（現状維持）
 

@@ -15,7 +15,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基
   `docs/topspec.md`
 
 - **Contracts**（横断契約・公開 API の形状）  
-  `docs/contracts.md`
+  `docs/contracts/contracts.md`
 
 ---
 
@@ -36,11 +36,11 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基
 ### 一覧（Inventory / Fact）
 
 - **Endpoints Inventory**  
-  `docs/endpoints.md`
+  `docs/inventory/`
 
 - **Exchange Inventories**  
-  `docs/inventory-bitflyer.md`  
-  `docs/inventory-bittrade.md`
+  `docs/inventory/endpoints-bitflyer.md`  
+  `docs/inventory/endpoints-bittrade.md`
 
 ---
 

@@ -8,7 +8,7 @@
 > 運用と裁定は以下：
 > - docs/process.md
 > - docs/exceptions.md
-> - docs/inventory/endpoints.md
+> - docs/inventory/
 > - docs/inventory-*.md
 
 # 文書設計ノート（参考）

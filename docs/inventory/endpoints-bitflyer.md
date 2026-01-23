@@ -20,53 +20,54 @@
 
 ---
 
-## Public — MarketData
+## Public
 
-| Scope  | Category   | Method | Path           | EndpointId    | Note                                  |
-| ------ | ---------- | ------ | -------------- | ------------- | ------------------------------------- |
-| public | MarketData | GET    | /v1/ticker     | GetTicker     | product_code 指定                       |
-| public | MarketData | GET    | /v1/board      | GetOrderBook  | product_code 指定                       |
-| public | MarketData | GET    | /v1/executions | GetExecutions | product_code / count / before / after |
-| public | MarketData | GET    | /v1/markets    | GetMarkets    | 取扱市場一覧                                |
-| public | MarketData | GET    | /v1/health     | GetHealth     | 稼働状態                                  |
-
----
-
-## Public — Other
-
-| Scope  | Category | Method | Path         | EndpointId | Note   |
-| ------ | -------- | ------ | ------------ | ---------- | ------ |
-| public | Other    | GET    | /v1/getchats | GetChats   | チャットログ |
-
----
-
-## Private — Trading
-
-| Scope   | Category | Method | Path                        | EndpointId           | Note |
-| ------- | -------- | ------ | --------------------------- | -------------------- | ---- |
-| private | Trading  | POST   | /v1/me/sendchildorder       | SendChildOrder       | 新規注文 |
-| private | Trading  | POST   | /v1/me/cancelchildorder     | CancelChildOrder     | 注文取消 |
-| private | Trading  | POST   | /v1/me/cancelallchildorders | CancelAllChildOrders | 一括取消 |
-| private | Trading  | GET    | /v1/me/getchildorders       | GetChildOrders       | 注文一覧 |
+| Scope  | Category   | Method | Path                       | EndpointId          | Note |
+| ------ | ---------- | ------ | -------------------------- | ------------------- | ---- |
+| public | MarketData | GET    | /v1/getmarkets             | GetMarkets          |      |
+| public | MarketData | GET    | /v1/markets                | Markets             |      |
+| public | MarketData | GET    | /v1/getboard               | GetBoard            |      |
+| public | MarketData | GET    | /v1/board                  | Board               |      |
+| public | MarketData | GET    | /v1/getticker              | GetTicker           |      |
+| public | MarketData | GET    | /v1/ticker                 | Ticker              |      |
+| public | MarketData | GET    | /v1/getexecutions          | GetExecutionsPublic |      |
+| public | MarketData | GET    | /v1/executions             | Executions          |      |
+| public | MarketData | GET    | /v1/getboardstate          | GetBoardState       |      |
+| public | MarketData | GET    | /v1/gethealth              | GetHealth           |      |
+| public | MarketData | GET    | /v1/getfundingrate         | GetFundingRate      |      |
+| public | MarketData | GET    | /v1/getcorporateleverage   | GetCorporateLeverage |      |
+| public | MarketData | GET    | /v1/getchats               | GetChats            |      |
 
 ---
 
-## Private — Account
+## Private
 
-| Scope   | Category | Method | Path                         | EndpointId            | Note  |
-| ------- | -------- | ------ | ---------------------------- | --------------------- | ----- |
-| private | Account  | GET    | /v1/me/getbalance            | GetBalance            | 資産残高  |
-| private | Account  | GET    | /v1/me/getcollateral         | GetCollateral         | 証拠金情報 |
-| private | Account  | GET    | /v1/me/getcollateralaccounts | GetCollateralAccounts | 証拠金口座 |
-
----
-
-## Private — History
-
-| Scope   | Category | Method | Path                        | EndpointId           | Note  |
-| ------- | -------- | ------ | --------------------------- | -------------------- | ----- |
-| private | History  | GET    | /v1/me/getexecutions        | GetMyExecutions      | 約定履歴  |
-| private | History  | GET    | /v1/me/gettradingcommission | GetTradingCommission | 取引手数料 |
+| Scope   | Category | Method | Path                           | EndpointId                 | Note |
+| ------- | -------- | ------ | ------------------------------ | -------------------------- | ---- |
+| private | Other    | GET    | /v1/me/getpermissions          | GetPermissions             |      |
+| private | Account  | GET    | /v1/me/getbalance              | GetBalance                 |      |
+| private | Account  | GET    | /v1/me/getcollateral           | GetCollateral              |      |
+| private | Account  | GET    | /v1/me/getcollateralaccounts   | GetCollateralAccounts      |      |
+| private | Account  | GET    | /v1/me/getaddresses            | GetAddresses               |      |
+| private | Account  | GET    | /v1/me/getcoinins              | GetCoinIns                 |      |
+| private | Account  | GET    | /v1/me/getcoinouts             | GetCoinOuts                |      |
+| private | Account  | GET    | /v1/me/getbankaccounts         | GetBankAccounts            |      |
+| private | Account  | GET    | /v1/me/getdeposits             | GetDeposits                |      |
+| private | Account  | POST   | /v1/me/withdraw                | Withdraw              |      |
+| private | Account  | GET    | /v1/me/getwithdrawals          | GetWithdrawals             |      |
+| private | Trading  | POST   | /v1/me/sendchildorder          | SendChildOrder             |      |
+| private | Trading  | POST   | /v1/me/sendparentorder         | SendParentOrder            |      |
+| private | Trading  | POST   | /v1/me/cancelchildorder        | CancelChildOrder           |      |
+| private | Trading  | POST   | /v1/me/cancelparentorder       | CancelParentOrder          |      |
+| private | Trading  | POST   | /v1/me/cancelallchildorders    | CancelAllChildOrders       |      |
+| private | Trading  | GET    | /v1/me/getchildorders          | GetChildOrders             |      |
+| private | Trading  | GET    | /v1/me/getparentorders         | GetParentOrders            |      |
+| private | Trading  | GET    | /v1/me/getparentorder          | GetParentOrder             |      |
+| private | History  | GET    | /v1/me/getexecutions           | GetExecutionsPrivate       |      |
+| private | History  | GET    | /v1/me/getbalancehistory       | GetBalanceHistory          |      |
+| private | Other    | GET    | /v1/me/getpositions            | GetPositions               |      |
+| private | History  | GET    | /v1/me/getcollateralhistory    | GetCollateralHistory       |      |
+| private | Other    | GET    | /v1/me/gettradingcommission    | GetTradingCommission       |      |
 
 ---
 

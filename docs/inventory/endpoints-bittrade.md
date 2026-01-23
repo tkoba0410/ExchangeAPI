@@ -1,8 +1,15 @@
 # Inventory — Bittrade Endpoints
 
-> 本文書は **一覧（inventory）** です。
-> 仕様判断・設計規範は **TopSpec（docs/topspec.md）** を正本とします。
-> 公式 API 文書を正本とし、ここでは対応関係のみを管理します。
+> 本文書は **一覧（inventory）** である。
+> 技術規範・命名規則・EndpointId の意味は **TopSpec（docs/topspec.md）** を正本とする。
+> 公式 API 文書を最上位の正本とし、ここでは対応関係のみを管理する。
+
+---
+
+## 並び順について
+
+本 inventory の endpoint 一覧は、**公式 API 文書における記載順**を正とする。
+可読性や実装都合を理由とした並び替えは行わない。
 
 ---
 
@@ -22,11 +29,11 @@
 
 ## Public
 
-| Scope  | Category | Method | Path                 | EndpointId      | Note |
-| ------ | -------- | ------ | -------------------- | --------------- | ---- |
-| public | Other    | GET    | /v1/common/symbols   | GetSymbols      |      |
-| public | Other    | GET    | /v1/common/currencys | GetCurrencys    |      |
-| public | Other    | GET    | /v1/common/timestamp | GetTimestamp    |      |
+| Scope  | Category   | Method | Path                  | EndpointId      | Note |
+| ------ | ---------- | ------ | --------------------- | --------------- | ---- |
+| public | Other      | GET    | /v1/common/symbols    | GetSymbols      |      |
+| public | Other      | GET    | /v1/common/currencys  | GetCurrencys    |      |
+| public | Other      | GET    | /v1/common/timestamp  | GetTimestamp    |      |
 | public | MarketData | GET    | /market/history/kline | GetHistoryKline |      |
 | public | MarketData | GET    | /market/detail/merged | GetDetailMerged |      |
 | public | MarketData | GET    | /market/tickers       | GetTickers      |      |
@@ -38,8 +45,8 @@
 
 ## Private
 
-| Scope   | Category | Method | Path                                           | EndpointId                            | Note |
-| ------- | -------- | ------ | ---------------------------------------------- | ------------------------------------- | ---- |
+| Scope   | Category | Method | Path                                         | EndpointId                            | Note |
+| ------- | -------- | ------ | -------------------------------------------- | ------------------------------------- | ---- |
 | private | Account  | GET    | /v1/account/accounts                         | GetAccounts                           |      |
 | private | Account  | GET    | /v1/account/accounts/{account-id}/balance    | GetAccountsBalanceByAccountId         |      |
 | private | Trading  | POST   | /v1/order/orders/place                       | PostOrdersPlace                       |      |
@@ -60,7 +67,29 @@
 
 ---
 
-## Notes
+## Notes（参考・非規範）
 
-* 本 inventory は **一覧のみ** を目的とし、層構造・責務・公開範囲の規範は記載しません。
-* EndpointId の意味・命名・層対応は TopSpec を参照してください。
+* 本 inventory は **一覧のみ** を目的とする。
+* EndpointId の意味・命名・層対応は TopSpec を参照する。
+
+### EndpointId 導出手順（参考）
+
+以下は、本 inventory に記載された EndpointId を導出する際に用いた手順の一例である。
+この手順自体は **設計規範ではない**（衝突時は TopSpec を優先する）。
+
+1. Path 先頭の `/` を除去する
+
+2. 先頭セグメントが version（例：`v1`）である場合は除去する
+
+3. その後の **先頭セグメントを 1 つ除去する**（取引所仕様上の prefix）
+
+4. 残りを `/` で分割し、空要素を除外する
+
+5. 各セグメントを TopSpec が定める一般単語境界に基づいて分割する
+
+   * `{...}` 形式の path parameter は、Path 上からは除去する
+   * path parameter が存在した場合は、parameter 名を PascalCase 化し、`By<ParameterName>` を EndpointId 末尾に付与する
+
+6. 分割された各単語を PascalCase 化し、連結する
+
+7. HTTP Method を PascalCase 化し、EndpointId の **先頭**に付与する（例：`GET`→`Get`、`POST`→`Post`）

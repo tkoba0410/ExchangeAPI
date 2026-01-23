@@ -187,13 +187,6 @@ Call は以下を表現する。
 2. 直下層の Request へ **機械的に変換可能**
 3. 意味判断を行わない
 
-#### 各層の Request の指針
-
-* Wire：HTTP 表現（method / path / query / header / bodyText）
-* Raw：primitive JSON に投影可能な表現
-* Normalized：取引所内意味確定型
-* Contract：取引所横断契約語彙
-
 ---
 
 ## 7. Request 変換規則
@@ -204,20 +197,68 @@ Call は以下を表現する。
 * Wire は Raw Request を query / header / body(text) に
   **機械的に投影するのみ**
 
-### 7.1 JSON パースと JsonConverter（Raw 実装規約）
-
-* Wire→Raw の変換における JSON パースは、実装手段として `System.Text.Json` の `JsonSerializer` / `JsonConverter` を用いてよい（MAY）。
-* `JsonConverter` が担ってよいのは **表現差の吸収**に限る（MUST）。例：型揺れ（string/number）、null/欠損、フィールド名揺れ、Raw DTO への機械的マッピング。
-* `JsonConverter` は **意味確定を行ってはならない**（MUST NOT）。例：単位換算、時刻規約の統一、列挙値の意味解釈、デフォルト補完、取引所横断の統一。
-* `JsonConverter` / JSON パースで発生した例外は、上位層へ例外として漏らさず `Call.Fail` に変換する（MUST）。
-
 ---
 
-## 8. EndpointId
+## 8. EndpointId 規約（統合）
 
-* EndpointId は API の **唯一の識別子**
-* 各 EndpointId に対し、各層の API が 1:1 対応する
-* EndpointId の一覧は inventory 文書に定義する
+### 8.1 定義
+
+EndpointId は、**API の意味的単位を識別するための論理識別子**である。
+
+* EndpointId は取引所内で一意でなければならない
+* EndpointId は文字列値ではなく、
+  **定数名 / enum 名 / 静的メンバ名として扱われる識別子**である
+* EndpointId は Request / Response 構造や振る舞いを表現しない
+
+### 8.2 責務と非責務
+
+**責務**
+
+* API endpoint を識別する
+* 公式 API（Method / Path / Scope）との対応付けの軸となる
+
+**非責務**
+
+* Request / Response の構造や型
+* paging / cursor / limit 等の挙動
+* Capability 提供の可否
+* 上位 API（Facade / Application 等）の存在
+
+### 8.3 命名規則
+
+* PascalCase を用いる
+* 取引所固有用語に引きずられない
+* HTTP Method や Path を含めない
+* 冗長な接頭辞（Get / Fetch 等）を避ける
+
+### 8.4 レイヤ別派生規則
+
+* EndpointId は各層で 1:1 に対応する
+* Raw / Normalized 層の API は `<EndpointId>CallAsync` を基本形とする
+* EndpointId と API メソッド名は意味的に一致しなければならない
+
+### 8.5 inventory との関係
+
+* EndpointId の一覧は inventory 文書に列挙される
+* inventory は **事実の一覧（Fact）**であり、規範ではない
+* inventory に記載のない endpoint は未定義として扱う
+
+### 8.6 取引所差異の扱い
+
+* EndpointId は取引所間で共通である
+* 取引所差異は以下に限定される
+
+  * HTTP Method
+  * Path
+  * Query / Body 構造
+
+* 差異は inventory に事実として記載する
+
+### 8.7 禁止事項
+
+* EndpointId に取引所名を含めること
+* EndpointId に HTTP Method を含めること
+* inventory のみを根拠に EndpointId を新設すること
 
 ---
 

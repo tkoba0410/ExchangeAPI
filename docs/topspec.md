@@ -201,7 +201,16 @@ Call は以下を表現する。
 
 ## 8. EndpointId 規約（統合）
 
-### 8.1 定義
+### 8.1 スコープと正本
+
+- EndpointId は **取引所スコープの識別子**であり、
+  取引所横断で同一である必要はない。
+- 各取引所における EndpointId の命名規約・一覧は、
+  当該取引所の inventory 文書にて定義される。
+- inventory に記載された EndpointId は、
+  その取引所における **正本（Source of Truth）**とする。
+
+### 8.2 定義
 
 EndpointId は、**API の意味的単位を識別するための論理識別子**である。
 
@@ -210,7 +219,7 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
   **定数名 / enum 名 / 静的メンバ名として扱われる識別子**である
 * EndpointId は Request / Response 構造や振る舞いを表現しない
 
-### 8.2 責務と非責務
+### 8.3 責務と非責務
 
 **責務**
 
@@ -224,26 +233,26 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * Capability 提供の可否
 * 上位 API（Facade / Application 等）の存在
 
-### 8.3 命名規則
+### 8.4 命名規則
 
 * PascalCase を用いる
 * 取引所固有用語に引きずられない
 * HTTP Method や Path を含めない
 * 冗長な接頭辞（Get / Fetch 等）を避ける
 
-### 8.4 レイヤ別派生規則
+### 8.5 レイヤ別派生規則
 
 * EndpointId は各層で 1:1 に対応する
 * Raw / Normalized 層の API は `<EndpointId>CallAsync` を基本形とする
 * EndpointId と API メソッド名は意味的に一致しなければならない
 
-### 8.5 inventory との関係
+### 8.6 inventory との関係
 
 * EndpointId の一覧は inventory 文書に列挙される
 * inventory は **事実の一覧（Fact）**であり、規範ではない
 * inventory に記載のない endpoint は未定義として扱う
 
-### 8.6 取引所差異の扱い
+### 8.7 取引所差異の扱い
 
 * EndpointId は取引所間で共通である
 * 取引所差異は以下に限定される
@@ -254,7 +263,7 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 
 * 差異は inventory に事実として記載する
 
-### 8.7 禁止事項
+### 8.8 禁止事項
 
 * EndpointId に取引所名を含めること
 * EndpointId に HTTP Method を含めること

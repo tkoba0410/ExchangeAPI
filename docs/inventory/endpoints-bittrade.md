@@ -4,6 +4,16 @@
 > 技術規範・命名規則・EndpointId の意味は **TopSpec（docs/topspec.md）** を正本とする。
 > 公式 API 文書を最上位の正本とし、ここでは対応関係のみを管理する。
 
+## EndpointId ルール（Bittrade）
+
+- EndpointId は **取引所スコープ**の識別子とする。
+- Endpoint の区別や衝突回避のため、
+  HTTP Method を表す語（Get / Post 等）を
+  prefix として用いることを許容する。
+- 命名は、公式 API の操作単位を優先して表現する。
+- 本文書に記載された EndpointId が、
+  Bittrade における正本である。
+
 ---
 
 ## 並び順について

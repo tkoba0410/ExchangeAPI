@@ -25,4 +25,8 @@
     <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Wire/ExchangeApi.Exchanges.Bitflyer.Wire.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\..\..\Inventory\InventoryEndpointIdParser.cs" Link="Inventory/InventoryEndpointIdParser.cs" />
+  </ItemGroup>
+
 </Project>

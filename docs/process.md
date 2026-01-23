@@ -5,7 +5,7 @@
 **TopSpec（docs/topspec.md）** とする。
 
 なお、`docs/contracts/*` は外部公開向けの **契約文書（公開安定 API の説明）** であり、
-設計規範（Normative）ではない。
+設計規範ではないが、**公開 API 契約としては Normative** である。
 
 本書に記載された手順や判断は、TopSpec に反しない範囲でのみ有効とする。
 

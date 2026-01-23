@@ -2,12 +2,13 @@
 
 ## はじめに
 
-本リポジトリの設計・仕様に関する **唯一の正本（Normative）** は、以下の文書です。
+本リポジトリの文書は、対象領域ごとに正本（Normative）を分けて定義する。
 
-* **`docs/topspec.md`**
+* **技術仕様・設計規範**：`docs/topspec.md`
+* **公開 API 契約**：`docs/contracts/contracts.md`
+* **設計判断の裁定**：`docs/governance.md`
 
-以降に配置されている文書は、すべて TopSpec を基準とした **補助文書（Informative / Reference）** です。
-設計判断・層責務・API 契約については、必ず TopSpec を基準にしてください。
+以降に配置されている文書は、上記正本を基準とした **補助文書（Informative / Reference）** です。
 
 ---
 

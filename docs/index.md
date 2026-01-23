@@ -2,13 +2,20 @@
 
 ## はじめに
 
-本リポジトリの文書は、対象領域ごとに正本（Normative）を分けて定義する。
+本リポジトリの文書は、対象領域ごとに正本（Normative）を定義する。
+
+以下は、それぞれの領域における正本である。
 
 * **技術仕様・設計規範**：`docs/topspec.md`
 * **公開 API 契約**：`docs/contracts/contracts.md`
 * **設計判断の裁定**：`docs/governance.md`
 
-以降に配置されている文書は、上記正本を基準とした **補助文書（Informative / Reference）** です。
+以降に配置されている文書は、上記正本を基準とした
+補助文書（Informative / Reference）である。
+
+技術仕様・設計規範については TopSpec を、
+公開 API 契約については Contracts を、
+設計判断の裁定については Governance を基準として参照すること。
 
 ---
 

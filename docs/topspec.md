@@ -232,6 +232,14 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
   **定数名 / enum 名 / 静的メンバ名として扱われる識別子**である。
 * EndpointId は Request / Response 構造や振る舞いを表現しない。
 
+### EndpointId の一意性と識別性
+
+* EndpointId は、本プロジェクトにおける **唯一の規範的識別子（Normative Identifier）** である。
+* EndpointId は、inventory 文書に列挙されたもののみが有効であり、それ以外の識別子は存在しない。
+* EndpointId は、別名（alias）、通称、代表名を持たない。
+* 人間向けの便宜的名称、分類語、ナビゲーション用語は、EndpointId の同義語・代替識別子として扱ってはならない。
+* EndpointId の解釈に、裁定者の判断を要してはならない。
+
 ### 8.4 責務と非責務
 
 **責務**

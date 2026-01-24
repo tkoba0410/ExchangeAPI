@@ -9,7 +9,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 
-public interface IBittradeNormalizedTradingApi
+internal interface IBittradeNormalizedTradingApi
 {
     Task<Call<PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
         BittradeOrderRequest request,

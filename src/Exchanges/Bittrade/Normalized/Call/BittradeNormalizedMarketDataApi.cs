@@ -9,16 +9,16 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 
 internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarketDataApi
 {
-    private readonly IBittradeRawMarketDataApi _raw;
+    private readonly IBittradeRawApi _raw;
 
-    internal BittradeNormalizedMarketDataApi(IBittradeRawMarketDataApi raw)
+    internal BittradeNormalizedMarketDataApi(IBittradeRawApi raw)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
@@ -39,7 +39,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetDetailMergedCallAsync(new RawPublicModels.GetTickerRequest(symbolText), ct)
+            .GetDetailMergedCallAsync(new RawPublicModels.GetMergedTickerRequest(symbolText), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -71,7 +71,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetDepthCallAsync(new RawPublicModels.GetOrderBookRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
+            .GetDepthCallAsync(new RawPublicModels.GetDepthRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -102,7 +102,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetTradeCallAsync(new RawPublicModels.GetMarketTradesRequest(symbolText), ct)
+            .GetTradeCallAsync(new RawPublicModels.GetTradesRequest(symbolText), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

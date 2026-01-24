@@ -14,7 +14,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Markets;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Primitives.CallCommon;
 
@@ -22,12 +22,12 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 
 internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingApi
 {
-    private readonly IBittradeRawTradingApi _trading;
+    private readonly IBittradeRawApi _trading;
     private readonly IBittradeMarketResolver _markets;
     private readonly string _accountId;
 
     public BittradeNormalizedTradingApi(
-        IBittradeRawTradingApi trading,
+        IBittradeRawApi trading,
         IBittradeMarketResolver markets,
         string accountId)
     {

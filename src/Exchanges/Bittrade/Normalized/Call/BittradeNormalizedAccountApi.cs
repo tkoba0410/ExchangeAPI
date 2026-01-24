@@ -6,7 +6,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Primitives.CallCommon;
 
@@ -14,10 +14,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 
 internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountApi
 {
-    private readonly IBittradeRawAccountApi _account;
+    private readonly IBittradeRawApi _account;
     private readonly string _accountId;
 
-    internal BittradeNormalizedAccountApi(IBittradeRawAccountApi raw, string accountId)
+    internal BittradeNormalizedAccountApi(IBittradeRawApi raw, string accountId)
     {
         _account = raw ?? throw new ArgumentNullException(nameof(raw));
         _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));

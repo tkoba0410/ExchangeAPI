@@ -6,7 +6,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 
-public interface IBittradeRawExchangeInfoApi
+internal interface IBittradeRawExchangeInfoApi
 {
     Task<Call<GetRawSymbolsRequest, RawSymbolsResponse>> GetSymbolsCallAsync(
         GetRawSymbolsRequest request,

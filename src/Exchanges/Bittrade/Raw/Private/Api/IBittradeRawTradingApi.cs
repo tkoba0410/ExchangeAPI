@@ -8,7 +8,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
 
-public interface IBittradeRawTradingApi
+internal interface IBittradeRawTradingApi
 {
     Task<Call<CreateOrderRequest, RawPlaceOrderResponse>> PostOrdersPlaceCallAsync(
         CreateOrderRequest request,

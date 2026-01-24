@@ -2,11 +2,8 @@ using System;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Call;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Markets;
 using ExchangeApi.Exchanges.Bittrade.Normalized.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized;
@@ -21,34 +18,18 @@ internal static class BittradeNormalizeFactory
         var wire = new WireTransport(restClient);
         var raw = new BittradeRawApi(wire);
 
-        var marketData = new BittradeNormalizedMarketDataApi(raw.MarketData);
-        var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw.ExchangeInfo);
+        var marketData = new BittradeNormalizedMarketDataApi(raw);
+        var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
         IBittradeNormalizedAccountApi account = normalizedAccountId is null
             ? new BittradePreconditionMissingNormalizedAccountApi(string.Empty)
-            : new BittradeNormalizedAccountApi(raw.Account, normalizedAccountId);
+            : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
 
         return new BittradeNormalizeBundle(
+            raw: raw,
             marketData: marketData,
             exchangeInfo: exchangeInfo,
             account: account,
             accountId: normalizedAccountId);
     }
 
-    public static IBittradeNormalizedTradingApi CreateTradingApi(
-        IRestClient restClient,
-        IBittradeMarketResolver markets,
-        string accountId)
-    {
-        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        if (markets is null) throw new ArgumentNullException(nameof(markets));
-
-        if (string.IsNullOrWhiteSpace(accountId))
-        {
-            throw new ArgumentException("accountId is required.", nameof(accountId));
-        }
-
-        var wire = new WireTransport(restClient);
-        var raw = new BittradeRawApi(wire);
-        return new BittradeNormalizedTradingApi(raw.Trading, markets, accountId);
-    }
 }

@@ -6,7 +6,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw;
 using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 using ExchangeApi.Primitives.CallCommon;
 
@@ -14,9 +14,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 
 internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
 {
-    private readonly IBittradeRawExchangeInfoApi _exchangeInfo;
+    private readonly IBittradeRawApi _exchangeInfo;
 
-    internal BittradeNormalizedExchangeInfoApi(IBittradeRawExchangeInfoApi raw)
+    internal BittradeNormalizedExchangeInfoApi(IBittradeRawApi raw)
     {
         _exchangeInfo = raw ?? throw new ArgumentNullException(nameof(raw));
     }
@@ -25,7 +25,7 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
         CancellationToken ct = default)
     {
         var rawCall = await _exchangeInfo
-            .GetSymbolsCallAsync(new RawPublicModels.GetRawSymbolsRequest(), ct)
+            .GetSymbolsCallAsync(new RawPublicModels.GetSymbolsRequest(), ct)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetSymbolsRequest();
 

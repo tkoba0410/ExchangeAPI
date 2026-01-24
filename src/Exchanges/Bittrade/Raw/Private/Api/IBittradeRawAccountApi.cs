@@ -6,7 +6,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
 
-public interface IBittradeRawAccountApi
+internal interface IBittradeRawAccountApi
 {
     Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountsBalanceByAccountIdCallAsync(
         GetAccountBalanceRequest request,

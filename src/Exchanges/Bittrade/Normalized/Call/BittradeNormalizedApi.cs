@@ -1,100 +1,115 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Markets;
+using ExchangeApi.Exchanges.Bittrade.Normalized.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Transport.Protocol;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 
 public sealed class BittradeNormalizedApi
 {
-    public BittradeNormalizedMarketDataFacade MarketData { get; }
-    public BittradeNormalizedExchangeInfoFacade ExchangeInfo { get; }
-    public BittradeNormalizedAccountFacade? Account { get; }
+    private readonly IBittradeNormalizedMarketDataApi _marketData;
+    private readonly IBittradeNormalizedExchangeInfoApi _exchangeInfo;
+    private readonly IBittradeNormalizedAccountApi _account;
+    private readonly IBittradeNormalizedTradingApi _trading;
     public string? AccountId { get; }
 
     private BittradeNormalizedApi(
-        BittradeNormalizedMarketDataFacade marketData,
-        BittradeNormalizedExchangeInfoFacade exchangeInfo,
-        BittradeNormalizedAccountFacade? account,
+        IBittradeNormalizedMarketDataApi marketData,
+        IBittradeNormalizedExchangeInfoApi exchangeInfo,
+        IBittradeNormalizedAccountApi account,
+        IBittradeNormalizedTradingApi trading,
         string? accountId)
     {
-        MarketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
-        ExchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
-        Account = account;
+        _marketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
+        _exchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
+        _account = account ?? throw new ArgumentNullException(nameof(account));
+        _trading = trading ?? throw new ArgumentNullException(nameof(trading));
         AccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
     }
 
-    public static BittradeNormalizedApi FromRestClient(IRestClient restClient, string? accountId = null)
+    public static BittradeNormalizedApi FromRestClient(
+        IRestClient restClient,
+        IBittradeMarketResolver? markets = null,
+        string? accountId = null)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+
         var bundle = BittradeNormalizeFactory.FromRestClient(restClient, accountId);
+        var normalizedAccountId = bundle.AccountId;
+        IBittradeNormalizedTradingApi trading = string.IsNullOrWhiteSpace(normalizedAccountId)
+            ? new BittradePreconditionMissingNormalizedTradingApi(string.Empty)
+            : new BittradeNormalizedTradingApi(
+                bundle.Raw,
+                markets ?? throw new ArgumentNullException(nameof(markets)),
+                normalizedAccountId);
 
         return new BittradeNormalizedApi(
-            marketData: new BittradeNormalizedMarketDataFacade(bundle.MarketData),
-            exchangeInfo: new BittradeNormalizedExchangeInfoFacade(bundle.ExchangeInfo),
-            account: bundle.Account is null ? null : new BittradeNormalizedAccountFacade(bundle.Account),
-            accountId: bundle.AccountId);
-    }
-}
-
-public sealed class BittradeNormalizedMarketDataFacade
-{
-    private readonly IBittradeNormalizedMarketDataApi _inner;
-
-    internal BittradeNormalizedMarketDataFacade(IBittradeNormalizedMarketDataApi inner)
-    {
-        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            marketData: bundle.MarketData,
+            exchangeInfo: bundle.ExchangeInfo,
+            account: bundle.Account,
+            trading: trading,
+            accountId: normalizedAccountId);
     }
 
     public Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
         string productCode,
         CancellationToken ct = default) =>
-        _inner.GetDetailMergedCallAsync(productCode, ct);
+        _marketData.GetDetailMergedCallAsync(productCode, ct);
 
     public Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
         string productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default) =>
-        _inner.GetDepthCallAsync(productCode, depthType, ct);
+        _marketData.GetDepthCallAsync(productCode, depthType, ct);
 
     public Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
         string productCode,
         CancellationToken ct = default) =>
-        _inner.GetTradeCallAsync(productCode, ct);
-}
-
-public sealed class BittradeNormalizedExchangeInfoFacade
-{
-    private readonly IBittradeNormalizedExchangeInfoApi _inner;
-
-    internal BittradeNormalizedExchangeInfoFacade(IBittradeNormalizedExchangeInfoApi inner)
-    {
-        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
-    }
+        _marketData.GetTradeCallAsync(productCode, ct);
 
     public Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
         CancellationToken ct = default) =>
-        _inner.GetSymbolsCallAsync(ct);
-}
-
-public sealed class BittradeNormalizedAccountFacade
-{
-    private readonly IBittradeNormalizedAccountApi _inner;
-
-    internal BittradeNormalizedAccountFacade(IBittradeNormalizedAccountApi inner)
-    {
-        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
-    }
+        _exchangeInfo.GetSymbolsCallAsync(ct);
 
     public Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default) =>
-        _inner.GetAccountsBalanceByAccountIdCallAsync(ct);
+        _account.GetAccountsBalanceByAccountIdCallAsync(ct);
+
+    public Task<Call<PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
+        BittradeOrderRequest request,
+        CancellationToken ct = default) =>
+        _trading.PlaceOrderCallAsync(request, ct);
+
+    public Task<Call<CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
+        Symbol symbol,
+        OrderKey orderKey,
+        CancellationToken ct = default) =>
+        _trading.CancelOrderCallAsync(symbol, orderKey, ct);
+
+    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>> GetOpenOrdersCallAsync(
+        Symbol symbol,
+        CancellationToken ct = default) =>
+        _trading.GetOpenOrdersCallAsync(symbol, ct);
+
+    public Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
+        Symbol symbol,
+        OrderKey orderKey,
+        CancellationToken ct = default) =>
+        _trading.GetOrdersByOrderIdCallAsync(symbol, orderKey, ct);
+
+    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
+        Symbol symbol,
+        int? limit = null,
+        CancellationToken ct = default) =>
+        _trading.GetMatchResultsCallAsync(symbol, limit, ct);
 }

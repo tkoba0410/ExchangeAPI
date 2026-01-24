@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Call;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
@@ -44,7 +45,7 @@ public static class BittradeClientFactory
         var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var normalizedMarkets = new BittradeNormalizedMarketResolver(markets);
-        var tradingApi = BittradeNormalizeFactory.CreateTradingApi(restClient, normalizedMarkets, accountId);
+        var tradingApi = new BittradeNormalizedTradingApi(normalizeBundle.Raw, normalizedMarkets, accountId);
         var trading = new BittradeTradingApi(tradingApi);
         IAccountApi account = new BittradeAccountApi(normalizeBundle.Account);
         return (new MarketApi(normalizeBundle.MarketData, markets), trading, account, exchangeInfo);

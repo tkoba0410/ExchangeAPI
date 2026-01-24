@@ -6,7 +6,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 
-public interface IBittradeRawMarketDataApi
+internal interface IBittradeRawMarketDataApi
 {
     Task<Call<BittradeRequests.GetTickerRequest, RawMergedResponse>> GetDetailMergedCallAsync(
         BittradeRequests.GetTickerRequest request,

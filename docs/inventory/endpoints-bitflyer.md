@@ -7,8 +7,9 @@
 ## EndpointId ルール（Bitflyer）
 
 - EndpointId は **取引所スコープ**の識別子とする。
-- HTTP Method を表す語（Get / Post 等）は原則として含めないが、
-  既存 EndpointId の識別上必要な場合は採用を許容する。
+- HTTP Method（GET / POST 等）をそのまま表す語は原則として含めない。
+- ただし、API 操作の意味を表す **慣用的な接頭辞**（Get / Send / Cancel 等）については、
+  既存 EndpointId の識別上必要な範囲で採用を許容する。
 - 単語境界は比較的細かく区切り、可読性を優先する。
 - Public / Private の差分は、必要に応じて suffix 等で表現する。
 - 本文書に記載された EndpointId が、
@@ -86,7 +87,7 @@
 本 inventory の endpoint 一覧は、**公式 API 文書における記載順**を正とする。
 可読性や実装都合を理由とした並び替えは行わない。
 
-## Notes（参考・非規範）
+## 補足
 
 * 本 inventory は **一覧のみ** を目的とする。
 * EndpointId の意味・命名・層対応は TopSpec を参照する。
@@ -102,4 +103,7 @@
 4. 分割された各単語を PascalCase 化し、連結する
 5. 上記規則で EndpointId が重複する場合は、末尾に Scope（`Public` / `Private`）を付与して解決する
 
-補足：bitFlyer は結果として **HTTP Method を EndpointId に含めていない**。
+- Bitflyer では、HTTP Method（GET / POST 等）を直接反映した
+  prefix（Get / Post など）を付与する方式は採用していない。
+- 一方で、API 操作の意味を表す慣用的な接頭辞としての
+  Get / Send / Cancel 等は EndpointId に含まれている。

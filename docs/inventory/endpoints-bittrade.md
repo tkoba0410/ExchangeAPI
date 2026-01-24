@@ -61,15 +61,15 @@
 
 | Scope  | Category   | Method | Path                  | EndpointId      | RequiredIn | Note |
 | ------ | ---------- | ------ | --------------------- | --------------- | ---------- | ---- |
-| public | Other      | GET    | /v1/common/symbols    | GetSymbols      |            |      |
-| public | Other      | GET    | /v1/common/currencys  | GetCurrencys    |            |      |
-| public | Other      | GET    | /v1/common/timestamp  | GetTimestamp    |            |      |
-| public | MarketData | GET    | /market/history/kline | GetHistoryKline |            |      |
-| public | MarketData | GET    | /market/detail/merged | GetDetailMerged |            |      |
-| public | MarketData | GET    | /market/tickers       | GetTickers      |            |      |
-| public | MarketData | GET    | /market/depth         | GetDepth        |            |      |
-| public | MarketData | GET    | /market/trade         | GetTrade        |            |      |
-| public | MarketData | GET    | /market/history/trade | GetHistoryTrade |            |      |
+| public | Other      | GET    | /v1/common/symbols    | GetSymbols      | Wire, Raw, Normalized |      |
+| public | Other      | GET    | /v1/common/currencys  | GetCurrencys    | Wire, Raw, Normalized |      |
+| public | Other      | GET    | /v1/common/timestamp  | GetTimestamp    | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/history/kline | GetHistoryKline | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/detail/merged | GetDetailMerged | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/tickers       | GetTickers      | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/depth         | GetDepth        | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/trade         | GetTrade        | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/history/trade | GetHistoryTrade | Wire, Raw, Normalized |      |
 
 ---
 
@@ -77,23 +77,23 @@
 
 | Scope   | Category | Method | Path                                         | EndpointId                            | RequiredIn | Note |
 | ------- | -------- | ------ | -------------------------------------------- | ------------------------------------- | ---------- | ---- |
-| private | Account  | GET    | /v1/account/accounts                         | GetAccounts                           |            |      |
-| private | Account  | GET    | /v1/account/accounts/{account-id}/balance    | GetAccountsBalanceByAccountId         |            |      |
-| private | Trading  | POST   | /v1/order/orders/place                       | PostOrdersPlace                       |            |      |
-| private | Trading  | GET    | /v1/order/openOrders                         | GetOpenOrders                         |            |      |
-| private | Trading  | POST   | /v1/order/orders/{order-id}/submitcancel     | PostOrdersSubmitCancelByOrderId       |            |      |
-| private | Trading  | POST   | /v1/order/orders/batchcancel                 | PostOrdersBatchCancel                 |            |      |
-| private | Trading  | POST   | /v1/order/orders/batchCancelOpenOrders       | PostOrdersBatchCancelOpenOrders       |            |      |
-| private | Trading  | GET    | /v1/order/orders/{order-id}                  | GetOrdersByOrderId                    |            |      |
-| private | Trading  | GET    | /v1/order/orders                             | GetOrders                             |            |      |
-| private | Trading  | GET    | /v1/order/orders/{order-id}/matchresults     | GetOrdersMatchResultsByOrderId        |            |      |
-| private | Trading  | GET    | /v1/order/matchresults                       | GetMatchResults                       |            |      |
-| private | Account  | POST   | /v1/dw/withdraw/api/create                   | PostWithdrawApiCreate                 |            |      |
-| private | Account  | POST   | /v1/dw/withdraw-virtual/{withdraw-id}/cancel | PostWithdrawVirtualCancelByWithdrawId |            |      |
-| private | Account  | GET    | /v1/query/deposit-withdraw                   | GetDepositWithdraw                    |            |      |
-| private | Trading  | POST   | /v1/retail/order/place                       | PostOrderPlace                        |            |      |
-| private | Trading  | GET    | /v1/retail/order/list                        | GetOrderList                          |            |      |
-| private | Account  | GET    | /v1/retail/maintain/time                     | GetMaintainTime                       |            |      |
+| private | Account  | GET    | /v1/account/accounts                         | GetAccounts                           | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/account/accounts/{account-id}/balance    | GetAccountsBalanceByAccountId         | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/order/orders/place                       | PostOrdersPlace                       | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/openOrders                         | GetOpenOrders                         | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/order/orders/{order-id}/submitcancel     | PostOrdersSubmitCancelByOrderId       | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/order/orders/batchcancel                 | PostOrdersBatchCancel                 | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/order/orders/batchCancelOpenOrders       | PostOrdersBatchCancelOpenOrders       | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/orders/{order-id}                  | GetOrdersByOrderId                    | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/orders                             | GetOrders                             | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/orders/{order-id}/matchresults     | GetOrdersMatchResultsByOrderId        | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/matchresults                       | GetMatchResults                       | Wire, Raw, Normalized |      |
+| private | Account  | POST   | /v1/dw/withdraw/api/create                   | PostWithdrawApiCreate                 | Wire, Raw, Normalized |      |
+| private | Account  | POST   | /v1/dw/withdraw-virtual/{withdraw-id}/cancel | PostWithdrawVirtualCancelByWithdrawId | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/query/deposit-withdraw                   | GetDepositWithdraw                    | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/retail/order/place                       | PostOrderPlace                        | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/retail/order/list                        | GetOrderList                          | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/retail/maintain/time                     | GetMaintainTime                       | Wire, Raw, Normalized |      |
 
 ---
 

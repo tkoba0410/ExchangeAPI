@@ -55,19 +55,19 @@
 
 | Scope  | Category   | Method | Path                     | EndpointId           | RequiredIn | Note |
 | ------ | ---------- | ------ | ------------------------ | -------------------- | ---------- | ---- |
-| public | MarketData | GET    | /v1/getmarkets           | GetMarkets           |            |      |
-| public | MarketData | GET    | /v1/markets              | Markets              |            |      |
-| public | MarketData | GET    | /v1/getboard             | GetBoard             |            |      |
-| public | MarketData | GET    | /v1/board                | Board                |            |      |
-| public | MarketData | GET    | /v1/getticker            | GetTicker            |            |      |
-| public | MarketData | GET    | /v1/ticker               | Ticker               |            |      |
-| public | MarketData | GET    | /v1/getexecutions        | GetExecutionsPublic  |            |      |
-| public | MarketData | GET    | /v1/executions           | Executions           |            |      |
-| public | MarketData | GET    | /v1/getboardstate        | GetBoardState        |            |      |
-| public | MarketData | GET    | /v1/gethealth            | GetHealth            |            |      |
-| public | MarketData | GET    | /v1/getfundingrate       | GetFundingRate       |            |      |
-| public | MarketData | GET    | /v1/getcorporateleverage | GetCorporateLeverage |            |      |
-| public | MarketData | GET    | /v1/getchats             | GetChats             |            |      |
+| public | MarketData | GET    | /v1/getmarkets           | GetMarkets           | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /v1/markets              | Markets              |                       |      |
+| public | MarketData | GET    | /v1/getboard             | GetBoard             | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /v1/board                | Board                |                       |      |
+| public | MarketData | GET    | /v1/getticker            | GetTicker            | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /v1/ticker               | Ticker               |                       |      |
+| public | MarketData | GET    | /v1/getexecutions        | GetExecutionsPublic  | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /v1/executions           | Executions           |                       |      |
+| public | MarketData | GET    | /v1/getboardstate        | GetBoardState        | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /v1/gethealth            | GetHealth            | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /v1/getfundingrate       | GetFundingRate       | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /v1/getcorporateleverage | GetCorporateLeverage | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /v1/getchats             | GetChats             | Wire, Raw, Normalized |      |
 
 ---
 
@@ -75,30 +75,30 @@
 
 | Scope   | Category | Method | Path                         | EndpointId            | RequiredIn | Note |
 | ------- | -------- | ------ | ---------------------------- | --------------------- | ---------- | ---- |
-| private | Other    | GET    | /v1/me/getpermissions        | GetPermissions        |            |      |
-| private | Account  | GET    | /v1/me/getbalance            | GetBalance            |            |      |
-| private | Account  | GET    | /v1/me/getcollateral         | GetCollateral         |            |      |
-| private | Account  | GET    | /v1/me/getcollateralaccounts | GetCollateralAccounts |            |      |
-| private | Account  | GET    | /v1/me/getaddresses          | GetAddresses          |            |      |
-| private | Account  | GET    | /v1/me/getcoinins            | GetCoinIns            |            |      |
-| private | Account  | GET    | /v1/me/getcoinouts           | GetCoinOuts           |            |      |
-| private | Account  | GET    | /v1/me/getbankaccounts       | GetBankAccounts       |            |      |
-| private | Account  | GET    | /v1/me/getdeposits           | GetDeposits           |            |      |
-| private | Account  | POST   | /v1/me/withdraw              | Withdraw              |            |      |
-| private | Account  | GET    | /v1/me/getwithdrawals        | GetWithdrawals        |            |      |
-| private | Trading  | POST   | /v1/me/sendchildorder        | SendChildOrder        |            |      |
-| private | Trading  | POST   | /v1/me/sendparentorder       | SendParentOrder       |            |      |
-| private | Trading  | POST   | /v1/me/cancelchildorder      | CancelChildOrder      |            |      |
-| private | Trading  | POST   | /v1/me/cancelparentorder     | CancelParentOrder     |            |      |
-| private | Trading  | POST   | /v1/me/cancelallchildorders  | CancelAllChildOrders  |            |      |
-| private | Trading  | GET    | /v1/me/getchildorders        | GetChildOrders        |            |      |
-| private | Trading  | GET    | /v1/me/getparentorders       | GetParentOrders       |            |      |
-| private | Trading  | GET    | /v1/me/getparentorder        | GetParentOrder        |            |      |
-| private | History  | GET    | /v1/me/getexecutions         | GetExecutionsPrivate  |            |      |
-| private | History  | GET    | /v1/me/getbalancehistory     | GetBalanceHistory     |            |      |
-| private | Other    | GET    | /v1/me/getpositions          | GetPositions          |            |      |
-| private | History  | GET    | /v1/me/getcollateralhistory  | GetCollateralHistory  |            |      |
-| private | Other    | GET    | /v1/me/gettradingcommission  | GetTradingCommission  |            |      |
+| private | Other    | GET    | /v1/me/getpermissions        | GetPermissions        | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/me/getbalance            | GetBalance            | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/me/getcollateral         | GetCollateral         | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/me/getcollateralaccounts | GetCollateralAccounts | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/me/getaddresses          | GetAddresses          | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/me/getcoinins            | GetCoinIns            | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/me/getcoinouts           | GetCoinOuts           | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/me/getbankaccounts       | GetBankAccounts       | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/me/getdeposits           | GetDeposits           | Wire, Raw, Normalized |      |
+| private | Account  | POST   | /v1/me/withdraw              | Withdraw              | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/me/getwithdrawals        | GetWithdrawals        | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/me/sendchildorder        | SendChildOrder        | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/me/sendparentorder       | SendParentOrder       | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/me/cancelchildorder      | CancelChildOrder      | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/me/cancelparentorder     | CancelParentOrder     | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/me/cancelallchildorders  | CancelAllChildOrders  | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/me/getchildorders        | GetChildOrders        | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/me/getparentorders       | GetParentOrders       | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/me/getparentorder        | GetParentOrder        | Wire, Raw, Normalized |      |
+| private | History  | GET    | /v1/me/getexecutions         | GetExecutionsPrivate  | Wire, Raw, Normalized |      |
+| private | History  | GET    | /v1/me/getbalancehistory     | GetBalanceHistory     | Wire, Raw, Normalized |      |
+| private | Other    | GET    | /v1/me/getpositions          | GetPositions          | Wire, Raw, Normalized |      |
+| private | History  | GET    | /v1/me/getcollateralhistory  | GetCollateralHistory  | Wire, Raw, Normalized |      |
+| private | Other    | GET    | /v1/me/gettradingcommission  | GetTradingCommission  | Wire, Raw, Normalized |      |
 
 ---
 

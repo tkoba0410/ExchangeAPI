@@ -201,25 +201,38 @@ Call は以下を表現する。
 
 ## 8. EndpointId 規約（統合）
 
-### 8.1 スコープと正本
+### 8.1 設計方針（共通）
 
-- EndpointId は **取引所スコープの識別子**であり、
-  取引所横断で同一である必要はない。
-- 各取引所における EndpointId の命名規約・一覧は、
+* EndpointId の設計において、取引所横断で規定するのは以下とする。
+  * 構成要素
+    * HTTP Method
+    * Path
+    * Scope（Public / Private 等）
+  * 表現方法
+    * PascalCase を用いること
+    * 一般的な単語境界を保つこと
+* EndpointId は、当該取引所内で一意に識別可能でなければならない。
+* EndpointId は、可読性および一貫性が確保されていることを求める。
+
+### 8.2 取引所固有ルール
+
+* 各取引所は、8.1 に示した構成要素および表現方法を前提として、
+  どの要素を採用するか、または省略するかを決定してよい。
+* 各取引所における EndpointId の命名規約・一覧は、
   当該取引所の inventory 文書にて定義される。
-- inventory に記載された EndpointId は、
+* inventory に記載された EndpointId は、
   その取引所における **正本（Source of Truth）**とする。
 
-### 8.2 定義
+### 8.3 定義
 
 EndpointId は、**API の意味的単位を識別するための論理識別子**である。
 
-* EndpointId は取引所内で一意でなければならない
+* EndpointId は取引所内で一意でなければならない。
 * EndpointId は文字列値ではなく、
-  **定数名 / enum 名 / 静的メンバ名として扱われる識別子**である
-* EndpointId は Request / Response 構造や振る舞いを表現しない
+  **定数名 / enum 名 / 静的メンバ名として扱われる識別子**である。
+* EndpointId は Request / Response 構造や振る舞いを表現しない。
 
-### 8.3 責務と非責務
+### 8.4 責務と非責務
 
 **責務**
 
@@ -233,26 +246,26 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * Capability 提供の可否
 * 上位 API（Facade / Application 等）の存在
 
-### 8.4 命名規則
+### 8.5 命名規則
 
 * PascalCase を用いる
 * 取引所固有用語に引きずられない
 * HTTP Method や Path を含めない
 * 冗長な接頭辞（Get / Fetch 等）を避ける
 
-### 8.5 レイヤ別派生規則
+### 8.6 レイヤ別派生規則
 
 * EndpointId は各層で 1:1 に対応する
 * Raw / Normalized 層の API は `<EndpointId>CallAsync` を基本形とする
 * EndpointId と API メソッド名は意味的に一致しなければならない
 
-### 8.6 inventory との関係
+### 8.7 inventory との関係
 
 * EndpointId の一覧は inventory 文書に列挙される
 * inventory は **事実の一覧（Fact）**であり、規範ではない
 * inventory に記載のない endpoint は未定義として扱う
 
-### 8.7 取引所差異の扱い
+### 8.8 取引所差異の扱い
 
 * EndpointId は取引所間で共通である
 * 取引所差異は以下に限定される
@@ -263,11 +276,12 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 
 * 差異は inventory に事実として記載する
 
-### 8.8 禁止事項
+### 8.9 禁止事項
 
 * EndpointId に取引所名を含めること
 * EndpointId に HTTP Method を含めること
 * inventory のみを根拠に EndpointId を新設すること
+
 
 ---
 

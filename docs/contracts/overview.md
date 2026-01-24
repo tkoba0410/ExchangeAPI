@@ -4,12 +4,14 @@
 
 本リポジトリにおける外部利用者向けの **公開安定 API** は **Contract 層のみ**である。
 
-- **Contract 層**：外部公開（安定契約）。本ディレクトリ配下の文書において、語彙・DTO・意味論を定義する。
+- **Contract 層**：外部公開（安定契約）。語彙・DTO・意味論（Shape / Semantics）は Contracts 文書群（例：`docs/contracts/contracts.md`）で定義する。
 - **Normalized / Raw / Wire 層**：内部実装（または高度利用向け）。外部互換性は保証しない。
 
 ## 1. Purpose
 
 本書は Contract 層における **公開安定 API の契約文書**である。
+
+本書（overview）は概要説明であり、拘束力（Normative）を持つ契約条文は `docs/contracts/contracts.md` を正本とする。
 
 設計規範（層構造、Call 抽象、公開範囲等）の正本は  
 **TopSpec（docs/topspec.md）** とする。
@@ -19,7 +21,7 @@
 * **取引所仕様に起因しない差異を排除すること**
 * **利用者が取引所ごとの分岐を書かずに利用できる範囲を明確化すること**
 
-型定義（Shape / Semantics）、実装方法（Canon）、背景説明は本書の対象外とする。
+実装方法（Canon）、背景説明は本書の対象外とする（Shape / Semantics の定義は contracts.md 等で行う）。
 
 ---
 

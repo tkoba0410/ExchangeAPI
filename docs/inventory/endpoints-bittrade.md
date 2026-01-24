@@ -1,8 +1,8 @@
 # Inventory — Bittrade Endpoints
 
 > 本文書は **一覧（inventory）** である。
-> 技術規範・命名規則・EndpointId の意味は **TopSpec（docs/topspec.md）** を正本とする。
-> 公式 API 文書を最上位の正本とし、ここでは対応関係のみを管理する。
+> 技術規範・共通方針は **TopSpec（docs/topspec.md）** を正本とする。
+> 公式 API 文書を最上位の正本とし、ここでは対応関係と命名規約を管理する。
 
 ## EndpointId ルール（Bittrade）
 

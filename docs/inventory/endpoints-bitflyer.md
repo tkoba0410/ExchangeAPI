@@ -1,13 +1,14 @@
 # Inventory — Bitflyer Endpoints
 
 > 本文書は **一覧（inventory）** である。
-> 技術規範・命名規則・EndpointId の意味は **TopSpec（docs/topspec.md）** を正本とする。
-> 公式 API 文書を最上位の正本とし、ここでは対応関係のみを管理する。
+> 技術規範・共通方針は **TopSpec（docs/topspec.md）** を正本とする。
+> 公式 API 文書を最上位の正本とし、ここでは対応関係と命名規約を管理する。
 
 ## EndpointId ルール（Bitflyer）
 
 - EndpointId は **取引所スコープ**の識別子とする。
-- HTTP Method を表す語（Get / Post 等）は原則として含めない。
+- HTTP Method を表す語（Get / Post 等）は原則として含めないが、
+  既存 EndpointId の識別上必要な場合は採用を許容する。
 - 単語境界は比較的細かく区切り、可読性を優先する。
 - Public / Private の差分は、必要に応じて suffix 等で表現する。
 - 本文書に記載された EndpointId が、
@@ -79,11 +80,6 @@
 | private | Other    | GET    | /v1/me/gettradingcommission  | GetTradingCommission  |      |
 
 ---
-
-## 並び順について
-
-本 inventory の endpoint 一覧は、**公式 API 文書における記載順**を正とする。
-可読性や実装都合を理由とした並び替えは行わない。
 
 ## 並び順について
 

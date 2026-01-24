@@ -4,6 +4,9 @@
 > 技術規範・共通方針は **TopSpec（docs/topspec.md）** を正本とする。
 > 公式 API 文書を最上位の正本とし、ここでは対応関係と命名規約を管理する。
 
+本文書は、TopSpec に基づき決定された EndpointId の一覧を記録するものであり、
+命名規範や派生規則そのものを定義するものではない。
+
 ## EndpointId ルール（Bittrade）
 
 - EndpointId は **取引所スコープ**の識別子とする。

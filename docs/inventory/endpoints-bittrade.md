@@ -44,57 +44,66 @@
 
 ## Columns
 
-| Scope | Category | Method | Path | EndpointId | Note |
-| ----- | -------- | ------ | ---- | ---------- | ---- |
+| Scope | Category | Method | Path | EndpointId | RequiredIn | Note |
+| ----- | -------- | ------ | ---- | ---------- | ---------- | ---- |
 
 * **Scope**: public / private
 * **Category**: MarketData / Trading / Account / History / Other
 * **Method**: HTTP method（GET/POST/...）
 * **Path**: API path（公式表記）
 * **EndpointId**: 本リポジトリでの識別子
+* **RequiredIn**: 当該 endpoint を提供する層（Wire / Raw / Normalized / Contracts）
 * **Note**: 任意（公式との差異・注意点など）
 
 ---
 
 ## Public
 
-| Scope  | Category   | Method | Path                  | EndpointId      | Note |
-| ------ | ---------- | ------ | --------------------- | --------------- | ---- |
-| public | Other      | GET    | /v1/common/symbols    | GetSymbols      |      |
-| public | Other      | GET    | /v1/common/currencys  | GetCurrencys    |      |
-| public | Other      | GET    | /v1/common/timestamp  | GetTimestamp    |      |
-| public | MarketData | GET    | /market/history/kline | GetHistoryKline |      |
-| public | MarketData | GET    | /market/detail/merged | GetDetailMerged |      |
-| public | MarketData | GET    | /market/tickers       | GetTickers      |      |
-| public | MarketData | GET    | /market/depth         | GetDepth        |      |
-| public | MarketData | GET    | /market/trade         | GetTrade        |      |
-| public | MarketData | GET    | /market/history/trade | GetHistoryTrade |      |
+| Scope  | Category   | Method | Path                  | EndpointId      | RequiredIn | Note |
+| ------ | ---------- | ------ | --------------------- | --------------- | ---------- | ---- |
+| public | Other      | GET    | /v1/common/symbols    | GetSymbols      |            |      |
+| public | Other      | GET    | /v1/common/currencys  | GetCurrencys    |            |      |
+| public | Other      | GET    | /v1/common/timestamp  | GetTimestamp    |            |      |
+| public | MarketData | GET    | /market/history/kline | GetHistoryKline |            |      |
+| public | MarketData | GET    | /market/detail/merged | GetDetailMerged |            |      |
+| public | MarketData | GET    | /market/tickers       | GetTickers      |            |      |
+| public | MarketData | GET    | /market/depth         | GetDepth        |            |      |
+| public | MarketData | GET    | /market/trade         | GetTrade        |            |      |
+| public | MarketData | GET    | /market/history/trade | GetHistoryTrade |            |      |
 
 ---
 
 ## Private
 
-| Scope   | Category | Method | Path                                         | EndpointId                            | Note |
-| ------- | -------- | ------ | -------------------------------------------- | ------------------------------------- | ---- |
-| private | Account  | GET    | /v1/account/accounts                         | GetAccounts                           |      |
-| private | Account  | GET    | /v1/account/accounts/{account-id}/balance    | GetAccountsBalanceByAccountId         |      |
-| private | Trading  | POST   | /v1/order/orders/place                       | PostOrdersPlace                       |      |
-| private | Trading  | GET    | /v1/order/openOrders                         | GetOpenOrders                         |      |
-| private | Trading  | POST   | /v1/order/orders/{order-id}/submitcancel     | PostOrdersSubmitCancelByOrderId       |      |
-| private | Trading  | POST   | /v1/order/orders/batchcancel                 | PostOrdersBatchCancel                 |      |
-| private | Trading  | POST   | /v1/order/orders/batchCancelOpenOrders       | PostOrdersBatchCancelOpenOrders       |      |
-| private | Trading  | GET    | /v1/order/orders/{order-id}                  | GetOrdersByOrderId                    |      |
-| private | Trading  | GET    | /v1/order/orders                             | GetOrders                             |      |
-| private | Trading  | GET    | /v1/order/orders/{order-id}/matchresults     | GetOrdersMatchResultsByOrderId        |      |
-| private | Trading  | GET    | /v1/order/matchresults                       | GetMatchResults                       |      |
-| private | Account  | POST   | /v1/dw/withdraw/api/create                   | PostWithdrawApiCreate                 |      |
-| private | Account  | POST   | /v1/dw/withdraw-virtual/{withdraw-id}/cancel | PostWithdrawVirtualCancelByWithdrawId |      |
-| private | Account  | GET    | /v1/query/deposit-withdraw                   | GetDepositWithdraw                    |      |
-| private | Trading  | POST   | /v1/retail/order/place                       | PostOrderPlace                        |      |
-| private | Trading  | GET    | /v1/retail/order/list                        | GetOrderList                          |      |
-| private | Account  | GET    | /v1/retail/maintain/time                     | GetMaintainTime                       |      |
+| Scope   | Category | Method | Path                                         | EndpointId                            | RequiredIn | Note |
+| ------- | -------- | ------ | -------------------------------------------- | ------------------------------------- | ---------- | ---- |
+| private | Account  | GET    | /v1/account/accounts                         | GetAccounts                           |            |      |
+| private | Account  | GET    | /v1/account/accounts/{account-id}/balance    | GetAccountsBalanceByAccountId         |            |      |
+| private | Trading  | POST   | /v1/order/orders/place                       | PostOrdersPlace                       |            |      |
+| private | Trading  | GET    | /v1/order/openOrders                         | GetOpenOrders                         |            |      |
+| private | Trading  | POST   | /v1/order/orders/{order-id}/submitcancel     | PostOrdersSubmitCancelByOrderId       |            |      |
+| private | Trading  | POST   | /v1/order/orders/batchcancel                 | PostOrdersBatchCancel                 |            |      |
+| private | Trading  | POST   | /v1/order/orders/batchCancelOpenOrders       | PostOrdersBatchCancelOpenOrders       |            |      |
+| private | Trading  | GET    | /v1/order/orders/{order-id}                  | GetOrdersByOrderId                    |            |      |
+| private | Trading  | GET    | /v1/order/orders                             | GetOrders                             |            |      |
+| private | Trading  | GET    | /v1/order/orders/{order-id}/matchresults     | GetOrdersMatchResultsByOrderId        |            |      |
+| private | Trading  | GET    | /v1/order/matchresults                       | GetMatchResults                       |            |      |
+| private | Account  | POST   | /v1/dw/withdraw/api/create                   | PostWithdrawApiCreate                 |            |      |
+| private | Account  | POST   | /v1/dw/withdraw-virtual/{withdraw-id}/cancel | PostWithdrawVirtualCancelByWithdrawId |            |      |
+| private | Account  | GET    | /v1/query/deposit-withdraw                   | GetDepositWithdraw                    |            |      |
+| private | Trading  | POST   | /v1/retail/order/place                       | PostOrderPlace                        |            |      |
+| private | Trading  | GET    | /v1/retail/order/list                        | GetOrderList                          |            |      |
+| private | Account  | GET    | /v1/retail/maintain/time                     | GetMaintainTime                       |            |      |
 
 ---
+
+## Aliases（任意）
+
+本 inventory の `EndpointId` 列に alias を記載してはならない。
+alias を記録する場合は、本セクションに `EndpointId` との対応として記載する。
+
+| EndpointId | Alias | Notes |
+|---|---|---|
 
 ## Notes（参考・非規範）
 

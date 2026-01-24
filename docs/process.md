@@ -139,6 +139,10 @@ Decisions に記録できるのは、次のいずれかのみ。
 #### C. Inventory（事実一覧）
 - [ ] 外部 API の追加/変更がある場合、`docs/inventory/endpoints-<exchange>.md` に反映されている
 - [ ] Official Reference（公式ドキュメントへの参照）が明示されている
+- [ ] inventory に `RequiredIn` 列が存在し、語彙が規定通りである
+- [ ] `RequiredIn` に `Raw` を含む endpoint について、Raw 層に `<EndpointId>CallAsync` が存在する
+- [ ] `RequiredIn` に `Normalized` を含む endpoint について、Normalized 層に `<EndpointId>CallAsync` が存在する
+- [ ] inventory の `EndpointId` 列に alias が混入していない（alias は `Aliases` 表にのみ記載されている）
 
 #### D. 例外（Decisions）
 - [ ] 原則からの逸脱がある場合、`docs/exceptions.md` に記録がある（未登録の例外は禁止）

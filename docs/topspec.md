@@ -248,10 +248,10 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 
 ### 8.5 命名規則
 
-* PascalCase を用いる
-* 取引所固有用語に引きずられない
-* HTTP Method や Path を含めない
-* 冗長な接頭辞（Get / Fetch 等）を避ける
+* EndpointId は元の HTTP Method / Path / Scope（Public / Private 等）に由来する要素から構成する。
+* 冗長な情報を含めず、意味が直感的に理解できる表現とする。
+* HTTP Method を表す語（Get / Post 等）や Path 由来の語彙の採用・省略は、
+  当該取引所の inventory に定義された命名規約に従う。
 
 ### 8.6 レイヤ別派生規則
 
@@ -262,24 +262,22 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 ### 8.7 inventory との関係
 
 * EndpointId の一覧は inventory 文書に列挙される
-* inventory は **事実の一覧（Fact）**であり、規範ではない
+* inventory は **取引所横断の規範ではない事実の一覧（Fact）**である
+* 取引所固有の EndpointId の命名規約および一覧は、当該取引所の inventory 文書にて定義される
+* inventory に記載された EndpointId は、その取引所における正本（Source of Truth）とする
 * inventory に記載のない endpoint は未定義として扱う
 
 ### 8.8 取引所差異の扱い
 
-* EndpointId は取引所間で共通である
-* 取引所差異は以下に限定される
-
-  * HTTP Method
-  * Path
-  * Query / Body 構造
-
+* EndpointId は取引所スコープの識別子であり、取引所横断で同一である必要はない。
+* 取引所固有の差異は、8.1 の構成要素と表現方法を前提とした取捨選択として扱う。
 * 差異は inventory に事実として記載する
 
 ### 8.9 禁止事項
 
 * EndpointId に取引所名を含めること
-* EndpointId に HTTP Method を含めること
+* 当該取引所の inventory に明示的な規定がない場合、
+  EndpointId に HTTP Method を含めること
 * inventory のみを根拠に EndpointId を新設すること
 
 

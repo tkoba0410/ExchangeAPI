@@ -65,13 +65,13 @@ Note 欄には、採用可否・実装判断・設計判断を記載してはな
 | Scope  | Category   | Method | Path                     | EndpointId           | RequiredIn | Note |
 | ------ | ---------- | ------ | ------------------------ | -------------------- | ---------- | ---- |
 | public | MarketData | GET    | /v1/getmarkets           | GetMarkets           | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/markets              | Markets              |                       |      |
+| public | MarketData | GET    | /v1/markets              | Markets              | None                  | duplicate candidate |
 | public | MarketData | GET    | /v1/getboard             | GetBoard             | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/board                | Board                |                       |      |
+| public | MarketData | GET    | /v1/board                | Board                | None                  | duplicate candidate |
 | public | MarketData | GET    | /v1/getticker            | GetTicker            | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/ticker               | Ticker               |                       |      |
+| public | MarketData | GET    | /v1/ticker               | Ticker               | None                  | duplicate candidate |
 | public | MarketData | GET    | /v1/getexecutions        | GetExecutionsPublic  | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/executions           | Executions           |                       |      |
+| public | MarketData | GET    | /v1/executions           | Executions           | None                  | duplicate candidate |
 | public | MarketData | GET    | /v1/getboardstate        | GetBoardState        | Wire, Raw, Normalized |      |
 | public | MarketData | GET    | /v1/gethealth            | GetHealth            | Wire, Raw, Normalized |      |
 | public | MarketData | GET    | /v1/getfundingrate       | GetFundingRate       | Wire, Raw, Normalized |      |

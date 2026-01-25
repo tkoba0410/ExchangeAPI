@@ -55,6 +55,15 @@
 * **RequiredIn**: 当該 endpoint を提供する層（Wire / Raw / Normalized / Contracts）
 * **Note**: 任意（公式との差異・注意点など）
 
+Note 欄には、以下のような **事実関係（状況）** を記載してよい。
+
+* 重複候補（duplicate candidate）
+* 旧版・非推奨の可能性（obsolete candidate）
+* 非機能の可能性（non-functional candidate）
+* version 並立の事実
+
+Note 欄には、採用可否・実装判断・設計判断を記載してはならない。
+
 ---
 
 ## Public

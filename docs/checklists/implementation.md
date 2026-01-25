@@ -30,6 +30,7 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] 単語境界の粒度が取引所ルールと一致していることを確認した
 * [ ] 別名・略称・代替表記（alias）を EndpointId に混入させていないことを確認した
   * [ ] alias を扱う必要がある場合は、inventory の `Aliases` セクション（または所定の記録箇所）に対応関係として記録し、EndpointId と混同しないことを確認した
+  * [ ] コード側で alias を扱う場合、その根拠が inventory の `Aliases` の記載と一致していることを確認した
 
 ---
 
@@ -38,6 +39,7 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] inventory に記載された RequiredIn を確認した
 * [ ] 実装した層（Wire / Raw / Normalized）が RequiredIn と一致していることを確認した
 * [ ] RequiredIn に記載のない層を実装していないことを確認した
+* [ ] RequiredIn が空欄（未記載）の場合、その扱い（未提供/記入漏れ/例外など）を TopSpec に立ち戻って裁定し、必要なら exceptions.md へ記録した
 * [ ] RequiredIn の解釈に迷いが生じた場合、TopSpec に立ち戻って裁定した
 
 ---

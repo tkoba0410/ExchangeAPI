@@ -33,6 +33,10 @@
 - 本文書に記載された EndpointId が、
   Bittrade における正本である。
 
+## Canonical Source（Entrypoint）
+
+- https://api.bittrade.co.jp/docs
+
 ---
 
 ## 並び順について
@@ -44,13 +48,14 @@
 
 ## Columns
 
-| Scope | Category | Method | Path | EndpointId | PresentIn | Note |
-| ----- | -------- | ------ | ---- | ---------- | ---------- | ---- |
+| Scope | Category | Method | Path | CanonicalSourceUrl | EndpointId | PresentIn | Note |
+| ----- | -------- | ------ | ---- | ------------------ | ---------- | ---------- | ---- |
 
 * **Scope**: public / private
 * **Category**: MarketData / Trading / Account / History / Other
 * **Method**: HTTP method（GET/POST/...）
 * **Path**: API path（公式表記）
+* **CanonicalSourceUrl**: 公式 API 文書における当該 endpoint の正本 URL（アンカー `#...` を含める）
 * **EndpointId**: 本リポジトリでの識別子
 * **PresentIn**: 当該 endpoint が存在する層（Wire / Raw / Normalized / Contracts）。空集合は `None`。
 * **Note**: 任意（公式との差異・注意点など）
@@ -68,41 +73,41 @@ Note 欄には、採用可否・実装判断・設計判断を記載してはな
 
 ## Public
 
-| Scope  | Category   | Method | Path                  | EndpointId      | PresentIn | Note |
-| ------ | ---------- | ------ | --------------------- | --------------- | ---------- | ---- |
-| public | Other      | GET    | /v1/common/symbols    | GetSymbols      | Wire, Raw, Normalized |      |
-| public | Other      | GET    | /v1/common/currencys  | GetCurrencys    | Wire, Raw, Normalized |      |
-| public | Other      | GET    | /v1/common/timestamp  | GetTimestamp    | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /market/history/kline | GetHistoryKline | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /market/detail/merged | GetDetailMerged | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /market/tickers       | GetTickers      | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /market/depth         | GetDepth        | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /market/trade         | GetTrade        | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /market/history/trade | GetHistoryTrade | Wire, Raw, Normalized |      |
+| Scope  | Category   | Method | Path                  | CanonicalSourceUrl              | EndpointId      | PresentIn             | Note |
+| ------ | ---------- | ------ | --------------------- | ------------------------------- | --------------- | --------------------- | ---- |
+| public | Other      | GET    | /v1/common/symbols    | https://api.bittrade.co.jp/docs | GetSymbols      | Wire, Raw, Normalized |      |
+| public | Other      | GET    | /v1/common/currencys  | https://api.bittrade.co.jp/docs | GetCurrencys    | Wire, Raw, Normalized |      |
+| public | Other      | GET    | /v1/common/timestamp  | https://api.bittrade.co.jp/docs | GetTimestamp    | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/history/kline | https://api.bittrade.co.jp/docs | GetHistoryKline | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/detail/merged | https://api.bittrade.co.jp/docs | GetDetailMerged | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/tickers       | https://api.bittrade.co.jp/docs | GetTickers      | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/depth         | https://api.bittrade.co.jp/docs | GetDepth        | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/trade         | https://api.bittrade.co.jp/docs | GetTrade        | Wire, Raw, Normalized |      |
+| public | MarketData | GET    | /market/history/trade | https://api.bittrade.co.jp/docs | GetHistoryTrade | Wire, Raw, Normalized |      |
 
 ---
 
 ## Private
 
-| Scope   | Category | Method | Path                                         | EndpointId                            | PresentIn | Note |
-| ------- | -------- | ------ | -------------------------------------------- | ------------------------------------- | ---------- | ---- |
-| private | Account  | GET    | /v1/account/accounts                         | GetAccounts                           | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/account/accounts/{account-id}/balance    | GetAccountsBalanceByAccountId         | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/order/orders/place                       | PostOrdersPlace                       | Wire, Raw, Normalized |      |
-| private | Trading  | GET    | /v1/order/openOrders                         | GetOpenOrders                         | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/order/orders/{order-id}/submitcancel     | PostOrdersSubmitCancelByOrderId       | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/order/orders/batchcancel                 | PostOrdersBatchCancel                 | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/order/orders/batchCancelOpenOrders       | PostOrdersBatchCancelOpenOrders       | Wire, Raw, Normalized |      |
-| private | Trading  | GET    | /v1/order/orders/{order-id}                  | GetOrdersByOrderId                    | Wire, Raw, Normalized |      |
-| private | Trading  | GET    | /v1/order/orders                             | GetOrders                             | Wire, Raw, Normalized |      |
-| private | Trading  | GET    | /v1/order/orders/{order-id}/matchresults     | GetOrdersMatchResultsByOrderId        | Wire, Raw, Normalized |      |
-| private | Trading  | GET    | /v1/order/matchresults                       | GetMatchResults                       | Wire, Raw, Normalized |      |
-| private | Account  | POST   | /v1/dw/withdraw/api/create                   | PostWithdrawApiCreate                 | Wire, Raw, Normalized |      |
-| private | Account  | POST   | /v1/dw/withdraw-virtual/{withdraw-id}/cancel | PostWithdrawVirtualCancelByWithdrawId | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/query/deposit-withdraw                   | GetDepositWithdraw                    | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/retail/order/place                       | PostOrderPlace                        | Wire, Raw, Normalized |      |
-| private | Trading  | GET    | /v1/retail/order/list                        | GetOrderList                          | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/retail/maintain/time                     | GetMaintainTime                       | Wire, Raw, Normalized |      |
+| Scope   | Category | Method | Path                                         | CanonicalSourceUrl              | EndpointId                            | PresentIn             | Note |
+| ------- | -------- | ------ | -------------------------------------------- | ------------------------------- | ------------------------------------- | --------------------- | ---- |
+| private | Account  | GET    | /v1/account/accounts                         | https://api.bittrade.co.jp/docs | GetAccounts                           | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/account/accounts/{account-id}/balance    | https://api.bittrade.co.jp/docs | GetAccountsBalanceByAccountId         | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/order/orders/place                       | https://api.bittrade.co.jp/docs | PostOrdersPlace                       | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/openOrders                         | https://api.bittrade.co.jp/docs | GetOpenOrders                         | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/order/orders/{order-id}/submitcancel     | https://api.bittrade.co.jp/docs | PostOrdersSubmitCancelByOrderId       | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/order/orders/batchcancel                 | https://api.bittrade.co.jp/docs | PostOrdersBatchCancel                 | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/order/orders/batchCancelOpenOrders       | https://api.bittrade.co.jp/docs | PostOrdersBatchCancelOpenOrders       | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/orders/{order-id}                  | https://api.bittrade.co.jp/docs | GetOrdersByOrderId                    | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/orders                             | https://api.bittrade.co.jp/docs | GetOrders                             | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/orders/{order-id}/matchresults     | https://api.bittrade.co.jp/docs | GetOrdersMatchResultsByOrderId        | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/order/matchresults                       | https://api.bittrade.co.jp/docs | GetMatchResults                       | Wire, Raw, Normalized |      |
+| private | Account  | POST   | /v1/dw/withdraw/api/create                   | https://api.bittrade.co.jp/docs | PostWithdrawApiCreate                 | Wire, Raw, Normalized |      |
+| private | Account  | POST   | /v1/dw/withdraw-virtual/{withdraw-id}/cancel | https://api.bittrade.co.jp/docs | PostWithdrawVirtualCancelByWithdrawId | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/query/deposit-withdraw                   | https://api.bittrade.co.jp/docs | GetDepositWithdraw                    | Wire, Raw, Normalized |      |
+| private | Trading  | POST   | /v1/retail/order/place                       | https://api.bittrade.co.jp/docs | PostOrderPlace                        | Wire, Raw, Normalized |      |
+| private | Trading  | GET    | /v1/retail/order/list                        | https://api.bittrade.co.jp/docs | GetOrderList                          | Wire, Raw, Normalized |      |
+| private | Account  | GET    | /v1/retail/maintain/time                     | https://api.bittrade.co.jp/docs | GetMaintainTime                       | Wire, Raw, Normalized |      |
 
 ---
 

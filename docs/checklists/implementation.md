@@ -25,10 +25,11 @@ TopSpec / inventory / governance により定義された規範が、
 
 * [ ] 実装対象のエンドポイントが inventory に列挙されていることを確認した
 * [ ] inventory に存在しない EndpointId を新規実装していない
-* [ ] EndpointId が Method 語（Get / Post / Send / Cancel 等）を含まないことを確認した
+* [ ] EndpointId の構成（HTTP Method を表す語を採用する/省略する等）が、当該取引所 inventory の EndpointId ルールと一致していることを確認した
 * [ ] EndpointId が識別子用途に限定され、意味・分類・ナビゲーションを背負っていないことを確認した
 * [ ] 単語境界の粒度が取引所ルールと一致していることを確認した
-* [ ] 別名・略称・代替表記（alias）を導入していないことを確認した
+* [ ] 別名・略称・代替表記（alias）を EndpointId に混入させていないことを確認した
+  * [ ] alias を扱う必要がある場合は、inventory の `Aliases` セクション（または所定の記録箇所）に対応関係として記録し、EndpointId と混同しないことを確認した
 
 ---
 
@@ -45,7 +46,8 @@ TopSpec / inventory / governance により定義された規範が、
 
 * [ ] Wire 層のメソッド名が `<EndpointId>` になっていることを確認した（該当する場合）
 * [ ] Raw / Normalized 層のメソッド名が `<EndpointId>CallAsync` になっていることを確認した
-* [ ] 独自の命名規則や補助語（Get / Send 等）を持ち込んでいないことを確認した
+* [ ] `<EndpointId>` / `<EndpointId>CallAsync` の派生規則に反する独自命名を導入していないことを確認した
+  * [ ] EndpointId 自体に Method 語を含める取引所ルールの場合、その Method 語は「独自補助語」ではなく EndpointId の一部として扱われていることを確認した
 * [ ] 例外命名が必要な場合、exceptions.md に記録したことを確認した
 
 ---
@@ -53,7 +55,7 @@ TopSpec / inventory / governance により定義された規範が、
 ## 4. DTO・型の層境界確認
 
 * [ ] Wire 層では文字列 / Json ミラーを使用していることを確認した
-* [ ] Raw / Normalized / 共通層へ文字列が流入していないことを確認した
+* [ ] Raw / Normalized / 共通層へ文字列が流入していないことを確認した（例外がある場合は例外として記録した）
 * [ ] Price / Size 等が専用型で表現されていることを確認した
 * [ ] parsing が Try 系を本流とし、OrThrow 系が補助として併設されていることを確認した
 
@@ -85,8 +87,9 @@ TopSpec / inventory / governance により定義された規範が、
 
 ## 8. 公式ドキュメント参照の確認
 
-* [ ] inventory 各行に、公式ドキュメント側で追跡可能な参照（API名・章名等）があることを確認した
-* [ ] 外部仕様変更時に、影響範囲を inventory から辿れることを確認した
+* [ ] inventory が「公式ドキュメント側で追跡可能な参照（API名・章名等）」を保持する設計になっていることを確認した
+  * [ ] 参照を保持する列/欄（例：OfficialRef / Note 等）が存在し、運用されている
+* [ ] 外部仕様変更時に、影響範囲を inventory から辿れることを確認した（参照が不足する場合は inventory の改善として扱う）
 
 ---
 

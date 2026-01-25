@@ -68,7 +68,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
                 SupportsCandlestick: false,
                 SupportsOrderBookDelta: false,
                 SupportsRealtimeExecutions: false,
-                SupportsWithdraw: false);
+                SupportsWithdraw: true);
 
             var maintenance = new ExchangeMaintenance(
                 Status: ExchangeMaintenanceStatus.Planned,

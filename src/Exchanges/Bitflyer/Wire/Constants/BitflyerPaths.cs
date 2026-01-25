@@ -4,13 +4,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 internal static class BitflyerPaths
 {
     public const string GetMarketsPath = "/v1/getmarkets";
-    public const string MarketsPath = "/v1/markets";
     public const string GetBoardPath = "/v1/getboard";
-    public const string BoardPath = "/v1/board";
     public const string GetTickerPath = "/v1/getticker";
-    public const string TickerPath = "/v1/ticker";
     public const string GetExecutionsPublicPath = "/v1/getexecutions";
-    public const string ExecutionsPath = "/v1/executions";
     public const string GetBoardStatePath = "/v1/getboardstate";
     public const string GetHealthPath = "/v1/gethealth";
     public const string GetFundingRatePath = "/v1/getfundingrate";

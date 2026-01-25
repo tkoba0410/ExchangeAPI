@@ -13,22 +13,10 @@ internal static class BitflyerEndpoints
             BitflyerPaths.GetTickerPath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
-    public static WireCallSpec Ticker(string productCode) =>
-        Get(
-            BitflyerEndpointIds.Ticker,
-            BitflyerPaths.TickerPath,
-            BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
-
     public static WireCallSpec GetBoard(string productCode) =>
         Get(
             BitflyerEndpointIds.GetBoard,
             BitflyerPaths.GetBoardPath,
-            BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
-
-    public static WireCallSpec Board(string productCode) =>
-        Get(
-            BitflyerEndpointIds.Board,
-            BitflyerPaths.BoardPath,
             BuildQuery((BitflyerQueryKeys.ProductCode, productCode)));
 
     public static WireCallSpec GetExecutionsPublic(
@@ -44,19 +32,6 @@ internal static class BitflyerEndpoints
             (BitflyerQueryKeys.After, after)));
     }
 
-    public static WireCallSpec Executions(
-        string productCode,
-        string? count = null,
-        string? before = null,
-        string? after = null)
-    {
-        return Get(BitflyerEndpointIds.Executions, BitflyerPaths.ExecutionsPath, BuildQuery(
-            (BitflyerQueryKeys.ProductCode, productCode),
-            (BitflyerQueryKeys.Count, count),
-            (BitflyerQueryKeys.Before, before),
-            (BitflyerQueryKeys.After, after)));
-    }
-
     public static WireCallSpec GetMarkets(string? region = null)
     {
         var path = BitflyerPaths.GetMarketsPath;
@@ -66,17 +41,6 @@ internal static class BitflyerEndpoints
         }
 
         return Get(BitflyerEndpointIds.GetMarkets, path, query: null);
-    }
-
-    public static WireCallSpec Markets(string? region = null)
-    {
-        var path = BitflyerPaths.MarketsPath;
-        if (!string.IsNullOrWhiteSpace(region))
-        {
-            path = $"{path}/{region}";
-        }
-
-        return Get(BitflyerEndpointIds.Markets, path, query: null);
     }
 
     public static WireCallSpec GetChats(string? fromDate = null, string? region = null)

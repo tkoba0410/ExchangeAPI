@@ -7,13 +7,9 @@ internal static class BitflyerEndpointTraits
         return endpointId switch
         {
             BitflyerEndpointIds.GetMarkets => false,
-            BitflyerEndpointIds.Markets => false,
             BitflyerEndpointIds.GetBoard => false,
-            BitflyerEndpointIds.Board => false,
             BitflyerEndpointIds.GetTicker => false,
-            BitflyerEndpointIds.Ticker => false,
             BitflyerEndpointIds.GetExecutionsPublic => false,
-            BitflyerEndpointIds.Executions => false,
             BitflyerEndpointIds.GetBoardState => false,
             BitflyerEndpointIds.GetHealth => false,
             BitflyerEndpointIds.GetFundingRate => false,

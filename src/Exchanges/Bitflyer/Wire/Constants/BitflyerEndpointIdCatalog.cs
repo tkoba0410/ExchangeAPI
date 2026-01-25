@@ -24,6 +24,7 @@ public static class BitflyerEndpointIdCatalog
         BitflyerEndpointIds.GetCoinOuts,
         BitflyerEndpointIds.GetBankAccounts,
         BitflyerEndpointIds.GetDeposits,
+        BitflyerEndpointIds.Withdraw,
         BitflyerEndpointIds.GetWithdrawals,
         BitflyerEndpointIds.SendChildOrder,
         BitflyerEndpointIds.SendParentOrder,
@@ -40,16 +41,15 @@ public static class BitflyerEndpointIdCatalog
         BitflyerEndpointIds.GetTradingCommission,
     };
 
-    private static readonly string[] Aliases =
+    private static readonly string[] NotImplemented =
     {
-        BitflyerEndpointIds.Markets,
-        BitflyerEndpointIds.Board,
-        BitflyerEndpointIds.Ticker,
-        BitflyerEndpointIds.Executions,
-        BitflyerEndpointIds.Withdraw,
+        "Markets",
+        "Board",
+        "Ticker",
+        "Executions",
     };
 
     public static IReadOnlyCollection<string> GetAllEndpointIds() => Endpoints;
 
-    public static IReadOnlyCollection<string> GetAliasEndpointIds() => Aliases;
+    public static IReadOnlyCollection<string> GetNotImplementedEndpointIds() => NotImplemented;
 }

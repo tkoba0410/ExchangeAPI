@@ -4,13 +4,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 internal static class BitflyerEndpointIds
 {
     public const string GetMarkets = "GetMarkets";
-    public const string Markets = "Markets";
     public const string GetBoard = "GetBoard";
-    public const string Board = "Board";
     public const string GetTicker = "GetTicker";
-    public const string Ticker = "Ticker";
     public const string GetExecutionsPublic = "GetExecutionsPublic";
-    public const string Executions = "Executions";
     public const string GetBoardState = "GetBoardState";
     public const string GetHealth = "GetHealth";
     public const string GetFundingRate = "GetFundingRate";

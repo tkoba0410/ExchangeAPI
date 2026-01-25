@@ -267,7 +267,7 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * Raw / Normalized 層の API は `<EndpointId>CallAsync` を基本形とする
 * EndpointId と API メソッド名は意味的に一致しなければならない
 * 上記の 1:1 対応は、inventory において当該層が実装対象として指定されている場合に限る。
-  実装対象の指定は inventory の `RequiredIn` 列により行う。
+  実装対象の指定は inventory の `PresentIn` 列により行う。
 
 ### 8.7 inventory との関係
 
@@ -277,10 +277,11 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * inventory に記載された EndpointId は、その取引所における正本（Source of Truth）とする
 * inventory に記載のない endpoint は未定義として扱う
 
-* inventory の endpoint 一覧には `RequiredIn` 列を設ける。
-* `RequiredIn` は、当該 endpoint をどの層で提供するかを表す集合であり、語彙は `{Wire, Raw, Normalized, Contracts}` とする。
-* `RequiredIn` に含まれない層に当該 endpoint の API が存在しないことは、実装漏れではなく仕様である。
-* `RequiredIn` を省略した場合のデフォルトは `Wire` とする。
+* inventory の endpoint 一覧には `PresentIn` 列を設ける。
+* `PresentIn` は、当該 endpoint が存在する層を表す集合であり、語彙は `{Wire, Raw, Normalized, Contracts}` とする。
+* `PresentIn` は必須であり、省略してはならない（Wire のみ提供する場合も `Wire` を明示する）。
+* `PresentIn` が空集合（どの層にも存在しない）であることを表す必要がある場合、`None` を用いる。
+* `PresentIn` に含まれない層に当該 endpoint の API が存在しないことは、実装漏れではなく仕様である。
 
 * inventory の `EndpointId` 列には正規 EndpointId のみを記載し、別名（alias）を記載してはならない。
   alias を記録する場合は、inventory 末尾の任意の `Aliases` 表に `EndpointId` との対応として記載する。

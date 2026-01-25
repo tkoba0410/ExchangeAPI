@@ -44,7 +44,7 @@
 
 ## Columns
 
-| Scope | Category | Method | Path | EndpointId | RequiredIn | Note |
+| Scope | Category | Method | Path | EndpointId | PresentIn | Note |
 | ----- | -------- | ------ | ---- | ---------- | ---------- | ---- |
 
 * **Scope**: public / private
@@ -52,7 +52,7 @@
 * **Method**: HTTP method（GET/POST/...）
 * **Path**: API path（公式表記）
 * **EndpointId**: 本リポジトリでの識別子
-* **RequiredIn**: 当該 endpoint を提供する層（Wire / Raw / Normalized / Contracts）
+* **PresentIn**: 当該 endpoint が存在する層（Wire / Raw / Normalized / Contracts）。空集合は `None`。
 * **Note**: 任意（公式との差異・注意点など）
 
 Note 欄には、以下のような **事実関係（状況）** を記載してよい。
@@ -68,7 +68,7 @@ Note 欄には、採用可否・実装判断・設計判断を記載してはな
 
 ## Public
 
-| Scope  | Category   | Method | Path                  | EndpointId      | RequiredIn | Note |
+| Scope  | Category   | Method | Path                  | EndpointId      | PresentIn | Note |
 | ------ | ---------- | ------ | --------------------- | --------------- | ---------- | ---- |
 | public | Other      | GET    | /v1/common/symbols    | GetSymbols      | Wire, Raw, Normalized |      |
 | public | Other      | GET    | /v1/common/currencys  | GetCurrencys    | Wire, Raw, Normalized |      |
@@ -84,7 +84,7 @@ Note 欄には、採用可否・実装判断・設計判断を記載してはな
 
 ## Private
 
-| Scope   | Category | Method | Path                                         | EndpointId                            | RequiredIn | Note |
+| Scope   | Category | Method | Path                                         | EndpointId                            | PresentIn | Note |
 | ------- | -------- | ------ | -------------------------------------------- | ------------------------------------- | ---------- | ---- |
 | private | Account  | GET    | /v1/account/accounts                         | GetAccounts                           | Wire, Raw, Normalized |      |
 | private | Account  | GET    | /v1/account/accounts/{account-id}/balance    | GetAccountsBalanceByAccountId         | Wire, Raw, Normalized |      |

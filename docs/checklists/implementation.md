@@ -34,13 +34,13 @@ TopSpec / inventory / governance により定義された規範が、
 
 ---
 
-## 2. RequiredIn（実装層）の確認
+## 2. PresentIn（実装層）の確認
 
-* [ ] inventory に記載された RequiredIn を確認した
-* [ ] 実装した層（Wire / Raw / Normalized）が RequiredIn と一致していることを確認した
-* [ ] RequiredIn に記載のない層を実装していないことを確認した
-* [ ] RequiredIn が空欄（未記載）の場合、その扱い（未提供/記入漏れ/例外など）を TopSpec に立ち戻って裁定し、必要なら exceptions.md へ記録した
-* [ ] RequiredIn の解釈に迷いが生じた場合、TopSpec に立ち戻って裁定した
+* [ ] inventory に記載された PresentIn を確認した
+* [ ] 実装した層（Wire / Raw / Normalized）が PresentIn と一致していることを確認した
+* [ ] PresentIn に記載のない層を実装していないことを確認した
+* [ ] PresentIn が `None` の場合、いかなる層にも当該 EndpointId の API が存在しないことを確認した
+* [ ] PresentIn の解釈に迷いが生じた場合、TopSpec に立ち戻って裁定した
 
 ---
 

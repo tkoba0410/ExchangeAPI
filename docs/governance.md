@@ -61,7 +61,7 @@
 
 重複・旧版・非機能・version 並立等の理由により、
 実装対象が自明でない場合に限り、
-最終的な実装可否の判断（inventory の `RequiredIn` の確定）は裁定者が行う。
+最終的な実装可否の判断（inventory の `PresentIn` の確定）は裁定者が行う。
 
 裁定対象は次に限定する。
 
@@ -72,7 +72,7 @@
 上記以外の場合、裁定は行わず、
 TopSpec および inventory に記載された事実に従う。
 
-裁定結果は、inventory の `RequiredIn` により必ず明示されなければならない。
+裁定結果は、inventory の `PresentIn` により必ず明示されなければならない（非採用は `None`）。
 
 ## 4. 公開 API 面に関する禁止原則
 

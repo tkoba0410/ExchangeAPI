@@ -87,10 +87,15 @@ TopSpec および inventory に記載された事実に従う。
 * MarketData / Trading / Account 等の意味分類を
   公開 API 面に持ち込んではならない。
 
-### 4.2 Public / Private 分離の禁止
+### 4.2 Public / Private 分離（許可・必須）
 
-* 署名有無（Public / Private）は**分類理由として扱ってはならない**。
-* 署名要否は endpoint の性質（trait）として扱う。
+本プロジェクトでは、Wire〜Adapter の低層において
+API/実装の物理配置を **Public / Private の2区分に限定**する。
+
+* Wire / Raw / Normalized / Adapter は **Public / Private のみで分離**してよい（MUST）。
+* MarketData / Trading / Account 等の意味分類（種類別フォルダ分割）は **禁止**（MUST NOT）。
+* 署名要否は endpoint の性質（trait）としても扱う（表現・検査のため）。
+  ただし、物理配置としては Public/Private の2区分を採用する。
 
 ---
 

@@ -59,6 +59,31 @@ Wire
 
 ---
 
+#### 3.1.1 Wire 層の物理配置（MUST）
+
+Wire 層の API/実装は、**署名有無（Public / Private）によってのみ分離**する。
+MarketData / Trading / Account 等の**意味分類（種類別フォルダ分割）は行わない**。
+
+* 取引所配下の Wire 物理配置は次を基準形（Canon）とする。
+
+```
+src/Exchanges/<Exchange>/Wire/
+  Public/
+    Endpoints/
+  Private/
+    Endpoints/
+  Constants/
+  Properties/
+  Internal/
+```
+
+* namespace は物理配置に一致させる（例）:
+  * `ExchangeApi.Exchanges.<Exchange>.Wire.Public.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Wire.Private.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Wire.Internal.*`
+
+* Endpoints は `WireCallSpec` を返すビルダであり、Wire 内部利用（internal）を前提とする。
+
 ### 3.2 Raw 層（表現 / Primitive JSON）
 
 **責務**

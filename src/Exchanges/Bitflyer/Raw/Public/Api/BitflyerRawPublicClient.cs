@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 using BitflyerRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
@@ -24,7 +24,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetTicker",
-            BitflyerEndpoints.GetTicker(request.ProductCode),
+            BitflyerPublicEndpoints.GetTicker(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Ticker>(json, "Bitflyer.GetTicker"));
 
@@ -34,7 +34,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetBoard",
-            BitflyerEndpoints.GetBoard(request.ProductCode),
+            BitflyerPublicEndpoints.GetBoard(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Board>(json, "Bitflyer.GetBoard"));
 
@@ -44,7 +44,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetExecutions",
-            BitflyerEndpoints.GetExecutionsPublic(
+            BitflyerPublicEndpoints.GetExecutionsPublic(
                 request.ProductCode,
                 request.Count?.ToString(CultureInfo.InvariantCulture),
                 request.Before?.ToString(CultureInfo.InvariantCulture),
@@ -60,7 +60,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetMarkets",
-            BitflyerEndpoints.GetMarkets(request.Region),
+            BitflyerPublicEndpoints.GetMarkets(request.Region),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Market>>(
                 json,
@@ -72,7 +72,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetChats",
-            BitflyerEndpoints.GetChats(request.FromDate, request.Region),
+            BitflyerPublicEndpoints.GetChats(request.FromDate, request.Region),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Chat>>(
                 json,
@@ -84,7 +84,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetHealth",
-            BitflyerEndpoints.GetHealth(request.ProductCode),
+            BitflyerPublicEndpoints.GetHealth(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<HealthResponse>(json, "Bitflyer.GetHealth"));
 
@@ -94,7 +94,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetBoardState",
-            BitflyerEndpoints.GetBoardState(request.ProductCode),
+            BitflyerPublicEndpoints.GetBoardState(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<BoardStateResponse>(
                 json,
@@ -106,7 +106,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetCorporateLeverage",
-            BitflyerEndpoints.GetCorporateLeverage(),
+            BitflyerPublicEndpoints.GetCorporateLeverage(),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<CorporateLeverageResponse>(
                 json,
@@ -118,7 +118,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetFundingRate",
-            BitflyerEndpoints.GetFundingRate(request.ProductCode),
+            BitflyerPublicEndpoints.GetFundingRate(request.ProductCode),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<FundingRateResponse>(
                 json,

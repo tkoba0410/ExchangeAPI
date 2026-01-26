@@ -1,6 +1,6 @@
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests;
 

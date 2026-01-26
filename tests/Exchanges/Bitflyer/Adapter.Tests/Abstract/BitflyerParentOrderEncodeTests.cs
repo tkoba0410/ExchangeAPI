@@ -1,4 +1,4 @@
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;

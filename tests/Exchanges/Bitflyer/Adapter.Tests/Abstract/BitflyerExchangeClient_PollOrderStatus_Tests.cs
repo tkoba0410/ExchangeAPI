@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using ExchangeApi.Application.Interfaces;
 using ExchangeApi.Application.Trading;
 using ExchangeApi.Composition.Adapters.Application;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
@@ -13,6 +12,7 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Application.UseCases;
 using Xunit;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Facade;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 

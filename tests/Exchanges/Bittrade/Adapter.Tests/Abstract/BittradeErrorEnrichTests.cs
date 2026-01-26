@@ -14,11 +14,11 @@ using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ContractsRequests = ExchangeApi.Contracts.Facade.Requests;
-using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 

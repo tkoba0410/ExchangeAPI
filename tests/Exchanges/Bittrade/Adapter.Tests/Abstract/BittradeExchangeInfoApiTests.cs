@@ -8,9 +8,9 @@ using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 

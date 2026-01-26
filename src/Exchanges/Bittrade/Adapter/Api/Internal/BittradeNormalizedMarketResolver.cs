@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Markets;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 

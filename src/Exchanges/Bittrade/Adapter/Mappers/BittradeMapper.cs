@@ -7,7 +7,7 @@ using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 
 internal static class BittradeMapper

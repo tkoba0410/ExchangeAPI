@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
 

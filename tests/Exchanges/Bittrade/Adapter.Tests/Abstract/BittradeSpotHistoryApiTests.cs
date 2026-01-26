@@ -13,14 +13,14 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
-using NormalizeRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using NormalizeRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 

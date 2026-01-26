@@ -1,10 +1,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Call;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos.Trading;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Markets;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Requests;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;

@@ -18,9 +18,9 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Account;

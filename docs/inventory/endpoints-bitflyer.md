@@ -42,11 +42,10 @@
 
 ## Columns
 
-| Scope | Category | Method | Path | CanonicalSourceUrl | EndpointId | PresentIn | Note |
-| ----- | -------- | ------ | ---- | ------------------ | ---------- | ---------- | ---- |
+| Scope | Method | Path | CanonicalSourceUrl | EndpointId | PresentIn | Note |
+| ----- | ------ | ---- | ------------------ | ---------- | ---------- | ---- |
 
 * **Scope**: public / private
-* **Category**: MarketData / Trading / Account / History / Other
 * **Method**: HTTP method（GET/POST/...）
 * **Path**: API path（公式表記）
 * **CanonicalSourceUrl**: 公式 API 文書における当該 endpoint の正本 URL（アンカー `#...` を含める）
@@ -67,52 +66,52 @@ Note 欄には、採用可否・実装判断・設計判断を記載してはな
 
 ## Public
 
-| Scope  | Category   | Method | Path                     | CanonicalSourceUrl                                                  | EndpointId           | PresentIn             | Note |
-| ------ | ---------- | ------ | ------------------------ | ------------------------------------------------------------------- | -------------------- | --------------------- | ---- |
-| public | MarketData | GET    | /v1/getmarkets           | https://lightning.bitflyer.com/docs#マーケットの一覧               | GetMarkets           | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/markets              | https://lightning.bitflyer.com/docs#マーケットの一覧               | Markets              | None                  | duplicate candidate |
-| public | MarketData | GET    | /v1/getboard             | https://lightning.bitflyer.com/docs#板情報                 | GetBoard             | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/board                | https://lightning.bitflyer.com/docs#板情報                 | Board                | None                  | duplicate candidate |
-| public | MarketData | GET    | /v1/getticker            | https://lightning.bitflyer.com/docs#ticker                | GetTicker            | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/ticker               | https://lightning.bitflyer.com/docs#ticker                | Ticker               | None                  | duplicate candidate |
-| public | MarketData | GET    | /v1/getexecutions        | https://lightning.bitflyer.com/docs#約定履歴            | GetExecutionsPublic  | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/executions           | https://lightning.bitflyer.com/docs#約定履歴            | Executions           | None                  | duplicate candidate |
-| public | MarketData | GET    | /v1/getboardstate        | https://lightning.bitflyer.com/docs#板情報state            | GetBoardState        | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/gethealth            | https://lightning.bitflyer.com/docs#取引所の状態                | GetHealth            | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/getfundingrate       | https://lightning.bitflyer.com/docs#ファンディングレート           | GetFundingRate       | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/getcorporateleverage | https://lightning.bitflyer.com/docs#法人アカウント最大レバレッジ     | GetCorporateLeverage | Wire, Raw, Normalized |      |
-| public | MarketData | GET    | /v1/getchats             | https://lightning.bitflyer.com/docs#チャット                 | GetChats             | Wire, Raw, Normalized |      |
+| Scope  | Method | Path                     | CanonicalSourceUrl                                                  | EndpointId           | PresentIn             | Note |
+| ------ | ------ | ------------------------ | ------------------------------------------------------------------- | -------------------- | --------------------- | ---- |
+| public | GET    | /v1/getmarkets           | https://lightning.bitflyer.com/docs#マーケットの一覧               | GetMarkets           | Wire, Raw, Normalized |      |
+| public | GET    | /v1/markets              | https://lightning.bitflyer.com/docs#マーケットの一覧               | Markets              | None                  | duplicate candidate |
+| public | GET    | /v1/getboard             | https://lightning.bitflyer.com/docs#板情報                 | GetBoard             | Wire, Raw, Normalized |      |
+| public | GET    | /v1/board                | https://lightning.bitflyer.com/docs#板情報                 | Board                | None                  | duplicate candidate |
+| public | GET    | /v1/getticker            | https://lightning.bitflyer.com/docs#ticker                | GetTicker            | Wire, Raw, Normalized |      |
+| public | GET    | /v1/ticker               | https://lightning.bitflyer.com/docs#ticker                | Ticker               | None                  | duplicate candidate |
+| public | GET    | /v1/getexecutions        | https://lightning.bitflyer.com/docs#約定履歴            | GetExecutionsPublic  | Wire, Raw, Normalized |      |
+| public | GET    | /v1/executions           | https://lightning.bitflyer.com/docs#約定履歴            | Executions           | None                  | duplicate candidate |
+| public | GET    | /v1/getboardstate        | https://lightning.bitflyer.com/docs#板情報state            | GetBoardState        | Wire, Raw, Normalized |      |
+| public | GET    | /v1/gethealth            | https://lightning.bitflyer.com/docs#取引所の状態                | GetHealth            | Wire, Raw, Normalized |      |
+| public | GET    | /v1/getfundingrate       | https://lightning.bitflyer.com/docs#ファンディングレート           | GetFundingRate       | Wire, Raw, Normalized |      |
+| public | GET    | /v1/getcorporateleverage | https://lightning.bitflyer.com/docs#法人アカウント最大レバレッジ     | GetCorporateLeverage | Wire, Raw, Normalized |      |
+| public | GET    | /v1/getchats             | https://lightning.bitflyer.com/docs#チャット                 | GetChats             | Wire, Raw, Normalized |      |
 
 ---
 
 ## Private
 
-| Scope   | Category | Method | Path                         | CanonicalSourceUrl                                                    | EndpointId            | PresentIn             | Note |
-| ------- | -------- | ------ | ---------------------------- | --------------------------------------------------------------------- | --------------------- | --------------------- | ---- |
-| private | Other    | GET    | /v1/me/getpermissions        | https://lightning.bitflyer.com/docs#api-キーの権限を取得            | GetPermissions        | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/me/getbalance            | https://lightning.bitflyer.com/docs#資産残高を取得                | GetBalance            | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/me/getcollateral         | https://lightning.bitflyer.com/docs#証拠金の状態を取得             | GetCollateral         | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/me/getcollateralaccounts | https://lightning.bitflyer.com/docs#証拠金の状態を取得accounts     | GetCollateralAccounts | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/me/getaddresses          | https://lightning.bitflyer.com/docs#預入用アドレス取得              | GetAddresses          | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/me/getcoinins            | https://lightning.bitflyer.com/docs#仮想通貨預入履歴                | GetCoinIns            | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/me/getcoinouts           | https://lightning.bitflyer.com/docs#仮想通貨送付履歴               | GetCoinOuts           | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/me/getbankaccounts       | https://lightning.bitflyer.com/docs#銀行口座一覧取得           | GetBankAccounts       | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/me/getdeposits           | https://lightning.bitflyer.com/docs#入金履歴               | GetDeposits           | Wire, Raw, Normalized |      |
-| private | Account  | POST   | /v1/me/withdraw              | https://lightning.bitflyer.com/docs#出金                  | Withdraw              | Wire, Raw, Normalized |      |
-| private | Account  | GET    | /v1/me/getwithdrawals        | https://lightning.bitflyer.com/docs#出金履歴            | GetWithdrawals        | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/me/sendchildorder        | https://lightning.bitflyer.com/docs#新規注文を出す            | SendChildOrder        | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/me/sendparentorder       | https://lightning.bitflyer.com/docs#新規の親注文を出す特殊注文           | SendParentOrder       | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/me/cancelchildorder      | https://lightning.bitflyer.com/docs#注文をキャンセルする          | CancelChildOrder      | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/me/cancelparentorder     | https://lightning.bitflyer.com/docs#親注文をキャンセルする         | CancelParentOrder     | Wire, Raw, Normalized |      |
-| private | Trading  | POST   | /v1/me/cancelallchildorders  | https://lightning.bitflyer.com/docs#すべての注文をキャンセルする      | CancelAllChildOrders  | Wire, Raw, Normalized |      |
-| private | Trading  | GET    | /v1/me/getchildorders        | https://lightning.bitflyer.com/docs#注文の一覧を取得            | GetChildOrders        | Wire, Raw, Normalized |      |
-| private | Trading  | GET    | /v1/me/getparentorders       | https://lightning.bitflyer.com/docs#親注文の一覧を取得           | GetParentOrders        | Wire, Raw, Normalized |      |
-| private | Trading  | GET    | /v1/me/getparentorder        | https://lightning.bitflyer.com/docs#親注文の詳細を取得            | GetParentOrder        | Wire, Raw, Normalized |      |
-| private | History  | GET    | /v1/me/getexecutions         | https://lightning.bitflyer.com/docs#約定の一覧を取得             | GetExecutionsPrivate  | Wire, Raw, Normalized |      |
-| private | History  | GET    | /v1/me/getbalancehistory     | https://lightning.bitflyer.com/docs#資産残高を取得history         | GetBalanceHistory     | Wire, Raw, Normalized |      |
-| private | Other    | GET    | /v1/me/getpositions          | https://lightning.bitflyer.com/docs#建玉の一覧を取得              | GetPositions          | Wire, Raw, Normalized |      |
-| private | History  | GET    | /v1/me/getcollateralhistory  | https://lightning.bitflyer.com/docs#証拠金の状態を取得history      | GetCollateralHistory  | Wire, Raw, Normalized |      |
-| private | Other    | GET    | /v1/me/gettradingcommission  | https://lightning.bitflyer.com/docs#取引手数料を取得      | GetTradingCommission  | Wire, Raw, Normalized |      |
+| Scope   | Method | Path                         | CanonicalSourceUrl                                                    | EndpointId            | PresentIn             | Note |
+| ------- | ------ | ---------------------------- | --------------------------------------------------------------------- | --------------------- | --------------------- | ---- |
+| private | GET    | /v1/me/getpermissions        | https://lightning.bitflyer.com/docs#api-キーの権限を取得            | GetPermissions        | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getbalance            | https://lightning.bitflyer.com/docs#資産残高を取得                | GetBalance            | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getcollateral         | https://lightning.bitflyer.com/docs#証拠金の状態を取得             | GetCollateral         | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getcollateralaccounts | https://lightning.bitflyer.com/docs#証拠金の状態を取得accounts     | GetCollateralAccounts | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getaddresses          | https://lightning.bitflyer.com/docs#預入用アドレス取得              | GetAddresses          | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getcoinins            | https://lightning.bitflyer.com/docs#仮想通貨預入履歴                | GetCoinIns            | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getcoinouts           | https://lightning.bitflyer.com/docs#仮想通貨送付履歴               | GetCoinOuts           | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getbankaccounts       | https://lightning.bitflyer.com/docs#銀行口座一覧取得           | GetBankAccounts       | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getdeposits           | https://lightning.bitflyer.com/docs#入金履歴               | GetDeposits           | Wire, Raw, Normalized |      |
+| private | POST   | /v1/me/withdraw              | https://lightning.bitflyer.com/docs#出金                  | Withdraw              | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getwithdrawals        | https://lightning.bitflyer.com/docs#出金履歴            | GetWithdrawals        | Wire, Raw, Normalized |      |
+| private | POST   | /v1/me/sendchildorder        | https://lightning.bitflyer.com/docs#新規注文を出す            | SendChildOrder        | Wire, Raw, Normalized |      |
+| private | POST   | /v1/me/sendparentorder       | https://lightning.bitflyer.com/docs#新規の親注文を出す特殊注文           | SendParentOrder       | Wire, Raw, Normalized |      |
+| private | POST   | /v1/me/cancelchildorder      | https://lightning.bitflyer.com/docs#注文をキャンセルする          | CancelChildOrder      | Wire, Raw, Normalized |      |
+| private | POST   | /v1/me/cancelparentorder     | https://lightning.bitflyer.com/docs#親注文をキャンセルする         | CancelParentOrder     | Wire, Raw, Normalized |      |
+| private | POST   | /v1/me/cancelallchildorders  | https://lightning.bitflyer.com/docs#すべての注文をキャンセルする      | CancelAllChildOrders  | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getchildorders        | https://lightning.bitflyer.com/docs#注文の一覧を取得            | GetChildOrders        | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getparentorders       | https://lightning.bitflyer.com/docs#親注文の一覧を取得           | GetParentOrders        | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getparentorder        | https://lightning.bitflyer.com/docs#親注文の詳細を取得            | GetParentOrder        | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getexecutions         | https://lightning.bitflyer.com/docs#約定の一覧を取得             | GetExecutionsPrivate  | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getbalancehistory     | https://lightning.bitflyer.com/docs#資産残高を取得history         | GetBalanceHistory     | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getpositions          | https://lightning.bitflyer.com/docs#建玉の一覧を取得              | GetPositions          | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/getcollateralhistory  | https://lightning.bitflyer.com/docs#証拠金の状態を取得history      | GetCollateralHistory  | Wire, Raw, Normalized |      |
+| private | GET    | /v1/me/gettradingcommission  | https://lightning.bitflyer.com/docs#取引手数料を取得      | GetTradingCommission  | Wire, Raw, Normalized |      |
 
 ---
 

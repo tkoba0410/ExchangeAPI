@@ -81,7 +81,7 @@ TopSpec / inventory / governance により定義された規範が、
 
 ## 7. 分類語彙の固定確認
 
-* [ ] API 分類語彙（Public / Private / MarketData / Trading / Account 等）が既存セットのみであることを確認した
+* [ ] Wire〜Adapter の API 分離が Public / Private のみであり、意味分類（MarketData / Trading / Account 等）を導入していないことを確認した
 * [ ] 新しい分類語彙を実装側で先行追加していないことを確認した
 * [ ] 語彙追加が必要な場合、governance / TopSpec による裁定を経ていることを確認した
 

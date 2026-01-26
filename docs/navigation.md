@@ -13,6 +13,10 @@
 
 ## Scope
 
+本リポジトリでは、Wire〜Adapter 層において
+API を意味分類（MarketData / Trading 等）で整理しない。
+Public / Private のみを物理分離の基準とする。
+
 本書に記載される用語は、特定の EndpointId を識別・代替・一意化するものではない。
 複数の EndpointId を指し得る概念的・慣例的呼称を含み得る。
 

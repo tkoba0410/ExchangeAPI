@@ -107,6 +107,33 @@ src/Exchanges/<Exchange>/Wire/
 
 ---
 
+#### 3.2.1 Raw 層の物理配置（MUST）
+
+Raw 層の API/実装は、Wire と同様に **署名有無（Public / Private）によってのみ分離**する。
+MarketData / Trading / Account 等の**意味分類（種類別フォルダ分割）は行わない**。
+
+* 取引所配下の Raw 物理配置は次を基準形（Canon）とする。
+
+```
+src/Exchanges/<Exchange>/Raw/
+  Api/
+  Public/
+    Api/
+    Models/
+  Private/
+    Api/
+    Models/
+  Internal/
+```
+
+* namespace は物理配置に一致させる（例）:
+  * `ExchangeApi.Exchanges.<Exchange>.Raw.Api.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Raw.Public.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Raw.Private.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Raw.Internal.*`
+
+* Raw の Public/Private は「署名の有無」を表す。意味分類の代替として用いない（= Public/Private 以外で分けない）。
+
 ### 3.3 Normalized 層（取引所内正規化）
 
 **責務**
@@ -126,7 +153,85 @@ src/Exchanges/<Exchange>/Wire/
 
 ---
 
-### 3.4 Contract 層（取引所横断契約）
+#### 3.3.1 Normalized 層の物理配置（MUST）
+
+Normalized 層の API/実装は、Wire/Raw と同様に **署名有無（Public / Private）によってのみ分離**する。
+MarketData / Trading / Account 等の**意味分類（種類別フォルダ分割）は行わない**。
+
+* 取引所配下の Normalized 物理配置は次を基準形（Canon）とする。
+
+```
+src/Exchanges/<Exchange>/Normalized/
+  Api/
+  Public/
+    Api/
+    Models/
+  Private/
+    Api/
+    Models/
+  Internal/
+```
+
+* namespace は物理配置に一致させる（例）:
+  * `ExchangeApi.Exchanges.<Exchange>.Normalized.Api.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Normalized.Public.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Normalized.Private.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Normalized.Internal.*`
+
+* Normalized の Public/Private は「署名の有無」を表す。意味分類の代替として用いない（= Public/Private 以外で分けない）。
+* Normalized は「取引所内の正規化」であり、Contracts（取引所横断）を侵食しない。
+
+---
+
+### 3.4 Adapter 層（Contracts への適合）
+
+**責務**
+
+* Contracts の I/F・DTO を実装するための変換層
+* Normalized（取引所内正規化）を Contracts（取引所横断）へ適合させる
+
+**禁止事項（MUST NOT）**
+
+* 取引所固有 endpoint の公開（取引所固有 endpoint は Normalized まで）
+* 変換方向の逆流（Contracts → Normalized）
+
+---
+
+#### 3.4.1 Adapter 層の物理配置（MUST）
+
+Adapter 層の API/実装は、Wire/Raw/Normalized と同様に
+**署名有無（Public / Private）によってのみ分離**する。
+MarketData / Trading / Account 等の**意味分類（種類別フォルダ分割）は行わない**。
+
+* 取引所配下の Adapter 物理配置は次を基準形（Canon）とする。
+
+```
+src/Exchanges/<Exchange>/Adapter/
+  Public/
+    Api/
+    Models/
+  Private/
+    Api/
+    Models/
+  Internal/
+```
+
+* namespace は物理配置に一致させる（例）:
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Public.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Private.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Internal.*`
+
+* Adapter の Public/Private は「署名の有無」を表す。意味分類の代替として用いない（= Public/Private 以外で分けない）。
+
+#### 3.4.2 Adapter の責務境界（MUST）
+
+* Adapter は **Contracts の I/F・DTO を実装するための変換層**である。
+* Adapter は取引所固有の endpoint を公開しない（取引所固有 endpoint は Normalized まで）。
+* 変換は「Normalized（取引所内正規化）→ Contracts（取引所横断）」の一方向とする。
+
+---
+
+### 3.5 Contract 層（取引所横断契約）
 
 **責務**
 

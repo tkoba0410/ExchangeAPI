@@ -83,19 +83,22 @@ TopSpec および inventory に記載された事実に従う。
 
 ### 4.1 分類の禁止
 
-* Wire / Raw / Normalized の公開 API 面を**分類してはならない**。
-* MarketData / Trading / Account 等の意味分類を
-  公開 API 面に持ち込んではならない。
+* Wire / Raw / Normalized / Adapter の公開 API 面を**意味分類してはならない**。
+* MarketData / Trading / Account 等の分類語彙は
+  **物理配置・namespace・公開 API に使用してはならない**。
 
-### 4.2 Public / Private 分離（許可・必須）
+### 4.2 Public / Private 分離（必須）
 
-本プロジェクトでは、Wire〜Adapter の低層において
-API/実装の物理配置を **Public / Private の2区分に限定**する。
+* Wire / Raw / Normalized / Adapter は
+  **Public / Private の2区分でのみ分離する**（MUST）。
 
-* Wire / Raw / Normalized / Adapter は **Public / Private のみで分離**してよい（MUST）。
-* MarketData / Trading / Account 等の意味分類（種類別フォルダ分割）は **禁止**（MUST NOT）。
-* 署名要否は endpoint の性質（trait）としても扱う（表現・検査のため）。
-  ただし、物理配置としては Public/Private の2区分を採用する。
+* Public / Private は「署名有無」を意味する。
+* 意味分類は以下に限定して表現する:
+  - EndpointTraits
+  - Capability
+  - Inventory（事実記録）
+
+* 物理構造で意味を表現してはならない。
 
 ---
 

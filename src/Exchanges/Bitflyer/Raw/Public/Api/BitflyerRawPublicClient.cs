@@ -7,7 +7,7 @@ using BitflyerRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 
 internal sealed class BitflyerRawPublicClient
 {

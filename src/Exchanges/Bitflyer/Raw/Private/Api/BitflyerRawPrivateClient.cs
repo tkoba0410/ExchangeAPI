@@ -6,7 +6,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
 
 internal sealed class BitflyerRawPrivateClient
 {

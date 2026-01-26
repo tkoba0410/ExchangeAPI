@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;

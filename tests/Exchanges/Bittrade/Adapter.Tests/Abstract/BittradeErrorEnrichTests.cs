@@ -55,6 +55,22 @@ public sealed class BittradeErrorEnrichTests
             string productCode,
             CancellationToken ct = default) =>
             throw new ExchangeApiException("boom");
+
+        public Task<Call<NormalizedRequests.GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>> GetHistoryKlineCallAsync(
+            string productCode,
+            string period,
+            int? size = null,
+            CancellationToken ct = default) =>
+            throw new ExchangeApiException("boom");
+
+        public Task<Call<NormalizedRequests.GetTickersRequest, IReadOnlyList<BittradeTickerEntryNormalized>>> GetTickersCallAsync(
+            CancellationToken ct = default) =>
+            throw new ExchangeApiException("boom");
+
+        public Task<Call<NormalizedRequests.GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetHistoryTradeCallAsync(
+            string productCode,
+            CancellationToken ct = default) =>
+            throw new ExchangeApiException("boom");
     }
 
     private static IExchangeMarketResolver CreateResolver() =>
@@ -79,5 +95,27 @@ public sealed class BittradeErrorEnrichTests
                 new ContractsRequests.GetExchangeInfoRequest(),
                 new CallResult<ExchangeInfo>.Ok(_info),
                 CallMeta.CreateInternal("Contracts", "StubExchangeInfo")));
+
+        public Task<Call<ContractsRequests.GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var request = new ContractsRequests.GetCurrencysRequest();
+            return Task.FromResult(NotSupportedCall.Create<ContractsRequests.GetCurrencysRequest, IReadOnlyList<string>>(
+                "Contracts",
+                "StubExchangeInfo",
+                request,
+                "Currencys"));
+        }
+
+        public Task<Call<ContractsRequests.GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var request = new ContractsRequests.GetTimestampRequest();
+            return Task.FromResult(NotSupportedCall.Create<ContractsRequests.GetTimestampRequest, DateTimeOffset>(
+                "Contracts",
+                "StubExchangeInfo",
+                request,
+                "Timestamp"));
+        }
     }
 }

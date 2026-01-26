@@ -66,5 +66,36 @@ public class BittradeExchangeInfoApiTests
                 Meta: meta);
             return Task.FromResult(call);
         }
+
+        public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+            System.Threading.CancellationToken ct = default)
+        {
+            IReadOnlyList<string> data = new[] { "btc", "jpy" };
+            var request = new GetCurrencysRequest();
+            var meta = CallMeta.CreateInternal("Normalized", "StubNormalizedExchangeInfoApi");
+            var call = new Call<GetCurrencysRequest, IReadOnlyList<string>>(
+                Id: CallId.New(),
+                StartedAt: System.DateTimeOffset.UtcNow,
+                Duration: System.TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<IReadOnlyList<string>>.Ok(data),
+                Meta: meta);
+            return Task.FromResult(call);
+        }
+
+        public Task<Call<GetTimestampRequest, System.DateTimeOffset>> GetTimestampCallAsync(
+            System.Threading.CancellationToken ct = default)
+        {
+            var request = new GetTimestampRequest();
+            var meta = CallMeta.CreateInternal("Normalized", "StubNormalizedExchangeInfoApi");
+            var call = new Call<GetTimestampRequest, System.DateTimeOffset>(
+                Id: CallId.New(),
+                StartedAt: System.DateTimeOffset.UtcNow,
+                Duration: System.TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<System.DateTimeOffset>.Ok(System.DateTimeOffset.UtcNow),
+                Meta: meta);
+            return Task.FromResult(call);
+        }
     }
 }

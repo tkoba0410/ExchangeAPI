@@ -176,6 +176,43 @@ internal sealed class MarketApi : IMarketDataApi
         }
     }
 
+    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
+        Symbol symbol,
+        string period,
+        int? size = null,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetHistoryKlineRequest(symbol, period, size);
+        return Task.FromResult(NotSupportedCall.Create<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>(
+            "Contracts",
+            BitflyerOperations.MarketData.GetCandlesticks,
+            request,
+            "HistoryKline"));
+    }
+
+    public Task<Call<GetTickersRequest, IReadOnlyList<CommonTicker>>> GetTickersCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetTickersRequest();
+        return Task.FromResult(NotSupportedCall.Create<GetTickersRequest, IReadOnlyList<CommonTicker>>(
+            "Contracts",
+            BitflyerOperations.MarketData.GetTickers,
+            request,
+            "Tickers"));
+    }
+
+    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetHistoryTradeRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>(
+            "Contracts",
+            BitflyerOperations.MarketData.GetHistoryTrade,
+            request,
+            "HistoryTrade"));
+    }
+
     private static IReadOnlyList<ExecutionMarket> ToExecutionList(
         Symbol symbol,
         IReadOnlyList<BitflyerExecutionNormalized> executions)

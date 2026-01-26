@@ -7,6 +7,9 @@ internal static class BitflyerOperations
         public const string GetTicker = "Bitflyer.MarketData.GetTicker";
         public const string GetOrderBook = "Bitflyer.MarketData.GetOrderBook";
         public const string GetExecutions = "Bitflyer.MarketData.GetExecutions";
+        public const string GetCandlesticks = "Bitflyer.MarketData.GetCandlesticks";
+        public const string GetTickers = "Bitflyer.MarketData.GetTickers";
+        public const string GetHistoryTrade = "Bitflyer.MarketData.GetHistoryTrade";
         public const string GetHealth = "Bitflyer.MarketData.GetHealth";
         public const string GetBoardState = "Bitflyer.MarketData.GetBoardState";
     }
@@ -28,6 +31,8 @@ internal static class BitflyerOperations
     internal static class ExchangeInfo
     {
         public const string GetExchangeInfo = "Bitflyer.ExchangeInfo.GetExchangeInfo";
+        public const string GetCurrencys = "Bitflyer.ExchangeInfo.GetCurrencys";
+        public const string GetTimestamp = "Bitflyer.ExchangeInfo.GetTimestamp";
     }
 
     internal static class History

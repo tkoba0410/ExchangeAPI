@@ -84,6 +84,30 @@ public sealed class BittradeNormalizedApi
         CancellationToken ct = default) =>
         _exchangeInfo.GetSymbolsCallAsync(ct);
 
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken ct = default) =>
+        _exchangeInfo.GetCurrencysCallAsync(ct);
+
+    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken ct = default) =>
+        _exchangeInfo.GetTimestampCallAsync(ct);
+
+    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>> GetHistoryKlineCallAsync(
+        string productCode,
+        string period,
+        int? size = null,
+        CancellationToken ct = default) =>
+        _marketData.GetHistoryKlineCallAsync(productCode, period, size, ct);
+
+    public Task<Call<GetTickersRequest, IReadOnlyList<BittradeTickerEntryNormalized>>> GetTickersCallAsync(
+        CancellationToken ct = default) =>
+        _marketData.GetTickersCallAsync(ct);
+
+    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetHistoryTradeCallAsync(
+        string productCode,
+        CancellationToken ct = default) =>
+        _marketData.GetHistoryTradeCallAsync(productCode, ct);
+
     public Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default) =>
         _account.GetAccountsBalanceByAccountIdCallAsync(ct);

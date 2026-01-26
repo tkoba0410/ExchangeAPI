@@ -63,6 +63,56 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
         }
     }
 
+    public async Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetCurrencysRequest();
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var call = await _normalized.GetCurrencysCallAsync(cancellationToken).ConfigureAwait(false);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BittradeOperations.ExchangeInfo.GetCurrencys,
+                ok => ok);
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<GetCurrencysRequest, IReadOnlyList<string>>(
+                request,
+                startedAt,
+                BittradeOperations.ExchangeInfo.GetCurrencys,
+                ex);
+        }
+    }
+
+    public async Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetTimestampRequest();
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var call = await _normalized.GetTimestampCallAsync(cancellationToken).ConfigureAwait(false);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BittradeOperations.ExchangeInfo.GetTimestamp,
+                ok => ok);
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<GetTimestampRequest, DateTimeOffset>(
+                request,
+                startedAt,
+                BittradeOperations.ExchangeInfo.GetTimestamp,
+                ex);
+        }
+    }
+
     internal static string ToApiSymbol(ExchangeMarketInfo market) =>
         BittradeSymbol.Normalize(market.ProductCode);
 

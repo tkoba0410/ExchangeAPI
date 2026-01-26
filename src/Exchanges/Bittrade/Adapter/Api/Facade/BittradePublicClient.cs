@@ -91,5 +91,21 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient
         CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
 
+    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
+        CommonSymbol symbol,
+        string period,
+        int? size = null,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetHistoryKlineCallAsync(symbol, period, size, cancellationToken);
+
+    public Task<Call<GetTickersRequest, IReadOnlyList<Ticker>>> GetTickersCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetTickersCallAsync(cancellationToken);
+
+    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
+        CommonSymbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
+
     // Raw access removed from public facade.
 }

@@ -86,6 +86,28 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
         }
     }
 
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetCurrencysRequest();
+        return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "Currencys"));
+    }
+
+    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetTimestampRequest();
+        return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, DateTimeOffset>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "Timestamp"));
+    }
+
     private ExchangeInfoDto GetCachedInfo()
     {
         lock (_sync)

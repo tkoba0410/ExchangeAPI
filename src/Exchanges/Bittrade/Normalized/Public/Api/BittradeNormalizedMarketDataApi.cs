@@ -116,6 +116,85 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             });
     }
 
+    public async Task<Call<NormalizedRequests.GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>> GetHistoryKlineCallAsync(
+        string productCode,
+        string period,
+        int? size = null,
+        CancellationToken ct = default)
+    {
+        var request = new NormalizedRequests.GetHistoryKlineRequest(productCode, period, size);
+        var startedAt = DateTimeOffset.UtcNow;
+        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        {
+            return CreateCallError<NormalizedRequests.GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>(
+                request,
+                "Bittrade.GetHistoryKline",
+                error!,
+                startedAt);
+        }
+
+        var rawCall = await _raw
+            .GetHistoryKlineCallAsync(new RawPublicModels.GetKlinesRequest(symbolText, period, size), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetHistoryKline",
+            ok =>
+            {
+                RequireOk(ok.Status, "klines");
+                return BittradeNormalizer.NormalizeKlines(ok.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetTickersRequest, IReadOnlyList<BittradeTickerEntryNormalized>>> GetTickersCallAsync(
+        CancellationToken ct = default)
+    {
+        var request = new NormalizedRequests.GetTickersRequest();
+        var rawCall = await _raw.GetTickersCallAsync(new RawPublicModels.GetTickersRequest(), ct).ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetTickers",
+            ok =>
+            {
+                RequireOk(ok.Status, "tickers");
+                return BittradeNormalizer.NormalizeTickers(ok.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetHistoryTradeCallAsync(
+        string productCode,
+        CancellationToken ct = default)
+    {
+        var request = new NormalizedRequests.GetHistoryTradeRequest(productCode);
+        var startedAt = DateTimeOffset.UtcNow;
+        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        {
+            return CreateCallError<NormalizedRequests.GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>(
+                request,
+                "Bittrade.GetHistoryTrade",
+                error!,
+                startedAt);
+        }
+
+        var rawCall = await _raw
+            .GetHistoryTradeCallAsync(new RawPublicModels.GetTradeHistoryRequest(symbolText), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetHistoryTrade",
+            ok =>
+            {
+                RequireOk(ok.Status, "history trades");
+                return BittradeNormalizer.NormalizeTradeHistory(ok.Data);
+            });
+    }
+
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
         Call<TRawReq, TRaw> rawCall,
         TReq request,

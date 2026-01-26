@@ -102,6 +102,28 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
         }
     }
 
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetCurrencysRequest();
+        return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
+            "Contracts",
+            BitflyerOperations.ExchangeInfo.GetCurrencys,
+            request,
+            "Currencys"));
+    }
+
+    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetTimestampRequest();
+        return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, DateTimeOffset>(
+            "Contracts",
+            BitflyerOperations.ExchangeInfo.GetTimestamp,
+            request,
+            "Timestamp"));
+    }
+
     private static DateTimeOffset? GetNextDailyMaintenanceEndUtc()
     {
         // bitFlyer は毎日 04:00-04:10 (JST) に定期メンテ。終了予定のみを返す。

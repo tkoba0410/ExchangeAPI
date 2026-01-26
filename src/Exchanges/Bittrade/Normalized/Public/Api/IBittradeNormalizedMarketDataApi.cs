@@ -23,4 +23,17 @@ internal interface IBittradeNormalizedMarketDataApi
     Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
         string productCode,
         CancellationToken ct = default);
+
+    Task<Call<GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>> GetHistoryKlineCallAsync(
+        string productCode,
+        string period,
+        int? size = null,
+        CancellationToken ct = default);
+
+    Task<Call<GetTickersRequest, IReadOnlyList<BittradeTickerEntryNormalized>>> GetTickersCallAsync(
+        CancellationToken ct = default);
+
+    Task<Call<GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetHistoryTradeCallAsync(
+        string productCode,
+        CancellationToken ct = default);
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
@@ -71,6 +72,28 @@ internal static class BitflyerTestHelpers
                 Result: new CallResult<ExchangeInfo>.Ok(_info),
                 Meta: meta);
             return Task.FromResult(call);
+        }
+
+        public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var request = new GetCurrencysRequest();
+            return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
+                "Contracts",
+                "StubExchangeInfoApi",
+                request,
+                "Currencys"));
+        }
+
+        public Task<Call<GetTimestampRequest, System.DateTimeOffset>> GetTimestampCallAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var request = new GetTimestampRequest();
+            return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, System.DateTimeOffset>(
+                "Contracts",
+                "StubExchangeInfoApi",
+                request,
+                "Timestamp"));
         }
     }
 }

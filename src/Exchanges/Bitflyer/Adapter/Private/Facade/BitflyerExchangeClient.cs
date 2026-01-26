@@ -127,6 +127,22 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
 
+    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
+        Symbol symbol,
+        string period,
+        int? size = null,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetHistoryKlineCallAsync(symbol, period, size, cancellationToken);
+
+    public Task<Call<GetTickersRequest, IReadOnlyList<CommonTicker>>> GetTickersCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetTickersCallAsync(cancellationToken);
+
+    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
+
     // Trading
     public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         Symbol symbol,

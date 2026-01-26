@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -146,6 +147,28 @@ public class BittradeMarketApiTests
                 Result: new CallResult<ExchangeInfo>.Ok(_info),
                 Meta: meta);
             return Task.FromResult(call);
+        }
+
+        public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var request = new GetCurrencysRequest();
+            return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
+                "Contracts",
+                "StubExchangeInfoApi",
+                request,
+                "Currencys"));
+        }
+
+        public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var request = new GetTimestampRequest();
+            return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, DateTimeOffset>(
+                "Contracts",
+                "StubExchangeInfoApi",
+                request,
+                "Timestamp"));
         }
     }
 

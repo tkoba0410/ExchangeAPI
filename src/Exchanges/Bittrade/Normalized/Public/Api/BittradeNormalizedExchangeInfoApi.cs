@@ -43,6 +43,52 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
             });
     }
 
+    public async Task<Call<NormalizedRequests.GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _exchangeInfo
+            .GetCurrencysCallAsync(new RawPublicModels.GetCurrenciesRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetCurrencysRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetCurrencys",
+            ok =>
+            {
+                if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new BittradeNormalizedException("Bittrade currencys response invalid.");
+                }
+
+                return ok.Data ?? Array.Empty<string>();
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _exchangeInfo
+            .GetTimestampCallAsync(new RawPublicModels.GetTimestampRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetTimestampRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetTimestamp",
+            ok =>
+            {
+                if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new BittradeNormalizedException("Bittrade timestamp response invalid.");
+                }
+
+                return ok.Data;
+            });
+    }
+
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
         Call<TRawReq, TRaw> rawCall,
         TReq request,

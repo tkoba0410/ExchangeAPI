@@ -115,6 +115,12 @@ public sealed class BittradeSpotHistoryApiTests
                 new NormalizeRequests.PlaceOrderRequest(request),
                 new BittradeOrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
 
+        public Task<Call<NormalizeRequests.GetOrdersRequest, IReadOnlyList<BittradeOrderSummaryNormalized>>> GetOrdersCallAsync(
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(
+                new NormalizeRequests.GetOrdersRequest(),
+                (IReadOnlyList<BittradeOrderSummaryNormalized>)Array.Empty<BittradeOrderSummaryNormalized>()));
+
         public Task<Call<NormalizeRequests.CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
             Symbol symbol,
             OrderKey orderKey,
@@ -148,6 +154,55 @@ public sealed class BittradeSpotHistoryApiTests
             int? limit = null,
             CancellationToken ct = default) =>
             Task.FromResult(MakeOkCall(new NormalizeRequests.GetAccountExecutionsRequest(symbol, limit), _executions));
+
+        public Task<Call<NormalizeRequests.GetRetailOrderListRequest, IReadOnlyList<BittradeRetailOrderEntryNormalized>>> GetRetailOrderListCallAsync(
+            NormalizeRequests.GetRetailOrderListRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(
+                request,
+                (IReadOnlyList<BittradeRetailOrderEntryNormalized>)Array.Empty<BittradeRetailOrderEntryNormalized>()));
+
+        public Task<Call<NormalizeRequests.GetRetailOrderDetailByOrderIdRequest, BittradeRetailOrderEntryNormalized?>> GetRetailOrderDetailByOrderIdCallAsync(
+            NormalizeRequests.GetRetailOrderDetailByOrderIdRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall<NormalizeRequests.GetRetailOrderDetailByOrderIdRequest, BittradeRetailOrderEntryNormalized?>(request, null));
+
+        public Task<Call<NormalizeRequests.PostRetailOrderHistoryRequest, IReadOnlyList<BittradeRetailOrderEntryNormalized>>> PostRetailOrderHistoryCallAsync(
+            NormalizeRequests.PostRetailOrderHistoryRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(
+                request,
+                (IReadOnlyList<BittradeRetailOrderEntryNormalized>)Array.Empty<BittradeRetailOrderEntryNormalized>()));
+
+        public Task<Call<NormalizeRequests.PostRetailOrderDetailRequest, BittradeRetailOrderEntryNormalized?>> PostRetailOrderDetailCallAsync(
+            NormalizeRequests.PostRetailOrderDetailRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall<NormalizeRequests.PostRetailOrderDetailRequest, BittradeRetailOrderEntryNormalized?>(request, null));
+
+        public Task<Call<NormalizeRequests.PostRetailOrderCreateRequest, BittradeRetailOrderResult>> PostRetailOrderCreateCallAsync(
+            NormalizeRequests.PostRetailOrderCreateRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(request, new BittradeRetailOrderResult(0, null, true, null)));
+
+        public Task<Call<NormalizeRequests.PostRetailOrderCancelByOrderIdRequest, BittradeRetailOrderResult>> PostRetailOrderCancelByOrderIdCallAsync(
+            NormalizeRequests.PostRetailOrderCancelByOrderIdRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(request, new BittradeRetailOrderResult(0, null, true, null)));
+
+        public Task<Call<NormalizeRequests.PostWithdrawVirtualByAddressIdCreateRequest, BittradeWithdrawResult>> PostWithdrawVirtualByAddressIdCreateCallAsync(
+            NormalizeRequests.PostWithdrawVirtualByAddressIdCreateRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(request, new BittradeWithdrawResult("ok", null)));
+
+        public Task<Call<NormalizeRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest, BittradeWithdrawResult>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
+            NormalizeRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(request, new BittradeWithdrawResult("ok", null)));
+
+        public Task<Call<NormalizeRequests.PostWithdrawVirtualByWithdrawIdCancelRequest, BittradeWithdrawResult>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
+            NormalizeRequests.PostWithdrawVirtualByWithdrawIdCancelRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(request, new BittradeWithdrawResult("ok", null)));
 
         private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
         {

@@ -138,6 +138,100 @@ internal static class BittradeTradingMapper
             .ToList();
     }
 
+    public static IReadOnlyList<BittradeOrderSummaryNormalized> ToOrderSummaries(
+        IReadOnlyList<RawPrivateModels.RawOrderSummary>? entries)
+    {
+        if (entries is null || entries.Count == 0)
+        {
+            return Array.Empty<BittradeOrderSummaryNormalized>();
+        }
+
+        return entries
+            .Select(entry => new BittradeOrderSummaryNormalized(
+                Id: entry.Id,
+                Symbol: entry.Symbol,
+                AccountId: entry.AccountId,
+                Amount: ParseRequiredDecimal(entry.Amount, "amount"),
+                Price: ParseDecimalOrThrow(entry.Price, "price"),
+                State: entry.State,
+                Type: entry.Type,
+                ClientOrderId: entry.ClientOrderId,
+                CreatedAt: entry.CreatedAt,
+                FilledAmount: ParseRequiredDecimal(entry.FilledAmount, "field-amount")))
+            .ToList();
+    }
+
+    public static IReadOnlyList<BittradeRetailOrderEntryNormalized> ToRetailOrders(
+        IReadOnlyList<RawPrivateModels.RawRetailOrderEntry>? entries)
+    {
+        if (entries is null || entries.Count == 0)
+        {
+            return Array.Empty<BittradeRetailOrderEntryNormalized>();
+        }
+
+        return entries
+            .Select(entry => new BittradeRetailOrderEntryNormalized(
+                Id: entry.Id,
+                Symbol: entry.Symbol,
+                Type: entry.Type,
+                Price: ParseDecimalOrThrow(entry.Price, "price"),
+                Amount: ParseDecimalOrThrow(entry.Amount, "amount"),
+                CashAmount: ParseDecimalOrThrow(entry.CashAmount, "cash_amount"),
+                Status: entry.Status,
+                CreatedAt: entry.CreatedAt))
+            .ToList();
+    }
+
+    public static BittradeRetailOrderEntryNormalized? ToRetailOrder(RawPrivateModels.RawRetailOrderEntry? entry)
+    {
+        if (entry is null)
+        {
+            return null;
+        }
+
+        return new BittradeRetailOrderEntryNormalized(
+            Id: entry.Id,
+            Symbol: entry.Symbol,
+            Type: entry.Type,
+            Price: ParseDecimalOrThrow(entry.Price, "price"),
+            Amount: ParseDecimalOrThrow(entry.Amount, "amount"),
+            CashAmount: ParseDecimalOrThrow(entry.CashAmount, "cash_amount"),
+            Status: entry.Status,
+            CreatedAt: entry.CreatedAt);
+    }
+
+    public static BittradeRetailOrderResult ToRetailOrderResult(RawPrivateModels.RawRetailOrderResponse raw)
+    {
+        return new BittradeRetailOrderResult(
+            Code: raw.Code,
+            OrderId: raw.Data,
+            Success: raw.Success,
+            Message: raw.Message);
+    }
+
+    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateModels.RawCreateWithdrawResponse raw)
+    {
+        return new BittradeWithdrawResult(raw.Status, raw.Data);
+    }
+
+    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateModels.RawCancelWithdrawResponse raw)
+    {
+        return new BittradeWithdrawResult(raw.Status, raw.Data);
+    }
+
+    public static RawPrivateModels.RawCreateRetailOrderRequest ToRawRetailOrder(BittradeRetailOrderRequest request)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var apiSymbol = BittradeSymbol.Normalize(request.Symbol.Value);
+        return new RawPrivateModels.RawCreateRetailOrderRequest(
+            Symbol: apiSymbol,
+            Type: request.Type,
+            Price: request.Price is null ? null : FormatDecimal(request.Price.Value),
+            Amount: request.Amount is null ? null : FormatDecimal(request.Amount.Value),
+            CashAmount: request.CashAmount is null ? null : FormatDecimal(request.CashAmount.Value));
+    }
+
     private static JsonElement ExtractSnapshot(string? rawJson)
     {
         if (string.IsNullOrWhiteSpace(rawJson))

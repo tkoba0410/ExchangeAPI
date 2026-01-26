@@ -57,6 +57,20 @@ internal static class BittradeNormalizer
             .ToList();
     }
 
+    internal static IReadOnlyList<BittradeExecutionNormalized> NormalizeTradeHistory(
+        IReadOnlyList<RawPublicModels.RawTradeHistoryEntry>? entries)
+    {
+        if (entries is null || entries.Count == 0)
+        {
+            return Array.Empty<BittradeExecutionNormalized>();
+        }
+
+        var flattened = entries
+            .SelectMany(entry => entry.Data ?? Array.Empty<RawPublicModels.RawTradeEntry>())
+            .ToList();
+        return NormalizeExecutions(flattened, rawJson: null);
+    }
+
     internal static IReadOnlyList<BittradeSymbolNormalized> NormalizeSymbols(IReadOnlyList<RawPublicModels.RawSymbolInfo> symbols)
     {
         if (symbols is null) throw new ArgumentNullException(nameof(symbols));
@@ -74,6 +88,46 @@ internal static class BittradeNormalizer
             .ToList();
     }
 
+    internal static IReadOnlyList<BittradeKlineNormalized> NormalizeKlines(
+        IReadOnlyList<RawPublicModels.RawKlineEntry>? entries)
+    {
+        if (entries is null || entries.Count == 0)
+        {
+            return Array.Empty<BittradeKlineNormalized>();
+        }
+
+        return entries
+            .Select(entry => new BittradeKlineNormalized(
+                Id: entry.Id,
+                Open: entry.Open,
+                Close: entry.Close,
+                Low: entry.Low,
+                High: entry.High,
+                Amount: entry.Amount,
+                Volume: entry.Volume,
+                Count: entry.Count))
+            .ToList();
+    }
+
+    internal static IReadOnlyList<BittradeTickerEntryNormalized> NormalizeTickers(
+        IReadOnlyList<RawPublicModels.RawTickerEntry>? entries)
+    {
+        if (entries is null || entries.Count == 0)
+        {
+            return Array.Empty<BittradeTickerEntryNormalized>();
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        return entries
+            .Select(entry => new BittradeTickerEntryNormalized(
+                entry.Symbol,
+                entry.Close,
+                now,
+                ExtractSnapshot(Serialize(entry)),
+                new Dictionary<string, JsonElement>()))
+            .ToList();
+    }
+
     internal static IReadOnlyList<BittradeBalanceEntryNormalized> NormalizeBalances(RawPrivateModels.RawBalanceData data)
     {
         if (data is null) throw new ArgumentNullException(nameof(data));
@@ -83,6 +137,45 @@ internal static class BittradeNormalizer
                 entry.Currency,
                 entry.Type,
                 ParseDecimalOrThrow(entry.Balance, "balance", "RawBalanceEntry")))
+            .ToList();
+    }
+
+    internal static IReadOnlyList<BittradeWithdrawVirtualAddressNormalized> NormalizeWithdrawVirtualAddresses(
+        IReadOnlyList<RawPrivateModels.RawWithdrawVirtualAddress>? entries)
+    {
+        if (entries is null || entries.Count == 0)
+        {
+            return Array.Empty<BittradeWithdrawVirtualAddressNormalized>();
+        }
+
+        return entries
+            .Select(entry => new BittradeWithdrawVirtualAddressNormalized(
+                AddressId: entry.AddressId,
+                Currency: entry.Currency,
+                Address: entry.Address,
+                AddressTag: entry.AddressTag,
+                Chain: entry.Chain,
+                Note: entry.Note,
+                State: entry.State,
+                CreatedAt: entry.CreatedAt,
+                UpdatedAt: entry.UpdatedAt))
+            .ToList();
+    }
+
+    internal static IReadOnlyList<BittradeRetailBalanceEntryNormalized> NormalizeRetailBalances(
+        IReadOnlyList<RawPrivateModels.RawRetailAccountBalanceEntry>? entries)
+    {
+        if (entries is null || entries.Count == 0)
+        {
+            return Array.Empty<BittradeRetailBalanceEntryNormalized>();
+        }
+
+        return entries
+            .Select(entry => new BittradeRetailBalanceEntryNormalized(
+                Currency: entry.Currency ?? string.Empty,
+                Balance: ParseNullableDecimal(entry.Balance, "balance", "RawRetailAccountBalanceEntry"),
+                Available: ParseNullableDecimal(entry.Available, "available", "RawRetailAccountBalanceEntry"),
+                Frozen: ParseNullableDecimal(entry.Frozen, "frozen", "RawRetailAccountBalanceEntry")))
             .ToList();
     }
 
@@ -136,6 +229,16 @@ internal static class BittradeNormalizer
         }
 
         throw new BittradeNormalizedException($"Invalid decimal for {dto}.{field}: '{s}'.");
+    }
+
+    private static decimal? ParseNullableDecimal(string? value, string field, string dto)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return ParseDecimalOrThrow(value, field, dto);
     }
 
     private static IReadOnlyList<JsonElement> ExtractTradeSnapshots(

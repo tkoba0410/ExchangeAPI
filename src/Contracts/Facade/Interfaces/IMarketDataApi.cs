@@ -29,4 +29,17 @@ public interface IMarketDataApi
     Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
+
+    Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
+        Symbol symbol,
+        string period,
+        int? size = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetTickersRequest, IReadOnlyList<Ticker>>> GetTickersCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default);
 }

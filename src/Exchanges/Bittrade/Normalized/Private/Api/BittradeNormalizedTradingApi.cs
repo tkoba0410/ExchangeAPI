@@ -62,6 +62,29 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         return CreateCall(rawCall, callRequest, "Bittrade.PlaceOrder", BittradeTradingMapper.ToOrderResult);
     }
 
+    public async Task<Call<NormalizedRequests.GetOrdersRequest, IReadOnlyList<BittradeOrderSummaryNormalized>>> GetOrdersCallAsync(
+        CancellationToken ct = default)
+    {
+        var request = new NormalizedRequests.GetOrdersRequest();
+        var rawCall = await _trading
+            .GetOrdersCallAsync(new RawPrivateModels.GetOrdersRequest(), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetOrders",
+            raw =>
+            {
+                if (!string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new BittradeNormalizedException("Bittrade orders response invalid.");
+                }
+
+                return BittradeTradingMapper.ToOrderSummaries(raw.Data);
+            });
+    }
+
     public async Task<Call<NormalizedRequests.CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
@@ -181,6 +204,205 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             callRequest,
             "Bittrade.GetExecutions",
             raw => BittradeTradingMapper.ToExecutions(raw.Data ?? Array.Empty<RawPrivateModels.RawMatchResultEntry>()));
+    }
+
+    public async Task<Call<NormalizedRequests.GetRetailOrderListRequest, IReadOnlyList<BittradeRetailOrderEntryNormalized>>> GetRetailOrderListCallAsync(
+        NormalizedRequests.GetRetailOrderListRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _trading
+            .GetOrderListCallAsync(new RawPrivateModels.GetRetailOrdersRequest(
+                Direct: request.Direct,
+                Status: request.Status,
+                StartTime: request.StartTime,
+                EndTime: request.EndTime), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetRetailOrderList",
+            raw =>
+            {
+                if (raw.Success is not true)
+                {
+                    throw new BittradeNormalizedException("Bittrade retail order list response invalid.");
+                }
+
+                return BittradeTradingMapper.ToRetailOrders(raw.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetRetailOrderDetailByOrderIdRequest, BittradeRetailOrderEntryNormalized?>> GetRetailOrderDetailByOrderIdCallAsync(
+        NormalizedRequests.GetRetailOrderDetailByOrderIdRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _trading
+            .GetRetailOrderDetailByOrderIdCallAsync(new RawPrivateModels.GetRetailOrderDetailByOrderIdRequest(request.OrderId), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetRetailOrderDetail",
+            raw =>
+            {
+                if (raw.Success is not true)
+                {
+                    throw new BittradeNormalizedException("Bittrade retail order detail response invalid.");
+                }
+
+                return BittradeTradingMapper.ToRetailOrder(raw.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.PostRetailOrderHistoryRequest, IReadOnlyList<BittradeRetailOrderEntryNormalized>>> PostRetailOrderHistoryCallAsync(
+        NormalizedRequests.PostRetailOrderHistoryRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var symbolText = request.Symbol is null ? null : BittradeSymbol.Normalize(request.Symbol.Value.Value);
+        var body = new RawPrivateModels.RawRetailOrderHistoryRequest(
+            Symbol: symbolText,
+            Direct: request.Direct,
+            Status: request.Status,
+            StartTime: request.StartTime?.ToUnixTimeMilliseconds(),
+            EndTime: request.EndTime?.ToUnixTimeMilliseconds(),
+            Size: request.Size);
+        var rawCall = await _trading
+            .PostRetailOrderHistoryCallAsync(new RawPrivateModels.PostRetailOrderHistoryRequest(body), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.PostRetailOrderHistory",
+            raw =>
+            {
+                if (raw.Success is not true)
+                {
+                    throw new BittradeNormalizedException("Bittrade retail order history response invalid.");
+                }
+
+                return BittradeTradingMapper.ToRetailOrders(raw.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.PostRetailOrderDetailRequest, BittradeRetailOrderEntryNormalized?>> PostRetailOrderDetailCallAsync(
+        NormalizedRequests.PostRetailOrderDetailRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var body = new RawPrivateModels.RawRetailOrderDetailRequest(request.OrderId);
+        var rawCall = await _trading
+            .PostRetailOrderDetailCallAsync(new RawPrivateModels.PostRetailOrderDetailRequest(body), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.PostRetailOrderDetail",
+            raw =>
+            {
+                if (raw.Success is not true)
+                {
+                    throw new BittradeNormalizedException("Bittrade retail order detail response invalid.");
+                }
+
+                return BittradeTradingMapper.ToRetailOrder(raw.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.PostRetailOrderCreateRequest, BittradeRetailOrderResult>> PostRetailOrderCreateCallAsync(
+        NormalizedRequests.PostRetailOrderCreateRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawRequest = BittradeTradingMapper.ToRawRetailOrder(request.Request);
+        var rawCall = await _trading
+            .PostRetailOrderCreateCallAsync(new RawPrivateModels.CreateRetailOrderRequest(rawRequest), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.PostRetailOrderCreate",
+            BittradeTradingMapper.ToRetailOrderResult);
+    }
+
+    public async Task<Call<NormalizedRequests.PostRetailOrderCancelByOrderIdRequest, BittradeRetailOrderResult>> PostRetailOrderCancelByOrderIdCallAsync(
+        NormalizedRequests.PostRetailOrderCancelByOrderIdRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _trading
+            .PostRetailOrderCancelByOrderIdCallAsync(new RawPrivateModels.CancelRetailOrderRequest(request.OrderId), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.PostRetailOrderCancel",
+            BittradeTradingMapper.ToRetailOrderResult);
+    }
+
+    public async Task<Call<NormalizedRequests.PostWithdrawVirtualByAddressIdCreateRequest, BittradeWithdrawResult>> PostWithdrawVirtualByAddressIdCreateCallAsync(
+        NormalizedRequests.PostWithdrawVirtualByAddressIdCreateRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _trading
+            .PostWithdrawVirtualByAddressIdCreateCallAsync(new RawPrivateModels.CreateWithdrawVirtualByAddressIdRequest(request.AddressId), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.PostWithdrawVirtualByAddressIdCreate",
+            BittradeTradingMapper.ToWithdrawResult);
+    }
+
+    public async Task<Call<NormalizedRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest, BittradeWithdrawResult>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
+        NormalizedRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _trading
+            .PostWithdrawVirtualByWithdrawIdPlaceCallAsync(new RawPrivateModels.PlaceWithdrawVirtualRequest(request.WithdrawId), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.PostWithdrawVirtualByWithdrawIdPlace",
+            BittradeTradingMapper.ToWithdrawResult);
+    }
+
+    public async Task<Call<NormalizedRequests.PostWithdrawVirtualByWithdrawIdCancelRequest, BittradeWithdrawResult>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
+        NormalizedRequests.PostWithdrawVirtualByWithdrawIdCancelRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _trading
+            .PostWithdrawVirtualCancelByWithdrawIdCallAsync(new RawPrivateModels.CancelWithdrawRequest(request.WithdrawId), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.PostWithdrawVirtualByWithdrawIdCancel",
+            BittradeTradingMapper.ToWithdrawResult);
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(

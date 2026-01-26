@@ -1,6 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -17,5 +18,11 @@ namespace ExchangeApi.Contracts.Facade.Interfaces;
 public interface IExchangeInfoApi
 {
     Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
         CancellationToken cancellationToken = default);
 }

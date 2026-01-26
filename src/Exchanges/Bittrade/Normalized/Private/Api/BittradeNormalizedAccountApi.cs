@@ -45,6 +45,52 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
             });
     }
 
+    public async Task<Call<NormalizedRequests.GetWithdrawVirtualAddressesRequest, IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>>> GetWithdrawVirtualAddressesCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _account
+            .GetWithdrawVirtualAddressesCallAsync(new RawPrivateModels.GetWithdrawVirtualAddressesRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetWithdrawVirtualAddressesRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetWithdrawVirtualAddresses",
+            ok =>
+            {
+                if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new BittradeNormalizedException("Bittrade withdraw addresses response invalid.");
+                }
+
+                return BittradeNormalizer.NormalizeWithdrawVirtualAddresses(ok.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetRetailAccountBalanceRequest, IReadOnlyList<BittradeRetailBalanceEntryNormalized>>> GetRetailAccountBalanceCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _account
+            .GetRetailAccountBalanceCallAsync(new RawPrivateModels.GetRetailAccountBalanceRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetRetailAccountBalanceRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetRetailAccountBalance",
+            ok =>
+            {
+                if (ok.Success is not true)
+                {
+                    throw new BittradeNormalizedException("Bittrade retail balance response invalid.");
+                }
+
+                return BittradeNormalizer.NormalizeRetailBalances(ok.Data);
+            });
+    }
+
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
         Call<TRawReq, TRaw> rawCall,
         TReq request,

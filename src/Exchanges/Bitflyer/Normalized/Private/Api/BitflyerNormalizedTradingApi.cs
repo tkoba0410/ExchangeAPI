@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
@@ -17,7 +17,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Api;
 
 internal sealed class BitflyerNormalizedTradingApi
 {

@@ -20,7 +20,7 @@ using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Transport.Protocol;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Operations;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Market;

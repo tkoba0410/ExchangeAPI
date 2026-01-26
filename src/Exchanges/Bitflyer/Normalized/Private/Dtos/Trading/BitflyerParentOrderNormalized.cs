@@ -6,7 +6,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 using ExchangeApi.Primitives.ValueCommon.Lossless;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 
 public sealed record BitflyerParentOrderNormalized(
     long Id,

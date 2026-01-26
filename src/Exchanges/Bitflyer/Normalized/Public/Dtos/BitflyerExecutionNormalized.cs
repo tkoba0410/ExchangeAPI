@@ -4,7 +4,7 @@ using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 using ExchangeApi.Primitives.ValueCommon.Lossless;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 
 public sealed record BitflyerExecutionNormalized(
     long Id,

@@ -9,13 +9,13 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
 using NormalizedRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Call;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Api;
 
 internal sealed class BitflyerNormalizedAccountApi
 {

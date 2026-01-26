@@ -2,7 +2,7 @@ using System;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Trading;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 
 public sealed record BitflyerOpenOrder(
     Symbol Symbol,

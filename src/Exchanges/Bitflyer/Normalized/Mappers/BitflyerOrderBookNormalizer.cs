@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;

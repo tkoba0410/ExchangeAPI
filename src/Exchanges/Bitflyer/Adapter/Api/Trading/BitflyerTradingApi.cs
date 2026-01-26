@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 using BitflyerOrderRequest = ExchangeApi.Exchanges.Bitflyer.Normalized.Requests.BitflyerOrderRequest;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.DomainCommon.Enums;

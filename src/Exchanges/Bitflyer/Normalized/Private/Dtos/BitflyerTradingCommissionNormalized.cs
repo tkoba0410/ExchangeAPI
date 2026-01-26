@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
 public sealed record BitflyerTradingCommissionNormalized(
     string ProductCode,

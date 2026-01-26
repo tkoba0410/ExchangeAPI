@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Primitives.ValueCommon.ClosedSet;

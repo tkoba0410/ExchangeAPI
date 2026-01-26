@@ -22,7 +22,7 @@ using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Primitives.CallCommon;

@@ -15,8 +15,8 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Operations;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Api.History;

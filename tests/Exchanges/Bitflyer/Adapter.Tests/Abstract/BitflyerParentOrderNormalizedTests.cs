@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 using ExchangeApi.Exchanges.Bitflyer.Raw;

@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Trading;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
 using ExchangeApi.Primitives.CallCommon;
 

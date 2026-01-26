@@ -1,6 +1,6 @@
 using ExchangeApi.Primitives.DomainCommon.Enums;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos.Account;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 
 public sealed record BitflyerBalanceEntryNormalized(
     string Currency,

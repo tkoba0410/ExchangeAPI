@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using ExchangeApi.Primitives.ValueCommon.Lossless;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Dtos;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 
 public sealed record BitflyerTickerNormalized(
     string ProductCode,

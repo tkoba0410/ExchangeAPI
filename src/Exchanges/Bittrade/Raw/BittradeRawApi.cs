@@ -82,11 +82,6 @@ public sealed class BittradeRawApi : IBittradeRawApi
         CancellationToken cancellationToken = default) =>
         _publicApi.GetHistoryTradeCallAsync(request, cancellationToken);
 
-    public Task<Call<GetRetailMaintainTimeRequest, RawRetailMaintainTimeResponse>> GetMaintainTimeCallAsync(
-        GetRetailMaintainTimeRequest request,
-        CancellationToken cancellationToken = default) =>
-        _publicApi.GetMaintainTimeCallAsync(request, cancellationToken);
-
     public Task<Call<GetAccountsRequest, RawAccountsResponse>> GetAccountsCallAsync(
         GetAccountsRequest request,
         CancellationToken cancellationToken = default) =>
@@ -101,6 +96,11 @@ public sealed class BittradeRawApi : IBittradeRawApi
         GetOpenOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetOpenOrdersCallAsync(request, cancellationToken);
+
+    public Task<Call<GetOrdersRequest, RawOrdersResponse>> GetOrdersCallAsync(
+        GetOrdersRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateApi.GetOrdersCallAsync(request, cancellationToken);
 
     public Task<Call<GetOrderRequest, RawOrderDetailResponse>> GetOrdersByOrderIdCallAsync(
         GetOrderRequest request,
@@ -122,10 +122,25 @@ public sealed class BittradeRawApi : IBittradeRawApi
         CancellationToken cancellationToken = default) =>
         _privateApi.GetDepositWithdrawCallAsync(request, cancellationToken);
 
+    public Task<Call<GetWithdrawVirtualAddressesRequest, RawWithdrawVirtualAddressesResponse>> GetWithdrawVirtualAddressesCallAsync(
+        GetWithdrawVirtualAddressesRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateApi.GetWithdrawVirtualAddressesCallAsync(request, cancellationToken);
+
     public Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetOrderListCallAsync(
         GetRetailOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetOrderListCallAsync(request, cancellationToken);
+
+    public Task<Call<GetRetailOrderDetailByOrderIdRequest, RawRetailOrderDetailResponse>> GetRetailOrderDetailByOrderIdCallAsync(
+        GetRetailOrderDetailByOrderIdRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateApi.GetRetailOrderDetailByOrderIdCallAsync(request, cancellationToken);
+
+    public Task<Call<GetRetailAccountBalanceRequest, RawRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
+        GetRetailAccountBalanceRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateApi.GetRetailAccountBalanceCallAsync(request, cancellationToken);
 
     public Task<Call<CreateOrderRequest, RawPlaceOrderResponse>> PostOrdersPlaceCallAsync(
         CreateOrderRequest request,
@@ -152,13 +167,43 @@ public sealed class BittradeRawApi : IBittradeRawApi
         CancellationToken cancellationToken = default) =>
         _privateTradingApi.PostWithdrawApiCreateCallAsync(request, cancellationToken);
 
+    public Task<Call<CreateWithdrawVirtualByAddressIdRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
+        CreateWithdrawVirtualByAddressIdRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.PostWithdrawVirtualByAddressIdCreateCallAsync(request, cancellationToken);
+
     public Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualCancelByWithdrawIdCallAsync(
         CancelWithdrawRequest request,
         CancellationToken cancellationToken = default) =>
         _privateTradingApi.PostWithdrawVirtualCancelByWithdrawIdCallAsync(request, cancellationToken);
 
+    public Task<Call<PlaceWithdrawVirtualRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
+        PlaceWithdrawVirtualRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.PostWithdrawVirtualByWithdrawIdPlaceCallAsync(request, cancellationToken);
+
     public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostOrderPlaceCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _privateTradingApi.PostOrderPlaceCallAsync(request, cancellationToken);
+
+    public Task<Call<CancelRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCancelByOrderIdCallAsync(
+        CancelRetailOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.PostRetailOrderCancelByOrderIdCallAsync(request, cancellationToken);
+
+    public Task<Call<PostRetailOrderHistoryRequest, RawRetailOrdersResponse>> PostRetailOrderHistoryCallAsync(
+        PostRetailOrderHistoryRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.PostRetailOrderHistoryCallAsync(request, cancellationToken);
+
+    public Task<Call<PostRetailOrderDetailRequest, RawRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
+        PostRetailOrderDetailRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.PostRetailOrderDetailCallAsync(request, cancellationToken);
+
+    public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCreateCallAsync(
+        CreateRetailOrderRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateTradingApi.PostRetailOrderCreateCallAsync(request, cancellationToken);
 }

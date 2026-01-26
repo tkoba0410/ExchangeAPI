@@ -18,5 +18,3 @@ public sealed record GetKlinesRequest(string Symbol, string Period, int? Size = 
 public sealed record GetTickersRequest;
 
 public sealed record GetTradeHistoryRequest(string Symbol);
-
-public sealed record GetRetailMaintainTimeRequest;

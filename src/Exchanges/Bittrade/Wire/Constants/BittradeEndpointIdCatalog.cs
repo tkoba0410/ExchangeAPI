@@ -27,11 +27,19 @@ public static class BittradeEndpointIdCatalog
         BittradeEndpointIds.GetOrders,
         BittradeEndpointIds.GetMatchResults,
         BittradeEndpointIds.PostWithdrawApiCreate,
-        BittradeEndpointIds.PostWithdrawVirtualCancelByWithdrawId,
+        BittradeEndpointIds.PostWithdrawVirtualByAddressIdCreate,
+        BittradeEndpointIds.PostWithdrawVirtualByWithdrawIdCancel,
+        BittradeEndpointIds.PostWithdrawVirtualByWithdrawIdPlace,
+        BittradeEndpointIds.GetWithdrawVirtualAddresses,
         BittradeEndpointIds.GetDepositWithdraw,
-        BittradeEndpointIds.PostOrderPlace,
-        BittradeEndpointIds.GetOrderList,
-        BittradeEndpointIds.GetMaintainTime,
+        BittradeEndpointIds.PostRetailOrderPlace,
+        BittradeEndpointIds.GetRetailOrderList,
+        BittradeEndpointIds.GetRetailOrderDetailByOrderId,
+        BittradeEndpointIds.PostRetailOrderCancelByOrderId,
+        BittradeEndpointIds.GetRetailAccountBalance,
+        BittradeEndpointIds.PostRetailOrderHistory,
+        BittradeEndpointIds.PostRetailOrderDetail,
+        BittradeEndpointIds.PostRetailOrderCreate,
     };
 
     public static IReadOnlyCollection<string> GetAllEndpointIds() => All;

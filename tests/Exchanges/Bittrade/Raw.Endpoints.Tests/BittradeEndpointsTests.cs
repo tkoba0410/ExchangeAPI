@@ -3,7 +3,8 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Raw.Internal;
 using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
-using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
+using ExchangeApi.Exchanges.Bittrade.Wire.Private.Endpoints;
+using ExchangeApi.Exchanges.Bittrade.Wire.Public.Endpoints;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
 
@@ -12,7 +13,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void GetSymbols_builds_request()
     {
-        var req = BittradeEndpoints.GetSymbols();
+        var req = BittradePublicEndpoints.GetSymbols();
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
@@ -24,7 +25,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void GetKlines_builds_request_with_ordered_query()
     {
-        var req = BittradeEndpoints.GetHistoryKline("btcjpy", "1min", "200");
+        var req = BittradePublicEndpoints.GetHistoryKline("btcjpy", "1min", "200");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
@@ -37,7 +38,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void GetTicker_builds_request()
     {
-        var req = BittradeEndpoints.GetDetailMerged("btcjpy");
+        var req = BittradePublicEndpoints.GetDetailMerged("btcjpy");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
@@ -59,7 +60,7 @@ public sealed class BittradeEndpointsTests
             Source: "api");
 
         var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
-        var req = BittradeEndpoints.PostOrdersPlace(bodyJson);
+        var req = BittradePrivateEndpoints.PostOrdersPlace(bodyJson);
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,

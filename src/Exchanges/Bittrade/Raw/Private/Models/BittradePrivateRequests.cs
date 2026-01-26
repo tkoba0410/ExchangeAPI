@@ -8,6 +8,8 @@ public sealed record GetAccountBalanceRequest(string AccountId);
 
 public sealed record GetOpenOrdersRequest(string Symbol, string AccountId);
 
+public sealed record GetOrdersRequest;
+
 public sealed record GetOrderRequest(string OrderId);
 
 public sealed record GetOrderMatchResultsRequest(string OrderId);
@@ -28,8 +30,14 @@ public sealed record GetDepositWithdrawsRequest(
     int? Size = null,
     string? Direct = null);
 
+public sealed record GetWithdrawVirtualAddressesRequest;
+
 public sealed record GetRetailOrdersRequest(
     int Direct,
     int? Status = null,
     DateTimeOffset? StartTime = null,
     DateTimeOffset? EndTime = null);
+
+public sealed record GetRetailOrderDetailByOrderIdRequest(string OrderId);
+
+public sealed record GetRetailAccountBalanceRequest;

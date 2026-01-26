@@ -45,7 +45,4 @@ internal interface IBittradePublicApi
         GetTradeHistoryRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetRetailMaintainTimeRequest, RawRetailMaintainTimeResponse>> GetMaintainTimeCallAsync(
-        GetRetailMaintainTimeRequest request,
-        CancellationToken cancellationToken = default);
 }

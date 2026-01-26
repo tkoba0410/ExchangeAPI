@@ -98,11 +98,6 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
             CancellationToken cancellationToken = default) =>
             throw CreateException();
 
-        public virtual Task<Call<RawPublicModels.GetRetailMaintainTimeRequest, RawPublicModels.RawRetailMaintainTimeResponse>> GetMaintainTimeCallAsync(
-            RawPublicModels.GetRetailMaintainTimeRequest request,
-            CancellationToken cancellationToken = default) =>
-            throw CreateException();
-
         public virtual Task<Call<RawPrivateModels.GetAccountsRequest, RawPrivateModels.RawAccountsResponse>> GetAccountsCallAsync(
             RawPrivateModels.GetAccountsRequest request,
             CancellationToken cancellationToken = default) =>
@@ -115,6 +110,11 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
 
         public virtual Task<Call<RawPrivateModels.GetOpenOrdersRequest, RawPrivateModels.RawOpenOrdersResponse>> GetOpenOrdersCallAsync(
             RawPrivateModels.GetOpenOrdersRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public virtual Task<Call<RawPrivateModels.GetOrdersRequest, RawPrivateModels.RawOrdersResponse>> GetOrdersCallAsync(
+            RawPrivateModels.GetOrdersRequest request,
             CancellationToken cancellationToken = default) =>
             throw CreateException();
 
@@ -138,8 +138,23 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
             CancellationToken cancellationToken = default) =>
             throw CreateException();
 
+        public virtual Task<Call<RawPrivateModels.GetWithdrawVirtualAddressesRequest, RawPrivateModels.RawWithdrawVirtualAddressesResponse>> GetWithdrawVirtualAddressesCallAsync(
+            RawPrivateModels.GetWithdrawVirtualAddressesRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
         public virtual Task<Call<RawPrivateModels.GetRetailOrdersRequest, RawPrivateModels.RawRetailOrdersResponse>> GetOrderListCallAsync(
             RawPrivateModels.GetRetailOrdersRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public virtual Task<Call<RawPrivateModels.GetRetailOrderDetailByOrderIdRequest, RawPrivateModels.RawRetailOrderDetailResponse>> GetRetailOrderDetailByOrderIdCallAsync(
+            RawPrivateModels.GetRetailOrderDetailByOrderIdRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public virtual Task<Call<RawPrivateModels.GetRetailAccountBalanceRequest, RawPrivateModels.RawRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
+            RawPrivateModels.GetRetailAccountBalanceRequest request,
             CancellationToken cancellationToken = default) =>
             throw CreateException();
 
@@ -168,12 +183,42 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
             CancellationToken cancellationToken = default) =>
             throw CreateException();
 
+        public virtual Task<Call<RawPrivateModels.CreateWithdrawVirtualByAddressIdRequest, RawPrivateModels.RawCreateWithdrawResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
+            RawPrivateModels.CreateWithdrawVirtualByAddressIdRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
         public virtual Task<Call<RawPrivateModels.CancelWithdrawRequest, RawPrivateModels.RawCancelWithdrawResponse>> PostWithdrawVirtualCancelByWithdrawIdCallAsync(
             RawPrivateModels.CancelWithdrawRequest request,
             CancellationToken cancellationToken = default) =>
             throw CreateException();
 
+        public virtual Task<Call<RawPrivateModels.PlaceWithdrawVirtualRequest, RawPrivateModels.RawCreateWithdrawResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
+            RawPrivateModels.PlaceWithdrawVirtualRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
         public virtual Task<Call<RawPrivateModels.CreateRetailOrderRequest, RawPrivateModels.RawRetailOrderResponse>> PostOrderPlaceCallAsync(
+            RawPrivateModels.CreateRetailOrderRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public virtual Task<Call<RawPrivateModels.CancelRetailOrderRequest, RawPrivateModels.RawRetailOrderResponse>> PostRetailOrderCancelByOrderIdCallAsync(
+            RawPrivateModels.CancelRetailOrderRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public virtual Task<Call<RawPrivateModels.PostRetailOrderHistoryRequest, RawPrivateModels.RawRetailOrdersResponse>> PostRetailOrderHistoryCallAsync(
+            RawPrivateModels.PostRetailOrderHistoryRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public virtual Task<Call<RawPrivateModels.PostRetailOrderDetailRequest, RawPrivateModels.RawRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
+            RawPrivateModels.PostRetailOrderDetailRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw CreateException();
+
+        public virtual Task<Call<RawPrivateModels.CreateRetailOrderRequest, RawPrivateModels.RawRetailOrderResponse>> PostRetailOrderCreateCallAsync(
             RawPrivateModels.CreateRetailOrderRequest request,
             CancellationToken cancellationToken = default) =>
             throw CreateException();

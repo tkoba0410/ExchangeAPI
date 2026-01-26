@@ -24,9 +24,17 @@ internal static class BittradeEndpointIds
     public const string GetOrders = "GetOrders";
     public const string GetMatchResults = "GetMatchResults";
     public const string PostWithdrawApiCreate = "PostWithdrawApiCreate";
-    public const string PostWithdrawVirtualCancelByWithdrawId = "PostWithdrawVirtualCancelByWithdrawId";
+    public const string PostWithdrawVirtualByAddressIdCreate = "PostWithdrawVirtualByAddressIdCreate";
+    public const string PostWithdrawVirtualByWithdrawIdCancel = "PostWithdrawVirtualByWithdrawIdCancel";
+    public const string PostWithdrawVirtualByWithdrawIdPlace = "PostWithdrawVirtualByWithdrawIdPlace";
+    public const string GetWithdrawVirtualAddresses = "GetWithdrawVirtualAddresses";
     public const string GetDepositWithdraw = "GetDepositWithdraw";
-    public const string PostOrderPlace = "PostOrderPlace";
-    public const string GetOrderList = "GetOrderList";
-    public const string GetMaintainTime = "GetMaintainTime";
+    public const string PostRetailOrderPlace = "PostRetailOrderPlace";
+    public const string GetRetailOrderList = "GetRetailOrderList";
+    public const string GetRetailOrderDetailByOrderId = "GetRetailOrderDetailByOrderId";
+    public const string PostRetailOrderCancelByOrderId = "PostRetailOrderCancelByOrderId";
+    public const string GetRetailAccountBalance = "GetRetailAccountBalance";
+    public const string PostRetailOrderHistory = "PostRetailOrderHistory";
+    public const string PostRetailOrderDetail = "PostRetailOrderDetail";
+    public const string PostRetailOrderCreate = "PostRetailOrderCreate";
 }

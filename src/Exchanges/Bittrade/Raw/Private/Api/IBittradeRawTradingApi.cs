@@ -30,16 +30,44 @@ internal interface IBittradeRawTradingApi
         CreateWithdrawRequest request,
         CancellationToken cancellationToken = default);
 
+    Task<Call<CreateWithdrawVirtualByAddressIdRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
+        CreateWithdrawVirtualByAddressIdRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualCancelByWithdrawIdCallAsync(
         CancelWithdrawRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<PlaceWithdrawVirtualRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
+        PlaceWithdrawVirtualRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostOrderPlaceCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default);
 
+    Task<Call<CancelRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCancelByOrderIdCallAsync(
+        CancelRetailOrderRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<PostRetailOrderHistoryRequest, RawRetailOrdersResponse>> PostRetailOrderHistoryCallAsync(
+        PostRetailOrderHistoryRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<PostRetailOrderDetailRequest, RawRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
+        PostRetailOrderDetailRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCreateCallAsync(
+        CreateRetailOrderRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<Call<GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersCallAsync(
         GetOpenOrdersRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetOrdersRequest, RawOrdersResponse>> GetOrdersCallAsync(
+        GetOrdersRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetOrderRequest, RawOrderDetailResponse>> GetOrdersByOrderIdCallAsync(
@@ -48,5 +76,13 @@ internal interface IBittradeRawTradingApi
 
     Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsCallAsync(
         GetMatchResultsRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetRetailOrderDetailByOrderIdRequest, RawRetailOrderDetailResponse>> GetRetailOrderDetailByOrderIdCallAsync(
+        GetRetailOrderDetailByOrderIdRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetRetailAccountBalanceRequest, RawRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
+        GetRetailAccountBalanceRequest request,
         CancellationToken cancellationToken = default);
 }

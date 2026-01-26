@@ -25,6 +25,10 @@ internal interface IBittradePrivateApi
         GetOpenOrdersRequest request,
         CancellationToken cancellationToken = default);
 
+    Task<Call<GetOrdersRequest, RawOrdersResponse>> GetOrdersCallAsync(
+        GetOrdersRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<Call<GetOrderRequest, RawOrderDetailResponse>> GetOrdersByOrderIdCallAsync(
         GetOrderRequest request,
         CancellationToken cancellationToken = default);
@@ -41,7 +45,19 @@ internal interface IBittradePrivateApi
         GetDepositWithdrawsRequest request,
         CancellationToken cancellationToken = default);
 
+    Task<Call<GetWithdrawVirtualAddressesRequest, RawWithdrawVirtualAddressesResponse>> GetWithdrawVirtualAddressesCallAsync(
+        GetWithdrawVirtualAddressesRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetOrderListCallAsync(
         GetRetailOrdersRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetRetailOrderDetailByOrderIdRequest, RawRetailOrderDetailResponse>> GetRetailOrderDetailByOrderIdCallAsync(
+        GetRetailOrderDetailByOrderIdRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetRetailAccountBalanceRequest, RawRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
+        GetRetailAccountBalanceRequest request,
         CancellationToken cancellationToken = default);
 }

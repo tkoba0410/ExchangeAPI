@@ -5,11 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using NormalizedRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
+using PublicRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 
@@ -22,14 +21,14 @@ internal sealed class BitflyerNormalizedExchangeInfoFacade
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<Call<NormalizedRequests.GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
+    public async Task<Call<PublicRequests.GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
         string? region = null,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
             .GetMarketsCallAsync(new RawPublicModels.GetMarketsRequest(region), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetMarketsRequest(region);
+        var request = new PublicRequests.GetMarketsRequest(region);
 
         return CreateCall(
             rawCall,

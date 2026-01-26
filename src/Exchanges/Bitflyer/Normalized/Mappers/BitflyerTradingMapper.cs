@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;

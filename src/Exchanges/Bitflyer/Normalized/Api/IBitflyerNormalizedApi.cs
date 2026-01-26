@@ -6,7 +6,8 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Api;

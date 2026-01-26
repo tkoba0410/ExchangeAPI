@@ -12,8 +12,8 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
-using NormalizedRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
+using PublicRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests;
+using PrivateRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Api;
@@ -63,22 +63,22 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
             account: new BitflyerNormalizedAccountApi(raw, markets));
     }
 
-    public Task<Call<NormalizedRequests.GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
+    public Task<Call<PublicRequests.GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
         string? region = null,
         CancellationToken cancellationToken = default) =>
         _exchangeInfo.GetMarketsCallAsync(region, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
+    public Task<Call<PublicRequests.GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
         string productCode,
         CancellationToken cancellationToken = default) =>
         _marketData.GetTickerCallAsync(productCode, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
+    public Task<Call<PublicRequests.GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
         string productCode,
         CancellationToken cancellationToken = default) =>
         _marketData.GetBoardCallAsync(productCode, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
+    public Task<Call<PublicRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
         string productCode,
         int? count = null,
         long? before = null,
@@ -86,74 +86,74 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         CancellationToken cancellationToken = default) =>
         _marketData.GetExecutionsPublicCallAsync(productCode, count, before, after, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(
+    public Task<Call<PublicRequests.GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(
         string productCode,
         CancellationToken cancellationToken = default) =>
         _marketData.GetHealthCallAsync(productCode, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
+    public Task<Call<PublicRequests.GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
         string productCode,
         CancellationToken cancellationToken = default) =>
         _marketData.GetBoardStateCallAsync(productCode, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
+    public Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
         string? fromDate = null,
         string? region = null,
         CancellationToken cancellationToken = default) =>
         _marketData.GetChatsCallAsync(fromDate, region, cancellationToken);
 
-    public Task<Call<NormalizedRequests.PlaceOrderRequest, BitflyerOrderResult>> PlaceOrderCallAsync(
-        BitflyerOrderRequest request,
+    public Task<Call<PrivateRequests.PlaceOrderRequest, BitflyerOrderResult>> PlaceOrderCallAsync(
+        PrivateRequests.BitflyerOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _trading.PlaceOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<NormalizedRequests.CancelOrderRequest, BitflyerCancelResult>> CancelOrderCallAsync(
+    public Task<Call<PrivateRequests.CancelOrderRequest, BitflyerCancelResult>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         _trading.CancelOrderCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
+    public Task<Call<PrivateRequests.GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _trading.GetChildOrdersCallAsync(symbol, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetOrderRequest, BitflyerOrderStatus>> GetChildOrdersCallAsync(
+    public Task<Call<PrivateRequests.GetOrderRequest, BitflyerOrderStatus>> GetChildOrdersCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         _trading.GetChildOrdersCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<NormalizedRequests.SendParentOrderRequest, BitflyerParentOrderAcceptance>> SendParentOrderCallAsync(
-        NormalizedRequests.SendParentOrderRequest request,
+    public Task<Call<PrivateRequests.SendParentOrderRequest, BitflyerParentOrderAcceptance>> SendParentOrderCallAsync(
+        PrivateRequests.SendParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _trading.SendParentOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<NormalizedRequests.CancelParentOrderRequest, BitflyerParentOrderCancelResult>> CancelParentOrderCallAsync(
-        NormalizedRequests.CancelParentOrderRequest request,
+    public Task<Call<PrivateRequests.CancelParentOrderRequest, BitflyerParentOrderCancelResult>> CancelParentOrderCallAsync(
+        PrivateRequests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _trading.CancelParentOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetParentOrdersRequest, IReadOnlyList<BitflyerParentOrderNormalized>>> GetParentOrdersCallAsync(
-        NormalizedRequests.GetParentOrdersRequest request,
+    public Task<Call<PrivateRequests.GetParentOrdersRequest, IReadOnlyList<BitflyerParentOrderNormalized>>> GetParentOrdersCallAsync(
+        PrivateRequests.GetParentOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _trading.GetParentOrdersCallAsync(request, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetParentOrderRequest, BitflyerParentOrderDetailNormalized>> GetParentOrderCallAsync(
-        NormalizedRequests.GetParentOrderRequest request,
+    public Task<Call<PrivateRequests.GetParentOrderRequest, BitflyerParentOrderDetailNormalized>> GetParentOrderCallAsync(
+        PrivateRequests.GetParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _trading.GetParentOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
+    public Task<Call<PrivateRequests.GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default) =>
         _account.GetBalanceCallAsync(cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
+    public Task<Call<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _account.GetExecutionsPrivateCallAsync(symbol, cancellationToken);
 
-    public Task<Call<NormalizedRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>> GetTradingCommissionCallAsync(
+    public Task<Call<PrivateRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>> GetTradingCommissionCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _account.GetTradingCommissionCallAsync(symbol, cancellationToken);

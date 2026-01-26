@@ -5,11 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using NormalizedRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
+using PublicRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 
@@ -22,14 +21,14 @@ internal sealed class BitflyerNormalizedMarketDataFacade
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<Call<NormalizedRequests.GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
+    public async Task<Call<PublicRequests.GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
             .GetTickerCallAsync(new RawPublicModels.GetTickerRequest(productCode), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetTickerRequest(productCode);
+        var request = new PublicRequests.GetTickerRequest(productCode);
 
         return CreateCall(
             rawCall,
@@ -38,19 +37,19 @@ internal sealed class BitflyerNormalizedMarketDataFacade
             raw => BitflyerTickerNormalizer.Normalize(raw, rawCall.Meta.RawJson));
     }
 
-    public async Task<Call<NormalizedRequests.GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
+    public async Task<Call<PublicRequests.GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
             .GetBoardCallAsync(new RawPublicModels.GetBoardRequest(productCode), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetOrderBookRequest(productCode);
+        var request = new PublicRequests.GetOrderBookRequest(productCode);
 
         return CreateCall(rawCall, request, "Bitflyer.GetBoard", BitflyerOrderBookNormalizer.Normalize);
     }
 
-    public async Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
+    public async Task<Call<PublicRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
         string productCode,
         int? count = null,
         long? before = null,
@@ -60,7 +59,7 @@ internal sealed class BitflyerNormalizedMarketDataFacade
         var rawCall = await _raw
             .GetExecutionsPublicCallAsync(new RawPublicModels.GetExecutionsRequest(productCode, count, before, after), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetExecutionsRequest(productCode, count, before, after);
+        var request = new PublicRequests.GetExecutionsRequest(productCode, count, before, after);
 
         return CreateCall(
             rawCall,
@@ -71,31 +70,31 @@ internal sealed class BitflyerNormalizedMarketDataFacade
                 rawCall.Meta.RawJson));
     }
 
-    public async Task<Call<NormalizedRequests.GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(
+    public async Task<Call<PublicRequests.GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
             .GetHealthCallAsync(new RawPublicModels.GetHealthRequest(productCode), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetHealthRequest(productCode);
+        var request = new PublicRequests.GetHealthRequest(productCode);
 
         return CreateCall(rawCall, request, "Bitflyer.GetHealth", BitflyerHealthNormalizer.Normalize);
     }
 
-    public async Task<Call<NormalizedRequests.GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
+    public async Task<Call<PublicRequests.GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
         string productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
             .GetBoardStateCallAsync(new RawPublicModels.GetBoardStateRequest(productCode), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetBoardStateRequest(productCode);
+        var request = new PublicRequests.GetBoardStateRequest(productCode);
 
         return CreateCall(rawCall, request, "Bitflyer.GetBoardState", BitflyerBoardStateNormalizer.Normalize);
     }
 
-    public async Task<Call<NormalizedRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
+    public async Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
         string? fromDate = null,
         string? region = null,
         CancellationToken ct = default)
@@ -103,7 +102,7 @@ internal sealed class BitflyerNormalizedMarketDataFacade
         var rawCall = await _raw
             .GetChatsCallAsync(new RawPublicModels.GetChatsRequest(fromDate, region), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetChatsRequest(fromDate, region);
+        var request = new PublicRequests.GetChatsRequest(fromDate, region);
 
         return CreateCall(
             rawCall,

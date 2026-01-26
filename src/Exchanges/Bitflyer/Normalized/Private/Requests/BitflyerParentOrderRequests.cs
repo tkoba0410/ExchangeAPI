@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests;
 
 public sealed record SendParentOrderRequest(
     IReadOnlyList<BitflyerParentOrderParameterRequest> Parameters,

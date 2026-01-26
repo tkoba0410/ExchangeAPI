@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Requests;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests;
 
 public sealed record GetTickerRequest(string ProductCode);
 

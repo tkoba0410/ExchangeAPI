@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;

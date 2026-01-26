@@ -1,9 +1,9 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 
 internal static class BitflyerCommonMapper
 {

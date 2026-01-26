@@ -11,7 +11,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Markets;
 using PublicRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests;
 using PrivateRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;

@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Types;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
 
 public enum BitflyerConditionType
 {

@@ -2,7 +2,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 
 internal static class BitflyerOrderEncoder
 {

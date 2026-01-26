@@ -5,7 +5,7 @@ using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 
 internal static class BitflyerExecutionNormalizer
 {

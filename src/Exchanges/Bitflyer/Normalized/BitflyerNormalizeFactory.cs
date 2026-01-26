@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Markets;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Markets;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized;
 

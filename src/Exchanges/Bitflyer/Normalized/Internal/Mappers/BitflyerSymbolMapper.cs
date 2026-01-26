@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 
 internal static class BitflyerSymbolMapper
 {

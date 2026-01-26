@@ -6,7 +6,7 @@ using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 
 internal static class BitflyerAccountMapper
 {

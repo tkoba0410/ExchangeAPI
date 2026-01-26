@@ -8,7 +8,7 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Mappers;
 

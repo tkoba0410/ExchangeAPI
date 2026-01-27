@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Primitives.CallCommon;
 

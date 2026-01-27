@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;

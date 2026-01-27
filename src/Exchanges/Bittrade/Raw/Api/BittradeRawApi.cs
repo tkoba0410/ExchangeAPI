@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw;
+namespace ExchangeApi.Exchanges.Bittrade.Raw.Api;
 
 /// <summary>
 /// Bittrade の Raw API アクセス（Public/Private/Trading をまとめた単一入口）。

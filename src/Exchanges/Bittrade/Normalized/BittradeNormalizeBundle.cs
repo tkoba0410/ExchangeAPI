@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 namespace ExchangeApi.Exchanges.Bittrade.Normalized;
 
 internal sealed class BittradeNormalizeBundle

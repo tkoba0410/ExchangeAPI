@@ -19,6 +19,7 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - Wire / Raw / Normalized / Adapter の各層で、**Public / Private / Internal** を基本骨格として揃える
 - **意味分類（MarketData / Trading / Account など）でフォルダ分割しない**（Public/Private 以外で分けない）
 - 生成・組み立て用途の `Factory` は **Internal 配下に置く**（例：`.../Internal/Factory`）
+- `Internal` は各層の直下に置く（例：`.../Normalized/Internal`）。Public/Private 配下には置かない
 
 ### 2.2 namespace
 
@@ -35,6 +36,12 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - 内部実装の詳細（DTO の内部表現、マッパの分割、最適化手法など）
 - Public 側の “Facade/Api” といった命名・構造パターン（統一する場合は別途タスク化）
 - `Properties` など **ビルドメタ情報の配置**は例外として許容する
+
+## 3.1 揺らぎ禁止（MUST NOT）
+
+- `Internal` の配置階層を取引所ごとに変えること
+- Raw API の入口配置（例：`Raw/Api` の有無）を取引所ごとに変えること
+- Factory の配置を `Internal` 以外に置くこと
 
 ## 4. Bitflyer を参照実装とする範囲（SHOULD）
 

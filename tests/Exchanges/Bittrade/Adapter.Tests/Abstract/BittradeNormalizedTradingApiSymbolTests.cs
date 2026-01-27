@@ -5,7 +5,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
-using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;

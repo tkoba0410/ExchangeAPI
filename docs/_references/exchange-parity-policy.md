@@ -21,6 +21,7 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - 生成・組み立て用途の `Factory` は **Internal 配下に置く**（例：`.../Internal/Factory`）
 - `Internal` は各層の直下に置く（例：`.../Normalized/Internal`）。Public/Private 配下には置かない
 - `Internal/NotSupported` は **全取引所で必須**（例外は設けない）
+- Public 側の命名は **`*Api` に統一**する（例外は設けない）
 
 ### 2.2 namespace
 
@@ -35,7 +36,6 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 
 - 取引所固有の機能差（例：片方に存在しない endpoint 群）
 - 内部実装の詳細（DTO の内部表現、マッパの分割、最適化手法など）
-- Public 側の命名は **`*Api` に統一**する（例外は設けない）
 - `Properties` など **ビルドメタ情報の配置**は例外として許容する
 
 ## 3.1 揺らぎ禁止（MUST NOT）

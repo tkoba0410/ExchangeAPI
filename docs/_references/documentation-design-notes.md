@@ -9,7 +9,7 @@
 > - docs/process.md
 > - docs/exceptions.md
 > - docs/inventory/
-> - docs/inventory-*.md
+> - docs/inventory/endpoints-*.md
 
 # 文書設計ノート（参考）
 
@@ -157,9 +157,8 @@ docs/
   contracts/contracts.md        # Normative（横断 Contract）
   exceptions.md       # 例外台帳
   process.md          # 運用・編集規律
-  inventory/endpoints.md        # Inventory（横断の一覧）
-  inventory/inventory-bitflyer.md
-  inventory/inventory-bittrade.md
+  inventory/endpoints-bitflyer.md
+  inventory/endpoints-bittrade.md
 ```
 
 ### 2.2 基本原則

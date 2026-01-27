@@ -119,10 +119,12 @@ src/Exchanges/<Exchange>/Raw/
   Api/
   Public/
     Api/
-    Models/
+    Dtos/
+    Requests/
   Private/
     Api/
-    Models/
+    Dtos/
+    Requests/
   Internal/
 ```
 
@@ -165,10 +167,12 @@ src/Exchanges/<Exchange>/Normalized/
   Api/
   Public/
     Api/
-    Models/
+    Dtos/
+    Requests/
   Private/
     Api/
-    Models/
+    Dtos/
+    Requests/
   Internal/
 ```
 
@@ -209,10 +213,10 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 src/Exchanges/<Exchange>/Adapter/
   Public/
     Api/
-    Models/
+    Dtos/
   Private/
     Api/
-    Models/
+    Dtos/
   Internal/
 ```
 

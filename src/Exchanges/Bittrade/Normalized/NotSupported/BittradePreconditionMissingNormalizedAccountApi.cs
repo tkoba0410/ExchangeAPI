@@ -25,6 +25,17 @@ internal sealed class BittradePreconditionMissingNormalizedAccountApi : IBittrad
         Task.FromResult(CreatePreconditionMissing<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>(
             new GetBalancesRequest(_accountId)));
 
+    public Task<Call<GetAccountsRequest, IReadOnlyList<BittradeAccountNormalized>>> GetAccountsCallAsync(
+        CancellationToken ct = default) =>
+        Task.FromResult(CreatePreconditionMissing<GetAccountsRequest, IReadOnlyList<BittradeAccountNormalized>>(
+            new GetAccountsRequest()));
+
+    public Task<Call<GetDepositWithdrawRequest, IReadOnlyList<BittradeDepositWithdrawNormalized>>> GetDepositWithdrawCallAsync(
+        GetDepositWithdrawRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(CreatePreconditionMissing<GetDepositWithdrawRequest, IReadOnlyList<BittradeDepositWithdrawNormalized>>(
+            request));
+
     public Task<Call<GetWithdrawVirtualAddressesRequest, IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>>> GetWithdrawVirtualAddressesCallAsync(
         CancellationToken ct = default) =>
         Task.FromResult(CreatePreconditionMissing<GetWithdrawVirtualAddressesRequest, IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>>(

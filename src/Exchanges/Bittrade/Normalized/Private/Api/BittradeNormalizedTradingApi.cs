@@ -37,24 +37,24 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             : accountId;
     }
 
-    public async Task<Call<NormalizedRequests.PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
-        BittradeOrderRequest request,
+    public async Task<Call<NormalizedRequests.PostOrdersPlaceRequest, BittradeOrderResult>> PostOrdersPlaceCallAsync(
+        NormalizedRequests.PostOrdersPlaceRequest request,
         CancellationToken ct = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var callRequest = new NormalizedRequests.PlaceOrderRequest(request);
-        var marketCall = await _markets.ResolveCallAsync(request.Symbol, ct).ConfigureAwait(false);
+        var callRequest = request;
+        var marketCall = await _markets.ResolveCallAsync(request.Request.Symbol, ct).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
         {
-            return CreateCallError<NormalizedRequests.PlaceOrderRequest, BittradeOrderResult>(
+            return CreateCallError<NormalizedRequests.PostOrdersPlaceRequest, BittradeOrderResult>(
                 marketCall,
                 callRequest,
                 "Bittrade.PlaceOrder",
                 marketError!);
         }
 
-        var rawRequest = BittradeTradingMapper.ToRaw(_accountId, apiSymbol!, request);
+        var rawRequest = BittradeTradingMapper.ToRaw(_accountId, apiSymbol!, request.Request);
         var rawCall = await _trading
             .PostOrdersPlaceCallAsync(new RawPrivateModels.CreateOrderRequest(rawRequest), ct)
             .ConfigureAwait(false);
@@ -85,7 +85,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             });
     }
 
-    public async Task<Call<NormalizedRequests.CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
+    public async Task<Call<NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest, BittradeCancelResult>> PostOrdersSubmitCancelByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default)
@@ -95,10 +95,10 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             throw new ArgumentException("symbol is required.", nameof(symbol));
         }
 
-        var callRequest = new NormalizedRequests.CancelOrderRequest(symbol, orderKey);
+        var callRequest = new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(symbol, orderKey);
         if (orderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
         {
-            return CreateNotSupported<NormalizedRequests.CancelOrderRequest, BittradeCancelResult>(
+            return CreateNotSupported<NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest, BittradeCancelResult>(
                 callRequest,
                 component: "Bittrade.Trading",
                 feature: "CancelOrder",
@@ -111,6 +111,61 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             .ConfigureAwait(false);
 
         return CreateCall(rawCall, callRequest, "Bittrade.CancelOrder", _ => new BittradeCancelResult(true));
+    }
+
+    public async Task<Call<NormalizedRequests.PostOrdersBatchCancelRequest, BittradeCancelResult>> PostOrdersBatchCancelCallAsync(
+        NormalizedRequests.PostOrdersBatchCancelRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _trading
+            .PostOrdersBatchCancelCallAsync(new RawPrivateModels.CancelOrdersRequest(
+                new RawPrivateModels.RawCancelOrdersRequest(request.OrderIds)), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(rawCall, request, "Bittrade.CancelOrders", raw =>
+            new BittradeCancelResult(string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase)));
+    }
+
+    public async Task<Call<NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>> PostOrdersBatchCancelOpenOrdersCallAsync(
+        NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        string? apiSymbol = null;
+        if (request.Symbol is { IsEmpty: false })
+        {
+            var marketCall = await _markets.ResolveCallAsync(request.Symbol.Value, ct).ConfigureAwait(false);
+            if (!TryGetApiSymbol(marketCall, out apiSymbol, out var marketError))
+            {
+                return CreateCallError<NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>(
+                    marketCall,
+                    request,
+                    "Bittrade.CancelOpenOrders",
+                    marketError!);
+            }
+        }
+
+        var rawRequest = new RawPrivateModels.RawCancelOpenOrdersRequest(
+            AccountId: _accountId,
+            Symbol: apiSymbol,
+            Side: request.Side is null
+                ? null
+                : request.Side.Value == Side.Buy
+                    ? "buy"
+                    : "sell",
+            Size: request.Size?.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            Price: request.Price?.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            CreatedAt: request.CreatedAt);
+
+        var rawCall = await _trading
+            .PostOrdersBatchCancelOpenOrdersCallAsync(new RawPrivateModels.CancelOpenOrdersRequest(rawRequest), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(rawCall, request, "Bittrade.CancelOpenOrders", raw =>
+            new BittradeCancelResult(string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase)));
     }
 
     public async Task<Call<NormalizedRequests.GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>> GetOpenOrdersCallAsync(
@@ -177,6 +232,23 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         return CreateCall(rawCall, callRequest, "Bittrade.GetOrder", raw => BittradeTradingMapper.ToOrderStatus(market.ProductCode, raw, key));
     }
 
+    public async Task<Call<NormalizedRequests.GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetOrdersMatchResultsByOrderIdCallAsync(
+        NormalizedRequests.GetOrdersMatchResultsByOrderIdRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _trading
+            .GetOrdersMatchResultsByOrderIdCallAsync(new RawPrivateModels.GetOrderMatchResultsRequest(request.OrderKey.Value), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetOrderMatchResults",
+            raw => BittradeTradingMapper.ToExecutions(raw.Data ?? Array.Empty<RawPrivateModels.RawMatchResultEntry>()));
+    }
+
     public async Task<Call<NormalizedRequests.GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
         Symbol symbol,
         int? limit = null,
@@ -204,6 +276,40 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             callRequest,
             "Bittrade.GetExecutions",
             raw => BittradeTradingMapper.ToExecutions(raw.Data ?? Array.Empty<RawPrivateModels.RawMatchResultEntry>()));
+    }
+
+    public async Task<Call<NormalizedRequests.PostWithdrawApiCreateRequest, BittradeWithdrawResult>> PostWithdrawApiCreateCallAsync(
+        NormalizedRequests.PostWithdrawApiCreateRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawRequest = new RawPrivateModels.RawCreateWithdrawRequest(
+            request.Address,
+            request.Amount.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            request.Currency,
+            request.Fee?.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            request.AddressTag);
+
+        var rawCall = await _trading
+            .PostWithdrawApiCreateCallAsync(new RawPrivateModels.CreateWithdrawRequest(rawRequest), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(rawCall, request, "Bittrade.CreateWithdraw", BittradeTradingMapper.ToWithdrawResult);
+    }
+
+    public async Task<Call<NormalizedRequests.PostRetailOrderPlaceRequest, BittradeRetailOrderResult>> PostRetailOrderPlaceCallAsync(
+        NormalizedRequests.PostRetailOrderPlaceRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawRequest = BittradeTradingMapper.ToRawRetailOrder(request.Request);
+        var rawCall = await _trading
+            .PostOrderPlaceCallAsync(new RawPrivateModels.CreateRetailOrderRequest(rawRequest), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(rawCall, request, "Bittrade.PostRetailOrderPlace", BittradeTradingMapper.ToRetailOrderResult);
     }
 
     public async Task<Call<NormalizedRequests.GetRetailOrderListRequest, IReadOnlyList<BittradeRetailOrderEntryNormalized>>> GetRetailOrderListCallAsync(

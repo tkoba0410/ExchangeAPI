@@ -11,16 +11,24 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 
 internal interface IBittradeNormalizedTradingApi
 {
-    Task<Call<PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
-        BittradeOrderRequest request,
+    Task<Call<PostOrdersPlaceRequest, BittradeOrderResult>> PostOrdersPlaceCallAsync(
+        PostOrdersPlaceRequest request,
         CancellationToken ct = default);
 
     Task<Call<GetOrdersRequest, IReadOnlyList<BittradeOrderSummaryNormalized>>> GetOrdersCallAsync(
         CancellationToken ct = default);
 
-    Task<Call<CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
+    Task<Call<PostOrdersSubmitCancelByOrderIdRequest, BittradeCancelResult>> PostOrdersSubmitCancelByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
+        CancellationToken ct = default);
+
+    Task<Call<PostOrdersBatchCancelRequest, BittradeCancelResult>> PostOrdersBatchCancelCallAsync(
+        PostOrdersBatchCancelRequest request,
+        CancellationToken ct = default);
+
+    Task<Call<PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>> PostOrdersBatchCancelOpenOrdersCallAsync(
+        PostOrdersBatchCancelOpenOrdersRequest request,
         CancellationToken ct = default);
 
     Task<Call<GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>> GetOpenOrdersCallAsync(
@@ -32,9 +40,21 @@ internal interface IBittradeNormalizedTradingApi
         OrderKey orderKey,
         CancellationToken ct = default);
 
+    Task<Call<GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetOrdersMatchResultsByOrderIdCallAsync(
+        GetOrdersMatchResultsByOrderIdRequest request,
+        CancellationToken ct = default);
+
     Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
         Symbol symbol,
         int? limit = null,
+        CancellationToken ct = default);
+
+    Task<Call<PostWithdrawApiCreateRequest, BittradeWithdrawResult>> PostWithdrawApiCreateCallAsync(
+        PostWithdrawApiCreateRequest request,
+        CancellationToken ct = default);
+
+    Task<Call<PostRetailOrderPlaceRequest, BittradeRetailOrderResult>> PostRetailOrderPlaceCallAsync(
+        PostRetailOrderPlaceRequest request,
         CancellationToken ct = default);
 
     Task<Call<GetRetailOrderListRequest, IReadOnlyList<BittradeRetailOrderEntryNormalized>>> GetRetailOrderListCallAsync(

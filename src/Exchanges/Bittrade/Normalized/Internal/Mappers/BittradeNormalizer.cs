@@ -140,6 +140,44 @@ internal static class BittradeNormalizer
             .ToList();
     }
 
+    internal static IReadOnlyList<BittradeAccountNormalized> NormalizeAccounts(
+        IReadOnlyList<RawPrivateModels.RawAccount>? accounts)
+    {
+        if (accounts is null || accounts.Count == 0)
+        {
+            return Array.Empty<BittradeAccountNormalized>();
+        }
+
+        return accounts
+            .Select(account => new BittradeAccountNormalized(
+                account.Id,
+                account.Type,
+                account.SubType,
+                account.State))
+            .ToList();
+    }
+
+    internal static IReadOnlyList<BittradeDepositWithdrawNormalized> NormalizeDepositWithdraws(
+        IReadOnlyList<RawPrivateModels.RawDepositWithdrawEntry>? entries)
+    {
+        if (entries is null || entries.Count == 0)
+        {
+            return Array.Empty<BittradeDepositWithdrawNormalized>();
+        }
+
+        return entries
+            .Select(entry => new BittradeDepositWithdrawNormalized(
+                entry.Id,
+                entry.Type,
+                entry.Currency,
+                entry.Amount,
+                entry.Address,
+                entry.TxHash,
+                entry.State,
+                entry.CreatedAt))
+            .ToList();
+    }
+
     internal static IReadOnlyList<BittradeWithdrawVirtualAddressNormalized> NormalizeWithdrawVirtualAddresses(
         IReadOnlyList<RawPrivateModels.RawWithdrawVirtualAddress>? entries)
     {

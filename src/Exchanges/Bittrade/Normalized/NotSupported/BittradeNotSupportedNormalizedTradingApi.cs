@@ -15,13 +15,13 @@ internal sealed class BittradeNotSupportedNormalizedTradingApi : IBittradeNormal
     private const string Layer = "Normalized";
     private const string Component = "Bittrade.NotSupported";
 
-    public Task<Call<PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
-        BittradeOrderRequest request,
+    public Task<Call<PostOrdersPlaceRequest, BittradeOrderResult>> PostOrdersPlaceCallAsync(
+        PostOrdersPlaceRequest request,
         CancellationToken ct = default) =>
-        Task.FromResult(NotSupportedCall.Create<PlaceOrderRequest, BittradeOrderResult>(
+        Task.FromResult(NotSupportedCall.Create<PostOrdersPlaceRequest, BittradeOrderResult>(
             Layer,
             Component,
-            new PlaceOrderRequest(request),
+            request,
             "Trading.PlaceOrder"));
 
     public Task<Call<GetOrdersRequest, IReadOnlyList<BittradeOrderSummaryNormalized>>> GetOrdersCallAsync(
@@ -32,15 +32,33 @@ internal sealed class BittradeNotSupportedNormalizedTradingApi : IBittradeNormal
             new GetOrdersRequest(),
             "Trading.GetOrders"));
 
-    public Task<Call<CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
+    public Task<Call<PostOrdersSubmitCancelByOrderIdRequest, BittradeCancelResult>> PostOrdersSubmitCancelByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default) =>
-        Task.FromResult(NotSupportedCall.Create<CancelOrderRequest, BittradeCancelResult>(
+        Task.FromResult(NotSupportedCall.Create<PostOrdersSubmitCancelByOrderIdRequest, BittradeCancelResult>(
             Layer,
             Component,
-            new CancelOrderRequest(symbol, orderKey),
+            new PostOrdersSubmitCancelByOrderIdRequest(symbol, orderKey),
             "Trading.CancelOrder"));
+
+    public Task<Call<PostOrdersBatchCancelRequest, BittradeCancelResult>> PostOrdersBatchCancelCallAsync(
+        PostOrdersBatchCancelRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(NotSupportedCall.Create<PostOrdersBatchCancelRequest, BittradeCancelResult>(
+            Layer,
+            Component,
+            request,
+            "Trading.CancelOrders"));
+
+    public Task<Call<PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>> PostOrdersBatchCancelOpenOrdersCallAsync(
+        PostOrdersBatchCancelOpenOrdersRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(NotSupportedCall.Create<PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>(
+            Layer,
+            Component,
+            request,
+            "Trading.CancelOpenOrders"));
 
     public Task<Call<GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>> GetOpenOrdersCallAsync(
         Symbol symbol,
@@ -61,6 +79,15 @@ internal sealed class BittradeNotSupportedNormalizedTradingApi : IBittradeNormal
             new GetOrderRequest(symbol, orderKey),
             "Trading.GetOrder"));
 
+    public Task<Call<GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetOrdersMatchResultsByOrderIdCallAsync(
+        GetOrdersMatchResultsByOrderIdRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(NotSupportedCall.Create<GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<BittradeExecutionNormalized>>(
+            Layer,
+            Component,
+            request,
+            "Trading.GetOrderExecutions"));
+
     public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
         Symbol symbol,
         int? limit = null,
@@ -70,6 +97,24 @@ internal sealed class BittradeNotSupportedNormalizedTradingApi : IBittradeNormal
             Component,
             new GetAccountExecutionsRequest(symbol, limit),
             "Trading.GetExecutions"));
+
+    public Task<Call<PostWithdrawApiCreateRequest, BittradeWithdrawResult>> PostWithdrawApiCreateCallAsync(
+        PostWithdrawApiCreateRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(NotSupportedCall.Create<PostWithdrawApiCreateRequest, BittradeWithdrawResult>(
+            Layer,
+            Component,
+            request,
+            "Trading.PostWithdrawApiCreate"));
+
+    public Task<Call<PostRetailOrderPlaceRequest, BittradeRetailOrderResult>> PostRetailOrderPlaceCallAsync(
+        PostRetailOrderPlaceRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(NotSupportedCall.Create<PostRetailOrderPlaceRequest, BittradeRetailOrderResult>(
+            Layer,
+            Component,
+            request,
+            "Trading.PostRetailOrderPlace"));
 
     public Task<Call<GetRetailOrderListRequest, IReadOnlyList<BittradeRetailOrderEntryNormalized>>> GetRetailOrderListCallAsync(
         GetRetailOrderListRequest request,

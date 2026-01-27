@@ -19,6 +19,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
 using BittradeOrderRequest = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.BittradeOrderRequest;
+using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
@@ -55,13 +56,14 @@ internal sealed class BittradeTradingApi : ITradingApi
         try
         {
             var call = await _trading
-                .PlaceOrderCallAsync(
-                    new BittradeOrderRequest(
-                        Symbol: symbol,
-                        Side: side,
-                        OrderType: OrderType.Limit,
-                        Size: size,
-                        Price: price),
+                .PostOrdersPlaceCallAsync(
+                    new NormalizedRequests.PostOrdersPlaceRequest(
+                        new BittradeOrderRequest(
+                            Symbol: symbol,
+                            Side: side,
+                            OrderType: OrderType.Limit,
+                            Size: size,
+                            Price: price)),
                     cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
@@ -92,13 +94,14 @@ internal sealed class BittradeTradingApi : ITradingApi
         try
         {
             var call = await _trading
-                .PlaceOrderCallAsync(
-                    new BittradeOrderRequest(
-                        Symbol: symbol,
-                        Side: side,
-                        OrderType: OrderType.Market,
-                        Size: size,
-                        Price: null),
+                .PostOrdersPlaceCallAsync(
+                    new NormalizedRequests.PostOrdersPlaceRequest(
+                        new BittradeOrderRequest(
+                            Symbol: symbol,
+                            Side: side,
+                            OrderType: OrderType.Market,
+                            Size: size,
+                            Price: null)),
                     cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
@@ -127,7 +130,9 @@ internal sealed class BittradeTradingApi : ITradingApi
 
         try
         {
-            var call = await _trading.CancelOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
+            var call = await _trading
+                .PostOrdersSubmitCancelByOrderIdCallAsync(symbol, orderKey, cancellationToken)
+                .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

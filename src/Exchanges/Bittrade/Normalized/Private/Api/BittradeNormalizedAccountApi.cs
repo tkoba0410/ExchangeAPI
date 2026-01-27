@@ -45,6 +45,59 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
             });
     }
 
+    public async Task<Call<NormalizedRequests.GetAccountsRequest, IReadOnlyList<BittradeAccountNormalized>>> GetAccountsCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _account
+            .GetAccountsCallAsync(new RawPrivateModels.GetAccountsRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetAccountsRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetAccounts",
+            ok =>
+            {
+                if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new BittradeNormalizedException("Bittrade accounts response invalid.");
+                }
+
+                return BittradeNormalizer.NormalizeAccounts(ok.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetDepositWithdrawRequest, IReadOnlyList<BittradeDepositWithdrawNormalized>>> GetDepositWithdrawCallAsync(
+        NormalizedRequests.GetDepositWithdrawRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _account
+            .GetDepositWithdrawCallAsync(new RawPrivateModels.GetDepositWithdrawsRequest(
+                request.Type,
+                request.Currency,
+                request.From,
+                request.Size,
+                request.Direct), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetDepositWithdraws",
+            ok =>
+            {
+                if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new BittradeNormalizedException("Bittrade deposit/withdraw response invalid.");
+                }
+
+                return BittradeNormalizer.NormalizeDepositWithdraws(ok.Data);
+            });
+    }
+
     public async Task<Call<NormalizedRequests.GetWithdrawVirtualAddressesRequest, IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>>> GetWithdrawVirtualAddressesCallAsync(
         CancellationToken ct = default)
     {

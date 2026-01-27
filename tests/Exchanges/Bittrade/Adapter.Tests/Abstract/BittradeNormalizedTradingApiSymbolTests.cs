@@ -22,9 +22,10 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
     public async Task TryGetApiSymbol_invalid_product_code_returns_error(string productCode)
     {
         var api = CreateApi(productCode);
-        var request = new BittradeOrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m));
+        var request = new PostOrdersPlaceRequest(
+            new BittradeOrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m)));
 
-        var call = await api.PlaceOrderCallAsync(request, CancellationToken.None);
+        var call = await api.PostOrdersPlaceCallAsync(request, CancellationToken.None);
 
         var err = Assert.IsType<CallResult<BittradeOrderResult>.Err>(call.Result);
         Assert.NotNull(err.Error);
@@ -35,9 +36,10 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
     {
         var raw = new RecordingRawTradingApi();
         var api = CreateApi("BTC_JPY", raw);
-        var request = new BittradeOrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m));
+        var request = new PostOrdersPlaceRequest(
+            new BittradeOrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m)));
 
-        await api.PlaceOrderCallAsync(request, CancellationToken.None);
+        await api.PostOrdersPlaceCallAsync(request, CancellationToken.None);
 
         Assert.True(raw.WasCalled);
     }

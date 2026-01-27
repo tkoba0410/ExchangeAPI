@@ -21,23 +21,35 @@ internal sealed class BittradePreconditionMissingNormalizedTradingApi : IBittrad
         _ = accountId;
     }
 
-    public Task<Call<PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
-        BittradeOrderRequest request,
+    public Task<Call<PostOrdersPlaceRequest, BittradeOrderResult>> PostOrdersPlaceCallAsync(
+        PostOrdersPlaceRequest request,
         CancellationToken ct = default) =>
-        Task.FromResult(CreatePreconditionMissing<PlaceOrderRequest, BittradeOrderResult>(
-            new PlaceOrderRequest(request)));
+        Task.FromResult(CreatePreconditionMissing<PostOrdersPlaceRequest, BittradeOrderResult>(
+            request));
 
     public Task<Call<GetOrdersRequest, IReadOnlyList<BittradeOrderSummaryNormalized>>> GetOrdersCallAsync(
         CancellationToken ct = default) =>
         Task.FromResult(CreatePreconditionMissing<GetOrdersRequest, IReadOnlyList<BittradeOrderSummaryNormalized>>(
             new GetOrdersRequest()));
 
-    public Task<Call<CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
+    public Task<Call<PostOrdersSubmitCancelByOrderIdRequest, BittradeCancelResult>> PostOrdersSubmitCancelByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default) =>
-        Task.FromResult(CreatePreconditionMissing<CancelOrderRequest, BittradeCancelResult>(
-            new CancelOrderRequest(symbol, orderKey)));
+        Task.FromResult(CreatePreconditionMissing<PostOrdersSubmitCancelByOrderIdRequest, BittradeCancelResult>(
+            new PostOrdersSubmitCancelByOrderIdRequest(symbol, orderKey)));
+
+    public Task<Call<PostOrdersBatchCancelRequest, BittradeCancelResult>> PostOrdersBatchCancelCallAsync(
+        PostOrdersBatchCancelRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(CreatePreconditionMissing<PostOrdersBatchCancelRequest, BittradeCancelResult>(
+            request));
+
+    public Task<Call<PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>> PostOrdersBatchCancelOpenOrdersCallAsync(
+        PostOrdersBatchCancelOpenOrdersRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(CreatePreconditionMissing<PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>(
+            request));
 
     public Task<Call<GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>> GetOpenOrdersCallAsync(
         Symbol symbol,
@@ -52,12 +64,30 @@ internal sealed class BittradePreconditionMissingNormalizedTradingApi : IBittrad
         Task.FromResult(CreatePreconditionMissing<GetOrderRequest, BittradeOrderStatus>(
             new GetOrderRequest(symbol, orderKey)));
 
+    public Task<Call<GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetOrdersMatchResultsByOrderIdCallAsync(
+        GetOrdersMatchResultsByOrderIdRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(CreatePreconditionMissing<GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<BittradeExecutionNormalized>>(
+            request));
+
     public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
         Symbol symbol,
         int? limit = null,
         CancellationToken ct = default) =>
         Task.FromResult(CreatePreconditionMissing<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
             new GetAccountExecutionsRequest(symbol, limit)));
+
+    public Task<Call<PostWithdrawApiCreateRequest, BittradeWithdrawResult>> PostWithdrawApiCreateCallAsync(
+        PostWithdrawApiCreateRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(CreatePreconditionMissing<PostWithdrawApiCreateRequest, BittradeWithdrawResult>(
+            request));
+
+    public Task<Call<PostRetailOrderPlaceRequest, BittradeRetailOrderResult>> PostRetailOrderPlaceCallAsync(
+        PostRetailOrderPlaceRequest request,
+        CancellationToken ct = default) =>
+        Task.FromResult(CreatePreconditionMissing<PostRetailOrderPlaceRequest, BittradeRetailOrderResult>(
+            request));
 
     public Task<Call<GetRetailOrderListRequest, IReadOnlyList<BittradeRetailOrderEntryNormalized>>> GetRetailOrderListCallAsync(
         GetRetailOrderListRequest request,

@@ -73,10 +73,12 @@ public sealed class BittradeOrderKeyConnectivityTests
         public Symbol? LastSymbol { get; private set; }
         public BittradeOrderStatus Order { get; init; } = CreateOrderStatus("default");
 
-        public Task<Call<PlaceOrderRequest, BittradeOrderResult>> PlaceOrderCallAsync(
-            BittradeOrderRequest request,
+        public Task<Call<PostOrdersPlaceRequest, BittradeOrderResult>> PostOrdersPlaceCallAsync(
+            PostOrdersPlaceRequest request,
             CancellationToken ct = default) =>
-            Task.FromResult(MakeOkCall(new PlaceOrderRequest(request), new BittradeOrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
+            Task.FromResult(MakeOkCall(
+                request,
+                new BittradeOrderResult(new OrderKey(OrderIdKind.AcceptanceId, "dummy"), AcceptanceId: "dummy")));
 
         public Task<Call<GetOrdersRequest, IReadOnlyList<BittradeOrderSummaryNormalized>>> GetOrdersCallAsync(
             CancellationToken ct = default) =>
@@ -84,15 +86,27 @@ public sealed class BittradeOrderKeyConnectivityTests
                 new GetOrdersRequest(),
                 (IReadOnlyList<BittradeOrderSummaryNormalized>)Array.Empty<BittradeOrderSummaryNormalized>()));
 
-        public Task<Call<CancelOrderRequest, BittradeCancelResult>> CancelOrderCallAsync(
+        public Task<Call<PostOrdersSubmitCancelByOrderIdRequest, BittradeCancelResult>> PostOrdersSubmitCancelByOrderIdCallAsync(
             Symbol symbol,
             OrderKey orderKey,
             CancellationToken ct = default)
         {
             LastSymbol = symbol;
             LastOrderKey = orderKey;
-            return Task.FromResult(MakeOkCall(new CancelOrderRequest(symbol, orderKey), new BittradeCancelResult(true)));
+            return Task.FromResult(MakeOkCall(
+                new PostOrdersSubmitCancelByOrderIdRequest(symbol, orderKey),
+                new BittradeCancelResult(true)));
         }
+
+        public Task<Call<PostOrdersBatchCancelRequest, BittradeCancelResult>> PostOrdersBatchCancelCallAsync(
+            PostOrdersBatchCancelRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(request, new BittradeCancelResult(true)));
+
+        public Task<Call<PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>> PostOrdersBatchCancelOpenOrdersCallAsync(
+            PostOrdersBatchCancelOpenOrdersRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(request, new BittradeCancelResult(true)));
 
         public Task<Call<GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>> GetOpenOrdersCallAsync(
             Symbol symbol,
@@ -109,6 +123,13 @@ public sealed class BittradeOrderKeyConnectivityTests
             return Task.FromResult(MakeOkCall(new GetOrderRequest(symbol, orderKey), Order with { Key = orderKey }));
         }
 
+        public Task<Call<GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetOrdersMatchResultsByOrderIdCallAsync(
+            GetOrdersMatchResultsByOrderIdRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(
+                request,
+                (IReadOnlyList<BittradeExecutionNormalized>)Array.Empty<BittradeExecutionNormalized>()));
+
         public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
             Symbol symbol,
             int? limit = null,
@@ -116,6 +137,16 @@ public sealed class BittradeOrderKeyConnectivityTests
             Task.FromResult(MakeOkCall(
                 new GetAccountExecutionsRequest(symbol, limit),
                 (IReadOnlyList<BittradeExecutionNormalized>)Array.Empty<BittradeExecutionNormalized>()));
+
+        public Task<Call<PostWithdrawApiCreateRequest, BittradeWithdrawResult>> PostWithdrawApiCreateCallAsync(
+            PostWithdrawApiCreateRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(request, new BittradeWithdrawResult("ok", null)));
+
+        public Task<Call<PostRetailOrderPlaceRequest, BittradeRetailOrderResult>> PostRetailOrderPlaceCallAsync(
+            PostRetailOrderPlaceRequest request,
+            CancellationToken ct = default) =>
+            Task.FromResult(MakeOkCall(request, new BittradeRetailOrderResult(0, null, true, null)));
 
         public Task<Call<GetRetailOrderListRequest, IReadOnlyList<BittradeRetailOrderEntryNormalized>>> GetRetailOrderListCallAsync(
             GetRetailOrderListRequest request,

@@ -41,6 +41,13 @@ public interface IBitflyerNormalizedApi
         string productCode,
         CancellationToken cancellationToken = default);
 
+    Task<Call<GetCorporateLeverageRequest, BitflyerCorporateLeverageNormalized>> GetCorporateLeverageCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetFundingRateRequest, BitflyerFundingRateNormalized>> GetFundingRateCallAsync(
+        string productCode,
+        CancellationToken cancellationToken = default);
+
     Task<Call<GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
         string? fromDate = null,
         string? region = null,
@@ -83,11 +90,79 @@ public interface IBitflyerNormalizedApi
     Task<Call<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default);
 
+    Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetCollateralRequest, BitflyerCollateralNormalized>> GetCollateralCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetCollateralAccountsRequest, IReadOnlyList<BitflyerCollateralAccountNormalized>>> GetCollateralAccountsCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetAddressesRequest, BitflyerRawJsonNormalized>> GetAddressesCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetCoinInsRequest, BitflyerRawJsonNormalized>> GetCoinInsCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetCoinOutsRequest, BitflyerRawJsonNormalized>> GetCoinOutsCallAsync(
+        string? messageId = null,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetBankAccountsRequest, BitflyerRawJsonNormalized>> GetBankAccountsCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetDepositsRequest, BitflyerRawJsonNormalized>> GetDepositsCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<WithdrawRequest, BitflyerWithdrawResultNormalized>> WithdrawCallAsync(
+        string currencyCode,
+        int bankAccountId,
+        decimal amount,
+        string? code = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetWithdrawalsRequest, BitflyerRawJsonNormalized>> GetWithdrawalsCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default);
+
     Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
+    Task<Call<GetBalanceHistoryRequest, BitflyerRawJsonNormalized>> GetBalanceHistoryCallAsync(
+        string? currencyCode = null,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>> GetPositionsCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetCollateralHistoryRequest, BitflyerRawJsonNormalized>> GetCollateralHistoryCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default);
+
     Task<Call<GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>> GetTradingCommissionCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<CancelAllChildOrdersRequest, BitflyerCancelResult>> CancelAllChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 }

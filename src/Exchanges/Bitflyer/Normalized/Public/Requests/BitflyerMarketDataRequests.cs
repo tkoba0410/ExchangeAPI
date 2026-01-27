@@ -18,6 +18,6 @@ public sealed record GetChatsRequest(string? FromDate = null, string? Region = n
 
 public sealed record GetMarketsRequest(string? Region = null);
 
-public sealed record GetCorporateLeverageRequest(string ProductCode);
+public sealed record GetCorporateLeverageRequest;
 
 public sealed record GetFundingRateRequest(string ProductCode);

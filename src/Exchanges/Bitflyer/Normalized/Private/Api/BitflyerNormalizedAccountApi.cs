@@ -38,6 +38,225 @@ internal sealed class BitflyerNormalizedAccountApi
         return CreateCall(rawCall, request, "Bitflyer.GetBalances", BitflyerAccountMapper.MapBalances);
     }
 
+    public async Task<Call<PrivateRequests.GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetPermissionsCallAsync(new RawPrivateModels.GetPermissionsRequest(), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetPermissionsRequest();
+        return CreateCall(rawCall, request, "Bitflyer.GetPermissions", raw => raw);
+    }
+
+    public async Task<Call<PrivateRequests.GetCollateralRequest, BitflyerCollateralNormalized>> GetCollateralCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetCollateralCallAsync(new RawPrivateModels.GetCollateralRequest(), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetCollateralRequest();
+        return CreateCall(
+            rawCall,
+            request,
+            "Bitflyer.GetCollateral",
+            raw => new BitflyerCollateralNormalized(raw.Collateral, raw.OpenPositionPnl, raw.RequireCollateral, raw.KeepRate));
+    }
+
+    public async Task<Call<PrivateRequests.GetCollateralAccountsRequest, IReadOnlyList<BitflyerCollateralAccountNormalized>>> GetCollateralAccountsCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetCollateralAccountsCallAsync(new RawPrivateModels.GetCollateralAccountsRequest(), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetCollateralAccountsRequest();
+        return CreateCall(
+            rawCall,
+            request,
+            "Bitflyer.GetCollateralAccounts",
+            raw =>
+            {
+                IReadOnlyList<BitflyerCollateralAccountNormalized> mapped = raw
+                    .Select(item => new BitflyerCollateralAccountNormalized(item.CurrencyCode, item.Amount, item.Available))
+                    .ToArray();
+                return mapped;
+            });
+    }
+
+    public async Task<Call<PrivateRequests.GetAddressesRequest, BitflyerRawJsonNormalized>> GetAddressesCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetAddressesCallAsync(new RawPrivateModels.GetAddressesRequest(), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetAddressesRequest();
+        return CreateCall(rawCall, request, "Bitflyer.GetAddresses", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+    }
+
+    public async Task<Call<PrivateRequests.GetCoinInsRequest, BitflyerRawJsonNormalized>> GetCoinInsCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetCoinInsCallAsync(new RawPrivateModels.GetCoinInsRequest(count, before, after), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetCoinInsRequest(count, before, after);
+        return CreateCall(rawCall, request, "Bitflyer.GetCoinIns", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+    }
+
+    public async Task<Call<PrivateRequests.GetCoinOutsRequest, BitflyerRawJsonNormalized>> GetCoinOutsCallAsync(
+        string? messageId = null,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetCoinOutsCallAsync(new RawPrivateModels.GetCoinOutsRequest(messageId, count, before, after), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetCoinOutsRequest(messageId, count, before, after);
+        return CreateCall(rawCall, request, "Bitflyer.GetCoinOuts", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+    }
+
+    public async Task<Call<PrivateRequests.GetBankAccountsRequest, BitflyerRawJsonNormalized>> GetBankAccountsCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetBankAccountsCallAsync(new RawPrivateModels.GetBankAccountsRequest(), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetBankAccountsRequest();
+        return CreateCall(rawCall, request, "Bitflyer.GetBankAccounts", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+    }
+
+    public async Task<Call<PrivateRequests.GetDepositsRequest, BitflyerRawJsonNormalized>> GetDepositsCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetDepositsCallAsync(new RawPrivateModels.GetDepositsRequest(count, before, after), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetDepositsRequest(count, before, after);
+        return CreateCall(rawCall, request, "Bitflyer.GetDeposits", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+    }
+
+    public async Task<Call<PrivateRequests.WithdrawRequest, BitflyerWithdrawResultNormalized>> WithdrawCallAsync(
+        string currencyCode,
+        int bankAccountId,
+        decimal amount,
+        string? code = null,
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .WithdrawCallAsync(new RawPrivateModels.CreateWithdrawalRequest
+            {
+                CurrencyCode = currencyCode,
+                BankAccountId = bankAccountId,
+                Amount = amount,
+                Code = code,
+            }, cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.WithdrawRequest(currencyCode, bankAccountId, amount, code);
+        return CreateCall(rawCall, request, "Bitflyer.Withdraw", raw => new BitflyerWithdrawResultNormalized(raw.MessageId));
+    }
+
+    public async Task<Call<PrivateRequests.GetWithdrawalsRequest, BitflyerRawJsonNormalized>> GetWithdrawalsCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetWithdrawalsCallAsync(new RawPrivateModels.GetWithdrawalsRequest(count, before, after), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetWithdrawalsRequest(count, before, after);
+        return CreateCall(rawCall, request, "Bitflyer.GetWithdrawals", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+    }
+
+    public async Task<Call<PrivateRequests.GetBalanceHistoryRequest, BitflyerRawJsonNormalized>> GetBalanceHistoryCallAsync(
+        string? currencyCode = null,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetBalanceHistoryCallAsync(new RawPrivateModels.GetBalanceHistoryRequest(currencyCode, count, before, after), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetBalanceHistoryRequest(currencyCode, count, before, after);
+        return CreateCall(rawCall, request, "Bitflyer.GetBalanceHistory", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+    }
+
+    public async Task<Call<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>> GetPositionsCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        if (symbol.IsEmpty)
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+
+        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        var request = new PrivateRequests.GetPositionsRequest(symbol);
+        if (marketCall.Result is CallResult<BitflyerMarketInfo>.Err marketError)
+        {
+            return CreateCallError<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>(
+                marketCall,
+                request,
+                "Bitflyer.GetPositions",
+                marketError.Error);
+        }
+
+        var productCode = marketCall.Result is CallResult<BitflyerMarketInfo>.Ok marketOk
+            ? marketOk.Response.ProductCode
+            : null;
+        if (string.IsNullOrEmpty(productCode))
+        {
+            return CreateCallError<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>(
+                marketCall,
+                request,
+                "Bitflyer.GetPositions",
+                new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
+        }
+
+        var rawCall = await _raw
+            .GetPositionsCallAsync(new RawPrivateModels.GetPositionsRequest(productCode), cancellationToken)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bitflyer.GetPositions",
+            raw =>
+            {
+                IReadOnlyList<BitflyerPositionNormalized> mapped = raw
+                    .Select(item => new BitflyerPositionNormalized(
+                        item.ProductCode,
+                        BitflyerCommonMapper.MapSide(item.Side),
+                        item.Size,
+                        item.Price,
+                        item.Pnl,
+                        item.OpenDate))
+                    .ToArray();
+                return mapped;
+            });
+    }
+
+    public async Task<Call<PrivateRequests.GetCollateralHistoryRequest, BitflyerRawJsonNormalized>> GetCollateralHistoryCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default)
+    {
+        var rawCall = await _raw
+            .GetCollateralHistoryCallAsync(new RawPrivateModels.GetCollateralHistoryRequest(count, before, after), cancellationToken)
+            .ConfigureAwait(false);
+        var request = new PrivateRequests.GetCollateralHistoryRequest(count, before, after);
+        return CreateCall(rawCall, request, "Bitflyer.GetCollateralHistory", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+    }
+
     public async Task<Call<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)

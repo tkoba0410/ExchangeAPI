@@ -113,6 +113,43 @@ internal sealed class BitflyerNormalizedMarketDataFacade
                 .ToArray());
     }
 
+    public async Task<Call<PublicRequests.GetCorporateLeverageRequest, BitflyerCorporateLeverageNormalized>> GetCorporateLeverageCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _raw
+            .GetCorporateLeverageCallAsync(new RawPublicModels.GetCorporateLeverageRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new PublicRequests.GetCorporateLeverageRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bitflyer.GetCorporateLeverage",
+            raw => new BitflyerCorporateLeverageNormalized(
+                raw.CurrentMax,
+                raw.CurrentStartDate,
+                raw.NextMax,
+                raw.NextStartDate));
+    }
+
+    public async Task<Call<PublicRequests.GetFundingRateRequest, BitflyerFundingRateNormalized>> GetFundingRateCallAsync(
+        string productCode,
+        CancellationToken ct = default)
+    {
+        var rawCall = await _raw
+            .GetFundingRateCallAsync(new RawPublicModels.GetFundingRateRequest(productCode), ct)
+            .ConfigureAwait(false);
+        var request = new PublicRequests.GetFundingRateRequest(productCode);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bitflyer.GetFundingRate",
+            raw => new BitflyerFundingRateNormalized(
+                raw.CurrentFundingRate,
+                raw.NextFundingRateSettleDate));
+    }
+
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
         Call<TRawReq, TRaw> rawCall,
         TReq request,

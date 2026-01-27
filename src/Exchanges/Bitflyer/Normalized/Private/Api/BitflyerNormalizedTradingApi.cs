@@ -132,6 +132,33 @@ internal sealed class BitflyerNormalizedTradingApi
         return CreateCall(rawCall, callRequest, "Bitflyer.CancelChildOrder", _ => new BitflyerCancelResult(true));
     }
 
+    public async Task<Call<PrivateRequests.CancelAllChildOrdersRequest, BitflyerCancelResult>> CancelAllChildOrdersCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        if (symbol.IsEmpty)
+        {
+            throw new ArgumentException("symbol is required.", nameof(symbol));
+        }
+
+        var callRequest = new PrivateRequests.CancelAllChildOrdersRequest(symbol);
+        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        if (!TryGetProductCode(marketCall, out var productCode, out var marketError))
+        {
+            return CreateCallError<PrivateRequests.CancelAllChildOrdersRequest, BitflyerCancelResult>(
+                marketCall,
+                callRequest,
+                "Bitflyer.CancelAllChildOrders",
+                marketError!);
+        }
+
+        var rawCall = await _raw
+            .CancelAllChildOrdersCallAsync(new RawPrivateModels.CancelAllChildOrdersRequest { ProductCode = productCode! }, cancellationToken)
+            .ConfigureAwait(false);
+
+        return CreateCall(rawCall, callRequest, "Bitflyer.CancelAllChildOrders", _ => new BitflyerCancelResult(true));
+    }
+
     public async Task<Call<PrivateRequests.GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)

@@ -96,6 +96,15 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         CancellationToken cancellationToken = default) =>
         _marketData.GetBoardStateCallAsync(productCode, cancellationToken);
 
+    public Task<Call<PublicRequests.GetCorporateLeverageRequest, BitflyerCorporateLeverageNormalized>> GetCorporateLeverageCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _marketData.GetCorporateLeverageCallAsync(cancellationToken);
+
+    public Task<Call<PublicRequests.GetFundingRateRequest, BitflyerFundingRateNormalized>> GetFundingRateCallAsync(
+        string productCode,
+        CancellationToken cancellationToken = default) =>
+        _marketData.GetFundingRateCallAsync(productCode, cancellationToken);
+
     public Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
         string? fromDate = null,
         string? region = null,
@@ -148,13 +157,95 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         CancellationToken cancellationToken = default) =>
         _account.GetBalanceCallAsync(cancellationToken);
 
+    public Task<Call<PrivateRequests.GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _account.GetPermissionsCallAsync(cancellationToken);
+
+    public Task<Call<PrivateRequests.GetCollateralRequest, BitflyerCollateralNormalized>> GetCollateralCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _account.GetCollateralCallAsync(cancellationToken);
+
+    public Task<Call<PrivateRequests.GetCollateralAccountsRequest, IReadOnlyList<BitflyerCollateralAccountNormalized>>> GetCollateralAccountsCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _account.GetCollateralAccountsCallAsync(cancellationToken);
+
+    public Task<Call<PrivateRequests.GetAddressesRequest, BitflyerRawJsonNormalized>> GetAddressesCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _account.GetAddressesCallAsync(cancellationToken);
+
+    public Task<Call<PrivateRequests.GetCoinInsRequest, BitflyerRawJsonNormalized>> GetCoinInsCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        _account.GetCoinInsCallAsync(count, before, after, cancellationToken);
+
+    public Task<Call<PrivateRequests.GetCoinOutsRequest, BitflyerRawJsonNormalized>> GetCoinOutsCallAsync(
+        string? messageId = null,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        _account.GetCoinOutsCallAsync(messageId, count, before, after, cancellationToken);
+
+    public Task<Call<PrivateRequests.GetBankAccountsRequest, BitflyerRawJsonNormalized>> GetBankAccountsCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _account.GetBankAccountsCallAsync(cancellationToken);
+
+    public Task<Call<PrivateRequests.GetDepositsRequest, BitflyerRawJsonNormalized>> GetDepositsCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        _account.GetDepositsCallAsync(count, before, after, cancellationToken);
+
+    public Task<Call<PrivateRequests.WithdrawRequest, BitflyerWithdrawResultNormalized>> WithdrawCallAsync(
+        string currencyCode,
+        int bankAccountId,
+        decimal amount,
+        string? code = null,
+        CancellationToken cancellationToken = default) =>
+        _account.WithdrawCallAsync(currencyCode, bankAccountId, amount, code, cancellationToken);
+
+    public Task<Call<PrivateRequests.GetWithdrawalsRequest, BitflyerRawJsonNormalized>> GetWithdrawalsCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        _account.GetWithdrawalsCallAsync(count, before, after, cancellationToken);
+
     public Task<Call<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _account.GetExecutionsPrivateCallAsync(symbol, cancellationToken);
 
+    public Task<Call<PrivateRequests.GetBalanceHistoryRequest, BitflyerRawJsonNormalized>> GetBalanceHistoryCallAsync(
+        string? currencyCode = null,
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        _account.GetBalanceHistoryCallAsync(currencyCode, count, before, after, cancellationToken);
+
+    public Task<Call<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>> GetPositionsCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _account.GetPositionsCallAsync(symbol, cancellationToken);
+
+    public Task<Call<PrivateRequests.GetCollateralHistoryRequest, BitflyerRawJsonNormalized>> GetCollateralHistoryCallAsync(
+        int? count = null,
+        long? before = null,
+        long? after = null,
+        CancellationToken cancellationToken = default) =>
+        _account.GetCollateralHistoryCallAsync(count, before, after, cancellationToken);
+
     public Task<Call<PrivateRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>> GetTradingCommissionCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _account.GetTradingCommissionCallAsync(symbol, cancellationToken);
+
+    public Task<Call<PrivateRequests.CancelAllChildOrdersRequest, BitflyerCancelResult>> CancelAllChildOrdersCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default) =>
+        _trading.CancelAllChildOrdersCallAsync(symbol, cancellationToken);
 }

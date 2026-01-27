@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw;

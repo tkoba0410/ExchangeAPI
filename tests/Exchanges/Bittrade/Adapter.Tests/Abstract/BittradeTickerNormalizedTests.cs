@@ -1,5 +1,5 @@
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;

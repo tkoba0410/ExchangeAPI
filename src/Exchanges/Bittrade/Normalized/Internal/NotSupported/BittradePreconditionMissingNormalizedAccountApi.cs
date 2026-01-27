@@ -7,7 +7,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.NotSupported;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.NotSupported;
 
 internal sealed class BittradePreconditionMissingNormalizedAccountApi : IBittradeNormalizedAccountApi
 {

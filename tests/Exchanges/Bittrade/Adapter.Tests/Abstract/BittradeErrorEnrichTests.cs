@@ -15,7 +15,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ContractsRequests = ExchangeApi.Contracts.Facade.Requests;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;

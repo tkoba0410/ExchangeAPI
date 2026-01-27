@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Types;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 
 public readonly record struct BittradeSymbol(string Value)
 {

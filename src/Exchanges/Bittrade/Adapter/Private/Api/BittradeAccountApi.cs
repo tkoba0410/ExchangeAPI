@@ -19,7 +19,7 @@ using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
 using ExchangeApi.Primitives.CallCommon;
 

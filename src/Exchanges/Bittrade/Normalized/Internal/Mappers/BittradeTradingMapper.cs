@@ -9,9 +9,9 @@ using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 
 internal static class BittradeTradingMapper
 {

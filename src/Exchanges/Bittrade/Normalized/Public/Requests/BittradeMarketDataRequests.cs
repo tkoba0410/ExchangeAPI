@@ -1,4 +1,4 @@
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 

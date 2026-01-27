@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Market.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -23,7 +23,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Market.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 /// <summary>
 /// bitFlyer の MarketData API 実装（REST）。

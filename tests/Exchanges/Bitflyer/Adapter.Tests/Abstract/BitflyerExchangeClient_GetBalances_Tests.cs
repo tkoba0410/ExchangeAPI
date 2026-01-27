@@ -11,7 +11,7 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using Xunit;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 {

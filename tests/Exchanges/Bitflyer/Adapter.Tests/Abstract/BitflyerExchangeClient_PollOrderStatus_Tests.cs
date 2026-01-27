@@ -12,7 +12,7 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Application.UseCases;
 using Xunit;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 

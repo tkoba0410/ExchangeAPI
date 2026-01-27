@@ -15,7 +15,7 @@ using ExchangeApi.Contracts.Common.Dtos.Common;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 

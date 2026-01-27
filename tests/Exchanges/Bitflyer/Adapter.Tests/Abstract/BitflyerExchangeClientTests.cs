@@ -22,7 +22,7 @@ using ContractOrderBook = ExchangeApi.Contracts.Common.Dtos.Market.OrderBook;
 using ContractBalance = ExchangeApi.Contracts.Common.Dtos.Account.Balance;
 using ContractCancelResult = ExchangeApi.Contracts.Common.Dtos.Trading.CancelResult;
 using Xunit;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract

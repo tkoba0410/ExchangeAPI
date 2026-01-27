@@ -5,7 +5,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Facade;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 

@@ -7,13 +7,11 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.ExchangeInfo.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Market.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 using ExchangeApi.Primitives.CallCommon;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Facade;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 /// <summary>
 /// bitFlyer の Public API だけを利用する軽量クライアント。

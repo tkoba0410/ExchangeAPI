@@ -21,7 +21,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Account.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 internal sealed class BitflyerAccountApi : IAccountApi
 {

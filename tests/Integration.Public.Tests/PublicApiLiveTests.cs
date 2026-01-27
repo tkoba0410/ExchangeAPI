@@ -43,7 +43,7 @@ public class PublicApiLiveTests
     public async Task Bitflyer_PublicExchangeInfo_Works()
     {
         var options = new BitflyerClientOptions { Observer = _observer };
-        var infoApi = new ExchangeApi.Exchanges.Bitflyer.Adapter.Public.ExchangeInfo.Api.BitflyerExchangeInfoApi();
+        var infoApi = new ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api.BitflyerExchangeInfoApi();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var call = await infoApi.GetExchangeInfoCallAsync(cts.Token);

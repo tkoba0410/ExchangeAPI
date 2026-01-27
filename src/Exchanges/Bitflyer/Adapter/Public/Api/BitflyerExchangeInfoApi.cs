@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.ExchangeInfo.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
@@ -17,7 +17,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.ExchangeInfo.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 /// <summary>
 /// bitFlyer の ExchangeInfo 実装。現状は対応可否を返すスケルトン。

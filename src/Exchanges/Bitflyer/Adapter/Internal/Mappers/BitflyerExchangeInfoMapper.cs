@@ -8,7 +8,7 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeI
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.ExchangeInfo.Mappers;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 
 internal static class BitflyerExchangeInfoMapper
 {

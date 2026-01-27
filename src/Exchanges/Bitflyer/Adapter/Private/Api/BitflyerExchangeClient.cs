@@ -13,11 +13,7 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Account.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.ExchangeInfo.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Market.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.History.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Trading.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
@@ -26,7 +22,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Primitives.CallCommon;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Facade;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。

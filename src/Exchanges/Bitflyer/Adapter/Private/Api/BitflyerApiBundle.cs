@@ -1,10 +1,10 @@
 using System;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.ExchangeInfo.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Facade;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 /// <summary>
 /// bitFlyer API 実装のセットをまとめるバンドル。

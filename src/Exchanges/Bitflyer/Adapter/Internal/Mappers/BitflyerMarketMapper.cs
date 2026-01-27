@@ -10,7 +10,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Market.Mappers;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 
 internal static class MarketMapper
 {

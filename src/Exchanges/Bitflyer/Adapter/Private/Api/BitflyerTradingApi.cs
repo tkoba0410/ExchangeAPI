@@ -23,7 +23,7 @@ using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Trading.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 /// <summary>
 /// bitFlyer の Trading API 実装（REST）。

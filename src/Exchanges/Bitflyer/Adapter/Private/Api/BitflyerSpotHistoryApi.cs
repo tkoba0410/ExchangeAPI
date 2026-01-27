@@ -19,7 +19,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.History.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
 {

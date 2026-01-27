@@ -2,7 +2,7 @@ using System;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.NotSupported;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Transport.Wire;
 

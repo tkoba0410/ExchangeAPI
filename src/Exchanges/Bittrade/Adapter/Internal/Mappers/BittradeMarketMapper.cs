@@ -9,7 +9,7 @@ using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Types;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 

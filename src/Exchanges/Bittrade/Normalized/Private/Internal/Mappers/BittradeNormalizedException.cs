@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Mappers;
 
 internal sealed class BittradeNormalizedException : Exception
 {

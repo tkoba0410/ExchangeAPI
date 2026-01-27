@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Types;
 
 internal enum BittradeOrderType
 {

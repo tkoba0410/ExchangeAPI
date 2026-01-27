@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.NotSupported;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.NotSupported;
 
 internal sealed class BittradeNotSupportedNormalizedTradingApi : IBittradeNormalizedTradingApi
 {

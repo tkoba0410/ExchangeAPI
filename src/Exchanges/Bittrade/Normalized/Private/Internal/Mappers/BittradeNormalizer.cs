@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Types;
 using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
 using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Internal.Mappers;
 
 internal static class BittradeNormalizer
 {

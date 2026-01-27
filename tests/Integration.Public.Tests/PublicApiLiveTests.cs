@@ -75,7 +75,7 @@ public class PublicApiLiveTests
     public async Task Bittrade_PublicExchangeInfo_Works()
     {
         #pragma warning disable CS0618
-        var infoApi = ExchangeApi.Exchanges.Bittrade.Adapter.Factory.BittradeClientFactory.CreateExchangeInfo();
+        var infoApi = ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory.BittradeClientFactory.CreateExchangeInfo();
         #pragma warning restore CS0618
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 

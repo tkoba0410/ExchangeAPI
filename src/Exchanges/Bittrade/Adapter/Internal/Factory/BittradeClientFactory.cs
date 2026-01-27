@@ -12,7 +12,7 @@ using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Factory;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
 
 /// <summary>
 /// Bittrade API クライアントを構築するファクトリ。

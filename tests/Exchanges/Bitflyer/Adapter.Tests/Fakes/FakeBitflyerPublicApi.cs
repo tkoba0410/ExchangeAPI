@@ -9,14 +9,14 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
 internal sealed class FakeBitflyerPublicApi : IBitflyerRawApi
 {
-    private readonly RawPublicModels.Ticker _response;
-    private readonly RawPublicModels.Board? _board;
+    private readonly RawPublicDtos.Ticker _response;
+    private readonly RawPublicDtos.Board? _board;
     private readonly FakeBitflyerPrivateApi? _privateApi;
     private readonly FakeBitflyerPrivateTradingApi? _tradingApi;
 
     public FakeBitflyerPublicApi(
-        RawPublicModels.Ticker response,
-        RawPublicModels.Board? board = null,
+        RawPublicDtos.Ticker response,
+        RawPublicDtos.Board? board = null,
         FakeBitflyerPrivateApi? privateApi = null,
         FakeBitflyerPrivateTradingApi? tradingApi = null)
     {
@@ -26,35 +26,35 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawApi
         _tradingApi = tradingApi;
     }
 
-    public Task<Call<RawPublicModels.GetMarketsRequest, IReadOnlyList<RawPublicModels.Market>>> GetMarketsCallAsync(
-        RawPublicModels.GetMarketsRequest request,
+    public Task<Call<RawPublicRequests.GetMarketsRequest, IReadOnlyList<RawPublicDtos.Market>>> GetMarketsCallAsync(
+        RawPublicRequests.GetMarketsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, (IReadOnlyList<RawPublicModels.Market>)new[] { new RawPublicModels.Market("BTC_JPY", "BTC_JPY") }));
+        Task.FromResult(MakeOkCall(request, (IReadOnlyList<RawPublicDtos.Market>)new[] { new RawPublicDtos.Market("BTC_JPY", "BTC_JPY") }));
 
-    public Task<Call<RawPublicModels.GetBoardRequest, RawPublicModels.Board>> GetBoardCallAsync(
-        RawPublicModels.GetBoardRequest request,
+    public Task<Call<RawPublicRequests.GetBoardRequest, RawPublicDtos.Board>> GetBoardCallAsync(
+        RawPublicRequests.GetBoardRequest request,
         CancellationToken cancellationToken = default)
     {
         if (_board is null)
         {
-            throw new InvalidOperationException("RawPublicModels.Board response is not configured.");
+            throw new InvalidOperationException("RawPublicDtos.Board response is not configured.");
         }
 
         return Task.FromResult(MakeOkCall(request, _board));
     }
 
-    public Task<Call<RawPublicModels.GetTickerRequest, RawPublicModels.Ticker>> GetTickerCallAsync(
-        RawPublicModels.GetTickerRequest request,
+    public Task<Call<RawPublicRequests.GetTickerRequest, RawPublicDtos.Ticker>> GetTickerCallAsync(
+        RawPublicRequests.GetTickerRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, _response));
 
-    public Task<Call<RawPublicModels.GetExecutionsRequest, IReadOnlyList<RawPublicModels.ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
-        RawPublicModels.GetExecutionsRequest request,
+    public Task<Call<RawPublicRequests.GetExecutionsRequest, IReadOnlyList<RawPublicDtos.ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
+        RawPublicRequests.GetExecutionsRequest request,
         CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<RawPublicModels.ExecutionPublicResponse> executions = new[]
+        IReadOnlyList<RawPublicDtos.ExecutionPublicResponse> executions = new[]
         {
-            new RawPublicModels.ExecutionPublicResponse
+            new RawPublicDtos.ExecutionPublicResponse
             {
                 Id = 1,
                 ProductCode = request.ProductCode,
@@ -68,176 +68,176 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawApi
         return Task.FromResult(MakeOkCall(request, executions));
     }
 
-    public Task<Call<RawPublicModels.GetBoardStateRequest, RawPublicModels.BoardStateResponse>> GetBoardStateCallAsync(
-        RawPublicModels.GetBoardStateRequest request,
+    public Task<Call<RawPublicRequests.GetBoardStateRequest, RawPublicDtos.BoardStateResponse>> GetBoardStateCallAsync(
+        RawPublicRequests.GetBoardStateRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, new RawPublicModels.BoardStateResponse("NORMAL", "RUNNING", null)));
+        Task.FromResult(MakeOkCall(request, new RawPublicDtos.BoardStateResponse("NORMAL", "RUNNING", null)));
 
-    public Task<Call<RawPublicModels.GetHealthRequest, RawPublicModels.HealthResponse>> GetHealthCallAsync(
-        RawPublicModels.GetHealthRequest request,
+    public Task<Call<RawPublicRequests.GetHealthRequest, RawPublicDtos.HealthResponse>> GetHealthCallAsync(
+        RawPublicRequests.GetHealthRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, new RawPublicModels.HealthResponse("NORMAL")));
+        Task.FromResult(MakeOkCall(request, new RawPublicDtos.HealthResponse("NORMAL")));
 
-    public Task<Call<RawPublicModels.GetFundingRateRequest, RawPublicModels.FundingRateResponse>> GetFundingRateCallAsync(
-        RawPublicModels.GetFundingRateRequest request,
+    public Task<Call<RawPublicRequests.GetFundingRateRequest, RawPublicDtos.FundingRateResponse>> GetFundingRateCallAsync(
+        RawPublicRequests.GetFundingRateRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, new RawPublicModels.FundingRateResponse(0m, DateTimeOffset.UtcNow)));
+        Task.FromResult(MakeOkCall(request, new RawPublicDtos.FundingRateResponse(0m, DateTimeOffset.UtcNow)));
 
-    public Task<Call<RawPublicModels.GetCorporateLeverageRequest, RawPublicModels.CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
-        RawPublicModels.GetCorporateLeverageRequest request,
+    public Task<Call<RawPublicRequests.GetCorporateLeverageRequest, RawPublicDtos.CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
+        RawPublicRequests.GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, new RawPublicModels.CorporateLeverageResponse(
+        Task.FromResult(MakeOkCall(request, new RawPublicDtos.CorporateLeverageResponse(
             CurrentMax: 7.7m,
             CurrentStartDate: DateTimeOffset.UtcNow,
             NextMax: 7.65m,
             NextStartDate: DateTimeOffset.UtcNow.AddDays(7))));
 
-    public Task<Call<RawPublicModels.GetChatsRequest, IReadOnlyList<RawPublicModels.Chat>>> GetChatsCallAsync(
-        RawPublicModels.GetChatsRequest request,
+    public Task<Call<RawPublicRequests.GetChatsRequest, IReadOnlyList<RawPublicDtos.Chat>>> GetChatsCallAsync(
+        RawPublicRequests.GetChatsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, (IReadOnlyList<RawPublicModels.Chat>)new[] { new RawPublicModels.Chat("n", "m", DateTimeOffset.UtcNow) }));
+        Task.FromResult(MakeOkCall(request, (IReadOnlyList<RawPublicDtos.Chat>)new[] { new RawPublicDtos.Chat("n", "m", DateTimeOffset.UtcNow) }));
 
-    public Task<Call<RawPrivateModels.GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
-        RawPrivateModels.GetPermissionsRequest request,
+    public Task<Call<RawPrivateRequests.GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+        RawPrivateRequests.GetPermissionsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetPermissionsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetBalancesRequest, IReadOnlyList<RawPrivateModels.BalanceResponse>>> GetBalanceCallAsync(
-        RawPrivateModels.GetBalancesRequest request,
+    public Task<Call<RawPrivateRequests.GetBalancesRequest, IReadOnlyList<RawPrivateDtos.BalanceResponse>>> GetBalanceCallAsync(
+        RawPrivateRequests.GetBalancesRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetBalanceCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetCollateralRequest, RawPrivateModels.CollateralResponse>> GetCollateralCallAsync(
-        RawPrivateModels.GetCollateralRequest request,
+    public Task<Call<RawPrivateRequests.GetCollateralRequest, RawPrivateDtos.CollateralResponse>> GetCollateralCallAsync(
+        RawPrivateRequests.GetCollateralRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetCollateralCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetCollateralAccountsRequest, IReadOnlyList<RawPrivateModels.CollateralAccount>>> GetCollateralAccountsCallAsync(
-        RawPrivateModels.GetCollateralAccountsRequest request,
+    public Task<Call<RawPrivateRequests.GetCollateralAccountsRequest, IReadOnlyList<RawPrivateDtos.CollateralAccount>>> GetCollateralAccountsCallAsync(
+        RawPrivateRequests.GetCollateralAccountsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetCollateralAccountsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetAddressesRequest, RawPrivateModels.RawJsonResponse>> GetAddressesCallAsync(
-        RawPrivateModels.GetAddressesRequest request,
+    public Task<Call<RawPrivateRequests.GetAddressesRequest, RawPrivateDtos.RawJsonResponse>> GetAddressesCallAsync(
+        RawPrivateRequests.GetAddressesRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetAddressesCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetCoinInsRequest, RawPrivateModels.RawJsonResponse>> GetCoinInsCallAsync(
-        RawPrivateModels.GetCoinInsRequest request,
+    public Task<Call<RawPrivateRequests.GetCoinInsRequest, RawPrivateDtos.RawJsonResponse>> GetCoinInsCallAsync(
+        RawPrivateRequests.GetCoinInsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetCoinInsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetCoinOutsRequest, RawPrivateModels.RawJsonResponse>> GetCoinOutsCallAsync(
-        RawPrivateModels.GetCoinOutsRequest request,
+    public Task<Call<RawPrivateRequests.GetCoinOutsRequest, RawPrivateDtos.RawJsonResponse>> GetCoinOutsCallAsync(
+        RawPrivateRequests.GetCoinOutsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetCoinOutsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetBankAccountsRequest, RawPrivateModels.RawJsonResponse>> GetBankAccountsCallAsync(
-        RawPrivateModels.GetBankAccountsRequest request,
+    public Task<Call<RawPrivateRequests.GetBankAccountsRequest, RawPrivateDtos.RawJsonResponse>> GetBankAccountsCallAsync(
+        RawPrivateRequests.GetBankAccountsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetBankAccountsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetDepositsRequest, RawPrivateModels.RawJsonResponse>> GetDepositsCallAsync(
-        RawPrivateModels.GetDepositsRequest request,
+    public Task<Call<RawPrivateRequests.GetDepositsRequest, RawPrivateDtos.RawJsonResponse>> GetDepositsCallAsync(
+        RawPrivateRequests.GetDepositsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetDepositsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.CreateWithdrawalRequest, RawPrivateModels.CreateWithdrawalResponse>> WithdrawCallAsync(
-        RawPrivateModels.CreateWithdrawalRequest request,
+    public Task<Call<RawPrivateRequests.CreateWithdrawalRequest, RawPrivateDtos.CreateWithdrawalResponse>> WithdrawCallAsync(
+        RawPrivateRequests.CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default) =>
         throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetWithdrawalsRequest, RawPrivateModels.RawJsonResponse>> GetWithdrawalsCallAsync(
-        RawPrivateModels.GetWithdrawalsRequest request,
+    public Task<Call<RawPrivateRequests.GetWithdrawalsRequest, RawPrivateDtos.RawJsonResponse>> GetWithdrawalsCallAsync(
+        RawPrivateRequests.GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetWithdrawalsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<string, RawPrivateModels.RawSendChildOrderResponse>> SendChildOrderCallAsync(
+    public Task<Call<string, RawPrivateDtos.RawSendChildOrderResponse>> SendChildOrderCallAsync(
         string bodyJson,
         CancellationToken cancellationToken = default) =>
         _tradingApi?.SendChildOrderCallAsync(bodyJson, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<string, RawPrivateModels.RawSendParentOrderResponse>> SendParentOrderCallAsync(
+    public Task<Call<string, RawPrivateDtos.RawSendParentOrderResponse>> SendParentOrderCallAsync(
         string bodyJson,
         CancellationToken cancellationToken = default) =>
         _tradingApi?.SendParentOrderCallAsync(bodyJson, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.CancelChildOrderRequest, RawPrivateModels.RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
-        RawPrivateModels.CancelChildOrderRequest request,
+    public Task<Call<RawPrivateRequests.CancelChildOrderRequest, RawPrivateDtos.RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
+        RawPrivateRequests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _tradingApi?.CancelChildOrderCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.CancelParentOrderRequest, RawPrivateModels.RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
-        RawPrivateModels.CancelParentOrderRequest request,
+    public Task<Call<RawPrivateRequests.CancelParentOrderRequest, RawPrivateDtos.RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
+        RawPrivateRequests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _tradingApi?.CancelParentOrderCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.CancelAllChildOrdersRequest, RawPrivateModels.RawCancelAllChildOrdersResponse>> CancelAllChildOrdersCallAsync(
-        RawPrivateModels.CancelAllChildOrdersRequest request,
+    public Task<Call<RawPrivateRequests.CancelAllChildOrdersRequest, RawPrivateDtos.RawCancelAllChildOrdersResponse>> CancelAllChildOrdersCallAsync(
+        RawPrivateRequests.CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetChildOrdersRequest, IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
-        RawPrivateModels.GetChildOrdersRequest request,
+    public Task<Call<RawPrivateRequests.GetChildOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
+        RawPrivateRequests.GetChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _tradingApi?.GetChildOrdersCallAsync(request, cancellationToken)
         ?? _privateApi?.GetChildOrdersCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetParentOrdersRequest, IReadOnlyList<RawPrivateModels.RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
-        RawPrivateModels.GetParentOrdersRequest request,
+    public Task<Call<RawPrivateRequests.GetParentOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
+        RawPrivateRequests.GetParentOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _tradingApi?.GetParentOrdersCallAsync(request, cancellationToken)
         ?? _privateApi?.GetParentOrdersCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetParentOrderRequest, RawPrivateModels.RawGetParentOrderResponse>> GetParentOrderCallAsync(
-        RawPrivateModels.GetParentOrderRequest request,
+    public Task<Call<RawPrivateRequests.GetParentOrderRequest, RawPrivateDtos.RawGetParentOrderResponse>> GetParentOrderCallAsync(
+        RawPrivateRequests.GetParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _tradingApi?.GetParentOrderCallAsync(request, cancellationToken)
         ?? _privateApi?.GetParentOrderCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetAccountExecutionsRequest, IReadOnlyList<RawPrivateModels.ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
-        RawPrivateModels.GetAccountExecutionsRequest request,
+    public Task<Call<RawPrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<RawPrivateDtos.ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
+        RawPrivateRequests.GetAccountExecutionsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetExecutionsPrivateCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetBalanceHistoryRequest, RawPrivateModels.RawJsonResponse>> GetBalanceHistoryCallAsync(
-        RawPrivateModels.GetBalanceHistoryRequest request,
+    public Task<Call<RawPrivateRequests.GetBalanceHistoryRequest, RawPrivateDtos.RawJsonResponse>> GetBalanceHistoryCallAsync(
+        RawPrivateRequests.GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetBalanceHistoryCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetPositionsRequest, IReadOnlyList<RawPrivateModels.PositionResponse>>> GetPositionsCallAsync(
-        RawPrivateModels.GetPositionsRequest request,
+    public Task<Call<RawPrivateRequests.GetPositionsRequest, IReadOnlyList<RawPrivateDtos.PositionResponse>>> GetPositionsCallAsync(
+        RawPrivateRequests.GetPositionsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetPositionsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetCollateralHistoryRequest, RawPrivateModels.RawJsonResponse>> GetCollateralHistoryCallAsync(
-        RawPrivateModels.GetCollateralHistoryRequest request,
+    public Task<Call<RawPrivateRequests.GetCollateralHistoryRequest, RawPrivateDtos.RawJsonResponse>> GetCollateralHistoryCallAsync(
+        RawPrivateRequests.GetCollateralHistoryRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetCollateralHistoryCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<RawPrivateModels.GetTradingCommissionRequest, RawPrivateModels.RawJsonResponse>> GetTradingCommissionCallAsync(
-        RawPrivateModels.GetTradingCommissionRequest request,
+    public Task<Call<RawPrivateRequests.GetTradingCommissionRequest, RawPrivateDtos.RawJsonResponse>> GetTradingCommissionCallAsync(
+        RawPrivateRequests.GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetTradingCommissionCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();

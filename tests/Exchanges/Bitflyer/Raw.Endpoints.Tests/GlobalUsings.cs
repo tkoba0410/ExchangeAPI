@@ -1,2 +1,2 @@
-global using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-global using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+global using RawPrivateDtos = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Dtos;
+global using RawPrivateRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;

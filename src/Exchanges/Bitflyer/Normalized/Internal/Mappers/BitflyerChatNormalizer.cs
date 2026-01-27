@@ -1,11 +1,11 @@
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
-using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using RawPublicDtos = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Dtos;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 
 internal static class BitflyerChatNormalizer
 {
-    public static BitflyerChatNormalized Normalize(RawPublicModels.Chat wire) =>
+    public static BitflyerChatNormalized Normalize(RawPublicDtos.Chat wire) =>
         new(
             Nickname: wire.Nickname,
             Message: wire.Message,

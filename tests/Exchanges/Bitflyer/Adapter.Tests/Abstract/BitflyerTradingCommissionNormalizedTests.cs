@@ -14,10 +14,10 @@ public sealed class BitflyerTradingCommissionNormalizedTests
     public async Task NormalizeTradingCommission_ParsesRate()
     {
         var privateApi = new FakeBitflyerPrivateApi(
-            response: Array.Empty<RawPrivateModels.BalanceResponse>(),
+            response: Array.Empty<RawPrivateDtos.BalanceResponse>(),
             tradingCommissionJson: "{\"commission_rate\":0.15}");
         var api = BitflyerTestHelpers.CreateNormalizedApi(
-            new RawPublicModels.Ticker { ProductCode = "BTC_JPY" },
+            new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" },
             BitflyerTestHelpers.CreateResolver(),
             privateApi: privateApi);
 

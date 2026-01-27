@@ -1,2 +1,4 @@
-global using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-global using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+global using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
+global using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
+global using RawPublicDtos = ExchangeApi.Exchanges.Bittrade.Raw.Public.Dtos;
+global using RawPublicRequests = ExchangeApi.Exchanges.Bittrade.Raw.Public.Requests;

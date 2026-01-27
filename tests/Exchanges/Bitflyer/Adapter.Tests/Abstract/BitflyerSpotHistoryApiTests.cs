@@ -23,10 +23,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         [Fact]
         public async Task GetOrdersAsync_ReturnsMappedOrders()
         {
-            var rawTicker = new RawPublicModels.Ticker();
+            var rawTicker = new RawPublicDtos.Ticker();
             var childOrders = new[]
             {
-                new RawPrivateModels.RawGetChildOrdersResponse
+                new RawPrivateDtos.RawGetChildOrdersResponse
                 {
                     ChildOrderId = "JOR-1",
                     ChildOrderAcceptanceId = "JRF-1",
@@ -41,11 +41,11 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             };
 
             var fakePrivate = new FakeBitflyerPrivateApi(
-                Array.Empty<RawPrivateModels.BalanceResponse>());
+                Array.Empty<RawPrivateDtos.BalanceResponse>());
             var fakeTrading = new FakeBitflyerPrivateTradingApi(
-                new RawPrivateModels.RawSendChildOrderResponse(),
+                new RawPrivateDtos.RawSendChildOrderResponse(),
                 childOrders);
-            var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() }, fakePrivate, fakeTrading);
+            var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.Board { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);
             var client = CreateClient(raw);
 
             var call = await client.History!.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY")));
@@ -63,10 +63,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         [Fact]
         public async Task GetOrders_Limit1_SlicesItemsAndAlignsMeta()
         {
-            var rawTicker = new RawPublicModels.Ticker();
+            var rawTicker = new RawPublicDtos.Ticker();
             var childOrders = new[]
             {
-                new RawPrivateModels.RawGetChildOrdersResponse
+                new RawPrivateDtos.RawGetChildOrdersResponse
                 {
                     ChildOrderAcceptanceId = "JRF-1",
                     ProductCode = "BTC_JPY",
@@ -77,7 +77,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                     OutstandingSize = 0.1m,
                     ExecutedSize = 0m
                 },
-                new RawPrivateModels.RawGetChildOrdersResponse
+                new RawPrivateDtos.RawGetChildOrdersResponse
                 {
                     ChildOrderAcceptanceId = "JRF-2",
                     ProductCode = "BTC_JPY",
@@ -91,11 +91,11 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             };
 
             var fakePrivate = new FakeBitflyerPrivateApi(
-                Array.Empty<RawPrivateModels.BalanceResponse>());
+                Array.Empty<RawPrivateDtos.BalanceResponse>());
             var fakeTrading = new FakeBitflyerPrivateTradingApi(
-                new RawPrivateModels.RawSendChildOrderResponse(),
+                new RawPrivateDtos.RawSendChildOrderResponse(),
                 childOrders);
-            var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() }, fakePrivate, fakeTrading);
+            var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.Board { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);
             var client = CreateClient(raw);
 
             var call = await client.History!.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
@@ -110,10 +110,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         [Fact]
         public async Task GetExecutions_Limit1_SlicesItemsAndAlignsMeta()
         {
-            var rawTicker = new RawPublicModels.Ticker();
+            var rawTicker = new RawPublicDtos.Ticker();
             var executions = new[]
             {
-                new RawPrivateModels.ExecutionPrivateResponse
+                new RawPrivateDtos.ExecutionPrivateResponse
                 {
                     Id = 1,
                     ProductCode = "BTC_JPY",
@@ -122,7 +122,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                     Size = 0.1m,
                     ExecDate = DateTimeOffset.UtcNow.AddMinutes(-1)
                 },
-                new RawPrivateModels.ExecutionPrivateResponse
+                new RawPrivateDtos.ExecutionPrivateResponse
                 {
                     Id = 2,
                     ProductCode = "BTC_JPY",
@@ -134,10 +134,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             };
 
             var fakePrivate = new FakeBitflyerPrivateApi(
-                Array.Empty<RawPrivateModels.BalanceResponse>(),
+                Array.Empty<RawPrivateDtos.BalanceResponse>(),
                 executions: executions);
-            var fakeTrading = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
-            var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicModels.Board { Bids = Array.Empty<RawPublicModels.BoardEntry>(), Asks = Array.Empty<RawPublicModels.BoardEntry>() }, fakePrivate, fakeTrading);
+            var fakeTrading = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.RawSendChildOrderResponse());
+            var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.Board { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);
             var client = CreateClient(raw);
 
             var call = await client.History!.GetExecutionsCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));

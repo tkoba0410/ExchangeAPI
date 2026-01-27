@@ -9,7 +9,8 @@ using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requ
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
-using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using RawPublicDtos = ExchangeApi.Exchanges.Bittrade.Raw.Public.Dtos;
+using RawPublicRequests = ExchangeApi.Exchanges.Bittrade.Raw.Public.Requests;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 
@@ -38,7 +39,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetDetailMergedCallAsync(new RawPublicModels.GetMergedTickerRequest(symbolText), ct)
+            .GetDetailMergedCallAsync(new RawPublicRequests.GetMergedTickerRequest(symbolText), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -70,7 +71,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetDepthCallAsync(new RawPublicModels.GetDepthRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
+            .GetDepthCallAsync(new RawPublicRequests.GetDepthRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -101,7 +102,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetTradeCallAsync(new RawPublicModels.GetTradesRequest(symbolText), ct)
+            .GetTradeCallAsync(new RawPublicRequests.GetTradesRequest(symbolText), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -134,7 +135,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetHistoryKlineCallAsync(new RawPublicModels.GetKlinesRequest(symbolText, period, size), ct)
+            .GetHistoryKlineCallAsync(new RawPublicRequests.GetKlinesRequest(symbolText, period, size), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -152,7 +153,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         CancellationToken ct = default)
     {
         var request = new NormalizedRequests.GetTickersRequest();
-        var rawCall = await _raw.GetTickersCallAsync(new RawPublicModels.GetTickersRequest(), ct).ConfigureAwait(false);
+        var rawCall = await _raw.GetTickersCallAsync(new RawPublicRequests.GetTickersRequest(), ct).ConfigureAwait(false);
 
         return CreateCall(
             rawCall,
@@ -181,7 +182,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
         }
 
         var rawCall = await _raw
-            .GetHistoryTradeCallAsync(new RawPublicModels.GetTradeHistoryRequest(symbolText), ct)
+            .GetHistoryTradeCallAsync(new RawPublicRequests.GetTradeHistoryRequest(symbolText), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

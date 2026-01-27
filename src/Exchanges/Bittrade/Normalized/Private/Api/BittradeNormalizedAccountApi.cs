@@ -6,7 +6,8 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
-using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
+using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
+using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
@@ -26,7 +27,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
         CancellationToken ct = default)
     {
         var rawCall = await _account
-            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateModels.GetAccountBalanceRequest(_accountId), ct)
+            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountBalanceRequest(_accountId), ct)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetBalancesRequest(_accountId);
 
@@ -49,7 +50,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
         CancellationToken ct = default)
     {
         var rawCall = await _account
-            .GetAccountsCallAsync(new RawPrivateModels.GetAccountsRequest(), ct)
+            .GetAccountsCallAsync(new RawPrivateRequests.GetAccountsRequest(), ct)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetAccountsRequest();
 
@@ -75,7 +76,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _account
-            .GetDepositWithdrawCallAsync(new RawPrivateModels.GetDepositWithdrawsRequest(
+            .GetDepositWithdrawCallAsync(new RawPrivateRequests.GetDepositWithdrawsRequest(
                 request.Type,
                 request.Currency,
                 request.From,
@@ -102,7 +103,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
         CancellationToken ct = default)
     {
         var rawCall = await _account
-            .GetWithdrawVirtualAddressesCallAsync(new RawPrivateModels.GetWithdrawVirtualAddressesRequest(), ct)
+            .GetWithdrawVirtualAddressesCallAsync(new RawPrivateRequests.GetWithdrawVirtualAddressesRequest(), ct)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetWithdrawVirtualAddressesRequest();
 
@@ -125,7 +126,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
         CancellationToken ct = default)
     {
         var rawCall = await _account
-            .GetRetailAccountBalanceCallAsync(new RawPrivateModels.GetRetailAccountBalanceRequest(), ct)
+            .GetRetailAccountBalanceCallAsync(new RawPrivateRequests.GetRetailAccountBalanceRequest(), ct)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetRetailAccountBalanceRequest();
 

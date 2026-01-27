@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
-using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using RawPublicDtos = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Dtos;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 
@@ -9,7 +9,7 @@ internal static class BitflyerTickerNormalizer
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
-    public static BitflyerTickerNormalized Normalize(RawPublicModels.Ticker wire, string? rawJson)
+    public static BitflyerTickerNormalized Normalize(RawPublicDtos.Ticker wire, string? rawJson)
     {
         var snapshot = ExtractSnapshot(rawJson ?? Serialize(wire));
         return new BitflyerTickerNormalized(

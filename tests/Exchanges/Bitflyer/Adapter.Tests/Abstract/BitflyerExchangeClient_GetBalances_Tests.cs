@@ -23,13 +23,13 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             // Arrange
             var rawBalances = new[]
             {
-                new RawPrivateModels.BalanceResponse
+                new RawPrivateDtos.BalanceResponse
                 {
                     CurrencyCode = "JPY",
                     Amount = 100000m,
                     Available = 80000m,
                 },
-                new RawPrivateModels.BalanceResponse
+                new RawPrivateDtos.BalanceResponse
                 {
                     CurrencyCode = "BTC",
                     Amount = 0.01m,
@@ -38,7 +38,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             };
 
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.RawSendChildOrderResponse());
 
             var raw = CreateDummyPublicApi(fakePrivateApi, fakeTradingApi);
             var client = CreateClient(raw);
@@ -66,10 +66,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         public async Task GetBalanceCallAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
         {
             // Arrange
-            var rawBalances = Array.Empty<RawPrivateModels.BalanceResponse>();
+            var rawBalances = Array.Empty<RawPrivateDtos.BalanceResponse>();
 
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.RawSendChildOrderResponse());
 
             var raw = CreateDummyPublicApi(fakePrivateApi, fakeTradingApi);
             var client = CreateClient(raw);
@@ -94,8 +94,8 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             FakeBitflyerPrivateApi privateApi,
             FakeBitflyerPrivateTradingApi tradingApi)
         {
-            // 既存の RawPublicModels.Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
-            var rawTicker = new RawPublicModels.Ticker
+            // 既存の RawPublicDtos.Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
+            var rawTicker = new RawPublicDtos.Ticker
             {
                 ProductCode = "BTC_JPY",
                 Timestamp = DateTimeOffset.UnixEpoch,

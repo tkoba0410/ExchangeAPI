@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
-using BitflyerRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Requests;
+using BitflyerRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Public.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
 

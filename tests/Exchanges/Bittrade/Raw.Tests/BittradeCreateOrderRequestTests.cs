@@ -8,7 +8,7 @@ public sealed class BittradeCreateOrderRequestTests
     [Fact]
     public void CreateOrderRequest_SerializesWithExpectedKeys()
     {
-        var request = new RawPrivateModels.RawCreateOrderRequest(
+        var request = new RawPrivateRequests.RawCreateOrderRequest(
             AccountId: "account-1",
             Symbol: "btcjpy",
             Type: "buy-limit",

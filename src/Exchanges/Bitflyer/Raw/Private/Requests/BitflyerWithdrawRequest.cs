@@ -1,0 +1,14 @@
+using System.Text.Json.Serialization;
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;
+
+/// <summary>/v1/me/withdraw リクエスト DTO。</summary>
+public sealed class CreateWithdrawalRequest
+{
+    [JsonPropertyName("currency_code")] public string CurrencyCode { get; init; } = string.Empty; // "JPY"
+    [JsonPropertyName("bank_account_id")] public int BankAccountId { get; init; }
+    [JsonPropertyName("amount")] public decimal Amount { get; init; }
+
+    [JsonPropertyName("code")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Code { get; init; }
+}

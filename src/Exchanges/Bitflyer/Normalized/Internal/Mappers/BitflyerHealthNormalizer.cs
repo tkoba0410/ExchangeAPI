@@ -1,10 +1,10 @@
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
-using RawPublicModels = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using RawPublicDtos = ExchangeApi.Exchanges.Bitflyer.Raw.Public.Dtos;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 
 internal static class BitflyerHealthNormalizer
 {
-    public static BitflyerHealthNormalized Normalize(RawPublicModels.HealthResponse wire) =>
+    public static BitflyerHealthNormalized Normalize(RawPublicDtos.HealthResponse wire) =>
         new(wire.Status);
 }

@@ -12,7 +12,7 @@ public sealed class BittradeIdNormalizationTests
         { "id": 1, "price": 100, "amount": 0.1, "direction": "buy", "ts": 1700000000001 }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPublicModels.RawTradeEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPublicDtos.RawTradeEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("1", entry!.Id);
@@ -25,7 +25,7 @@ public sealed class BittradeIdNormalizationTests
         { "id": "trade-1", "price": 100, "amount": 0.1, "direction": "buy", "ts": 1700000000001 }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPublicModels.RawTradeEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPublicDtos.RawTradeEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("trade-1", entry!.Id);
@@ -49,7 +49,7 @@ public sealed class BittradeIdNormalizationTests
         }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPrivateModels.RawMatchResultEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPrivateDtos.RawMatchResultEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("mr-1", entry!.Id);
@@ -73,7 +73,7 @@ public sealed class BittradeIdNormalizationTests
         }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPrivateModels.RawDepositWithdrawEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPrivateDtos.RawDepositWithdrawEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("200", entry!.Id);
@@ -95,7 +95,7 @@ public sealed class BittradeIdNormalizationTests
         }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPrivateModels.RawRetailOrderEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPrivateDtos.RawRetailOrderEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("r-1", entry!.Id);
@@ -115,7 +115,7 @@ public sealed class BittradeIdNormalizationTests
         }
         """;
 
-        var response = JsonSerializer.Deserialize<RawPublicModels.RawKlinesResponse>(json);
+        var response = JsonSerializer.Deserialize<RawPublicDtos.RawKlinesResponse>(json);
 
         Assert.NotNull(response);
         Assert.NotNull(response!.Data);
@@ -130,7 +130,7 @@ public sealed class BittradeIdNormalizationTests
         { "status": "ok", "data": { "success-count": 1, "failed-count": 0, "next-id": 10 } }
         """;
 
-        var response = JsonSerializer.Deserialize<RawPrivateModels.RawCancelOpenOrdersResponse>(json);
+        var response = JsonSerializer.Deserialize<RawPrivateDtos.RawCancelOpenOrdersResponse>(json);
 
         Assert.NotNull(response);
         Assert.NotNull(response!.Data);

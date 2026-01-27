@@ -6,8 +6,10 @@ using System.Text.Json;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
-using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using RawPublicModels = ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
+using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
+using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
+using RawPublicDtos = ExchangeApi.Exchanges.Bittrade.Raw.Public.Dtos;
+using RawPublicRequests = ExchangeApi.Exchanges.Bittrade.Raw.Public.Requests;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 
@@ -15,7 +17,7 @@ internal static class BittradeNormalizer
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
-    internal static BittradeTickerNormalized NormalizeTicker(RawPublicModels.RawMergedResponse response, string? rawJson)
+    internal static BittradeTickerNormalized NormalizeTicker(RawPublicDtos.RawMergedResponse response, string? rawJson)
     {
         if (response is null) throw new ArgumentNullException(nameof(response));
 
@@ -29,7 +31,7 @@ internal static class BittradeNormalizer
             new Dictionary<string, JsonElement>());
     }
 
-    internal static BittradeOrderBookNormalized NormalizeOrderBook(RawPublicModels.RawDepthTick tick)
+    internal static BittradeOrderBookNormalized NormalizeOrderBook(RawPublicDtos.RawDepthTick tick)
     {
         if (tick is null) throw new ArgumentNullException(nameof(tick));
 
@@ -39,7 +41,7 @@ internal static class BittradeNormalizer
     }
 
     internal static IReadOnlyList<BittradeExecutionNormalized> NormalizeExecutions(
-        IReadOnlyList<RawPublicModels.RawTradeEntry> entries,
+        IReadOnlyList<RawPublicDtos.RawTradeEntry> entries,
         string? rawJson)
     {
         if (entries is null) throw new ArgumentNullException(nameof(entries));
@@ -58,7 +60,7 @@ internal static class BittradeNormalizer
     }
 
     internal static IReadOnlyList<BittradeExecutionNormalized> NormalizeTradeHistory(
-        IReadOnlyList<RawPublicModels.RawTradeHistoryEntry>? entries)
+        IReadOnlyList<RawPublicDtos.RawTradeHistoryEntry>? entries)
     {
         if (entries is null || entries.Count == 0)
         {
@@ -66,12 +68,12 @@ internal static class BittradeNormalizer
         }
 
         var flattened = entries
-            .SelectMany(entry => entry.Data ?? Array.Empty<RawPublicModels.RawTradeEntry>())
+            .SelectMany(entry => entry.Data ?? Array.Empty<RawPublicDtos.RawTradeEntry>())
             .ToList();
         return NormalizeExecutions(flattened, rawJson: null);
     }
 
-    internal static IReadOnlyList<BittradeSymbolNormalized> NormalizeSymbols(IReadOnlyList<RawPublicModels.RawSymbolInfo> symbols)
+    internal static IReadOnlyList<BittradeSymbolNormalized> NormalizeSymbols(IReadOnlyList<RawPublicDtos.RawSymbolInfo> symbols)
     {
         if (symbols is null) throw new ArgumentNullException(nameof(symbols));
 
@@ -89,7 +91,7 @@ internal static class BittradeNormalizer
     }
 
     internal static IReadOnlyList<BittradeKlineNormalized> NormalizeKlines(
-        IReadOnlyList<RawPublicModels.RawKlineEntry>? entries)
+        IReadOnlyList<RawPublicDtos.RawKlineEntry>? entries)
     {
         if (entries is null || entries.Count == 0)
         {
@@ -110,7 +112,7 @@ internal static class BittradeNormalizer
     }
 
     internal static IReadOnlyList<BittradeTickerEntryNormalized> NormalizeTickers(
-        IReadOnlyList<RawPublicModels.RawTickerEntry>? entries)
+        IReadOnlyList<RawPublicDtos.RawTickerEntry>? entries)
     {
         if (entries is null || entries.Count == 0)
         {
@@ -128,7 +130,7 @@ internal static class BittradeNormalizer
             .ToList();
     }
 
-    internal static IReadOnlyList<BittradeBalanceEntryNormalized> NormalizeBalances(RawPrivateModels.RawBalanceData data)
+    internal static IReadOnlyList<BittradeBalanceEntryNormalized> NormalizeBalances(RawPrivateDtos.RawBalanceData data)
     {
         if (data is null) throw new ArgumentNullException(nameof(data));
 
@@ -141,7 +143,7 @@ internal static class BittradeNormalizer
     }
 
     internal static IReadOnlyList<BittradeAccountNormalized> NormalizeAccounts(
-        IReadOnlyList<RawPrivateModels.RawAccount>? accounts)
+        IReadOnlyList<RawPrivateDtos.RawAccount>? accounts)
     {
         if (accounts is null || accounts.Count == 0)
         {
@@ -158,7 +160,7 @@ internal static class BittradeNormalizer
     }
 
     internal static IReadOnlyList<BittradeDepositWithdrawNormalized> NormalizeDepositWithdraws(
-        IReadOnlyList<RawPrivateModels.RawDepositWithdrawEntry>? entries)
+        IReadOnlyList<RawPrivateDtos.RawDepositWithdrawEntry>? entries)
     {
         if (entries is null || entries.Count == 0)
         {
@@ -179,7 +181,7 @@ internal static class BittradeNormalizer
     }
 
     internal static IReadOnlyList<BittradeWithdrawVirtualAddressNormalized> NormalizeWithdrawVirtualAddresses(
-        IReadOnlyList<RawPrivateModels.RawWithdrawVirtualAddress>? entries)
+        IReadOnlyList<RawPrivateDtos.RawWithdrawVirtualAddress>? entries)
     {
         if (entries is null || entries.Count == 0)
         {
@@ -201,7 +203,7 @@ internal static class BittradeNormalizer
     }
 
     internal static IReadOnlyList<BittradeRetailBalanceEntryNormalized> NormalizeRetailBalances(
-        IReadOnlyList<RawPrivateModels.RawRetailAccountBalanceEntry>? entries)
+        IReadOnlyList<RawPrivateDtos.RawRetailAccountBalanceEntry>? entries)
     {
         if (entries is null || entries.Count == 0)
         {
@@ -281,7 +283,7 @@ internal static class BittradeNormalizer
 
     private static IReadOnlyList<JsonElement> ExtractTradeSnapshots(
         string? rawJson,
-        IReadOnlyList<RawPublicModels.RawTradeEntry> entries)
+        IReadOnlyList<RawPublicDtos.RawTradeEntry> entries)
     {
         if (entries.Count == 0)
         {

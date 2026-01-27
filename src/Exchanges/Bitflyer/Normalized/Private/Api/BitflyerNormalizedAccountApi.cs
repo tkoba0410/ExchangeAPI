@@ -12,7 +12,7 @@ using PrivateRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Reques
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
-using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using RawPrivateRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Api;
@@ -32,7 +32,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetBalanceCallAsync(new RawPrivateModels.GetBalancesRequest(), cancellationToken)
+            .GetBalanceCallAsync(new RawPrivateRequests.GetBalancesRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetBalancesRequest();
         return CreateCall(rawCall, request, "Bitflyer.GetBalances", BitflyerAccountMapper.MapBalances);
@@ -42,7 +42,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetPermissionsCallAsync(new RawPrivateModels.GetPermissionsRequest(), cancellationToken)
+            .GetPermissionsCallAsync(new RawPrivateRequests.GetPermissionsRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetPermissionsRequest();
         return CreateCall(rawCall, request, "Bitflyer.GetPermissions", raw => raw);
@@ -52,7 +52,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetCollateralCallAsync(new RawPrivateModels.GetCollateralRequest(), cancellationToken)
+            .GetCollateralCallAsync(new RawPrivateRequests.GetCollateralRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetCollateralRequest();
         return CreateCall(
@@ -66,7 +66,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetCollateralAccountsCallAsync(new RawPrivateModels.GetCollateralAccountsRequest(), cancellationToken)
+            .GetCollateralAccountsCallAsync(new RawPrivateRequests.GetCollateralAccountsRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetCollateralAccountsRequest();
         return CreateCall(
@@ -86,7 +86,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetAddressesCallAsync(new RawPrivateModels.GetAddressesRequest(), cancellationToken)
+            .GetAddressesCallAsync(new RawPrivateRequests.GetAddressesRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetAddressesRequest();
         return CreateCall(rawCall, request, "Bitflyer.GetAddresses", raw => new BitflyerRawJsonNormalized(raw.RawJson));
@@ -99,7 +99,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetCoinInsCallAsync(new RawPrivateModels.GetCoinInsRequest(count, before, after), cancellationToken)
+            .GetCoinInsCallAsync(new RawPrivateRequests.GetCoinInsRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetCoinInsRequest(count, before, after);
         return CreateCall(rawCall, request, "Bitflyer.GetCoinIns", raw => new BitflyerRawJsonNormalized(raw.RawJson));
@@ -113,7 +113,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetCoinOutsCallAsync(new RawPrivateModels.GetCoinOutsRequest(messageId, count, before, after), cancellationToken)
+            .GetCoinOutsCallAsync(new RawPrivateRequests.GetCoinOutsRequest(messageId, count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetCoinOutsRequest(messageId, count, before, after);
         return CreateCall(rawCall, request, "Bitflyer.GetCoinOuts", raw => new BitflyerRawJsonNormalized(raw.RawJson));
@@ -123,7 +123,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetBankAccountsCallAsync(new RawPrivateModels.GetBankAccountsRequest(), cancellationToken)
+            .GetBankAccountsCallAsync(new RawPrivateRequests.GetBankAccountsRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetBankAccountsRequest();
         return CreateCall(rawCall, request, "Bitflyer.GetBankAccounts", raw => new BitflyerRawJsonNormalized(raw.RawJson));
@@ -136,7 +136,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetDepositsCallAsync(new RawPrivateModels.GetDepositsRequest(count, before, after), cancellationToken)
+            .GetDepositsCallAsync(new RawPrivateRequests.GetDepositsRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetDepositsRequest(count, before, after);
         return CreateCall(rawCall, request, "Bitflyer.GetDeposits", raw => new BitflyerRawJsonNormalized(raw.RawJson));
@@ -150,7 +150,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .WithdrawCallAsync(new RawPrivateModels.CreateWithdrawalRequest
+            .WithdrawCallAsync(new RawPrivateRequests.CreateWithdrawalRequest
             {
                 CurrencyCode = currencyCode,
                 BankAccountId = bankAccountId,
@@ -169,7 +169,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetWithdrawalsCallAsync(new RawPrivateModels.GetWithdrawalsRequest(count, before, after), cancellationToken)
+            .GetWithdrawalsCallAsync(new RawPrivateRequests.GetWithdrawalsRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetWithdrawalsRequest(count, before, after);
         return CreateCall(rawCall, request, "Bitflyer.GetWithdrawals", raw => new BitflyerRawJsonNormalized(raw.RawJson));
@@ -183,7 +183,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetBalanceHistoryCallAsync(new RawPrivateModels.GetBalanceHistoryRequest(currencyCode, count, before, after), cancellationToken)
+            .GetBalanceHistoryCallAsync(new RawPrivateRequests.GetBalanceHistoryRequest(currencyCode, count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetBalanceHistoryRequest(currencyCode, count, before, after);
         return CreateCall(rawCall, request, "Bitflyer.GetBalanceHistory", raw => new BitflyerRawJsonNormalized(raw.RawJson));
@@ -222,7 +222,7 @@ internal sealed class BitflyerNormalizedAccountApi
         }
 
         var rawCall = await _raw
-            .GetPositionsCallAsync(new RawPrivateModels.GetPositionsRequest(productCode), cancellationToken)
+            .GetPositionsCallAsync(new RawPrivateRequests.GetPositionsRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -251,7 +251,7 @@ internal sealed class BitflyerNormalizedAccountApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetCollateralHistoryCallAsync(new RawPrivateModels.GetCollateralHistoryRequest(count, before, after), cancellationToken)
+            .GetCollateralHistoryCallAsync(new RawPrivateRequests.GetCollateralHistoryRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetCollateralHistoryRequest(count, before, after);
         return CreateCall(rawCall, request, "Bitflyer.GetCollateralHistory", raw => new BitflyerRawJsonNormalized(raw.RawJson));
@@ -290,7 +290,7 @@ internal sealed class BitflyerNormalizedAccountApi
         }
 
         var rawCall = await _raw
-            .GetExecutionsPrivateCallAsync(new RawPrivateModels.GetAccountExecutionsRequest(productCode), cancellationToken)
+            .GetExecutionsPrivateCallAsync(new RawPrivateRequests.GetAccountExecutionsRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -333,7 +333,7 @@ internal sealed class BitflyerNormalizedAccountApi
         }
 
         var rawCall = await _raw
-            .GetTradingCommissionCallAsync(new RawPrivateModels.GetTradingCommissionRequest(productCode), cancellationToken)
+            .GetTradingCommissionCallAsync(new RawPrivateRequests.GetTradingCommissionRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

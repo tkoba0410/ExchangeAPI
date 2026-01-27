@@ -96,7 +96,7 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void CancelParentOrder_builds_request_with_body_json()
     {
-        var request = new RawPrivateModels.CancelParentOrderRequest
+        var request = new RawPrivateRequests.CancelParentOrderRequest
         {
             ProductCode = "BTC_JPY",
             ParentOrderAcceptanceId = "JRF-1",

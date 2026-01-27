@@ -38,7 +38,7 @@ public sealed class BitflyerParentOrderNormalizedTests
         ]
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPrivateModels.RawGetParentOrdersResponse>>(
+        var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>>(
             json,
             "Bitflyer.GetParentOrders");
         var normalized = BitflyerParentOrderNormalizer.NormalizeList(raw, json);
@@ -72,7 +72,7 @@ public sealed class BitflyerParentOrderNormalizedTests
         }
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<RawPrivateModels.RawGetParentOrderResponse>(
+        var raw = BitflyerRawJson.DeserializeOrThrow<RawPrivateDtos.RawGetParentOrderResponse>(
             json,
             "Bitflyer.GetParentOrder");
         var normalized = BitflyerParentOrderNormalizer.NormalizeDetail(raw, json);

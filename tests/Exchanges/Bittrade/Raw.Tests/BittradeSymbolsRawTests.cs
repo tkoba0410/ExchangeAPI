@@ -30,7 +30,7 @@ public sealed class BittradeSymbolsRawTests
             }
             """;
 
-        var response = BittradeRawJson.DeserializeOrThrow<RawPublicModels.RawSymbolsResponse>(json, "Bittrade.GetSymbols");
+        var response = BittradeRawJson.DeserializeOrThrow<RawPublicDtos.RawSymbolsResponse>(json, "Bittrade.GetSymbols");
         var symbol = Assert.Single(response.Data!);
 
         Assert.Equal("0.0001", symbol.MinOrderAmount);

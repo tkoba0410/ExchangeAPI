@@ -13,13 +13,13 @@ public sealed class BittradeParsingTests
     [Fact]
     public void MapBalances_InvalidBalance_ThrowsWithContext()
     {
-        var data = new RawPrivateModels.RawBalanceData(
+        var data = new RawPrivateDtos.RawBalanceData(
             Id: "1",
             Type: "spot",
             State: "working",
-            List: new List<RawPrivateModels.RawBalanceEntry>
+            List: new List<RawPrivateDtos.RawBalanceEntry>
             {
-                new RawPrivateModels.RawBalanceEntry(Currency: "btc", Type: "trade", Balance: "bad")
+                new RawPrivateDtos.RawBalanceEntry(Currency: "btc", Type: "trade", Balance: "bad")
             });
 
         var ex = Assert.Throws<BittradeNormalizedException>(() => BittradeNormalizer.NormalizeBalances(data));

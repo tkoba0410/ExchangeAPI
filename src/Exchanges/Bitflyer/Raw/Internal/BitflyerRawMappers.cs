@@ -1,12 +1,12 @@
 using System.Linq;
-using PrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using PrivateRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 
 internal static class BitflyerRawMappers
 {
-    public static RawSendChildOrderRequest MapSendChildOrderRequest(PrivateModels.CreateChildOrderRequest request) => new()
+    public static RawSendChildOrderRequest MapSendChildOrderRequest(PrivateRequests.CreateChildOrderRequest request) => new()
     {
         ProductCode = request.ProductCode,
         ChildOrderType = request.ChildOrderType,
@@ -18,7 +18,7 @@ internal static class BitflyerRawMappers
         TriggerPrice = request.TriggerPrice,
     };
 
-    public static RawSendParentOrderRequest MapSendParentOrderRequest(PrivateModels.CreateParentOrderRequest request)
+    public static RawSendParentOrderRequest MapSendParentOrderRequest(PrivateRequests.CreateParentOrderRequest request)
     {
         var parameters = request.Parameters.Select(p => new RawSendParentOrderParameter
         {

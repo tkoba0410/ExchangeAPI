@@ -5,7 +5,8 @@ using System.Text.Json;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
-using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using RawPrivateDtos = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Dtos;
+using RawPrivateRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;
 using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
@@ -13,7 +14,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 internal static class BitflyerParentOrderNormalizer
 {
     public static IReadOnlyList<BitflyerParentOrderNormalized> NormalizeList(
-        IReadOnlyList<RawPrivateModels.RawGetParentOrdersResponse> raw,
+        IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> raw,
         string? rawJson)
     {
         var snapshots = ExtractSnapshots(rawJson, raw.Count);
@@ -23,7 +24,7 @@ internal static class BitflyerParentOrderNormalizer
     }
 
     public static BitflyerParentOrderDetailNormalized NormalizeDetail(
-        RawPrivateModels.RawGetParentOrderResponse raw,
+        RawPrivateDtos.RawGetParentOrderResponse raw,
         string? rawJson)
     {
         var snapshot = ExtractSnapshot(rawJson);
@@ -44,7 +45,7 @@ internal static class BitflyerParentOrderNormalizer
     }
 
     private static BitflyerParentOrderNormalized NormalizeSummary(
-        RawPrivateModels.RawGetParentOrdersResponse raw,
+        RawPrivateDtos.RawGetParentOrdersResponse raw,
         JsonElement snapshot)
     {
         return new BitflyerParentOrderNormalized(
@@ -68,7 +69,7 @@ internal static class BitflyerParentOrderNormalizer
             Extras: new Dictionary<string, JsonElement>());
     }
 
-    private static BitflyerParentOrderParameterNormalized NormalizeParameter(RawPrivateModels.ParentOrderParameterResponse raw)
+    private static BitflyerParentOrderParameterNormalized NormalizeParameter(RawPrivateDtos.ParentOrderParameterResponse raw)
     {
         return new BitflyerParentOrderParameterNormalized(
             ProductCode: raw.ProductCode,

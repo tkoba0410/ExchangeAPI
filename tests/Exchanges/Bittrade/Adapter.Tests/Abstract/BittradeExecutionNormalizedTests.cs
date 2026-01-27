@@ -32,8 +32,8 @@ public sealed class BittradeExecutionNormalizedTests
         }
         """;
 
-        var raw = BittradeRawJson.DeserializeOrThrow<RawPublicModels.RawTradeResponse>(json, "Bittrade.GetTrades");
-        var entries = raw.Tick?.Data ?? new List<RawPublicModels.RawTradeEntry>();
+        var raw = BittradeRawJson.DeserializeOrThrow<RawPublicDtos.RawTradeResponse>(json, "Bittrade.GetTrades");
+        var entries = raw.Tick?.Data ?? new List<RawPublicDtos.RawTradeEntry>();
         var normalized = BittradeNormalizer.NormalizeExecutions(entries, json);
 
         Assert.Single(normalized);

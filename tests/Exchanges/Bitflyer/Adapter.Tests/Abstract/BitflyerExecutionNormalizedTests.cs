@@ -27,7 +27,7 @@ public sealed class BitflyerExecutionNormalizedTests
         ]
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPublicModels.ExecutionPublicResponse>>(
+        var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPublicDtos.ExecutionPublicResponse>>(
             json,
             "Bitflyer.GetExecutions");
         var normalized = BitflyerExecutionNormalizer.NormalizeList(raw, json);

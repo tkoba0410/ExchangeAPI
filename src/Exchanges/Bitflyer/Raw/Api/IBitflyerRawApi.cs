@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Models;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Api;

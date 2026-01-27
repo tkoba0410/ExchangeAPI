@@ -23,8 +23,8 @@ public sealed class BitflyerTradingApi_NotFoundTests
     [Fact]
     public async Task GetOrderAsync_ByAcceptanceId_NotFound_Throws()
     {
-        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
+        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateDtos.BalanceResponse>());
+        var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.RawSendChildOrderResponse());
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets, privateApi);
         var api = new BitflyerTradingApi(normalized);
@@ -38,8 +38,8 @@ public sealed class BitflyerTradingApi_NotFoundTests
     [Fact]
     public async Task GetOrderAsync_ByExchangeOrderId_NotFound_Throws()
     {
-        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse());
+        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateDtos.BalanceResponse>());
+        var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.RawSendChildOrderResponse());
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalized = BitflyerTestHelpers.CreateTradingApi(tradingApi, markets, privateApi);
         var api = new BitflyerTradingApi(normalized);

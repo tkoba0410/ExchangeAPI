@@ -24,14 +24,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 
 public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
 {
-    private readonly BitflyerNormalizedMarketDataFacade _marketData;
-    private readonly BitflyerNormalizedExchangeInfoFacade _exchangeInfo;
+    private readonly BitflyerNormalizedMarketDataApi _marketData;
+    private readonly BitflyerNormalizedExchangeInfoApi _exchangeInfo;
     private readonly BitflyerNormalizedTradingApi _trading;
     private readonly BitflyerNormalizedAccountApi _account;
 
     private BitflyerNormalizedApi(
-        BitflyerNormalizedMarketDataFacade marketData,
-        BitflyerNormalizedExchangeInfoFacade exchangeInfo,
+        BitflyerNormalizedMarketDataApi marketData,
+        BitflyerNormalizedExchangeInfoApi exchangeInfo,
         BitflyerNormalizedTradingApi trading,
         BitflyerNormalizedAccountApi account)
     {
@@ -57,8 +57,8 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         if (markets is null) throw new ArgumentNullException(nameof(markets));
 
         return new BitflyerNormalizedApi(
-            marketData: new BitflyerNormalizedMarketDataFacade(raw),
-            exchangeInfo: new BitflyerNormalizedExchangeInfoFacade(raw),
+            marketData: new BitflyerNormalizedMarketDataApi(raw),
+            exchangeInfo: new BitflyerNormalizedExchangeInfoApi(raw),
             trading: new BitflyerNormalizedTradingApi(raw, markets),
             account: new BitflyerNormalizedAccountApi(raw, markets));
     }

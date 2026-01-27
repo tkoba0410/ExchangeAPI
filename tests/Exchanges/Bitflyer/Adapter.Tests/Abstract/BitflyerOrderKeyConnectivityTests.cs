@@ -26,7 +26,7 @@ public sealed class BitflyerOrderKeyConnectivityTests
         var acceptanceId = "ACCEPT-1";
         var childOrders = new[]
         {
-            new RawPrivateModels.RawGetChildOrdersResponse
+            new RawPrivateDtos.RawGetChildOrdersResponse
             {
                 ChildOrderId = "JRF-1",
                 ChildOrderAcceptanceId = acceptanceId,
@@ -39,8 +39,8 @@ public sealed class BitflyerOrderKeyConnectivityTests
             }
         };
 
-        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
-        var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateModels.RawSendChildOrderResponse
+        var privateApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateDtos.BalanceResponse>());
+        var tradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.RawSendChildOrderResponse
         {
             ChildOrderAcceptanceId = acceptanceId
         }, childOrders);

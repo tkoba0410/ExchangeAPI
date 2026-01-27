@@ -14,7 +14,7 @@ public sealed class BitflyerPublicClientTests
     [Fact]
     public async Task GetHealthCallAsync_ReturnsRawHealth()
     {
-        var rawTicker = new RawPublicModels.Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
@@ -29,7 +29,7 @@ public sealed class BitflyerPublicClientTests
     [Fact]
     public async Task GetBoardStateCallAsync_ReturnsRawBoardState()
     {
-        var rawTicker = new RawPublicModels.Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
@@ -46,7 +46,7 @@ public sealed class BitflyerPublicClientTests
     [Fact]
     public async Task GetTickerCallAsync_UnknownSymbol_Throws()
     {
-        var rawTicker = new RawPublicModels.Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);

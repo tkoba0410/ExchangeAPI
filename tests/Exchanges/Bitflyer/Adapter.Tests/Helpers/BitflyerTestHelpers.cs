@@ -24,9 +24,9 @@ internal static class BitflyerTestHelpers
         BitflyerNormalizedApi.FromRaw(raw, markets);
 
     public static IBitflyerNormalizedApi CreateNormalizedApi(
-        RawPublicModels.Ticker ticker,
+        RawPublicDtos.Ticker ticker,
         IBitflyerMarketResolver markets,
-        RawPublicModels.Board? board = null,
+        RawPublicDtos.Board? board = null,
         FakeBitflyerPrivateApi? privateApi = null,
         FakeBitflyerPrivateTradingApi? tradingApi = null)
     {
@@ -39,7 +39,7 @@ internal static class BitflyerTestHelpers
         IBitflyerMarketResolver markets,
         FakeBitflyerPrivateApi? privateApi = null) =>
         CreateNormalizedApi(
-            new RawPublicModels.Ticker { ProductCode = "BTC_JPY" },
+            new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" },
             markets,
             privateApi: privateApi,
             tradingApi: tradingApi);

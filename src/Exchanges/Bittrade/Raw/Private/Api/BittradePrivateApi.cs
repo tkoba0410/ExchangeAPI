@@ -1,13 +1,12 @@
 using System;
-using System.Text.Json;
 using System.Globalization;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Models;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;

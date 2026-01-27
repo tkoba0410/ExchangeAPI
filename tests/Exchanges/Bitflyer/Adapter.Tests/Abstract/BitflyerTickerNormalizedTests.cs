@@ -29,7 +29,7 @@ public sealed class BitflyerTickerNormalizedTests
         }
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<RawPublicModels.Ticker>(json, "Bitflyer.GetTicker");
+        var raw = BitflyerRawJson.DeserializeOrThrow<RawPublicDtos.Ticker>(json, "Bitflyer.GetTicker");
         var normalized = BitflyerTickerNormalizer.Normalize(raw, json);
 
         Assert.Equal(JsonValueKind.Object, normalized.RawSnapshot.ValueKind);

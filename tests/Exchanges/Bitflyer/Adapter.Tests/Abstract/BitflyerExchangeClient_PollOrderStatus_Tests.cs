@@ -22,7 +22,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
     public async Task WaitForOrderAsync_CompletesWhenStateTransitions()
     {
         var acceptanceId = "ACCEPT-1";
-        var active = new RawPrivateModels.RawGetChildOrdersResponse
+        var active = new RawPrivateDtos.RawGetChildOrdersResponse
         {
             ProductCode = "BTC_JPY",
             ChildOrderAcceptanceId = acceptanceId,
@@ -35,7 +35,7 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             ChildOrderType = "LIMIT",
             Size = 0.01m,
         };
-        var completed = new RawPrivateModels.RawGetChildOrdersResponse
+        var completed = new RawPrivateDtos.RawGetChildOrdersResponse
         {
             ProductCode = active.ProductCode,
             ChildOrderAcceptanceId = acceptanceId,
@@ -49,11 +49,11 @@ public sealed class BitflyerExchangeClient_PollOrderStatus_Tests
             Size = active.Size,
         };
 
-        var accountApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateModels.BalanceResponse>());
+        var accountApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateDtos.BalanceResponse>());
         var tradingApi = new FakeBitflyerPrivateTradingApi(
-            new RawPrivateModels.RawSendChildOrderResponse(),
+            new RawPrivateDtos.RawSendChildOrderResponse(),
             snapshots: new[] { new[] { active }, new[] { completed } });
-        var raw = new FakeBitflyerPublicApi(new RawPublicModels.Ticker(), privateApi: accountApi, tradingApi: tradingApi);
+        var raw = new FakeBitflyerPublicApi(new RawPublicDtos.Ticker(), privateApi: accountApi, tradingApi: tradingApi);
         var client = CreateClient(raw);
 
         IOrderQueryApi orderQueryApi = new TradingApiOrderQueryAdapter(client);

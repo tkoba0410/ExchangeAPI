@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using RawPrivateModels = ExchangeApi.Exchanges.Bittrade.Raw.Private.Models;
+using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
+using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
@@ -17,7 +18,7 @@ internal static class BittradeTradingMapper
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
-    public static RawPrivateModels.RawCreateOrderRequest ToRaw(string accountId, string apiSymbol, BittradeOrderRequest request)
+    public static RawPrivateRequests.RawCreateOrderRequest ToRaw(string accountId, string apiSymbol, BittradeOrderRequest request)
     {
         if (string.IsNullOrWhiteSpace(accountId))
         {
@@ -33,7 +34,7 @@ internal static class BittradeTradingMapper
         var price = request.Price?.Value;
         var size = FormatDecimal(request.Size.Value);
 
-        return new RawPrivateModels.RawCreateOrderRequest(
+        return new RawPrivateRequests.RawCreateOrderRequest(
             AccountId: accountId,
             Symbol: apiSymbol,
             Type: type,
@@ -42,14 +43,14 @@ internal static class BittradeTradingMapper
             Source: null);
     }
 
-    public static BittradeOrderResult ToOrderResult(RawPrivateModels.RawPlaceOrderResponse raw)
+    public static BittradeOrderResult ToOrderResult(RawPrivateDtos.RawPlaceOrderResponse raw)
     {
         var orderId = raw.OrderId;
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
         return new BittradeOrderResult(key, ExchangeOrderId: orderId);
     }
 
-    public static IReadOnlyList<BittradeOpenOrder> ToOpenOrders(Symbol symbol, RawPrivateModels.RawOpenOrdersResponse raw)
+    public static IReadOnlyList<BittradeOpenOrder> ToOpenOrders(Symbol symbol, RawPrivateDtos.RawOpenOrdersResponse raw)
     {
         if (raw.Data is null || raw.Data.Count == 0)
         {
@@ -59,7 +60,7 @@ internal static class BittradeTradingMapper
         return raw.Data.Select(order => ToOpenOrder(symbol, order)).ToList();
     }
 
-    private static BittradeOpenOrder ToOpenOrder(Symbol symbol, RawPrivateModels.RawOrderSummary raw)
+    private static BittradeOpenOrder ToOpenOrder(Symbol symbol, RawPrivateDtos.RawOrderSummary raw)
     {
         var (side, type) = MapSideAndType(raw.Type);
         var status = MapStatus(raw.State);
@@ -85,7 +86,7 @@ internal static class BittradeTradingMapper
             ExchangeOrderId: raw.Id);
     }
 
-    public static BittradeOrderStatus ToOrderStatus(string productCode, RawPrivateModels.RawOrderDetailResponse raw, OrderKey key)
+    public static BittradeOrderStatus ToOrderStatus(string productCode, RawPrivateDtos.RawOrderDetailResponse raw, OrderKey key)
     {
         if (string.IsNullOrWhiteSpace(productCode))
         {
@@ -115,7 +116,7 @@ internal static class BittradeTradingMapper
     }
 
     public static IReadOnlyList<BittradeExecutionNormalized> ToExecutions(
-        IReadOnlyList<RawPrivateModels.RawMatchResultEntry> entries)
+        IReadOnlyList<RawPrivateDtos.RawMatchResultEntry> entries)
     {
         if (entries is null || entries.Count == 0)
         {
@@ -139,7 +140,7 @@ internal static class BittradeTradingMapper
     }
 
     public static IReadOnlyList<BittradeOrderSummaryNormalized> ToOrderSummaries(
-        IReadOnlyList<RawPrivateModels.RawOrderSummary>? entries)
+        IReadOnlyList<RawPrivateDtos.RawOrderSummary>? entries)
     {
         if (entries is null || entries.Count == 0)
         {
@@ -162,7 +163,7 @@ internal static class BittradeTradingMapper
     }
 
     public static IReadOnlyList<BittradeRetailOrderEntryNormalized> ToRetailOrders(
-        IReadOnlyList<RawPrivateModels.RawRetailOrderEntry>? entries)
+        IReadOnlyList<RawPrivateDtos.RawRetailOrderEntry>? entries)
     {
         if (entries is null || entries.Count == 0)
         {
@@ -182,7 +183,7 @@ internal static class BittradeTradingMapper
             .ToList();
     }
 
-    public static BittradeRetailOrderEntryNormalized? ToRetailOrder(RawPrivateModels.RawRetailOrderEntry? entry)
+    public static BittradeRetailOrderEntryNormalized? ToRetailOrder(RawPrivateDtos.RawRetailOrderEntry? entry)
     {
         if (entry is null)
         {
@@ -200,7 +201,7 @@ internal static class BittradeTradingMapper
             CreatedAt: entry.CreatedAt);
     }
 
-    public static BittradeRetailOrderResult ToRetailOrderResult(RawPrivateModels.RawRetailOrderResponse raw)
+    public static BittradeRetailOrderResult ToRetailOrderResult(RawPrivateDtos.RawRetailOrderResponse raw)
     {
         return new BittradeRetailOrderResult(
             Code: raw.Code,
@@ -209,22 +210,22 @@ internal static class BittradeTradingMapper
             Message: raw.Message);
     }
 
-    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateModels.RawCreateWithdrawResponse raw)
+    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.RawCreateWithdrawResponse raw)
     {
         return new BittradeWithdrawResult(raw.Status, raw.Data);
     }
 
-    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateModels.RawCancelWithdrawResponse raw)
+    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.RawCancelWithdrawResponse raw)
     {
         return new BittradeWithdrawResult(raw.Status, raw.Data);
     }
 
-    public static RawPrivateModels.RawCreateRetailOrderRequest ToRawRetailOrder(BittradeRetailOrderRequest request)
+    public static RawPrivateRequests.RawCreateRetailOrderRequest ToRawRetailOrder(BittradeRetailOrderRequest request)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var apiSymbol = BittradeSymbol.Normalize(request.Symbol.Value);
-        return new RawPrivateModels.RawCreateRetailOrderRequest(
+        return new RawPrivateRequests.RawCreateRetailOrderRequest(
             Symbol: apiSymbol,
             Type: request.Type,
             Price: request.Price is null ? null : FormatDecimal(request.Price.Value),

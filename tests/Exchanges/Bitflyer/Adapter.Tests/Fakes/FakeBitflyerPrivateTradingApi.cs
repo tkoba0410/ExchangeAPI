@@ -8,31 +8,31 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
 public sealed class FakeBitflyerPrivateTradingApi
 {
-    private readonly RawPrivateModels.RawSendChildOrderResponse _response;
-    private readonly IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse> _childOrders;
-    private readonly Queue<IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>>? _childOrderSnapshots;
+    private readonly RawPrivateDtos.RawSendChildOrderResponse _response;
+    private readonly IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> _childOrders;
+    private readonly Queue<IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>? _childOrderSnapshots;
     private readonly Exception? _exceptionToThrow;
 
     public string? LastBodyJson { get; private set; }
     public string? LastParentOrderBodyJson { get; private set; }
-    public RawPrivateModels.CancelChildOrderRequest? LastCancelRequest { get; private set; }
-    public RawPrivateModels.CancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
-    public RawPrivateModels.GetChildOrdersRequest? LastGetChildOrdersRequest { get; private set; }
+    public RawPrivateRequests.CancelChildOrderRequest? LastCancelRequest { get; private set; }
+    public RawPrivateRequests.CancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
+    public RawPrivateRequests.GetChildOrdersRequest? LastGetChildOrdersRequest { get; private set; }
 
     public FakeBitflyerPrivateTradingApi(
-        RawPrivateModels.RawSendChildOrderResponse response,
-        IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>? childOrders = null,
-        IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>[]? snapshots = null,
+        RawPrivateDtos.RawSendChildOrderResponse response,
+        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>? childOrders = null,
+        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>[]? snapshots = null,
         Exception? exceptionToThrow = null)
     {
         _response = response;
-        _childOrders = childOrders ?? Array.Empty<RawPrivateModels.RawGetChildOrdersResponse>();
-        _childOrderSnapshots = snapshots is null ? null : new Queue<IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>>(
+        _childOrders = childOrders ?? Array.Empty<RawPrivateDtos.RawGetChildOrdersResponse>();
+        _childOrderSnapshots = snapshots is null ? null : new Queue<IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>(
             snapshots);
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task<Call<string, RawPrivateModels.RawSendChildOrderResponse>> SendChildOrderCallAsync(
+    public Task<Call<string, RawPrivateDtos.RawSendChildOrderResponse>> SendChildOrderCallAsync(
         string bodyJson,
         CancellationToken cancellationToken = default)
     {
@@ -40,34 +40,34 @@ public sealed class FakeBitflyerPrivateTradingApi
         return Task.FromResult(MakeCall(bodyJson, _response));
     }
 
-    public Task<Call<string, RawPrivateModels.RawSendParentOrderResponse>> SendParentOrderCallAsync(
+    public Task<Call<string, RawPrivateDtos.RawSendParentOrderResponse>> SendParentOrderCallAsync(
         string bodyJson,
         CancellationToken cancellationToken = default)
     {
         LastParentOrderBodyJson = bodyJson;
         return Task.FromResult(MakeCall(
             bodyJson,
-            new RawPrivateModels.RawSendParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
+            new RawPrivateDtos.RawSendParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
     }
 
-    public Task<Call<RawPrivateModels.CancelChildOrderRequest, RawPrivateModels.RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
-        RawPrivateModels.CancelChildOrderRequest request,
+    public Task<Call<RawPrivateRequests.CancelChildOrderRequest, RawPrivateDtos.RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
+        RawPrivateRequests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastCancelRequest = request;
-        return Task.FromResult(MakeCall(request, new RawPrivateModels.RawCancelChildOrderResponse()));
+        return Task.FromResult(MakeCall(request, new RawPrivateDtos.RawCancelChildOrderResponse()));
     }
 
-    public Task<Call<RawPrivateModels.CancelParentOrderRequest, RawPrivateModels.RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
-        RawPrivateModels.CancelParentOrderRequest request,
+    public Task<Call<RawPrivateRequests.CancelParentOrderRequest, RawPrivateDtos.RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
+        RawPrivateRequests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastCancelParentOrderRequest = request;
-        return Task.FromResult(MakeCall(request, new RawPrivateModels.RawCancelParentOrderResponse()));
+        return Task.FromResult(MakeCall(request, new RawPrivateDtos.RawCancelParentOrderResponse()));
     }
 
-    public Task<Call<RawPrivateModels.GetChildOrdersRequest, IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
-        RawPrivateModels.GetChildOrdersRequest request,
+    public Task<Call<RawPrivateRequests.GetChildOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
+        RawPrivateRequests.GetChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
         LastGetChildOrdersRequest = request;
@@ -77,7 +77,7 @@ public sealed class FakeBitflyerPrivateTradingApi
             return Task.FromResult(MakeCall(request, snapshot));
         }
 
-        IReadOnlyList<RawPrivateModels.RawGetChildOrdersResponse> response;
+        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> response;
         if (!string.IsNullOrWhiteSpace(request.ChildOrderAcceptanceId))
         {
             response = _childOrders
@@ -97,19 +97,19 @@ public sealed class FakeBitflyerPrivateTradingApi
         return Task.FromResult(MakeCall(request, response));
     }
 
-    public Task<Call<RawPrivateModels.GetParentOrdersRequest, IReadOnlyList<RawPrivateModels.RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
-        RawPrivateModels.GetParentOrdersRequest request,
+    public Task<Call<RawPrivateRequests.GetParentOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
+        RawPrivateRequests.GetParentOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<RawPrivateModels.RawGetParentOrdersResponse> response = Array.Empty<RawPrivateModels.RawGetParentOrdersResponse>();
+        IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> response = Array.Empty<RawPrivateDtos.RawGetParentOrdersResponse>();
         return Task.FromResult(MakeCall(request, response));
     }
 
-    public Task<Call<RawPrivateModels.GetParentOrderRequest, RawPrivateModels.RawGetParentOrderResponse>> GetParentOrderCallAsync(
-        RawPrivateModels.GetParentOrderRequest request,
+    public Task<Call<RawPrivateRequests.GetParentOrderRequest, RawPrivateDtos.RawGetParentOrderResponse>> GetParentOrderCallAsync(
+        RawPrivateRequests.GetParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(MakeCall(request, new RawPrivateModels.RawGetParentOrderResponse()));
+        return Task.FromResult(MakeCall(request, new RawPrivateDtos.RawGetParentOrderResponse()));
     }
 
     private Call<TReq, TResponse> MakeCall<TReq, TResponse>(TReq request, TResponse response)

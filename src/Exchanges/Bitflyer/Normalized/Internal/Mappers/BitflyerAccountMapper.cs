@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using RawPrivateModels = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Models;
+using RawPrivateDtos = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Dtos;
+using RawPrivateRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
 
@@ -11,7 +12,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 internal static class BitflyerAccountMapper
 {
     public static IReadOnlyList<BitflyerBalanceEntryNormalized> MapBalances(
-        IReadOnlyList<RawPrivateModels.BalanceResponse> rawBalances)
+        IReadOnlyList<RawPrivateDtos.BalanceResponse> rawBalances)
     {
         if (rawBalances is null) throw new ArgumentNullException(nameof(rawBalances));
 
@@ -25,7 +26,7 @@ internal static class BitflyerAccountMapper
 
     public static IReadOnlyList<BitflyerExecutionAccountNormalized> MapAccountExecutions(
         Symbol symbol,
-        IReadOnlyList<RawPrivateModels.ExecutionPrivateResponse> rawExecutions)
+        IReadOnlyList<RawPrivateDtos.ExecutionPrivateResponse> rawExecutions)
     {
         if (rawExecutions is null) throw new ArgumentNullException(nameof(rawExecutions));
 

@@ -38,9 +38,9 @@ public sealed class BittradeFailFastMapperTests
     [Fact]
     public void ToOrderStatus_UnknownState_Throws()
     {
-        var raw = new RawPrivateModels.RawOrderDetailResponse(
+        var raw = new RawPrivateDtos.RawOrderDetailResponse(
             Status: "ok",
-            Data: new RawPrivateModels.RawOrderDetail(
+            Data: new RawPrivateDtos.RawOrderDetail(
                 Id: "1",
                 Symbol: "btcjpy",
                 AccountId: "1",
@@ -59,12 +59,12 @@ public sealed class BittradeFailFastMapperTests
             BittradeTradingMapper.ToOrderStatus("BTC_JPY", raw, new OrderKey(OrderIdKind.ExchangeOrderId, "1")));
     }
 
-    private static RawPrivateModels.RawOpenOrdersResponse CreateOpenOrdersResponse(string type) =>
+    private static RawPrivateDtos.RawOpenOrdersResponse CreateOpenOrdersResponse(string type) =>
         new(
             Status: "ok",
             Data:
             [
-                new RawPrivateModels.RawOrderSummary(
+                new RawPrivateDtos.RawOrderSummary(
                     Id: "1",
                     Symbol: "btcjpy",
                     AccountId: "1",

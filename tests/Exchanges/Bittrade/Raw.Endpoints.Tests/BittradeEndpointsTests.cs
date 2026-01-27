@@ -51,7 +51,7 @@ public sealed class BittradeEndpointsTests
     [Fact]
     public void PlaceOrder_builds_request_with_body_json()
     {
-        var request = new RawPrivateModels.RawCreateOrderRequest(
+        var request = new RawPrivateRequests.RawCreateOrderRequest(
             AccountId: "123",
             Symbol: "btcjpy",
             Type: "buy-limit",

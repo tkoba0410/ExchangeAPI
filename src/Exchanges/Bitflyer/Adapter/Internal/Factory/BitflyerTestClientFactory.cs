@@ -6,7 +6,7 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 
 /// <summary>
 /// テスト専用のファクトリ。公開 API を汚さずにモックやカスタム Transport を注入できる。

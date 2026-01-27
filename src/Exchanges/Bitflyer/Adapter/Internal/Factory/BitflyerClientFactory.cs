@@ -11,7 +11,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 
 /// <summary>
 /// Factory for constructing bitFlyer client instances.

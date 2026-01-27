@@ -2,7 +2,7 @@ using System.Net.Http;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 
 /// <summary>
 /// bitFlyer クライアントの構成オプション。

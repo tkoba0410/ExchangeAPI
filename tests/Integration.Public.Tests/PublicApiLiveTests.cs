@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Protocol;

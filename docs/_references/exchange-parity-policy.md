@@ -18,6 +18,7 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 
 - Wire / Raw / Normalized / Adapter の各層で、**Public / Private / Internal** を基本骨格として揃える
 - **意味分類（MarketData / Trading / Account など）でフォルダ分割しない**（Public/Private 以外で分けない）
+- 生成・組み立て用途の `Factory` は **Internal 配下に置く**（例：`.../Internal/Factory`）
 
 ### 2.2 namespace
 
@@ -33,6 +34,7 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - 取引所固有の機能差（例：片方に存在しない endpoint 群）
 - 内部実装の詳細（DTO の内部表現、マッパの分割、最適化手法など）
 - Public 側の “Facade/Api” といった命名・構造パターン（統一する場合は別途タスク化）
+- `Properties` など **ビルドメタ情報の配置**は例外として許容する
 
 ## 4. Bitflyer を参照実装とする範囲（SHOULD）
 
@@ -51,4 +53,3 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 3. Raw: inventory と 1:1 の `*CallAsync` を追加
 4. Normalized: inventory と 1:1 の `*CallAsync` を追加（取引所内正規化）
 5. Adapter: Contracts への適合のみ（取引所固有 endpoint を公開しない）
-

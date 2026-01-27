@@ -37,7 +37,7 @@ internal interface IBittradePrivateTradingApi
         CreateWithdrawVirtualByAddressIdRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualCancelByWithdrawIdCallAsync(
+    Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
         CancelWithdrawRequest request,
         CancellationToken cancellationToken = default);
 
@@ -45,7 +45,7 @@ internal interface IBittradePrivateTradingApi
         PlaceWithdrawVirtualRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostOrderPlaceCallAsync(
+    Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderPlaceCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default);
 

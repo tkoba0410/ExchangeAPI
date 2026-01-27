@@ -57,7 +57,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 Size: size,
                 Price: price);
             var call = await _normalized
-                .PlaceOrderCallAsync(normalizedRequest, cancellationToken)
+                .SendChildOrderCallAsync(normalizedRequest, cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -93,7 +93,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
                 Size: size,
                 Price: null);
             var call = await _normalized
-                .PlaceOrderCallAsync(normalizedRequest, cancellationToken)
+                .SendChildOrderCallAsync(normalizedRequest, cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -121,7 +121,7 @@ internal sealed class BitflyerTradingApi : ITradingApi
 
         try
         {
-            var call = await _normalized.CancelOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
+            var call = await _normalized.CancelChildOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

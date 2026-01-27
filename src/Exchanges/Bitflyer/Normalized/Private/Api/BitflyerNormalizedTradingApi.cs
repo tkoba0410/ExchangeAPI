@@ -32,7 +32,7 @@ internal sealed class BitflyerNormalizedTradingApi
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public async Task<Call<PrivateRequests.PlaceOrderRequest, BitflyerOrderResult>> PlaceOrderCallAsync(
+    public async Task<Call<PrivateRequests.PlaceOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(
         BitflyerOrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -78,7 +78,7 @@ internal sealed class BitflyerNormalizedTradingApi
             });
     }
 
-    public async Task<Call<PrivateRequests.CancelOrderRequest, BitflyerCancelResult>> CancelOrderCallAsync(
+    public async Task<Call<PrivateRequests.CancelOrderRequest, BitflyerCancelResult>> CancelChildOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)

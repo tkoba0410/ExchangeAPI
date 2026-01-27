@@ -49,7 +49,7 @@ internal interface IBittradePrivateApi
         GetWithdrawVirtualAddressesRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetOrderListCallAsync(
+    Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetRetailOrderListCallAsync(
         GetRetailOrdersRequest request,
         CancellationToken cancellationToken = default);
 

@@ -80,7 +80,7 @@ public interface IBittradeRawApi
         GetWithdrawVirtualAddressesRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetOrderListCallAsync(
+    Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetRetailOrderListCallAsync(
         GetRetailOrdersRequest request,
         CancellationToken cancellationToken = default);
 
@@ -116,7 +116,7 @@ public interface IBittradeRawApi
         CreateWithdrawVirtualByAddressIdRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualCancelByWithdrawIdCallAsync(
+    Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
         CancelWithdrawRequest request,
         CancellationToken cancellationToken = default);
 
@@ -124,7 +124,7 @@ public interface IBittradeRawApi
         PlaceWithdrawVirtualRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostOrderPlaceCallAsync(
+    Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderPlaceCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default);
 

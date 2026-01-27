@@ -140,7 +140,7 @@ internal sealed class BittradePrivateApi : IBittradePrivateApi
                 json,
                 "Bittrade.GetWithdrawVirtualAddresses"));
 
-    public Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetOrderListCallAsync(
+    public Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetRetailOrderListCallAsync(
         GetRetailOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(

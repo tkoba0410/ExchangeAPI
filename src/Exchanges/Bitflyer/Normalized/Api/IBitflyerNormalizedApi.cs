@@ -53,11 +53,11 @@ public interface IBitflyerNormalizedApi
         string? region = null,
         CancellationToken cancellationToken = default);
 
-    Task<Call<PlaceOrderRequest, BitflyerOrderResult>> PlaceOrderCallAsync(
+    Task<Call<PlaceOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(
         BitflyerOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelOrderRequest, BitflyerCancelResult>> CancelOrderCallAsync(
+    Task<Call<CancelOrderRequest, BitflyerCancelResult>> CancelChildOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);

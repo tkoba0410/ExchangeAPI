@@ -111,16 +111,16 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         CancellationToken cancellationToken = default) =>
         _marketData.GetChatsCallAsync(fromDate, region, cancellationToken);
 
-    public Task<Call<PrivateRequests.PlaceOrderRequest, BitflyerOrderResult>> PlaceOrderCallAsync(
+    public Task<Call<PrivateRequests.PlaceOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(
         PrivateRequests.BitflyerOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _trading.PlaceOrderCallAsync(request, cancellationToken);
+        _trading.SendChildOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<PrivateRequests.CancelOrderRequest, BitflyerCancelResult>> CancelOrderCallAsync(
+    public Task<Call<PrivateRequests.CancelOrderRequest, BitflyerCancelResult>> CancelChildOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
-        _trading.CancelOrderCallAsync(symbol, orderKey, cancellationToken);
+        _trading.CancelChildOrderCallAsync(symbol, orderKey, cancellationToken);
 
     public Task<Call<PrivateRequests.GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,

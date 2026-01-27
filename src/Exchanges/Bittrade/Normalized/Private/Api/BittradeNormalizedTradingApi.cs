@@ -306,7 +306,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
 
         var rawRequest = BittradeTradingMapper.ToRawRetailOrder(request.Request);
         var rawCall = await _trading
-            .PostOrderPlaceCallAsync(new RawPrivateModels.CreateRetailOrderRequest(rawRequest), ct)
+            .PostRetailOrderPlaceCallAsync(new RawPrivateModels.CreateRetailOrderRequest(rawRequest), ct)
             .ConfigureAwait(false);
 
         return CreateCall(rawCall, request, "Bittrade.PostRetailOrderPlace", BittradeTradingMapper.ToRetailOrderResult);
@@ -319,7 +319,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .GetOrderListCallAsync(new RawPrivateModels.GetRetailOrdersRequest(
+            .GetRetailOrderListCallAsync(new RawPrivateModels.GetRetailOrdersRequest(
                 Direct: request.Direct,
                 Status: request.Status,
                 StartTime: request.StartTime,
@@ -501,7 +501,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostWithdrawVirtualCancelByWithdrawIdCallAsync(new RawPrivateModels.CancelWithdrawRequest(request.WithdrawId), ct)
+            .PostWithdrawVirtualByWithdrawIdCancelCallAsync(new RawPrivateModels.CancelWithdrawRequest(request.WithdrawId), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

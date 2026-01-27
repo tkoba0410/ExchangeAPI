@@ -97,7 +97,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
                 json,
                 "Bittrade.CreateWithdrawByAddressId"));
 
-    public Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualCancelByWithdrawIdCallAsync(
+    public Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
         CancelWithdrawRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -121,7 +121,7 @@ internal sealed class BittradePrivateTradingApi : IBittradePrivateTradingApi
                 json,
                 "Bittrade.PlaceWithdraw"));
 
-    public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostOrderPlaceCallAsync(
+    public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderPlaceCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(

@@ -20,6 +20,7 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - **意味分類（MarketData / Trading / Account など）でフォルダ分割しない**（Public/Private 以外で分けない）
 - 生成・組み立て用途の `Factory` は **Internal 配下に置く**（例：`.../Internal/Factory`）
 - `Internal` は各層の直下に置く（例：`.../Normalized/Internal`）。Public/Private 配下には置かない
+- `Internal/NotSupported` は **全取引所で必須**（例外は設けない）
 
 ### 2.2 namespace
 
@@ -34,7 +35,7 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 
 - 取引所固有の機能差（例：片方に存在しない endpoint 群）
 - 内部実装の詳細（DTO の内部表現、マッパの分割、最適化手法など）
-- Public 側の “Facade/Api” といった命名・構造パターン（統一する場合は別途タスク化）
+- Public 側の命名は **`*Api` に統一**する（例外は設けない）
 - `Properties` など **ビルドメタ情報の配置**は例外として許容する
 
 ## 3.1 揺らぎ禁止（MUST NOT）
@@ -42,6 +43,7 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - `Internal` の配置階層を取引所ごとに変えること
 - Raw API の入口配置（例：`Raw/Api` の有無）を取引所ごとに変えること
 - Factory の配置を `Internal` 以外に置くこと
+- `Internal/NotSupported` の有無を取引所ごとに変えること
 
 ## 4. Bitflyer を参照実装とする範囲（SHOULD）
 

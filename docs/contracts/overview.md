@@ -16,6 +16,8 @@
 設計規範（層構造、Call 抽象、公開範囲等）の正本は  
 **TopSpec（docs/topspec.md）** とする。
 
+取引所実装間の「統一/例外」の運用方針は `docs/_references/exchange-parity-policy.md` を参照する。
+
 本書の目的は次の 2 点に限定される。
 
 * **取引所仕様に起因しない差異を排除すること**

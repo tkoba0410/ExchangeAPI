@@ -16,7 +16,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 /// <summary>
 /// Bittrade Public REST API の Raw 実装。
 /// </summary>
-internal sealed class BittradePublicApi : IBittradePublicApi
+internal sealed class BittradePublicApi
 {
     private readonly IWireTransport _wire;
 

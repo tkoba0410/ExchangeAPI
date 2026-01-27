@@ -7,13 +7,12 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Facade.Requests;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Primitives.CallCommon;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 
 /// <summary>
 /// Bittrade の Public API だけを利用する軽量クライアント。

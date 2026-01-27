@@ -4,10 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -24,7 +23,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 
 /// <summary>
 /// Bittrade の Public REST 実装（Ticker/OrderBook/Executions）。

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -23,7 +23,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Account;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 /// <summary>
 /// Bittrade の口座 API 実装（Balances/Executions）。

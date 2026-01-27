@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 
 public static class BittradeOperations
 {

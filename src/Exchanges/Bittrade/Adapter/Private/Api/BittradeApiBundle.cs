@@ -2,14 +2,14 @@ using System;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.NotSupported;
 using ExchangeApi.Contracts.Facade.Interfaces;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 /// <summary>
 /// Bittrade API 実装のセットをまとめるバンドル。

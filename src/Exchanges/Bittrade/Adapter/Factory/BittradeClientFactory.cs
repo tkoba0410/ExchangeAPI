@@ -1,12 +1,9 @@
 using System;
 using System.Net.Http;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Account;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
@@ -15,7 +12,7 @@ using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Factory;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Factory;
 
 /// <summary>
 /// Bittrade API クライアントを構築するファクトリ。

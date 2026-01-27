@@ -11,14 +11,11 @@ using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Account;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.History;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Market;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Primitives.CallCommon;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 /// <summary>
 /// Bittrade 用のファサード。各 API 実装を委譲するだけの薄いラッパー。

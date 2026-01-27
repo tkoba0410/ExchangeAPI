@@ -1,6 +1,6 @@
 using System.Net;
 using ExchangeApi.Transport.Protocol;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 
 /// <summary>
 /// Bittrade エラーをカテゴリに正規化する。

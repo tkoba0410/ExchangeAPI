@@ -2,8 +2,9 @@ using System;
 using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Facade;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
 
 namespace ExchangeApi.Composition.Bootstrap.Factories;

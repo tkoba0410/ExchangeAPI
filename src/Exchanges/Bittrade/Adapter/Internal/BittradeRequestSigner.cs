@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 
 /// <summary>
 /// Bittrade (Huobi 系) HmacSHA256 署名。

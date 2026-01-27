@@ -2,7 +2,7 @@ using System;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 
 internal static class BittradeSymbolMapper
 {

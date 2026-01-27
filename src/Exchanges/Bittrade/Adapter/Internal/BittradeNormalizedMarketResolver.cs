@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 
 internal sealed class BittradeNormalizedMarketResolver : IBittradeMarketResolver
 {

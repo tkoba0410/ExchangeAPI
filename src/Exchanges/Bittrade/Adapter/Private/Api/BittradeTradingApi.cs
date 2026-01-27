@@ -15,14 +15,14 @@ using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
 using BittradeOrderRequest = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.BittradeOrderRequest;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Operations;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Trading;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 /// <summary>
 /// Bittrade Private トレード/アカウント API（最小スコープ: Balance, Order, Cancel, OpenOrders, Status）。

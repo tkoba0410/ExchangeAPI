@@ -13,7 +13,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 
 internal static class BittradeMarketMapper
 {

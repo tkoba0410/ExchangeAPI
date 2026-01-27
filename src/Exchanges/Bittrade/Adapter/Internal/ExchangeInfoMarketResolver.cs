@@ -12,7 +12,7 @@ using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 
 internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
 {

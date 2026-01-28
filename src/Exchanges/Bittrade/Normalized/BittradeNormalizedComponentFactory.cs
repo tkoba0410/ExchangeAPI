@@ -12,7 +12,7 @@ internal static class BittradeNormalizedComponentFactory
 {
     public static BittradeNormalizedComponents FromRestClient(
         IRestClient restClient,
-        Func<BittradeNormalizedExchangeInfoApi, IBittradeMarketResolver> marketResolverFactory,
+        Func<BittradeNormalizedPublicApi, IBittradeMarketResolver> marketResolverFactory,
         string? accountId = null)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
@@ -22,17 +22,13 @@ internal static class BittradeNormalizedComponentFactory
         var wire = new WireTransport(restClient);
         var raw = new BittradeRawApi(wire);
 
-        var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
-        var markets = marketResolverFactory(exchangeInfo);
-        var marketData = new BittradeNormalizedMarketDataApi(raw);
-        var account = new BittradeNormalizedAccountApi(raw, normalizedAccountId);
-        var trading = new BittradeNormalizedTradingApi(raw, markets, normalizedAccountId);
+        var publicApi = new BittradeNormalizedPublicApi(raw);
+        var markets = marketResolverFactory(publicApi);
+        var privateApi = new BittradeNormalizedPrivateApi(raw, markets, normalizedAccountId);
 
         return new BittradeNormalizedComponents(
-            marketData: marketData,
-            exchangeInfo: exchangeInfo,
-            account: account,
-            trading: trading,
+            publicApi: publicApi,
+            privateApi: privateApi,
             accountId: normalizedAccountId);
     }
 }

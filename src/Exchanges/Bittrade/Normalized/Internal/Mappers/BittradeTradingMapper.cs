@@ -8,7 +8,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
 using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 

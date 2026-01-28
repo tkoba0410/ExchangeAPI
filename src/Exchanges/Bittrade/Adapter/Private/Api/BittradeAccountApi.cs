@@ -20,7 +20,7 @@ using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
@@ -30,10 +30,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 internal sealed class BittradeAccountApi : IAccountApi
 {
-    private readonly BittradeNormalizedAccountApi _account;
+    private readonly BittradeNormalizedPrivateApi _account;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public BittradeAccountApi(BittradeNormalizedAccountApi account)
+    public BittradeAccountApi(BittradeNormalizedPrivateApi account)
     {
         _account = account ?? throw new ArgumentNullException(nameof(account));
     }

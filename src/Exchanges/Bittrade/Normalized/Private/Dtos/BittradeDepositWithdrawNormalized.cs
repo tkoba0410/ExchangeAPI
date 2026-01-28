@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 
 public sealed record BittradeDepositWithdrawNormalized(
     string Id,

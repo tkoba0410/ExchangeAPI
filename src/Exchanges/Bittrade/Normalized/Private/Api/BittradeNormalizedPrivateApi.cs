@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.NotSupported;
@@ -21,13 +21,13 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 
-internal sealed class BittradeNormalizedTradingApi
+internal sealed class BittradeNormalizedPrivateApi
 {
     private readonly IBittradeRawApi _trading;
     private readonly IBittradeMarketResolver _markets;
     private readonly string? _accountId;
 
-    public BittradeNormalizedTradingApi(
+    public BittradeNormalizedPrivateApi(
         IBittradeRawApi trading,
         IBittradeMarketResolver markets,
         string? accountId)
@@ -35,6 +35,137 @@ internal sealed class BittradeNormalizedTradingApi
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
         _accountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
+    }
+
+    public async Task<Call<NormalizedRequests.GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
+        CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(_accountId))
+        {
+            return BittradeNotSupportedNormalizedCalls.Create<
+                NormalizedRequests.GetBalancesRequest,
+                IReadOnlyList<BittradeBalanceEntryNormalized>>(
+                new NormalizedRequests.GetBalancesRequest(string.Empty),
+                "AccountIdRequired");
+        }
+
+        var rawCall = await _trading
+            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountBalanceRequest(_accountId), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetBalancesRequest(_accountId!);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetAccountBalance",
+            ok =>
+            {
+                if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase) || ok.Data is null)
+                {
+                    throw new InvalidOperationException("Bittrade balance response invalid.");
+                }
+
+                return BittradeNormalizer.NormalizeBalances(ok.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetAccountsRequest, IReadOnlyList<BittradeAccountNormalized>>> GetAccountsCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _trading
+            .GetAccountsCallAsync(new RawPrivateRequests.GetAccountsRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetAccountsRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetAccounts",
+            ok =>
+            {
+                if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("Bittrade accounts response invalid.");
+                }
+
+                return BittradeNormalizer.NormalizeAccounts(ok.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetDepositWithdrawRequest, IReadOnlyList<BittradeDepositWithdrawNormalized>>> GetDepositWithdrawCallAsync(
+        NormalizedRequests.GetDepositWithdrawRequest request,
+        CancellationToken ct = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+
+        var rawCall = await _trading
+            .GetDepositWithdrawCallAsync(new RawPrivateRequests.GetDepositWithdrawsRequest(
+                request.Type,
+                request.Currency,
+                request.From,
+                request.Size,
+                request.Direct), ct)
+            .ConfigureAwait(false);
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetDepositWithdraws",
+            ok =>
+            {
+                if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("Bittrade deposit/withdraw response invalid.");
+                }
+
+                return BittradeNormalizer.NormalizeDepositWithdraws(ok.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetWithdrawVirtualAddressesRequest, IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>>> GetWithdrawVirtualAddressesCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _trading
+            .GetWithdrawVirtualAddressesCallAsync(new RawPrivateRequests.GetWithdrawVirtualAddressesRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetWithdrawVirtualAddressesRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetWithdrawVirtualAddresses",
+            ok =>
+            {
+                if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("Bittrade withdraw addresses response invalid.");
+                }
+
+                return BittradeNormalizer.NormalizeWithdrawVirtualAddresses(ok.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetRetailAccountBalanceRequest, IReadOnlyList<BittradeRetailBalanceEntryNormalized>>> GetRetailAccountBalanceCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _trading
+            .GetRetailAccountBalanceCallAsync(new RawPrivateRequests.GetRetailAccountBalanceRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetRetailAccountBalanceRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetRetailAccountBalance",
+            ok =>
+            {
+                if (ok.Success is not true)
+                {
+                    throw new InvalidOperationException("Bittrade retail balance response invalid.");
+                }
+
+                return BittradeNormalizer.NormalizeRetailBalances(ok.Data);
+            });
     }
 
     public async Task<Call<NormalizedRequests.PostOrdersPlaceRequest, BittradeOrderResult>> PostOrdersPlaceCallAsync(

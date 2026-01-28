@@ -17,7 +17,7 @@ using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using BittradeOrderRequest = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.BittradeOrderRequest;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
@@ -30,9 +30,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 internal sealed class BittradeTradingApi : ITradingApi
 {
-    private readonly BittradeNormalizedTradingApi _trading;
+    private readonly BittradeNormalizedPrivateApi _trading;
 
-    public BittradeTradingApi(BittradeNormalizedTradingApi trading)
+    public BittradeTradingApi(BittradeNormalizedPrivateApi trading)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
     }

@@ -35,7 +35,7 @@ public static class BittradeClientFactory
     {
         var restClient = CreateRestClient();
         var raw = new BittradeRawApi(new ExchangeApi.Transport.Wire.WireTransport(restClient));
-        var normalizedExchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
+        var normalizedExchangeInfo = new BittradeNormalizedPublicApi(raw);
         return new BittradeExchangeInfoApi(normalizedExchangeInfo);
     }
 
@@ -46,15 +46,14 @@ public static class BittradeClientFactory
     {
         var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
         var raw = new BittradeRawApi(new ExchangeApi.Transport.Wire.WireTransport(restClient));
-        var normalizedMarketData = new BittradeNormalizedMarketDataApi(raw);
-        var normalizedExchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
-        var exchangeInfo = new BittradeExchangeInfoApi(normalizedExchangeInfo);
+        var normalizedPublic = new BittradeNormalizedPublicApi(raw);
+        var exchangeInfo = new BittradeExchangeInfoApi(normalizedPublic);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var normalizedMarkets = new BittradeNormalizedMarketResolver(markets);
-        var tradingApi = new BittradeNormalizedTradingApi(raw, normalizedMarkets, accountId);
-        var trading = new BittradeTradingApi(tradingApi);
-        IAccountApi account = new BittradeAccountApi(new BittradeNormalizedAccountApi(raw, accountId));
-        return (new MarketApi(normalizedMarketData, markets), trading, account, exchangeInfo);
+        var normalizedPrivate = new BittradeNormalizedPrivateApi(raw, normalizedMarkets, accountId);
+        var trading = new BittradeTradingApi(normalizedPrivate);
+        IAccountApi account = new BittradeAccountApi(normalizedPrivate);
+        return (new MarketApi(normalizedPublic, markets), trading, account, exchangeInfo);
     }
 
     public static BittradeExchangeClient CreateDefault(

@@ -17,7 +17,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
 
@@ -25,10 +25,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
 {
-    private readonly BittradeNormalizedTradingApi _trading;
+    private readonly BittradeNormalizedPrivateApi _trading;
 
     public BittradeSpotHistoryApi(
-        BittradeNormalizedTradingApi trading)
+        BittradeNormalizedPrivateApi trading)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
     }
@@ -87,7 +87,7 @@ internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
 
     private static Page<OrderSnapshotItem> BuildOrderPage(
         MarketLimitCursorRequest request,
-        IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading.BittradeOpenOrder> orders)
+        IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.BittradeOpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
         var (requestedLimit, appliedLimit) = GetLimits(request);
@@ -119,7 +119,7 @@ internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
         return new Page<ExecutionItem>(items, HasMore: false, NextCursor: null, Meta: meta);
     }
 
-    private static OrderSnapshotItem MapSnapshot(ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading.BittradeOpenOrder order)
+    private static OrderSnapshotItem MapSnapshot(ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.BittradeOpenOrder order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch

@@ -2,7 +2,7 @@ using System;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 
 public sealed record BittradeExecutionAccountNormalized(
     Symbol Symbol,

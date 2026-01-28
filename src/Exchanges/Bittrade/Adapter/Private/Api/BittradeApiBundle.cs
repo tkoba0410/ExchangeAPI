@@ -15,26 +15,23 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 internal sealed class BittradeApiBundle
 {
-    public BittradeNormalizedTradingApi Trading { get; }
-    public BittradeNormalizedMarketDataApi NormalizedMarketData { get; }
-    public BittradeNormalizedAccountApi NormalizedAccount { get; }
+    public BittradeNormalizedPublicApi Public { get; }
+    public BittradeNormalizedPrivateApi Private { get; }
     public IExchangeInfoApi ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
     public IRestClient RestClient { get; }
     public string? AccountId { get; }
 
     public BittradeApiBundle(
-        BittradeNormalizedTradingApi trading,
-        BittradeNormalizedMarketDataApi normalizedMarketData,
-        BittradeNormalizedAccountApi normalizedAccount,
+        BittradeNormalizedPublicApi publicApi,
+        BittradeNormalizedPrivateApi privateApi,
         IExchangeInfoApi exchangeInfo,
         IExchangeMarketResolver markets,
         IRestClient restClient,
         string? accountId = null)
     {
-        Trading = trading ?? throw new ArgumentNullException(nameof(trading));
-        NormalizedMarketData = normalizedMarketData ?? throw new ArgumentNullException(nameof(normalizedMarketData));
-        NormalizedAccount = normalizedAccount ?? throw new ArgumentNullException(nameof(normalizedAccount));
+        Public = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
+        Private = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
         ExchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
         Markets = markets ?? throw new ArgumentNullException(nameof(markets));
         RestClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
@@ -56,13 +53,12 @@ internal sealed class BittradeApiBundle
             },
             normalizedAccountId);
 
-        var exchangeInfo = new BittradeExchangeInfoApi(components.ExchangeInfo);
+        var exchangeInfo = new BittradeExchangeInfoApi(components.Public);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var trading = components.Trading;
+        var privateApi = components.Private;
         return new BittradeApiBundle(
-            trading: trading,
-            normalizedMarketData: components.MarketData,
-            normalizedAccount: components.Account,
+            publicApi: components.Public,
+            privateApi: privateApi,
             exchangeInfo: exchangeInfo,
             markets: markets,
             restClient: restClient,

@@ -30,11 +30,11 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// </summary>
 internal sealed class MarketApi : IMarketDataApi
 {
-    private readonly BittradeNormalizedMarketDataApi _marketData;
+    private readonly BittradeNormalizedPublicApi _marketData;
     private readonly IExchangeMarketResolver _markets;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public MarketApi(BittradeNormalizedMarketDataApi marketData, IExchangeMarketResolver markets)
+    public MarketApi(BittradeNormalizedPublicApi marketData, IExchangeMarketResolver markets)
     {
         _marketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));

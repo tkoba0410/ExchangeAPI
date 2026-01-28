@@ -37,7 +37,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient
 
         // 公開APIのみ: market/exchangeInfo 取得に限定し、Trading/Account/History は提供しない。
         var bundle = BittradeApiBundle.FromRestClient(restClient, accountId: null);
-        _marketApi = new MarketApi(bundle.NormalizedMarketData, bundle.Markets);
+        _marketApi = new MarketApi(bundle.Public, bundle.Markets);
         _tradingApi = null;
         _accountApi = null;
         _historyApi = null;
@@ -55,7 +55,7 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient
     internal BittradePublicClient(BittradeApiBundle bundle)
     {
         if (bundle is null) throw new ArgumentNullException(nameof(bundle));
-        _marketApi = new MarketApi(bundle.NormalizedMarketData, bundle.Markets);
+        _marketApi = new MarketApi(bundle.Public, bundle.Markets);
         _tradingApi = null;
         _accountApi = null;
         _historyApi = null;

@@ -14,13 +14,71 @@ using RawPublicRequests = ExchangeApi.Exchanges.Bittrade.Raw.Public.Requests;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 
-internal sealed class BittradeNormalizedMarketDataApi
+internal sealed class BittradeNormalizedPublicApi
 {
     private readonly IBittradeRawApi _raw;
 
-    internal BittradeNormalizedMarketDataApi(IBittradeRawApi raw)
+    internal BittradeNormalizedPublicApi(IBittradeRawApi raw)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
+    }
+
+    public async Task<Call<NormalizedRequests.GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _raw
+            .GetSymbolsCallAsync(new RawPublicRequests.GetSymbolsRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetSymbolsRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetSymbols",
+            ok =>
+            {
+                RequireOk(ok.Status, "symbols");
+                if (ok.Data is null) throw new InvalidOperationException("Bittrade symbols response invalid.");
+                return BittradeNormalizer.NormalizeSymbols(ok.Data);
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _raw
+            .GetCurrencysCallAsync(new RawPublicRequests.GetCurrenciesRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetCurrencysRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetCurrencys",
+            ok =>
+            {
+                RequireOk(ok.Status, "currencys");
+                return ok.Data ?? Array.Empty<string>();
+            });
+    }
+
+    public async Task<Call<NormalizedRequests.GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _raw
+            .GetTimestampCallAsync(new RawPublicRequests.GetTimestampRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new NormalizedRequests.GetTimestampRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bittrade.GetTimestamp",
+            ok =>
+            {
+                RequireOk(ok.Status, "timestamp");
+                return ok.Data;
+            });
     }
 
     public async Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(

@@ -30,10 +30,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// </summary>
 public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
 {
-    private readonly BittradeNormalizedExchangeInfoApi _normalized;
+    private readonly BittradeNormalizedPublicApi _normalized;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    internal BittradeExchangeInfoApi(BittradeNormalizedExchangeInfoApi normalized)
+    internal BittradeExchangeInfoApi(BittradeNormalizedPublicApi normalized)
     {
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }

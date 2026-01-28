@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
 using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;

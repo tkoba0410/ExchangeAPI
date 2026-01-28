@@ -5,23 +5,17 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized;
 
 internal sealed class BittradeNormalizedComponents
 {
-    public BittradeNormalizedMarketDataApi MarketData { get; }
-    public BittradeNormalizedExchangeInfoApi ExchangeInfo { get; }
-    public BittradeNormalizedAccountApi Account { get; }
-    public BittradeNormalizedTradingApi Trading { get; }
+    public BittradeNormalizedPublicApi Public { get; }
+    public BittradeNormalizedPrivateApi Private { get; }
     public string? AccountId { get; }
 
     public BittradeNormalizedComponents(
-        BittradeNormalizedMarketDataApi marketData,
-        BittradeNormalizedExchangeInfoApi exchangeInfo,
-        BittradeNormalizedAccountApi account,
-        BittradeNormalizedTradingApi trading,
+        BittradeNormalizedPublicApi publicApi,
+        BittradeNormalizedPrivateApi privateApi,
         string? accountId)
     {
-        MarketData = marketData;
-        ExchangeInfo = exchangeInfo;
-        Account = account;
-        Trading = trading;
+        Public = publicApi;
+        Private = privateApi;
         AccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
     }
 }

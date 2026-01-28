@@ -20,7 +20,7 @@ using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 
-public sealed class BittradeNormalizedApi
+public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
 {
     private readonly IBittradeNormalizedMarketDataApi _marketData;
     private readonly IBittradeNormalizedExchangeInfoApi _exchangeInfo;

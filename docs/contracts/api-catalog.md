@@ -7,6 +7,13 @@
 
 Public/Private は **署名の有無**のみを表す（用途別分類ではない）。
 
+### 1.1 命名ルール（参照実装と例外）
+
+- 代表 API 名は **Bitflyer の命名を参照**する。
+- ただし **Bitflyer準拠で挙動が著しく歪む場合は独自命名を採用**する。
+  - 特に **注文系（Order）** は取引所差が大きいため、独自命名を許容する。
+- Bitflyer 名は **拘束ではなく参照**であり、Contracts の取引所非依存性を優先する。
+
 ## 2. Public (No Signature)
 
 ### 2.1 IMarketDataApi

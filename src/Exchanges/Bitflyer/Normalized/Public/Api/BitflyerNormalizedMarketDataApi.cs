@@ -96,13 +96,12 @@ internal sealed class BitflyerNormalizedMarketDataApi
 
     public async Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
         string? fromDate = null,
-        string? region = null,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetChatsCallAsync(new RawPublicRequests.GetChatsRequest(fromDate, region), ct)
+            .GetChatsCallAsync(new RawPublicRequests.GetChatsRequest(fromDate), ct)
             .ConfigureAwait(false);
-        var request = new PublicRequests.GetChatsRequest(fromDate, region);
+        var request = new PublicRequests.GetChatsRequest(fromDate);
 
         return CreateCall(
             rawCall,

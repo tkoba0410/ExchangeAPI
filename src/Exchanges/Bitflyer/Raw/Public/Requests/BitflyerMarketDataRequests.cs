@@ -12,9 +12,9 @@ public sealed record GetExecutionsRequest(
     long? After = null,
     bool UseAliasPath = false);
 
-public sealed record GetMarketsRequest(string? Region = null, bool UseAliasPath = false);
+public sealed record GetMarketsRequest(bool UseAliasPath = false);
 
-public sealed record GetChatsRequest(string? FromDate = null, string? Region = null);
+public sealed record GetChatsRequest(string? FromDate = null);
 
 public sealed record GetHealthRequest(string ProductCode);
 

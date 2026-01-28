@@ -55,6 +55,17 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - **事実（Fact）**：inventory の `Note` で記録してよい（例：duplicate candidate、obsolete candidate）
 - **運用方針/設計判断**：inventory に書かず、本書（または設計メモ）に記録する
 
+## 5.1 非正本（Playground 等）の扱い
+
+- 公式 API ドキュメント（Canonical Source）に記載されていない挙動は **非正本** とする
+- Playground 等で動作する挙動であっても、公式ドキュメントに記載がなければ **デフォルトではサポートしない**
+- 必要な場合は例外として `docs/exceptions.md` に記録し、実装側で明示的に隔離する
+
+## 5.2 EndpointIdCatalog の NotImplemented 取り扱い
+
+- `PresentIn=None` が inventory に存在する場合のみ `NotImplemented` を設ける
+- `PresentIn=None` が存在しない場合は **空集合も持たず** `NotImplemented` 自体を定義しない
+
 ## 6. 変更時チェックリスト
 
 1. inventory を更新（EndpointId / PresentIn）

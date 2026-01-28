@@ -61,7 +61,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetMarkets",
-            BitflyerPublicEndpoints.GetMarkets(request.Region),
+            BitflyerPublicEndpoints.GetMarkets(),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Market>>(
                 json,
@@ -73,7 +73,7 @@ internal sealed class BitflyerRawPublicClient
         _executor.SendAndParse(
             request,
             "Bitflyer.GetChats",
-            BitflyerPublicEndpoints.GetChats(request.FromDate, request.Region),
+            BitflyerPublicEndpoints.GetChats(request.FromDate),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Chat>>(
                 json,

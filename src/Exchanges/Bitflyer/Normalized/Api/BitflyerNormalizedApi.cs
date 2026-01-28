@@ -64,9 +64,8 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
     }
 
     public Task<Call<PublicRequests.GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
-        string? region = null,
         CancellationToken cancellationToken = default) =>
-        _exchangeInfo.GetMarketsCallAsync(region, cancellationToken);
+        _exchangeInfo.GetMarketsCallAsync(cancellationToken);
 
     public Task<Call<PublicRequests.GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
         string productCode,
@@ -107,9 +106,8 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
 
     public Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
         string? fromDate = null,
-        string? region = null,
         CancellationToken cancellationToken = default) =>
-        _marketData.GetChatsCallAsync(fromDate, region, cancellationToken);
+        _marketData.GetChatsCallAsync(fromDate, cancellationToken);
 
     public Task<Call<PrivateRequests.PlaceOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(
         PrivateRequests.BitflyerOrderRequest request,

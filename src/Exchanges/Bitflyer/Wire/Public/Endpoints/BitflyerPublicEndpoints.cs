@@ -34,30 +34,14 @@ internal static class BitflyerPublicEndpoints
                 (BitflyerQueryKeys.After, after)));
     }
 
-    public static WireCallSpec GetMarkets(string? region = null)
-    {
-        var path = BitflyerPaths.GetMarketsPath;
-        if (!string.IsNullOrWhiteSpace(region))
-        {
-            path = $"{path}/{region}";
-        }
+    public static WireCallSpec GetMarkets() =>
+        BitflyerWireSpecBuilder.Get(BitflyerEndpointIds.GetMarkets, BitflyerPaths.GetMarketsPath, query: null);
 
-        return BitflyerWireSpecBuilder.Get(BitflyerEndpointIds.GetMarkets, path, query: null);
-    }
-
-    public static WireCallSpec GetChats(string? fromDate = null, string? region = null)
-    {
-        var path = BitflyerPaths.GetChatsPath;
-        if (!string.IsNullOrWhiteSpace(region))
-        {
-            path = $"{path}/{region}";
-        }
-
-        return BitflyerWireSpecBuilder.Get(
+    public static WireCallSpec GetChats(string? fromDate = null) =>
+        BitflyerWireSpecBuilder.Get(
             BitflyerEndpointIds.GetChats,
-            path,
+            BitflyerPaths.GetChatsPath,
             BitflyerWireSpecBuilder.BuildQuery((BitflyerQueryKeys.FromDate, fromDate)));
-    }
 
     public static WireCallSpec GetHealth(string productCode) =>
         BitflyerWireSpecBuilder.Get(

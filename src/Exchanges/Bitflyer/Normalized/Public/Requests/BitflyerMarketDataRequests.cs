@@ -14,9 +14,9 @@ public sealed record GetHealthRequest(string ProductCode);
 
 public sealed record GetBoardStateRequest(string ProductCode);
 
-public sealed record GetChatsRequest(string? FromDate = null, string? Region = null);
+public sealed record GetChatsRequest(string? FromDate = null);
 
-public sealed record GetMarketsRequest(string? Region = null);
+public sealed record GetMarketsRequest;
 
 public sealed record GetCorporateLeverageRequest;
 

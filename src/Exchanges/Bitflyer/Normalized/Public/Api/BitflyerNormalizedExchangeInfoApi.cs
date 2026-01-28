@@ -22,13 +22,12 @@ internal sealed class BitflyerNormalizedExchangeInfoApi
     }
 
     public async Task<Call<PublicRequests.GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
-        string? region = null,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetMarketsCallAsync(new RawPublicRequests.GetMarketsRequest(region), ct)
+            .GetMarketsCallAsync(new RawPublicRequests.GetMarketsRequest(), ct)
             .ConfigureAwait(false);
-        var request = new PublicRequests.GetMarketsRequest(region);
+        var request = new PublicRequests.GetMarketsRequest();
 
         return CreateCall(
             rawCall,

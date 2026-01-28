@@ -15,7 +15,6 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 public interface IBitflyerNormalizedApi
 {
     Task<Call<GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
-        string? region = null,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
@@ -50,7 +49,6 @@ public interface IBitflyerNormalizedApi
 
     Task<Call<GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
         string? fromDate = null,
-        string? region = null,
         CancellationToken cancellationToken = default);
 
     Task<Call<PlaceOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(

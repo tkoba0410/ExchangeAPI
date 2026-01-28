@@ -12,7 +12,7 @@ internal static class BittradePrivateEndpoints
     public static WireCallSpec GetAccountsBalanceByAccountId(string accountId) =>
         BittradeWireSpecBuilder.Get(
             BittradeEndpointIds.GetAccountsBalanceByAccountId,
-            $"{BittradePaths.AccountsPath}/{accountId}/balance",
+            BittradePaths.AccountsBalancePath(accountId),
             query: null);
 
     public static WireCallSpec PostOrdersPlace(string bodyJson) =>
@@ -29,7 +29,7 @@ internal static class BittradePrivateEndpoints
     public static WireCallSpec PostOrdersSubmitCancelByOrderId(string orderId) =>
         BittradeWireSpecBuilder.Post(
             BittradeEndpointIds.PostOrdersSubmitCancelByOrderId,
-            $"{BittradePaths.OrdersPath}/{orderId}/submitcancel",
+            BittradePaths.OrdersSubmitCancelPath(orderId),
             bodyJson: null);
 
     public static WireCallSpec PostOrdersBatchCancel(string bodyJson) =>
@@ -44,7 +44,7 @@ internal static class BittradePrivateEndpoints
     public static WireCallSpec GetOrdersByOrderId(string orderId) =>
         BittradeWireSpecBuilder.Get(
             BittradeEndpointIds.GetOrdersByOrderId,
-            $"{BittradePaths.OrdersPath}/{orderId}",
+            BittradePaths.OrdersByIdPath(orderId),
             query: null);
 
     public static WireCallSpec GetOrders() =>
@@ -53,7 +53,7 @@ internal static class BittradePrivateEndpoints
     public static WireCallSpec GetOrdersMatchResultsByOrderId(string orderId) =>
         BittradeWireSpecBuilder.Get(
             BittradeEndpointIds.GetOrdersMatchResultsByOrderId,
-            $"{BittradePaths.OrdersPath}/{orderId}/matchresults",
+            BittradePaths.OrdersMatchResultsByIdPath(orderId),
             query: null);
 
     public static WireCallSpec GetMatchResults(
@@ -84,19 +84,19 @@ internal static class BittradePrivateEndpoints
     public static WireCallSpec PostWithdrawVirtualByAddressIdCreate(string addressId) =>
         BittradeWireSpecBuilder.Post(
             BittradeEndpointIds.PostWithdrawVirtualByAddressIdCreate,
-            $"{BittradePaths.WithdrawVirtualPath}/{addressId}/create",
+            BittradePaths.WithdrawVirtualByAddressCreatePath(addressId),
             bodyJson: null);
 
     public static WireCallSpec PostWithdrawVirtualByWithdrawIdCancel(string withdrawId) =>
         BittradeWireSpecBuilder.Post(
             BittradeEndpointIds.PostWithdrawVirtualByWithdrawIdCancel,
-            $"{BittradePaths.WithdrawVirtualPath}/{withdrawId}/cancel",
+            BittradePaths.WithdrawVirtualByIdCancelPath(withdrawId),
             bodyJson: null);
 
     public static WireCallSpec PostWithdrawVirtualByWithdrawIdPlace(string withdrawId) =>
         BittradeWireSpecBuilder.Post(
             BittradeEndpointIds.PostWithdrawVirtualByWithdrawIdPlace,
-            $"{BittradePaths.WithdrawVirtualPath}/{withdrawId}/place",
+            BittradePaths.WithdrawVirtualByIdPlacePath(withdrawId),
             bodyJson: null);
 
     public static WireCallSpec GetWithdrawVirtualAddresses() =>
@@ -145,13 +145,13 @@ internal static class BittradePrivateEndpoints
     public static WireCallSpec GetRetailOrderDetailByOrderId(string orderId) =>
         BittradeWireSpecBuilder.Get(
             BittradeEndpointIds.GetRetailOrderDetailByOrderId,
-            $"{BittradePaths.RetailOrderDetailPath}/{orderId}",
+            BittradePaths.RetailOrderDetailByIdPath(orderId),
             query: null);
 
     public static WireCallSpec PostRetailOrderCancelByOrderId(string orderId) =>
         BittradeWireSpecBuilder.Post(
             BittradeEndpointIds.PostRetailOrderCancelByOrderId,
-            $"{BittradePaths.RetailOrderCancelPath}/{orderId}",
+            BittradePaths.RetailOrderCancelByIdPath(orderId),
             bodyJson: null);
 
     public static WireCallSpec GetRetailAccountBalance() =>

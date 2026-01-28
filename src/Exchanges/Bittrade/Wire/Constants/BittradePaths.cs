@@ -29,4 +29,31 @@ internal static class BittradePaths
     public const string RetailAccountBalancePath = "/v1/retail/account/balance";
     public const string WithdrawCreatePath = "/v1/dw/withdraw/api/create";
     public const string WithdrawVirtualPath = "/v1/dw/withdraw-virtual";
+
+    public static string AccountsBalancePath(string accountId) =>
+        $"{AccountsPath}/{accountId}/balance";
+
+    public static string OrdersSubmitCancelPath(string orderId) =>
+        $"{OrdersPath}/{orderId}/submitcancel";
+
+    public static string OrdersByIdPath(string orderId) =>
+        $"{OrdersPath}/{orderId}";
+
+    public static string OrdersMatchResultsByIdPath(string orderId) =>
+        $"{OrdersPath}/{orderId}/matchresults";
+
+    public static string WithdrawVirtualByAddressCreatePath(string addressId) =>
+        $"{WithdrawVirtualPath}/{addressId}/create";
+
+    public static string WithdrawVirtualByIdCancelPath(string withdrawId) =>
+        $"{WithdrawVirtualPath}/{withdrawId}/cancel";
+
+    public static string WithdrawVirtualByIdPlacePath(string withdrawId) =>
+        $"{WithdrawVirtualPath}/{withdrawId}/place";
+
+    public static string RetailOrderDetailByIdPath(string orderId) =>
+        $"{RetailOrderDetailPath}/{orderId}";
+
+    public static string RetailOrderCancelByIdPath(string orderId) =>
+        $"{RetailOrderCancelPath}/{orderId}";
 }

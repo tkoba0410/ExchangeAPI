@@ -37,6 +37,12 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - Raw の送信/パース/Call 生成の責務配置は **参照実装（Bitflyer）に統一**する
 - Raw 内部の共通 executor（Wire 呼び出しと Call 生成の共通化）は **全取引所で揃える**
 
+### 2.5 Wire 内部実装の骨格
+
+- Wire のパス構築は **Paths 定数に閉じる**（Endpoints 側での文字列補間は禁止）
+- 動的パスが必要な場合は **Paths 側に専用ヘルパを用意**して集約する
+- Query の構築は **`*WireSpecBuilder.BuildQuery` に統一**し、手書きの query 文字列を作らない
+
 ## 3. 統一しないもの（MAY）
 
 - 取引所固有の機能差（例：片方に存在しない endpoint 群）

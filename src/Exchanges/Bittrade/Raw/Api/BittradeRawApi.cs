@@ -21,10 +21,11 @@ public sealed class BittradeRawApi : IBittradeRawApi
     private readonly BittradeRawPrivateClient _privateClient;
 
     public BittradeRawApi(IWireTransport wire)
-        : this(
-            publicApi: new BittradePublicApi(wire ?? throw new ArgumentNullException(nameof(wire))),
-            privateClient: new BittradeRawPrivateClient(wire))
     {
+        if (wire is null) throw new ArgumentNullException(nameof(wire));
+        var executor = new BittradeRawCallExecutor(wire);
+        _publicApi = new BittradePublicApi(executor);
+        _privateClient = new BittradeRawPrivateClient(executor);
     }
 
     internal BittradeRawApi(

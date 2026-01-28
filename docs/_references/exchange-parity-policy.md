@@ -32,10 +32,14 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - inventory の `EndpointId` を正として、Wire/Raw/Normalized は原則 **`<EndpointId>CallAsync`** を 1:1 対応させる
 - 対応対象は inventory の `PresentIn` により決定する（`None` は未実装として扱う）
 
+### 2.4 Raw 内部実装の骨格
+
+- Raw の送信/パース/Call 生成の責務配置は **参照実装（Bitflyer）に統一**する
+- Raw 内部の共通 executor（Wire 呼び出しと Call 生成の共通化）は **全取引所で揃える**
+
 ## 3. 統一しないもの（MAY）
 
 - 取引所固有の機能差（例：片方に存在しない endpoint 群）
-- 内部実装の詳細（DTO の内部表現、マッパの分割、最適化手法など）
 - `Properties` など **ビルドメタ情報の配置**は例外として許容する
 
 ## 3.1 揺らぎ禁止（MUST NOT）

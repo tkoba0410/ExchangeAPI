@@ -1,15 +1,12 @@
 using System;
 using System.Globalization;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Transport.Wire;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
 
@@ -18,17 +15,17 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
 /// </summary>
 internal sealed class BittradeRawPrivateClient
 {
-    private readonly IWireTransport _wire;
+    private readonly BittradeRawCallExecutor _executor;
 
-    public BittradeRawPrivateClient(IWireTransport wire)
+    public BittradeRawPrivateClient(BittradeRawCallExecutor executor)
     {
-        _wire = wire ?? throw new ArgumentNullException(nameof(wire));
+        _executor = executor ?? throw new ArgumentNullException(nameof(executor));
     }
 
     public Task<Call<GetAccountsRequest, RawAccountsResponse>> GetAccountsCallAsync(
         GetAccountsRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetAccounts",
             BittradePrivateEndpoints.GetAccounts(),
@@ -38,7 +35,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountsBalanceByAccountIdCallAsync(
         GetAccountBalanceRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetAccountBalance",
             BittradePrivateEndpoints.GetAccountsBalanceByAccountId(request.AccountId),
@@ -50,7 +47,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersCallAsync(
         GetOpenOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetOpenOrders",
             BittradePrivateEndpoints.GetOpenOrders(request.Symbol, request.AccountId),
@@ -62,7 +59,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetOrdersRequest, RawOrdersResponse>> GetOrdersCallAsync(
         GetOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetOrders",
             BittradePrivateEndpoints.GetOrders(),
@@ -72,7 +69,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetOrderRequest, RawOrderDetailResponse>> GetOrdersByOrderIdCallAsync(
         GetOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetOrder",
             BittradePrivateEndpoints.GetOrdersByOrderId(request.OrderId),
@@ -82,7 +79,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetOrderMatchResultsRequest, RawOrderMatchResultsResponse>> GetOrdersMatchResultsByOrderIdCallAsync(
         GetOrderMatchResultsRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetOrderMatchResults",
             BittradePrivateEndpoints.GetOrdersMatchResultsByOrderId(request.OrderId),
@@ -94,7 +91,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsCallAsync(
         GetMatchResultsRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetMatchResults",
             BittradePrivateEndpoints.GetMatchResults(
@@ -113,7 +110,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetDepositWithdrawsRequest, RawDepositWithdrawsResponse>> GetDepositWithdrawCallAsync(
         GetDepositWithdrawsRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetDepositWithdraws",
             BittradePrivateEndpoints.GetDepositWithdraw(
@@ -130,7 +127,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetWithdrawVirtualAddressesRequest, RawWithdrawVirtualAddressesResponse>> GetWithdrawVirtualAddressesCallAsync(
         GetWithdrawVirtualAddressesRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetWithdrawVirtualAddresses",
             BittradePrivateEndpoints.GetWithdrawVirtualAddresses(),
@@ -142,7 +139,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetRetailOrderListCallAsync(
         GetRetailOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetRetailOrders",
             BittradePrivateEndpoints.GetRetailOrderList(
@@ -158,7 +155,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetRetailOrderDetailByOrderIdRequest, RawRetailOrderDetailResponse>> GetRetailOrderDetailByOrderIdCallAsync(
         GetRetailOrderDetailByOrderIdRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetRetailOrderDetail",
             BittradePrivateEndpoints.GetRetailOrderDetailByOrderId(request.OrderId),
@@ -170,7 +167,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<GetRetailAccountBalanceRequest, RawRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
         GetRetailAccountBalanceRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetRetailAccountBalance",
             BittradePrivateEndpoints.GetRetailAccountBalance(),
@@ -182,7 +179,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CreateOrderRequest, RawPlaceOrderResponse>> PostOrdersPlaceCallAsync(
         CreateOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.PlaceOrder",
             BittradePrivateEndpoints.PostOrdersPlace(
@@ -193,7 +190,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CancelOrderRequest, RawCancelOrderResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
         CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.CancelOrder",
             BittradePrivateEndpoints.PostOrdersSubmitCancelByOrderId(request.OrderId),
@@ -203,7 +200,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CancelOrdersRequest, RawCancelOrdersResponse>> PostOrdersBatchCancelCallAsync(
         CancelOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.CancelOrders",
             BittradePrivateEndpoints.PostOrdersBatchCancel(
@@ -216,7 +213,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
         CancelOpenOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.CancelOpenOrders",
             BittradePrivateEndpoints.PostOrdersBatchCancelOpenOrders(
@@ -229,7 +226,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CreateWithdrawRequest, RawCreateWithdrawResponse>> PostWithdrawApiCreateCallAsync(
         CreateWithdrawRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.CreateWithdraw",
             BittradePrivateEndpoints.PostWithdrawApiCreate(
@@ -242,7 +239,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CreateWithdrawVirtualByAddressIdRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
         CreateWithdrawVirtualByAddressIdRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.CreateWithdrawByAddressId",
             BittradePrivateEndpoints.PostWithdrawVirtualByAddressIdCreate(request.AddressId),
@@ -254,7 +251,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
         CancelWithdrawRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.CancelWithdraw",
             BittradePrivateEndpoints.PostWithdrawVirtualByWithdrawIdCancel(request.WithdrawId),
@@ -266,7 +263,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<PlaceWithdrawVirtualRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
         PlaceWithdrawVirtualRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.PlaceWithdraw",
             BittradePrivateEndpoints.PostWithdrawVirtualByWithdrawIdPlace(request.WithdrawId),
@@ -278,7 +275,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderPlaceCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.CreateRetailOrder",
             BittradePrivateEndpoints.PostRetailOrderPlace(
@@ -291,7 +288,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CancelRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCancelByOrderIdCallAsync(
         CancelRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.CancelRetailOrder",
             BittradePrivateEndpoints.PostRetailOrderCancelByOrderId(request.OrderId),
@@ -303,7 +300,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<PostRetailOrderHistoryRequest, RawRetailOrdersResponse>> PostRetailOrderHistoryCallAsync(
         PostRetailOrderHistoryRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetRetailOrderHistory",
             BittradePrivateEndpoints.PostRetailOrderHistory(
@@ -316,7 +313,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<PostRetailOrderDetailRequest, RawRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
         PostRetailOrderDetailRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.GetRetailOrderDetail",
             BittradePrivateEndpoints.PostRetailOrderDetail(
@@ -329,7 +326,7 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCreateCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        _executor.SendAndParse(
             request,
             "Bittrade.CreateRetailOrder",
             BittradePrivateEndpoints.PostRetailOrderCreate(
@@ -338,102 +335,4 @@ internal sealed class BittradeRawPrivateClient
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderResponse>(
                 json,
                 "Bittrade.CreateRetailOrder"));
-
-    private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
-        TReq request,
-        string component,
-        WireCallSpec spec,
-        CancellationToken cancellationToken,
-        Func<string, TRes> parse)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-        if (parse is null) throw new ArgumentNullException(nameof(parse));
-
-        var wireCall = await _wire.SendAsync(ExchangeCode.Bittrade, spec, cancellationToken).ConfigureAwait(false);
-        return CreateCall(request, component, wireCall, parse);
-    }
-
-    private static Call<TReq, TRes> CreateCall<TReq, TRes>(
-        TReq request,
-        string component,
-        Call<WireCallSpec, WireResponse> wireCall,
-        Func<string, TRes> parse)
-    {
-        return wireCall.Result switch
-        {
-            CallResult<WireResponse>.Err err => new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Err(err.Error),
-                Meta: wireCall.Meta),
-            CallResult<WireResponse>.Ok ok => CreateOkCall(request, component, ok.Response, wireCall, parse),
-            _ => new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Err(new CallError(CallErrorKind.Unknown, "Wire call returned unknown result.")),
-                Meta: wireCall.Meta)
-        };
-    }
-
-    private static Call<TReq, TRes> CreateOkCall<TReq, TRes>(
-        TReq request,
-        string component,
-        WireResponse response,
-        Call<WireCallSpec, WireResponse> wireCall,
-        Func<string, TRes> parse)
-    {
-        if (response.StatusCode is < 200 or >= 300)
-        {
-            var error = new CallError(
-                CallErrorKind.Http,
-                $"{component} failed with status {response.StatusCode}.",
-                HttpStatus: response.StatusCode,
-                BodySnippet: Snip(response.Json));
-            return new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Err(error),
-                Meta: wireCall.Meta);
-        }
-
-        try
-        {
-            var parsed = parse(response.Json);
-            return new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Ok(parsed),
-                Meta: wireCall.Meta);
-        }
-        catch (Exception ex) when (ex is JsonException or NotSupportedException)
-        {
-            var error = new CallError(
-                CallErrorKind.Codec,
-                $"{component} failed to parse response.",
-                ex,
-                response.StatusCode,
-                Snip(response.Json));
-            return new Call<TReq, TRes>(
-                Id: CallId.New(),
-                StartedAt: wireCall.StartedAt,
-                Duration: wireCall.Duration,
-                Request: request,
-                Result: new CallResult<TRes>.Err(error),
-                Meta: wireCall.Meta);
-        }
-    }
-
-    private static string? Snip(string? json)
-    {
-        if (string.IsNullOrEmpty(json)) return json;
-        return json.Length <= 512 ? json : json[..512];
-    }
 }

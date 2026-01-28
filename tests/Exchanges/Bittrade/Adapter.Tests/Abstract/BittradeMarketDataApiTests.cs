@@ -121,8 +121,10 @@ public class BittradeMarketApiTests
         var transport = new HttpTransport(client, disposeHttpClient: true);
         var restClient = new RestClient(client.BaseAddress!, transport);
         var markets = CreateResolver(new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot"));
-        var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient);
-        return new MarketApi(normalizeBundle.MarketData, markets);
+        var raw = new ExchangeApi.Exchanges.Bittrade.Raw.Api.BittradeRawApi(
+            new ExchangeApi.Transport.Wire.WireTransport(restClient));
+        var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api.BittradeNormalizedMarketDataApi(raw);
+        return new MarketApi(normalizedMarketData, markets);
     }
 
     private static IExchangeMarketResolver CreateResolver(params ExchangeMarketInfo[] markets) =>

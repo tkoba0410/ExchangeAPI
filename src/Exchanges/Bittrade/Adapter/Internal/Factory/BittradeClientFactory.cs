@@ -5,8 +5,9 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
@@ -30,8 +31,13 @@ public static class BittradeClientFactory
         new BittradePublicClient(BittradeApiBundle.FromRestClient(
             CreateRestClient(observer: observer, logger: logger)));
 
-    public static IExchangeInfoApi CreateExchangeInfo() =>
-        new BittradeExchangeInfoApi(BittradeNormalizeFactory.FromRestClient(CreateRestClient()).ExchangeInfo);
+    public static IExchangeInfoApi CreateExchangeInfo()
+    {
+        var restClient = CreateRestClient();
+        var raw = new BittradeRawApi(new ExchangeApi.Transport.Wire.WireTransport(restClient));
+        var normalizedExchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
+        return new BittradeExchangeInfoApi(normalizedExchangeInfo);
+    }
 
     public static (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account, IExchangeInfoApi ExchangeInfo) CreatePrivate(
         string accessKey,
@@ -39,14 +45,16 @@ public static class BittradeClientFactory
         string accountId)
     {
         var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
-        var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient, accountId);
-        var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
+        var raw = new BittradeRawApi(new ExchangeApi.Transport.Wire.WireTransport(restClient));
+        var normalizedMarketData = new BittradeNormalizedMarketDataApi(raw);
+        var normalizedExchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
+        var exchangeInfo = new BittradeExchangeInfoApi(normalizedExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var normalizedMarkets = new BittradeNormalizedMarketResolver(markets);
-        var tradingApi = new BittradeNormalizedTradingApi(normalizeBundle.Raw, normalizedMarkets, accountId);
+        var tradingApi = new BittradeNormalizedTradingApi(raw, normalizedMarkets, accountId);
         var trading = new BittradeTradingApi(tradingApi);
-        IAccountApi account = new BittradeAccountApi(normalizeBundle.Account);
-        return (new MarketApi(normalizeBundle.MarketData, markets), trading, account, exchangeInfo);
+        IAccountApi account = new BittradeAccountApi(new BittradeNormalizedAccountApi(raw, accountId));
+        return (new MarketApi(normalizedMarketData, markets), trading, account, exchangeInfo);
     }
 
     public static BittradeExchangeClient CreateDefault(

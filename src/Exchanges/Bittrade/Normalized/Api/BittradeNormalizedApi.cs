@@ -12,9 +12,11 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 
@@ -47,19 +49,27 @@ public sealed class BittradeNormalizedApi
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
 
-        var bundle = BittradeNormalizeFactory.FromRestClient(restClient, accountId);
-        var normalizedAccountId = bundle.AccountId;
+        var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
+        var wire = new WireTransport(restClient);
+        var raw = new BittradeRawApi(wire);
+
+        var marketData = new BittradeNormalizedMarketDataApi(raw);
+        var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
+        IBittradeNormalizedAccountApi account = normalizedAccountId is null
+            ? new BittradePreconditionMissingNormalizedAccountApi(string.Empty)
+            : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
+
         IBittradeNormalizedTradingApi trading = string.IsNullOrWhiteSpace(normalizedAccountId)
             ? new BittradePreconditionMissingNormalizedTradingApi(string.Empty)
             : new BittradeNormalizedTradingApi(
-                bundle.Raw,
+                raw,
                 markets ?? throw new ArgumentNullException(nameof(markets)),
                 normalizedAccountId);
 
         return new BittradeNormalizedApi(
-            marketData: bundle.MarketData,
-            exchangeInfo: bundle.ExchangeInfo,
-            account: bundle.Account,
+            marketData: marketData,
+            exchangeInfo: exchangeInfo,
+            account: account,
             trading: trading,
             accountId: normalizedAccountId);
     }

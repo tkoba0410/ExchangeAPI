@@ -1,35 +1,20 @@
 using System;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.NotSupported;
-using ExchangeApi.Exchanges.Bittrade.Raw.Api;
-using ExchangeApi.Transport.Wire;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized;
 
 internal static class BittradeNormalizeFactory
 {
-    public static BittradeNormalizeBundle FromRestClient(IRestClient restClient, string? accountId = null)
+    public static BittradeNormalizedApi FromRestClient(
+        IRestClient restClient,
+        IBittradeMarketResolver markets,
+        string? accountId = null)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+        if (markets is null) throw new ArgumentNullException(nameof(markets));
 
-        var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
-        var wire = new WireTransport(restClient);
-        var raw = new BittradeRawApi(wire);
-
-        var marketData = new BittradeNormalizedMarketDataApi(raw);
-        var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
-        IBittradeNormalizedAccountApi account = normalizedAccountId is null
-            ? new BittradePreconditionMissingNormalizedAccountApi(string.Empty)
-            : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
-
-        return new BittradeNormalizeBundle(
-            raw: raw,
-            marketData: marketData,
-            exchangeInfo: exchangeInfo,
-            account: account,
-            accountId: normalizedAccountId);
+        return BittradeNormalizedApi.FromRestClient(restClient, markets, accountId);
     }
-
 }

@@ -7,6 +7,8 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.NotSupported;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
+using ExchangeApi.Transport.Wire;
 using ExchangeApi.Contracts.Facade.Interfaces;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
@@ -47,17 +49,25 @@ internal sealed class BittradeApiBundle
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
         var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
-        var normalizeBundle = BittradeNormalizeFactory.FromRestClient(restClient, normalizedAccountId);
-        var exchangeInfo = new BittradeExchangeInfoApi(normalizeBundle.ExchangeInfo);
+
+        var wire = new WireTransport(restClient);
+        var raw = new BittradeRawApi(wire);
+        var normalizedMarketData = new BittradeNormalizedMarketDataApi(raw);
+        var normalizedExchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
+        IBittradeNormalizedAccountApi normalizedAccount = normalizedAccountId is null
+            ? new BittradePreconditionMissingNormalizedAccountApi(string.Empty)
+            : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
+
+        var exchangeInfo = new BittradeExchangeInfoApi(normalizedExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var normalizedMarkets = new BittradeNormalizedMarketResolver(markets);
         IBittradeNormalizedTradingApi trading = normalizedAccountId is null
             ? new BittradePreconditionMissingNormalizedTradingApi(string.Empty)
-            : new BittradeNormalizedTradingApi(normalizeBundle.Raw, normalizedMarkets, normalizedAccountId);
+            : new BittradeNormalizedTradingApi(raw, normalizedMarkets, normalizedAccountId);
         return new BittradeApiBundle(
             trading: trading,
-            normalizedMarketData: normalizeBundle.MarketData,
-            normalizedAccount: normalizeBundle.Account,
+            normalizedMarketData: normalizedMarketData,
+            normalizedAccount: normalizedAccount,
             exchangeInfo: exchangeInfo,
             markets: markets,
             restClient: restClient,

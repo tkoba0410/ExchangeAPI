@@ -61,9 +61,8 @@ internal sealed class BitflyerNormalizedTradingApi
             Price = request.Price?.Value,
         };
 
-        var bodyJson = BitflyerOrderEncoder.BuildChildOrderBodyJson(dto);
         var rawCall = await _raw
-            .SendChildOrderCallAsync(bodyJson, cancellationToken)
+            .SendChildOrderCallAsync(dto, cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -332,9 +331,8 @@ internal sealed class BitflyerNormalizedTradingApi
             Parameters = rawParameters
         };
 
-        var bodyJson = BitflyerOrderEncoder.BuildParentOrderBodyJson(rawRequest);
         var rawCall = await _raw
-            .SendParentOrderCallAsync(bodyJson, cancellationToken)
+            .SendParentOrderCallAsync(rawRequest, cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

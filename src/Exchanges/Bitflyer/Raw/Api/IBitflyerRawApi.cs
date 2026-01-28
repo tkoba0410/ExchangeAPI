@@ -91,12 +91,12 @@ public interface IBitflyerRawApi
         GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<string, RawSendChildOrderResponse>> SendChildOrderCallAsync(
-        string bodyJson,
+    Task<Call<CreateChildOrderRequest, RawSendChildOrderResponse>> SendChildOrderCallAsync(
+        CreateChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<string, RawSendParentOrderResponse>> SendParentOrderCallAsync(
-        string bodyJson,
+    Task<Call<CreateParentOrderRequest, RawSendParentOrderResponse>> SendParentOrderCallAsync(
+        CreateParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<CancelChildOrderRequest, RawCancelChildOrderResponse>> CancelChildOrderCallAsync(

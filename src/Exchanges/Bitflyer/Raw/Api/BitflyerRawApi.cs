@@ -14,60 +14,60 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 
 public sealed class BitflyerRawApi : IBitflyerRawApi
 {
-    private readonly BitflyerRawPublicClient _publicClient;
+    private readonly BitflyerPublicApi _publicApi;
     private readonly BitflyerRawPrivateClient _privateClient;
 
     public BitflyerRawApi(IWireTransport wire)
     {
         var executor = new BitflyerRawCallExecutor(wire);
-        _publicClient = new BitflyerRawPublicClient(executor);
+        _publicApi = new BitflyerPublicApi(executor);
         _privateClient = new BitflyerRawPrivateClient(executor);
     }
 
     public Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsCallAsync(
         GetMarketsRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicClient.GetMarketsCallAsync(request, cancellationToken);
+        _publicApi.GetMarketsCallAsync(request, cancellationToken);
 
     public Task<Call<GetBoardRequest, Board>> GetBoardCallAsync(
         GetBoardRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicClient.GetBoardCallAsync(request, cancellationToken);
+        _publicApi.GetBoardCallAsync(request, cancellationToken);
 
     public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
         GetTickerRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicClient.GetTickerCallAsync(request, cancellationToken);
+        _publicApi.GetTickerCallAsync(request, cancellationToken);
 
     public Task<Call<GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
         GetExecutionsRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicClient.GetExecutionsPublicCallAsync(request, cancellationToken);
+        _publicApi.GetExecutionsPublicCallAsync(request, cancellationToken);
 
     public Task<Call<GetBoardStateRequest, BoardStateResponse>> GetBoardStateCallAsync(
         GetBoardStateRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicClient.GetBoardStateCallAsync(request, cancellationToken);
+        _publicApi.GetBoardStateCallAsync(request, cancellationToken);
 
     public Task<Call<GetHealthRequest, HealthResponse>> GetHealthCallAsync(
         GetHealthRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicClient.GetHealthCallAsync(request, cancellationToken);
+        _publicApi.GetHealthCallAsync(request, cancellationToken);
 
     public Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateCallAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicClient.GetFundingRateCallAsync(request, cancellationToken);
+        _publicApi.GetFundingRateCallAsync(request, cancellationToken);
 
     public Task<Call<GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
         GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicClient.GetCorporateLeverageCallAsync(request, cancellationToken);
+        _publicApi.GetCorporateLeverageCallAsync(request, cancellationToken);
 
     public Task<Call<GetChatsRequest, IReadOnlyList<Chat>>> GetChatsCallAsync(
         GetChatsRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicClient.GetChatsCallAsync(request, cancellationToken);
+        _publicApi.GetChatsCallAsync(request, cancellationToken);
 
     public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
         GetPermissionsRequest request,
@@ -124,15 +124,15 @@ public sealed class BitflyerRawApi : IBitflyerRawApi
         CancellationToken cancellationToken = default) =>
         _privateClient.GetWithdrawalsCallAsync(request, cancellationToken);
 
-    public Task<Call<string, RawSendChildOrderResponse>> SendChildOrderCallAsync(
-        string bodyJson,
+    public Task<Call<CreateChildOrderRequest, RawSendChildOrderResponse>> SendChildOrderCallAsync(
+        CreateChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateClient.SendChildOrderCallAsync(bodyJson, cancellationToken);
+        _privateClient.SendChildOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<string, RawSendParentOrderResponse>> SendParentOrderCallAsync(
-        string bodyJson,
+    public Task<Call<CreateParentOrderRequest, RawSendParentOrderResponse>> SendParentOrderCallAsync(
+        CreateParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateClient.SendParentOrderCallAsync(bodyJson, cancellationToken);
+        _privateClient.SendParentOrderCallAsync(request, cancellationToken);
 
     public Task<Call<CancelChildOrderRequest, RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
         CancelChildOrderRequest request,

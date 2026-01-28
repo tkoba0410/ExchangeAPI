@@ -10,11 +10,11 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 
-internal sealed class BitflyerRawPublicClient
+internal sealed class BitflyerPublicApi
 {
     private readonly BitflyerRawCallExecutor _executor;
 
-    public BitflyerRawPublicClient(BitflyerRawCallExecutor executor)
+    public BitflyerPublicApi(BitflyerRawCallExecutor executor)
     {
         _executor = executor;
     }

@@ -89,19 +89,9 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        GetDetailMergedCallAsync(symbol, cancellationToken);
-
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        GetDepthCallAsync(symbol, cancellationToken);
-
-    public Task<Call<GetTickerRequest, Ticker>> GetDetailMergedCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetDepthCallAsync(
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetOrderBookCallAsync(symbol, cancellationToken);
@@ -127,13 +117,9 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetAccountsBalanceByAccountIdCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _accountApi.GetBalancesCallAsync(cancellationToken);
-
     public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default) =>
-        GetAccountsBalanceByAccountIdCallAsync(cancellationToken);
+        _accountApi.GetBalancesCallAsync(cancellationToken);
 
     public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         CommonSymbol symbol,
@@ -156,17 +142,11 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<GetOrderRequest, OrderStatus>> GetOrdersByOrderIdCallAsync(
-        CommonSymbol symbol,
-        OrderKey orderKey,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOrderCallAsync(symbol, orderKey, cancellationToken);
-
     public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
         CommonSymbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
-        GetOrdersByOrderIdCallAsync(symbol, orderKey, cancellationToken);
+        _tradingApi.GetOrderCallAsync(symbol, orderKey, cancellationToken);
 
     public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
         CommonSymbol symbol,

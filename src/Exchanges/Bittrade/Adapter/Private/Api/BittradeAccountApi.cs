@@ -30,10 +30,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 internal sealed class BittradeAccountApi : IAccountApi
 {
-    private readonly IBittradeNormalizedAccountApi _account;
+    private readonly BittradeNormalizedAccountApi _account;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
-    public BittradeAccountApi(IBittradeNormalizedAccountApi account)
+    public BittradeAccountApi(BittradeNormalizedAccountApi account)
     {
         _account = account ?? throw new ArgumentNullException(nameof(account));
     }

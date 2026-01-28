@@ -58,7 +58,7 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _marketApi = new MarketApi(bundle.NormalizedMarketData, bundle.Markets);
         _tradingApi = new BittradeTradingApi(bundle.Trading);
         _accountApi = new BittradeAccountApi(bundle.NormalizedAccount);
-        _historyApi = new BittradeSpotHistoryApi(bundle.Trading, bundle.AccountId);
+        _historyApi = new BittradeSpotHistoryApi(bundle.Trading);
         _restClient = bundle.RestClient;
         ApiBundle = bundle;
     }

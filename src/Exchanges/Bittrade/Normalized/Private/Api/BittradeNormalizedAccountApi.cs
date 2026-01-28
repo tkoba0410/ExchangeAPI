@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Account;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.NotSupported;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
@@ -12,24 +13,33 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 
-internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountApi
+internal sealed class BittradeNormalizedAccountApi
 {
     private readonly IBittradeRawApi _account;
-    private readonly string _accountId;
+    private readonly string? _accountId;
 
-    internal BittradeNormalizedAccountApi(IBittradeRawApi raw, string accountId)
+    internal BittradeNormalizedAccountApi(IBittradeRawApi raw, string? accountId)
     {
         _account = raw ?? throw new ArgumentNullException(nameof(raw));
-        _accountId = accountId ?? throw new ArgumentNullException(nameof(accountId));
+        _accountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
     }
 
     public async Task<Call<NormalizedRequests.GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default)
     {
+        if (string.IsNullOrWhiteSpace(_accountId))
+        {
+            return BittradeNotSupportedNormalizedCalls.Create<
+                NormalizedRequests.GetBalancesRequest,
+                IReadOnlyList<BittradeBalanceEntryNormalized>>(
+                new NormalizedRequests.GetBalancesRequest(string.Empty),
+                "AccountIdRequired");
+        }
+
         var rawCall = await _account
             .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountBalanceRequest(_accountId), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetBalancesRequest(_accountId);
+        var request = new NormalizedRequests.GetBalancesRequest(_accountId!);
 
         return CreateCall(
             rawCall,
@@ -39,7 +49,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase) || ok.Data is null)
                 {
-                    throw new BittradeNormalizedException("Bittrade balance response invalid.");
+                    throw new InvalidOperationException("Bittrade balance response invalid.");
                 }
 
                 return BittradeNormalizer.NormalizeBalances(ok.Data);
@@ -62,7 +72,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new BittradeNormalizedException("Bittrade accounts response invalid.");
+                    throw new InvalidOperationException("Bittrade accounts response invalid.");
                 }
 
                 return BittradeNormalizer.NormalizeAccounts(ok.Data);
@@ -92,7 +102,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new BittradeNormalizedException("Bittrade deposit/withdraw response invalid.");
+                    throw new InvalidOperationException("Bittrade deposit/withdraw response invalid.");
                 }
 
                 return BittradeNormalizer.NormalizeDepositWithdraws(ok.Data);
@@ -115,7 +125,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new BittradeNormalizedException("Bittrade withdraw addresses response invalid.");
+                    throw new InvalidOperationException("Bittrade withdraw addresses response invalid.");
                 }
 
                 return BittradeNormalizer.NormalizeWithdrawVirtualAddresses(ok.Data);
@@ -138,7 +148,7 @@ internal sealed class BittradeNormalizedAccountApi : IBittradeNormalizedAccountA
             {
                 if (ok.Success is not true)
                 {
-                    throw new BittradeNormalizedException("Bittrade retail balance response invalid.");
+                    throw new InvalidOperationException("Bittrade retail balance response invalid.");
                 }
 
                 return BittradeNormalizer.NormalizeRetailBalances(ok.Data);

@@ -43,6 +43,11 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 - 動的パスが必要な場合は **Paths 側に専用ヘルパを用意**して集約する
 - Query の構築は **`*WireSpecBuilder.BuildQuery` に統一**し、手書きの query 文字列を作らない
 
+### 2.6 Normalized 内部実装の骨格
+
+- Normalized の Public/Private サブ API は **具象クラスのみ**とし、I/F を持たない
+- NotSupported は **静的ヘルパ経由**で生成し、API 差し替えによる PreconditionMissing 表現は行わない
+
 ## 3. 統一しないもの（MAY）
 
 - 取引所固有の機能差（例：片方に存在しない endpoint 群）

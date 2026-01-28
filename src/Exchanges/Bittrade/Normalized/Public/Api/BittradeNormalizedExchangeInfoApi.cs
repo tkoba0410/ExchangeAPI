@@ -12,7 +12,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 
-internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
+internal sealed class BittradeNormalizedExchangeInfoApi
 {
     private readonly IBittradeRawApi _exchangeInfo;
 
@@ -37,7 +37,7 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase) || ok.Data is null)
                 {
-                    throw new BittradeNormalizedException("Bittrade symbols response invalid.");
+                    throw new InvalidOperationException("Bittrade symbols response invalid.");
                 }
 
                 return BittradeNormalizer.NormalizeSymbols(ok.Data);
@@ -60,7 +60,7 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new BittradeNormalizedException("Bittrade currencys response invalid.");
+                    throw new InvalidOperationException("Bittrade currencys response invalid.");
                 }
 
                 return ok.Data ?? Array.Empty<string>();
@@ -83,7 +83,7 @@ internal sealed class BittradeNormalizedExchangeInfoApi : IBittradeNormalizedExc
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new BittradeNormalizedException("Bittrade timestamp response invalid.");
+                    throw new InvalidOperationException("Bittrade timestamp response invalid.");
                 }
 
                 return ok.Data;

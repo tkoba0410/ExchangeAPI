@@ -6,7 +6,6 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Transport.Wire;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -19,18 +18,18 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 internal sealed class BittradeApiBundle
 {
-    public IBittradeNormalizedTradingApi Trading { get; }
-    public IBittradeNormalizedMarketDataApi NormalizedMarketData { get; }
-    public IBittradeNormalizedAccountApi NormalizedAccount { get; }
+    public BittradeNormalizedTradingApi Trading { get; }
+    public BittradeNormalizedMarketDataApi NormalizedMarketData { get; }
+    public BittradeNormalizedAccountApi NormalizedAccount { get; }
     public IExchangeInfoApi ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
     public IRestClient RestClient { get; }
     public string? AccountId { get; }
 
     public BittradeApiBundle(
-        IBittradeNormalizedTradingApi trading,
-        IBittradeNormalizedMarketDataApi normalizedMarketData,
-        IBittradeNormalizedAccountApi normalizedAccount,
+        BittradeNormalizedTradingApi trading,
+        BittradeNormalizedMarketDataApi normalizedMarketData,
+        BittradeNormalizedAccountApi normalizedAccount,
         IExchangeInfoApi exchangeInfo,
         IExchangeMarketResolver markets,
         IRestClient restClient,
@@ -54,16 +53,12 @@ internal sealed class BittradeApiBundle
         var raw = new BittradeRawApi(wire);
         var normalizedMarketData = new BittradeNormalizedMarketDataApi(raw);
         var normalizedExchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
-        IBittradeNormalizedAccountApi normalizedAccount = normalizedAccountId is null
-            ? new BittradePreconditionMissingNormalizedAccountApi(string.Empty)
-            : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
+        var normalizedAccount = new BittradeNormalizedAccountApi(raw, normalizedAccountId);
 
         var exchangeInfo = new BittradeExchangeInfoApi(normalizedExchangeInfo);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var normalizedMarkets = new BittradeNormalizedMarketResolver(markets);
-        IBittradeNormalizedTradingApi trading = normalizedAccountId is null
-            ? new BittradePreconditionMissingNormalizedTradingApi(string.Empty)
-            : new BittradeNormalizedTradingApi(raw, normalizedMarkets, normalizedAccountId);
+        var trading = new BittradeNormalizedTradingApi(raw, normalizedMarkets, normalizedAccountId);
         return new BittradeApiBundle(
             trading: trading,
             normalizedMarketData: normalizedMarketData,

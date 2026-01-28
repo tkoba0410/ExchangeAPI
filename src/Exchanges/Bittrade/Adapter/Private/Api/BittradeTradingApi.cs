@@ -30,9 +30,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 internal sealed class BittradeTradingApi : ITradingApi
 {
-    private readonly IBittradeNormalizedTradingApi _trading;
+    private readonly BittradeNormalizedTradingApi _trading;
 
-    public BittradeTradingApi(IBittradeNormalizedTradingApi trading)
+    public BittradeTradingApi(BittradeNormalizedTradingApi trading)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
     }

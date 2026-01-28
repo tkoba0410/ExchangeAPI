@@ -25,15 +25,12 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
 {
-    private readonly IBittradeNormalizedTradingApi _trading;
-    private readonly string? _accountId;
+    private readonly BittradeNormalizedTradingApi _trading;
 
     public BittradeSpotHistoryApi(
-        IBittradeNormalizedTradingApi trading,
-        string? accountId)
+        BittradeNormalizedTradingApi trading)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
-        _accountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
     }
 
     public async Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
@@ -66,15 +63,6 @@ internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
         CancellationToken cancellationToken = default)
     {
         var startedAt = DateTimeOffset.UtcNow;
-
-        if (string.IsNullOrWhiteSpace(_accountId))
-        {
-            return NotSupportedCall.Create<MarketLimitCursorRequest, Page<ExecutionItem>>(
-                "Contracts",
-                BittradeOperations.History.GetExecutions,
-                request,
-                "AccountIdRequired");
-        }
 
         try
         {

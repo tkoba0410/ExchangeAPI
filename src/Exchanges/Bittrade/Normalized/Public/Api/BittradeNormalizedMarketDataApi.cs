@@ -14,7 +14,7 @@ using RawPublicRequests = ExchangeApi.Exchanges.Bittrade.Raw.Public.Requests;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 
-internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarketDataApi
+internal sealed class BittradeNormalizedMarketDataApi
 {
     private readonly IBittradeRawApi _raw;
 
@@ -81,7 +81,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             ok =>
             {
                 RequireOk(ok.Status, "orderbook");
-                var tick = ok.Tick ?? throw new BittradeNormalizedException("Bittrade order book response missing tick.");
+                var tick = ok.Tick ?? throw new InvalidOperationException("Bittrade order book response missing tick.");
                 return BittradeNormalizer.NormalizeOrderBook(tick);
             });
     }
@@ -112,7 +112,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             ok =>
             {
                 RequireOk(ok.Status, "trades");
-                var entries = ok.Tick?.Data ?? throw new BittradeNormalizedException("Bittrade trades response missing data.");
+                var entries = ok.Tick?.Data ?? throw new InvalidOperationException("Bittrade trades response missing data.");
                 return BittradeNormalizer.NormalizeExecutions(entries, rawCall.Meta.RawJson);
             });
     }
@@ -295,7 +295,7 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
     {
         if (!string.Equals(status, "ok", StringComparison.OrdinalIgnoreCase))
         {
-            throw new BittradeNormalizedException($"Bittrade {operation} response status invalid: {status}.");
+            throw new InvalidOperationException($"Bittrade {operation} response status invalid: {status}.");
         }
     }
 
@@ -308,6 +308,6 @@ internal sealed class BittradeNormalizedMarketDataApi : IBittradeNormalizedMarke
             BittradeDepthType.Step3 => "step3",
             BittradeDepthType.Step4 => "step4",
             BittradeDepthType.Step5 => "step5",
-            _ => throw new BittradeNormalizedException($"Unsupported depth type: {depthType}."),
+            _ => throw new InvalidOperationException($"Unsupported depth type: {depthType}."),
         };
 }

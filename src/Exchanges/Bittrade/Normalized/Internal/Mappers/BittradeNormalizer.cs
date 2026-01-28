@@ -225,7 +225,7 @@ internal static class BittradeNormalizer
     {
         if (levels is null)
         {
-            throw new BittradeNormalizedException($"Bittrade order book missing {field}.");
+            throw new InvalidOperationException($"Bittrade order book missing {field}.");
         }
 
         return levels.Select(level => NormalizeLevel(level, field)).ToList();
@@ -235,7 +235,7 @@ internal static class BittradeNormalizer
     {
         if (level.Count < 2)
         {
-            throw new BittradeNormalizedException($"Bittrade order book {field} level is invalid.");
+            throw new InvalidOperationException($"Bittrade order book {field} level is invalid.");
         }
 
         return new BittradeOrderBookLevelNormalized(level[0], level[1]);
@@ -245,7 +245,7 @@ internal static class BittradeNormalizer
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new BittradeNormalizedException($"RawSymbolInfo.{field} is empty.");
+            throw new InvalidOperationException($"RawSymbolInfo.{field} is empty.");
         }
 
         return ParseDecimalOrThrow(value, field, "RawSymbolInfo");
@@ -268,7 +268,7 @@ internal static class BittradeNormalizer
             return value;
         }
 
-        throw new BittradeNormalizedException($"Invalid decimal for {dto}.{field}: '{s}'.");
+        throw new InvalidOperationException($"Invalid decimal for {dto}.{field}: '{s}'.");
     }
 
     private static decimal? ParseNullableDecimal(string? value, string field, string dto)
@@ -362,7 +362,7 @@ internal static class BittradeNormalizer
         }
         catch (ArgumentException ex)
         {
-            throw new BittradeNormalizedException(ex.Message);
+            throw new InvalidOperationException(ex.Message);
         }
     }
 }

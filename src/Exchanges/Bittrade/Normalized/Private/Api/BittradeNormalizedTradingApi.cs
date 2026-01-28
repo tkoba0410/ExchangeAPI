@@ -10,6 +10,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.NotSupported;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
@@ -20,22 +21,20 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 
-internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingApi
+internal sealed class BittradeNormalizedTradingApi
 {
     private readonly IBittradeRawApi _trading;
     private readonly IBittradeMarketResolver _markets;
-    private readonly string _accountId;
+    private readonly string? _accountId;
 
     public BittradeNormalizedTradingApi(
         IBittradeRawApi trading,
         IBittradeMarketResolver markets,
-        string accountId)
+        string? accountId)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
-        _accountId = string.IsNullOrWhiteSpace(accountId)
-            ? throw new ArgumentException("accountId is required.", nameof(accountId))
-            : accountId;
+        _accountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
     }
 
     public async Task<Call<NormalizedRequests.PostOrdersPlaceRequest, BittradeOrderResult>> PostOrdersPlaceCallAsync(
@@ -43,6 +42,10 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         CancellationToken ct = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
+        if (!HasAccountId)
+        {
+            return AccountIdMissing<NormalizedRequests.PostOrdersPlaceRequest, BittradeOrderResult>(request);
+        }
 
         var callRequest = request;
         var marketCall = await _markets.ResolveCallAsync(request.Request.Symbol, ct).ConfigureAwait(false);
@@ -55,7 +58,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
                 marketError!);
         }
 
-        var rawRequest = BittradeTradingMapper.ToRaw(_accountId, apiSymbol!, request.Request);
+        var rawRequest = BittradeTradingMapper.ToRaw(_accountId!, apiSymbol!, request.Request);
         var rawCall = await _trading
             .PostOrdersPlaceCallAsync(new RawPrivateRequests.CreateOrderRequest(rawRequest), ct)
             .ConfigureAwait(false);
@@ -79,7 +82,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             {
                 if (!string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new BittradeNormalizedException("Bittrade orders response invalid.");
+                    throw new InvalidOperationException("Bittrade orders response invalid.");
                 }
 
                 return BittradeTradingMapper.ToOrderSummaries(raw.Data);
@@ -134,6 +137,10 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         CancellationToken ct = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
+        if (!HasAccountId)
+        {
+            return AccountIdMissing<NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>(request);
+        }
 
         string? apiSymbol = null;
         if (request.Symbol is { IsEmpty: false })
@@ -150,7 +157,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         }
 
         var rawRequest = new RawPrivateRequests.RawCancelOpenOrdersRequest(
-            AccountId: _accountId,
+            AccountId: _accountId!,
             Symbol: apiSymbol,
             Side: request.Side is null
                 ? null
@@ -174,6 +181,10 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         CancellationToken ct = default)
     {
         var callRequest = new NormalizedRequests.GetOpenOrdersRequest(symbol);
+        if (!HasAccountId)
+        {
+            return AccountIdMissing<NormalizedRequests.GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>(callRequest);
+        }
         var marketCall = await _markets.ResolveCallAsync(symbol, ct).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
         {
@@ -185,7 +196,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
         }
 
         var rawCall = await _trading
-            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(apiSymbol!, _accountId), ct)
+            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(apiSymbol!, _accountId!), ct)
             .ConfigureAwait(false);
 
         return CreateCall(rawCall, callRequest, "Bittrade.GetOpenOrders", raw => BittradeTradingMapper.ToOpenOrders(symbol, raw));
@@ -335,7 +346,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             {
                 if (raw.Success is not true)
                 {
-                    throw new BittradeNormalizedException("Bittrade retail order list response invalid.");
+                    throw new InvalidOperationException("Bittrade retail order list response invalid.");
                 }
 
                 return BittradeTradingMapper.ToRetailOrders(raw.Data);
@@ -360,7 +371,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             {
                 if (raw.Success is not true)
                 {
-                    throw new BittradeNormalizedException("Bittrade retail order detail response invalid.");
+                    throw new InvalidOperationException("Bittrade retail order detail response invalid.");
                 }
 
                 return BittradeTradingMapper.ToRetailOrder(raw.Data);
@@ -393,7 +404,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             {
                 if (raw.Success is not true)
                 {
-                    throw new BittradeNormalizedException("Bittrade retail order history response invalid.");
+                    throw new InvalidOperationException("Bittrade retail order history response invalid.");
                 }
 
                 return BittradeTradingMapper.ToRetailOrders(raw.Data);
@@ -419,7 +430,7 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             {
                 if (raw.Success is not true)
                 {
-                    throw new BittradeNormalizedException("Bittrade retail order detail response invalid.");
+                    throw new InvalidOperationException("Bittrade retail order detail response invalid.");
                 }
 
                 return BittradeTradingMapper.ToRetailOrder(raw.Data);
@@ -642,5 +653,10 @@ internal sealed class BittradeNormalizedTradingApi : IBittradeNormalizedTradingA
             Result: new CallResult<TOk>.Err(error),
             Meta: meta);
     }
+
+    private bool HasAccountId => !string.IsNullOrWhiteSpace(_accountId);
+
+    private static Call<TReq, TOk> AccountIdMissing<TReq, TOk>(TReq request) =>
+        BittradeNotSupportedNormalizedCalls.Create<TReq, TOk>(request, "AccountIdRequired");
 
 }

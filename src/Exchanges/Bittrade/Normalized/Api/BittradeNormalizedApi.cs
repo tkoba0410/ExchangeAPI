@@ -10,7 +10,6 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.NotSupported;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
@@ -22,17 +21,17 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 
 public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
 {
-    private readonly IBittradeNormalizedMarketDataApi _marketData;
-    private readonly IBittradeNormalizedExchangeInfoApi _exchangeInfo;
-    private readonly IBittradeNormalizedAccountApi _account;
-    private readonly IBittradeNormalizedTradingApi _trading;
+    private readonly BittradeNormalizedMarketDataApi _marketData;
+    private readonly BittradeNormalizedExchangeInfoApi _exchangeInfo;
+    private readonly BittradeNormalizedAccountApi _account;
+    private readonly BittradeNormalizedTradingApi _trading;
     public string? AccountId { get; }
 
     private BittradeNormalizedApi(
-        IBittradeNormalizedMarketDataApi marketData,
-        IBittradeNormalizedExchangeInfoApi exchangeInfo,
-        IBittradeNormalizedAccountApi account,
-        IBittradeNormalizedTradingApi trading,
+        BittradeNormalizedMarketDataApi marketData,
+        BittradeNormalizedExchangeInfoApi exchangeInfo,
+        BittradeNormalizedAccountApi account,
+        BittradeNormalizedTradingApi trading,
         string? accountId)
     {
         _marketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
@@ -55,16 +54,12 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
 
         var marketData = new BittradeNormalizedMarketDataApi(raw);
         var exchangeInfo = new BittradeNormalizedExchangeInfoApi(raw);
-        IBittradeNormalizedAccountApi account = normalizedAccountId is null
-            ? new BittradePreconditionMissingNormalizedAccountApi(string.Empty)
-            : new BittradeNormalizedAccountApi(raw, normalizedAccountId);
+        var account = new BittradeNormalizedAccountApi(raw, normalizedAccountId);
 
-        IBittradeNormalizedTradingApi trading = string.IsNullOrWhiteSpace(normalizedAccountId)
-            ? new BittradePreconditionMissingNormalizedTradingApi(string.Empty)
-            : new BittradeNormalizedTradingApi(
-                raw,
-                markets ?? throw new ArgumentNullException(nameof(markets)),
-                normalizedAccountId);
+        var trading = new BittradeNormalizedTradingApi(
+            raw,
+            markets ?? throw new ArgumentNullException(nameof(markets)),
+            normalizedAccountId);
 
         return new BittradeNormalizedApi(
             marketData: marketData,

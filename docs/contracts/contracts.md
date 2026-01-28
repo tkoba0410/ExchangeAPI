@@ -98,7 +98,7 @@ NotSupported を通常制御フローとして常用してはならない（原�
 
 ## 6.1 Facade API の Public / Private（署名有無）
 
-Contracts の Facade API は、必要に応じて Public / Private に分離してよい。
+Contracts の Facade API は Public / Private に分離する（MUST）。
 ここでの Public/Private は **署名の有無**のみを表す（MUST）。
 
 - Public/Private を MarketData / Trading / Account 等の意味分類の代替として用いてはならない（MUST NOT）。

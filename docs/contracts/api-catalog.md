@@ -5,7 +5,11 @@
 
 ## 1. Facade Interfaces
 
-### 1.1 IMarketDataApi
+Public/Private は **署名の有無**のみを表す（用途別分類ではない）。
+
+## 2. Public (No Signature)
+
+### 2.1 IMarketDataApi
 
 - `GetTickerCallAsync` -> `Call<GetTickerRequest, Ticker>`
 - `GetOrderBookCallAsync` -> `Call<GetOrderBookRequest, OrderBook>`
@@ -16,7 +20,17 @@
 
 Source: `src/Contracts/Facade/Interfaces/IMarketDataApi.cs`
 
-### 1.2 ITradingApi
+### 2.2 IExchangeInfoApi
+
+- `GetExchangeInfoCallAsync` -> `Call<GetExchangeInfoRequest, ExchangeInfo>`
+- `GetCurrencysCallAsync` -> `Call<GetCurrencysRequest, IReadOnlyList<string>>`
+- `GetTimestampCallAsync` -> `Call<GetTimestampRequest, DateTimeOffset>`
+
+Source: `src/Contracts/Facade/Interfaces/IExchangeInfoApi.cs`
+
+## 3. Private (Signature Required)
+
+### 3.1 ITradingApi
 
 - `PlaceLimitOrderCallAsync` -> `Call<PlaceLimitOrderRequest, OrderResult>`
 - `PlaceMarketOrderCallAsync` -> `Call<PlaceMarketOrderRequest, OrderResult>`
@@ -26,28 +40,20 @@ Source: `src/Contracts/Facade/Interfaces/IMarketDataApi.cs`
 
 Source: `src/Contracts/Facade/Interfaces/ITradingApi.cs`
 
-### 1.3 IAccountApi
+### 3.2 IAccountApi
 
 - `GetBalancesCallAsync` -> `Call<GetBalancesRequest, IReadOnlyList<Balance>>`
 
 Source: `src/Contracts/Facade/Interfaces/IAccountApi.cs`
 
-### 1.4 IExchangeInfoApi
-
-- `GetExchangeInfoCallAsync` -> `Call<GetExchangeInfoRequest, ExchangeInfo>`
-- `GetCurrencysCallAsync` -> `Call<GetCurrencysRequest, IReadOnlyList<string>>`
-- `GetTimestampCallAsync` -> `Call<GetTimestampRequest, DateTimeOffset>`
-
-Source: `src/Contracts/Facade/Interfaces/IExchangeInfoApi.cs`
-
-### 1.5 ISpotHistoryApi
+### 3.3 ISpotHistoryApi
 
 - `GetOrdersCallAsync` -> `Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>`
 - `GetExecutionsCallAsync` -> `Call<MarketLimitCursorRequest, Page<ExecutionItem>>`
 
 Source: `src/Contracts/Facade/Interfaces/ISpotHistoryApi.cs`
 
-## 2. Notes
+## 4. Notes
 
 - Contracts の公開 API は Call-only であり、I/O は Wire 層のみが行う。
 - NotSupported は capability 不足を示す語彙であり、通常制御フローには用いない。

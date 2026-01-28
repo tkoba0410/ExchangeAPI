@@ -37,6 +37,11 @@ Contracts の公開 API 一覧は `docs/contracts/api-catalog.md` を参照す�
 
 本書は、取引所固有仕様の詳細、実装手法、最適化方針を規定しない。
 
+### 2.1 Public / Private（署名有無）
+
+Contracts の公開 API は、必要に応じて Public / Private に分離される。
+この Public/Private は **署名の有無**のみを表し、用途別（MarketData / Trading / Account 等）の分類ではない。
+
 ---
 
 ## 3. Guaranteed（差異禁止）
@@ -44,14 +49,14 @@ Contracts の公開 API 一覧は `docs/contracts/api-catalog.md` を参照す�
 本節に記載された事項については、**取引所間で差異が存在してはならない**。
 利用者は、本節に関して **取引所判別・分岐・例外処理を書く必要がない**。
 
-### 3.X 取引所判別情報の非提供
+### 3.1 取引所判別情報の非提供
 
 * Contracts API の戻り値（`Call<TRequest, TResponse>`）および `TResponse`（ContractDTO）には、
   取引所識別情報（例：`ExchangeCode`）は含まれない。
 * 利用者は「どの取引所か」を前提とした分岐を、Contracts API の戻り値から行ってはならない。
   - 分岐が必要な場合は、capability / 構築形態（Composition）によって **事前に** 分離・選択する。
 
-### 3.1 API 呼び出し前提条件
+### 3.2 API 呼び出し前提条件
 
 * 同名の Contracts API は、取引所間で **呼び出し前提条件の差異を持たない**。
 * 取引所固有の追加前提条件（例：accountId 等）が存在する場合、次のいずれかにより差異を解消しなければならない。
@@ -61,21 +66,21 @@ Contracts の公開 API 一覧は `docs/contracts/api-catalog.md` を参照す�
 
 ---
 
-### 3.2 戻り値・失敗表現
+### 3.3 戻り値・失敗表現
 
 * Contracts API の戻り値は常に `Call<TRequest, TResponse>` である。
 * 失敗は `Call` の失敗として表現され、例外は制御フローとして用いてはならない。
 * 未対応 capability は **Facade の nullable capability により事前に判定可能**でなければならない。
 * `NotSupported` を通常制御フロー（取引所判別・分岐）として利用することは禁止される（原則使用しない）。
 
-#### 3.2.1 CallAsync 命名（Call-only）
+#### 3.3.1 CallAsync 命名（Call-only）
 
 * Contracts の公開 I/F は Call-only で提供されるため、I/O を伴う公開メソッド名は末尾を **`CallAsync`** とする。
 * `Async` のみ（例：`GetBalanceAsync`）は使用しない。
 
 ---
 
-### 3.3 意味論の統一
+### 3.4 意味論の統一
 
 以下の概念の意味論は、取引所に依存せず常に共通である。
 

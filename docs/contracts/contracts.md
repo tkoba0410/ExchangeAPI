@@ -76,7 +76,7 @@ Contracts は、API 資格情報（API Key / Secret 等）の **取得方法・�
 - エラー表現は **分類レベル**（例：通信失敗 / 認証失敗 / 業務的失敗）までに留め、詳細コード体系を契約に含めない（MUST）。
 - リトライ可否・HTTP ステータス・レート制限などの運用情報は、必要に応じて Call のメタで表現する（MUST）。
 
-## NotSupported（Shape / Semantics）
+## 5.1 NotSupported（Shape / Semantics）
 
 NotSupported は、Contracts API における **capability 不足**を示す語彙として予約する。
 ただし、未対応 capability は Facade の nullable capability により **事前に判定可能**でなければならず、
@@ -93,6 +93,16 @@ NotSupported を通常制御フローとして常用してはならない（原�
 - Abstract DTO（公開契約の型）は **Contracts 層が定義元（オーナー）**である（MUST）。
 - Contracts で定義された型を **返却する責務を持つのは Adapter（および Contracts 実装）** である（MUST）。
 - Normalized 層は取引所固有の意味確定 DTO を返し、Adapter が受け取り Contracts 型へ写像する（MUST）。
+
+---
+
+## 6.1 Facade API の Public / Private（署名有無）
+
+Contracts の Facade API は、必要に応じて Public / Private に分離してよい。
+ここでの Public/Private は **署名の有無**のみを表す（MUST）。
+
+- Public/Private を MarketData / Trading / Account 等の意味分類の代替として用いてはならない（MUST NOT）。
+- 分離の目的は「認証境界の明確化」であり、Contracts の Shape / Semantics を変更してはならない（MUST NOT）。
 
 ---
 

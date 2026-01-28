@@ -253,6 +253,12 @@ src/Exchanges/<Exchange>/Adapter/
 * 共通化できるもののみ Contract に含める
 * 差異・欠損は Contract で明示的に表現する
 
+**Public / Private（署名有無）**
+
+* Contracts でも Public/Private を「署名の有無」を表す分類として用いる（MUST）。
+* Public/Private を MarketData / Trading / Account 等の意味分類の代替として用いてはならない（MUST NOT）。
+  * 意味分類（種類別フォルダ分割）は行わない。
+
 ---
 
 ## 4. API サーフェス規則

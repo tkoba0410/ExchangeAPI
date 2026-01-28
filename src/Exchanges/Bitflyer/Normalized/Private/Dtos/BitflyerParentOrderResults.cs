@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Trading;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
 public sealed record BitflyerParentOrderAcceptance(string ParentOrderAcceptanceId);
 

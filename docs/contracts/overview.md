@@ -41,6 +41,7 @@ Contracts の公開 API 一覧は `docs/contracts/api-catalog.md` を参照す�
 
 Contracts の公開 API は Public / Private に分離する。
 この Public/Private は **署名の有無**のみを表し、用途別（MarketData / Trading / Account 等）の分類ではない。
+用途別の意味分類は **上位レイヤのラッパにのみ許容**し、Contracts には持ち込まない。
 
 ---
 

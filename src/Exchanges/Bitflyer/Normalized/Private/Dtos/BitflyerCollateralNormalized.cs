@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
 public sealed record BitflyerCollateralNormalized(
     decimal Collateral,

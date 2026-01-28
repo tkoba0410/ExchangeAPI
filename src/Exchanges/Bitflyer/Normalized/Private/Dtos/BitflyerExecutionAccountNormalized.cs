@@ -2,7 +2,7 @@ using System;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.Account;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
 public sealed record BitflyerExecutionAccountNormalized(
     Symbol Symbol,

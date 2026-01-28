@@ -103,6 +103,7 @@ Contracts の Facade API は Public / Private に分離する（MUST）。
 
 - Public/Private を MarketData / Trading / Account 等の意味分類の代替として用いてはならない（MUST NOT）。
 - 分離の目的は「認証境界の明確化」であり、Contracts の Shape / Semantics を変更してはならない（MUST NOT）。
+ - 公開 API 面の分類は **Public / Private のみ**とし、意味分類語彙を公開 I/F 名称や namespace に使用してはならない（MUST NOT）。
 
 ---
 

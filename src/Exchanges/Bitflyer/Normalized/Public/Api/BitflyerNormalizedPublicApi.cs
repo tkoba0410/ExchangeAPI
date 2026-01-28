@@ -12,13 +12,30 @@ using PublicRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 
-internal sealed class BitflyerNormalizedMarketDataApi
+internal sealed class BitflyerNormalizedPublicApi
 {
     private readonly IBitflyerRawApi _raw;
 
-    internal BitflyerNormalizedMarketDataApi(IBitflyerRawApi raw)
+    internal BitflyerNormalizedPublicApi(IBitflyerRawApi raw)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
+    }
+
+    public async Task<Call<PublicRequests.GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>> GetMarketsCallAsync(
+        CancellationToken ct = default)
+    {
+        var rawCall = await _raw
+            .GetMarketsCallAsync(new RawPublicRequests.GetMarketsRequest(), ct)
+            .ConfigureAwait(false);
+        var request = new PublicRequests.GetMarketsRequest();
+
+        return CreateCall(
+            rawCall,
+            request,
+            "Bitflyer.GetMarkets",
+            raw => (IReadOnlyList<BitflyerMarketNormalized>)raw
+                .Select(BitflyerMarketNormalizer.Normalize)
+                .ToArray());
     }
 
     public async Task<Call<PublicRequests.GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(

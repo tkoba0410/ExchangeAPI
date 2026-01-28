@@ -16,7 +16,8 @@ EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
 
 ### 2.1 物理配置（骨格）
 
-- Wire / Raw / Normalized / Adapter の各層で、**Public / Private / Internal** を基本骨格として揃える
+- Wire / Raw / Normalized / Adapter の各層で、**Public / Private を分類の骨格**として揃える
+- `Internal` は実装補助のための **非公開置き場**であり、分類軸として扱わない
 - （参考）Contracts も Public/Private を「署名有無」の分類として扱い、用途別の意味分類は導入しない
 - **意味分類（MarketData / Trading / Account など）でフォルダ分割しない**（Public/Private 以外で分けない）
 - 生成・組み立て用途の `Factory` は **Internal 配下に置く**（例：`.../Internal/Factory`）

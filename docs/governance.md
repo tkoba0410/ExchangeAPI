@@ -86,6 +86,7 @@ TopSpec および inventory に記載された事実に従う。
 * Wire / Raw / Normalized / Adapter の公開 API 面を**意味分類してはならない**。
 * MarketData / Trading / Account 等の分類語彙は
   **物理配置・namespace・公開 API に使用してはならない**。
+* `Internal` は実装補助のための **非公開置き場**であり、分類軸として扱わない。
 
 ### 4.2 Public / Private 分離（必須）
 

@@ -13,7 +13,7 @@
 
 ## Scope
 
-本リポジトリでは、Wire〜Adapter 層において
+本リポジトリでは、全層において
 API を意味分類（MarketData / Trading 等）で整理しない。
 Public / Private のみを物理分離の基準とする。
 

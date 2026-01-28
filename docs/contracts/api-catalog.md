@@ -13,6 +13,8 @@ Public/Private は **署名の有無**のみを表す（用途別分類ではな
 - ただし **Bitflyer準拠で挙動が著しく歪む場合は独自命名を採用**する。
   - 特に **注文系（Order）** は取引所差が大きいため、独自命名を許容する。
 - Bitflyer 名は **拘束ではなく参照**であり、Contracts の取引所非依存性を優先する。
+- Contracts の公開 API 面の分類は **Public / Private のみ**とし、意味分類語彙を公開 I/F 名称や namespace に使用してはならない。
+- 用途別の意味分類は **上位レイヤのラッパにのみ許容**する。
 
 ## 2. Public (No Signature)
 

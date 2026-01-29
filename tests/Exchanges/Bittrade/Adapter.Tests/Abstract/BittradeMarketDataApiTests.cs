@@ -130,7 +130,7 @@ public class BittradeMarketApiTests
     private static IExchangeMarketResolver CreateResolver(params ExchangeMarketInfo[] markets) =>
         new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(markets, null, null, null)));
 
-    private sealed class StubExchangeInfoApi : IExchangeInfoApi
+    private sealed class StubExchangeInfoApi : IExchangeInfoProvider
     {
         private readonly ExchangeInfo _info;
 
@@ -150,27 +150,6 @@ public class BittradeMarketApiTests
             return Task.FromResult(call);
         }
 
-        public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
-            CancellationToken cancellationToken = default)
-        {
-            var request = new GetCurrencysRequest();
-            return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
-                "Contracts",
-                "StubExchangeInfoApi",
-                request,
-                "Currencys"));
-        }
-
-        public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
-            CancellationToken cancellationToken = default)
-        {
-            var request = new GetTimestampRequest();
-            return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, DateTimeOffset>(
-                "Contracts",
-                "StubExchangeInfoApi",
-                request,
-                "Timestamp"));
-        }
     }
 
     private sealed class StubHandler : HttpMessageHandler

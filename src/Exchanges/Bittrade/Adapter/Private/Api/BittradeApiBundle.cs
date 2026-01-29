@@ -5,7 +5,6 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
-using ExchangeApi.Contracts.Facade.Interfaces;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
@@ -17,7 +16,7 @@ internal sealed class BittradeApiBundle
 {
     public BittradeNormalizedPublicApi Public { get; }
     public BittradeNormalizedPrivateApi Private { get; }
-    public IExchangeInfoApi ExchangeInfo { get; }
+    public IExchangeInfoProvider ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
     public IRestClient RestClient { get; }
     public string? AccountId { get; }
@@ -25,7 +24,7 @@ internal sealed class BittradeApiBundle
     public BittradeApiBundle(
         BittradeNormalizedPublicApi publicApi,
         BittradeNormalizedPrivateApi privateApi,
-        IExchangeInfoApi exchangeInfo,
+        IExchangeInfoProvider exchangeInfo,
         IExchangeMarketResolver markets,
         IRestClient restClient,
         string? accountId = null)

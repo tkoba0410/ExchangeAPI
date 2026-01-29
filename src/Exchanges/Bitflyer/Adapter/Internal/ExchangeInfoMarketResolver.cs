@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
@@ -16,10 +16,10 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 
 internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
 {
-    private readonly IExchangeInfoApi _exchangeInfo;
+    private readonly IExchangeInfoProvider _exchangeInfo;
     private ExchangeInfoDto? _cache;
 
-    public ExchangeInfoMarketResolver(IExchangeInfoApi exchangeInfo) =>
+    public ExchangeInfoMarketResolver(IExchangeInfoProvider exchangeInfo) =>
         _exchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
 
     public async Task<Call<ResolveExchangeMarketRequest, ExchangeMarketInfo>> ResolveCallAsync(

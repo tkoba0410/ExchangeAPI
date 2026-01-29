@@ -23,7 +23,7 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
-internal sealed class BitflyerAccountApi : IAccountApi
+internal sealed class BitflyerAccountApi
 {
     private readonly IBitflyerNormalizedApi _normalized;
     public BitflyerAccountApi(

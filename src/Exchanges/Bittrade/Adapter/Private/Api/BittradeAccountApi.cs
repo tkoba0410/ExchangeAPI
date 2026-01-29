@@ -28,7 +28,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// <summary>
 /// Bittrade の口座 API 実装（Balances/Executions）。
 /// </summary>
-internal sealed class BittradeAccountApi : IAccountApi
+internal sealed class BittradeAccountApi
 {
     private readonly BittradeNormalizedPrivateApi _account;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;

@@ -20,31 +20,32 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// <summary>
 /// Bittrade 用のファサード。各 API 実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IExchangeClient
+public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 {
-    private readonly IMarketDataApi _marketApi;
-    private readonly ITradingApi _tradingApi;
-    private readonly IAccountApi _accountApi;
-    private readonly ISpotHistoryApi _historyApi;
+    private readonly MarketApi _marketApi;
+    private readonly BittradeTradingApi _tradingApi;
+    private readonly BittradeAccountApi _accountApi;
+    private readonly BittradeSpotHistoryApi _historyApi;
+    private readonly BittradeExchangeInfoApi _exchangeInfoApi;
     private readonly IRestClient? _restClient;
     internal BittradeApiBundle? ApiBundle { get; }
 
     // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
-    public IMarketDataApi? Market => _marketApi;
-    public ITradingApi? Trading => _tradingApi;
-    public IAccountApi? Account => _accountApi;
-    public ISpotHistoryApi? History => _historyApi;
+    public IPublicApi? Public => this;
+    public IPrivateApi? Private => this;
 
     public BittradeExchangeClient(
-        IMarketDataApi marketApi,
-        ITradingApi tradingApi,
-        IAccountApi accountApi,
-        ISpotHistoryApi historyApi)
+        MarketApi marketApi,
+        BittradeTradingApi tradingApi,
+        BittradeAccountApi accountApi,
+        BittradeSpotHistoryApi historyApi,
+        BittradeExchangeInfoApi exchangeInfoApi)
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _historyApi = historyApi ?? throw new ArgumentNullException(nameof(historyApi));
+        _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
     }
 
     internal BittradeExchangeClient(BittradeApiBundle bundle)
@@ -59,29 +60,32 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         _tradingApi = new BittradeTradingApi(bundle.Private);
         _accountApi = new BittradeAccountApi(bundle.Private);
         _historyApi = new BittradeSpotHistoryApi(bundle.Private);
+        _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.Public);
         _restClient = bundle.RestClient;
         ApiBundle = bundle;
     }
 
     public BittradeExchangeClient(
-        IMarketDataApi marketApi,
-        ITradingApi tradingApi,
-        IAccountApi accountApi,
-        ISpotHistoryApi historyApi,
+        MarketApi marketApi,
+        BittradeTradingApi tradingApi,
+        BittradeAccountApi accountApi,
+        BittradeSpotHistoryApi historyApi,
+        BittradeExchangeInfoApi exchangeInfoApi,
         IRestClient restClient)
-        : this(marketApi, tradingApi, accountApi, historyApi)
+        : this(marketApi, tradingApi, accountApi, historyApi, exchangeInfoApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
     public BittradeExchangeClient(
-        IMarketDataApi marketApi,
-        ITradingApi tradingApi,
-        IAccountApi accountApi,
-        ISpotHistoryApi historyApi,
+        MarketApi marketApi,
+        BittradeTradingApi tradingApi,
+        BittradeAccountApi accountApi,
+        BittradeSpotHistoryApi historyApi,
+        BittradeExchangeInfoApi exchangeInfoApi,
         IRestClient restClient,
         string accountId)
-        : this(marketApi, tradingApi, accountApi, historyApi)
+        : this(marketApi, tradingApi, accountApi, historyApi, exchangeInfoApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
@@ -116,6 +120,19 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
+
+    // ExchangeInfo
+    public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
+
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetCurrencysCallAsync(cancellationToken);
+
+    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetTimestampCallAsync(cancellationToken);
 
     public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default) =>
@@ -152,6 +169,17 @@ public sealed class BittradeExchangeClient : IMarketDataApi, ITradingApi, IAccou
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _tradingApi.GetOpenOrdersCallAsync(symbol, cancellationToken);
+
+    // SpotHistory
+    public Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
+        MarketLimitCursorRequest request,
+        CancellationToken cancellationToken = default) =>
+        _historyApi.GetOrdersCallAsync(request, cancellationToken);
+
+    public Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsCallAsync(
+        MarketLimitCursorRequest request,
+        CancellationToken cancellationToken = default) =>
+        _historyApi.GetExecutionsCallAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

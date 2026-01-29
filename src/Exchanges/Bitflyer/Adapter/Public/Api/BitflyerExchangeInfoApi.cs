@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -22,7 +22,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 /// <summary>
 /// bitFlyer の ExchangeInfo 実装。現状は対応可否を返すスケルトン。
 /// </summary>
-public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
+public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 {
     private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan DailyMaintenanceEndJst = new(4, 10, 0);
@@ -100,6 +100,28 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoApi
                 BitflyerOperations.ExchangeInfo.GetExchangeInfo,
                 ex);
         }
+    }
+
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetCurrencysRequest();
+        return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
+            "Contracts",
+            "BitflyerExchangeInfo",
+            request,
+            "Currencys"));
+    }
+
+    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetTimestampRequest();
+        return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, DateTimeOffset>(
+            "Contracts",
+            "BitflyerExchangeInfo",
+            request,
+            "Timestamp"));
     }
 
     public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(

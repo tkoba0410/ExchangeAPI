@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -11,12 +10,14 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Contracts.Facade.Interfaces;
 
 /// <summary>
-/// 市場データ（REST）を取得するための抽象インターフェース。
+/// Public API (no signature). Market data + exchange info.
 /// </summary>
-public interface IMarketDataApi
+public interface IPublicApi
 {
     Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
         Symbol symbol,
@@ -41,5 +42,14 @@ public interface IMarketDataApi
 
     Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
         Symbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
         CancellationToken cancellationToken = default);
 }

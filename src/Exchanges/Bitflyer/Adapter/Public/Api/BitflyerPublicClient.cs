@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
@@ -16,26 +17,20 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 /// <summary>
 /// bitFlyer の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeClient
+public sealed class BitflyerPublicClient : IPublicApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
-    private readonly ITradingApi? _tradingApi;
-    private readonly IAccountApi? _accountApi;
-    private readonly ISpotHistoryApi? _historyApi;
+    private readonly BitflyerExchangeInfoApi _exchangeInfoApi;
 
-    public IMarketDataApi? Market => _marketApi;
-    public ITradingApi? Trading => _tradingApi;
-    public IAccountApi? Account => _accountApi;
-    public ISpotHistoryApi? History => _historyApi;
+    public IPublicApi? Public => this;
+    public IPrivateApi? Private => null;
 
     internal BitflyerPublicClient(IBitflyerNormalizedApi normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        var markets = new ExchangeInfoMarketResolver(new BitflyerExchangeInfoApi());
+        _exchangeInfoApi = new BitflyerExchangeInfoApi();
+        var markets = new ExchangeInfoMarketResolver(_exchangeInfoApi);
         _marketApi = new MarketApi(normalized, markets);
-        _tradingApi = null;
-        _accountApi = null;
-        _historyApi = null;
     }
 
     public Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(
@@ -68,6 +63,18 @@ public sealed class BitflyerPublicClient : IMarketDataApi, IExchangeClient
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
+
+    public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
+
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetCurrencysCallAsync(cancellationToken);
+
+    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetTimestampCallAsync(cancellationToken);
 
     // Raw access removed from public facade.
 }

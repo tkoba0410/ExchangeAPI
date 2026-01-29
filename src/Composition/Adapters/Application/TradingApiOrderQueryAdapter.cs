@@ -15,9 +15,9 @@ namespace ExchangeApi.Composition.Adapters.Application;
 
 public sealed class TradingApiOrderQueryAdapter : IOrderQueryApi
 {
-    private readonly ITradingApi _tradingApi;
+    private readonly IPrivateApi _tradingApi;
 
-    public TradingApiOrderQueryAdapter(ITradingApi tradingApi)
+    public TradingApiOrderQueryAdapter(IPrivateApi tradingApi)
     {
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
     }

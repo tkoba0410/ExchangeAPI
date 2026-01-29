@@ -27,18 +27,17 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccountApi, IExchangeClient
+public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 {
-    private readonly IMarketDataApi _marketApi;
-    private readonly ITradingApi _tradingApi;
-    private readonly IAccountApi _accountApi;
-    private readonly ISpotHistoryApi _historyApi;
+    private readonly MarketApi _marketApi;
+    private readonly BitflyerTradingApi _tradingApi;
+    private readonly BitflyerAccountApi _accountApi;
+    private readonly BitflyerSpotHistoryApi _historyApi;
+    private readonly BitflyerExchangeInfoApi _exchangeInfoApi;
     internal BitflyerApiBundle? ApiBundle { get; }
     // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
-    public IMarketDataApi? Market => _marketApi;
-    public ITradingApi? Trading => _tradingApi;
-    public IAccountApi? Account => _accountApi;
-    public ISpotHistoryApi? History => _historyApi;
+    public IPublicApi? Public => this;
+    public IPrivateApi? Private => this;
 
     internal BitflyerExchangeClient(
         IBitflyerNormalizedApi normalized,
@@ -54,16 +53,17 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     }
 
     public BitflyerExchangeClient(
-        IMarketDataApi marketApi,
-        ITradingApi tradingApi,
-        IAccountApi accountApi,
-        ISpotHistoryApi historyApi,
+        MarketApi marketApi,
+        BitflyerTradingApi tradingApi,
+        BitflyerAccountApi accountApi,
+        BitflyerSpotHistoryApi historyApi,
         object? rawBundle = null)
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
         _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
         _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
         _historyApi = historyApi ?? throw new ArgumentNullException(nameof(historyApi));
+        _exchangeInfoApi = new BitflyerExchangeInfoApi();
     }
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
@@ -104,7 +104,7 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     private static BitflyerAccountApi CreateAccountApi(IBitflyerNormalizedApi normalized) =>
         new(normalized);
 
-    private static ISpotHistoryApi CreateSpotHistoryApi(IBitflyerNormalizedApi normalized) =>
+    private static BitflyerSpotHistoryApi CreateSpotHistoryApi(IBitflyerNormalizedApi normalized) =>
         new BitflyerSpotHistoryApi(normalized);
 
     // Market
@@ -138,6 +138,19 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
+
+    // ExchangeInfo
+    public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
+
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetCurrencysCallAsync(cancellationToken);
+
+    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetTimestampCallAsync(cancellationToken);
 
     // Trading
     public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
@@ -176,6 +189,17 @@ public sealed class BitflyerExchangeClient : IMarketDataApi, ITradingApi, IAccou
     public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
         CancellationToken cancellationToken = default) =>
         _accountApi.GetBalancesCallAsync(cancellationToken);
+
+    // SpotHistory
+    public Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
+        MarketLimitCursorRequest request,
+        CancellationToken cancellationToken = default) =>
+        _historyApi.GetOrdersCallAsync(request, cancellationToken);
+
+    public Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsCallAsync(
+        MarketLimitCursorRequest request,
+        CancellationToken cancellationToken = default) =>
+        _historyApi.GetExecutionsCallAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

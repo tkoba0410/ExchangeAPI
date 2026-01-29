@@ -23,7 +23,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
-internal sealed class BittradeSpotHistoryApi : ISpotHistoryApi
+internal sealed class BittradeSpotHistoryApi
 {
     private readonly BittradeNormalizedPrivateApi _trading;
 

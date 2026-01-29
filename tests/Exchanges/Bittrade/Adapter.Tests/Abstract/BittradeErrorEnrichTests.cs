@@ -79,7 +79,7 @@ public sealed class BittradeErrorEnrichTests
             null,
             null)));
 
-    private sealed class StubExchangeInfoApi : IExchangeInfoApi
+    private sealed class StubExchangeInfoApi : IExchangeInfoProvider
     {
         private readonly ExchangeInfo _info;
 
@@ -95,26 +95,5 @@ public sealed class BittradeErrorEnrichTests
                 new CallResult<ExchangeInfo>.Ok(_info),
                 CallMeta.CreateInternal("Contracts", "StubExchangeInfo")));
 
-        public Task<Call<ContractsRequests.GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
-            CancellationToken cancellationToken = default)
-        {
-            var request = new ContractsRequests.GetCurrencysRequest();
-            return Task.FromResult(NotSupportedCall.Create<ContractsRequests.GetCurrencysRequest, IReadOnlyList<string>>(
-                "Contracts",
-                "StubExchangeInfo",
-                request,
-                "Currencys"));
-        }
-
-        public Task<Call<ContractsRequests.GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
-            CancellationToken cancellationToken = default)
-        {
-            var request = new ContractsRequests.GetTimestampRequest();
-            return Task.FromResult(NotSupportedCall.Create<ContractsRequests.GetTimestampRequest, DateTimeOffset>(
-                "Contracts",
-                "StubExchangeInfo",
-                request,
-                "Timestamp"));
-        }
     }
 }

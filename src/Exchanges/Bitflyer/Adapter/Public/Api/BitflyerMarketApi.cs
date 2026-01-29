@@ -28,7 +28,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 /// <summary>
 /// bitFlyer の MarketData API 実装（REST）。
 /// </summary>
-internal sealed class MarketApi : IMarketDataApi
+internal sealed class MarketApi
 {
     private readonly IBitflyerNormalizedApi _normalized;
     private readonly IExchangeMarketResolver _markets;

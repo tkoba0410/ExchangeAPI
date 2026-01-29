@@ -28,7 +28,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// <summary>
 /// Bittrade Private トレード/アカウント API（最小スコープ: Balance, Order, Cancel, OpenOrders, Status）。
 /// </summary>
-internal sealed class BittradeTradingApi : ITradingApi
+internal sealed class BittradeTradingApi
 {
     private readonly BittradeNormalizedPrivateApi _trading;
 

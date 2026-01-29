@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -28,7 +28,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// <summary>
 /// Bittrade の ExchangeInfo API 実装（/v1/common/symbols を使用）。
 /// </summary>
-public sealed class BittradeExchangeInfoApi : IExchangeInfoApi
+public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
 {
     private readonly BittradeNormalizedPublicApi _normalized;
     private const ExchangeCode Exchange = ExchangeCode.Bittrade;

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos.Market;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Primitives.DomainCommon.Enums;
@@ -17,19 +18,15 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// <summary>
 /// Bittrade の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient
+public sealed class BittradePublicClient : IPublicApi, IExchangeClient
 {
-    private readonly IMarketDataApi _marketApi;
-    private readonly ITradingApi? _tradingApi;
-    private readonly IAccountApi? _accountApi;
-    private readonly ISpotHistoryApi? _historyApi;
+    private readonly MarketApi _marketApi;
+    private readonly BittradeExchangeInfoApi _exchangeInfoApi;
     private readonly IRestClient? _restClient;
     internal BittradeApiBundle? ApiBundle { get; }
 
-    public IMarketDataApi? Market => _marketApi;
-    public ITradingApi? Trading => _tradingApi;
-    public IAccountApi? Account => _accountApi;
-    public ISpotHistoryApi? History => _historyApi;
+    public IPublicApi? Public => this;
+    public IPrivateApi? Private => null;
 
     public BittradePublicClient(IRestClient restClient)
     {
@@ -38,27 +35,15 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient
         // 公開APIのみ: market/exchangeInfo 取得に限定し、Trading/Account/History は提供しない。
         var bundle = BittradeApiBundle.FromRestClient(restClient, accountId: null);
         _marketApi = new MarketApi(bundle.Public, bundle.Markets);
-        _tradingApi = null;
-        _accountApi = null;
-        _historyApi = null;
+        _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.Public);
         _restClient = restClient;
-    }
-
-    public BittradePublicClient(IMarketDataApi marketApi)
-    {
-        _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
-        _tradingApi = null;
-        _accountApi = null;
-        _historyApi = null;
     }
 
     internal BittradePublicClient(BittradeApiBundle bundle)
     {
         if (bundle is null) throw new ArgumentNullException(nameof(bundle));
         _marketApi = new MarketApi(bundle.Public, bundle.Markets);
-        _tradingApi = null;
-        _accountApi = null;
-        _historyApi = null;
+        _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.Public);
         _restClient = bundle.RestClient;
         ApiBundle = bundle;
     }
@@ -93,6 +78,18 @@ public sealed class BittradePublicClient : IMarketDataApi, IExchangeClient
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
+
+    public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
+
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetCurrencysCallAsync(cancellationToken);
+
+    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+        CancellationToken cancellationToken = default) =>
+        _exchangeInfoApi.GetTimestampCallAsync(cancellationToken);
 
     // Raw access removed from public facade.
 }

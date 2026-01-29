@@ -20,10 +20,10 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeI
 namespace ExchangeApi.Composition.Providers.ExchangeInfo;
 
 /// <summary>
-/// JSON ファイルから ExchangeInfo を読み込む IExchangeInfoApi 実装。
+/// JSON ファイルから ExchangeInfo を読み込む IPublicApi 実装。
 /// 複数ファイル指定時は後勝ちでマージする。
 /// </summary>
-public sealed class JsonExchangeInfoApi : IExchangeInfoApi
+public sealed class JsonExchangeInfoApi : IPublicApi
 {
     private readonly string[] _paths;
     private readonly JsonSerializerOptions _options;
@@ -84,6 +84,79 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
                     new CallError(CallErrorKind.Unknown, ex.Message, ex)),
                 Meta: meta);
         }
+    }
+
+    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetTickerRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetTickerRequest, Ticker>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "Ticker"));
+    }
+
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetOrderBookRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetOrderBookRequest, OrderBook>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "OrderBook"));
+    }
+
+    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetMarketExecutionsRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "MarketExecutions"));
+    }
+
+    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
+        Symbol symbol,
+        string period,
+        int? size = null,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetHistoryKlineRequest(symbol, period, size);
+        return Task.FromResult(NotSupportedCall.Create<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "HistoryKline"));
+    }
+
+    public Task<Call<GetTickersRequest, IReadOnlyList<Ticker>>> GetTickersCallAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetTickersRequest();
+        return Task.FromResult(NotSupportedCall.Create<GetTickersRequest, IReadOnlyList<Ticker>>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "Tickers"));
+    }
+
+    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetHistoryTradeRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "HistoryTrade"));
     }
 
     public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(

@@ -1,9 +1,6 @@
 using System.Collections.Generic;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -12,12 +9,15 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Contracts.Facade.Interfaces;
 
 /// <summary>
-/// 取引（REST）の抽象インターフェース。
+/// Private API (signature required). Trading + account + spot history.
 /// </summary>
-public interface ITradingApi
+public interface IPrivateApi
 {
     Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
         Symbol symbol,
@@ -44,5 +44,16 @@ public interface ITradingApi
 
     Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
         Symbol symbol,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
+        MarketLimitCursorRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsCallAsync(
+        MarketLimitCursorRequest request,
         CancellationToken cancellationToken = default);
 }

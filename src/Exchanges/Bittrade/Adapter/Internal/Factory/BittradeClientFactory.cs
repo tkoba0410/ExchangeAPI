@@ -23,7 +23,7 @@ public static class BittradeClientFactory
 {
     private static readonly Uri BaseUri = new("https://api-cloud.bittrade.co.jp/");
 
-    public static IMarketDataApi CreatePublic() => CreatePublicClient();
+    public static IPublicApi CreatePublic() => CreatePublicClient();
 
     public static BittradePublicClient CreatePublicClient(
         IRestCallObserver? observer = null,
@@ -31,7 +31,7 @@ public static class BittradeClientFactory
         new BittradePublicClient(BittradeApiBundle.FromRestClient(
             CreateRestClient(observer: observer, logger: logger)));
 
-    public static IExchangeInfoApi CreateExchangeInfo()
+    public static BittradeExchangeInfoApi CreateExchangeInfo()
     {
         var restClient = CreateRestClient();
         var raw = new BittradeRawApi(new ExchangeApi.Transport.Wire.WireTransport(restClient));
@@ -39,7 +39,7 @@ public static class BittradeClientFactory
         return new BittradeExchangeInfoApi(normalizedExchangeInfo);
     }
 
-    public static (IMarketDataApi Market, ITradingApi Trading, IAccountApi Account, IExchangeInfoApi ExchangeInfo) CreatePrivate(
+    public static (MarketApi Market, BittradeTradingApi Trading, BittradeAccountApi Account, BittradeExchangeInfoApi ExchangeInfo) CreatePrivate(
         string accessKey,
         string secretKey,
         string accountId)
@@ -52,7 +52,7 @@ public static class BittradeClientFactory
         var normalizedMarkets = new BittradeNormalizedMarketResolver(markets);
         var normalizedPrivate = new BittradeNormalizedPrivateApi(raw, normalizedMarkets, accountId);
         var trading = new BittradeTradingApi(normalizedPrivate);
-        IAccountApi account = new BittradeAccountApi(normalizedPrivate);
+        var account = new BittradeAccountApi(normalizedPrivate);
         return (new MarketApi(normalizedPublic, markets), trading, account, exchangeInfo);
     }
 

@@ -20,7 +20,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
-internal sealed class BitflyerSpotHistoryApi : ISpotHistoryApi
+internal sealed class BitflyerSpotHistoryApi
 {
     private readonly IBitflyerNormalizedApi _normalized;
 

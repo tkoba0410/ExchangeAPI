@@ -54,7 +54,7 @@ internal static class BitflyerTestHelpers
         return new BitflyerNormalizedMarketResolver(resolver);
     }
 
-    private sealed class StubExchangeInfoApi : IExchangeInfoApi
+    private sealed class StubExchangeInfoApi : IExchangeInfoProvider
     {
         private readonly ExchangeInfo _info;
 
@@ -74,26 +74,5 @@ internal static class BitflyerTestHelpers
             return Task.FromResult(call);
         }
 
-        public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
-            CancellationToken cancellationToken = default)
-        {
-            var request = new GetCurrencysRequest();
-            return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
-                "Contracts",
-                "StubExchangeInfoApi",
-                request,
-                "Currencys"));
-        }
-
-        public Task<Call<GetTimestampRequest, System.DateTimeOffset>> GetTimestampCallAsync(
-            CancellationToken cancellationToken = default)
-        {
-            var request = new GetTimestampRequest();
-            return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, System.DateTimeOffset>(
-                "Contracts",
-                "StubExchangeInfoApi",
-                request,
-                "Timestamp"));
-        }
     }
 }

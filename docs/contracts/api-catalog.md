@@ -18,7 +18,7 @@ Public/Private は **署名の有無**のみを表す（用途別分類ではな
 
 ## 2. Public (No Signature)
 
-### 2.1 IMarketDataApi
+### 2.1 IPublicApi
 
 - `GetTickerCallAsync` -> `Call<GetTickerRequest, Ticker>`
 - `GetOrderBookCallAsync` -> `Call<GetOrderBookRequest, OrderBook>`
@@ -26,41 +26,26 @@ Public/Private は **署名の有無**のみを表す（用途別分類ではな
 - `GetHistoryKlineCallAsync` -> `Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>`
 - `GetTickersCallAsync` -> `Call<GetTickersRequest, IReadOnlyList<Ticker>>`
 - `GetHistoryTradeCallAsync` -> `Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>`
-
-Source: `src/Contracts/Facade/Interfaces/IMarketDataApi.cs`
-
-### 2.2 IExchangeInfoApi
-
 - `GetExchangeInfoCallAsync` -> `Call<GetExchangeInfoRequest, ExchangeInfo>`
 - `GetCurrencysCallAsync` -> `Call<GetCurrencysRequest, IReadOnlyList<string>>`
 - `GetTimestampCallAsync` -> `Call<GetTimestampRequest, DateTimeOffset>`
 
-Source: `src/Contracts/Facade/Interfaces/IExchangeInfoApi.cs`
+Source: `src/Contracts/Facade/Interfaces/IPublicApi.cs`
 
 ## 3. Private (Signature Required)
 
-### 3.1 ITradingApi
+### 3.1 IPrivateApi
 
 - `PlaceLimitOrderCallAsync` -> `Call<PlaceLimitOrderRequest, OrderResult>`
 - `PlaceMarketOrderCallAsync` -> `Call<PlaceMarketOrderRequest, OrderResult>`
 - `CancelOrderCallAsync` -> `Call<CancelOrderRequest, CancelResult>`
 - `GetOrderCallAsync` -> `Call<GetOrderRequest, OrderStatus>`
 - `GetOpenOrdersCallAsync` -> `Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>`
-
-Source: `src/Contracts/Facade/Interfaces/ITradingApi.cs`
-
-### 3.2 IAccountApi
-
 - `GetBalancesCallAsync` -> `Call<GetBalancesRequest, IReadOnlyList<Balance>>`
-
-Source: `src/Contracts/Facade/Interfaces/IAccountApi.cs`
-
-### 3.3 ISpotHistoryApi
-
 - `GetOrdersCallAsync` -> `Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>`
 - `GetExecutionsCallAsync` -> `Call<MarketLimitCursorRequest, Page<ExecutionItem>>`
 
-Source: `src/Contracts/Facade/Interfaces/ISpotHistoryApi.cs`
+Source: `src/Contracts/Facade/Interfaces/IPrivateApi.cs`
 
 ## 4. Notes
 

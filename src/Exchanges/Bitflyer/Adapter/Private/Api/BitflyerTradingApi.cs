@@ -28,7 +28,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 /// <summary>
 /// bitFlyer の Trading API 実装（REST）。
 /// </summary>
-internal sealed class BitflyerTradingApi : ITradingApi
+internal sealed class BitflyerTradingApi
 {
     private readonly IBitflyerNormalizedApi _normalized;
 

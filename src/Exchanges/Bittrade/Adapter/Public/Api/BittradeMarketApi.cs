@@ -28,7 +28,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// <summary>
 /// Bittrade の Public REST 実装（Ticker/OrderBook/Executions）。
 /// </summary>
-internal sealed class MarketApi : IMarketDataApi
+internal sealed class MarketApi
 {
     private readonly BittradeNormalizedPublicApi _marketData;
     private readonly IExchangeMarketResolver _markets;

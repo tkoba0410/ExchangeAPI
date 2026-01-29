@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -12,14 +12,14 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ContractsRequests = ExchangeApi.Contracts.Facade.Requests;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
+using ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Helpers;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
@@ -28,7 +28,7 @@ public sealed class BittradeErrorEnrichTests
     [Fact]
     public async Task GetDetailMergedCallAsync_EnrichesExchangeAndOperation()
     {
-        var api = new MarketApi(new ThrowingMarketDataApi(), CreateResolver());
+        var api = new MarketApi(new BittradeNormalizedPublicApi(new ThrowingRawApi()), CreateResolver());
 
         var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
 
@@ -37,38 +37,36 @@ public sealed class BittradeErrorEnrichTests
         Assert.Equal("boom", err.Error.Message);
     }
 
-    private sealed class ThrowingMarketDataApi : IBittradeNormalizedMarketDataApi
+    private sealed class ThrowingRawApi : BittradeRawApiStub
     {
-        public Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
-            string productCode,
-            CancellationToken ct = default) =>
+        public override Task<Call<RawPublicRequests.GetMergedTickerRequest, RawPublicDtos.RawMergedResponse>> GetDetailMergedCallAsync(
+            RawPublicRequests.GetMergedTickerRequest request,
+            CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
-            string productCode,
-            BittradeDepthType? depthType = null,
-            CancellationToken ct = default) =>
+        public override Task<Call<RawPublicRequests.GetDepthRequest, RawPublicDtos.RawDepthResponse>> GetDepthCallAsync(
+            RawPublicRequests.GetDepthRequest request,
+            CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
-            string productCode,
-            CancellationToken ct = default) =>
+        public override Task<Call<RawPublicRequests.GetTradesRequest, RawPublicDtos.RawTradeResponse>> GetTradeCallAsync(
+            RawPublicRequests.GetTradesRequest request,
+            CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<Call<NormalizedRequests.GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>> GetHistoryKlineCallAsync(
-            string productCode,
-            string period,
-            int? size = null,
-            CancellationToken ct = default) =>
+        public override Task<Call<RawPublicRequests.GetKlinesRequest, RawPublicDtos.RawKlinesResponse>> GetHistoryKlineCallAsync(
+            RawPublicRequests.GetKlinesRequest request,
+            CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<Call<NormalizedRequests.GetTickersRequest, IReadOnlyList<BittradeTickerEntryNormalized>>> GetTickersCallAsync(
-            CancellationToken ct = default) =>
+        public override Task<Call<RawPublicRequests.GetTickersRequest, RawPublicDtos.RawTickersResponse>> GetTickersCallAsync(
+            RawPublicRequests.GetTickersRequest request,
+            CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<Call<NormalizedRequests.GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetHistoryTradeCallAsync(
-            string productCode,
-            CancellationToken ct = default) =>
+        public override Task<Call<RawPublicRequests.GetTradeHistoryRequest, RawPublicDtos.RawTradeHistoryResponse>> GetHistoryTradeCallAsync(
+            RawPublicRequests.GetTradeHistoryRequest request,
+            CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
     }
 

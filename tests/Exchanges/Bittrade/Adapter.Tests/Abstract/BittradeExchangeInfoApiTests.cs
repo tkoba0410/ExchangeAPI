@@ -1,17 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos.Common;
 using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Helpers;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
@@ -21,7 +17,7 @@ public class BittradeExchangeInfoApiTests
     [Fact]
     public async Task GetExchangeInfoAsync_MapsSymbols()
     {
-        var api = new BittradeExchangeInfoApi(new StubNormalizedExchangeInfoApi());
+        var api = new BittradeExchangeInfoApi(new BittradeNormalizedPublicApi(new StubRawApi()));
 
         var call = await api.GetExchangeInfoCallAsync();
         var ok = Assert.IsType<CallResult<ExchangeInfo>.Ok>(call.Result);
@@ -38,62 +34,64 @@ public class BittradeExchangeInfoApiTests
         Assert.True(m.IsSupported);
     }
 
-    private sealed class StubNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
+    private sealed class StubRawApi : BittradeRawApiStub
     {
-        public Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
+        public override Task<Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.RawSymbolsResponse>> GetSymbolsCallAsync(
+            RawPublicRequests.GetSymbolsRequest request,
             System.Threading.CancellationToken ct = default)
         {
-            IReadOnlyList<BittradeSymbolNormalized> symbols = new[]
+            IReadOnlyList<RawPublicDtos.RawSymbolInfo> symbols = new[]
             {
-                new BittradeSymbolNormalized(
+                new RawPublicDtos.RawSymbolInfo(
                     Symbol: "btcjpy",
                     BaseCurrency: "btc",
                     QuoteCurrency: "jpy",
                     PricePrecision: 2,
                     AmountPrecision: 4,
-                    MinOrderAmount: 0.0001m,
-                    MinOrderValue: 1000m,
+                    ValuePrecision: null,
+                    MinOrderAmount: "0.0001",
+                    MinOrderValue: "1000",
                     State: "online")
             };
-            var request = new GetSymbolsRequest();
-            var meta = CallMeta.CreateInternal("Normalized", "StubNormalizedExchangeInfoApi");
-            var call = new Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>(
+            var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
+            var call = new Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.RawSymbolsResponse>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<IReadOnlyList<BittradeSymbolNormalized>>.Ok(symbols),
+                Result: new CallResult<RawPublicDtos.RawSymbolsResponse>.Ok(new RawPublicDtos.RawSymbolsResponse("ok", symbols)),
                 Meta: meta);
             return Task.FromResult(call);
         }
 
-        public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+        public override Task<Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.RawCurrenciesResponse>> GetCurrencysCallAsync(
+            RawPublicRequests.GetCurrenciesRequest request,
             System.Threading.CancellationToken ct = default)
         {
             IReadOnlyList<string> data = new[] { "btc", "jpy" };
-            var request = new GetCurrencysRequest();
-            var meta = CallMeta.CreateInternal("Normalized", "StubNormalizedExchangeInfoApi");
-            var call = new Call<GetCurrencysRequest, IReadOnlyList<string>>(
+            var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
+            var call = new Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.RawCurrenciesResponse>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<IReadOnlyList<string>>.Ok(data),
+                Result: new CallResult<RawPublicDtos.RawCurrenciesResponse>.Ok(new RawPublicDtos.RawCurrenciesResponse("ok", data)),
                 Meta: meta);
             return Task.FromResult(call);
         }
 
-        public Task<Call<GetTimestampRequest, System.DateTimeOffset>> GetTimestampCallAsync(
+        public override Task<Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.RawTimestampResponse>> GetTimestampCallAsync(
+            RawPublicRequests.GetTimestampRequest request,
             System.Threading.CancellationToken ct = default)
         {
-            var request = new GetTimestampRequest();
-            var meta = CallMeta.CreateInternal("Normalized", "StubNormalizedExchangeInfoApi");
-            var call = new Call<GetTimestampRequest, System.DateTimeOffset>(
+            var data = System.DateTimeOffset.UtcNow;
+            var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
+            var call = new Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.RawTimestampResponse>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<System.DateTimeOffset>.Ok(System.DateTimeOffset.UtcNow),
+                Result: new CallResult<RawPublicDtos.RawTimestampResponse>.Ok(new RawPublicDtos.RawTimestampResponse("ok", data)),
                 Meta: meta);
             return Task.FromResult(call);
         }

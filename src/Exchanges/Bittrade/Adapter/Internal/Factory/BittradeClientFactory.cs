@@ -39,7 +39,7 @@ public static class BittradeClientFactory
         return new BittradeExchangeInfoApi(normalizedExchangeInfo);
     }
 
-    public static (MarketApi Market, BittradeTradingApi Trading, BittradeAccountApi Account, BittradeExchangeInfoApi ExchangeInfo) CreatePrivate(
+    internal static (MarketApi Market, BittradeTradingApi Trading, BittradeAccountApi Account, BittradeExchangeInfoApi ExchangeInfo) CreatePrivate(
         string accessKey,
         string secretKey,
         string accountId)

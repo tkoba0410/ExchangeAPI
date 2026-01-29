@@ -162,16 +162,16 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawApi
         _privateApi?.GetWithdrawalsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<string, RawPrivateDtos.RawSendChildOrderResponse>> SendChildOrderCallAsync(
-        string bodyJson,
+    public Task<Call<RawPrivateRequests.CreateChildOrderRequest, RawPrivateDtos.RawSendChildOrderResponse>> SendChildOrderCallAsync(
+        RawPrivateRequests.CreateChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _tradingApi?.SendChildOrderCallAsync(bodyJson, cancellationToken)
+        _tradingApi?.SendChildOrderCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
-    public Task<Call<string, RawPrivateDtos.RawSendParentOrderResponse>> SendParentOrderCallAsync(
-        string bodyJson,
+    public Task<Call<RawPrivateRequests.CreateParentOrderRequest, RawPrivateDtos.RawSendParentOrderResponse>> SendParentOrderCallAsync(
+        RawPrivateRequests.CreateParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _tradingApi?.SendParentOrderCallAsync(bodyJson, cancellationToken)
+        _tradingApi?.SendParentOrderCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
     public Task<Call<RawPrivateRequests.CancelChildOrderRequest, RawPrivateDtos.RawCancelChildOrderResponse>> CancelChildOrderCallAsync(

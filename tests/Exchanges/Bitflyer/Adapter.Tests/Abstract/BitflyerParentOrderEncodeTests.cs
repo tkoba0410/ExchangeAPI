@@ -1,4 +1,4 @@
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -19,7 +19,7 @@ public sealed class BitflyerParentOrderEncodeTests
             TimeInForce = "GTC",
         };
 
-        var bodyJson = BitflyerOrderEncoder.BuildChildOrderBodyJson(request);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.SendChildOrder");
 
         Assert.Contains("\"product_code\"", bodyJson);
         Assert.Contains("\"child_order_type\"", bodyJson);
@@ -47,7 +47,7 @@ public sealed class BitflyerParentOrderEncodeTests
             }
         };
 
-        var bodyJson = BitflyerOrderEncoder.BuildParentOrderBodyJson(request);
+        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.SendParentOrder");
 
         Assert.Contains("\"order_method\"", bodyJson);
         Assert.Contains("\"parameters\"", bodyJson);

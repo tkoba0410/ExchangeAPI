@@ -5,6 +5,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Contracts.Facade.Interfaces;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 

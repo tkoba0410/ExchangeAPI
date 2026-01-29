@@ -52,7 +52,7 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         ApiBundle = new BitflyerApiBundle(normalized);
     }
 
-    public BitflyerExchangeClient(
+    internal BitflyerExchangeClient(
         MarketApi marketApi,
         BitflyerTradingApi tradingApi,
         BitflyerAccountApi accountApi,

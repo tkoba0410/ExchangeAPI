@@ -48,7 +48,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.Board { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);
             var client = CreateClient(raw);
 
-            var call = await client.History!.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY")));
+            var call = await client.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY")));
             var ok = Assert.IsType<CallResult<Page<OrderSnapshotItem>>.Ok>(call.Result);
             var result = ok.Response.Items;
 
@@ -98,7 +98,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.Board { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);
             var client = CreateClient(raw);
 
-            var call = await client.History!.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
+            var call = await client.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
             var ok = Assert.IsType<CallResult<Page<OrderSnapshotItem>>.Ok>(call.Result);
 
             Assert.Single(ok.Response.Items);
@@ -140,7 +140,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.Board { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);
             var client = CreateClient(raw);
 
-            var call = await client.History!.GetExecutionsCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
+            var call = await client.GetExecutionsCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
             var ok = Assert.IsType<CallResult<Page<ExecutionItem>>.Ok>(call.Result);
 
             Assert.Single(ok.Response.Items);

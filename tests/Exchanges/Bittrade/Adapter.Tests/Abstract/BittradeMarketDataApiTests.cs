@@ -123,7 +123,7 @@ public class BittradeMarketApiTests
         var markets = CreateResolver(new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot"));
         var raw = new ExchangeApi.Exchanges.Bittrade.Raw.Api.BittradeRawApi(
             new ExchangeApi.Transport.Wire.WireTransport(restClient));
-        var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api.BittradeNormalizedMarketDataApi(raw);
+        var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api.BittradeNormalizedPublicApi(raw);
         return new MarketApi(normalizedMarketData, markets);
     }
 

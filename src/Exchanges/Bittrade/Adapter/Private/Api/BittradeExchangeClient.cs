@@ -8,6 +8,8 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Contracts.Common.Dtos.Account;
+using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
@@ -34,7 +36,7 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
     public IPublicApi? Public => this;
     public IPrivateApi? Private => this;
 
-    public BittradeExchangeClient(
+    internal BittradeExchangeClient(
         MarketApi marketApi,
         BittradeTradingApi tradingApi,
         BittradeAccountApi accountApi,
@@ -65,7 +67,7 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         ApiBundle = bundle;
     }
 
-    public BittradeExchangeClient(
+    internal BittradeExchangeClient(
         MarketApi marketApi,
         BittradeTradingApi tradingApi,
         BittradeAccountApi accountApi,
@@ -77,7 +79,7 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    public BittradeExchangeClient(
+    internal BittradeExchangeClient(
         MarketApi marketApi,
         BittradeTradingApi tradingApi,
         BittradeAccountApi accountApi,

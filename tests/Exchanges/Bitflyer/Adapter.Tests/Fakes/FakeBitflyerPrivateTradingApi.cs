@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.CallCommon;
@@ -32,21 +33,21 @@ public sealed class FakeBitflyerPrivateTradingApi
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task<Call<string, RawPrivateDtos.RawSendChildOrderResponse>> SendChildOrderCallAsync(
-        string bodyJson,
+    public Task<Call<RawPrivateRequests.CreateChildOrderRequest, RawPrivateDtos.RawSendChildOrderResponse>> SendChildOrderCallAsync(
+        RawPrivateRequests.CreateChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        LastBodyJson = bodyJson;
-        return Task.FromResult(MakeCall(bodyJson, _response));
+        LastBodyJson = JsonSerializer.Serialize(request);
+        return Task.FromResult(MakeCall(request, _response));
     }
 
-    public Task<Call<string, RawPrivateDtos.RawSendParentOrderResponse>> SendParentOrderCallAsync(
-        string bodyJson,
+    public Task<Call<RawPrivateRequests.CreateParentOrderRequest, RawPrivateDtos.RawSendParentOrderResponse>> SendParentOrderCallAsync(
+        RawPrivateRequests.CreateParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        LastParentOrderBodyJson = bodyJson;
+        LastParentOrderBodyJson = JsonSerializer.Serialize(request);
         return Task.FromResult(MakeCall(
-            bodyJson,
+            request,
             new RawPrivateDtos.RawSendParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
     }
 

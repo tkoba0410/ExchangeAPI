@@ -9,6 +9,7 @@ internal sealed class BitflyerStaticExchangeInfo
     public BitflyerStaticFeatureFlags? Features { get; init; }
     public BitflyerStaticRateLimits? RateLimits { get; init; }
     public BitflyerStaticMaintenance? Maintenance { get; init; }
+    public BitflyerStaticFeeSchedule? FeeSchedule { get; init; }
 }
 
 internal sealed class BitflyerStaticMarketInfo
@@ -59,4 +60,19 @@ internal enum BitflyerStaticMaintenanceStatus
     Normal,
     Planned,
     Unplanned,
+}
+
+internal sealed class BitflyerStaticFeeSchedule
+{
+    public string Scope { get; init; } = string.Empty;
+    public string Unit { get; init; } = string.Empty;
+    public string? Notes { get; init; }
+    public IReadOnlyList<BitflyerStaticFeeTier> Tiers { get; init; } = Array.Empty<BitflyerStaticFeeTier>();
+}
+
+internal sealed class BitflyerStaticFeeTier
+{
+    public decimal MinJpy { get; init; }
+    public decimal? MaxJpy { get; init; }
+    public decimal Rate { get; init; }
 }

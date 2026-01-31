@@ -54,7 +54,7 @@ public sealed class BitflyerPublicClientTests
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
         var client = new BitflyerPublicClient(normalized, exchangeInfo);
 
-        var call = await client.GetTickerCallAsync(new Symbol("ETH/JPY"));
+        var call = await client.GetTickerCallAsync(new Symbol("DOGE/JPY"));
         var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Market.Ticker>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }

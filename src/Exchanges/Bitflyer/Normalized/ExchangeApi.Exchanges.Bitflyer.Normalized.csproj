@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\..\Contracts\Facade\ExchangeApi.Contracts.Facade.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Static/bitflyer-exchange-info.json" />
+  </ItemGroup>
+
 </Project>

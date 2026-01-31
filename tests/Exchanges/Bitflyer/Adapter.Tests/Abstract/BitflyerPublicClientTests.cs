@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
@@ -49,8 +48,7 @@ public sealed class BitflyerPublicClientTests
     {
         var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
-        var publicNormalized = new BitflyerNormalizedPublicApi(publicApi);
-        var exchangeInfo = new BitflyerExchangeInfoApi(publicNormalized);
+        var exchangeInfo = new BitflyerExchangeInfoApi();
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
         var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);

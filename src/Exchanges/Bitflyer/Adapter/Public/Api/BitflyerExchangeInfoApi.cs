@@ -5,14 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Static;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
-using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerMarketNormalized>>;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 /// <summary>
@@ -20,19 +18,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 /// </summary>
 public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 {
-    private readonly Func<CancellationToken, Task<MarketsCall>> _getMarkets;
-
-    internal BitflyerExchangeInfoApi(BitflyerNormalizedPublicApi normalized)
-    {
-        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _getMarkets = normalized.GetMarketsCallAsync;
-    }
-
-    internal BitflyerExchangeInfoApi(IBitflyerNormalizedApi normalized)
-    {
-        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _getMarkets = normalized.GetMarketsCallAsync;
-    }
+    public BitflyerExchangeInfoApi() { }
 
     public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default)
@@ -42,12 +28,20 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 
         try
         {
-            var call = await _getMarkets(cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
-                request,
-                call,
-                BitflyerOperations.ExchangeInfo.GetExchangeInfo,
-                MapExchangeInfo);
+            var info = MapExchangeInfo(BitflyerStaticExchangeInfoLoader.Load());
+            var meta = new CallMeta(
+                Layer: "Contracts",
+                Component: BitflyerOperations.ExchangeInfo.GetExchangeInfo,
+                EndpointId: CallMeta.InternalEndpointId,
+                Tags: null,
+                Children: null);
+            return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+                Id: CallId.New(),
+                StartedAt: startedAt,
+                Duration: DateTimeOffset.UtcNow - startedAt,
+                Request: request,
+                Result: new CallResult<ExchangeInfoDto>.Ok(info),
+                Meta: meta);
         }
         catch (Exception ex)
         {
@@ -81,33 +75,78 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             "Timestamp"));
     }
 
-    private static ExchangeInfoDto MapExchangeInfo(IReadOnlyList<BitflyerMarketNormalized> markets)
+    private static ExchangeInfoDto MapExchangeInfo(BitflyerStaticExchangeInfo info)
     {
-        var mapped = markets.Select(MapMarket).ToList();
-        return new ExchangeInfoDto(mapped, Features: null, RateLimits: null, Maintenance: null);
+        var mapped = info.Markets.Select(MapMarket).ToList();
+        return new ExchangeInfoDto(
+            Markets: mapped,
+            Features: MapFeatures(info.Features),
+            RateLimits: MapRateLimits(info.RateLimits),
+            Maintenance: MapMaintenance(info.Maintenance));
     }
 
-    private static ExchangeMarketInfo MapMarket(BitflyerMarketNormalized market) =>
+    private static ExchangeMarketInfo MapMarket(BitflyerStaticMarketInfo market) =>
         new(
-            Symbol: NormalizeSymbol(market),
+            Symbol: market.Symbol,
             ProductCode: market.ProductCode,
-            Type: "Spot",
-            IsSupported: true);
+            Type: market.Type,
+            MinSize: ToSize(market.MinSize),
+            MaxSize: ToSize(market.MaxSize),
+            MinNotional: market.MinNotional,
+            PriceIncrement: ToPrice(market.PriceIncrement),
+            SizeIncrement: ToSize(market.SizeIncrement),
+            MakerFeeRate: market.MakerFeeRate,
+            TakerFeeRate: market.TakerFeeRate,
+            FeeCurrency: market.FeeCurrency,
+            FeeType: MapFeeType(market.FeeType),
+            IsSupported: market.IsSupported,
+            StatusNote: market.StatusNote);
 
-    private static string NormalizeSymbol(BitflyerMarketNormalized market)
-    {
-        var symbol = market.ProductCode;
-        if (symbol.Contains('_', StringComparison.Ordinal))
+    private static ExchangeFeatureFlags? MapFeatures(BitflyerStaticFeatureFlags? features) =>
+        features is null
+            ? null
+            : new ExchangeFeatureFlags(
+                SupportsWebSocket: features.SupportsWebSocket,
+                SupportsMargin: features.SupportsMargin,
+                SupportsStopOrder: features.SupportsStopOrder,
+                SupportsParentOrder: features.SupportsParentOrder,
+                SupportsCandlestick: features.SupportsCandlestick,
+                SupportsOrderBookDelta: features.SupportsOrderBookDelta,
+                SupportsRealtimeExecutions: features.SupportsRealtimeExecutions,
+                SupportsWithdraw: features.SupportsWithdraw);
+
+    private static ExchangeRateLimits? MapRateLimits(BitflyerStaticRateLimits? limits) =>
+        limits is null ? null : new ExchangeRateLimits(limits.RequestsPerMinute, limits.OrdersPerMinute);
+
+    private static ExchangeMaintenance? MapMaintenance(BitflyerStaticMaintenance? maintenance) =>
+        maintenance is null
+            ? null
+            : new ExchangeMaintenance(
+                Status: MapMaintenanceStatus(maintenance.Status),
+                PlannedUntil: maintenance.PlannedUntil,
+                Message: maintenance.Message);
+
+    private static ExchangeMaintenanceStatus? MapMaintenanceStatus(BitflyerStaticMaintenanceStatus? status) =>
+        status switch
         {
-            return symbol.Replace('_', '/');
-        }
+            null => null,
+            BitflyerStaticMaintenanceStatus.Normal => ExchangeMaintenanceStatus.Normal,
+            BitflyerStaticMaintenanceStatus.Planned => ExchangeMaintenanceStatus.Planned,
+            BitflyerStaticMaintenanceStatus.Unplanned => ExchangeMaintenanceStatus.Unplanned,
+            _ => null
+        };
 
-        if (!string.IsNullOrWhiteSpace(market.Alias) &&
-            market.Alias.Contains('_', StringComparison.Ordinal))
+    private static FeeType? MapFeeType(string? feeType) =>
+        feeType?.ToUpperInvariant() switch
         {
-            return market.Alias.Replace('_', '/');
-        }
+            "PERCENTAGE" => FeeType.Percentage,
+            "FLAT" => FeeType.Flat,
+            _ => null
+        };
 
-        return symbol;
-    }
+    private static Size? ToSize(decimal? value) =>
+        value is null ? null : new Size(value.Value);
+
+    private static Price? ToPrice(decimal? value) =>
+        value is null ? null : new Price(value.Value);
 }

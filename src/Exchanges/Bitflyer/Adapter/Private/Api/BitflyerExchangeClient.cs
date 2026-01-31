@@ -42,7 +42,7 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         object? rawBundle = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        var exchangeInfo = new BitflyerExchangeInfoApi(normalized);
+        var exchangeInfo = new BitflyerExchangeInfoApi();
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         _marketApi = new MarketApi(normalized, markets);
         _tradingApi = new BitflyerTradingApi(normalized);

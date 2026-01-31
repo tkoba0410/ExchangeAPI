@@ -1,0 +1,14 @@
+{
+  "markets": [
+    {
+      "symbol": "BTC/JPY",
+      "productCode": "BTC_JPY",
+      "type": "Spot",
+      "minSize": 0.001,
+      "priceIncrement": 1,
+      "sizeIncrement": 0.001,
+      "feeCurrency": "BTC",
+      "isSupported": true
+    }
+  ]
+}

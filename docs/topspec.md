@@ -273,6 +273,35 @@ src/Exchanges/<Exchange>/Adapter/
 
 ---
 
+#### 3.4.3 Adapter ExchangeInfo サブモジュール（MUST）
+
+ExchangeInfo は「取引所仕様メタ情報」であり、署名分類とも機能分類とも独立している。
+Normalized と同様に、Adapter 層でも **ExchangeInfo 専用サブモジュール**を例外として許可する。
+
+* ExchangeInfo は **Adapter 内で Contracts DTO へ変換**する（他 API と同様に Adapter から公開）。
+* ExchangeInfo の Public/Private 分類は不要とする。
+* 例外サブモジュールの物理配置は次を基準形（Canon）とする。
+
+```
+src/Exchanges/<Exchange>/Adapter/ExchangeInfo/
+  Public/
+    Api/
+    Dtos/
+  Private/
+    Api/
+    Dtos/
+  Internal/
+```
+
+* namespace は物理配置に一致させる（例）:
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.ExchangeInfo.Public.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.ExchangeInfo.Private.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.ExchangeInfo.Internal.*`
+
+* ExchangeInfo の Public/Private は「署名の有無」を表す（他 Adapter と同じ規則を維持）。
+
+---
+
 ### 3.5 Contract 層（取引所横断契約）
 
 **責務**

@@ -10,6 +10,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Static;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Compose;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Dynamic;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;

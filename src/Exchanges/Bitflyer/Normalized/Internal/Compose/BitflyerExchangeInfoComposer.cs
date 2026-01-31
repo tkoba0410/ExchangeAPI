@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Dynamic;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Static;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Static;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Compose;
 
 internal static class BitflyerExchangeInfoComposer
 {

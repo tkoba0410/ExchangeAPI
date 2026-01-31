@@ -193,6 +193,36 @@ src/Exchanges/<Exchange>/Normalized/
 
 ---
 
+#### 3.3.2 ExchangeInfo サブモジュール（MUST）
+
+ExchangeInfo は「取引所仕様メタ情報」であり、エンドポイント機能分類ではない。
+Public/Private の署名分類とも無関係であるため、例外として **専用サブモジュール**を許可する。
+
+* ExchangeInfo は **Normalized 内に閉じる**（Contracts では定義しない）。
+* Adapter 層のみが Contracts DTO へ変換する。
+* ExchangeInfo は **Static + Dynamic の合成**で構成する。
+  * Static: 仕様・固定値・手動更新が必要な情報（市場一覧、手数料テーブル等）
+  * Dynamic: API から取得可能な状態・制約（稼働状態、手数料率、最小数量等）
+  * Compose: Static をベースに Dynamic で上書き・拡張する
+* 例外サブモジュールの物理配置は次を基準形（Canon）とする。
+
+```
+src/Exchanges/<Exchange>/Normalized/ExchangeInfo/
+  Static/
+  Dynamic/
+  Compose/
+  Internal/
+```
+
+* namespace は物理配置に一致させる（例）:
+  * `ExchangeApi.Exchanges.<Exchange>.Normalized.ExchangeInfo.Static.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Normalized.ExchangeInfo.Dynamic.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Normalized.ExchangeInfo.Compose.*`
+
+* 詳細な合成規則・マッピングは `_references/exchangeinfo.md` に記載する（非正本）。
+
+---
+
 ### 3.4 Adapter 層（Contracts への適合）
 
 **責務**

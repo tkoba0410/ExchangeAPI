@@ -4,8 +4,6 @@ using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Normalized;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
@@ -28,11 +26,8 @@ public static class BitflyerFactory
         var restClient = CreateRestClient(settings, signer);
         if (signer is null)
         {
-            var exchangeInfo = new BitflyerExchangeInfoApi();
-            var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
-            var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
-            var normalized = BitflyerNormalizedApi.FromRestClient(restClient, markets);
-            return new BitflyerPublicClient(normalized);
+            var bundle = BitflyerApiBundle.FromRestClient(restClient);
+            return new BitflyerPublicClient(bundle);
         }
 
         return BitflyerExchangeClient.FromRestClient(restClient);

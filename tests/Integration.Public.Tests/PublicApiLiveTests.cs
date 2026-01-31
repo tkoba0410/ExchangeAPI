@@ -43,10 +43,10 @@ public class PublicApiLiveTests
     public async Task Bitflyer_PublicExchangeInfo_Works()
     {
         var options = new BitflyerClientOptions { Observer = _observer };
-        var infoApi = new ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api.BitflyerExchangeInfoApi();
+        var client = BitflyerClientFactory.CreatePublic(options);
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var call = await infoApi.GetExchangeInfoCallAsync(cts.Token);
+        var call = await client.GetExchangeInfoCallAsync(cts.Token);
         var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
         var msg = $"bitFlyer ExchangeInfo markets={info.Markets.Count}";

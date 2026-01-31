@@ -1,17 +1,13 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
-using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Markets;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Primitives.CallCommon;
@@ -52,6 +48,16 @@ internal static class BitflyerTestHelpers
             null,
             null)));
         return new BitflyerNormalizedMarketResolver(resolver);
+    }
+
+    public static BitflyerApiBundle CreateBundle(IBitflyerRawApi raw)
+    {
+        var publicApi = new BitflyerNormalizedPublicApi(raw);
+        var exchangeInfo = new BitflyerExchangeInfoApi(publicApi);
+        var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
+        var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
+        var normalized = BitflyerNormalizedApi.FromRaw(raw, markets);
+        return new BitflyerApiBundle(normalized, publicApi, exchangeInfo, contractMarkets);
     }
 
     private sealed class StubExchangeInfoApi : IExchangeInfoProvider

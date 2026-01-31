@@ -6,12 +6,10 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 /// <summary>
@@ -21,16 +19,17 @@ public sealed class BitflyerPublicClient : IPublicApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
     private readonly BitflyerExchangeInfoApi _exchangeInfoApi;
+    internal BitflyerApiBundle? ApiBundle { get; }
 
     public IPublicApi? Public => this;
     public IPrivateApi? Private => null;
 
-    internal BitflyerPublicClient(IBitflyerNormalizedApi normalized)
+    internal BitflyerPublicClient(BitflyerApiBundle bundle)
     {
-        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _exchangeInfoApi = new BitflyerExchangeInfoApi();
-        var markets = new ExchangeInfoMarketResolver(_exchangeInfoApi);
-        _marketApi = new MarketApi(normalized, markets);
+        if (bundle is null) throw new ArgumentNullException(nameof(bundle));
+        _exchangeInfoApi = bundle.ExchangeInfo;
+        _marketApi = new MarketApi(bundle.Normalized, bundle.Markets);
+        ApiBundle = bundle;
     }
 
     public Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(

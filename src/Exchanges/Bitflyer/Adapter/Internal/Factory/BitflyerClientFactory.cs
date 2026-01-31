@@ -7,8 +7,6 @@ using ExchangeApi.Transport.Time;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Normalized;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
@@ -48,11 +46,8 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var exchangeInfo = new BitflyerExchangeInfoApi();
-        var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
-        var normalized = BitflyerNormalizeFactory.FromRestClient(restClient, markets);
-        return new BitflyerPublicClient(normalized);
+        var bundle = BitflyerApiBundle.FromRestClient(restClient);
+        return new BitflyerPublicClient(bundle);
     }
 
     /// <summary>

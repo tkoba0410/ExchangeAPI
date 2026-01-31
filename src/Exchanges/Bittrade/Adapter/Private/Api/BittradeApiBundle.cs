@@ -2,6 +2,8 @@ using System;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.ExchangeInfo.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.ExchangeInfo.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;

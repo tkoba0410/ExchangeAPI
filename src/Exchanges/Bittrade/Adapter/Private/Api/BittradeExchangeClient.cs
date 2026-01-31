@@ -9,10 +9,12 @@ using ExchangeApi.Contracts.Common.Dtos;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
+using ExchangeApi.Exchanges.Bittrade.Adapter.ExchangeInfo.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.ExchangeInfo.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Transport.Protocol;
@@ -124,7 +126,7 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
 
     // ExchangeInfo
-    public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+    public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 

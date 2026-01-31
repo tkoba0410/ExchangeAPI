@@ -2,12 +2,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bittrade.Adapter.ExchangeInfo.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Common.Errors;
@@ -71,7 +73,7 @@ public sealed class BittradeErrorEnrichTests
     }
 
     private static IExchangeMarketResolver CreateResolver() =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
+        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
             new[] { new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot") },
             null,
             null,
@@ -79,18 +81,18 @@ public sealed class BittradeErrorEnrichTests
 
     private sealed class StubExchangeInfoApi : IExchangeInfoProvider
     {
-        private readonly ExchangeInfo _info;
+        private readonly ExchangeInfoDto _info;
 
-        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
+        public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
-        public Task<Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        public Task<Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default) =>
-            Task.FromResult(new Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfo>(
+            Task.FromResult(new Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfoDto>(
                 CallId.New(),
                 DateTimeOffset.UtcNow,
                 TimeSpan.Zero,
                 new ContractsRequests.GetExchangeInfoRequest(),
-                new CallResult<ExchangeInfo>.Ok(_info),
+                new CallResult<ExchangeInfoDto>.Ok(_info),
                 CallMeta.CreateInternal("Contracts", "StubExchangeInfo")));
 
     }

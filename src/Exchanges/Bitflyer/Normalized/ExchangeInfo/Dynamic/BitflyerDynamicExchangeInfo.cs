@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Dynamic;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.ExchangeInfo.Dynamic;
 
 internal sealed class BitflyerDynamicExchangeInfo
 {

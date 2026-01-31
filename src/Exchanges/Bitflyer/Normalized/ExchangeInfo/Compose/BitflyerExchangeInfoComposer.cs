@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Dynamic;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Static;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.ExchangeInfo.Dynamic;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.ExchangeInfo.Static;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Compose;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.ExchangeInfo.Compose;
 
 internal static class BitflyerExchangeInfoComposer
 {

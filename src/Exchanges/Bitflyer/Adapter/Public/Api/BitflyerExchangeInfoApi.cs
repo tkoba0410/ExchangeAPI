@@ -18,6 +18,8 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerMarketNormalized>>;
 using TradingCommissionCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.GetTradingCommissionRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.BitflyerTradingCommissionNormalized>;
+using HealthCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetHealthRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerHealthNormalized>;
+using BoardStateCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetBoardStateRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerBoardStateNormalized>;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 /// <summary>
@@ -27,6 +29,8 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 {
     private readonly Func<CancellationToken, Task<MarketsCall>>? _getMarkets;
     private readonly Func<Symbol, CancellationToken, Task<TradingCommissionCall>>? _getTradingCommission;
+    private readonly Func<string, CancellationToken, Task<HealthCall>>? _getHealth;
+    private readonly Func<string, CancellationToken, Task<BoardStateCall>>? _getBoardState;
 
     public BitflyerExchangeInfoApi() { }
 
@@ -34,6 +38,8 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         _getMarkets = normalized.GetMarketsCallAsync;
+        _getHealth = normalized.GetHealthCallAsync;
+        _getBoardState = normalized.GetBoardStateCallAsync;
     }
 
     internal BitflyerExchangeInfoApi(IBitflyerNormalizedApi normalized)
@@ -41,6 +47,8 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         _getMarkets = normalized.GetMarketsCallAsync;
         _getTradingCommission = normalized.GetTradingCommissionCallAsync;
+        _getHealth = normalized.GetHealthCallAsync;
+        _getBoardState = normalized.GetBoardStateCallAsync;
     }
 
     public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
@@ -194,9 +202,17 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             await EnrichTradingCommissionAsync(marketInfos, cancellationToken).ConfigureAwait(false);
         }
 
+        BitflyerDynamicMaintenance? maintenance = null;
+        if (marketInfos.Count > 0 && (_getHealth is not null || _getBoardState is not null))
+        {
+            var productCode = marketInfos[0].ProductCode;
+            maintenance = await GetMaintenanceAsync(productCode, cancellationToken).ConfigureAwait(false);
+        }
+
         return new BitflyerDynamicExchangeInfo
         {
-            Markets = marketInfos
+            Markets = marketInfos,
+            Maintenance = maintenance
         };
     }
 
@@ -250,5 +266,123 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             market.TakerFeeRate = ok.Response.CommissionRate;
             market.FeeType = "Percentage";
         }
+    }
+
+    private async Task<BitflyerDynamicMaintenance?> GetMaintenanceAsync(
+        string productCode,
+        CancellationToken cancellationToken)
+    {
+        BitflyerDynamicMaintenance? maintenanceFromHealth = null;
+        if (_getHealth is not null)
+        {
+            try
+            {
+                var call = await _getHealth(productCode, cancellationToken).ConfigureAwait(false);
+                if (call.Result is CallResult<BitflyerHealthNormalized>.Ok ok)
+                {
+                    maintenanceFromHealth = MapMaintenanceFromHealth(ok.Response.Status);
+                }
+            }
+            catch
+            {
+                // Ignore dynamic maintenance failures.
+            }
+        }
+
+        if (_getBoardState is not null)
+        {
+            try
+            {
+                var call = await _getBoardState(productCode, cancellationToken).ConfigureAwait(false);
+                if (call.Result is CallResult<BitflyerBoardStateNormalized>.Ok ok)
+                {
+                    var fromBoardState = MapMaintenanceFromBoardState(ok.Response);
+                    if (fromBoardState is not null)
+                    {
+                        return fromBoardState;
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore dynamic maintenance failures.
+            }
+        }
+
+        return maintenanceFromHealth;
+    }
+
+    private static BitflyerDynamicMaintenance? MapMaintenanceFromHealth(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status)) return null;
+        var normalized = status.Trim().ToUpperInvariant();
+        if (normalized is "NORMAL" || normalized.Contains("BUSY", StringComparison.Ordinal))
+        {
+            return new BitflyerDynamicMaintenance
+            {
+                Status = BitflyerDynamicMaintenanceStatus.Normal,
+                Message = $"Health:{status}"
+            };
+        }
+
+        if (normalized is "STOP" or "FAIL")
+        {
+            return new BitflyerDynamicMaintenance
+            {
+                Status = BitflyerDynamicMaintenanceStatus.Unplanned,
+                Message = $"Health:{status}"
+            };
+        }
+
+        return null;
+    }
+
+    private static BitflyerDynamicMaintenance? MapMaintenanceFromBoardState(BitflyerBoardStateNormalized state)
+    {
+        if (!string.IsNullOrWhiteSpace(state.Health))
+        {
+            var health = state.Health.Trim().ToUpperInvariant();
+            if (health is "NORMAL" || health.Contains("BUSY", StringComparison.Ordinal))
+            {
+                return new BitflyerDynamicMaintenance
+                {
+                    Status = BitflyerDynamicMaintenanceStatus.Normal,
+                    Message = $"BoardState.Health:{state.Health}"
+                };
+            }
+
+            if (health is "STOP" or "FAIL")
+            {
+                return new BitflyerDynamicMaintenance
+                {
+                    Status = BitflyerDynamicMaintenanceStatus.Unplanned,
+                    Message = $"BoardState.Health:{state.Health}"
+                };
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(state.State))
+        {
+            var boardState = state.State.Trim().ToUpperInvariant();
+            if (boardState is "RUNNING")
+            {
+                return new BitflyerDynamicMaintenance
+                {
+                    Status = BitflyerDynamicMaintenanceStatus.Normal,
+                    Message = $"BoardState.State:{state.State}"
+                };
+            }
+
+            if (boardState is "CLOSED" or "STOP")
+            {
+                return new BitflyerDynamicMaintenance
+                {
+                    Status = BitflyerDynamicMaintenanceStatus.Unplanned,
+                    Message = $"BoardState.State:{state.State}"
+                };
+            }
+        }
+
+        return null;
     }
 }

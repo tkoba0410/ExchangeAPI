@@ -1,16 +1,14 @@
 using System;
+using System.Net.Http;
 using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
-using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Composition.Bootstrap.Factories;
 
@@ -27,19 +25,31 @@ public static class BitflyerFactory
         var settings = options ?? new BitflyerFactoryOptions();
         // 署名（認証）が無い場合は PublicClient を返し、未対応 capability は null とする。
         var signer = settings.RequestSigner ?? CreateSigner(settings);
-        var restClient = CreateRestClient(settings, signer);
         if (signer is null)
         {
-            var wire = new WireTransport(restClient);
-            var raw = new BitflyerRawApi(wire);
-            var publicApi = new BitflyerNormalizedPublicApi(raw);
-            var exchangeInfo = new BitflyerExchangeInfoApi(publicApi);
-            var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
-            var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
-            var normalized = BitflyerNormalizedApi.FromRaw(raw, markets);
-            return new BitflyerPublicClient(normalized, exchangeInfo);
+            var httpClient = settings.HttpClient;
+            if (httpClient is null && settings.BaseUri is not null)
+            {
+                httpClient = new HttpClient { BaseAddress = settings.BaseUri };
+            }
+
+            var clientOptions = new BitflyerClientOptions
+            {
+                HttpClient = httpClient,
+                Policy = settings.Policy,
+                PolicyOptions = settings.PolicyOptions,
+                Logger = settings.Logger,
+                Observer = settings.Observer,
+                ErrorClassifier = settings.ErrorClassifier,
+            };
+
+            return BitflyerClientFactory.CreatePublic(
+                clientOptions,
+                httpClient: httpClient,
+                transportOverride: settings.Transport);
         }
 
+        var restClient = CreateRestClient(settings, signer);
         return BitflyerExchangeClient.FromRestClient(restClient);
     }
 

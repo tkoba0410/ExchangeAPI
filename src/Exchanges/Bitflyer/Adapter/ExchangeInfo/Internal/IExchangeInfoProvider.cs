@@ -1,13 +1,13 @@
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Internal;
 
 internal interface IExchangeInfoProvider
 {
-    Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+    Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default);
 }

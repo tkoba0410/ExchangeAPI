@@ -8,13 +8,15 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
@@ -117,7 +119,7 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
 
     // ExchangeInfo
-    public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+    public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 

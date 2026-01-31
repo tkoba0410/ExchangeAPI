@@ -1,10 +1,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Markets;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
@@ -42,7 +44,7 @@ internal static class BitflyerTestHelpers
 
     public static IBitflyerMarketResolver CreateResolver()
     {
-        var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
+        var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
             new[] { new ExchangeMarketInfo("BTC/JPY", "BTC_JPY", "Spot") },
             null,
             null,
@@ -62,20 +64,20 @@ internal static class BitflyerTestHelpers
 
     private sealed class StubExchangeInfoApi : IExchangeInfoProvider
     {
-        private readonly ExchangeInfo _info;
+        private readonly ExchangeInfoDto _info;
 
-        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
+        public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
-        public Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default)
         {
             var meta = CallMeta.CreateInternal("Contracts", "StubExchangeInfoApi");
-            var call = new Call<GetExchangeInfoRequest, ExchangeInfo>(
+            var call = new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
                 Request: new GetExchangeInfoRequest(),
-                Result: new CallResult<ExchangeInfo>.Ok(_info),
+                Result: new CallResult<ExchangeInfoDto>.Ok(_info),
                 Meta: meta);
             return Task.FromResult(call);
         }

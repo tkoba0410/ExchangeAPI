@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
@@ -21,7 +22,7 @@ using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges
 using TradingCommissionCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.GetTradingCommissionRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.BitflyerTradingCommissionNormalized>;
 using HealthCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetHealthRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerHealthNormalized>;
 using BoardStateCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetBoardStateRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerBoardStateNormalized>;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Public.Api;
 
 /// <summary>
 /// bitFlyer の ExchangeInfo 実装（/v1/getmarkets を使用）。

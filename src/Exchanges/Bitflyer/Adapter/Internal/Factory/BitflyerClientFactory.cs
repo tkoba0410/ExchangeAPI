@@ -7,6 +7,8 @@ using ExchangeApi.Transport.Time;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;

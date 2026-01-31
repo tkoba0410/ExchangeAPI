@@ -1,4 +1,5 @@
 using System;
+using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;

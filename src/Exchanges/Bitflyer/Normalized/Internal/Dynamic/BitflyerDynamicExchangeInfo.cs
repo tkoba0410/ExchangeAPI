@@ -16,17 +16,17 @@ internal sealed class BitflyerDynamicMarketInfo
     public string ProductCode { get; init; } = string.Empty;
     public string? Symbol { get; init; }
     public string? Type { get; init; }
-    public decimal? MinSize { get; init; }
-    public decimal? MaxSize { get; init; }
-    public decimal? MinNotional { get; init; }
-    public decimal? PriceIncrement { get; init; }
-    public decimal? SizeIncrement { get; init; }
-    public decimal? MakerFeeRate { get; init; }
-    public decimal? TakerFeeRate { get; init; }
-    public string? FeeCurrency { get; init; }
-    public string? FeeType { get; init; }
-    public bool? IsSupported { get; init; }
-    public string? StatusNote { get; init; }
+    public decimal? MinSize { get; set; }
+    public decimal? MaxSize { get; set; }
+    public decimal? MinNotional { get; set; }
+    public decimal? PriceIncrement { get; set; }
+    public decimal? SizeIncrement { get; set; }
+    public decimal? MakerFeeRate { get; set; }
+    public decimal? TakerFeeRate { get; set; }
+    public string? FeeCurrency { get; set; }
+    public string? FeeType { get; set; }
+    public bool? IsSupported { get; set; }
+    public string? StatusNote { get; set; }
 }
 
 internal sealed class BitflyerDynamicFeatureFlags

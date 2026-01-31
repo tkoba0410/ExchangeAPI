@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Static;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Dynamic;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
@@ -16,6 +17,7 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerMarketNormalized>>;
+using TradingCommissionCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.GetTradingCommissionRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.BitflyerTradingCommissionNormalized>;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 /// <summary>
@@ -24,6 +26,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 {
     private readonly Func<CancellationToken, Task<MarketsCall>>? _getMarkets;
+    private readonly Func<Symbol, CancellationToken, Task<TradingCommissionCall>>? _getTradingCommission;
 
     public BitflyerExchangeInfoApi() { }
 
@@ -37,6 +40,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         _getMarkets = normalized.GetMarketsCallAsync;
+        _getTradingCommission = normalized.GetTradingCommissionCallAsync;
     }
 
     public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
@@ -183,9 +187,16 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         }
 
         var markets = ((CallResult<IReadOnlyList<BitflyerMarketNormalized>>.Ok)marketsCall.Result).Response;
+        var marketInfos = markets.Select(MapDynamicMarket).ToList();
+
+        if (_getTradingCommission is not null)
+        {
+            await EnrichTradingCommissionAsync(marketInfos, cancellationToken).ConfigureAwait(false);
+        }
+
         return new BitflyerDynamicExchangeInfo
         {
-            Markets = markets.Select(MapDynamicMarket).ToList()
+            Markets = marketInfos
         };
     }
 
@@ -201,5 +212,43 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             Symbol = symbol,
             Type = market.Alias is null ? "Spot" : "Spot"
         };
+    }
+
+    private async Task EnrichTradingCommissionAsync(
+        List<BitflyerDynamicMarketInfo> markets,
+        CancellationToken cancellationToken)
+    {
+        foreach (var market in markets)
+        {
+            if (string.IsNullOrWhiteSpace(market.Symbol))
+            {
+                continue;
+            }
+
+            var symbol = new Symbol(market.Symbol);
+            TradingCommissionCall call;
+            try
+            {
+                call = await _getTradingCommission!(symbol, cancellationToken).ConfigureAwait(false);
+            }
+            catch
+            {
+                continue;
+            }
+
+            if (call.Result is CallResult<BitflyerTradingCommissionNormalized>.Err)
+            {
+                continue;
+            }
+
+            var ok = (CallResult<BitflyerTradingCommissionNormalized>.Ok)call.Result;
+            if (ok.Response.CommissionRate is null)
+            {
+                continue;
+            }
+
+            market.TakerFeeRate = ok.Response.CommissionRate;
+            market.FeeType = "Percentage";
+        }
     }
 }

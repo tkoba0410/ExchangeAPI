@@ -13,6 +13,7 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using PublicRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests;
+using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<PublicRequests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerMarketNormalized>>;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 /// <summary>
@@ -20,7 +21,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 /// </summary>
 public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 {
-    private readonly Func<CancellationToken, Task<Call<PublicRequests.GetMarketsRequest, IReadOnlyList<BitflyerMarketNormalized>>>>> _getMarkets;
+    private readonly Func<CancellationToken, Task<MarketsCall>> _getMarkets;
 
     internal BitflyerExchangeInfoApi(BitflyerNormalizedPublicApi normalized)
     {

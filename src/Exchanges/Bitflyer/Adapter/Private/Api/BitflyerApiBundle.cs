@@ -38,7 +38,7 @@ internal sealed class BitflyerApiBundle
         var wire = new WireTransport(restClient);
         var raw = new BitflyerRawApi(wire);
         var publicApi = new BitflyerNormalizedPublicApi(raw);
-        var exchangeInfo = new BitflyerExchangeInfoApi();
+        var exchangeInfo = new BitflyerExchangeInfoApi(publicApi);
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
         var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
         var normalized = BitflyerNormalizedApi.FromRaw(raw, markets);

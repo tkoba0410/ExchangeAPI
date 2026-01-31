@@ -5,12 +5,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Static;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Dynamic;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
+using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerMarketNormalized>>;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 /// <summary>
@@ -18,7 +23,21 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 /// </summary>
 public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 {
+    private readonly Func<CancellationToken, Task<MarketsCall>>? _getMarkets;
+
     public BitflyerExchangeInfoApi() { }
+
+    internal BitflyerExchangeInfoApi(BitflyerNormalizedPublicApi normalized)
+    {
+        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
+        _getMarkets = normalized.GetMarketsCallAsync;
+    }
+
+    internal BitflyerExchangeInfoApi(IBitflyerNormalizedApi normalized)
+    {
+        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
+        _getMarkets = normalized.GetMarketsCallAsync;
+    }
 
     public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default)
@@ -28,7 +47,10 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 
         try
         {
-            var info = MapExchangeInfo(BitflyerStaticExchangeInfoLoader.Load());
+            var staticInfo = BitflyerStaticExchangeInfoLoader.Load();
+            var dynamicInfo = await GetDynamicInfoAsync(cancellationToken).ConfigureAwait(false);
+            var composed = BitflyerExchangeInfoComposer.Compose(staticInfo, dynamicInfo);
+            var info = MapExchangeInfo(composed);
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: BitflyerOperations.ExchangeInfo.GetExchangeInfo,
@@ -149,4 +171,35 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 
     private static Price? ToPrice(decimal? value) =>
         value is null ? null : new Price(value.Value);
+
+    private async Task<BitflyerDynamicExchangeInfo?> GetDynamicInfoAsync(CancellationToken cancellationToken)
+    {
+        if (_getMarkets is null) return null;
+
+        var marketsCall = await _getMarkets(cancellationToken).ConfigureAwait(false);
+        if (marketsCall.Result is CallResult<IReadOnlyList<BitflyerMarketNormalized>>.Err)
+        {
+            return null;
+        }
+
+        var markets = ((CallResult<IReadOnlyList<BitflyerMarketNormalized>>.Ok)marketsCall.Result).Response;
+        return new BitflyerDynamicExchangeInfo
+        {
+            Markets = markets.Select(MapDynamicMarket).ToList()
+        };
+    }
+
+    private static BitflyerDynamicMarketInfo MapDynamicMarket(BitflyerMarketNormalized market)
+    {
+        var symbol = market.ProductCode.Contains('_', StringComparison.Ordinal)
+            ? market.ProductCode.Replace('_', '/')
+            : market.ProductCode;
+
+        return new BitflyerDynamicMarketInfo
+        {
+            ProductCode = market.ProductCode,
+            Symbol = symbol,
+            Type = market.Alias is null ? "Spot" : "Spot"
+        };
+    }
 }

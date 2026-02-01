@@ -1,8 +1,8 @@
 using System;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Internal;
+using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;

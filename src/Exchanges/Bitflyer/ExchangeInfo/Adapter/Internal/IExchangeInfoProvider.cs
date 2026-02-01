@@ -4,7 +4,7 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeI
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.ExchangeInfo.Internal;
+namespace ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Internal;
 
 internal interface IExchangeInfoProvider
 {

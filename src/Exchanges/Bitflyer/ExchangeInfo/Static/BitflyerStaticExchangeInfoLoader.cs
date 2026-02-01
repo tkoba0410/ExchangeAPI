@@ -3,12 +3,12 @@ using System.IO;
 using System.Reflection;
 using System.Text.Json;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.ExchangeInfo.Static;
+namespace ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Static;
 
 internal static class BitflyerStaticExchangeInfoLoader
 {
     private const string ResourceName =
-        "ExchangeApi.Exchanges.Bitflyer.Normalized.ExchangeInfo.Static.bitflyer-exchange-info.json";
+        "ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Static.bitflyer-exchange-info.json";
     private static readonly Lazy<BitflyerStaticExchangeInfo> Cache = new(LoadInternal);
 
     public static BitflyerStaticExchangeInfo Load() => Cache.Value;

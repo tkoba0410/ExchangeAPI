@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.ExchangeInfo.Static;
+namespace ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Static;
 
 internal sealed class BitflyerStaticExchangeInfo
 {

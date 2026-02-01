@@ -4,8 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Operations;
+using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
@@ -67,7 +66,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             var info = MapExchangeInfo(composed);
             var meta = new CallMeta(
                 Layer: "Contracts",
-                Component: BitflyerOperations.ExchangeInfo.GetExchangeInfo,
+                Component: BitflyerExchangeInfoOperations.GetExchangeInfo,
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
@@ -81,10 +80,10 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(
+            return ExchangeInfoCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(
                 request,
                 startedAt,
-                BitflyerOperations.ExchangeInfo.GetExchangeInfo,
+                BitflyerExchangeInfoOperations.GetExchangeInfo,
                 ex);
         }
     }
@@ -95,7 +94,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         var request = new GetCurrencysRequest();
         return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
             "Contracts",
-            BitflyerOperations.ExchangeInfo.GetCurrencys,
+            BitflyerExchangeInfoOperations.GetCurrencys,
             request,
             "Currencys"));
     }
@@ -106,7 +105,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         var request = new GetTimestampRequest();
         return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, DateTimeOffset>(
             "Contracts",
-            BitflyerOperations.ExchangeInfo.GetTimestamp,
+            BitflyerExchangeInfoOperations.GetTimestamp,
             request,
             "Timestamp"));
     }

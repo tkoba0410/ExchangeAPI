@@ -3,6 +3,7 @@ using System.Linq;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
+using ExchangeApi.Utilities.Account;
 namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Mappers;
 
 internal static class BittradeMapper
@@ -16,7 +17,7 @@ internal static class BittradeMapper
             var available = group
                 .Where(x => string.Equals(x.Type, "trade", StringComparison.OrdinalIgnoreCase))
                 .Sum(e => e.Balance);
-            result.Add(Balance.Create(
+            result.Add(BalanceFactory.Create(
                 currency: group.Key.ToUpperInvariant(),
                 amount: total,
                 available: available));

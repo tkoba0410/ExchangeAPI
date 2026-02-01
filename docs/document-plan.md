@@ -154,6 +154,7 @@
 
 * 利用者期待・運用判断は Overview に移動
 * 型・Nullable・Page / Cursor 定義のみを残す
+* 整形・変換・補助操作は Utilities に集約する
 
 ---
 
@@ -179,6 +180,8 @@
 
   * 必ず Inventory または Exceptions に落ちる
 * 「この判断はどこに書くべきか」という議論が発生しない
+* Contracts に便利機能が残っていない
+* Utilities に便利機能が集約されている
 
 ---
 

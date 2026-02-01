@@ -3,7 +3,7 @@ using System.Linq;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 
-namespace ExchangeApi.Composition.Extensions;
+namespace ExchangeApi.Utilities.Extensions;
 
 /// <summary>
 /// ExchangeInfo の検索ヘルパ。

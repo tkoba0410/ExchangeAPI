@@ -3,28 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ContractOrderBook = global::ExchangeApi.Contracts.Common.Dtos.OrderBook;
 
-namespace ExchangeApi.Composition.Extensions;
+namespace ExchangeApi.Utilities.Extensions;
 
 /// <summary>OrderBook に対する共通ユーティリティ（両サイドを参照）。</summary>
 public static class OrderBookExtensions
 {
     /// <summary>最良買い気配（Bid）。板が空なら null。</summary>
-    public static Price? GetBestBid(this OrderBook orderBook)
+    public static Price? GetBestBid(this ContractOrderBook orderBook)
     {
         var first = orderBook?.Bids?.FirstOrDefault();
         return first?.Price;
     }
 
     /// <summary>最良売り気配（Ask）。板が空なら null。</summary>
-    public static Price? GetBestAsk(this OrderBook orderBook)
+    public static Price? GetBestAsk(this ContractOrderBook orderBook)
     {
         var first = orderBook?.Asks?.FirstOrDefault();
         return first?.Price;
     }
 
     /// <summary>ミッドプライス（(Bid+Ask)/2）。どちらか欠損なら null。</summary>
-    public static Price? GetMidPrice(this OrderBook orderBook)
+    public static Price? GetMidPrice(this ContractOrderBook orderBook)
     {
         var bid = orderBook.GetBestBid();
         var ask = orderBook.GetBestAsk();
@@ -33,7 +34,7 @@ public static class OrderBookExtensions
     }
 
     /// <summary>スプレッド（Ask-Bid）。どちらか欠損なら null。</summary>
-    public static Price? GetSpread(this OrderBook orderBook)
+    public static Price? GetSpread(this ContractOrderBook orderBook)
     {
         var bid = orderBook.GetBestBid();
         var ask = orderBook.GetBestAsk();
@@ -42,18 +43,18 @@ public static class OrderBookExtensions
     }
 
     /// <summary>総サイズ（全レベルの size 合計）。</summary>
-    public static Size GetTotalSize(this OrderBook orderBook) =>
+    public static Size GetTotalSize(this ContractOrderBook orderBook) =>
         new((orderBook?.Asks?.Sum(x => x.Size.Value) ?? 0m) + (orderBook?.Bids?.Sum(x => x.Size.Value) ?? 0m));
 
     /// <summary>サイズ指定で買い成行を呑み切る計算（asks 側）。</summary>
-    public static FillEstimate CalcBuyPriceBySize(this OrderBook orderBook, Size takerSize)
+    public static FillEstimate CalcBuyPriceBySize(this ContractOrderBook orderBook, Size takerSize)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
         return Fill(orderBook.Asks, takerSize, isBuy: true, targetSize: takerSize, targetPrice: null);
     }
 
     /// <summary>サイズ指定で売り成行を呑み切る計算（bids 側）。</summary>
-    public static FillEstimate CalcSellPriceBySize(this OrderBook orderBook, Size takerSize)
+    public static FillEstimate CalcSellPriceBySize(this ContractOrderBook orderBook, Size takerSize)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
         return Fill(orderBook.Bids, takerSize, isBuy: false, targetSize: takerSize, targetPrice: null);
@@ -63,7 +64,7 @@ public static class OrderBookExtensions
     /// 価格指定で買い側の約定可能量を計算（asks 側、昇順想定）。
     /// 合計サイズ・合計コスト・平均価格を返す。
     /// </summary>
-    public static FillEstimate CalcBuySizeByPrice(this OrderBook orderBook, Price maxPrice)
+    public static FillEstimate CalcBuySizeByPrice(this ContractOrderBook orderBook, Price maxPrice)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
         if (maxPrice.Value <= 0) throw new ArgumentOutOfRangeException(nameof(maxPrice));
@@ -98,7 +99,7 @@ public static class OrderBookExtensions
     /// 価格指定で売り側の約定可能量を計算（bids 側、降順想定）。
     /// 合計サイズ・合計受取・平均価格を返す。
     /// </summary>
-    public static FillEstimate CalcSellSizeByPrice(this OrderBook orderBook, Price minPrice)
+    public static FillEstimate CalcSellSizeByPrice(this ContractOrderBook orderBook, Price minPrice)
     {
         if (orderBook is null) throw new ArgumentNullException(nameof(orderBook));
         if (minPrice.Value <= 0) throw new ArgumentOutOfRangeException(nameof(minPrice));

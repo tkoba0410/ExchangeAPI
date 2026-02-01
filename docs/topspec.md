@@ -36,6 +36,17 @@ Utilities は 4 層構造に含めず、Contracts/Primitives に依存してよ�
 Contracts/Primitives から Utilities への依存は禁止する。
 詳細は `docs/utilities.md` を参照する。
 
+**責務（MUST）**
+
+* データの整形・変換・補助的操作を提供する
+* Contracts の Shape/Semantics を拡張しない
+
+**禁止事項（MUST NOT）**
+
+* 外部 I/O を行う
+* 取引所固有仕様の吸収（Normalized/Adapter の責務）
+* Contracts を参照する側への逆依存
+
 ### 2.1 依存関係
 
 * 依存は **一方向のみ**とする

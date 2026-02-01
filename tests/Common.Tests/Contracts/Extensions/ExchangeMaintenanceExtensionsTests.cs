@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Composition.Extensions;
+using ExchangeApi.Utilities.Extensions;
 using Xunit;
 
 namespace ExchangeApi.Tests.Common.Tests.Contracts.Extensions;

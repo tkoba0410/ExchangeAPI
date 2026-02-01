@@ -16,6 +16,7 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Operations;
+using ExchangeApi.Utilities.Account;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
 
 internal sealed class BitflyerAccountApi
@@ -54,7 +55,7 @@ internal sealed class BitflyerAccountApi
 
     private static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BitflyerBalanceEntryNormalized> balances) =>
         balances
-            .Select(b => Balance.Create(
+            .Select(b => BalanceFactory.Create(
                 currency: b.Currency,
                 amount: b.Amount,
                 available: b.Available))

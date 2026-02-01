@@ -4,11 +4,11 @@ using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Factory;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
 
 namespace ExchangeApi.Composition.Bootstrap.Factories;
 

@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Raw/ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
-    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Wire/ExchangeApi.Exchanges.Bitflyer.Wire.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Api/Raw/ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Api/Wire/ExchangeApi.Exchanges.Bitflyer.Wire.csproj" />
   </ItemGroup>
 
   <ItemGroup>

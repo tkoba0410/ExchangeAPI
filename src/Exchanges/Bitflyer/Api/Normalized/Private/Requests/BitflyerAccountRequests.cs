@@ -1,0 +1,35 @@
+using ExchangeApi.Primitives.DomainCommon.Types;
+
+namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Requests;
+
+public sealed record GetPermissionsRequest;
+
+public sealed record GetBalancesRequest;
+
+public sealed record GetCollateralRequest;
+
+public sealed record GetCollateralAccountsRequest;
+
+public sealed record GetAccountExecutionsRequest(Symbol Symbol);
+
+public sealed record GetAddressesRequest;
+
+public sealed record GetCoinInsRequest(int? Count = null, long? Before = null, long? After = null);
+
+public sealed record GetCoinOutsRequest(string? MessageId = null, int? Count = null, long? Before = null, long? After = null);
+
+public sealed record GetBankAccountsRequest;
+
+public sealed record GetDepositsRequest(int? Count = null, long? Before = null, long? After = null);
+
+public sealed record WithdrawRequest(string CurrencyCode, int BankAccountId, decimal Amount, string? Code = null);
+
+public sealed record GetWithdrawalsRequest(int? Count = null, long? Before = null, long? After = null);
+
+public sealed record GetBalanceHistoryRequest(string? CurrencyCode = null, int? Count = null, long? Before = null, long? After = null);
+
+public sealed record GetPositionsRequest(Symbol Symbol);
+
+public sealed record GetCollateralHistoryRequest(int? Count = null, long? Before = null, long? After = null);
+
+public sealed record GetTradingCommissionRequest(Symbol Symbol);

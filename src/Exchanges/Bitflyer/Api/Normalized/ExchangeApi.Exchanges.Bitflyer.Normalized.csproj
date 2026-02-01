@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AssemblyName>ExchangeApi.Exchanges.Bitflyer.Api.Normalized</AssemblyName>
+    <RootNamespace>ExchangeApi.Exchanges.Bitflyer.Api.Normalized</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Raw\ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="..\..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
+    <ProjectReference Include="..\..\..\..\Contracts\Common\ExchangeApi.Contracts.Common.csproj" />
+    <ProjectReference Include="..\..\..\..\Contracts\Facade\ExchangeApi.Contracts.Facade.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\ExchangeInfo\Static\**\*.cs" Link="ExchangeInfo/Static/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\ExchangeInfo\Dynamic\**\*.cs" Link="ExchangeInfo/Dynamic/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\ExchangeInfo\Compose\**\*.cs" Link="ExchangeInfo/Compose/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\ExchangeInfo\Static\bitflyer-exchange-info.json"
+                      Link="ExchangeInfo/Static/bitflyer-exchange-info.json"
+                      LogicalName="ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Static.bitflyer-exchange-info.json" />
+  </ItemGroup>
+
+</Project>

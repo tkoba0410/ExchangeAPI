@@ -5,12 +5,12 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeI
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Markets;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Markets;
+using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Primitives.CallCommon;
 

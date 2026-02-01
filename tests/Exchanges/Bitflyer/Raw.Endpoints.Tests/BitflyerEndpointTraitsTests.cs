@@ -1,4 +1,4 @@
-using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
 using Xunit;
 
 namespace Exchange.Bitflyer.Raw.Endpoints.Tests;

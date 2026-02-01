@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Helpers;
 using ExchangeApi.Primitives.CallCommon;

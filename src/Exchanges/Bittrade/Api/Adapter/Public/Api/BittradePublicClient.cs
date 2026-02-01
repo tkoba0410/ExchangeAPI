@@ -8,8 +8,8 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeI
 using ExchangeApi.Contracts.Facade.Requests;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.ExchangeInfo.Internal;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.ExchangeInfo.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized;

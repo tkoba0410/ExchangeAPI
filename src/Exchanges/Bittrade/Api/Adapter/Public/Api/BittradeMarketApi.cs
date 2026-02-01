@@ -11,7 +11,7 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.ExchangeInfo.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Facade.Requests;

@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\..\ExchangeInfo\Adapter\**\*.cs" Link="ExchangeInfo/Adapter/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>

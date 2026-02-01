@@ -24,6 +24,8 @@
 - 本書は `src/Contracts/` 配下の型・インターフェイス・公開 API 仕様に適用される（MUST）。
 - Contracts は **取引所非依存**でなければならない（MUST）。
 - Contracts は概念最上位フォルダであり、他のカテゴリに含めてはならない。
+ - データの整形・変換・補助操作は Contracts の責務ではない（MUST NOT）。
+   それらは Utilities レイヤに集約する。
 
 ---
 

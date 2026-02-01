@@ -28,6 +28,14 @@ Raw
 Wire
 ```
 
+### Utilities（補助レイヤ）
+
+Contracts に含めない便利機能（整形・変換・補助的操作）は、
+独立レイヤ **Utilities** に集約する。
+Utilities は 4 層構造に含めず、Contracts/Primitives に依存してよいが、
+Contracts/Primitives から Utilities への依存は禁止する。
+詳細は `docs/utilities.md` を参照する。
+
 ### 2.1 依存関係
 
 * 依存は **一方向のみ**とする

@@ -209,6 +209,8 @@ API 系統とは性質が異なる。例外として **独立系統**として�
   * Compose: Static をベースに Dynamic で上書き・拡張する（市場の増減を許可）
 * ExchangeInfo の **Contracts への適合は ExchangeInfo/Adapter で行う**。
   * 変換元は **Local（独自）DTO** を正とし、Contracts へ写像する。
+* ExchangeInfo は **Normalized への依存を許容**し、API Adapter への依存を禁止する。
+  * Dynamic 取得のために Normalized API を呼び出してよい。
 * 物理配置は次を基準形（Canon）とする。
 
 ```

@@ -193,31 +193,34 @@ src/Exchanges/<Exchange>/Normalized/
 
 ---
 
-#### 3.3.2 ExchangeInfo サブモジュール（MUST）
+#### 3.3.2 ExchangeInfo 独立系統（MUST）
 
-ExchangeInfo は「取引所仕様メタ情報」であり、エンドポイント機能分類ではない。
-Public/Private の署名分類とも無関係であるため、例外として **専用サブモジュール**を許可する。
+ExchangeInfo は「取引所仕様メタ情報」であり、Wire/Raw/Normalized/Adapter の
+API 系統とは性質が異なる。例外として **独立系統**として扱う。
 
-* ExchangeInfo は **Normalized 内に閉じる**（Contracts では定義しない）。
-* Adapter 層のみが Contracts DTO へ変換する。
+* ExchangeInfo は **取引所配下の独立モジュール**として配置する。
+* ExchangeInfo の DTO は **独自定義**とするが、**Contracts と同構成**を必須とする。
+  * 独自 DTO とする理由は「契約安定性・取引所固有運用のための境界」を明確化するため。
 * ExchangeInfo は **Static + Dynamic の合成**で構成する。
   * Static: 仕様・固定値・手動更新が必要な情報（市場一覧、手数料テーブル等）
   * Dynamic: API から取得可能な状態・制約（稼働状態、手数料率、最小数量等）
-  * Compose: Static をベースに Dynamic で上書き・拡張する
-* 例外サブモジュールの物理配置は次を基準形（Canon）とする。
+  * Compose: Static をベースに Dynamic で上書き・拡張する（市場の増減を許可）
+* ExchangeInfo の **Contracts への適合は ExchangeInfo/Adapter で行う**。
+* 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Normalized/ExchangeInfo/
+src/Exchanges/<Exchange>/ExchangeInfo/
   Static/
   Dynamic/
   Compose/
-  Internal/
+  Adapter/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Normalized.ExchangeInfo.Static.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Normalized.ExchangeInfo.Dynamic.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Normalized.ExchangeInfo.Compose.*`
+  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Static.*`
+  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Dynamic.*`
+  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Compose.*`
+  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Adapter.*`
 
 * 詳細な合成規則・マッピングは `_references/exchangeinfo.md` に記載する（非正本）。
 
@@ -273,32 +276,14 @@ src/Exchanges/<Exchange>/Adapter/
 
 ---
 
-#### 3.4.3 Adapter ExchangeInfo サブモジュール（MUST）
+#### 3.4.3 Adapter と ExchangeInfo の関係（MUST）
 
-ExchangeInfo は「取引所仕様メタ情報」であり、署名分類とも機能分類とも独立している。
-Normalized と同様に、Adapter 層でも **ExchangeInfo 専用サブモジュール**を例外として許可する。
+ExchangeInfo は独立系統であり、Contracts への適合は
+`ExchangeInfo/Adapter` で完結させる。
+API 系統の Adapter とは **別系統**として扱う。
 
-* ExchangeInfo は **Adapter 内で Contracts DTO へ変換**する（他 API と同様に Adapter から公開）。
-* ExchangeInfo の Public/Private 分類は不要とする。
-* 例外サブモジュールの物理配置は次を基準形（Canon）とする。
-
-```
-src/Exchanges/<Exchange>/Adapter/ExchangeInfo/
-  Public/
-    Api/
-    Dtos/
-  Private/
-    Api/
-    Dtos/
-  Internal/
-```
-
-* namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Adapter.ExchangeInfo.Public.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Adapter.ExchangeInfo.Private.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Adapter.ExchangeInfo.Internal.*`
-
-* ExchangeInfo の Public/Private は「署名の有無」を表す（他 Adapter と同じ規則を維持）。
+* API 系統の Adapter は従来通り `src/Exchanges/<Exchange>/Api/Adapter/` に置く。
+* ExchangeInfo の Adapter は `src/Exchanges/<Exchange>/ExchangeInfo/Adapter/` に置く。
 
 ---
 

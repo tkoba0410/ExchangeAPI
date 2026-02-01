@@ -1,5 +1,5 @@
 using System.Net;
-using ExchangeApi.Contracts.Common.Errors;
+using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 using Xunit;
 

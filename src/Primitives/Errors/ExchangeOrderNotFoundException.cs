@@ -1,4 +1,4 @@
-namespace ExchangeApi.Contracts.Common.Errors;
+namespace ExchangeApi.Primitives.Errors;
 
 public sealed class ExchangeOrderNotFoundException : ExchangeApiException
 {

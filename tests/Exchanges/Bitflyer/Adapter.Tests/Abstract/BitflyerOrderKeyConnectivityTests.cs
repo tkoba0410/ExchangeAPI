@@ -8,11 +8,6 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal.Encoding;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using Xunit;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 

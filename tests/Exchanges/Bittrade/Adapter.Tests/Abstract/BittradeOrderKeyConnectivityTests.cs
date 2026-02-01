@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Markets;

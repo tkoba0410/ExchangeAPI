@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExchangeApi.Primitives.DomainCommon.Types;
-namespace ExchangeApi.Contracts.Common.Dtos.Market;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 /// <summary>
 /// 板スナップショット。Bids は価格降順、Asks は価格昇順で内部整列される。

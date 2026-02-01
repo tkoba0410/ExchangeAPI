@@ -1,6 +1,6 @@
 using System;
 
-namespace ExchangeApi.Contracts.Common.Dtos.Common;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 public sealed record PageMeta(
     int RequestedLimit,

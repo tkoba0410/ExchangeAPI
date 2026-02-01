@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-namespace ExchangeApi.Contracts.Common.Dtos.Trading;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 /// <summary>
 /// オープンな子注文の概要（受付IDなし、Exchange/時刻を含む）。

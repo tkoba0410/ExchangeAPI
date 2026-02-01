@@ -1,4 +1,4 @@
-namespace ExchangeApi.Contracts.Common.Errors;
+namespace ExchangeApi.Primitives.Errors;
 
 /// <summary>
 /// クライアントがサポートしていないシンボルが指定されたときの例外。

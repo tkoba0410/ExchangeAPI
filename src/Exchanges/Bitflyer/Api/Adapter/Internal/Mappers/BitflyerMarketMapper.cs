@@ -1,15 +1,10 @@
 using System;
 using System.Linq;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
-using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
+using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 
 internal static class MarketMapper

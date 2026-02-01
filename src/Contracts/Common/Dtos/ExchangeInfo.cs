@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using ExchangeApi.Primitives.DomainCommon.Types;
-namespace ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 public sealed record ExchangeInfo(
     IReadOnlyList<ExchangeMarketInfo> Markets,
@@ -15,7 +15,7 @@ public sealed record ExchangeInfo(
 /// MinSize/MaxSize/MinNotional/PriceIncrement/SizeIncrement はバリデーションのヒントとして利用し、欠損時は取引所デフォルトに従う。
 /// IsSupported=false は「取引所に存在するがこのライブラリでは未サポート」を示し、StatusNote に理由を入れられる。
 /// MakerFeeRate/TakerFeeRate は片道の手数料率 (例: 0.001 = 0.1%) を表し、負の値もリベートとして許容する。返せない場合は null にする。
-/// FeeCurrency は手数料を徴収する通貨（null は約定通貨を意味する）。例: bitFlyer の BTC/JPY は BTC 徴収。
+/// FeeCurrency は手数料を徴収する通貨（null は約定通貨を意味する）。
 /// FeeType は Percentage/Flat を表す。Flat の場合は 1注文あたり固定額と解釈し、FeeCurrency と併せて使う。別トークン割引や特典は将来拡張で表現する前提。
 /// </remarks>
 public sealed record ExchangeMarketInfo(

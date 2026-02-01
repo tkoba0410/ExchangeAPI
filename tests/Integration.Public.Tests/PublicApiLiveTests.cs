@@ -30,7 +30,7 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var call = await client.GetTickerCallAsync(new Symbol("BTC/JPY"), cts.Token);
-        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Market.Ticker>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Ticker>.Ok>(call.Result);
         var ticker = ok.Response;
         var msg = $"bitFlyer Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
@@ -47,7 +47,7 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var call = await client.GetExchangeInfoCallAsync(cts.Token);
-        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
         var msg = $"bitFlyer ExchangeInfo markets={info.Markets.Count}";
         Log(msg);
@@ -62,7 +62,7 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var call = await client.GetTickerCallAsync(new Symbol("BTC/JPY"), cts.Token);
-        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Market.Ticker>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Ticker>.Ok>(call.Result);
         var ticker = ok.Response;
         var msg = $"Bittrade Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
@@ -80,7 +80,7 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var call = await infoApi.GetExchangeInfoCallAsync(cts.Token);
-        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
         var msg = $"Bittrade ExchangeInfo markets={info.Markets.Count}";
         Log(msg);

@@ -5,7 +5,7 @@ using ExchangeApi.Application.Errors;
 using ExchangeApi.Application.Interfaces;
 using ExchangeApi.Application.Trading;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Errors;
+using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;

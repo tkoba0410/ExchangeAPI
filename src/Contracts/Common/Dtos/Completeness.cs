@@ -1,4 +1,4 @@
-namespace ExchangeApi.Contracts.Common.Dtos.Common;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 public enum Completeness
 {

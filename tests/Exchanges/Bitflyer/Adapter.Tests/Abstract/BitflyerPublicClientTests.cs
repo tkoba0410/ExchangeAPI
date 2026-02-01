@@ -57,7 +57,7 @@ public sealed class BitflyerPublicClientTests
         var client = new BitflyerPublicClient(normalized, exchangeInfo);
 
         var call = await client.GetTickerCallAsync(new Symbol("DOGE/JPY"));
-        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Market.Ticker>.Err>(call.Result);
+        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Ticker>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }
 }

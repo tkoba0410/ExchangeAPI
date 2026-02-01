@@ -1,11 +1,6 @@
 using System;
 using System.Net.Http;
-using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
+using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Http;

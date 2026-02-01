@@ -1,6 +1,6 @@
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-namespace ExchangeApi.Contracts.Common.Dtos.Trading;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 /// <summary>
 /// 抽象注文リクエスト。

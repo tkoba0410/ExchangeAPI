@@ -1,4 +1,4 @@
-using ExchangeApi.Contracts.Common.Errors;
+using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 

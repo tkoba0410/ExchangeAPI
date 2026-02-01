@@ -128,7 +128,7 @@ public sealed class FakeBitflyerPrivateTradingApi
                 Meta: meta);
         }
 
-        if (_exceptionToThrow is ExchangeApi.Contracts.Common.Errors.ExchangeApiException ex)
+        if (_exceptionToThrow is ExchangeApi.Primitives.Errors.ExchangeApiException ex)
         {
             var statusCode = ex.StatusCode.HasValue ? (int)ex.StatusCode.Value : (int?)null;
             var error = new CallError(CallErrorKind.Http, ex.Message, ex, statusCode);

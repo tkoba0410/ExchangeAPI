@@ -1,4 +1,4 @@
-namespace ExchangeApi.Contracts.Common.Dtos.Trading;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 public enum OrderSnapshotType
 {

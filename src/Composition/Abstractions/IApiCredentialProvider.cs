@@ -1,4 +1,4 @@
-using ExchangeApi.Contracts.Common.Dtos.Common;
+using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 
 namespace ExchangeApi.Composition.Abstractions;

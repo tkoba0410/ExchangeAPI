@@ -1,5 +1,5 @@
 ﻿using ExchangeApi.Primitives.DomainCommon.Types;
-namespace ExchangeApi.Contracts.Common.Dtos.Market;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 /// <summary>
 /// 取引所共通フォーマットのティッカー情報。

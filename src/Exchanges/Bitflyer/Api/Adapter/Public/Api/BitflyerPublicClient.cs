@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
-using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;
+using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Ticker;
 using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Public.Api;
 

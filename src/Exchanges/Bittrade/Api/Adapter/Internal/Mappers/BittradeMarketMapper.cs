@@ -1,13 +1,8 @@
 using System;
 using System.Linq;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Common.Dtos.Account;
-using ExchangeApi.Contracts.Common.Dtos.Common;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
-using ExchangeApi.Contracts.Common.Dtos.Market;
-using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Contracts.Common.Errors;
+using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
 using ExchangeApi.Primitives.DomainCommon.Enums;

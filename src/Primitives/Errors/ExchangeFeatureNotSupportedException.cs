@@ -1,6 +1,6 @@
 using ExchangeApi.Primitives.DomainCommon.Enums;
 
-namespace ExchangeApi.Contracts.Common.Errors;
+namespace ExchangeApi.Primitives.Errors;
 
 /// <summary>
 /// 取引所が特定機能をサポートしていない場合の例外。

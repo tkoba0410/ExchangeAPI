@@ -1,6 +1,6 @@
 using System;
 using System.Net;
-using ExchangeApi.Contracts.Common.Errors;
+using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;

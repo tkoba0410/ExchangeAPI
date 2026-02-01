@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ExchangeApi.Primitives.DomainCommon.Types;
-namespace ExchangeApi.Contracts.Common.Dtos.Market;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 /// <summary>
 /// Candlestick を列指向で保持する内部向けバッファ。

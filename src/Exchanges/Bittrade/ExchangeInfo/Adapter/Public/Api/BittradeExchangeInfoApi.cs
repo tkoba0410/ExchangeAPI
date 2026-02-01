@@ -11,11 +11,11 @@ using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Compose;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Dynamic;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Static;
-using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Requests.GetSymbolsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos.BittradeSymbolNormalized>>;
 
 namespace ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;

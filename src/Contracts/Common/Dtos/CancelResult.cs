@@ -1,4 +1,4 @@
-namespace ExchangeApi.Contracts.Common.Dtos.Trading;
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 /// <summary>
 /// キャンセル結果を示す簡易 DTO。

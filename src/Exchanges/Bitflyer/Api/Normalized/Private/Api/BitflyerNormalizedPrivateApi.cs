@@ -662,7 +662,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
-                "Bitflyer.GetExecutions",
+                "Bitflyer.GetExecutionsPrivate",
                 marketError.Error);
         }
 
@@ -674,7 +674,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
-                "Bitflyer.GetExecutions",
+                "Bitflyer.GetExecutionsPrivate",
                 new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
         }
 
@@ -685,7 +685,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetExecutions",
+            "Bitflyer.GetExecutionsPrivate",
             raw => BitflyerAccountMapper.MapAccountExecutions(symbol, raw));
     }
 

@@ -81,7 +81,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetExecutions",
+            "Bitflyer.GetExecutionsPublic",
             raw => (IReadOnlyList<BitflyerExecutionNormalized>)BitflyerExecutionNormalizer.NormalizeList(
                 raw,
                 rawCall.Meta.RawJson));

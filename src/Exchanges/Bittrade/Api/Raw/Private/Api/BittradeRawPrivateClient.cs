@@ -37,12 +37,12 @@ internal sealed class BittradeRawPrivateClient
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.GetAccountBalance",
+            "Bittrade.GetAccountsBalanceByAccountId",
             BittradePrivateEndpoints.GetAccountsBalanceByAccountId(request.AccountId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawBalancesResponse>(
                 json,
-                "Bittrade.GetAccountBalance"));
+                "Bittrade.GetAccountsBalanceByAccountId"));
 
     public Task<Call<GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersCallAsync(
         GetOpenOrdersRequest request,
@@ -71,22 +71,22 @@ internal sealed class BittradeRawPrivateClient
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.GetOrder",
+            "Bittrade.GetOrdersByOrderId",
             BittradePrivateEndpoints.GetOrdersByOrderId(request.OrderId),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawOrderDetailResponse>(json, "Bittrade.GetOrder"));
+            json => BittradeRawJson.DeserializeOrThrow<RawOrderDetailResponse>(json, "Bittrade.GetOrdersByOrderId"));
 
     public Task<Call<GetOrderMatchResultsRequest, RawOrderMatchResultsResponse>> GetOrdersMatchResultsByOrderIdCallAsync(
         GetOrderMatchResultsRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.GetOrderMatchResults",
+            "Bittrade.GetOrdersMatchResultsByOrderId",
             BittradePrivateEndpoints.GetOrdersMatchResultsByOrderId(request.OrderId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawOrderMatchResultsResponse>(
                 json,
-                "Bittrade.GetOrderMatchResults"));
+                "Bittrade.GetOrdersMatchResultsByOrderId"));
 
     public Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsCallAsync(
         GetMatchResultsRequest request,
@@ -112,7 +112,7 @@ internal sealed class BittradeRawPrivateClient
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.GetDepositWithdraws",
+            "Bittrade.GetDepositWithdraw",
             BittradePrivateEndpoints.GetDepositWithdraw(
                 request.Type,
                 request.Currency,
@@ -122,7 +122,7 @@ internal sealed class BittradeRawPrivateClient
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawDepositWithdrawsResponse>(
                 json,
-                "Bittrade.GetDepositWithdraws"));
+                "Bittrade.GetDepositWithdraw"));
 
     public Task<Call<GetWithdrawVirtualAddressesRequest, RawWithdrawVirtualAddressesResponse>> GetWithdrawVirtualAddressesCallAsync(
         GetWithdrawVirtualAddressesRequest request,
@@ -141,7 +141,7 @@ internal sealed class BittradeRawPrivateClient
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.GetRetailOrders",
+            "Bittrade.GetRetailOrderList",
             BittradePrivateEndpoints.GetRetailOrderList(
                 request.Direct.ToString(CultureInfo.InvariantCulture),
                 request.Status?.ToString(CultureInfo.InvariantCulture),
@@ -150,19 +150,19 @@ internal sealed class BittradeRawPrivateClient
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrdersResponse>(
                 json,
-                "Bittrade.GetRetailOrders"));
+                "Bittrade.GetRetailOrderList"));
 
     public Task<Call<GetRetailOrderDetailByOrderIdRequest, RawRetailOrderDetailResponse>> GetRetailOrderDetailByOrderIdCallAsync(
         GetRetailOrderDetailByOrderIdRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.GetRetailOrderDetail",
+            "Bittrade.PostRetailOrderDetail",
             BittradePrivateEndpoints.GetRetailOrderDetailByOrderId(request.OrderId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderDetailResponse>(
                 json,
-                "Bittrade.GetRetailOrderDetail"));
+                "Bittrade.PostRetailOrderDetail"));
 
     public Task<Call<GetRetailAccountBalanceRequest, RawRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
         GetRetailAccountBalanceRequest request,
@@ -181,158 +181,158 @@ internal sealed class BittradeRawPrivateClient
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.PlaceOrder",
+            "Bittrade.PostOrdersPlace",
             BittradePrivateEndpoints.PostOrdersPlace(
-                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PlaceOrder")),
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PostOrdersPlace")),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawPlaceOrderResponse>(json, "Bittrade.PlaceOrder"));
+            json => BittradeRawJson.DeserializeOrThrow<RawPlaceOrderResponse>(json, "Bittrade.PostOrdersPlace"));
 
     public Task<Call<CancelOrderRequest, RawCancelOrderResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
         CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.CancelOrder",
+            "Bittrade.PostOrdersSubmitCancelByOrderId",
             BittradePrivateEndpoints.PostOrdersSubmitCancelByOrderId(request.OrderId),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawCancelOrderResponse>(json, "Bittrade.CancelOrder"));
+            json => BittradeRawJson.DeserializeOrThrow<RawCancelOrderResponse>(json, "Bittrade.PostOrdersSubmitCancelByOrderId"));
 
     public Task<Call<CancelOrdersRequest, RawCancelOrdersResponse>> PostOrdersBatchCancelCallAsync(
         CancelOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.CancelOrders",
+            "Bittrade.PostOrdersBatchCancel",
             BittradePrivateEndpoints.PostOrdersBatchCancel(
-                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.CancelOrders")),
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PostOrdersBatchCancel")),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCancelOrdersResponse>(
                 json,
-                "Bittrade.CancelOrders"));
+                "Bittrade.PostOrdersBatchCancel"));
 
     public Task<Call<CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
         CancelOpenOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.CancelOpenOrders",
+            "Bittrade.PostOrdersBatchCancelOpenOrders",
             BittradePrivateEndpoints.PostOrdersBatchCancelOpenOrders(
-                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.CancelOpenOrders")),
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PostOrdersBatchCancelOpenOrders")),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCancelOpenOrdersResponse>(
                 json,
-                "Bittrade.CancelOpenOrders"));
+                "Bittrade.PostOrdersBatchCancelOpenOrders"));
 
     public Task<Call<CreateWithdrawRequest, RawCreateWithdrawResponse>> PostWithdrawApiCreateCallAsync(
         CreateWithdrawRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.CreateWithdraw",
+            "Bittrade.PostWithdrawApiCreate",
             BittradePrivateEndpoints.PostWithdrawApiCreate(
-                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.CreateWithdraw")),
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PostWithdrawApiCreate")),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCreateWithdrawResponse>(
                 json,
-                "Bittrade.CreateWithdraw"));
+                "Bittrade.PostWithdrawApiCreate"));
 
     public Task<Call<CreateWithdrawVirtualByAddressIdRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
         CreateWithdrawVirtualByAddressIdRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.CreateWithdrawByAddressId",
+            "Bittrade.PostWithdrawApiCreateByAddressId",
             BittradePrivateEndpoints.PostWithdrawVirtualByAddressIdCreate(request.AddressId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCreateWithdrawResponse>(
                 json,
-                "Bittrade.CreateWithdrawByAddressId"));
+                "Bittrade.PostWithdrawApiCreateByAddressId"));
 
     public Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
         CancelWithdrawRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.CancelWithdraw",
+            "Bittrade.PostWithdrawVirtualByWithdrawIdCancel",
             BittradePrivateEndpoints.PostWithdrawVirtualByWithdrawIdCancel(request.WithdrawId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCancelWithdrawResponse>(
                 json,
-                "Bittrade.CancelWithdraw"));
+                "Bittrade.PostWithdrawVirtualByWithdrawIdCancel"));
 
     public Task<Call<PlaceWithdrawVirtualRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
         PlaceWithdrawVirtualRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.PlaceWithdraw",
+            "Bittrade.PostWithdrawVirtualByWithdrawIdPlace",
             BittradePrivateEndpoints.PostWithdrawVirtualByWithdrawIdPlace(request.WithdrawId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCreateWithdrawResponse>(
                 json,
-                "Bittrade.PlaceWithdraw"));
+                "Bittrade.PostWithdrawVirtualByWithdrawIdPlace"));
 
     public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderPlaceCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.CreateRetailOrder",
+            "Bittrade.PostRetailOrderPlace",
             BittradePrivateEndpoints.PostRetailOrderPlace(
-                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.CreateRetailOrder")),
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PostRetailOrderPlace")),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderResponse>(
                 json,
-                "Bittrade.CreateRetailOrder"));
+                "Bittrade.PostRetailOrderPlace"));
 
     public Task<Call<CancelRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCancelByOrderIdCallAsync(
         CancelRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.CancelRetailOrder",
+            "Bittrade.PostRetailOrderCancelByOrderId",
             BittradePrivateEndpoints.PostRetailOrderCancelByOrderId(request.OrderId),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderResponse>(
                 json,
-                "Bittrade.CancelRetailOrder"));
+                "Bittrade.PostRetailOrderCancelByOrderId"));
 
     public Task<Call<PostRetailOrderHistoryRequest, RawRetailOrdersResponse>> PostRetailOrderHistoryCallAsync(
         PostRetailOrderHistoryRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.GetRetailOrderHistory",
+            "Bittrade.PostRetailOrderHistory",
             BittradePrivateEndpoints.PostRetailOrderHistory(
-                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.GetRetailOrderHistory")),
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PostRetailOrderHistory")),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrdersResponse>(
                 json,
-                "Bittrade.GetRetailOrderHistory"));
+                "Bittrade.PostRetailOrderHistory"));
 
     public Task<Call<PostRetailOrderDetailRequest, RawRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
         PostRetailOrderDetailRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.GetRetailOrderDetail",
+            "Bittrade.PostRetailOrderDetail",
             BittradePrivateEndpoints.PostRetailOrderDetail(
-                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.GetRetailOrderDetail")),
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PostRetailOrderDetail")),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderDetailResponse>(
                 json,
-                "Bittrade.GetRetailOrderDetail"));
+                "Bittrade.PostRetailOrderDetail"));
 
     public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCreateCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bittrade.CreateRetailOrder",
+            "Bittrade.PostRetailOrderCreate",
             BittradePrivateEndpoints.PostRetailOrderCreate(
-                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.CreateRetailOrder")),
+                BittradeRawJson.SerializeOrThrow(request.Body, "Bittrade.PostRetailOrderCreate")),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderResponse>(
                 json,
-                "Bittrade.CreateRetailOrder"));
+                "Bittrade.PostRetailOrderCreate"));
 }

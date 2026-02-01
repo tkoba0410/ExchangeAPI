@@ -57,7 +57,7 @@ internal sealed class BittradeNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetAccountBalance",
+            "Bittrade.GetAccountsBalanceByAccountId",
             ok =>
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase) || ok.Data is null)
@@ -110,7 +110,7 @@ internal sealed class BittradeNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetDepositWithdraws",
+            "Bittrade.GetDepositWithdraw",
             ok =>
             {
                 if (!string.Equals(ok.Status, "ok", StringComparison.OrdinalIgnoreCase))
@@ -185,7 +185,7 @@ internal sealed class BittradeNormalizedPrivateApi
             return CreateCallError<NormalizedRequests.PostOrdersPlaceRequest, BittradeOrderResult>(
                 marketCall,
                 callRequest,
-                "Bittrade.PlaceOrder",
+                "Bittrade.PostOrdersPlace",
                 marketError!);
         }
 
@@ -194,7 +194,7 @@ internal sealed class BittradeNormalizedPrivateApi
             .PostOrdersPlaceCallAsync(new RawPrivateRequests.CreateOrderRequest(rawRequest), ct)
             .ConfigureAwait(false);
 
-        return CreateCall(rawCall, callRequest, "Bittrade.PlaceOrder", BittradeTradingMapper.ToOrderResult);
+        return CreateCall(rawCall, callRequest, "Bittrade.PostOrdersPlace", BittradeTradingMapper.ToOrderResult);
     }
 
     public async Task<Call<NormalizedRequests.GetOrdersRequest, IReadOnlyList<BittradeOrderSummaryNormalized>>> GetOrdersCallAsync(
@@ -245,7 +245,7 @@ internal sealed class BittradeNormalizedPrivateApi
             .PostOrdersSubmitCancelByOrderIdCallAsync(new RawPrivateRequests.CancelOrderRequest(orderKey.Value), ct)
             .ConfigureAwait(false);
 
-        return CreateCall(rawCall, callRequest, "Bittrade.CancelOrder", _ => new BittradeCancelResult(true));
+        return CreateCall(rawCall, callRequest, "Bittrade.PostOrdersSubmitCancelByOrderId", _ => new BittradeCancelResult(true));
     }
 
     public async Task<Call<NormalizedRequests.PostOrdersBatchCancelRequest, BittradeCancelResult>> PostOrdersBatchCancelCallAsync(
@@ -259,7 +259,7 @@ internal sealed class BittradeNormalizedPrivateApi
                 new RawPrivateRequests.RawCancelOrdersRequest(request.OrderIds)), ct)
             .ConfigureAwait(false);
 
-        return CreateCall(rawCall, request, "Bittrade.CancelOrders", raw =>
+        return CreateCall(rawCall, request, "Bittrade.PostOrdersBatchCancel", raw =>
             new BittradeCancelResult(string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase)));
     }
 
@@ -282,7 +282,7 @@ internal sealed class BittradeNormalizedPrivateApi
                 return CreateCallError<NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>(
                     marketCall,
                     request,
-                    "Bittrade.CancelOpenOrders",
+                    "Bittrade.PostOrdersBatchCancelOpenOrders",
                     marketError!);
             }
         }
@@ -303,7 +303,7 @@ internal sealed class BittradeNormalizedPrivateApi
             .PostOrdersBatchCancelOpenOrdersCallAsync(new RawPrivateRequests.CancelOpenOrdersRequest(rawRequest), ct)
             .ConfigureAwait(false);
 
-        return CreateCall(rawCall, request, "Bittrade.CancelOpenOrders", raw =>
+        return CreateCall(rawCall, request, "Bittrade.PostOrdersBatchCancelOpenOrders", raw =>
             new BittradeCancelResult(string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase)));
     }
 
@@ -359,7 +359,7 @@ internal sealed class BittradeNormalizedPrivateApi
             return CreateCallError<NormalizedRequests.GetOrderRequest, BittradeOrderStatus>(
                 marketCall,
                 callRequest,
-                "Bittrade.GetOrder",
+                "Bittrade.GetOrdersByOrderId",
                 marketError.Error);
         }
 
@@ -372,7 +372,7 @@ internal sealed class BittradeNormalizedPrivateApi
             .GetOrdersByOrderIdCallAsync(new RawPrivateRequests.GetOrderRequest(orderKey.Value), ct)
             .ConfigureAwait(false);
 
-        return CreateCall(rawCall, callRequest, "Bittrade.GetOrder", raw => BittradeTradingMapper.ToOrderStatus(market.ProductCode, raw, key));
+        return CreateCall(rawCall, callRequest, "Bittrade.GetOrdersByOrderId", raw => BittradeTradingMapper.ToOrderStatus(market.ProductCode, raw, key));
     }
 
     public async Task<Call<NormalizedRequests.GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetOrdersMatchResultsByOrderIdCallAsync(
@@ -388,7 +388,7 @@ internal sealed class BittradeNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetOrderMatchResults",
+            "Bittrade.GetOrdersMatchResultsByOrderId",
             raw => BittradeTradingMapper.ToExecutions(raw.Data ?? Array.Empty<RawPrivateDtos.RawMatchResultEntry>()));
     }
 
@@ -404,7 +404,7 @@ internal sealed class BittradeNormalizedPrivateApi
             return CreateCallError<NormalizedRequests.GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
                 marketCall,
                 callRequest,
-                "Bittrade.GetExecutions",
+                "Bittrade.GetMatchResults",
                 marketError!);
         }
 
@@ -417,7 +417,7 @@ internal sealed class BittradeNormalizedPrivateApi
         return CreateCall(
             rawCall,
             callRequest,
-            "Bittrade.GetExecutions",
+            "Bittrade.GetMatchResults",
             raw => BittradeTradingMapper.ToExecutions(raw.Data ?? Array.Empty<RawPrivateDtos.RawMatchResultEntry>()));
     }
 
@@ -438,7 +438,7 @@ internal sealed class BittradeNormalizedPrivateApi
             .PostWithdrawApiCreateCallAsync(new RawPrivateRequests.CreateWithdrawRequest(rawRequest), ct)
             .ConfigureAwait(false);
 
-        return CreateCall(rawCall, request, "Bittrade.CreateWithdraw", BittradeTradingMapper.ToWithdrawResult);
+        return CreateCall(rawCall, request, "Bittrade.PostWithdrawApiCreate", BittradeTradingMapper.ToWithdrawResult);
     }
 
     public async Task<Call<NormalizedRequests.PostRetailOrderPlaceRequest, BittradeRetailOrderResult>> PostRetailOrderPlaceCallAsync(
@@ -497,7 +497,7 @@ internal sealed class BittradeNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetRetailOrderDetail",
+            "Bittrade.GetRetailOrderDetailByOrderId",
             raw =>
             {
                 if (raw.Success is not true)
@@ -599,7 +599,7 @@ internal sealed class BittradeNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.PostRetailOrderCancel",
+            "Bittrade.PostRetailOrderCancelByOrderId",
             BittradeTradingMapper.ToRetailOrderResult);
     }
 

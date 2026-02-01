@@ -60,7 +60,7 @@ internal sealed class BitflyerRawPrivateClient
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bitflyer.GetExecutions",
+            "Bitflyer.GetExecutionsPrivate",
             BitflyerPrivateEndpoints.GetExecutionsPrivate(
                 request.ProductCode,
                 request.ChildOrderId,
@@ -71,7 +71,7 @@ internal sealed class BitflyerRawPrivateClient
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPrivateResponse>>(
                 json,
-                "Bitflyer.GetExecutions"));
+                "Bitflyer.GetExecutionsPrivate"));
 
     public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralCallAsync(
         GetCollateralRequest request,

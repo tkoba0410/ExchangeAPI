@@ -91,7 +91,7 @@ internal sealed class BittradeNormalizedPublicApi
         {
             return CreateCallError<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>(
                 request,
-                "Bittrade.GetTicker",
+                "Bittrade.GetDetailMerged",
                 error!,
                 startedAt);
         }
@@ -103,7 +103,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetTicker",
+            "Bittrade.GetDetailMerged",
             ok =>
             {
                 RequireOk(ok.Status, "ticker");
@@ -123,7 +123,7 @@ internal sealed class BittradeNormalizedPublicApi
         {
             return CreateCallError<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>(
                 request,
-                "Bittrade.GetOrderBook",
+                "Bittrade.GetDepth",
                 error!,
                 startedAt);
         }
@@ -135,7 +135,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetOrderBook",
+            "Bittrade.GetDepth",
             ok =>
             {
                 RequireOk(ok.Status, "orderbook");
@@ -154,7 +154,7 @@ internal sealed class BittradeNormalizedPublicApi
         {
             return CreateCallError<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
                 request,
-                "Bittrade.GetExecutions",
+                "Bittrade.GetTrade",
                 error!,
                 startedAt);
         }
@@ -166,7 +166,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetExecutions",
+            "Bittrade.GetTrade",
             ok =>
             {
                 RequireOk(ok.Status, "trades");

@@ -44,7 +44,7 @@ internal sealed class BitflyerPublicApi
         CancellationToken cancellationToken = default) =>
         _executor.SendAndParse(
             request,
-            "Bitflyer.GetExecutions",
+            "Bitflyer.GetExecutionsPublic",
             BitflyerPublicEndpoints.GetExecutionsPublic(
                 request.ProductCode,
                 request.Count?.ToString(CultureInfo.InvariantCulture),
@@ -53,7 +53,7 @@ internal sealed class BitflyerPublicApi
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPublicResponse>>(
                 json,
-                "Bitflyer.GetExecutions"));
+                "Bitflyer.GetExecutionsPublic"));
 
     public Task<Call<BitflyerRequests.GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsCallAsync(
         BitflyerRequests.GetMarketsRequest request,

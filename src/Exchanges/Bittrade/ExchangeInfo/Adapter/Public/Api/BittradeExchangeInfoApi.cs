@@ -4,8 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Operations;
+using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
@@ -49,7 +48,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
             var info = MapExchangeInfo(composed);
             var meta = new CallMeta(
                 Layer: "Contracts",
-                Component: BittradeOperations.ExchangeInfo.GetExchangeInfo,
+                Component: BittradeExchangeInfoOperations.GetExchangeInfo,
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
@@ -63,10 +62,10 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(
+            return ExchangeInfoCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(
                 request,
                 startedAt,
-                BittradeOperations.ExchangeInfo.GetExchangeInfo,
+                BittradeExchangeInfoOperations.GetExchangeInfo,
                 ex);
         }
     }
@@ -80,18 +79,18 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         try
         {
             var call = await _normalized.GetCurrencysCallAsync(cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return ExchangeInfoCallMapper.MapCall(
                 request,
                 call,
-                BittradeOperations.ExchangeInfo.GetCurrencys,
+                BittradeExchangeInfoOperations.GetCurrencys,
                 ok => ok);
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetCurrencysRequest, IReadOnlyList<string>>(
+            return ExchangeInfoCallMapper.FromException<GetCurrencysRequest, IReadOnlyList<string>>(
                 request,
                 startedAt,
-                BittradeOperations.ExchangeInfo.GetCurrencys,
+                BittradeExchangeInfoOperations.GetCurrencys,
                 ex);
         }
     }
@@ -105,18 +104,18 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         try
         {
             var call = await _normalized.GetTimestampCallAsync(cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return ExchangeInfoCallMapper.MapCall(
                 request,
                 call,
-                BittradeOperations.ExchangeInfo.GetTimestamp,
+                BittradeExchangeInfoOperations.GetTimestamp,
                 ok => ok);
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetTimestampRequest, DateTimeOffset>(
+            return ExchangeInfoCallMapper.FromException<GetTimestampRequest, DateTimeOffset>(
                 request,
                 startedAt,
-                BittradeOperations.ExchangeInfo.GetTimestamp,
+                BittradeExchangeInfoOperations.GetTimestamp,
                 ex);
         }
     }

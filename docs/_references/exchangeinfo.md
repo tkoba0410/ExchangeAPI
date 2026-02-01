@@ -7,9 +7,10 @@
 ## 0. 位置づけ
 
 ExchangeInfo は「取引所仕様メタ情報」を扱う。
-API エンドポイント分類や署名分類とは無関係であり、Normalized 内の専用サブモジュールで扱う。
+API エンドポイント分類や署名分類とは無関係であり、**API 系統とは独立したモジュール**として扱う。
+構成は Contracts の ExchangeInfo と同一だが、**独自 DTO**を用いる。
 
-## 1. Static / Dynamic / Compose の役割
+## 1. Static / Dynamic / Compose / Adapter の役割
 
 - Static
   - 公式仕様や手動更新が必要な固定値を保持する。
@@ -20,6 +21,8 @@ API エンドポイント分類や署名分類とは無関係であり、Normali
 - Compose
   - Static を基準に Dynamic で上書き・拡張する。
   - Static に存在しない Market は Dynamic で追加可能。
+- Adapter
+  - 独自 DTO を Contracts DTO に変換する。
 
 ## 2. フィールドの扱い方（指針）
 
@@ -32,6 +35,16 @@ API エンドポイント分類や署名分類とは無関係であり、Normali
   - Static を基準にし、Dynamic で補完・上書き。
 - `Maintenance`
   - Dynamic が取得可能な場合は Dynamic を優先する。
+
+## 2.1 物理配置（参考）
+
+```
+src/Exchanges/<Exchange>/ExchangeInfo/
+  Static/
+  Dynamic/
+  Compose/
+  Adapter/
+```
 
 ## 3. Dynamic ソースの例（Bitflyer）
 

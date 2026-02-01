@@ -9,6 +9,8 @@
 ExchangeInfo は「取引所仕様メタ情報」を扱う。
 API エンドポイント分類や署名分類とは無関係であり、**API 系統とは独立したモジュール**として扱う。
 構成は Contracts の ExchangeInfo と同一だが、**独自 DTO**を用いる。
+独自 DTO は **Contracts と同構成 + 追加情報**を許容し、ここでは便宜上 **Local DTO** と呼ぶ。
+Contracts への変換は Adapter で行い、追加情報は変換時に落とす（欠落ではなく境界）。
 
 ## 1. Static / Dynamic / Compose / Adapter の役割
 
@@ -22,7 +24,7 @@ API エンドポイント分類や署名分類とは無関係であり、**API �
   - Static を基準に Dynamic で上書き・拡張する。
   - Static に存在しない Market は Dynamic で追加可能。
 - Adapter
-  - 独自 DTO を Contracts DTO に変換する。
+  - Local DTO を Contracts DTO に変換する。
 
 ## 2. フィールドの扱い方（指針）
 

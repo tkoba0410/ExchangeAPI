@@ -201,11 +201,14 @@ API 系統とは性質が異なる。例外として **独立系統**として�
 * ExchangeInfo は **取引所配下の独立モジュール**として配置する。
 * ExchangeInfo の DTO は **独自定義**とするが、**Contracts と同構成**を必須とする。
   * 独自 DTO とする理由は「契約安定性・取引所固有運用のための境界」を明確化するため。
+  * 独自 DTO は **Contracts と同構成 + 追加情報**の形を許容する（例: `Local` 拡張）。
+  * Contracts への変換では **追加情報を落とす**（欠落ではなく境界）。
 * ExchangeInfo は **Static + Dynamic の合成**で構成する。
   * Static: 仕様・固定値・手動更新が必要な情報（市場一覧、手数料テーブル等）
   * Dynamic: API から取得可能な状態・制約（稼働状態、手数料率、最小数量等）
   * Compose: Static をベースに Dynamic で上書き・拡張する（市場の増減を許可）
 * ExchangeInfo の **Contracts への適合は ExchangeInfo/Adapter で行う**。
+  * 変換元は **Local（独自）DTO** を正とし、Contracts へ写像する。
 * 物理配置は次を基準形（Canon）とする。
 
 ```

@@ -14,12 +14,4 @@ public sealed record OrderRequest(
     OrderType OrderType,
     Size Size,
     Price? Price = null)
-{
-    /// <summary>成行注文を生成するユーティリティ。</summary>
-    public static OrderRequest Market(Symbol symbol, Side side, Size size) =>
-        new(symbol, side, OrderType.Market, size);
-
-    /// <summary>指値注文を生成するユーティリティ。</summary>
-    public static OrderRequest Limit(Symbol symbol, Side side, Size size, Price price) =>
-        new(symbol, side, OrderType.Limit, size, price);
-}
+;

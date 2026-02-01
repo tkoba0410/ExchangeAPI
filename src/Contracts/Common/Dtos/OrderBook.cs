@@ -1,52 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Contracts.Common.Dtos;
 
 /// <summary>
-/// 板スナップショット。Bids は価格降順、Asks は価格昇順で内部整列される。
+/// 板スナップショット。
 /// </summary>
-public sealed record OrderBook
-{
-    public IReadOnlyList<OrderBookLevel> Bids { get; init; }
-    public IReadOnlyList<OrderBookLevel> Asks { get; init; }
-
-    public OrderBook(IEnumerable<OrderBookLevel> bids, IEnumerable<OrderBookLevel> asks)
-    {
-        if (bids is null) throw new ArgumentNullException(nameof(bids));
-        if (asks is null) throw new ArgumentNullException(nameof(asks));
-
-        Bids = SortDescending(bids);
-        Asks = SortAscending(asks);
-    }
-
-    private static IReadOnlyList<OrderBookLevel> SortDescending(IEnumerable<OrderBookLevel> levels)
-    {
-        var dict = new SortedDictionary<decimal, decimal>(Comparer<decimal>.Create((x, y) => y.CompareTo(x)));
-        foreach (var level in levels)
-        {
-            var price = level.Price.Value;
-            dict[price] = dict.TryGetValue(price, out var size)
-                ? size + level.Size.Value
-                : level.Size.Value;
-        }
-        return dict.Select(kv => new OrderBookLevel(new Price(kv.Key), new Size(kv.Value))).ToList();
-    }
-
-    private static IReadOnlyList<OrderBookLevel> SortAscending(IEnumerable<OrderBookLevel> levels)
-    {
-        var dict = new SortedDictionary<decimal, decimal>(Comparer<decimal>.Default);
-        foreach (var level in levels)
-        {
-            var price = level.Price.Value;
-            dict[price] = dict.TryGetValue(price, out var size)
-                ? size + level.Size.Value
-                : level.Size.Value;
-        }
-        return dict.Select(kv => new OrderBookLevel(new Price(kv.Key), new Size(kv.Value))).ToList();
-    }
-}
+public sealed record OrderBook(
+    IReadOnlyList<OrderBookLevel> Bids,
+    IReadOnlyList<OrderBookLevel> Asks);
 
 /// <summary>
 /// 板の価格レベル。

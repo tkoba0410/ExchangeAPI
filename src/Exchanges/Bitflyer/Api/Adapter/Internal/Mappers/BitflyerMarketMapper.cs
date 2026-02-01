@@ -4,6 +4,7 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
+using ExchangeApi.Utilities.OrderBook;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Ticker;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 
@@ -31,7 +32,7 @@ internal static class MarketMapper
             .Select(a => new OrderBookLevel(new Price(a.Price), new Size(a.Size)))
             .ToArray();
 
-        return new OrderBook(bids, asks);
+        return OrderBookNormalizer.Normalize(bids, asks);
     }
 
     public static ExecutionMarket MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)

@@ -147,6 +147,7 @@
       <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Primitives'))" />
       <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Application'))" />
       <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Composition'))" />
+      <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Utilities'))" />
       <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Exchanges'))" />
       <_AllowedTopDirs Include="$([System.IO.Path]::Combine('$(_SrcRoot)', 'Contracts'))" />
       <_ExtraTopDirs Include="@(_TopDirs)" />

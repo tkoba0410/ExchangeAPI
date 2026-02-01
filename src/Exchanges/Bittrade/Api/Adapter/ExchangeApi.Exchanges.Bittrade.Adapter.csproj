@@ -14,6 +14,7 @@
     <ProjectReference Include="..\Normalized\ExchangeApi.Exchanges.Bittrade.Normalized.csproj" />
     <ProjectReference Include="..\..\..\..\Contracts\Facade\ExchangeApi.Contracts.Facade.csproj" />
     <ProjectReference Include="..\..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\ExchangeApi.Utilities.csproj" />
   </ItemGroup>
 
   <ItemGroup>

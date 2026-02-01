@@ -6,6 +6,7 @@
     <Project Path="src/Composition/ExchangeApi.Composition.csproj" />
     <Project Path="src/Contracts/Common/ExchangeApi.Contracts.Common.csproj" />
     <Project Path="src/Contracts/Facade/ExchangeApi.Contracts.Facade.csproj" />
+    <Project Path="src/Utilities/ExchangeApi.Utilities.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Api/Wire/ExchangeApi.Exchanges.Bitflyer.Wire.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Api/Raw/ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Api/Normalized/ExchangeApi.Exchanges.Bitflyer.Normalized.csproj" />

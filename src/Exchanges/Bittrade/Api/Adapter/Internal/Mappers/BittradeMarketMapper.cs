@@ -6,6 +6,7 @@ using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
 using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Utilities.OrderBook;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Mappers;
@@ -29,7 +30,7 @@ internal static class BittradeMarketMapper
             .Select(level => new OrderBookLevel(new Price(level.Price), new Size(level.Size)))
             .ToList();
 
-        return new OrderBook(bids, asks);
+        return OrderBookNormalizer.Normalize(bids, asks);
     }
 
     public static ExecutionMarket MapExecution(CommonSymbol symbol, BittradeExecutionNormalized normalized)

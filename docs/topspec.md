@@ -273,6 +273,7 @@ src/Exchanges/<Exchange>/Adapter/
 * Adapter は **Contracts の I/F・DTO を実装するための変換層**である。
 * Adapter は取引所固有の endpoint を公開しない（取引所固有 endpoint は Normalized まで）。
 * 変換は「Normalized（取引所内正規化）→ Contracts（取引所横断）」の一方向とする。
+  * 本項は **API 系統の Adapter**に適用する。ExchangeInfo 系統は 3.3.2 の規定に従う。
 
 ---
 
@@ -282,7 +283,7 @@ ExchangeInfo は独立系統であり、Contracts への適合は
 `ExchangeInfo/Adapter` で完結させる。
 API 系統の Adapter とは **別系統**として扱う。
 
-* API 系統の Adapter は従来通り `src/Exchanges/<Exchange>/Api/Adapter/` に置く。
+* API 系統の Adapter は従来通り `src/Exchanges/<Exchange>/Adapter/` に置く。
 * ExchangeInfo の Adapter は `src/Exchanges/<Exchange>/ExchangeInfo/Adapter/` に置く。
 
 ---

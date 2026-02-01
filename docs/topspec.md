@@ -211,6 +211,9 @@ API 系統とは性質が異なる。例外として **独立系統**として�
   * 変換元は **Local（独自）DTO** を正とし、Contracts へ写像する。
 * ExchangeInfo は **Normalized への依存を許容**し、API Adapter への依存を禁止する。
   * Dynamic 取得のために Normalized API を呼び出してよい。
+* ExchangeInfo は **共通サブシステム**を持てる。
+  * 共通化対象（例）: CallMapper / MarketResolver / Compose Merge / Static JSON Loader
+  * 共通サブシステムの配置は `src/Exchanges/Common/ExchangeInfo/` を基準とする。
 * 物理配置は次を基準形（Canon）とする。
 
 ```
@@ -219,6 +222,15 @@ src/Exchanges/<Exchange>/ExchangeInfo/
   Dynamic/
   Compose/
   Adapter/
+```
+
+* 取引所横断で共通化する場合は次を追加してよい。
+
+```
+src/Exchanges/Common/ExchangeInfo/
+  Adapter/
+  Compose/
+  Static/
 ```
 
 * namespace は物理配置に一致させる（例）:

@@ -12,6 +12,7 @@ API エンドポイント分類や署名分類とは無関係であり、**API �
 独自 DTO は **Contracts と同構成 + 追加情報**を許容し、ここでは便宜上 **Local DTO** と呼ぶ。
 Contracts への変換は Adapter で行い、追加情報は変換時に落とす（欠落ではなく境界）。
 ExchangeInfo は **Normalized への依存は許容**するが、**API Adapter への依存は禁止**とする。
+ExchangeInfo は **共通サブシステム**を持ち、取引所間で共通化できる。
 
 ## 1. Static / Dynamic / Compose / Adapter の役割
 
@@ -47,6 +48,15 @@ src/Exchanges/<Exchange>/ExchangeInfo/
   Dynamic/
   Compose/
   Adapter/
+```
+
+共通化する場合は以下の配置を追加する。
+
+```
+src/Exchanges/Common/ExchangeInfo/
+  Adapter/
+  Compose/
+  Static/
 ```
 
 ## 3. Dynamic ソースの例（Bitflyer）

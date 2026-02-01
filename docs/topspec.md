@@ -69,7 +69,7 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Wire 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Wire/
+src/Exchanges/<Exchange>/Api/Wire/
   Public/
     Endpoints/
   Private/
@@ -119,7 +119,7 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Raw 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Raw/
+src/Exchanges/<Exchange>/Api/Raw/
   Api/
   Public/
     Api/
@@ -169,7 +169,7 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Normalized 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Normalized/
+src/Exchanges/<Exchange>/Api/Normalized/
   Api/
   Public/
     Api/
@@ -251,7 +251,7 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Adapter 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Adapter/
+src/Exchanges/<Exchange>/Api/Adapter/
   Public/
     Api/
     Dtos/
@@ -262,9 +262,9 @@ src/Exchanges/<Exchange>/Adapter/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Public.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Private.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Internal.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Api.Adapter.Public.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Api.Adapter.Private.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Api.Adapter.Internal.*`
 
 * Adapter の Public/Private は「署名の有無」を表す。意味分類の代替として用いない（= Public/Private 以外で分けない）。
 
@@ -283,7 +283,7 @@ ExchangeInfo は独立系統であり、Contracts への適合は
 `ExchangeInfo/Adapter` で完結させる。
 API 系統の Adapter とは **別系統**として扱う。
 
-* API 系統の Adapter は従来通り `src/Exchanges/<Exchange>/Adapter/` に置く。
+* API 系統の Adapter は `src/Exchanges/<Exchange>/Api/Adapter/` に置く。
 * ExchangeInfo の Adapter は `src/Exchanges/<Exchange>/ExchangeInfo/Adapter/` に置く。
 
 ---

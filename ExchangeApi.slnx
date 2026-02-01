@@ -10,10 +10,10 @@
     <Project Path="src/Exchanges/Bitflyer/Api/Raw/ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Api/Normalized/ExchangeApi.Exchanges.Bitflyer.Normalized.csproj" />
     <Project Path="src/Exchanges/Bitflyer/Api/Adapter/ExchangeApi.Exchanges.Bitflyer.Adapter.csproj" />
-    <Project Path="src/Exchanges/Bittrade/Wire/ExchangeApi.Exchanges.Bittrade.Wire.csproj" />
-    <Project Path="src/Exchanges/Bittrade/Raw/ExchangeApi.Exchanges.Bittrade.Raw.csproj" />
-    <Project Path="src/Exchanges/Bittrade/Normalized/ExchangeApi.Exchanges.Bittrade.Normalized.csproj" />
-    <Project Path="src/Exchanges/Bittrade/Adapter/ExchangeApi.Exchanges.Bittrade.Adapter.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Api/Wire/ExchangeApi.Exchanges.Bittrade.Wire.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Api/Raw/ExchangeApi.Exchanges.Bittrade.Raw.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Api/Normalized/ExchangeApi.Exchanges.Bittrade.Normalized.csproj" />
+    <Project Path="src/Exchanges/Bittrade/Api/Adapter/ExchangeApi.Exchanges.Bittrade.Adapter.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Core.Tests/Core.Tests.csproj" />

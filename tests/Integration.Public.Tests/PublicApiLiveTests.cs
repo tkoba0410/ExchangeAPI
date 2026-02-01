@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Factory;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Protocol;
 using System.Net.Http;
@@ -75,7 +75,7 @@ public class PublicApiLiveTests
     public async Task Bittrade_PublicExchangeInfo_Works()
     {
         #pragma warning disable CS0618
-        var infoApi = ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory.BittradeClientFactory.CreateExchangeInfo();
+        var infoApi = ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Factory.BittradeClientFactory.CreateExchangeInfo();
         #pragma warning restore CS0618
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 

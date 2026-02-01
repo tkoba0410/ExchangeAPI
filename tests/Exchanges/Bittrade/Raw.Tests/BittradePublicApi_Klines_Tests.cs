@@ -1,4 +1,4 @@
-using ExchangeApi.Exchanges.Bittrade.Wire.Public.Endpoints;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Public.Endpoints;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;

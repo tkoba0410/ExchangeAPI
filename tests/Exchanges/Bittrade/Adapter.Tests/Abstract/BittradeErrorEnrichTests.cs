@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bittrade.Adapter.ExchangeInfo.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.ExchangeInfo.Internal;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
@@ -13,15 +13,15 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeI
 using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeApi.Contracts.Common.Dtos.Trading;
 using ExchangeApi.Contracts.Common.Errors;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 using ContractsRequests = ExchangeApi.Contracts.Facade.Requests;
-using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
+using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 using ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Helpers;
-using ExchangeApi.Exchanges.Bittrade.Raw.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 

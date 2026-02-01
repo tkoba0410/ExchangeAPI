@@ -1,10 +1,10 @@
-using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Raw.Internal;
-using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
-using ExchangeApi.Exchanges.Bittrade.Wire.Private.Endpoints;
-using ExchangeApi.Exchanges.Bittrade.Wire.Public.Endpoints;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw.Internal;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Constants;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Private.Endpoints;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Public.Endpoints;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
 

@@ -15,7 +15,7 @@
     <ProjectReference Include="..\Transport\ExchangeApi.Transport.csproj" />
     <ProjectReference Include="..\Primitives\ExchangeApi.Primitives.csproj" />
     <ProjectReference Include="..\Exchanges\Bitflyer\Api\Adapter\ExchangeApi.Exchanges.Bitflyer.Adapter.csproj" />
-    <ProjectReference Include="..\Exchanges\Bittrade\Adapter\ExchangeApi.Exchanges.Bittrade.Adapter.csproj" />
+    <ProjectReference Include="..\Exchanges\Bittrade\Api\Adapter\ExchangeApi.Exchanges.Bittrade.Adapter.csproj" />
   </ItemGroup>
 
 </Project>

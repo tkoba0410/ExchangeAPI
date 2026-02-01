@@ -4,13 +4,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Adapter.ExchangeInfo.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.ExchangeInfo.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.ExchangeInfo.Internal;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.ExchangeInfo.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Common.Dtos.Account;
 using ExchangeApi.Contracts.Common.Dtos.Common;
@@ -22,7 +22,7 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Contracts.Common.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
-using ExchangeApi.Exchanges.Bittrade.Normalized;
+using ExchangeApi.Exchanges.Bittrade.Api.Normalized;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 
@@ -124,9 +124,9 @@ public class BittradeMarketApiTests
         var transport = new HttpTransport(client, disposeHttpClient: true);
         var restClient = new RestClient(client.BaseAddress!, transport);
         var markets = CreateResolver(new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot"));
-        var raw = new ExchangeApi.Exchanges.Bittrade.Raw.Api.BittradeRawApi(
+        var raw = new ExchangeApi.Exchanges.Bittrade.Api.Raw.Api.BittradeRawApi(
             new ExchangeApi.Transport.Wire.WireTransport(restClient));
-        var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api.BittradeNormalizedPublicApi(raw);
+        var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api.BittradeNormalizedPublicApi(raw);
         return new MarketApi(normalizedMarketData, markets);
     }
 

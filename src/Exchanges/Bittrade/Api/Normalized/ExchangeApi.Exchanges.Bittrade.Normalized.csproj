@@ -21,6 +21,8 @@
     <Compile Include="..\..\ExchangeInfo\Static\**\*.cs" Link="ExchangeInfo/Static/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\..\ExchangeInfo\Dynamic\**\*.cs" Link="ExchangeInfo/Dynamic/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\..\ExchangeInfo\Compose\**\*.cs" Link="ExchangeInfo/Compose/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\..\Common\ExchangeInfo\Static\**\*.cs" Link="Common/ExchangeInfo/Static/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\..\Common\ExchangeInfo\Compose\**\*.cs" Link="Common/ExchangeInfo/Compose/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;

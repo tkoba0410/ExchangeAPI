@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExchangeApi.Exchanges.Common.ExchangeInfo.Compose;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Dynamic;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Static;
 
@@ -33,45 +34,34 @@ internal static class BittradeExchangeInfoComposer
         IReadOnlyList<BittradeStaticMarketInfo> staticMarkets,
         IReadOnlyList<BittradeDynamicMarketInfo>? dynamicMarkets)
     {
-        if (dynamicMarkets is null || dynamicMarkets.Count == 0)
-        {
-            return staticMarkets;
-        }
-
-        var byProduct = dynamicMarkets
+        var dynamic = (dynamicMarkets ?? Array.Empty<BittradeDynamicMarketInfo>())
             .Where(m => !string.IsNullOrWhiteSpace(m.ProductCode))
-            .ToDictionary(m => m.ProductCode!, StringComparer.OrdinalIgnoreCase);
-
-        var merged = staticMarkets
-            .Select(s => byProduct.TryGetValue(s.ProductCode, out var d) ? MergeMarket(s, d) : s)
             .ToList();
 
-        foreach (var extra in dynamicMarkets)
-        {
-            if (string.IsNullOrWhiteSpace(extra.ProductCode)) continue;
-            if (staticMarkets.Any(s => string.Equals(s.ProductCode, extra.ProductCode, StringComparison.OrdinalIgnoreCase)))
-                continue;
-
-            merged.Add(new BittradeStaticMarketInfo
+        return ExchangeInfoMerge.MergeByKey(
+            staticMarkets,
+            dynamic,
+            staticItem => staticItem.ProductCode,
+            dynamicItem => dynamicItem.ProductCode ?? string.Empty,
+            MergeMarket,
+            dynamicItem => new BittradeStaticMarketInfo
             {
-                Symbol = extra.Symbol ?? extra.ProductCode!,
-                ProductCode = extra.ProductCode!,
-                Type = extra.Type ?? "Spot",
-                MinSize = extra.MinSize,
-                MaxSize = extra.MaxSize,
-                MinNotional = extra.MinNotional,
-                PriceIncrement = extra.PriceIncrement,
-                SizeIncrement = extra.SizeIncrement,
-                MakerFeeRate = extra.MakerFeeRate,
-                TakerFeeRate = extra.TakerFeeRate,
-                FeeCurrency = extra.FeeCurrency,
-                FeeType = extra.FeeType,
-                IsSupported = extra.IsSupported,
-                StatusNote = extra.StatusNote
-            });
-        }
-
-        return merged;
+                Symbol = dynamicItem.Symbol ?? dynamicItem.ProductCode ?? string.Empty,
+                ProductCode = dynamicItem.ProductCode ?? string.Empty,
+                Type = dynamicItem.Type ?? "Spot",
+                MinSize = dynamicItem.MinSize,
+                MaxSize = dynamicItem.MaxSize,
+                MinNotional = dynamicItem.MinNotional,
+                PriceIncrement = dynamicItem.PriceIncrement,
+                SizeIncrement = dynamicItem.SizeIncrement,
+                MakerFeeRate = dynamicItem.MakerFeeRate,
+                TakerFeeRate = dynamicItem.TakerFeeRate,
+                FeeCurrency = dynamicItem.FeeCurrency,
+                FeeType = dynamicItem.FeeType,
+                IsSupported = dynamicItem.IsSupported,
+                StatusNote = dynamicItem.StatusNote
+            },
+            StringComparer.OrdinalIgnoreCase);
     }
 
     private static BittradeStaticMarketInfo MergeMarket(BittradeStaticMarketInfo s, BittradeDynamicMarketInfo d) =>

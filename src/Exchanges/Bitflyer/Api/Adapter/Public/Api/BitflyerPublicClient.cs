@@ -7,7 +7,7 @@ using ExchangeApi.Contracts.Common.Dtos.Market;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Market.Ticker;

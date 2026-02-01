@@ -1,7 +1,7 @@
 using System;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Internal;
+namespace ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 
 internal static class ExchangeInfoCallMapper
 {

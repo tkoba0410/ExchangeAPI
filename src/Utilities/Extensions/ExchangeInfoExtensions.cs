@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Utilities.Extensions;
 
@@ -13,14 +14,13 @@ public static class ExchangeInfoExtensions
     /// <summary>
     /// シンボルまたは productCode でマーケット情報を探す。
     /// </summary>
-    public static ExchangeMarketInfo? FindMarket(this ExchangeInfo info, string symbol, string? productCode = null)
+    public static ExchangeMarketInfo? FindMarket(this ExchangeInfo info, Symbol symbol, ProductCode? productCode = null)
     {
         if (info is null) throw new ArgumentNullException(nameof(info));
-        if (symbol is null) throw new ArgumentNullException(nameof(symbol));
 
         return info.Markets.FirstOrDefault(m =>
-            string.Equals(m.Symbol, symbol, StringComparison.Ordinal) ||
-            (!string.IsNullOrEmpty(productCode) && string.Equals(m.ProductCode, productCode, StringComparison.Ordinal)));
+            m.Symbol.Equals(symbol) ||
+            (productCode is { } code && m.ProductCode.Equals(code)));
     }
 
     /// <summary>
@@ -28,15 +28,14 @@ public static class ExchangeInfoExtensions
     /// </summary>
     public static bool TryGetFeeRates(
         this ExchangeInfo info,
-        string symbol,
+        Symbol symbol,
         out decimal? makerFeeRate,
         out decimal? takerFeeRate,
-        out string? feeCurrency,
+        out CurrencyCode? feeCurrency,
         out FeeType? feeType,
-        string? productCode = null)
+        ProductCode? productCode = null)
     {
         if (info is null) throw new ArgumentNullException(nameof(info));
-        if (symbol is null) throw new ArgumentNullException(nameof(symbol));
 
         var market = info.FindMarket(symbol, productCode);
         if (market is null)

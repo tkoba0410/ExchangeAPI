@@ -14,6 +14,7 @@ using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Static;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Requests.GetSymbolsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos.BittradeSymbolNormalized>>;
@@ -121,7 +122,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
     }
 
     internal static string ToApiSymbol(ExchangeMarketInfo market) =>
-        BittradeSymbol.Normalize(market.ProductCode);
+        BittradeSymbol.Normalize(market.ProductCode.Value);
 
     private static ExchangeInfoDto MapExchangeInfo(BittradeStaticExchangeInfo info)
     {
@@ -135,9 +136,9 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
 
     private static ExchangeMarketInfo MapMarket(BittradeStaticMarketInfo market) =>
         new(
-            Symbol: market.Symbol,
-            ProductCode: market.ProductCode,
-            Type: market.Type,
+            Symbol: Symbol.ParseOrThrow(market.Symbol),
+            ProductCode: ProductCode.ParseOrThrow(market.ProductCode),
+            Type: MarketType.ParseOrThrow(market.Type),
             MinSize: ToSize(market.MinSize),
             MaxSize: ToSize(market.MaxSize),
             MinNotional: market.MinNotional,
@@ -145,10 +146,13 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
             SizeIncrement: ToSize(market.SizeIncrement),
             MakerFeeRate: market.MakerFeeRate,
             TakerFeeRate: market.TakerFeeRate,
-            FeeCurrency: market.FeeCurrency,
+            FeeCurrency: ToCurrencyCode(market.FeeCurrency),
             FeeType: MapFeeType(market.FeeType),
             IsSupported: market.IsSupported,
             StatusNote: market.StatusNote);
+
+    private static CurrencyCode? ToCurrencyCode(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : CurrencyCodeConverter.FromString(value);
 
     private static ExchangeFeatureFlags? MapFeatures(BittradeStaticFeatureFlags? features) =>
         features is null

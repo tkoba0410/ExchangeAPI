@@ -15,6 +15,6 @@ public class BitflyerExchangeInfoApi_Tests
         var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
 
-        Assert.Contains(info.Markets, market => market.Symbol == "BTC/JPY" && market.ProductCode == "BTC_JPY");
+        Assert.Contains(info.Markets, market => market.Symbol.Value == "BTC/JPY" && market.ProductCode.Value == "BTC_JPY");
     }
 }

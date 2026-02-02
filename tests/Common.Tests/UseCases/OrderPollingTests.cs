@@ -19,7 +19,7 @@ public sealed class OrderPollingTests
     public async Task WaitForOrderAsync_ReturnsLastStatus_WhenMaxAttemptsReached()
     {
         var api = new FakeTradingApi(_ => new OrderStatusSnapshot(
-            ProductCode: "BTC_JPY",
+            ProductCode: ProductCode.ParseOrThrow("BTC_JPY"),
             Key: new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
             Status: OrderState.Active,
             ExecutedSize: new Size(0m),
@@ -44,7 +44,7 @@ public sealed class OrderPollingTests
     public async Task WaitForOrderAsync_CancelsDuringDelay()
     {
         var api = new FakeTradingApi(_ => new OrderStatusSnapshot(
-            ProductCode: "BTC_JPY",
+            ProductCode: ProductCode.ParseOrThrow("BTC_JPY"),
             Key: new OrderKey(OrderIdKind.AcceptanceId, "order-1"),
             Status: OrderState.Active,
             ExecutedSize: new Size(0m),

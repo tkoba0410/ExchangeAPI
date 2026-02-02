@@ -37,7 +37,7 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         }
 
         _cache ??= ((CallResult<ExchangeInfoDto>.Ok)exchangeInfoCall.Result).Response;
-        var market = FindMarket(_cache, symbol.Value);
+        var market = FindMarket(_cache, symbol);
         if (market is null)
         {
             return ErrorFromChild(request, exchangeInfoCall, new CallError(CallErrorKind.Semantic, $"Symbol not supported: {symbol.Value}"));
@@ -46,11 +46,11 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         return OkFromChild(request, exchangeInfoCall, market);
     }
 
-    private static ExchangeMarketInfo? FindMarket(ExchangeInfoDto info, string symbol)
+    private static ExchangeMarketInfo? FindMarket(ExchangeInfoDto info, Symbol symbol)
     {
         foreach (var market in info.Markets)
         {
-            if (string.Equals(market.Symbol, symbol, StringComparison.Ordinal))
+            if (market.Symbol.Equals(symbol))
             {
                 return market;
             }

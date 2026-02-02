@@ -226,7 +226,7 @@ internal sealed class BittradeTradingApi
 
     private static OrderStatus MapOrderStatus(BittradeOrderStatus status) =>
         new(
-            ProductCode: status.ProductCode,
+            ProductCode: ProductCode.ParseOrThrow(status.ProductCode),
             Key: status.Key,
             Status: status.Status,
             ExecutedSize: status.ExecutedSize,

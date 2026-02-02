@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Markets;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
@@ -45,7 +46,7 @@ internal static class BitflyerTestHelpers
     public static IBitflyerMarketResolver CreateResolver()
     {
         var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
-            new[] { new ExchangeMarketInfo("BTC/JPY", "BTC_JPY", "Spot") },
+            new[] { new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("BTC_JPY"), MarketType.ParseOrThrow("Spot")) },
             null,
             null,
             null)));

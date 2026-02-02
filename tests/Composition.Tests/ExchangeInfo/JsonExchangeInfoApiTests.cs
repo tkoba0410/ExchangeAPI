@@ -56,8 +56,8 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
 
         Assert.Single(info.Markets);
         var market = info.Markets[0];
-        Assert.Equal("BTC_JPY", market.ProductCode);
-        Assert.Equal("BTC", market.FeeCurrency);
+        Assert.Equal("BTC_JPY", market.ProductCode.Value);
+        Assert.Equal(CurrencyCode.Btc, market.FeeCurrency);
         Assert.Equal(FeeType.Percentage, market.FeeType);
         Assert.NotNull(info.Features);
         Assert.NotNull(info.RateLimits);
@@ -89,7 +89,7 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
 
         Assert.Single(info.Markets);
         var market = info.Markets[0];
-        Assert.Equal("JPY", market.FeeCurrency); // overlay wins
+        Assert.Equal(CurrencyCode.Jpy, market.FeeCurrency); // overlay wins
         Assert.Equal(FeeType.Flat, market.FeeType);
         Assert.Equal(0.003m, market.MakerFeeRate);
         Assert.True(info.Features?.SupportsWebSocket);

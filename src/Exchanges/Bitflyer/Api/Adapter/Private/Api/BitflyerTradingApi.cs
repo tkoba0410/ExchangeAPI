@@ -215,7 +215,7 @@ internal sealed class BitflyerTradingApi
 
     private static OrderStatus MapOrderStatus(BitflyerOrderStatus status) =>
         new(
-            ProductCode: status.ProductCode,
+            ProductCode: ProductCode.ParseOrThrow(status.ProductCode),
             Key: status.Key,
             Status: status.Status,
             ExecutedSize: status.ExecutedSize,

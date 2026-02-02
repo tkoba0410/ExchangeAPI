@@ -15,6 +15,7 @@ using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Dynamic;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Requests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos.BitflyerMarketNormalized>>;
@@ -122,9 +123,9 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 
     private static ExchangeMarketInfo MapMarket(BitflyerStaticMarketInfo market) =>
         new(
-            Symbol: market.Symbol,
-            ProductCode: market.ProductCode,
-            Type: market.Type,
+            Symbol: Symbol.ParseOrThrow(market.Symbol),
+            ProductCode: ProductCode.ParseOrThrow(market.ProductCode),
+            Type: MarketType.ParseOrThrow(market.Type),
             MinSize: ToSize(market.MinSize),
             MaxSize: ToSize(market.MaxSize),
             MinNotional: market.MinNotional,
@@ -132,10 +133,13 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             SizeIncrement: ToSize(market.SizeIncrement),
             MakerFeeRate: market.MakerFeeRate,
             TakerFeeRate: market.TakerFeeRate,
-            FeeCurrency: market.FeeCurrency,
+            FeeCurrency: ToCurrencyCode(market.FeeCurrency),
             FeeType: MapFeeType(market.FeeType),
             IsSupported: market.IsSupported,
             StatusNote: market.StatusNote);
+
+    private static CurrencyCode? ToCurrencyCode(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : CurrencyCodeConverter.FromString(value);
 
     private static ExchangeFeatureFlags? MapFeatures(BitflyerStaticFeatureFlags? features) =>
         features is null

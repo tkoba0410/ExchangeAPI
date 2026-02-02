@@ -5,7 +5,7 @@ namespace ExchangeApi.Contracts.Common.Dtos;
 
 /// <summary>注文ステータスの簡易ビュー（ポーリング用）。</summary>
 public sealed record OrderStatus(
-    string ProductCode,
+    ProductCode ProductCode,
     OrderKey Key,
     OrderState Status,
     Size ExecutedSize,

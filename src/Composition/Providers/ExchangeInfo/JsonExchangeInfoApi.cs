@@ -253,7 +253,7 @@ public sealed class JsonExchangeInfoApi : IPublicApi
     }
 
     private static string GetKey(ExchangeMarketInfo market) =>
-        string.IsNullOrWhiteSpace(market.ProductCode) ? market.Symbol : market.ProductCode;
+        market.ProductCode.IsEmpty ? market.Symbol.Value : market.ProductCode.Value;
 
     private static JsonSerializerOptions CreateDefaultOptions() =>
         new()

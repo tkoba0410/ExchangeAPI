@@ -24,8 +24,8 @@ public class BittradeExchangeInfoApiTests
 
         Assert.Single(info.Markets);
         var m = info.Markets[0];
-        Assert.Equal("BTC/JPY", m.Symbol);
-        Assert.Equal("btcjpy", m.ProductCode);
+        Assert.Equal("BTC/JPY", m.Symbol.Value);
+        Assert.Equal("btcjpy", m.ProductCode.Value);
         Assert.Equal(new Price(0.01m), m.PriceIncrement);
         Assert.Equal(new Size(0.0001m), m.SizeIncrement);
         Assert.Equal(new Size(0.0001m), m.MinSize);

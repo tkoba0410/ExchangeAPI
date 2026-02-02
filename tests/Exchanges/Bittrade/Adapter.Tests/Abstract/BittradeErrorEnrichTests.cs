@@ -69,7 +69,7 @@ public sealed class BittradeErrorEnrichTests
 
     private static IExchangeMarketResolver CreateResolver() =>
         new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
-            new[] { new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot") },
+            new[] { new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("btcjpy"), MarketType.ParseOrThrow("Spot")) },
             null,
             null,
             null)));

@@ -4,7 +4,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Application.Trading;
 
 public sealed record OrderStatusSnapshot(
-    string ProductCode,
+    ProductCode ProductCode,
     OrderKey Key,
     OrderState Status,
     Size ExecutedSize,

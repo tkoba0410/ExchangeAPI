@@ -30,9 +30,9 @@ internal sealed class BitflyerNormalizedMarketResolver : IBitflyerMarketResolver
         }
 
         if (innerCall.Result is CallResult<ExchangeMarketInfo>.Ok ok &&
-            !string.IsNullOrWhiteSpace(ok.Response.ProductCode))
+            !ok.Response.ProductCode.IsEmpty)
         {
-            var market = new BitflyerMarketInfo(symbol, ok.Response.ProductCode);
+            var market = new BitflyerMarketInfo(symbol, ok.Response.ProductCode.Value);
             return OkFromChild(request, innerCall, market);
         }
 

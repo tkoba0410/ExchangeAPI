@@ -12,7 +12,7 @@ public sealed class OrderStatusJsonTests
     public void OrderStatus_RoundTrips_WithOrderKey()
     {
         var status = new OrderStatus(
-            ProductCode: "BTC_JPY",
+            ProductCode: ProductCode.ParseOrThrow("BTC_JPY"),
             Key: new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-1"),
             Status: OrderState.Completed,
             ExecutedSize: new Size(0.01m),

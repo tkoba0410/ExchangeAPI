@@ -118,7 +118,7 @@ public class BittradeMarketApiTests
         var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost/") };
         var transport = new HttpTransport(client, disposeHttpClient: true);
         var restClient = new RestClient(client.BaseAddress!, transport);
-        var markets = CreateResolver(new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot"));
+        var markets = CreateResolver(new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("btcjpy"), MarketType.ParseOrThrow("Spot")));
         var raw = new ExchangeApi.Exchanges.Bittrade.Api.Raw.Api.BittradeRawApi(
             new ExchangeApi.Transport.Wire.WireTransport(restClient));
         var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api.BittradeNormalizedPublicApi(raw);

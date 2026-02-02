@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Contracts.Common.Dtos;
 
@@ -19,9 +20,9 @@ public sealed record ExchangeInfo(
 /// FeeType は Percentage/Flat を表す。Flat の場合は 1注文あたり固定額と解釈し、FeeCurrency と併せて使う。別トークン割引や特典は将来拡張で表現する前提。
 /// </remarks>
 public sealed record ExchangeMarketInfo(
-    string Symbol,
-    string ProductCode,
-    string Type,
+    Symbol Symbol,
+    ProductCode ProductCode,
+    MarketType Type,
     Size? MinSize = null,
     Size? MaxSize = null,
     decimal? MinNotional = null,
@@ -29,7 +30,7 @@ public sealed record ExchangeMarketInfo(
     Size? SizeIncrement = null,
     decimal? MakerFeeRate = null,
     decimal? TakerFeeRate = null,
-    string? FeeCurrency = null,
+    CurrencyCode? FeeCurrency = null,
     FeeType? FeeType = FeeType.Percentage,
     bool? IsSupported = null,
     string? StatusNote = null);

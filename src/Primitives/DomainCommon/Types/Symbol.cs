@@ -19,7 +19,12 @@ public readonly record struct Symbol
 
     public override string ToString() => Value ?? string.Empty;
 
-    public static Symbol Parse(string value)
+    public static Symbol Parse(string? value)
+    {
+        return TryParse(value, out var symbol) ? symbol : Empty;
+    }
+
+    public static Symbol ParseOrThrow(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {

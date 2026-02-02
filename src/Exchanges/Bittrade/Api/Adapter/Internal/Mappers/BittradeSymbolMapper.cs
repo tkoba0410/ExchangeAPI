@@ -6,7 +6,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Mappers;
 
 internal static class BittradeSymbolMapper
 {
-    public static Symbol Parse(string symbol)
+    public static Symbol ParseOrThrow(string symbol)
     {
         if (string.IsNullOrWhiteSpace(symbol))
         {

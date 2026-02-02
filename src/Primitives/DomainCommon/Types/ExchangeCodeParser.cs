@@ -7,12 +7,17 @@ public static class ExchangeCodeParser
 {
     public static ExchangeCode Parse(string value)
     {
-        if (TryParse(value, out var exchange))
+        return TryParse(value, out var exchange) ? exchange : ExchangeCode.Unknown;
+    }
+
+    public static ExchangeCode ParseOrThrow(string value)
+    {
+        if (!TryParse(value, out var exchange))
         {
-            return exchange;
+            throw new ArgumentException($"Unknown exchange code: '{value}'.", nameof(value));
         }
 
-        throw new ArgumentException($"Unknown exchange code: '{value}'.", nameof(value));
+        return exchange;
     }
 
     public static bool TryParse(string? value, out ExchangeCode exchange)

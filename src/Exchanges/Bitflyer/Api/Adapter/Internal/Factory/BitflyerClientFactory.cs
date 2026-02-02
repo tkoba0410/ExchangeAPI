@@ -40,7 +40,8 @@ public static class BitflyerClientFactory
         var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = BitflyerApiBaseUri };
         IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
 
-        var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(options.PolicyOptions);
+        var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
+            options.PolicyOptions ?? BitflyerHttpPolicyDefaults.Create());
         var logger = options.Logger;
         var observer = options.Observer;
         var errorClassifier = options.ErrorClassifier ?? BitflyerErrorClassifier.Instance;
@@ -115,7 +116,8 @@ public static class BitflyerClientFactory
         IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
 
         IExchangeClock clock = new SystemClock();
-        var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(options.PolicyOptions);
+        var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
+            options.PolicyOptions ?? BitflyerHttpPolicyDefaults.Create());
         var logger = options.Logger;
         var observer = options.Observer;
         var errorClassifier = options.ErrorClassifier ?? BitflyerErrorClassifier.Instance;

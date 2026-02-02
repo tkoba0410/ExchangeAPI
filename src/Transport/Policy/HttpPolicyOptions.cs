@@ -24,5 +24,4 @@ public sealed class HttpPolicyOptions
 
     public TimeSpan CircuitBreakerOpenDuration { get; init; } = TimeSpan.FromSeconds(5);
 
-    public static HttpPolicyOptions BitflyerDefaults() => new();
 }

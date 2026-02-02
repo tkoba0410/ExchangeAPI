@@ -8,7 +8,7 @@ public static class HttpPolicyFactory
 {
     public static IHttpPolicy CreateDefault(HttpPolicyOptions? options = null, IPolicyObserver? observer = null)
     {
-        var opts = options ?? HttpPolicyOptions.BitflyerDefaults();
+        var opts = options ?? new HttpPolicyOptions();
         var obs = observer ?? NoOpPolicyObserver.Instance;
 
         return new HttpPolicyPipeline(

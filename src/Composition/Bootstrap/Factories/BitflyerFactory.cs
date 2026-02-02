@@ -60,7 +60,8 @@ public static class BitflyerFactory
     private static RestClient CreateRestClient(BitflyerFactoryOptions settings, IRequestSigner? signer)
     {
         var baseUri = settings.BaseUri ?? DefaultBaseUri;
-        var policy = settings.Policy ?? HttpPolicyFactory.CreateDefault(settings.PolicyOptions);
+        var policy = settings.Policy ?? HttpPolicyFactory.CreateDefault(
+            settings.PolicyOptions ?? BitflyerHttpPolicyDefaults.Create());
 
         return RestClientFactory.Create(
             baseUri,

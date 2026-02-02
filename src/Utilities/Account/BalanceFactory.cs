@@ -17,9 +17,8 @@ public static class BalanceFactory
         var code = codeResolver?.Invoke(currency) ?? CurrencyCodeConverter.FromString(currency);
 
         return new Balance(
-            Currency: currency,
+            Currency: code,
             Amount: amount,
-            Available: available,
-            CurrencyCode: code);
+            Available: available);
     }
 }

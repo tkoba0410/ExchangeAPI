@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Contracts.Facade.Interfaces;
@@ -28,7 +29,7 @@ public interface IPublicApi
 
     Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
         Symbol symbol,
-        string period,
+        Period period,
         int? size = null,
         CancellationToken cancellationToken = default);
 
@@ -42,7 +43,7 @@ public interface IPublicApi
     Task<Call<GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+    Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
         CancellationToken cancellationToken = default);
 
     Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(

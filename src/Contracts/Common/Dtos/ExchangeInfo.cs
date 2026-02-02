@@ -33,7 +33,7 @@ public sealed record ExchangeMarketInfo(
     CurrencyCode? FeeCurrency = null,
     FeeType? FeeType = FeeType.Percentage,
     bool? IsSupported = null,
-    string? StatusNote = null);
+    FreeText? StatusNote = null);
 
 public sealed record ExchangeFeatureFlags(
     bool SupportsWebSocket,
@@ -62,7 +62,7 @@ public enum FeeType
 public sealed record ExchangeMaintenance(
     ExchangeMaintenanceStatus? Status,
     DateTimeOffset? PlannedUntil = null,
-    string? Message = null);
+    FreeText? Message = null);
 
 public enum ExchangeMaintenanceStatus
 {

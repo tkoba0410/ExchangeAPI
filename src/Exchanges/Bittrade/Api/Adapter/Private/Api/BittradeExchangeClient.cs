@@ -107,7 +107,7 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
 
     public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
         CommonSymbol symbol,
-        string period,
+        Period period,
         int? size = null,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetHistoryKlineCallAsync(symbol, period, size, cancellationToken);
@@ -126,7 +126,7 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
-    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetCurrencysCallAsync(cancellationToken);
 

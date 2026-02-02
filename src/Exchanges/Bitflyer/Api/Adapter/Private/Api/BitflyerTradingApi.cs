@@ -198,7 +198,7 @@ internal sealed class BitflyerTradingApi
 
         return new OrderSnapshotItem(
             CreatedAt: createdAt,
-            OrderId: order.Key.Value,
+            OrderId: OrderId.ParseOrThrow(order.Key.Value),
             Market: order.Symbol,
             Side: order.Side,
             OrderType: orderType,
@@ -210,8 +210,8 @@ internal sealed class BitflyerTradingApi
     private static OrderResult MapOrderResult(BitflyerOrderResult result) =>
         new(
             Key: result.Key,
-            ExchangeOrderId: result.ExchangeOrderId,
-            AcceptanceId: result.AcceptanceId);
+            ExchangeOrderId: ToExchangeOrderId(result.ExchangeOrderId),
+            AcceptanceId: ToAcceptanceId(result.AcceptanceId));
 
     private static OrderStatus MapOrderStatus(BitflyerOrderStatus status) =>
         new(
@@ -223,4 +223,9 @@ internal sealed class BitflyerTradingApi
             Price: status.Price,
             AveragePrice: status.AveragePrice);
 
+    private static ExchangeOrderId? ToExchangeOrderId(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : new ExchangeOrderId(value);
+
+    private static AcceptanceId? ToAcceptanceId(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : new AcceptanceId(value);
 }

@@ -47,12 +47,12 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             Assert.Equal(2, result.Count);
 
             var jpy = result[0];
-            Assert.Equal("JPY", jpy.Currency);
+            Assert.Equal(CurrencyCode.Jpy, jpy.Currency);
             Assert.Equal(100000m, jpy.Amount);
             Assert.Equal(80000m, jpy.Available);
 
             var btc = result[1];
-            Assert.Equal("BTC", btc.Currency);
+            Assert.Equal(CurrencyCode.Btc, btc.Currency);
             Assert.Equal(0.01m, btc.Amount);
             Assert.Equal(0.009m, btc.Available);
         }

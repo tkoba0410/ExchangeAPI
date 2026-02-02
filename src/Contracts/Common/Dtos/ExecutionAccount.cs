@@ -8,11 +8,11 @@ namespace ExchangeApi.Contracts.Common.Dtos;
 /// </summary>
 public sealed record ExecutionAccount(
     Symbol Symbol,
-    string OrderId,
+    OrderId OrderId,
     Side Side,
     Price Price,
     Size Size,
     DateTimeOffset ExecutedAt,
     decimal? Commission = null,
     decimal? Pnl = null,
-    string? Liquidity = null);
+    FreeText? Liquidity = null);

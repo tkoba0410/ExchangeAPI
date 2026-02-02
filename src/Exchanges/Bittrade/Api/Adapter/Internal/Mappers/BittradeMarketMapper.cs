@@ -36,12 +36,12 @@ internal static class BittradeMarketMapper
     public static ExecutionMarket MapExecution(CommonSymbol symbol, BittradeExecutionNormalized normalized)
     {
         return new ExecutionMarket(
-            symbol,
-            normalized.Id,
-            MapSide(normalized.Side),
-            new Price(normalized.Price),
-            new Size(normalized.Size),
-            normalized.Timestamp);
+            Symbol: symbol,
+            OrderId: OrderId.ParseOrThrow(normalized.Id),
+            Side: MapSide(normalized.Side),
+            Price: new Price(normalized.Price),
+            Size: new Size(normalized.Size),
+            ExecutedAt: normalized.Timestamp);
     }
 
     private static Side MapSide(BittradeOrderSide side) =>

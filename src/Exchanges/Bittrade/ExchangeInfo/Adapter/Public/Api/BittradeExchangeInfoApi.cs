@@ -71,7 +71,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         }
     }
 
-    public async Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+    public async Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetCurrencysRequest();
@@ -88,7 +88,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         }
         catch (Exception ex)
         {
-            return ExchangeInfoCallMapper.FromException<GetCurrencysRequest, IReadOnlyList<string>>(
+            return ExchangeInfoCallMapper.FromException<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
                 request,
                 startedAt,
                 BittradeExchangeInfoOperations.GetCurrencys,
@@ -149,10 +149,13 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
             FeeCurrency: ToCurrencyCode(market.FeeCurrency),
             FeeType: MapFeeType(market.FeeType),
             IsSupported: market.IsSupported,
-            StatusNote: market.StatusNote);
+            StatusNote: ToFreeText(market.StatusNote));
 
     private static CurrencyCode? ToCurrencyCode(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : CurrencyCodeConverter.FromString(value);
+
+    private static FreeText? ToFreeText(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : new FreeText(value);
 
     private static ExchangeFeatureFlags? MapFeatures(BittradeStaticFeatureFlags? features) =>
         features is null
@@ -176,7 +179,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
             : new ExchangeMaintenance(
                 Status: MapMaintenanceStatus(maintenance.Status),
                 PlannedUntil: maintenance.PlannedUntil,
-                Message: maintenance.Message);
+                Message: ToFreeText(maintenance.Message));
 
     private static ExchangeMaintenanceStatus? MapMaintenanceStatus(BittradeStaticMaintenanceStatus? status) =>
         status switch

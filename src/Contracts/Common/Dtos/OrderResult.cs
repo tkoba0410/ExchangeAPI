@@ -10,5 +10,5 @@ namespace ExchangeApi.Contracts.Common.Dtos;
 /// </summary>
 public sealed record OrderResult(
     OrderKey Key,
-    string? ExchangeOrderId = null,
-    string? AcceptanceId = null);
+    ExchangeOrderId? ExchangeOrderId = null,
+    AcceptanceId? AcceptanceId = null);

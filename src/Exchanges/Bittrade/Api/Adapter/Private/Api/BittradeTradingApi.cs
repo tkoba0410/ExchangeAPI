@@ -209,7 +209,7 @@ internal sealed class BittradeTradingApi
 
         return new OrderSnapshotItem(
             CreatedAt: createdAt,
-            OrderId: order.Key.Value,
+            OrderId: OrderId.ParseOrThrow(order.Key.Value),
             Market: order.Symbol,
             Side: order.Side,
             OrderType: orderType,
@@ -221,8 +221,8 @@ internal sealed class BittradeTradingApi
     private static OrderResult MapOrderResult(BittradeOrderResult result) =>
         new(
             Key: result.Key,
-            ExchangeOrderId: result.ExchangeOrderId,
-            AcceptanceId: result.AcceptanceId);
+            ExchangeOrderId: ToExchangeOrderId(result.ExchangeOrderId),
+            AcceptanceId: ToAcceptanceId(result.AcceptanceId));
 
     private static OrderStatus MapOrderStatus(BittradeOrderStatus status) =>
         new(
@@ -234,4 +234,9 @@ internal sealed class BittradeTradingApi
             Price: status.Price,
             AveragePrice: status.AveragePrice);
 
+    private static ExchangeOrderId? ToExchangeOrderId(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : new ExchangeOrderId(value);
+
+    private static AcceptanceId? ToAcceptanceId(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : new AcceptanceId(value);
 }

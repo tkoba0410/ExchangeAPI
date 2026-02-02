@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -93,7 +94,7 @@ internal sealed class BitflyerSpotHistoryApi
     {
         var items = executions.Select(e => new ExecutionItem(
             Timestamp: e.ExecutedAt,
-            ExecutionId: e.OrderId,
+            ExecutionId: ExecutionId.ParseOrThrow(e.OrderId),
             Market: e.Symbol,
             Side: e.Side,
             Price: e.Price,
@@ -117,7 +118,7 @@ internal sealed class BitflyerSpotHistoryApi
 
         return new OrderSnapshotItem(
             CreatedAt: createdAt,
-            OrderId: order.Key.Value,
+            OrderId: OrderId.ParseOrThrow(order.Key.Value),
             Market: order.Symbol,
             Side: order.Side,
             OrderType: orderType,

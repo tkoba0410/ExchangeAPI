@@ -6,7 +6,7 @@ namespace ExchangeApi.Contracts.Common.Dtos;
 
 public sealed record OrderSnapshotItem(
     DateTimeOffset CreatedAt,
-    string OrderId,
+    OrderId OrderId,
     Symbol Market,
     Side Side,
     OrderSnapshotType OrderType,

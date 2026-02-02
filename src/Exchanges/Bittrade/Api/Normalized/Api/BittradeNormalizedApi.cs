@@ -12,6 +12,7 @@ using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Markets;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Api;
@@ -51,18 +52,18 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
     }
 
     public Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default) =>
         _publicApi.GetDetailMergedCallAsync(productCode, ct);
 
     public Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
-        string productCode,
+        ProductCode productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default) =>
         _publicApi.GetDepthCallAsync(productCode, depthType, ct);
 
     public Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default) =>
         _publicApi.GetTradeCallAsync(productCode, ct);
 
@@ -70,7 +71,7 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
         CancellationToken ct = default) =>
         _publicApi.GetSymbolsCallAsync(ct);
 
-    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
         CancellationToken ct = default) =>
         _publicApi.GetCurrencysCallAsync(ct);
 
@@ -79,8 +80,8 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
         _publicApi.GetTimestampCallAsync(ct);
 
     public Task<Call<GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>> GetHistoryKlineCallAsync(
-        string productCode,
-        string period,
+        ProductCode productCode,
+        Period period,
         int? size = null,
         CancellationToken ct = default) =>
         _publicApi.GetHistoryKlineCallAsync(productCode, period, size, ct);
@@ -90,7 +91,7 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
         _publicApi.GetTickersCallAsync(ct);
 
     public Task<Call<GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetHistoryTradeCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default) =>
         _publicApi.GetHistoryTradeCallAsync(productCode, ct);
 

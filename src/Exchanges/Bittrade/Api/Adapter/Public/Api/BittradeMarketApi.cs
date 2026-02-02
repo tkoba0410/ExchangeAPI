@@ -65,9 +65,8 @@ internal sealed class MarketApi
                     BittradeOperations.MarketData.GetTicker);
             }
 
-            var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
-                ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
-            var call = await _marketData.GetDetailMergedCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+            var call = await _marketData.GetDetailMergedCallAsync(productCode, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -111,9 +110,8 @@ internal sealed class MarketApi
                     BittradeOperations.MarketData.GetOrderBook);
             }
 
-            var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
-                ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
-            var call = await _marketData.GetDepthCallAsync(apiSymbol, ct: cancellationToken).ConfigureAwait(false);
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+            var call = await _marketData.GetDepthCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -157,9 +155,8 @@ internal sealed class MarketApi
                     BittradeOperations.MarketData.GetExecutions);
             }
 
-            var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
-                ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
-            var call = await _marketData.GetTradeCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+            var call = await _marketData.GetTradeCallAsync(productCode, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -186,7 +183,7 @@ internal sealed class MarketApi
 
     public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
         CommonSymbol symbol,
-        string period,
+        Period period,
         int? size = null,
         CancellationToken cancellationToken = default) =>
         GetHistoryKlineInternalAsync(symbol, period, size, cancellationToken);
@@ -212,7 +209,7 @@ internal sealed class MarketApi
 
     private async Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineInternalAsync(
         CommonSymbol symbol,
-        string period,
+        Period period,
         int? size,
         CancellationToken cancellationToken)
     {
@@ -231,10 +228,9 @@ internal sealed class MarketApi
                     BittradeOperations.MarketData.GetCandlesticks);
             }
 
-            var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
-                ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _marketData
-                .GetHistoryKlineCallAsync(apiSymbol, period, size, cancellationToken)
+                .GetHistoryKlineCallAsync(productCode, period, size, cancellationToken)
                 .ConfigureAwait(false);
 
             return ApiCallMapper.MapCall(
@@ -297,9 +293,8 @@ internal sealed class MarketApi
                     BittradeOperations.MarketData.GetHistoryTrade);
             }
 
-            var apiSymbol = BittradeExchangeInfoApi.ToApiSymbol(
-                ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response);
-            var call = await _marketData.GetHistoryTradeCallAsync(apiSymbol, cancellationToken).ConfigureAwait(false);
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+            var call = await _marketData.GetHistoryTradeCallAsync(productCode, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -324,7 +319,7 @@ internal sealed class MarketApi
 
     private static IReadOnlyList<Candlestick> MapCandlesticks(
         CommonSymbol symbol,
-        string period,
+        Period period,
         IReadOnlyList<BittradeKlineNormalized> klines)
     {
         var timescale = ParseTimescale(period);
@@ -356,9 +351,14 @@ internal sealed class MarketApi
         return candles;
     }
 
-    private static TimeSpan ParseTimescale(string period)
+    private static TimeSpan ParseTimescale(Period period)
     {
-        return period switch
+        if (period.IsEmpty)
+        {
+            return TimeSpan.Zero;
+        }
+
+        return period.Value switch
         {
             "1min" => TimeSpan.FromMinutes(1),
             "3min" => TimeSpan.FromMinutes(3),

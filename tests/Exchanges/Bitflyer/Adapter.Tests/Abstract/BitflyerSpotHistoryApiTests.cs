@@ -49,7 +49,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
             Assert.Single(result);
             var order = result[0];
-            Assert.Equal("JRF-1", order.OrderId);
+            Assert.Equal(OrderId.ParseOrThrow("JRF-1"), order.OrderId);
             Assert.Equal(Side.Buy, order.Side);
             Assert.Equal(OrderSnapshotType.Limit, order.OrderType);
             Assert.Equal(new Size(0.1m), order.Size);

@@ -370,8 +370,9 @@ API 系統の Adapter とは **別系統**として扱う。
 
 ### 4.3 文字列の流入禁止（MUST）
 
-* Wire 以外の層（Raw / Normalized / Contract）の API の in/out に `string` を使用してはならない。
+* Wire 以外の層（Raw / Normalized / Contract）の API の in/out に **生の `string`** を使用してはならない。
 * 文字列は entry point でのみ許可し、必ず TryParse/OrThrow で明示的に型化する。
+* 自由記述（message/status/notes 等）は **`FreeText` 等の明示的なラッパ型**として表現する。
 * 例外がある場合は Decisions に記録する。
 
 ### 4.4 取引所差分の配置（MUST）

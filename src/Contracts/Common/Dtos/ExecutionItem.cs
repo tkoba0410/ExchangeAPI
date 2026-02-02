@@ -6,7 +6,7 @@ namespace ExchangeApi.Contracts.Common.Dtos;
 
 public sealed record ExecutionItem(
     DateTimeOffset Timestamp,
-    string ExecutionId,
+    ExecutionId ExecutionId,
     Symbol Market,
     Side Side,
     Price Price,

@@ -158,8 +158,8 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             IReadOnlyList<ContractBalance> result = ok.Response;
 
             Assert.Equal(2, result.Count);
-            Assert.Contains(result, b => b.Currency == "JPY" && b.Amount == 10000m && b.Available == 8000m);
-            Assert.Contains(result, b => b.Currency == "BTC" && b.Amount == 1.5m && b.Available == 1.2m);
+            Assert.Contains(result, b => b.Currency == CurrencyCode.Jpy && b.Amount == 10000m && b.Available == 8000m);
+            Assert.Contains(result, b => b.Currency == CurrencyCode.Btc && b.Amount == 1.5m && b.Available == 1.2m);
         }
 
         [Fact]

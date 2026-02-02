@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Requests;
@@ -44,7 +45,7 @@ internal sealed class BittradeNormalizedPublicApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+    public async Task<Call<NormalizedRequests.GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
         CancellationToken ct = default)
     {
         var rawCall = await _raw
@@ -52,14 +53,21 @@ internal sealed class BittradeNormalizedPublicApi
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetCurrencysRequest();
 
-        return CreateCall(
+        return CreateCall<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.RawCurrenciesResponse, NormalizedRequests.GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
             rawCall,
             request,
             Component(BittradeEndpointIds.GetCurrencys),
             ok =>
             {
                 RequireOk(ok.Status, "currencys");
-                return ok.Data ?? Array.Empty<string>();
+                if (ok.Data is null) return Array.Empty<CurrencyCode>();
+                var codes = new List<CurrencyCode>(ok.Data.Count);
+                foreach (var code in ok.Data)
+                {
+                    codes.Add(CurrencyCodeConverter.FromString(code));
+                }
+
+                return codes;
             });
     }
 
@@ -83,12 +91,12 @@ internal sealed class BittradeNormalizedPublicApi
     }
 
     public async Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default)
     {
         var request = new NormalizedRequests.GetTickerRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
-        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
             return CreateCallError<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>(
                 request,
@@ -113,14 +121,14 @@ internal sealed class BittradeNormalizedPublicApi
     }
 
     public async Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
-        string productCode,
+        ProductCode productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default)
     {
         var normalizedDepthType = depthType ?? BittradeDepthType.Step0;
         var request = new NormalizedRequests.GetOrderBookRequest(productCode, depthType);
         var startedAt = DateTimeOffset.UtcNow;
-        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
             return CreateCallError<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>(
                 request,
@@ -146,12 +154,12 @@ internal sealed class BittradeNormalizedPublicApi
     }
 
     public async Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default)
     {
         var request = new NormalizedRequests.GetExecutionsRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
-        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
             return CreateCallError<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
                 request,
@@ -177,14 +185,14 @@ internal sealed class BittradeNormalizedPublicApi
     }
 
     public async Task<Call<NormalizedRequests.GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>> GetHistoryKlineCallAsync(
-        string productCode,
-        string period,
+        ProductCode productCode,
+        Period period,
         int? size = null,
         CancellationToken ct = default)
     {
         var request = new NormalizedRequests.GetHistoryKlineRequest(productCode, period, size);
         var startedAt = DateTimeOffset.UtcNow;
-        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
             return CreateCallError<NormalizedRequests.GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>(
                 request,
@@ -194,7 +202,7 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetHistoryKlineCallAsync(new RawPublicRequests.GetKlinesRequest(symbolText, period, size), ct)
+            .GetHistoryKlineCallAsync(new RawPublicRequests.GetKlinesRequest(symbolText, period.Value, size), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -226,12 +234,12 @@ internal sealed class BittradeNormalizedPublicApi
     }
 
     public async Task<Call<NormalizedRequests.GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetHistoryTradeCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default)
     {
         var request = new NormalizedRequests.GetHistoryTradeRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
-        if (!TryGetApiSymbol(productCode, out var symbolText, out var error))
+        if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
             return CreateCallError<NormalizedRequests.GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>(
                 request,

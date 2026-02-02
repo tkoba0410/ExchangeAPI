@@ -114,7 +114,8 @@ Contracts の Facade API は Public / Private に分離する（MUST）。
 
 - Contracts の公開メソッド（インターフェイス）は、Contracts で許可された型のみを in/out に用いる（MUST）。
 - Raw DTO / Exchange DTO / Wire string を Contracts の in/out に含めてはならない（MUST NOT）。
-- Contracts の公開 API で `string` を in/out に使用してはならない（MUST NOT）。
+- Contracts の公開 API で **生の `string`** を in/out に使用してはならない（MUST NOT）。
+- 自由記述は `FreeText` 等の明示的なラッパ型で表現する（MUST）。
 - `string` を保持する DTO が必要な場合は、例外として Decisions に記録する（MUST）。
 
 ---

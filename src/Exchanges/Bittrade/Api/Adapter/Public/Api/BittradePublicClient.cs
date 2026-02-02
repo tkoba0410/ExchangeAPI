@@ -8,6 +8,7 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
@@ -67,7 +68,7 @@ public sealed class BittradePublicClient : IPublicApi, IExchangeClient
 
     public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
         CommonSymbol symbol,
-        string period,
+        Period period,
         int? size = null,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetHistoryKlineCallAsync(symbol, period, size, cancellationToken);
@@ -85,7 +86,7 @@ public sealed class BittradePublicClient : IPublicApi, IExchangeClient
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
-    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetCurrencysCallAsync(cancellationToken);
 

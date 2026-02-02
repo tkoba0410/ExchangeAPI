@@ -41,7 +41,7 @@ internal static class MarketMapper
 
         return new ExecutionMarket(
             Symbol: symbol,
-            OrderId: normalized.Id.ToString(),
+            OrderId: OrderId.ParseOrThrow(normalized.Id.ToString(System.Globalization.CultureInfo.InvariantCulture)),
             Side: BitflyerCommonMapper.MapSide(normalized.Side),
             Price: new Price(normalized.Price),
             Size: new Size(normalized.Size),

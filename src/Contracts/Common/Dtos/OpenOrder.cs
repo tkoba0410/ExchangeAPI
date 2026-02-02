@@ -18,6 +18,6 @@ public sealed record OpenOrder(
     DateTimeOffset? OrderedAt = null,
     DateTimeOffset? UpdatedAt = null,
     Price? StopPrice = null,
-    string? Status = null,
-    string? ExchangeOrderId = null,
-    string? AcceptanceId = null);
+    FreeText? Status = null,
+    ExchangeOrderId? ExchangeOrderId = null,
+    AcceptanceId? AcceptanceId = null);

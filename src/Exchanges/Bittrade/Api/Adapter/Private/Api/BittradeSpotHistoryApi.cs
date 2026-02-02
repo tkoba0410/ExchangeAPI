@@ -97,7 +97,7 @@ internal sealed class BittradeSpotHistoryApi
     {
         var items = executions.Select(e => new ExecutionItem(
             Timestamp: e.Timestamp,
-            ExecutionId: e.Id,
+            ExecutionId: ExecutionId.ParseOrThrow(e.Id),
             Market: request.Market,
             Side: e.Side switch
             {
@@ -126,7 +126,7 @@ internal sealed class BittradeSpotHistoryApi
 
         return new OrderSnapshotItem(
             CreatedAt: createdAt,
-            OrderId: order.Key.Value,
+            OrderId: OrderId.ParseOrThrow(order.Key.Value),
             Market: order.Symbol,
             Side: order.Side,
             OrderType: orderType,

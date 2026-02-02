@@ -11,6 +11,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 namespace ExchangeApi.Composition.Providers.ExchangeInfo;
 
@@ -119,7 +120,7 @@ public sealed class JsonExchangeInfoApi : IPublicApi
 
     public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
         Symbol symbol,
-        string period,
+        Period period,
         int? size = null,
         CancellationToken cancellationToken = default)
     {
@@ -154,11 +155,11 @@ public sealed class JsonExchangeInfoApi : IPublicApi
             "HistoryTrade"));
     }
 
-    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetCurrencysRequest();
-        return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
+        return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
             "Contracts",
             "JsonExchangeInfo",
             request,

@@ -89,11 +89,11 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         }
     }
 
-    public Task<Call<GetCurrencysRequest, IReadOnlyList<string>>> GetCurrencysCallAsync(
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetCurrencysRequest();
-        return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<string>>(
+        return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
             "Contracts",
             BitflyerExchangeInfoOperations.GetCurrencys,
             request,
@@ -136,10 +136,13 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             FeeCurrency: ToCurrencyCode(market.FeeCurrency),
             FeeType: MapFeeType(market.FeeType),
             IsSupported: market.IsSupported,
-            StatusNote: market.StatusNote);
+            StatusNote: ToFreeText(market.StatusNote));
 
     private static CurrencyCode? ToCurrencyCode(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : CurrencyCodeConverter.FromString(value);
+
+    private static FreeText? ToFreeText(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : new FreeText(value);
 
     private static ExchangeFeatureFlags? MapFeatures(BitflyerStaticFeatureFlags? features) =>
         features is null
@@ -163,7 +166,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             : new ExchangeMaintenance(
                 Status: MapMaintenanceStatus(maintenance.Status),
                 PlannedUntil: maintenance.PlannedUntil,
-                Message: maintenance.Message);
+                Message: ToFreeText(maintenance.Message));
 
     private static ExchangeMaintenanceStatus? MapMaintenanceStatus(BitflyerStaticMaintenanceStatus? status) =>
         status switch

@@ -173,7 +173,7 @@ internal sealed class MarketApi
 
     public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
         Symbol symbol,
-        string period,
+        Period period,
         int? size = null,
         CancellationToken cancellationToken = default)
     {

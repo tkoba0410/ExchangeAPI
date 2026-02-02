@@ -368,6 +368,17 @@ API 系統の Adapter とは **別系統**として扱う。
 * Raw 層は `IWireTransport` を参照してはならない。
 * 実装例の一貫性を保つため、Wire は送信実行クラス（例: `*WireCallExecutor`）、Raw はパース専用クラス（例: `*RawCallExecutor`）を持つ。
 
+### 4.3 文字列の流入禁止（MUST）
+
+* Wire 以外の層（Raw / Normalized / Contract）の API の in/out に `string` を使用してはならない。
+* 文字列は entry point でのみ許可し、必ず TryParse/OrThrow で明示的に型化する。
+* 例外がある場合は Decisions に記録する。
+
+### 4.4 取引所差分の配置（MUST）
+
+* 取引所固有の既定値・ポリシーは `Exchanges/<Exchange>` 配下に閉じる。
+* Transport / Utilities / Primitives / Contracts など共通層に取引所名を含む既定値や規約を置いてはならない。
+
 ---
 
 ## 5. Call 抽象

@@ -33,6 +33,10 @@
 
 ※ Inventory に仕様本文（公式APIの写経）を書いてはならない。
 
+#### 2.2.1 公式仕様の正本（MUST）
+- 公式 API 仕様の正本は `doc-api.zip` とする。
+- Inventory の CanonicalSourceUrl は `doc-api.zip` を根拠として一致検証できなければならない。
+
 ### 2.3 Decisions（例外台帳）
 - `docs/exceptions.md`：原則からの逸脱（差分と理由）
 

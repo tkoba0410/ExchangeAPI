@@ -39,9 +39,23 @@ internal sealed class BittradeNormalizedPublicApi
             Component(BittradeEndpointIds.GetSymbols),
             ok =>
             {
-                RequireOk(ok.Status, "symbols");
-                if (ok.Data is null) throw new InvalidOperationException("Bittrade symbols response invalid.");
-                return BittradeNormalizer.NormalizeSymbols(ok.Data);
+                if (!TryRequireOk(ok.Status, "symbols", out var error))
+                {
+                    return MapResult<IReadOnlyList<BittradeSymbolNormalized>>.Fail(error);
+                }
+
+                if (ok.Data is null)
+                {
+                    return MapResult<IReadOnlyList<BittradeSymbolNormalized>>.Fail(
+                        new CallError(CallErrorKind.Mapping, "Bittrade symbols response invalid."));
+                }
+
+                if (!BittradeNormalizer.TryNormalizeSymbols(ok.Data, out var symbols, out var normalizeError))
+                {
+                    return MapResult<IReadOnlyList<BittradeSymbolNormalized>>.Fail(normalizeError!);
+                }
+
+                return MapResult<IReadOnlyList<BittradeSymbolNormalized>>.Ok(symbols!);
             });
     }
 
@@ -59,15 +73,22 @@ internal sealed class BittradeNormalizedPublicApi
             Component(BittradeEndpointIds.GetCurrencys),
             ok =>
             {
-                RequireOk(ok.Status, "currencys");
-                if (ok.Data is null) return Array.Empty<CurrencyCode>();
+                if (!TryRequireOk(ok.Status, "currencys", out var error))
+                {
+                    return MapResult<IReadOnlyList<CurrencyCode>>.Fail(error);
+                }
+
+                if (ok.Data is null)
+                {
+                    return MapResult<IReadOnlyList<CurrencyCode>>.Ok(Array.Empty<CurrencyCode>());
+                }
                 var codes = new List<CurrencyCode>(ok.Data.Count);
                 foreach (var code in ok.Data)
                 {
                     codes.Add(CurrencyCodeConverter.FromString(code));
                 }
 
-                return codes;
+                return MapResult<IReadOnlyList<CurrencyCode>>.Ok(codes);
             });
     }
 
@@ -85,8 +106,12 @@ internal sealed class BittradeNormalizedPublicApi
             Component(BittradeEndpointIds.GetTimestamp),
             ok =>
             {
-                RequireOk(ok.Status, "timestamp");
-                return ok.Data;
+                if (!TryRequireOk(ok.Status, "timestamp", out var error))
+                {
+                    return MapResult<DateTimeOffset>.Fail(error);
+                }
+
+                return MapResult<DateTimeOffset>.Ok(ok.Data);
             });
     }
 
@@ -115,8 +140,17 @@ internal sealed class BittradeNormalizedPublicApi
             Component(BittradeEndpointIds.GetDetailMerged),
             ok =>
             {
-                RequireOk(ok.Status, "ticker");
-                return BittradeNormalizer.NormalizeTicker(ok, rawCall.Meta.RawJson);
+                if (!TryRequireOk(ok.Status, "ticker", out var error))
+                {
+                    return MapResult<BittradeTickerNormalized>.Fail(error);
+                }
+
+                if (!BittradeNormalizer.TryNormalizeTicker(ok, rawCall.Meta.RawJson, out var ticker, out var normalizeError))
+                {
+                    return MapResult<BittradeTickerNormalized>.Fail(normalizeError!);
+                }
+
+                return MapResult<BittradeTickerNormalized>.Ok(ticker!);
             });
     }
 
@@ -137,8 +171,17 @@ internal sealed class BittradeNormalizedPublicApi
                 startedAt);
         }
 
+        if (!TryGetRawDepthType(normalizedDepthType, out var rawDepth, out var depthError))
+        {
+            return CreateCallError<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>(
+                request,
+                Component(BittradeEndpointIds.GetDepth),
+                depthError!,
+                startedAt);
+        }
+
         var rawCall = await _raw
-            .GetDepthCallAsync(new RawPublicRequests.GetDepthRequest(symbolText, ToRawDepthType(normalizedDepthType)), ct)
+            .GetDepthCallAsync(new RawPublicRequests.GetDepthRequest(symbolText, rawDepth), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -147,9 +190,17 @@ internal sealed class BittradeNormalizedPublicApi
             Component(BittradeEndpointIds.GetDepth),
             ok =>
             {
-                RequireOk(ok.Status, "orderbook");
-                var tick = ok.Tick ?? throw new InvalidOperationException("Bittrade order book response missing tick.");
-                return BittradeNormalizer.NormalizeOrderBook(tick);
+                if (!TryRequireOk(ok.Status, "orderbook", out var error))
+                {
+                    return MapResult<BittradeOrderBookNormalized>.Fail(error);
+                }
+
+                if (!BittradeNormalizer.TryNormalizeOrderBook(ok.Tick!, out var orderBook, out var normalizeError))
+                {
+                    return MapResult<BittradeOrderBookNormalized>.Fail(normalizeError!);
+                }
+
+                return MapResult<BittradeOrderBookNormalized>.Ok(orderBook!);
             });
     }
 
@@ -178,9 +229,18 @@ internal sealed class BittradeNormalizedPublicApi
             Component(BittradeEndpointIds.GetTrade),
             ok =>
             {
-                RequireOk(ok.Status, "trades");
-                var entries = ok.Tick?.Data ?? throw new InvalidOperationException("Bittrade trades response missing data.");
-                return BittradeNormalizer.NormalizeExecutions(entries, rawCall.Meta.RawJson);
+                if (!TryRequireOk(ok.Status, "trades", out var error))
+                {
+                    return MapResult<IReadOnlyList<BittradeExecutionNormalized>>.Fail(error);
+                }
+
+                var entries = ok.Tick?.Data;
+                if (!BittradeNormalizer.TryNormalizeExecutions(entries!, rawCall.Meta.RawJson, out var executions, out var normalizeError))
+                {
+                    return MapResult<IReadOnlyList<BittradeExecutionNormalized>>.Fail(normalizeError!);
+                }
+
+                return MapResult<IReadOnlyList<BittradeExecutionNormalized>>.Ok(executions!);
             });
     }
 
@@ -211,8 +271,12 @@ internal sealed class BittradeNormalizedPublicApi
             Component(BittradeEndpointIds.GetHistoryKline),
             ok =>
             {
-                RequireOk(ok.Status, "klines");
-                return BittradeNormalizer.NormalizeKlines(ok.Data);
+                if (!TryRequireOk(ok.Status, "klines", out var error))
+                {
+                    return MapResult<IReadOnlyList<BittradeKlineNormalized>>.Fail(error);
+                }
+
+                return MapResult<IReadOnlyList<BittradeKlineNormalized>>.Ok(BittradeNormalizer.NormalizeKlines(ok.Data));
             });
     }
 
@@ -228,8 +292,12 @@ internal sealed class BittradeNormalizedPublicApi
             Component(BittradeEndpointIds.GetTickers),
             ok =>
             {
-                RequireOk(ok.Status, "tickers");
-                return BittradeNormalizer.NormalizeTickers(ok.Data);
+                if (!TryRequireOk(ok.Status, "tickers", out var error))
+                {
+                    return MapResult<IReadOnlyList<BittradeTickerEntryNormalized>>.Fail(error);
+                }
+
+                return MapResult<IReadOnlyList<BittradeTickerEntryNormalized>>.Ok(BittradeNormalizer.NormalizeTickers(ok.Data));
             });
     }
 
@@ -258,8 +326,17 @@ internal sealed class BittradeNormalizedPublicApi
             Component(BittradeEndpointIds.GetHistoryTrade),
             ok =>
             {
-                RequireOk(ok.Status, "history trades");
-                return BittradeNormalizer.NormalizeTradeHistory(ok.Data);
+                if (!TryRequireOk(ok.Status, "history trades", out var error))
+                {
+                    return MapResult<IReadOnlyList<BittradeExecutionNormalized>>.Fail(error);
+                }
+
+                if (!BittradeNormalizer.TryNormalizeTradeHistory(ok.Data, out var history, out var normalizeError))
+                {
+                    return MapResult<IReadOnlyList<BittradeExecutionNormalized>>.Fail(normalizeError!);
+                }
+
+                return MapResult<IReadOnlyList<BittradeExecutionNormalized>>.Ok(history!);
             });
     }
 
@@ -267,7 +344,7 @@ internal sealed class BittradeNormalizedPublicApi
         Call<TRawReq, TRaw> rawCall,
         TReq request,
         string component,
-        Func<TRaw, TOk> mapper)
+        Func<TRaw, MapResult<TOk>> mapper)
     {
         return rawCall.Result switch
         {
@@ -332,11 +409,23 @@ internal sealed class BittradeNormalizedPublicApi
         TReq request,
         string component,
         TRaw raw,
-        Func<TRaw, TOk> mapper)
+        Func<TRaw, MapResult<TOk>> mapper)
     {
         try
         {
-            var mapped = mapper(raw);
+            var result = mapper(raw);
+            if (result.Error is not null)
+            {
+                return new Call<TReq, TOk>(
+                    Id: CallId.New(),
+                    StartedAt: rawCall.StartedAt,
+                    Duration: rawCall.Duration,
+                    Request: request,
+                    Result: new CallResult<TOk>.Err(result.Error),
+                    Meta: rawCall.Meta);
+            }
+
+            var mapped = result.Value!;
             return new Call<TReq, TOk>(
                 Id: CallId.New(),
                 StartedAt: rawCall.StartedAt,
@@ -358,25 +447,58 @@ internal sealed class BittradeNormalizedPublicApi
         }
     }
 
-    private static void RequireOk(string? status, string operation)
+    private static bool TryRequireOk(string? status, string operation, out CallError error)
     {
         if (!string.Equals(status, "ok", StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException($"Bittrade {operation} response status invalid: {status}.");
+            error = new CallError(CallErrorKind.Semantic, $"Bittrade {operation} response status invalid: {status}.");
+            return false;
+        }
+
+        error = null!;
+        return true;
+    }
+
+    private static bool TryGetRawDepthType(BittradeDepthType depthType, out string rawDepth, out CallError? error)
+    {
+        switch (depthType)
+        {
+            case BittradeDepthType.Step0:
+                rawDepth = "step0";
+                error = null;
+                return true;
+            case BittradeDepthType.Step1:
+                rawDepth = "step1";
+                error = null;
+                return true;
+            case BittradeDepthType.Step2:
+                rawDepth = "step2";
+                error = null;
+                return true;
+            case BittradeDepthType.Step3:
+                rawDepth = "step3";
+                error = null;
+                return true;
+            case BittradeDepthType.Step4:
+                rawDepth = "step4";
+                error = null;
+                return true;
+            case BittradeDepthType.Step5:
+                rawDepth = "step5";
+                error = null;
+                return true;
+            default:
+                rawDepth = string.Empty;
+                error = new CallError(CallErrorKind.Semantic, $"Unsupported depth type: {depthType}.");
+                return false;
         }
     }
 
-    private static string ToRawDepthType(BittradeDepthType depthType) =>
-        depthType switch
-        {
-            BittradeDepthType.Step0 => "step0",
-            BittradeDepthType.Step1 => "step1",
-            BittradeDepthType.Step2 => "step2",
-            BittradeDepthType.Step3 => "step3",
-            BittradeDepthType.Step4 => "step4",
-            BittradeDepthType.Step5 => "step5",
-            _ => throw new InvalidOperationException($"Unsupported depth type: {depthType}."),
-        };
+    private readonly record struct MapResult<TOk>(TOk? Value, CallError? Error)
+    {
+        public static MapResult<TOk> Ok(TOk value) => new(value, null);
+        public static MapResult<TOk> Fail(CallError error) => new(default, error);
+    }
 
     private static string Component(string endpointId) => $"Bittrade.{endpointId}";
 }

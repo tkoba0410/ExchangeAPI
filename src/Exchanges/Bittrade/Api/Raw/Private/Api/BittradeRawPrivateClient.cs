@@ -184,11 +184,18 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CreateOrderRequest, RawPlaceOrderResponse>> PostOrdersPlaceCallAsync(
         CreateOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BittradeEndpointIds.PostOrdersPlace),
-            BittradePrivateEndpoints.PostOrdersPlace(
-                BittradeRawJson.SerializeOrThrow(request.Body, Component(BittradeEndpointIds.PostOrdersPlace))),
+            () =>
+            {
+                if (!BittradeRawJson.TrySerialize(request.Body, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BittradePrivateEndpoints.PostOrdersPlace(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawPlaceOrderResponse>(json, Component(BittradeEndpointIds.PostOrdersPlace)));
 
@@ -205,11 +212,18 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CancelOrdersRequest, RawCancelOrdersResponse>> PostOrdersBatchCancelCallAsync(
         CancelOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BittradeEndpointIds.PostOrdersBatchCancel),
-            BittradePrivateEndpoints.PostOrdersBatchCancel(
-                BittradeRawJson.SerializeOrThrow(request.Body, Component(BittradeEndpointIds.PostOrdersBatchCancel))),
+            () =>
+            {
+                if (!BittradeRawJson.TrySerialize(request.Body, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BittradePrivateEndpoints.PostOrdersBatchCancel(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCancelOrdersResponse>(
                 json,
@@ -218,11 +232,18 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
         CancelOpenOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BittradeEndpointIds.PostOrdersBatchCancelOpenOrders),
-            BittradePrivateEndpoints.PostOrdersBatchCancelOpenOrders(
-                BittradeRawJson.SerializeOrThrow(request.Body, Component(BittradeEndpointIds.PostOrdersBatchCancelOpenOrders))),
+            () =>
+            {
+                if (!BittradeRawJson.TrySerialize(request.Body, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BittradePrivateEndpoints.PostOrdersBatchCancelOpenOrders(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCancelOpenOrdersResponse>(
                 json,
@@ -231,11 +252,18 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CreateWithdrawRequest, RawCreateWithdrawResponse>> PostWithdrawApiCreateCallAsync(
         CreateWithdrawRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BittradeEndpointIds.PostWithdrawApiCreate),
-            BittradePrivateEndpoints.PostWithdrawApiCreate(
-                BittradeRawJson.SerializeOrThrow(request.Body, Component(BittradeEndpointIds.PostWithdrawApiCreate))),
+            () =>
+            {
+                if (!BittradeRawJson.TrySerialize(request.Body, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BittradePrivateEndpoints.PostWithdrawApiCreate(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCreateWithdrawResponse>(
                 json,
@@ -280,11 +308,18 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderPlaceCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BittradeEndpointIds.PostRetailOrderPlace),
-            BittradePrivateEndpoints.PostRetailOrderPlace(
-                BittradeRawJson.SerializeOrThrow(request.Body, Component(BittradeEndpointIds.PostRetailOrderPlace))),
+            () =>
+            {
+                if (!BittradeRawJson.TrySerialize(request.Body, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BittradePrivateEndpoints.PostRetailOrderPlace(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderResponse>(
                 json,
@@ -305,11 +340,18 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<PostRetailOrderHistoryRequest, RawRetailOrdersResponse>> PostRetailOrderHistoryCallAsync(
         PostRetailOrderHistoryRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BittradeEndpointIds.PostRetailOrderHistory),
-            BittradePrivateEndpoints.PostRetailOrderHistory(
-                BittradeRawJson.SerializeOrThrow(request.Body, Component(BittradeEndpointIds.PostRetailOrderHistory))),
+            () =>
+            {
+                if (!BittradeRawJson.TrySerialize(request.Body, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BittradePrivateEndpoints.PostRetailOrderHistory(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrdersResponse>(
                 json,
@@ -318,11 +360,18 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<PostRetailOrderDetailRequest, RawRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
         PostRetailOrderDetailRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BittradeEndpointIds.PostRetailOrderDetail),
-            BittradePrivateEndpoints.PostRetailOrderDetail(
-                BittradeRawJson.SerializeOrThrow(request.Body, Component(BittradeEndpointIds.PostRetailOrderDetail))),
+            () =>
+            {
+                if (!BittradeRawJson.TrySerialize(request.Body, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BittradePrivateEndpoints.PostRetailOrderDetail(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderDetailResponse>(
                 json,
@@ -331,11 +380,18 @@ internal sealed class BittradeRawPrivateClient
     public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCreateCallAsync(
         CreateRetailOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BittradeEndpointIds.PostRetailOrderCreate),
-            BittradePrivateEndpoints.PostRetailOrderCreate(
-                BittradeRawJson.SerializeOrThrow(request.Body, Component(BittradeEndpointIds.PostRetailOrderCreate))),
+            () =>
+            {
+                if (!BittradeRawJson.TrySerialize(request.Body, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BittradePrivateEndpoints.PostRetailOrderCreate(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderResponse>(
                 json,
@@ -350,6 +406,43 @@ internal sealed class BittradeRawPrivateClient
     {
         var wireCall = await _wire.SendAsync(spec, cancellationToken).ConfigureAwait(false);
         return _executor.Parse(request, component, wireCall, parse);
+    }
+
+    private Task<Call<TReq, TRes>> TryBuildSpec<TReq, TRes>(
+        TReq request,
+        string component,
+        Func<(WireCallSpec? Spec, Exception? Error)> buildSpec,
+        CancellationToken cancellationToken,
+        Func<string, TRes> parse)
+    {
+        var (spec, error) = buildSpec();
+        if (spec is null)
+        {
+            return Task.FromResult(CreateSerializeErrorCall<TReq, TRes>(request, component, error));
+        }
+
+        return SendAndParse(request, component, spec, cancellationToken, parse);
+    }
+
+    private static Call<TReq, TRes> CreateSerializeErrorCall<TReq, TRes>(
+        TReq request,
+        string component,
+        Exception? error)
+    {
+        var callError = new CallError(
+            CallErrorKind.Codec,
+            $"{component} failed to serialize request.",
+            error);
+        var meta = CallMeta.CreateInternal("Raw", component);
+        var now = DateTimeOffset.UtcNow;
+
+        return new Call<TReq, TRes>(
+            Id: CallId.New(),
+            StartedAt: now,
+            Duration: TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<TRes>.Err(callError),
+            Meta: meta);
     }
 
     private static string Component(string endpointId) => $"Bittrade.{endpointId}";

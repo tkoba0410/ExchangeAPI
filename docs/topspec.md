@@ -382,6 +382,18 @@ API 系統の Adapter とは **別系統**として扱う。
 
 ---
 
+### 4.5 例外（throw）と CallError の境界（MUST）
+
+* entry point は「外部入力を最初に受け取る境界」を指す（Wire API / Public API / CLI 等）。
+* entry point 以外での throw は禁止（MUST NOT）。
+* Raw / Normalized は Try 系で失敗を CallError に変換し、Call として返す（MUST）。
+* throw を許容するのは以下に限定する（MUST）:
+  * プログラミングエラー
+  * 設定不備
+  * 内部不整合（プロセス継続不能）
+
+---
+
 ## 5. Call 抽象
 
 ### 5.1 Call の定義

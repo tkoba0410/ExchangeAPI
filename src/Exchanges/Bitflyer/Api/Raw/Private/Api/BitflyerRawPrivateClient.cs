@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
@@ -216,11 +217,18 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CreateWithdrawalRequest, CreateWithdrawalResponse>> WithdrawCallAsync(
         CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BitflyerEndpointIds.Withdraw),
-            BitflyerPrivateEndpoints.Withdraw(
-                BitflyerRawJson.SerializeOrThrow(request, Component(BitflyerEndpointIds.Withdraw))),
+            () =>
+            {
+                if (!BitflyerRawJson.TrySerialize(request, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BitflyerPrivateEndpoints.Withdraw(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<CreateWithdrawalResponse>(
                 json,
@@ -229,13 +237,19 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CreateChildOrderRequest, RawSendChildOrderResponse>> SendChildOrderCallAsync(
         CreateChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BitflyerEndpointIds.SendChildOrder),
-            BitflyerPrivateEndpoints.SendChildOrder(
-                BitflyerRawJson.SerializeOrThrow(
-                    BitflyerRawMappers.MapSendChildOrderRequest(request),
-                    Component(BitflyerEndpointIds.SendChildOrder))),
+            () =>
+            {
+                var bodyModel = BitflyerRawMappers.MapSendChildOrderRequest(request);
+                if (!BitflyerRawJson.TrySerialize(bodyModel, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BitflyerPrivateEndpoints.SendChildOrder(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawSendChildOrderResponse>(
                 json,
@@ -244,13 +258,19 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CreateParentOrderRequest, RawSendParentOrderResponse>> SendParentOrderCallAsync(
         CreateParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BitflyerEndpointIds.SendParentOrder),
-            BitflyerPrivateEndpoints.SendParentOrder(
-                BitflyerRawJson.SerializeOrThrow(
-                    BitflyerRawMappers.MapSendParentOrderRequest(request),
-                    Component(BitflyerEndpointIds.SendParentOrder))),
+            () =>
+            {
+                var bodyModel = BitflyerRawMappers.MapSendParentOrderRequest(request);
+                if (!BitflyerRawJson.TrySerialize(bodyModel, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BitflyerPrivateEndpoints.SendParentOrder(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawSendParentOrderResponse>(
                 json,
@@ -259,11 +279,18 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CancelChildOrderRequest, RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
         CancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BitflyerEndpointIds.CancelChildOrder),
-            BitflyerPrivateEndpoints.CancelChildOrder(
-                BitflyerRawJson.SerializeOrThrow(request, Component(BitflyerEndpointIds.CancelChildOrder))),
+            () =>
+            {
+                if (!BitflyerRawJson.TrySerialize(request, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BitflyerPrivateEndpoints.CancelChildOrder(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawCancelChildOrderResponse>(
                 json,
@@ -272,11 +299,18 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CancelParentOrderRequest, RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
         CancelParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BitflyerEndpointIds.CancelParentOrder),
-            BitflyerPrivateEndpoints.CancelParentOrder(
-                BitflyerRawJson.SerializeOrThrow(request, Component(BitflyerEndpointIds.CancelParentOrder))),
+            () =>
+            {
+                if (!BitflyerRawJson.TrySerialize(request, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BitflyerPrivateEndpoints.CancelParentOrder(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawCancelParentOrderResponse>(
                 json,
@@ -285,11 +319,18 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CancelAllChildOrdersRequest, RawCancelAllChildOrdersResponse>> CancelAllChildOrdersCallAsync(
         CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        SendAndParse(
+        TryBuildSpec(
             request,
             Component(BitflyerEndpointIds.CancelAllChildOrders),
-            BitflyerPrivateEndpoints.CancelAllChildOrders(
-                BitflyerRawJson.SerializeOrThrow(request, Component(BitflyerEndpointIds.CancelAllChildOrders))),
+            () =>
+            {
+                if (!BitflyerRawJson.TrySerialize(request, out var body, out var error))
+                {
+                    return (Spec: (WireCallSpec?)null, Error: error);
+                }
+
+                return (Spec: BitflyerPrivateEndpoints.CancelAllChildOrders(body!), Error: (Exception?)null);
+            },
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawCancelAllChildOrdersResponse>(
                 json,
@@ -355,6 +396,43 @@ internal sealed class BitflyerRawPrivateClient
     {
         var wireCall = await _wire.SendAsync(spec, cancellationToken).ConfigureAwait(false);
         return _executor.Parse(request, component, wireCall, parse);
+    }
+
+    private Task<Call<TReq, TRes>> TryBuildSpec<TReq, TRes>(
+        TReq request,
+        string component,
+        Func<(WireCallSpec? Spec, Exception? Error)> buildSpec,
+        CancellationToken cancellationToken,
+        Func<string, TRes> parse)
+    {
+        var (spec, error) = buildSpec();
+        if (spec is null)
+        {
+            return Task.FromResult(CreateSerializeErrorCall<TReq, TRes>(request, component, error));
+        }
+
+        return SendAndParse(request, component, spec, cancellationToken, parse);
+    }
+
+    private static Call<TReq, TRes> CreateSerializeErrorCall<TReq, TRes>(
+        TReq request,
+        string component,
+        Exception? error)
+    {
+        var callError = new CallError(
+            CallErrorKind.Codec,
+            $"{component} failed to serialize request.",
+            error);
+        var meta = CallMeta.CreateInternal("Raw", component);
+        var now = DateTimeOffset.UtcNow;
+
+        return new Call<TReq, TRes>(
+            Id: CallId.New(),
+            StartedAt: now,
+            Duration: TimeSpan.Zero,
+            Request: request,
+            Result: new CallResult<TRes>.Err(callError),
+            Meta: meta);
     }
 
     private static string Component(string endpointId) => $"Bitflyer.{endpointId}";

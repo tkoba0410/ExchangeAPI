@@ -115,6 +115,31 @@ RawJson は Normalized 内部に閉じ、Adapter 以外へは露出しない。
 
 ---
 
+## Normalized Mapper Throws During Mapping (Bitflyer/Bittrade)
+
+### Summary
+Normalized の一部 Mapper に例外ベースの旧実装が残っているが、主要パスは Try 系で CallError に変換している。
+
+### Reason
+既存の Mapper が例外ベースで書かれており、Try 系への全面移行が段階的であるため。
+
+### Affected Area
+- Exchange: bitFlyer / Bittrade
+- Layer: Normalized
+- API / Type: *Mapper / *Normalizer（旧 API）
+
+### Impact
+旧 API が使われた場合に例外が発生する可能性があるが、主要パスは Try 系で CallError 化している。
+
+### Mitigation
+主要パスは Try 系で CallError 化。MapOk でも例外を捕捉して CallError に変換する。
+
+### Future Plan
+旧 API の使用箇所を完全に排除し、例外ベースの実装を整理・削除する。
+
+### Status
+- [x] Temporary
+
 ---
 
 ## Authority

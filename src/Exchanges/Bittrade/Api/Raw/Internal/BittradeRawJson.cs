@@ -31,6 +31,29 @@ internal static class BittradeRawJson
         }
     }
 
+    public static bool TrySerialize<T>(T value, out string? json, out Exception? error)
+    {
+        if (value is null)
+        {
+            json = null;
+            error = new ArgumentNullException(nameof(value));
+            return false;
+        }
+
+        try
+        {
+            json = JsonSerializer.Serialize(value, Options);
+            error = null;
+            return true;
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            json = null;
+            error = ex;
+            return false;
+        }
+    }
+
     public static T DeserializeOrThrow<T>(string json, string context)
     {
         if (TryDeserialize<T>(json, out var value, out var error))
@@ -38,22 +61,21 @@ internal static class BittradeRawJson
             return value!;
         }
 
-        throw new TransportException(
+        throw new JsonException(
             $"Failed to deserialize {context}.",
-            innerException: error);
+            error);
     }
 
     public static string SerializeOrThrow<T>(T value, string context)
     {
-        if (value is null) throw new ArgumentNullException(nameof(value));
-        try
+        if (TrySerialize(value, out var json, out var error))
         {
-            return JsonSerializer.Serialize(value, Options);
+            return json!;
         }
-        catch (Exception ex) when (ex is JsonException or NotSupportedException)
-        {
-            throw new TransportException($"Failed to serialize {context}.", innerException: ex);
-        }
+
+        throw new JsonException(
+            $"Failed to serialize {context}.",
+            error);
     }
 
     public static TransportException CreateStatusException(string context, int statusCode, string json)

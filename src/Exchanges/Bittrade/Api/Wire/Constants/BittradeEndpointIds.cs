@@ -1,7 +1,7 @@
 // Exchanges/Bittrade/Wire/Constants/BittradeEndpointIds.cs
 namespace ExchangeApi.Exchanges.Bittrade.Api.Wire.Constants;
 
-internal static class BittradeEndpointIds
+public static class BittradeEndpointIds
 {
     public const string GetSymbols = "GetSymbols";
     public const string GetCurrencys = "GetCurrencys";

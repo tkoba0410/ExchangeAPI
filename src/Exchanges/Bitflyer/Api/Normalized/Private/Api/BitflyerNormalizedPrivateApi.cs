@@ -17,6 +17,7 @@ using PrivateRequests = ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Re
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 using RawPrivateRequests = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Api;
 
@@ -95,7 +96,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.CancelOrderRequest, BitflyerCancelResult>(
                 marketCall,
                 callRequest,
-                "Bitflyer.CancelChildOrder",
+                Component(BitflyerEndpointIds.CancelChildOrder),
                 marketError!);
         }
 
@@ -129,7 +130,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .CancelChildOrderCallAsync(dto, cancellationToken)
             .ConfigureAwait(false);
 
-        return CreateCall(rawCall, callRequest, "Bitflyer.CancelChildOrder", _ => new BitflyerCancelResult(true));
+        return CreateCall(rawCall, callRequest, Component(BitflyerEndpointIds.CancelChildOrder), _ => new BitflyerCancelResult(true));
     }
 
     public async Task<Call<PrivateRequests.CancelAllChildOrdersRequest, BitflyerCancelResult>> CancelAllChildOrdersCallAsync(
@@ -148,7 +149,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.CancelAllChildOrdersRequest, BitflyerCancelResult>(
                 marketCall,
                 callRequest,
-                "Bitflyer.CancelAllChildOrders",
+                Component(BitflyerEndpointIds.CancelAllChildOrders),
                 marketError!);
         }
 
@@ -156,7 +157,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .CancelAllChildOrdersCallAsync(new RawPrivateRequests.CancelAllChildOrdersRequest { ProductCode = productCode! }, cancellationToken)
             .ConfigureAwait(false);
 
-        return CreateCall(rawCall, callRequest, "Bitflyer.CancelAllChildOrders", _ => new BitflyerCancelResult(true));
+        return CreateCall(rawCall, callRequest, Component(BitflyerEndpointIds.CancelAllChildOrders), _ => new BitflyerCancelResult(true));
     }
 
     public async Task<Call<PrivateRequests.GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
@@ -364,7 +365,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             callRequest,
-            "Bitflyer.CancelParentOrder",
+            Component(BitflyerEndpointIds.CancelParentOrder),
             _ => new BitflyerParentOrderCancelResult(true));
     }
 
@@ -391,7 +392,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             callRequest,
-            "Bitflyer.GetParentOrders",
+            Component(BitflyerEndpointIds.GetParentOrders),
             ok => BitflyerParentOrderNormalizer.NormalizeList(ok, rawCall.Meta.RawJson));
     }
 
@@ -413,7 +414,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             callRequest,
-            "Bitflyer.GetParentOrder",
+            Component(BitflyerEndpointIds.GetParentOrder),
             ok => BitflyerParentOrderNormalizer.NormalizeDetail(ok, rawCall.Meta.RawJson));
     }
 
@@ -434,7 +435,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .GetPermissionsCallAsync(new RawPrivateRequests.GetPermissionsRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetPermissionsRequest();
-        return CreateCall(rawCall, request, "Bitflyer.GetPermissions", raw => raw);
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetPermissions), raw => raw);
     }
 
     public async Task<Call<PrivateRequests.GetCollateralRequest, BitflyerCollateralNormalized>> GetCollateralCallAsync(
@@ -447,7 +448,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetCollateral",
+            Component(BitflyerEndpointIds.GetCollateral),
             raw => new BitflyerCollateralNormalized(raw.Collateral, raw.OpenPositionPnl, raw.RequireCollateral, raw.KeepRate));
     }
 
@@ -461,7 +462,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetCollateralAccounts",
+            Component(BitflyerEndpointIds.GetCollateralAccounts),
             raw =>
             {
                 IReadOnlyList<BitflyerCollateralAccountNormalized> mapped = raw
@@ -478,7 +479,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .GetAddressesCallAsync(new RawPrivateRequests.GetAddressesRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetAddressesRequest();
-        return CreateCall(rawCall, request, "Bitflyer.GetAddresses", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetAddresses), raw => new BitflyerRawJsonNormalized(raw.RawJson));
     }
 
     public async Task<Call<PrivateRequests.GetCoinInsRequest, BitflyerRawJsonNormalized>> GetCoinInsCallAsync(
@@ -491,7 +492,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .GetCoinInsCallAsync(new RawPrivateRequests.GetCoinInsRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetCoinInsRequest(count, before, after);
-        return CreateCall(rawCall, request, "Bitflyer.GetCoinIns", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetCoinIns), raw => new BitflyerRawJsonNormalized(raw.RawJson));
     }
 
     public async Task<Call<PrivateRequests.GetCoinOutsRequest, BitflyerRawJsonNormalized>> GetCoinOutsCallAsync(
@@ -505,7 +506,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .GetCoinOutsCallAsync(new RawPrivateRequests.GetCoinOutsRequest(messageId, count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetCoinOutsRequest(messageId, count, before, after);
-        return CreateCall(rawCall, request, "Bitflyer.GetCoinOuts", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetCoinOuts), raw => new BitflyerRawJsonNormalized(raw.RawJson));
     }
 
     public async Task<Call<PrivateRequests.GetBankAccountsRequest, BitflyerRawJsonNormalized>> GetBankAccountsCallAsync(
@@ -515,7 +516,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .GetBankAccountsCallAsync(new RawPrivateRequests.GetBankAccountsRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetBankAccountsRequest();
-        return CreateCall(rawCall, request, "Bitflyer.GetBankAccounts", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetBankAccounts), raw => new BitflyerRawJsonNormalized(raw.RawJson));
     }
 
     public async Task<Call<PrivateRequests.GetDepositsRequest, BitflyerRawJsonNormalized>> GetDepositsCallAsync(
@@ -528,7 +529,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .GetDepositsCallAsync(new RawPrivateRequests.GetDepositsRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetDepositsRequest(count, before, after);
-        return CreateCall(rawCall, request, "Bitflyer.GetDeposits", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetDeposits), raw => new BitflyerRawJsonNormalized(raw.RawJson));
     }
 
     public async Task<Call<PrivateRequests.WithdrawRequest, BitflyerWithdrawResultNormalized>> WithdrawCallAsync(
@@ -548,7 +549,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             }, cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.WithdrawRequest(currencyCode, bankAccountId, amount, code);
-        return CreateCall(rawCall, request, "Bitflyer.Withdraw", raw => new BitflyerWithdrawResultNormalized(raw.MessageId));
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.Withdraw), raw => new BitflyerWithdrawResultNormalized(raw.MessageId));
     }
 
     public async Task<Call<PrivateRequests.GetWithdrawalsRequest, BitflyerRawJsonNormalized>> GetWithdrawalsCallAsync(
@@ -561,7 +562,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .GetWithdrawalsCallAsync(new RawPrivateRequests.GetWithdrawalsRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetWithdrawalsRequest(count, before, after);
-        return CreateCall(rawCall, request, "Bitflyer.GetWithdrawals", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetWithdrawals), raw => new BitflyerRawJsonNormalized(raw.RawJson));
     }
 
     public async Task<Call<PrivateRequests.GetBalanceHistoryRequest, BitflyerRawJsonNormalized>> GetBalanceHistoryCallAsync(
@@ -575,7 +576,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .GetBalanceHistoryCallAsync(new RawPrivateRequests.GetBalanceHistoryRequest(currencyCode, count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetBalanceHistoryRequest(currencyCode, count, before, after);
-        return CreateCall(rawCall, request, "Bitflyer.GetBalanceHistory", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetBalanceHistory), raw => new BitflyerRawJsonNormalized(raw.RawJson));
     }
 
     public async Task<Call<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>> GetPositionsCallAsync(
@@ -594,7 +595,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>(
                 marketCall,
                 request,
-                "Bitflyer.GetPositions",
+                Component(BitflyerEndpointIds.GetPositions),
                 marketError.Error);
         }
 
@@ -606,7 +607,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>(
                 marketCall,
                 request,
-                "Bitflyer.GetPositions",
+                Component(BitflyerEndpointIds.GetPositions),
                 new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
         }
 
@@ -617,7 +618,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetPositions",
+            Component(BitflyerEndpointIds.GetPositions),
             raw =>
             {
                 IReadOnlyList<BitflyerPositionNormalized> mapped = raw
@@ -643,7 +644,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             .GetCollateralHistoryCallAsync(new RawPrivateRequests.GetCollateralHistoryRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetCollateralHistoryRequest(count, before, after);
-        return CreateCall(rawCall, request, "Bitflyer.GetCollateralHistory", raw => new BitflyerRawJsonNormalized(raw.RawJson));
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetCollateralHistory), raw => new BitflyerRawJsonNormalized(raw.RawJson));
     }
 
     public async Task<Call<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
@@ -662,7 +663,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
-                "Bitflyer.GetExecutionsPrivate",
+                Component(BitflyerEndpointIds.GetExecutionsPrivate),
                 marketError.Error);
         }
 
@@ -674,7 +675,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
-                "Bitflyer.GetExecutionsPrivate",
+                Component(BitflyerEndpointIds.GetExecutionsPrivate),
                 new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
         }
 
@@ -685,7 +686,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetExecutionsPrivate",
+            Component(BitflyerEndpointIds.GetExecutionsPrivate),
             raw => BitflyerAccountMapper.MapAccountExecutions(symbol, raw));
     }
 
@@ -705,7 +706,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
                 marketCall,
                 request,
-                "Bitflyer.GetTradingCommission",
+                Component(BitflyerEndpointIds.GetTradingCommission),
                 marketError.Error);
         }
 
@@ -717,7 +718,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
                 marketCall,
                 request,
-                "Bitflyer.GetTradingCommission",
+                Component(BitflyerEndpointIds.GetTradingCommission),
                 new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
         }
 
@@ -728,7 +729,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetTradingCommission",
+            Component(BitflyerEndpointIds.GetTradingCommission),
             raw => ParseTradingCommission(raw.RawJson, productCode));
     }
 
@@ -913,5 +914,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             Result: new CallResult<TOk>.Err(error),
             Meta: meta);
     }
+
+    private static string Component(string endpointId) => $"Bitflyer.{endpointId}";
 
 }

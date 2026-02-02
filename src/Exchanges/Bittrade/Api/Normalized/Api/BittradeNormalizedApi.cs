@@ -13,8 +13,6 @@ using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Api;
 
@@ -34,22 +32,17 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
         AccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
     }
 
-    public static BittradeNormalizedApi FromRestClient(
-        IRestClient restClient,
-        IBittradeMarketResolver? markets = null,
+    internal static BittradeNormalizedApi FromRaw(
+        IBittradeRawApi raw,
+        IBittradeMarketResolver markets,
         string? accountId = null)
     {
-        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+        if (raw is null) throw new ArgumentNullException(nameof(raw));
+        if (markets is null) throw new ArgumentNullException(nameof(markets));
 
         var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
-        var wire = new WireTransport(restClient);
-        var raw = new BittradeRawApi(wire);
-
         var publicApi = new BittradeNormalizedPublicApi(raw);
-        var privateApi = new BittradeNormalizedPrivateApi(
-            raw,
-            markets ?? throw new ArgumentNullException(nameof(markets)),
-            normalizedAccountId);
+        var privateApi = new BittradeNormalizedPrivateApi(raw, markets, normalizedAccountId);
 
         return new BittradeNormalizedApi(
             publicApi: publicApi,

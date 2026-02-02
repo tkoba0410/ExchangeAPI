@@ -7,6 +7,7 @@ namespace ExchangeApi.Tests.Inventory;
 internal static class InventoryEndpointIdParser
 {
     private const int EndpointIdColumnIndex = 5;
+    private const int PresentInColumnIndex = 6;
 
     public static HashSet<string> ParseEndpointIdsFromFile(string path)
     {
@@ -52,6 +53,15 @@ internal static class InventoryEndpointIdParser
             if (IsSeparatorToken(endpointId))
             {
                 continue;
+            }
+
+            if (cells.Length > PresentInColumnIndex)
+            {
+                var presentIn = cells[PresentInColumnIndex].Trim();
+                if (string.Equals(presentIn, "None", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
             }
 
             ids.Add(endpointId);

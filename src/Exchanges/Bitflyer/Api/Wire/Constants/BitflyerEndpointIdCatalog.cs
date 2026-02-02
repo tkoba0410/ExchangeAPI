@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
 
@@ -42,16 +42,10 @@ public static class BitflyerEndpointIdCatalog
         BitflyerEndpointIds.GetTradingCommission,
     };
 
-    private static readonly string[] NotImplemented =
-    {
-        BitflyerEndpointIds.Markets,
-        BitflyerEndpointIds.Board,
-        BitflyerEndpointIds.Ticker,
-        BitflyerEndpointIds.Executions,
-    };
+    private static readonly string[] NotImplemented = Array.Empty<string>();
 
     public static IReadOnlyCollection<string> GetAllEndpointIds() =>
-        Endpoints.Concat(NotImplemented).ToArray();
+        Endpoints;
 
     public static IReadOnlyCollection<string> GetNotImplementedEndpointIds() => NotImplemented;
 }

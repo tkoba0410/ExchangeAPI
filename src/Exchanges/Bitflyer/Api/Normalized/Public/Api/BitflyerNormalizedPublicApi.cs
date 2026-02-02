@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
 using ExchangeApi.Primitives.CallCommon;
 using RawPublicRequests = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Requests;
 using PublicRequests = ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Requests;
@@ -32,7 +33,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetMarkets",
+            Component(BitflyerEndpointIds.GetMarkets),
             raw => (IReadOnlyList<BitflyerMarketNormalized>)raw
                 .Select(BitflyerMarketNormalizer.Normalize)
                 .ToArray());
@@ -50,7 +51,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetTicker",
+            Component(BitflyerEndpointIds.GetTicker),
             raw => BitflyerTickerNormalizer.Normalize(raw, rawCall.Meta.RawJson));
     }
 
@@ -63,7 +64,7 @@ internal sealed class BitflyerNormalizedPublicApi
             .ConfigureAwait(false);
         var request = new PublicRequests.GetOrderBookRequest(productCode);
 
-        return CreateCall(rawCall, request, "Bitflyer.GetBoard", BitflyerOrderBookNormalizer.Normalize);
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetBoard), BitflyerOrderBookNormalizer.Normalize);
     }
 
     public async Task<Call<PublicRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
@@ -81,7 +82,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetExecutionsPublic",
+            Component(BitflyerEndpointIds.GetExecutionsPublic),
             raw => (IReadOnlyList<BitflyerExecutionNormalized>)BitflyerExecutionNormalizer.NormalizeList(
                 raw,
                 rawCall.Meta.RawJson));
@@ -96,7 +97,7 @@ internal sealed class BitflyerNormalizedPublicApi
             .ConfigureAwait(false);
         var request = new PublicRequests.GetHealthRequest(productCode);
 
-        return CreateCall(rawCall, request, "Bitflyer.GetHealth", BitflyerHealthNormalizer.Normalize);
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetHealth), BitflyerHealthNormalizer.Normalize);
     }
 
     public async Task<Call<PublicRequests.GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
@@ -108,7 +109,7 @@ internal sealed class BitflyerNormalizedPublicApi
             .ConfigureAwait(false);
         var request = new PublicRequests.GetBoardStateRequest(productCode);
 
-        return CreateCall(rawCall, request, "Bitflyer.GetBoardState", BitflyerBoardStateNormalizer.Normalize);
+        return CreateCall(rawCall, request, Component(BitflyerEndpointIds.GetBoardState), BitflyerBoardStateNormalizer.Normalize);
     }
 
     public async Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
@@ -123,7 +124,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetChats",
+            Component(BitflyerEndpointIds.GetChats),
             raw => (IReadOnlyList<BitflyerChatNormalized>)raw
                 .Select(BitflyerChatNormalizer.Normalize)
                 .ToArray());
@@ -140,7 +141,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetCorporateLeverage",
+            Component(BitflyerEndpointIds.GetCorporateLeverage),
             raw => new BitflyerCorporateLeverageNormalized(
                 raw.CurrentMax,
                 raw.CurrentStartDate,
@@ -160,7 +161,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bitflyer.GetFundingRate",
+            Component(BitflyerEndpointIds.GetFundingRate),
             raw => new BitflyerFundingRateNormalized(
                 raw.CurrentFundingRate,
                 raw.NextFundingRateSettleDate));
@@ -222,4 +223,6 @@ internal sealed class BitflyerNormalizedPublicApi
                 Meta: rawCall.Meta);
         }
     }
+
+    private static string Component(string endpointId) => $"Bitflyer.{endpointId}";
 }

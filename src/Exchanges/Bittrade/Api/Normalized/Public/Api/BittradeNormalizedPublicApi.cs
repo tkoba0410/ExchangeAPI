@@ -11,6 +11,7 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
 using RawPublicDtos = ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Dtos;
 using RawPublicRequests = ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Requests;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Constants;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
 
@@ -34,7 +35,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetSymbols",
+            Component(BittradeEndpointIds.GetSymbols),
             ok =>
             {
                 RequireOk(ok.Status, "symbols");
@@ -54,7 +55,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetCurrencys",
+            Component(BittradeEndpointIds.GetCurrencys),
             ok =>
             {
                 RequireOk(ok.Status, "currencys");
@@ -73,7 +74,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetTimestamp",
+            Component(BittradeEndpointIds.GetTimestamp),
             ok =>
             {
                 RequireOk(ok.Status, "timestamp");
@@ -91,7 +92,7 @@ internal sealed class BittradeNormalizedPublicApi
         {
             return CreateCallError<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>(
                 request,
-                "Bittrade.GetDetailMerged",
+                Component(BittradeEndpointIds.GetDetailMerged),
                 error!,
                 startedAt);
         }
@@ -103,7 +104,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetDetailMerged",
+            Component(BittradeEndpointIds.GetDetailMerged),
             ok =>
             {
                 RequireOk(ok.Status, "ticker");
@@ -123,7 +124,7 @@ internal sealed class BittradeNormalizedPublicApi
         {
             return CreateCallError<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>(
                 request,
-                "Bittrade.GetDepth",
+                Component(BittradeEndpointIds.GetDepth),
                 error!,
                 startedAt);
         }
@@ -135,7 +136,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetDepth",
+            Component(BittradeEndpointIds.GetDepth),
             ok =>
             {
                 RequireOk(ok.Status, "orderbook");
@@ -154,7 +155,7 @@ internal sealed class BittradeNormalizedPublicApi
         {
             return CreateCallError<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
                 request,
-                "Bittrade.GetTrade",
+                Component(BittradeEndpointIds.GetTrade),
                 error!,
                 startedAt);
         }
@@ -166,7 +167,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetTrade",
+            Component(BittradeEndpointIds.GetTrade),
             ok =>
             {
                 RequireOk(ok.Status, "trades");
@@ -187,7 +188,7 @@ internal sealed class BittradeNormalizedPublicApi
         {
             return CreateCallError<NormalizedRequests.GetHistoryKlineRequest, IReadOnlyList<BittradeKlineNormalized>>(
                 request,
-                "Bittrade.GetHistoryKline",
+                Component(BittradeEndpointIds.GetHistoryKline),
                 error!,
                 startedAt);
         }
@@ -199,7 +200,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetHistoryKline",
+            Component(BittradeEndpointIds.GetHistoryKline),
             ok =>
             {
                 RequireOk(ok.Status, "klines");
@@ -216,7 +217,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetTickers",
+            Component(BittradeEndpointIds.GetTickers),
             ok =>
             {
                 RequireOk(ok.Status, "tickers");
@@ -234,7 +235,7 @@ internal sealed class BittradeNormalizedPublicApi
         {
             return CreateCallError<NormalizedRequests.GetHistoryTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>(
                 request,
-                "Bittrade.GetHistoryTrade",
+                Component(BittradeEndpointIds.GetHistoryTrade),
                 error!,
                 startedAt);
         }
@@ -246,7 +247,7 @@ internal sealed class BittradeNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            "Bittrade.GetHistoryTrade",
+            Component(BittradeEndpointIds.GetHistoryTrade),
             ok =>
             {
                 RequireOk(ok.Status, "history trades");
@@ -368,4 +369,6 @@ internal sealed class BittradeNormalizedPublicApi
             BittradeDepthType.Step5 => "step5",
             _ => throw new InvalidOperationException($"Unsupported depth type: {depthType}."),
         };
+
+    private static string Component(string endpointId) => $"Bittrade.{endpointId}";
 }

@@ -1,20 +1,20 @@
 using System;
-using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Markets;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized;
 
 internal static class BittradeNormalizeFactory
 {
-    public static BittradeNormalizedApi FromRestClient(
-        IRestClient restClient,
+    public static BittradeNormalizedApi FromRaw(
+        IBittradeRawApi raw,
         IBittradeMarketResolver markets,
         string? accountId = null)
     {
-        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+        if (raw is null) throw new ArgumentNullException(nameof(raw));
         if (markets is null) throw new ArgumentNullException(nameof(markets));
 
-        return BittradeNormalizedApi.FromRestClient(restClient, markets, accountId);
+        return BittradeNormalizedApi.FromRaw(raw, markets, accountId);
     }
 }

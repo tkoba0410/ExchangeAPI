@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
@@ -16,7 +15,6 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Api;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
 
@@ -31,16 +29,6 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
     {
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
-    }
-
-    public static BitflyerNormalizedApi FromRestClient(IRestClient restClient, IBitflyerMarketResolver markets)
-    {
-        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        if (markets is null) throw new ArgumentNullException(nameof(markets));
-        var wire = new WireTransport(restClient);
-        var raw = new BitflyerRawApi(wire);
-
-        return FromRaw(raw, markets);
     }
 
     internal static BitflyerNormalizedApi FromRaw(IBitflyerRawApi raw, IBitflyerMarketResolver markets)

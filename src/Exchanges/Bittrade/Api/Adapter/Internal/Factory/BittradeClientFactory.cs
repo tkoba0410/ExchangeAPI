@@ -10,11 +10,13 @@ using ExchangeApi.Exchanges.Bittrade.Api.Normalized;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Internal;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
+using ExchangeApi.Transport.Wire;
 namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Factory;
 
 /// <summary>
@@ -36,7 +38,9 @@ public static class BittradeClientFactory
     public static BittradeExchangeInfoApi CreateExchangeInfo()
     {
         var restClient = CreateRestClient();
-        var raw = new BittradeRawApi(new ExchangeApi.Transport.Wire.WireTransport(restClient));
+        var wireTransport = new WireTransport(restClient);
+        var wire = new BittradeWireCallExecutor(wireTransport);
+        var raw = new BittradeRawApi(wire);
         var normalizedExchangeInfo = new BittradeNormalizedPublicApi(raw);
         return new BittradeExchangeInfoApi(normalizedExchangeInfo);
     }
@@ -47,7 +51,9 @@ public static class BittradeClientFactory
         string accountId)
     {
         var restClient = CreateRestClient(new BittradeRequestSigner(accessKey, secretKey));
-        var raw = new BittradeRawApi(new ExchangeApi.Transport.Wire.WireTransport(restClient));
+        var wireTransport = new WireTransport(restClient);
+        var wire = new BittradeWireCallExecutor(wireTransport);
+        var raw = new BittradeRawApi(wire);
         var normalizedPublic = new BittradeNormalizedPublicApi(raw);
         var exchangeInfo = new BittradeExchangeInfoApi(normalizedPublic);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);

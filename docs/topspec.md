@@ -362,6 +362,12 @@ API 系統の Adapter とは **別系統**として扱う。
 * Raw / Normalized / Contract は I/O を行ってはならない
 * 外部通信は必ず Wire 層を経由する
 
+#### 4.2.1 送信とパースの分離（MUST）
+
+* Wire 層で `SendAsync` を実行し、Raw 層は `Call<WireCallSpec, WireResponse>` を受け取って JSON 解析のみを行う。
+* Raw 層は `IWireTransport` を参照してはならない。
+* 実装例の一貫性を保つため、Wire は送信実行クラス（例: `*WireCallExecutor`）、Raw はパース専用クラス（例: `*RawCallExecutor`）を持つ。
+
 ---
 
 ## 5. Call 抽象

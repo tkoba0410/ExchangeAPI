@@ -57,4 +57,4 @@ src/Utilities/
 - API 呼び出し
 - 取引所固有仕様の吸収（Normalized/Adapter の責務）
 - Contracts の Shape / Semantics の拡張
-
+- I/O 実行（Wire 層のみ。TopSpec 4.2/4.2.1 参照）

@@ -6,24 +6,28 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Private.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Api;
 
 internal sealed class BitflyerRawPrivateClient
 {
+    private readonly IBitflyerWireCallExecutor _wire;
     private readonly BitflyerRawCallExecutor _executor;
 
-    public BitflyerRawPrivateClient(BitflyerRawCallExecutor executor)
+    public BitflyerRawPrivateClient(IBitflyerWireCallExecutor wire, BitflyerRawCallExecutor executor)
     {
-        _executor = executor;
+        _wire = wire ?? throw new System.ArgumentNullException(nameof(wire));
+        _executor = executor ?? throw new System.ArgumentNullException(nameof(executor));
     }
 
     public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
         GetPermissionsRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetPermissions),
             BitflyerPrivateEndpoints.GetPermissions(),
@@ -35,7 +39,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalanceCallAsync(
         GetBalancesRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetBalance),
             BitflyerPrivateEndpoints.GetBalance(),
@@ -47,7 +51,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsCallAsync(
         GetPositionsRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetPositions),
             BitflyerPrivateEndpoints.GetPositions(request.ProductCode),
@@ -59,7 +63,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
         GetAccountExecutionsRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetExecutionsPrivate),
             BitflyerPrivateEndpoints.GetExecutionsPrivate(
@@ -77,7 +81,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralCallAsync(
         GetCollateralRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetCollateral),
             BitflyerPrivateEndpoints.GetCollateral(),
@@ -89,7 +93,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetCollateralAccountsRequest, IReadOnlyList<CollateralAccount>>> GetCollateralAccountsCallAsync(
         GetCollateralAccountsRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetCollateralAccounts),
             BitflyerPrivateEndpoints.GetCollateralAccounts(),
@@ -101,7 +105,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetBalanceHistoryRequest, RawJsonResponse>> GetBalanceHistoryCallAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetBalanceHistory),
             BitflyerPrivateEndpoints.GetBalanceHistory(
@@ -115,7 +119,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionCallAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetTradingCommission),
             BitflyerPrivateEndpoints.GetTradingCommission(request.ProductCode),
@@ -125,7 +129,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetCollateralHistoryRequest, RawJsonResponse>> GetCollateralHistoryCallAsync(
         GetCollateralHistoryRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetCollateralHistory),
             BitflyerPrivateEndpoints.GetCollateralHistory(
@@ -138,7 +142,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetAddressesRequest, RawJsonResponse>> GetAddressesCallAsync(
         GetAddressesRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetAddresses),
             BitflyerPrivateEndpoints.GetAddresses(),
@@ -148,7 +152,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetCoinInsRequest, RawJsonResponse>> GetCoinInsCallAsync(
         GetCoinInsRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetCoinIns),
             BitflyerPrivateEndpoints.GetCoinIns(
@@ -161,7 +165,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetCoinOutsRequest, RawJsonResponse>> GetCoinOutsCallAsync(
         GetCoinOutsRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetCoinOuts),
             BitflyerPrivateEndpoints.GetCoinOuts(
@@ -175,7 +179,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetDepositsRequest, RawJsonResponse>> GetDepositsCallAsync(
         GetDepositsRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetDeposits),
             BitflyerPrivateEndpoints.GetDeposits(
@@ -188,7 +192,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetWithdrawalsRequest, RawJsonResponse>> GetWithdrawalsCallAsync(
         GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetWithdrawals),
             BitflyerPrivateEndpoints.GetWithdrawals(
@@ -202,7 +206,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetBankAccountsRequest, RawJsonResponse>> GetBankAccountsCallAsync(
         GetBankAccountsRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetBankAccounts),
             BitflyerPrivateEndpoints.GetBankAccounts(),
@@ -212,7 +216,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CreateWithdrawalRequest, CreateWithdrawalResponse>> WithdrawCallAsync(
         CreateWithdrawalRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.Withdraw),
             BitflyerPrivateEndpoints.Withdraw(
@@ -225,7 +229,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CreateChildOrderRequest, RawSendChildOrderResponse>> SendChildOrderCallAsync(
         CreateChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.SendChildOrder),
             BitflyerPrivateEndpoints.SendChildOrder(
@@ -240,7 +244,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CreateParentOrderRequest, RawSendParentOrderResponse>> SendParentOrderCallAsync(
         CreateParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.SendParentOrder),
             BitflyerPrivateEndpoints.SendParentOrder(
@@ -255,7 +259,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CancelChildOrderRequest, RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
         CancelChildOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.CancelChildOrder),
             BitflyerPrivateEndpoints.CancelChildOrder(
@@ -268,7 +272,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CancelParentOrderRequest, RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
         CancelParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.CancelParentOrder),
             BitflyerPrivateEndpoints.CancelParentOrder(
@@ -281,7 +285,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<CancelAllChildOrdersRequest, RawCancelAllChildOrdersResponse>> CancelAllChildOrdersCallAsync(
         CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.CancelAllChildOrders),
             BitflyerPrivateEndpoints.CancelAllChildOrders(
@@ -294,7 +298,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetChildOrdersRequest, IReadOnlyList<RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
         GetChildOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetChildOrders),
             BitflyerPrivateEndpoints.GetChildOrders(
@@ -314,7 +318,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetParentOrdersRequest, IReadOnlyList<RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
         GetParentOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetParentOrders),
             BitflyerPrivateEndpoints.GetParentOrders(
@@ -331,7 +335,7 @@ internal sealed class BitflyerRawPrivateClient
     public Task<Call<GetParentOrderRequest, RawGetParentOrderResponse>> GetParentOrderCallAsync(
         GetParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _executor.SendAndParse(
+        SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetParentOrder),
             BitflyerPrivateEndpoints.GetParentOrder(
@@ -341,6 +345,17 @@ internal sealed class BitflyerRawPrivateClient
             json => BitflyerRawJson.DeserializeOrThrow<RawGetParentOrderResponse>(
                 json,
                 Component(BitflyerEndpointIds.GetParentOrder)));
+
+    private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
+        TReq request,
+        string component,
+        WireCallSpec spec,
+        CancellationToken cancellationToken,
+        Func<string, TRes> parse)
+    {
+        var wireCall = await _wire.SendAsync(spec, cancellationToken).ConfigureAwait(false);
+        return _executor.Parse(request, component, wireCall, parse);
+    }
 
     private static string Component(string endpointId) => $"Bitflyer.{endpointId}";
 }

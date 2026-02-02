@@ -7,8 +7,8 @@ using ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Requests;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Internal;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
 
@@ -20,12 +20,12 @@ public sealed class BittradeRawApi : IBittradeRawApi
     private readonly BittradePublicApi _publicApi;
     private readonly BittradeRawPrivateClient _privateClient;
 
-    public BittradeRawApi(IWireTransport wire)
+    public BittradeRawApi(IBittradeWireCallExecutor wire)
     {
         if (wire is null) throw new ArgumentNullException(nameof(wire));
-        var executor = new BittradeRawCallExecutor(wire);
-        _publicApi = new BittradePublicApi(executor);
-        _privateClient = new BittradeRawPrivateClient(executor);
+        var executor = new BittradeRawCallExecutor();
+        _publicApi = new BittradePublicApi(wire, executor);
+        _privateClient = new BittradeRawPrivateClient(wire, executor);
     }
 
     internal BittradeRawApi(

@@ -11,6 +11,7 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
@@ -119,8 +120,9 @@ public class BittradeMarketApiTests
         var transport = new HttpTransport(client, disposeHttpClient: true);
         var restClient = new RestClient(client.BaseAddress!, transport);
         var markets = CreateResolver(new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("btcjpy"), MarketType.ParseOrThrow("Spot")));
-        var raw = new ExchangeApi.Exchanges.Bittrade.Api.Raw.Api.BittradeRawApi(
-            new ExchangeApi.Transport.Wire.WireTransport(restClient));
+        var wireTransport = new ExchangeApi.Transport.Wire.WireTransport(restClient);
+        var wire = new BittradeWireCallExecutor(wireTransport);
+        var raw = new ExchangeApi.Exchanges.Bittrade.Api.Raw.Api.BittradeRawApi(wire);
         var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api.BittradeNormalizedPublicApi(raw);
         return new MarketApi(normalizedMarketData, markets);
     }

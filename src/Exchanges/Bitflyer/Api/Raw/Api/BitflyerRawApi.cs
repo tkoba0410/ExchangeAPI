@@ -7,8 +7,8 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Internal;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 
@@ -17,11 +17,11 @@ public sealed class BitflyerRawApi : IBitflyerRawApi
     private readonly BitflyerPublicApi _publicApi;
     private readonly BitflyerRawPrivateClient _privateClient;
 
-    public BitflyerRawApi(IWireTransport wire)
+    public BitflyerRawApi(IBitflyerWireCallExecutor wire)
     {
-        var executor = new BitflyerRawCallExecutor(wire);
-        _publicApi = new BitflyerPublicApi(executor);
-        _privateClient = new BitflyerRawPrivateClient(executor);
+        var executor = new BitflyerRawCallExecutor();
+        _publicApi = new BitflyerPublicApi(wire, executor);
+        _privateClient = new BitflyerRawPrivateClient(wire, executor);
     }
 
     public Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsCallAsync(

@@ -1,8 +1,5 @@
 using System;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
@@ -10,24 +7,15 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 
 internal sealed class BitflyerRawCallExecutor
 {
-    private readonly IWireTransport _wire;
-
-    public BitflyerRawCallExecutor(IWireTransport wire)
-    {
-        _wire = wire ?? throw new ArgumentNullException(nameof(wire));
-    }
-
-    public async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
+    public Call<TReq, TRes> Parse<TReq, TRes>(
         TReq request,
         string component,
-        WireCallSpec spec,
-        CancellationToken cancellationToken,
+        Call<WireCallSpec, WireResponse> wireCall,
         Func<string, TRes> parse)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
         if (parse is null) throw new ArgumentNullException(nameof(parse));
 
-        var wireCall = await _wire.SendAsync(ExchangeCode.Bitflyer, spec, cancellationToken).ConfigureAwait(false);
         return CreateCall(request, component, wireCall, parse);
     }
 

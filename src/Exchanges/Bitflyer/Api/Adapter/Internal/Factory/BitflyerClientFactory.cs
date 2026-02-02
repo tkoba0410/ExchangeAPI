@@ -14,6 +14,7 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Internal;
 using ExchangeApi.Transport.Wire;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Factory;
 
@@ -52,7 +53,8 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var wire = new WireTransport(restClient);
+        var wireTransport = new WireTransport(restClient);
+        var wire = new BitflyerWireCallExecutor(wireTransport);
         var raw = new BitflyerRawApi(wire);
         var publicApi = new BitflyerNormalizedPublicApi(raw);
         var exchangeInfo = new BitflyerExchangeInfoApi(publicApi);

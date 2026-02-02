@@ -9,6 +9,7 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Internal;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;
@@ -47,7 +48,9 @@ internal sealed class BittradeApiBundle
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
         var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
 
-        var raw = new BittradeRawApi(new WireTransport(restClient));
+        var wireTransport = new WireTransport(restClient);
+        var wire = new BittradeWireCallExecutor(wireTransport);
+        var raw = new BittradeRawApi(wire);
         var components = BittradeNormalizedComponentFactory.FromRaw(
             raw,
             exchangeInfo =>

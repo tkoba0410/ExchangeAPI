@@ -34,12 +34,12 @@ internal static class BitflyerParentOrderNormalizer
 
         return new BitflyerParentOrderDetailNormalized(
             Id: raw.Id,
-            ParentOrderId: raw.ParentOrderId,
+            ParentOrderId: ExchangeOrderId.Parse(raw.ParentOrderId),
             OrderMethod: ParseOrderMethod(raw.OrderMethod),
             ExpireDate: raw.ExpireDate,
             TimeInForce: ParseTimeInForce(raw.TimeInForce),
             Parameters: parameters,
-            ParentOrderAcceptanceId: raw.ParentOrderAcceptanceId,
+            ParentOrderAcceptanceId: AcceptanceId.Parse(raw.ParentOrderAcceptanceId),
             RawSnapshot: snapshot,
             Extras: new Dictionary<string, JsonElement>());
     }
@@ -50,8 +50,8 @@ internal static class BitflyerParentOrderNormalizer
     {
         return new BitflyerParentOrderNormalized(
             Id: raw.Id,
-            ParentOrderId: raw.ParentOrderId,
-            ProductCode: raw.ProductCode,
+            ParentOrderId: ExchangeOrderId.Parse(raw.ParentOrderId),
+            ProductCode: ProductCode.ParseNormalized(raw.ProductCode),
             Side: ParseSide(raw.Side),
             ParentOrderType: ParseParentOrderType(raw.ParentOrderType),
             Price: raw.Price == 0 ? null : new Price(raw.Price),
@@ -60,7 +60,7 @@ internal static class BitflyerParentOrderNormalizer
             ParentOrderState: ParseParentOrderState(raw.ParentOrderState),
             ExpireDate: raw.ExpireDate,
             ParentOrderDate: raw.ParentOrderDate,
-            ParentOrderAcceptanceId: raw.ParentOrderAcceptanceId,
+            ParentOrderAcceptanceId: AcceptanceId.Parse(raw.ParentOrderAcceptanceId),
             OutstandingSize: new Size(raw.OutstandingSize),
             CancelSize: new Size(raw.CancelSize),
             ExecutedSize: new Size(raw.ExecutedSize),
@@ -72,7 +72,7 @@ internal static class BitflyerParentOrderNormalizer
     private static BitflyerParentOrderParameterNormalized NormalizeParameter(RawPrivateDtos.ParentOrderParameterResponse raw)
     {
         return new BitflyerParentOrderParameterNormalized(
-            ProductCode: raw.ProductCode,
+            ProductCode: ProductCode.ParseNormalized(raw.ProductCode),
             ConditionType: ParseConditionType(raw.ConditionType),
             Side: ParseSide(raw.Side),
             Price: raw.Price is > 0 ? new Price(raw.Price.Value) : null,

@@ -82,7 +82,7 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
 
         public StubMarketResolver(string productCode)
         {
-            _market = new BittradeMarketInfo(new Symbol("BTC/JPY"), productCode);
+            _market = new BittradeMarketInfo(new Symbol("BTC/JPY"), ProductCode.Parse(productCode));
         }
 
         public Task<Call<ResolveBittradeMarketRequest, BittradeMarketInfo>> ResolveCallAsync(

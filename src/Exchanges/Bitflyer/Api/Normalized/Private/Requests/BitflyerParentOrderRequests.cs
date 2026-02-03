@@ -11,7 +11,7 @@ public sealed record SendParentOrderRequest(
     BitflyerTimeInForce? TimeInForce = null);
 
 public sealed record BitflyerParentOrderParameterRequest(
-    string ProductCode,
+    ProductCode ProductCode,
     BitflyerConditionType ConditionType,
     BitflyerSide Side,
     Size Size,
@@ -20,17 +20,17 @@ public sealed record BitflyerParentOrderParameterRequest(
     decimal? Offset = null);
 
 public sealed record CancelParentOrderRequest(
-    string ProductCode,
-    string? ParentOrderId = null,
-    string? ParentOrderAcceptanceId = null);
+    ProductCode ProductCode,
+    ExchangeOrderId? ParentOrderId = null,
+    AcceptanceId? ParentOrderAcceptanceId = null);
 
 public sealed record GetParentOrdersRequest(
-    string ProductCode,
+    ProductCode ProductCode,
     BitflyerParentOrderState? ParentOrderState = null,
     int? Count = null,
     long? Before = null,
     long? After = null);
 
 public sealed record GetParentOrderRequest(
-    string? ParentOrderId = null,
-    string? ParentOrderAcceptanceId = null);
+    ExchangeOrderId? ParentOrderId = null,
+    AcceptanceId? ParentOrderAcceptanceId = null);

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using RawPrivateDtos = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Dtos;
 using RawPrivateRequests = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 using ExchangeApi.Primitives.CallCommon;
@@ -19,7 +20,7 @@ internal static class BitflyerAccountMapper
 
         return rawBalances
             .Select(b => new BitflyerBalanceEntryNormalized(
-                Currency: b.CurrencyCode,
+                CurrencyCode: CurrencyCodeConverter.FromString(b.CurrencyCode),
                 Amount: b.Amount,
                 Available: b.Available))
             .ToArray();
@@ -34,7 +35,7 @@ internal static class BitflyerAccountMapper
         return rawExecutions
             .Select(e => new BitflyerExecutionAccountNormalized(
                 Symbol: symbol,
-                OrderId: e.Id.ToString(CultureInfo.InvariantCulture),
+                OrderId: new OrderId(e.Id.ToString(CultureInfo.InvariantCulture)),
                 Side: BitflyerCommonMapper.MapSide(e.Side),
                 Price: new Price(e.Price),
                 Size: new Size(e.Size),
@@ -69,7 +70,7 @@ internal static class BitflyerAccountMapper
 
             mapped.Add(new BitflyerExecutionAccountNormalized(
                 Symbol: symbol,
-                OrderId: e.Id.ToString(CultureInfo.InvariantCulture),
+                OrderId: new OrderId(e.Id.ToString(CultureInfo.InvariantCulture)),
                 Side: side,
                 Price: new Price(e.Price),
                 Size: new Size(e.Size),

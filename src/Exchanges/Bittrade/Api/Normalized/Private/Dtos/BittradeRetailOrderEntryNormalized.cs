@@ -1,10 +1,11 @@
 using System;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
 
 public sealed record BittradeRetailOrderEntryNormalized(
-    string Id,
-    string Symbol,
+    OrderId Id,
+    Symbol Symbol,
     int Type,
     decimal? Price,
     decimal? Amount,

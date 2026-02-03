@@ -1,6 +1,8 @@
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
 
 public sealed record BitflyerBoardStateNormalized(
-    string? Health,
-    string? State,
-    string? Data);
+    FreeText? Health,
+    FreeText? State,
+    FreeText? Data);

@@ -4,4 +4,4 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Markets;
 
 public sealed record BittradeMarketInfo(
     Symbol Symbol,
-    string ProductCode);
+    ProductCode ProductCode);

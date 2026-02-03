@@ -51,7 +51,7 @@ public sealed class BittradeFailFastMapperTests
                 Fees: "0"));
 
         Assert.Throws<InvalidOperationException>(() =>
-            BittradeTradingMapper.ToOrderStatus("BTC_JPY", raw, new OrderKey(OrderIdKind.ExchangeOrderId, "1")));
+            BittradeTradingMapper.ToOrderStatus(ProductCode.Parse("BTC_JPY"), raw, new OrderKey(OrderIdKind.ExchangeOrderId, "1")));
     }
 
     private static RawPrivateDtos.RawOpenOrdersResponse CreateOpenOrdersResponse(string type) =>

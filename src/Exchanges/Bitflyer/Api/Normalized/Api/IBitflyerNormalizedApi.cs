@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
@@ -16,37 +17,37 @@ public interface IBitflyerNormalizedApi
         CancellationToken cancellationToken = default);
 
     Task<Call<GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
-        string productCode,
+        ProductCode productCode,
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetCorporateLeverageRequest, BitflyerCorporateLeverageNormalized>> GetCorporateLeverageCallAsync(
         CancellationToken cancellationToken = default);
 
     Task<Call<GetFundingRateRequest, BitflyerFundingRateNormalized>> GetFundingRateCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
-        string? fromDate = null,
+        FreeText? fromDate = null,
         CancellationToken cancellationToken = default);
 
     Task<Call<PlaceOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(
@@ -86,7 +87,7 @@ public interface IBitflyerNormalizedApi
     Task<Call<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+    Task<Call<GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
         CancellationToken cancellationToken = default);
 
     Task<Call<GetCollateralRequest, BitflyerCollateralNormalized>> GetCollateralCallAsync(
@@ -105,7 +106,7 @@ public interface IBitflyerNormalizedApi
         CancellationToken cancellationToken = default);
 
     Task<Call<GetCoinOutsRequest, BitflyerRawJsonNormalized>> GetCoinOutsCallAsync(
-        string? messageId = null,
+        FreeText? messageId = null,
         int? count = null,
         long? before = null,
         long? after = null,
@@ -121,10 +122,10 @@ public interface IBitflyerNormalizedApi
         CancellationToken cancellationToken = default);
 
     Task<Call<WithdrawRequest, BitflyerWithdrawResultNormalized>> WithdrawCallAsync(
-        string currencyCode,
+        CurrencyCode currencyCode,
         int bankAccountId,
         decimal amount,
-        string? code = null,
+        FreeText? code = null,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetWithdrawalsRequest, BitflyerRawJsonNormalized>> GetWithdrawalsCallAsync(
@@ -138,7 +139,7 @@ public interface IBitflyerNormalizedApi
         CancellationToken cancellationToken = default);
 
     Task<Call<GetBalanceHistoryRequest, BitflyerRawJsonNormalized>> GetBalanceHistoryCallAsync(
-        string? currencyCode = null,
+        CurrencyCode? currencyCode = null,
         int? count = null,
         long? before = null,
         long? after = null,

@@ -11,11 +11,11 @@ internal static class BittradeMapper
     public static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BittradeBalanceEntryNormalized> entries)
     {
         var result = new List<Balance>();
-        foreach (var group in entries.GroupBy(e => e.Currency, StringComparer.OrdinalIgnoreCase))
+        foreach (var group in entries.GroupBy(e => e.Currency.Value, StringComparer.OrdinalIgnoreCase))
         {
             var total = group.Sum(e => e.Balance);
             var available = group
-                .Where(x => string.Equals(x.Type, "trade", StringComparison.OrdinalIgnoreCase))
+                .Where(x => string.Equals(x.Type.Value, "trade", StringComparison.OrdinalIgnoreCase))
                 .Sum(e => e.Balance);
             result.Add(BalanceFactory.Create(
                 currency: group.Key.ToUpperInvariant(),

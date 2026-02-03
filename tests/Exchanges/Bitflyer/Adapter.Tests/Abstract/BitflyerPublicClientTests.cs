@@ -21,11 +21,11 @@ public sealed class BitflyerPublicClientTests
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
 
-        var call = await normalized.GetHealthCallAsync("BTC_JPY");
+        var call = await normalized.GetHealthCallAsync(ProductCode.ParseOrThrow("BTC_JPY"));
         var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos.BitflyerHealthNormalized>.Ok>(call.Result);
         var result = ok.Response;
 
-        Assert.Equal("NORMAL", result.Status);
+        Assert.Equal("NORMAL", result.Status?.Value);
     }
 
     [Fact]
@@ -36,12 +36,12 @@ public sealed class BitflyerPublicClientTests
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
 
-        var call = await normalized.GetBoardStateCallAsync("BTC_JPY");
+        var call = await normalized.GetBoardStateCallAsync(ProductCode.ParseOrThrow("BTC_JPY"));
         var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos.BitflyerBoardStateNormalized>.Ok>(call.Result);
         var result = ok.Response;
 
-        Assert.Equal("NORMAL", result.Health);
-        Assert.Equal("RUNNING", result.State);
+        Assert.Equal("NORMAL", result.Health?.Value);
+        Assert.Equal("RUNNING", result.State?.Value);
         Assert.Null(result.Data);
     }
 

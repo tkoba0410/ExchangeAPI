@@ -6,11 +6,11 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
 
 public sealed record BittradeExecutionAccountNormalized(
     Symbol Symbol,
-    string OrderId,
+    OrderId OrderId,
     Side Side,
     Price Price,
     Size Size,
     DateTimeOffset ExecutedAt,
     decimal? Commission = null,
     decimal? Pnl = null,
-    string? Liquidity = null);
+    FreeText? Liquidity = null);

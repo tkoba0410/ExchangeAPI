@@ -37,7 +37,7 @@ internal static class BittradeMarketMapper
     {
         return new ExecutionMarket(
             Symbol: symbol,
-            OrderId: OrderId.ParseOrThrow(normalized.Id),
+            OrderId: normalized.Id,
             Side: MapSide(normalized.Side),
             Price: new Price(normalized.Price),
             Size: new Size(normalized.Size),

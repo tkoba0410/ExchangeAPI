@@ -31,8 +31,8 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 {
     private readonly Func<CancellationToken, Task<MarketsCall>>? _getMarkets;
     private readonly Func<Symbol, CancellationToken, Task<TradingCommissionCall>>? _getTradingCommission;
-    private readonly Func<string, CancellationToken, Task<HealthCall>>? _getHealth;
-    private readonly Func<string, CancellationToken, Task<BoardStateCall>>? _getBoardState;
+    private readonly Func<ProductCode, CancellationToken, Task<HealthCall>>? _getHealth;
+    private readonly Func<ProductCode, CancellationToken, Task<BoardStateCall>>? _getBoardState;
 
     public BitflyerExchangeInfoApi() { }
 
@@ -213,7 +213,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         BitflyerDynamicMaintenance? maintenance = null;
         if (marketInfos.Count > 0 && (_getHealth is not null || _getBoardState is not null))
         {
-            var productCode = marketInfos[0].ProductCode;
+            var productCode = ProductCode.ParseNormalized(marketInfos[0].ProductCode);
             maintenance = await GetMaintenanceAsync(productCode, cancellationToken).ConfigureAwait(false);
         }
 
@@ -226,13 +226,14 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 
     private static BitflyerDynamicMarketInfo MapDynamicMarket(BitflyerMarketNormalized market)
     {
-        var symbol = market.ProductCode.Contains('_', StringComparison.Ordinal)
-            ? market.ProductCode.Replace('_', '/')
-            : market.ProductCode;
+        var productCodeText = market.ProductCode.Value;
+        var symbol = productCodeText.Contains('_', StringComparison.Ordinal)
+            ? productCodeText.Replace('_', '/')
+            : productCodeText;
 
         return new BitflyerDynamicMarketInfo
         {
-            ProductCode = market.ProductCode,
+            ProductCode = productCodeText,
             Symbol = symbol,
             Type = market.Alias is null ? "Spot" : "Spot"
         };
@@ -277,7 +278,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
     }
 
     private async Task<BitflyerDynamicMaintenance?> GetMaintenanceAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken)
     {
         BitflyerDynamicMaintenance? maintenanceFromHealth = null;
@@ -320,16 +321,17 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         return maintenanceFromHealth;
     }
 
-    private static BitflyerDynamicMaintenance? MapMaintenanceFromHealth(string? status)
+    private static BitflyerDynamicMaintenance? MapMaintenanceFromHealth(FreeText? status)
     {
-        if (string.IsNullOrWhiteSpace(status)) return null;
-        var normalized = status.Trim().ToUpperInvariant();
+        if (status is null || status.Value.IsEmpty) return null;
+        var statusText = status.Value.Value;
+        var normalized = statusText.Trim().ToUpperInvariant();
         if (normalized is "NORMAL" || normalized.Contains("BUSY", StringComparison.Ordinal))
         {
             return new BitflyerDynamicMaintenance
             {
                 Status = BitflyerDynamicMaintenanceStatus.Normal,
-                Message = $"Health:{status}"
+                Message = $"Health:{statusText}"
             };
         }
 
@@ -338,7 +340,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             return new BitflyerDynamicMaintenance
             {
                 Status = BitflyerDynamicMaintenanceStatus.Unplanned,
-                Message = $"Health:{status}"
+                Message = $"Health:{statusText}"
             };
         }
 
@@ -347,15 +349,16 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 
     private static BitflyerDynamicMaintenance? MapMaintenanceFromBoardState(BitflyerBoardStateNormalized state)
     {
-        if (!string.IsNullOrWhiteSpace(state.Health))
+        if (state.Health is not null && !state.Health.Value.IsEmpty)
         {
-            var health = state.Health.Trim().ToUpperInvariant();
+            var healthText = state.Health.Value.Value;
+            var health = healthText.Trim().ToUpperInvariant();
             if (health is "NORMAL" || health.Contains("BUSY", StringComparison.Ordinal))
             {
                 return new BitflyerDynamicMaintenance
                 {
                     Status = BitflyerDynamicMaintenanceStatus.Normal,
-                    Message = $"BoardState.Health:{state.Health}"
+                    Message = $"BoardState.Health:{healthText}"
                 };
             }
 
@@ -364,20 +367,21 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
                 return new BitflyerDynamicMaintenance
                 {
                     Status = BitflyerDynamicMaintenanceStatus.Unplanned,
-                    Message = $"BoardState.Health:{state.Health}"
+                    Message = $"BoardState.Health:{healthText}"
                 };
             }
         }
 
-        if (!string.IsNullOrWhiteSpace(state.State))
+        if (state.State is not null && !state.State.Value.IsEmpty)
         {
-            var boardState = state.State.Trim().ToUpperInvariant();
+            var stateText = state.State.Value.Value;
+            var boardState = stateText.Trim().ToUpperInvariant();
             if (boardState is "RUNNING")
             {
                 return new BitflyerDynamicMaintenance
                 {
                     Status = BitflyerDynamicMaintenanceStatus.Normal,
-                    Message = $"BoardState.State:{state.State}"
+                    Message = $"BoardState.State:{stateText}"
                 };
             }
 
@@ -386,7 +390,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
                 return new BitflyerDynamicMaintenance
                 {
                     Status = BitflyerDynamicMaintenanceStatus.Unplanned,
-                    Message = $"BoardState.State:{state.State}"
+                    Message = $"BoardState.State:{stateText}"
                 };
             }
         }

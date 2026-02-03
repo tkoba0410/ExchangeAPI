@@ -3,7 +3,6 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 
 public sealed record BitflyerBalanceEntryNormalized(
-    string Currency,
+    CurrencyCode CurrencyCode,
     decimal Amount,
-    decimal Available,
-    CurrencyCode CurrencyCode = CurrencyCode.Unknown);
+    decimal Available);

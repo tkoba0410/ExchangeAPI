@@ -94,7 +94,7 @@ internal sealed class BitflyerSpotHistoryApi
     {
         var items = executions.Select(e => new ExecutionItem(
             Timestamp: e.ExecutedAt,
-            ExecutionId: ExecutionId.ParseOrThrow(e.OrderId),
+            ExecutionId: ExecutionId.ParseOrThrow(e.OrderId.ToString()),
             Market: e.Symbol,
             Side: e.Side,
             Price: e.Price,

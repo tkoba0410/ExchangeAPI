@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using RawPublicDtos = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Dtos;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
@@ -13,7 +14,7 @@ internal static class BitflyerTickerNormalizer
     {
         var snapshot = ExtractSnapshot(rawJson ?? Serialize(wire));
         return new BitflyerTickerNormalized(
-            ProductCode: wire.ProductCode,
+            ProductCode: ProductCode.ParseNormalized(wire.ProductCode),
             LastTradedPrice: wire.LastTradedPrice,
             Timestamp: wire.Timestamp,
             RawSnapshot: snapshot,

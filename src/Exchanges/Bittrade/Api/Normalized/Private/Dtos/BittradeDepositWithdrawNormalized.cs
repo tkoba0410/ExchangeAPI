@@ -1,13 +1,14 @@
 using System;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
 
 public sealed record BittradeDepositWithdrawNormalized(
-    string Id,
-    string Type,
-    string Currency,
+    FreeText Id,
+    FreeText Type,
+    FreeText Currency,
     decimal Amount,
-    string? Address,
-    string? TxHash,
-    string? State,
+    FreeText? Address,
+    FreeText? TxHash,
+    FreeText? State,
     DateTimeOffset? CreatedAt);

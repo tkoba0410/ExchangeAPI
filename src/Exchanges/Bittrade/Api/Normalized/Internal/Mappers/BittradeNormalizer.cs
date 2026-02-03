@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Dtos;
 using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Requests;
 using RawPublicDtos = ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Dtos;
@@ -82,7 +83,7 @@ internal static class BittradeNormalizer
         var snapshots = ExtractTradeSnapshots(rawJson, entries);
         return entries
             .Select((entry, idx) => new BittradeExecutionNormalized(
-                entry.Id.ToString(),
+                new OrderId(entry.Id.ToString()),
                 MapSide(entry.Direction),
                 entry.Price,
                 entry.Amount,
@@ -117,7 +118,7 @@ internal static class BittradeNormalizer
             }
 
             mapped.Add(new BittradeExecutionNormalized(
-                entry.Id.ToString(),
+                new OrderId(entry.Id.ToString()),
                 side,
                 entry.Price,
                 entry.Amount,
@@ -170,14 +171,14 @@ internal static class BittradeNormalizer
 
         return symbols
             .Select(symbol => new BittradeSymbolNormalized(
-                Symbol: symbol.Symbol,
-                BaseCurrency: symbol.BaseCurrency,
-                QuoteCurrency: symbol.QuoteCurrency,
+                Symbol: FreeText.Parse(symbol.Symbol),
+                BaseCurrency: FreeText.Parse(symbol.BaseCurrency),
+                QuoteCurrency: FreeText.Parse(symbol.QuoteCurrency),
                 PricePrecision: symbol.PricePrecision,
                 AmountPrecision: symbol.AmountPrecision,
                 MinOrderAmount: ParseDecimalFlexible(symbol.MinOrderAmount, "min-order-amt"),
                 MinOrderValue: ParseNullableDecimalFlexible(symbol.MinOrderValue, "min-order-value"),
-                State: symbol.State))
+                State: FreeText.Parse(symbol.State)))
             .ToList();
     }
 
@@ -209,14 +210,14 @@ internal static class BittradeNormalizer
             }
 
             mapped.Add(new BittradeSymbolNormalized(
-                Symbol: symbol.Symbol,
-                BaseCurrency: symbol.BaseCurrency,
-                QuoteCurrency: symbol.QuoteCurrency,
+                Symbol: FreeText.Parse(symbol.Symbol),
+                BaseCurrency: FreeText.Parse(symbol.BaseCurrency),
+                QuoteCurrency: FreeText.Parse(symbol.QuoteCurrency),
                 PricePrecision: symbol.PricePrecision,
                 AmountPrecision: symbol.AmountPrecision,
                 MinOrderAmount: minOrderAmount,
                 MinOrderValue: minOrderValue,
-                State: symbol.State));
+                State: FreeText.Parse(symbol.State)));
         }
 
         normalized = mapped;
@@ -234,7 +235,7 @@ internal static class BittradeNormalizer
 
         return entries
             .Select(entry => new BittradeKlineNormalized(
-                Id: entry.Id,
+                Id: FreeText.Parse(entry.Id),
                 Open: entry.Open,
                 Close: entry.Close,
                 Low: entry.Low,
@@ -256,7 +257,7 @@ internal static class BittradeNormalizer
         var now = DateTimeOffset.UtcNow;
         return entries
             .Select(entry => new BittradeTickerEntryNormalized(
-                entry.Symbol,
+                FreeText.Parse(entry.Symbol),
                 entry.Close,
                 now,
                 ExtractSnapshot(Serialize(entry)),
@@ -270,8 +271,8 @@ internal static class BittradeNormalizer
 
         return data.List
             .Select(entry => new BittradeBalanceEntryNormalized(
-                entry.Currency,
-                entry.Type,
+                FreeText.Parse(entry.Currency),
+                FreeText.Parse(entry.Type),
                 ParseDecimalOrThrow(entry.Balance, "balance", "RawBalanceEntry")))
             .ToList();
     }
@@ -297,7 +298,10 @@ internal static class BittradeNormalizer
                 return false;
             }
 
-            mapped.Add(new BittradeBalanceEntryNormalized(entry.Currency, entry.Type, balance));
+            mapped.Add(new BittradeBalanceEntryNormalized(
+                FreeText.Parse(entry.Currency),
+                FreeText.Parse(entry.Type),
+                balance));
         }
 
         normalized = mapped;
@@ -315,10 +319,10 @@ internal static class BittradeNormalizer
 
         return accounts
             .Select(account => new BittradeAccountNormalized(
-                account.Id,
-                account.Type,
-                account.SubType,
-                account.State))
+                FreeText.Parse(account.Id),
+                FreeText.Parse(account.Type),
+                ParseOptional(account.SubType),
+                FreeText.Parse(account.State)))
             .ToList();
     }
 
@@ -332,13 +336,13 @@ internal static class BittradeNormalizer
 
         return entries
             .Select(entry => new BittradeDepositWithdrawNormalized(
-                entry.Id,
-                entry.Type,
-                entry.Currency,
+                FreeText.Parse(entry.Id),
+                FreeText.Parse(entry.Type),
+                FreeText.Parse(entry.Currency),
                 entry.Amount,
-                entry.Address,
-                entry.TxHash,
-                entry.State,
+                ParseOptional(entry.Address),
+                ParseOptional(entry.TxHash),
+                ParseOptional(entry.State),
                 entry.CreatedAt))
             .ToList();
     }
@@ -354,12 +358,12 @@ internal static class BittradeNormalizer
         return entries
             .Select(entry => new BittradeWithdrawVirtualAddressNormalized(
                 AddressId: entry.AddressId,
-                Currency: entry.Currency,
-                Address: entry.Address,
-                AddressTag: entry.AddressTag,
-                Chain: entry.Chain,
-                Note: entry.Note,
-                State: entry.State,
+                Currency: ParseOptional(entry.Currency),
+                Address: ParseOptional(entry.Address),
+                AddressTag: ParseOptional(entry.AddressTag),
+                Chain: ParseOptional(entry.Chain),
+                Note: ParseOptional(entry.Note),
+                State: ParseOptional(entry.State),
                 CreatedAt: entry.CreatedAt,
                 UpdatedAt: entry.UpdatedAt))
             .ToList();
@@ -375,7 +379,7 @@ internal static class BittradeNormalizer
 
         return entries
             .Select(entry => new BittradeRetailBalanceEntryNormalized(
-                Currency: entry.Currency ?? string.Empty,
+                Currency: FreeText.Parse(entry.Currency),
                 Balance: ParseNullableDecimal(entry.Balance, "balance", "RawRetailAccountBalanceEntry"),
                 Available: ParseNullableDecimal(entry.Available, "available", "RawRetailAccountBalanceEntry"),
                 Frozen: ParseNullableDecimal(entry.Frozen, "frozen", "RawRetailAccountBalanceEntry")))
@@ -406,7 +410,7 @@ internal static class BittradeNormalizer
             }
 
             mapped.Add(new BittradeRetailBalanceEntryNormalized(
-                Currency: entry.Currency ?? string.Empty,
+                Currency: FreeText.Parse(entry.Currency),
                 Balance: balance,
                 Available: available,
                 Frozen: frozen));
@@ -611,6 +615,9 @@ internal static class BittradeNormalizer
 
     private static string Serialize<T>(T value) =>
         JsonSerializer.Serialize(value, SerializerOptions);
+
+    private static FreeText? ParseOptional(string? value) =>
+        FreeText.TryParse(value, out var text) ? text : null;
 
     private static BittradeOrderSide MapSide(string? direction)
     {

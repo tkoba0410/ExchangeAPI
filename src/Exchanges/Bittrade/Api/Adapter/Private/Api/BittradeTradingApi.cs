@@ -221,22 +221,16 @@ internal sealed class BittradeTradingApi
     private static OrderResult MapOrderResult(BittradeOrderResult result) =>
         new(
             Key: result.Key,
-            ExchangeOrderId: ToExchangeOrderId(result.ExchangeOrderId),
-            AcceptanceId: ToAcceptanceId(result.AcceptanceId));
+            ExchangeOrderId: result.ExchangeOrderId,
+            AcceptanceId: result.AcceptanceId);
 
     private static OrderStatus MapOrderStatus(BittradeOrderStatus status) =>
         new(
-            ProductCode: ProductCode.ParseOrThrow(status.ProductCode),
+            ProductCode: status.ProductCode,
             Key: status.Key,
             Status: status.Status,
             ExecutedSize: status.ExecutedSize,
             OutstandingSize: status.OutstandingSize,
             Price: status.Price,
             AveragePrice: status.AveragePrice);
-
-    private static ExchangeOrderId? ToExchangeOrderId(string? value) =>
-        string.IsNullOrWhiteSpace(value) ? null : new ExchangeOrderId(value);
-
-    private static AcceptanceId? ToAcceptanceId(string? value) =>
-        string.IsNullOrWhiteSpace(value) ? null : new AcceptanceId(value);
 }

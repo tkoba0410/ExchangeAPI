@@ -55,7 +55,7 @@ internal sealed class MarketApi
                     BitflyerOperations.MarketData.GetTicker);
             }
 
-            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode.Value;
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _normalized.GetTickerCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -100,7 +100,7 @@ internal sealed class MarketApi
                     BitflyerOperations.MarketData.GetOrderBook);
             }
 
-            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode.Value;
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _normalized.GetBoardCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -145,7 +145,7 @@ internal sealed class MarketApi
                     BitflyerOperations.MarketData.GetExecutions);
             }
 
-            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode.Value;
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _normalized.GetExecutionsPublicCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,

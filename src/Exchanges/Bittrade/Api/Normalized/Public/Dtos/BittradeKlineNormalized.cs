@@ -1,7 +1,9 @@
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 
 public sealed record BittradeKlineNormalized(
-    string Id,
+    FreeText Id,
     decimal Open,
     decimal Close,
     decimal Low,

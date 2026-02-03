@@ -1,15 +1,16 @@
 using System;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
 
 public sealed record BittradeOrderSummaryNormalized(
-    string Id,
-    string Symbol,
-    string AccountId,
+    OrderId Id,
+    Symbol Symbol,
+    FreeText AccountId,
     decimal Amount,
     decimal? Price,
-    string State,
-    string Type,
-    string? ClientOrderId,
+    FreeText State,
+    FreeText Type,
+    FreeText? ClientOrderId,
     DateTimeOffset CreatedAt,
     decimal FilledAmount);

@@ -7,6 +7,17 @@ namespace ExchangeApi.Utilities.Account;
 public static class BalanceFactory
 {
     public static Balance Create(
+        CurrencyCode currency,
+        decimal amount,
+        decimal available)
+    {
+        return new Balance(
+            Currency: currency,
+            Amount: amount,
+            Available: available);
+    }
+
+    public static Balance Create(
         string currency,
         decimal amount,
         decimal available,

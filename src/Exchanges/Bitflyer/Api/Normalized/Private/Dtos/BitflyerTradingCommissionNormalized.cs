@@ -1,5 +1,7 @@
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 
 public sealed record BitflyerTradingCommissionNormalized(
-    string ProductCode,
+    ProductCode ProductCode,
     decimal? CommissionRate);

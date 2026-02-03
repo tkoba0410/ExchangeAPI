@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using RawPublicRequests = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Requests;
 using PublicRequests = ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Requests;
 
@@ -39,11 +40,11 @@ internal sealed class BitflyerNormalizedPublicApi
     }
 
     public async Task<Call<PublicRequests.GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetTickerCallAsync(new RawPublicRequests.GetTickerRequest(productCode), ct)
+            .GetTickerCallAsync(new RawPublicRequests.GetTickerRequest(productCode.Value), ct)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetTickerRequest(productCode);
 
@@ -56,11 +57,11 @@ internal sealed class BitflyerNormalizedPublicApi
     }
 
     public async Task<Call<PublicRequests.GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetBoardCallAsync(new RawPublicRequests.GetBoardRequest(productCode), ct)
+            .GetBoardCallAsync(new RawPublicRequests.GetBoardRequest(productCode.Value), ct)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetOrderBookRequest(productCode);
 
@@ -72,14 +73,14 @@ internal sealed class BitflyerNormalizedPublicApi
     }
 
     public async Task<Call<PublicRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
-        string productCode,
+        ProductCode productCode,
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetExecutionsPublicCallAsync(new RawPublicRequests.GetExecutionsRequest(productCode, count, before, after), ct)
+            .GetExecutionsPublicCallAsync(new RawPublicRequests.GetExecutionsRequest(productCode.Value, count, before, after), ct)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetExecutionsRequest(productCode, count, before, after);
 
@@ -99,11 +100,11 @@ internal sealed class BitflyerNormalizedPublicApi
     }
 
     public async Task<Call<PublicRequests.GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetHealthCallAsync(new RawPublicRequests.GetHealthRequest(productCode), ct)
+            .GetHealthCallAsync(new RawPublicRequests.GetHealthRequest(productCode.Value), ct)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetHealthRequest(productCode);
 
@@ -115,11 +116,11 @@ internal sealed class BitflyerNormalizedPublicApi
     }
 
     public async Task<Call<PublicRequests.GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetBoardStateCallAsync(new RawPublicRequests.GetBoardStateRequest(productCode), ct)
+            .GetBoardStateCallAsync(new RawPublicRequests.GetBoardStateRequest(productCode.Value), ct)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetBoardStateRequest(productCode);
 
@@ -131,11 +132,12 @@ internal sealed class BitflyerNormalizedPublicApi
     }
 
     public async Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
-        string? fromDate = null,
+        FreeText? fromDate = null,
         CancellationToken ct = default)
     {
+        var fromDateText = fromDate?.Value;
         var rawCall = await _raw
-            .GetChatsCallAsync(new RawPublicRequests.GetChatsRequest(fromDate), ct)
+            .GetChatsCallAsync(new RawPublicRequests.GetChatsRequest(fromDateText), ct)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetChatsRequest(fromDate);
 
@@ -168,11 +170,11 @@ internal sealed class BitflyerNormalizedPublicApi
     }
 
     public async Task<Call<PublicRequests.GetFundingRateRequest, BitflyerFundingRateNormalized>> GetFundingRateCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetFundingRateCallAsync(new RawPublicRequests.GetFundingRateRequest(productCode), ct)
+            .GetFundingRateCallAsync(new RawPublicRequests.GetFundingRateRequest(productCode.Value), ct)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetFundingRateRequest(productCode);
 

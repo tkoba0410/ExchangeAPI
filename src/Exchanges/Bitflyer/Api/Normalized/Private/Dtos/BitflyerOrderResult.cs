@@ -4,5 +4,5 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 
 public sealed record BitflyerOrderResult(
     OrderKey Key,
-    string? ExchangeOrderId = null,
-    string? AcceptanceId = null);
+    ExchangeOrderId? ExchangeOrderId = null,
+    AcceptanceId? AcceptanceId = null);

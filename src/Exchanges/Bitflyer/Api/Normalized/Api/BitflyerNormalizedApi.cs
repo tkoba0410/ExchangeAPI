@@ -46,17 +46,17 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         _publicApi.GetMarketsCallAsync(cancellationToken);
 
     public Task<Call<PublicRequests.GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetTickerCallAsync(productCode, cancellationToken);
 
     public Task<Call<PublicRequests.GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetBoardCallAsync(productCode, cancellationToken);
 
     public Task<Call<PublicRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
-        string productCode,
+        ProductCode productCode,
         int? count = null,
         long? before = null,
         long? after = null,
@@ -64,12 +64,12 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         _publicApi.GetExecutionsPublicCallAsync(productCode, count, before, after, cancellationToken);
 
     public Task<Call<PublicRequests.GetHealthRequest, BitflyerHealthNormalized>> GetHealthCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetHealthCallAsync(productCode, cancellationToken);
 
     public Task<Call<PublicRequests.GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetBoardStateCallAsync(productCode, cancellationToken);
 
@@ -78,12 +78,12 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         _publicApi.GetCorporateLeverageCallAsync(cancellationToken);
 
     public Task<Call<PublicRequests.GetFundingRateRequest, BitflyerFundingRateNormalized>> GetFundingRateCallAsync(
-        string productCode,
+        ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetFundingRateCallAsync(productCode, cancellationToken);
 
     public Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
-        string? fromDate = null,
+        FreeText? fromDate = null,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetChatsCallAsync(fromDate, cancellationToken);
 
@@ -133,7 +133,7 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.GetBalanceCallAsync(cancellationToken);
 
-    public Task<Call<PrivateRequests.GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+    public Task<Call<PrivateRequests.GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
         CancellationToken cancellationToken = default) =>
         _privateApi.GetPermissionsCallAsync(cancellationToken);
 
@@ -157,7 +157,7 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         _privateApi.GetCoinInsCallAsync(count, before, after, cancellationToken);
 
     public Task<Call<PrivateRequests.GetCoinOutsRequest, BitflyerRawJsonNormalized>> GetCoinOutsCallAsync(
-        string? messageId = null,
+        FreeText? messageId = null,
         int? count = null,
         long? before = null,
         long? after = null,
@@ -176,10 +176,10 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         _privateApi.GetDepositsCallAsync(count, before, after, cancellationToken);
 
     public Task<Call<PrivateRequests.WithdrawRequest, BitflyerWithdrawResultNormalized>> WithdrawCallAsync(
-        string currencyCode,
+        CurrencyCode currencyCode,
         int bankAccountId,
         decimal amount,
-        string? code = null,
+        FreeText? code = null,
         CancellationToken cancellationToken = default) =>
         _privateApi.WithdrawCallAsync(currencyCode, bankAccountId, amount, code, cancellationToken);
 
@@ -196,7 +196,7 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         _privateApi.GetExecutionsPrivateCallAsync(symbol, cancellationToken);
 
     public Task<Call<PrivateRequests.GetBalanceHistoryRequest, BitflyerRawJsonNormalized>> GetBalanceHistoryCallAsync(
-        string? currencyCode = null,
+        CurrencyCode? currencyCode = null,
         int? count = null,
         long? before = null,
         long? after = null,

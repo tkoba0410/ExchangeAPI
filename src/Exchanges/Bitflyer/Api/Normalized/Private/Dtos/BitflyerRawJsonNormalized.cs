@@ -1,3 +1,5 @@
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 
-public sealed record BitflyerRawJsonNormalized(string? RawJson);
+public sealed record BitflyerRawJsonNormalized(FreeText RawJson);

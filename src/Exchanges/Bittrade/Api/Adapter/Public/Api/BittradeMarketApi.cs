@@ -326,9 +326,9 @@ internal sealed class MarketApi
         var candles = new List<Candlestick>(klines.Count);
         foreach (var kline in klines)
         {
-            if (!long.TryParse(kline.Id, out var seconds))
+            if (!long.TryParse(kline.Id.Value, out var seconds))
             {
-                throw new InvalidOperationException($"Invalid kline id: '{kline.Id}'.");
+                throw new InvalidOperationException($"Invalid kline id: '{kline.Id.Value}'.");
             }
 
             var openTime = DateTimeOffset.FromUnixTimeSeconds(seconds);
@@ -378,7 +378,7 @@ internal sealed class MarketApi
     {
         return entries
             .Select(entry => new Ticker(
-                Symbol: new CommonSymbol(entry.Symbol),
+                Symbol: new CommonSymbol(entry.Symbol.Value),
                 LastTradedPrice: new Price(entry.LastTradedPrice),
                 Timestamp: entry.Timestamp))
             .ToList();

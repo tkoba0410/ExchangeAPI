@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using RawPublicDtos = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Dtos;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
@@ -60,7 +61,7 @@ internal static class BitflyerExecutionNormalizer
             Price: wire.Price,
             Size: wire.Size,
             ExecutedAt: wire.ExecDate,
-            ChildOrderAcceptanceId: wire.ChildOrderAcceptanceId,
+            ChildOrderAcceptanceId: ToAcceptanceId(wire.ChildOrderAcceptanceId),
             RawSnapshot: snapshot,
             Extras: new Dictionary<string, JsonElement>());
 
@@ -82,12 +83,15 @@ internal static class BitflyerExecutionNormalizer
             Price: wire.Price,
             Size: wire.Size,
             ExecutedAt: wire.ExecDate,
-            ChildOrderAcceptanceId: wire.ChildOrderAcceptanceId,
+            ChildOrderAcceptanceId: ToAcceptanceId(wire.ChildOrderAcceptanceId),
             RawSnapshot: snapshot,
             Extras: new Dictionary<string, JsonElement>());
         error = null;
         return true;
     }
+
+    private static AcceptanceId? ToAcceptanceId(string? value) =>
+        AcceptanceId.TryParse(value, out var parsed) ? parsed : null;
 
     private static IReadOnlyList<JsonElement> ExtractSnapshots(
         string? rawJson,

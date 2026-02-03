@@ -1,8 +1,9 @@
 using System;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
 
 public sealed record BitflyerChatNormalized(
-    string? Nickname,
-    string? Message,
+    FreeText? Nickname,
+    FreeText? Message,
     DateTimeOffset? Timestamp);

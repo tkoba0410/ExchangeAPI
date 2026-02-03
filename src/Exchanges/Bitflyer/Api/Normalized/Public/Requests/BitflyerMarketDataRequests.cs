@@ -1,23 +1,25 @@
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Requests;
 
-public sealed record GetTickerRequest(string ProductCode);
+public sealed record GetTickerRequest(ProductCode ProductCode);
 
-public sealed record GetOrderBookRequest(string ProductCode);
+public sealed record GetOrderBookRequest(ProductCode ProductCode);
 
 public sealed record GetExecutionsRequest(
-    string ProductCode,
+    ProductCode ProductCode,
     int? Count = null,
     long? Before = null,
     long? After = null);
 
-public sealed record GetHealthRequest(string ProductCode);
+public sealed record GetHealthRequest(ProductCode ProductCode);
 
-public sealed record GetBoardStateRequest(string ProductCode);
+public sealed record GetBoardStateRequest(ProductCode ProductCode);
 
-public sealed record GetChatsRequest(string? FromDate = null);
+public sealed record GetChatsRequest(FreeText? FromDate = null);
 
 public sealed record GetMarketsRequest;
 
 public sealed record GetCorporateLeverageRequest;
 
-public sealed record GetFundingRateRequest(string ProductCode);
+public sealed record GetFundingRateRequest(ProductCode ProductCode);

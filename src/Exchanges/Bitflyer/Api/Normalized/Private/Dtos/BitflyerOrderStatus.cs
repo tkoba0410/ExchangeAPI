@@ -4,7 +4,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 
 public sealed record BitflyerOrderStatus(
-    string ProductCode,
+    ProductCode ProductCode,
     OrderKey Key,
     OrderState Status,
     Size ExecutedSize,

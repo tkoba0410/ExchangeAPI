@@ -95,7 +95,8 @@ internal static class BittradeTradingMapper
     {
         var orderId = raw.OrderId;
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
-        return new BittradeOrderResult(key, ExchangeOrderId: orderId);
+        var exchangeOrderId = string.IsNullOrWhiteSpace(orderId) ? (ExchangeOrderId?)null : new ExchangeOrderId(orderId);
+        return new BittradeOrderResult(key, ExchangeOrderId: exchangeOrderId);
     }
 
     public static bool TryToOpenOrders(
@@ -192,8 +193,8 @@ internal static class BittradeTradingMapper
             OrderedAt: raw.CreatedAt,
             UpdatedAt: null,
             StopPrice: null,
-            Status: raw.State,
-            ExchangeOrderId: raw.Id);
+            Status: ParseOptional(raw.State),
+            ExchangeOrderId: new ExchangeOrderId(raw.Id));
         error = null;
         return true;
     }
@@ -220,18 +221,18 @@ internal static class BittradeTradingMapper
             OrderedAt: raw.CreatedAt,
             UpdatedAt: null,
             StopPrice: null,
-            Status: raw.State,
-            ExchangeOrderId: raw.Id);
+            Status: ParseOptional(raw.State),
+            ExchangeOrderId: new ExchangeOrderId(raw.Id));
     }
 
     public static bool TryToOrderStatus(
-        string productCode,
+        ProductCode productCode,
         RawPrivateDtos.RawOrderDetailResponse raw,
         OrderKey key,
         out BittradeOrderStatus? status,
         out CallError? error)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (productCode.IsEmpty)
         {
             status = null;
             error = new CallError(CallErrorKind.Mapping, "productCode is required.");
@@ -286,9 +287,9 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static BittradeOrderStatus ToOrderStatus(string productCode, RawPrivateDtos.RawOrderDetailResponse raw, OrderKey key)
+    public static BittradeOrderStatus ToOrderStatus(ProductCode productCode, RawPrivateDtos.RawOrderDetailResponse raw, OrderKey key)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (productCode.IsEmpty)
         {
             throw new ArgumentException("productCode is required.", nameof(productCode));
         }
@@ -342,7 +343,7 @@ internal static class BittradeTradingMapper
             }
 
             mapped.Add(new BittradeExecutionNormalized(
-                Id: string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId,
+                Id: new OrderId(string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId),
                 Side: side,
                 Price: entry.Price,
                 Size: entry.FilledAmount,
@@ -370,7 +371,7 @@ internal static class BittradeTradingMapper
 
         return entries
             .Select((entry, idx) => new BittradeExecutionNormalized(
-                Id: string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId,
+                Id: new OrderId(string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId),
                 Side: MapSide(entry.Type),
                 Price: entry.Price,
                 Size: entry.FilledAmount,
@@ -414,14 +415,14 @@ internal static class BittradeTradingMapper
             }
 
             mapped.Add(new BittradeOrderSummaryNormalized(
-                Id: entry.Id,
-                Symbol: entry.Symbol,
-                AccountId: entry.AccountId,
+                Id: new OrderId(entry.Id),
+                Symbol: Symbol.Parse(entry.Symbol),
+                AccountId: FreeText.Parse(entry.AccountId),
                 Amount: amount,
                 Price: price,
-                State: entry.State,
-                Type: entry.Type,
-                ClientOrderId: entry.ClientOrderId,
+                State: FreeText.Parse(entry.State),
+                Type: FreeText.Parse(entry.Type),
+                ClientOrderId: ParseOptional(entry.ClientOrderId),
                 CreatedAt: entry.CreatedAt,
                 FilledAmount: filled));
         }
@@ -441,14 +442,14 @@ internal static class BittradeTradingMapper
 
         return entries
             .Select(entry => new BittradeOrderSummaryNormalized(
-                Id: entry.Id,
-                Symbol: entry.Symbol,
-                AccountId: entry.AccountId,
+                Id: new OrderId(entry.Id),
+                Symbol: Symbol.Parse(entry.Symbol),
+                AccountId: FreeText.Parse(entry.AccountId),
                 Amount: ParseRequiredDecimal(entry.Amount, "amount"),
                 Price: ParseDecimalOrThrow(entry.Price, "price"),
-                State: entry.State,
-                Type: entry.Type,
-                ClientOrderId: entry.ClientOrderId,
+                State: FreeText.Parse(entry.State),
+                Type: FreeText.Parse(entry.Type),
+                ClientOrderId: ParseOptional(entry.ClientOrderId),
                 CreatedAt: entry.CreatedAt,
                 FilledAmount: ParseRequiredDecimal(entry.FilledAmount, "field-amount")))
             .ToList();
@@ -478,8 +479,8 @@ internal static class BittradeTradingMapper
             }
 
             mapped.Add(new BittradeRetailOrderEntryNormalized(
-                Id: entry.Id,
-                Symbol: entry.Symbol,
+                Id: new OrderId(entry.Id),
+                Symbol: Symbol.Parse(entry.Symbol),
                 Type: entry.Type,
                 Price: price,
                 Amount: amount,
@@ -503,8 +504,8 @@ internal static class BittradeTradingMapper
 
         return entries
             .Select(entry => new BittradeRetailOrderEntryNormalized(
-                Id: entry.Id,
-                Symbol: entry.Symbol,
+                Id: new OrderId(entry.Id),
+                Symbol: Symbol.Parse(entry.Symbol),
                 Type: entry.Type,
                 Price: ParseDecimalOrThrow(entry.Price, "price"),
                 Amount: ParseDecimalOrThrow(entry.Amount, "amount"),
@@ -535,8 +536,8 @@ internal static class BittradeTradingMapper
         }
 
         normalized = new BittradeRetailOrderEntryNormalized(
-            Id: entry.Id,
-            Symbol: entry.Symbol,
+            Id: new OrderId(entry.Id),
+            Symbol: Symbol.Parse(entry.Symbol),
             Type: entry.Type,
             Price: price,
             Amount: amount,
@@ -555,8 +556,8 @@ internal static class BittradeTradingMapper
         }
 
         return new BittradeRetailOrderEntryNormalized(
-            Id: entry.Id,
-            Symbol: entry.Symbol,
+            Id: new OrderId(entry.Id),
+            Symbol: Symbol.Parse(entry.Symbol),
             Type: entry.Type,
             Price: ParseDecimalOrThrow(entry.Price, "price"),
             Amount: ParseDecimalOrThrow(entry.Amount, "amount"),
@@ -571,17 +572,17 @@ internal static class BittradeTradingMapper
             Code: raw.Code,
             OrderId: raw.Data,
             Success: raw.Success,
-            Message: raw.Message);
+            Message: ParseOptional(raw.Message));
     }
 
     public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.RawCreateWithdrawResponse raw)
     {
-        return new BittradeWithdrawResult(raw.Status, raw.Data);
+        return new BittradeWithdrawResult(FreeText.Parse(raw.Status), raw.Data);
     }
 
     public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.RawCancelWithdrawResponse raw)
     {
-        return new BittradeWithdrawResult(raw.Status, raw.Data);
+        return new BittradeWithdrawResult(FreeText.Parse(raw.Status), raw.Data);
     }
 
     public static bool TryToRawRetailOrder(
@@ -1038,4 +1039,7 @@ internal static class BittradeTradingMapper
         error = new CallError(CallErrorKind.Mapping, $"Invalid {field}: '{text}'.");
         return false;
     }
+
+    private static FreeText? ParseOptional(string? value) =>
+        FreeText.TryParse(value, out var text) ? text : null;
 }

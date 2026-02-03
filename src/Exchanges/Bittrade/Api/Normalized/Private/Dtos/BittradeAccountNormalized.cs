@@ -1,7 +1,9 @@
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
 
 public sealed record BittradeAccountNormalized(
-    string Id,
-    string Type,
-    string? SubType,
-    string State);
+    FreeText Id,
+    FreeText Type,
+    FreeText? SubType,
+    FreeText State);

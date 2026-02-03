@@ -11,7 +11,7 @@ public sealed record GetOrdersRequest;
 
 public sealed record PostOrdersSubmitCancelByOrderIdRequest(Symbol Symbol, OrderKey OrderKey);
 
-public sealed record PostOrdersBatchCancelRequest(IReadOnlyList<string> OrderIds);
+public sealed record PostOrdersBatchCancelRequest(IReadOnlyList<OrderId> OrderIds);
 
 public sealed record PostOrdersBatchCancelOpenOrdersRequest(
     Symbol? Symbol = null,
@@ -34,7 +34,7 @@ public sealed record GetRetailOrderListRequest(
     DateTimeOffset? StartTime = null,
     DateTimeOffset? EndTime = null);
 
-public sealed record GetRetailOrderDetailByOrderIdRequest(string OrderId);
+public sealed record GetRetailOrderDetailByOrderIdRequest(OrderId OrderId);
 
 public sealed record PostRetailOrderHistoryRequest(
     Symbol? Symbol = null,
@@ -44,7 +44,7 @@ public sealed record PostRetailOrderHistoryRequest(
     DateTimeOffset? EndTime = null,
     int? Size = null);
 
-public sealed record PostRetailOrderDetailRequest(string OrderId);
+public sealed record PostRetailOrderDetailRequest(OrderId OrderId);
 
 public sealed record BittradeRetailOrderRequest(
     Symbol Symbol,
@@ -57,17 +57,17 @@ public sealed record PostRetailOrderCreateRequest(BittradeRetailOrderRequest Req
 
 public sealed record PostRetailOrderPlaceRequest(BittradeRetailOrderRequest Request);
 
-public sealed record PostRetailOrderCancelByOrderIdRequest(string OrderId);
+public sealed record PostRetailOrderCancelByOrderIdRequest(OrderId OrderId);
 
 public sealed record PostWithdrawApiCreateRequest(
-    string Address,
+    FreeText Address,
     decimal Amount,
-    string Currency,
+    FreeText Currency,
     decimal? Fee = null,
-    string? AddressTag = null);
+    FreeText? AddressTag = null);
 
-public sealed record PostWithdrawVirtualByAddressIdCreateRequest(string AddressId);
+public sealed record PostWithdrawVirtualByAddressIdCreateRequest(FreeText AddressId);
 
-public sealed record PostWithdrawVirtualByWithdrawIdPlaceRequest(string WithdrawId);
+public sealed record PostWithdrawVirtualByWithdrawIdPlaceRequest(FreeText WithdrawId);
 
-public sealed record PostWithdrawVirtualByWithdrawIdCancelRequest(string WithdrawId);
+public sealed record PostWithdrawVirtualByWithdrawIdCancelRequest(FreeText WithdrawId);

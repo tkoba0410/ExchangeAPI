@@ -1,6 +1,8 @@
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
 
 public sealed record BittradeBalanceEntryNormalized(
-    string Currency,
-    string Type,
+    FreeText Currency,
+    FreeText Type,
     decimal Balance);

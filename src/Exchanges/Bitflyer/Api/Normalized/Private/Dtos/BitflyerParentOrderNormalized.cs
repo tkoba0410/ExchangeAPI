@@ -10,8 +10,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 
 public sealed record BitflyerParentOrderNormalized(
     long Id,
-    string ParentOrderId,
-    string ProductCode,
+    ExchangeOrderId ParentOrderId,
+    ProductCode ProductCode,
     Closed<BitflyerSide> Side,
     Closed<BitflyerParentOrderType> ParentOrderType,
     Price? Price,
@@ -20,7 +20,7 @@ public sealed record BitflyerParentOrderNormalized(
     Closed<BitflyerParentOrderState> ParentOrderState,
     DateTimeOffset ExpireDate,
     DateTimeOffset ParentOrderDate,
-    string ParentOrderAcceptanceId,
+    AcceptanceId ParentOrderAcceptanceId,
     Size OutstandingSize,
     Size CancelSize,
     Size ExecutedSize,
@@ -30,17 +30,17 @@ public sealed record BitflyerParentOrderNormalized(
 
 public sealed record BitflyerParentOrderDetailNormalized(
     long Id,
-    string ParentOrderId,
+    ExchangeOrderId ParentOrderId,
     Closed<BitflyerOrderMethod> OrderMethod,
     DateTimeOffset ExpireDate,
     Closed<BitflyerTimeInForce> TimeInForce,
     IReadOnlyList<BitflyerParentOrderParameterNormalized> Parameters,
-    string ParentOrderAcceptanceId,
+    AcceptanceId ParentOrderAcceptanceId,
     JsonElement RawSnapshot,
     IReadOnlyDictionary<string, JsonElement> Extras) : ILosslessNormalized;
 
 public sealed record BitflyerParentOrderParameterNormalized(
-    string ProductCode,
+    ProductCode ProductCode,
     Closed<BitflyerConditionType> ConditionType,
     Closed<BitflyerSide> Side,
     Price? Price,

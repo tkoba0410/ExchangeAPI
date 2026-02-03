@@ -1,14 +1,15 @@
 using System;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
 
 public sealed record BittradeWithdrawVirtualAddressNormalized(
     long? AddressId,
-    string? Currency,
-    string? Address,
-    string? AddressTag,
-    string? Chain,
-    string? Note,
-    string? State,
+    FreeText? Currency,
+    FreeText? Address,
+    FreeText? AddressTag,
+    FreeText? Chain,
+    FreeText? Note,
+    FreeText? State,
     DateTimeOffset? CreatedAt,
     DateTimeOffset? UpdatedAt);

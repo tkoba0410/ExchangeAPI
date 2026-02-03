@@ -4,6 +4,7 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Raw;
 using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
 using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Private.Endpoints;
 using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Public.Endpoints;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Raw.Endpoints.Tests;
 
@@ -98,8 +99,8 @@ public sealed class BitflyerEndpointsTests
     {
         var request = new RawPrivateRequests.CancelParentOrderRequest
         {
-            ProductCode = "BTC_JPY",
-            ParentOrderAcceptanceId = "JRF-1",
+            ProductCode = ProductCode.ParseOrThrowNormalized("BTC_JPY"),
+            ParentOrderAcceptanceId = new FreeText("JRF-1"),
         };
 
         var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelParentOrder");

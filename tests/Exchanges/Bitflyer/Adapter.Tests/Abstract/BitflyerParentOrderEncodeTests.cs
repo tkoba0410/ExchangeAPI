@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -10,13 +11,13 @@ public sealed class BitflyerParentOrderEncodeTests
     {
         var request = new RawPrivateRequests.CreateChildOrderRequest
         {
-            ProductCode = "FX_BTC_JPY",
-            ChildOrderType = "LIMIT",
-            Side = "BUY",
+            ProductCode = ProductCode.ParseOrThrowNormalized("FX_BTC_JPY"),
+            ChildOrderType = new FreeText("LIMIT"),
+            Side = new FreeText("BUY"),
             Size = 0.1m,
             Price = 5000000m,
             MinuteToExpire = 1,
-            TimeInForce = "GTC",
+            TimeInForce = new FreeText("GTC"),
         };
 
         var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.SendChildOrder");
@@ -31,16 +32,16 @@ public sealed class BitflyerParentOrderEncodeTests
     {
         var request = new RawPrivateRequests.CreateParentOrderRequest
         {
-            OrderMethod = "IFDOCO",
+            OrderMethod = new FreeText("IFDOCO"),
             MinuteToExpire = 10000,
-            TimeInForce = "GTC",
+            TimeInForce = new FreeText("GTC"),
             Parameters = new[]
             {
                 new RawPrivateRequests.CreateParentOrderParameter
                 {
-                    ProductCode = "BTC_JPY",
-                    ConditionType = "LIMIT",
-                    Side = "BUY",
+                    ProductCode = ProductCode.ParseOrThrowNormalized("BTC_JPY"),
+                    ConditionType = new FreeText("LIMIT"),
+                    Side = new FreeText("BUY"),
                     Size = 0.1m,
                     Price = 30000m
                 }

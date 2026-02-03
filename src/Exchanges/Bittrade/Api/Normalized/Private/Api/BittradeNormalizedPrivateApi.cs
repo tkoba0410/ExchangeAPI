@@ -512,7 +512,7 @@ internal sealed class BittradeNormalizedPrivateApi
         var requestedLimit = limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);
         var rawCall = await _trading
-            .GetMatchResultsCallAsync(new RawPrivateRequests.GetMatchResultsRequest(Symbol: new Symbol(apiSymbol), Size: appliedLimit), ct)
+            .GetMatchResultsCallAsync(new RawPrivateRequests.GetMatchResultsRequest(Symbol: new Symbol(apiSymbol!), Size: appliedLimit), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

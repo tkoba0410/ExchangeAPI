@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 
@@ -10,7 +11,7 @@ public sealed class CreateParentOrderRequest
 {
     [JsonPropertyName("order_method")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? OrderMethod { get; init; }
+    public FreeText? OrderMethod { get; init; }
 
     [JsonPropertyName("minute_to_expire")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -18,7 +19,7 @@ public sealed class CreateParentOrderRequest
 
     [JsonPropertyName("time_in_force")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? TimeInForce { get; init; }
+    public FreeText? TimeInForce { get; init; }
 
     [JsonPropertyName("parameters")] public IReadOnlyList<CreateParentOrderParameter> Parameters { get; init; }
         = new List<CreateParentOrderParameter>();
@@ -26,9 +27,9 @@ public sealed class CreateParentOrderRequest
 
 public sealed class CreateParentOrderParameter
 {
-    [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
-    [JsonPropertyName("condition_type")] public string ConditionType { get; init; } = string.Empty;
-    [JsonPropertyName("side")] public string Side { get; init; } = string.Empty;
+    [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; } = ProductCode.Empty;
+    [JsonPropertyName("condition_type")] public FreeText ConditionType { get; init; } = FreeText.Empty;
+    [JsonPropertyName("side")] public FreeText Side { get; init; } = FreeText.Empty;
     [JsonPropertyName("size")] public decimal Size { get; init; }
 
     [JsonPropertyName("price")]

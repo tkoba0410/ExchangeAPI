@@ -63,9 +63,9 @@ public sealed class BittradeOrderKeyConnectivityTests
             RawPrivateRequests.GetOrderRequest request,
             CancellationToken cancellationToken = default)
         {
-            LastOrderId = request.OrderId;
+            LastOrderId = request.OrderId.Value;
             var detail = new RawPrivateDtos.RawOrderDetail(
-                Id: request.OrderId,
+                Id: request.OrderId.Value,
                 Symbol: "btcjpy",
                 AccountId: "account",
                 Amount: "1",
@@ -86,8 +86,8 @@ public sealed class BittradeOrderKeyConnectivityTests
             RawPrivateRequests.CancelOrderRequest request,
             CancellationToken cancellationToken = default)
         {
-            LastCancelOrderId = request.OrderId;
-            var response = new RawPrivateDtos.RawCancelOrderResponse("ok", request.OrderId);
+            LastCancelOrderId = request.OrderId.Value;
+            var response = new RawPrivateDtos.RawCancelOrderResponse("ok", request.OrderId.Value);
             return Task.FromResult(CreateOkCall(request, response));
         }
 

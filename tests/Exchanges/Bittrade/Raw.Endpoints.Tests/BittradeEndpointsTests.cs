@@ -5,6 +5,7 @@ using ExchangeApi.Exchanges.Bittrade.Api.Raw.Internal;
 using ExchangeApi.Exchanges.Bittrade.Api.Wire.Constants;
 using ExchangeApi.Exchanges.Bittrade.Api.Wire.Private.Endpoints;
 using ExchangeApi.Exchanges.Bittrade.Api.Wire.Public.Endpoints;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
 
@@ -52,12 +53,12 @@ public sealed class BittradeEndpointsTests
     public void PlaceOrder_builds_request_with_body_json()
     {
         var request = new RawPrivateRequests.RawCreateOrderRequest(
-            AccountId: "123",
-            Symbol: "btcjpy",
-            Type: "buy-limit",
-            Amount: "0.1",
-            Price: "3000000",
-            Source: "api");
+            AccountId: new AccountId("123"),
+            Symbol: new Symbol("btcjpy"),
+            Type: new FreeText("buy-limit"),
+            Amount: new FreeText("0.1"),
+            Price: new FreeText("3000000"),
+            Source: new FreeText("api"));
 
         var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
         var req = BittradePrivateEndpoints.PostOrdersPlace(bodyJson);

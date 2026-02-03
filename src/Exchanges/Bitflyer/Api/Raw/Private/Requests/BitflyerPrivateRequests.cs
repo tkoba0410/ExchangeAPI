@@ -1,46 +1,49 @@
 
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
+
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 
 public sealed record GetPermissionsRequest;
 public sealed record GetBalancesRequest;
-public sealed record GetPositionsRequest(string ProductCode);
+public sealed record GetPositionsRequest(ProductCode ProductCode);
 public sealed record GetAccountExecutionsRequest(
-    string ProductCode,
-    string? ChildOrderId = null,
-    string? ChildOrderAcceptanceId = null,
+    ProductCode ProductCode,
+    FreeText? ChildOrderId = null,
+    FreeText? ChildOrderAcceptanceId = null,
     int? Count = null,
     long? Before = null,
     long? After = null);
 public sealed record GetCollateralRequest;
 public sealed record GetCollateralAccountsRequest;
 public sealed record GetChildOrdersRequest(
-    string ProductCode,
-    string? ChildOrderStatusState = null,
-    string? ChildOrderAcceptanceId = null,
-    string? ChildOrderId = null,
-    string? ParentOrderId = null,
+    ProductCode ProductCode,
+    FreeText? ChildOrderStatusState = null,
+    FreeText? ChildOrderAcceptanceId = null,
+    FreeText? ChildOrderId = null,
+    FreeText? ParentOrderId = null,
     int? Count = null,
     long? Before = null,
     long? After = null);
 public sealed record GetParentOrdersRequest(
-    string ProductCode,
-    string? ParentOrderState = null,
+    ProductCode ProductCode,
+    FreeText? ParentOrderState = null,
     int? Count = null,
     long? Before = null,
     long? After = null);
 public sealed record GetParentOrderRequest(
-    string? ParentOrderId = null,
-    string? ParentOrderAcceptanceId = null);
+    FreeText? ParentOrderId = null,
+    FreeText? ParentOrderAcceptanceId = null);
 public sealed record GetBalanceHistoryRequest(
-    string? CurrencyCode = null,
+    CurrencyCode? CurrencyCode = null,
     int? Count = null,
     long? Before = null,
     long? After = null);
-public sealed record GetTradingCommissionRequest(string ProductCode);
+public sealed record GetTradingCommissionRequest(ProductCode ProductCode);
 public sealed record GetCollateralHistoryRequest(int? Count = null, long? Before = null, long? After = null);
 public sealed record GetAddressesRequest;
 public sealed record GetCoinInsRequest(int? Count = null, long? Before = null, long? After = null);
-public sealed record GetCoinOutsRequest(string? MessageId = null, int? Count = null, long? Before = null, long? After = null);
+public sealed record GetCoinOutsRequest(FreeText? MessageId = null, int? Count = null, long? Before = null, long? After = null);
 public sealed record GetDepositsRequest(int? Count = null, long? Before = null, long? After = null);
 public sealed record GetWithdrawalsRequest(int? Count = null, long? Before = null, long? After = null);
 public sealed record GetBankAccountsRequest;

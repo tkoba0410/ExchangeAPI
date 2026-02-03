@@ -79,16 +79,16 @@ public sealed class FakeBitflyerPrivateTradingApi
         }
 
         IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> response;
-        if (!string.IsNullOrWhiteSpace(request.ChildOrderAcceptanceId))
+        if (request.ChildOrderAcceptanceId is { IsEmpty: false })
         {
             response = _childOrders
-                .Where(o => o.ChildOrderAcceptanceId == request.ChildOrderAcceptanceId)
+                .Where(o => o.ChildOrderAcceptanceId == request.ChildOrderAcceptanceId.Value.Value)
                 .ToArray();
         }
-        else if (!string.IsNullOrWhiteSpace(request.ChildOrderId))
+        else if (request.ChildOrderId is { IsEmpty: false })
         {
             response = _childOrders
-                .Where(o => o.ChildOrderId == request.ChildOrderId)
+                .Where(o => o.ChildOrderId == request.ChildOrderId.Value.Value)
                 .ToArray();
         }
         else

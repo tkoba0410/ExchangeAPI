@@ -34,7 +34,7 @@ internal sealed class BittradePublicApi
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetDetailMerged),
-            BittradePublicEndpoints.GetDetailMerged(request.Symbol),
+            BittradePublicEndpoints.GetDetailMerged(request.Symbol.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawMergedResponse>(json, Component(BittradeEndpointIds.GetDetailMerged)));
 
@@ -44,7 +44,7 @@ internal sealed class BittradePublicApi
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetDepth),
-            BittradePublicEndpoints.GetDepth(request.Symbol, request.Type),
+            BittradePublicEndpoints.GetDepth(request.Symbol.Value, request.Type?.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawDepthResponse>(json, Component(BittradeEndpointIds.GetDepth)));
 
@@ -54,7 +54,7 @@ internal sealed class BittradePublicApi
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetTrade),
-            BittradePublicEndpoints.GetTrade(request.Symbol),
+            BittradePublicEndpoints.GetTrade(request.Symbol.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawTradeResponse>(json, Component(BittradeEndpointIds.GetTrade)));
 
@@ -95,8 +95,8 @@ internal sealed class BittradePublicApi
             request,
             Component(BittradeEndpointIds.GetHistoryKline),
             BittradePublicEndpoints.GetHistoryKline(
-                request.Symbol,
-                request.Period,
+                request.Symbol.Value,
+                request.Period.Value,
                 request.Size?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawKlinesResponse>(json, Component(BittradeEndpointIds.GetHistoryKline)));
@@ -117,7 +117,7 @@ internal sealed class BittradePublicApi
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetHistoryTrade),
-            BittradePublicEndpoints.GetHistoryTrade(request.Symbol),
+            BittradePublicEndpoints.GetHistoryTrade(request.Symbol.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawTradeHistoryResponse>(json, Component(BittradeEndpointIds.GetHistoryTrade)));
 

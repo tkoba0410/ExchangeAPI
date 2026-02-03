@@ -30,7 +30,7 @@ internal sealed class BitflyerPublicApi
         SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetTicker),
-            BitflyerPublicEndpoints.GetTicker(request.ProductCode),
+            BitflyerPublicEndpoints.GetTicker(request.ProductCode.Value),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Ticker>(json, Component(BitflyerEndpointIds.GetTicker)));
 
@@ -40,7 +40,7 @@ internal sealed class BitflyerPublicApi
         SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetBoard),
-            BitflyerPublicEndpoints.GetBoard(request.ProductCode),
+            BitflyerPublicEndpoints.GetBoard(request.ProductCode.Value),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<Board>(json, Component(BitflyerEndpointIds.GetBoard)));
 
@@ -51,7 +51,7 @@ internal sealed class BitflyerPublicApi
             request,
             Component(BitflyerEndpointIds.GetExecutionsPublic),
             BitflyerPublicEndpoints.GetExecutionsPublic(
-                request.ProductCode,
+                request.ProductCode.Value,
                 request.Count?.ToString(CultureInfo.InvariantCulture),
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
@@ -78,7 +78,7 @@ internal sealed class BitflyerPublicApi
         SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetChats),
-            BitflyerPublicEndpoints.GetChats(request.FromDate),
+            BitflyerPublicEndpoints.GetChats(request.FromDate?.Value),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Chat>>(
                 json,
@@ -90,7 +90,7 @@ internal sealed class BitflyerPublicApi
         SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetHealth),
-            BitflyerPublicEndpoints.GetHealth(request.ProductCode),
+            BitflyerPublicEndpoints.GetHealth(request.ProductCode.Value),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<HealthResponse>(json, Component(BitflyerEndpointIds.GetHealth)));
 
@@ -100,7 +100,7 @@ internal sealed class BitflyerPublicApi
         SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetBoardState),
-            BitflyerPublicEndpoints.GetBoardState(request.ProductCode),
+            BitflyerPublicEndpoints.GetBoardState(request.ProductCode.Value),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<BoardStateResponse>(
                 json,
@@ -124,7 +124,7 @@ internal sealed class BitflyerPublicApi
         SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetFundingRate),
-            BitflyerPublicEndpoints.GetFundingRate(request.ProductCode),
+            BitflyerPublicEndpoints.GetFundingRate(request.ProductCode.Value),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<FundingRateResponse>(
                 json,

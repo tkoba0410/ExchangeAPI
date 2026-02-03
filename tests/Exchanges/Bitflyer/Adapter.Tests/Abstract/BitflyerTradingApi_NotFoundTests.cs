@@ -44,7 +44,7 @@ public sealed class BitflyerTradingApi_NotFoundTests
         var err = Assert.IsType<CallResult<OrderStatus>.Err>(call.Result);
         Assert.Contains("Order not found", err.Error.Message);
 
-        Assert.Equal(key.Value, tradingApi.LastGetChildOrdersRequest?.ChildOrderId);
+        Assert.Equal(key.Value, tradingApi.LastGetChildOrdersRequest?.ChildOrderId?.Value);
         Assert.Null(tradingApi.LastGetChildOrdersRequest?.ChildOrderAcceptanceId);
     }
 

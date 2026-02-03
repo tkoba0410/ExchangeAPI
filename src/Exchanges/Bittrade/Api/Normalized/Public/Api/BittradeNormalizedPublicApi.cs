@@ -131,7 +131,7 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetDetailMergedCallAsync(new RawPublicRequests.GetMergedTickerRequest(symbolText), ct)
+            .GetDetailMergedCallAsync(new RawPublicRequests.GetMergedTickerRequest(new Symbol(symbolText)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -181,7 +181,9 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetDepthCallAsync(new RawPublicRequests.GetDepthRequest(symbolText, rawDepth), ct)
+            .GetDepthCallAsync(new RawPublicRequests.GetDepthRequest(
+                new Symbol(symbolText),
+                rawDepth is null ? null : new FreeText(rawDepth)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -220,7 +222,7 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetTradeCallAsync(new RawPublicRequests.GetTradesRequest(symbolText), ct)
+            .GetTradeCallAsync(new RawPublicRequests.GetTradesRequest(new Symbol(symbolText)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -262,7 +264,7 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetHistoryKlineCallAsync(new RawPublicRequests.GetKlinesRequest(symbolText, period.Value, size), ct)
+            .GetHistoryKlineCallAsync(new RawPublicRequests.GetKlinesRequest(new Symbol(symbolText), period, size), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -327,7 +329,7 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetHistoryTradeCallAsync(new RawPublicRequests.GetTradeHistoryRequest(symbolText), ct)
+            .GetHistoryTradeCallAsync(new RawPublicRequests.GetTradeHistoryRequest(new Symbol(symbolText)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

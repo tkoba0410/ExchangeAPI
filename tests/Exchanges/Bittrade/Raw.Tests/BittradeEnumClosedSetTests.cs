@@ -115,6 +115,6 @@ public sealed class BittradeEnumClosedSetTests
         var request = JsonSerializer.Deserialize<RawPrivateRequests.RawCancelOpenOrdersRequest>(json);
 
         Assert.NotNull(request);
-        Assert.Equal("buy", request!.Side);
+        Assert.Equal("buy", request!.Side?.Value);
     }
 }

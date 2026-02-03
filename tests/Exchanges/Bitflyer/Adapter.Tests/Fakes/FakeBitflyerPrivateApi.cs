@@ -73,10 +73,10 @@ public sealed class FakeBitflyerPrivateApi
         RawPrivateRequests.GetChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (!string.IsNullOrEmpty(request.ChildOrderAcceptanceId))
+        if (request.ChildOrderAcceptanceId is { IsEmpty: false })
         {
             var filtered = _childOrders
-                .Where(o => o.ChildOrderAcceptanceId == request.ChildOrderAcceptanceId)
+                .Where(o => o.ChildOrderAcceptanceId == request.ChildOrderAcceptanceId.Value.Value)
                 .ToArray();
             return Task.FromResult(MakeOkCall(request, (IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>)filtered));
         }

@@ -43,7 +43,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetAccountsBalanceByAccountId),
-            BittradePrivateEndpoints.GetAccountsBalanceByAccountId(request.AccountId),
+            BittradePrivateEndpoints.GetAccountsBalanceByAccountId(request.AccountId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawBalancesResponse>(
                 json,
@@ -55,7 +55,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetOpenOrders),
-            BittradePrivateEndpoints.GetOpenOrders(request.Symbol, request.AccountId),
+            BittradePrivateEndpoints.GetOpenOrders(request.Symbol.Value, request.AccountId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawOpenOrdersResponse>(
                 json,
@@ -77,7 +77,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetOrdersByOrderId),
-            BittradePrivateEndpoints.GetOrdersByOrderId(request.OrderId),
+            BittradePrivateEndpoints.GetOrdersByOrderId(request.OrderId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawOrderDetailResponse>(json, Component(BittradeEndpointIds.GetOrdersByOrderId)));
 
@@ -87,7 +87,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetOrdersMatchResultsByOrderId),
-            BittradePrivateEndpoints.GetOrdersMatchResultsByOrderId(request.OrderId),
+            BittradePrivateEndpoints.GetOrdersMatchResultsByOrderId(request.OrderId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawOrderMatchResultsResponse>(
                 json,
@@ -100,12 +100,12 @@ internal sealed class BittradeRawPrivateClient
             request,
             Component(BittradeEndpointIds.GetMatchResults),
             BittradePrivateEndpoints.GetMatchResults(
-                request.Symbol,
-                request.Types,
-                request.StartDate,
-                request.EndDate,
+                request.Symbol?.Value,
+                request.Types?.Value,
+                request.StartDate?.Value,
+                request.EndDate?.Value,
                 request.From?.ToString(CultureInfo.InvariantCulture),
-                request.Direct,
+                request.Direct?.Value,
                 request.Size?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawMatchResultsResponse>(
@@ -119,11 +119,11 @@ internal sealed class BittradeRawPrivateClient
             request,
             Component(BittradeEndpointIds.GetDepositWithdraw),
             BittradePrivateEndpoints.GetDepositWithdraw(
-                request.Type,
-                request.Currency,
+                request.Type.Value,
+                request.Currency?.Value,
                 request.From?.ToString(CultureInfo.InvariantCulture),
                 request.Size?.ToString(CultureInfo.InvariantCulture),
-                request.Direct),
+                request.Direct?.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawDepositWithdrawsResponse>(
                 json,
@@ -163,7 +163,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             Component(BittradeEndpointIds.PostRetailOrderDetail),
-            BittradePrivateEndpoints.GetRetailOrderDetailByOrderId(request.OrderId),
+            BittradePrivateEndpoints.GetRetailOrderDetailByOrderId(request.OrderId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderDetailResponse>(
                 json,
@@ -205,7 +205,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             Component(BittradeEndpointIds.PostOrdersSubmitCancelByOrderId),
-            BittradePrivateEndpoints.PostOrdersSubmitCancelByOrderId(request.OrderId),
+            BittradePrivateEndpoints.PostOrdersSubmitCancelByOrderId(request.OrderId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCancelOrderResponse>(json, Component(BittradeEndpointIds.PostOrdersSubmitCancelByOrderId)));
 
@@ -275,7 +275,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             "Bittrade.PostWithdrawApiCreateByAddressId",
-            BittradePrivateEndpoints.PostWithdrawVirtualByAddressIdCreate(request.AddressId),
+            BittradePrivateEndpoints.PostWithdrawVirtualByAddressIdCreate(request.AddressId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCreateWithdrawResponse>(
                 json,
@@ -287,7 +287,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             Component(BittradeEndpointIds.PostWithdrawVirtualByWithdrawIdCancel),
-            BittradePrivateEndpoints.PostWithdrawVirtualByWithdrawIdCancel(request.WithdrawId),
+            BittradePrivateEndpoints.PostWithdrawVirtualByWithdrawIdCancel(request.WithdrawId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCancelWithdrawResponse>(
                 json,
@@ -299,7 +299,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             Component(BittradeEndpointIds.PostWithdrawVirtualByWithdrawIdPlace),
-            BittradePrivateEndpoints.PostWithdrawVirtualByWithdrawIdPlace(request.WithdrawId),
+            BittradePrivateEndpoints.PostWithdrawVirtualByWithdrawIdPlace(request.WithdrawId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawCreateWithdrawResponse>(
                 json,
@@ -331,7 +331,7 @@ internal sealed class BittradeRawPrivateClient
         SendAndParse(
             request,
             Component(BittradeEndpointIds.PostRetailOrderCancelByOrderId),
-            BittradePrivateEndpoints.PostRetailOrderCancelByOrderId(request.OrderId),
+            BittradePrivateEndpoints.PostRetailOrderCancelByOrderId(request.OrderId.Value),
             cancellationToken,
             json => BittradeRawJson.DeserializeOrThrow<RawRetailOrderResponse>(
                 json,

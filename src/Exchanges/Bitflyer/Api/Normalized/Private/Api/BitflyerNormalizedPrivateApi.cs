@@ -85,9 +85,9 @@ internal sealed class BitflyerNormalizedPrivateApi
 
         var dto = new RawPrivateRequests.CreateChildOrderRequest
         {
-            ProductCode = productCode.Value,
-            Side = apiSide,
-            ChildOrderType = apiChildOrderType,
+            ProductCode = productCode,
+            Side = new FreeText(apiSide),
+            ChildOrderType = new FreeText(apiChildOrderType),
             Size = request.Size.Value,
             Price = request.Price?.Value,
         };
@@ -136,15 +136,15 @@ internal sealed class BitflyerNormalizedPrivateApi
             case OrderIdKind.AcceptanceId:
                 dto = new RawPrivateRequests.CancelChildOrderRequest
                 {
-                    ProductCode = productCode.Value,
-                    ChildOrderAcceptanceId = orderKey.Value,
+                    ProductCode = productCode,
+                    ChildOrderAcceptanceId = new FreeText(orderKey.Value),
                 };
                 break;
             case OrderIdKind.ExchangeOrderId:
                 dto = new RawPrivateRequests.CancelChildOrderRequest
                 {
-                    ProductCode = productCode.Value,
-                    ChildOrderId = orderKey.Value,
+                    ProductCode = productCode,
+                    ChildOrderId = new FreeText(orderKey.Value),
                 };
                 break;
             default:
@@ -191,7 +191,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         }
 
         var rawCall = await _raw
-            .CancelAllChildOrdersCallAsync(new RawPrivateRequests.CancelAllChildOrdersRequest { ProductCode = productCode.Value }, cancellationToken)
+            .CancelAllChildOrdersCallAsync(new RawPrivateRequests.CancelAllChildOrdersRequest { ProductCode = productCode }, cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -227,8 +227,8 @@ internal sealed class BitflyerNormalizedPrivateApi
         var rawCall = await _raw
             .GetChildOrdersCallAsync(
                 new RawPrivateRequests.GetChildOrdersRequest(
-                    productCode.Value,
-                    ChildOrderStatusState: "ACTIVE",
+                    productCode,
+                    ChildOrderStatusState: new FreeText("ACTIVE"),
                     ChildOrderAcceptanceId: null),
                 cancellationToken)
             .ConfigureAwait(false);
@@ -332,17 +332,17 @@ internal sealed class BitflyerNormalizedPrivateApi
             ? await _raw
                 .GetChildOrdersCallAsync(
                     new RawPrivateRequests.GetChildOrdersRequest(
-                        productCode.Value,
+                        productCode,
                         ChildOrderStatusState: null,
-                        ChildOrderAcceptanceId: orderKey.Value),
+                        ChildOrderAcceptanceId: new FreeText(orderKey.Value)),
                     cancellationToken)
                 .ConfigureAwait(false)
             : await _raw
                 .GetChildOrdersCallAsync(
                     new RawPrivateRequests.GetChildOrdersRequest(
-                        productCode.Value,
+                        productCode,
                         ChildOrderStatusState: null,
-                        ChildOrderId: orderKey.Value),
+                        ChildOrderId: new FreeText(orderKey.Value)),
                     cancellationToken)
                 .ConfigureAwait(false);
 
@@ -402,9 +402,9 @@ internal sealed class BitflyerNormalizedPrivateApi
 
             rawParameters.Add(new RawPrivateRequests.CreateParentOrderParameter
             {
-                ProductCode = p.ProductCode.Value,
-                ConditionType = conditionType,
-                Side = side,
+                ProductCode = p.ProductCode,
+                ConditionType = new FreeText(conditionType),
+                Side = new FreeText(side),
                 Price = p.Price?.Value,
                 Size = p.Size.Value,
                 TriggerPrice = p.TriggerPrice?.Value,
@@ -442,9 +442,9 @@ internal sealed class BitflyerNormalizedPrivateApi
 
         var rawRequest = new RawPrivateRequests.CreateParentOrderRequest
         {
-            OrderMethod = orderMethod,
+            OrderMethod = orderMethod is null ? null : new FreeText(orderMethod),
             MinuteToExpire = request.MinuteToExpire,
-            TimeInForce = timeInForce,
+            TimeInForce = timeInForce is null ? null : new FreeText(timeInForce),
             Parameters = rawParameters.ToArray()
         };
 
@@ -468,9 +468,9 @@ internal sealed class BitflyerNormalizedPrivateApi
         var callRequest = request;
         var rawRequest = new RawPrivateRequests.CancelParentOrderRequest
         {
-            ProductCode = request.ProductCode.Value,
-            ParentOrderId = request.ParentOrderId?.Value,
-            ParentOrderAcceptanceId = request.ParentOrderAcceptanceId?.Value,
+            ProductCode = request.ProductCode,
+            ParentOrderId = request.ParentOrderId is null ? null : new FreeText(request.ParentOrderId.Value.Value),
+            ParentOrderAcceptanceId = request.ParentOrderAcceptanceId is null ? null : new FreeText(request.ParentOrderAcceptanceId.Value.Value),
         };
 
         var rawCall = await _raw
@@ -506,8 +506,8 @@ internal sealed class BitflyerNormalizedPrivateApi
         }
 
         var rawRequest = new RawPrivateRequests.GetParentOrdersRequest(
-            request.ProductCode.Value,
-            parentOrderState,
+            request.ProductCode,
+            parentOrderState is null ? null : new FreeText(parentOrderState),
             request.Count,
             request.Before,
             request.After);
@@ -539,8 +539,8 @@ internal sealed class BitflyerNormalizedPrivateApi
 
         var callRequest = request;
         var rawRequest = new RawPrivateRequests.GetParentOrderRequest(
-            request.ParentOrderId?.Value,
-            request.ParentOrderAcceptanceId?.Value);
+            request.ParentOrderId is null ? null : new FreeText(request.ParentOrderId.Value.Value),
+            request.ParentOrderAcceptanceId is null ? null : new FreeText(request.ParentOrderAcceptanceId.Value.Value));
 
         var rawCall = await _raw
             .GetParentOrderCallAsync(rawRequest, cancellationToken)
@@ -662,9 +662,8 @@ internal sealed class BitflyerNormalizedPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var messageIdText = messageId?.Value;
         var rawCall = await _raw
-            .GetCoinOutsCallAsync(new RawPrivateRequests.GetCoinOutsRequest(messageIdText, count, before, after), cancellationToken)
+            .GetCoinOutsCallAsync(new RawPrivateRequests.GetCoinOutsRequest(messageId, count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetCoinOutsRequest(messageId, count, before, after);
         return CreateCall(
@@ -716,10 +715,10 @@ internal sealed class BitflyerNormalizedPrivateApi
         var rawCall = await _raw
             .WithdrawCallAsync(new RawPrivateRequests.CreateWithdrawalRequest
             {
-                CurrencyCode = currencyText,
+                CurrencyCode = new FreeText(currencyText),
                 BankAccountId = bankAccountId,
                 Amount = amount,
-                Code = code?.Value,
+                Code = code,
             }, cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.WithdrawRequest(currencyCode, bankAccountId, amount, code);
@@ -754,11 +753,8 @@ internal sealed class BitflyerNormalizedPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
-        var currencyText = currencyCode.HasValue
-            ? CurrencyCodeConverter.ToCurrencyString(currencyCode.Value)
-            : null;
         var rawCall = await _raw
-            .GetBalanceHistoryCallAsync(new RawPrivateRequests.GetBalanceHistoryRequest(currencyText, count, before, after), cancellationToken)
+            .GetBalanceHistoryCallAsync(new RawPrivateRequests.GetBalanceHistoryRequest(currencyCode, count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PrivateRequests.GetBalanceHistoryRequest(currencyCode, count, before, after);
         return CreateCall(
@@ -804,7 +800,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         }
 
         var rawCall = await _raw
-            .GetPositionsCallAsync(new RawPrivateRequests.GetPositionsRequest(productCode.Value), cancellationToken)
+            .GetPositionsCallAsync(new RawPrivateRequests.GetPositionsRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -887,7 +883,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         }
 
         var rawCall = await _raw
-            .GetExecutionsPrivateCallAsync(new RawPrivateRequests.GetAccountExecutionsRequest(productCode.Value), cancellationToken)
+            .GetExecutionsPrivateCallAsync(new RawPrivateRequests.GetAccountExecutionsRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -941,7 +937,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         }
 
         var rawCall = await _raw
-            .GetTradingCommissionCallAsync(new RawPrivateRequests.GetTradingCommissionRequest(productCode.Value), cancellationToken)
+            .GetTradingCommissionCallAsync(new RawPrivateRequests.GetTradingCommissionRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

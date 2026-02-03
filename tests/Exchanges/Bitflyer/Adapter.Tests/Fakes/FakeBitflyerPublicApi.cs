@@ -57,7 +57,7 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawApi
             new RawPublicDtos.ExecutionPublicResponse
             {
                 Id = 1,
-                ProductCode = request.ProductCode,
+                ProductCode = request.ProductCode.Value,
                 Side = "BUY",
                 Price = 100m,
                 Size = 0.01m,

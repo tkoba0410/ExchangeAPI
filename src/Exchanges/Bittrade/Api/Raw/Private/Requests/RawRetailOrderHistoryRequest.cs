@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Requests;
 
 public sealed record RawRetailOrderHistoryRequest(
-    [property: JsonPropertyName("symbol")] string? Symbol = null,
+    [property: JsonPropertyName("symbol")] Symbol? Symbol = null,
     [property: JsonPropertyName("direct")] int? Direct = null,
     [property: JsonPropertyName("status")] int? Status = null,
     [property: JsonPropertyName("start_time")] long? StartTime = null,

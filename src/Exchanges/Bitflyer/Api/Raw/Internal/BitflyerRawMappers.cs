@@ -8,13 +8,13 @@ internal static class BitflyerRawMappers
 {
     public static RawSendChildOrderRequest MapSendChildOrderRequest(PrivateRequests.CreateChildOrderRequest request) => new()
     {
-        ProductCode = request.ProductCode,
-        ChildOrderType = request.ChildOrderType,
-        Side = request.Side,
+        ProductCode = request.ProductCode.Value,
+        ChildOrderType = request.ChildOrderType.Value,
+        Side = request.Side.Value,
         Size = request.Size,
         Price = request.Price,
         MinuteToExpire = request.MinuteToExpire,
-        TimeInForce = request.TimeInForce,
+        TimeInForce = request.TimeInForce?.Value,
         TriggerPrice = request.TriggerPrice,
     };
 
@@ -22,9 +22,9 @@ internal static class BitflyerRawMappers
     {
         var parameters = request.Parameters.Select(p => new RawSendParentOrderParameter
         {
-            ProductCode = p.ProductCode,
-            ConditionType = p.ConditionType,
-            Side = p.Side,
+            ProductCode = p.ProductCode.Value,
+            ConditionType = p.ConditionType.Value,
+            Side = p.Side.Value,
             Price = p.Price,
             Size = p.Size,
             TriggerPrice = p.TriggerPrice,
@@ -33,9 +33,9 @@ internal static class BitflyerRawMappers
 
         return new RawSendParentOrderRequest
         {
-            OrderMethod = request.OrderMethod,
+            OrderMethod = request.OrderMethod?.Value,
             MinuteToExpire = request.MinuteToExpire,
-            TimeInForce = request.TimeInForce,
+            TimeInForce = request.TimeInForce?.Value,
             Parameters = parameters,
         };
     }

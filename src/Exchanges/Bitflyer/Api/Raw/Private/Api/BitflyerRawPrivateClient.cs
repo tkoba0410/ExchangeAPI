@@ -10,6 +10,7 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
 using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Private.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Api;
@@ -55,7 +56,7 @@ internal sealed class BitflyerRawPrivateClient
         SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetPositions),
-            BitflyerPrivateEndpoints.GetPositions(request.ProductCode),
+            BitflyerPrivateEndpoints.GetPositions(request.ProductCode.Value),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<PositionResponse>>(
                 json,
@@ -68,9 +69,9 @@ internal sealed class BitflyerRawPrivateClient
             request,
             Component(BitflyerEndpointIds.GetExecutionsPrivate),
             BitflyerPrivateEndpoints.GetExecutionsPrivate(
-                request.ProductCode,
-                request.ChildOrderId,
-                request.ChildOrderAcceptanceId,
+                request.ProductCode.Value,
+                request.ChildOrderId?.Value,
+                request.ChildOrderAcceptanceId?.Value,
                 request.Count?.ToString(CultureInfo.InvariantCulture),
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
@@ -110,7 +111,7 @@ internal sealed class BitflyerRawPrivateClient
             request,
             Component(BitflyerEndpointIds.GetBalanceHistory),
             BitflyerPrivateEndpoints.GetBalanceHistory(
-                request.CurrencyCode,
+                request.CurrencyCode.HasValue ? CurrencyCodeConverter.ToCurrencyString(request.CurrencyCode.Value) : null,
                 request.Count?.ToString(CultureInfo.InvariantCulture),
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
@@ -123,7 +124,7 @@ internal sealed class BitflyerRawPrivateClient
         SendAndParse(
             request,
             Component(BitflyerEndpointIds.GetTradingCommission),
-            BitflyerPrivateEndpoints.GetTradingCommission(request.ProductCode),
+            BitflyerPrivateEndpoints.GetTradingCommission(request.ProductCode.Value),
             cancellationToken,
             json => new RawJsonResponse(json));
 
@@ -170,7 +171,7 @@ internal sealed class BitflyerRawPrivateClient
             request,
             Component(BitflyerEndpointIds.GetCoinOuts),
             BitflyerPrivateEndpoints.GetCoinOuts(
-                request.MessageId,
+                request.MessageId?.Value,
                 request.Count?.ToString(CultureInfo.InvariantCulture),
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
@@ -343,14 +344,14 @@ internal sealed class BitflyerRawPrivateClient
             request,
             Component(BitflyerEndpointIds.GetChildOrders),
             BitflyerPrivateEndpoints.GetChildOrders(
-                request.ProductCode,
-                request.ChildOrderStatusState,
-                request.ChildOrderAcceptanceId,
-                request.ChildOrderId,
+                request.ProductCode.Value,
+                request.ChildOrderStatusState?.Value,
+                request.ChildOrderAcceptanceId?.Value,
+                request.ChildOrderId?.Value,
                 request.Count?.ToString(CultureInfo.InvariantCulture),
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture),
-                request.ParentOrderId),
+                request.ParentOrderId?.Value),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawGetChildOrdersResponse>>(
                 json,
@@ -363,8 +364,8 @@ internal sealed class BitflyerRawPrivateClient
             request,
             Component(BitflyerEndpointIds.GetParentOrders),
             BitflyerPrivateEndpoints.GetParentOrders(
-                request.ProductCode,
-                request.ParentOrderState,
+                request.ProductCode.Value,
+                request.ParentOrderState?.Value,
                 request.Count?.ToString(CultureInfo.InvariantCulture),
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
@@ -380,8 +381,8 @@ internal sealed class BitflyerRawPrivateClient
             request,
             Component(BitflyerEndpointIds.GetParentOrder),
             BitflyerPrivateEndpoints.GetParentOrder(
-                request.ParentOrderId,
-                request.ParentOrderAcceptanceId),
+                request.ParentOrderId?.Value,
+                request.ParentOrderAcceptanceId?.Value),
             cancellationToken,
             json => BitflyerRawJson.DeserializeOrThrow<RawGetParentOrderResponse>(
                 json,

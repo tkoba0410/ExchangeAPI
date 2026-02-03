@@ -1,34 +1,35 @@
 using System;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Requests;
 
 public sealed record GetAccountsRequest;
 
-public sealed record GetAccountBalanceRequest(string AccountId);
+public sealed record GetAccountBalanceRequest(AccountId AccountId);
 
-public sealed record GetOpenOrdersRequest(string Symbol, string AccountId);
+public sealed record GetOpenOrdersRequest(Symbol Symbol, AccountId AccountId);
 
 public sealed record GetOrdersRequest;
 
-public sealed record GetOrderRequest(string OrderId);
+public sealed record GetOrderRequest(OrderId OrderId);
 
-public sealed record GetOrderMatchResultsRequest(string OrderId);
+public sealed record GetOrderMatchResultsRequest(OrderId OrderId);
 
 public sealed record GetMatchResultsRequest(
-    string? Symbol = null,
-    string? Types = null,
-    string? StartDate = null,
-    string? EndDate = null,
+    Symbol? Symbol = null,
+    FreeText? Types = null,
+    FreeText? StartDate = null,
+    FreeText? EndDate = null,
     long? From = null,
-    string? Direct = null,
+    FreeText? Direct = null,
     int? Size = null);
 
 public sealed record GetDepositWithdrawsRequest(
-    string Type,
-    string? Currency = null,
+    FreeText Type,
+    FreeText? Currency = null,
     long? From = null,
     int? Size = null,
-    string? Direct = null);
+    FreeText? Direct = null);
 
 public sealed record GetWithdrawVirtualAddressesRequest;
 
@@ -38,6 +39,6 @@ public sealed record GetRetailOrdersRequest(
     DateTimeOffset? StartTime = null,
     DateTimeOffset? EndTime = null);
 
-public sealed record GetRetailOrderDetailByOrderIdRequest(string OrderId);
+public sealed record GetRetailOrderDetailByOrderIdRequest(OrderId OrderId);
 
 public sealed record GetRetailAccountBalanceRequest;

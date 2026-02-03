@@ -20,20 +20,20 @@ internal static class BittradeTradingMapper
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
     public static bool TryToRaw(
-        string accountId,
-        string apiSymbol,
+        AccountId accountId,
+        Symbol apiSymbol,
         BittradeOrderRequest request,
         out RawPrivateRequests.RawCreateOrderRequest? raw,
         out CallError? error)
     {
-        if (string.IsNullOrWhiteSpace(accountId))
+        if (accountId.IsEmpty)
         {
             raw = null;
             error = new CallError(CallErrorKind.Mapping, "accountId is required.");
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(apiSymbol))
+        if (apiSymbol.IsEmpty)
         {
             raw = null;
             error = new CallError(CallErrorKind.Mapping, "apiSymbol is required.");
@@ -58,22 +58,22 @@ internal static class BittradeTradingMapper
         raw = new RawPrivateRequests.RawCreateOrderRequest(
             AccountId: accountId,
             Symbol: apiSymbol,
-            Type: rawType,
-            Amount: size,
-            Price: price is null ? null : FormatDecimal(price.Value),
+            Type: new FreeText(rawType),
+            Amount: new FreeText(size),
+            Price: price is null ? null : new FreeText(FormatDecimal(price.Value)),
             Source: null);
         error = null;
         return true;
     }
 
-    public static RawPrivateRequests.RawCreateOrderRequest ToRaw(string accountId, string apiSymbol, BittradeOrderRequest request)
+    public static RawPrivateRequests.RawCreateOrderRequest ToRaw(AccountId accountId, Symbol apiSymbol, BittradeOrderRequest request)
     {
-        if (string.IsNullOrWhiteSpace(accountId))
+        if (accountId.IsEmpty)
         {
             throw new ArgumentException("accountId is required.", nameof(accountId));
         }
 
-        if (string.IsNullOrWhiteSpace(apiSymbol))
+        if (apiSymbol.IsEmpty)
         {
             throw new ArgumentException("apiSymbol is required.", nameof(apiSymbol));
         }
@@ -85,9 +85,9 @@ internal static class BittradeTradingMapper
         return new RawPrivateRequests.RawCreateOrderRequest(
             AccountId: accountId,
             Symbol: apiSymbol,
-            Type: type,
-            Amount: size,
-            Price: price is null ? null : FormatDecimal(price.Value),
+            Type: new FreeText(type),
+            Amount: new FreeText(size),
+            Price: price is null ? null : new FreeText(FormatDecimal(price.Value)),
             Source: null);
     }
 
@@ -461,11 +461,11 @@ internal static class BittradeTradingMapper
         }
 
         raw = new RawPrivateRequests.RawCreateRetailOrderRequest(
-            Symbol: symbol.Value,
+            Symbol: new Symbol(symbol.Value),
             Type: request.Type,
-            Price: request.Price is null ? null : FormatDecimal(request.Price.Value),
-            Amount: request.Amount is null ? null : FormatDecimal(request.Amount.Value),
-            CashAmount: request.CashAmount is null ? null : FormatDecimal(request.CashAmount.Value));
+            Price: request.Price is null ? null : new FreeText(FormatDecimal(request.Price.Value)),
+            Amount: request.Amount is null ? null : new FreeText(FormatDecimal(request.Amount.Value)),
+            CashAmount: request.CashAmount is null ? null : new FreeText(FormatDecimal(request.CashAmount.Value)));
         error = null;
         return true;
     }

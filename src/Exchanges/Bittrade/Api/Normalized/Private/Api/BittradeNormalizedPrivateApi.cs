@@ -97,7 +97,12 @@ internal sealed class BittradeNormalizedPrivateApi
                         new CallError(CallErrorKind.Mapping, "Bittrade accounts response invalid."));
                 }
 
-                return MapResult<IReadOnlyList<BittradeAccountNormalized>>.Ok(BittradeNormalizer.NormalizeAccounts(ok.Data));
+                if (!BittradeNormalizer.TryNormalizeAccounts(ok.Data, out var accounts, out var normalizeError))
+                {
+                    return MapResult<IReadOnlyList<BittradeAccountNormalized>>.Fail(normalizeError!);
+                }
+
+                return MapResult<IReadOnlyList<BittradeAccountNormalized>>.Ok(accounts!);
             });
     }
 
@@ -128,8 +133,12 @@ internal sealed class BittradeNormalizedPrivateApi
                         new CallError(CallErrorKind.Mapping, "Bittrade deposit/withdraw response invalid."));
                 }
 
-                return MapResult<IReadOnlyList<BittradeDepositWithdrawNormalized>>.Ok(
-                    BittradeNormalizer.NormalizeDepositWithdraws(ok.Data));
+                if (!BittradeNormalizer.TryNormalizeDepositWithdraws(ok.Data, out var entries, out var normalizeError))
+                {
+                    return MapResult<IReadOnlyList<BittradeDepositWithdrawNormalized>>.Fail(normalizeError!);
+                }
+
+                return MapResult<IReadOnlyList<BittradeDepositWithdrawNormalized>>.Ok(entries!);
             });
     }
 
@@ -153,8 +162,12 @@ internal sealed class BittradeNormalizedPrivateApi
                         new CallError(CallErrorKind.Mapping, "Bittrade withdraw addresses response invalid."));
                 }
 
-                return MapResult<IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>>.Ok(
-                    BittradeNormalizer.NormalizeWithdrawVirtualAddresses(ok.Data));
+                if (!BittradeNormalizer.TryNormalizeWithdrawVirtualAddresses(ok.Data, out var addresses, out var normalizeError))
+                {
+                    return MapResult<IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>>.Fail(normalizeError!);
+                }
+
+                return MapResult<IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>>.Ok(addresses!);
             });
     }
 

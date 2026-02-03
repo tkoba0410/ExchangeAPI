@@ -129,15 +129,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static IReadOnlyList<BittradeOpenOrder> ToOpenOrders(Symbol symbol, RawPrivateDtos.RawOpenOrdersResponse raw)
-    {
-        if (raw.Data is null || raw.Data.Count == 0)
-        {
-            return Array.Empty<BittradeOpenOrder>();
-        }
-
-        return raw.Data.Select(order => ToOpenOrder(symbol, order)).ToList();
-    }
 
     private static bool TryToOpenOrder(
         Symbol symbol,
@@ -199,31 +190,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    private static BittradeOpenOrder ToOpenOrder(Symbol symbol, RawPrivateDtos.RawOrderSummary raw)
-    {
-        var (side, type) = MapSideAndType(raw.Type);
-        var status = MapStatus(raw.State);
-        var size = new Size(ParseRequiredDecimal(raw.Amount, "amount"));
-        var executed = new Size(ParseDecimalOrThrow(raw.FilledAmount, "field-amount") ?? 0m);
-        var outstanding = new Size(Math.Max(0m, size.Value - executed.Value));
-        var priceValue = ParseDecimalOrThrow(raw.Price, "price");
-        var price = priceValue is null ? (Price?)null : new Price(priceValue.Value);
-
-        return new BittradeOpenOrder(
-            Symbol: symbol,
-            Key: new OrderKey(OrderIdKind.ExchangeOrderId, raw.Id),
-            Side: side,
-            OrderType: type,
-            Size: size,
-            OutstandingSize: outstanding,
-            ExecutedSize: executed,
-            Price: price,
-            OrderedAt: raw.CreatedAt,
-            UpdatedAt: null,
-            StopPrice: null,
-            Status: ParseOptional(raw.State),
-            ExchangeOrderId: new ExchangeOrderId(raw.Id));
-    }
 
     public static bool TryToOrderStatus(
         ProductCode productCode,
@@ -287,34 +253,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static BittradeOrderStatus ToOrderStatus(ProductCode productCode, RawPrivateDtos.RawOrderDetailResponse raw, OrderKey key)
-    {
-        if (productCode.IsEmpty)
-        {
-            throw new ArgumentException("productCode is required.", nameof(productCode));
-        }
-
-        if (raw.Data is null)
-        {
-            throw new InvalidOperationException("Bittrade order response is missing data.");
-        }
-
-        var status = MapStatus(raw.Data.State);
-        var priceValue = ParseDecimalOrThrow(raw.Data.Price, "price");
-        var price = priceValue is null ? (Price?)null : new Price(priceValue.Value);
-        var size = ParseRequiredDecimal(raw.Data.Amount, "amount");
-        var executed = new Size(ParseDecimalOrThrow(raw.Data.FilledAmount, "field-amount") ?? 0m);
-        var outstanding = new Size(Math.Max(0m, size - executed.Value));
-
-        return new BittradeOrderStatus(
-            productCode,
-            key,
-            status,
-            executed,
-            outstanding,
-            price,
-            null);
-    }
 
     public static bool TryToExecutions(
         IReadOnlyList<RawPrivateDtos.RawMatchResultEntry> entries,
@@ -357,29 +295,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static IReadOnlyList<BittradeExecutionNormalized> ToExecutions(
-        IReadOnlyList<RawPrivateDtos.RawMatchResultEntry> entries)
-    {
-        if (entries is null || entries.Count == 0)
-        {
-            return Array.Empty<BittradeExecutionNormalized>();
-        }
-
-        var snapshots = entries
-            .Select(entry => ExtractSnapshot(Serialize(entry)))
-            .ToArray();
-
-        return entries
-            .Select((entry, idx) => new BittradeExecutionNormalized(
-                Id: new OrderId(string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId),
-                Side: MapSide(entry.Type),
-                Price: entry.Price,
-                Size: entry.FilledAmount,
-                Timestamp: entry.CreatedAt,
-                RawSnapshot: snapshots[idx],
-                Extras: new Dictionary<string, JsonElement>()))
-            .ToList();
-    }
 
     public static bool TryToOrderSummaries(
         IReadOnlyList<RawPrivateDtos.RawOrderSummary>? entries,
@@ -432,28 +347,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static IReadOnlyList<BittradeOrderSummaryNormalized> ToOrderSummaries(
-        IReadOnlyList<RawPrivateDtos.RawOrderSummary>? entries)
-    {
-        if (entries is null || entries.Count == 0)
-        {
-            return Array.Empty<BittradeOrderSummaryNormalized>();
-        }
-
-        return entries
-            .Select(entry => new BittradeOrderSummaryNormalized(
-                Id: new OrderId(entry.Id),
-                Symbol: Symbol.Parse(entry.Symbol),
-                AccountId: FreeText.Parse(entry.AccountId),
-                Amount: ParseRequiredDecimal(entry.Amount, "amount"),
-                Price: ParseDecimalOrThrow(entry.Price, "price"),
-                State: FreeText.Parse(entry.State),
-                Type: FreeText.Parse(entry.Type),
-                ClientOrderId: ParseOptional(entry.ClientOrderId),
-                CreatedAt: entry.CreatedAt,
-                FilledAmount: ParseRequiredDecimal(entry.FilledAmount, "field-amount")))
-            .ToList();
-    }
 
     public static bool TryToRetailOrders(
         IReadOnlyList<RawPrivateDtos.RawRetailOrderEntry>? entries,
@@ -494,26 +387,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static IReadOnlyList<BittradeRetailOrderEntryNormalized> ToRetailOrders(
-        IReadOnlyList<RawPrivateDtos.RawRetailOrderEntry>? entries)
-    {
-        if (entries is null || entries.Count == 0)
-        {
-            return Array.Empty<BittradeRetailOrderEntryNormalized>();
-        }
-
-        return entries
-            .Select(entry => new BittradeRetailOrderEntryNormalized(
-                Id: new OrderId(entry.Id),
-                Symbol: Symbol.Parse(entry.Symbol),
-                Type: entry.Type,
-                Price: ParseDecimalOrThrow(entry.Price, "price"),
-                Amount: ParseDecimalOrThrow(entry.Amount, "amount"),
-                CashAmount: ParseDecimalOrThrow(entry.CashAmount, "cash_amount"),
-                Status: entry.Status,
-                CreatedAt: entry.CreatedAt))
-            .ToList();
-    }
 
     public static bool TryToRetailOrder(
         RawPrivateDtos.RawRetailOrderEntry? entry,
@@ -548,23 +421,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static BittradeRetailOrderEntryNormalized? ToRetailOrder(RawPrivateDtos.RawRetailOrderEntry? entry)
-    {
-        if (entry is null)
-        {
-            return null;
-        }
-
-        return new BittradeRetailOrderEntryNormalized(
-            Id: new OrderId(entry.Id),
-            Symbol: Symbol.Parse(entry.Symbol),
-            Type: entry.Type,
-            Price: ParseDecimalOrThrow(entry.Price, "price"),
-            Amount: ParseDecimalOrThrow(entry.Amount, "amount"),
-            CashAmount: ParseDecimalOrThrow(entry.CashAmount, "cash_amount"),
-            Status: entry.Status,
-            CreatedAt: entry.CreatedAt);
-    }
 
     public static BittradeRetailOrderResult ToRetailOrderResult(RawPrivateDtos.RawRetailOrderResponse raw)
     {
@@ -614,18 +470,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static RawPrivateRequests.RawCreateRetailOrderRequest ToRawRetailOrder(BittradeRetailOrderRequest request)
-    {
-        if (request is null) throw new ArgumentNullException(nameof(request));
-
-        var apiSymbol = BittradeSymbol.Normalize(request.Symbol.Value);
-        return new RawPrivateRequests.RawCreateRetailOrderRequest(
-            Symbol: apiSymbol,
-            Type: request.Type,
-            Price: request.Price is null ? null : FormatDecimal(request.Price.Value),
-            Amount: request.Amount is null ? null : FormatDecimal(request.Amount.Value),
-            CashAmount: request.CashAmount is null ? null : FormatDecimal(request.CashAmount.Value));
-    }
 
     private static JsonElement ExtractSnapshot(string? rawJson)
     {

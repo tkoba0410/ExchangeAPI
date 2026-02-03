@@ -52,7 +52,14 @@ internal static class BittradeSymbolMapper
         }
 
         var productCode = ToProductCode(symbol);
-        return BittradeSymbol.Normalize(productCode);
+        if (!BittradeSymbol.TryParse(productCode, out var parsed))
+        {
+            throw new ArgumentException(
+                $"Bittrade symbol is invalid: '{productCode}'. Expected lowercase alphanumeric like 'btcjpy'.",
+                nameof(symbol));
+        }
+
+        return parsed.Value;
     }
 
 }

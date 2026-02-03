@@ -30,8 +30,8 @@ public sealed class BittradeSymbolTests
     [Fact]
     public void Normalize_returns_value_accepted_by_ParseOrThrow()
     {
-        var normalized = BittradeSymbol.Normalize("BTC_JPY");
-        var parsed = BittradeSymbol.ParseOrThrow(normalized);
+        Assert.True(BittradeSymbol.TryParse("BTC_JPY", out var normalized));
+        var parsed = BittradeSymbol.ParseOrThrow(normalized.Value);
 
         Assert.Equal("btcjpy", parsed.ToString());
     }

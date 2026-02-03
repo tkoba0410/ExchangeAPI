@@ -276,7 +276,12 @@ internal sealed class BittradeNormalizedPublicApi
                     return MapResult<IReadOnlyList<BittradeKlineNormalized>>.Fail(error);
                 }
 
-                return MapResult<IReadOnlyList<BittradeKlineNormalized>>.Ok(BittradeNormalizer.NormalizeKlines(ok.Data));
+                if (!BittradeNormalizer.TryNormalizeKlines(ok.Data, out var klines, out var normalizeError))
+                {
+                    return MapResult<IReadOnlyList<BittradeKlineNormalized>>.Fail(normalizeError!);
+                }
+
+                return MapResult<IReadOnlyList<BittradeKlineNormalized>>.Ok(klines!);
             });
     }
 
@@ -297,7 +302,12 @@ internal sealed class BittradeNormalizedPublicApi
                     return MapResult<IReadOnlyList<BittradeTickerEntryNormalized>>.Fail(error);
                 }
 
-                return MapResult<IReadOnlyList<BittradeTickerEntryNormalized>>.Ok(BittradeNormalizer.NormalizeTickers(ok.Data));
+                if (!BittradeNormalizer.TryNormalizeTickers(ok.Data, out var tickers, out var normalizeError))
+                {
+                    return MapResult<IReadOnlyList<BittradeTickerEntryNormalized>>.Fail(normalizeError!);
+                }
+
+                return MapResult<IReadOnlyList<BittradeTickerEntryNormalized>>.Ok(tickers!);
             });
     }
 

@@ -32,9 +32,12 @@ public sealed class BittradeTickerNormalizedTests
         """;
 
         var raw = BittradeRawJson.DeserializeOrThrow<RawPublicDtos.RawMergedResponse>(json, "Bittrade.GetTicker");
-        var normalized = BittradeNormalizer.NormalizeTicker(raw, json);
+        var ok = BittradeNormalizer.TryNormalizeTicker(raw, json, out var normalized, out var error);
+        Assert.True(ok);
+        Assert.NotNull(normalized);
+        Assert.Null(error);
 
-        Assert.Equal(JsonValueKind.Object, normalized.RawSnapshot.ValueKind);
+        Assert.Equal(JsonValueKind.Object, normalized!.RawSnapshot.ValueKind);
         Assert.True(normalized.RawSnapshot.TryGetProperty("tick", out _));
     }
 }

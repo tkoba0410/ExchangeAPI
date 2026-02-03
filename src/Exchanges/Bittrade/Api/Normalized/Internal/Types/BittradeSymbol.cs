@@ -18,18 +18,6 @@ public readonly record struct BittradeSymbol(string Value)
         return true;
     }
 
-    public static string Normalize(string? value)
-    {
-        if (TryNormalize(value, out var normalized))
-        {
-            return normalized;
-        }
-
-        throw new ArgumentException(
-            $"Bittrade symbol is invalid: '{value}'. Expected lowercase alphanumeric like 'btcjpy'.",
-            nameof(value));
-    }
-
     public static BittradeSymbol ParseOrThrow(string? value)
     {
         if (TryParse(value, out var symbol))

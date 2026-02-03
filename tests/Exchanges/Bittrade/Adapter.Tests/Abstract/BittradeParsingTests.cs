@@ -22,9 +22,11 @@ public sealed class BittradeParsingTests
                 new RawPrivateDtos.RawBalanceEntry(Currency: "btc", Type: "trade", Balance: "bad")
             });
 
-        var ex = Assert.Throws<InvalidOperationException>(() => BittradeNormalizer.NormalizeBalances(data));
-
-        Assert.Contains("RawBalanceEntry.balance", ex.Message);
-        Assert.Contains("bad", ex.Message);
+        var ok = BittradeNormalizer.TryNormalizeBalances(data, out var balances, out var error);
+        Assert.False(ok);
+        Assert.Null(balances);
+        Assert.NotNull(error);
+        Assert.Contains("RawBalanceEntry.balance", error!.Message, StringComparison.Ordinal);
+        Assert.Contains("bad", error.Message, StringComparison.Ordinal);
     }
 }

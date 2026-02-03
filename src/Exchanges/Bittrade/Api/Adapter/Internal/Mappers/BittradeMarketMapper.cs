@@ -30,7 +30,12 @@ internal static class BittradeMarketMapper
             .Select(level => new OrderBookLevel(new Price(level.Price), new Size(level.Size)))
             .ToList();
 
-        return OrderBookNormalizer.Normalize(bids, asks);
+        if (!OrderBookNormalizer.TryNormalize(bids, asks, out var orderBook, out var error))
+        {
+            throw new ExchangeApiException(error?.Message ?? "OrderBook normalization failed.");
+        }
+
+        return orderBook!;
     }
 
     public static ExecutionMarket MapExecution(CommonSymbol symbol, BittradeExecutionNormalized normalized)

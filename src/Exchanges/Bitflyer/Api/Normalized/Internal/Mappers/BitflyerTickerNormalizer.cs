@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
+using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using RawPublicDtos = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Dtos;
 
@@ -10,15 +12,24 @@ internal static class BitflyerTickerNormalizer
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
-    public static BitflyerTickerNormalized Normalize(RawPublicDtos.Ticker wire, string? rawJson)
+    public static bool TryNormalize(
+        RawPublicDtos.Ticker wire,
+        string? rawJson,
+        out BitflyerTickerNormalized? normalized,
+        out CallError? error)
     {
-        var snapshot = ExtractSnapshot(rawJson ?? Serialize(wire));
-        return new BitflyerTickerNormalized(
-            ProductCode: ProductCode.ParseNormalized(wire.ProductCode),
-            LastTradedPrice: wire.LastTradedPrice,
-            Timestamp: wire.Timestamp,
-            RawSnapshot: snapshot,
-            Extras: new Dictionary<string, JsonElement>());
+        try
+        {
+            normalized = Build(wire, rawJson);
+            error = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "bitFlyer ticker response invalid.", ex);
+            return false;
+        }
     }
 
     private static JsonElement ExtractSnapshot(string? rawJson)
@@ -47,4 +58,15 @@ internal static class BitflyerTickerNormalizer
 
     private static string Serialize<T>(T value) =>
         JsonSerializer.Serialize(value, SerializerOptions);
+
+    private static BitflyerTickerNormalized Build(RawPublicDtos.Ticker wire, string? rawJson)
+    {
+        var snapshot = ExtractSnapshot(rawJson ?? Serialize(wire));
+        return new BitflyerTickerNormalized(
+            ProductCode: ProductCode.ParseNormalized(wire.ProductCode),
+            LastTradedPrice: wire.LastTradedPrice,
+            Timestamp: wire.Timestamp,
+            RawSnapshot: snapshot,
+            Extras: new Dictionary<string, JsonElement>());
+    }
 }

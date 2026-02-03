@@ -2,12 +2,40 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Utilities.OrderBook;
 
 public static class OrderBookNormalizer
 {
+    public static bool TryNormalize(
+        IEnumerable<OrderBookLevel> bids,
+        IEnumerable<OrderBookLevel> asks,
+        out ExchangeApi.Contracts.Common.Dtos.OrderBook? normalized,
+        out CallError? error)
+    {
+        if (bids is null || asks is null)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "OrderBook normalization input is null.");
+            return false;
+        }
+
+        try
+        {
+            normalized = Normalize(bids, asks);
+            error = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "OrderBook normalization failed.", ex);
+            return false;
+        }
+    }
+
     public static ExchangeApi.Contracts.Common.Dtos.OrderBook Normalize(
         IEnumerable<OrderBookLevel> bids,
         IEnumerable<OrderBookLevel> asks)

@@ -30,9 +30,12 @@ public sealed class BitflyerTickerNormalizedTests
         """;
 
         var raw = BitflyerRawJson.DeserializeOrThrow<RawPublicDtos.Ticker>(json, "Bitflyer.GetTicker");
-        var normalized = BitflyerTickerNormalizer.Normalize(raw, json);
+        var ok = BitflyerTickerNormalizer.TryNormalize(raw, json, out var normalized, out var error);
+        Assert.True(ok);
+        Assert.NotNull(normalized);
+        Assert.Null(error);
 
-        Assert.Equal(JsonValueKind.Object, normalized.RawSnapshot.ValueKind);
+        Assert.Equal(JsonValueKind.Object, normalized!.RawSnapshot.ValueKind);
         Assert.True(normalized.RawSnapshot.TryGetProperty("best_bid", out _));
     }
 }

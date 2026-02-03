@@ -17,8 +17,10 @@ public sealed class BittradeFailFastMapperTests
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        Assert.Throws<InvalidOperationException>(() =>
-            BittradeTradingMapper.ToOpenOrders(new Symbol("BTC/JPY"), raw));
+        var ok = BittradeTradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
+        Assert.False(ok);
+        Assert.Null(orders);
+        Assert.NotNull(error);
     }
 
     [Fact]
@@ -26,8 +28,10 @@ public sealed class BittradeFailFastMapperTests
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        Assert.Throws<InvalidOperationException>(() =>
-            BittradeTradingMapper.ToOpenOrders(new Symbol("BTC/JPY"), raw));
+        var ok = BittradeTradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
+        Assert.False(ok);
+        Assert.Null(orders);
+        Assert.NotNull(error);
     }
 
     [Fact]
@@ -50,8 +54,15 @@ public sealed class BittradeFailFastMapperTests
                 FilledCashAmount: "0",
                 Fees: "0"));
 
-        Assert.Throws<InvalidOperationException>(() =>
-            BittradeTradingMapper.ToOrderStatus(ProductCode.Parse("BTC_JPY"), raw, new OrderKey(OrderIdKind.ExchangeOrderId, "1")));
+        var ok = BittradeTradingMapper.TryToOrderStatus(
+            ProductCode.Parse("BTC_JPY"),
+            raw,
+            new OrderKey(OrderIdKind.ExchangeOrderId, "1"),
+            out var status,
+            out var error);
+        Assert.False(ok);
+        Assert.Null(status);
+        Assert.NotNull(error);
     }
 
     private static RawPrivateDtos.RawOpenOrdersResponse CreateOpenOrdersResponse(string type) =>

@@ -35,8 +35,21 @@ internal sealed class BitflyerNormalizedPublicApi
             rawCall,
             request,
             Component(BitflyerEndpointIds.GetMarkets),
-            raw => MapResult<IReadOnlyList<BitflyerMarketNormalized>>.Ok(
-                raw.Select(BitflyerMarketNormalizer.Normalize).ToArray()));
+            raw =>
+            {
+                var mapped = new List<BitflyerMarketNormalized>(raw.Count);
+                foreach (var entry in raw)
+                {
+                    if (!BitflyerMarketNormalizer.TryNormalize(entry, out var market, out var error))
+                    {
+                        return MapResult<IReadOnlyList<BitflyerMarketNormalized>>.Fail(error!);
+                    }
+
+                    mapped.Add(market!);
+                }
+
+                return MapResult<IReadOnlyList<BitflyerMarketNormalized>>.Ok(mapped.ToArray());
+            });
     }
 
     public async Task<Call<PublicRequests.GetTickerRequest, BitflyerTickerNormalized>> GetTickerCallAsync(
@@ -52,8 +65,15 @@ internal sealed class BitflyerNormalizedPublicApi
             rawCall,
             request,
             Component(BitflyerEndpointIds.GetTicker),
-            raw => MapResult<BitflyerTickerNormalized>.Ok(
-                BitflyerTickerNormalizer.Normalize(raw, rawCall.Meta.RawJson)));
+            raw =>
+            {
+                if (!BitflyerTickerNormalizer.TryNormalize(raw, rawCall.Meta.RawJson, out var ticker, out var error))
+                {
+                    return MapResult<BitflyerTickerNormalized>.Fail(error!);
+                }
+
+                return MapResult<BitflyerTickerNormalized>.Ok(ticker!);
+            });
     }
 
     public async Task<Call<PublicRequests.GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
@@ -69,7 +89,15 @@ internal sealed class BitflyerNormalizedPublicApi
             rawCall,
             request,
             Component(BitflyerEndpointIds.GetBoard),
-            raw => MapResult<BitflyerOrderBookNormalized>.Ok(BitflyerOrderBookNormalizer.Normalize(raw)));
+            raw =>
+            {
+                if (!BitflyerOrderBookNormalizer.TryNormalize(raw, out var orderBook, out var error))
+                {
+                    return MapResult<BitflyerOrderBookNormalized>.Fail(error!);
+                }
+
+                return MapResult<BitflyerOrderBookNormalized>.Ok(orderBook!);
+            });
     }
 
     public async Task<Call<PublicRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
@@ -112,7 +140,15 @@ internal sealed class BitflyerNormalizedPublicApi
             rawCall,
             request,
             Component(BitflyerEndpointIds.GetHealth),
-            raw => MapResult<BitflyerHealthNormalized>.Ok(BitflyerHealthNormalizer.Normalize(raw)));
+            raw =>
+            {
+                if (!BitflyerHealthNormalizer.TryNormalize(raw, out var normalized, out var error))
+                {
+                    return MapResult<BitflyerHealthNormalized>.Fail(error!);
+                }
+
+                return MapResult<BitflyerHealthNormalized>.Ok(normalized!);
+            });
     }
 
     public async Task<Call<PublicRequests.GetBoardStateRequest, BitflyerBoardStateNormalized>> GetBoardStateCallAsync(
@@ -128,7 +164,15 @@ internal sealed class BitflyerNormalizedPublicApi
             rawCall,
             request,
             Component(BitflyerEndpointIds.GetBoardState),
-            raw => MapResult<BitflyerBoardStateNormalized>.Ok(BitflyerBoardStateNormalizer.Normalize(raw)));
+            raw =>
+            {
+                if (!BitflyerBoardStateNormalizer.TryNormalize(raw, out var normalized, out var error))
+                {
+                    return MapResult<BitflyerBoardStateNormalized>.Fail(error!);
+                }
+
+                return MapResult<BitflyerBoardStateNormalized>.Ok(normalized!);
+            });
     }
 
     public async Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<BitflyerChatNormalized>>> GetChatsCallAsync(
@@ -145,8 +189,21 @@ internal sealed class BitflyerNormalizedPublicApi
             rawCall,
             request,
             Component(BitflyerEndpointIds.GetChats),
-            raw => MapResult<IReadOnlyList<BitflyerChatNormalized>>.Ok(
-                raw.Select(BitflyerChatNormalizer.Normalize).ToArray()));
+            raw =>
+            {
+                var mapped = new List<BitflyerChatNormalized>(raw.Count);
+                foreach (var entry in raw)
+                {
+                    if (!BitflyerChatNormalizer.TryNormalize(entry, out var chat, out var error))
+                    {
+                        return MapResult<IReadOnlyList<BitflyerChatNormalized>>.Fail(error!);
+                    }
+
+                    mapped.Add(chat!);
+                }
+
+                return MapResult<IReadOnlyList<BitflyerChatNormalized>>.Ok(mapped.ToArray());
+            });
     }
 
     public async Task<Call<PublicRequests.GetCorporateLeverageRequest, BitflyerCorporateLeverageNormalized>> GetCorporateLeverageCallAsync(

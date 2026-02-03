@@ -51,47 +51,6 @@ internal static class BittradeNormalizer
         return true;
     }
 
-    internal static BittradeTickerNormalized NormalizeTicker(RawPublicDtos.RawMergedResponse response, string? rawJson)
-    {
-        if (response is null) throw new ArgumentNullException(nameof(response));
-
-        var tick = response.Tick ?? throw new ArgumentNullException(nameof(response.Tick));
-        var timestamp = tick.Ts ?? response.Ts ?? DateTimeOffset.UtcNow;
-        var snapshot = ExtractSnapshot(rawJson ?? Serialize(response));
-        return new BittradeTickerNormalized(
-            tick.Close,
-            timestamp,
-            snapshot,
-            new Dictionary<string, JsonElement>());
-    }
-
-    internal static BittradeOrderBookNormalized NormalizeOrderBook(RawPublicDtos.RawDepthTick tick)
-    {
-        if (tick is null) throw new ArgumentNullException(nameof(tick));
-
-        var bids = NormalizeLevels(tick.Bids, "bids");
-        var asks = NormalizeLevels(tick.Asks, "asks");
-        return new BittradeOrderBookNormalized(bids, asks);
-    }
-
-    internal static IReadOnlyList<BittradeExecutionNormalized> NormalizeExecutions(
-        IReadOnlyList<RawPublicDtos.RawTradeEntry> entries,
-        string? rawJson)
-    {
-        if (entries is null) throw new ArgumentNullException(nameof(entries));
-
-        var snapshots = ExtractTradeSnapshots(rawJson, entries);
-        return entries
-            .Select((entry, idx) => new BittradeExecutionNormalized(
-                new OrderId(entry.Id.ToString()),
-                MapSide(entry.Direction),
-                entry.Price,
-                entry.Amount,
-                entry.Ts,
-                snapshots[idx],
-                new Dictionary<string, JsonElement>()))
-            .ToList();
-    }
 
     internal static bool TryNormalizeExecutions(
         IReadOnlyList<RawPublicDtos.RawTradeEntry> entries,
@@ -132,20 +91,6 @@ internal static class BittradeNormalizer
         return true;
     }
 
-    internal static IReadOnlyList<BittradeExecutionNormalized> NormalizeTradeHistory(
-        IReadOnlyList<RawPublicDtos.RawTradeHistoryEntry>? entries)
-    {
-        if (entries is null || entries.Count == 0)
-        {
-            return Array.Empty<BittradeExecutionNormalized>();
-        }
-
-        var flattened = entries
-            .SelectMany(entry => entry.Data ?? Array.Empty<RawPublicDtos.RawTradeEntry>())
-            .ToList();
-        return NormalizeExecutions(flattened, rawJson: null);
-    }
-
     internal static bool TryNormalizeTradeHistory(
         IReadOnlyList<RawPublicDtos.RawTradeHistoryEntry>? entries,
         out IReadOnlyList<BittradeExecutionNormalized>? normalized,
@@ -163,23 +108,6 @@ internal static class BittradeNormalizer
             .ToList();
 
         return TryNormalizeExecutions(flattened, rawJson: null, out normalized, out error);
-    }
-
-    internal static IReadOnlyList<BittradeSymbolNormalized> NormalizeSymbols(IReadOnlyList<RawPublicDtos.RawSymbolInfo> symbols)
-    {
-        if (symbols is null) throw new ArgumentNullException(nameof(symbols));
-
-        return symbols
-            .Select(symbol => new BittradeSymbolNormalized(
-                Symbol: Symbol.Parse(symbol.Symbol),
-                BaseCurrency: FreeText.Parse(symbol.BaseCurrency),
-                QuoteCurrency: FreeText.Parse(symbol.QuoteCurrency),
-                PricePrecision: symbol.PricePrecision,
-                AmountPrecision: symbol.AmountPrecision,
-                MinOrderAmount: ParseDecimalFlexible(symbol.MinOrderAmount, "min-order-amt"),
-                MinOrderValue: ParseNullableDecimalFlexible(symbol.MinOrderValue, "min-order-value"),
-                State: FreeText.Parse(symbol.State)))
-            .ToList();
     }
 
     internal static bool TryNormalizeSymbols(
@@ -225,28 +153,62 @@ internal static class BittradeNormalizer
         return true;
     }
 
-    internal static IReadOnlyList<BittradeKlineNormalized> NormalizeKlines(
-        IReadOnlyList<RawPublicDtos.RawKlineEntry>? entries)
+    internal static bool TryNormalizeKlines(
+        IReadOnlyList<RawPublicDtos.RawKlineEntry>? entries,
+        out IReadOnlyList<BittradeKlineNormalized>? normalized,
+        out CallError? error)
     {
-        if (entries is null || entries.Count == 0)
+        try
         {
-            return Array.Empty<BittradeKlineNormalized>();
-        }
+            if (entries is null || entries.Count == 0)
+            {
+                normalized = Array.Empty<BittradeKlineNormalized>();
+                error = null;
+                return true;
+            }
 
-        return entries
-            .Select(entry => new BittradeKlineNormalized(
-                Id: FreeText.Parse(entry.Id),
-                Open: entry.Open,
-                Close: entry.Close,
-                Low: entry.Low,
-                High: entry.High,
-                Amount: entry.Amount,
-                Volume: entry.Volume,
-                Count: entry.Count))
-            .ToList();
+            normalized = entries
+                .Select(entry => new BittradeKlineNormalized(
+                    Id: FreeText.Parse(entry.Id),
+                    Open: entry.Open,
+                    Close: entry.Close,
+                    Low: entry.Low,
+                    High: entry.High,
+                    Amount: entry.Amount,
+                    Volume: entry.Volume,
+                    Count: entry.Count))
+                .ToList();
+            error = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "Bittrade klines response invalid.", ex);
+            return false;
+        }
     }
 
-    internal static IReadOnlyList<BittradeTickerEntryNormalized> NormalizeTickers(
+    internal static bool TryNormalizeTickers(
+        IReadOnlyList<RawPublicDtos.RawTickerEntry>? entries,
+        out IReadOnlyList<BittradeTickerEntryNormalized>? normalized,
+        out CallError? error)
+    {
+        try
+        {
+            normalized = BuildTickers(entries);
+            error = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "Bittrade tickers response invalid.", ex);
+            return false;
+        }
+    }
+
+    private static IReadOnlyList<BittradeTickerEntryNormalized> BuildTickers(
         IReadOnlyList<RawPublicDtos.RawTickerEntry>? entries)
     {
         if (entries is null || entries.Count == 0)
@@ -262,18 +224,6 @@ internal static class BittradeNormalizer
                 now,
                 ExtractSnapshot(Serialize(entry)),
                 new Dictionary<string, JsonElement>()))
-            .ToList();
-    }
-
-    internal static IReadOnlyList<BittradeBalanceEntryNormalized> NormalizeBalances(RawPrivateDtos.RawBalanceData data)
-    {
-        if (data is null) throw new ArgumentNullException(nameof(data));
-
-        return data.List
-            .Select(entry => new BittradeBalanceEntryNormalized(
-                FreeText.Parse(entry.Currency),
-                FreeText.Parse(entry.Type),
-                ParseDecimalOrThrow(entry.Balance, "balance", "RawBalanceEntry")))
             .ToList();
     }
 
@@ -309,81 +259,109 @@ internal static class BittradeNormalizer
         return true;
     }
 
-    internal static IReadOnlyList<BittradeAccountNormalized> NormalizeAccounts(
-        IReadOnlyList<RawPrivateDtos.RawAccount>? accounts)
+    internal static bool TryNormalizeAccounts(
+        IReadOnlyList<RawPrivateDtos.RawAccount>? accounts,
+        out IReadOnlyList<BittradeAccountNormalized>? normalized,
+        out CallError? error)
     {
-        if (accounts is null || accounts.Count == 0)
+        try
         {
-            return Array.Empty<BittradeAccountNormalized>();
-        }
+            if (accounts is null || accounts.Count == 0)
+            {
+                normalized = Array.Empty<BittradeAccountNormalized>();
+                error = null;
+                return true;
+            }
 
-        return accounts
-            .Select(account => new BittradeAccountNormalized(
-                FreeText.Parse(account.Id),
-                FreeText.Parse(account.Type),
-                ParseOptional(account.SubType),
-                FreeText.Parse(account.State)))
-            .ToList();
+            normalized = accounts
+                .Select(account => new BittradeAccountNormalized(
+                    FreeText.Parse(account.Id),
+                    FreeText.Parse(account.Type),
+                    ParseOptional(account.SubType),
+                    FreeText.Parse(account.State)))
+                .ToList();
+            error = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "Bittrade accounts response invalid.", ex);
+            return false;
+        }
     }
 
-    internal static IReadOnlyList<BittradeDepositWithdrawNormalized> NormalizeDepositWithdraws(
-        IReadOnlyList<RawPrivateDtos.RawDepositWithdrawEntry>? entries)
+    internal static bool TryNormalizeDepositWithdraws(
+        IReadOnlyList<RawPrivateDtos.RawDepositWithdrawEntry>? entries,
+        out IReadOnlyList<BittradeDepositWithdrawNormalized>? normalized,
+        out CallError? error)
     {
-        if (entries is null || entries.Count == 0)
+        try
         {
-            return Array.Empty<BittradeDepositWithdrawNormalized>();
-        }
+            if (entries is null || entries.Count == 0)
+            {
+                normalized = Array.Empty<BittradeDepositWithdrawNormalized>();
+                error = null;
+                return true;
+            }
 
-        return entries
-            .Select(entry => new BittradeDepositWithdrawNormalized(
-                FreeText.Parse(entry.Id),
-                FreeText.Parse(entry.Type),
-                FreeText.Parse(entry.Currency),
-                entry.Amount,
-                ParseOptional(entry.Address),
-                ParseOptional(entry.TxHash),
-                ParseOptional(entry.State),
-                entry.CreatedAt))
-            .ToList();
+            normalized = entries
+                .Select(entry => new BittradeDepositWithdrawNormalized(
+                    FreeText.Parse(entry.Id),
+                    FreeText.Parse(entry.Type),
+                    FreeText.Parse(entry.Currency),
+                    entry.Amount,
+                    ParseOptional(entry.Address),
+                    ParseOptional(entry.TxHash),
+                    ParseOptional(entry.State),
+                    entry.CreatedAt))
+                .ToList();
+            error = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "Bittrade deposit/withdraw response invalid.", ex);
+            return false;
+        }
     }
 
-    internal static IReadOnlyList<BittradeWithdrawVirtualAddressNormalized> NormalizeWithdrawVirtualAddresses(
-        IReadOnlyList<RawPrivateDtos.RawWithdrawVirtualAddress>? entries)
+    internal static bool TryNormalizeWithdrawVirtualAddresses(
+        IReadOnlyList<RawPrivateDtos.RawWithdrawVirtualAddress>? entries,
+        out IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>? normalized,
+        out CallError? error)
     {
-        if (entries is null || entries.Count == 0)
+        try
         {
-            return Array.Empty<BittradeWithdrawVirtualAddressNormalized>();
+            if (entries is null || entries.Count == 0)
+            {
+                normalized = Array.Empty<BittradeWithdrawVirtualAddressNormalized>();
+                error = null;
+                return true;
+            }
+
+            normalized = entries
+                .Select(entry => new BittradeWithdrawVirtualAddressNormalized(
+                    AddressId: entry.AddressId,
+                    Currency: ParseOptional(entry.Currency),
+                    Address: ParseOptional(entry.Address),
+                    AddressTag: ParseOptional(entry.AddressTag),
+                    Chain: ParseOptional(entry.Chain),
+                    Note: ParseOptional(entry.Note),
+                    State: ParseOptional(entry.State),
+                    CreatedAt: entry.CreatedAt,
+                    UpdatedAt: entry.UpdatedAt))
+                .ToList();
+            error = null;
+            return true;
         }
-
-        return entries
-            .Select(entry => new BittradeWithdrawVirtualAddressNormalized(
-                AddressId: entry.AddressId,
-                Currency: ParseOptional(entry.Currency),
-                Address: ParseOptional(entry.Address),
-                AddressTag: ParseOptional(entry.AddressTag),
-                Chain: ParseOptional(entry.Chain),
-                Note: ParseOptional(entry.Note),
-                State: ParseOptional(entry.State),
-                CreatedAt: entry.CreatedAt,
-                UpdatedAt: entry.UpdatedAt))
-            .ToList();
-    }
-
-    internal static IReadOnlyList<BittradeRetailBalanceEntryNormalized> NormalizeRetailBalances(
-        IReadOnlyList<RawPrivateDtos.RawRetailAccountBalanceEntry>? entries)
-    {
-        if (entries is null || entries.Count == 0)
+        catch (Exception ex)
         {
-            return Array.Empty<BittradeRetailBalanceEntryNormalized>();
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "Bittrade withdraw addresses response invalid.", ex);
+            return false;
         }
-
-        return entries
-            .Select(entry => new BittradeRetailBalanceEntryNormalized(
-                Currency: FreeText.Parse(entry.Currency),
-                Balance: ParseNullableDecimal(entry.Balance, "balance", "RawRetailAccountBalanceEntry"),
-                Available: ParseNullableDecimal(entry.Available, "available", "RawRetailAccountBalanceEntry"),
-                Frozen: ParseNullableDecimal(entry.Frozen, "frozen", "RawRetailAccountBalanceEntry")))
-            .ToList();
     }
 
     internal static bool TryNormalizeRetailBalances(

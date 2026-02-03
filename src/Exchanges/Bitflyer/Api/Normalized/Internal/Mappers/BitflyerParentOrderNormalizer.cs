@@ -8,12 +8,60 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Types;
 using RawPrivateDtos = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Dtos;
 using RawPrivateRequests = ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 using ExchangeApi.Primitives.ValueCommon.ClosedSet;
+using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 
 internal static class BitflyerParentOrderNormalizer
 {
-    public static IReadOnlyList<BitflyerParentOrderNormalized> NormalizeList(
+    public static bool TryNormalizeList(
+        IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> raw,
+        string? rawJson,
+        out IReadOnlyList<BitflyerParentOrderNormalized>? normalized,
+        out CallError? error)
+    {
+        if (raw is null)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "bitFlyer parent orders response is null.");
+            return false;
+        }
+
+        try
+        {
+            normalized = BuildList(raw, rawJson);
+            error = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "bitFlyer parent orders response invalid.", ex);
+            return false;
+        }
+    }
+
+    public static bool TryNormalizeDetail(
+        RawPrivateDtos.RawGetParentOrderResponse raw,
+        string? rawJson,
+        out BitflyerParentOrderDetailNormalized? normalized,
+        out CallError? error)
+    {
+        try
+        {
+            normalized = BuildDetail(raw, rawJson);
+            error = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "bitFlyer parent order response invalid.", ex);
+            return false;
+        }
+    }
+
+    private static IReadOnlyList<BitflyerParentOrderNormalized> BuildList(
         IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> raw,
         string? rawJson)
     {
@@ -23,7 +71,7 @@ internal static class BitflyerParentOrderNormalizer
             .ToArray();
     }
 
-    public static BitflyerParentOrderDetailNormalized NormalizeDetail(
+    private static BitflyerParentOrderDetailNormalized BuildDetail(
         RawPrivateDtos.RawGetParentOrderResponse raw,
         string? rawJson)
     {

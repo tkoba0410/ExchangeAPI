@@ -520,8 +520,15 @@ internal sealed class BitflyerNormalizedPrivateApi
             rawCall,
             callRequest,
             Component(BitflyerEndpointIds.GetParentOrders),
-            ok => MapResult<IReadOnlyList<BitflyerParentOrderNormalized>>.Ok(
-                BitflyerParentOrderNormalizer.NormalizeList(ok, rawCall.Meta.RawJson)));
+            ok =>
+            {
+                if (!BitflyerParentOrderNormalizer.TryNormalizeList(ok, rawCall.Meta.RawJson, out var normalized, out var error))
+                {
+                    return MapResult<IReadOnlyList<BitflyerParentOrderNormalized>>.Fail(error!);
+                }
+
+                return MapResult<IReadOnlyList<BitflyerParentOrderNormalized>>.Ok(normalized!);
+            });
     }
 
     public async Task<Call<PrivateRequests.GetParentOrderRequest, BitflyerParentOrderDetailNormalized>> GetParentOrderCallAsync(
@@ -543,8 +550,15 @@ internal sealed class BitflyerNormalizedPrivateApi
             rawCall,
             callRequest,
             Component(BitflyerEndpointIds.GetParentOrder),
-            ok => MapResult<BitflyerParentOrderDetailNormalized>.Ok(
-                BitflyerParentOrderNormalizer.NormalizeDetail(ok, rawCall.Meta.RawJson)));
+            ok =>
+            {
+                if (!BitflyerParentOrderNormalizer.TryNormalizeDetail(ok, rawCall.Meta.RawJson, out var normalized, out var error))
+                {
+                    return MapResult<BitflyerParentOrderDetailNormalized>.Fail(error!);
+                }
+
+                return MapResult<BitflyerParentOrderDetailNormalized>.Ok(normalized!);
+            });
     }
 
     public async Task<Call<PrivateRequests.GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(

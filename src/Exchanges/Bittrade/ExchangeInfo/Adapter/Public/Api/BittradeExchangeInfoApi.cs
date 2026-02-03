@@ -121,8 +121,17 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         }
     }
 
-    internal static string ToApiSymbol(ExchangeMarketInfo market) =>
-        BittradeSymbol.Normalize(market.ProductCode.Value);
+    internal static string ToApiSymbol(ExchangeMarketInfo market)
+    {
+        if (!BittradeSymbol.TryParse(market.ProductCode.Value, out var parsed))
+        {
+            throw new ArgumentException(
+                $"Bittrade symbol is invalid: '{market.ProductCode.Value}'. Expected lowercase alphanumeric like 'btcjpy'.",
+                nameof(market));
+        }
+
+        return parsed.Value;
+    }
 
     private static ExchangeInfoDto MapExchangeInfo(BittradeStaticExchangeInfo info)
     {
@@ -225,7 +234,14 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         var baseCurrency = symbol.BaseCurrency.Value;
         var quoteCurrency = symbol.QuoteCurrency.Value;
         var displaySymbol = $"{baseCurrency.ToUpperInvariant()}/{quoteCurrency.ToUpperInvariant()}";
-        var product = BittradeSymbol.Normalize(symbol.Symbol.Value);
+        if (!BittradeSymbol.TryParse(symbol.Symbol.Value, out var parsed))
+        {
+            throw new ArgumentException(
+                $"Bittrade symbol is invalid: '{symbol.Symbol.Value}'. Expected lowercase alphanumeric like 'btcjpy'.",
+                nameof(symbol));
+        }
+
+        var product = parsed.Value;
         var priceIncrement = Pow10(-symbol.PricePrecision);
         var sizeIncrement = Pow10(-symbol.AmountPrecision);
         var minSize = symbol.MinOrderAmount;

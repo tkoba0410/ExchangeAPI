@@ -41,9 +41,12 @@ public sealed class BitflyerParentOrderNormalizedTests
         var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>>(
             json,
             "Bitflyer.GetParentOrders");
-        var normalized = BitflyerParentOrderNormalizer.NormalizeList(raw, json);
+        var ok = BitflyerParentOrderNormalizer.TryNormalizeList(raw, json, out var normalized, out var error);
+        Assert.True(ok);
+        Assert.NotNull(normalized);
+        Assert.Null(error);
 
-        Assert.Single(normalized);
+        Assert.Single(normalized!);
         Assert.True(normalized[0].ParentOrderState.IsKnown);
         Assert.Equal(BitflyerParentOrderState.Completed, normalized[0].ParentOrderState.Known);
         Assert.Equal(JsonValueKind.Object, normalized[0].RawSnapshot.ValueKind);
@@ -75,9 +78,12 @@ public sealed class BitflyerParentOrderNormalizedTests
         var raw = BitflyerRawJson.DeserializeOrThrow<RawPrivateDtos.RawGetParentOrderResponse>(
             json,
             "Bitflyer.GetParentOrder");
-        var normalized = BitflyerParentOrderNormalizer.NormalizeDetail(raw, json);
+        var ok = BitflyerParentOrderNormalizer.TryNormalizeDetail(raw, json, out var normalized, out var error);
+        Assert.True(ok);
+        Assert.NotNull(normalized);
+        Assert.Null(error);
 
-        Assert.True(normalized.OrderMethod.IsKnown);
+        Assert.True(normalized!.OrderMethod.IsKnown);
         Assert.Equal(BitflyerOrderMethod.IfdOco, normalized.OrderMethod.Known);
         Assert.Single(normalized.Parameters);
         Assert.Equal(JsonValueKind.Object, normalized.RawSnapshot.ValueKind);

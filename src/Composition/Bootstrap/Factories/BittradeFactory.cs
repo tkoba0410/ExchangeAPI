@@ -56,7 +56,7 @@ public static class BittradeFactory
     private static IRequestSigner? CreateSigner(BittradeFactoryOptions settings, bool requireCredentials)
     {
         var credentials = settings.Credentials
-            ?? settings.CredentialProvider?.Get(settings.Exchange, settings.AccountId);
+            ?? settings.CredentialProvider?.Get(settings.AccountId);
 
         if (credentials is null)
         {

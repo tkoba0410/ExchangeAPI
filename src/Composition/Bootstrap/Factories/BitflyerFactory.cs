@@ -77,7 +77,7 @@ public static class BitflyerFactory
     private static IRequestSigner? CreateSigner(BitflyerFactoryOptions settings)
     {
         var credentials = settings.Credentials
-            ?? settings.CredentialProvider?.Get(settings.Exchange, settings.AccountId);
+            ?? settings.CredentialProvider?.Get(settings.AccountId);
 
         if (credentials is null)
         {

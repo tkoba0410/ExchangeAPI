@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using ExchangeApi.Application.Errors;
 using ExchangeApi.Application.Interfaces;
 using ExchangeApi.Application.Trading;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Application.UseCases;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
@@ -145,7 +145,7 @@ public sealed class OrderPollingTests
             var error = new CallError(
                 CallErrorKind.Semantic,
                 "Order not found.",
-                new OrderNotFoundException(ExchangeCode.Sandbox, "GetOrder", request.Symbol, request.OrderKey));
+                new OrderNotFoundException("GetOrder", request.Symbol, request.OrderKey));
             return Task.FromResult(new Call<GetOrderQuery, OrderStatusSnapshot>(
                 CallId.New(),
                 now,

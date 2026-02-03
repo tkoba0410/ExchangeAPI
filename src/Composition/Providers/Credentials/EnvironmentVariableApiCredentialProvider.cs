@@ -1,8 +1,6 @@
 using System;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Composition.Dtos;
-using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Composition.Providers.Credentials;
 
 /// <summary>
@@ -11,20 +9,26 @@ namespace ExchangeApi.Composition.Providers.Credentials;
 /// </summary>
 public sealed class EnvironmentVariableApiCredentialProvider : IApiCredentialProvider
 {
-    public ApiCredentials Get(ExchangeCode exchange, string accountId)
+    private readonly string _exchangeId;
+
+    public EnvironmentVariableApiCredentialProvider(string exchangeId)
     {
-        if (exchange is ExchangeCode.None or ExchangeCode.Unknown)
+        if (string.IsNullOrWhiteSpace(exchangeId))
         {
-            throw new ArgumentException("ExchangeCode is required.", nameof(exchange));
+            throw new ArgumentException("ExchangeId is required.", nameof(exchangeId));
         }
 
+        _exchangeId = exchangeId;
+    }
+
+    public ApiCredentials Get(string accountId)
+    {
         if (string.IsNullOrWhiteSpace(accountId))
         {
             throw new ArgumentException("AccountId is required.", nameof(accountId));
         }
 
-        var exchangeId = ExchangeCodeFormatter.ToCanonicalId(exchange);
-        var prefix = $"{Normalize(exchangeId)}_{Normalize(accountId)}";
+        var prefix = $"{Normalize(_exchangeId)}_{Normalize(accountId)}";
         var apiKeyName = $"{prefix}_API_KEY";
         var apiSecretName = $"{prefix}_API_SECRET";
 

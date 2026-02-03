@@ -2,7 +2,6 @@ using System;
 using System.Net.Http;
 using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Abstractions;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
@@ -20,8 +19,6 @@ public sealed class BittradeFactoryOptions
 
     /// <summary>CredentialProvider を使う場合に設定。</summary>
     public IApiCredentialProvider? CredentialProvider { get; init; }
-
-    public ExchangeCode Exchange { get; init; } = ExchangeCode.Bittrade;
 
     /// <summary>Bittrade API で利用する account-id。既定は "default"。</summary>
     public string AccountId { get; init; } = "default";

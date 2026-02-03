@@ -2,7 +2,6 @@ using System;
 using System.Net.Http;
 using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Abstractions;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
@@ -21,8 +20,6 @@ public sealed class BitflyerFactoryOptions
 
     /// <summary>環境変数などから資格情報を引く場合に利用。</summary>
     public IApiCredentialProvider? CredentialProvider { get; init; }
-
-    public ExchangeCode Exchange { get; init; } = ExchangeCode.Bitflyer;
 
     public string AccountId { get; init; } = "default";
 

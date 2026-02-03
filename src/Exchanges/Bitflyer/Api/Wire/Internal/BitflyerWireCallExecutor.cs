@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Wire.Internal;
@@ -26,5 +25,5 @@ public sealed class BitflyerWireCallExecutor : IBitflyerWireCallExecutor
     public Task<Call<WireCallSpec, WireResponse>> SendAsync(
         WireCallSpec spec,
         CancellationToken cancellationToken = default) =>
-        _wire.SendAsync(ExchangeCode.Bitflyer, spec, cancellationToken);
+        _wire.SendAsync(spec, cancellationToken);
 }

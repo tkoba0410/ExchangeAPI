@@ -36,7 +36,6 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
 
     internal BitflyerExchangeClient(
         IBitflyerNormalizedApi normalized,
-        ExchangeCode exchangeCode = ExchangeCode.Bitflyer,
         object? rawBundle = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));

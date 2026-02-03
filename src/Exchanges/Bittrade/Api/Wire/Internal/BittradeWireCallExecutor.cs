@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Wire.Internal;
@@ -26,5 +25,5 @@ public sealed class BittradeWireCallExecutor : IBittradeWireCallExecutor
     public Task<Call<WireCallSpec, WireResponse>> SendAsync(
         WireCallSpec spec,
         CancellationToken cancellationToken = default) =>
-        _wire.SendAsync(ExchangeCode.Bittrade, spec, cancellationToken);
+        _wire.SendAsync(spec, cancellationToken);
 }

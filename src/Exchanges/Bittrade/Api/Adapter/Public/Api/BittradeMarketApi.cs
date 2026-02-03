@@ -10,7 +10,6 @@ using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Mappers;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Primitives.Errors;
@@ -28,7 +27,6 @@ internal sealed class MarketApi
 {
     private readonly BittradeNormalizedPublicApi _marketData;
     private readonly IExchangeMarketResolver _markets;
-    private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
     public MarketApi(BittradeNormalizedPublicApi marketData, IExchangeMarketResolver markets)
     {

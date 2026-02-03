@@ -9,7 +9,6 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
@@ -26,7 +25,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;
 internal sealed class BittradeAccountApi
 {
     private readonly BittradeNormalizedPrivateApi _account;
-    private const ExchangeCode Exchange = ExchangeCode.Bittrade;
 
     public BittradeAccountApi(BittradeNormalizedPrivateApi account)
     {

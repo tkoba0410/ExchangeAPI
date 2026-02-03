@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Primitives.CallCommon;
 
@@ -25,7 +24,6 @@ public sealed class WireTransport : IWireTransport
     /// Call を生成して返す。RequestId が取得できる場合は Meta に設定する。
     /// </summary>
     public async Task<Call<WireCallSpec, WireResponse>> SendAsync(
-        ExchangeCode exchange,
         WireCallSpec request,
         CancellationToken ct = default)
     {
@@ -43,7 +41,6 @@ public sealed class WireTransport : IWireTransport
                 ? null
                 : new Dictionary<string, string>(responseMeta.Headers, StringComparer.OrdinalIgnoreCase);
             var response = new WireResponse(
-                Exchange: exchange,
                 StatusCode: responseMeta.StatusCode,
                 Json: responseMeta.Body ?? string.Empty,
                 Headers: headers,
@@ -51,7 +48,7 @@ public sealed class WireTransport : IWireTransport
                 ElapsedMs: (long)elapsed.TotalMilliseconds);
             var meta = new CallMeta(
                 Layer: "Wire",
-                Component: $"{exchange}.SendRawAsync",
+                Component: "Wire.SendRawAsync",
                 EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null)
@@ -73,7 +70,7 @@ public sealed class WireTransport : IWireTransport
             var error = new CallError(CallErrorKind.Transport, "Wire transport canceled.");
             var meta = new CallMeta(
                 Layer: "Wire",
-                Component: $"{exchange}.SendRawAsync",
+                Component: "Wire.SendRawAsync",
                 EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null);
@@ -91,7 +88,7 @@ public sealed class WireTransport : IWireTransport
             var error = new CallError(CallErrorKind.Transport, "Wire transport failed.", ex);
             var meta = new CallMeta(
                 Layer: "Wire",
-                Component: $"{exchange}.SendRawAsync",
+                Component: "Wire.SendRawAsync",
                 EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null);

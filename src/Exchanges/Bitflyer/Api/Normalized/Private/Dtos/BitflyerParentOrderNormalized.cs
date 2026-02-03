@@ -26,7 +26,7 @@ public sealed record BitflyerParentOrderNormalized(
     Size ExecutedSize,
     decimal TotalCommission,
     JsonElement RawSnapshot,
-    IReadOnlyDictionary<string, JsonElement> Extras) : ILosslessNormalized;
+    IReadOnlyDictionary<FreeText, JsonElement> Extras) : ILosslessNormalized;
 
 public sealed record BitflyerParentOrderDetailNormalized(
     long Id,
@@ -37,7 +37,7 @@ public sealed record BitflyerParentOrderDetailNormalized(
     IReadOnlyList<BitflyerParentOrderParameterNormalized> Parameters,
     AcceptanceId ParentOrderAcceptanceId,
     JsonElement RawSnapshot,
-    IReadOnlyDictionary<string, JsonElement> Extras) : ILosslessNormalized;
+    IReadOnlyDictionary<FreeText, JsonElement> Extras) : ILosslessNormalized;
 
 public sealed record BitflyerParentOrderParameterNormalized(
     ProductCode ProductCode,

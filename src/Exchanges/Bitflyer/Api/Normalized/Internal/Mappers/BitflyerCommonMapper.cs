@@ -8,30 +8,6 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 
 internal static class BitflyerCommonMapper
 {
-    public static ContractSide MapSide(string side) =>
-        BitflyerSideMapper.ToContractSide(BitflyerSideMapper.ToExchangeSide(side));
-
-    public static ContractSide MapSide(BitflyerSide side) =>
-        BitflyerSideMapper.ToContractSide(side);
-
-    public static string MapSideToExchange(ContractSide side) =>
-        BitflyerSideMapper.ToApi(BitflyerSideMapper.FromContractSide(side));
-
-    public static string ToApiProductCode(string productCode) =>
-        string.IsNullOrWhiteSpace(productCode)
-            ? throw new InvalidOperationException($"SymbolNotSupported:{productCode ?? string.Empty}")
-            : productCode;
-
-    public static string ParseProductCode(string productCode)
-    {
-        if (string.IsNullOrWhiteSpace(productCode))
-        {
-            throw new InvalidOperationException($"SymbolNotSupported:{productCode ?? string.Empty}");
-        }
-
-        return productCode;
-    }
-
     public static OrderState MapOrderStatus(string childOrderStatusState) =>
         (childOrderStatusState ?? string.Empty).ToUpperInvariant() switch
         {

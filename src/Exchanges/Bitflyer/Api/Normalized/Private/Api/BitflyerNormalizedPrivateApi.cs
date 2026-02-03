@@ -572,7 +572,15 @@ internal sealed class BitflyerNormalizedPrivateApi
             rawCall,
             request,
             "Bitflyer.GetBalances",
-            raw => MapResult<IReadOnlyList<BitflyerBalanceEntryNormalized>>.Ok(BitflyerAccountMapper.MapBalances(raw)));
+            raw =>
+            {
+                if (!BitflyerAccountMapper.TryMapBalances(raw, out var balances, out var mapError))
+                {
+                    return MapResult<IReadOnlyList<BitflyerBalanceEntryNormalized>>.Fail(mapError!);
+                }
+
+                return MapResult<IReadOnlyList<BitflyerBalanceEntryNormalized>>.Ok(balances!);
+            });
     }
 
     public async Task<Call<PrivateRequests.GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(

@@ -67,6 +67,6 @@ internal static class BitflyerTickerNormalizer
             LastTradedPrice: wire.LastTradedPrice,
             Timestamp: wire.Timestamp,
             RawSnapshot: snapshot,
-            Extras: new Dictionary<string, JsonElement>());
+            Extras: new Dictionary<FreeText, JsonElement>());
     }
 }

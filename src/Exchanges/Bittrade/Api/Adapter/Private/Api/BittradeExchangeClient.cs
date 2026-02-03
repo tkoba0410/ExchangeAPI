@@ -55,6 +55,10 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         {
             throw new InvalidOperationException("BittradeApiBundle.AccountId is required to create BittradeExchangeClient.");
         }
+        if (bundle.Private is null)
+        {
+            throw new InvalidOperationException("BittradeApiBundle.Private is required to create BittradeExchangeClient.");
+        }
 
         _marketApi = new MarketApi(bundle.Public, bundle.Markets);
         _tradingApi = new BittradeTradingApi(bundle.Private);

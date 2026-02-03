@@ -12,12 +12,16 @@ internal static class BittradeNormalizedComponentFactory
     public static BittradeNormalizedComponents FromRaw(
         IBittradeRawApi raw,
         Func<BittradeNormalizedPublicApi, IBittradeMarketResolver> marketResolverFactory,
-        FreeText? accountId = null)
+        FreeText accountId)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
         if (marketResolverFactory is null) throw new ArgumentNullException(nameof(marketResolverFactory));
+        if (accountId.IsEmpty)
+        {
+            throw new ArgumentException("accountId is required.", nameof(accountId));
+        }
 
-        var normalizedAccountId = accountId is null || accountId.Value.IsEmpty ? null : accountId;
+        var normalizedAccountId = accountId;
         var publicApi = new BittradeNormalizedPublicApi(raw);
         var markets = marketResolverFactory(publicApi);
         var privateApi = new BittradeNormalizedPrivateApi(raw, markets, normalizedAccountId);

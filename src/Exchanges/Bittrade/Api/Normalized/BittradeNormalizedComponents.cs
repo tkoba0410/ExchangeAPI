@@ -8,15 +8,15 @@ internal sealed class BittradeNormalizedComponents
 {
     public BittradeNormalizedPublicApi Public { get; }
     public BittradeNormalizedPrivateApi Private { get; }
-    public FreeText? AccountId { get; }
+    public FreeText AccountId { get; }
 
     public BittradeNormalizedComponents(
         BittradeNormalizedPublicApi publicApi,
         BittradeNormalizedPrivateApi privateApi,
-        FreeText? accountId)
+        FreeText accountId)
     {
         Public = publicApi;
         Private = privateApi;
-        AccountId = accountId is null || accountId.Value.IsEmpty ? null : accountId;
+        AccountId = accountId;
     }
 }

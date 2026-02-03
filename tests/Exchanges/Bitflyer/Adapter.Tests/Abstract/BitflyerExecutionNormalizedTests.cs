@@ -11,7 +11,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 public sealed class BitflyerExecutionNormalizedTests
 {
     [Fact]
-    public void NormalizeList_keeps_raw_snapshot()
+    public void TryNormalizeList_keeps_raw_snapshot()
     {
         var json = """
         [
@@ -30,10 +30,11 @@ public sealed class BitflyerExecutionNormalizedTests
         var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPublicDtos.ExecutionPublicResponse>>(
             json,
             "Bitflyer.GetExecutions");
-        var normalized = BitflyerExecutionNormalizer.NormalizeList(raw, json);
+        Assert.True(BitflyerExecutionNormalizer.TryNormalizeList(raw, json, out var normalized, out var error));
+        Assert.Null(error);
 
-        Assert.Single(normalized);
-        Assert.Equal(JsonValueKind.Object, normalized[0].RawSnapshot.ValueKind);
-        Assert.True(normalized[0].RawSnapshot.TryGetProperty("product_code", out _));
+        Assert.Single(normalized!);
+        Assert.Equal(JsonValueKind.Object, normalized![0].RawSnapshot.ValueKind);
+        Assert.True(normalized![0].RawSnapshot.TryGetProperty("product_code", out _));
     }
 }

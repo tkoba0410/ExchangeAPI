@@ -22,7 +22,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;
 internal sealed class BittradeApiBundle
 {
     public BittradeNormalizedPublicApi Public { get; }
-    public BittradeNormalizedPrivateApi Private { get; }
+    public BittradeNormalizedPrivateApi? Private { get; }
     public IExchangeInfoProvider ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
     public IRestClient RestClient { get; }
@@ -30,14 +30,14 @@ internal sealed class BittradeApiBundle
 
     public BittradeApiBundle(
         BittradeNormalizedPublicApi publicApi,
-        BittradeNormalizedPrivateApi privateApi,
+        BittradeNormalizedPrivateApi? privateApi,
         IExchangeInfoProvider exchangeInfo,
         IExchangeMarketResolver markets,
         IRestClient restClient,
         FreeText? accountId = null)
     {
         Public = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
-        Private = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
+        Private = privateApi;
         ExchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
         Markets = markets ?? throw new ArgumentNullException(nameof(markets));
         RestClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
@@ -47,11 +47,27 @@ internal sealed class BittradeApiBundle
     public static BittradeApiBundle FromRestClient(IRestClient restClient, string? accountId = null)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        var normalizedAccountId = FreeText.TryParse(accountId, out var parsed) ? parsed : (FreeText?)null;
+        var hasAccountId = !string.IsNullOrWhiteSpace(accountId);
 
         var wireTransport = new WireTransport(restClient);
         var wire = new BittradeWireCallExecutor(wireTransport);
         var raw = new BittradeRawApi(wire);
+
+        if (!hasAccountId)
+        {
+            var publicApi = new BittradeNormalizedPublicApi(raw);
+            var exchangeInfo = new BittradeExchangeInfoApi(publicApi);
+            var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+            return new BittradeApiBundle(
+                publicApi: publicApi,
+                privateApi: null,
+                exchangeInfo: exchangeInfo,
+                markets: markets,
+                restClient: restClient,
+                accountId: null);
+        }
+
+        var normalizedAccountId = FreeText.ParseOrThrow(accountId);
         var components = BittradeNormalizedComponentFactory.FromRaw(
             raw,
             exchangeInfo =>
@@ -62,14 +78,14 @@ internal sealed class BittradeApiBundle
             },
             normalizedAccountId);
 
-        var exchangeInfo = new BittradeExchangeInfoApi(components.Public);
-        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+        var exchangeInfoFull = new BittradeExchangeInfoApi(components.Public);
+        var marketsFull = new ExchangeInfoMarketResolver(exchangeInfoFull);
         var privateApi = components.Private;
         return new BittradeApiBundle(
             publicApi: components.Public,
             privateApi: privateApi,
-            exchangeInfo: exchangeInfo,
-            markets: markets,
+            exchangeInfo: exchangeInfoFull,
+            markets: marketsFull,
             restClient: restClient,
             accountId: normalizedAccountId);
     }

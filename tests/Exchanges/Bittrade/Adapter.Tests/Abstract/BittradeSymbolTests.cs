@@ -1,4 +1,3 @@
-using System;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
 using Xunit;
 
@@ -21,18 +20,9 @@ public sealed class BittradeSymbolTests
     }
 
     [Fact]
-    public void ParseOrThrow_throws_with_clear_message()
-    {
-        var ex = Assert.Throws<ArgumentException>(() => BittradeSymbol.ParseOrThrow("btc-jpy"));
-        Assert.Contains("Bittrade symbol is invalid", ex.Message, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void Normalize_returns_value_accepted_by_ParseOrThrow()
+    public void Normalize_returns_normalized_value()
     {
         Assert.True(BittradeSymbol.TryParse("BTC_JPY", out var normalized));
-        var parsed = BittradeSymbol.ParseOrThrow(normalized.Value);
-
-        Assert.Equal("btcjpy", parsed.ToString());
+        Assert.Equal("btcjpy", normalized.ToString());
     }
 }

@@ -11,4 +11,4 @@ public sealed record BitflyerTickerNormalized(
     decimal LastTradedPrice,
     DateTimeOffset Timestamp,
     JsonElement RawSnapshot,
-    IReadOnlyDictionary<string, JsonElement> Extras) : ILosslessNormalized;
+    IReadOnlyDictionary<FreeText, JsonElement> Extras) : ILosslessNormalized;

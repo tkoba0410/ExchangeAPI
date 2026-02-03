@@ -65,6 +65,10 @@ Contracts の公開 API は Public / Private に分離する。
   * Composition により **自動的に前提条件を満たす**（利用者に追加入力を要求しない）
   * **別 API として明示的に分離する**（同名 API のまま成功可否が分かれる状態を禁止）
 
+例:
+Bittrade の Private API で accountId が必要な場合は、Composition で accountId を必須注入し、
+Normalized/Adapter で `NotSupported` を返す通常制御を行わない。
+
 ---
 
 ### 3.3 戻り値・失敗表現

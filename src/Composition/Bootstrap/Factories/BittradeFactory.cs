@@ -19,14 +19,18 @@ public static class BittradeFactory
     public static IExchangeClient CreateClient(BittradeFactoryOptions? options = null)
     {
         var settings = options ?? new BittradeFactoryOptions();
-        // 認証や AccountId が無い場合は PublicClient を返し、未対応 capability は null とする。
-        var hasAccountId = !string.IsNullOrWhiteSpace(settings.AccountId);
         var signer = settings.RequestSigner ?? CreateSigner(settings, requireCredentials: false);
         var restClient = CreateRestClient(settings, signer);
 
-        if (!hasAccountId || signer is null)
+        // 認証が無い場合は PublicClient を返す（Private capability は提供しない）。
+        if (signer is null)
         {
             return new BittradePublicClient(restClient);
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.AccountId))
+        {
+            throw new InvalidOperationException("Bittrade accountId is required to create a private client.");
         }
 
         var bundle = BittradeApiBundle.FromRestClient(restClient, settings.AccountId);

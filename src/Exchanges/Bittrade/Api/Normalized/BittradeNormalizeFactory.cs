@@ -11,7 +11,7 @@ internal static class BittradeNormalizeFactory
     public static BittradeNormalizedApi FromRaw(
         IBittradeRawApi raw,
         IBittradeMarketResolver markets,
-        FreeText? accountId = null)
+        FreeText accountId)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
         if (markets is null) throw new ArgumentNullException(nameof(markets));

@@ -44,11 +44,15 @@ internal static class MarketMapper
     public static ExecutionMarket MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
+        if (!BitflyerCommonMapper.TryMapSide(normalized.Side, out var side, out var error))
+        {
+            throw new ExchangeApiException(error?.Message ?? "bitFlyer side mapping failed.");
+        }
 
         return new ExecutionMarket(
             Symbol: symbol,
             OrderId: OrderId.ParseOrThrow(normalized.Id.ToString(System.Globalization.CultureInfo.InvariantCulture)),
-            Side: BitflyerCommonMapper.MapSide(normalized.Side),
+            Side: side,
             Price: new Price(normalized.Price),
             Size: new Size(normalized.Size),
             ExecutedAt: normalized.ExecutedAt);

@@ -28,13 +28,4 @@ internal static class BittradeOrderSideParser
         return false;
     }
 
-    public static BittradeOrderSide ParseOrThrow(string? value, string context)
-    {
-        if (TryParse(value, out var side))
-        {
-            return side;
-        }
-
-        throw new ArgumentException($"Unsupported {context} side: {value ?? "<null>"}.", nameof(value));
-    }
 }

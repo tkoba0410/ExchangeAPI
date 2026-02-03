@@ -15,4 +15,4 @@ public sealed record BitflyerExecutionNormalized(
     DateTimeOffset ExecutedAt,
     AcceptanceId? ChildOrderAcceptanceId,
     JsonElement RawSnapshot,
-    IReadOnlyDictionary<string, JsonElement> Extras) : ILosslessNormalized;
+    IReadOnlyDictionary<FreeText, JsonElement> Extras) : ILosslessNormalized;

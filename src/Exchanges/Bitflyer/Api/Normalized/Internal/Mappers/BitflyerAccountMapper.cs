@@ -13,37 +13,26 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 
 internal static class BitflyerAccountMapper
 {
-    public static IReadOnlyList<BitflyerBalanceEntryNormalized> MapBalances(
-        IReadOnlyList<RawPrivateDtos.BalanceResponse> rawBalances)
+    public static bool TryMapBalances(
+        IReadOnlyList<RawPrivateDtos.BalanceResponse> rawBalances,
+        out IReadOnlyList<BitflyerBalanceEntryNormalized>? normalized,
+        out CallError? error)
     {
-        if (rawBalances is null) throw new ArgumentNullException(nameof(rawBalances));
+        if (rawBalances is null)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "bitFlyer balances response is null.");
+            return false;
+        }
 
-        return rawBalances
+        normalized = rawBalances
             .Select(b => new BitflyerBalanceEntryNormalized(
                 CurrencyCode: CurrencyCodeConverter.FromString(b.CurrencyCode),
                 Amount: b.Amount,
                 Available: b.Available))
             .ToArray();
-    }
-
-    public static IReadOnlyList<BitflyerExecutionAccountNormalized> MapAccountExecutions(
-        Symbol symbol,
-        IReadOnlyList<RawPrivateDtos.ExecutionPrivateResponse> rawExecutions)
-    {
-        if (rawExecutions is null) throw new ArgumentNullException(nameof(rawExecutions));
-
-        return rawExecutions
-            .Select(e => new BitflyerExecutionAccountNormalized(
-                Symbol: symbol,
-                OrderId: new OrderId(e.Id.ToString(CultureInfo.InvariantCulture)),
-                Side: BitflyerCommonMapper.MapSide(e.Side),
-                Price: new Price(e.Price),
-                Size: new Size(e.Size),
-                ExecutedAt: e.ExecDate,
-                Commission: null,
-                Pnl: null,
-                Liquidity: null))
-            .ToArray();
+        error = null;
+        return true;
     }
 
     public static bool TryMapAccountExecutions(

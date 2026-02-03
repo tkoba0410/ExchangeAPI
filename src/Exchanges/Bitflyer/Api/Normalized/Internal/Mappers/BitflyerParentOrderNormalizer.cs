@@ -89,7 +89,7 @@ internal static class BitflyerParentOrderNormalizer
             Parameters: parameters,
             ParentOrderAcceptanceId: AcceptanceId.Parse(raw.ParentOrderAcceptanceId),
             RawSnapshot: snapshot,
-            Extras: new Dictionary<string, JsonElement>());
+            Extras: new Dictionary<FreeText, JsonElement>());
     }
 
     private static BitflyerParentOrderNormalized NormalizeSummary(
@@ -114,7 +114,7 @@ internal static class BitflyerParentOrderNormalizer
             ExecutedSize: new Size(raw.ExecutedSize),
             TotalCommission: raw.TotalCommission,
             RawSnapshot: snapshot,
-            Extras: new Dictionary<string, JsonElement>());
+            Extras: new Dictionary<FreeText, JsonElement>());
     }
 
     private static BitflyerParentOrderParameterNormalized NormalizeParameter(RawPrivateDtos.ParentOrderParameterResponse raw)

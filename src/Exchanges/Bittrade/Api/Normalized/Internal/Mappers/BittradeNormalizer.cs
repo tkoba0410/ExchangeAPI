@@ -46,7 +46,7 @@ internal static class BittradeNormalizer
             tick.Close,
             timestamp,
             snapshot,
-            new Dictionary<string, JsonElement>());
+            new Dictionary<FreeText, JsonElement>());
         error = null;
         return true;
     }
@@ -83,7 +83,7 @@ internal static class BittradeNormalizer
                 entry.Amount,
                 entry.Ts,
                 snapshots[i],
-                new Dictionary<string, JsonElement>()));
+                new Dictionary<FreeText, JsonElement>()));
         }
 
         normalized = mapped;
@@ -223,7 +223,7 @@ internal static class BittradeNormalizer
                 entry.Close,
                 now,
                 ExtractSnapshot(Serialize(entry)),
-                new Dictionary<string, JsonElement>()))
+                new Dictionary<FreeText, JsonElement>()))
             .ToList();
     }
 
@@ -428,28 +428,6 @@ internal static class BittradeNormalizer
         return true;
     }
 
-    private static IReadOnlyList<BittradeOrderBookLevelNormalized> NormalizeLevels(
-        IReadOnlyList<IReadOnlyList<decimal>>? levels,
-        string field)
-    {
-        if (levels is null)
-        {
-            throw new InvalidOperationException($"Bittrade order book missing {field}.");
-        }
-
-        return levels.Select(level => NormalizeLevel(level, field)).ToList();
-    }
-
-    private static BittradeOrderBookLevelNormalized NormalizeLevel(IReadOnlyList<decimal> level, string field)
-    {
-        if (level.Count < 2)
-        {
-            throw new InvalidOperationException($"Bittrade order book {field} level is invalid.");
-        }
-
-        return new BittradeOrderBookLevelNormalized(level[0], level[1]);
-    }
-
     private static bool TryNormalizeLevels(
         IReadOnlyList<IReadOnlyList<decimal>>? levels,
         string field,
@@ -479,46 +457,6 @@ internal static class BittradeNormalizer
         normalized = mapped;
         error = null;
         return true;
-    }
-
-    private static decimal ParseDecimalFlexible(string? value, string field)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new InvalidOperationException($"RawSymbolInfo.{field} is empty.");
-        }
-
-        return ParseDecimalOrThrow(value, field, "RawSymbolInfo");
-    }
-
-    private static decimal? ParseNullableDecimalFlexible(string? value, string field)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return null;
-        }
-
-        return ParseDecimalOrThrow(value, field, "RawSymbolInfo");
-    }
-
-    private static decimal ParseDecimalOrThrow(string s, string field, string dto)
-    {
-        if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
-        {
-            return value;
-        }
-
-        throw new InvalidOperationException($"Invalid decimal for {dto}.{field}: '{s}'.");
-    }
-
-    private static decimal? ParseNullableDecimal(string? value, string field, string dto)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return null;
-        }
-
-        return ParseDecimalOrThrow(value, field, dto);
     }
 
     private static IReadOnlyList<JsonElement> ExtractTradeSnapshots(
@@ -596,18 +534,6 @@ internal static class BittradeNormalizer
 
     private static FreeText? ParseOptional(string? value) =>
         FreeText.TryParse(value, out var text) ? text : null;
-
-    private static BittradeOrderSide MapSide(string? direction)
-    {
-        try
-        {
-            return BittradeOrderSideParser.ParseOrThrow(direction, "trade");
-        }
-        catch (ArgumentException ex)
-        {
-            throw new InvalidOperationException(ex.Message);
-        }
-    }
 
     private static bool TryParseDecimalFlexible(
         string? value,

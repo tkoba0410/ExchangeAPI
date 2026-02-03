@@ -11,7 +11,6 @@ using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Markets;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.NotSupported;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
@@ -27,34 +26,30 @@ internal sealed class BittradeNormalizedPrivateApi
 {
     private readonly IBittradeRawApi _trading;
     private readonly IBittradeMarketResolver _markets;
-    private readonly FreeText? _accountId;
+    private readonly FreeText _accountId;
 
     public BittradeNormalizedPrivateApi(
         IBittradeRawApi trading,
         IBittradeMarketResolver markets,
-        FreeText? accountId)
+        FreeText accountId)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
-        _accountId = accountId is null || accountId.Value.IsEmpty ? null : accountId;
+        if (accountId.IsEmpty)
+        {
+            throw new ArgumentException("accountId is required.", nameof(accountId));
+        }
+
+        _accountId = accountId;
     }
 
     public async Task<Call<NormalizedRequests.GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default)
     {
-        if (!HasAccountId)
-        {
-            return BittradeNotSupportedNormalizedCalls.Create<
-                NormalizedRequests.GetBalancesRequest,
-                IReadOnlyList<BittradeBalanceEntryNormalized>>(
-                new NormalizedRequests.GetBalancesRequest(FreeText.Empty),
-                "AccountIdRequired");
-        }
-
         var rawCall = await _trading
-            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountBalanceRequest(new AccountId(_accountId!.Value.Value)), ct)
+            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountBalanceRequest(new AccountId(_accountId.Value)), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetBalancesRequest(_accountId!.Value);
+        var request = new NormalizedRequests.GetBalancesRequest(_accountId);
 
         return CreateCall(
             rawCall,
@@ -205,11 +200,6 @@ internal sealed class BittradeNormalizedPrivateApi
         CancellationToken ct = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        if (!HasAccountId)
-        {
-            return AccountIdMissing<NormalizedRequests.PostOrdersPlaceRequest, BittradeOrderResult>(request);
-        }
-
         var callRequest = request;
         var marketCall = await _markets.ResolveCallAsync(request.Request.Symbol, ct).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
@@ -221,7 +211,7 @@ internal sealed class BittradeNormalizedPrivateApi
                 marketError!);
         }
 
-        if (!BittradeTradingMapper.TryToRaw(new AccountId(_accountId!.Value.Value), new Symbol(apiSymbol!), request.Request, out var rawRequest, out var mapError))
+        if (!BittradeTradingMapper.TryToRaw(new AccountId(_accountId.Value), new Symbol(apiSymbol!), request.Request, out var rawRequest, out var mapError))
         {
             return CreateImmediateError<NormalizedRequests.PostOrdersPlaceRequest, BittradeOrderResult>(
                 callRequest,
@@ -328,11 +318,6 @@ internal sealed class BittradeNormalizedPrivateApi
         CancellationToken ct = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        if (!HasAccountId)
-        {
-            return AccountIdMissing<NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest, BittradeCancelResult>(request);
-        }
-
         string? apiSymbol = null;
         if (request.Symbol is { IsEmpty: false })
         {
@@ -348,7 +333,7 @@ internal sealed class BittradeNormalizedPrivateApi
         }
 
         var rawRequest = new RawPrivateRequests.RawCancelOpenOrdersRequest(
-            AccountId: new AccountId(_accountId!.Value.Value),
+            AccountId: new AccountId(_accountId.Value),
             Symbol: apiSymbol is null ? null : new Symbol(apiSymbol),
             Side: request.Side is null
                 ? null
@@ -378,10 +363,6 @@ internal sealed class BittradeNormalizedPrivateApi
         CancellationToken ct = default)
     {
         var callRequest = new NormalizedRequests.GetOpenOrdersRequest(symbol);
-        if (!HasAccountId)
-        {
-            return AccountIdMissing<NormalizedRequests.GetOpenOrdersRequest, IReadOnlyList<BittradeOpenOrder>>(callRequest);
-        }
         var marketCall = await _markets.ResolveCallAsync(symbol, ct).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
         {
@@ -393,7 +374,7 @@ internal sealed class BittradeNormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(new Symbol(apiSymbol!), new AccountId(_accountId!.Value.Value)), ct)
+            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(new Symbol(apiSymbol!), new AccountId(_accountId.Value)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -985,11 +966,6 @@ internal sealed class BittradeNormalizedPrivateApi
         public static MapResult<TOk> Ok(TOk value) => new(value, null);
         public static MapResult<TOk> Fail(CallError error) => new(default, error);
     }
-
-    private bool HasAccountId => _accountId is { IsEmpty: false };
-
-    private static Call<TReq, TOk> AccountIdMissing<TReq, TOk>(TReq request) =>
-        BittradeNotSupportedNormalizedCalls.Create<TReq, TOk>(request, "AccountIdRequired");
 
     private static string Component(string endpointId) => $"Bittrade.{endpointId}";
 }

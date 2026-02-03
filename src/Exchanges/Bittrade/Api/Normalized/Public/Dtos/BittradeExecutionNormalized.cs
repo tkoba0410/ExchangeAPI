@@ -14,4 +14,4 @@ public sealed record BittradeExecutionNormalized(
     decimal Size,
     DateTimeOffset Timestamp,
     JsonElement RawSnapshot,
-    IReadOnlyDictionary<string, JsonElement> Extras) : ILosslessNormalized;
+    IReadOnlyDictionary<FreeText, JsonElement> Extras) : ILosslessNormalized;

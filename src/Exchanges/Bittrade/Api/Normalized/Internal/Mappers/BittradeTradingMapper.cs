@@ -66,31 +66,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static RawPrivateRequests.RawCreateOrderRequest ToRaw(AccountId accountId, Symbol apiSymbol, BittradeOrderRequest request)
-    {
-        if (accountId.IsEmpty)
-        {
-            throw new ArgumentException("accountId is required.", nameof(accountId));
-        }
-
-        if (apiSymbol.IsEmpty)
-        {
-            throw new ArgumentException("apiSymbol is required.", nameof(apiSymbol));
-        }
-
-        var type = ToRawOrderType(MapOrderType(request.Side, request.OrderType));
-        var price = request.Price?.Value;
-        var size = FormatDecimal(request.Size.Value);
-
-        return new RawPrivateRequests.RawCreateOrderRequest(
-            AccountId: accountId,
-            Symbol: apiSymbol,
-            Type: new FreeText(type),
-            Amount: new FreeText(size),
-            Price: price is null ? null : new FreeText(FormatDecimal(price.Value)),
-            Source: null);
-    }
-
     public static BittradeOrderResult ToOrderResult(RawPrivateDtos.RawPlaceOrderResponse raw)
     {
         var orderId = raw.OrderId;
@@ -287,7 +262,7 @@ internal static class BittradeTradingMapper
                 Size: entry.FilledAmount,
                 Timestamp: entry.CreatedAt,
                 RawSnapshot: snapshots[i],
-                Extras: new Dictionary<string, JsonElement>()));
+                Extras: new Dictionary<FreeText, JsonElement>()));
         }
 
         normalized = mapped;
@@ -498,11 +473,6 @@ internal static class BittradeTradingMapper
     private static string Serialize<T>(T value) =>
         JsonSerializer.Serialize(value, SerializerOptions);
 
-    private static BittradeOrderSide MapSide(string? side)
-    {
-        return BittradeOrderSideParser.ParseOrThrow(side, "execution");
-    }
-
     private static bool TryMapExecutionSide(string? side, out BittradeOrderSide parsed, out CallError? error)
     {
         if (!BittradeOrderSideParser.TryParse(side, out parsed))
@@ -513,18 +483,6 @@ internal static class BittradeTradingMapper
 
         error = null;
         return true;
-    }
-
-    private static BittradeOrderType MapOrderType(Side side, OrderType type)
-    {
-        return (side, type) switch
-        {
-            (Side.Buy, OrderType.Market) => BittradeOrderType.BuyMarket,
-            (Side.Sell, OrderType.Market) => BittradeOrderType.SellMarket,
-            (Side.Buy, OrderType.Limit) => BittradeOrderType.BuyLimit,
-            (Side.Sell, OrderType.Limit) => BittradeOrderType.SellLimit,
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unsupported order type.")
-        };
     }
 
     private static bool TryMapOrderType(Side side, OrderType type, out BittradeOrderType mapped, out CallError? error)
@@ -552,26 +510,6 @@ internal static class BittradeTradingMapper
                 error = new CallError(CallErrorKind.Mapping, $"Unsupported order type: {type}.");
                 return false;
         }
-    }
-
-    private static (Side Side, OrderType OrderType) MapSideAndType(string type)
-    {
-        var parsedType = ParseOrderType(type);
-        var parsedSide = parsedType switch
-        {
-            BittradeOrderType.BuyLimit or BittradeOrderType.BuyMarket or BittradeOrderType.BuyLimitMaker or BittradeOrderType.BuyIoc => Side.Buy,
-            BittradeOrderType.SellLimit or BittradeOrderType.SellMarket or BittradeOrderType.SellLimitMaker or BittradeOrderType.SellIoc => Side.Sell,
-            _ => throw new InvalidOperationException($"Unsupported order side: {type}.")
-        };
-
-        var orderType = parsedType switch
-        {
-            BittradeOrderType.BuyMarket or BittradeOrderType.SellMarket => OrderType.Market,
-            BittradeOrderType.BuyLimit or BittradeOrderType.SellLimit => OrderType.Limit,
-            _ => throw new InvalidOperationException($"Unsupported order type: {type}.")
-        };
-
-        return (parsedSide, orderType);
     }
 
     private static bool TryMapSideAndType(
@@ -628,19 +566,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    private static ExchangeApi.Primitives.DomainCommon.Enums.OrderState MapStatus(string state)
-    {
-        return ParseOrderState(state) switch
-        {
-            BittradeOrderState.Submitted => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Active,
-            BittradeOrderState.PartialFilled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Active,
-            BittradeOrderState.Filled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Completed,
-            BittradeOrderState.PartialCanceled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Canceled,
-            BittradeOrderState.Canceled => ExchangeApi.Primitives.DomainCommon.Enums.OrderState.Canceled,
-            _ => throw new InvalidOperationException($"Unsupported order state: {state}.")
-        };
-    }
-
     private static bool TryMapStatus(
         string state,
         out ExchangeApi.Primitives.DomainCommon.Enums.OrderState mapped,
@@ -672,20 +597,6 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    private static string ToRawOrderType(BittradeOrderType type) =>
-        type switch
-        {
-            BittradeOrderType.BuyLimit => "buy-limit",
-            BittradeOrderType.SellLimit => "sell-limit",
-            BittradeOrderType.BuyMarket => "buy-market",
-            BittradeOrderType.SellMarket => "sell-market",
-            BittradeOrderType.BuyLimitMaker => "buy-limit-maker",
-            BittradeOrderType.SellLimitMaker => "sell-limit-maker",
-            BittradeOrderType.BuyIoc => "buy-ioc",
-            BittradeOrderType.SellIoc => "sell-ioc",
-            _ => throw new InvalidOperationException($"Unsupported order type: {type}.")
-        };
-
     private static bool TryToRawOrderType(BittradeOrderType type, out string raw, out CallError? error)
     {
         raw = type switch
@@ -710,20 +621,6 @@ internal static class BittradeTradingMapper
         error = null;
         return true;
     }
-
-    private static BittradeOrderType ParseOrderType(string type) =>
-        type switch
-        {
-            "buy-limit" => BittradeOrderType.BuyLimit,
-            "sell-limit" => BittradeOrderType.SellLimit,
-            "buy-market" => BittradeOrderType.BuyMarket,
-            "sell-market" => BittradeOrderType.SellMarket,
-            "buy-limit-maker" => BittradeOrderType.BuyLimitMaker,
-            "sell-limit-maker" => BittradeOrderType.SellLimitMaker,
-            "buy-ioc" => BittradeOrderType.BuyIoc,
-            "sell-ioc" => BittradeOrderType.SellIoc,
-            _ => throw new InvalidOperationException($"Unsupported order type: {type}.")
-        };
 
     private static bool TryParseOrderType(string type, out BittradeOrderType parsed, out CallError? error)
     {
@@ -768,17 +665,6 @@ internal static class BittradeTradingMapper
         }
     }
 
-    private static BittradeOrderState ParseOrderState(string state) =>
-        state switch
-        {
-            "submitted" => BittradeOrderState.Submitted,
-            "partial-filled" => BittradeOrderState.PartialFilled,
-            "filled" => BittradeOrderState.Filled,
-            "partial-canceled" => BittradeOrderState.PartialCanceled,
-            "canceled" => BittradeOrderState.Canceled,
-            _ => throw new InvalidOperationException($"Unsupported order state: {state}.")
-        };
-
     private static bool TryParseOrderState(string state, out BittradeOrderState parsed, out CallError? error)
     {
         switch (state)
@@ -811,36 +697,6 @@ internal static class BittradeTradingMapper
     }
     private static string FormatDecimal(decimal value) =>
         value.ToString(CultureInfo.InvariantCulture);
-
-    private static decimal? ParseDecimalOrThrow(string? text, string field)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return null;
-        }
-
-        if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
-        {
-            return value;
-        }
-
-        throw new InvalidOperationException($"Invalid {field}: '{text}'.");
-    }
-
-    private static decimal ParseRequiredDecimal(string? text, string field)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            throw new InvalidOperationException($"Missing {field}: <missing>.");
-        }
-
-        if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
-        {
-            return value;
-        }
-
-        throw new InvalidOperationException($"Invalid {field}: '{text}'.");
-    }
 
     private static bool TryParseDecimal(string? text, string field, out decimal? parsed, out CallError? error)
     {

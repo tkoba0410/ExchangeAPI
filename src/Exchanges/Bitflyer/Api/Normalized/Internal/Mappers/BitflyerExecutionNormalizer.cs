@@ -44,27 +44,6 @@ internal static class BitflyerExecutionNormalizer
         return true;
     }
 
-    public static IReadOnlyList<BitflyerExecutionNormalized> NormalizeList(
-        IReadOnlyList<RawPublicDtos.ExecutionPublicResponse> raw,
-        string? rawJson)
-    {
-        var snapshots = ExtractSnapshots(rawJson, raw);
-        return raw
-            .Select((entry, idx) => Normalize(entry, snapshots[idx]))
-            .ToArray();
-    }
-
-    private static BitflyerExecutionNormalized Normalize(RawPublicDtos.ExecutionPublicResponse wire, JsonElement snapshot) =>
-        new(
-            Id: wire.Id,
-            Side: BitflyerSideMapper.ToExchangeSide(wire.Side),
-            Price: wire.Price,
-            Size: wire.Size,
-            ExecutedAt: wire.ExecDate,
-            ChildOrderAcceptanceId: ToAcceptanceId(wire.ChildOrderAcceptanceId),
-            RawSnapshot: snapshot,
-            Extras: new Dictionary<string, JsonElement>());
-
     private static bool TryNormalize(
         RawPublicDtos.ExecutionPublicResponse wire,
         JsonElement snapshot,
@@ -85,7 +64,7 @@ internal static class BitflyerExecutionNormalizer
             ExecutedAt: wire.ExecDate,
             ChildOrderAcceptanceId: ToAcceptanceId(wire.ChildOrderAcceptanceId),
             RawSnapshot: snapshot,
-            Extras: new Dictionary<string, JsonElement>());
+            Extras: new Dictionary<FreeText, JsonElement>());
         error = null;
         return true;
     }

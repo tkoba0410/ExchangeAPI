@@ -57,7 +57,7 @@ public sealed class BittradeSpotHistoryApiTests
     private static BittradeSpotHistoryApi CreateApi(StubRawApi raw)
     {
         var markets = new StubMarketResolver("btcjpy");
-        var normalized = new BittradeNormalizedPrivateApi(raw, markets, accountId: "account");
+        var normalized = new BittradeNormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
         return new BittradeSpotHistoryApi(normalized);
     }
 

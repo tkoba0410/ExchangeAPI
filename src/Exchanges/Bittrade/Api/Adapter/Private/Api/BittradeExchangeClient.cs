@@ -51,7 +51,7 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
     internal BittradeExchangeClient(BittradeApiBundle bundle)
     {
         if (bundle is null) throw new ArgumentNullException(nameof(bundle));
-        if (string.IsNullOrWhiteSpace(bundle.AccountId))
+        if (bundle.AccountId is null || bundle.AccountId.Value.IsEmpty)
         {
             throw new InvalidOperationException("BittradeApiBundle.AccountId is required to create BittradeExchangeClient.");
         }

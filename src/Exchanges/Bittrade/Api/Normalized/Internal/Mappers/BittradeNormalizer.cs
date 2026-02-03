@@ -171,7 +171,7 @@ internal static class BittradeNormalizer
 
         return symbols
             .Select(symbol => new BittradeSymbolNormalized(
-                Symbol: FreeText.Parse(symbol.Symbol),
+                Symbol: Symbol.Parse(symbol.Symbol),
                 BaseCurrency: FreeText.Parse(symbol.BaseCurrency),
                 QuoteCurrency: FreeText.Parse(symbol.QuoteCurrency),
                 PricePrecision: symbol.PricePrecision,
@@ -210,7 +210,7 @@ internal static class BittradeNormalizer
             }
 
             mapped.Add(new BittradeSymbolNormalized(
-                Symbol: FreeText.Parse(symbol.Symbol),
+                Symbol: Symbol.Parse(symbol.Symbol),
                 BaseCurrency: FreeText.Parse(symbol.BaseCurrency),
                 QuoteCurrency: FreeText.Parse(symbol.QuoteCurrency),
                 PricePrecision: symbol.PricePrecision,
@@ -257,7 +257,7 @@ internal static class BittradeNormalizer
         var now = DateTimeOffset.UtcNow;
         return entries
             .Select(entry => new BittradeTickerEntryNormalized(
-                FreeText.Parse(entry.Symbol),
+                Symbol.Parse(entry.Symbol),
                 entry.Close,
                 now,
                 ExtractSnapshot(Serialize(entry)),

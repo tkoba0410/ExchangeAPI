@@ -27,22 +27,22 @@ internal sealed class BittradeNormalizedPrivateApi
 {
     private readonly IBittradeRawApi _trading;
     private readonly IBittradeMarketResolver _markets;
-    private readonly string? _accountId;
+    private readonly FreeText? _accountId;
 
     public BittradeNormalizedPrivateApi(
         IBittradeRawApi trading,
         IBittradeMarketResolver markets,
-        string? accountId)
+        FreeText? accountId)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
-        _accountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
+        _accountId = accountId is null || accountId.Value.IsEmpty ? null : accountId;
     }
 
     public async Task<Call<NormalizedRequests.GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(_accountId))
+        if (!HasAccountId)
         {
             return BittradeNotSupportedNormalizedCalls.Create<
                 NormalizedRequests.GetBalancesRequest,
@@ -52,9 +52,9 @@ internal sealed class BittradeNormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountBalanceRequest(_accountId), ct)
+            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountBalanceRequest(_accountId!.Value.Value), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetBalancesRequest(new FreeText(_accountId!));
+        var request = new NormalizedRequests.GetBalancesRequest(_accountId!.Value);
 
         return CreateCall(
             rawCall,
@@ -208,7 +208,7 @@ internal sealed class BittradeNormalizedPrivateApi
                 marketError!);
         }
 
-        if (!BittradeTradingMapper.TryToRaw(_accountId!, apiSymbol!, request.Request, out var rawRequest, out var mapError))
+        if (!BittradeTradingMapper.TryToRaw(_accountId!.Value.Value, apiSymbol!, request.Request, out var rawRequest, out var mapError))
         {
             return CreateImmediateError<NormalizedRequests.PostOrdersPlaceRequest, BittradeOrderResult>(
                 callRequest,
@@ -336,7 +336,7 @@ internal sealed class BittradeNormalizedPrivateApi
         }
 
         var rawRequest = new RawPrivateRequests.RawCancelOpenOrdersRequest(
-            AccountId: _accountId!,
+            AccountId: _accountId!.Value.Value,
             Symbol: apiSymbol,
             Side: request.Side is null
                 ? null
@@ -379,7 +379,7 @@ internal sealed class BittradeNormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(apiSymbol!, _accountId!), ct)
+            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(apiSymbol!, _accountId!.Value.Value), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -972,7 +972,7 @@ internal sealed class BittradeNormalizedPrivateApi
         public static MapResult<TOk> Fail(CallError error) => new(default, error);
     }
 
-    private bool HasAccountId => !string.IsNullOrWhiteSpace(_accountId);
+    private bool HasAccountId => _accountId is { IsEmpty: false };
 
     private static Call<TReq, TOk> AccountIdMissing<TReq, TOk>(TReq request) =>
         BittradeNotSupportedNormalizedCalls.Create<TReq, TOk>(request, "AccountIdRequired");

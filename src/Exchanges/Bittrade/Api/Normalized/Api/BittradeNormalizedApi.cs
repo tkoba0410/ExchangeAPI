@@ -21,27 +21,27 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
 {
     private readonly BittradeNormalizedPublicApi _publicApi;
     private readonly BittradeNormalizedPrivateApi _privateApi;
-    public string? AccountId { get; }
+    public FreeText? AccountId { get; }
 
     private BittradeNormalizedApi(
         BittradeNormalizedPublicApi publicApi,
         BittradeNormalizedPrivateApi privateApi,
-        string? accountId)
+        FreeText? accountId)
     {
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
-        AccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
+        AccountId = accountId is null || accountId.Value.IsEmpty ? null : accountId;
     }
 
     internal static BittradeNormalizedApi FromRaw(
         IBittradeRawApi raw,
         IBittradeMarketResolver markets,
-        string? accountId = null)
+        FreeText? accountId = null)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
         if (markets is null) throw new ArgumentNullException(nameof(markets));
 
-        var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
+        var normalizedAccountId = accountId is null || accountId.Value.IsEmpty ? null : accountId;
         var publicApi = new BittradeNormalizedPublicApi(raw);
         var privateApi = new BittradeNormalizedPrivateApi(raw, markets, normalizedAccountId);
 

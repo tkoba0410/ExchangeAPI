@@ -11,6 +11,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Wire.Internal;
 using ExchangeApi.Transport.Wire;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;
 
@@ -25,7 +26,7 @@ internal sealed class BittradeApiBundle
     public IExchangeInfoProvider ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
     public IRestClient RestClient { get; }
-    public string? AccountId { get; }
+    public FreeText? AccountId { get; }
 
     public BittradeApiBundle(
         BittradeNormalizedPublicApi publicApi,
@@ -33,20 +34,20 @@ internal sealed class BittradeApiBundle
         IExchangeInfoProvider exchangeInfo,
         IExchangeMarketResolver markets,
         IRestClient restClient,
-        string? accountId = null)
+        FreeText? accountId = null)
     {
         Public = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
         Private = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
         ExchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
         Markets = markets ?? throw new ArgumentNullException(nameof(markets));
         RestClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-        AccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
+        AccountId = accountId is null || accountId.Value.IsEmpty ? null : accountId;
     }
 
     public static BittradeApiBundle FromRestClient(IRestClient restClient, string? accountId = null)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        var normalizedAccountId = string.IsNullOrWhiteSpace(accountId) ? null : accountId;
+        var normalizedAccountId = FreeText.TryParse(accountId, out var parsed) ? parsed : (FreeText?)null;
 
         var wireTransport = new WireTransport(restClient);
         var wire = new BittradeWireCallExecutor(wireTransport);

@@ -50,7 +50,7 @@ public sealed class BittradeOrderKeyConnectivityTests
     private static BittradeTradingApi CreateApi(RecordingRawApi raw)
     {
         var markets = new StubMarketResolver("BTC_JPY");
-        var normalized = new BittradeNormalizedPrivateApi(raw, markets, accountId: "account");
+        var normalized = new BittradeNormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
         return new BittradeTradingApi(normalized);
     }
 

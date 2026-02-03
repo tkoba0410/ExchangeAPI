@@ -17,6 +17,7 @@ using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Wire;
+using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Factory;
 
 /// <summary>
@@ -58,7 +59,7 @@ public static class BittradeClientFactory
         var exchangeInfo = new BittradeExchangeInfoApi(normalizedPublic);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var normalizedMarkets = new BittradeNormalizedMarketResolver(markets);
-        var normalizedPrivate = new BittradeNormalizedPrivateApi(raw, normalizedMarkets, accountId);
+        var normalizedPrivate = new BittradeNormalizedPrivateApi(raw, normalizedMarkets, new FreeText(accountId));
         var trading = new BittradeTradingApi(normalizedPrivate);
         var account = new BittradeAccountApi(normalizedPrivate);
         return (new MarketApi(normalizedPublic, markets), trading, account, exchangeInfo);

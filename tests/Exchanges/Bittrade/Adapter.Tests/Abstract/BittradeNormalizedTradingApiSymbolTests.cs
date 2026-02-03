@@ -48,7 +48,7 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
     {
         raw ??= new ThrowingRawApi();
         var markets = new StubMarketResolver(productCode);
-        return new BittradeNormalizedPrivateApi(raw, markets, accountId: "account");
+        return new BittradeNormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
     }
 
     private sealed class ThrowingRawApi : BittradeRawApiStub

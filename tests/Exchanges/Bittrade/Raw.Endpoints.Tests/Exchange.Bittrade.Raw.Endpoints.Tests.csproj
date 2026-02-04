@@ -22,10 +22,12 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../../src/Exchanges/Bittrade/Api/Raw/ExchangeApi.Exchanges.Bittrade.Raw.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bittrade/Api/Normalized/ExchangeApi.Exchanges.Bittrade.Normalized.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\..\..\Inventory\InventoryEndpointIdParser.cs" Link="Inventory/InventoryEndpointIdParser.cs" />
+    <Compile Include="..\..\..\Inventory\EndpointIdNamingAssertions.cs" Link="Inventory/EndpointIdNamingAssertions.cs" />
   </ItemGroup>
 
 </Project>

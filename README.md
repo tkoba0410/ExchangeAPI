@@ -41,6 +41,10 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基
 - **Endpoints Inventory**  
   `docs/inventory/`
 
+- **Contracts Inventory（SSOT）**  
+  `docs/inventory/endpoints-contracts.md`  
+  Contracts の実装対象は `endpoints-contracts.md` を正とする。
+
 - **Exchange Inventories**  
   `docs/inventory/endpoints-bitflyer.md`  
   `docs/inventory/endpoints-bittrade.md`

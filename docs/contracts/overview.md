@@ -17,7 +17,7 @@
 **TopSpec（docs/topspec.md）** とする。
 
 取引所実装間の「統一/例外」の運用方針は `docs/_references/exchange-parity-policy.md` を参照する。
-Contracts の公開 API 一覧は `docs/contracts/api-catalog.md` を参照する（Reference）。
+Contracts API 署名の正本は `src/Contracts/Facade/Interfaces/*` とする。
 
 本書の目的は次の 2 点に限定される。
 

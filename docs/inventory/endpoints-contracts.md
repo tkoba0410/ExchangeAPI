@@ -27,7 +27,7 @@
 
 ## Canonical Source（参照）
 
-* Contracts API 署名一覧: `docs/contracts/api-catalog.md`
+* Contracts API 署名の正本: `src/Contracts/Facade/Interfaces/*`
 * 取引所 endpoint inventory: `docs/inventory/endpoints-*.md`
 
 ※ 本書は「どの Contracts API を採用し、どの取引所 EndpointId に対応づけるか」を記録する正本であり、

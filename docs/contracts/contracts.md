@@ -9,6 +9,7 @@
 概要説明や背景整理は `docs/contracts/overview.md` に委ねる。
 
 本書は TopSpec に基づく契約内容の記述を目的とするものであり、設計上の裁定権や例外規定は持たない。
+Contracts API の採用可否および取引所対応関係の正本（SSOT）は `docs/inventory/endpoints-contracts.md` に記録される。
 
 ---
 

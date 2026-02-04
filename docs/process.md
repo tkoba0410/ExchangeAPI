@@ -30,6 +30,7 @@
 
 ### 2.2 Inventory（事実一覧）
 - `docs/inventory/endpoints-<exchange>.md`：取引所別インベントリ
+- `docs/inventory/endpoints-contracts.md`：Contracts 採用/対応関係の SSOT
 
 ※ Inventory に仕様本文（公式APIの写経）を書いてはならない。
 

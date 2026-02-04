@@ -53,6 +53,7 @@
 
 * `docs/inventory/`
 
+  * `endpoints-contracts.md` — Contracts API 採用/対応関係の SSOT
   * `endpoints-bitflyer.md`
   * `endpoints-bittrade.md`
 

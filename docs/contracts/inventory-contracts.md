@@ -64,10 +64,10 @@
 
 | ContractScope | ContractApiId        | ContractMethod                | Parameters | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | DecisionNote        |
 | ------------- | -------------------- | ----------------------------- | ---------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------------- |
-| public        | GetExchangeInfo      | GetExchangeInfoCallAsync      | Symbol     | GetExchangeInfoRequest      | ExchangeInfo                   | Contracts | None                 |                    |                     |
-| public        | GetTicker            | GetTickerCallAsync            | Symbol     | GetTickerRequest            | Ticker                         | Contracts | GetTicker            |                    |                     |
-| public        | GetBoard             | GetBoardCallAsync             | Symbol     | GetBoardRequest             | OrderBook                      | Contracts | GetBoard             |                    |                     |
-| public        | GetExecutionsPublic  | GetExecutionsPublicCallAsync  | Symbol     | GetExecutionsRequest        | IReadOnlyList<ExecutionMarket> | Contracts | GetExecutionsPublic  |                    |                     |
+| public        | GetExchangeInfo      | GetExchangeInfoCallAsync      | Symbol     | GetExchangeInfoRequest      | ExchangeInfo                   | Contracts | None                 | None               |                     |
+| public        | GetTicker            | GetTickerCallAsync            | Symbol     | GetTickerRequest            | Ticker                         | Contracts | GetTicker            | GetDetailMerged    |                     |
+| public        | GetBoard             | GetBoardCallAsync             | Symbol     | GetBoardRequest             | OrderBook                      | Contracts | GetBoard             | GetDepth           |                     |
+| public        | GetExecutionsPublic  | GetExecutionsPublicCallAsync  | Symbol     | GetExecutionsRequest        | IReadOnlyList<ExecutionMarket> | Contracts | GetExecutionsPublic  | GetTrade           |                     |
 
 ---
 
@@ -75,8 +75,8 @@
 
 | ContractScope | ContractApiId         | ContractMethod                 | Parameters         | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId | DecisionNote |
 | ------------- | --------------------- | ------------------------------ | ------------------ | ---------------------------- | -------------------------------- | --------- | --------------------- | ------------------ | ------------ |
-| private       | GetBalance            | GetBalanceCallAsync            | (none)             | GetBalanceRequest            | IReadOnlyList<Balance>           | Contracts | GetBalance            |                    |              |
-| private       | GetExecutionsPrivate  | GetExecutionsPrivateCallAsync  | CursorRequest      | CursorRequest                | Page<ExecutionItem>              | Contracts | GetExecutionsPrivate  |                    |              |
-| private       | GetOrders             | GetOrdersCallAsync             | CursorRequest      | CursorRequest                | Page<OrderSnapshotItem>          | Contracts | GetChildOrders        |                    |              |
-| private       | OrderLimit            | OrderLimitCallAsync            | OrderRequest       | OrderRequest                 | OrderResult                      | Contracts | SendChildOrder        |                    |              |
-| private       | CancelOrder           | CancelOrderCallAsync           | CancelOrderRequest | CancelOrderRequest           | CancelResult                     | Contracts | CancelChildOrder      |                    |              |
+| private       | GetBalance            | GetBalanceCallAsync            | (none)             | GetBalanceRequest            | IReadOnlyList<Balance>           | Contracts | GetBalance            | GetAccountsBalanceByAccountId |              |
+| private       | GetExecutionsPrivate  | GetExecutionsPrivateCallAsync  | CursorRequest      | CursorRequest                | Page<ExecutionItem>              | Contracts | GetExecutionsPrivate  | GetMatchResults     |              |
+| private       | GetOrders             | GetOrdersCallAsync             | CursorRequest      | CursorRequest                | Page<OrderSnapshotItem>          | Contracts | GetChildOrders        | GetOpenOrders        |              |
+| private       | OrderLimit            | OrderLimitCallAsync            | OrderRequest       | OrderRequest                 | OrderResult                      | Contracts | SendChildOrder        | PostOrdersPlace      |              |
+| private       | CancelOrder           | CancelOrderCallAsync           | CancelOrderRequest | CancelOrderRequest           | CancelResult                     | Contracts | CancelChildOrder      | PostOrdersSubmitCancelByOrderId |              |

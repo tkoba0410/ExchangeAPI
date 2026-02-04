@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using ExchangeApi.Composition.Bootstrap.Factories;
 using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Exchanges.Bitflyer.Composition;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
+using ExchangeApi.Exchanges.Bittrade.Composition;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Api;
 
 namespace ExchangeApi.Tests.Composition.Tests.Guard;

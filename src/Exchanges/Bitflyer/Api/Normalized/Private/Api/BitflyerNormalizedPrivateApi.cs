@@ -594,7 +594,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             rawCall,
             request,
             Component(BitflyerEndpointIds.GetPermissions),
-            raw => MapResult<IReadOnlyList<FreeText>>.Ok(raw.Select(FreeText.Parse).ToArray()));
+            raw => MapResult<IReadOnlyList<FreeText>>.Ok(raw.ToArray()));
     }
 
     public async Task<Call<PrivateRequests.GetCollateralRequest, BitflyerCollateralNormalized>> GetCollateralCallAsync(

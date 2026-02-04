@@ -8,7 +8,7 @@ using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 
-namespace ExchangeApi.Composition.Bootstrap.Factories;
+namespace ExchangeApi.Exchanges.Bitflyer.Composition;
 
 /// <summary>
 /// bitFlyer 用の生成オプション。すべて任意で、設定しなければ既定値（公開 API のみ）が使われる。

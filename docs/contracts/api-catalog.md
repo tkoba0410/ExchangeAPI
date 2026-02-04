@@ -27,7 +27,7 @@ Public/Private は **署名の有無**のみを表す（用途別分類ではな
 - `GetTickersCallAsync` -> `Call<GetTickersRequest, IReadOnlyList<Ticker>>`
 - `GetHistoryTradeCallAsync` -> `Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>`
 - `GetExchangeInfoCallAsync` -> `Call<GetExchangeInfoRequest, ExchangeInfo>`
-- `GetCurrencysCallAsync` -> `Call<GetCurrencysRequest, IReadOnlyList<string>>`
+- `GetCurrencysCallAsync` -> `Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>`
 - `GetTimestampCallAsync` -> `Call<GetTimestampRequest, DateTimeOffset>`
 
 Source: `src/Contracts/Facade/Interfaces/IPublicApi.cs`

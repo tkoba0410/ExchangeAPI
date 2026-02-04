@@ -6,6 +6,7 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 
@@ -47,7 +48,7 @@ public interface IBitflyerRawApi
         GetChatsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+    Task<Call<GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
         GetPermissionsRequest request,
         CancellationToken cancellationToken = default);
 

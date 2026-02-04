@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
@@ -39,10 +40,10 @@ public sealed class FakeBitflyerPrivateApi
         _tradingCommission = new RawPrivateDtos.RawJsonResponse(tradingCommissionJson ?? "{}");
     }
 
-    public Task<Call<RawPrivateRequests.GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+    public Task<Call<RawPrivateRequests.GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
         RawPrivateRequests.GetPermissionsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, (IReadOnlyList<string>)Array.Empty<string>()));
+        Task.FromResult(MakeOkCall(request, (IReadOnlyList<FreeText>)Array.Empty<FreeText>()));
 
     public Task<Call<RawPrivateRequests.GetBalancesRequest, IReadOnlyList<RawPrivateDtos.BalanceResponse>>> GetBalanceCallAsync(
         RawPrivateRequests.GetBalancesRequest request,

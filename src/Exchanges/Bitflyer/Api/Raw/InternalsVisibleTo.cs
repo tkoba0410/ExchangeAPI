@@ -6,5 +6,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("ExchangeApi.Exchanges.Bitflyer.Api.Normalized")]
 [assembly: InternalsVisibleTo("Exchange.Bitflyer.Raw.Tests")]
 [assembly: InternalsVisibleTo("Exchange.Bitflyer.Raw.Endpoints.Tests")]
-[assembly: InternalsVisibleTo("ExchangeApi.Composition")]
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw;

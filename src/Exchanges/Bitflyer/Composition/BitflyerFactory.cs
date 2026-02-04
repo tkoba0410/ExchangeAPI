@@ -10,7 +10,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
 
-namespace ExchangeApi.Composition.Bootstrap.Factories;
+namespace ExchangeApi.Exchanges.Bitflyer.Composition;
 
 /// <summary>
 /// bitFlyer 用の標準配線を提供するファクトリ。

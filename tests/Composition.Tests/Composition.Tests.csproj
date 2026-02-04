@@ -26,6 +26,8 @@
     <ProjectReference Include="../../src/Application/ExchangeApi.Application.csproj" />
     <ProjectReference Include="../../src/Transport/ExchangeApi.Transport.csproj" />
     <ProjectReference Include="../../src/Primitives/ExchangeApi.Primitives.csproj" />
+    <ProjectReference Include="../../src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj" />
+    <ProjectReference Include="../../src/Exchanges/Bittrade/Composition/ExchangeApi.Exchanges.Bittrade.Composition.csproj" />
   </ItemGroup>
 
 </Project>

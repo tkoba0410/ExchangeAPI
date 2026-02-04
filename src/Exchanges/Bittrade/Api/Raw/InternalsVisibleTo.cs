@@ -6,5 +6,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("ExchangeApi.Exchanges.Bittrade.Api.Normalized")]
 [assembly: InternalsVisibleTo("Exchange.Bittrade.Raw.Tests")]
 [assembly: InternalsVisibleTo("Exchange.Bittrade.Raw.Endpoints.Tests")]
-[assembly: InternalsVisibleTo("ExchangeApi.Composition")]
 namespace ExchangeApi.Exchanges.Bittrade.Api.Raw;

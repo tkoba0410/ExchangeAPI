@@ -7,7 +7,7 @@ using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Composition.Bootstrap.Factories;
+namespace ExchangeApi.Exchanges.Bittrade.Composition;
 
 /// <summary>
 /// Bittrade 用の生成オプション。

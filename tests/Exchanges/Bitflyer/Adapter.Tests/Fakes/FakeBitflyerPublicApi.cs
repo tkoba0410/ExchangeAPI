@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
@@ -97,7 +98,7 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawApi
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, (IReadOnlyList<RawPublicDtos.Chat>)new[] { new RawPublicDtos.Chat("n", "m", DateTimeOffset.UtcNow) }));
 
-    public Task<Call<RawPrivateRequests.GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+    public Task<Call<RawPrivateRequests.GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
         RawPrivateRequests.GetPermissionsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi?.GetPermissionsCallAsync(request, cancellationToken)

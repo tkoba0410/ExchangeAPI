@@ -7,7 +7,7 @@ using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
 
-namespace ExchangeApi.Composition.Bootstrap.Factories;
+namespace ExchangeApi.Exchanges.Bittrade.Composition;
 
 /// <summary>
 /// Bittrade 用の標準配線ファクトリ。Adapter を既定とし、Spec を参照しない。

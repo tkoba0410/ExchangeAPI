@@ -11,6 +11,7 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Private.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Api;
@@ -26,7 +27,7 @@ internal sealed class BitflyerRawPrivateClient
         _executor = executor ?? throw new System.ArgumentNullException(nameof(executor));
     }
 
-    public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+    public Task<Call<GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
         GetPermissionsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -34,7 +35,7 @@ internal sealed class BitflyerRawPrivateClient
             Component(BitflyerEndpointIds.GetPermissions),
             BitflyerPrivateEndpoints.GetPermissions(),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<string>>(
+            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<FreeText>>(
                 json,
                 Component(BitflyerEndpointIds.GetPermissions)));
 

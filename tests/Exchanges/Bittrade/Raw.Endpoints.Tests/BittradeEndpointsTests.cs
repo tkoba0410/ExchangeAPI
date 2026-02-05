@@ -1,63 +1,73 @@
-using ExchangeApi.Exchanges.Bittrade.Raw;
-using ExchangeApi.Exchanges.Bittrade.Wire.Endpoints;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw.Internal;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Constants;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Private.Endpoints;
+using ExchangeApi.Exchanges.Bittrade.Api.Wire.Public.Endpoints;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw.Endpoints.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
 
 public sealed class BittradeEndpointsTests
 {
     [Fact]
     public void GetSymbols_builds_request()
     {
-        var req = BittradeEndpoints.GetSymbols();
+        var req = BittradePublicEndpoints.GetSymbols();
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
-            path: "v1/common/symbols");
+            path: "/v1/common/symbols",
+            endpointId: BittradeEndpointIds.GetSymbols);
     }
 
     [Fact]
     public void GetKlines_builds_request_with_ordered_query()
     {
-        var req = BittradeEndpoints.GetKlines("btcjpy", "1min", 200);
+        var req = BittradePublicEndpoints.GetHistoryKline("btcjpy", "1min", "200");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
-            path: "market/history/kline",
+            path: "/market/history/kline",
+            endpointId: BittradeEndpointIds.GetHistoryKline,
             query: "period=1min&symbol=btcjpy&size=200");
     }
 
     [Fact]
     public void GetTicker_builds_request()
     {
-        var req = BittradeEndpoints.GetTicker("btcjpy");
+        var req = BittradePublicEndpoints.GetDetailMerged("btcjpy");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
-            path: "market/detail/merged",
+            path: "/market/detail/merged",
+            endpointId: BittradeEndpointIds.GetDetailMerged,
             query: "symbol=btcjpy");
     }
 
     [Fact]
     public void PlaceOrder_builds_request_with_body_json()
     {
-        var request = new RawCreateOrderRequest(
-            AccountId: "123",
-            Symbol: "btcjpy",
-            Type: "buy-limit",
-            Amount: "0.1",
-            Price: "3000000",
-            Source: "api");
+        var request = new RawPrivateRequests.RawCreateOrderRequest(
+            AccountId: new AccountId("123"),
+            Symbol: new Symbol("btcjpy"),
+            Type: new FreeText("buy-limit"),
+            Amount: new FreeText("0.1"),
+            Price: new FreeText("3000000"),
+            Source: new FreeText("api"));
 
         var bodyJson = BittradeRawJson.SerializeOrThrow(request, "Bittrade.PlaceOrder");
-        var req = BittradeEndpoints.PlaceOrder(bodyJson);
+        var req = BittradePrivateEndpoints.PostOrdersPlace(bodyJson);
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "POST",
-            path: "v1/order/orders/place",
+            path: "/v1/order/orders/place",
+            endpointId: BittradeEndpointIds.PostOrdersPlace,
             bodyJson: "{\"account-id\":\"123\",\"symbol\":\"btcjpy\",\"type\":\"buy-limit\",\"amount\":\"0.1\",\"price\":\"3000000\",\"source\":\"api\"}");
     }
 }

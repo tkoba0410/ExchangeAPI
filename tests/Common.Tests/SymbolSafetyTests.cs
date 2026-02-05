@@ -1,8 +1,8 @@
 using System;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using Xunit;
 
-namespace Common.Tests;
+namespace ExchangeApi.Tests.Common.Tests;
 
 public sealed class SymbolSafetyTests
 {
@@ -15,9 +15,16 @@ public sealed class SymbolSafetyTests
     }
 
     [Fact]
-    public void Parse_Empty_Throws()
+    public void Parse_Empty_ReturnsEmpty()
     {
-        Assert.Throws<ArgumentException>(() => Symbol.Parse(" "));
+        var symbol = Symbol.Parse(" ");
+        Assert.True(symbol.IsEmpty);
+    }
+
+    [Fact]
+    public void ParseOrThrow_Empty_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => Symbol.ParseOrThrow(" "));
     }
 
     [Fact]

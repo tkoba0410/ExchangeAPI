@@ -1,22 +1,20 @@
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.ExchangeInfo;
+using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
 public class BitflyerExchangeInfoApi_Tests
 {
     [Fact]
-    public async Task GetExchangeInfo_ReturnsFeatureFlags()
+    public async Task GetExchangeInfo_ReturnsMappedMarkets()
     {
         var api = new BitflyerExchangeInfoApi();
 
         var call = await api.GetExchangeInfoCallAsync();
-        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
 
-        Assert.False(info.Features!.SupportsCandlestick);
-        Assert.False(info.Features.SupportsOrderBookDelta);
-        Assert.False(info.Features.SupportsRealtimeExecutions);
+        Assert.Contains(info.Markets, market => market.Symbol.Value == "BTC/JPY" && market.ProductCode.Value == "BTC_JPY");
     }
 }

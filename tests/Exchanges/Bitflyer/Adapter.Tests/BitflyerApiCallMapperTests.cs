@@ -1,8 +1,8 @@
-using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Spec.CallCommon;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Internal;
+using ExchangeApi.Primitives.Errors;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests;
 
 public sealed class BitflyerApiCallMapperTests
 {

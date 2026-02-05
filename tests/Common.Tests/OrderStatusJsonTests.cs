@@ -1,10 +1,10 @@
 using System.Text.Json;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using Xunit;
 
-namespace Common.Tests;
+namespace ExchangeApi.Tests.Common.Tests;
 
 public sealed class OrderStatusJsonTests
 {
@@ -12,7 +12,7 @@ public sealed class OrderStatusJsonTests
     public void OrderStatus_RoundTrips_WithOrderKey()
     {
         var status = new OrderStatus(
-            ProductCode: "BTC_JPY",
+            ProductCode: ProductCode.ParseOrThrow("BTC_JPY"),
             Key: new OrderKey(OrderIdKind.AcceptanceId, "ACCEPT-1"),
             Status: OrderState.Completed,
             ExecutedSize: new Size(0.01m),

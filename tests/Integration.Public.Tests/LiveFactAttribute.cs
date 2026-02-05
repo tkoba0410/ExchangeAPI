@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace Integration.Public.Tests;
+namespace ExchangeApi.Tests.Integration.Public.Tests;
 
 /// <summary>
 /// LIVE_PUBLIC が設定されている場合にのみ実行される Fact。

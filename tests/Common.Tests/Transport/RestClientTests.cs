@@ -7,12 +7,12 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Observability;
-using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Transport.Observability;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Http;
 using Xunit;
 
-namespace ExchangeApi.Core.Transport.Tests;
+namespace ExchangeApi.Tests.Common.Tests.Transport;
 
 public sealed class RestClientTests
 {
@@ -23,11 +23,12 @@ public sealed class RestClientTests
     {
         var rest = CreateRestClient(out var transport);
 
-        var result = await rest.GetAsync<TestDto>(
+        var raw = await rest.GetRawAsync(
             "/api?a=1",
             new Dictionary<string, string?> { ["b"] = "2" });
+        var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);
 
-        Assert.Equal("ok", result.Value);
+        Assert.Equal("ok", result!.Value);
         AssertQueryEquals("/api?a=1&b=2", transport.LastRequest!.RequestUri!.PathAndQuery);
     }
 
@@ -36,11 +37,12 @@ public sealed class RestClientTests
     {
         var rest = CreateRestClient(out var transport);
 
-        var result = await rest.GetAsync<TestDto>(
+        var raw = await rest.GetRawAsync(
             "/api?a=1",
             new Dictionary<string, string?> { ["a"] = "1" });
+        var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);
 
-        Assert.Equal("ok", result.Value);
+        Assert.Equal("ok", result!.Value);
         AssertQueryEquals("/api?a=1", transport.LastRequest!.RequestUri!.PathAndQuery);
     }
 
@@ -50,7 +52,7 @@ public sealed class RestClientTests
         var rest = CreateRestClient(out _);
 
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            rest.GetAsync<TestDto>(
+            rest.GetRawAsync(
                 "/api?a=1",
                 new Dictionary<string, string?> { ["a"] = "2" }));
     }
@@ -60,11 +62,12 @@ public sealed class RestClientTests
     {
         var rest = CreateRestClient(out var transport);
 
-        var result = await rest.GetAsync<TestDto>(
+        var raw = await rest.GetRawAsync(
             "/api",
             new Dictionary<string, string?> { ["a"] = null, ["b"] = "x" });
+        var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);
 
-        Assert.Equal("ok", result.Value);
+        Assert.Equal("ok", result!.Value);
         AssertQueryEquals("/api?b=x", transport.LastRequest!.RequestUri!.PathAndQuery);
     }
 
@@ -73,9 +76,10 @@ public sealed class RestClientTests
     {
         var rest = CreateRestClient(out var transport);
 
-        var result = await rest.GetAsync<TestDto>("/api");
+        var raw = await rest.GetRawAsync("/api");
+        var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);
 
-        Assert.Equal("ok", result.Value);
+        Assert.Equal("ok", result!.Value);
         AssertQueryEquals("/api", transport.LastRequest!.RequestUri!.PathAndQuery);
     }
 
@@ -84,11 +88,12 @@ public sealed class RestClientTests
     {
         var rest = CreateRestClient(out var transport);
 
-        var result = await rest.GetAsync<TestDto>(
+        var raw = await rest.GetRawAsync(
             "/api",
             new Dictionary<string, string?> { ["q"] = "a b&c" });
+        var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);
 
-        Assert.Equal("ok", result.Value);
+        Assert.Equal("ok", result!.Value);
         AssertQueryEquals("/api?q=a%20b%26c", transport.LastRequest!.RequestUri!.PathAndQuery);
     }
 
@@ -104,7 +109,9 @@ public sealed class RestClientTests
         };
         var rest = new RestClient(new Uri("https://example.com"), transport);
 
-        await Assert.ThrowsAsync<TransportException>(() => rest.GetAsync<TestDto>("/api"));
+        var raw = await rest.GetRawAsync("/api");
+        Assert.Equal((int)HttpStatusCode.NoContent, raw.StatusCode);
+        Assert.Equal(string.Empty, raw.Body);
     }
 
     [Fact]
@@ -119,10 +126,9 @@ public sealed class RestClientTests
         };
         var rest = new RestClient(new Uri("https://example.com"), transport);
 
-        var ex = await Assert.ThrowsAsync<TransportException>(() => rest.GetAsync<TestDto>("/api"));
-
-        Assert.Equal(HttpStatusCode.InternalServerError, ex.StatusCode);
-        Assert.Contains("/api", ex.Message, StringComparison.Ordinal);
+        var raw = await rest.GetRawAsync("/api");
+        Assert.Equal((int)HttpStatusCode.InternalServerError, raw.StatusCode);
+        Assert.Equal("server error", raw.Body);
     }
 
     [Fact]
@@ -134,11 +140,10 @@ public sealed class RestClientTests
         };
         var rest = new RestClient(new Uri("https://example.com"), transport);
 
-        var ex = await Assert.ThrowsAsync<TransportException>(() => rest.GetAsync<TestDto>("/api"));
+        var ex = await Assert.ThrowsAsync<TransportException>(() => rest.SendRawAsync("GET", "/api"));
 
         Assert.Equal(HttpStatusCode.BadGateway, ex.StatusCode);
         Assert.IsType<HttpRequestException>(ex.InnerException);
-        Assert.Contains("/api", ex.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -153,7 +158,9 @@ public sealed class RestClientTests
         };
         var rest = new RestClient(new Uri("https://example.com"), transport);
 
-        await Assert.ThrowsAsync<TransportException>(() => rest.GetAsync<TestDto>("/api"));
+        var raw = await rest.GetRawAsync("/api");
+        Assert.Equal((int)HttpStatusCode.OK, raw.StatusCode);
+        Assert.Equal(string.Empty, raw.Body);
     }
 
     [Fact]
@@ -168,9 +175,9 @@ public sealed class RestClientTests
         };
         var rest = new RestClient(new Uri("https://example.com"), transport);
 
-        var ex = await Assert.ThrowsAsync<TransportException>(() => rest.GetAsync<TestDto>("/api"));
-
-        Assert.IsType<JsonException>(ex.InnerException);
+        var raw = await rest.GetRawAsync("/api");
+        Assert.Equal((int)HttpStatusCode.OK, raw.StatusCode);
+        Assert.Equal("not json", raw.Body);
     }
 
     [Fact]
@@ -181,11 +188,12 @@ public sealed class RestClientTests
 
         var body = new TestDto("req");
 
-        var result = await rest.PostAsync<TestDto, TestDto>("/api", body);
+        var raw = await rest.SendRawAsync("POST", "/api", bodyJson: JsonSerializer.Serialize(body));
+        var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);
 
-        Assert.Equal("ok", result.Value);
+        Assert.Equal("ok", result!.Value);
         Assert.Equal(HttpMethod.Post, transport.LastRequest!.Method);
-        Assert.Contains("\"value\":\"req\"", transport.LastRequestContent);
+        Assert.Contains("\"Value\":\"req\"", transport.LastRequestContent);
     }
 
     [Fact]
@@ -200,10 +208,8 @@ public sealed class RestClientTests
         };
         var rest = new RestClient(new Uri("https://example.com"), transport);
 
-        var ex = await Assert.ThrowsAsync<TransportException>(() =>
-            rest.PostAsync<TestDto, TestDto>("/api", new TestDto("x")));
-
-        Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
+        var raw = await rest.SendRawAsync("POST", "/api", bodyJson: JsonSerializer.Serialize(new TestDto("x")));
+        Assert.Equal((int)HttpStatusCode.BadRequest, raw.StatusCode);
     }
 
     [Fact]
@@ -218,10 +224,9 @@ public sealed class RestClientTests
         };
         var rest = new RestClient(new Uri("https://example.com"), transport);
 
-        var ex = await Assert.ThrowsAsync<TransportException>(() =>
-            rest.PostAsync<TestDto, TestDto>("/api", new TestDto("x")));
-
-        Assert.IsType<JsonException>(ex.InnerException);
+        var raw = await rest.SendRawAsync("POST", "/api", bodyJson: JsonSerializer.Serialize(new TestDto("x")));
+        Assert.Equal((int)HttpStatusCode.OK, raw.StatusCode);
+        Assert.Equal("not json", raw.Body);
     }
 
     [Fact]
@@ -237,11 +242,12 @@ public sealed class RestClientTests
         };
         var rest = new RestClient(new Uri("https://example.com"), transport, observer: observer);
 
-        await Assert.ThrowsAsync<TransportException>(() => rest.GetAsync<TestDto>("/api"));
+        var raw = await rest.GetRawAsync("/api");
+        Assert.Equal((int)HttpStatusCode.BadRequest, raw.StatusCode);
 
         Assert.True(observer.RequestCalled);
         Assert.True(observer.ResponseCalled);
-        Assert.True(observer.ErrorCalled);
+        Assert.False(observer.ErrorCalled);
         Assert.Equal(HttpStatusCode.BadRequest, observer.LastStatus);
         Assert.NotEqual(Guid.Empty, observer.LastRequestId);
     }

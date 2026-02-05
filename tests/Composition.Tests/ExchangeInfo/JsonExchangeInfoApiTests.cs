@@ -1,12 +1,12 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Composition.Providers.ExchangeInfo;
 using Xunit;
 
-namespace Composition.Tests.ExchangeInfo;
+namespace ExchangeApi.Tests.Composition.Tests.ExchangeInfo;
 
 public class JsonExchangeInfoApiTests : IAsyncLifetime
 {
@@ -51,13 +51,13 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
         var api = new JsonExchangeInfoApi(new[] { _basePath }, cacheTtl: TimeSpan.FromSeconds(1));
 
         var call = await api.GetExchangeInfoCallAsync();
-        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
 
         Assert.Single(info.Markets);
         var market = info.Markets[0];
-        Assert.Equal("BTC_JPY", market.ProductCode);
-        Assert.Equal("BTC", market.FeeCurrency);
+        Assert.Equal("BTC_JPY", market.ProductCode.Value);
+        Assert.Equal(CurrencyCode.Btc, market.FeeCurrency);
         Assert.Equal(FeeType.Percentage, market.FeeType);
         Assert.NotNull(info.Features);
         Assert.NotNull(info.RateLimits);
@@ -84,12 +84,12 @@ public class JsonExchangeInfoApiTests : IAsyncLifetime
         var api = new JsonExchangeInfoApi(new[] { _basePath, _overlayPath }, cacheTtl: TimeSpan.FromSeconds(1));
 
         var call = await api.GetExchangeInfoCallAsync();
-        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo>.Ok>(call.Result);
         var info = ok.Response;
 
         Assert.Single(info.Markets);
         var market = info.Markets[0];
-        Assert.Equal("JPY", market.FeeCurrency); // overlay wins
+        Assert.Equal(CurrencyCode.Jpy, market.FeeCurrency); // overlay wins
         Assert.Equal(FeeType.Flat, market.FeeType);
         Assert.Equal(0.003m, market.MakerFeeRate);
         Assert.True(info.Features?.SupportsWebSocket);

@@ -1,8 +1,7 @@
 using System;
-using ExchangeApi.Common.Enums;
 using ExchangeApi.Composition.Providers.Credentials;
 
-namespace Composition.Tests.Credentials;
+namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 
 public class EnvironmentVariableApiCredentialProvider_Tests
 {
@@ -10,8 +9,7 @@ public class EnvironmentVariableApiCredentialProvider_Tests
     public void Get_ReturnsCredentials_WhenBothVariablesExist()
     {
         // Arrange
-        var provider = new EnvironmentVariableApiCredentialProvider();
-        var exchange = ExchangeCode.Bitflyer;
+        var provider = new EnvironmentVariableApiCredentialProvider("bitflyer");
         var account = "default";
 
         var apiKeyName = "BITFLYER_DEFAULT_API_KEY";
@@ -23,7 +21,7 @@ public class EnvironmentVariableApiCredentialProvider_Tests
         try
         {
             // Act
-            var creds = provider.Get(exchange, account);
+            var creds = provider.Get(account);
 
             // Assert
             Assert.Equal("key-123", creds.ApiKey);
@@ -40,8 +38,7 @@ public class EnvironmentVariableApiCredentialProvider_Tests
     public void Get_Throws_WhenKeyMissing()
     {
         // Arrange
-        var provider = new EnvironmentVariableApiCredentialProvider();
-        var exchange = ExchangeCode.Bitflyer;
+        var provider = new EnvironmentVariableApiCredentialProvider("bitflyer");
         var account = "trading";
 
         var apiKeyName = "BITFLYER_TRADING_API_KEY";
@@ -51,7 +48,7 @@ public class EnvironmentVariableApiCredentialProvider_Tests
         Environment.SetEnvironmentVariable(apiSecretName, "secret-only");
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => provider.Get(exchange, account));
+        Assert.Throws<InvalidOperationException>(() => provider.Get(account));
 
         Environment.SetEnvironmentVariable(apiSecretName, null);
     }

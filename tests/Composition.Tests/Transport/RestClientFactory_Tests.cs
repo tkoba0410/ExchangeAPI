@@ -1,15 +1,16 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Core.Transport.Observability;
-using ExchangeApi.Core.Transport.Policy;
-using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Transport.Observability;
+using ExchangeApi.Transport.Policy;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Http;
 using ExchangeApi.Composition.Bootstrap.Transport;
 
-namespace Composition.Tests.Transport;
+namespace ExchangeApi.Tests.Composition.Tests.Transport;
 
 public class RestClientFactory_Tests
 {
@@ -26,9 +27,10 @@ public class RestClientFactory_Tests
 
         var client = RestClientFactory.Create(baseUri, transport, signer, policy, logger);
 
-        var result = await client.GetAsync<TestDto>("/api");
+        var raw = await client.SendRawAsync("GET", "/api");
+        var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);
 
-        Assert.Equal("ok", result.Value);
+        Assert.Equal("ok", result!.Value);
         Assert.True(signer.Called);
         Assert.True(policy.Called);
         Assert.True(logger.RequestLogged);
@@ -44,7 +46,7 @@ public class RestClientFactory_Tests
             LastRequest = request;
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent("{\"value\":\"ok\"}")
+                Content = new StringContent("{\"Value\":\"ok\"}")
             };
             return Task.FromResult(response);
         }

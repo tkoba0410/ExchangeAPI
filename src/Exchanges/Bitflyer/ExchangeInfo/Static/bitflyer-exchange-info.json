@@ -1,0 +1,125 @@
+{
+  "markets": [
+    {
+      "symbol": "BTC/JPY",
+      "productCode": "BTC_JPY",
+      "type": "Spot",
+      "isSupported": true
+    },
+    {
+      "symbol": "XRP/JPY",
+      "productCode": "XRP_JPY",
+      "type": "Spot",
+      "isSupported": true
+    },
+    {
+      "symbol": "ETH/JPY",
+      "productCode": "ETH_JPY",
+      "type": "Spot",
+      "isSupported": true
+    },
+    {
+      "symbol": "XLM/JPY",
+      "productCode": "XLM_JPY",
+      "type": "Spot",
+      "isSupported": true
+    },
+    {
+      "symbol": "MONA/JPY",
+      "productCode": "MONA_JPY",
+      "type": "Spot",
+      "isSupported": true
+    },
+    {
+      "symbol": "ELF/JPY",
+      "productCode": "ELF_JPY",
+      "type": "Spot",
+      "isSupported": true
+    },
+    {
+      "symbol": "ETH/BTC",
+      "productCode": "ETH_BTC",
+      "type": "Spot",
+      "isSupported": true
+    },
+    {
+      "symbol": "BCH/BTC",
+      "productCode": "BCH_BTC",
+      "type": "Spot",
+      "isSupported": true
+    },
+    {
+      "symbol": "FX/BTC/JPY",
+      "productCode": "FX_BTC_JPY",
+      "type": "FX",
+      "isSupported": true
+    }
+  ],
+  "feeSchedule": {
+    "scope": "Lightning Spot",
+    "unit": "30d_execution_volume_jpy",
+    "notes": "Volume-tiered execution fee. Check official site for latest rates.",
+    "tiers": [
+      {
+        "minJpy": 0,
+        "maxJpy": 99999,
+        "rate": 0.0015
+      },
+      {
+        "minJpy": 100000,
+        "maxJpy": 199999,
+        "rate": 0.0014
+      },
+      {
+        "minJpy": 200000,
+        "maxJpy": 499999,
+        "rate": 0.0013
+      },
+      {
+        "minJpy": 500000,
+        "maxJpy": 999999,
+        "rate": 0.0012
+      },
+      {
+        "minJpy": 1000000,
+        "maxJpy": 1999999,
+        "rate": 0.0011
+      },
+      {
+        "minJpy": 2000000,
+        "maxJpy": 4999999,
+        "rate": 0.001
+      },
+      {
+        "minJpy": 5000000,
+        "maxJpy": 9999999,
+        "rate": 0.0009
+      },
+      {
+        "minJpy": 10000000,
+        "maxJpy": 19999999,
+        "rate": 0.0007
+      },
+      {
+        "minJpy": 20000000,
+        "maxJpy": 49999999,
+        "rate": 0.0005
+      },
+      {
+        "minJpy": 50000000,
+        "maxJpy": 99999999,
+        "rate": 0.0003
+      },
+      {
+        "minJpy": 100000000,
+        "maxJpy": 499999999,
+        "rate": 0.0002
+      },
+      {
+        "minJpy": 500000000,
+        "maxJpy": null,
+        "rate": 0.0001
+      }
+    ]
+  }
+}

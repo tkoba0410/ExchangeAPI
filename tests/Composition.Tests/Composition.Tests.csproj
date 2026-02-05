@@ -21,10 +21,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Domain/Common/Common/Shared.Common.csproj" />
-    <ProjectReference Include="../../src/Domain/Contracts/Shared.Contracts.csproj" />
-    <ProjectReference Include="../../src/Core/Core.csproj" />
-    <ProjectReference Include="../../src/Composition/Composition.csproj" />
+    <ProjectReference Include="../../src/Contracts/Facade/ExchangeApi.Contracts.Facade.csproj" />
+    <ProjectReference Include="../../src/Composition/ExchangeApi.Composition.csproj" />
+    <ProjectReference Include="../../src/Application/ExchangeApi.Application.csproj" />
+    <ProjectReference Include="../../src/Transport/ExchangeApi.Transport.csproj" />
+    <ProjectReference Include="../../src/Primitives/ExchangeApi.Primitives.csproj" />
+    <ProjectReference Include="../../src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj" />
+    <ProjectReference Include="../../src/Exchanges/Bittrade/Composition/ExchangeApi.Exchanges.Bittrade.Composition.csproj" />
   </ItemGroup>
 
 </Project>

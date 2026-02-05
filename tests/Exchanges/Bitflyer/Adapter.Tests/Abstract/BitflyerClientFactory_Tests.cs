@@ -1,35 +1,11 @@
-using System;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Core.Transport.Policy;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Factory;
+using ExchangeApi.Transport.Policy;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Factory;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
     public class BitflyerClientFactory_Tests
     {
-        [Fact]
-        public void Create_WithProvider_DelegatesToProviderAndReturnsClient()
-        {
-        // Arrange
-        var provider = new FakeProvider(new ApiCredentials("key-1", "secret-1"));
-
-        // Act
-        var client = BitflyerClientFactory.Create(provider, ExchangeCode.Bitflyer, "default");
-
-        // Assert
-        Assert.NotNull(client);
-    }
-
-    [Fact]
-    public void Create_WithProvider_NullProvider_Throws()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            BitflyerClientFactory.Create(provider: null!, ExchangeCode.Bitflyer, "default"));
-    }
-
     [Fact]
     public void Create_WithOptions_Succeeds()
     {
@@ -42,17 +18,4 @@ namespace ExchangeApi.Exchanges.Bitflyer.Tests;
 
         Assert.NotNull(client);
     }
-
-    private sealed class FakeProvider : IApiCredentialProvider
-    {
-        private readonly ApiCredentials _creds;
-
-        public FakeProvider(ApiCredentials creds)
-        {
-            _creds = creds;
-        }
-
-        public ApiCredentials Get(ExchangeCode exchange, string accountId) => _creds;
-    }
-
 }

@@ -1,57 +1,63 @@
-using System;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Api.Facade;
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
-using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
+using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
+using ExchangeApi.Primitives.CallCommon;
 using Xunit;
+using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
 
 public sealed class BitflyerPublicClientTests
 {
     [Fact]
-    public async Task GetHealthAsync_ReturnsRawHealth()
+    public async Task GetHealthCallAsync_ReturnsRawHealth()
     {
-        var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
-        var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
 
-        var call = await marketData.GetHealthCallAsync("BTC_JPY");
-        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos.BitflyerHealthNormalized>.Ok>(call.Result);
+        var call = await normalized.GetHealthCallAsync(ProductCode.ParseOrThrow("BTC_JPY"));
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos.BitflyerHealthNormalized>.Ok>(call.Result);
         var result = ok.Response;
 
-        Assert.Equal("NORMAL", result.Status);
+        Assert.Equal("NORMAL", result.Status?.Value);
     }
 
     [Fact]
-    public async Task GetBoardStateAsync_ReturnsRawBoardState()
+    public async Task GetBoardStateCallAsync_ReturnsRawBoardState()
     {
-        var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
-        var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
+        var markets = BitflyerTestHelpers.CreateResolver();
+        var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
 
-        var call = await marketData.GetBoardStateCallAsync("BTC_JPY");
-        var ok = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Exchanges.Bitflyer.Normalize.Dtos.BitflyerBoardStateNormalized>.Ok>(call.Result);
+        var call = await normalized.GetBoardStateCallAsync(ProductCode.ParseOrThrow("BTC_JPY"));
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos.BitflyerBoardStateNormalized>.Ok>(call.Result);
         var result = ok.Response;
 
-        Assert.Equal("NORMAL", result.Health);
-        Assert.Equal("RUNNING", result.State);
+        Assert.Equal("NORMAL", result.Health?.Value);
+        Assert.Equal("RUNNING", result.State?.Value);
         Assert.Null(result.Data);
     }
 
     [Fact]
-    public async Task GetTickerAsync_UnknownSymbol_Throws()
+    public async Task GetTickerCallAsync_UnknownSymbol_Throws()
     {
-        var rawTicker = new Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
-        var marketData = new BitflyerNormalizedMarketDataFacade(publicApi);
-        var client = new BitflyerPublicClient(marketData);
+        var exchangeInfo = new BitflyerExchangeInfoApi();
+        var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
+        var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
+        var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
+        var client = new BitflyerPublicClient(normalized, exchangeInfo);
 
-        var call = await client.GetTickerCallAsync(new Symbol("ETH/JPY"));
-        var err = Assert.IsType<ExchangeApi.Spec.CallCommon.CallResult<ExchangeApi.Contracts.Dtos.Ticker>.Err>(call.Result);
+        var call = await client.GetTickerCallAsync(new Symbol("DOGE/JPY"));
+        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Ticker>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }
 }

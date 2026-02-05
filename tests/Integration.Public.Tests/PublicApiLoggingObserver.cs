@@ -1,9 +1,9 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using ExchangeApi.Core.Transport.Observability;
+using ExchangeApi.Transport.Observability;
 
-namespace Integration.Public.Tests;
+namespace ExchangeApi.Tests.Integration.Public.Tests;
 
 /// <summary>
 /// Public API 用の素朴なロガー（ヘッダはそのまま出さない）。ボディは短くトリムする。

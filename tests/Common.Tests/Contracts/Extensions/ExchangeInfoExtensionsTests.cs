@@ -1,18 +1,19 @@
 using System.Collections.Generic;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Domain.Extensions;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Utilities.Extensions;
 using Xunit;
 
-namespace Common.Tests.Contracts.Extensions;
+namespace ExchangeApi.Tests.Common.Tests.Contracts.Extensions;
 
 public class ExchangeInfoExtensionsTests
 {
     private readonly ExchangeInfo _info = new(
         Markets: new List<ExchangeMarketInfo>
         {
-            new("BTC/JPY", "BTC_JPY", "Spot", MakerFeeRate: 0.001m, TakerFeeRate: 0.002m),
-            new("ETH/JPY", "ETH_JPY", "Spot", MakerFeeRate: null, TakerFeeRate: null),
+            new(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("BTC_JPY"), MarketType.ParseOrThrow("Spot"), MakerFeeRate: 0.001m, TakerFeeRate: 0.002m),
+            new(Symbol.ParseOrThrow("ETH/JPY"), ProductCode.ParseOrThrow("ETH_JPY"), MarketType.ParseOrThrow("Spot"), MakerFeeRate: null, TakerFeeRate: null),
         },
         Features: null,
         RateLimits: null,
@@ -21,17 +22,17 @@ public class ExchangeInfoExtensionsTests
     [Fact]
     public void FindMarket_BySymbol_ShouldReturnMarket()
     {
-        var market = _info.FindMarket("BTC/JPY");
+        var market = _info.FindMarket(Symbol.ParseOrThrow("BTC/JPY"));
         Assert.NotNull(market);
-        Assert.Equal("BTC_JPY", market!.ProductCode);
+        Assert.Equal("BTC_JPY", market!.ProductCode.Value);
     }
 
     [Fact]
     public void FindMarket_ByProductCode_ShouldReturnMarket()
     {
-        var market = _info.FindMarket("unknown", productCode: "ETH_JPY");
+        var market = _info.FindMarket(Symbol.ParseOrThrow("unknown"), productCode: ProductCode.ParseOrThrow("ETH_JPY"));
         Assert.NotNull(market);
-        Assert.Equal("ETH/JPY", market!.Symbol);
+        Assert.Equal("ETH/JPY", market!.Symbol.Value);
     }
 
     [Fact]
@@ -40,25 +41,25 @@ public class ExchangeInfoExtensionsTests
         var info = new ExchangeInfo(
             Markets: new List<ExchangeMarketInfo>
             {
-                new("BTC/JPY", "BTC_JPY", "Spot", MakerFeeRate: 0.001m, TakerFeeRate: 0.002m, FeeCurrency: "BTC", FeeType: FeeType.Percentage),
+                new(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("BTC_JPY"), MarketType.ParseOrThrow("Spot"), MakerFeeRate: 0.001m, TakerFeeRate: 0.002m, FeeCurrency: CurrencyCode.Btc, FeeType: FeeType.Percentage),
             },
             Features: null,
             RateLimits: null,
             Maintenance: null);
 
-        var found = info.TryGetFeeRates("BTC/JPY", out var maker, out var taker, out var feeCurrency, out var feeType);
+        var found = info.TryGetFeeRates(Symbol.ParseOrThrow("BTC/JPY"), out var maker, out var taker, out var feeCurrency, out var feeType);
 
         Assert.True(found);
         Assert.Equal(0.001m, maker);
         Assert.Equal(0.002m, taker);
-        Assert.Equal("BTC", feeCurrency);
+        Assert.Equal(CurrencyCode.Btc, feeCurrency);
         Assert.Equal(FeeType.Percentage, feeType);
     }
 
     [Fact]
     public void TryGetFeeRates_NotFound_ShouldReturnFalseAndNulls()
     {
-        var found = _info.TryGetFeeRates("XRP/JPY", out var maker, out var taker, out var feeCurrency, out var feeType);
+        var found = _info.TryGetFeeRates(Symbol.ParseOrThrow("XRP/JPY"), out var maker, out var taker, out var feeCurrency, out var feeType);
 
         Assert.False(found);
         Assert.Null(maker);

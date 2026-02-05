@@ -1,10 +1,10 @@
 using System;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Domain.Extensions;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Utilities.Extensions;
 using Xunit;
 
-namespace Common.Tests.Contracts.Extensions;
+namespace ExchangeApi.Tests.Common.Tests.Contracts.Extensions;
 
 public class ExchangeMaintenanceExtensionsTests
 {

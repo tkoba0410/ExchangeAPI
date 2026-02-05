@@ -1,76 +1,94 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Domain.Services;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalize;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
-using ContractsRequests = ExchangeApi.Contracts.Requests;
-using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
+using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Primitives.Errors;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
+using ContractsRequests = ExchangeApi.Contracts.Facade.Requests;
+using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Requests;
+using ExchangeApi.Primitives.CallCommon;
 using Xunit;
+using ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Helpers;
+using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public sealed class BittradeErrorEnrichTests
 {
     [Fact]
-    public async Task GetTickerAsync_EnrichesExchangeAndOperation()
+    public async Task GetDetailMergedCallAsync_EnrichesExchangeAndOperation()
     {
-        var api = new BittradeMarketDataApi(new ThrowingMarketDataApi(), CreateResolver());
+        var api = new MarketApi(new BittradeNormalizedPublicApi(new ThrowingRawApi()), CreateResolver());
 
-        var call = await api.GetTickerCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
+        var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
 
         var err = Assert.IsType<CallResult<Ticker>.Err>(call.Result);
         Assert.Equal("Bittrade.Market.GetTicker", call.Meta.Component);
         Assert.Equal("boom", err.Error.Message);
     }
 
-    private sealed class ThrowingMarketDataApi : IBittradeNormalizedMarketDataApi
+    private sealed class ThrowingRawApi : BittradeRawApiStub
     {
-        public Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetTickerCallAsync(
-            string symbol,
-            CancellationToken ct = default) =>
+        public override Task<Call<RawPublicRequests.GetMergedTickerRequest, RawPublicDtos.RawMergedResponse>> GetDetailMergedCallAsync(
+            RawPublicRequests.GetMergedTickerRequest request,
+            CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetOrderBookCallAsync(
-            string symbol,
-            ExchangeApi.Exchanges.Bittrade.Normalize.Types.BittradeDepthType? depthType = null,
-            CancellationToken ct = default) =>
+        public override Task<Call<RawPublicRequests.GetDepthRequest, RawPublicDtos.RawDepthResponse>> GetDepthCallAsync(
+            RawPublicRequests.GetDepthRequest request,
+            CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetExecutionsCallAsync(
-            string symbol,
-            CancellationToken ct = default) =>
+        public override Task<Call<RawPublicRequests.GetTradesRequest, RawPublicDtos.RawTradeResponse>> GetTradeCallAsync(
+            RawPublicRequests.GetTradesRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw new ExchangeApiException("boom");
+
+        public override Task<Call<RawPublicRequests.GetKlinesRequest, RawPublicDtos.RawKlinesResponse>> GetHistoryKlineCallAsync(
+            RawPublicRequests.GetKlinesRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw new ExchangeApiException("boom");
+
+        public override Task<Call<RawPublicRequests.GetTickersRequest, RawPublicDtos.RawTickersResponse>> GetTickersCallAsync(
+            RawPublicRequests.GetTickersRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw new ExchangeApiException("boom");
+
+        public override Task<Call<RawPublicRequests.GetTradeHistoryRequest, RawPublicDtos.RawTradeHistoryResponse>> GetHistoryTradeCallAsync(
+            RawPublicRequests.GetTradeHistoryRequest request,
+            CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
     }
 
     private static IExchangeMarketResolver CreateResolver() =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfo(
-            new[] { new ExchangeMarketInfo("BTC/JPY", "btcjpy", "Spot") },
+        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
+            new[] { new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("btcjpy"), MarketType.ParseOrThrow("Spot")) },
             null,
             null,
             null)));
 
-    private sealed class StubExchangeInfoApi : IExchangeInfoApi
+    private sealed class StubExchangeInfoApi : IExchangeInfoProvider
     {
-        private readonly ExchangeInfo _info;
+        private readonly ExchangeInfoDto _info;
 
-        public StubExchangeInfoApi(ExchangeInfo info) => _info = info;
+        public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
-        public Task<Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfo>> GetExchangeInfoCallAsync(
+        public Task<Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default) =>
-            Task.FromResult(new Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfo>(
+            Task.FromResult(new Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfoDto>(
                 CallId.New(),
                 DateTimeOffset.UtcNow,
                 TimeSpan.Zero,
                 new ContractsRequests.GetExchangeInfoRequest(),
-                new CallResult<ExchangeInfo>.Ok(_info),
-                new CallMeta("Contracts", "StubExchangeInfo", null, null)));
+                new CallResult<ExchangeInfoDto>.Ok(_info),
+                CallMeta.CreateInternal("Contracts", "StubExchangeInfo")));
+
     }
 }

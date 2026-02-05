@@ -6,19 +6,20 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Contracts.Requests;
-using ExchangeApi.Spec.CallCommon;
-using ExchangeInfoDto = ExchangeApi.Contracts.Dtos.ExchangeInfo;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Facade.Requests;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.Errors;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 namespace ExchangeApi.Composition.Providers.ExchangeInfo;
 
 /// <summary>
-/// JSON ファイルから ExchangeInfo を読み込む IExchangeInfoApi 実装。
+/// JSON ファイルから ExchangeInfo を読み込む IPublicApi 実装。
 /// 複数ファイル指定時は後勝ちでマージする。
 /// </summary>
-public sealed class JsonExchangeInfoApi : IExchangeInfoApi
+public sealed class JsonExchangeInfoApi : IPublicApi
 {
     private readonly string[] _paths;
     private readonly JsonSerializerOptions _options;
@@ -51,6 +52,7 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: "JsonExchangeInfo",
+                EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
             return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
@@ -66,6 +68,7 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: "JsonExchangeInfo",
+                EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
             return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
@@ -77,6 +80,42 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
                     new CallError(CallErrorKind.Unknown, ex.Message, ex)),
                 Meta: meta);
         }
+    }
+
+    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetTickerRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetTickerRequest, Ticker>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "Ticker"));
+    }
+
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetBoardCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetOrderBookRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetOrderBookRequest, OrderBook>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "OrderBook"));
+    }
+
+    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetExecutionsPublicCallAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetMarketExecutionsRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "MarketExecutions"));
     }
 
     private ExchangeInfoDto GetCachedInfo()
@@ -156,7 +195,7 @@ public sealed class JsonExchangeInfoApi : IExchangeInfoApi
     }
 
     private static string GetKey(ExchangeMarketInfo market) =>
-        string.IsNullOrWhiteSpace(market.ProductCode) ? market.Symbol : market.ProductCode;
+        market.ProductCode.IsEmpty ? market.Symbol.Value : market.ProductCode.Value;
 
     private static JsonSerializerOptions CreateDefaultOptions() =>
         new()

@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Composition.Abstractions;
+using ExchangeApi.Composition.Dtos;
 namespace ExchangeApi.Composition.Providers.Credentials;
 
 /// <summary>
@@ -21,15 +19,22 @@ public sealed class FileApiCredentialProvider : IApiCredentialProvider
 {
     private readonly string _filePath;
     private readonly IReadOnlyDictionary<string, ApiCredentials> _store;
+    private readonly string _exchangeId;
 
-    public FileApiCredentialProvider(string filePath)
+    public FileApiCredentialProvider(string filePath, string exchangeId)
     {
         if (string.IsNullOrWhiteSpace(filePath))
         {
             throw new ArgumentException("filePath is required.", nameof(filePath));
         }
 
+        if (string.IsNullOrWhiteSpace(exchangeId))
+        {
+            throw new ArgumentException("ExchangeId is required.", nameof(exchangeId));
+        }
+
         _filePath = filePath;
+        _exchangeId = exchangeId;
 
         if (!File.Exists(_filePath))
         {
@@ -45,20 +50,14 @@ public sealed class FileApiCredentialProvider : IApiCredentialProvider
         _store = dict ?? throw new InvalidOperationException("Credential file is empty or invalid.");
     }
 
-    public ApiCredentials Get(ExchangeCode exchange, string accountId)
+    public ApiCredentials Get(string accountId)
     {
-        if (exchange is ExchangeCode.None or ExchangeCode.Unknown)
-        {
-            throw new ArgumentException("ExchangeCode is required.", nameof(exchange));
-        }
-
         if (string.IsNullOrWhiteSpace(accountId))
         {
             throw new ArgumentException("AccountId is required.", nameof(accountId));
         }
 
-        var exchangeId = ExchangeCodeFormatter.ToCanonicalId(exchange);
-        var key = $"{exchangeId}/{accountId}";
+        var key = $"{_exchangeId}/{accountId}";
         if (_store.TryGetValue(key, out var creds) && IsValid(creds))
         {
             return creds;

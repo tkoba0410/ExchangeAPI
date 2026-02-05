@@ -1,69 +1,121 @@
 using System;
+using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Private;
-using RawRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Requests;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Tests.Fakes;
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
-public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
+public sealed class FakeBitflyerPrivateTradingApi
 {
-    private readonly CreateChildOrderResponse _response;
+    private readonly RawPrivateDtos.RawSendChildOrderResponse _response;
+    private readonly IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> _childOrders;
+    private readonly Queue<IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>? _childOrderSnapshots;
     private readonly Exception? _exceptionToThrow;
 
-    public RawRequests.CreateChildOrderRequest? LastRequest { get; private set; }
-    public RawRequests.CancelChildOrderRequest? LastCancelRequest { get; private set; }
-    public RawRequests.CancelAllChildOrdersRequest? LastCancelAllRequest { get; private set; }
-    public RawRequests.CreateWithdrawalRequest? LastWithdrawRequest { get; private set; }
+    public string? LastBodyJson { get; private set; }
+    public string? LastParentOrderBodyJson { get; private set; }
+    public RawPrivateRequests.CancelChildOrderRequest? LastCancelRequest { get; private set; }
+    public RawPrivateRequests.CancelParentOrderRequest? LastCancelParentOrderRequest { get; private set; }
+    public RawPrivateRequests.GetChildOrdersRequest? LastGetChildOrdersRequest { get; private set; }
 
     public FakeBitflyerPrivateTradingApi(
-        CreateChildOrderResponse response,
+        RawPrivateDtos.RawSendChildOrderResponse response,
+        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>? childOrders = null,
+        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>[]? snapshots = null,
         Exception? exceptionToThrow = null)
     {
         _response = response;
+        _childOrders = childOrders ?? Array.Empty<RawPrivateDtos.RawGetChildOrdersResponse>();
+        _childOrderSnapshots = snapshots is null ? null : new Queue<IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>(
+            snapshots);
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task<Call<RawRequests.CreateChildOrderRequest, CreateChildOrderResponse>> CreateChildOrderAsync(
-        RawRequests.CreateChildOrderRequest request,
+    public Task<Call<RawPrivateRequests.CreateChildOrderRequest, RawPrivateDtos.RawSendChildOrderResponse>> SendChildOrderCallAsync(
+        RawPrivateRequests.CreateChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        LastRequest = request;
+        LastBodyJson = JsonSerializer.Serialize(request);
         return Task.FromResult(MakeCall(request, _response));
     }
 
-    public Task<Call<RawRequests.CancelChildOrderRequest, EmptyResponse>> CancelChildOrderAsync(
-        RawRequests.CancelChildOrderRequest request,
+    public Task<Call<RawPrivateRequests.CreateParentOrderRequest, RawPrivateDtos.RawSendParentOrderResponse>> SendParentOrderCallAsync(
+        RawPrivateRequests.CreateParentOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        LastParentOrderBodyJson = JsonSerializer.Serialize(request);
+        return Task.FromResult(MakeCall(
+            request,
+            new RawPrivateDtos.RawSendParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
+    }
+
+    public Task<Call<RawPrivateRequests.CancelChildOrderRequest, RawPrivateDtos.RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
+        RawPrivateRequests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastCancelRequest = request;
-        return Task.FromResult(MakeCall(request, new EmptyResponse()));
+        return Task.FromResult(MakeCall(request, new RawPrivateDtos.RawCancelChildOrderResponse()));
     }
 
-    public Task<Call<RawRequests.CancelAllChildOrdersRequest, EmptyResponse>> CancelAllChildOrdersAsync(
-        RawRequests.CancelAllChildOrdersRequest request,
+    public Task<Call<RawPrivateRequests.CancelParentOrderRequest, RawPrivateDtos.RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
+        RawPrivateRequests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        LastCancelAllRequest = request;
-        return Task.FromResult(MakeCall(request, new EmptyResponse()));
+        LastCancelParentOrderRequest = request;
+        return Task.FromResult(MakeCall(request, new RawPrivateDtos.RawCancelParentOrderResponse()));
     }
 
-    public Task<Call<RawRequests.CreateWithdrawalRequest, CreateWithdrawalResponse>> CreateWithdrawalAsync(
-        RawRequests.CreateWithdrawalRequest request,
+    public Task<Call<RawPrivateRequests.GetChildOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
+        RawPrivateRequests.GetChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
-        LastWithdrawRequest = request;
-        return Task.FromResult(MakeCall(request, new CreateWithdrawalResponse { MessageId = "WITHDRAW" }));
+        LastGetChildOrdersRequest = request;
+        if (_childOrderSnapshots is not null && _childOrderSnapshots.Count > 0)
+        {
+            var snapshot = _childOrderSnapshots.Dequeue();
+            return Task.FromResult(MakeCall(request, snapshot));
+        }
+
+        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> response;
+        if (request.ChildOrderAcceptanceId is { IsEmpty: false })
+        {
+            response = _childOrders
+                .Where(o => o.ChildOrderAcceptanceId == request.ChildOrderAcceptanceId.Value.Value)
+                .ToArray();
+        }
+        else if (request.ChildOrderId is { IsEmpty: false })
+        {
+            response = _childOrders
+                .Where(o => o.ChildOrderId == request.ChildOrderId.Value.Value)
+                .ToArray();
+        }
+        else
+        {
+            response = _childOrders;
+        }
+        return Task.FromResult(MakeCall(request, response));
+    }
+
+    public Task<Call<RawPrivateRequests.GetParentOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
+        RawPrivateRequests.GetParentOrdersRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> response = Array.Empty<RawPrivateDtos.RawGetParentOrdersResponse>();
+        return Task.FromResult(MakeCall(request, response));
+    }
+
+    public Task<Call<RawPrivateRequests.GetParentOrderRequest, RawPrivateDtos.RawGetParentOrderResponse>> GetParentOrderCallAsync(
+        RawPrivateRequests.GetParentOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(MakeCall(request, new RawPrivateDtos.RawGetParentOrderResponse()));
     }
 
     private Call<TReq, TResponse> MakeCall<TReq, TResponse>(TReq request, TResponse response)
     {
-        var meta = new CallMeta(
-            Layer: "Raw",
-            Component: "FakeBitflyerPrivateTradingApi",
-            Tags: null,
-            Children: null);
+        var meta = CallMeta.CreateInternal("Raw", "FakeBitflyerPrivateTradingApi");
 
         if (_exceptionToThrow is null)
         {
@@ -76,7 +128,7 @@ public sealed class FakeBitflyerPrivateTradingApi : IBitflyerPrivateTradingApi
                 Meta: meta);
         }
 
-        if (_exceptionToThrow is ExchangeApi.Core.Contracts.Errors.ExchangeApiException ex)
+        if (_exceptionToThrow is ExchangeApi.Primitives.Errors.ExchangeApiException ex)
         {
             var statusCode = ex.StatusCode.HasValue ? (int)ex.StatusCode.Value : (int?)null;
             var error = new CallError(CallErrorKind.Http, ex.Message, ex, statusCode);

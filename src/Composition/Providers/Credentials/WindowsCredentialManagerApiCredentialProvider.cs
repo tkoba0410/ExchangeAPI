@@ -1,10 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Composition.Abstractions;
+using ExchangeApi.Composition.Dtos;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 namespace ExchangeApi.Composition.Providers.Credentials;
 
@@ -14,13 +12,20 @@ namespace ExchangeApi.Composition.Providers.Credentials;
 /// </summary>
 public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredentialProvider
 {
-    public ApiCredentials Get(ExchangeCode exchange, string accountId)
+    private readonly string _exchangeId;
+
+    public WindowsCredentialManagerApiCredentialProvider(string exchangeId)
     {
-        if (exchange is ExchangeCode.None or ExchangeCode.Unknown)
+        if (string.IsNullOrWhiteSpace(exchangeId))
         {
-            throw new ArgumentException("ExchangeCode is required.", nameof(exchange));
+            throw new ArgumentException("ExchangeId is required.", nameof(exchangeId));
         }
 
+        _exchangeId = exchangeId;
+    }
+
+    public ApiCredentials Get(string accountId)
+    {
         if (string.IsNullOrWhiteSpace(accountId))
         {
             throw new ArgumentException("AccountId is required.", nameof(accountId));
@@ -31,9 +36,8 @@ public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredenti
             throw new PlatformNotSupportedException("Windows Credential Manager is only available on Windows.");
         }
 
-        var exchangeId = ExchangeCodeFormatter.ToCanonicalId(exchange);
-        var apiKeyTarget = BuildTarget(exchangeId, accountId, "api_key");
-        var apiSecretTarget = BuildTarget(exchangeId, accountId, "api_secret");
+        var apiKeyTarget = BuildTarget(_exchangeId, accountId, "api_key");
+        var apiSecretTarget = BuildTarget(_exchangeId, accountId, "api_secret");
 
         var apiKey = ReadCredential(apiKeyTarget);
         var apiSecret = ReadCredential(apiSecretTarget);

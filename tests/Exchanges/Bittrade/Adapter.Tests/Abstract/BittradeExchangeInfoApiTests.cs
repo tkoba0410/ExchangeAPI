@@ -1,31 +1,31 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.ExchangeInfo;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Types;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Apis;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Requests;
-using ExchangeApi.Spec.CallCommon;
+using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Helpers;
 using Xunit;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
 public class BittradeExchangeInfoApiTests
 {
     [Fact]
     public async Task GetExchangeInfoAsync_MapsSymbols()
     {
-        var api = new BittradeExchangeInfoApi(new StubNormalizedExchangeInfoApi());
+        var api = new BittradeExchangeInfoApi(new BittradeNormalizedPublicApi(new StubRawApi()));
 
         var call = await api.GetExchangeInfoCallAsync();
-        var ok = Assert.IsType<CallResult<ExchangeInfo>.Ok>(call.Result);
+        var ok = Assert.IsType<CallResult<ExchangeInfoDto>.Ok>(call.Result);
         var info = ok.Response;
 
         Assert.Single(info.Markets);
         var m = info.Markets[0];
-        Assert.Equal("BTC/JPY", m.Symbol);
-        Assert.Equal("btcjpy", m.ProductCode);
+        Assert.Equal("BTC/JPY", m.Symbol.Value);
+        Assert.Equal("btcjpy", m.ProductCode.Value);
         Assert.Equal(new Price(0.01m), m.PriceIncrement);
         Assert.Equal(new Size(0.0001m), m.SizeIncrement);
         Assert.Equal(new Size(0.0001m), m.MinSize);
@@ -33,35 +33,64 @@ public class BittradeExchangeInfoApiTests
         Assert.True(m.IsSupported);
     }
 
-    private sealed class StubNormalizedExchangeInfoApi : IBittradeNormalizedExchangeInfoApi
+    private sealed class StubRawApi : BittradeRawApiStub
     {
-        public Task<Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>> GetSymbolsCallAsync(
+        public override Task<Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.RawSymbolsResponse>> GetSymbolsCallAsync(
+            RawPublicRequests.GetSymbolsRequest request,
             System.Threading.CancellationToken ct = default)
         {
-            IReadOnlyList<BittradeSymbolNormalized> symbols = new[]
+            IReadOnlyList<RawPublicDtos.RawSymbolInfo> symbols = new[]
             {
-                new BittradeSymbolNormalized(
+                new RawPublicDtos.RawSymbolInfo(
                     Symbol: "btcjpy",
                     BaseCurrency: "btc",
                     QuoteCurrency: "jpy",
                     PricePrecision: 2,
                     AmountPrecision: 4,
-                    MinOrderAmount: 0.0001m,
-                    MinOrderValue: 1000m,
+                    ValuePrecision: null,
+                    MinOrderAmount: "0.0001",
+                    MinOrderValue: "1000",
                     State: "online")
             };
-            var request = new GetSymbolsRequest();
-            var meta = new CallMeta(
-                Layer: "Normalized",
-                Component: "StubNormalizedExchangeInfoApi",
-                Tags: null,
-                Children: null);
-            var call = new Call<GetSymbolsRequest, IReadOnlyList<BittradeSymbolNormalized>>(
+            var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
+            var call = new Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.RawSymbolsResponse>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<IReadOnlyList<BittradeSymbolNormalized>>.Ok(symbols),
+                Result: new CallResult<RawPublicDtos.RawSymbolsResponse>.Ok(new RawPublicDtos.RawSymbolsResponse("ok", symbols)),
+                Meta: meta);
+            return Task.FromResult(call);
+        }
+
+        public override Task<Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.RawCurrenciesResponse>> GetCurrencysCallAsync(
+            RawPublicRequests.GetCurrenciesRequest request,
+            System.Threading.CancellationToken ct = default)
+        {
+            IReadOnlyList<string> data = new[] { "btc", "jpy" };
+            var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
+            var call = new Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.RawCurrenciesResponse>(
+                Id: CallId.New(),
+                StartedAt: System.DateTimeOffset.UtcNow,
+                Duration: System.TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<RawPublicDtos.RawCurrenciesResponse>.Ok(new RawPublicDtos.RawCurrenciesResponse("ok", data)),
+                Meta: meta);
+            return Task.FromResult(call);
+        }
+
+        public override Task<Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.RawTimestampResponse>> GetTimestampCallAsync(
+            RawPublicRequests.GetTimestampRequest request,
+            System.Threading.CancellationToken ct = default)
+        {
+            var data = System.DateTimeOffset.UtcNow;
+            var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
+            var call = new Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.RawTimestampResponse>(
+                Id: CallId.New(),
+                StartedAt: System.DateTimeOffset.UtcNow,
+                Duration: System.TimeSpan.Zero,
+                Request: request,
+                Result: new CallResult<RawPublicDtos.RawTimestampResponse>.Ok(new RawPublicDtos.RawTimestampResponse("ok", data)),
                 Meta: meta);
             return Task.FromResult(call);
         }

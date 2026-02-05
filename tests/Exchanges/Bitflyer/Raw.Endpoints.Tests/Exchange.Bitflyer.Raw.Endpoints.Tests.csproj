@@ -21,7 +21,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Spec/Exchanges/Bitflyer/Raw/Exchange.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Api/Raw/ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Api/Wire/ExchangeApi.Exchanges.Bitflyer.Wire.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Api/Normalized/ExchangeApi.Exchanges.Bitflyer.Normalized.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\Inventory\InventoryEndpointIdParser.cs" Link="Inventory/InventoryEndpointIdParser.cs" />
+    <Compile Include="..\..\..\Inventory\EndpointIdNamingAssertions.cs" Link="Inventory/EndpointIdNamingAssertions.cs" />
   </ItemGroup>
 
 </Project>

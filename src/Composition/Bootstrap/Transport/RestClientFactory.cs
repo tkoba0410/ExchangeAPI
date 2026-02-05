@@ -1,11 +1,11 @@
 using System;
 using System.Net.Http;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Core.Transport.Observability;
-using ExchangeApi.Core.Transport.Policy;
-using ExchangeApi.Core.Transport.Protocol;
-using ExchangeApi.Core.Transport.Time;
-using ExchangeApi.Core.Transport.Http;
+using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Transport.Observability;
+using ExchangeApi.Transport.Policy;
+using ExchangeApi.Transport.Protocol;
+using ExchangeApi.Transport.Time;
+using ExchangeApi.Transport.Http;
 namespace ExchangeApi.Composition.Bootstrap.Transport;
 
 /// <summary>

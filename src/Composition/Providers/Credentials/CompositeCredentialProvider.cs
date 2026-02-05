@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Contracts.Dtos;
-using ExchangeApi.Common.Enums;
-using ExchangeApi.Common.Types;
+using ExchangeApi.Composition.Abstractions;
+using ExchangeApi.Composition.Dtos;
 namespace ExchangeApi.Composition.Providers.Credentials;
 
 /// <summary>
@@ -30,7 +28,7 @@ public sealed class CompositeCredentialProvider : IApiCredentialProvider
         _providers = list;
     }
 
-    public ApiCredentials Get(ExchangeCode exchange, string accountId)
+    public ApiCredentials Get(string accountId)
     {
         var errors = new List<string>();
 
@@ -38,7 +36,7 @@ public sealed class CompositeCredentialProvider : IApiCredentialProvider
         {
             try
             {
-                var creds = provider.Get(exchange, accountId);
+                var creds = provider.Get(accountId);
                 if (IsValid(creds))
                 {
                     return creds;
@@ -53,7 +51,7 @@ public sealed class CompositeCredentialProvider : IApiCredentialProvider
         }
 
         throw new InvalidOperationException(
-            $"No credential provider could supply credentials for '{ExchangeCodeFormatter.ToCanonicalId(exchange)}/{accountId}'. Details: {string.Join(" | ", errors)}");
+            $"No credential provider could supply credentials for '{accountId}'. Details: {string.Join(" | ", errors)}");
     }
 
     private static bool IsValid(ApiCredentials creds)

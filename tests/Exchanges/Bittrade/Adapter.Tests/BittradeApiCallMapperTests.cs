@@ -1,8 +1,8 @@
-using ExchangeApi.Core.Contracts.Errors;
-using ExchangeApi.Spec.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Api.Internal;
+using ExchangeApi.Primitives.Errors;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 
-namespace ExchangeApi.Exchanges.Bittrade.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests;
 
 public sealed class BittradeApiCallMapperTests
 {

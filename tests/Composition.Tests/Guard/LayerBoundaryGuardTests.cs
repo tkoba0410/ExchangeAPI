@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using ExchangeApi.Composition.Bootstrap.Factories;
-using ExchangeApi.Contracts.Interfaces;
-using ExchangeApi.Exchanges.Bitflyer.Normalize.Call;
-using ExchangeApi.Exchanges.Bittrade.Normalize.Call;
+using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Exchanges.Bitflyer.Composition;
+using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
+using ExchangeApi.Exchanges.Bittrade.Composition;
+using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Api;
 
-namespace Composition.Tests.Guard;
+namespace ExchangeApi.Tests.Composition.Tests.Guard;
 
 public class LayerBoundaryGuardTests
 {
@@ -82,12 +83,12 @@ public class LayerBoundaryGuardTests
         var bitflyer = typeof(BitflyerNormalizedApi)
             .Assembly
             .GetExportedTypes()
-            .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bitflyer.Normalize.Call");
+            .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api");
 
         var bittrade = typeof(BittradeNormalizedApi)
             .Assembly
             .GetExportedTypes()
-            .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bittrade.Normalize.Call");
+            .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bittrade.Api.Normalized.Api");
 
         return bitflyer.Concat(bittrade);
     }

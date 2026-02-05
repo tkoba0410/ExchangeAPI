@@ -21,7 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Core/Core.csproj" />
+    <ProjectReference Include="../../src/Transport/ExchangeApi.Transport.csproj" />
+    <ProjectReference Include="../../src/Primitives/ExchangeApi.Primitives.csproj" />
   </ItemGroup>
 
 </Project>

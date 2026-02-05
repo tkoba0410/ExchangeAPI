@@ -1,10 +1,9 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using ExchangeApi.Common.Enums;
 using ExchangeApi.Composition.Providers.Credentials;
 
-namespace Composition.Tests.Credentials;
+namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 
 public class FileApiCredentialProvider_Tests
 {
@@ -21,9 +20,9 @@ public class FileApiCredentialProvider_Tests
             """;
             File.WriteAllText(path, json);
 
-            var provider = new FileApiCredentialProvider(path);
+            var provider = new FileApiCredentialProvider(path, "bitflyer");
 
-            var creds = provider.Get(ExchangeCode.Bitflyer, "default");
+            var creds = provider.Get("default");
 
             Assert.Equal("key1", creds.ApiKey);
             Assert.Equal("sec1", creds.ApiSecret);
@@ -38,7 +37,7 @@ public class FileApiCredentialProvider_Tests
     public void Get_Throws_WhenFileMissing()
     {
         var missingPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
-        Assert.Throws<FileNotFoundException>(() => new FileApiCredentialProvider(missingPath));
+        Assert.Throws<FileNotFoundException>(() => new FileApiCredentialProvider(missingPath, "bitflyer"));
     }
 
     [Fact]
@@ -48,7 +47,7 @@ public class FileApiCredentialProvider_Tests
         try
         {
             File.WriteAllText(path, "{ invalid json");
-            Assert.Throws<JsonException>(() => new FileApiCredentialProvider(path));
+            Assert.Throws<JsonException>(() => new FileApiCredentialProvider(path, "bitflyer"));
         }
         finally
         {

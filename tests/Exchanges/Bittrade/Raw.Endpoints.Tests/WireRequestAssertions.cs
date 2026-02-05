@@ -1,7 +1,7 @@
 using System.Linq;
-using ExchangeApi.Spec.Wire;
+using ExchangeApi.Transport.Wire;
 
-namespace ExchangeApi.Exchanges.Bittrade.Raw.Endpoints.Tests;
+namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
 
 internal static class WireCallSpecAssertions
 {
@@ -9,11 +9,13 @@ internal static class WireCallSpecAssertions
         WireCallSpec request,
         string method,
         string path,
+        string endpointId,
         string? query = null,
         string? bodyJson = null)
     {
         Assert.Equal(method, request.Method);
         Assert.Equal(path, request.Path);
+        Assert.Equal(endpointId, request.EndpointId);
         Assert.Equal(query, request.Query);
         Assert.Equal(NormalizeJson(bodyJson), NormalizeJson(request.BodyJson));
     }

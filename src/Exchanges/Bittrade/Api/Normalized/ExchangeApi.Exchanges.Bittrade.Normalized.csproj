@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AssemblyName>ExchangeApi.Exchanges.Bittrade.Api.Normalized</AssemblyName>
+    <RootNamespace>ExchangeApi.Exchanges.Bittrade.Api.Normalized</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Raw\ExchangeApi.Exchanges.Bittrade.Raw.csproj" />
+    <ProjectReference Include="..\..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\ExchangeInfo\Static\**\*.cs" Link="ExchangeInfo/Static/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\ExchangeInfo\Dynamic\**\*.cs" Link="ExchangeInfo/Dynamic/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\ExchangeInfo\Compose\**\*.cs" Link="ExchangeInfo/Compose/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\..\Common\ExchangeInfo\Static\**\*.cs" Link="Common/ExchangeInfo/Static/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\..\Common\ExchangeInfo\Compose\**\*.cs" Link="Common/ExchangeInfo/Compose/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\ExchangeInfo\Static\bittrade-exchange-info.json"
+                      Link="ExchangeInfo/Static/bittrade-exchange-info.json"
+                      LogicalName="ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Static.bittrade-exchange-info.json" />
+  </ItemGroup>
+
+</Project>

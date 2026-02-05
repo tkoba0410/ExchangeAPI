@@ -10,7 +10,7 @@ namespace ExchangeApi.Primitives.Errors;
 public class ExchangeApiException : Exception
 {
     /// <summary>
-    /// 抽象クライアント上の操作名。（例: "GetTicker", "GetBalances"）
+    /// 抽象クライアント上の操作名。（例: "GetTicker", "GetBalance"）
     /// </summary>
     public string? Operation { get; }
 

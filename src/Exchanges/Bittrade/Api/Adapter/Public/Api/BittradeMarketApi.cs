@@ -105,7 +105,7 @@ internal sealed class MarketApi
                     request,
                     marketCall,
                     err.Error,
-                    BittradeOperations.MarketData.GetOrderBook);
+                    BittradeOperations.MarketData.GetBoard);
             }
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
@@ -113,7 +113,7 @@ internal sealed class MarketApi
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                BittradeOperations.MarketData.GetOrderBook,
+                BittradeOperations.MarketData.GetBoard,
                 BittradeMarketMapper.MapOrderBook);
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
@@ -121,7 +121,7 @@ internal sealed class MarketApi
             return SymbolNotSupported<GetOrderBookRequest, OrderBook>(
                 request,
                 startedAt,
-                BittradeOperations.MarketData.GetOrderBook,
+                BittradeOperations.MarketData.GetBoard,
                 ex);
         }
         catch (Exception ex)
@@ -129,7 +129,7 @@ internal sealed class MarketApi
             return ApiCallMapper.FromException<GetOrderBookRequest, OrderBook>(
                 request,
                 startedAt,
-                BittradeOperations.MarketData.GetOrderBook,
+                BittradeOperations.MarketData.GetBoard,
                 ex);
         }
     }

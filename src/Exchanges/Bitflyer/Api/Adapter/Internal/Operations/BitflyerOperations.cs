@@ -5,7 +5,7 @@ internal static class BitflyerOperations
     internal static class MarketData
     {
         public const string GetTicker = "Bitflyer.MarketData.GetTicker";
-        public const string GetOrderBook = "Bitflyer.MarketData.GetOrderBook";
+        public const string GetBoard = "Bitflyer.MarketData.GetBoard";
         public const string GetExecutions = "Bitflyer.MarketData.GetExecutions";
         public const string GetCandlesticks = "Bitflyer.MarketData.GetCandlesticks";
         public const string GetTickers = "Bitflyer.MarketData.GetTickers";
@@ -18,13 +18,13 @@ internal static class BitflyerOperations
     {
         public const string PlaceOrder = "Bitflyer.Trading.PlaceOrder";
         public const string CancelOrder = "Bitflyer.Trading.CancelOrder";
-        public const string GetOpenOrders = "Bitflyer.Trading.GetOpenOrders";
+        public const string GetOrders = "Bitflyer.Trading.GetOrders";
         public const string GetOrder = "Bitflyer.Trading.GetOrder";
     }
 
     internal static class Account
     {
-        public const string GetBalances = "Bitflyer.Account.GetBalances";
+        public const string GetBalance = "Bitflyer.Account.GetBalance";
         public const string GetTradingCommission = "Bitflyer.Account.GetTradingCommission";
     }
 

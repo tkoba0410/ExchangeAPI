@@ -41,7 +41,7 @@
 | ------------- | ------------- | -------------- | ---------- | ----------- | ------------ | --------- | ------------------ | ------------------ | ------------ |
 
 * **ContractScope**: `public` / `private`
-* **ContractApiId**: Contracts 側の論理識別子（例: `GetTicker`, `PlaceLimitOrder`）
+* **ContractApiId**: Contracts 側の論理識別子（例: `GetTicker`, `OrderLimit`）
 * **ContractMethod**: Facade の公開メソッド名（例: `GetTickerCallAsync`）
 * **Parameters**: メソッド引数の型一覧（例: `Symbol` / `Symbol, Side, Size, Price` / `MarketLimitCursorRequest`）
 * **RequestType / ResponseType**: `Call<TRequest, TOk>` の `TRequest` / `TOk` 型

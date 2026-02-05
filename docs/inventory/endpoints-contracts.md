@@ -29,6 +29,7 @@
 
 * Contracts API 署名の正本: `src/Contracts/Facade/Interfaces/*`
 * 取引所 endpoint inventory: `docs/inventory/endpoints-*.md`
+* Contracts 契約条文の正本: `docs/contracts/contracts.md`
 
 ※ 本書は「どの Contracts API を採用し、どの取引所 EndpointId に対応づけるか」を記録する正本であり、
 　署名の詳細や命名規範そのものは上記文書を参照する。

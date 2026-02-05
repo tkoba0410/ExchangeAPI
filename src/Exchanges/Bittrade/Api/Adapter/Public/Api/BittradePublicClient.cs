@@ -7,8 +7,6 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
-using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
@@ -56,43 +54,19 @@ public sealed class BittradePublicClient : IPublicApi, IExchangeClient
         CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetBoardCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetOrderBookCallAsync(symbol, cancellationToken);
+        _marketApi.GetBoardCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
+    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetExecutionsPublicCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
-
-    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
-        CommonSymbol symbol,
-        Period period,
-        int? size = null,
-        CancellationToken cancellationToken = default) =>
-        _marketApi.GetHistoryKlineCallAsync(symbol, period, size, cancellationToken);
-
-    public Task<Call<GetTickersRequest, IReadOnlyList<Ticker>>> GetTickersCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickersCallAsync(cancellationToken);
-
-    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
+        _marketApi.GetExecutionsPublicCallAsync(symbol, cancellationToken);
 
     public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
-
-    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetCurrencysCallAsync(cancellationToken);
-
-    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetTimestampCallAsync(cancellationToken);
 
     // Raw access removed from public facade.
 }

@@ -39,7 +39,7 @@ internal sealed class MarketApi
         CancellationToken cancellationToken = default) =>
         GetDetailMergedCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetBoardCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         GetDepthCallAsync(symbol, cancellationToken);
@@ -134,7 +134,7 @@ internal sealed class MarketApi
         }
     }
 
-    public async Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
+    public async Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetExecutionsPublicCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -179,22 +179,6 @@ internal sealed class MarketApi
         }
     }
 
-    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
-        CommonSymbol symbol,
-        Period period,
-        int? size = null,
-        CancellationToken cancellationToken = default) =>
-        GetHistoryKlineInternalAsync(symbol, period, size, cancellationToken);
-
-    public Task<Call<GetTickersRequest, IReadOnlyList<Ticker>>> GetTickersCallAsync(
-        CancellationToken cancellationToken = default) =>
-        GetTickersInternalAsync(cancellationToken);
-
-    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        GetHistoryTradeInternalAsync(symbol, cancellationToken);
-
     private static IReadOnlyList<ExecutionMarket> ToExecutionList(
         CommonSymbol symbol,
         IReadOnlyList<BittradeExecutionNormalized> executions)
@@ -205,182 +189,6 @@ internal sealed class MarketApi
         return mapped;
     }
 
-    private async Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineInternalAsync(
-        CommonSymbol symbol,
-        Period period,
-        int? size,
-        CancellationToken cancellationToken)
-    {
-        var request = new GetHistoryKlineRequest(symbol, period, size);
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
-            {
-                return MarketResolutionError<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>(
-                    request,
-                    marketCall,
-                    err.Error,
-                    BittradeOperations.MarketData.GetCandlesticks);
-            }
-
-            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _marketData
-                .GetHistoryKlineCallAsync(productCode, period, size, cancellationToken)
-                .ConfigureAwait(false);
-
-            return ApiCallMapper.MapCall(
-                request,
-                call,
-                BittradeOperations.MarketData.GetCandlesticks,
-                ok => MapCandlesticks(symbol, period, ok));
-        }
-        catch (Exception ex)
-        {
-            return ApiCallMapper.FromException<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>(
-                request,
-                startedAt,
-                BittradeOperations.MarketData.GetCandlesticks,
-                ex);
-        }
-    }
-
-    private async Task<Call<GetTickersRequest, IReadOnlyList<Ticker>>> GetTickersInternalAsync(
-        CancellationToken cancellationToken)
-    {
-        var request = new GetTickersRequest();
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _marketData.GetTickersCallAsync(cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
-                request,
-                call,
-                BittradeOperations.MarketData.GetTickers,
-                MapTickers);
-        }
-        catch (Exception ex)
-        {
-            return ApiCallMapper.FromException<GetTickersRequest, IReadOnlyList<Ticker>>(
-                request,
-                startedAt,
-                BittradeOperations.MarketData.GetTickers,
-                ex);
-        }
-    }
-
-    private async Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeInternalAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken)
-    {
-        var request = new GetHistoryTradeRequest(symbol);
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
-            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
-            {
-                return MarketResolutionError<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>(
-                    request,
-                    marketCall,
-                    err.Error,
-                    BittradeOperations.MarketData.GetHistoryTrade);
-            }
-
-            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _marketData.GetHistoryTradeCallAsync(productCode, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
-                request,
-                call,
-                BittradeOperations.MarketData.GetHistoryTrade,
-                ok =>
-                {
-                    IReadOnlyList<ExecutionMarket> mapped = ok
-                        .Select(e => BittradeMarketMapper.MapExecution(symbol, e))
-                        .ToList();
-                    return mapped;
-                });
-        }
-        catch (Exception ex)
-        {
-            return ApiCallMapper.FromException<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>(
-                request,
-                startedAt,
-                BittradeOperations.MarketData.GetHistoryTrade,
-                ex);
-        }
-    }
-
-    private static IReadOnlyList<Candlestick> MapCandlesticks(
-        CommonSymbol symbol,
-        Period period,
-        IReadOnlyList<BittradeKlineNormalized> klines)
-    {
-        var timescale = ParseTimescale(period);
-        var candles = new List<Candlestick>(klines.Count);
-        foreach (var kline in klines)
-        {
-            if (!long.TryParse(kline.Id.Value, out var seconds))
-            {
-                throw new InvalidOperationException($"Invalid kline id: '{kline.Id.Value}'.");
-            }
-
-            var openTime = DateTimeOffset.FromUnixTimeSeconds(seconds);
-            var closeTime = timescale == TimeSpan.Zero ? openTime : openTime.Add(timescale);
-            candles.Add(new Candlestick(
-                Symbol: symbol,
-                Timescale: timescale,
-                OpenTime: openTime,
-                CloseTime: closeTime,
-                Open: kline.Open,
-                High: kline.High,
-                Low: kline.Low,
-                Close: kline.Close,
-                Volume: kline.Amount,
-                IsFinal: true,
-                QuoteVolume: kline.Volume,
-                NumberOfTrades: kline.Count));
-        }
-
-        return candles;
-    }
-
-    private static TimeSpan ParseTimescale(Period period)
-    {
-        if (period.IsEmpty)
-        {
-            return TimeSpan.Zero;
-        }
-
-        return period.Value switch
-        {
-            "1min" => TimeSpan.FromMinutes(1),
-            "3min" => TimeSpan.FromMinutes(3),
-            "5min" => TimeSpan.FromMinutes(5),
-            "15min" => TimeSpan.FromMinutes(15),
-            "30min" => TimeSpan.FromMinutes(30),
-            "60min" => TimeSpan.FromHours(1),
-            "1day" => TimeSpan.FromDays(1),
-            "1week" => TimeSpan.FromDays(7),
-            "1mon" => TimeSpan.FromDays(30),
-            "1year" => TimeSpan.FromDays(365),
-            _ => TimeSpan.Zero,
-        };
-    }
-
-    private static IReadOnlyList<Ticker> MapTickers(IReadOnlyList<BittradeTickerEntryNormalized> entries)
-    {
-        return entries
-            .Select(entry => new Ticker(
-                Symbol: new CommonSymbol(entry.Symbol.Value),
-                LastTradedPrice: new Price(entry.LastTradedPrice),
-                Timestamp: entry.Timestamp))
-            .ToList();
-    }
 
     private static Call<TReq, TOk> MarketResolutionError<TReq, TOk>(
         TReq request,

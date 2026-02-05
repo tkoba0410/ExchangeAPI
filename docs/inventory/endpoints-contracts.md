@@ -64,10 +64,10 @@
 
 | ContractScope | ContractApiId        | ContractMethod                | Parameters | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | DecisionNote        |
 | ------------- | -------------------- | ----------------------------- | ---------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------------- |
-| public        | GetExchangeInfo      | GetExchangeInfoCallAsync      | Symbol     | GetExchangeInfoRequest      | ExchangeInfo                   | Contracts | None                 | None               |                     |
+| public        | GetExchangeInfo      | GetExchangeInfoCallAsync      | (none)     | GetExchangeInfoRequest      | ExchangeInfo                   | Contracts | Internal             | None               |                     |
 | public        | GetTicker            | GetTickerCallAsync            | Symbol     | GetTickerRequest            | Ticker                         | Contracts | GetTicker            | GetDetailMerged    |                     |
-| public        | GetBoard             | GetBoardCallAsync             | Symbol     | GetBoardRequest             | OrderBook                      | Contracts | GetBoard             | GetDepth           |                     |
-| public        | GetExecutionsPublic  | GetExecutionsPublicCallAsync  | Symbol     | GetExecutionsRequest        | IReadOnlyList<ExecutionMarket> | Contracts | GetExecutionsPublic  | GetTrade           |                     |
+| public        | GetBoard             | GetBoardCallAsync             | Symbol     | GetOrderBookRequest         | OrderBook                      | Contracts | GetBoard             | GetDepth           |                     |
+| public        | GetExecutionsPublic  | GetExecutionsPublicCallAsync  | Symbol     | GetMarketExecutionsRequest  | IReadOnlyList<ExecutionMarket> | Contracts | GetExecutionsPublic  | GetTrade           |                     |
 
 ---
 
@@ -75,8 +75,8 @@
 
 | ContractScope | ContractApiId         | ContractMethod                 | Parameters         | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId | DecisionNote |
 | ------------- | --------------------- | ------------------------------ | ------------------ | ---------------------------- | -------------------------------- | --------- | --------------------- | ------------------ | ------------ |
-| private       | GetBalance            | GetBalanceCallAsync            | (none)             | GetBalanceRequest            | IReadOnlyList<Balance>           | Contracts | GetBalance            | GetAccountsBalanceByAccountId |              |
-| private       | GetExecutionsPrivate  | GetExecutionsPrivateCallAsync  | CursorRequest      | CursorRequest                | Page<ExecutionItem>              | Contracts | GetExecutionsPrivate  | GetMatchResults     |              |
-| private       | GetOrders             | GetOrdersCallAsync             | CursorRequest      | CursorRequest                | Page<OrderSnapshotItem>          | Contracts | GetChildOrders        | GetOpenOrders        |              |
-| private       | OrderLimit            | OrderLimitCallAsync            | OrderRequest       | OrderRequest                 | OrderResult                      | Contracts | SendChildOrder        | PostOrdersPlace      |              |
+| private       | GetBalance            | GetBalanceCallAsync            | (none)             | GetBalancesRequest           | IReadOnlyList<Balance>           | Contracts | GetBalance            | GetAccountsBalanceByAccountId |              |
+| private       | GetExecutionsPrivate  | GetExecutionsPrivateCallAsync  | MarketLimitCursorRequest | MarketLimitCursorRequest  | Page<ExecutionItem>              | Contracts | GetExecutionsPrivate  | GetMatchResults     |              |
+| private       | GetOrders             | GetOrdersCallAsync             | MarketLimitCursorRequest | MarketLimitCursorRequest  | Page<OrderSnapshotItem>          | Contracts | GetChildOrders        | GetOpenOrders        |              |
+| private       | OrderLimit            | OrderLimitCallAsync            | Symbol, Side, Size, Price | PlaceLimitOrderRequest   | OrderResult                      | Contracts | SendChildOrder        | PostOrdersPlace      |              |
 | private       | CancelOrder           | CancelOrderCallAsync           | CancelOrderRequest | CancelOrderRequest           | CancelResult                     | Contracts | CancelChildOrder      | PostOrdersSubmitCancelByOrderId |              |

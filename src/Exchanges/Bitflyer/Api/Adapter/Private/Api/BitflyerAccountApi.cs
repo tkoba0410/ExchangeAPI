@@ -28,7 +28,7 @@ internal sealed class BitflyerAccountApi
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
-    public async Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
+    public async Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetBalancesRequest();

@@ -99,63 +99,32 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetBoardCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetOrderBookCallAsync(symbol, cancellationToken);
+        _marketApi.GetBoardCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
+    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetExecutionsPublicCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetMarketExecutionsCallAsync(symbol, cancellationToken);
-
-    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
-        CommonSymbol symbol,
-        Period period,
-        int? size = null,
-        CancellationToken cancellationToken = default) =>
-        _marketApi.GetHistoryKlineCallAsync(symbol, period, size, cancellationToken);
-
-    public Task<Call<GetTickersRequest, IReadOnlyList<Ticker>>> GetTickersCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickersCallAsync(cancellationToken);
-
-    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        _marketApi.GetHistoryTradeCallAsync(symbol, cancellationToken);
+        _marketApi.GetExecutionsPublicCallAsync(symbol, cancellationToken);
 
     // ExchangeInfo
     public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
 
-    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetCurrencysCallAsync(cancellationToken);
+        _accountApi.GetBalanceCallAsync(cancellationToken);
 
-    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetTimestampCallAsync(cancellationToken);
-
-    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
-        CancellationToken cancellationToken = default) =>
-        _accountApi.GetBalancesCallAsync(cancellationToken);
-
-    public Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
+    public Task<Call<PlaceLimitOrderRequest, OrderResult>> OrderLimitCallAsync(
         CommonSymbol symbol,
         Side side,
         Size size,
         Price price,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceLimitOrderCallAsync(symbol, side, size, price, cancellationToken);
-
-    public Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(
-        CommonSymbol symbol,
-        Side side,
-        Size size,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.PlaceMarketOrderCallAsync(symbol, side, size, cancellationToken);
+        _tradingApi.OrderLimitCallAsync(symbol, side, size, price, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
         CommonSymbol symbol,
@@ -163,27 +132,16 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         CancellationToken cancellationToken = default) =>
         _tradingApi.CancelOrderCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
-        CommonSymbol symbol,
-        OrderKey orderKey,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOrderCallAsync(symbol, orderKey, cancellationToken);
-
-    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        _tradingApi.GetOpenOrdersCallAsync(symbol, cancellationToken);
-
     // SpotHistory
     public Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
         MarketLimitCursorRequest request,
         CancellationToken cancellationToken = default) =>
         _historyApi.GetOrdersCallAsync(request, cancellationToken);
 
-    public Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsCallAsync(
+    public Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsPrivateCallAsync(
         MarketLimitCursorRequest request,
         CancellationToken cancellationToken = default) =>
-        _historyApi.GetExecutionsCallAsync(request, cancellationToken);
+        _historyApi.GetExecutionsPrivateCallAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

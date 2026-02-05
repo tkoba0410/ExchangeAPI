@@ -11,7 +11,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.Errors;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 namespace ExchangeApi.Composition.Providers.ExchangeInfo;
 
@@ -94,7 +94,7 @@ public sealed class JsonExchangeInfoApi : IPublicApi
             "Ticker"));
     }
 
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetOrderBookCallAsync(
+    public Task<Call<GetOrderBookRequest, OrderBook>> GetBoardCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -106,7 +106,7 @@ public sealed class JsonExchangeInfoApi : IPublicApi
             "OrderBook"));
     }
 
-    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetMarketExecutionsCallAsync(
+    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetExecutionsPublicCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -116,65 +116,6 @@ public sealed class JsonExchangeInfoApi : IPublicApi
             "JsonExchangeInfo",
             request,
             "MarketExecutions"));
-    }
-
-    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>> GetHistoryKlineCallAsync(
-        Symbol symbol,
-        Period period,
-        int? size = null,
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetHistoryKlineRequest(symbol, period, size);
-        return Task.FromResult(NotSupportedCall.Create<GetHistoryKlineRequest, IReadOnlyList<Candlestick>>(
-            "Contracts",
-            "JsonExchangeInfo",
-            request,
-            "HistoryKline"));
-    }
-
-    public Task<Call<GetTickersRequest, IReadOnlyList<Ticker>>> GetTickersCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetTickersRequest();
-        return Task.FromResult(NotSupportedCall.Create<GetTickersRequest, IReadOnlyList<Ticker>>(
-            "Contracts",
-            "JsonExchangeInfo",
-            request,
-            "Tickers"));
-    }
-
-    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>> GetHistoryTradeCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetHistoryTradeRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetHistoryTradeRequest, IReadOnlyList<ExecutionMarket>>(
-            "Contracts",
-            "JsonExchangeInfo",
-            request,
-            "HistoryTrade"));
-    }
-
-    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetCurrencysRequest();
-        return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
-            "Contracts",
-            "JsonExchangeInfo",
-            request,
-            "Currencys"));
-    }
-
-    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetTimestampRequest();
-        return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, DateTimeOffset>(
-            "Contracts",
-            "JsonExchangeInfo",
-            request,
-            "Timestamp"));
     }
 
     private ExchangeInfoDto GetCachedInfo()

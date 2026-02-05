@@ -31,7 +31,7 @@ internal sealed class BittradeAccountApi
         _account = account ?? throw new ArgumentNullException(nameof(account));
     }
 
-    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default) =>
         GetAccountsBalanceByAccountIdCallAsync(cancellationToken);
 

@@ -1,8 +1,9 @@
 # Process（運用ルール）
 
 本書は、開発および文書整備の進め方を示す **参考文書**である。
-設計規範・層責務・公開範囲・API 契約の正本は  
-**TopSpec（docs/topspec.md）** とする。
+設計規範・層責務・公開範囲の正本は  
+**TopSpec（docs/topspec.md）** とする。  
+公開 API 契約の正本は **docs/contracts/contracts.md** とする。
 
 なお、`docs/contracts/*` は外部公開向けの **契約文書（公開安定 API の説明）** であり、
 設計規範ではないが、**公開 API 契約としては Normative** である。

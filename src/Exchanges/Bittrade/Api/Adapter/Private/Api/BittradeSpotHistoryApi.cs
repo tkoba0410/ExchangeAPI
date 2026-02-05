@@ -53,7 +53,7 @@ internal sealed class BittradeSpotHistoryApi
         }
     }
 
-    public async Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsCallAsync(
+    public async Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsPrivateCallAsync(
         MarketLimitCursorRequest request,
         CancellationToken cancellationToken = default)
     {

@@ -14,17 +14,11 @@ namespace ExchangeApi.Contracts.Facade.Interfaces;
 /// </summary>
 public interface IPrivateApi
 {
-    Task<Call<PlaceLimitOrderRequest, OrderResult>> PlaceLimitOrderCallAsync(
+    Task<Call<PlaceLimitOrderRequest, OrderResult>> OrderLimitCallAsync(
         Symbol symbol,
         Side side,
         Size size,
         Price price,
-        CancellationToken cancellationToken = default);
-
-    Task<Call<PlaceMarketOrderRequest, OrderResult>> PlaceMarketOrderCallAsync(
-        Symbol symbol,
-        Side side,
-        Size size,
         CancellationToken cancellationToken = default);
 
     Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
@@ -32,23 +26,14 @@ public interface IPrivateApi
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetOrderRequest, OrderStatus>> GetOrderCallAsync(
-        Symbol symbol,
-        OrderKey orderKey,
-        CancellationToken cancellationToken = default);
-
-    Task<Call<GetOpenOrdersRequest, IReadOnlyList<OrderSnapshotItem>>> GetOpenOrdersCallAsync(
-        Symbol symbol,
-        CancellationToken cancellationToken = default);
-
-    Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
+    Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default);
 
     Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
         MarketLimitCursorRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsCallAsync(
+    Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsPrivateCallAsync(
         MarketLimitCursorRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -39,7 +39,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var client = CreateClient(raw);
 
             // Act
-            var call = await client.GetBalancesCallAsync();
+            var call = await client.GetBalanceCallAsync();
             var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
             IReadOnlyList<Balance> result = ok.Response;
 
@@ -70,7 +70,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var client = CreateClient(raw);
 
             // Act
-            var call = await client.GetBalancesCallAsync();
+            var call = await client.GetBalanceCallAsync();
             var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
             IReadOnlyList<Balance> result = ok.Response;
 

@@ -38,7 +38,7 @@ public sealed class BittradeSpotHistoryApiTests
         var raw = new StubRawApi();
         var api = CreateApi(raw);
 
-        var call = await api.GetExecutionsCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
+        var call = await api.GetExecutionsPrivateCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
         var resultType = call.Result.GetType();
         var responseProp = resultType.GetProperty("Response");
         if (responseProp is null)

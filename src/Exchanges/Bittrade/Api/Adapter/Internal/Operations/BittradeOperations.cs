@@ -5,7 +5,7 @@ public static class BittradeOperations
     public static class MarketData
     {
         public const string GetTicker = "Bittrade.Market.GetTicker";
-        public const string GetOrderBook = "Bittrade.Market.GetOrderBook";
+        public const string GetBoard = "Bittrade.Market.GetBoard";
         public const string GetExecutions = "Bittrade.Market.GetExecutions";
         public const string GetCandlesticks = "Bittrade.Market.GetCandlesticks";
         public const string GetTickers = "Bittrade.Market.GetTickers";
@@ -16,13 +16,13 @@ public static class BittradeOperations
     {
         public const string PlaceOrder = "Bittrade.Trading.PlaceOrder";
         public const string CancelOrder = "Bittrade.Trading.CancelOrder";
-        public const string GetOpenOrders = "Bittrade.Trading.GetOpenOrders";
+        public const string GetOrders = "Bittrade.Trading.GetOrders";
         public const string GetOrder = "Bittrade.Trading.GetOrder";
     }
 
     public static class Account
     {
-        public const string GetBalances = "Bittrade.Account.GetBalances";
+        public const string GetBalance = "Bittrade.Account.GetBalance";
     }
 
     public static class ExchangeInfo

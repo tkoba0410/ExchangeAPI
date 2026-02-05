@@ -31,7 +31,7 @@ internal sealed class BittradeAccountApi
         _account = account ?? throw new ArgumentNullException(nameof(account));
     }
 
-    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalancesCallAsync(
+    public Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default) =>
         GetAccountsBalanceByAccountIdCallAsync(cancellationToken);
 
@@ -47,7 +47,7 @@ internal sealed class BittradeAccountApi
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                BittradeOperations.Account.GetBalances,
+                BittradeOperations.Account.GetBalance,
                 BittradeMapper.MapBalances);
         }
         catch (Exception ex)
@@ -55,7 +55,7 @@ internal sealed class BittradeAccountApi
             return ApiCallMapper.FromException<GetBalancesRequest, IReadOnlyList<Balance>>(
                 request,
                 startedAt,
-                BittradeOperations.Account.GetBalances,
+                BittradeOperations.Account.GetBalance,
                 ex);
         }
     }

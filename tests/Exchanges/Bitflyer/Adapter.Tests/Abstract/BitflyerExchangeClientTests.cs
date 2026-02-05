@@ -128,7 +128,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var rawApi = new FakeBitflyerPublicApi(rawTicker, boardRaw, fakePrivateApi, fakeTradingApi);
             var client = CreateClient(rawApi);
 
-            var call = await client.GetOrderBookCallAsync(new Symbol("BTC/JPY"));
+            var call = await client.GetBoardCallAsync(new Symbol("BTC/JPY"));
             var ok = Assert.IsType<CallResult<ContractOrderBook>.Ok>(call.Result);
             ContractOrderBook board = ok.Response;
 
@@ -153,7 +153,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var rawApi = new FakeBitflyerPublicApi(rawTicker, privateApi: privateApi, tradingApi: tradingApi);
             var client = CreateClient(rawApi);
 
-            var call = await client.GetBalancesCallAsync();
+            var call = await client.GetBalanceCallAsync();
             var ok = Assert.IsType<CallResult<IReadOnlyList<ContractBalance>>.Ok>(call.Result);
             IReadOnlyList<ContractBalance> result = ok.Response;
 

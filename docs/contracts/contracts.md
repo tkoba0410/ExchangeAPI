@@ -172,6 +172,12 @@ Contracts の公開 API は **Request DTO を第一の契約**とする（MUST�
 - 略語は一般的なもののみ使用する（MUST）。
 - 取引所固有の語彙をそのまま転記してはならない（MUST NOT）。
 
+### 8.3 Contracts API 命名
+
+- ContractApiId は **動詞を省略した名詞**で表現する（MUST）。例: `Ticker`, `Board`, `ExecutionsPublic`。
+- Request/Response 型は **`<ContractApiId>Request` / `<ContractApiId>Response`** とする（MUST）。
+- Facade メソッド名は **`Get` + `<ContractApiId>` + `Async`** を基本とし、`Call` は付与しない（MUST）。例: `GetTickerAsync`。
+
 ---
 
 ## 9. Nullable / Optional ポリシー

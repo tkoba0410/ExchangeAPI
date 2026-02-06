@@ -52,7 +52,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             // Act
             var call = await client.GetTickerCallAsync(new Symbol("BTC/JPY"));
             var ok = Assert.IsType<CallResult<ContractTicker>.Ok>(call.Result);
-            var ticker = ok.Response.Value;
+            var ticker = ok.Response;
 
             Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
             Assert.Equal(new Price(raw.LastTradedPrice), ticker.LastTradedPrice);

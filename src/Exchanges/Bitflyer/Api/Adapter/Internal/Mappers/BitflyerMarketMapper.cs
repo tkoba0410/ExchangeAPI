@@ -16,12 +16,12 @@ internal static class MarketMapper
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
-        var ticker = new Ticker(
+        var ticker = new CommonTicker(
             Symbol: symbol,
             LastTradedPrice: new Price(normalized.LastTradedPrice),
             Timestamp: normalized.Timestamp);
 
-        return new CommonTicker(ticker);
+        return ticker;
     }
 
     public static CommonBoard MapOrderBook(BitflyerOrderBookNormalized normalized)

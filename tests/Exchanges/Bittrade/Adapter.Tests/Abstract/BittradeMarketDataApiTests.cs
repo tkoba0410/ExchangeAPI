@@ -49,7 +49,7 @@ public class BittradeMarketApiTests
 
         var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"));
         var ok = Assert.IsType<CallResult<GetTickerResponse>.Ok>(call.Result);
-        var ticker = ok.Response.Value;
+        var ticker = ok.Response;
 
         Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
         Assert.Equal(new Price(100m), ticker.LastTradedPrice);

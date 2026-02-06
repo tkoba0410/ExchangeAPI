@@ -32,7 +32,7 @@ public class PublicApiLiveTests
 
         var call = await publicApi.GetTickerCallAsync(new Symbol("BTC/JPY"), cts.Token);
         var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetTickerResponse>.Ok>(call.Result);
-        var ticker = ok.Response.Value;
+        var ticker = ok.Response;
         var msg = $"bitFlyer Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
@@ -73,7 +73,7 @@ public class PublicApiLiveTests
 
         var call = await publicApi.GetTickerCallAsync(new Symbol("BTC/JPY"), cts.Token);
         var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetTickerResponse>.Ok>(call.Result);
-        var ticker = ok.Response.Value;
+        var ticker = ok.Response;
         var msg = $"Bittrade Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 

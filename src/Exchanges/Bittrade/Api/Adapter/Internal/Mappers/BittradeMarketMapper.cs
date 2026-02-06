@@ -15,12 +15,12 @@ internal static class BittradeMarketMapper
 {
     public static GetTickerResponse MapTicker(CommonSymbol symbol, BittradeTickerNormalized normalized)
     {
-        var ticker = new Ticker(
+        var ticker = new GetTickerResponse(
             Symbol: symbol,
             LastTradedPrice: new Price(normalized.LastTradedPrice),
             Timestamp: normalized.Timestamp);
 
-        return new GetTickerResponse(ticker);
+        return ticker;
     }
 
     public static GetBoardResponse MapOrderBook(BittradeOrderBookNormalized normalized)

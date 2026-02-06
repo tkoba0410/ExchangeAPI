@@ -26,7 +26,7 @@ public sealed record GetOrdersByOrderIdRequest(Symbol Symbol, OrderKey OrderKey)
 
 public sealed record GetOrdersMatchResultsByOrderIdRequest(OrderKey OrderKey);
 
-public sealed record GetAccountExecutionsRequest(Symbol Symbol, int? Limit = null);
+public sealed record GetMatchResultsRequest(Symbol Symbol, int? Limit = null);
 
 public sealed record GetRetailOrderListRequest(
     int Direct,

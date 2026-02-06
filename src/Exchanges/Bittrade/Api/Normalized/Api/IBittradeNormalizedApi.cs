@@ -15,16 +15,16 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Api;
 
 public interface IBittradeNormalizedApi
 {
-    Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
+    Task<Call<GetDetailMergedRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
         ProductCode productCode,
         CancellationToken ct = default);
 
-    Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
+    Task<Call<GetDepthRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
         ProductCode productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default);
 
-    Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
+    Task<Call<GetTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
         ProductCode productCode,
         CancellationToken ct = default);
 
@@ -53,7 +53,7 @@ public interface IBittradeNormalizedApi
     Task<Call<GetAccountsRequest, IReadOnlyList<BittradeAccountNormalized>>> GetAccountsCallAsync(
         CancellationToken ct = default);
 
-    Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
+    Task<Call<GetAccountsBalanceByAccountIdRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default);
 
     Task<Call<GetDepositWithdrawRequest, IReadOnlyList<BittradeDepositWithdrawNormalized>>> GetDepositWithdrawCallAsync(
@@ -98,8 +98,8 @@ public interface IBittradeNormalizedApi
         GetOrdersMatchResultsByOrderIdRequest request,
         CancellationToken ct = default);
 
-    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
-        GetAccountExecutionsRequest request,
+    Task<Call<GetMatchResultsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
+        GetMatchResultsRequest request,
         CancellationToken ct = default);
 
     Task<Call<PostWithdrawApiCreateRequest, BittradeWithdrawResult>> PostWithdrawApiCreateCallAsync(

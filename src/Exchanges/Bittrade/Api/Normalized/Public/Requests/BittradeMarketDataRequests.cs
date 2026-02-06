@@ -3,11 +3,11 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Requests;
 
-public sealed record GetTickerRequest(ProductCode ProductCode);
+public sealed record GetDetailMergedRequest(ProductCode ProductCode);
 
-public sealed record GetOrderBookRequest(ProductCode ProductCode, BittradeDepthType? DepthType = null);
+public sealed record GetDepthRequest(ProductCode ProductCode, BittradeDepthType? DepthType = null);
 
-public sealed record GetExecutionsRequest(ProductCode ProductCode);
+public sealed record GetTradeRequest(ProductCode ProductCode);
 
 public sealed record GetHistoryKlineRequest(ProductCode ProductCode, Period Period, int? Size = null);
 

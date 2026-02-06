@@ -56,18 +56,18 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
             accountId: normalizedAccountId);
     }
 
-    public Task<Call<GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
+    public Task<Call<GetDetailMergedRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
         ProductCode productCode,
         CancellationToken ct = default) =>
         _publicApi.GetDetailMergedCallAsync(productCode, ct);
 
-    public Task<Call<GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
+    public Task<Call<GetDepthRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
         ProductCode productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default) =>
         _publicApi.GetDepthCallAsync(productCode, depthType, ct);
 
-    public Task<Call<GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
+    public Task<Call<GetTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
         ProductCode productCode,
         CancellationToken ct = default) =>
         _publicApi.GetTradeCallAsync(productCode, ct);
@@ -104,7 +104,7 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
         CancellationToken ct = default) =>
         _privateApi.GetAccountsCallAsync(ct);
 
-    public Task<Call<GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
+    public Task<Call<GetAccountsBalanceByAccountIdRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default) =>
         _privateApi.GetAccountsBalanceByAccountIdCallAsync(ct);
 
@@ -161,8 +161,8 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
         CancellationToken ct = default) =>
         _privateApi.GetOrdersMatchResultsByOrderIdCallAsync(request, ct);
 
-    public Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
-        GetAccountExecutionsRequest request,
+    public Task<Call<GetMatchResultsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
+        GetMatchResultsRequest request,
         CancellationToken ct = default) =>
         _privateApi.GetMatchResultsCallAsync(request.Symbol, request.Limit, ct);
 

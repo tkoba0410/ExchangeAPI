@@ -19,6 +19,7 @@
     <Project Path="src/Exchanges/Bittrade/Composition/ExchangeApi.Exchanges.Bittrade.Composition.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Docs.Inventory.Tests/Docs.Inventory.Tests.csproj" />
     <Project Path="tests/Core.Tests/Core.Tests.csproj" />
     <Project Path="tests/Common.Tests/Common.Tests.csproj" />
     <Project Path="tests/Composition.Tests/Composition.Tests.csproj" />

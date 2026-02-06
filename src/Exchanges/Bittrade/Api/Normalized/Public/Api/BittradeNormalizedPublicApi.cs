@@ -115,15 +115,15 @@ internal sealed class BittradeNormalizedPublicApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
+    public async Task<Call<NormalizedRequests.GetDetailMergedRequest, BittradeTickerNormalized>> GetDetailMergedCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
-        var request = new NormalizedRequests.GetTickerRequest(productCode);
+        var request = new NormalizedRequests.GetDetailMergedRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
-            return CreateCallError<NormalizedRequests.GetTickerRequest, BittradeTickerNormalized>(
+            return CreateCallError<NormalizedRequests.GetDetailMergedRequest, BittradeTickerNormalized>(
                 request,
                 Component(BittradeEndpointIds.GetDetailMerged),
                 error!,
@@ -154,17 +154,17 @@ internal sealed class BittradeNormalizedPublicApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
+    public async Task<Call<NormalizedRequests.GetDepthRequest, BittradeOrderBookNormalized>> GetDepthCallAsync(
         ProductCode productCode,
         BittradeDepthType? depthType = null,
         CancellationToken ct = default)
     {
         var normalizedDepthType = depthType ?? BittradeDepthType.Step0;
-        var request = new NormalizedRequests.GetOrderBookRequest(productCode, depthType);
+        var request = new NormalizedRequests.GetDepthRequest(productCode, depthType);
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
-            return CreateCallError<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>(
+            return CreateCallError<NormalizedRequests.GetDepthRequest, BittradeOrderBookNormalized>(
                 request,
                 Component(BittradeEndpointIds.GetDepth),
                 error!,
@@ -173,7 +173,7 @@ internal sealed class BittradeNormalizedPublicApi
 
         if (!TryGetRawDepthType(normalizedDepthType, out var rawDepth, out var depthError))
         {
-            return CreateCallError<NormalizedRequests.GetOrderBookRequest, BittradeOrderBookNormalized>(
+            return CreateCallError<NormalizedRequests.GetDepthRequest, BittradeOrderBookNormalized>(
                 request,
                 Component(BittradeEndpointIds.GetDepth),
                 depthError!,
@@ -206,15 +206,15 @@ internal sealed class BittradeNormalizedPublicApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
+    public async Task<Call<NormalizedRequests.GetTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetTradeCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
-        var request = new NormalizedRequests.GetExecutionsRequest(productCode);
+        var request = new NormalizedRequests.GetTradeRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
-            return CreateCallError<NormalizedRequests.GetExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
+            return CreateCallError<NormalizedRequests.GetTradeRequest, IReadOnlyList<BittradeExecutionNormalized>>(
                 request,
                 Component(BittradeEndpointIds.GetTrade),
                 error!,

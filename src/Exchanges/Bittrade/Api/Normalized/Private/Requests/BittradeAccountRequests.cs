@@ -4,7 +4,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Requests;
 
 public sealed record GetAccountsRequest;
 
-public sealed record GetBalancesRequest(FreeText AccountId);
+public sealed record GetAccountsBalanceByAccountIdRequest(FreeText AccountId);
 
 public sealed record GetDepositWithdrawRequest(
     FreeText Type,

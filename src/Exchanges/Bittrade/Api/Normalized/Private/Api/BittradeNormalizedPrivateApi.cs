@@ -43,13 +43,13 @@ internal sealed class BittradeNormalizedPrivateApi
         _accountId = accountId;
     }
 
-    public async Task<Call<NormalizedRequests.GetBalancesRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
+    public async Task<Call<NormalizedRequests.GetAccountsBalanceByAccountIdRequest, IReadOnlyList<BittradeBalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default)
     {
         var rawCall = await _trading
             .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountsBalanceByAccountIdRequest(new AccountId(_accountId.Value)), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetBalancesRequest(_accountId);
+        var request = new NormalizedRequests.GetAccountsBalanceByAccountIdRequest(_accountId);
 
         return CreateCall(
             rawCall,
@@ -474,16 +474,16 @@ internal sealed class BittradeNormalizedPrivateApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
+    public async Task<Call<NormalizedRequests.GetMatchResultsRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetMatchResultsCallAsync(
         Symbol symbol,
         int? limit = null,
         CancellationToken ct = default)
     {
-        var callRequest = new NormalizedRequests.GetAccountExecutionsRequest(symbol, limit);
+        var callRequest = new NormalizedRequests.GetMatchResultsRequest(symbol, limit);
         var marketCall = await _markets.ResolveCallAsync(symbol, ct).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
         {
-            return CreateCallError<NormalizedRequests.GetAccountExecutionsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
+            return CreateCallError<NormalizedRequests.GetMatchResultsRequest, IReadOnlyList<BittradeExecutionNormalized>>(
                 marketCall,
                 callRequest,
                 Component(BittradeEndpointIds.GetMatchResults),

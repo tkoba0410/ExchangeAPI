@@ -35,7 +35,7 @@ public class BittradeExchangeInfoApiTests
 
     private sealed class StubRawApi : BittradeRawApiStub
     {
-        public override Task<Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.RawSymbolsResponse>> GetSymbolsCallAsync(
+        public override Task<Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.GetSymbolsResponse>> GetSymbolsCallAsync(
             RawPublicRequests.GetSymbolsRequest request,
             System.Threading.CancellationToken ct = default)
         {
@@ -53,44 +53,44 @@ public class BittradeExchangeInfoApiTests
                     State: "online")
             };
             var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
-            var call = new Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.RawSymbolsResponse>(
+            var call = new Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.GetSymbolsResponse>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<RawPublicDtos.RawSymbolsResponse>.Ok(new RawPublicDtos.RawSymbolsResponse("ok", symbols)),
+                Result: new CallResult<RawPublicDtos.GetSymbolsResponse>.Ok(new RawPublicDtos.GetSymbolsResponse("ok", symbols)),
                 Meta: meta);
             return Task.FromResult(call);
         }
 
-        public override Task<Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.RawCurrenciesResponse>> GetCurrencysCallAsync(
-            RawPublicRequests.GetCurrenciesRequest request,
+        public override Task<Call<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse>> GetCurrencysCallAsync(
+            RawPublicRequests.GetCurrencysRequest request,
             System.Threading.CancellationToken ct = default)
         {
             IReadOnlyList<string> data = new[] { "btc", "jpy" };
             var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
-            var call = new Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.RawCurrenciesResponse>(
+            var call = new Call<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<RawPublicDtos.RawCurrenciesResponse>.Ok(new RawPublicDtos.RawCurrenciesResponse("ok", data)),
+                Result: new CallResult<RawPublicDtos.GetCurrencysResponse>.Ok(new RawPublicDtos.GetCurrencysResponse("ok", data)),
                 Meta: meta);
             return Task.FromResult(call);
         }
 
-        public override Task<Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.RawTimestampResponse>> GetTimestampCallAsync(
+        public override Task<Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.GetTimestampResponse>> GetTimestampCallAsync(
             RawPublicRequests.GetTimestampRequest request,
             System.Threading.CancellationToken ct = default)
         {
             var data = System.DateTimeOffset.UtcNow;
             var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
-            var call = new Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.RawTimestampResponse>(
+            var call = new Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.GetTimestampResponse>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<RawPublicDtos.RawTimestampResponse>.Ok(new RawPublicDtos.RawTimestampResponse("ok", data)),
+                Result: new CallResult<RawPublicDtos.GetTimestampResponse>.Ok(new RawPublicDtos.GetTimestampResponse("ok", data)),
                 Meta: meta);
             return Task.FromResult(call);
         }

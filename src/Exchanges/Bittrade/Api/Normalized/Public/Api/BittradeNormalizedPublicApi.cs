@@ -63,11 +63,11 @@ internal sealed class BittradeNormalizedPublicApi
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetCurrencysCallAsync(new RawPublicRequests.GetCurrenciesRequest(), ct)
+            .GetCurrencysCallAsync(new RawPublicRequests.GetCurrencysRequest(), ct)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetCurrencysRequest();
 
-        return CreateCall<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.RawCurrenciesResponse, NormalizedRequests.GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
+        return CreateCall<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse, NormalizedRequests.GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
             rawCall,
             request,
             Component(BittradeEndpointIds.GetCurrencys),
@@ -131,7 +131,7 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetDetailMergedCallAsync(new RawPublicRequests.GetMergedTickerRequest(new Symbol(symbolText)), ct)
+            .GetDetailMergedCallAsync(new RawPublicRequests.GetDetailMergedRequest(new Symbol(symbolText)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -222,7 +222,7 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetTradeCallAsync(new RawPublicRequests.GetTradesRequest(new Symbol(symbolText)), ct)
+            .GetTradeCallAsync(new RawPublicRequests.GetTradeRequest(new Symbol(symbolText)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -264,7 +264,7 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetHistoryKlineCallAsync(new RawPublicRequests.GetKlinesRequest(new Symbol(symbolText), period, size), ct)
+            .GetHistoryKlineCallAsync(new RawPublicRequests.GetHistoryKlineRequest(new Symbol(symbolText), period, size), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -329,7 +329,7 @@ internal sealed class BittradeNormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetHistoryTradeCallAsync(new RawPublicRequests.GetTradeHistoryRequest(new Symbol(symbolText)), ct)
+            .GetHistoryTradeCallAsync(new RawPublicRequests.GetHistoryTradeRequest(new Symbol(symbolText)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

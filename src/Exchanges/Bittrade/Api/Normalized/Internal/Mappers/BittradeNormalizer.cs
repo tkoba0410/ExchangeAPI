@@ -20,7 +20,7 @@ internal static class BittradeNormalizer
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
     internal static bool TryNormalizeTicker(
-        RawPublicDtos.RawMergedResponse response,
+        RawPublicDtos.GetDetailMergedResponse response,
         string? rawJson,
         out BittradeTickerNormalized? normalized,
         out CallError? error)

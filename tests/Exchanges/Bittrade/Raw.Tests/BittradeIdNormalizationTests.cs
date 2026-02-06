@@ -115,7 +115,7 @@ public sealed class BittradeIdNormalizationTests
         }
         """;
 
-        var response = JsonSerializer.Deserialize<RawPublicDtos.RawKlinesResponse>(json);
+        var response = JsonSerializer.Deserialize<RawPublicDtos.GetHistoryKlineResponse>(json);
 
         Assert.NotNull(response);
         Assert.NotNull(response!.Data);

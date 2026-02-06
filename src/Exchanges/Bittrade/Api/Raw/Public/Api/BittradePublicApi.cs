@@ -28,17 +28,17 @@ internal sealed class BittradePublicApi
         _executor = executor ?? throw new ArgumentNullException(nameof(executor));
     }
 
-    public Task<Call<GetMergedTickerRequest, RawMergedResponse>> GetDetailMergedCallAsync(
-        GetMergedTickerRequest request,
+    public Task<Call<GetDetailMergedRequest, GetDetailMergedResponse>> GetDetailMergedCallAsync(
+        GetDetailMergedRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetDetailMerged),
             BittradePublicEndpoints.GetDetailMerged(request.Symbol.Value),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawMergedResponse>(json, Component(BittradeEndpointIds.GetDetailMerged)));
+            json => BittradeRawJson.DeserializeOrThrow<GetDetailMergedResponse>(json, Component(BittradeEndpointIds.GetDetailMerged)));
 
-    public Task<Call<GetDepthRequest, RawDepthResponse>> GetDepthCallAsync(
+    public Task<Call<GetDepthRequest, GetDepthResponse>> GetDepthCallAsync(
         GetDepthRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -46,19 +46,19 @@ internal sealed class BittradePublicApi
             Component(BittradeEndpointIds.GetDepth),
             BittradePublicEndpoints.GetDepth(request.Symbol.Value, request.Type?.Value),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawDepthResponse>(json, Component(BittradeEndpointIds.GetDepth)));
+            json => BittradeRawJson.DeserializeOrThrow<GetDepthResponse>(json, Component(BittradeEndpointIds.GetDepth)));
 
-    public Task<Call<GetTradesRequest, RawTradeResponse>> GetTradeCallAsync(
-        GetTradesRequest request,
+    public Task<Call<GetTradeRequest, GetTradeResponse>> GetTradeCallAsync(
+        GetTradeRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetTrade),
             BittradePublicEndpoints.GetTrade(request.Symbol.Value),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawTradeResponse>(json, Component(BittradeEndpointIds.GetTrade)));
+            json => BittradeRawJson.DeserializeOrThrow<GetTradeResponse>(json, Component(BittradeEndpointIds.GetTrade)));
 
-    public Task<Call<GetSymbolsRequest, RawSymbolsResponse>> GetSymbolsCallAsync(
+    public Task<Call<GetSymbolsRequest, GetSymbolsResponse>> GetSymbolsCallAsync(
         GetSymbolsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -66,19 +66,19 @@ internal sealed class BittradePublicApi
             Component(BittradeEndpointIds.GetSymbols),
             BittradePublicEndpoints.GetSymbols(),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawSymbolsResponse>(json, Component(BittradeEndpointIds.GetSymbols)));
+            json => BittradeRawJson.DeserializeOrThrow<GetSymbolsResponse>(json, Component(BittradeEndpointIds.GetSymbols)));
 
-    public Task<Call<GetCurrenciesRequest, RawCurrenciesResponse>> GetCurrencysCallAsync(
-        GetCurrenciesRequest request,
+    public Task<Call<GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
+        GetCurrencysRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetCurrencys),
             BittradePublicEndpoints.GetCurrencys(),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawCurrenciesResponse>(json, Component(BittradeEndpointIds.GetCurrencys)));
+            json => BittradeRawJson.DeserializeOrThrow<GetCurrencysResponse>(json, Component(BittradeEndpointIds.GetCurrencys)));
 
-    public Task<Call<GetTimestampRequest, RawTimestampResponse>> GetTimestampCallAsync(
+    public Task<Call<GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(
         GetTimestampRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -86,10 +86,10 @@ internal sealed class BittradePublicApi
             Component(BittradeEndpointIds.GetTimestamp),
             BittradePublicEndpoints.GetTimestamp(),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawTimestampResponse>(json, Component(BittradeEndpointIds.GetTimestamp)));
+            json => BittradeRawJson.DeserializeOrThrow<GetTimestampResponse>(json, Component(BittradeEndpointIds.GetTimestamp)));
 
-    public Task<Call<GetKlinesRequest, RawKlinesResponse>> GetHistoryKlineCallAsync(
-        GetKlinesRequest request,
+    public Task<Call<GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
+        GetHistoryKlineRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
@@ -99,9 +99,9 @@ internal sealed class BittradePublicApi
                 request.Period.Value,
                 request.Size?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawKlinesResponse>(json, Component(BittradeEndpointIds.GetHistoryKline)));
+            json => BittradeRawJson.DeserializeOrThrow<GetHistoryKlineResponse>(json, Component(BittradeEndpointIds.GetHistoryKline)));
 
-    public Task<Call<GetTickersRequest, RawTickersResponse>> GetTickersCallAsync(
+    public Task<Call<GetTickersRequest, GetTickersResponse>> GetTickersCallAsync(
         GetTickersRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -109,17 +109,17 @@ internal sealed class BittradePublicApi
             Component(BittradeEndpointIds.GetTickers),
             BittradePublicEndpoints.GetTickers(),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawTickersResponse>(json, Component(BittradeEndpointIds.GetTickers)));
+            json => BittradeRawJson.DeserializeOrThrow<GetTickersResponse>(json, Component(BittradeEndpointIds.GetTickers)));
 
-    public Task<Call<GetTradeHistoryRequest, RawTradeHistoryResponse>> GetHistoryTradeCallAsync(
-        GetTradeHistoryRequest request,
+    public Task<Call<GetHistoryTradeRequest, GetHistoryTradeResponse>> GetHistoryTradeCallAsync(
+        GetHistoryTradeRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
             Component(BittradeEndpointIds.GetHistoryTrade),
             BittradePublicEndpoints.GetHistoryTrade(request.Symbol.Value),
             cancellationToken,
-            json => BittradeRawJson.DeserializeOrThrow<RawTradeHistoryResponse>(json, Component(BittradeEndpointIds.GetHistoryTrade)));
+            json => BittradeRawJson.DeserializeOrThrow<GetHistoryTradeResponse>(json, Component(BittradeEndpointIds.GetHistoryTrade)));
 
     private async Task<Call<TReq, TRes>> SendAndParse<TReq, TRes>(
         TReq request,

@@ -10,40 +10,40 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
 
 public interface IBittradeRawApi
 {
-    Task<Call<GetMergedTickerRequest, RawMergedResponse>> GetDetailMergedCallAsync(
-        GetMergedTickerRequest request,
+    Task<Call<GetDetailMergedRequest, GetDetailMergedResponse>> GetDetailMergedCallAsync(
+        GetDetailMergedRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetDepthRequest, RawDepthResponse>> GetDepthCallAsync(
+    Task<Call<GetDepthRequest, GetDepthResponse>> GetDepthCallAsync(
         GetDepthRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTradesRequest, RawTradeResponse>> GetTradeCallAsync(
-        GetTradesRequest request,
+    Task<Call<GetTradeRequest, GetTradeResponse>> GetTradeCallAsync(
+        GetTradeRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetSymbolsRequest, RawSymbolsResponse>> GetSymbolsCallAsync(
+    Task<Call<GetSymbolsRequest, GetSymbolsResponse>> GetSymbolsCallAsync(
         GetSymbolsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCurrenciesRequest, RawCurrenciesResponse>> GetCurrencysCallAsync(
-        GetCurrenciesRequest request,
+    Task<Call<GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
+        GetCurrencysRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTimestampRequest, RawTimestampResponse>> GetTimestampCallAsync(
+    Task<Call<GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(
         GetTimestampRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetKlinesRequest, RawKlinesResponse>> GetHistoryKlineCallAsync(
-        GetKlinesRequest request,
+    Task<Call<GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
+        GetHistoryKlineRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTickersRequest, RawTickersResponse>> GetTickersCallAsync(
+    Task<Call<GetTickersRequest, GetTickersResponse>> GetTickersCallAsync(
         GetTickersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTradeHistoryRequest, RawTradeHistoryResponse>> GetHistoryTradeCallAsync(
-        GetTradeHistoryRequest request,
+    Task<Call<GetHistoryTradeRequest, GetHistoryTradeResponse>> GetHistoryTradeCallAsync(
+        GetHistoryTradeRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetAccountsRequest, RawAccountsResponse>> GetAccountsCallAsync(

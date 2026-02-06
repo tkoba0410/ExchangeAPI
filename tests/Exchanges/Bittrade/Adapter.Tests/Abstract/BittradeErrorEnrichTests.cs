@@ -36,33 +36,33 @@ public sealed class BittradeErrorEnrichTests
 
     private sealed class ThrowingRawApi : BittradeRawApiStub
     {
-        public override Task<Call<RawPublicRequests.GetMergedTickerRequest, RawPublicDtos.RawMergedResponse>> GetDetailMergedCallAsync(
-            RawPublicRequests.GetMergedTickerRequest request,
+        public override Task<Call<RawPublicRequests.GetDetailMergedRequest, RawPublicDtos.GetDetailMergedResponse>> GetDetailMergedCallAsync(
+            RawPublicRequests.GetDetailMergedRequest request,
             CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public override Task<Call<RawPublicRequests.GetDepthRequest, RawPublicDtos.RawDepthResponse>> GetDepthCallAsync(
+        public override Task<Call<RawPublicRequests.GetDepthRequest, RawPublicDtos.GetDepthResponse>> GetDepthCallAsync(
             RawPublicRequests.GetDepthRequest request,
             CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public override Task<Call<RawPublicRequests.GetTradesRequest, RawPublicDtos.RawTradeResponse>> GetTradeCallAsync(
-            RawPublicRequests.GetTradesRequest request,
+        public override Task<Call<RawPublicRequests.GetTradeRequest, RawPublicDtos.GetTradeResponse>> GetTradeCallAsync(
+            RawPublicRequests.GetTradeRequest request,
             CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public override Task<Call<RawPublicRequests.GetKlinesRequest, RawPublicDtos.RawKlinesResponse>> GetHistoryKlineCallAsync(
-            RawPublicRequests.GetKlinesRequest request,
+        public override Task<Call<RawPublicRequests.GetHistoryKlineRequest, RawPublicDtos.GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
+            RawPublicRequests.GetHistoryKlineRequest request,
             CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public override Task<Call<RawPublicRequests.GetTickersRequest, RawPublicDtos.RawTickersResponse>> GetTickersCallAsync(
+        public override Task<Call<RawPublicRequests.GetTickersRequest, RawPublicDtos.GetTickersResponse>> GetTickersCallAsync(
             RawPublicRequests.GetTickersRequest request,
             CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
 
-        public override Task<Call<RawPublicRequests.GetTradeHistoryRequest, RawPublicDtos.RawTradeHistoryResponse>> GetHistoryTradeCallAsync(
-            RawPublicRequests.GetTradeHistoryRequest request,
+        public override Task<Call<RawPublicRequests.GetHistoryTradeRequest, RawPublicDtos.GetHistoryTradeResponse>> GetHistoryTradeCallAsync(
+            RawPublicRequests.GetHistoryTradeRequest request,
             CancellationToken cancellationToken = default) =>
             throw new ExchangeApiException("boom");
     }

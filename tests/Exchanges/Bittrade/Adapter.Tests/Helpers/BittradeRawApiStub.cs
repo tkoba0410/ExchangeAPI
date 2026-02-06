@@ -11,48 +11,48 @@ internal abstract class BittradeRawApiStub : IBittradeRawApi
 {
     protected static Exception CreateException() => new InvalidOperationException("Raw API should not be called.");
 
-    public virtual Task<Call<RawPublicRequests.GetMergedTickerRequest, RawPublicDtos.RawMergedResponse>> GetDetailMergedCallAsync(
-        RawPublicRequests.GetMergedTickerRequest request,
+    public virtual Task<Call<RawPublicRequests.GetDetailMergedRequest, RawPublicDtos.GetDetailMergedResponse>> GetDetailMergedCallAsync(
+        RawPublicRequests.GetDetailMergedRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 
-    public virtual Task<Call<RawPublicRequests.GetDepthRequest, RawPublicDtos.RawDepthResponse>> GetDepthCallAsync(
+    public virtual Task<Call<RawPublicRequests.GetDepthRequest, RawPublicDtos.GetDepthResponse>> GetDepthCallAsync(
         RawPublicRequests.GetDepthRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 
-    public virtual Task<Call<RawPublicRequests.GetTradesRequest, RawPublicDtos.RawTradeResponse>> GetTradeCallAsync(
-        RawPublicRequests.GetTradesRequest request,
+    public virtual Task<Call<RawPublicRequests.GetTradeRequest, RawPublicDtos.GetTradeResponse>> GetTradeCallAsync(
+        RawPublicRequests.GetTradeRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 
-    public virtual Task<Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.RawSymbolsResponse>> GetSymbolsCallAsync(
+    public virtual Task<Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.GetSymbolsResponse>> GetSymbolsCallAsync(
         RawPublicRequests.GetSymbolsRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 
-    public virtual Task<Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.RawCurrenciesResponse>> GetCurrencysCallAsync(
-        RawPublicRequests.GetCurrenciesRequest request,
+    public virtual Task<Call<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse>> GetCurrencysCallAsync(
+        RawPublicRequests.GetCurrencysRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 
-    public virtual Task<Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.RawTimestampResponse>> GetTimestampCallAsync(
+    public virtual Task<Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.GetTimestampResponse>> GetTimestampCallAsync(
         RawPublicRequests.GetTimestampRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 
-    public virtual Task<Call<RawPublicRequests.GetKlinesRequest, RawPublicDtos.RawKlinesResponse>> GetHistoryKlineCallAsync(
-        RawPublicRequests.GetKlinesRequest request,
+    public virtual Task<Call<RawPublicRequests.GetHistoryKlineRequest, RawPublicDtos.GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
+        RawPublicRequests.GetHistoryKlineRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 
-    public virtual Task<Call<RawPublicRequests.GetTickersRequest, RawPublicDtos.RawTickersResponse>> GetTickersCallAsync(
+    public virtual Task<Call<RawPublicRequests.GetTickersRequest, RawPublicDtos.GetTickersResponse>> GetTickersCallAsync(
         RawPublicRequests.GetTickersRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 
-    public virtual Task<Call<RawPublicRequests.GetTradeHistoryRequest, RawPublicDtos.RawTradeHistoryResponse>> GetHistoryTradeCallAsync(
-        RawPublicRequests.GetTradeHistoryRequest request,
+    public virtual Task<Call<RawPublicRequests.GetHistoryTradeRequest, RawPublicDtos.GetHistoryTradeResponse>> GetHistoryTradeCallAsync(
+        RawPublicRequests.GetHistoryTradeRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 

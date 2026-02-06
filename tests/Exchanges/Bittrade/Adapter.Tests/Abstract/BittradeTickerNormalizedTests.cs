@@ -31,7 +31,7 @@ public sealed class BittradeTickerNormalizedTests
         }
         """;
 
-        var raw = BittradeRawJson.DeserializeOrThrow<RawPublicDtos.RawMergedResponse>(json, "Bittrade.GetTicker");
+        var raw = BittradeRawJson.DeserializeOrThrow<RawPublicDtos.GetDetailMergedResponse>(json, "Bittrade.GetTicker");
         var ok = BittradeNormalizer.TryNormalizeTicker(raw, json, out var normalized, out var error);
         Assert.True(ok);
         Assert.NotNull(normalized);

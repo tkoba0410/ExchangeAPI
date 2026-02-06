@@ -36,48 +36,48 @@ public sealed class BittradeRawApi : IBittradeRawApi
         _privateClient = privateClient ?? throw new ArgumentNullException(nameof(privateClient));
     }
 
-    public Task<Call<GetMergedTickerRequest, RawMergedResponse>> GetDetailMergedCallAsync(
-        GetMergedTickerRequest request,
+    public Task<Call<GetDetailMergedRequest, GetDetailMergedResponse>> GetDetailMergedCallAsync(
+        GetDetailMergedRequest request,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetDetailMergedCallAsync(request, cancellationToken);
 
-    public Task<Call<GetDepthRequest, RawDepthResponse>> GetDepthCallAsync(
+    public Task<Call<GetDepthRequest, GetDepthResponse>> GetDepthCallAsync(
         GetDepthRequest request,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetDepthCallAsync(request, cancellationToken);
 
-    public Task<Call<GetTradesRequest, RawTradeResponse>> GetTradeCallAsync(
-        GetTradesRequest request,
+    public Task<Call<GetTradeRequest, GetTradeResponse>> GetTradeCallAsync(
+        GetTradeRequest request,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetTradeCallAsync(request, cancellationToken);
 
-    public Task<Call<GetSymbolsRequest, RawSymbolsResponse>> GetSymbolsCallAsync(
+    public Task<Call<GetSymbolsRequest, GetSymbolsResponse>> GetSymbolsCallAsync(
         GetSymbolsRequest request,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetSymbolsCallAsync(request, cancellationToken);
 
-    public Task<Call<GetCurrenciesRequest, RawCurrenciesResponse>> GetCurrencysCallAsync(
-        GetCurrenciesRequest request,
+    public Task<Call<GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
+        GetCurrencysRequest request,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetCurrencysCallAsync(request, cancellationToken);
 
-    public Task<Call<GetTimestampRequest, RawTimestampResponse>> GetTimestampCallAsync(
+    public Task<Call<GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(
         GetTimestampRequest request,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetTimestampCallAsync(request, cancellationToken);
 
-    public Task<Call<GetKlinesRequest, RawKlinesResponse>> GetHistoryKlineCallAsync(
-        GetKlinesRequest request,
+    public Task<Call<GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
+        GetHistoryKlineRequest request,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetHistoryKlineCallAsync(request, cancellationToken);
 
-    public Task<Call<GetTickersRequest, RawTickersResponse>> GetTickersCallAsync(
+    public Task<Call<GetTickersRequest, GetTickersResponse>> GetTickersCallAsync(
         GetTickersRequest request,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetTickersCallAsync(request, cancellationToken);
 
-    public Task<Call<GetTradeHistoryRequest, RawTradeHistoryResponse>> GetHistoryTradeCallAsync(
-        GetTradeHistoryRequest request,
+    public Task<Call<GetHistoryTradeRequest, GetHistoryTradeResponse>> GetHistoryTradeCallAsync(
+        GetHistoryTradeRequest request,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetHistoryTradeCallAsync(request, cancellationToken);
 

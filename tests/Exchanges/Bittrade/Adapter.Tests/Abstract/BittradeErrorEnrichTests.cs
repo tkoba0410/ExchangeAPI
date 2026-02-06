@@ -7,7 +7,6 @@ using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
-using ContractExchangeInfo = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
@@ -69,7 +68,7 @@ public sealed class BittradeErrorEnrichTests
     }
 
     private static IExchangeMarketResolver CreateResolver() =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ContractExchangeInfo(
+        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
             new[] { new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("btcjpy"), MarketType.ParseOrThrow("Spot")) },
             null,
             null,
@@ -79,7 +78,7 @@ public sealed class BittradeErrorEnrichTests
     {
         private readonly ExchangeInfoDto _info;
 
-        public StubExchangeInfoApi(ContractExchangeInfo info) => _info = new ExchangeInfoDto(info);
+        public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
         public Task<Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default) =>

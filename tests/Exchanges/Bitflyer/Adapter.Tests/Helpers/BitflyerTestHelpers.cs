@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
-using ContractExchangeInfo = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
@@ -46,7 +45,7 @@ internal static class BitflyerTestHelpers
 
     public static IBitflyerMarketResolver CreateResolver()
     {
-        var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ContractExchangeInfo(
+        var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
             new[] { new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("BTC_JPY"), MarketType.ParseOrThrow("Spot")) },
             null,
             null,
@@ -68,7 +67,7 @@ internal static class BitflyerTestHelpers
     {
         private readonly ExchangeInfoDto _info;
 
-        public StubExchangeInfoApi(ContractExchangeInfo info) => _info = new ExchangeInfoDto(info);
+        public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
         public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default)

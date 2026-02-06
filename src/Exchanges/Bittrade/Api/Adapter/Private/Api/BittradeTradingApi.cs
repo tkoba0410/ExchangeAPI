@@ -59,7 +59,10 @@ internal sealed class BittradeTradingApi
                 request,
                 call,
                 BittradeOperations.Trading.PlaceOrder,
-                ok => new OrderLimitResponse(MapOrderResult(ok)));
+                ok => new OrderLimitResponse(
+                    Key: ok.Key,
+                    ExchangeOrderId: ok.ExchangeOrderId,
+                    AcceptanceId: ok.AcceptanceId));
         }
         catch (Exception ex)
         {
@@ -88,7 +91,7 @@ internal sealed class BittradeTradingApi
                 request,
                 call,
                 BittradeOperations.Trading.CancelOrder,
-                ok => new CancelOrderResponse(new CancelResult(ok.IsSuccess)));
+                ok => new CancelOrderResponse(ok.IsSuccess));
         }
         catch (Exception ex)
         {
@@ -100,11 +103,5 @@ internal sealed class BittradeTradingApi
         }
     }
 
-
-    private static OrderResult MapOrderResult(BittradeOrderResult result) =>
-        new(
-            Key: result.Key,
-            ExchangeOrderId: result.ExchangeOrderId,
-            AcceptanceId: result.AcceptanceId);
 
 }

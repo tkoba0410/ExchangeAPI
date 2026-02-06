@@ -171,11 +171,11 @@ internal sealed class MarketApi
         }
     }
 
-    private static IReadOnlyList<ExecutionMarket> ToExecutionList(
+    private static IReadOnlyList<GetExecutionsPublicItem> ToExecutionList(
         Symbol symbol,
         IReadOnlyList<BitflyerExecutionNormalized> executions)
     {
-        IReadOnlyList<ExecutionMarket> mapped = executions
+        IReadOnlyList<GetExecutionsPublicItem> mapped = executions
             .Select(e => MarketMapper.MapExecution(symbol, e))
             .ToArray();
         return mapped;

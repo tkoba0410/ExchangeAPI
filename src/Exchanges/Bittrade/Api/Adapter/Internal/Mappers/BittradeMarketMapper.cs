@@ -26,10 +26,10 @@ internal static class BittradeMarketMapper
     public static GetBoardResponse MapOrderBook(BittradeOrderBookNormalized normalized)
     {
         var bids = normalized.Bids
-            .Select(level => new OrderBookLevel(new Price(level.Price), new Size(level.Size)))
+            .Select(level => new GetBoardLevel(new Price(level.Price), new Size(level.Size)))
             .ToList();
         var asks = normalized.Asks
-            .Select(level => new OrderBookLevel(new Price(level.Price), new Size(level.Size)))
+            .Select(level => new GetBoardLevel(new Price(level.Price), new Size(level.Size)))
             .ToList();
 
         if (!OrderBookNormalizer.TryNormalize(bids, asks, out var orderBook, out var error))
@@ -37,12 +37,12 @@ internal static class BittradeMarketMapper
             throw new ExchangeApiException(error?.Message ?? "OrderBook normalization failed.");
         }
 
-        return new GetBoardResponse(orderBook!);
+        return orderBook!;
     }
 
-    public static ExecutionMarket MapExecution(CommonSymbol symbol, BittradeExecutionNormalized normalized)
+    public static GetExecutionsPublicItem MapExecution(CommonSymbol symbol, BittradeExecutionNormalized normalized)
     {
-        return new ExecutionMarket(
+        return new GetExecutionsPublicItem(
             Symbol: symbol,
             OrderId: normalized.Id,
             Side: MapSide(normalized.Side),

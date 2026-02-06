@@ -14,7 +14,6 @@ using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Api.Wire.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
-using ContractExchangeInfo = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
@@ -71,7 +70,7 @@ public class BittradeMarketApiTests
 
         var call = await api.GetDepthCallAsync(new Symbol("BTC/JPY"));
         var ok = Assert.IsType<CallResult<GetBoardResponse>.Ok>(call.Result);
-        var book = ok.Response.Value;
+        var book = ok.Response;
 
         Assert.Equal(2, book.Bids.Count);
         Assert.Equal(2, book.Asks.Count);
@@ -96,7 +95,7 @@ public class BittradeMarketApiTests
 
         var call = await api.GetExecutionsPublicCallAsync(new Symbol("BTC/JPY"));
         var ok = Assert.IsType<CallResult<GetExecutionsPublicResponse>.Ok>(call.Result);
-        var executions = ok.Response.Value;
+        var executions = ok.Response.Items;
 
         Assert.Equal(2, executions.Count);
         Assert.Equal(Side.Buy, executions[0].Side);
@@ -129,13 +128,13 @@ public class BittradeMarketApiTests
     }
 
     private static IExchangeMarketResolver CreateResolver(params ExchangeMarketInfo[] markets) =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ContractExchangeInfo(markets, null, null, null)));
+        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(markets, null, null, null)));
 
     private sealed class StubExchangeInfoApi : IExchangeInfoProvider
     {
         private readonly ExchangeInfoDto _info;
 
-        public StubExchangeInfoApi(ContractExchangeInfo info) => _info = new ExchangeInfoDto(info);
+        public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
         public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default)

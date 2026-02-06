@@ -130,7 +130,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
             var call = await client.GetBoardCallAsync(new Symbol("BTC/JPY"));
             var ok = Assert.IsType<CallResult<ContractOrderBook>.Ok>(call.Result);
-            var board = ok.Response.Value;
+            var board = ok.Response;
 
             Assert.Single(board.Bids);
             Assert.Single(board.Asks);
@@ -155,7 +155,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
             var call = await client.GetBalanceCallAsync();
             var ok = Assert.IsType<CallResult<ContractBalance>.Ok>(call.Result);
-            var result = ok.Response.Value;
+            var result = ok.Response.Balances;
 
             Assert.Equal(2, result.Count);
             Assert.Contains(result, b => b.Currency == CurrencyCode.Jpy && b.Amount == 10000m && b.Available == 8000m);

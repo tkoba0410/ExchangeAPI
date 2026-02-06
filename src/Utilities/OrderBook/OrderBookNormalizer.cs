@@ -10,9 +10,9 @@ namespace ExchangeApi.Utilities.OrderBook;
 public static class OrderBookNormalizer
 {
     public static bool TryNormalize(
-        IEnumerable<OrderBookLevel> bids,
-        IEnumerable<OrderBookLevel> asks,
-        out ExchangeApi.Contracts.Common.Dtos.OrderBook? normalized,
+        IEnumerable<GetBoardLevel> bids,
+        IEnumerable<GetBoardLevel> asks,
+        out GetBoardResponse? normalized,
         out CallError? error)
     {
         if (bids is null || asks is null)
@@ -36,19 +36,19 @@ public static class OrderBookNormalizer
         }
     }
 
-    public static ExchangeApi.Contracts.Common.Dtos.OrderBook Normalize(
-        IEnumerable<OrderBookLevel> bids,
-        IEnumerable<OrderBookLevel> asks)
+    public static GetBoardResponse Normalize(
+        IEnumerable<GetBoardLevel> bids,
+        IEnumerable<GetBoardLevel> asks)
     {
         if (bids is null) throw new ArgumentNullException(nameof(bids));
         if (asks is null) throw new ArgumentNullException(nameof(asks));
 
-        return new ExchangeApi.Contracts.Common.Dtos.OrderBook(
+        return new GetBoardResponse(
             Bids: SortDescending(bids),
             Asks: SortAscending(asks));
     }
 
-    private static IReadOnlyList<OrderBookLevel> SortDescending(IEnumerable<OrderBookLevel> levels)
+    private static IReadOnlyList<GetBoardLevel> SortDescending(IEnumerable<GetBoardLevel> levels)
     {
         var dict = new SortedDictionary<decimal, decimal>(Comparer<decimal>.Create((x, y) => y.CompareTo(x)));
         foreach (var level in levels)
@@ -58,10 +58,10 @@ public static class OrderBookNormalizer
                 ? size + level.Size.Value
                 : level.Size.Value;
         }
-        return dict.Select(kv => new OrderBookLevel(new Price(kv.Key), new Size(kv.Value))).ToList();
+        return dict.Select(kv => new GetBoardLevel(new Price(kv.Key), new Size(kv.Value))).ToList();
     }
 
-    private static IReadOnlyList<OrderBookLevel> SortAscending(IEnumerable<OrderBookLevel> levels)
+    private static IReadOnlyList<GetBoardLevel> SortAscending(IEnumerable<GetBoardLevel> levels)
     {
         var dict = new SortedDictionary<decimal, decimal>(Comparer<decimal>.Default);
         foreach (var level in levels)
@@ -71,6 +71,6 @@ public static class OrderBookNormalizer
                 ? size + level.Size.Value
                 : level.Size.Value;
         }
-        return dict.Select(kv => new OrderBookLevel(new Price(kv.Key), new Size(kv.Value))).ToList();
+        return dict.Select(kv => new GetBoardLevel(new Price(kv.Key), new Size(kv.Value))).ToList();
     }
 }

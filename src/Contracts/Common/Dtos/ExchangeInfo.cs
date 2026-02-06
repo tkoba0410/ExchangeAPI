@@ -1,13 +1,8 @@
-using System.Collections.Generic;
+using System;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-namespace ExchangeApi.Contracts.Common.Dtos;
 
-public sealed record ExchangeInfo(
-    IReadOnlyList<ExchangeMarketInfo> Markets,
-    ExchangeFeatureFlags? Features,
-    ExchangeRateLimits? RateLimits,
-    ExchangeMaintenance? Maintenance);
+namespace ExchangeApi.Contracts.Common.Dtos;
 
 /// <summary>
 /// 取引可能な銘柄と、そのバリデーション向けメタ情報。

@@ -45,13 +45,13 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 
             var call = await client.GetOrdersCallAsync(new GetOrdersRequest(new Symbol("BTC/JPY")));
             var ok = Assert.IsType<CallResult<GetOrdersResponse>.Ok>(call.Result);
-            var result = ok.Response.Value.Items;
+            var result = ok.Response.Items;
 
             Assert.Single(result);
             var order = result[0];
             Assert.Equal(OrderId.ParseOrThrow("JRF-1"), order.OrderId);
             Assert.Equal(Side.Buy, order.Side);
-            Assert.Equal(OrderSnapshotType.Limit, order.OrderType);
+            Assert.Equal(GetOrdersOrderType.Limit, order.OrderType);
             Assert.Equal(new Size(0.1m), order.Size);
         }
 
@@ -96,10 +96,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var call = await client.GetOrdersCallAsync(new GetOrdersRequest(new Symbol("BTC/JPY"), Limit: 1));
             var ok = Assert.IsType<CallResult<GetOrdersResponse>.Ok>(call.Result);
 
-            Assert.Single(ok.Response.Value.Items);
-            Assert.Equal(1, ok.Response.Value.Meta.RequestedLimit);
-            Assert.Equal(1, ok.Response.Value.Meta.AppliedLimit);
-            Assert.Equal(1, ok.Response.Value.Meta.ReturnedCount);
+            Assert.Single(ok.Response.Items);
+            Assert.Equal(1, ok.Response.RequestedLimit);
+            Assert.Equal(1, ok.Response.AppliedLimit);
+            Assert.Equal(1, ok.Response.ReturnedCount);
         }
 
         [Fact]
@@ -138,10 +138,10 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var call = await client.GetExecutionsPrivateCallAsync(new GetExecutionsPrivateRequest(new Symbol("BTC/JPY"), Limit: 1));
             var ok = Assert.IsType<CallResult<GetExecutionsPrivateResponse>.Ok>(call.Result);
 
-            Assert.Single(ok.Response.Value.Items);
-            Assert.Equal(1, ok.Response.Value.Meta.RequestedLimit);
-            Assert.Equal(1, ok.Response.Value.Meta.AppliedLimit);
-            Assert.Equal(1, ok.Response.Value.Meta.ReturnedCount);
+            Assert.Single(ok.Response.Items);
+            Assert.Equal(1, ok.Response.RequestedLimit);
+            Assert.Equal(1, ok.Response.AppliedLimit);
+            Assert.Equal(1, ok.Response.ReturnedCount);
         }
 
         private static BitflyerExchangeClient CreateClient(IBitflyerRawApi raw)

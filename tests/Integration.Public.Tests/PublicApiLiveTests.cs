@@ -53,7 +53,7 @@ public class PublicApiLiveTests
 
         var call = await publicApi.GetExchangeInfoCallAsync(cts.Token);
         var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse>.Ok>(call.Result);
-        var info = ok.Response.Value;
+        var info = ok.Response;
         var msg = $"bitFlyer ExchangeInfo markets={info.Markets.Count}";
         Log(msg);
 
@@ -94,7 +94,7 @@ public class PublicApiLiveTests
 
         var call = await publicApi.GetExchangeInfoCallAsync(cts.Token);
         var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse>.Ok>(call.Result);
-        var info = ok.Response.Value;
+        var info = ok.Response;
         var msg = $"Bittrade ExchangeInfo markets={info.Markets.Count}";
         Log(msg);
 

@@ -12,7 +12,7 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.Errors;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
 using ExchangeInfoResponse = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
 namespace ExchangeApi.Composition.Providers.ExchangeInfo;
 
@@ -50,7 +50,7 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         try
         {
             var info = GetCachedInfo();
-            var response = new ExchangeInfoResponse(info);
+            var response = info;
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: "JsonExchangeInfo",

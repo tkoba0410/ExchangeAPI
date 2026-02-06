@@ -29,11 +29,11 @@ internal static class MarketMapper
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
         var bids = normalized.Bids
-            .Select(b => new OrderBookLevel(new Price(b.Price), new Size(b.Size)))
+            .Select(b => new GetBoardLevel(new Price(b.Price), new Size(b.Size)))
             .ToArray();
 
         var asks = normalized.Asks
-            .Select(a => new OrderBookLevel(new Price(a.Price), new Size(a.Size)))
+            .Select(a => new GetBoardLevel(new Price(a.Price), new Size(a.Size)))
             .ToArray();
 
         if (!OrderBookNormalizer.TryNormalize(bids, asks, out var orderBook, out var error))
@@ -41,10 +41,10 @@ internal static class MarketMapper
             throw new ExchangeApiException(error?.Message ?? "OrderBook normalization failed.");
         }
 
-        return new CommonBoard(orderBook!);
+        return orderBook!;
     }
 
-    public static ExecutionMarket MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)
+    public static GetExecutionsPublicItem MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         if (!BitflyerCommonMapper.TryMapSide(normalized.Side, out var side, out var error))
@@ -52,7 +52,7 @@ internal static class MarketMapper
             throw new ExchangeApiException(error?.Message ?? "bitFlyer side mapping failed.");
         }
 
-        return new ExecutionMarket(
+        return new GetExecutionsPublicItem(
             Symbol: symbol,
             OrderId: OrderId.ParseOrThrow(normalized.Id.ToString(System.Globalization.CultureInfo.InvariantCulture)),
             Side: side,

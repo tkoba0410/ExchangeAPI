@@ -53,7 +53,7 @@ internal sealed class BitflyerAccountApi
         }
     }
 
-    private static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BitflyerBalanceEntryNormalized> balances) =>
+    private static IReadOnlyList<GetBalanceEntry> MapBalances(IReadOnlyList<BitflyerBalanceEntryNormalized> balances) =>
         balances
             .Select(b => BalanceFactory.Create(
                 currency: b.CurrencyCode,

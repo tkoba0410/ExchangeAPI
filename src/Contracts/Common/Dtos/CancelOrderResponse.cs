@@ -1,3 +1,3 @@
 namespace ExchangeApi.Contracts.Common.Dtos;
 
-public sealed record CancelOrderResponse(CancelResult Value);
+public sealed record CancelOrderResponse(bool IsSuccess);

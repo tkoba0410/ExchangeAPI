@@ -8,9 +8,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Mappers;
 
 internal static class BittradeMapper
 {
-    public static IReadOnlyList<Balance> MapBalances(IReadOnlyList<BittradeBalanceEntryNormalized> entries)
+    public static IReadOnlyList<GetBalanceEntry> MapBalances(IReadOnlyList<BittradeBalanceEntryNormalized> entries)
     {
-        var result = new List<Balance>();
+        var result = new List<GetBalanceEntry>();
         foreach (var group in entries.GroupBy(e => e.Currency.Value, StringComparer.OrdinalIgnoreCase))
         {
             var total = group.Sum(e => e.Balance);

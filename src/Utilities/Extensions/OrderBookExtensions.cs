@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ContractOrderBook = global::ExchangeApi.Contracts.Common.Dtos.OrderBook;
+using ContractOrderBook = global::ExchangeApi.Contracts.Common.Dtos.GetBoardResponse;
 
 namespace ExchangeApi.Utilities.Extensions;
 
@@ -130,7 +130,7 @@ public static class OrderBookExtensions
             TargetSize: null);
     }
 
-    private static FillEstimate Fill(IReadOnlyList<OrderBookLevel> levels, Size takerSize, bool isBuy, Size? targetSize, Price? targetPrice)
+    private static FillEstimate Fill(IReadOnlyList<GetBoardLevel> levels, Size takerSize, bool isBuy, Size? targetSize, Price? targetPrice)
     {
         if (levels is null) throw new ArgumentNullException(nameof(levels));
         if (takerSize.Value <= 0) throw new ArgumentOutOfRangeException(nameof(takerSize));

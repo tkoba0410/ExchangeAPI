@@ -20,7 +20,7 @@ public class BittradeExchangeInfoApiTests
 
         var call = await api.GetExchangeInfoCallAsync();
         var ok = Assert.IsType<CallResult<ExchangeInfoDto>.Ok>(call.Result);
-        var info = ok.Response.Value;
+        var info = ok.Response;
 
         Assert.Single(info.Markets);
         var m = info.Markets[0];

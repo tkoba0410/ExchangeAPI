@@ -7,7 +7,6 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
-using ContractExchangeInfo = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 
 namespace ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 
@@ -38,7 +37,7 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         }
 
         _cache ??= ((CallResult<ExchangeInfoDto>.Ok)exchangeInfoCall.Result).Response;
-        var market = FindMarket(_cache.Value, symbol);
+        var market = FindMarket(_cache, symbol);
         if (market is null)
         {
             return ErrorFromChild(request, exchangeInfoCall, new CallError(CallErrorKind.Semantic, $"Symbol not supported: {symbol.Value}"));
@@ -47,7 +46,7 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         return OkFromChild(request, exchangeInfoCall, market);
     }
 
-    private static ExchangeMarketInfo? FindMarket(ContractExchangeInfo info, Symbol symbol)
+    private static ExchangeMarketInfo? FindMarket(ExchangeInfoDto info, Symbol symbol)
     {
         foreach (var market in info.Markets)
         {

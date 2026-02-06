@@ -39,7 +39,7 @@ internal sealed class BitflyerSpotHistoryApi
                 request,
                 call,
                 BitflyerOperations.History.GetOrders,
-                ok => new GetOrdersResponse(BuildOrderPage(request, ok)));
+                ok => BuildOrderResponse(request, ok));
         }
         catch (Exception ex)
         {
@@ -65,7 +65,7 @@ internal sealed class BitflyerSpotHistoryApi
                 request,
                 call,
                 BitflyerOperations.History.GetExecutions,
-                ok => new GetExecutionsPrivateResponse(BuildExecutionPage(request, ok)));
+                ok => BuildExecutionResponse(request, ok));
         }
         catch (Exception ex)
         {
@@ -77,22 +77,37 @@ internal sealed class BitflyerSpotHistoryApi
         }
     }
 
-    private static Page<OrderSnapshotItem> BuildOrderPage(
+    private static GetOrdersResponse BuildOrderResponse(
         GetOrdersRequest request,
         IReadOnlyList<BitflyerOpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
         var (requestedLimit, appliedLimit) = GetLimits(request);
         items = items.Take(appliedLimit).ToList();
-        var meta = BuildMeta(requestedLimit, appliedLimit, items.Count, Completeness.MayBePartial, PartialReason.Unknown);
-        return new Page<OrderSnapshotItem>(items, HasMore: false, NextCursor: null, Meta: meta);
+        var (returnedCount, limitClamped, completeness, reason, asOf) = BuildMeta(
+            requestedLimit,
+            appliedLimit,
+            items.Count,
+            Completeness.MayBePartial,
+            PartialReason.Unknown);
+        return new GetOrdersResponse(
+            Items: items,
+            HasMore: false,
+            NextCursor: null,
+            RequestedLimit: requestedLimit,
+            AppliedLimit: appliedLimit,
+            ReturnedCount: returnedCount,
+            LimitClamped: limitClamped,
+            Completeness: completeness,
+            PartialReason: reason,
+            AsOf: asOf);
     }
 
-    private static Page<ExecutionItem> BuildExecutionPage(
+    private static GetExecutionsPrivateResponse BuildExecutionResponse(
         GetExecutionsPrivateRequest request,
         IReadOnlyList<BitflyerExecutionAccountNormalized> executions)
     {
-        var items = executions.Select(e => new ExecutionItem(
+        var items = executions.Select(e => new GetExecutionsPrivateItem(
             Timestamp: e.ExecutedAt,
             ExecutionId: ExecutionId.ParseOrThrow(e.OrderId.ToString()),
             Market: e.Symbol,
@@ -102,21 +117,36 @@ internal sealed class BitflyerSpotHistoryApi
 
         var (requestedLimit, appliedLimit) = GetLimits(request);
         items = items.Take(appliedLimit).ToList();
-        var meta = BuildMeta(requestedLimit, appliedLimit, items.Count, Completeness.MayBePartial, PartialReason.Unknown);
-        return new Page<ExecutionItem>(items, HasMore: false, NextCursor: null, Meta: meta);
+        var (returnedCount, limitClamped, completeness, reason, asOf) = BuildMeta(
+            requestedLimit,
+            appliedLimit,
+            items.Count,
+            Completeness.MayBePartial,
+            PartialReason.Unknown);
+        return new GetExecutionsPrivateResponse(
+            Items: items,
+            HasMore: false,
+            NextCursor: null,
+            RequestedLimit: requestedLimit,
+            AppliedLimit: appliedLimit,
+            ReturnedCount: returnedCount,
+            LimitClamped: limitClamped,
+            Completeness: completeness,
+            PartialReason: reason,
+            AsOf: asOf);
     }
 
-    private static OrderSnapshotItem MapSnapshot(BitflyerOpenOrder order)
+    private static GetOrdersItem MapSnapshot(BitflyerOpenOrder order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch
         {
-            OrderType.Limit => OrderSnapshotType.Limit,
-            OrderType.Market => OrderSnapshotType.Market,
-            _ => OrderSnapshotType.Unknown,
+            OrderType.Limit => GetOrdersOrderType.Limit,
+            OrderType.Market => GetOrdersOrderType.Market,
+            _ => GetOrdersOrderType.Unknown,
         };
 
-        return new OrderSnapshotItem(
+        return new GetOrdersItem(
             CreatedAt: createdAt,
             OrderId: OrderId.ParseOrThrow(order.Key.Value),
             Market: order.Symbol,
@@ -124,7 +154,7 @@ internal sealed class BitflyerSpotHistoryApi
             OrderType: orderType,
             Price: order.Price,
             Size: order.Size,
-            Status: OrderSnapshotStatus.Open);
+            Status: GetOrdersOrderStatus.Open);
     }
 
     private static (int RequestedLimit, int AppliedLimit) GetLimits(GetOrdersRequest request)
@@ -141,7 +171,7 @@ internal sealed class BitflyerSpotHistoryApi
         return (requestedLimit, appliedLimit);
     }
 
-    private static PageMeta BuildMeta(
+    private static (int ReturnedCount, bool LimitClamped, Completeness Completeness, PartialReason? PartialReason, DateTimeOffset AsOf) BuildMeta(
         int requestedLimit,
         int appliedLimit,
         int returnedCount,
@@ -149,14 +179,6 @@ internal sealed class BitflyerSpotHistoryApi
         PartialReason? reason)
     {
         var clamped = appliedLimit != requestedLimit;
-
-        return new PageMeta(
-            RequestedLimit: requestedLimit,
-            AppliedLimit: appliedLimit,
-            ReturnedCount: returnedCount,
-            LimitClamped: clamped,
-            Completeness: completeness,
-            PartialReason: reason,
-            AsOf: DateTimeOffset.UtcNow);
+        return (returnedCount, clamped, completeness, reason, DateTimeOffset.UtcNow);
     }
 }

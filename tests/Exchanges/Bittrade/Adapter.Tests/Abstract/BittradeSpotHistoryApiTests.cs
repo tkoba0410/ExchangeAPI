@@ -27,9 +27,9 @@ public sealed class BittradeSpotHistoryApiTests
         var call = await api.GetOrdersCallAsync(new GetOrdersRequest(new Symbol("BTC/JPY"), Limit: 1));
         var ok = Assert.IsType<CallResult<GetOrdersResponse>.Ok>(call.Result);
 
-        Assert.Single(ok.Response.Value.Items);
-        Assert.Equal(1, ok.Response.Value.Meta.AppliedLimit);
-        Assert.Equal(1, ok.Response.Value.Meta.ReturnedCount);
+        Assert.Single(ok.Response.Items);
+        Assert.Equal(1, ok.Response.AppliedLimit);
+        Assert.Equal(1, ok.Response.ReturnedCount);
     }
 
     [Fact]
@@ -40,11 +40,11 @@ public sealed class BittradeSpotHistoryApiTests
 
         var call = await api.GetExecutionsPrivateCallAsync(new GetExecutionsPrivateRequest(new Symbol("BTC/JPY"), Limit: 1));
         var ok = Assert.IsType<CallResult<GetExecutionsPrivateResponse>.Ok>(call.Result);
-        var response = ok.Response.Value;
+        var response = ok.Response;
 
         Assert.Empty(response.Items);
-        Assert.Equal(1, response.Meta.AppliedLimit);
-        Assert.Equal(0, response.Meta.ReturnedCount);
+        Assert.Equal(1, response.AppliedLimit);
+        Assert.Equal(0, response.ReturnedCount);
     }
 
     private static BittradeSpotHistoryApi CreateApi(StubRawApi raw)

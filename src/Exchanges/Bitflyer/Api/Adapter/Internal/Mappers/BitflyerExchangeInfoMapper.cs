@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 

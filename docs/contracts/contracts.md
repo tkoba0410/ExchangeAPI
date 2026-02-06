@@ -111,6 +111,25 @@ Contracts の Facade API は Public / Private に分離する（MUST）。
 
 ---
 
+## 6.2 Facade API 引数順序（Argument Order）
+
+Contracts の公開メソッドは、**引数順序を一貫した規則**で定義する（MUST）。
+順序は呼び出し時の認知負荷を下げる目的で固定し、メソッドごとに恣意的に変更してはならない（MUST NOT）。
+
+**標準順序（必須）**
+
+1. **ルーティング要素**: `Symbol` / `Market` など対象市場を特定する引数
+2. **主要操作パラメータ**: `Side` / `Size` / `Price` / `OrderKey` など
+3. **絞り込み・ページング**: `Limit` / `Cursor` / `From` / `To` / `Since` など
+4. **`CancellationToken`**: 常に最後
+
+**補足**
+
+- 引数が無い API は `CancellationToken` のみを受け取る（MUST）。
+- 追加引数が必要になった場合も、上記順序に従って挿入する（MUST）。
+
+---
+
 ## 7. 層境界の型制約
 
 - Contracts の公開メソッド（インターフェイス）は、Contracts で許可された型のみを in/out に用いる（MUST）。

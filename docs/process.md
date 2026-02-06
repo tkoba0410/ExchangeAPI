@@ -152,6 +152,7 @@ governance に従って裁定を行う。
 - [ ] `string` が Wire から下流へ漏れていない（in/out の型制約が守られている）
 - [ ] Raw が lossless であり、意味確定（単位換算・時刻統一・解釈・デフォルト補完）をしていない
 - [ ] Raw DTO / RawJson が公開面（Contracts）へ漏れていない
+- [ ] 単一の API 呼び出し実装／単一インスタンス内部で、複数取引所の Raw / Normalized 型を混在させていない（TopSpec 3.4.4）
 
 #### A2. 非層カテゴリ（TopSpec）
 - [ ] `Application` は横断ユースケースの置き場であり、`Contracts.*` を参照していない

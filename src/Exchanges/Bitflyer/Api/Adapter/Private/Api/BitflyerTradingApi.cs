@@ -33,7 +33,7 @@ internal sealed class BitflyerTradingApi
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
-    public async Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitCallAsync(
+    public async Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         Symbol symbol,
         ContractSide side,
         Size size,
@@ -73,7 +73,7 @@ internal sealed class BitflyerTradingApi
         }
     }
 
-    public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderCallAsync(
+    public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)

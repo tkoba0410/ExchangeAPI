@@ -6,7 +6,7 @@ using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
@@ -29,7 +29,7 @@ public sealed class BittradeErrorEnrichTests
 
         var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
 
-        var err = Assert.IsType<CallResult<GetTickerResponse>.Err>(call.Result);
+        var err = Assert.IsType<CallResult<TickerResponse>.Err>(call.Result);
         Assert.Equal("Bittrade.Market.GetTicker", call.Meta.Component);
         Assert.Equal("boom", err.Error.Message);
     }
@@ -80,13 +80,13 @@ public sealed class BittradeErrorEnrichTests
 
         public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
-        public Task<Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
+        public Task<Call<ContractsRequests.ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
             CancellationToken cancellationToken = default) =>
-            Task.FromResult(new Call<ContractsRequests.GetExchangeInfoRequest, ExchangeInfoDto>(
+            Task.FromResult(new Call<ContractsRequests.ExchangeInfoRequest, ExchangeInfoDto>(
                 CallId.New(),
                 DateTimeOffset.UtcNow,
                 TimeSpan.Zero,
-                new ContractsRequests.GetExchangeInfoRequest(),
+                new ContractsRequests.ExchangeInfoRequest(),
                 new CallResult<ExchangeInfoDto>.Ok(_info),
                 CallMeta.CreateInternal("Contracts", "StubExchangeInfo")));
 

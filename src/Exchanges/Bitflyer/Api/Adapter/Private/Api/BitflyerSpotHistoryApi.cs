@@ -26,8 +26,8 @@ internal sealed class BitflyerSpotHistoryApi
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
-    public async Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
-        GetOrdersRequest request,
+    public async Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
+        OrdersRequest request,
         CancellationToken cancellationToken = default)
     {
         var startedAt = DateTimeOffset.UtcNow;
@@ -43,7 +43,7 @@ internal sealed class BitflyerSpotHistoryApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetOrdersRequest, GetOrdersResponse>(
+            return ApiCallMapper.FromException<OrdersRequest, OrdersResponse>(
                 request,
                 startedAt,
                 BitflyerOperations.History.GetOrders,
@@ -51,8 +51,8 @@ internal sealed class BitflyerSpotHistoryApi
         }
     }
 
-    public async Task<Call<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
-        GetExecutionsPrivateRequest request,
+    public async Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
+        ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default)
     {
         var startedAt = DateTimeOffset.UtcNow;
@@ -69,7 +69,7 @@ internal sealed class BitflyerSpotHistoryApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>(
+            return ApiCallMapper.FromException<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
                 request,
                 startedAt,
                 BitflyerOperations.History.GetExecutions,
@@ -77,8 +77,8 @@ internal sealed class BitflyerSpotHistoryApi
         }
     }
 
-    private static GetOrdersResponse BuildOrderResponse(
-        GetOrdersRequest request,
+    private static OrdersResponse BuildOrderResponse(
+        OrdersRequest request,
         IReadOnlyList<BitflyerOpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
@@ -90,7 +90,7 @@ internal sealed class BitflyerSpotHistoryApi
             items.Count,
             Completeness.MayBePartial,
             PartialReason.Unknown);
-        return new GetOrdersResponse(
+        return new OrdersResponse(
             Items: items,
             HasMore: false,
             NextCursor: null,
@@ -103,11 +103,11 @@ internal sealed class BitflyerSpotHistoryApi
             AsOf: asOf);
     }
 
-    private static GetExecutionsPrivateResponse BuildExecutionResponse(
-        GetExecutionsPrivateRequest request,
+    private static ExecutionsPrivateResponse BuildExecutionResponse(
+        ExecutionsPrivateRequest request,
         IReadOnlyList<BitflyerExecutionAccountNormalized> executions)
     {
-        var items = executions.Select(e => new GetExecutionsPrivateItem(
+        var items = executions.Select(e => new ExecutionsPrivateItem(
             Timestamp: e.ExecutedAt,
             ExecutionId: ExecutionId.ParseOrThrow(e.OrderId.ToString()),
             Market: e.Symbol,
@@ -123,7 +123,7 @@ internal sealed class BitflyerSpotHistoryApi
             items.Count,
             Completeness.MayBePartial,
             PartialReason.Unknown);
-        return new GetExecutionsPrivateResponse(
+        return new ExecutionsPrivateResponse(
             Items: items,
             HasMore: false,
             NextCursor: null,
@@ -136,17 +136,17 @@ internal sealed class BitflyerSpotHistoryApi
             AsOf: asOf);
     }
 
-    private static GetOrdersItem MapSnapshot(BitflyerOpenOrder order)
+    private static OrdersItem MapSnapshot(BitflyerOpenOrder order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch
         {
-            OrderType.Limit => GetOrdersOrderType.Limit,
-            OrderType.Market => GetOrdersOrderType.Market,
-            _ => GetOrdersOrderType.Unknown,
+            OrderType.Limit => OrdersOrderType.Limit,
+            OrderType.Market => OrdersOrderType.Market,
+            _ => OrdersOrderType.Unknown,
         };
 
-        return new GetOrdersItem(
+        return new OrdersItem(
             CreatedAt: createdAt,
             OrderId: OrderId.ParseOrThrow(order.Key.Value),
             Market: order.Symbol,
@@ -154,17 +154,17 @@ internal sealed class BitflyerSpotHistoryApi
             OrderType: orderType,
             Price: order.Price,
             Size: order.Size,
-            Status: GetOrdersOrderStatus.Open);
+            Status: OrdersOrderStatus.Open);
     }
 
-    private static (int RequestedLimit, int AppliedLimit) GetLimits(GetOrdersRequest request)
+    private static (int RequestedLimit, int AppliedLimit) GetLimits(OrdersRequest request)
     {
         var requestedLimit = request.Limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);
         return (requestedLimit, appliedLimit);
     }
 
-    private static (int RequestedLimit, int AppliedLimit) GetLimits(GetExecutionsPrivateRequest request)
+    private static (int RequestedLimit, int AppliedLimit) GetLimits(ExecutionsPrivateRequest request)
     {
         var requestedLimit = request.Limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);

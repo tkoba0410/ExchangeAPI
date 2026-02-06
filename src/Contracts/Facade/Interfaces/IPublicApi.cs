@@ -13,18 +13,18 @@ namespace ExchangeApi.Contracts.Facade.Interfaces;
 /// </summary>
 public interface IPublicApi
 {
-    Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
+    Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
+    Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetExchangeInfoRequest, GetExchangeInfoResponse>> GetExchangeInfoCallAsync(
+    Task<Call<ExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoAsync(
         CancellationToken cancellationToken = default);
 }

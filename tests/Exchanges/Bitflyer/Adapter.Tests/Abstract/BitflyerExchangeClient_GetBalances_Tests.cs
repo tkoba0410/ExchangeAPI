@@ -13,7 +13,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
     public class BitflyerExchangeClient_GetBalances_Tests
     {
         [Fact]
-        public async Task GetBalanceCallAsync_ReturnsMappedBalanceList()
+        public async Task GetBalanceAsync_ReturnsMappedBalanceList()
         {
             // Arrange
             var rawBalances = new[]
@@ -39,9 +39,9 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var client = CreateClient(raw);
 
             // Act
-            var call = await client.GetBalanceCallAsync();
-            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<GetBalanceResponse>.Ok>(call.Result);
-            IReadOnlyList<GetBalanceEntry> result = ok.Response.Balances;
+            var call = await client.GetBalanceAsync();
+            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<BalanceResponse>.Ok>(call.Result);
+            IReadOnlyList<BalanceEntry> result = ok.Response.Balances;
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -58,7 +58,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         }
 
         [Fact]
-        public async Task GetBalanceCallAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
+        public async Task GetBalanceAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
         {
             // Arrange
             var rawBalances = Array.Empty<RawPrivateDtos.BalanceResponse>();
@@ -70,9 +70,9 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var client = CreateClient(raw);
 
             // Act
-            var call = await client.GetBalanceCallAsync();
-            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<GetBalanceResponse>.Ok>(call.Result);
-            IReadOnlyList<GetBalanceEntry> result = ok.Response.Balances;
+            var call = await client.GetBalanceAsync();
+            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<BalanceResponse>.Ok>(call.Result);
+            IReadOnlyList<BalanceEntry> result = ok.Response.Balances;
 
             // Assert
             Assert.Empty(result);

@@ -6,7 +6,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 
 namespace ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 
@@ -30,7 +30,7 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
             return ErrorCall(request, startedAt, new CallError(CallErrorKind.Semantic, "symbol is required."));
         }
 
-        var exchangeInfoCall = await _exchangeInfo.GetExchangeInfoCallAsync(ct).ConfigureAwait(false);
+        var exchangeInfoCall = await _exchangeInfo.GetExchangeInfoAsync(ct).ConfigureAwait(false);
         if (exchangeInfoCall.Result is CallResult<ExchangeInfoDto>.Err err)
         {
             return ErrorFromChild(request, exchangeInfoCall, err.Error);
@@ -61,7 +61,7 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
 
     private static Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> OkFromChild(
         ResolveExchangeMarketRequest request,
-        Call<GetExchangeInfoRequest, ExchangeInfoDto> child,
+        Call<ExchangeInfoRequest, ExchangeInfoDto> child,
         ExchangeMarketInfo market)
     {
         var meta = new CallMeta(
@@ -82,7 +82,7 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
 
     private static Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> ErrorFromChild(
         ResolveExchangeMarketRequest request,
-        Call<GetExchangeInfoRequest, ExchangeInfoDto> child,
+        Call<ExchangeInfoRequest, ExchangeInfoDto> child,
         CallError error)
     {
         var meta = new CallMeta(

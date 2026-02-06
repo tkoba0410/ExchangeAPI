@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
@@ -49,24 +49,24 @@ public sealed class BittradePublicClient : IPublicApi, IExchangeClient
         ApiBundle = bundle;
     }
 
-    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerCallAsync(symbol, cancellationToken);
+        _marketApi.GetTickerAsync(symbol, cancellationToken);
 
-    public Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
+    public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardCallAsync(symbol, cancellationToken);
+        _marketApi.GetBoardAsync(symbol, cancellationToken);
 
-    public Task<Call<GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
+    public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicCallAsync(symbol, cancellationToken);
+        _marketApi.GetExecutionsPublicAsync(symbol, cancellationToken);
 
-    public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
+    public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
         CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
+        _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
 
     // Raw access removed from public facade.
 }

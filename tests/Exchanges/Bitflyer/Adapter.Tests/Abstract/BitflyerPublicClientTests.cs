@@ -46,7 +46,7 @@ public sealed class BitflyerPublicClientTests
     }
 
     [Fact]
-    public async Task GetTickerCallAsync_UnknownSymbol_Throws()
+    public async Task GetTickerAsync_UnknownSymbol_Throws()
     {
         var rawTicker = new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
@@ -56,8 +56,8 @@ public sealed class BitflyerPublicClientTests
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
         var client = new BitflyerPublicClient(normalized, exchangeInfo);
 
-        var call = await client.GetTickerCallAsync(new Symbol("DOGE/JPY"));
-        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetTickerResponse>.Err>(call.Result);
+        var call = await client.GetTickerAsync(new Symbol("DOGE/JPY"));
+        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.TickerResponse>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }
 }

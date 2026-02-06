@@ -164,6 +164,12 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawApi
         _privateApi?.GetDepositsCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
+    public Task<Call<RawPrivateRequests.GetExecutionsPrivateRequest, RawPrivateDtos.GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
+        RawPrivateRequests.GetExecutionsPrivateRequest request,
+        CancellationToken cancellationToken = default) =>
+        _privateApi?.GetExecutionsPrivateCallAsync(request, cancellationToken)
+        ?? throw new NotSupportedException();
+
     public Task<Call<RawPrivateRequests.WithdrawRequest, RawPrivateDtos.WithdrawResponse>> WithdrawCallAsync(
         RawPrivateRequests.WithdrawRequest request,
         CancellationToken cancellationToken = default) =>
@@ -223,12 +229,6 @@ internal sealed class FakeBitflyerPublicApi : IBitflyerRawApi
         CancellationToken cancellationToken = default) =>
         _tradingApi?.GetParentOrderCallAsync(request, cancellationToken)
         ?? _privateApi?.GetParentOrderCallAsync(request, cancellationToken)
-        ?? throw new NotSupportedException();
-
-    public Task<Call<RawPrivateRequests.GetExecutionsPrivateRequest, RawPrivateDtos.GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
-        RawPrivateRequests.GetExecutionsPrivateRequest request,
-        CancellationToken cancellationToken = default) =>
-        _privateApi?.GetExecutionsPrivateCallAsync(request, cancellationToken)
         ?? throw new NotSupportedException();
 
     public Task<Call<RawPrivateRequests.GetBalanceHistoryRequest, RawPrivateDtos.GetBalanceHistoryResponse>> GetBalanceHistoryCallAsync(

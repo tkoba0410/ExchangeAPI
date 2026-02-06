@@ -31,14 +31,14 @@ internal sealed class BittradeAccountApi
         _account = account ?? throw new ArgumentNullException(nameof(account));
     }
 
-    public Task<Call<GetBalanceRequest, GetBalanceResponse>> GetBalanceCallAsync(
+    public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         CancellationToken cancellationToken = default) =>
         GetAccountsBalanceByAccountIdCallAsync(cancellationToken);
 
-    public async Task<Call<GetBalanceRequest, GetBalanceResponse>> GetAccountsBalanceByAccountIdCallAsync(
+    public async Task<Call<BalanceRequest, BalanceResponse>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var request = new GetBalanceRequest();
+        var request = new BalanceRequest();
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -48,11 +48,11 @@ internal sealed class BittradeAccountApi
                 request,
                 call,
                 BittradeOperations.Account.GetBalance,
-                ok => new GetBalanceResponse(BittradeMapper.MapBalances(ok)));
+                ok => new BalanceResponse(BittradeMapper.MapBalances(ok)));
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetBalanceRequest, GetBalanceResponse>(
+            return ApiCallMapper.FromException<BalanceRequest, BalanceResponse>(
                 request,
                 startedAt,
                 BittradeOperations.Account.GetBalance,

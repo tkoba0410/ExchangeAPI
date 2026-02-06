@@ -32,7 +32,7 @@ internal sealed class BittradeTradingApi
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
     }
 
-    public async Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitCallAsync(
+    public async Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         CommonSymbol symbol,
         Side side,
         Size size,
@@ -74,7 +74,7 @@ internal sealed class BittradeTradingApi
         }
     }
 
-    public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderCallAsync(
+    public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         CommonSymbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)

@@ -17,7 +17,7 @@ public static class SideSizeExtensions
     public static Size SignedSize(this OpenOrder order) =>
         order.Side.SignedSize(order.Size);
 
-    public static Size SignedSize(this GetExecutionsPublicItem execution) =>
+    public static Size SignedSize(this ExecutionsPublicItem execution) =>
         execution.Side.SignedSize(execution.Size);
 
     public static Size SignedSize(this ExecutionAccount execution) =>

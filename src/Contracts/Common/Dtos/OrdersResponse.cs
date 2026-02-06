@@ -5,8 +5,8 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Contracts.Common.Dtos;
 
-public sealed record GetOrdersResponse(
-    IReadOnlyList<GetOrdersItem> Items,
+public sealed record OrdersResponse(
+    IReadOnlyList<OrdersItem> Items,
     bool HasMore,
     Cursor? NextCursor,
     int RequestedLimit,
@@ -17,24 +17,24 @@ public sealed record GetOrdersResponse(
     PartialReason? PartialReason,
     DateTimeOffset AsOf);
 
-public sealed record GetOrdersItem(
+public sealed record OrdersItem(
     DateTimeOffset CreatedAt,
     OrderId OrderId,
     Symbol Market,
     Side Side,
-    GetOrdersOrderType OrderType,
+    OrdersOrderType OrderType,
     Price? Price,
     Size Size,
-    GetOrdersOrderStatus Status);
+    OrdersOrderStatus Status);
 
-public enum GetOrdersOrderType
+public enum OrdersOrderType
 {
     Limit,
     Market,
     Unknown
 }
 
-public enum GetOrdersOrderStatus
+public enum OrdersOrderStatus
 {
     Open,
     Filled,

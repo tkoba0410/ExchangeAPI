@@ -12,8 +12,8 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.Errors;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
-using ExchangeInfoResponse = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
+using ExchangeInfoResponse = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 namespace ExchangeApi.Composition.Providers.ExchangeInfo;
 
 /// <summary>
@@ -41,10 +41,10 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         _options = options ?? CreateDefaultOptions();
     }
 
-    public async Task<Call<GetExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoCallAsync(
+    public async Task<Call<ExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoAsync(
         CancellationToken cancellationToken = default)
     {
-        var request = new GetExchangeInfoRequest();
+        var request = new ExchangeInfoRequest();
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -57,7 +57,7 @@ public sealed class JsonExchangeInfoApi : IPublicApi
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
-            return new Call<GetExchangeInfoRequest, ExchangeInfoResponse>(
+            return new Call<ExchangeInfoRequest, ExchangeInfoResponse>(
                 Id: CallId.New(),
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
@@ -73,7 +73,7 @@ public sealed class JsonExchangeInfoApi : IPublicApi
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
-            return new Call<GetExchangeInfoRequest, ExchangeInfoResponse>(
+            return new Call<ExchangeInfoRequest, ExchangeInfoResponse>(
                 Id: CallId.New(),
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
@@ -84,36 +84,36 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         }
     }
 
-    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetTickerRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetTickerRequest, GetTickerResponse>(
+        var request = new TickerRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<TickerRequest, TickerResponse>(
             "Contracts",
             "JsonExchangeInfo",
             request,
             "Ticker"));
     }
 
-    public Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
+    public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetBoardRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetBoardRequest, GetBoardResponse>(
+        var request = new BoardRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<BoardRequest, BoardResponse>(
             "Contracts",
             "JsonExchangeInfo",
             request,
             "OrderBook"));
     }
 
-    public Task<Call<GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
+    public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetExecutionsPublicRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetExecutionsPublicRequest, GetExecutionsPublicResponse>(
+        var request = new ExecutionsPublicRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<ExecutionsPublicRequest, ExecutionsPublicResponse>(
             "Contracts",
             "JsonExchangeInfo",
             request,

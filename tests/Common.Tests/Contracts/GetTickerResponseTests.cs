@@ -5,7 +5,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Common.Tests.Contracts;
 
-public class GetTickerResponseTests
+public class TickerResponseTests
 {
     [Fact]
     public void Constructor_SetsPropertiesCorrectly()
@@ -13,7 +13,7 @@ public class GetTickerResponseTests
         var lastPrice = 5_000_500m;
         var timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-        var ticker = new GetTickerResponse(
+        var ticker = new TickerResponse(
             Symbol: new Symbol("BTC/JPY"),
             LastTradedPrice: new Price(lastPrice),
             Timestamp: timestamp);
@@ -26,7 +26,7 @@ public class GetTickerResponseTests
     [Fact]
     public void WithExpression_CreatesModifiedInstance()
     {
-        var original = new GetTickerResponse(
+        var original = new TickerResponse(
             Symbol: new Symbol("BTC/JPY"),
             LastTradedPrice: new Price(5_000_500m),
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
@@ -39,9 +39,9 @@ public class GetTickerResponseTests
     }
 
     [Fact]
-    public void GetTickerResponse_IsImmutable()
+    public void TickerResponse_IsImmutable()
     {
-        var original = new GetTickerResponse(
+        var original = new TickerResponse(
             Symbol: new Symbol("BTC/JPY"),
             LastTradedPrice: new Price(5_000_500m),
             Timestamp: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));

@@ -9,7 +9,7 @@ namespace ExchangeApi.Tests.Common.Tests.Contracts.Extensions;
 
 public class ExchangeInfoExtensionsTests
 {
-    private readonly GetExchangeInfoResponse _info = new(
+    private readonly ExchangeInfoResponse _info = new(
         Markets: new List<ExchangeMarketInfo>
         {
             new(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("BTC_JPY"), MarketType.ParseOrThrow("Spot"), MakerFeeRate: 0.001m, TakerFeeRate: 0.002m),
@@ -38,7 +38,7 @@ public class ExchangeInfoExtensionsTests
     [Fact]
     public void TryGetFeeRates_Found_ShouldReturnRates()
     {
-        var info = new GetExchangeInfoResponse(
+        var info = new ExchangeInfoResponse(
             Markets: new List<ExchangeMarketInfo>
             {
                 new(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("BTC_JPY"), MarketType.ParseOrThrow("Spot"), MakerFeeRate: 0.001m, TakerFeeRate: 0.002m, FeeCurrency: CurrencyCode.Btc, FeeType: FeeType.Percentage),

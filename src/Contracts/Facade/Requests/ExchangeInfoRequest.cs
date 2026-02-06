@@ -1,3 +1,3 @@
 namespace ExchangeApi.Contracts.Facade.Requests;
 
-public sealed record GetBalanceRequest();
+public sealed record ExchangeInfoRequest();

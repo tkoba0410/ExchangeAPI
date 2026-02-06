@@ -6,8 +6,8 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Utilities.OrderBook;
-using CommonTicker = ExchangeApi.Contracts.Common.Dtos.GetTickerResponse;
-using CommonBoard = ExchangeApi.Contracts.Common.Dtos.GetBoardResponse;
+using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
+using CommonBoard = ExchangeApi.Contracts.Common.Dtos.BoardResponse;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 
 internal static class MarketMapper
@@ -29,11 +29,11 @@ internal static class MarketMapper
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
         var bids = normalized.Bids
-            .Select(b => new GetBoardLevel(new Price(b.Price), new Size(b.Size)))
+            .Select(b => new BoardLevel(new Price(b.Price), new Size(b.Size)))
             .ToArray();
 
         var asks = normalized.Asks
-            .Select(a => new GetBoardLevel(new Price(a.Price), new Size(a.Size)))
+            .Select(a => new BoardLevel(new Price(a.Price), new Size(a.Size)))
             .ToArray();
 
         if (!OrderBookNormalizer.TryNormalize(bids, asks, out var orderBook, out var error))
@@ -44,7 +44,7 @@ internal static class MarketMapper
         return orderBook!;
     }
 
-    public static GetExecutionsPublicItem MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)
+    public static ExecutionsPublicItem MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         if (!BitflyerCommonMapper.TryMapSide(normalized.Side, out var side, out var error))
@@ -52,7 +52,7 @@ internal static class MarketMapper
             throw new ExchangeApiException(error?.Message ?? "bitFlyer side mapping failed.");
         }
 
-        return new GetExecutionsPublicItem(
+        return new ExecutionsPublicItem(
             Symbol: symbol,
             OrderId: OrderId.ParseOrThrow(normalized.Id.ToString(System.Globalization.CultureInfo.InvariantCulture)),
             Side: side,

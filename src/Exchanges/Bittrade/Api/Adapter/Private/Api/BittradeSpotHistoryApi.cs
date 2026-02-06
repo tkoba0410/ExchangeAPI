@@ -28,8 +28,8 @@ internal sealed class BittradeSpotHistoryApi
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
     }
 
-    public async Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
-        GetOrdersRequest request,
+    public async Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
+        OrdersRequest request,
         CancellationToken cancellationToken = default)
     {
         var startedAt = DateTimeOffset.UtcNow;
@@ -45,7 +45,7 @@ internal sealed class BittradeSpotHistoryApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetOrdersRequest, GetOrdersResponse>(
+            return ApiCallMapper.FromException<OrdersRequest, OrdersResponse>(
                 request,
                 startedAt,
                 BittradeOperations.History.GetOrders,
@@ -53,8 +53,8 @@ internal sealed class BittradeSpotHistoryApi
         }
     }
 
-    public async Task<Call<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
-        GetExecutionsPrivateRequest request,
+    public async Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
+        ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default)
     {
         var startedAt = DateTimeOffset.UtcNow;
@@ -72,7 +72,7 @@ internal sealed class BittradeSpotHistoryApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>(
+            return ApiCallMapper.FromException<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
                 request,
                 startedAt,
                 BittradeOperations.History.GetExecutions,
@@ -80,8 +80,8 @@ internal sealed class BittradeSpotHistoryApi
         }
     }
 
-    private static GetOrdersResponse BuildOrderResponse(
-        GetOrdersRequest request,
+    private static OrdersResponse BuildOrderResponse(
+        OrdersRequest request,
         IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos.BittradeOpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
@@ -93,7 +93,7 @@ internal sealed class BittradeSpotHistoryApi
             items.Count,
             Completeness.MayBePartial,
             PartialReason.Unknown);
-        return new GetOrdersResponse(
+        return new OrdersResponse(
             Items: items,
             HasMore: false,
             NextCursor: null,
@@ -106,11 +106,11 @@ internal sealed class BittradeSpotHistoryApi
             AsOf: asOf);
     }
 
-    private static GetExecutionsPrivateResponse BuildExecutionResponse(
-        GetExecutionsPrivateRequest request,
+    private static ExecutionsPrivateResponse BuildExecutionResponse(
+        ExecutionsPrivateRequest request,
         IReadOnlyList<BittradeExecutionNormalized> executions)
     {
-        var items = executions.Select(e => new GetExecutionsPrivateItem(
+        var items = executions.Select(e => new ExecutionsPrivateItem(
             Timestamp: e.Timestamp,
             ExecutionId: ExecutionId.ParseOrThrow(e.Id.Value),
             Market: request.Market,
@@ -131,7 +131,7 @@ internal sealed class BittradeSpotHistoryApi
             items.Count,
             Completeness.MayBePartial,
             PartialReason.Unknown);
-        return new GetExecutionsPrivateResponse(
+        return new ExecutionsPrivateResponse(
             Items: items,
             HasMore: false,
             NextCursor: null,
@@ -144,17 +144,17 @@ internal sealed class BittradeSpotHistoryApi
             AsOf: asOf);
     }
 
-    private static GetOrdersItem MapSnapshot(ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos.BittradeOpenOrder order)
+    private static OrdersItem MapSnapshot(ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos.BittradeOpenOrder order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch
         {
-            OrderType.Limit => GetOrdersOrderType.Limit,
-            OrderType.Market => GetOrdersOrderType.Market,
-            _ => GetOrdersOrderType.Unknown,
+            OrderType.Limit => OrdersOrderType.Limit,
+            OrderType.Market => OrdersOrderType.Market,
+            _ => OrdersOrderType.Unknown,
         };
 
-        return new GetOrdersItem(
+        return new OrdersItem(
             CreatedAt: createdAt,
             OrderId: OrderId.ParseOrThrow(order.Key.Value),
             Market: order.Symbol,
@@ -162,17 +162,17 @@ internal sealed class BittradeSpotHistoryApi
             OrderType: orderType,
             Price: order.Price,
             Size: order.Size,
-            Status: GetOrdersOrderStatus.Open);
+            Status: OrdersOrderStatus.Open);
     }
 
-    private static (int RequestedLimit, int AppliedLimit) GetLimits(GetOrdersRequest request)
+    private static (int RequestedLimit, int AppliedLimit) GetLimits(OrdersRequest request)
     {
         var requestedLimit = request.Limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);
         return (requestedLimit, appliedLimit);
     }
 
-    private static (int RequestedLimit, int AppliedLimit) GetLimits(GetExecutionsPrivateRequest request)
+    private static (int RequestedLimit, int AppliedLimit) GetLimits(ExecutionsPrivateRequest request)
     {
         var requestedLimit = request.Limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);

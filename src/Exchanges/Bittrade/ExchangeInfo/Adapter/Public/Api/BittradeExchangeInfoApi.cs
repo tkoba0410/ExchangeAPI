@@ -16,7 +16,7 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Requests.GetSymbolsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos.BittradeSymbolNormalized>>;
 
 namespace ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
@@ -35,10 +35,10 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         _getSymbols = normalized.GetSymbolsCallAsync;
     }
 
-    public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
+    public async Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
         CancellationToken cancellationToken = default)
     {
-        var request = new GetExchangeInfoRequest();
+        var request = new ExchangeInfoRequest();
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -53,7 +53,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
-            return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+            return new Call<ExchangeInfoRequest, ExchangeInfoDto>(
                 Id: CallId.New(),
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
@@ -63,7 +63,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         }
         catch (Exception ex)
         {
-            return ExchangeInfoCallMapper.FromException<GetExchangeInfoRequest, ExchangeInfoDto>(
+            return ExchangeInfoCallMapper.FromException<ExchangeInfoRequest, ExchangeInfoDto>(
                 request,
                 startedAt,
                 BittradeExchangeInfoOperations.GetExchangeInfo,

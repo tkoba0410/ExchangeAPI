@@ -3,7 +3,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Contracts.Common.Dtos;
 
-public sealed record GetTickerResponse(
+public sealed record TickerResponse(
     Symbol Symbol,
     Price LastTradedPrice,
     DateTimeOffset Timestamp);

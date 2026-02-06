@@ -4,13 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
-using CommonTicker = ExchangeApi.Contracts.Common.Dtos.GetTickerResponse;
+using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Public.Api;
 
@@ -33,24 +33,24 @@ public sealed class BitflyerPublicClient : IPublicApi, IExchangeClient
         _marketApi = new MarketApi(normalized, markets);
     }
 
-    public Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(
+    public Task<Call<TickerRequest, CommonTicker>> GetTickerAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerCallAsync(symbol, cancellationToken);
+        _marketApi.GetTickerAsync(symbol, cancellationToken);
 
-    public Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
+    public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardCallAsync(symbol, cancellationToken);
+        _marketApi.GetBoardAsync(symbol, cancellationToken);
 
-    public Task<Call<GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
+    public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicCallAsync(symbol, cancellationToken);
+        _marketApi.GetExecutionsPublicAsync(symbol, cancellationToken);
 
-    public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
+    public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
         CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
+        _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
 
     // Raw access removed from public facade.
 }

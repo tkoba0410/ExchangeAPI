@@ -5,8 +5,8 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Contracts.Common.Dtos;
 
-public sealed record GetExecutionsPrivateResponse(
-    IReadOnlyList<GetExecutionsPrivateItem> Items,
+public sealed record ExecutionsPrivateResponse(
+    IReadOnlyList<ExecutionsPrivateItem> Items,
     bool HasMore,
     Cursor? NextCursor,
     int RequestedLimit,
@@ -17,7 +17,7 @@ public sealed record GetExecutionsPrivateResponse(
     PartialReason? PartialReason,
     DateTimeOffset AsOf);
 
-public sealed record GetExecutionsPrivateItem(
+public sealed record ExecutionsPrivateItem(
     DateTimeOffset Timestamp,
     ExecutionId ExecutionId,
     Symbol Market,

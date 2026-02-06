@@ -5,9 +5,9 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Contracts.Common.Dtos;
 
-public sealed record GetExecutionsPublicResponse(IReadOnlyList<GetExecutionsPublicItem> Items);
+public sealed record ExecutionsPublicResponse(IReadOnlyList<ExecutionsPublicItem> Items);
 
-public sealed record GetExecutionsPublicItem(
+public sealed record ExecutionsPublicItem(
     Symbol Symbol,
     OrderId OrderId,
     Side Side,

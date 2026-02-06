@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
@@ -13,7 +13,7 @@ using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
-using CommonTicker = ExchangeApi.Contracts.Common.Dtos.GetTickerResponse;
+using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
@@ -81,56 +81,56 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
     }
 
     // Market
-    public Task<Call<GetTickerRequest, CommonTicker>> GetTickerCallAsync(
+    public Task<Call<TickerRequest, CommonTicker>> GetTickerAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerCallAsync(symbol, cancellationToken);
+        _marketApi.GetTickerAsync(symbol, cancellationToken);
 
-    public Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
+    public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardCallAsync(symbol, cancellationToken);
+        _marketApi.GetBoardAsync(symbol, cancellationToken);
 
-    public Task<Call<GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
+    public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicCallAsync(symbol, cancellationToken);
+        _marketApi.GetExecutionsPublicAsync(symbol, cancellationToken);
 
     // ExchangeInfo
-    public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
+    public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
         CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoCallAsync(cancellationToken);
+        _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
 
     // Trading
-    public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitCallAsync(
+    public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         Symbol symbol,
         ContractSide side,
         Size size,
         Price price,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.OrderLimitCallAsync(symbol, side, size, price, cancellationToken);
+        _tradingApi.OrderLimitAsync(symbol, side, size, price, cancellationToken);
 
-    public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderCallAsync(
+    public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.CancelOrderCallAsync(symbol, orderKey, cancellationToken);
+        _tradingApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
 
     // Account
-    public Task<Call<GetBalanceRequest, GetBalanceResponse>> GetBalanceCallAsync(
+    public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         CancellationToken cancellationToken = default) =>
-        _accountApi.GetBalanceCallAsync(cancellationToken);
+        _accountApi.GetBalanceAsync(cancellationToken);
 
     // SpotHistory
-    public Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
-        GetOrdersRequest request,
+    public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
+        OrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _historyApi.GetOrdersCallAsync(request, cancellationToken);
+        _historyApi.GetOrdersAsync(request, cancellationToken);
 
-    public Task<Call<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
-        GetExecutionsPrivateRequest request,
+    public Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
+        ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default) =>
-        _historyApi.GetExecutionsPrivateCallAsync(request, cancellationToken);
+        _historyApi.GetExecutionsPrivateAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

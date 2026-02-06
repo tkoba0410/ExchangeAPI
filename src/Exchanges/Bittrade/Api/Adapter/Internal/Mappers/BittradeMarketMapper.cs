@@ -13,9 +13,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Mappers;
 
 internal static class BittradeMarketMapper
 {
-    public static GetTickerResponse MapTicker(CommonSymbol symbol, BittradeTickerNormalized normalized)
+    public static TickerResponse MapTicker(CommonSymbol symbol, BittradeTickerNormalized normalized)
     {
-        var ticker = new GetTickerResponse(
+        var ticker = new TickerResponse(
             Symbol: symbol,
             LastTradedPrice: new Price(normalized.LastTradedPrice),
             Timestamp: normalized.Timestamp);
@@ -23,13 +23,13 @@ internal static class BittradeMarketMapper
         return ticker;
     }
 
-    public static GetBoardResponse MapOrderBook(BittradeOrderBookNormalized normalized)
+    public static BoardResponse MapOrderBook(BittradeOrderBookNormalized normalized)
     {
         var bids = normalized.Bids
-            .Select(level => new GetBoardLevel(new Price(level.Price), new Size(level.Size)))
+            .Select(level => new BoardLevel(new Price(level.Price), new Size(level.Size)))
             .ToList();
         var asks = normalized.Asks
-            .Select(level => new GetBoardLevel(new Price(level.Price), new Size(level.Size)))
+            .Select(level => new BoardLevel(new Price(level.Price), new Size(level.Size)))
             .ToList();
 
         if (!OrderBookNormalizer.TryNormalize(bids, asks, out var orderBook, out var error))
@@ -40,9 +40,9 @@ internal static class BittradeMarketMapper
         return orderBook!;
     }
 
-    public static GetExecutionsPublicItem MapExecution(CommonSymbol symbol, BittradeExecutionNormalized normalized)
+    public static ExecutionsPublicItem MapExecution(CommonSymbol symbol, BittradeExecutionNormalized normalized)
     {
-        return new GetExecutionsPublicItem(
+        return new ExecutionsPublicItem(
             Symbol: symbol,
             OrderId: normalized.Id,
             Side: MapSide(normalized.Side),

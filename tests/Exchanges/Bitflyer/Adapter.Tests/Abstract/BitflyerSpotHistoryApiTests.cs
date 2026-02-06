@@ -43,15 +43,15 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.GetBoardResponse { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);
             var client = CreateClient(raw);
 
-            var call = await client.GetOrdersCallAsync(new GetOrdersRequest(new Symbol("BTC/JPY")));
-            var ok = Assert.IsType<CallResult<GetOrdersResponse>.Ok>(call.Result);
+            var call = await client.GetOrdersAsync(new OrdersRequest(new Symbol("BTC/JPY")));
+            var ok = Assert.IsType<CallResult<OrdersResponse>.Ok>(call.Result);
             var result = ok.Response.Items;
 
             Assert.Single(result);
             var order = result[0];
             Assert.Equal(OrderId.ParseOrThrow("JRF-1"), order.OrderId);
             Assert.Equal(Side.Buy, order.Side);
-            Assert.Equal(GetOrdersOrderType.Limit, order.OrderType);
+            Assert.Equal(OrdersOrderType.Limit, order.OrderType);
             Assert.Equal(new Size(0.1m), order.Size);
         }
 
@@ -93,8 +93,8 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.GetBoardResponse { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);
             var client = CreateClient(raw);
 
-            var call = await client.GetOrdersCallAsync(new GetOrdersRequest(new Symbol("BTC/JPY"), Limit: 1));
-            var ok = Assert.IsType<CallResult<GetOrdersResponse>.Ok>(call.Result);
+            var call = await client.GetOrdersAsync(new OrdersRequest(new Symbol("BTC/JPY"), Limit: 1));
+            var ok = Assert.IsType<CallResult<OrdersResponse>.Ok>(call.Result);
 
             Assert.Single(ok.Response.Items);
             Assert.Equal(1, ok.Response.RequestedLimit);
@@ -135,8 +135,8 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.GetBoardResponse { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);
             var client = CreateClient(raw);
 
-            var call = await client.GetExecutionsPrivateCallAsync(new GetExecutionsPrivateRequest(new Symbol("BTC/JPY"), Limit: 1));
-            var ok = Assert.IsType<CallResult<GetExecutionsPrivateResponse>.Ok>(call.Result);
+            var call = await client.GetExecutionsPrivateAsync(new ExecutionsPrivateRequest(new Symbol("BTC/JPY"), Limit: 1));
+            var ok = Assert.IsType<CallResult<ExecutionsPrivateResponse>.Ok>(call.Result);
 
             Assert.Single(ok.Response.Items);
             Assert.Equal(1, ok.Response.RequestedLimit);

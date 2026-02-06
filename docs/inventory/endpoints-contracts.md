@@ -45,9 +45,9 @@
 * **ContractApiId**: Contracts 側の論理識別子（例: `GetTicker`, `OrderLimit`）
 * **ContractMethod**: Facade の公開メソッド名（例: `GetTickerCallAsync`）
 * **Parameters**: メソッド引数の型一覧（例: `Symbol` / `Symbol, Side, Size, Price` / `MarketLimitCursorRequest`）
-* **RequestType / ResponseType**: `Call<TRequest, TOk>` の `TRequest` / `TOk` 型
+* **RequestType / ResponseType**: Contracts の `Call<TRequest, TOk>` における `TRequest` / `TOk` 型
 * **PresentIn**: 当該 Contracts API が存在する層（`Contracts`, `Adapter`, `Normalized` 等）。通常は `Contracts`
-* **BitflyerEndpointId / BittradeEndpointId**: 各取引所 inventory における EndpointId。未対応は `None`。
+* **BitflyerEndpointId / BittradeEndpointId**: 各取引所 inventory における EndpointId。未対応は `None` / `Internal`。
 * **DecisionNote**: 裁定者による判断理由・留保理由（NotSupported もここに記す）
 
 ---
@@ -63,21 +63,21 @@
 
 ## Public
 
-| ContractScope | ContractApiId        | ContractMethod                | Parameters | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | DecisionNote        |
-| ------------- | -------------------- | ----------------------------- | ---------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------------- |
-| public        | GetExchangeInfo      | GetExchangeInfoCallAsync      | (none)     | GetExchangeInfoRequest      | ExchangeInfo                   | Contracts | Internal             | None               |                     |
-| public        | GetTicker            | GetTickerCallAsync            | Symbol     | GetTickerRequest            | Ticker                         | Contracts | GetTicker            | GetDetailMerged    |                     |
-| public        | GetBoard             | GetBoardCallAsync             | Symbol     | GetOrderBookRequest         | OrderBook                      | Contracts | GetBoard             | GetDepth           |                     |
-| public        | GetExecutionsPublic  | GetExecutionsPublicCallAsync  | Symbol     | GetMarketExecutionsRequest  | IReadOnlyList<ExecutionMarket> | Contracts | GetExecutionsPublic  | GetTrade           |                     |
+| ContractScope | ContractApiId        | ContractMethod                | Parameters | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | DecisionNote |
+| ------------- | -------------------- | ----------------------------- | ---------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------ |
+| public        | GetExchangeInfo      | GetExchangeInfoCallAsync      | (none)     | GetExchangeInfoRequest      | GetExchangeInfoResponse        | Contracts | Internal             | None               |              |
+| public        | GetTicker            | GetTickerCallAsync            | Symbol     | GetTickerRequest            | GetTickerResponse              | Contracts | GetTicker            | GetDetailMerged    |              |
+| public        | GetBoard             | GetBoardCallAsync             | Symbol     | GetBoardRequest             | GetBoardResponse               | Contracts | GetBoard             | GetDepth           |              |
+| public        | GetExecutionsPublic  | GetExecutionsPublicCallAsync  | Symbol     | GetExecutionsPublicRequest  | GetExecutionsPublicResponse    | Contracts | GetExecutionsPublic  | GetTrade           |              |
 
 ---
 
 ## Private
 
-| ContractScope | ContractApiId         | ContractMethod                 | Parameters         | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId | DecisionNote |
-| ------------- | --------------------- | ------------------------------ | ------------------ | ---------------------------- | -------------------------------- | --------- | --------------------- | ------------------ | ------------ |
-| private       | GetBalance            | GetBalanceCallAsync            | (none)             | GetBalancesRequest           | IReadOnlyList<Balance>           | Contracts | GetBalance            | GetAccountsBalanceByAccountId |              |
-| private       | GetExecutionsPrivate  | GetExecutionsPrivateCallAsync  | MarketLimitCursorRequest | MarketLimitCursorRequest  | Page<ExecutionItem>              | Contracts | GetExecutionsPrivate  | GetMatchResults     |              |
-| private       | GetOrders             | GetOrdersCallAsync             | MarketLimitCursorRequest | MarketLimitCursorRequest  | Page<OrderSnapshotItem>          | Contracts | GetChildOrders        | GetOpenOrders        |              |
-| private       | OrderLimit            | OrderLimitCallAsync            | Symbol, Side, Size, Price | PlaceLimitOrderRequest   | OrderResult                      | Contracts | SendChildOrder        | PostOrdersPlace      |              |
-| private       | CancelOrder           | CancelOrderCallAsync           | CancelOrderRequest | CancelOrderRequest           | CancelResult                     | Contracts | CancelChildOrder      | PostOrdersSubmitCancelByOrderId |              |
+| ContractScope | ContractApiId         | ContractMethod                 | Parameters         | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId              | DecisionNote |
+| ------------- | --------------------- | ------------------------------ | ------------------ | ---------------------------- | -------------------------------- | --------- | --------------------- | -------------------------------- | ------------ |
+| private       | GetBalance            | GetBalanceCallAsync            | (none)             | GetBalanceRequest            | GetBalanceResponse              | Contracts | GetBalance            | GetAccountsBalanceByAccountId   |              |
+| private       | GetExecutionsPrivate  | GetExecutionsPrivateCallAsync  | MarketLimitCursorRequest | GetExecutionsPrivateRequest | GetExecutionsPrivateResponse     | Contracts | GetExecutionsPrivate  | GetMatchResults                 |              |
+| private       | GetOrders             | GetOrdersCallAsync             | MarketLimitCursorRequest | GetOrdersRequest            | GetOrdersResponse                | Contracts | GetChildOrders        | GetOpenOrders                    |              |
+| private       | OrderLimit            | OrderLimitCallAsync            | Symbol, Side, Size, Price | OrderLimitRequest          | OrderLimitResponse               | Contracts | SendChildOrder        | PostOrdersPlace                  |              |
+| private       | CancelOrder           | CancelOrderCallAsync           | CancelOrderRequest | CancelOrderRequest           | CancelOrderResponse              | Contracts | CancelChildOrder      | PostOrdersSubmitCancelByOrderId  |              |

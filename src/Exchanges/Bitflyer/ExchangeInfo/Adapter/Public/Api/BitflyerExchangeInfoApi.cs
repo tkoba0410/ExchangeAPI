@@ -17,7 +17,8 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ContractExchangeInfo = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Requests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos.BitflyerMarketNormalized>>;
 using TradingCommissionCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Requests.GetTradingCommissionRequest, ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos.BitflyerTradingCommissionNormalized>;
 using HealthCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Requests.GetHealthRequest, ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos.BitflyerHealthNormalized>;
@@ -65,6 +66,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             var dynamicInfo = await GetDynamicInfoAsync(cancellationToken).ConfigureAwait(false);
             var composed = BitflyerExchangeInfoComposer.Compose(staticInfo, dynamicInfo);
             var info = MapExchangeInfo(composed);
+            var response = new ExchangeInfoDto(info);
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: BitflyerExchangeInfoOperations.GetExchangeInfo,
@@ -76,7 +78,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
                 Request: request,
-                Result: new CallResult<ExchangeInfoDto>.Ok(info),
+                Result: new CallResult<ExchangeInfoDto>.Ok(response),
                 Meta: meta);
         }
         catch (Exception ex)
@@ -111,10 +113,10 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             "Timestamp"));
     }
 
-    private static ExchangeInfoDto MapExchangeInfo(BitflyerStaticExchangeInfo info)
+    private static ContractExchangeInfo MapExchangeInfo(BitflyerStaticExchangeInfo info)
     {
         var mapped = info.Markets.Select(MapMarket).ToList();
-        return new ExchangeInfoDto(
+        return new ContractExchangeInfo(
             Markets: mapped,
             Features: MapFeatures(info.Features),
             RateLimits: MapRateLimits(info.RateLimits),

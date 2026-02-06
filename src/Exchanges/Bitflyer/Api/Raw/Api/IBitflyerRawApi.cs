@@ -12,135 +12,135 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 
 public interface IBitflyerRawApi
 {
-    Task<Call<GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsCallAsync(
+    Task<Call<GetMarketsRequest, GetMarketsResponse>> GetMarketsCallAsync(
         GetMarketsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBoardRequest, Board>> GetBoardCallAsync(
+    Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
         GetBoardRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
+    Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
         GetTickerRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
-        GetExecutionsRequest request,
+    Task<Call<GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
+        GetExecutionsPublicRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBoardStateRequest, BoardStateResponse>> GetBoardStateCallAsync(
+    Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
         GetBoardStateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetHealthRequest, HealthResponse>> GetHealthCallAsync(
+    Task<Call<GetHealthRequest, GetHealthResponse>> GetHealthCallAsync(
         GetHealthRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateCallAsync(
+    Task<Call<GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateCallAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
+    Task<Call<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
         GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetChatsRequest, IReadOnlyList<Chat>>> GetChatsCallAsync(
+    Task<Call<GetChatsRequest, GetChatsResponse>> GetChatsCallAsync(
         GetChatsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
+    Task<Call<GetPermissionsRequest, GetPermissionsResponse>> GetPermissionsCallAsync(
         GetPermissionsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBalancesRequest, IReadOnlyList<BalanceResponse>>> GetBalanceCallAsync(
-        GetBalancesRequest request,
+    Task<Call<GetBalanceRequest, GetBalanceResponse>> GetBalanceCallAsync(
+        GetBalanceRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCollateralRequest, CollateralResponse>> GetCollateralCallAsync(
+    Task<Call<GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(
         GetCollateralRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCollateralAccountsRequest, IReadOnlyList<CollateralAccount>>> GetCollateralAccountsCallAsync(
+    Task<Call<GetCollateralAccountsRequest, GetCollateralAccountsResponse>> GetCollateralAccountsCallAsync(
         GetCollateralAccountsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetAddressesRequest, RawJsonResponse>> GetAddressesCallAsync(
+    Task<Call<GetAddressesRequest, GetAddressesResponse>> GetAddressesCallAsync(
         GetAddressesRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCoinInsRequest, RawJsonResponse>> GetCoinInsCallAsync(
+    Task<Call<GetCoinInsRequest, GetCoinInsResponse>> GetCoinInsCallAsync(
         GetCoinInsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCoinOutsRequest, RawJsonResponse>> GetCoinOutsCallAsync(
+    Task<Call<GetCoinOutsRequest, GetCoinOutsResponse>> GetCoinOutsCallAsync(
         GetCoinOutsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBankAccountsRequest, RawJsonResponse>> GetBankAccountsCallAsync(
+    Task<Call<GetBankAccountsRequest, GetBankAccountsResponse>> GetBankAccountsCallAsync(
         GetBankAccountsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetDepositsRequest, RawJsonResponse>> GetDepositsCallAsync(
+    Task<Call<GetDepositsRequest, GetDepositsResponse>> GetDepositsCallAsync(
         GetDepositsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CreateWithdrawalRequest, CreateWithdrawalResponse>> WithdrawCallAsync(
-        CreateWithdrawalRequest request,
+    Task<Call<WithdrawRequest, WithdrawResponse>> WithdrawCallAsync(
+        WithdrawRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetWithdrawalsRequest, RawJsonResponse>> GetWithdrawalsCallAsync(
+    Task<Call<GetWithdrawalsRequest, GetWithdrawalsResponse>> GetWithdrawalsCallAsync(
         GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CreateChildOrderRequest, RawSendChildOrderResponse>> SendChildOrderCallAsync(
-        CreateChildOrderRequest request,
+    Task<Call<SendChildOrderRequest, SendChildOrderResponse>> SendChildOrderCallAsync(
+        SendChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CreateParentOrderRequest, RawSendParentOrderResponse>> SendParentOrderCallAsync(
-        CreateParentOrderRequest request,
+    Task<Call<SendParentOrderRequest, SendParentOrderResponse>> SendParentOrderCallAsync(
+        SendParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelChildOrderRequest, RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
+    Task<Call<CancelChildOrderRequest, CancelChildOrderResponse>> CancelChildOrderCallAsync(
         CancelChildOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelParentOrderRequest, RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
+    Task<Call<CancelParentOrderRequest, CancelParentOrderResponse>> CancelParentOrderCallAsync(
         CancelParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelAllChildOrdersRequest, RawCancelAllChildOrdersResponse>> CancelAllChildOrdersCallAsync(
+    Task<Call<CancelAllChildOrdersRequest, CancelAllChildOrdersResponse>> CancelAllChildOrdersCallAsync(
         CancelAllChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetChildOrdersRequest, IReadOnlyList<RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
+    Task<Call<GetChildOrdersRequest, GetChildOrdersResponse>> GetChildOrdersCallAsync(
         GetChildOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetParentOrdersRequest, IReadOnlyList<RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
+    Task<Call<GetParentOrdersRequest, GetParentOrdersResponse>> GetParentOrdersCallAsync(
         GetParentOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetParentOrderRequest, RawGetParentOrderResponse>> GetParentOrderCallAsync(
+    Task<Call<GetParentOrderRequest, GetParentOrderResponse>> GetParentOrderCallAsync(
         GetParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
-        GetAccountExecutionsRequest request,
+    Task<Call<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
+        GetExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBalanceHistoryRequest, RawJsonResponse>> GetBalanceHistoryCallAsync(
+    Task<Call<GetBalanceHistoryRequest, GetBalanceHistoryResponse>> GetBalanceHistoryCallAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetPositionsRequest, IReadOnlyList<PositionResponse>>> GetPositionsCallAsync(
+    Task<Call<GetPositionsRequest, GetPositionsResponse>> GetPositionsCallAsync(
         GetPositionsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCollateralHistoryRequest, RawJsonResponse>> GetCollateralHistoryCallAsync(
+    Task<Call<GetCollateralHistoryRequest, GetCollateralHistoryResponse>> GetCollateralHistoryCallAsync(
         GetCollateralHistoryRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTradingCommissionRequest, RawJsonResponse>> GetTradingCommissionCallAsync(
+    Task<Call<GetTradingCommissionRequest, GetTradingCommissionResponse>> GetTradingCommissionCallAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default);
 }

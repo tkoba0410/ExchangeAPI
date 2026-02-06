@@ -17,7 +17,7 @@ public sealed class BitflyerTradingCommissionNormalizedTests
             response: Array.Empty<RawPrivateDtos.BalanceResponse>(),
             tradingCommissionJson: "{\"commission_rate\":0.15}");
         var api = BitflyerTestHelpers.CreateNormalizedApi(
-            new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" },
+            new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" },
             BitflyerTestHelpers.CreateResolver(),
             privateApi: privateApi);
 

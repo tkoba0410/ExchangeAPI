@@ -9,7 +9,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
 public sealed class FakeBitflyerPrivateTradingApi
 {
-    private readonly RawPrivateDtos.RawSendChildOrderResponse _response;
+    private readonly RawPrivateDtos.SendChildOrderResponse _response;
     private readonly IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> _childOrders;
     private readonly Queue<IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>? _childOrderSnapshots;
     private readonly Exception? _exceptionToThrow;
@@ -21,7 +21,7 @@ public sealed class FakeBitflyerPrivateTradingApi
     public RawPrivateRequests.GetChildOrdersRequest? LastGetChildOrdersRequest { get; private set; }
 
     public FakeBitflyerPrivateTradingApi(
-        RawPrivateDtos.RawSendChildOrderResponse response,
+        RawPrivateDtos.SendChildOrderResponse response,
         IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>? childOrders = null,
         IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>[]? snapshots = null,
         Exception? exceptionToThrow = null)
@@ -33,41 +33,41 @@ public sealed class FakeBitflyerPrivateTradingApi
         _exceptionToThrow = exceptionToThrow;
     }
 
-    public Task<Call<RawPrivateRequests.CreateChildOrderRequest, RawPrivateDtos.RawSendChildOrderResponse>> SendChildOrderCallAsync(
-        RawPrivateRequests.CreateChildOrderRequest request,
+    public Task<Call<RawPrivateRequests.SendChildOrderRequest, RawPrivateDtos.SendChildOrderResponse>> SendChildOrderCallAsync(
+        RawPrivateRequests.SendChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastBodyJson = JsonSerializer.Serialize(request);
         return Task.FromResult(MakeCall(request, _response));
     }
 
-    public Task<Call<RawPrivateRequests.CreateParentOrderRequest, RawPrivateDtos.RawSendParentOrderResponse>> SendParentOrderCallAsync(
-        RawPrivateRequests.CreateParentOrderRequest request,
+    public Task<Call<RawPrivateRequests.SendParentOrderRequest, RawPrivateDtos.SendParentOrderResponse>> SendParentOrderCallAsync(
+        RawPrivateRequests.SendParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastParentOrderBodyJson = JsonSerializer.Serialize(request);
         return Task.FromResult(MakeCall(
             request,
-            new RawPrivateDtos.RawSendParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
+            new RawPrivateDtos.SendParentOrderResponse { ParentOrderAcceptanceId = "PARENT-1" }));
     }
 
-    public Task<Call<RawPrivateRequests.CancelChildOrderRequest, RawPrivateDtos.RawCancelChildOrderResponse>> CancelChildOrderCallAsync(
+    public Task<Call<RawPrivateRequests.CancelChildOrderRequest, RawPrivateDtos.CancelChildOrderResponse>> CancelChildOrderCallAsync(
         RawPrivateRequests.CancelChildOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastCancelRequest = request;
-        return Task.FromResult(MakeCall(request, new RawPrivateDtos.RawCancelChildOrderResponse()));
+        return Task.FromResult(MakeCall(request, new RawPrivateDtos.CancelChildOrderResponse()));
     }
 
-    public Task<Call<RawPrivateRequests.CancelParentOrderRequest, RawPrivateDtos.RawCancelParentOrderResponse>> CancelParentOrderCallAsync(
+    public Task<Call<RawPrivateRequests.CancelParentOrderRequest, RawPrivateDtos.CancelParentOrderResponse>> CancelParentOrderCallAsync(
         RawPrivateRequests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
         LastCancelParentOrderRequest = request;
-        return Task.FromResult(MakeCall(request, new RawPrivateDtos.RawCancelParentOrderResponse()));
+        return Task.FromResult(MakeCall(request, new RawPrivateDtos.CancelParentOrderResponse()));
     }
 
-    public Task<Call<RawPrivateRequests.GetChildOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
+    public Task<Call<RawPrivateRequests.GetChildOrdersRequest, RawPrivateDtos.GetChildOrdersResponse>> GetChildOrdersCallAsync(
         RawPrivateRequests.GetChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -75,42 +75,46 @@ public sealed class FakeBitflyerPrivateTradingApi
         if (_childOrderSnapshots is not null && _childOrderSnapshots.Count > 0)
         {
             var snapshot = _childOrderSnapshots.Dequeue();
-            return Task.FromResult(MakeCall(request, snapshot));
+            var snapshotResponse = new RawPrivateDtos.GetChildOrdersResponse();
+            snapshotResponse.AddRange(snapshot);
+            return Task.FromResult(MakeCall(request, snapshotResponse));
         }
 
-        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> response;
+        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> responseItems;
         if (request.ChildOrderAcceptanceId is { IsEmpty: false })
         {
-            response = _childOrders
+            responseItems = _childOrders
                 .Where(o => o.ChildOrderAcceptanceId == request.ChildOrderAcceptanceId.Value.Value)
                 .ToArray();
         }
         else if (request.ChildOrderId is { IsEmpty: false })
         {
-            response = _childOrders
+            responseItems = _childOrders
                 .Where(o => o.ChildOrderId == request.ChildOrderId.Value.Value)
                 .ToArray();
         }
         else
         {
-            response = _childOrders;
+            responseItems = _childOrders;
         }
+        var response = new RawPrivateDtos.GetChildOrdersResponse();
+        response.AddRange(responseItems);
         return Task.FromResult(MakeCall(request, response));
     }
 
-    public Task<Call<RawPrivateRequests.GetParentOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
+    public Task<Call<RawPrivateRequests.GetParentOrdersRequest, RawPrivateDtos.GetParentOrdersResponse>> GetParentOrdersCallAsync(
         RawPrivateRequests.GetParentOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> response = Array.Empty<RawPrivateDtos.RawGetParentOrdersResponse>();
+        var response = new RawPrivateDtos.GetParentOrdersResponse();
         return Task.FromResult(MakeCall(request, response));
     }
 
-    public Task<Call<RawPrivateRequests.GetParentOrderRequest, RawPrivateDtos.RawGetParentOrderResponse>> GetParentOrderCallAsync(
+    public Task<Call<RawPrivateRequests.GetParentOrderRequest, RawPrivateDtos.GetParentOrderResponse>> GetParentOrderCallAsync(
         RawPrivateRequests.GetParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(MakeCall(request, new RawPrivateDtos.RawGetParentOrderResponse()));
+        return Task.FromResult(MakeCall(request, new RawPrivateDtos.GetParentOrderResponse()));
     }
 
     private Call<TReq, TResponse> MakeCall<TReq, TResponse>(TReq request, TResponse response)

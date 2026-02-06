@@ -5,9 +5,9 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 
 public sealed record GetPermissionsRequest;
-public sealed record GetBalancesRequest;
+public sealed record GetBalanceRequest;
 public sealed record GetPositionsRequest(ProductCode ProductCode);
-public sealed record GetAccountExecutionsRequest(
+public sealed record GetExecutionsPrivateRequest(
     ProductCode ProductCode,
     FreeText? ChildOrderId = null,
     FreeText? ChildOrderAcceptanceId = null,

@@ -26,8 +26,8 @@ internal sealed class BitflyerSpotHistoryApi
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
-    public async Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
-        MarketLimitCursorRequest request,
+    public async Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
+        GetOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
         var startedAt = DateTimeOffset.UtcNow;
@@ -39,11 +39,11 @@ internal sealed class BitflyerSpotHistoryApi
                 request,
                 call,
                 BitflyerOperations.History.GetOrders,
-                ok => BuildOrderPage(request, ok));
+                ok => new GetOrdersResponse(BuildOrderPage(request, ok)));
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<MarketLimitCursorRequest, Page<OrderSnapshotItem>>(
+            return ApiCallMapper.FromException<GetOrdersRequest, GetOrdersResponse>(
                 request,
                 startedAt,
                 BitflyerOperations.History.GetOrders,
@@ -51,8 +51,8 @@ internal sealed class BitflyerSpotHistoryApi
         }
     }
 
-    public async Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsPrivateCallAsync(
-        MarketLimitCursorRequest request,
+    public async Task<Call<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
+        GetExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default)
     {
         var startedAt = DateTimeOffset.UtcNow;
@@ -65,11 +65,11 @@ internal sealed class BitflyerSpotHistoryApi
                 request,
                 call,
                 BitflyerOperations.History.GetExecutions,
-                ok => BuildExecutionPage(request, ok));
+                ok => new GetExecutionsPrivateResponse(BuildExecutionPage(request, ok)));
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<MarketLimitCursorRequest, Page<ExecutionItem>>(
+            return ApiCallMapper.FromException<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>(
                 request,
                 startedAt,
                 BitflyerOperations.History.GetExecutions,
@@ -78,7 +78,7 @@ internal sealed class BitflyerSpotHistoryApi
     }
 
     private static Page<OrderSnapshotItem> BuildOrderPage(
-        MarketLimitCursorRequest request,
+        GetOrdersRequest request,
         IReadOnlyList<BitflyerOpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
@@ -89,7 +89,7 @@ internal sealed class BitflyerSpotHistoryApi
     }
 
     private static Page<ExecutionItem> BuildExecutionPage(
-        MarketLimitCursorRequest request,
+        GetExecutionsPrivateRequest request,
         IReadOnlyList<BitflyerExecutionAccountNormalized> executions)
     {
         var items = executions.Select(e => new ExecutionItem(
@@ -127,7 +127,14 @@ internal sealed class BitflyerSpotHistoryApi
             Status: OrderSnapshotStatus.Open);
     }
 
-    private static (int RequestedLimit, int AppliedLimit) GetLimits(MarketLimitCursorRequest request)
+    private static (int RequestedLimit, int AppliedLimit) GetLimits(GetOrdersRequest request)
+    {
+        var requestedLimit = request.Limit ?? 1000;
+        var appliedLimit = Math.Min(requestedLimit, 1000);
+        return (requestedLimit, appliedLimit);
+    }
+
+    private static (int RequestedLimit, int AppliedLimit) GetLimits(GetExecutionsPrivateRequest request)
     {
         var requestedLimit = request.Limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);

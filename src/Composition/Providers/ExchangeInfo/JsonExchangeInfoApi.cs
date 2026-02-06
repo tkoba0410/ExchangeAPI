@@ -13,6 +13,7 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.Errors;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoResponse = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
 namespace ExchangeApi.Composition.Providers.ExchangeInfo;
 
 /// <summary>
@@ -40,7 +41,7 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         _options = options ?? CreateDefaultOptions();
     }
 
-    public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
+    public async Task<Call<GetExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoCallAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new GetExchangeInfoRequest();
@@ -49,18 +50,19 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         try
         {
             var info = GetCachedInfo();
+            var response = new ExchangeInfoResponse(info);
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: "JsonExchangeInfo",
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
-            return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+            return new Call<GetExchangeInfoRequest, ExchangeInfoResponse>(
                 Id: CallId.New(),
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
                 Request: request,
-                Result: new CallResult<ExchangeInfoDto>.Ok(info),
+                Result: new CallResult<ExchangeInfoResponse>.Ok(response),
                 Meta: meta);
         }
         catch (Exception ex)
@@ -71,47 +73,47 @@ public sealed class JsonExchangeInfoApi : IPublicApi
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
-            return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+            return new Call<GetExchangeInfoRequest, ExchangeInfoResponse>(
                 Id: CallId.New(),
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
                 Request: request,
-                Result: new CallResult<ExchangeInfoDto>.Err(
+                Result: new CallResult<ExchangeInfoResponse>.Err(
                     new CallError(CallErrorKind.Unknown, ex.Message, ex)),
                 Meta: meta);
         }
     }
 
-    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
+    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
         var request = new GetTickerRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetTickerRequest, Ticker>(
+        return Task.FromResult(NotSupportedCall.Create<GetTickerRequest, GetTickerResponse>(
             "Contracts",
             "JsonExchangeInfo",
             request,
             "Ticker"));
     }
 
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetBoardCallAsync(
+    public Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetOrderBookRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetOrderBookRequest, OrderBook>(
+        var request = new GetBoardRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetBoardRequest, GetBoardResponse>(
             "Contracts",
             "JsonExchangeInfo",
             request,
             "OrderBook"));
     }
 
-    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetExecutionsPublicCallAsync(
+    public Task<Call<GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetMarketExecutionsRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
+        var request = new GetExecutionsPublicRequest(symbol);
+        return Task.FromResult(NotSupportedCall.Create<GetExecutionsPublicRequest, GetExecutionsPublicResponse>(
             "Contracts",
             "JsonExchangeInfo",
             request,

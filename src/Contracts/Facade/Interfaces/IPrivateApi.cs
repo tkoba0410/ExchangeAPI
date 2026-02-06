@@ -14,26 +14,26 @@ namespace ExchangeApi.Contracts.Facade.Interfaces;
 /// </summary>
 public interface IPrivateApi
 {
-    Task<Call<PlaceLimitOrderRequest, OrderResult>> OrderLimitCallAsync(
+    Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitCallAsync(
         Symbol symbol,
         Side side,
         Size size,
         Price price,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
+    Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalanceCallAsync(
+    Task<Call<GetBalanceRequest, GetBalanceResponse>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
-        MarketLimitCursorRequest request,
+    Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
+        GetOrdersRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsPrivateCallAsync(
-        MarketLimitCursorRequest request,
+    Task<Call<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
+        GetExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default);
 }

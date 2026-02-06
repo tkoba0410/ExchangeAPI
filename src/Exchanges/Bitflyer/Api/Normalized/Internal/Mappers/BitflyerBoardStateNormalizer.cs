@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 internal static class BitflyerBoardStateNormalizer
 {
     public static bool TryNormalize(
-        RawPublicDtos.BoardStateResponse wire,
+        RawPublicDtos.GetBoardStateResponse wire,
         out BitflyerBoardStateNormalized? normalized,
         out CallError? error)
     {
@@ -30,7 +30,7 @@ internal static class BitflyerBoardStateNormalizer
     private static FreeText? ParseOptional(string? value) =>
         FreeText.TryParse(value, out var text) ? text : null;
 
-    private static BitflyerBoardStateNormalized Build(RawPublicDtos.BoardStateResponse wire) =>
+    private static BitflyerBoardStateNormalized Build(RawPublicDtos.GetBoardStateResponse wire) =>
         new(
             Health: ParseOptional(wire.Health),
             State: ParseOptional(wire.State),

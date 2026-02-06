@@ -6,7 +6,8 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Utilities.OrderBook;
-using CommonTicker = ExchangeApi.Contracts.Common.Dtos.Ticker;
+using CommonTicker = ExchangeApi.Contracts.Common.Dtos.GetTickerResponse;
+using CommonBoard = ExchangeApi.Contracts.Common.Dtos.GetBoardResponse;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 
 internal static class MarketMapper
@@ -15,13 +16,15 @@ internal static class MarketMapper
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
-        return new CommonTicker(
+        var ticker = new Ticker(
             Symbol: symbol,
             LastTradedPrice: new Price(normalized.LastTradedPrice),
             Timestamp: normalized.Timestamp);
+
+        return new CommonTicker(ticker);
     }
 
-    public static OrderBook MapOrderBook(BitflyerOrderBookNormalized normalized)
+    public static CommonBoard MapOrderBook(BitflyerOrderBookNormalized normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
@@ -38,7 +41,7 @@ internal static class MarketMapper
             throw new ExchangeApiException(error?.Message ?? "OrderBook normalization failed.");
         }
 
-        return orderBook!;
+        return new CommonBoard(orderBook!);
     }
 
     public static ExecutionMarket MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)

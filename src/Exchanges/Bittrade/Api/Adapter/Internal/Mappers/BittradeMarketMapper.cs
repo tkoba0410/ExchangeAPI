@@ -13,15 +13,17 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Mappers;
 
 internal static class BittradeMarketMapper
 {
-    public static Ticker MapTicker(CommonSymbol symbol, BittradeTickerNormalized normalized)
+    public static GetTickerResponse MapTicker(CommonSymbol symbol, BittradeTickerNormalized normalized)
     {
-        return new Ticker(
+        var ticker = new Ticker(
             Symbol: symbol,
             LastTradedPrice: new Price(normalized.LastTradedPrice),
             Timestamp: normalized.Timestamp);
+
+        return new GetTickerResponse(ticker);
     }
 
-    public static OrderBook MapOrderBook(BittradeOrderBookNormalized normalized)
+    public static GetBoardResponse MapOrderBook(BittradeOrderBookNormalized normalized)
     {
         var bids = normalized.Bids
             .Select(level => new OrderBookLevel(new Price(level.Price), new Size(level.Size)))
@@ -35,7 +37,7 @@ internal static class BittradeMarketMapper
             throw new ExchangeApiException(error?.Message ?? "OrderBook normalization failed.");
         }
 
-        return orderBook!;
+        return new GetBoardResponse(orderBook!);
     }
 
     public static ExecutionMarket MapExecution(CommonSymbol symbol, BittradeExecutionNormalized normalized)

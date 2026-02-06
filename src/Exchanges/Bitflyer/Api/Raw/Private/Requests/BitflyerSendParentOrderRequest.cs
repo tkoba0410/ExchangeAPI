@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 /// <summary>
 /// /v1/me/sendparentorder のリクエスト DTO。
 /// </summary>
-public sealed class CreateParentOrderRequest
+public sealed class SendParentOrderRequest
 {
     [JsonPropertyName("order_method")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

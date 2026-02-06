@@ -9,7 +9,7 @@ public sealed class BitflyerParentOrderEncodeTests
     [Fact]
     public void BuildBodyJson_contains_expected_keys_for_send_child_order()
     {
-        var request = new RawPrivateRequests.CreateChildOrderRequest
+        var request = new RawPrivateRequests.SendChildOrderRequest
         {
             ProductCode = ProductCode.ParseOrThrowNormalized("FX_BTC_JPY"),
             ChildOrderType = new FreeText("LIMIT"),
@@ -30,7 +30,7 @@ public sealed class BitflyerParentOrderEncodeTests
     [Fact]
     public void BuildBodyJson_contains_expected_keys_for_send_parent_order()
     {
-        var request = new RawPrivateRequests.CreateParentOrderRequest
+        var request = new RawPrivateRequests.SendParentOrderRequest
         {
             OrderMethod = new FreeText("IFDOCO"),
             MinuteToExpire = 10000,

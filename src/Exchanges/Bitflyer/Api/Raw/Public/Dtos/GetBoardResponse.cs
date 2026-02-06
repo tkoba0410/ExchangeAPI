@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Dtos;
 
-public sealed class Board
+public sealed class GetBoardResponse
 {
     [JsonPropertyName("mid_price")] public decimal MidPrice { get; init; }
     [JsonPropertyName("bids")] public IReadOnlyList<BoardEntry> Bids { get; init; } = [];

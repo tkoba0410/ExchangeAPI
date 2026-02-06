@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Dtos;
 
-public sealed class RawGetParentOrderResponse
+public sealed class GetParentOrderResponse
 {
     [JsonPropertyName("id")] public long Id { get; init; }
     [JsonPropertyName("parent_order_id")] public string ParentOrderId { get; init; } = string.Empty;

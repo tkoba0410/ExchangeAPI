@@ -1,5 +1,5 @@
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Dtos;
 
-public sealed class RawCancelParentOrderResponse
+public sealed class CancelParentOrderResponse
 {
 }

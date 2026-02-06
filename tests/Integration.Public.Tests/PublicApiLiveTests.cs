@@ -31,8 +31,8 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var call = await publicApi.GetTickerCallAsync(new Symbol("BTC/JPY"), cts.Token);
-        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Ticker>.Ok>(call.Result);
-        var ticker = ok.Response;
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetTickerResponse>.Ok>(call.Result);
+        var ticker = ok.Response.Value;
         var msg = $"bitFlyer Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
@@ -52,8 +52,8 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var call = await publicApi.GetExchangeInfoCallAsync(cts.Token);
-        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo>.Ok>(call.Result);
-        var info = ok.Response;
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse>.Ok>(call.Result);
+        var info = ok.Response.Value;
         var msg = $"bitFlyer ExchangeInfo markets={info.Markets.Count}";
         Log(msg);
 
@@ -72,8 +72,8 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var call = await publicApi.GetTickerCallAsync(new Symbol("BTC/JPY"), cts.Token);
-        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Ticker>.Ok>(call.Result);
-        var ticker = ok.Response;
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetTickerResponse>.Ok>(call.Result);
+        var ticker = ok.Response.Value;
         var msg = $"Bittrade Ticker: {ticker.Symbol} last={ticker.LastTradedPrice} ts={ticker.Timestamp:o}";
         Log(msg);
 
@@ -93,8 +93,8 @@ public class PublicApiLiveTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var call = await publicApi.GetExchangeInfoCallAsync(cts.Token);
-        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo>.Ok>(call.Result);
-        var info = ok.Response;
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse>.Ok>(call.Result);
+        var info = ok.Response.Value;
         var msg = $"Bittrade ExchangeInfo markets={info.Markets.Count}";
         Log(msg);
 

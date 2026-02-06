@@ -13,7 +13,7 @@ internal static class BitflyerTickerNormalizer
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
     public static bool TryNormalize(
-        RawPublicDtos.Ticker wire,
+        RawPublicDtos.GetTickerResponse wire,
         string? rawJson,
         out BitflyerTickerNormalized? normalized,
         out CallError? error)
@@ -59,7 +59,7 @@ internal static class BitflyerTickerNormalizer
     private static string Serialize<T>(T value) =>
         JsonSerializer.Serialize(value, SerializerOptions);
 
-    private static BitflyerTickerNormalized Build(RawPublicDtos.Ticker wire, string? rawJson)
+    private static BitflyerTickerNormalized Build(RawPublicDtos.GetTickerResponse wire, string? rawJson)
     {
         var snapshot = ExtractSnapshot(rawJson ?? Serialize(wire));
         return new BitflyerTickerNormalized(

@@ -76,14 +76,14 @@ internal sealed class BitflyerNormalizedPublicApi
             });
     }
 
-    public async Task<Call<PublicRequests.GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
+    public async Task<Call<PublicRequests.GetBoardRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
         var rawCall = await _raw
             .GetBoardCallAsync(new RawPublicRequests.GetBoardRequest(productCode), ct)
             .ConfigureAwait(false);
-        var request = new PublicRequests.GetOrderBookRequest(productCode);
+        var request = new PublicRequests.GetBoardRequest(productCode);
 
         return CreateCall(
             rawCall,
@@ -100,7 +100,7 @@ internal sealed class BitflyerNormalizedPublicApi
             });
     }
 
-    public async Task<Call<PublicRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
+    public async Task<Call<PublicRequests.GetExecutionsPublicRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
         ProductCode productCode,
         int? count = null,
         long? before = null,
@@ -108,9 +108,9 @@ internal sealed class BitflyerNormalizedPublicApi
         CancellationToken ct = default)
     {
         var rawCall = await _raw
-            .GetExecutionsPublicCallAsync(new RawPublicRequests.GetExecutionsRequest(productCode, count, before, after), ct)
+            .GetExecutionsPublicCallAsync(new RawPublicRequests.GetExecutionsPublicRequest(productCode, count, before, after), ct)
             .ConfigureAwait(false);
-        var request = new PublicRequests.GetExecutionsRequest(productCode, count, before, after);
+        var request = new PublicRequests.GetExecutionsPublicRequest(productCode, count, before, after);
 
         return CreateCall(
             rawCall,

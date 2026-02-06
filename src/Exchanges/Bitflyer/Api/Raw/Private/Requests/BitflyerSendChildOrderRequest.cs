@@ -5,7 +5,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 /// <summary>
 /// /v1/me/sendchildorder のリクエスト DTO。
 /// </summary>
-public sealed class CreateChildOrderRequest
+public sealed class SendChildOrderRequest
 {
     [JsonPropertyName("product_code")] public ProductCode ProductCode { get; init; } = ProductCode.Empty;
     [JsonPropertyName("child_order_type")] public FreeText ChildOrderType { get; init; } = FreeText.Empty;

@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 internal static class BitflyerOrderBookNormalizer
 {
     public static bool TryNormalize(
-        RawPublicDtos.Board wire,
+        RawPublicDtos.GetBoardResponse wire,
         out BitflyerOrderBookNormalized? normalized,
         out CallError? error)
     {
@@ -27,7 +27,7 @@ internal static class BitflyerOrderBookNormalizer
         }
     }
 
-    private static BitflyerOrderBookNormalized Build(RawPublicDtos.Board wire) =>
+    private static BitflyerOrderBookNormalized Build(RawPublicDtos.GetBoardResponse wire) =>
         new(
             Bids: (wire.Bids ?? Array.Empty<RawPublicDtos.BoardEntry>())
                 .Select(b => new BitflyerOrderBookLevelNormalized(b.Price, b.Size))

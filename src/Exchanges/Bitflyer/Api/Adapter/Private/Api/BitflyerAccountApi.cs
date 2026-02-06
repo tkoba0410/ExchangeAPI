@@ -28,10 +28,10 @@ internal sealed class BitflyerAccountApi
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
-    public async Task<Call<GetBalancesRequest, IReadOnlyList<Balance>>> GetBalanceCallAsync(
+    public async Task<Call<GetBalanceRequest, GetBalanceResponse>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default)
     {
-        var request = new GetBalancesRequest();
+        var request = new GetBalanceRequest();
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -41,11 +41,11 @@ internal sealed class BitflyerAccountApi
                 request,
                 call,
                 BitflyerOperations.Account.GetBalance,
-                MapBalances);
+                ok => new GetBalanceResponse(MapBalances(ok)));
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetBalancesRequest, IReadOnlyList<Balance>>(
+            return ApiCallMapper.FromException<GetBalanceRequest, GetBalanceResponse>(
                 request,
                 startedAt,
                 BitflyerOperations.Account.GetBalance,

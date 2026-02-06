@@ -4,9 +4,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Requests;
 
 public sealed record GetTickerRequest(ProductCode ProductCode);
 
-public sealed record GetOrderBookRequest(ProductCode ProductCode);
+public sealed record GetBoardRequest(ProductCode ProductCode);
 
-public sealed record GetExecutionsRequest(
+public sealed record GetExecutionsPublicRequest(
     ProductCode ProductCode,
     int? Count = null,
     long? Before = null,

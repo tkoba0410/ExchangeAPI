@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
@@ -49,17 +49,17 @@ public sealed class BittradePublicClient : IPublicApi, IExchangeClient
         ApiBundle = bundle;
     }
 
-    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
+    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetTickerCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetBoardCallAsync(
+    public Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetBoardCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetExecutionsPublicCallAsync(
+    public Task<Call<GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetExecutionsPublicCallAsync(symbol, cancellationToken);

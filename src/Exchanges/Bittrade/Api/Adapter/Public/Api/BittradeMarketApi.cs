@@ -34,17 +34,17 @@ internal sealed class MarketApi
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
+    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         GetDetailMergedCallAsync(symbol, cancellationToken);
 
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetBoardCallAsync(
+    public Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default) =>
         GetDepthCallAsync(symbol, cancellationToken);
 
-    public async Task<Call<GetTickerRequest, Ticker>> GetDetailMergedCallAsync(
+    public async Task<Call<GetTickerRequest, GetTickerResponse>> GetDetailMergedCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default)
     {
@@ -56,7 +56,7 @@ internal sealed class MarketApi
             var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
-                return MarketResolutionError<GetTickerRequest, Ticker>(
+                return MarketResolutionError<GetTickerRequest, GetTickerResponse>(
                     request,
                     marketCall,
                     err.Error,
@@ -73,7 +73,7 @@ internal sealed class MarketApi
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            return SymbolNotSupported<GetTickerRequest, Ticker>(
+            return SymbolNotSupported<GetTickerRequest, GetTickerResponse>(
                 request,
                 startedAt,
                 BittradeOperations.MarketData.GetTicker,
@@ -81,7 +81,7 @@ internal sealed class MarketApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetTickerRequest, Ticker>(
+            return ApiCallMapper.FromException<GetTickerRequest, GetTickerResponse>(
                 request,
                 startedAt,
                 BittradeOperations.MarketData.GetTicker,
@@ -89,11 +89,11 @@ internal sealed class MarketApi
         }
     }
 
-    public async Task<Call<GetOrderBookRequest, OrderBook>> GetDepthCallAsync(
+    public async Task<Call<GetBoardRequest, GetBoardResponse>> GetDepthCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetOrderBookRequest(symbol);
+        var request = new GetBoardRequest(symbol);
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -101,7 +101,7 @@ internal sealed class MarketApi
             var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
-                return MarketResolutionError<GetOrderBookRequest, OrderBook>(
+                return MarketResolutionError<GetBoardRequest, GetBoardResponse>(
                     request,
                     marketCall,
                     err.Error,
@@ -118,7 +118,7 @@ internal sealed class MarketApi
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            return SymbolNotSupported<GetOrderBookRequest, OrderBook>(
+            return SymbolNotSupported<GetBoardRequest, GetBoardResponse>(
                 request,
                 startedAt,
                 BittradeOperations.MarketData.GetBoard,
@@ -126,7 +126,7 @@ internal sealed class MarketApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetOrderBookRequest, OrderBook>(
+            return ApiCallMapper.FromException<GetBoardRequest, GetBoardResponse>(
                 request,
                 startedAt,
                 BittradeOperations.MarketData.GetBoard,
@@ -134,11 +134,11 @@ internal sealed class MarketApi
         }
     }
 
-    public async Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetExecutionsPublicCallAsync(
+    public async Task<Call<GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
         CommonSymbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetMarketExecutionsRequest(symbol);
+        var request = new GetExecutionsPublicRequest(symbol);
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -146,7 +146,7 @@ internal sealed class MarketApi
             var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
-                return MarketResolutionError<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
+                return MarketResolutionError<GetExecutionsPublicRequest, GetExecutionsPublicResponse>(
                     request,
                     marketCall,
                     err.Error,
@@ -159,11 +159,11 @@ internal sealed class MarketApi
                 request,
                 call,
                 BittradeOperations.MarketData.GetExecutions,
-                ok => ToExecutionList(symbol, ok));
+                ok => new GetExecutionsPublicResponse(ToExecutionList(symbol, ok)));
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            return SymbolNotSupported<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
+            return SymbolNotSupported<GetExecutionsPublicRequest, GetExecutionsPublicResponse>(
                 request,
                 startedAt,
                 BittradeOperations.MarketData.GetExecutions,
@@ -171,7 +171,7 @@ internal sealed class MarketApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
+            return ApiCallMapper.FromException<GetExecutionsPublicRequest, GetExecutionsPublicResponse>(
                 request,
                 startedAt,
                 BittradeOperations.MarketData.GetExecutions,

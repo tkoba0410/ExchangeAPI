@@ -16,7 +16,8 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ContractExchangeInfo = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Requests.GetSymbolsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos.BittradeSymbolNormalized>>;
 
 namespace ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
@@ -47,6 +48,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
             var dynamicInfo = await GetDynamicInfoAsync(cancellationToken).ConfigureAwait(false);
             var composed = BittradeExchangeInfoComposer.Compose(staticInfo, dynamicInfo);
             var info = MapExchangeInfo(composed);
+            var response = new ExchangeInfoDto(info);
             var meta = new CallMeta(
                 Layer: "Contracts",
                 Component: BittradeExchangeInfoOperations.GetExchangeInfo,
@@ -58,7 +60,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
                 Request: request,
-                Result: new CallResult<ExchangeInfoDto>.Ok(info),
+                Result: new CallResult<ExchangeInfoDto>.Ok(response),
                 Meta: meta);
         }
         catch (Exception ex)
@@ -133,10 +135,10 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         return parsed.Value;
     }
 
-    private static ExchangeInfoDto MapExchangeInfo(BittradeStaticExchangeInfo info)
+    private static ContractExchangeInfo MapExchangeInfo(BittradeStaticExchangeInfo info)
     {
         var mapped = info.Markets.Select(MapMarket).ToList();
-        return new ExchangeInfoDto(
+        return new ContractExchangeInfo(
             Markets: mapped,
             Features: MapFeatures(info.Features),
             RateLimits: MapRateLimits(info.RateLimits),

@@ -16,7 +16,7 @@ public sealed class BitflyerPublicClientTests
     [Fact]
     public async Task GetHealthCallAsync_ReturnsRawHealth()
     {
-        var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
@@ -31,7 +31,7 @@ public sealed class BitflyerPublicClientTests
     [Fact]
     public async Task GetBoardStateCallAsync_ReturnsRawBoardState()
     {
-        var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var markets = BitflyerTestHelpers.CreateResolver();
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
@@ -48,7 +48,7 @@ public sealed class BitflyerPublicClientTests
     [Fact]
     public async Task GetTickerCallAsync_UnknownSymbol_Throws()
     {
-        var rawTicker = new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" };
+        var rawTicker = new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" };
         var publicApi = new FakeBitflyerPublicApi(rawTicker);
         var exchangeInfo = new BitflyerExchangeInfoApi();
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
@@ -57,7 +57,7 @@ public sealed class BitflyerPublicClientTests
         var client = new BitflyerPublicClient(normalized, exchangeInfo);
 
         var call = await client.GetTickerCallAsync(new Symbol("DOGE/JPY"));
-        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.Ticker>.Err>(call.Result);
+        var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.GetTickerResponse>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }
 }

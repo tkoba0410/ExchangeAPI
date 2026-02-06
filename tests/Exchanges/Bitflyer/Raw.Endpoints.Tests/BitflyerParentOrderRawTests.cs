@@ -63,7 +63,7 @@ public sealed class BitflyerParentOrderRawTests
         }
         """;
 
-        var result = BitflyerRawJson.DeserializeOrThrow<RawPrivateDtos.RawGetParentOrderResponse>(
+        var result = BitflyerRawJson.DeserializeOrThrow<RawPrivateDtos.GetParentOrderResponse>(
             json,
             "Bitflyer.GetParentOrder");
 

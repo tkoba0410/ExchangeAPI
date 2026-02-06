@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Public.Dtos;
 
-public sealed class Ticker
+public sealed class GetTickerResponse
 {
     [JsonPropertyName("product_code")]
     public string ProductCode { get; init; } = string.Empty;

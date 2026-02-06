@@ -5,13 +5,13 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Requests;
 
 public sealed record GetPermissionsRequest;
 
-public sealed record GetBalancesRequest;
+public sealed record GetBalanceRequest;
 
 public sealed record GetCollateralRequest;
 
 public sealed record GetCollateralAccountsRequest;
 
-public sealed record GetAccountExecutionsRequest(Symbol Symbol);
+public sealed record GetExecutionsPrivateRequest(Symbol Symbol);
 
 public sealed record GetAddressesRequest;
 

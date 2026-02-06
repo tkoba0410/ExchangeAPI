@@ -7,7 +7,7 @@ public sealed record GetTickerRequest(ProductCode ProductCode, bool UseAliasPath
 
 public sealed record GetBoardRequest(ProductCode ProductCode, bool UseAliasPath = false);
 
-public sealed record GetExecutionsRequest(
+public sealed record GetExecutionsPublicRequest(
     ProductCode ProductCode,
     int? Count = null,
     long? Before = null,

@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
 internal static class BitflyerHealthNormalizer
 {
     public static bool TryNormalize(
-        RawPublicDtos.HealthResponse wire,
+        RawPublicDtos.GetHealthResponse wire,
         out BitflyerHealthNormalized? normalized,
         out CallError? error)
     {
@@ -30,6 +30,6 @@ internal static class BitflyerHealthNormalizer
     private static FreeText? ParseOptional(string? value) =>
         FreeText.TryParse(value, out var text) ? text : null;
 
-    private static BitflyerHealthNormalized Build(RawPublicDtos.HealthResponse wire) =>
+    private static BitflyerHealthNormalized Build(RawPublicDtos.GetHealthResponse wire) =>
         new(ParseOptional(wire.Status));
 }

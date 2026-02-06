@@ -1,7 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.GetExchangeInfoResponse;
+using ContractExchangeInfo = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
@@ -23,9 +24,9 @@ internal static class BitflyerTestHelpers
         BitflyerNormalizedApi.FromRaw(raw, markets);
 
     public static IBitflyerNormalizedApi CreateNormalizedApi(
-        RawPublicDtos.Ticker ticker,
+        RawPublicDtos.GetTickerResponse ticker,
         IBitflyerMarketResolver markets,
-        RawPublicDtos.Board? board = null,
+        RawPublicDtos.GetBoardResponse? board = null,
         FakeBitflyerPrivateApi? privateApi = null,
         FakeBitflyerPrivateTradingApi? tradingApi = null)
     {
@@ -38,14 +39,14 @@ internal static class BitflyerTestHelpers
         IBitflyerMarketResolver markets,
         FakeBitflyerPrivateApi? privateApi = null) =>
         CreateNormalizedApi(
-            new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" },
+            new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" },
             markets,
             privateApi: privateApi,
             tradingApi: tradingApi);
 
     public static IBitflyerMarketResolver CreateResolver()
     {
-        var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
+        var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ContractExchangeInfo(
             new[] { new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("BTC_JPY"), MarketType.ParseOrThrow("Spot")) },
             null,
             null,
@@ -67,7 +68,7 @@ internal static class BitflyerTestHelpers
     {
         private readonly ExchangeInfoDto _info;
 
-        public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
+        public StubExchangeInfoApi(ContractExchangeInfo info) => _info = new ExchangeInfoDto(info);
 
         public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
             CancellationToken cancellationToken = default)

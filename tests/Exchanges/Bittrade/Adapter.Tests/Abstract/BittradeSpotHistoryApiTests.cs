@@ -24,12 +24,12 @@ public sealed class BittradeSpotHistoryApiTests
         var raw = new StubRawApi();
         var api = CreateApi(raw);
 
-        var call = await api.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
-        var ok = Assert.IsType<CallResult<Page<OrderSnapshotItem>>.Ok>(call.Result);
+        var call = await api.GetOrdersCallAsync(new GetOrdersRequest(new Symbol("BTC/JPY"), Limit: 1));
+        var ok = Assert.IsType<CallResult<GetOrdersResponse>.Ok>(call.Result);
 
-        Assert.Single(ok.Response.Items);
-        Assert.Equal(1, ok.Response.Meta.AppliedLimit);
-        Assert.Equal(1, ok.Response.Meta.ReturnedCount);
+        Assert.Single(ok.Response.Value.Items);
+        Assert.Equal(1, ok.Response.Value.Meta.AppliedLimit);
+        Assert.Equal(1, ok.Response.Value.Meta.ReturnedCount);
     }
 
     [Fact]
@@ -38,16 +38,9 @@ public sealed class BittradeSpotHistoryApiTests
         var raw = new StubRawApi();
         var api = CreateApi(raw);
 
-        var call = await api.GetExecutionsPrivateCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
-        var resultType = call.Result.GetType();
-        var responseProp = resultType.GetProperty("Response");
-        if (responseProp is null)
-        {
-            var errorProp = resultType.GetProperty("Error");
-            var error = errorProp?.GetValue(call.Result);
-            Assert.Fail($"Expected Ok but got Err: {error}");
-        }
-        var response = Assert.IsType<Page<ExecutionItem>>(responseProp.GetValue(call.Result));
+        var call = await api.GetExecutionsPrivateCallAsync(new GetExecutionsPrivateRequest(new Symbol("BTC/JPY"), Limit: 1));
+        var ok = Assert.IsType<CallResult<GetExecutionsPrivateResponse>.Ok>(call.Result);
+        var response = ok.Response.Value;
 
         Assert.Empty(response.Items);
         Assert.Equal(1, response.Meta.AppliedLimit);

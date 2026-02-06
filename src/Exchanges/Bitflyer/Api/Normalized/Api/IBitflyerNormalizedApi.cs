@@ -20,11 +20,11 @@ public interface IBitflyerNormalizedApi
         ProductCode productCode,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
+    Task<Call<GetBoardRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
         ProductCode productCode,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
+    Task<Call<GetExecutionsPublicRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
         ProductCode productCode,
         int? count = null,
         long? before = null,
@@ -84,7 +84,7 @@ public interface IBitflyerNormalizedApi
         GetParentOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
+    Task<Call<GetBalanceRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default);
 
     Task<Call<GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
@@ -134,7 +134,7 @@ public interface IBitflyerNormalizedApi
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
+    Task<Call<GetExecutionsPrivateRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 

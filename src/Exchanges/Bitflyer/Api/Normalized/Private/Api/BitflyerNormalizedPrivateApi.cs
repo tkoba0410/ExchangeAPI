@@ -83,7 +83,7 @@ internal sealed class BitflyerNormalizedPrivateApi
                 childOrderError!);
         }
 
-        var dto = new RawPrivateRequests.CreateChildOrderRequest
+        var dto = new RawPrivateRequests.SendChildOrderRequest
         {
             ProductCode = productCode,
             Side = new FreeText(apiSide),
@@ -440,7 +440,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             timeInForce = tif;
         }
 
-        var rawRequest = new RawPrivateRequests.CreateParentOrderRequest
+        var rawRequest = new RawPrivateRequests.SendParentOrderRequest
         {
             OrderMethod = orderMethod is null ? null : new FreeText(orderMethod),
             MinuteToExpire = request.MinuteToExpire,
@@ -561,13 +561,13 @@ internal sealed class BitflyerNormalizedPrivateApi
             });
     }
 
-    public async Task<Call<PrivateRequests.GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
+    public async Task<Call<PrivateRequests.GetBalanceRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetBalanceCallAsync(new RawPrivateRequests.GetBalancesRequest(), cancellationToken)
+            .GetBalanceCallAsync(new RawPrivateRequests.GetBalanceRequest(), cancellationToken)
             .ConfigureAwait(false);
-        var request = new PrivateRequests.GetBalancesRequest();
+        var request = new PrivateRequests.GetBalanceRequest();
         return CreateCall(
             rawCall,
             request,
@@ -721,7 +721,7 @@ internal sealed class BitflyerNormalizedPrivateApi
     {
         var currencyText = CurrencyCodeConverter.ToCurrencyString(currencyCode);
         var rawCall = await _raw
-            .WithdrawCallAsync(new RawPrivateRequests.CreateWithdrawalRequest
+            .WithdrawCallAsync(new RawPrivateRequests.WithdrawRequest
             {
                 CurrencyCode = new FreeText(currencyText),
                 BankAccountId = bankAccountId,
@@ -855,14 +855,14 @@ internal sealed class BitflyerNormalizedPrivateApi
             raw => MapResult<BitflyerRawJsonNormalized>.Ok(new BitflyerRawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
+    public async Task<Call<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new PrivateRequests.GetAccountExecutionsRequest(symbol);
+        var request = new PrivateRequests.GetExecutionsPrivateRequest(symbol);
         if (symbol.IsEmpty)
         {
-            return CreateImmediateError<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
+            return CreateImmediateError<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 request,
                 Component(BitflyerEndpointIds.GetExecutionsPrivate),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
@@ -871,7 +871,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (marketCall.Result is CallResult<BitflyerMarketInfo>.Err marketError)
         {
-            return CreateCallError<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
+            return CreateCallError<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
                 Component(BitflyerEndpointIds.GetExecutionsPrivate),
@@ -883,7 +883,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             : ProductCode.Empty;
         if (productCode.IsEmpty)
         {
-            return CreateCallError<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
+            return CreateCallError<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
                 Component(BitflyerEndpointIds.GetExecutionsPrivate),
@@ -891,7 +891,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         }
 
         var rawCall = await _raw
-            .GetExecutionsPrivateCallAsync(new RawPrivateRequests.GetAccountExecutionsRequest(productCode), cancellationToken)
+            .GetExecutionsPrivateCallAsync(new RawPrivateRequests.GetExecutionsPrivateRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

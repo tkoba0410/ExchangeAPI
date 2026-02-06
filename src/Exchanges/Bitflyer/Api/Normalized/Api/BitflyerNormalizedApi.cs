@@ -50,12 +50,12 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         CancellationToken cancellationToken = default) =>
         _publicApi.GetTickerCallAsync(productCode, cancellationToken);
 
-    public Task<Call<PublicRequests.GetOrderBookRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
+    public Task<Call<PublicRequests.GetBoardRequest, BitflyerOrderBookNormalized>> GetBoardCallAsync(
         ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetBoardCallAsync(productCode, cancellationToken);
 
-    public Task<Call<PublicRequests.GetExecutionsRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
+    public Task<Call<PublicRequests.GetExecutionsPublicRequest, IReadOnlyList<BitflyerExecutionNormalized>>> GetExecutionsPublicCallAsync(
         ProductCode productCode,
         int? count = null,
         long? before = null,
@@ -129,7 +129,7 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.GetParentOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetBalancesRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
+    public Task<Call<PrivateRequests.GetBalanceRequest, IReadOnlyList<BitflyerBalanceEntryNormalized>>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default) =>
         _privateApi.GetBalanceCallAsync(cancellationToken);
 
@@ -190,7 +190,7 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.GetWithdrawalsCallAsync(count, before, after, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
+    public Task<Call<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetExecutionsPrivateCallAsync(symbol, cancellationToken);

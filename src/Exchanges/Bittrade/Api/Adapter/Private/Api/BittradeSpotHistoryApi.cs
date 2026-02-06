@@ -28,8 +28,8 @@ internal sealed class BittradeSpotHistoryApi
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
     }
 
-    public async Task<Call<MarketLimitCursorRequest, Page<OrderSnapshotItem>>> GetOrdersCallAsync(
-        MarketLimitCursorRequest request,
+    public async Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
+        GetOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
         var startedAt = DateTimeOffset.UtcNow;
@@ -41,11 +41,11 @@ internal sealed class BittradeSpotHistoryApi
                 request,
                 call,
                 BittradeOperations.History.GetOrders,
-                ok => BuildOrderPage(request, ok));
+                ok => new GetOrdersResponse(BuildOrderPage(request, ok)));
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<MarketLimitCursorRequest, Page<OrderSnapshotItem>>(
+            return ApiCallMapper.FromException<GetOrdersRequest, GetOrdersResponse>(
                 request,
                 startedAt,
                 BittradeOperations.History.GetOrders,
@@ -53,8 +53,8 @@ internal sealed class BittradeSpotHistoryApi
         }
     }
 
-    public async Task<Call<MarketLimitCursorRequest, Page<ExecutionItem>>> GetExecutionsPrivateCallAsync(
-        MarketLimitCursorRequest request,
+    public async Task<Call<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
+        GetExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default)
     {
         var startedAt = DateTimeOffset.UtcNow;
@@ -68,11 +68,11 @@ internal sealed class BittradeSpotHistoryApi
                 request,
                 call,
                 BittradeOperations.History.GetExecutions,
-                ok => BuildExecutionPage(request, ok));
+                ok => new GetExecutionsPrivateResponse(BuildExecutionPage(request, ok)));
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<MarketLimitCursorRequest, Page<ExecutionItem>>(
+            return ApiCallMapper.FromException<GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>(
                 request,
                 startedAt,
                 BittradeOperations.History.GetExecutions,
@@ -81,7 +81,7 @@ internal sealed class BittradeSpotHistoryApi
     }
 
     private static Page<OrderSnapshotItem> BuildOrderPage(
-        MarketLimitCursorRequest request,
+        GetOrdersRequest request,
         IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Dtos.BittradeOpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
@@ -92,7 +92,7 @@ internal sealed class BittradeSpotHistoryApi
     }
 
     private static Page<ExecutionItem> BuildExecutionPage(
-        MarketLimitCursorRequest request,
+        GetExecutionsPrivateRequest request,
         IReadOnlyList<BittradeExecutionNormalized> executions)
     {
         var items = executions.Select(e => new ExecutionItem(
@@ -135,7 +135,14 @@ internal sealed class BittradeSpotHistoryApi
             Status: OrderSnapshotStatus.Open);
     }
 
-    private static (int RequestedLimit, int AppliedLimit) GetLimits(MarketLimitCursorRequest request)
+    private static (int RequestedLimit, int AppliedLimit) GetLimits(GetOrdersRequest request)
+    {
+        var requestedLimit = request.Limit ?? 1000;
+        var appliedLimit = Math.Min(requestedLimit, 1000);
+        return (requestedLimit, appliedLimit);
+    }
+
+    private static (int RequestedLimit, int AppliedLimit) GetLimits(GetExecutionsPrivateRequest request)
     {
         var requestedLimit = request.Limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);

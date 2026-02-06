@@ -2,4 +2,4 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Contracts.Facade.Requests;
 
-public sealed record GetOrderBookRequest(Symbol Symbol);
+public sealed record GetExecutionsPublicRequest(Symbol Symbol);

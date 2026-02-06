@@ -32,14 +32,14 @@ internal sealed class BittradeTradingApi
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
     }
 
-    public async Task<Call<PlaceLimitOrderRequest, OrderResult>> OrderLimitCallAsync(
+    public async Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitCallAsync(
         CommonSymbol symbol,
         Side side,
         Size size,
         Price price,
         CancellationToken cancellationToken = default)
     {
-        var request = new PlaceLimitOrderRequest(symbol, side, size, price);
+        var request = new OrderLimitRequest(symbol, side, size, price);
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -59,11 +59,11 @@ internal sealed class BittradeTradingApi
                 request,
                 call,
                 BittradeOperations.Trading.PlaceOrder,
-                MapOrderResult);
+                ok => new OrderLimitResponse(MapOrderResult(ok)));
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<PlaceLimitOrderRequest, OrderResult>(
+            return ApiCallMapper.FromException<OrderLimitRequest, OrderLimitResponse>(
                 request,
                 startedAt,
                 BittradeOperations.Trading.PlaceOrder,
@@ -71,7 +71,7 @@ internal sealed class BittradeTradingApi
         }
     }
 
-    public async Task<Call<CancelOrderRequest, CancelResult>> CancelOrderCallAsync(
+    public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderCallAsync(
         CommonSymbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
@@ -88,11 +88,11 @@ internal sealed class BittradeTradingApi
                 request,
                 call,
                 BittradeOperations.Trading.CancelOrder,
-                ok => new CancelResult(ok.IsSuccess));
+                ok => new CancelOrderResponse(new CancelResult(ok.IsSuccess)));
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<CancelOrderRequest, CancelResult>(
+            return ApiCallMapper.FromException<CancelOrderRequest, CancelOrderResponse>(
                 request,
                 startedAt,
                 BittradeOperations.Trading.CancelOrder,

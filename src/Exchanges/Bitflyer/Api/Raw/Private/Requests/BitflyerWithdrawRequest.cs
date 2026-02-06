@@ -3,7 +3,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Private.Requests;
 
 /// <summary>/v1/me/withdraw リクエスト DTO。</summary>
-public sealed class CreateWithdrawalRequest
+public sealed class WithdrawRequest
 {
     [JsonPropertyName("currency_code")] public FreeText CurrencyCode { get; init; } = FreeText.Empty; // "JPY"
     [JsonPropertyName("bank_account_id")] public int BankAccountId { get; init; }

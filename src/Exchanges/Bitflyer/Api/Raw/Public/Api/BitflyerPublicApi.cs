@@ -24,7 +24,7 @@ internal sealed class BitflyerPublicApi
         _executor = executor ?? throw new System.ArgumentNullException(nameof(executor));
     }
 
-    public Task<Call<BitflyerRequests.GetTickerRequest, Ticker>> GetTickerCallAsync(
+    public Task<Call<BitflyerRequests.GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
         BitflyerRequests.GetTickerRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -32,9 +32,9 @@ internal sealed class BitflyerPublicApi
             Component(BitflyerEndpointIds.GetTicker),
             BitflyerPublicEndpoints.GetTicker(request.ProductCode.Value),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<Ticker>(json, Component(BitflyerEndpointIds.GetTicker)));
+            json => BitflyerRawJson.DeserializeOrThrow<GetTickerResponse>(json, Component(BitflyerEndpointIds.GetTicker)));
 
-    public Task<Call<BitflyerRequests.GetBoardRequest, Board>> GetBoardCallAsync(
+    public Task<Call<BitflyerRequests.GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
         BitflyerRequests.GetBoardRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -42,10 +42,10 @@ internal sealed class BitflyerPublicApi
             Component(BitflyerEndpointIds.GetBoard),
             BitflyerPublicEndpoints.GetBoard(request.ProductCode.Value),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<Board>(json, Component(BitflyerEndpointIds.GetBoard)));
+            json => BitflyerRawJson.DeserializeOrThrow<GetBoardResponse>(json, Component(BitflyerEndpointIds.GetBoard)));
 
-    public Task<Call<BitflyerRequests.GetExecutionsRequest, IReadOnlyList<ExecutionPublicResponse>>> GetExecutionsPublicCallAsync(
-        BitflyerRequests.GetExecutionsRequest request,
+    public Task<Call<BitflyerRequests.GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
+        BitflyerRequests.GetExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
@@ -56,11 +56,11 @@ internal sealed class BitflyerPublicApi
                 request.Before?.ToString(CultureInfo.InvariantCulture),
                 request.After?.ToString(CultureInfo.InvariantCulture)),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<ExecutionPublicResponse>>(
+            json => BitflyerRawJson.DeserializeOrThrow<GetExecutionsPublicResponse>(
                 json,
                 Component(BitflyerEndpointIds.GetExecutionsPublic)));
 
-    public Task<Call<BitflyerRequests.GetMarketsRequest, IReadOnlyList<Market>>> GetMarketsCallAsync(
+    public Task<Call<BitflyerRequests.GetMarketsRequest, GetMarketsResponse>> GetMarketsCallAsync(
         BitflyerRequests.GetMarketsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -68,11 +68,11 @@ internal sealed class BitflyerPublicApi
             Component(BitflyerEndpointIds.GetMarkets),
             BitflyerPublicEndpoints.GetMarkets(),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Market>>(
+            json => BitflyerRawJson.DeserializeOrThrow<GetMarketsResponse>(
                 json,
                 Component(BitflyerEndpointIds.GetMarkets)));
 
-    public Task<Call<BitflyerRequests.GetChatsRequest, IReadOnlyList<Chat>>> GetChatsCallAsync(
+    public Task<Call<BitflyerRequests.GetChatsRequest, GetChatsResponse>> GetChatsCallAsync(
         BitflyerRequests.GetChatsRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -80,11 +80,11 @@ internal sealed class BitflyerPublicApi
             Component(BitflyerEndpointIds.GetChats),
             BitflyerPublicEndpoints.GetChats(request.FromDate?.Value),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<Chat>>(
+            json => BitflyerRawJson.DeserializeOrThrow<GetChatsResponse>(
                 json,
                 Component(BitflyerEndpointIds.GetChats)));
 
-    public Task<Call<BitflyerRequests.GetHealthRequest, HealthResponse>> GetHealthCallAsync(
+    public Task<Call<BitflyerRequests.GetHealthRequest, GetHealthResponse>> GetHealthCallAsync(
         BitflyerRequests.GetHealthRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -92,9 +92,9 @@ internal sealed class BitflyerPublicApi
             Component(BitflyerEndpointIds.GetHealth),
             BitflyerPublicEndpoints.GetHealth(request.ProductCode.Value),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<HealthResponse>(json, Component(BitflyerEndpointIds.GetHealth)));
+            json => BitflyerRawJson.DeserializeOrThrow<GetHealthResponse>(json, Component(BitflyerEndpointIds.GetHealth)));
 
-    public Task<Call<BitflyerRequests.GetBoardStateRequest, BoardStateResponse>> GetBoardStateCallAsync(
+    public Task<Call<BitflyerRequests.GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
         BitflyerRequests.GetBoardStateRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -102,11 +102,11 @@ internal sealed class BitflyerPublicApi
             Component(BitflyerEndpointIds.GetBoardState),
             BitflyerPublicEndpoints.GetBoardState(request.ProductCode.Value),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<BoardStateResponse>(
+            json => BitflyerRawJson.DeserializeOrThrow<GetBoardStateResponse>(
                 json,
                 Component(BitflyerEndpointIds.GetBoardState)));
 
-    public Task<Call<BitflyerRequests.GetCorporateLeverageRequest, CorporateLeverageResponse>> GetCorporateLeverageCallAsync(
+    public Task<Call<BitflyerRequests.GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
         BitflyerRequests.GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -114,11 +114,11 @@ internal sealed class BitflyerPublicApi
             Component(BitflyerEndpointIds.GetCorporateLeverage),
             BitflyerPublicEndpoints.GetCorporateLeverage(),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<CorporateLeverageResponse>(
+            json => BitflyerRawJson.DeserializeOrThrow<GetCorporateLeverageResponse>(
                 json,
                 Component(BitflyerEndpointIds.GetCorporateLeverage)));
 
-    public Task<Call<GetFundingRateRequest, FundingRateResponse>> GetFundingRateCallAsync(
+    public Task<Call<GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateCallAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
@@ -126,7 +126,7 @@ internal sealed class BitflyerPublicApi
             Component(BitflyerEndpointIds.GetFundingRate),
             BitflyerPublicEndpoints.GetFundingRate(request.ProductCode.Value),
             cancellationToken,
-            json => BitflyerRawJson.DeserializeOrThrow<FundingRateResponse>(
+            json => BitflyerRawJson.DeserializeOrThrow<GetFundingRateResponse>(
                 json,
                 Component(BitflyerEndpointIds.GetFundingRate)));
 

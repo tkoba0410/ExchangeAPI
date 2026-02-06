@@ -6,7 +6,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal;
 
 internal static class BitflyerRawMappers
 {
-    public static RawSendChildOrderRequest MapSendChildOrderRequest(PrivateRequests.CreateChildOrderRequest request) => new()
+    public static RawSendChildOrderRequest MapSendChildOrderRequest(PrivateRequests.SendChildOrderRequest request) => new()
     {
         ProductCode = request.ProductCode.Value,
         ChildOrderType = request.ChildOrderType.Value,
@@ -18,7 +18,7 @@ internal static class BitflyerRawMappers
         TriggerPrice = request.TriggerPrice,
     };
 
-    public static RawSendParentOrderRequest MapSendParentOrderRequest(PrivateRequests.CreateParentOrderRequest request)
+    public static RawSendParentOrderRequest MapSendParentOrderRequest(PrivateRequests.SendParentOrderRequest request)
     {
         var parameters = request.Parameters.Select(p => new RawSendParentOrderParameter
         {

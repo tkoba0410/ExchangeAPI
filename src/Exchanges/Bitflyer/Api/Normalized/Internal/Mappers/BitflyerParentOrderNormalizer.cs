@@ -42,7 +42,7 @@ internal static class BitflyerParentOrderNormalizer
     }
 
     public static bool TryNormalizeDetail(
-        RawPrivateDtos.RawGetParentOrderResponse raw,
+        RawPrivateDtos.GetParentOrderResponse raw,
         string? rawJson,
         out BitflyerParentOrderDetailNormalized? normalized,
         out CallError? error)
@@ -72,7 +72,7 @@ internal static class BitflyerParentOrderNormalizer
     }
 
     private static BitflyerParentOrderDetailNormalized BuildDetail(
-        RawPrivateDtos.RawGetParentOrderResponse raw,
+        RawPrivateDtos.GetParentOrderResponse raw,
         string? rawJson)
     {
         var snapshot = ExtractSnapshot(rawJson);

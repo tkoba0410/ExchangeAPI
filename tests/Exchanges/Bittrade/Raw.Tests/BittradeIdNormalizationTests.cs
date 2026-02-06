@@ -12,7 +12,7 @@ public sealed class BittradeIdNormalizationTests
         { "id": 1, "price": 100, "amount": 0.1, "direction": "buy", "ts": 1700000000001 }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPublicDtos.RawTradeEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPublicDtos.GetHistoryTradeEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("1", entry!.Id);
@@ -25,7 +25,7 @@ public sealed class BittradeIdNormalizationTests
         { "id": "trade-1", "price": 100, "amount": 0.1, "direction": "buy", "ts": 1700000000001 }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPublicDtos.RawTradeEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPublicDtos.GetHistoryTradeEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("trade-1", entry!.Id);

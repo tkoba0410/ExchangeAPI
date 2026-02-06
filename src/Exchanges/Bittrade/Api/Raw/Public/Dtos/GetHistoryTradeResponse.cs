@@ -16,4 +16,4 @@ public sealed record RawTradeHistoryEntry(
     [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Id,
     [property: JsonPropertyName("ts")]
     [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset Ts,
-    [property: JsonPropertyName("data")] IReadOnlyList<RawTradeEntry>? Data);
+    [property: JsonPropertyName("data")] IReadOnlyList<GetHistoryTradeEntry>? Data);

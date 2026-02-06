@@ -5,6 +5,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Dtos;
 
 public sealed record GetDepthResponse(
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("tick")] RawDepthTick? Tick,
+    [property: JsonPropertyName("tick")] GetDepthLevel? Tick,
     [property: JsonPropertyName("ts")]
     [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset? Ts);

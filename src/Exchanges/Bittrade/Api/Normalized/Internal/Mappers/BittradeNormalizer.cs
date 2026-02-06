@@ -53,7 +53,7 @@ internal static class BittradeNormalizer
 
 
     internal static bool TryNormalizeExecutions(
-        IReadOnlyList<RawPublicDtos.RawTradeEntry> entries,
+        IReadOnlyList<RawPublicDtos.GetHistoryTradeEntry> entries,
         string? rawJson,
         out IReadOnlyList<BittradeExecutionNormalized>? normalized,
         out CallError? error)
@@ -104,7 +104,7 @@ internal static class BittradeNormalizer
         }
 
         var flattened = entries
-            .SelectMany(entry => entry.Data ?? Array.Empty<RawPublicDtos.RawTradeEntry>())
+            .SelectMany(entry => entry.Data ?? Array.Empty<RawPublicDtos.GetHistoryTradeEntry>())
             .ToList();
 
         return TryNormalizeExecutions(flattened, rawJson: null, out normalized, out error);
@@ -400,7 +400,7 @@ internal static class BittradeNormalizer
     }
 
     internal static bool TryNormalizeOrderBook(
-        RawPublicDtos.RawDepthTick tick,
+        RawPublicDtos.GetDepthLevel tick,
         out BittradeOrderBookNormalized? normalized,
         out CallError? error)
     {
@@ -461,7 +461,7 @@ internal static class BittradeNormalizer
 
     private static IReadOnlyList<JsonElement> ExtractTradeSnapshots(
         string? rawJson,
-        IReadOnlyList<RawPublicDtos.RawTradeEntry> entries)
+        IReadOnlyList<RawPublicDtos.GetHistoryTradeEntry> entries)
     {
         if (entries.Count == 0)
         {

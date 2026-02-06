@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using ExchangeApi.Primitives.JsonCommon.Converters;
 namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Dtos;
 
-public sealed record RawMergedTick(
+public sealed record GetDetailMergedTick(
     [property: JsonPropertyName("close")] decimal Close,
     [property: JsonPropertyName("open")] decimal Open,
     [property: JsonPropertyName("low")] decimal Low,

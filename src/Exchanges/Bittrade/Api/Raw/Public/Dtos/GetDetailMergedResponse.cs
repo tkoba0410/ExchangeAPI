@@ -5,6 +5,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Dtos;
 
 public sealed record GetDetailMergedResponse(
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("tick")] RawMergedTick? Tick,
+    [property: JsonPropertyName("tick")] GetDetailMergedTick? Tick,
     [property: JsonPropertyName("ts")]
     [property: JsonConverter(typeof(UnixTimeMillisecondsDateTimeOffsetConverter))] DateTimeOffset? Ts);

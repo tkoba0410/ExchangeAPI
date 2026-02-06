@@ -33,7 +33,7 @@ public sealed class BittradeExecutionNormalizedTests
         """;
 
         var raw = BittradeRawJson.DeserializeOrThrow<RawPublicDtos.GetTradeResponse>(json, "Bittrade.GetTrades");
-        var entries = raw.Tick?.Data ?? new List<RawPublicDtos.RawTradeEntry>();
+        var entries = raw.Tick?.Data ?? new List<RawPublicDtos.GetHistoryTradeEntry>();
         var ok = BittradeNormalizer.TryNormalizeExecutions(entries, json, out var normalized, out var error);
         Assert.True(ok);
         Assert.NotNull(normalized);

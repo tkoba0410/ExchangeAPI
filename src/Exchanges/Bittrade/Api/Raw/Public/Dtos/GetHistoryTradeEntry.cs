@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using ExchangeApi.Primitives.JsonCommon.Converters;
 namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Dtos;
 
-public sealed record RawTradeEntry(
+public sealed record GetHistoryTradeEntry(
     [property: JsonPropertyName("id")]
     [property: JsonConverter(typeof(StringOrNumberToStringConverter))] string Id,
     [property: JsonPropertyName("price")] decimal Price,

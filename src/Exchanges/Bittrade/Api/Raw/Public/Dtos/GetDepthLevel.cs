@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using ExchangeApi.Primitives.JsonCommon.Converters;
 namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Dtos;
 
-public sealed record RawDepthTick(
+public sealed record GetDepthLevel(
     [property: JsonPropertyName("bids")] IReadOnlyList<IReadOnlyList<decimal>>? Bids,
     [property: JsonPropertyName("asks")] IReadOnlyList<IReadOnlyList<decimal>>? Asks,
     [property: JsonPropertyName("ts")]

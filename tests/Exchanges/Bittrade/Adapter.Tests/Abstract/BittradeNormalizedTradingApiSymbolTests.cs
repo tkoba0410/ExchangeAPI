@@ -59,18 +59,18 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
     {
         public bool WasCalled { get; private set; }
 
-        public override Task<Call<RawPrivateRequests.CreateOrderRequest, RawPrivateDtos.RawPlaceOrderResponse>> PostOrdersPlaceCallAsync(
-            RawPrivateRequests.CreateOrderRequest request,
+        public override Task<Call<RawPrivateRequests.PostOrdersPlaceRequest, RawPrivateDtos.PostOrdersPlaceResponse>> PostOrdersPlaceCallAsync(
+            RawPrivateRequests.PostOrdersPlaceRequest request,
             CancellationToken cancellationToken = default)
         {
             WasCalled = true;
             var meta = CallMeta.CreateInternal("Tests", "RecordingRawTradingApi");
-            return Task.FromResult(new Call<RawPrivateRequests.CreateOrderRequest, RawPrivateDtos.RawPlaceOrderResponse>(
+            return Task.FromResult(new Call<RawPrivateRequests.PostOrdersPlaceRequest, RawPrivateDtos.PostOrdersPlaceResponse>(
                 Id: CallId.New(),
                 StartedAt: DateTimeOffset.UtcNow,
                 Duration: TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<RawPrivateDtos.RawPlaceOrderResponse>.Err(
+                Result: new CallResult<RawPrivateDtos.PostOrdersPlaceResponse>.Err(
                     new CallError(CallErrorKind.Unknown, "raw-error")),
                 Meta: meta));
         }

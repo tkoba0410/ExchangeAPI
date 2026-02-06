@@ -5,15 +5,15 @@ namespace ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Requests;
 
 public sealed record GetAccountsRequest;
 
-public sealed record GetAccountBalanceRequest(AccountId AccountId);
+public sealed record GetAccountsBalanceByAccountIdRequest(AccountId AccountId);
 
 public sealed record GetOpenOrdersRequest(Symbol Symbol, AccountId AccountId);
 
 public sealed record GetOrdersRequest;
 
-public sealed record GetOrderRequest(OrderId OrderId);
+public sealed record GetOrdersByOrderIdRequest(OrderId OrderId);
 
-public sealed record GetOrderMatchResultsRequest(OrderId OrderId);
+public sealed record GetOrdersMatchResultsByOrderIdRequest(OrderId OrderId);
 
 public sealed record GetMatchResultsRequest(
     Symbol? Symbol = null,
@@ -24,7 +24,7 @@ public sealed record GetMatchResultsRequest(
     FreeText? Direct = null,
     int? Size = null);
 
-public sealed record GetDepositWithdrawsRequest(
+public sealed record GetDepositWithdrawRequest(
     FreeText Type,
     FreeText? Currency = null,
     long? From = null,
@@ -33,7 +33,7 @@ public sealed record GetDepositWithdrawsRequest(
 
 public sealed record GetWithdrawVirtualAddressesRequest;
 
-public sealed record GetRetailOrdersRequest(
+public sealed record GetRetailOrderListRequest(
     int Direct,
     int? Status = null,
     DateTimeOffset? StartTime = null,

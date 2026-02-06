@@ -151,8 +151,8 @@ public sealed class BittradeNormalizedApi : IBittradeNormalizedApi
         CancellationToken ct = default) =>
         _privateApi.GetOpenOrdersCallAsync(request.Symbol, ct);
 
-    public Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
-        GetOrderRequest request,
+    public Task<Call<GetOrdersByOrderIdRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
+        GetOrdersByOrderIdRequest request,
         CancellationToken ct = default) =>
         _privateApi.GetOrdersByOrderIdCallAsync(request.Symbol, request.OrderKey, ct);
 

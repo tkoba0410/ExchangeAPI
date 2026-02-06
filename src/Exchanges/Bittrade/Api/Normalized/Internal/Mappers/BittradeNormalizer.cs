@@ -228,7 +228,7 @@ internal static class BittradeNormalizer
     }
 
     internal static bool TryNormalizeBalances(
-        RawPrivateDtos.RawBalanceData data,
+        RawPrivateDtos.GetAccountsBalanceByAccountIdData data,
         out IReadOnlyList<BittradeBalanceEntryNormalized>? normalized,
         out CallError? error)
     {
@@ -242,7 +242,7 @@ internal static class BittradeNormalizer
         var mapped = new List<BittradeBalanceEntryNormalized>(data.List.Count);
         foreach (var entry in data.List)
         {
-            if (!TryParseDecimal(entry.Balance, "balance", "RawBalanceEntry", out var balance, out error))
+            if (!TryParseDecimal(entry.Balance, "balance", "GetAccountsBalanceByAccountIdEntry", out var balance, out error))
             {
                 normalized = null;
                 return false;
@@ -260,7 +260,7 @@ internal static class BittradeNormalizer
     }
 
     internal static bool TryNormalizeAccounts(
-        IReadOnlyList<RawPrivateDtos.RawAccount>? accounts,
+        IReadOnlyList<RawPrivateDtos.GetAccountsItem>? accounts,
         out IReadOnlyList<BittradeAccountNormalized>? normalized,
         out CallError? error)
     {
@@ -292,7 +292,7 @@ internal static class BittradeNormalizer
     }
 
     internal static bool TryNormalizeDepositWithdraws(
-        IReadOnlyList<RawPrivateDtos.RawDepositWithdrawEntry>? entries,
+        IReadOnlyList<RawPrivateDtos.GetDepositWithdrawEntry>? entries,
         out IReadOnlyList<BittradeDepositWithdrawNormalized>? normalized,
         out CallError? error)
     {
@@ -328,7 +328,7 @@ internal static class BittradeNormalizer
     }
 
     internal static bool TryNormalizeWithdrawVirtualAddresses(
-        IReadOnlyList<RawPrivateDtos.RawWithdrawVirtualAddress>? entries,
+        IReadOnlyList<RawPrivateDtos.GetWithdrawVirtualAddressesItem>? entries,
         out IReadOnlyList<BittradeWithdrawVirtualAddressNormalized>? normalized,
         out CallError? error)
     {
@@ -365,7 +365,7 @@ internal static class BittradeNormalizer
     }
 
     internal static bool TryNormalizeRetailBalances(
-        IReadOnlyList<RawPrivateDtos.RawRetailAccountBalanceEntry>? entries,
+        IReadOnlyList<RawPrivateDtos.GetRetailAccountBalanceEntry>? entries,
         out IReadOnlyList<BittradeRetailBalanceEntryNormalized>? normalized,
         out CallError? error)
     {
@@ -379,9 +379,9 @@ internal static class BittradeNormalizer
         var mapped = new List<BittradeRetailBalanceEntryNormalized>(entries.Count);
         foreach (var entry in entries)
         {
-            if (!TryParseNullableDecimal(entry.Balance, "balance", "RawRetailAccountBalanceEntry", out var balance, out error)
-                || !TryParseNullableDecimal(entry.Available, "available", "RawRetailAccountBalanceEntry", out var available, out error)
-                || !TryParseNullableDecimal(entry.Frozen, "frozen", "RawRetailAccountBalanceEntry", out var frozen, out error))
+            if (!TryParseNullableDecimal(entry.Balance, "balance", "GetRetailAccountBalanceEntry", out var balance, out error)
+                || !TryParseNullableDecimal(entry.Available, "available", "GetRetailAccountBalanceEntry", out var available, out error)
+                || !TryParseNullableDecimal(entry.Frozen, "frozen", "GetRetailAccountBalanceEntry", out var frozen, out error))
             {
                 normalized = null;
                 return false;

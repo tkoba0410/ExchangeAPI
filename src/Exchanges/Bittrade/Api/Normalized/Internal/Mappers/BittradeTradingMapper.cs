@@ -23,7 +23,7 @@ internal static class BittradeTradingMapper
         AccountId accountId,
         Symbol apiSymbol,
         BittradeOrderRequest request,
-        out RawPrivateRequests.RawCreateOrderRequest? raw,
+        out RawPrivateRequests.RawPostOrdersPlaceRequest? raw,
         out CallError? error)
     {
         if (accountId.IsEmpty)
@@ -55,7 +55,7 @@ internal static class BittradeTradingMapper
         var price = request.Price?.Value;
         var size = FormatDecimal(request.Size.Value);
 
-        raw = new RawPrivateRequests.RawCreateOrderRequest(
+        raw = new RawPrivateRequests.RawPostOrdersPlaceRequest(
             AccountId: accountId,
             Symbol: apiSymbol,
             Type: new FreeText(rawType),
@@ -66,7 +66,7 @@ internal static class BittradeTradingMapper
         return true;
     }
 
-    public static BittradeOrderResult ToOrderResult(RawPrivateDtos.RawPlaceOrderResponse raw)
+    public static BittradeOrderResult ToOrderResult(RawPrivateDtos.PostOrdersPlaceResponse raw)
     {
         var orderId = raw.OrderId;
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
@@ -76,7 +76,7 @@ internal static class BittradeTradingMapper
 
     public static bool TryToOpenOrders(
         Symbol symbol,
-        RawPrivateDtos.RawOpenOrdersResponse raw,
+        RawPrivateDtos.GetOpenOrdersResponse raw,
         out IReadOnlyList<BittradeOpenOrder>? orders,
         out CallError? error)
     {
@@ -168,7 +168,7 @@ internal static class BittradeTradingMapper
 
     public static bool TryToOrderStatus(
         ProductCode productCode,
-        RawPrivateDtos.RawOrderDetailResponse raw,
+        RawPrivateDtos.GetOrdersByOrderIdResponse raw,
         OrderKey key,
         out BittradeOrderStatus? status,
         out CallError? error)
@@ -397,7 +397,7 @@ internal static class BittradeTradingMapper
     }
 
 
-    public static BittradeRetailOrderResult ToRetailOrderResult(RawPrivateDtos.RawRetailOrderResponse raw)
+    public static BittradeRetailOrderResult ToRetailOrderResult(RawPrivateDtos.PostRetailOrderPlaceResponse raw)
     {
         return new BittradeRetailOrderResult(
             Code: raw.Code,
@@ -406,19 +406,47 @@ internal static class BittradeTradingMapper
             Message: ParseOptional(raw.Message));
     }
 
-    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.RawCreateWithdrawResponse raw)
+    public static BittradeRetailOrderResult ToRetailOrderResult(RawPrivateDtos.PostRetailOrderCreateResponse raw)
+    {
+        return new BittradeRetailOrderResult(
+            Code: raw.Code,
+            OrderId: raw.Data,
+            Success: raw.Success,
+            Message: ParseOptional(raw.Message));
+    }
+
+    public static BittradeRetailOrderResult ToRetailOrderResult(RawPrivateDtos.PostRetailOrderCancelByOrderIdResponse raw)
+    {
+        return new BittradeRetailOrderResult(
+            Code: raw.Code,
+            OrderId: raw.Data,
+            Success: raw.Success,
+            Message: ParseOptional(raw.Message));
+    }
+
+    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.PostWithdrawApiCreateResponse raw)
     {
         return new BittradeWithdrawResult(FreeText.Parse(raw.Status), raw.Data);
     }
 
-    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.RawCancelWithdrawResponse raw)
+    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.PostWithdrawVirtualByAddressIdCreateResponse raw)
+    {
+        return new BittradeWithdrawResult(FreeText.Parse(raw.Status), raw.Data);
+    }
+
+    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.PostWithdrawVirtualByWithdrawIdPlaceResponse raw)
+    {
+        return new BittradeWithdrawResult(FreeText.Parse(raw.Status), raw.Data);
+    }
+
+    public static BittradeWithdrawResult ToWithdrawResult(RawPrivateDtos.PostWithdrawVirtualByWithdrawIdCancelResponse raw)
     {
         return new BittradeWithdrawResult(FreeText.Parse(raw.Status), raw.Data);
     }
 
     public static bool TryToRawRetailOrder(
         BittradeRetailOrderRequest request,
-        out RawPrivateRequests.RawCreateRetailOrderRequest? raw,
+        out RawPrivateRequests.RawPostRetailOrderPlaceRequest? raw,
         out CallError? error)
     {
         if (request is null)
@@ -435,7 +463,7 @@ internal static class BittradeTradingMapper
             return false;
         }
 
-        raw = new RawPrivateRequests.RawCreateRetailOrderRequest(
+        raw = new RawPrivateRequests.RawPostRetailOrderPlaceRequest(
             Symbol: new Symbol(symbol.Value),
             Type: request.Type,
             Price: request.Price is null ? null : new FreeText(FormatDecimal(request.Price.Value)),

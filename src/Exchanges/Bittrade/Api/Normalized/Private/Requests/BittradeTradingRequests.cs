@@ -22,7 +22,7 @@ public sealed record PostOrdersBatchCancelOpenOrdersRequest(
 
 public sealed record GetOpenOrdersRequest(Symbol Symbol);
 
-public sealed record GetOrderRequest(Symbol Symbol, OrderKey OrderKey);
+public sealed record GetOrdersByOrderIdRequest(Symbol Symbol, OrderKey OrderKey);
 
 public sealed record GetOrdersMatchResultsByOrderIdRequest(OrderKey OrderKey);
 

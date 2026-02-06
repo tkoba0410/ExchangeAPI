@@ -47,7 +47,7 @@ internal sealed class BittradeNormalizedPrivateApi
         CancellationToken ct = default)
     {
         var rawCall = await _trading
-            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountBalanceRequest(new AccountId(_accountId.Value)), ct)
+            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountsBalanceByAccountIdRequest(new AccountId(_accountId.Value)), ct)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetBalancesRequest(_accountId);
 
@@ -108,7 +108,7 @@ internal sealed class BittradeNormalizedPrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .GetDepositWithdrawCallAsync(new RawPrivateRequests.GetDepositWithdrawsRequest(
+            .GetDepositWithdrawCallAsync(new RawPrivateRequests.GetDepositWithdrawRequest(
                 request.Type,
                 request.Currency,
                 request.From,
@@ -220,7 +220,7 @@ internal sealed class BittradeNormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .PostOrdersPlaceCallAsync(new RawPrivateRequests.CreateOrderRequest(rawRequest!), ct)
+            .PostOrdersPlaceCallAsync(new RawPrivateRequests.PostOrdersPlaceRequest(rawRequest!), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -284,7 +284,7 @@ internal sealed class BittradeNormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .PostOrdersSubmitCancelByOrderIdCallAsync(new RawPrivateRequests.CancelOrderRequest(new OrderId(orderKey.Value)), ct)
+            .PostOrdersSubmitCancelByOrderIdCallAsync(new RawPrivateRequests.PostOrdersSubmitCancelByOrderIdRequest(new OrderId(orderKey.Value)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -301,8 +301,8 @@ internal sealed class BittradeNormalizedPrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostOrdersBatchCancelCallAsync(new RawPrivateRequests.CancelOrdersRequest(
-                new RawPrivateRequests.RawCancelOrdersRequest(request.OrderIds.ToList())), ct)
+            .PostOrdersBatchCancelCallAsync(new RawPrivateRequests.PostOrdersBatchCancelRequest(
+                new RawPrivateRequests.RawPostOrdersBatchCancelRequest(request.OrderIds.ToList())), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -332,7 +332,7 @@ internal sealed class BittradeNormalizedPrivateApi
             }
         }
 
-        var rawRequest = new RawPrivateRequests.RawCancelOpenOrdersRequest(
+        var rawRequest = new RawPrivateRequests.RawPostOrdersBatchCancelOpenOrdersRequest(
             AccountId: new AccountId(_accountId.Value),
             Symbol: apiSymbol is null ? null : new Symbol(apiSymbol),
             Side: request.Side is null
@@ -347,7 +347,7 @@ internal sealed class BittradeNormalizedPrivateApi
             CreatedAt: request.CreatedAt);
 
         var rawCall = await _trading
-            .PostOrdersBatchCancelOpenOrdersCallAsync(new RawPrivateRequests.CancelOpenOrdersRequest(rawRequest), ct)
+            .PostOrdersBatchCancelOpenOrdersCallAsync(new RawPrivateRequests.PostOrdersBatchCancelOpenOrdersRequest(rawRequest), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -392,15 +392,15 @@ internal sealed class BittradeNormalizedPrivateApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetOrderRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
+    public async Task<Call<NormalizedRequests.GetOrdersByOrderIdRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken ct = default)
     {
-        var callRequest = new NormalizedRequests.GetOrderRequest(symbol, orderKey);
+        var callRequest = new NormalizedRequests.GetOrdersByOrderIdRequest(symbol, orderKey);
         if (symbol.IsEmpty)
         {
-            return CreateImmediateError<NormalizedRequests.GetOrderRequest, BittradeOrderStatus>(
+            return CreateImmediateError<NormalizedRequests.GetOrdersByOrderIdRequest, BittradeOrderStatus>(
                 callRequest,
                 Component(BittradeEndpointIds.GetOrdersByOrderId),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
@@ -408,7 +408,7 @@ internal sealed class BittradeNormalizedPrivateApi
 
         if (orderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
         {
-            return CreateNotSupported<NormalizedRequests.GetOrderRequest, BittradeOrderStatus>(
+            return CreateNotSupported<NormalizedRequests.GetOrdersByOrderIdRequest, BittradeOrderStatus>(
                 callRequest,
                 component: "Bittrade.Trading",
                 feature: "GetOrder",
@@ -418,7 +418,7 @@ internal sealed class BittradeNormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(symbol, ct).ConfigureAwait(false);
         if (marketCall.Result is CallResult<BittradeMarketInfo>.Err marketError)
         {
-            return CreateCallError<NormalizedRequests.GetOrderRequest, BittradeOrderStatus>(
+            return CreateCallError<NormalizedRequests.GetOrdersByOrderIdRequest, BittradeOrderStatus>(
                 marketCall,
                 callRequest,
                 Component(BittradeEndpointIds.GetOrdersByOrderId),
@@ -431,7 +431,7 @@ internal sealed class BittradeNormalizedPrivateApi
             : new OrderKey(OrderIdKind.ExchangeOrderId, orderKey.Value);
 
         var rawCall = await _trading
-            .GetOrdersByOrderIdCallAsync(new RawPrivateRequests.GetOrderRequest(new OrderId(orderKey.Value)), ct)
+            .GetOrdersByOrderIdCallAsync(new RawPrivateRequests.GetOrdersByOrderIdRequest(new OrderId(orderKey.Value)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -456,7 +456,7 @@ internal sealed class BittradeNormalizedPrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .GetOrdersMatchResultsByOrderIdCallAsync(new RawPrivateRequests.GetOrderMatchResultsRequest(new OrderId(request.OrderKey.Value)), ct)
+            .GetOrdersMatchResultsByOrderIdCallAsync(new RawPrivateRequests.GetOrdersMatchResultsByOrderIdRequest(new OrderId(request.OrderKey.Value)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -517,7 +517,7 @@ internal sealed class BittradeNormalizedPrivateApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var rawRequest = new RawPrivateRequests.RawCreateWithdrawRequest(
+        var rawRequest = new RawPrivateRequests.RawPostWithdrawApiCreateRequest(
             request.Address,
             new FreeText(request.Amount.ToString(System.Globalization.CultureInfo.InvariantCulture)),
             request.Currency,
@@ -525,7 +525,7 @@ internal sealed class BittradeNormalizedPrivateApi
             request.AddressTag);
 
         var rawCall = await _trading
-            .PostWithdrawApiCreateCallAsync(new RawPrivateRequests.CreateWithdrawRequest(rawRequest), ct)
+            .PostWithdrawApiCreateCallAsync(new RawPrivateRequests.PostWithdrawApiCreateRequest(rawRequest), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -550,7 +550,7 @@ internal sealed class BittradeNormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .PostRetailOrderPlaceCallAsync(new RawPrivateRequests.CreateRetailOrderRequest(rawRequest!), ct)
+            .PostRetailOrderPlaceCallAsync(new RawPrivateRequests.PostRetailOrderPlaceRequest(rawRequest!), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -567,7 +567,7 @@ internal sealed class BittradeNormalizedPrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .GetRetailOrderListCallAsync(new RawPrivateRequests.GetRetailOrdersRequest(
+            .GetRetailOrderListCallAsync(new RawPrivateRequests.GetRetailOrderListRequest(
                 Direct: request.Direct,
                 Status: request.Status,
                 StartTime: request.StartTime,
@@ -645,7 +645,7 @@ internal sealed class BittradeNormalizedPrivateApi
 
             symbolText = parsedSymbol.Value;
         }
-        var body = new RawPrivateRequests.RawRetailOrderHistoryRequest(
+        var body = new RawPrivateRequests.RawPostRetailOrderHistoryRequest(
             Symbol: symbolText is null ? null : new Symbol(symbolText),
             Direct: request.Direct,
             Status: request.Status,
@@ -683,7 +683,7 @@ internal sealed class BittradeNormalizedPrivateApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        var body = new RawPrivateRequests.RawRetailOrderDetailRequest(request.OrderId);
+        var body = new RawPrivateRequests.RawPostRetailOrderDetailRequest(request.OrderId);
         var rawCall = await _trading
             .PostRetailOrderDetailCallAsync(new RawPrivateRequests.PostRetailOrderDetailRequest(body), ct)
             .ConfigureAwait(false);
@@ -724,7 +724,8 @@ internal sealed class BittradeNormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .PostRetailOrderCreateCallAsync(new RawPrivateRequests.CreateRetailOrderRequest(rawRequest!), ct)
+            .PostRetailOrderCreateCallAsync(new RawPrivateRequests.PostRetailOrderCreateRequest(
+                new RawPrivateRequests.RawPostRetailOrderCreateRequest(rawRequest!.Symbol, rawRequest.Type, rawRequest.Price, rawRequest.Amount, rawRequest.CashAmount)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -741,7 +742,7 @@ internal sealed class BittradeNormalizedPrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostRetailOrderCancelByOrderIdCallAsync(new RawPrivateRequests.CancelRetailOrderRequest(request.OrderId), ct)
+            .PostRetailOrderCancelByOrderIdCallAsync(new RawPrivateRequests.PostRetailOrderCancelByOrderIdRequest(request.OrderId), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -758,7 +759,7 @@ internal sealed class BittradeNormalizedPrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostWithdrawVirtualByAddressIdCreateCallAsync(new RawPrivateRequests.CreateWithdrawVirtualByAddressIdRequest(new AddressId(request.AddressId.Value)), ct)
+            .PostWithdrawVirtualByAddressIdCreateCallAsync(new RawPrivateRequests.PostWithdrawVirtualByAddressIdCreateRequest(new AddressId(request.AddressId.Value)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -775,7 +776,7 @@ internal sealed class BittradeNormalizedPrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostWithdrawVirtualByWithdrawIdPlaceCallAsync(new RawPrivateRequests.PlaceWithdrawVirtualRequest(new WithdrawId(request.WithdrawId.Value)), ct)
+            .PostWithdrawVirtualByWithdrawIdPlaceCallAsync(new RawPrivateRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest(new WithdrawId(request.WithdrawId.Value)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -792,7 +793,7 @@ internal sealed class BittradeNormalizedPrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostWithdrawVirtualByWithdrawIdCancelCallAsync(new RawPrivateRequests.CancelWithdrawRequest(new WithdrawId(request.WithdrawId.Value)), ct)
+            .PostWithdrawVirtualByWithdrawIdCancelCallAsync(new RawPrivateRequests.PostWithdrawVirtualByWithdrawIdCancelRequest(new WithdrawId(request.WithdrawId.Value)), ct)
             .ConfigureAwait(false);
 
         return CreateCall(

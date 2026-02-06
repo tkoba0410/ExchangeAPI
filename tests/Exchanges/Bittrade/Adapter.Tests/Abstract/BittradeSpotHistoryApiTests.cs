@@ -63,7 +63,7 @@ public sealed class BittradeSpotHistoryApiTests
 
     private sealed class StubRawApi : BittradeRawApiStub
     {
-        public override Task<Call<RawPrivateRequests.GetOpenOrdersRequest, RawPrivateDtos.RawOpenOrdersResponse>> GetOpenOrdersCallAsync(
+        public override Task<Call<RawPrivateRequests.GetOpenOrdersRequest, RawPrivateDtos.GetOpenOrdersResponse>> GetOpenOrdersCallAsync(
             RawPrivateRequests.GetOpenOrdersRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -92,15 +92,15 @@ public sealed class BittradeSpotHistoryApiTests
                     CreatedAt: DateTimeOffset.UtcNow,
                     FilledAmount: "0"),
             };
-            var response = new RawPrivateDtos.RawOpenOrdersResponse("ok", data);
+            var response = new RawPrivateDtos.GetOpenOrdersResponse("ok", data);
             return Task.FromResult(CreateOkCall(request, response));
         }
 
-        public override Task<Call<RawPrivateRequests.GetMatchResultsRequest, RawPrivateDtos.RawMatchResultsResponse>> GetMatchResultsCallAsync(
+        public override Task<Call<RawPrivateRequests.GetMatchResultsRequest, RawPrivateDtos.GetMatchResultsResponse>> GetMatchResultsCallAsync(
             RawPrivateRequests.GetMatchResultsRequest request,
             CancellationToken cancellationToken = default)
         {
-            var response = new RawPrivateDtos.RawMatchResultsResponse(
+            var response = new RawPrivateDtos.GetMatchResultsResponse(
                 "ok",
                 Array.Empty<RawPrivateDtos.RawMatchResultEntry>());
             return Task.FromResult(CreateOkCall(request, response));

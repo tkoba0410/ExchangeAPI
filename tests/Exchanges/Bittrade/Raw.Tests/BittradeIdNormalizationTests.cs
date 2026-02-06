@@ -73,7 +73,7 @@ public sealed class BittradeIdNormalizationTests
         }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPrivateDtos.RawDepositWithdrawEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPrivateDtos.GetDepositWithdrawEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("200", entry!.Id);
@@ -130,7 +130,7 @@ public sealed class BittradeIdNormalizationTests
         { "status": "ok", "data": { "success-count": 1, "failed-count": 0, "next-id": 10 } }
         """;
 
-        var response = JsonSerializer.Deserialize<RawPrivateDtos.RawCancelOpenOrdersResponse>(json);
+        var response = JsonSerializer.Deserialize<RawPrivateDtos.PostOrdersBatchCancelOpenOrdersResponse>(json);
 
         Assert.NotNull(response);
         Assert.NotNull(response!.Data);

@@ -81,128 +81,128 @@ public sealed class BittradeRawApi : IBittradeRawApi
         CancellationToken cancellationToken = default) =>
         _publicApi.GetHistoryTradeCallAsync(request, cancellationToken);
 
-    public Task<Call<GetAccountsRequest, RawAccountsResponse>> GetAccountsCallAsync(
+    public Task<Call<GetAccountsRequest, GetAccountsResponse>> GetAccountsCallAsync(
         GetAccountsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetAccountsCallAsync(request, cancellationToken);
 
-    public Task<Call<GetAccountBalanceRequest, RawBalancesResponse>> GetAccountsBalanceByAccountIdCallAsync(
-        GetAccountBalanceRequest request,
+    public Task<Call<GetAccountsBalanceByAccountIdRequest, GetAccountsBalanceByAccountIdResponse>> GetAccountsBalanceByAccountIdCallAsync(
+        GetAccountsBalanceByAccountIdRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetAccountsBalanceByAccountIdCallAsync(request, cancellationToken);
 
-    public Task<Call<GetOpenOrdersRequest, RawOpenOrdersResponse>> GetOpenOrdersCallAsync(
+    public Task<Call<GetOpenOrdersRequest, GetOpenOrdersResponse>> GetOpenOrdersCallAsync(
         GetOpenOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetOpenOrdersCallAsync(request, cancellationToken);
 
-    public Task<Call<GetOrdersRequest, RawOrdersResponse>> GetOrdersCallAsync(
+    public Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
         GetOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetOrdersCallAsync(request, cancellationToken);
 
-    public Task<Call<GetOrderRequest, RawOrderDetailResponse>> GetOrdersByOrderIdCallAsync(
-        GetOrderRequest request,
+    public Task<Call<GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>> GetOrdersByOrderIdCallAsync(
+        GetOrdersByOrderIdRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetOrdersByOrderIdCallAsync(request, cancellationToken);
 
-    public Task<Call<GetOrderMatchResultsRequest, RawOrderMatchResultsResponse>> GetOrdersMatchResultsByOrderIdCallAsync(
-        GetOrderMatchResultsRequest request,
+    public Task<Call<GetOrdersMatchResultsByOrderIdRequest, GetOrdersMatchResultsByOrderIdResponse>> GetOrdersMatchResultsByOrderIdCallAsync(
+        GetOrdersMatchResultsByOrderIdRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetOrdersMatchResultsByOrderIdCallAsync(request, cancellationToken);
 
-    public Task<Call<GetMatchResultsRequest, RawMatchResultsResponse>> GetMatchResultsCallAsync(
+    public Task<Call<GetMatchResultsRequest, GetMatchResultsResponse>> GetMatchResultsCallAsync(
         GetMatchResultsRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetMatchResultsCallAsync(request, cancellationToken);
 
-    public Task<Call<GetDepositWithdrawsRequest, RawDepositWithdrawsResponse>> GetDepositWithdrawCallAsync(
-        GetDepositWithdrawsRequest request,
+    public Task<Call<GetDepositWithdrawRequest, GetDepositWithdrawResponse>> GetDepositWithdrawCallAsync(
+        GetDepositWithdrawRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetDepositWithdrawCallAsync(request, cancellationToken);
 
-    public Task<Call<GetWithdrawVirtualAddressesRequest, RawWithdrawVirtualAddressesResponse>> GetWithdrawVirtualAddressesCallAsync(
+    public Task<Call<GetWithdrawVirtualAddressesRequest, GetWithdrawVirtualAddressesResponse>> GetWithdrawVirtualAddressesCallAsync(
         GetWithdrawVirtualAddressesRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetWithdrawVirtualAddressesCallAsync(request, cancellationToken);
 
-    public Task<Call<GetRetailOrdersRequest, RawRetailOrdersResponse>> GetRetailOrderListCallAsync(
-        GetRetailOrdersRequest request,
+    public Task<Call<GetRetailOrderListRequest, GetRetailOrderListResponse>> GetRetailOrderListCallAsync(
+        GetRetailOrderListRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetRetailOrderListCallAsync(request, cancellationToken);
 
-    public Task<Call<GetRetailOrderDetailByOrderIdRequest, RawRetailOrderDetailResponse>> GetRetailOrderDetailByOrderIdCallAsync(
+    public Task<Call<GetRetailOrderDetailByOrderIdRequest, GetRetailOrderDetailByOrderIdResponse>> GetRetailOrderDetailByOrderIdCallAsync(
         GetRetailOrderDetailByOrderIdRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetRetailOrderDetailByOrderIdCallAsync(request, cancellationToken);
 
-    public Task<Call<GetRetailAccountBalanceRequest, RawRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
+    public Task<Call<GetRetailAccountBalanceRequest, GetRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
         GetRetailAccountBalanceRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.GetRetailAccountBalanceCallAsync(request, cancellationToken);
 
-    public Task<Call<CreateOrderRequest, RawPlaceOrderResponse>> PostOrdersPlaceCallAsync(
-        CreateOrderRequest request,
+    public Task<Call<PostOrdersPlaceRequest, PostOrdersPlaceResponse>> PostOrdersPlaceCallAsync(
+        PostOrdersPlaceRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostOrdersPlaceCallAsync(request, cancellationToken);
 
-    public Task<Call<CancelOrderRequest, RawCancelOrderResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
-        CancelOrderRequest request,
+    public Task<Call<PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
+        PostOrdersSubmitCancelByOrderIdRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostOrdersSubmitCancelByOrderIdCallAsync(request, cancellationToken);
 
-    public Task<Call<CancelOrdersRequest, RawCancelOrdersResponse>> PostOrdersBatchCancelCallAsync(
-        CancelOrdersRequest request,
+    public Task<Call<PostOrdersBatchCancelRequest, PostOrdersBatchCancelResponse>> PostOrdersBatchCancelCallAsync(
+        PostOrdersBatchCancelRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostOrdersBatchCancelCallAsync(request, cancellationToken);
 
-    public Task<Call<CancelOpenOrdersRequest, RawCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
-        CancelOpenOrdersRequest request,
+    public Task<Call<PostOrdersBatchCancelOpenOrdersRequest, PostOrdersBatchCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
+        PostOrdersBatchCancelOpenOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostOrdersBatchCancelOpenOrdersCallAsync(request, cancellationToken);
 
-    public Task<Call<CreateWithdrawRequest, RawCreateWithdrawResponse>> PostWithdrawApiCreateCallAsync(
-        CreateWithdrawRequest request,
+    public Task<Call<PostWithdrawApiCreateRequest, PostWithdrawApiCreateResponse>> PostWithdrawApiCreateCallAsync(
+        PostWithdrawApiCreateRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostWithdrawApiCreateCallAsync(request, cancellationToken);
 
-    public Task<Call<CreateWithdrawVirtualByAddressIdRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
-        CreateWithdrawVirtualByAddressIdRequest request,
+    public Task<Call<PostWithdrawVirtualByAddressIdCreateRequest, PostWithdrawVirtualByAddressIdCreateResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
+        PostWithdrawVirtualByAddressIdCreateRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostWithdrawVirtualByAddressIdCreateCallAsync(request, cancellationToken);
 
-    public Task<Call<CancelWithdrawRequest, RawCancelWithdrawResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
-        CancelWithdrawRequest request,
+    public Task<Call<PostWithdrawVirtualByWithdrawIdCancelRequest, PostWithdrawVirtualByWithdrawIdCancelResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
+        PostWithdrawVirtualByWithdrawIdCancelRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostWithdrawVirtualByWithdrawIdCancelCallAsync(request, cancellationToken);
 
-    public Task<Call<PlaceWithdrawVirtualRequest, RawCreateWithdrawResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
-        PlaceWithdrawVirtualRequest request,
+    public Task<Call<PostWithdrawVirtualByWithdrawIdPlaceRequest, PostWithdrawVirtualByWithdrawIdPlaceResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
+        PostWithdrawVirtualByWithdrawIdPlaceRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostWithdrawVirtualByWithdrawIdPlaceCallAsync(request, cancellationToken);
 
-    public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderPlaceCallAsync(
-        CreateRetailOrderRequest request,
+    public Task<Call<PostRetailOrderPlaceRequest, PostRetailOrderPlaceResponse>> PostRetailOrderPlaceCallAsync(
+        PostRetailOrderPlaceRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostRetailOrderPlaceCallAsync(request, cancellationToken);
 
-    public Task<Call<CancelRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCancelByOrderIdCallAsync(
-        CancelRetailOrderRequest request,
+    public Task<Call<PostRetailOrderCancelByOrderIdRequest, PostRetailOrderCancelByOrderIdResponse>> PostRetailOrderCancelByOrderIdCallAsync(
+        PostRetailOrderCancelByOrderIdRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostRetailOrderCancelByOrderIdCallAsync(request, cancellationToken);
 
-    public Task<Call<PostRetailOrderHistoryRequest, RawRetailOrdersResponse>> PostRetailOrderHistoryCallAsync(
+    public Task<Call<PostRetailOrderHistoryRequest, PostRetailOrderHistoryResponse>> PostRetailOrderHistoryCallAsync(
         PostRetailOrderHistoryRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostRetailOrderHistoryCallAsync(request, cancellationToken);
 
-    public Task<Call<PostRetailOrderDetailRequest, RawRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
+    public Task<Call<PostRetailOrderDetailRequest, PostRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
         PostRetailOrderDetailRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostRetailOrderDetailCallAsync(request, cancellationToken);
 
-    public Task<Call<CreateRetailOrderRequest, RawRetailOrderResponse>> PostRetailOrderCreateCallAsync(
-        CreateRetailOrderRequest request,
+    public Task<Call<PostRetailOrderCreateRequest, PostRetailOrderCreateResponse>> PostRetailOrderCreateCallAsync(
+        PostRetailOrderCreateRequest request,
         CancellationToken cancellationToken = default) =>
         _privateClient.PostRetailOrderCreateCallAsync(request, cancellationToken);
 }

@@ -90,8 +90,8 @@ public interface IBittradeNormalizedApi
         GetOpenOrdersRequest request,
         CancellationToken ct = default);
 
-    Task<Call<GetOrderRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
-        GetOrderRequest request,
+    Task<Call<GetOrdersByOrderIdRequest, BittradeOrderStatus>> GetOrdersByOrderIdCallAsync(
+        GetOrdersByOrderIdRequest request,
         CancellationToken ct = default);
 
     Task<Call<GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<BittradeExecutionNormalized>>> GetOrdersMatchResultsByOrderIdCallAsync(

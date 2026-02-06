@@ -50,20 +50,20 @@ public interface IBitflyerNormalizedApi
         FreeText? fromDate = null,
         CancellationToken cancellationToken = default);
 
-    Task<Call<PlaceOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(
+    Task<Call<SendChildOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(
         BitflyerOrderRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<CancelOrderRequest, BitflyerCancelResult>> CancelChildOrderCallAsync(
+    Task<Call<CancelChildOrderRequest, BitflyerCancelResult>> CancelChildOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
+    Task<Call<GetChildOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetOrderRequest, BitflyerOrderStatus>> GetChildOrdersCallAsync(
+    Task<Call<GetChildOrdersByOrderKeyRequest, BitflyerOrderStatus>> GetChildOrdersCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default);

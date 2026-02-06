@@ -87,23 +87,23 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         CancellationToken cancellationToken = default) =>
         _publicApi.GetChatsCallAsync(fromDate, cancellationToken);
 
-    public Task<Call<PrivateRequests.PlaceOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(
+    public Task<Call<PrivateRequests.SendChildOrderRequest, BitflyerOrderResult>> SendChildOrderCallAsync(
         PrivateRequests.BitflyerOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.SendChildOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<PrivateRequests.CancelOrderRequest, BitflyerCancelResult>> CancelChildOrderCallAsync(
+    public Task<Call<PrivateRequests.CancelChildOrderRequest, BitflyerCancelResult>> CancelChildOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         _privateApi.CancelChildOrderCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetOpenOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
+    public Task<Call<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetChildOrdersCallAsync(symbol, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetOrderRequest, BitflyerOrderStatus>> GetChildOrdersCallAsync(
+    public Task<Call<PrivateRequests.GetChildOrdersByOrderKeyRequest, BitflyerOrderStatus>> GetChildOrdersCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>

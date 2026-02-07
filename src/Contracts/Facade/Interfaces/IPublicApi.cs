@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Contracts.Facade.Interfaces;
 
@@ -14,23 +13,22 @@ namespace ExchangeApi.Contracts.Facade.Interfaces;
 public interface IPublicApi
 {
     Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
-        Symbol symbol,
+        TickerRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
-        Symbol symbol,
+        BoardRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
-        Symbol symbol,
+        ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        Symbol symbol,
-        PeriodDto period,
-        int? size = null,
+        CandlesticksRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<ExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoAsync(
+        ExchangeInfoRequest request,
         CancellationToken cancellationToken = default);
 }

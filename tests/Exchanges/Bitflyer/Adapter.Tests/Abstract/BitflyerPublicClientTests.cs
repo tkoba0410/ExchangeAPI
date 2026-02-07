@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Primitives.CallCommon;
@@ -56,7 +57,7 @@ public sealed class BitflyerPublicClientTests
         var normalized = BitflyerNormalizedApi.FromRaw(publicApi, markets);
         var client = new BitflyerPublicClient(normalized, exchangeInfo);
 
-        var call = await client.GetTickerAsync(new Symbol("DOGE/JPY"));
+        var call = await client.GetTickerAsync(new TickerRequest(new Symbol("DOGE/JPY")));
         var err = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.TickerResponse>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }

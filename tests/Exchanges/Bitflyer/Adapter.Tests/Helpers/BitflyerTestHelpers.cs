@@ -70,6 +70,7 @@ internal static class BitflyerTestHelpers
         public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
         public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+            ExchangeInfoRequest request,
             CancellationToken cancellationToken = default)
         {
             var meta = CallMeta.CreateInternal("Contracts", "StubExchangeInfoApi");

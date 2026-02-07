@@ -54,9 +54,9 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
     }
 
     public async Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+        ExchangeInfoRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new ExchangeInfoRequest();
         var startedAt = DateTimeOffset.UtcNow;
 
         try

@@ -42,15 +42,15 @@ public sealed class BitflyerPublicClient : IPublicApi, IExchangeClient
     }
 
     public async Task<Call<TickerRequest, CommonTicker>> GetTickerAsync(
-        Symbol symbol,
+        TickerRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new TickerRequest(symbol);
+        var symbol = request.Symbol;
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<TickerRequest, CommonTicker>(
@@ -87,15 +87,15 @@ public sealed class BitflyerPublicClient : IPublicApi, IExchangeClient
     }
 
     public async Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
-        Symbol symbol,
+        BoardRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new BoardRequest(symbol);
+        var symbol = request.Symbol;
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<BoardRequest, BoardResponse>(
@@ -132,15 +132,15 @@ public sealed class BitflyerPublicClient : IPublicApi, IExchangeClient
     }
 
     public async Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
-        Symbol symbol,
+        ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new ExecutionsPublicRequest(symbol);
+        var symbol = request.Symbol;
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<ExecutionsPublicRequest, ExecutionsPublicResponse>(
@@ -177,12 +177,9 @@ public sealed class BitflyerPublicClient : IPublicApi, IExchangeClient
     }
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        Symbol symbol,
-        PeriodDto period,
-        int? size = null,
+        CandlesticksRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new CandlesticksRequest(symbol, period, size);
         return Task.FromResult(NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
             "Contracts",
             BitflyerOperations.MarketData.GetCandlesticks,
@@ -191,8 +188,9 @@ public sealed class BitflyerPublicClient : IPublicApi, IExchangeClient
     }
 
     public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+        ExchangeInfoRequest request,
         CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+        _exchangeInfoApi.GetExchangeInfoAsync(request, cancellationToken);
 
     private static IReadOnlyList<ExecutionsPublicItem> ToExecutionList(
         Symbol symbol,

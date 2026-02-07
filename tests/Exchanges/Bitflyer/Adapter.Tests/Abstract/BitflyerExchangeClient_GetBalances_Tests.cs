@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
@@ -39,7 +40,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var client = CreateClient(raw);
 
             // Act
-            var call = await client.GetBalanceAsync();
+            var call = await client.GetBalanceAsync(new BalanceRequest());
             var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<BalanceResponse>.Ok>(call.Result);
             IReadOnlyList<BalanceEntry> result = ok.Response.Balances;
 
@@ -70,7 +71,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var client = CreateClient(raw);
 
             // Act
-            var call = await client.GetBalanceAsync();
+            var call = await client.GetBalanceAsync(new BalanceRequest());
             var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<BalanceResponse>.Ok>(call.Result);
             IReadOnlyList<BalanceEntry> result = ok.Response.Balances;
 

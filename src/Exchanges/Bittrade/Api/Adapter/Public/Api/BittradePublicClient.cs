@@ -6,7 +6,6 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
-using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
@@ -50,30 +49,29 @@ public sealed class BittradePublicClient : IPublicApi, IExchangeClient
     }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
-        CommonSymbol symbol,
+        TickerRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerAsync(symbol, cancellationToken);
+        _marketApi.GetTickerAsync(request.Symbol, cancellationToken);
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
-        CommonSymbol symbol,
+        BoardRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardAsync(symbol, cancellationToken);
+        _marketApi.GetBoardAsync(request.Symbol, cancellationToken);
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
-        CommonSymbol symbol,
+        ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicAsync(symbol, cancellationToken);
+        _marketApi.GetExecutionsPublicAsync(request.Symbol, cancellationToken);
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        CommonSymbol symbol,
-        PeriodDto period,
-        int? size = null,
+        CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetCandlesticksAsync(symbol, period, size, cancellationToken);
+        _marketApi.GetCandlesticksAsync(request.Symbol, request.Period, request.Size, cancellationToken);
 
     public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+        ExchangeInfoRequest request,
         CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+        _exchangeInfoApi.GetExchangeInfoAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

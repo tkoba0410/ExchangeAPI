@@ -42,9 +42,9 @@ public sealed class JsonExchangeInfoApi : IPublicApi
     }
 
     public async Task<Call<ExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoAsync(
+        ExchangeInfoRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new ExchangeInfoRequest();
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -85,10 +85,9 @@ public sealed class JsonExchangeInfoApi : IPublicApi
     }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
-        Symbol symbol,
+        TickerRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new TickerRequest(symbol);
         return Task.FromResult(NotSupportedCall.Create<TickerRequest, TickerResponse>(
             "Contracts",
             "JsonExchangeInfo",
@@ -97,10 +96,9 @@ public sealed class JsonExchangeInfoApi : IPublicApi
     }
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
-        Symbol symbol,
+        BoardRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new BoardRequest(symbol);
         return Task.FromResult(NotSupportedCall.Create<BoardRequest, BoardResponse>(
             "Contracts",
             "JsonExchangeInfo",
@@ -109,10 +107,9 @@ public sealed class JsonExchangeInfoApi : IPublicApi
     }
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
-        Symbol symbol,
+        ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new ExecutionsPublicRequest(symbol);
         return Task.FromResult(NotSupportedCall.Create<ExecutionsPublicRequest, ExecutionsPublicResponse>(
             "Contracts",
             "JsonExchangeInfo",
@@ -121,12 +118,9 @@ public sealed class JsonExchangeInfoApi : IPublicApi
     }
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        Symbol symbol,
-        PeriodDto period,
-        int? size = null,
+        CandlesticksRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new CandlesticksRequest(symbol, period, size);
         return Task.FromResult(NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
             "Contracts",
             "JsonExchangeInfo",

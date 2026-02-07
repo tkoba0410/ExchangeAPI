@@ -81,6 +81,7 @@ public sealed class BittradeErrorEnrichTests
         public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
         public Task<Call<ContractsRequests.ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+            ContractsRequests.ExchangeInfoRequest request,
             CancellationToken cancellationToken = default) =>
             Task.FromResult(new Call<ContractsRequests.ExchangeInfoRequest, ExchangeInfoDto>(
                 CallId.New(),

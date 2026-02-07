@@ -55,7 +55,7 @@ internal sealed class MarketApi
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<TickerRequest, TickerResponse>(
@@ -100,7 +100,7 @@ internal sealed class MarketApi
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<BoardRequest, BoardResponse>(
@@ -145,7 +145,7 @@ internal sealed class MarketApi
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<ExecutionsPublicRequest, ExecutionsPublicResponse>(
@@ -210,7 +210,7 @@ internal sealed class MarketApi
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<CandlesticksRequest, CandlesticksResponse>(

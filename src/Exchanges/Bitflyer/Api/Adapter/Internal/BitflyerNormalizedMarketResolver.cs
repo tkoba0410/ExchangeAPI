@@ -21,8 +21,8 @@ internal sealed class BitflyerNormalizedMarketResolver : IBitflyerMarketResolver
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var innerCall = await _inner.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         var request = new ResolveBitflyerMarketRequest(symbol);
+        var innerCall = await _inner.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
 
         if (innerCall.Result is CallResult<ExchangeMarketInfo>.Err err)
         {

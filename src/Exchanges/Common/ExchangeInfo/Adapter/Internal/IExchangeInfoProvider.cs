@@ -9,5 +9,6 @@ namespace ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 internal interface IExchangeInfoProvider
 {
     Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+        ExchangeInfoRequest request,
         CancellationToken cancellationToken = default);
 }

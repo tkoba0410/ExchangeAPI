@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
 using ExchangeApi.Primitives.CallCommon;
@@ -18,7 +19,7 @@ public class BittradeExchangeInfoApiTests
     {
         var api = new BittradeExchangeInfoApi(new BittradeNormalizedPublicApi(new StubRawApi()));
 
-        var call = await api.GetExchangeInfoAsync();
+        var call = await api.GetExchangeInfoAsync(new ExchangeInfoRequest());
         var ok = Assert.IsType<CallResult<ExchangeInfoDto>.Ok>(call.Result);
         var info = ok.Response;
 

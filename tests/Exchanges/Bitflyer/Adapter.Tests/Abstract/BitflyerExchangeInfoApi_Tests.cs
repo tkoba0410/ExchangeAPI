@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
 using Xunit;
 
@@ -11,7 +12,7 @@ public class BitflyerExchangeInfoApi_Tests
     {
         var api = new BitflyerExchangeInfoApi();
 
-        var call = await api.GetExchangeInfoAsync();
+        var call = await api.GetExchangeInfoAsync(new ExchangeInfoRequest());
         var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse>.Ok>(call.Result);
         var info = ok.Response;
 

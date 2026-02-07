@@ -66,42 +66,41 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
 
     // Market
     public Task<Call<TickerRequest, CommonTicker>> GetTickerAsync(
-        Symbol symbol,
+        TickerRequest request,
         CancellationToken cancellationToken = default) =>
-        GetTickerInternalAsync(symbol, cancellationToken);
+        GetTickerInternalAsync(request, cancellationToken);
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
-        Symbol symbol,
+        BoardRequest request,
         CancellationToken cancellationToken = default) =>
-        GetBoardInternalAsync(symbol, cancellationToken);
+        GetBoardInternalAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
-        Symbol symbol,
+        ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
-        GetExecutionsPublicInternalAsync(symbol, cancellationToken);
+        GetExecutionsPublicInternalAsync(request, cancellationToken);
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        Symbol symbol,
-        PeriodDto period,
-        int? size = null,
+        CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
-        GetCandlesticksInternalAsync(symbol, period, size, cancellationToken);
+        GetCandlesticksInternalAsync(request, cancellationToken);
 
     // ExchangeInfo
     public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+        ExchangeInfoRequest request,
         CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+        _exchangeInfoApi.GetExchangeInfoAsync(request, cancellationToken);
 
     private async Task<Call<TickerRequest, CommonTicker>> GetTickerInternalAsync(
-        Symbol symbol,
+        TickerRequest request,
         CancellationToken cancellationToken)
     {
-        var request = new TickerRequest(symbol);
+        var symbol = request.Symbol;
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<TickerRequest, CommonTicker>(
@@ -138,15 +137,15 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
     }
 
     private async Task<Call<BoardRequest, BoardResponse>> GetBoardInternalAsync(
-        Symbol symbol,
+        BoardRequest request,
         CancellationToken cancellationToken)
     {
-        var request = new BoardRequest(symbol);
+        var symbol = request.Symbol;
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<BoardRequest, BoardResponse>(
@@ -183,15 +182,15 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
     }
 
     private async Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicInternalAsync(
-        Symbol symbol,
+        ExecutionsPublicRequest request,
         CancellationToken cancellationToken)
     {
-        var request = new ExecutionsPublicRequest(symbol);
+        var symbol = request.Symbol;
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
-            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
                 return MarketResolutionError<ExecutionsPublicRequest, ExecutionsPublicResponse>(
@@ -228,12 +227,9 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
     }
 
     private Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksInternalAsync(
-        Symbol symbol,
-        PeriodDto period,
-        int? size,
+        CandlesticksRequest request,
         CancellationToken cancellationToken)
     {
-        var request = new CandlesticksRequest(symbol, period, size);
         return Task.FromResult(NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
             "Contracts",
             BitflyerOperations.MarketData.GetCandlesticks,
@@ -298,21 +294,18 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
 
     // Trading
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
-        Symbol symbol,
-        ContractSide side,
-        Size size,
-        Price price,
+        OrderLimitRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.OrderLimitAsync(symbol, side, size, price, cancellationToken);
+        _privateApi.OrderLimitAsync(request.Symbol, request.Side, request.Size, request.Price, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
-        Symbol symbol,
-        OrderKey orderKey,
+        CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
+        _privateApi.CancelOrderAsync(request.Symbol, request.OrderKey, cancellationToken);
 
     // Account
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
+        BalanceRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetBalanceAsync(cancellationToken);
 

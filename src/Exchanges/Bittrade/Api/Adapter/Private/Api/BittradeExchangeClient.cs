@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
-using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
@@ -95,49 +92,45 @@ public sealed class BittradeExchangeClient : IPublicApi, IPrivateApi, IExchangeC
     }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
-        CommonSymbol symbol,
+        TickerRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerAsync(symbol, cancellationToken);
+        _marketApi.GetTickerAsync(request.Symbol, cancellationToken);
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
-        CommonSymbol symbol,
+        BoardRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardAsync(symbol, cancellationToken);
+        _marketApi.GetBoardAsync(request.Symbol, cancellationToken);
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
-        CommonSymbol symbol,
+        ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicAsync(symbol, cancellationToken);
+        _marketApi.GetExecutionsPublicAsync(request.Symbol, cancellationToken);
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        CommonSymbol symbol,
-        PeriodDto period,
-        int? size = null,
+        CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetCandlesticksAsync(symbol, period, size, cancellationToken);
+        _marketApi.GetCandlesticksAsync(request.Symbol, request.Period, request.Size, cancellationToken);
 
     // ExchangeInfo
     public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+        ExchangeInfoRequest request,
         CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+        _exchangeInfoApi.GetExchangeInfoAsync(request, cancellationToken);
 
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
+        BalanceRequest request,
         CancellationToken cancellationToken = default) =>
         _accountApi.GetBalanceAsync(cancellationToken);
 
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
-        CommonSymbol symbol,
-        Side side,
-        Size size,
-        Price price,
+        OrderLimitRequest request,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.OrderLimitAsync(symbol, side, size, price, cancellationToken);
+        _tradingApi.OrderLimitAsync(request.Symbol, request.Side, request.Size, request.Price, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
-        CommonSymbol symbol,
-        OrderKey orderKey,
+        CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
+        _tradingApi.CancelOrderAsync(request.Symbol, request.OrderKey, cancellationToken);
 
     // SpotHistory
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(

@@ -19,18 +19,18 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         _exchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
 
     public async Task<Call<ResolveExchangeMarketRequest, ExchangeMarketInfo>> ResolveCallAsync(
-        Symbol symbol,
-        CancellationToken ct = default)
+        ResolveExchangeMarketRequest request,
+        CancellationToken cancellationToken = default)
     {
-        var request = new ResolveExchangeMarketRequest(symbol);
         var startedAt = DateTimeOffset.UtcNow;
+        var symbol = request.Symbol;
 
         if (symbol.IsEmpty)
         {
             return ErrorCall(request, startedAt, new CallError(CallErrorKind.Semantic, "symbol is required."));
         }
 
-        var exchangeInfoCall = await _exchangeInfo.GetExchangeInfoAsync(ct).ConfigureAwait(false);
+        var exchangeInfoCall = await _exchangeInfo.GetExchangeInfoAsync(new ExchangeInfoRequest(), cancellationToken).ConfigureAwait(false);
         if (exchangeInfoCall.Result is CallResult<ExchangeInfoDto>.Err err)
         {
             return ErrorFromChild(request, exchangeInfoCall, err.Error);

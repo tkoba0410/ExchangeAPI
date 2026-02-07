@@ -19,8 +19,6 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api.Get;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api.Post;
 using ExchangeApi.Primitives.Errors;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
 
@@ -31,8 +29,7 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
 {
     private readonly IBitflyerNormalizedApi _normalized;
     private readonly IExchangeMarketResolver _markets;
-    private readonly BitflyerPrivatePostApi _privatePostApi;
-    private readonly BitflyerPrivateGetApi _privateGetApi;
+    private readonly BitflyerPrivateApi _privateApi;
     private readonly BitflyerExchangeInfoApi _exchangeInfoApi;
     internal BitflyerApiBundle? ApiBundle { get; }
     // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
@@ -47,8 +44,7 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         _normalized = normalized;
         _exchangeInfoApi = new BitflyerExchangeInfoApi(normalized);
         _markets = new ExchangeInfoMarketResolver(_exchangeInfoApi);
-        _privatePostApi = new BitflyerPrivatePostApi(normalized);
-        _privateGetApi = new BitflyerPrivateGetApi(normalized);
+        _privateApi = new BitflyerPrivateApi(normalized);
     }
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
@@ -57,8 +53,7 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         _normalized = bundle.Normalized;
         _markets = bundle.Markets;
         _exchangeInfoApi = bundle.ExchangeInfo;
-        _privatePostApi = new BitflyerPrivatePostApi(bundle.Normalized);
-        _privateGetApi = new BitflyerPrivateGetApi(bundle.Normalized);
+        _privateApi = new BitflyerPrivateApi(bundle.Normalized);
         ApiBundle = bundle;
     }
 
@@ -308,29 +303,29 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         Size size,
         Price price,
         CancellationToken cancellationToken = default) =>
-        _privatePostApi.OrderLimitAsync(symbol, side, size, price, cancellationToken);
+        _privateApi.OrderLimitAsync(symbol, side, size, price, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
-        _privatePostApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
+        _privateApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
 
     // Account
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         CancellationToken cancellationToken = default) =>
-        _privateGetApi.GetBalanceAsync(cancellationToken);
+        _privateApi.GetBalanceAsync(cancellationToken);
 
     // SpotHistory
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
         OrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateGetApi.GetOrdersAsync(request, cancellationToken);
+        _privateApi.GetOrdersAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateGetApi.GetExecutionsPrivateAsync(request, cancellationToken);
+        _privateApi.GetExecutionsPrivateAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

@@ -77,8 +77,9 @@
 
 * `docs/process.md`
 * `docs/document-plan.md`
+* `docs/utilities.md`
 
-これらの文書は TopSpec および Governance に反しない範囲でのみ有効です。
+これらの文書は TopSpec / Contracts / Governance に反しない範囲でのみ有効です。
 
 ---
 

@@ -27,7 +27,9 @@
 本リポジトリの文書は、次の種類に限定する（新カテゴリの増設は禁止）。
 
 ### 2.1 Normative（規範）
-- `docs/topspec.md`：最上位規範（層・境界・禁止事項）
+- `docs/topspec.md`：技術仕様・設計規範の正本（層・境界・禁止事項）
+- `docs/contracts/contracts.md`：公開 API 契約の正本（Contract 層）
+- `docs/governance.md`：設計判断の裁定ルールの正本
 
 ### 2.2 Inventory（事実一覧）
 - `docs/inventory/endpoints-<exchange>.md`：取引所別インベントリ
@@ -45,8 +47,9 @@
 ### 2.4 Process（運用）
 - 本書：文書化ルール・レビュー手順・例外運用
 
-#### 2.4.1 Governance（運用補助・配置のみ）
-`docs/governance.md` は **新しい文書カテゴリではない**。Process（運用）の一部として扱う。
+#### 2.4.1 Governance（補足）
+`docs/governance.md` 自体は「裁定ルールの正本」であり、文書カテゴリとしては追加しない。
+運用上は Process と密接に扱うが、内容の優先順位は Normative に従う。
 
 - 目的：特定スコープの「揺らぎ止め」を、短いルールで固定する（例：Exchanges 配下のみの統一）
 - 禁止：仕様本文の写経、実装手順の解説、TopSpec の代替

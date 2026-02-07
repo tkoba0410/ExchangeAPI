@@ -231,8 +231,8 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
 
     private static BittradeDynamicMarketInfo MapDynamicMarket(SymbolNormalized symbol)
     {
-        var baseCurrency = symbol.BaseCurrency.Value;
-        var quoteCurrency = symbol.QuoteCurrency.Value;
+        var baseCurrency = CurrencyCodeConverter.ToCurrencyString(symbol.BaseCurrency);
+        var quoteCurrency = CurrencyCodeConverter.ToCurrencyString(symbol.QuoteCurrency);
         var displaySymbol = $"{baseCurrency.ToUpperInvariant()}/{quoteCurrency.ToUpperInvariant()}";
         if (!ExchangeSymbol.TryParse(symbol.Symbol.Value, out var parsed))
         {
@@ -246,7 +246,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         var sizeIncrement = Pow10(-symbol.AmountPrecision);
         var minSize = symbol.MinOrderAmount;
         var minNotional = symbol.MinOrderValue;
-        var supported = string.Equals(symbol.State.Value, "online", StringComparison.OrdinalIgnoreCase);
+        var supported = symbol.State.IsKnown && symbol.State.Known == ExchangeSymbolState.Online;
 
         return new BittradeDynamicMarketInfo
         {
@@ -258,7 +258,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
             PriceIncrement = priceIncrement,
             SizeIncrement = sizeIncrement,
             IsSupported = supported,
-            StatusNote = symbol.State.Value
+            StatusNote = symbol.State.ToString()
         };
     }
 

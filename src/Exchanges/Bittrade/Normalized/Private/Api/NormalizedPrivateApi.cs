@@ -49,7 +49,7 @@ internal sealed class NormalizedPrivateApi
         var rawCall = await _trading
             .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountsBalanceByAccountIdRequest(new AccountId(_accountId.Value)), ct)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetAccountsBalanceByAccountIdRequest(_accountId);
+        var request = new NormalizedRequests.GetAccountsBalanceByAccountIdRequest(new AccountId(_accountId.Value));
 
         return CreateCall(
             rawCall,
@@ -109,8 +109,8 @@ internal sealed class NormalizedPrivateApi
 
         var rawCall = await _trading
             .GetDepositWithdrawCallAsync(new RawPrivateRequests.GetDepositWithdrawRequest(
-                request.Type,
-                request.Currency,
+                new FreeText(request.Type.ToString()),
+                request.Currency.HasValue ? new FreeText(CurrencyCodeConverter.ToCurrencyString(request.Currency.Value)) : null,
                 request.From,
                 request.Size,
                 request.Direct), ct)

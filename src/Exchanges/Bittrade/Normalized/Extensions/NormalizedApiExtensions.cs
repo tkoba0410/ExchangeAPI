@@ -9,6 +9,8 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
+using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Extensions;
 
@@ -16,8 +18,8 @@ public static class NormalizedApiExtensions
 {
     public static Task<Call<GetDepositWithdrawRequest, IReadOnlyList<DepositWithdrawNormalized>>> GetDepositWithdrawCallAsync(
         this IBittradeNormalizedApi api,
-        FreeText type,
-        FreeText? currency = null,
+        Closed<ExchangeDepositWithdrawType> type,
+        CurrencyCode? currency = null,
         long? from = null,
         int? size = null,
         FreeText? direct = null,

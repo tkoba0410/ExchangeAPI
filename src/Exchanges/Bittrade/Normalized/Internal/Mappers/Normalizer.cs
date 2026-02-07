@@ -7,7 +7,9 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
 using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
 using RawPublicDtos = ExchangeApi.Exchanges.Bittrade.Raw.Public.Dtos;
@@ -139,13 +141,13 @@ internal static class Normalizer
 
             mapped.Add(new SymbolNormalized(
                 Symbol: Symbol.Parse(symbol.Symbol),
-                BaseCurrency: FreeText.Parse(symbol.BaseCurrency),
-                QuoteCurrency: FreeText.Parse(symbol.QuoteCurrency),
+                BaseCurrency: CurrencyCodeConverter.FromString(symbol.BaseCurrency),
+                QuoteCurrency: CurrencyCodeConverter.FromString(symbol.QuoteCurrency),
                 PricePrecision: symbol.PricePrecision,
                 AmountPrecision: symbol.AmountPrecision,
                 MinOrderAmount: minOrderAmount,
                 MinOrderValue: minOrderValue,
-                State: FreeText.Parse(symbol.State)));
+                State: ParseSymbolState(symbol.State)));
         }
 
         normalized = mapped;
@@ -249,8 +251,8 @@ internal static class Normalizer
             }
 
             mapped.Add(new BalanceEntryNormalized(
-                FreeText.Parse(entry.Currency),
-                FreeText.Parse(entry.Type),
+                CurrencyCodeConverter.FromString(entry.Currency),
+                ParseBalanceType(entry.Type),
                 balance));
         }
 
@@ -275,10 +277,10 @@ internal static class Normalizer
 
             normalized = accounts
                 .Select(account => new AccountNormalized(
-                    FreeText.Parse(account.Id),
-                    FreeText.Parse(account.Type),
-                    ParseOptional(account.SubType),
-                    FreeText.Parse(account.State)))
+                    AccountId: AccountId.Parse(account.Id),
+                    Type: ParseAccountType(account.Type),
+                    SubType: ParseAccountSubType(account.SubType),
+                    State: ParseAccountState(account.State)))
                 .ToList();
             error = null;
             return true;
@@ -307,13 +309,13 @@ internal static class Normalizer
 
             normalized = entries
                 .Select(entry => new DepositWithdrawNormalized(
-                    FreeText.Parse(entry.Id),
-                    FreeText.Parse(entry.Type),
-                    FreeText.Parse(entry.Currency),
+                    TransactionId: TransactionId.Parse(entry.Id),
+                    Type: ParseDepositWithdrawType(entry.Type),
+                    Currency: CurrencyCodeConverter.FromString(entry.Currency),
                     entry.Amount,
                     ParseOptional(entry.Address),
                     ParseOptional(entry.TxHash),
-                    ParseOptional(entry.State),
+                    ParseDepositWithdrawState(entry.State),
                     entry.CreatedAt))
                 .ToList();
             error = null;
@@ -534,6 +536,76 @@ internal static class Normalizer
 
     private static FreeText? ParseOptional(string? value) =>
         FreeText.TryParse(value, out var text) ? text : null;
+
+    private static Closed<ExchangeSymbolState> ParseSymbolState(string? state) =>
+        (state ?? string.Empty).ToLowerInvariant() switch
+        {
+            "online" => Closed<ExchangeSymbolState>.KnownValue(ExchangeSymbolState.Online),
+            "offline" => Closed<ExchangeSymbolState>.KnownValue(ExchangeSymbolState.Offline),
+            _ => Closed<ExchangeSymbolState>.UnknownValue(state ?? string.Empty),
+        };
+
+    private static Closed<ExchangeBalanceType> ParseBalanceType(string? type) =>
+        (type ?? string.Empty).ToLowerInvariant() switch
+        {
+            "trade" => Closed<ExchangeBalanceType>.KnownValue(ExchangeBalanceType.Trade),
+            "frozen" => Closed<ExchangeBalanceType>.KnownValue(ExchangeBalanceType.Frozen),
+            _ => Closed<ExchangeBalanceType>.UnknownValue(type ?? string.Empty),
+        };
+
+    private static Closed<ExchangeAccountType> ParseAccountType(string? type) =>
+        (type ?? string.Empty).ToLowerInvariant() switch
+        {
+            "spot" => Closed<ExchangeAccountType>.KnownValue(ExchangeAccountType.Spot),
+            _ => Closed<ExchangeAccountType>.UnknownValue(type ?? string.Empty),
+        };
+
+    private static Closed<ExchangeAccountSubType>? ParseAccountSubType(string? subType)
+    {
+        if (string.IsNullOrWhiteSpace(subType))
+        {
+            return null;
+        }
+
+        return subType.ToLowerInvariant() switch
+        {
+            "main" => Closed<ExchangeAccountSubType>.KnownValue(ExchangeAccountSubType.Main),
+            _ => Closed<ExchangeAccountSubType>.UnknownValue(subType),
+        };
+    }
+
+    private static Closed<ExchangeAccountState> ParseAccountState(string? state) =>
+        (state ?? string.Empty).ToLowerInvariant() switch
+        {
+            "working" => Closed<ExchangeAccountState>.KnownValue(ExchangeAccountState.Working),
+            _ => Closed<ExchangeAccountState>.UnknownValue(state ?? string.Empty),
+        };
+
+    private static Closed<ExchangeDepositWithdrawType> ParseDepositWithdrawType(string? type) =>
+        (type ?? string.Empty).ToLowerInvariant() switch
+        {
+            "deposit" => Closed<ExchangeDepositWithdrawType>.KnownValue(ExchangeDepositWithdrawType.Deposit),
+            "withdraw" => Closed<ExchangeDepositWithdrawType>.KnownValue(ExchangeDepositWithdrawType.Withdraw),
+            _ => Closed<ExchangeDepositWithdrawType>.UnknownValue(type ?? string.Empty),
+        };
+
+    private static Closed<ExchangeDepositWithdrawState>? ParseDepositWithdrawState(string? state)
+    {
+        if (string.IsNullOrWhiteSpace(state))
+        {
+            return null;
+        }
+
+        return state.ToLowerInvariant() switch
+        {
+            "submitted" => Closed<ExchangeDepositWithdrawState>.KnownValue(ExchangeDepositWithdrawState.Submitted),
+            "processing" => Closed<ExchangeDepositWithdrawState>.KnownValue(ExchangeDepositWithdrawState.Processing),
+            "completed" => Closed<ExchangeDepositWithdrawState>.KnownValue(ExchangeDepositWithdrawState.Completed),
+            "canceled" => Closed<ExchangeDepositWithdrawState>.KnownValue(ExchangeDepositWithdrawState.Canceled),
+            "failed" => Closed<ExchangeDepositWithdrawState>.KnownValue(ExchangeDepositWithdrawState.Failed),
+            _ => Closed<ExchangeDepositWithdrawState>.UnknownValue(state),
+        };
+    }
 
     private static bool TryParseDecimalFlexible(
         string? value,

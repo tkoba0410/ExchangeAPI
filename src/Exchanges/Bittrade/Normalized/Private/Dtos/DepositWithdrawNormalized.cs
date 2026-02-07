@@ -1,14 +1,17 @@
 using System;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
+using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 
 public sealed record DepositWithdrawNormalized(
-    FreeText Id,
-    FreeText Type,
-    FreeText Currency,
+    TransactionId TransactionId,
+    Closed<ExchangeDepositWithdrawType> Type,
+    CurrencyCode Currency,
     decimal Amount,
     FreeText? Address,
     FreeText? TxHash,
-    FreeText? State,
+    Closed<ExchangeDepositWithdrawState>? State,
     DateTimeOffset? CreatedAt);

@@ -1,6 +1,6 @@
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 
-internal enum ExchangeOrderState
+public enum ExchangeOrderState
 {
     Submitted,
     PartialFilled,

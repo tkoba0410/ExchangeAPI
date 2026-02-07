@@ -12,6 +12,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
+using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 
@@ -307,11 +308,11 @@ internal static class TradingMapper
             mapped.Add(new OrderSummaryNormalized(
                 OrderId: new OrderId(entry.Id),
                 Symbol: Symbol.Parse(entry.Symbol),
-                AccountId: FreeText.Parse(entry.AccountId),
+                AccountId: AccountId.Parse(entry.AccountId),
                 Amount: amount,
                 Price: price,
-                State: FreeText.Parse(entry.State),
-                Type: FreeText.Parse(entry.Type),
+                State: ParseOrderStateClosed(entry.State),
+                Type: ParseOrderTypeClosed(entry.Type),
                 ClientOrderId: ParseOptional(entry.ClientOrderId),
                 CreatedAt: entry.CreatedAt,
                 FilledAmount: filled));
@@ -693,6 +694,20 @@ internal static class TradingMapper
         }
     }
 
+    private static Closed<ExchangeOrderType> ParseOrderTypeClosed(string? type) =>
+        (type ?? string.Empty) switch
+        {
+            "buy-limit" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.BuyLimit),
+            "sell-limit" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.SellLimit),
+            "buy-market" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.BuyMarket),
+            "sell-market" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.SellMarket),
+            "buy-limit-maker" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.BuyLimitMaker),
+            "sell-limit-maker" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.SellLimitMaker),
+            "buy-ioc" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.BuyIoc),
+            "sell-ioc" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.SellIoc),
+            _ => Closed<ExchangeOrderType>.UnknownValue(type ?? string.Empty),
+        };
+
     private static bool TryParseOrderState(string state, out ExchangeOrderState parsed, out CallError? error)
     {
         switch (state)
@@ -723,6 +738,18 @@ internal static class TradingMapper
                 return false;
         }
     }
+
+    private static Closed<ExchangeOrderState> ParseOrderStateClosed(string? state) =>
+        (state ?? string.Empty) switch
+        {
+            "submitted" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.Submitted),
+            "partial-filled" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.PartialFilled),
+            "filled" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.Filled),
+            "partial-canceled" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.PartialCanceled),
+            "canceled" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.Canceled),
+            _ => Closed<ExchangeOrderState>.UnknownValue(state ?? string.Empty),
+        };
+
     private static string FormatDecimal(decimal value) =>
         value.ToString(CultureInfo.InvariantCulture);
 

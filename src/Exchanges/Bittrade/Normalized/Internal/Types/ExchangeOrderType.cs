@@ -1,6 +1,6 @@
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 
-internal enum ExchangeOrderType
+public enum ExchangeOrderType
 {
     BuyLimit,
     SellLimit,

@@ -1,16 +1,18 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
+using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 
 public sealed record OrderSummaryNormalized(
     OrderId OrderId,
     Symbol Symbol,
-    FreeText AccountId,
+    AccountId AccountId,
     decimal Amount,
     decimal? Price,
-    FreeText State,
-    FreeText Type,
+    Closed<ExchangeOrderState> State,
+    Closed<ExchangeOrderType> Type,
     FreeText? ClientOrderId,
     DateTimeOffset CreatedAt,
     decimal FilledAmount);

@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Mappers;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;

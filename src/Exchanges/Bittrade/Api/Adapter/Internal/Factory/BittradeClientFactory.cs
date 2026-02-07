@@ -1,8 +1,8 @@
 using System;
 using System.Net.Http;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Mappers;
-using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;

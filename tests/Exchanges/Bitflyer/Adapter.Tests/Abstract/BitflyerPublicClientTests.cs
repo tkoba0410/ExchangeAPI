@@ -5,8 +5,8 @@ using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
-using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
 

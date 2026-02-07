@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;

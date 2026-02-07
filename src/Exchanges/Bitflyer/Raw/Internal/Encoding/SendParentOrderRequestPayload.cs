@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 
-internal sealed class RawSendParentOrderRequest
+internal sealed class SendParentOrderRequestPayload
 {
     [JsonPropertyName("order_method")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -17,11 +17,11 @@ internal sealed class RawSendParentOrderRequest
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? TimeInForce { get; init; }
 
-    [JsonPropertyName("parameters")] public IReadOnlyList<RawSendParentOrderParameter> Parameters { get; init; }
-        = new List<RawSendParentOrderParameter>();
+    [JsonPropertyName("parameters")] public IReadOnlyList<SendParentOrderRequestPayloadItem> Parameters { get; init; }
+        = new List<SendParentOrderRequestPayloadItem>();
 }
 
-internal sealed class RawSendParentOrderParameter
+internal sealed class SendParentOrderRequestPayloadItem
 {
     [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
     [JsonPropertyName("condition_type")] public string ConditionType { get; init; } = string.Empty;

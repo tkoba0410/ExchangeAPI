@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 
-internal sealed class RawSendChildOrderRequest
+internal sealed class SendChildOrderRequestPayload
 {
     [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
     [JsonPropertyName("child_order_type")] public string ChildOrderType { get; init; } = string.Empty;

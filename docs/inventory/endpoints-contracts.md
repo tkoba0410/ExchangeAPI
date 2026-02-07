@@ -69,7 +69,7 @@
 | public        | Ticker               | GetTickerAsync                | Symbol     | TickerRequest               | TickerResponse                 | Contracts | GetTicker            | GetDetailMerged    |              |
 | public        | Board                | GetBoardAsync                 | Symbol     | BoardRequest                | BoardResponse                  | Contracts | GetBoard             | GetDepth           |              |
 | public        | ExecutionsPublic     | GetExecutionsPublicAsync      | Symbol     | ExecutionsPublicRequest     | ExecutionsPublicResponse       | Contracts | GetExecutionsPublic  | GetTrade           |              |
-| public        | Candlestick          | GetCandlesticksAsync          | Symbol, Period, int? | CandlesticksRequest        | CandlesticksResponse           | None      | None                 | GetHistoryKline    | Planned (no Contracts API yet) |
+| public        | Candlestick          | GetCandlesticksAsync          | Symbol, PeriodDto, int? | CandlesticksRequest     | CandlesticksResponse           | Contracts | None                 | GetHistoryKline    | Bitflyer NotSupported           |
 
 ---
 

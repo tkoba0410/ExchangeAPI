@@ -96,6 +96,13 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         CancellationToken cancellationToken = default) =>
         _marketApi.GetExecutionsPublicAsync(symbol, cancellationToken);
 
+    public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
+        Symbol symbol,
+        PeriodDto period,
+        int? size = null,
+        CancellationToken cancellationToken = default) =>
+        _marketApi.GetCandlesticksAsync(symbol, period, size, cancellationToken);
+
     // ExchangeInfo
     public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
         CancellationToken cancellationToken = default) =>

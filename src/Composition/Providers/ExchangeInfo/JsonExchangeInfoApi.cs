@@ -120,6 +120,20 @@ public sealed class JsonExchangeInfoApi : IPublicApi
             "MarketExecutions"));
     }
 
+    public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
+        Symbol symbol,
+        PeriodDto period,
+        int? size = null,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new CandlesticksRequest(symbol, period, size);
+        return Task.FromResult(NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
+            "Contracts",
+            "JsonExchangeInfo",
+            request,
+            "Candlesticks"));
+    }
+
     private ExchangeInfoDto GetCachedInfo()
     {
         lock (_sync)

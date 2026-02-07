@@ -25,6 +25,12 @@ public interface IPublicApi
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
+    Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
+        Symbol symbol,
+        PeriodDto period,
+        int? size = null,
+        CancellationToken cancellationToken = default);
+
     Task<Call<ExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoAsync(
         CancellationToken cancellationToken = default);
 }

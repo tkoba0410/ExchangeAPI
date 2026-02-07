@@ -5,6 +5,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Constants;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Utilities.OrderBook;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
@@ -51,6 +52,38 @@ internal static class BittradeMarketMapper
             ExecutedAt: normalized.Timestamp);
     }
 
+    public static IReadOnlyList<Candlestick> MapCandlesticks(
+        CommonSymbol symbol,
+        PeriodDto period,
+        IReadOnlyList<BittradeKlineNormalized> klines)
+    {
+        if (!BittradeCandlestickPeriods.TryGetTimescale(period.Code, out var timescale))
+        {
+            throw new ExchangeApiException($"Unsupported candlestick period: {period.Code}");
+        }
+
+        return klines
+            .Select(kline =>
+            {
+                var openTime = ParseUnixTimestamp(kline.Id);
+                var closeTime = openTime + timescale;
+                return new Candlestick(
+                    Symbol: symbol,
+                    Timescale: timescale,
+                    OpenTime: openTime,
+                    CloseTime: closeTime,
+                    Open: kline.Open,
+                    High: kline.High,
+                    Low: kline.Low,
+                    Close: kline.Close,
+                    Volume: kline.Volume,
+                    IsFinal: true,
+                    QuoteVolume: kline.Amount,
+                    NumberOfTrades: kline.Count);
+            })
+            .ToList();
+    }
+
     private static Side MapSide(BittradeOrderSide side) =>
         side switch
         {
@@ -58,4 +91,16 @@ internal static class BittradeMarketMapper
             BittradeOrderSide.Sell => Side.Sell,
             _ => throw new ExchangeApiException($"Unsupported side: {side}.")
         };
+
+    private static DateTimeOffset ParseUnixTimestamp(FreeText id)
+    {
+        if (!long.TryParse(id.Value, out var unixValue))
+        {
+            throw new ExchangeApiException($"Invalid candlestick timestamp: {id.Value}");
+        }
+
+        return unixValue >= 10_000_000_000
+            ? DateTimeOffset.FromUnixTimeMilliseconds(unixValue)
+            : DateTimeOffset.FromUnixTimeSeconds(unixValue);
+    }
 }

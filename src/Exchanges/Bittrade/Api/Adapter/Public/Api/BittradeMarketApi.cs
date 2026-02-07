@@ -18,6 +18,8 @@ using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal.Constants;
+
 namespace ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
 
 /// <summary>
@@ -175,6 +177,74 @@ internal sealed class MarketApi
                 request,
                 startedAt,
                 BittradeOperations.MarketData.GetExecutions,
+                ex);
+        }
+    }
+
+    public async Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
+        CommonSymbol symbol,
+        PeriodDto period,
+        int? size = null,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new CandlesticksRequest(symbol, period, size);
+        var startedAt = DateTimeOffset.UtcNow;
+
+        if (period is null || period.IsEmpty)
+        {
+            return NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
+                "Contracts",
+                BittradeOperations.MarketData.GetCandlesticks,
+                request,
+                "CandlesticksPeriod");
+        }
+
+        if (!BittradeCandlestickPeriods.TryGetTimescale(period.Code, out _))
+        {
+            return NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
+                "Contracts",
+                BittradeOperations.MarketData.GetCandlesticks,
+                request,
+                $"CandlesticksPeriod:{period.Code}");
+        }
+
+        try
+        {
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<CandlesticksRequest, CandlesticksResponse>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    BittradeOperations.MarketData.GetCandlesticks);
+            }
+
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+            var call = await _marketData
+                .GetHistoryKlineCallAsync(productCode, new Period(period.Code), size, cancellationToken)
+                .ConfigureAwait(false);
+
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BittradeOperations.MarketData.GetCandlesticks,
+                ok => new CandlesticksResponse(BittradeMarketMapper.MapCandlesticks(symbol, period, ok)));
+        }
+        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
+        {
+            return SymbolNotSupported<CandlesticksRequest, CandlesticksResponse>(
+                request,
+                startedAt,
+                BittradeOperations.MarketData.GetCandlesticks,
+                ex);
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<CandlesticksRequest, CandlesticksResponse>(
+                request,
+                startedAt,
+                BittradeOperations.MarketData.GetCandlesticks,
                 ex);
         }
     }

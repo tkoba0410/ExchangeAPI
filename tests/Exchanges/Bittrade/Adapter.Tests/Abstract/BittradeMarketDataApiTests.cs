@@ -104,6 +104,27 @@ public class BittradeMarketApiTests
     }
 
     [Fact]
+    public async Task GetCandlesticksAsync_MapsKlines()
+    {
+        var json = """
+        { "status":"ok", "ts":1700000000000,
+          "data": [
+            { "id": 1700000000, "open": 90, "close": 100, "low": 80, "high": 110, "amount": 1.2, "vol": 1200000, "count": 10 }
+          ]
+        }
+        """;
+        var api = CreateApi("/market/history/kline?period=1min&symbol=btcjpy&size=1", json);
+
+        var call = await api.GetCandlesticksAsync(new Symbol("BTC/JPY"), new PeriodDto("1min"), size: 1);
+        var ok = Assert.IsType<CallResult<CandlesticksResponse>.Ok>(call.Result);
+        var item = Assert.Single(ok.Response.Items);
+
+        Assert.Equal(TimeSpan.FromMinutes(1), item.Timescale);
+        Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1700000000), item.OpenTime);
+        Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1700000000).AddMinutes(1), item.CloseTime);
+    }
+
+    [Fact]
     public async Task GetDetailMergedCallAsync_UnknownSymbol_Throws()
     {
         var api = CreateApi("/market/detail/merged?symbol=btcjpy", "{}");

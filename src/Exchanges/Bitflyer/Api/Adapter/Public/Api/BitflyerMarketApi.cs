@@ -171,6 +171,20 @@ internal sealed class MarketApi
         }
     }
 
+    public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
+        Symbol symbol,
+        PeriodDto period,
+        int? size = null,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new CandlesticksRequest(symbol, period, size);
+        return Task.FromResult(NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
+            "Contracts",
+            BitflyerOperations.MarketData.GetCandlesticks,
+            request,
+            "Candlesticks"));
+    }
+
     private static IReadOnlyList<ExecutionsPublicItem> ToExecutionList(
         Symbol symbol,
         IReadOnlyList<BitflyerExecutionNormalized> executions)

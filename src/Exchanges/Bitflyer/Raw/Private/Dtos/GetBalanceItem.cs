@@ -4,7 +4,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private.Dtos;
 /// <summary>
 /// bitFlyer /v1/me/getbalance の Raw レスポンス。
 /// </summary>
-public sealed class BalanceResponse
+public sealed class GetBalanceItem
 {
     [JsonPropertyName("currency_code")]
     public string CurrencyCode { get; init; } = string.Empty;

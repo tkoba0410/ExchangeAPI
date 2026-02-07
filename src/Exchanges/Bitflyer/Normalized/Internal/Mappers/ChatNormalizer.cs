@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 internal static class ChatNormalizer
 {
     public static bool TryNormalize(
-        RawPublicDtos.Chat wire,
+        RawPublicDtos.GetChatsItem wire,
         out ChatNormalized? normalized,
         out CallError? error)
     {
@@ -30,7 +30,7 @@ internal static class ChatNormalizer
     private static FreeText? ParseOptional(string? value) =>
         FreeText.TryParse(value, out var text) ? text : null;
 
-    private static ChatNormalized Build(RawPublicDtos.Chat wire) =>
+    private static ChatNormalized Build(RawPublicDtos.GetChatsItem wire) =>
         new(
             Nickname: ParseOptional(wire.Nickname),
             Message: ParseOptional(wire.Message),

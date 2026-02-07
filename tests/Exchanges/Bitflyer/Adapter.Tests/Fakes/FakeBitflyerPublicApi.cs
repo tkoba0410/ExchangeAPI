@@ -33,7 +33,7 @@ internal sealed class FakeBitflyerPublicApi : IRawApi
     {
         var response = new RawPublicDtos.GetMarketsResponse
         {
-            new RawPublicDtos.Market("BTC_JPY", "BTC_JPY")
+            new RawPublicDtos.GetMarketsItem("BTC_JPY", "BTC_JPY")
         };
         return Task.FromResult(MakeOkCall(request, response));
     }
@@ -61,7 +61,7 @@ internal sealed class FakeBitflyerPublicApi : IRawApi
     {
         var executions = new RawPublicDtos.GetExecutionsPublicResponse
         {
-            new RawPublicDtos.ExecutionPublicResponse
+            new RawPublicDtos.GetExecutionsPublicItem
             {
                 Id = 1,
                 ProductCode = request.ProductCode.Value,
@@ -105,7 +105,7 @@ internal sealed class FakeBitflyerPublicApi : IRawApi
     {
         var response = new RawPublicDtos.GetChatsResponse
         {
-            new RawPublicDtos.Chat("n", "m", DateTimeOffset.UtcNow)
+            new RawPublicDtos.GetChatsItem("n", "m", DateTimeOffset.UtcNow)
         };
         return Task.FromResult(MakeOkCall(request, response));
     }

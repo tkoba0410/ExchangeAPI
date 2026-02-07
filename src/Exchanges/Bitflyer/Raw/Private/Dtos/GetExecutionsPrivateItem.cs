@@ -1,7 +1,12 @@
+using System;
 using System.Text.Json.Serialization;
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.Public.Dtos;
 
-public sealed class ExecutionPublicResponse
+namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private.Dtos;
+
+/// <summary>
+/// Private 約定履歴 (/v1/me/getexecutions) のレスポンス DTO。
+/// </summary>
+public sealed class GetExecutionsPrivateItem
 {
     [JsonPropertyName("id")] public long Id { get; init; }
     [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;

@@ -14,7 +14,7 @@ internal static class ExecutionNormalizer
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
     public static bool TryNormalizeList(
-        IReadOnlyList<RawPublicDtos.ExecutionPublicResponse> raw,
+        IReadOnlyList<RawPublicDtos.GetExecutionsPublicItem> raw,
         string? rawJson,
         out IReadOnlyList<ExecutionNormalized>? normalized,
         out CallError? error)
@@ -45,7 +45,7 @@ internal static class ExecutionNormalizer
     }
 
     private static bool TryNormalize(
-        RawPublicDtos.ExecutionPublicResponse wire,
+        RawPublicDtos.GetExecutionsPublicItem wire,
         JsonElement snapshot,
         out ExecutionNormalized? normalized,
         out CallError? error)
@@ -74,7 +74,7 @@ internal static class ExecutionNormalizer
 
     private static IReadOnlyList<JsonElement> ExtractSnapshots(
         string? rawJson,
-        IReadOnlyList<RawPublicDtos.ExecutionPublicResponse> raw)
+        IReadOnlyList<RawPublicDtos.GetExecutionsPublicItem> raw)
     {
         if (raw.Count == 0)
         {

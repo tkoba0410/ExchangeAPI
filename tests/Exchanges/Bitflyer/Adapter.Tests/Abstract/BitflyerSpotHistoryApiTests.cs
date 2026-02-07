@@ -36,7 +36,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             };
 
             var fakePrivate = new FakeBitflyerPrivateApi(
-                Array.Empty<RawPrivateDtos.BalanceResponse>());
+                Array.Empty<RawPrivateDtos.GetBalanceItem>());
             var fakeTrading = new FakeBitflyerPrivateTradingApi(
                 new RawPrivateDtos.SendChildOrderResponse(),
                 childOrders);
@@ -86,7 +86,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             };
 
             var fakePrivate = new FakeBitflyerPrivateApi(
-                Array.Empty<RawPrivateDtos.BalanceResponse>());
+                Array.Empty<RawPrivateDtos.GetBalanceItem>());
             var fakeTrading = new FakeBitflyerPrivateTradingApi(
                 new RawPrivateDtos.SendChildOrderResponse(),
                 childOrders);
@@ -108,7 +108,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var rawTicker = new RawPublicDtos.GetTickerResponse();
             var executions = new[]
             {
-                new RawPrivateDtos.ExecutionPrivateResponse
+                new RawPrivateDtos.GetExecutionsPrivateItem
                 {
                     Id = 1,
                     ProductCode = "BTC_JPY",
@@ -117,7 +117,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                     Size = 0.1m,
                     ExecDate = DateTimeOffset.UtcNow.AddMinutes(-1)
                 },
-                new RawPrivateDtos.ExecutionPrivateResponse
+                new RawPrivateDtos.GetExecutionsPrivateItem
                 {
                     Id = 2,
                     ProductCode = "BTC_JPY",
@@ -129,7 +129,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             };
 
             var fakePrivate = new FakeBitflyerPrivateApi(
-                Array.Empty<RawPrivateDtos.BalanceResponse>(),
+                Array.Empty<RawPrivateDtos.GetBalanceItem>(),
                 executions: executions);
             var fakeTrading = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.SendChildOrderResponse());
             var raw = new FakeBitflyerPublicApi(rawTicker, new RawPublicDtos.GetBoardResponse { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() }, fakePrivate, fakeTrading);

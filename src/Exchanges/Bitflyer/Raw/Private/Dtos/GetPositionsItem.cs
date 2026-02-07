@@ -6,7 +6,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Raw.Private.Dtos;
 /// <summary>
 /// /v1/me/getpositions のレスポンス DTO。
 /// </summary>
-public sealed class PositionResponse
+public sealed class GetPositionsItem
 {
     [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
     [JsonPropertyName("side")] public string Side { get; init; } = string.Empty;

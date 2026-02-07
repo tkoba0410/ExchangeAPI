@@ -19,13 +19,13 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             // Arrange
             var rawBalances = new[]
             {
-                new RawPrivateDtos.BalanceResponse
+                new RawPrivateDtos.GetBalanceItem
                 {
                     CurrencyCode = "JPY",
                     Amount = 100000m,
                     Available = 80000m,
                 },
-                new RawPrivateDtos.BalanceResponse
+                new RawPrivateDtos.GetBalanceItem
                 {
                     CurrencyCode = "BTC",
                     Amount = 0.01m,
@@ -62,7 +62,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         public async Task GetBalanceAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
         {
             // Arrange
-            var rawBalances = Array.Empty<RawPrivateDtos.BalanceResponse>();
+            var rawBalances = Array.Empty<RawPrivateDtos.GetBalanceItem>();
 
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
             var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.SendChildOrderResponse());

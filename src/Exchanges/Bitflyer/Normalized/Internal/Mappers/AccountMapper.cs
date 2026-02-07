@@ -14,7 +14,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 internal static class AccountMapper
 {
     public static bool TryMapBalances(
-        IReadOnlyList<RawPrivateDtos.BalanceResponse> rawBalances,
+        IReadOnlyList<RawPrivateDtos.GetBalanceItem> rawBalances,
         out IReadOnlyList<BalanceEntryNormalized>? normalized,
         out CallError? error)
     {
@@ -37,7 +37,7 @@ internal static class AccountMapper
 
     public static bool TryMapAccountExecutions(
         Symbol symbol,
-        IReadOnlyList<RawPrivateDtos.ExecutionPrivateResponse> rawExecutions,
+        IReadOnlyList<RawPrivateDtos.GetExecutionsPrivateItem> rawExecutions,
         out IReadOnlyList<ExecutionAccountNormalized>? normalized,
         out CallError? error)
     {

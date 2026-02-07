@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 using ExchangeApi.Tests.Inventory;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Types;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal.Encoding;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;

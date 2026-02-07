@@ -1,4 +1,4 @@
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using Xunit;
 

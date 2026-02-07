@@ -13,8 +13,8 @@ public sealed class RawApiSerializationTests
         var root = FindRepoRoot();
         var rawApiDirs = new[]
         {
-            Path.Combine(root, "src", "Exchanges", "Bitflyer", "Api", "Raw"),
-            Path.Combine(root, "src", "Exchanges", "Bittrade", "Api", "Raw"),
+            Path.Combine(root, "src", "Exchanges", "Bitflyer", "Raw"),
+            Path.Combine(root, "src", "Exchanges", "Bittrade", "Raw"),
         };
 
         var offenders = rawApiDirs

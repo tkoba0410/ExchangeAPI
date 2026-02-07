@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Exchanges/Bittrade/Api/Raw/ExchangeApi.Exchanges.Bittrade.Raw.csproj" />
-    <ProjectReference Include="../../../../src/Exchanges/Bittrade/Api/Normalized/ExchangeApi.Exchanges.Bittrade.Normalized.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bittrade/Raw/ExchangeApi.Exchanges.Bittrade.Raw.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bittrade/Normalized/ExchangeApi.Exchanges.Bittrade.Normalized.csproj" />
   </ItemGroup>
 
   <ItemGroup>

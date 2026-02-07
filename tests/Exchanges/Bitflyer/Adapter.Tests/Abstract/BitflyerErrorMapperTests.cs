@@ -1,6 +1,6 @@
 using System.Net;
 using ExchangeApi.Primitives.Errors;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;

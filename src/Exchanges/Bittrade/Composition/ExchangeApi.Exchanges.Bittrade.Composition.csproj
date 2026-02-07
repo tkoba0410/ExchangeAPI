@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Api\Adapter\ExchangeApi.Exchanges.Bittrade.Adapter.csproj" />
+    <ProjectReference Include="..\Adapter\ExchangeApi.Exchanges.Bittrade.Adapter.csproj" />
     <ProjectReference Include="..\..\..\Composition\ExchangeApi.Composition.csproj" />
   </ItemGroup>
 

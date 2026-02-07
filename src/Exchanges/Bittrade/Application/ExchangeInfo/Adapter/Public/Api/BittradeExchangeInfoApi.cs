@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Internal.Operations;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Compose;
 using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Dynamic;
 using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Static;
@@ -17,7 +17,7 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
-using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Requests.GetSymbolsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Dtos.BittradeSymbolNormalized>>;
+using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests.GetSymbolsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.BittradeSymbolNormalized>>;
 
 namespace ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 

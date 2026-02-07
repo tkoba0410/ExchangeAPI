@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Api/Adapter/ExchangeApi.Exchanges.Bitflyer.Adapter.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Adapter/ExchangeApi.Exchanges.Bitflyer.Adapter.csproj" />
     <ProjectReference Include="../../../../src/Contracts/Common/ExchangeApi.Contracts.Common.csproj" />
     <ProjectReference Include="../../../../src/Contracts/Facade/ExchangeApi.Contracts.Facade.csproj" />
     <ProjectReference Include="../../../../src/Application/ExchangeApi.Application.csproj" />

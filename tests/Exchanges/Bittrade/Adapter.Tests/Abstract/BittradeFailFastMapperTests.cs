@@ -2,10 +2,10 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using System;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;

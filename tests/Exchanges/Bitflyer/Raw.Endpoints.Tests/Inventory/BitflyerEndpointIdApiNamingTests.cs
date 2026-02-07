@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 using ExchangeApi.Tests.Inventory;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Raw.Endpoints.Tests;

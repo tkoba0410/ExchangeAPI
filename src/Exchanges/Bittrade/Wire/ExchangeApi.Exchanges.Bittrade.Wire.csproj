@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AssemblyName>ExchangeApi.Exchanges.Bittrade.Wire</AssemblyName>
+    <RootNamespace>ExchangeApi.Exchanges.Bittrade.Wire</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Transport\ExchangeApi.Transport.csproj" />
+    <ProjectReference Include="..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
+  </ItemGroup>
+
+</Project>

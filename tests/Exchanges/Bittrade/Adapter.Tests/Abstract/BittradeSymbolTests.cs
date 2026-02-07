@@ -1,4 +1,4 @@
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;

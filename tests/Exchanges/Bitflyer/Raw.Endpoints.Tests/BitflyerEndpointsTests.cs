@@ -1,9 +1,9 @@
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal.Encoding;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Constants;
-using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Private.Endpoints;
-using ExchangeApi.Exchanges.Bitflyer.Api.Wire.Public.Endpoints;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Private.Endpoints;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Public.Endpoints;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Raw.Endpoints.Tests;

@@ -12,7 +12,7 @@ public sealed class BittradeAdapterShapeGuardTests
     public void AdapterApi_DoesNotContainOperationLiterals()
     {
         var root = FindRepoRoot();
-        var adapterPath = Path.Combine(root, "src", "Exchanges", "Bittrade", "Api", "Adapter");
+        var adapterPath = Path.Combine(root, "src", "Exchanges", "Bittrade", "Adapter");
         var operationsFile = Path.Combine(adapterPath, "Internal", "Operations", "BittradeOperations.cs");
 
         var files = Directory.GetFiles(adapterPath, "*.cs", SearchOption.AllDirectories)
@@ -35,7 +35,6 @@ public sealed class BittradeAdapterShapeGuardTests
             "src",
             "Exchanges",
             "Bittrade",
-            "Api",
             "Adapter",
             "Public",
             "Api",

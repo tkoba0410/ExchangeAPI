@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Primitives.Errors;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
@@ -17,7 +17,7 @@ using ContractOrderBook = ExchangeApi.Contracts.Common.Dtos.BoardResponse;
 using ContractBalance = ExchangeApi.Contracts.Common.Dtos.BalanceResponse;
 using ContractCancelResult = ExchangeApi.Contracts.Common.Dtos.CancelOrderResponse;
 using Xunit;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract

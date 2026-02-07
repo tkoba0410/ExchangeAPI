@@ -5,7 +5,7 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Helpers;
 using Xunit;

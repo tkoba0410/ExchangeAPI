@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using ExchangeApi.Exchanges.Bittrade.Api.Wire.Constants;
+using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 using ExchangeApi.Tests.Inventory;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Internal;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;

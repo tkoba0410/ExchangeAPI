@@ -1,1 +1,1 @@
-global using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Requests;
+global using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;

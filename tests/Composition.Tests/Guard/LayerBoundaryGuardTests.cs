@@ -80,7 +80,7 @@ public class LayerBoundaryGuardTests
 
     private static IEnumerable<Type> GetFacadeTypes()
     {
-        var bitflyer = typeof(BitflyerNormalizedApi)
+        var bitflyer = typeof(NormalizedApi)
             .Assembly
             .GetExportedTypes()
             .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bitflyer.Normalized.Api");

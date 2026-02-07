@@ -18,10 +18,10 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
-using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerMarketNormalized>>;
-using TradingCommissionCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.GetTradingCommissionRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.BitflyerTradingCommissionNormalized>;
-using HealthCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetHealthRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerHealthNormalized>;
-using BoardStateCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetBoardStateRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BitflyerBoardStateNormalized>;
+using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.MarketNormalized>>;
+using TradingCommissionCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.GetTradingCommissionRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.TradingCommissionNormalized>;
+using HealthCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetHealthRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.HealthNormalized>;
+using BoardStateCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetBoardStateRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BoardStateNormalized>;
 namespace ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
 
 /// <summary>
@@ -36,7 +36,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 
     public BitflyerExchangeInfoApi() { }
 
-    internal BitflyerExchangeInfoApi(BitflyerNormalizedPublicApi normalized)
+    internal BitflyerExchangeInfoApi(NormalizedPublicApi normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         _getMarkets = normalized.GetMarketsCallAsync;
@@ -44,7 +44,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         _getBoardState = normalized.GetBoardStateCallAsync;
     }
 
-    internal BitflyerExchangeInfoApi(IBitflyerNormalizedApi normalized)
+    internal BitflyerExchangeInfoApi(INormalizedApi normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         _getMarkets = normalized.GetMarketsCallAsync;
@@ -197,12 +197,12 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         if (_getMarkets is null) return null;
 
         var marketsCall = await _getMarkets(cancellationToken).ConfigureAwait(false);
-        if (marketsCall.Result is CallResult<IReadOnlyList<BitflyerMarketNormalized>>.Err)
+        if (marketsCall.Result is CallResult<IReadOnlyList<MarketNormalized>>.Err)
         {
             return null;
         }
 
-        var markets = ((CallResult<IReadOnlyList<BitflyerMarketNormalized>>.Ok)marketsCall.Result).Response;
+        var markets = ((CallResult<IReadOnlyList<MarketNormalized>>.Ok)marketsCall.Result).Response;
         var marketInfos = markets.Select(MapDynamicMarket).ToList();
 
         if (_getTradingCommission is not null)
@@ -224,7 +224,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         };
     }
 
-    private static BitflyerDynamicMarketInfo MapDynamicMarket(BitflyerMarketNormalized market)
+    private static BitflyerDynamicMarketInfo MapDynamicMarket(MarketNormalized market)
     {
         var productCodeText = market.ProductCode.Value;
         var symbol = productCodeText.Contains('_', StringComparison.Ordinal)
@@ -261,12 +261,12 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
                 continue;
             }
 
-            if (call.Result is CallResult<BitflyerTradingCommissionNormalized>.Err)
+            if (call.Result is CallResult<TradingCommissionNormalized>.Err)
             {
                 continue;
             }
 
-            var ok = (CallResult<BitflyerTradingCommissionNormalized>.Ok)call.Result;
+            var ok = (CallResult<TradingCommissionNormalized>.Ok)call.Result;
             if (ok.Response.CommissionRate is null)
             {
                 continue;
@@ -287,7 +287,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             try
             {
                 var call = await _getHealth(productCode, cancellationToken).ConfigureAwait(false);
-                if (call.Result is CallResult<BitflyerHealthNormalized>.Ok ok)
+                if (call.Result is CallResult<HealthNormalized>.Ok ok)
                 {
                     maintenanceFromHealth = MapMaintenanceFromHealth(ok.Response.Status);
                 }
@@ -303,7 +303,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             try
             {
                 var call = await _getBoardState(productCode, cancellationToken).ConfigureAwait(false);
-                if (call.Result is CallResult<BitflyerBoardStateNormalized>.Ok ok)
+                if (call.Result is CallResult<BoardStateNormalized>.Ok ok)
                 {
                     var fromBoardState = MapMaintenanceFromBoardState(ok.Response);
                     if (fromBoardState is not null)
@@ -347,7 +347,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         return null;
     }
 
-    private static BitflyerDynamicMaintenance? MapMaintenanceFromBoardState(BitflyerBoardStateNormalized state)
+    private static BitflyerDynamicMaintenance? MapMaintenanceFromBoardState(BoardStateNormalized state)
     {
         if (state.Health is not null && !state.Health.Value.IsEmpty)
         {

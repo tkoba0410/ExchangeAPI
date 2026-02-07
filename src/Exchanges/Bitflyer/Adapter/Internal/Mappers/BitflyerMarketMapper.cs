@@ -6,13 +6,14 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Utilities.OrderBook;
+using UtilityOrderBookNormalizer = ExchangeApi.Utilities.OrderBook.OrderBookNormalizer;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using CommonBoard = ExchangeApi.Contracts.Common.Dtos.BoardResponse;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 
 internal static class MarketMapper
 {
-    public static CommonTicker MapTicker(Symbol symbol, BitflyerTickerNormalized normalized)
+    public static CommonTicker MapTicker(Symbol symbol, TickerNormalized normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
@@ -24,7 +25,7 @@ internal static class MarketMapper
         return ticker;
     }
 
-    public static CommonBoard MapOrderBook(BitflyerOrderBookNormalized normalized)
+    public static CommonBoard MapOrderBook(OrderBookNormalized normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
 
@@ -36,7 +37,7 @@ internal static class MarketMapper
             .Select(a => new BoardLevel(new Price(a.Price), new Size(a.Size)))
             .ToArray();
 
-        if (!OrderBookNormalizer.TryNormalize(bids, asks, out var orderBook, out var error))
+        if (!UtilityOrderBookNormalizer.TryNormalize(bids, asks, out var orderBook, out var error))
         {
             throw new ExchangeApiException(error?.Message ?? "OrderBook normalization failed.");
         }
@@ -44,10 +45,10 @@ internal static class MarketMapper
         return orderBook!;
     }
 
-    public static ExecutionsPublicItem MapExecution(Symbol symbol, BitflyerExecutionNormalized normalized)
+    public static ExecutionsPublicItem MapExecution(Symbol symbol, ExecutionNormalized normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        if (!BitflyerCommonMapper.TryMapSide(normalized.Side, out var side, out var error))
+        if (!CommonMapper.TryMapSide(normalized.Side, out var side, out var error))
         {
             throw new ExchangeApiException(error?.Message ?? "bitFlyer side mapping failed.");
         }

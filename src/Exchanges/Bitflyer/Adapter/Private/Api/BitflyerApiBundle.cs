@@ -17,14 +17,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 /// </summary>
 internal sealed class BitflyerApiBundle
 {
-    public BitflyerNormalizedPublicApi Public { get; }
-    public IBitflyerNormalizedApi Normalized { get; }
+    public NormalizedPublicApi Public { get; }
+    public INormalizedApi Normalized { get; }
     public BitflyerExchangeInfoApi ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
 
     public BitflyerApiBundle(
-        IBitflyerNormalizedApi normalized,
-        BitflyerNormalizedPublicApi publicApi,
+        INormalizedApi normalized,
+        NormalizedPublicApi publicApi,
         BitflyerExchangeInfoApi exchangeInfo,
         IExchangeMarketResolver markets)
     {
@@ -40,11 +40,11 @@ internal sealed class BitflyerApiBundle
         var wireTransport = new WireTransport(restClient);
         var wire = new WireCallExecutor(wireTransport);
         var raw = new RawApi(wire);
-        var publicApi = new BitflyerNormalizedPublicApi(raw);
+        var publicApi = new NormalizedPublicApi(raw);
         var exchangeInfo = new BitflyerExchangeInfoApi(publicApi);
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
         var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
-        var normalized = BitflyerNormalizedApi.FromRaw(raw, markets);
+        var normalized = NormalizedApi.FromRaw(raw, markets);
         return new BitflyerApiBundle(normalized, publicApi, exchangeInfo, contractMarkets);
     }
 }

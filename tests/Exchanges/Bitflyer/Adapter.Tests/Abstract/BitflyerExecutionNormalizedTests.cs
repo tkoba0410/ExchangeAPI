@@ -30,7 +30,7 @@ public sealed class BitflyerExecutionNormalizedTests
         var raw = RawJson.DeserializeOrThrow<IReadOnlyList<RawPublicDtos.ExecutionPublicResponse>>(
             json,
             "Bitflyer.GetExecutions");
-        Assert.True(BitflyerExecutionNormalizer.TryNormalizeList(raw, json, out var normalized, out var error));
+        Assert.True(ExecutionNormalizer.TryNormalizeList(raw, json, out var normalized, out var error));
         Assert.Null(error);
 
         Assert.Single(normalized!);

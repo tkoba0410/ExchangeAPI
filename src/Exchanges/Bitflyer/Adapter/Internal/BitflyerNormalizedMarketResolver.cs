@@ -10,18 +10,18 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 
-internal sealed class BitflyerNormalizedMarketResolver : IBitflyerMarketResolver
+internal sealed class BitflyerNormalizedMarketResolver : IMarketResolver
 {
     private readonly IExchangeMarketResolver _inner;
 
     public BitflyerNormalizedMarketResolver(IExchangeMarketResolver inner) =>
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
 
-    public async Task<Call<ResolveBitflyerMarketRequest, BitflyerMarketInfo>> ResolveCallAsync(
+    public async Task<Call<ResolveMarketRequest, MarketInfo>> ResolveCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new ResolveBitflyerMarketRequest(symbol);
+        var request = new ResolveMarketRequest(symbol);
         var innerCall = await _inner.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
 
         if (innerCall.Result is CallResult<ExchangeMarketInfo>.Err err)
@@ -32,7 +32,7 @@ internal sealed class BitflyerNormalizedMarketResolver : IBitflyerMarketResolver
         if (innerCall.Result is CallResult<ExchangeMarketInfo>.Ok ok &&
             !ok.Response.ProductCode.IsEmpty)
         {
-            var market = new BitflyerMarketInfo(symbol, ok.Response.ProductCode);
+            var market = new MarketInfo(symbol, ok.Response.ProductCode);
             return OkFromChild(request, innerCall, market);
         }
 
@@ -42,10 +42,10 @@ internal sealed class BitflyerNormalizedMarketResolver : IBitflyerMarketResolver
             new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
     }
 
-    private static Call<ResolveBitflyerMarketRequest, BitflyerMarketInfo> OkFromChild(
-        ResolveBitflyerMarketRequest request,
+    private static Call<ResolveMarketRequest, MarketInfo> OkFromChild(
+        ResolveMarketRequest request,
         Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> child,
-        BitflyerMarketInfo market)
+        MarketInfo market)
     {
         var meta = new CallMeta(
             Layer: "Adapter",
@@ -54,17 +54,17 @@ internal sealed class BitflyerNormalizedMarketResolver : IBitflyerMarketResolver
             Tags: null,
             Children: new[] { child.Id });
 
-        return new Call<ResolveBitflyerMarketRequest, BitflyerMarketInfo>(
+        return new Call<ResolveMarketRequest, MarketInfo>(
             Id: CallId.New(),
             StartedAt: child.StartedAt,
             Duration: child.Duration,
             Request: request,
-            Result: new CallResult<BitflyerMarketInfo>.Ok(market),
+            Result: new CallResult<MarketInfo>.Ok(market),
             Meta: meta);
     }
 
-    private static Call<ResolveBitflyerMarketRequest, BitflyerMarketInfo> ErrorFromChild(
-        ResolveBitflyerMarketRequest request,
+    private static Call<ResolveMarketRequest, MarketInfo> ErrorFromChild(
+        ResolveMarketRequest request,
         Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> child,
         CallError error)
     {
@@ -75,12 +75,12 @@ internal sealed class BitflyerNormalizedMarketResolver : IBitflyerMarketResolver
             Tags: null,
             Children: new[] { child.Id });
 
-        return new Call<ResolveBitflyerMarketRequest, BitflyerMarketInfo>(
+        return new Call<ResolveMarketRequest, MarketInfo>(
             Id: CallId.New(),
             StartedAt: child.StartedAt,
             Duration: child.Duration,
             Request: request,
-            Result: new CallResult<BitflyerMarketInfo>.Err(error),
+            Result: new CallResult<MarketInfo>.Err(error),
             Meta: meta);
     }
 }

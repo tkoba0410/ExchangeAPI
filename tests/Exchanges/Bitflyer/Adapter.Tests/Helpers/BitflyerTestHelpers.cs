@@ -19,23 +19,23 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Helpers;
 
 internal static class BitflyerTestHelpers
 {
-    public static IBitflyerNormalizedApi CreateNormalizedApi(IRawApi raw, IBitflyerMarketResolver markets) =>
-        BitflyerNormalizedApi.FromRaw(raw, markets);
+    public static INormalizedApi CreateNormalizedApi(IRawApi raw, IMarketResolver markets) =>
+        NormalizedApi.FromRaw(raw, markets);
 
-    public static IBitflyerNormalizedApi CreateNormalizedApi(
+    public static INormalizedApi CreateNormalizedApi(
         RawPublicDtos.GetTickerResponse ticker,
-        IBitflyerMarketResolver markets,
+        IMarketResolver markets,
         RawPublicDtos.GetBoardResponse? board = null,
         FakeBitflyerPrivateApi? privateApi = null,
         FakeBitflyerPrivateTradingApi? tradingApi = null)
     {
         var raw = new FakeBitflyerPublicApi(ticker, board, privateApi, tradingApi);
-        return BitflyerNormalizedApi.FromRaw(raw, markets);
+        return NormalizedApi.FromRaw(raw, markets);
     }
 
-    public static IBitflyerNormalizedApi CreateTradingApi(
+    public static INormalizedApi CreateTradingApi(
         FakeBitflyerPrivateTradingApi tradingApi,
-        IBitflyerMarketResolver markets,
+        IMarketResolver markets,
         FakeBitflyerPrivateApi? privateApi = null) =>
         CreateNormalizedApi(
             new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" },
@@ -43,7 +43,7 @@ internal static class BitflyerTestHelpers
             privateApi: privateApi,
             tradingApi: tradingApi);
 
-    public static IBitflyerMarketResolver CreateResolver()
+    public static IMarketResolver CreateResolver()
     {
         var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
             new[] { new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("BTC_JPY"), MarketType.ParseOrThrow("Spot")) },
@@ -55,11 +55,11 @@ internal static class BitflyerTestHelpers
 
     public static BitflyerApiBundle CreateBundle(IRawApi raw)
     {
-        var publicApi = new BitflyerNormalizedPublicApi(raw);
+        var publicApi = new NormalizedPublicApi(raw);
         var exchangeInfo = new BitflyerExchangeInfoApi();
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
         var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
-        var normalized = BitflyerNormalizedApi.FromRaw(raw, markets);
+        var normalized = NormalizedApi.FromRaw(raw, markets);
         return new BitflyerApiBundle(normalized, publicApi, exchangeInfo, contractMarkets);
     }
 

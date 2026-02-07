@@ -20,7 +20,7 @@ public sealed class BitflyerEndpointIdApiNamingTests
     public void Bitflyer_InventoryEndpointIds_MustHave_NormalizedCallAsyncMethods()
     {
         var inventory = LoadInventoryEndpointIds();
-        EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(IBitflyerNormalizedApi));
+        EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(INormalizedApi));
     }
 
     private static string InventoryFilePath =>

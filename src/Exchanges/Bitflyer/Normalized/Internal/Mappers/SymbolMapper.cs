@@ -1,0 +1,44 @@
+using System;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Primitives.CallCommon;
+
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
+
+internal static class SymbolMapper
+{
+    public static bool TryToProductCode(Symbol symbol, out string productCode, out CallError? error)
+    {
+        if (symbol.IsEmpty)
+        {
+            productCode = string.Empty;
+            error = new CallError(CallErrorKind.Mapping, $"SymbolNotSupported:{symbol}");
+            return false;
+        }
+
+        return CommonMapper.TryParseProductCode(symbol.Value, out productCode, out error);
+    }
+
+    public static bool TryToProductCode(string symbol, out string productCode, out CallError? error)
+    {
+        return CommonMapper.TryParseProductCode(symbol, out productCode, out error);
+    }
+
+    public static bool TryToApiProductCode(string productCode, out string apiProductCode, out CallError? error)
+    {
+        return CommonMapper.TryToApiProductCode(productCode, out apiProductCode, out error);
+    }
+
+    public static bool TryFromProductCode(string symbol, out Symbol parsed, out CallError? error)
+    {
+        if (string.IsNullOrWhiteSpace(symbol))
+        {
+            parsed = default;
+            error = new CallError(CallErrorKind.Mapping, $"SymbolNotSupported:{symbol ?? string.Empty}");
+            return false;
+        }
+
+        parsed = new Symbol(symbol);
+        error = null;
+        return true;
+    }
+}

@@ -30,7 +30,7 @@ public sealed class BitflyerTickerNormalizedTests
         """;
 
         var raw = RawJson.DeserializeOrThrow<RawPublicDtos.GetTickerResponse>(json, "Bitflyer.GetTicker");
-        var ok = BitflyerTickerNormalizer.TryNormalize(raw, json, out var normalized, out var error);
+        var ok = TickerNormalizer.TryNormalize(raw, json, out var normalized, out var error);
         Assert.True(ok);
         Assert.NotNull(normalized);
         Assert.Null(error);

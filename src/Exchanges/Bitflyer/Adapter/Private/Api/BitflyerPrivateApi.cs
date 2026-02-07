@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BitflyerOrderRequest = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.BitflyerOrderRequest;
+using OrderRequest = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.OrderRequest;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
@@ -21,9 +21,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 internal sealed class BitflyerPrivateApi
 {
-    private readonly IBitflyerNormalizedApi _normalized;
+    private readonly INormalizedApi _normalized;
 
-    public BitflyerPrivateApi(IBitflyerNormalizedApi normalized)
+    public BitflyerPrivateApi(INormalizedApi normalized)
     {
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
@@ -116,7 +116,7 @@ internal sealed class BitflyerPrivateApi
 
         try
         {
-            var normalizedRequest = new BitflyerOrderRequest(
+            var normalizedRequest = new OrderRequest(
                 Symbol: symbol,
                 Side: side,
                 OrderType: OrderType.Limit,
@@ -171,7 +171,7 @@ internal sealed class BitflyerPrivateApi
         }
     }
 
-    private static IReadOnlyList<BalanceEntry> MapBalances(IReadOnlyList<BitflyerBalanceEntryNormalized> balances) =>
+    private static IReadOnlyList<BalanceEntry> MapBalances(IReadOnlyList<BalanceEntryNormalized> balances) =>
         balances
             .Select(b => BalanceFactory.Create(
                 currency: b.CurrencyCode,
@@ -181,7 +181,7 @@ internal sealed class BitflyerPrivateApi
 
     private static OrdersResponse BuildOrderResponse(
         OrdersRequest request,
-        IReadOnlyList<BitflyerOpenOrder> orders)
+        IReadOnlyList<OpenOrderNormalized> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
         var (requestedLimit, appliedLimit) = GetLimits(request);
@@ -207,7 +207,7 @@ internal sealed class BitflyerPrivateApi
 
     private static ExecutionsPrivateResponse BuildExecutionResponse(
         ExecutionsPrivateRequest request,
-        IReadOnlyList<BitflyerExecutionAccountNormalized> executions)
+        IReadOnlyList<ExecutionAccountNormalized> executions)
     {
         var items = executions.Select(e => new ExecutionsPrivateItem(
             Timestamp: e.ExecutedAt,
@@ -238,7 +238,7 @@ internal sealed class BitflyerPrivateApi
             AsOf: asOf);
     }
 
-    private static OrdersItem MapSnapshot(BitflyerOpenOrder order)
+    private static OrdersItem MapSnapshot(OpenOrderNormalized order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch

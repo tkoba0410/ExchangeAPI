@@ -22,7 +22,7 @@ public sealed class BitflyerTradingCommissionNormalizedTests
             privateApi: privateApi);
 
         var call = await api.GetTradingCommissionCallAsync(new Symbol("BTC/JPY"));
-        var ok = Assert.IsType<CallResult<BitflyerTradingCommissionNormalized>.Ok>(call.Result);
+        var ok = Assert.IsType<CallResult<TradingCommissionNormalized>.Ok>(call.Result);
 
         Assert.Equal(ProductCode.ParseOrThrow("BTC_JPY"), ok.Response.ProductCode);
         Assert.Equal(0.15m, ok.Response.CommissionRate);

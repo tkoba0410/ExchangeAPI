@@ -27,7 +27,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 /// </summary>
 public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 {
-    private readonly IBitflyerNormalizedApi _normalized;
+    private readonly INormalizedApi _normalized;
     private readonly IExchangeMarketResolver _markets;
     private readonly BitflyerPrivateApi _privateApi;
     private readonly BitflyerExchangeInfoApi _exchangeInfoApi;
@@ -37,7 +37,7 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
     public IPrivateApi? Private => this;
 
     internal BitflyerExchangeClient(
-        IBitflyerNormalizedApi normalized,
+        INormalizedApi normalized,
         object? rawBundle = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
@@ -239,7 +239,7 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
 
     private static IReadOnlyList<ExecutionsPublicItem> ToExecutionList(
         Symbol symbol,
-        IReadOnlyList<BitflyerExecutionNormalized> executions)
+        IReadOnlyList<ExecutionNormalized> executions)
     {
         IReadOnlyList<ExecutionsPublicItem> mapped = executions
             .Select(e => MarketMapper.MapExecution(symbol, e))

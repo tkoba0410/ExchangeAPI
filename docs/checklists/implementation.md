@@ -71,6 +71,8 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] `CallMeta.EndpointId` がログ・表示用途の識別子であることを確認した
 * [ ] 規範的な識別は EndpointId 定数・型で行っていることを確認した
 * [ ] この運用方針が文書（TopSpec / governance 等）に明文化されていることを確認した
+* [ ] `CallMeta.EndpointId` 文字列を仕様分岐キーとして使用していないことを確認した
+* [ ] `CallMeta.EndpointId` と規範識別子の乖離補正が Adapter 層で実施されていることを確認した
 
 ---
 

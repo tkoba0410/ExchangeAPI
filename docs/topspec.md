@@ -578,7 +578,16 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 
 ※ 取引所実装間で「統一する/しない」を運用として管理する場合は、参考として `docs/_references/exchange-parity-policy.md` を用いる。
 
-### 8.9 禁止事項
+### 8.9 CallMeta.EndpointId の運用（MUST）
+
+* `CallMeta.EndpointId` は、観測用途（ログ・表示・トレース・メトリクス）に限定して使用する（MUST）。
+* 規範的な識別・分岐・対応可否判定は、EndpointId 定数または型で行う（MUST）。
+* `CallMeta.EndpointId` の文字列比較を、仕様判断や業務分岐の根拠にしてはならない（MUST NOT）。
+* `CallMeta.InternalEndpointId` 等の補助識別子は、規範的識別子として扱ってはならない（MUST NOT）。
+* `CallMeta.EndpointId` と規範識別子が乖離した場合、規範識別子を正とし、`CallMeta` は観測値として補正する（MUST）。
+* 乖離補正の責務は Adapter 層に置く（MUST）。
+
+### 8.10 禁止事項
 
 * EndpointId に取引所名を含めること
 * 当該取引所の inventory に明示的な規定がない場合、

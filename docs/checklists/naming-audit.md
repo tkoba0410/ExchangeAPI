@@ -12,32 +12,28 @@
 
 ## 要修正（差分）
 
+現時点で高確度の要修正項目は未検出。
+
+## 解消済み（今回確認）
+
 1. `Symbol` と `Market` の混在（Contracts Request）
-- 状況: 同一意味（通貨ペア）に `Symbol` と `Market` が混在
-- 根拠:
-  - `src/Contracts/Facade/Requests/TickerRequest.cs:5` `Symbol Symbol`
-  - `src/Contracts/Facade/Requests/BoardRequest.cs:5` `Symbol Symbol`
-  - `src/Contracts/Facade/Requests/OrdersRequest.cs:6` `Symbol Market`
-  - `src/Contracts/Facade/Requests/ExecutionsPrivateRequest.cs:6` `Symbol Market`
-  - `src/Contracts/Facade/Extensions/PrivateApiExtensions.cs:37` `Symbol market`
-- 影響: 利用者視点の引数語彙が不統一
-- 推奨: Contracts 層は `Symbol` に統一（`Market` は内部文脈名に限定）
+- 状況: 解消済み（`Symbol` に統一）
+- 確認:
+  - `src/Contracts/Facade/Requests/OrdersRequest.cs:6` `Symbol Symbol`
+  - `src/Contracts/Facade/Requests/ExecutionsPrivateRequest.cs:6` `Symbol Symbol`
+  - `src/Contracts/Facade/Extensions/PrivateApiExtensions.cs:37` `Symbol symbol`
 
 2. `OrderId` 意味のフィールドが `Id` になっている（Bittrade Normalized）
-- 状況: 実体が `OrderId` なのにフィールド名が `Id`
-- 根拠:
-  - `src/Exchanges/Bittrade/Normalized/Public/Dtos/ExecutionNormalized.cs:11` `OrderId Id`
-  - `src/Exchanges/Bittrade/Adapter/Internal/Mappers/MarketMapper.cs:48` `OrderId: normalized.Id`
-- 影響: `Id` が何の識別子か不明瞭
-- 推奨: `OrderId` へ改名
+- 状況: 解消済み
+- 確認:
+  - `src/Exchanges/Bittrade/Normalized/Public/Dtos/ExecutionNormalized.cs:11` `OrderId OrderId`
+  - `src/Exchanges/Bittrade/Adapter/Internal/Mappers/MarketMapper.cs:48` `OrderId: normalized.OrderId`
 
 3. Kline 時刻キーのフィールド名が `Id`（意味不一致）
-- 状況: Unix 時刻を保持する値が `Id` 命名
-- 根拠:
-  - `src/Exchanges/Bittrade/Normalized/Public/Dtos/KlineNormalized.cs:6` `FreeText Id`
-  - `src/Exchanges/Bittrade/Adapter/Internal/Mappers/MarketMapper.cs:68` `ParseUnixTimestamp(kline.Id)`
-- 影響: 読み手が識別子と誤認しやすい
-- 推奨: `Timestamp` または `OpenTimeUnix` など意味名に変更
+- 状況: 解消済み
+- 確認:
+  - `src/Exchanges/Bittrade/Normalized/Public/Dtos/KlineNormalized.cs:6` `FreeText OpenTimeUnix`
+  - `src/Exchanges/Bittrade/Adapter/Internal/Mappers/MarketMapper.cs:68` `ParseUnixTimestamp(kline.OpenTimeUnix)`
 
 ---
 

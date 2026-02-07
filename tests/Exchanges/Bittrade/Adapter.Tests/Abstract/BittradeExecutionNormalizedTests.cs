@@ -9,7 +9,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public sealed class BittradeExecutionNormalizedTests
+public sealed class ExecutionNormalizedTests
 {
     [Fact]
     public void NormalizeList_keeps_raw_snapshot()
@@ -32,9 +32,9 @@ public sealed class BittradeExecutionNormalizedTests
         }
         """;
 
-        var raw = BittradeRawJson.DeserializeOrThrow<RawPublicDtos.GetTradeResponse>(json, "Bittrade.GetTrades");
+        var raw = RawJson.DeserializeOrThrow<RawPublicDtos.GetTradeResponse>(json, "Bittrade.GetTrades");
         var entries = raw.Tick?.Data ?? new List<RawPublicDtos.GetHistoryTradeEntry>();
-        var ok = BittradeNormalizer.TryNormalizeExecutions(entries, json, out var normalized, out var error);
+        var ok = Normalizer.TryNormalizeExecutions(entries, json, out var normalized, out var error);
         Assert.True(ok);
         Assert.NotNull(normalized);
         Assert.Null(error);

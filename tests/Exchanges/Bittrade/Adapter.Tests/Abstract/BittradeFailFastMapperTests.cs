@@ -10,14 +10,14 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public sealed class BittradeFailFastMapperTests
+public sealed class FailFastMapperTests
 {
     [Fact]
     public void ToOpenOrder_UnknownSide_Throws()
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        var ok = BittradeTradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
+        var ok = TradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
         Assert.False(ok);
         Assert.Null(orders);
         Assert.NotNull(error);
@@ -28,7 +28,7 @@ public sealed class BittradeFailFastMapperTests
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        var ok = BittradeTradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
+        var ok = TradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
         Assert.False(ok);
         Assert.Null(orders);
         Assert.NotNull(error);
@@ -54,7 +54,7 @@ public sealed class BittradeFailFastMapperTests
                 FilledCashAmount: "0",
                 Fees: "0"));
 
-        var ok = BittradeTradingMapper.TryToOrderStatus(
+        var ok = TradingMapper.TryToOrderStatus(
             ProductCode.Parse("BTC_JPY"),
             raw,
             new OrderKey(OrderIdKind.ExchangeOrderId, "1"),

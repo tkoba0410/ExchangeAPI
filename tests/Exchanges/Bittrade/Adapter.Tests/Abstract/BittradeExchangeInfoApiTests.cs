@@ -12,12 +12,12 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public class BittradeExchangeInfoApiTests
+public class ExchangeInfoApiTests
 {
     [Fact]
     public async Task GetExchangeInfoAsync_MapsSymbols()
     {
-        var api = new BittradeExchangeInfoApi(new BittradeNormalizedPublicApi(new StubRawApi()));
+        var api = new BittradeExchangeInfoApi(new NormalizedPublicApi(new StubRawApi()));
 
         var call = await api.GetExchangeInfoAsync(new ExchangeInfoRequest());
         var ok = Assert.IsType<CallResult<ExchangeInfoDto>.Ok>(call.Result);
@@ -34,7 +34,7 @@ public class BittradeExchangeInfoApiTests
         Assert.True(m.IsSupported);
     }
 
-    private sealed class StubRawApi : BittradeRawApiStub
+    private sealed class StubRawApi : RawApiStub
     {
         public override Task<Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.GetSymbolsResponse>> GetSymbolsCallAsync(
             RawPublicRequests.GetSymbolsRequest request,

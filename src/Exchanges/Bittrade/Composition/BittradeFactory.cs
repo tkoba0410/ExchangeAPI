@@ -25,7 +25,7 @@ public static class BittradeFactory
         // 認証が無い場合は PublicClient を返す（Private capability は提供しない）。
         if (signer is null)
         {
-            return new BittradePublicClient(restClient);
+            return new PublicClient(restClient);
         }
 
         if (string.IsNullOrWhiteSpace(settings.AccountId))
@@ -33,13 +33,13 @@ public static class BittradeFactory
             throw new InvalidOperationException("Bittrade accountId is required to create a private client.");
         }
 
-        var bundle = BittradeApiBundle.FromRestClient(restClient, settings.AccountId);
-        return new BittradeExchangeClient(bundle);
+        var bundle = ApiBundle.FromRestClient(restClient, settings.AccountId);
+        return new ExchangeClient(bundle);
     }
 
     [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]
-    internal static BittradeExchangeClient CreateAdapter(BittradeFactoryOptions? options = null) =>
-        (BittradeExchangeClient)CreateClient(options);
+    internal static ExchangeClient CreateAdapter(BittradeFactoryOptions? options = null) =>
+        (ExchangeClient)CreateClient(options);
 
     private static RestClient CreateRestClient(BittradeFactoryOptions settings, IRequestSigner? signer)
     {
@@ -72,6 +72,6 @@ public static class BittradeFactory
             return null;
         }
 
-        return new BittradeRequestSigner(credentials.ApiKey, credentials.ApiSecret);
+        return new RequestSigner(credentials.ApiKey, credentials.ApiSecret);
     }
 }

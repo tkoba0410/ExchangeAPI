@@ -20,12 +20,12 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public sealed class BittradeErrorEnrichTests
+public sealed class ErrorEnrichTests
 {
     [Fact]
     public async Task GetDetailMergedCallAsync_EnrichesExchangeAndOperation()
     {
-        var api = new MarketApi(new BittradeNormalizedPublicApi(new ThrowingRawApi()), CreateResolver());
+        var api = new MarketApi(new NormalizedPublicApi(new ThrowingRawApi()), CreateResolver());
 
         var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
 
@@ -34,7 +34,7 @@ public sealed class BittradeErrorEnrichTests
         Assert.Equal("boom", err.Error.Message);
     }
 
-    private sealed class ThrowingRawApi : BittradeRawApiStub
+    private sealed class ThrowingRawApi : RawApiStub
     {
         public override Task<Call<RawPublicRequests.GetDetailMergedRequest, RawPublicDtos.GetDetailMergedResponse>> GetDetailMergedCallAsync(
             RawPublicRequests.GetDetailMergedRequest request,

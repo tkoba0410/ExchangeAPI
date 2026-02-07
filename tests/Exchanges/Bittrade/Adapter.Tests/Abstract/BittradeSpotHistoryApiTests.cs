@@ -16,7 +16,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public sealed class BittradeSpotHistoryApiTests
+public sealed class SpotHistoryApiTests
 {
     [Fact]
     public async Task GetOrdersAsync_LimitApplied()
@@ -47,14 +47,14 @@ public sealed class BittradeSpotHistoryApiTests
         Assert.Equal(0, response.ReturnedCount);
     }
 
-    private static BittradeSpotHistoryApi CreateApi(StubRawApi raw)
+    private static SpotHistoryApi CreateApi(StubRawApi raw)
     {
         var markets = new StubMarketResolver("btcjpy");
-        var normalized = new BittradeNormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
-        return new BittradeSpotHistoryApi(normalized);
+        var normalized = new NormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
+        return new SpotHistoryApi(normalized);
     }
 
-    private sealed class StubRawApi : BittradeRawApiStub
+    private sealed class StubRawApi : RawApiStub
     {
         public override Task<Call<RawPrivateRequests.GetOpenOrdersRequest, RawPrivateDtos.GetOpenOrdersResponse>> GetOpenOrdersCallAsync(
             RawPrivateRequests.GetOpenOrdersRequest request,
@@ -114,26 +114,26 @@ public sealed class BittradeSpotHistoryApiTests
 
     private sealed class StubMarketResolver : IBittradeMarketResolver
     {
-        private readonly BittradeMarketInfo _market;
+        private readonly MarketInfo _market;
 
         public StubMarketResolver(string productCode)
         {
-            _market = new BittradeMarketInfo(new Symbol("BTC/JPY"), ProductCode.Parse(productCode));
+            _market = new MarketInfo(new Symbol("BTC/JPY"), ProductCode.Parse(productCode));
         }
 
-        public Task<Call<ResolveBittradeMarketRequest, BittradeMarketInfo>> ResolveCallAsync(
+        public Task<Call<ResolveBittradeMarketRequest, MarketInfo>> ResolveCallAsync(
             Symbol symbol,
             CancellationToken ct = default)
         {
             var request = new ResolveBittradeMarketRequest(symbol);
             var meta = CallMeta.CreateInternal("Normalized", "StubMarketResolver");
 
-            return Task.FromResult(new Call<ResolveBittradeMarketRequest, BittradeMarketInfo>(
+            return Task.FromResult(new Call<ResolveBittradeMarketRequest, MarketInfo>(
                 Id: CallId.New(),
                 StartedAt: DateTimeOffset.UtcNow,
                 Duration: TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<BittradeMarketInfo>.Ok(_market),
+                Result: new CallResult<MarketInfo>.Ok(_market),
                 Meta: meta));
         }
     }

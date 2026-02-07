@@ -24,7 +24,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public class BittradeMarketApiTests
+public class MarketApiTests
 {
     [Fact]
     public async Task GetDetailMergedCallAsync_MapsMergedResponse()
@@ -142,9 +142,9 @@ public class BittradeMarketApiTests
         var restClient = new RestClient(client.BaseAddress!, transport);
         var markets = CreateResolver(new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("btcjpy"), MarketType.ParseOrThrow("Spot")));
         var wireTransport = new ExchangeApi.Transport.Wire.WireTransport(restClient);
-        var wire = new BittradeWireCallExecutor(wireTransport);
-        var raw = new ExchangeApi.Exchanges.Bittrade.Raw.Api.BittradeRawApi(wire);
-        var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api.BittradeNormalizedPublicApi(raw);
+        var wire = new WireCallExecutor(wireTransport);
+        var raw = new ExchangeApi.Exchanges.Bittrade.Raw.Api.RawApi(wire);
+        var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api.NormalizedPublicApi(raw);
         return new MarketApi(normalizedMarketData, markets);
     }
 

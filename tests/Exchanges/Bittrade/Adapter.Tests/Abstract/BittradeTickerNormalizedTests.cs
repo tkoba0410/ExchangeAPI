@@ -8,7 +8,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public sealed class BittradeTickerNormalizedTests
+public sealed class TickerNormalizedTests
 {
     [Fact]
     public void Normalize_keeps_raw_snapshot()
@@ -31,8 +31,8 @@ public sealed class BittradeTickerNormalizedTests
         }
         """;
 
-        var raw = BittradeRawJson.DeserializeOrThrow<RawPublicDtos.GetDetailMergedResponse>(json, "Bittrade.GetTicker");
-        var ok = BittradeNormalizer.TryNormalizeTicker(raw, json, out var normalized, out var error);
+        var raw = RawJson.DeserializeOrThrow<RawPublicDtos.GetDetailMergedResponse>(json, "Bittrade.GetTicker");
+        var ok = Normalizer.TryNormalizeTicker(raw, json, out var normalized, out var error);
         Assert.True(ok);
         Assert.NotNull(normalized);
         Assert.Null(error);

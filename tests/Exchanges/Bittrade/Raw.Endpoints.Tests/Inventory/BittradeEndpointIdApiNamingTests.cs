@@ -6,7 +6,7 @@ using ExchangeApi.Tests.Inventory;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
 
-public sealed class BittradeEndpointIdApiNamingTests
+public sealed class EndpointIdApiNamingTests
 {
     [Fact]
     public void Bittrade_InventoryEndpointIds_MustHave_RawCallAsyncMethods()

@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Text.Json;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Composition;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bittrade.Composition;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
+using BitflyerNormalizedApi = ExchangeApi.Exchanges.Bitflyer.Normalized.Api.NormalizedApi;
+using BittradeNormalizedApi = ExchangeApi.Exchanges.Bittrade.Normalized.Api.NormalizedApi;
 
 namespace ExchangeApi.Tests.Composition.Tests.Guard;
 
@@ -80,7 +80,7 @@ public class LayerBoundaryGuardTests
 
     private static IEnumerable<Type> GetFacadeTypes()
     {
-        var bitflyer = typeof(NormalizedApi)
+        var bitflyer = typeof(BitflyerNormalizedApi)
             .Assembly
             .GetExportedTypes()
             .Where(t => t.Namespace == "ExchangeApi.Exchanges.Bitflyer.Normalized.Api");

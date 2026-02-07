@@ -4,7 +4,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
-public sealed class BittradePostOrdersPlaceRequestTests
+public sealed class PostOrdersPlaceRequestTests
 {
     [Fact]
     public void PostOrdersPlaceRequest_SerializesWithExpectedKeys()

@@ -17,7 +17,7 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
-using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests.GetSymbolsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.BittradeSymbolNormalized>>;
+using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests.GetSymbolsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.SymbolNormalized>>;
 
 namespace ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 
@@ -26,10 +26,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public
 /// </summary>
 public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
 {
-    private readonly BittradeNormalizedPublicApi _normalized;
+    private readonly NormalizedPublicApi _normalized;
     private readonly Func<CancellationToken, Task<SymbolsCall>>? _getSymbols;
 
-    internal BittradeExchangeInfoApi(BittradeNormalizedPublicApi normalized)
+    internal BittradeExchangeInfoApi(NormalizedPublicApi normalized)
     {
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
         _getSymbols = normalized.GetSymbolsCallAsync;
@@ -123,7 +123,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
 
     internal static string ToApiSymbol(ExchangeMarketInfo market)
     {
-        if (!BittradeSymbol.TryParse(market.ProductCode.Value, out var parsed))
+        if (!ExchangeSymbol.TryParse(market.ProductCode.Value, out var parsed))
         {
             throw new ArgumentException(
                 $"Bittrade symbol is invalid: '{market.ProductCode.Value}'. Expected lowercase alphanumeric like 'btcjpy'.",
@@ -219,22 +219,22 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         if (_getSymbols is null) return null;
 
         var symbolsCall = await _getSymbols(cancellationToken).ConfigureAwait(false);
-        if (symbolsCall.Result is CallResult<IReadOnlyList<BittradeSymbolNormalized>>.Err)
+        if (symbolsCall.Result is CallResult<IReadOnlyList<SymbolNormalized>>.Err)
         {
             return null;
         }
 
-        var symbols = ((CallResult<IReadOnlyList<BittradeSymbolNormalized>>.Ok)symbolsCall.Result).Response;
+        var symbols = ((CallResult<IReadOnlyList<SymbolNormalized>>.Ok)symbolsCall.Result).Response;
         var markets = symbols.Select(MapDynamicMarket).ToList();
         return new BittradeDynamicExchangeInfo { Markets = markets };
     }
 
-    private static BittradeDynamicMarketInfo MapDynamicMarket(BittradeSymbolNormalized symbol)
+    private static BittradeDynamicMarketInfo MapDynamicMarket(SymbolNormalized symbol)
     {
         var baseCurrency = symbol.BaseCurrency.Value;
         var quoteCurrency = symbol.QuoteCurrency.Value;
         var displaySymbol = $"{baseCurrency.ToUpperInvariant()}/{quoteCurrency.ToUpperInvariant()}";
-        if (!BittradeSymbol.TryParse(symbol.Symbol.Value, out var parsed))
+        if (!ExchangeSymbol.TryParse(symbol.Symbol.Value, out var parsed))
         {
             throw new ArgumentException(
                 $"Bittrade symbol is invalid: '{symbol.Symbol.Value}'. Expected lowercase alphanumeric like 'btcjpy'.",

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public sealed class BittradeParsingTests
+public sealed class ParsingTests
 {
     [Fact]
     public void MapBalances_InvalidBalance_ThrowsWithContext()
@@ -22,7 +22,7 @@ public sealed class BittradeParsingTests
                 new RawPrivateDtos.GetAccountsBalanceByAccountIdEntry(Currency: "btc", Type: "trade", Balance: "bad")
             });
 
-        var ok = BittradeNormalizer.TryNormalizeBalances(data, out var balances, out var error);
+        var ok = Normalizer.TryNormalizeBalances(data, out var balances, out var error);
         Assert.False(ok);
         Assert.Null(balances);
         Assert.NotNull(error);

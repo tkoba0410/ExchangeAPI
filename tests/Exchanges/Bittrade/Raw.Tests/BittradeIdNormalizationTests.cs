@@ -3,7 +3,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
-public sealed class BittradeIdNormalizationTests
+public sealed class IdNormalizationTests
 {
     [Fact]
     public void TradeEntry_Id_AllowsNumber()

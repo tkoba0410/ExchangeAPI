@@ -3,7 +3,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
-public sealed class BittradeEnumClosedSetTests
+public sealed class EnumClosedSetTests
 {
     [Fact]
     public void OrderDetail_KnownTypeAndState_Deserialize()

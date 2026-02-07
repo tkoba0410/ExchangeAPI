@@ -13,7 +13,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public sealed class BittradeNormalizedTradingApiSymbolTests
+public sealed class NormalizedTradingApiSymbolTests
 {
     [Theory]
     [InlineData("")]
@@ -23,11 +23,11 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
     {
         var api = CreateApi(productCode);
         var request = new PostOrdersPlaceRequest(
-            new BittradeOrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m)));
+            new OrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m)));
 
         var call = await api.PostOrdersPlaceCallAsync(request, CancellationToken.None);
 
-        var err = Assert.IsType<CallResult<BittradeOrderResult>.Err>(call.Result);
+        var err = Assert.IsType<CallResult<OrderResult>.Err>(call.Result);
         Assert.NotNull(err.Error);
     }
 
@@ -37,25 +37,25 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
         var raw = new RecordingRawTradingApi();
         var api = CreateApi("BTC_JPY", raw);
         var request = new PostOrdersPlaceRequest(
-            new BittradeOrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m)));
+            new OrderRequest(new Symbol("BTC/JPY"), Side.Buy, OrderType.Market, new Size(1m)));
 
         await api.PostOrdersPlaceCallAsync(request, CancellationToken.None);
 
         Assert.True(raw.WasCalled);
     }
 
-    private static BittradeNormalizedPrivateApi CreateApi(string productCode, BittradeRawApiStub? raw = null)
+    private static NormalizedPrivateApi CreateApi(string productCode, RawApiStub? raw = null)
     {
         raw ??= new ThrowingRawApi();
         var markets = new StubMarketResolver(productCode);
-        return new BittradeNormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
+        return new NormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
     }
 
-    private sealed class ThrowingRawApi : BittradeRawApiStub
+    private sealed class ThrowingRawApi : RawApiStub
     {
     }
 
-    private sealed class RecordingRawTradingApi : BittradeRawApiStub
+    private sealed class RecordingRawTradingApi : RawApiStub
     {
         public bool WasCalled { get; private set; }
 
@@ -78,26 +78,26 @@ public sealed class BittradeNormalizedTradingApiSymbolTests
 
     private sealed class StubMarketResolver : IBittradeMarketResolver
     {
-        private readonly BittradeMarketInfo _market;
+        private readonly MarketInfo _market;
 
         public StubMarketResolver(string productCode)
         {
-            _market = new BittradeMarketInfo(new Symbol("BTC/JPY"), ProductCode.Parse(productCode));
+            _market = new MarketInfo(new Symbol("BTC/JPY"), ProductCode.Parse(productCode));
         }
 
-        public Task<Call<ResolveBittradeMarketRequest, BittradeMarketInfo>> ResolveCallAsync(
+        public Task<Call<ResolveBittradeMarketRequest, MarketInfo>> ResolveCallAsync(
             Symbol symbol,
             CancellationToken ct = default)
         {
             var request = new ResolveBittradeMarketRequest(symbol);
             var meta = CallMeta.CreateInternal("Normalized", "StubMarketResolver");
 
-            return Task.FromResult(new Call<ResolveBittradeMarketRequest, BittradeMarketInfo>(
+            return Task.FromResult(new Call<ResolveBittradeMarketRequest, MarketInfo>(
                 Id: CallId.New(),
                 StartedAt: DateTimeOffset.UtcNow,
                 Duration: TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<BittradeMarketInfo>.Ok(_market),
+                Result: new CallResult<MarketInfo>.Ok(_market),
                 Meta: meta));
         }
     }

@@ -26,16 +26,16 @@
 2. `OrderId` 意味のフィールドが `Id` になっている（Bittrade Normalized）
 - 状況: 実体が `OrderId` なのにフィールド名が `Id`
 - 根拠:
-  - `src/Exchanges/Bittrade/Normalized/Public/Dtos/BittradeExecutionNormalized.cs:11` `OrderId Id`
-  - `src/Exchanges/Bittrade/Adapter/Internal/Mappers/BittradeMarketMapper.cs:48` `OrderId: normalized.Id`
+  - `src/Exchanges/Bittrade/Normalized/Public/Dtos/ExecutionNormalized.cs:11` `OrderId Id`
+  - `src/Exchanges/Bittrade/Adapter/Internal/Mappers/MarketMapper.cs:48` `OrderId: normalized.Id`
 - 影響: `Id` が何の識別子か不明瞭
 - 推奨: `OrderId` へ改名
 
 3. Kline 時刻キーのフィールド名が `Id`（意味不一致）
 - 状況: Unix 時刻を保持する値が `Id` 命名
 - 根拠:
-  - `src/Exchanges/Bittrade/Normalized/Public/Dtos/BittradeKlineNormalized.cs:6` `FreeText Id`
-  - `src/Exchanges/Bittrade/Adapter/Internal/Mappers/BittradeMarketMapper.cs:68` `ParseUnixTimestamp(kline.Id)`
+  - `src/Exchanges/Bittrade/Normalized/Public/Dtos/KlineNormalized.cs:6` `FreeText Id`
+  - `src/Exchanges/Bittrade/Adapter/Internal/Mappers/MarketMapper.cs:68` `ParseUnixTimestamp(kline.Id)`
 - 影響: 読み手が識別子と誤認しやすい
 - 推奨: `Timestamp` または `OpenTimeUnix` など意味名に変更
 
@@ -47,7 +47,7 @@
 - 状況: 一般英語では `Currencies` だが、EndpointId は `GetCurrencys`
 - 根拠:
   - `docs/inventory/endpoints-bittrade.md:80` `GetCurrencys`
-  - `src/Exchanges/Bittrade/Wire/Constants/BittradeEndpointIds.cs:7` `GetCurrencys`
+  - `src/Exchanges/Bittrade/Wire/Constants/EndpointIds.cs:7` `GetCurrencys`
 - 判断: EndpointId 由来として許容（仕様準拠）
 
 ---

@@ -117,7 +117,7 @@ internal static class ParentOrderNormalizer
             Extras: new Dictionary<FreeText, JsonElement>());
     }
 
-    private static ParentOrderParameterNormalized NormalizeParameter(RawPrivateDtos.ParentOrderParameterResponse raw)
+    private static ParentOrderParameterNormalized NormalizeParameter(RawPrivateDtos.ParentOrderParameterItem raw)
     {
         return new ParentOrderParameterNormalized(
             ProductCode: ProductCode.ParseNormalized(raw.ProductCode),

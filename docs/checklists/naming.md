@@ -25,6 +25,8 @@
 - [ ] `Raw/Normalized` の API は `<EndpointId>CallAsync`
 - [ ] `RequestType/ResponseType` は `<EndpointId>` と対応している
 - [ ] コレクション応答は `<EndpointId>Response`（コンテナ）/ `<EndpointId>Item`（要素）で命名している
+- [ ] ルート配列 Response は `<EndpointId>Response : List<<EndpointId>Item>` の形にしている（該当時）
+- [ ] ルート配列要素型は `<EndpointId>Item` になっている
 - [ ] EndpointId と異なる独自別名を API 名に混在させていない
 
 ## 4. 同義語の統制
@@ -32,8 +34,12 @@
 - [ ] 同じ意味に複数語（例: `Symbol` と `Market`）を混在させていない
 - [ ] `Id` / `OrderId` / `ExchangeOrderId` を意味ごとに使い分けている
 - [ ] `Request` / `Response` / `Result` の責務が混線していない
+- [ ] `Request` / `Response` は API 境界の第1階層 DTO のみに付与している
+- [ ] ルート配列の要素型が `<EndpointId>Item` になっている
 - [ ] Internal 補助モデル（送信前エンコード / 受信後中間表現 / 変換専用モデル）の対象が明確に判別できる
-- [ ] Internal 補助モデルで `Request` / `Response` を使う場合でも、`Payload` / `Body` / `Envelope` / `Document` / `Encoded` など役割接尾辞を必ず併記している
+- [ ] 第1階層 DTO 以外（ネスト要素 / Internal 補助モデル）に `Request` / `Response` を付けていない
+- [ ] Internal 補助モデルに `Payload` / `Body` / `Envelope` / `Document` / `Encoded` / `Item` / `Entry` / `Record` など役割接尾辞を付与している
+- [ ] オブジェクト内配列は `IReadOnlyList<T>` で公開している
 
 ## 5. 意味と名前の一致
 
@@ -59,3 +65,4 @@
 - `rg -n "\\bOrderId Id\\b|\\bFreeText Id\\b" src/Exchanges`
 - `rg -n "Get[A-Za-z]+CallAsync" src/Exchanges/*/{Raw,Normalized}`
 - `rg -n "Raw.*(Request|Response)" src/Exchanges/*/Raw/Internal`
+- `rg -n "class .*Request|record .*Request|class .*Response|record .*Response" src/Exchanges/*/{Raw,Normalized}/Internal`

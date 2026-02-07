@@ -50,6 +50,7 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] Raw / Normalized 層のメソッド名が `<EndpointId>CallAsync` になっていることを確認した
 * [ ] `<EndpointId>` / `<EndpointId>CallAsync` の派生規則に反する独自命名を導入していないことを確認した
   * [ ] EndpointId 自体に Method 語を含める取引所ルールの場合、その Method 語は「独自補助語」ではなく EndpointId の一部として扱われていることを確認した
+* [ ] `Request` / `Response` 接尾辞が API 境界の第1階層 DTO のみに使われていることを確認した
 * [ ] 例外命名が必要な場合、exceptions.md に記録したことを確認した
 
 ---
@@ -58,6 +59,7 @@ TopSpec / inventory / governance により定義された規範が、
 
 * [ ] Wire 層では文字列 / Json ミラーを使用していることを確認した
 * [ ] Raw / Normalized / 共通層へ文字列が流入していないことを確認した（例外がある場合は例外として記録した）
+* [ ] 配列DTOが「ルート配列=List継承（許容） / 内部配列=IReadOnlyList（必須）」の方針に一致していることを確認した
 * [ ] Price / Size 等が専用型で表現されていることを確認した
 * [ ] Normalized / Contracts で識別子（OrderId/AccountId 等）が専用型で表現されていることを確認した
 * [ ] Normalized / Contracts で `State` / `Type` / `Side` 等の列挙的概念が専用型（未知値保持を含む）で表現されていることを確認した

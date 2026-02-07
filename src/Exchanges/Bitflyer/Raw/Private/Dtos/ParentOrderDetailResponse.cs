@@ -11,12 +11,12 @@ public sealed class ParentOrderDetailResponse
     [JsonPropertyName("order_method")] public string OrderMethod { get; init; } = string.Empty;
     [JsonPropertyName("expire_date")] public DateTimeOffset ExpireDate { get; init; }
     [JsonPropertyName("time_in_force")] public string TimeInForce { get; init; } = string.Empty;
-    [JsonPropertyName("parameters")] public IReadOnlyList<ParentOrderParameterResponse> Parameters { get; init; }
-        = new List<ParentOrderParameterResponse>();
+    [JsonPropertyName("parameters")] public IReadOnlyList<ParentOrderParameterItem> Parameters { get; init; }
+        = new List<ParentOrderParameterItem>();
     [JsonPropertyName("parent_order_acceptance_id")] public string ParentOrderAcceptanceId { get; init; } = string.Empty;
 }
 
-public sealed class ParentOrderParameterResponse
+public sealed class ParentOrderParameterItem
 {
     [JsonPropertyName("product_code")] public string ProductCode { get; init; } = string.Empty;
     [JsonPropertyName("condition_type")] public string ConditionType { get; init; } = string.Empty;

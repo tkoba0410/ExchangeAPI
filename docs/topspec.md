@@ -453,14 +453,26 @@ Call は以下を表現する。
 ### 6.3 Request / Response 命名の予約（MUST）
 
 * 層の公開 API 契約（in/out）を表す型は、`Request` / `Response` を基本形として命名する（MUST）。
+* `Request` / `Response` 接尾辞を付与できる対象は、API 境界の第1階層 DTO に限定する（MUST）。
+  * ルートがオブジェクトの場合: そのルート DTO
+  * ルートが配列の場合: その配列要素 DTO（通常 `<EndpointId>Item`）
 * 本節でいう Internal 補助モデルは、次を指す（MUST）。
   * 送信前エンコードモデル（Wire に渡す body/query/header 生成用）
   * 受信後中間表現モデル（Raw JSON からの一時構造）
   * 変換専用モデル（Mapper 内部の入出力補助）
-* Internal 補助モデルに `Request` / `Response` を用いてよい（MAY）。
-* ただし Internal 補助モデルは、`Request` / `Response` の有無にかかわらず、役割を表す接尾辞を必ず付与する（MUST）。
-  例: `Payload`, `Body`, `Envelope`, `Document`, `Encoded`
-* 同一 EndpointId で契約 DTO と補助モデルが併存する場合、契約 DTO 側に `Request` / `Response` を優先し、補助モデル側は役割名で分離する（MUST）。
+* 第1階層 DTO 以外（ネスト要素 DTO・Internal 補助モデル）に `Request` / `Response` を付与してはならない（MUST NOT）。
+* Internal 補助モデルは、役割を表す接尾辞を必ず付与する（MUST）。
+  例: `Payload`, `Body`, `Envelope`, `Document`, `Encoded`, `Item`, `Entry`, `Record`
+* 同一 EndpointId で API 境界 DTO と補助モデルが併存する場合、`Request` / `Response` は API 境界 DTO 側にのみ付与し、補助モデル側は役割名で分離する（MUST）。
+
+---
+
+### 6.4 配列 DTO の型方針
+
+* オブジェクト内の配列プロパティは `IReadOnlyList<T>` で公開する（MUST）。
+* ルートが配列の Response DTO は `<EndpointId>Response : List<<EndpointId>Item>` を許容する（SHOULD）。
+* ルート配列の要素型は `<EndpointId>Item` を基本とする（SHOULD）。
+* Raw 層で `List<T>` を使用しても、Normalized/Contracts への境界では読み取り専用表現に変換する（MUST）。
 
 ---
 
@@ -564,6 +576,7 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * EndpointId と API メソッド名は意味的に一致しなければならない
 * コレクション応答は、コンテナ型を `<EndpointId>Response`、要素型を `<EndpointId>Item` とする（SHOULD）。
   例: `GetChildOrdersResponse` / `GetChildOrdersItem`
+* `Request` / `Response` は API 境界の第1階層 DTO に限定し、内部モデルには付与しない（MUST）。
 * 上記の 1:1 対応は、inventory において当該層が実装対象として指定されている場合に限る。
   実装対象の指定は inventory の `PresentIn` 列により行う。
 

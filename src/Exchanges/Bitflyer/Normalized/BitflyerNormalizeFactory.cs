@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized;
 internal static class BitflyerNormalizeFactory
 {
     public static BitflyerNormalizedApi FromRaw(
-        IBitflyerRawApi raw,
+        IRawApi raw,
         IBitflyerMarketResolver markets)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));

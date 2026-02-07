@@ -8,7 +8,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 
 public sealed record BittradeExecutionNormalized(
-    OrderId Id,
+    OrderId OrderId,
     BittradeOrderSide Side,
     decimal Price,
     decimal Size,

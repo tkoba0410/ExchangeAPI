@@ -144,7 +144,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             Assert.Equal(1, ok.Response.ReturnedCount);
         }
 
-        private static BitflyerExchangeClient CreateClient(IBitflyerRawApi raw)
+        private static BitflyerExchangeClient CreateClient(IRawApi raw)
         {
             var markets = BitflyerTestHelpers.CreateResolver();
             var normalized = BitflyerTestHelpers.CreateNormalizedApi(raw, markets);

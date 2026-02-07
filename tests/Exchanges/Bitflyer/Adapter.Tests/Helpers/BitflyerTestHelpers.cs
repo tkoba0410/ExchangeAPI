@@ -19,7 +19,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Helpers;
 
 internal static class BitflyerTestHelpers
 {
-    public static IBitflyerNormalizedApi CreateNormalizedApi(IBitflyerRawApi raw, IBitflyerMarketResolver markets) =>
+    public static IBitflyerNormalizedApi CreateNormalizedApi(IRawApi raw, IBitflyerMarketResolver markets) =>
         BitflyerNormalizedApi.FromRaw(raw, markets);
 
     public static IBitflyerNormalizedApi CreateNormalizedApi(
@@ -53,7 +53,7 @@ internal static class BitflyerTestHelpers
         return new BitflyerNormalizedMarketResolver(resolver);
     }
 
-    public static BitflyerApiBundle CreateBundle(IBitflyerRawApi raw)
+    public static BitflyerApiBundle CreateBundle(IRawApi raw)
     {
         var publicApi = new BitflyerNormalizedPublicApi(raw);
         var exchangeInfo = new BitflyerExchangeInfoApi();

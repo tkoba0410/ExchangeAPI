@@ -5,7 +5,7 @@ using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 
-internal sealed class BitflyerRawCallExecutor
+internal sealed class RawCallExecutor
 {
     public Call<TReq, TRes> Parse<TReq, TRes>(
         TReq request,

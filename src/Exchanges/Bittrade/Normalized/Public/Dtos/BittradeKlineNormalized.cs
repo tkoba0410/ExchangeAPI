@@ -3,7 +3,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 
 public sealed record BittradeKlineNormalized(
-    FreeText Id,
+    FreeText OpenTimeUnix,
     decimal Open,
     decimal Close,
     decimal Low,

@@ -23,11 +23,11 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Api;
 
 internal sealed class BitflyerNormalizedPrivateApi
 {
-    private readonly IBitflyerRawApi _raw;
+    private readonly IRawApi _raw;
     private readonly IBitflyerMarketResolver _markets;
 
     public BitflyerNormalizedPrivateApi(
-        IBitflyerRawApi raw,
+        IRawApi raw,
         IBitflyerMarketResolver markets)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
@@ -116,7 +116,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         {
             return CreateImmediateError<PrivateRequests.CancelChildOrderRequest, BitflyerCancelResult>(
                 callRequest,
-                Component(BitflyerEndpointIds.CancelChildOrder),
+                Component(EndpointIds.CancelChildOrder),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
         }
 
@@ -126,7 +126,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.CancelChildOrderRequest, BitflyerCancelResult>(
                 marketCall,
                 callRequest,
-                Component(BitflyerEndpointIds.CancelChildOrder),
+                Component(EndpointIds.CancelChildOrder),
                 marketError!);
         }
 
@@ -163,7 +163,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             callRequest,
-            Component(BitflyerEndpointIds.CancelChildOrder),
+            Component(EndpointIds.CancelChildOrder),
             _ => MapResult<BitflyerCancelResult>.Ok(new BitflyerCancelResult(true)));
     }
 
@@ -176,7 +176,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         {
             return CreateImmediateError<PrivateRequests.CancelAllChildOrdersRequest, BitflyerCancelResult>(
                 callRequest,
-                Component(BitflyerEndpointIds.CancelAllChildOrders),
+                Component(EndpointIds.CancelAllChildOrders),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
         }
 
@@ -186,7 +186,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.CancelAllChildOrdersRequest, BitflyerCancelResult>(
                 marketCall,
                 callRequest,
-                Component(BitflyerEndpointIds.CancelAllChildOrders),
+                Component(EndpointIds.CancelAllChildOrders),
                 marketError!);
         }
 
@@ -197,7 +197,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             callRequest,
-            Component(BitflyerEndpointIds.CancelAllChildOrders),
+            Component(EndpointIds.CancelAllChildOrders),
             _ => MapResult<BitflyerCancelResult>.Ok(new BitflyerCancelResult(true)));
     }
 
@@ -210,7 +210,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         {
             return CreateImmediateError<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<BitflyerOpenOrder>>(
                 callRequest,
-                Component(BitflyerEndpointIds.GetChildOrders),
+                Component(EndpointIds.GetChildOrders),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
         }
 
@@ -480,7 +480,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             callRequest,
-            Component(BitflyerEndpointIds.CancelParentOrder),
+            Component(EndpointIds.CancelParentOrder),
             _ => MapResult<BitflyerParentOrderCancelResult>.Ok(new BitflyerParentOrderCancelResult(true)));
     }
 
@@ -498,7 +498,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             {
                 return CreateImmediateError<PrivateRequests.GetParentOrdersRequest, IReadOnlyList<BitflyerParentOrderNormalized>>(
                     callRequest,
-                    Component(BitflyerEndpointIds.GetParentOrders),
+                    Component(EndpointIds.GetParentOrders),
                     stateError!);
             }
 
@@ -519,7 +519,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             callRequest,
-            Component(BitflyerEndpointIds.GetParentOrders),
+            Component(EndpointIds.GetParentOrders),
             ok =>
             {
                 if (!BitflyerParentOrderNormalizer.TryNormalizeList(ok, rawCall.Meta.RawJson, out var normalized, out var error))
@@ -549,7 +549,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             callRequest,
-            Component(BitflyerEndpointIds.GetParentOrder),
+            Component(EndpointIds.GetParentOrder),
             ok =>
             {
                 if (!BitflyerParentOrderNormalizer.TryNormalizeDetail(ok, rawCall.Meta.RawJson, out var normalized, out var error))
@@ -593,7 +593,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetPermissions),
+            Component(EndpointIds.GetPermissions),
             raw => MapResult<IReadOnlyList<FreeText>>.Ok(raw.ToArray()));
     }
 
@@ -607,7 +607,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetCollateral),
+            Component(EndpointIds.GetCollateral),
             raw => MapResult<BitflyerCollateralNormalized>.Ok(
                 new BitflyerCollateralNormalized(
                     raw.Collateral,
@@ -626,7 +626,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetCollateralAccounts),
+            Component(EndpointIds.GetCollateralAccounts),
             raw => MapResult<IReadOnlyList<BitflyerCollateralAccountNormalized>>.Ok(
                 raw.Select(item => new BitflyerCollateralAccountNormalized(CurrencyCodeConverter.FromString(item.CurrencyCode), item.Amount, item.Available))
                     .ToArray()));
@@ -642,7 +642,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetAddresses),
+            Component(EndpointIds.GetAddresses),
             raw => MapResult<BitflyerRawJsonNormalized>.Ok(new BitflyerRawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
@@ -659,7 +659,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetCoinIns),
+            Component(EndpointIds.GetCoinIns),
             raw => MapResult<BitflyerRawJsonNormalized>.Ok(new BitflyerRawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
@@ -677,7 +677,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetCoinOuts),
+            Component(EndpointIds.GetCoinOuts),
             raw => MapResult<BitflyerRawJsonNormalized>.Ok(new BitflyerRawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
@@ -691,7 +691,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetBankAccounts),
+            Component(EndpointIds.GetBankAccounts),
             raw => MapResult<BitflyerRawJsonNormalized>.Ok(new BitflyerRawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
@@ -708,7 +708,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetDeposits),
+            Component(EndpointIds.GetDeposits),
             raw => MapResult<BitflyerRawJsonNormalized>.Ok(new BitflyerRawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
@@ -733,7 +733,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.Withdraw),
+            Component(EndpointIds.Withdraw),
             raw => MapResult<BitflyerWithdrawResultNormalized>.Ok(new BitflyerWithdrawResultNormalized(FreeText.Parse(raw.MessageId))));
     }
 
@@ -750,7 +750,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetWithdrawals),
+            Component(EndpointIds.GetWithdrawals),
             raw => MapResult<BitflyerRawJsonNormalized>.Ok(new BitflyerRawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
@@ -768,7 +768,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetBalanceHistory),
+            Component(EndpointIds.GetBalanceHistory),
             raw => MapResult<BitflyerRawJsonNormalized>.Ok(new BitflyerRawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
@@ -781,7 +781,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         {
             return CreateImmediateError<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>(
                 request,
-                Component(BitflyerEndpointIds.GetPositions),
+                Component(EndpointIds.GetPositions),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
         }
 
@@ -791,7 +791,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>(
                 marketCall,
                 request,
-                Component(BitflyerEndpointIds.GetPositions),
+                Component(EndpointIds.GetPositions),
                 marketError.Error);
         }
 
@@ -803,7 +803,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetPositionsRequest, IReadOnlyList<BitflyerPositionNormalized>>(
                 marketCall,
                 request,
-                Component(BitflyerEndpointIds.GetPositions),
+                Component(EndpointIds.GetPositions),
                 new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
         }
 
@@ -814,7 +814,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetPositions),
+            Component(EndpointIds.GetPositions),
             raw =>
             {
                 var mapped = new List<BitflyerPositionNormalized>(raw.Count);
@@ -851,7 +851,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetCollateralHistory),
+            Component(EndpointIds.GetCollateralHistory),
             raw => MapResult<BitflyerRawJsonNormalized>.Ok(new BitflyerRawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
@@ -864,7 +864,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         {
             return CreateImmediateError<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 request,
-                Component(BitflyerEndpointIds.GetExecutionsPrivate),
+                Component(EndpointIds.GetExecutionsPrivate),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
         }
 
@@ -874,7 +874,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
-                Component(BitflyerEndpointIds.GetExecutionsPrivate),
+                Component(EndpointIds.GetExecutionsPrivate),
                 marketError.Error);
         }
 
@@ -886,7 +886,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<BitflyerExecutionAccountNormalized>>(
                 marketCall,
                 request,
-                Component(BitflyerEndpointIds.GetExecutionsPrivate),
+                Component(EndpointIds.GetExecutionsPrivate),
                 new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
         }
 
@@ -897,7 +897,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetExecutionsPrivate),
+            Component(EndpointIds.GetExecutionsPrivate),
             raw =>
             {
                 if (!BitflyerAccountMapper.TryMapAccountExecutions(symbol, raw, out var executions, out var error))
@@ -918,7 +918,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         {
             return CreateImmediateError<PrivateRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
                 request,
-                Component(BitflyerEndpointIds.GetTradingCommission),
+                Component(EndpointIds.GetTradingCommission),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
         }
 
@@ -928,7 +928,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
                 marketCall,
                 request,
-                Component(BitflyerEndpointIds.GetTradingCommission),
+                Component(EndpointIds.GetTradingCommission),
                 marketError.Error);
         }
 
@@ -940,7 +940,7 @@ internal sealed class BitflyerNormalizedPrivateApi
             return CreateCallError<PrivateRequests.GetTradingCommissionRequest, BitflyerTradingCommissionNormalized>(
                 marketCall,
                 request,
-                Component(BitflyerEndpointIds.GetTradingCommission),
+                Component(EndpointIds.GetTradingCommission),
                 new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
         }
 
@@ -951,7 +951,7 @@ internal sealed class BitflyerNormalizedPrivateApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetTradingCommission),
+            Component(EndpointIds.GetTradingCommission),
             raw =>
             {
                 if (!TryParseTradingCommission(raw.RawJson, productCode, out var parsed, out var error))

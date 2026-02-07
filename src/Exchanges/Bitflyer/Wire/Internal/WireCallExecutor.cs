@@ -6,18 +6,18 @@ using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Internal;
 
-public interface IBitflyerWireCallExecutor
+public interface IWireCallExecutor
 {
     Task<Call<WireCallSpec, WireResponse>> SendAsync(
         WireCallSpec spec,
         CancellationToken cancellationToken = default);
 }
 
-public sealed class BitflyerWireCallExecutor : IBitflyerWireCallExecutor
+public sealed class WireCallExecutor : IWireCallExecutor
 {
     private readonly IWireTransport _wire;
 
-    public BitflyerWireCallExecutor(IWireTransport wire)
+    public WireCallExecutor(IWireTransport wire)
     {
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
     }

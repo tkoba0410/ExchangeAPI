@@ -13,7 +13,7 @@ public sealed class BitflyerEndpointIdApiNamingTests
     public void Bitflyer_InventoryEndpointIds_MustHave_RawCallAsyncMethods()
     {
         var inventory = LoadInventoryEndpointIds();
-        EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(IBitflyerRawApi));
+        EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(IRawApi));
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public sealed class BitflyerEndpointIdApiNamingTests
     private static IReadOnlyCollection<string> LoadInventoryEndpointIds()
     {
         var inventory = InventoryEndpointIdParser.ParseEndpointIdsFromFile(InventoryFilePath);
-        var notImplemented = BitflyerEndpointIdCatalog.GetNotImplementedEndpointIds();
+        var notImplemented = EndpointIdCatalog.GetNotImplementedEndpointIds();
         if (notImplemented.Count == 0)
         {
             return inventory;

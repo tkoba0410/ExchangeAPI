@@ -10,7 +10,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 
-public interface IBitflyerRawApi
+public interface IRawApi
 {
     Task<Call<GetMarketsRequest, GetMarketsResponse>> GetMarketsCallAsync(
         GetMarketsRequest request,

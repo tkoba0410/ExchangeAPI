@@ -38,8 +38,8 @@ internal sealed class BitflyerApiBundle
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
         var wireTransport = new WireTransport(restClient);
-        var wire = new BitflyerWireCallExecutor(wireTransport);
-        var raw = new BitflyerRawApi(wire);
+        var wire = new WireCallExecutor(wireTransport);
+        var raw = new RawApi(wire);
         var publicApi = new BitflyerNormalizedPublicApi(raw);
         var exchangeInfo = new BitflyerExchangeInfoApi(publicApi);
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);

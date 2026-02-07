@@ -36,7 +36,7 @@ internal sealed class BittradeSpotHistoryApi
 
         try
         {
-            var call = await _trading.GetOpenOrdersCallAsync(request.Market, cancellationToken).ConfigureAwait(false);
+            var call = await _trading.GetOpenOrdersCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -62,7 +62,7 @@ internal sealed class BittradeSpotHistoryApi
         try
         {
             var call = await _trading
-                .GetMatchResultsCallAsync(request.Market, request.Limit, cancellationToken)
+                .GetMatchResultsCallAsync(request.Symbol, request.Limit, cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -112,8 +112,8 @@ internal sealed class BittradeSpotHistoryApi
     {
         var items = executions.Select(e => new ExecutionsPrivateItem(
             Timestamp: e.Timestamp,
-            ExecutionId: ExecutionId.ParseOrThrow(e.Id.Value),
-            Market: request.Market,
+            ExecutionId: ExecutionId.ParseOrThrow(e.OrderId.Value),
+            Market: request.Symbol,
             Side: e.Side switch
             {
                 BittradeOrderSide.Buy => Side.Buy,

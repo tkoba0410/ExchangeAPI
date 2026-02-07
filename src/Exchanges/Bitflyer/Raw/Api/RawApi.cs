@@ -13,16 +13,16 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 
-public sealed class BitflyerRawApi : IBitflyerRawApi
+public sealed class RawApi : IRawApi
 {
-    private readonly BitflyerPublicApi _publicApi;
-    private readonly BitflyerRawPrivateClient _privateClient;
+    private readonly PublicApi _publicApi;
+    private readonly RawPrivateClient _privateClient;
 
-    public BitflyerRawApi(IBitflyerWireCallExecutor wire)
+    public RawApi(IWireCallExecutor wire)
     {
-        var executor = new BitflyerRawCallExecutor();
-        _publicApi = new BitflyerPublicApi(wire, executor);
-        _privateClient = new BitflyerRawPrivateClient(wire, executor);
+        var executor = new RawCallExecutor();
+        _publicApi = new PublicApi(wire, executor);
+        _privateClient = new RawPrivateClient(wire, executor);
     }
 
     public Task<Call<GetMarketsRequest, GetMarketsResponse>> GetMarketsCallAsync(

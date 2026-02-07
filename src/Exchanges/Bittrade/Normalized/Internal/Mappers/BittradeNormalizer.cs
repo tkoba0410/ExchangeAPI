@@ -169,7 +169,7 @@ internal static class BittradeNormalizer
 
             normalized = entries
                 .Select(entry => new BittradeKlineNormalized(
-                    Id: FreeText.Parse(entry.Id),
+                    OpenTimeUnix: FreeText.Parse(entry.Id),
                     Open: entry.Open,
                     Close: entry.Close,
                     Low: entry.Low,

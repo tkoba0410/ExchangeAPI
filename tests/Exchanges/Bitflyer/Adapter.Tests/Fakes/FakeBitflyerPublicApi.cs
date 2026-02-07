@@ -8,7 +8,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
-internal sealed class FakeBitflyerPublicApi : IBitflyerRawApi
+internal sealed class FakeBitflyerPublicApi : IRawApi
 {
     private readonly RawPublicDtos.GetTickerResponse _response;
     private readonly RawPublicDtos.GetBoardResponse? _board;

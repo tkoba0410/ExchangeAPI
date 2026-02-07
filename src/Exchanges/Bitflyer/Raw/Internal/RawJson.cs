@@ -5,7 +5,7 @@ using ExchangeApi.Transport.Protocol;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 
-internal static class BitflyerRawJson
+internal static class RawJson
 {
     private static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web);
 

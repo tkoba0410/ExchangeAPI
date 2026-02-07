@@ -20,7 +20,7 @@ public sealed class BitflyerParentOrderEncodeTests
             TimeInForce = new FreeText("GTC"),
         };
 
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.SendChildOrder");
+        var bodyJson = RawJson.SerializeOrThrow(request, "Bitflyer.SendChildOrder");
 
         Assert.Contains("\"product_code\"", bodyJson);
         Assert.Contains("\"child_order_type\"", bodyJson);
@@ -48,7 +48,7 @@ public sealed class BitflyerParentOrderEncodeTests
             }
         };
 
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.SendParentOrder");
+        var bodyJson = RawJson.SerializeOrThrow(request, "Bitflyer.SendParentOrder");
 
         Assert.Contains("\"order_method\"", bodyJson);
         Assert.Contains("\"parameters\"", bodyJson);

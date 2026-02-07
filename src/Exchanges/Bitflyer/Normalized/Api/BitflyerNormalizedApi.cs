@@ -31,7 +31,7 @@ public sealed class BitflyerNormalizedApi : IBitflyerNormalizedApi
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
     }
 
-    internal static BitflyerNormalizedApi FromRaw(IBitflyerRawApi raw, IBitflyerMarketResolver markets)
+    internal static BitflyerNormalizedApi FromRaw(IRawApi raw, IBitflyerMarketResolver markets)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
         if (markets is null) throw new ArgumentNullException(nameof(markets));

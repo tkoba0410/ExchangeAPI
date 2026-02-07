@@ -1,7 +1,7 @@
-// Exchanges/Bitflyer/Wire/Constants/BitflyerPaths.cs
+// Exchanges/Bitflyer/Wire/Constants/Paths.cs
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 
-internal static class BitflyerPaths
+internal static class Paths
 {
     public const string GetMarketsPath = "/v1/getmarkets";
     public const string GetBoardPath = "/v1/getboard";

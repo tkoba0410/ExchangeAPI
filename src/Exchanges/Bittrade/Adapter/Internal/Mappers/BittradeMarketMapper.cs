@@ -45,7 +45,7 @@ internal static class BittradeMarketMapper
     {
         return new ExecutionsPublicItem(
             Symbol: symbol,
-            OrderId: normalized.Id,
+            OrderId: normalized.OrderId,
             Side: MapSide(normalized.Side),
             Price: new Price(normalized.Price),
             Size: new Size(normalized.Size),
@@ -65,7 +65,7 @@ internal static class BittradeMarketMapper
         return klines
             .Select(kline =>
             {
-                var openTime = ParseUnixTimestamp(kline.Id);
+                var openTime = ParseUnixTimestamp(kline.OpenTimeUnix);
                 var closeTime = openTime + timescale;
                 return new Candlestick(
                     Symbol: symbol,
@@ -92,11 +92,11 @@ internal static class BittradeMarketMapper
             _ => throw new ExchangeApiException($"Unsupported side: {side}.")
         };
 
-    private static DateTimeOffset ParseUnixTimestamp(FreeText id)
+    private static DateTimeOffset ParseUnixTimestamp(FreeText openTimeUnix)
     {
-        if (!long.TryParse(id.Value, out var unixValue))
+        if (!long.TryParse(openTimeUnix.Value, out var unixValue))
         {
-            throw new ExchangeApiException($"Invalid candlestick timestamp: {id.Value}");
+            throw new ExchangeApiException($"Invalid candlestick timestamp: {openTimeUnix.Value}");
         }
 
         return unixValue >= 10_000_000_000

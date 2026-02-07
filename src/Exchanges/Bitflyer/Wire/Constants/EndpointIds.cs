@@ -1,7 +1,7 @@
-// Exchanges/Bitflyer/Wire/Constants/BitflyerEndpointIds.cs
+// Exchanges/Bitflyer/Wire/Constants/EndpointIds.cs
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 
-public static class BitflyerEndpointIds
+public static class EndpointIds
 {
     public const string GetMarkets = "GetMarkets";
     public const string GetBoard = "GetBoard";

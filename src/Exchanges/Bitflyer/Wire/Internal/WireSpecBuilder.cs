@@ -4,7 +4,7 @@ using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Internal;
 
-internal static class BitflyerWireSpecBuilder
+internal static class WireSpecBuilder
 {
     public static WireCallSpec Get(string endpointId, string path, string? query) =>
         new(Method: "GET", Path: path, EndpointId: endpointId, Query: query);

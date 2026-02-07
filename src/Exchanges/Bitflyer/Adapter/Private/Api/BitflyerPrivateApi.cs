@@ -61,7 +61,7 @@ internal sealed class BitflyerPrivateApi
 
         try
         {
-            var call = await _normalized.GetChildOrdersCallAsync(request.Market, cancellationToken).ConfigureAwait(false);
+            var call = await _normalized.GetChildOrdersCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -86,7 +86,7 @@ internal sealed class BitflyerPrivateApi
 
         try
         {
-            var call = await _normalized.GetExecutionsPrivateCallAsync(request.Market, cancellationToken)
+            var call = await _normalized.GetExecutionsPrivateCallAsync(request.Symbol, cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,

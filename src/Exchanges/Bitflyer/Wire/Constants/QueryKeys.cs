@@ -1,6 +1,6 @@
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 
-internal static class BitflyerQueryKeys
+internal static class QueryKeys
 {
     public const string ProductCode = "product_code";
     public const string Count = "count";

@@ -4,7 +4,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 
-internal static class BitflyerRawMappers
+internal static class RawMappers
 {
     public static RawSendChildOrderRequest MapSendChildOrderRequest(PrivateRequests.SendChildOrderRequest request) => new()
     {

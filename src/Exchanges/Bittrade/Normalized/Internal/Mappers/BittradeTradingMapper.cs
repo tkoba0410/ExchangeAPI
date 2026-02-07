@@ -256,7 +256,7 @@ internal static class BittradeTradingMapper
             }
 
             mapped.Add(new BittradeExecutionNormalized(
-                Id: new OrderId(string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId),
+                OrderId: new OrderId(string.IsNullOrWhiteSpace(entry.MatchId) ? entry.Id : entry.MatchId),
                 Side: side,
                 Price: entry.Price,
                 Size: entry.FilledAmount,

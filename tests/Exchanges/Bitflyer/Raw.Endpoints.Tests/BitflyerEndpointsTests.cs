@@ -13,46 +13,46 @@ public sealed class BitflyerEndpointsTests
     [Fact]
     public void GetHealth_builds_request()
     {
-        var req = BitflyerPublicEndpoints.GetHealth("FX_BTC_JPY");
+        var req = PublicEndpoints.GetHealth("FX_BTC_JPY");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "/v1/gethealth",
-            endpointId: BitflyerEndpointIds.GetHealth,
+            endpointId: EndpointIds.GetHealth,
             query: "product_code=FX_BTC_JPY");
     }
 
     [Fact]
     public void GetBoardState_builds_request()
     {
-        var req = BitflyerPublicEndpoints.GetBoardState("BTC_JPY");
+        var req = PublicEndpoints.GetBoardState("BTC_JPY");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "/v1/getboardstate",
-            endpointId: BitflyerEndpointIds.GetBoardState,
+            endpointId: EndpointIds.GetBoardState,
             query: "product_code=BTC_JPY");
     }
 
     [Fact]
     public void GetTicker_builds_request()
     {
-        var req = BitflyerPublicEndpoints.GetTicker("BTC_JPY");
+        var req = PublicEndpoints.GetTicker("BTC_JPY");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "/v1/getticker",
-            endpointId: BitflyerEndpointIds.GetTicker,
+            endpointId: EndpointIds.GetTicker,
             query: "product_code=BTC_JPY");
     }
 
     [Fact]
     public void GetExecutions_builds_request_with_ordered_query()
     {
-        var req = BitflyerPublicEndpoints.GetExecutionsPublic(
+        var req = PublicEndpoints.GetExecutionsPublic(
             "BTC_JPY",
             count: "100",
             before: "123",
@@ -62,7 +62,7 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "GET",
             path: "/v1/getexecutions",
-            endpointId: BitflyerEndpointIds.GetExecutionsPublic,
+            endpointId: EndpointIds.GetExecutionsPublic,
             query: "product_code=BTC_JPY&count=100&before=123&after=456");
     }
 
@@ -70,13 +70,13 @@ public sealed class BitflyerEndpointsTests
     public void CreateChildOrder_builds_request_with_body_json()
     {
         var bodyJson = "{\"dummy\":true}";
-        var req = BitflyerPrivateEndpoints.SendChildOrder(bodyJson);
+        var req = PrivateEndpoints.SendChildOrder(bodyJson);
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "POST",
             path: "/v1/me/sendchildorder",
-            endpointId: BitflyerEndpointIds.SendChildOrder,
+            endpointId: EndpointIds.SendChildOrder,
             bodyJson: bodyJson);
     }
 
@@ -84,13 +84,13 @@ public sealed class BitflyerEndpointsTests
     public void SendParentOrder_builds_request_with_body_json()
     {
         var bodyJson = "{\"dummy\":\"payload\"}";
-        var req = BitflyerPrivateEndpoints.SendParentOrder(bodyJson);
+        var req = PrivateEndpoints.SendParentOrder(bodyJson);
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "POST",
             path: "/v1/me/sendparentorder",
-            endpointId: BitflyerEndpointIds.SendParentOrder,
+            endpointId: EndpointIds.SendParentOrder,
             bodyJson: bodyJson);
     }
 
@@ -103,21 +103,21 @@ public sealed class BitflyerEndpointsTests
             ParentOrderAcceptanceId = new FreeText("JRF-1"),
         };
 
-        var bodyJson = BitflyerRawJson.SerializeOrThrow(request, "Bitflyer.CancelParentOrder");
-        var req = BitflyerPrivateEndpoints.CancelParentOrder(bodyJson);
+        var bodyJson = RawJson.SerializeOrThrow(request, "Bitflyer.CancelParentOrder");
+        var req = PrivateEndpoints.CancelParentOrder(bodyJson);
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "POST",
             path: "/v1/me/cancelparentorder",
-            endpointId: BitflyerEndpointIds.CancelParentOrder,
+            endpointId: EndpointIds.CancelParentOrder,
             bodyJson: bodyJson);
     }
 
     [Fact]
     public void GetParentOrders_builds_request_with_query()
     {
-        var req = BitflyerPrivateEndpoints.GetParentOrders(
+        var req = PrivateEndpoints.GetParentOrders(
             "BTC_JPY",
             parentOrderState: "ACTIVE",
             count: "10",
@@ -128,20 +128,20 @@ public sealed class BitflyerEndpointsTests
             req,
             method: "GET",
             path: "/v1/me/getparentorders",
-            endpointId: BitflyerEndpointIds.GetParentOrders,
+            endpointId: EndpointIds.GetParentOrders,
             query: "product_code=BTC_JPY&parent_order_state=ACTIVE&count=10&before=100&after=50");
     }
 
     [Fact]
     public void GetParentOrder_builds_request_with_acceptance_id()
     {
-        var req = BitflyerPrivateEndpoints.GetParentOrder(parentOrderAcceptanceId: "JRF-1");
+        var req = PrivateEndpoints.GetParentOrder(parentOrderAcceptanceId: "JRF-1");
 
         WireCallSpecAssertions.AssertWireCallSpec(
             req,
             method: "GET",
             path: "/v1/me/getparentorder",
-            endpointId: BitflyerEndpointIds.GetParentOrder,
+            endpointId: EndpointIds.GetParentOrder,
             query: "parent_order_acceptance_id=JRF-1");
     }
 }

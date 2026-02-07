@@ -12,7 +12,7 @@ public sealed class BitflyerInventoryEndpointIdConsistencyTests
     public void Bitflyer_InventoryEndpointIds_MustMatch_CodeEndpointIds()
     {
         var inventory = LoadInventoryEndpointIds();
-        var code = BitflyerEndpointIdCatalog.GetAllEndpointIds();
+        var code = EndpointIdCatalog.GetAllEndpointIds();
 
         var missing = inventory.Except(code, StringComparer.Ordinal)
             .OrderBy(id => id, StringComparer.Ordinal)
@@ -25,7 +25,7 @@ public sealed class BitflyerInventoryEndpointIdConsistencyTests
     public void Bitflyer_CodeEndpointIds_MustMatch_InventoryEndpointIds()
     {
         var inventory = LoadInventoryEndpointIds();
-        var code = BitflyerEndpointIdCatalog.GetAllEndpointIds();
+        var code = EndpointIdCatalog.GetAllEndpointIds();
 
         var extra = code.Except(inventory, StringComparer.Ordinal)
             .OrderBy(id => id, StringComparer.Ordinal)

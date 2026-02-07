@@ -79,14 +79,14 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             Assert.Empty(result);
         }
 
-        private static BitflyerExchangeClient CreateClient(IBitflyerRawApi raw)
+        private static BitflyerExchangeClient CreateClient(IRawApi raw)
         {
             var markets = BitflyerTestHelpers.CreateResolver();
             var normalized = BitflyerTestHelpers.CreateNormalizedApi(raw, markets);
             return new BitflyerExchangeClient(normalized);
         }
 
-        private static IBitflyerRawApi CreateDummyPublicApi(
+        private static IRawApi CreateDummyPublicApi(
             FakeBitflyerPrivateApi privateApi,
             FakeBitflyerPrivateTradingApi tradingApi)
         {

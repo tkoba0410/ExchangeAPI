@@ -16,9 +16,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 
 internal sealed class BitflyerNormalizedPublicApi
 {
-    private readonly IBitflyerRawApi _raw;
+    private readonly IRawApi _raw;
 
-    internal BitflyerNormalizedPublicApi(IBitflyerRawApi raw)
+    internal BitflyerNormalizedPublicApi(IRawApi raw)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
@@ -34,7 +34,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetMarkets),
+            Component(EndpointIds.GetMarkets),
             raw =>
             {
                 var mapped = new List<BitflyerMarketNormalized>(raw.Count);
@@ -64,7 +64,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetTicker),
+            Component(EndpointIds.GetTicker),
             raw =>
             {
                 if (!BitflyerTickerNormalizer.TryNormalize(raw, rawCall.Meta.RawJson, out var ticker, out var error))
@@ -88,7 +88,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetBoard),
+            Component(EndpointIds.GetBoard),
             raw =>
             {
                 if (!BitflyerOrderBookNormalizer.TryNormalize(raw, out var orderBook, out var error))
@@ -115,7 +115,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetExecutionsPublic),
+            Component(EndpointIds.GetExecutionsPublic),
             raw =>
             {
                 if (!BitflyerExecutionNormalizer.TryNormalizeList(raw, rawCall.Meta.RawJson, out var executions, out var error))
@@ -139,7 +139,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetHealth),
+            Component(EndpointIds.GetHealth),
             raw =>
             {
                 if (!BitflyerHealthNormalizer.TryNormalize(raw, out var normalized, out var error))
@@ -163,7 +163,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetBoardState),
+            Component(EndpointIds.GetBoardState),
             raw =>
             {
                 if (!BitflyerBoardStateNormalizer.TryNormalize(raw, out var normalized, out var error))
@@ -188,7 +188,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetChats),
+            Component(EndpointIds.GetChats),
             raw =>
             {
                 var mapped = new List<BitflyerChatNormalized>(raw.Count);
@@ -217,7 +217,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetCorporateLeverage),
+            Component(EndpointIds.GetCorporateLeverage),
             raw => MapResult<BitflyerCorporateLeverageNormalized>.Ok(
                 new BitflyerCorporateLeverageNormalized(
                     raw.CurrentMax,
@@ -238,7 +238,7 @@ internal sealed class BitflyerNormalizedPublicApi
         return CreateCall(
             rawCall,
             request,
-            Component(BitflyerEndpointIds.GetFundingRate),
+            Component(EndpointIds.GetFundingRate),
             raw => MapResult<BitflyerFundingRateNormalized>.Ok(
                 new BitflyerFundingRateNormalized(
                     raw.CurrentFundingRate,

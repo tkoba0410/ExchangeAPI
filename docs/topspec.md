@@ -88,7 +88,7 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Wire 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Api/Wire/
+src/Exchanges/<Exchange>/Wire/
   Public/
     Endpoints/
   Private/
@@ -138,21 +138,13 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Raw 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Api/Raw/
-  Api/
+src/Exchanges/<Exchange>/Raw/
   Public/
-    Api/
-    Dtos/
-    Requests/
   Private/
-    Api/
-    Dtos/
-    Requests/
   Internal/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Raw.Api.*`
   * `ExchangeApi.Exchanges.<Exchange>.Raw.Public.*`
   * `ExchangeApi.Exchanges.<Exchange>.Raw.Private.*`
   * `ExchangeApi.Exchanges.<Exchange>.Raw.Internal.*`
@@ -188,21 +180,13 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Normalized 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Api/Normalized/
-  Api/
+src/Exchanges/<Exchange>/Normalized/
   Public/
-    Api/
-    Dtos/
-    Requests/
   Private/
-    Api/
-    Dtos/
-    Requests/
   Internal/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Normalized.Api.*`
   * `ExchangeApi.Exchanges.<Exchange>.Normalized.Public.*`
   * `ExchangeApi.Exchanges.<Exchange>.Normalized.Private.*`
   * `ExchangeApi.Exchanges.<Exchange>.Normalized.Internal.*`
@@ -212,51 +196,47 @@ src/Exchanges/<Exchange>/Api/Normalized/
 
 ---
 
-#### 3.3.2 ExchangeInfo 独立系統（MUST）
+#### 3.3.2 ExchangeInfo の Application 配置（MUST）
 
-ExchangeInfo は「取引所仕様メタ情報」であり、Wire/Raw/Normalized/Adapter の
-API 系統とは性質が異なる。例外として **独立系統**として扱う。
+ExchangeInfo は「取引所仕様メタ情報」の統合・解決を担う
+**複合写像（オーケストレーション）**である。
+そのため、ExchangeInfo は Application 層として扱う。
 
-* ExchangeInfo は **取引所配下の独立モジュール**として配置する。
 * ExchangeInfo の DTO は **独自定義**とするが、**Contracts と同構成**を必須とする。
-  * 独自 DTO とする理由は「契約安定性・取引所固有運用のための境界」を明確化するため。
-  * 独自 DTO は **Contracts と同構成 + 追加情報**の形を許容する（例: `Local` 拡張）。
+  * 独自 DTO は **Contracts と同構成 + 追加情報**を許容する（例: `Local` 拡張）。
   * Contracts への変換では **追加情報を落とす**（欠落ではなく境界）。
 * ExchangeInfo は **Static + Dynamic の合成**で構成する。
   * Static: 仕様・固定値・手動更新が必要な情報（市場一覧、手数料テーブル等）
   * Dynamic: API から取得可能な状態・制約（稼働状態、手数料率、最小数量等）
   * Compose: Static をベースに Dynamic で上書き・拡張する（市場の増減を許可）
-* ExchangeInfo の **Contracts への適合は ExchangeInfo/Adapter で行う**。
+* ExchangeInfo の **Contracts への適合は Application/ExchangeInfo 配下の Adapter で行う**。
   * 変換元は **Local（独自）DTO** を正とし、Contracts へ写像する。
 * ExchangeInfo は **Normalized への依存を許容**し、API Adapter への依存を禁止する。
   * Dynamic 取得のために Normalized API を呼び出してよい。
 * ExchangeInfo は **共通サブシステム**を持てる。
   * 共通化対象（例）: CallMapper / MarketResolver / Compose Merge / Static JSON Loader
-  * 共通サブシステムの配置は `src/Exchanges/Common/ExchangeInfo/` を基準とする。
+  * 共通サブシステムの配置は `src/Exchanges/Common/Application/ExchangeInfo/` を基準とする。
 * 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/ExchangeInfo/
-  Static/
-  Dynamic/
-  Compose/
-  Adapter/
+src/Exchanges/<Exchange>/Application/ExchangeInfo/
+  Public/
+  Private/
+  Internal/
 ```
 
 * 取引所横断で共通化する場合は次を追加してよい。
 
 ```
-src/Exchanges/Common/ExchangeInfo/
+src/Exchanges/Common/Application/ExchangeInfo/
   Adapter/
   Compose/
   Static/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Static.*`
-  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Dynamic.*`
-  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Compose.*`
-  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Adapter.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Application.ExchangeInfo.*`
+  * `ExchangeApi.Exchanges.Common.Application.ExchangeInfo.*`
 
 * 詳細な合成規則・マッピングは `_references/exchangeinfo.md` に記載する（非正本）。
 
@@ -287,20 +267,16 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Adapter 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Api/Adapter/
+src/Exchanges/<Exchange>/Adapter/
   Public/
-    Api/
-    Dtos/
   Private/
-    Api/
-    Dtos/
   Internal/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Api.Adapter.Public.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Api.Adapter.Private.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Api.Adapter.Internal.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Public.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Private.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Internal.*`
 
 * Adapter の Public/Private は「署名の有無」を表す。意味分類の代替として用いない（= Public/Private 以外で分けない）。
 
@@ -315,12 +291,12 @@ src/Exchanges/<Exchange>/Api/Adapter/
 
 #### 3.4.3 Adapter と ExchangeInfo の関係（MUST）
 
-ExchangeInfo は独立系統であり、Contracts への適合は
-`ExchangeInfo/Adapter` で完結させる。
-API 系統の Adapter とは **別系統**として扱う。
+ExchangeInfo は Application 系統であり、Contracts への適合は
+`Application/ExchangeInfo` 配下で完結させる。
+API 系統の Adapter とは **役割分離**して扱う。
 
-* API 系統の Adapter は `src/Exchanges/<Exchange>/Api/Adapter/` に置く。
-* ExchangeInfo の Adapter は `src/Exchanges/<Exchange>/ExchangeInfo/Adapter/` に置く。
+* API 系統の Adapter は `src/Exchanges/<Exchange>/Adapter/` に置く。
+* ExchangeInfo の Adapter は `src/Exchanges/<Exchange>/Application/ExchangeInfo/` 配下に置く。
 
 ---
 

@@ -46,7 +46,7 @@
 * **ContractMethod**: Facade の公開メソッド名（例: `GetTickerAsync`）
 * **Parameters**: メソッド引数の型一覧（例: `Symbol` / `Symbol, Side, Size, Price` / `GetOrdersRequest`）
 * **RequestType / ResponseType**: Contracts の `Call<TRequest, TOk>` における `TRequest` / `TOk` 型
-* **PresentIn**: 当該 Contracts API が存在する層（`Contracts`, `Adapter`, `Normalized` 等）。通常は `Contracts`
+* **PresentIn**: 当該 Contracts API が存在する層（`Contracts`, `Adapter`, `Normalized`, `Application` 等）。通常は `Contracts`
 * **BitflyerEndpointId / BittradeEndpointId**: 各取引所 inventory における EndpointId。未対応は `None` / `Internal`。
 * **DecisionNote**: 裁定者による判断理由・留保理由（NotSupported もここに記す）
 

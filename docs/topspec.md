@@ -450,6 +450,20 @@ Call は以下を表現する。
 
 ---
 
+### 6.3 Request / Response 命名の予約（MUST）
+
+* 層の公開 API 契約（in/out）を表す型は、`Request` / `Response` を基本形として命名する（MUST）。
+* 本節でいう Internal 補助モデルは、次を指す（MUST）。
+  * 送信前エンコードモデル（Wire に渡す body/query/header 生成用）
+  * 受信後中間表現モデル（Raw JSON からの一時構造）
+  * 変換専用モデル（Mapper 内部の入出力補助）
+* Internal 補助モデルに `Request` / `Response` を用いてよい（MAY）。
+* ただし Internal 補助モデルは、`Request` / `Response` の有無にかかわらず、役割を表す接尾辞を必ず付与する（MUST）。
+  例: `Payload`, `Body`, `Envelope`, `Document`, `Encoded`
+* 同一 EndpointId で契約 DTO と補助モデルが併存する場合、契約 DTO 側に `Request` / `Response` を優先し、補助モデル側は役割名で分離する（MUST）。
+
+---
+
 ## 7. Request 変換規則
 
 * 上位層 → 下位層の Request 変換は

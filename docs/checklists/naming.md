@@ -32,6 +32,8 @@
 - [ ] 同じ意味に複数語（例: `Symbol` と `Market`）を混在させていない
 - [ ] `Id` / `OrderId` / `ExchangeOrderId` を意味ごとに使い分けている
 - [ ] `Request` / `Response` / `Result` の責務が混線していない
+- [ ] Internal 補助モデル（送信前エンコード / 受信後中間表現 / 変換専用モデル）の対象が明確に判別できる
+- [ ] Internal 補助モデルで `Request` / `Response` を使う場合でも、`Payload` / `Body` / `Envelope` / `Document` / `Encoded` など役割接尾辞を必ず併記している
 
 ## 5. 意味と名前の一致
 
@@ -56,3 +58,4 @@
 - `rg -n "\\b(Market|Symbol)\\b" src/Contracts/Facade/Requests src/Contracts/Facade/Extensions`
 - `rg -n "\\bOrderId Id\\b|\\bFreeText Id\\b" src/Exchanges`
 - `rg -n "Get[A-Za-z]+CallAsync" src/Exchanges/*/{Raw,Normalized}`
+- `rg -n "Raw.*(Request|Response)" src/Exchanges/*/Raw/Internal`

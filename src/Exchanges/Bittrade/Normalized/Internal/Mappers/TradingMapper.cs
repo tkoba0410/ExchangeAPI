@@ -305,7 +305,7 @@ internal static class TradingMapper
             }
 
             mapped.Add(new OrderSummaryNormalized(
-                Id: new OrderId(entry.Id),
+                OrderId: new OrderId(entry.Id),
                 Symbol: Symbol.Parse(entry.Symbol),
                 AccountId: FreeText.Parse(entry.AccountId),
                 Amount: amount,
@@ -347,7 +347,7 @@ internal static class TradingMapper
             }
 
             mapped.Add(new RetailOrderEntryNormalized(
-                Id: new OrderId(entry.Id),
+                OrderId: new OrderId(entry.Id),
                 Symbol: Symbol.Parse(entry.Symbol),
                 Type: entry.Type,
                 Price: price,
@@ -384,7 +384,7 @@ internal static class TradingMapper
         }
 
         normalized = new RetailOrderEntryNormalized(
-            Id: new OrderId(entry.Id),
+            OrderId: new OrderId(entry.Id),
             Symbol: Symbol.Parse(entry.Symbol),
             Type: entry.Type,
             Price: price,

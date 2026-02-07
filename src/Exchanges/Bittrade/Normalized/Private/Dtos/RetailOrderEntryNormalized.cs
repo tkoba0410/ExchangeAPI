@@ -4,7 +4,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 
 public sealed record RetailOrderEntryNormalized(
-    OrderId Id,
+    OrderId OrderId,
     Symbol Symbol,
     int Type,
     decimal? Price,

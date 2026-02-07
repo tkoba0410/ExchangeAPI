@@ -9,9 +9,9 @@ public sealed class GetBalanceResponse : List<BalanceResponse>;
 
 public sealed class GetCollateralAccountsResponse : List<CollateralAccount>;
 
-public sealed class GetChildOrdersResponse : List<RawGetChildOrdersResponse>;
+public sealed class GetChildOrdersResponse : List<GetChildOrdersItem>;
 
-public sealed class GetParentOrdersResponse : List<RawGetParentOrdersResponse>;
+public sealed class GetParentOrdersResponse : List<GetParentOrdersItem>;
 
 public sealed class GetExecutionsPrivateResponse : List<ExecutionPrivateResponse>;
 

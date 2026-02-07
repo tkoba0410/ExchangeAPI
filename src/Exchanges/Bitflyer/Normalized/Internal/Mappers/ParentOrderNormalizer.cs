@@ -15,7 +15,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 internal static class ParentOrderNormalizer
 {
     public static bool TryNormalizeList(
-        IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> raw,
+        IReadOnlyList<RawPrivateDtos.GetParentOrdersItem> raw,
         string? rawJson,
         out IReadOnlyList<ParentOrderNormalized>? normalized,
         out CallError? error)
@@ -62,7 +62,7 @@ internal static class ParentOrderNormalizer
     }
 
     private static IReadOnlyList<ParentOrderNormalized> BuildList(
-        IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> raw,
+        IReadOnlyList<RawPrivateDtos.GetParentOrdersItem> raw,
         string? rawJson)
     {
         var snapshots = ExtractSnapshots(rawJson, raw.Count);
@@ -93,7 +93,7 @@ internal static class ParentOrderNormalizer
     }
 
     private static ParentOrderNormalized NormalizeSummary(
-        RawPrivateDtos.RawGetParentOrdersResponse raw,
+        RawPrivateDtos.GetParentOrdersItem raw,
         JsonElement snapshot)
     {
         return new ParentOrderNormalized(

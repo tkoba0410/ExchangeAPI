@@ -31,7 +31,7 @@ public sealed class BitflyerParentOrderRawTests
         ]
         """;
 
-        var result = RawJson.DeserializeOrThrow<IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>>(
+        var result = RawJson.DeserializeOrThrow<IReadOnlyList<RawPrivateDtos.GetParentOrdersItem>>(
             json,
             "Bitflyer.GetParentOrders");
 

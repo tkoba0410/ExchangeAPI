@@ -21,7 +21,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var rawTicker = new RawPublicDtos.GetTickerResponse();
             var childOrders = new[]
             {
-                new RawPrivateDtos.RawGetChildOrdersResponse
+                new RawPrivateDtos.GetChildOrdersItem
                 {
                     ChildOrderId = "JOR-1",
                     ChildOrderAcceptanceId = "JRF-1",
@@ -61,7 +61,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             var rawTicker = new RawPublicDtos.GetTickerResponse();
             var childOrders = new[]
             {
-                new RawPrivateDtos.RawGetChildOrdersResponse
+                new RawPrivateDtos.GetChildOrdersItem
                 {
                     ChildOrderAcceptanceId = "JRF-1",
                     ProductCode = "BTC_JPY",
@@ -72,7 +72,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
                     OutstandingSize = 0.1m,
                     ExecutedSize = 0m
                 },
-                new RawPrivateDtos.RawGetChildOrdersResponse
+                new RawPrivateDtos.GetChildOrdersItem
                 {
                     ChildOrderAcceptanceId = "JRF-2",
                     ProductCode = "BTC_JPY",

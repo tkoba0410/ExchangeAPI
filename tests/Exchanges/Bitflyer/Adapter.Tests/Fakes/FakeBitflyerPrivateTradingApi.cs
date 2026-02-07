@@ -10,8 +10,8 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 public sealed class FakeBitflyerPrivateTradingApi
 {
     private readonly RawPrivateDtos.SendChildOrderResponse _response;
-    private readonly IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> _childOrders;
-    private readonly Queue<IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>? _childOrderSnapshots;
+    private readonly IReadOnlyList<RawPrivateDtos.GetChildOrdersItem> _childOrders;
+    private readonly Queue<IReadOnlyList<RawPrivateDtos.GetChildOrdersItem>>? _childOrderSnapshots;
     private readonly Exception? _exceptionToThrow;
 
     public string? LastBodyJson { get; private set; }
@@ -22,13 +22,13 @@ public sealed class FakeBitflyerPrivateTradingApi
 
     public FakeBitflyerPrivateTradingApi(
         RawPrivateDtos.SendChildOrderResponse response,
-        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>? childOrders = null,
-        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>[]? snapshots = null,
+        IReadOnlyList<RawPrivateDtos.GetChildOrdersItem>? childOrders = null,
+        IReadOnlyList<RawPrivateDtos.GetChildOrdersItem>[]? snapshots = null,
         Exception? exceptionToThrow = null)
     {
         _response = response;
-        _childOrders = childOrders ?? Array.Empty<RawPrivateDtos.RawGetChildOrdersResponse>();
-        _childOrderSnapshots = snapshots is null ? null : new Queue<IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>(
+        _childOrders = childOrders ?? Array.Empty<RawPrivateDtos.GetChildOrdersItem>();
+        _childOrderSnapshots = snapshots is null ? null : new Queue<IReadOnlyList<RawPrivateDtos.GetChildOrdersItem>>(
             snapshots);
         _exceptionToThrow = exceptionToThrow;
     }
@@ -80,7 +80,7 @@ public sealed class FakeBitflyerPrivateTradingApi
             return Task.FromResult(MakeCall(request, snapshotResponse));
         }
 
-        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> responseItems;
+        IReadOnlyList<RawPrivateDtos.GetChildOrdersItem> responseItems;
         if (request.ChildOrderAcceptanceId is { IsEmpty: false })
         {
             responseItems = _childOrders

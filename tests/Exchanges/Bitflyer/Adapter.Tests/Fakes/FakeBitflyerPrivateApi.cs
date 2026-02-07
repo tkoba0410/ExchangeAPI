@@ -14,8 +14,8 @@ public sealed class FakeBitflyerPrivateApi
     private readonly IReadOnlyList<RawPrivateDtos.PositionResponse> _positions;
     private readonly IReadOnlyList<RawPrivateDtos.ExecutionPrivateResponse> _executions;
     private readonly RawPrivateDtos.GetCollateralResponse _collateral;
-    private readonly IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> _childOrders;
-    private readonly IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> _parentOrders;
+    private readonly IReadOnlyList<RawPrivateDtos.GetChildOrdersItem> _childOrders;
+    private readonly IReadOnlyList<RawPrivateDtos.GetParentOrdersItem> _parentOrders;
     private readonly IReadOnlyList<RawPrivateDtos.CollateralAccount> _collateralAccounts;
     private readonly RawPrivateDtos.RawJsonResponse _rawJsonList = new("[]");
     private readonly RawPrivateDtos.RawJsonResponse _rawJsonObject = new("{}");
@@ -26,16 +26,16 @@ public sealed class FakeBitflyerPrivateApi
         IReadOnlyList<RawPrivateDtos.PositionResponse>? positions = null,
         IReadOnlyList<RawPrivateDtos.ExecutionPrivateResponse>? executions = null,
         RawPrivateDtos.GetCollateralResponse? collateral = null,
-        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>? childOrders = null,
-        IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>? parentOrders = null,
+        IReadOnlyList<RawPrivateDtos.GetChildOrdersItem>? childOrders = null,
+        IReadOnlyList<RawPrivateDtos.GetParentOrdersItem>? parentOrders = null,
         string? tradingCommissionJson = null)
     {
         _response = response;
         _positions = positions ?? Array.Empty<RawPrivateDtos.PositionResponse>();
         _executions = executions ?? Array.Empty<RawPrivateDtos.ExecutionPrivateResponse>();
         _collateral = collateral ?? new RawPrivateDtos.GetCollateralResponse();
-        _childOrders = childOrders ?? Array.Empty<RawPrivateDtos.RawGetChildOrdersResponse>();
-        _parentOrders = parentOrders ?? Array.Empty<RawPrivateDtos.RawGetParentOrdersResponse>();
+        _childOrders = childOrders ?? Array.Empty<RawPrivateDtos.GetChildOrdersItem>();
+        _parentOrders = parentOrders ?? Array.Empty<RawPrivateDtos.GetParentOrdersItem>();
         _collateralAccounts = Array.Empty<RawPrivateDtos.CollateralAccount>();
         _tradingCommission = new RawPrivateDtos.RawJsonResponse(tradingCommissionJson ?? "{}");
     }

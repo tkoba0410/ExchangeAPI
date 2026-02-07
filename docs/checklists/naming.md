@@ -24,6 +24,7 @@
 
 - [ ] `Raw/Normalized` の API は `<EndpointId>CallAsync`
 - [ ] `RequestType/ResponseType` は `<EndpointId>` と対応している
+- [ ] コレクション応答は `<EndpointId>Response`（コンテナ）/ `<EndpointId>Item`（要素）で命名している
 - [ ] EndpointId と異なる独自別名を API 名に混在させていない
 
 ## 4. 同義語の統制

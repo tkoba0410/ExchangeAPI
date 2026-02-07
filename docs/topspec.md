@@ -537,6 +537,8 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * EndpointId は各層で 1:1 に対応する
 * Raw / Normalized 層の API は `<EndpointId>CallAsync` を基本形とする
 * EndpointId と API メソッド名は意味的に一致しなければならない
+* コレクション応答は、コンテナ型を `<EndpointId>Response`、要素型を `<EndpointId>Item` とする（SHOULD）。
+  例: `GetChildOrdersResponse` / `GetChildOrdersItem`
 * 上記の 1:1 対応は、inventory において当該層が実装対象として指定されている場合に限る。
   実装対象の指定は inventory の `PresentIn` 列により行う。
 

@@ -20,9 +20,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 
 /// <summary>
 /// Factory for constructing bitFlyer client instances.
-/// HttpClient -> HttpTransport -> RestClient(署名/ポリシー/ログ) -> Raw/Private API -> BitflyerExchangeClient.
+/// HttpClient -> HttpTransport -> RestClient(署名/ポリシー/ログ) -> Raw/Private API -> ExchangeClient.
 /// </summary>
-public static class BitflyerClientFactory
+public static class ClientFactory
 {
     private static readonly Uri BitflyerApiBaseUri = new("https://api.bitflyer.com");
 
@@ -30,21 +30,21 @@ public static class BitflyerClientFactory
     /// Public API のみを利用する軽量クライアントを作成する。
     /// 署名を行わず、マーケット/ExchangeInfo 取得に限定する。
     /// </summary>
-    public static BitflyerPublicClient CreatePublic(
-        BitflyerClientOptions? options = null,
+    public static PublicClient CreatePublic(
+        ClientOptions? options = null,
         HttpClient? httpClient = null,
         IHttpTransport? transportOverride = null)
     {
-        options ??= new BitflyerClientOptions();
+        options ??= new ClientOptions();
 
         var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = BitflyerApiBaseUri };
         IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
 
         var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
-            options.PolicyOptions ?? BitflyerHttpPolicyDefaults.Create());
+            options.PolicyOptions ?? HttpPolicyDefaults.Create());
         var logger = options.Logger;
         var observer = options.Observer;
-        var errorClassifier = options.ErrorClassifier ?? BitflyerErrorClassifier.Instance;
+        var errorClassifier = options.ErrorClassifier ?? ErrorClassifier.Instance;
 
         IRestClient restClient = new RestClient(
             BitflyerApiBaseUri,
@@ -60,15 +60,15 @@ public static class BitflyerClientFactory
         var publicApi = new NormalizedPublicApi(raw);
         var exchangeInfo = new BitflyerExchangeInfoApi(publicApi);
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
+        var markets = new NormalizedMarketResolver(contractMarkets);
         var normalized = NormalizedApi.FromRaw(raw, markets);
-        return new BitflyerPublicClient(normalized, exchangeInfo);
+        return new PublicClient(normalized, exchangeInfo);
     }
 
     /// <summary>
     /// Create bitFlyer client with explicit API key/secret supplied by the caller.
     /// </summary>
-    public static BitflyerExchangeClient Create(
+    public static ExchangeClient Create(
         string apiKey,
         string apiSecret,
         IHttpPolicy? policy = null,
@@ -77,7 +77,7 @@ public static class BitflyerClientFactory
         IExchangeErrorClassifier? errorClassifier = null,
         HttpClient? httpClient = null)
     {
-        var options = new BitflyerClientOptions
+        var options = new ClientOptions
         {
             Policy = policy,
             Logger = logger,
@@ -92,10 +92,10 @@ public static class BitflyerClientFactory
     /// <summary>
     /// Create bitFlyer client with explicit API key/secret supplied by the caller using options.
     /// </summary>
-    public static BitflyerExchangeClient Create(
+    public static ExchangeClient Create(
         string apiKey,
         string apiSecret,
-        BitflyerClientOptions? options,
+        ClientOptions? options,
         HttpClient? httpClient = null,
         IHttpTransport? transportOverride = null)
     {
@@ -109,7 +109,7 @@ public static class BitflyerClientFactory
             throw new ArgumentException("API secret is required.", nameof(apiSecret));
         }
 
-        options ??= new BitflyerClientOptions();
+        options ??= new ClientOptions();
 
         var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = BitflyerApiBaseUri };
 
@@ -117,12 +117,12 @@ public static class BitflyerClientFactory
 
         IExchangeClock clock = new SystemClock();
         var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
-            options.PolicyOptions ?? BitflyerHttpPolicyDefaults.Create());
+            options.PolicyOptions ?? HttpPolicyDefaults.Create());
         var logger = options.Logger;
         var observer = options.Observer;
-        var errorClassifier = options.ErrorClassifier ?? BitflyerErrorClassifier.Instance;
+        var errorClassifier = options.ErrorClassifier ?? ErrorClassifier.Instance;
 
-        IRequestSigner signer = new BitflyerRequestSigner(apiKey, apiSecret, clock);
+        IRequestSigner signer = new RequestSigner(apiKey, apiSecret, clock);
 
         IRestClient restClient = new RestClient(
             BitflyerApiBaseUri,
@@ -133,6 +133,6 @@ public static class BitflyerClientFactory
             observer: observer,
             errorClassifier: errorClassifier);
 
-        return BitflyerExchangeClient.FromRestClient(restClient);
+        return ExchangeClient.FromRestClient(restClient);
     }
 }

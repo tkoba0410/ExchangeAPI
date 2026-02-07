@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 /// <summary>
 /// bitFlyer クライアントの構成オプション。
 /// </summary>
-public sealed class BitflyerClientOptions
+public sealed class ClientOptions
 {
     public HttpClient? HttpClient { get; init; }
     public IHttpPolicy? Policy { get; init; }
@@ -17,17 +17,17 @@ public sealed class BitflyerClientOptions
     public IExchangeErrorClassifier? ErrorClassifier { get; init; }
 }
 
-public static class BitflyerClientOptionsExtensions
+public static class ClientOptionsExtensions
 {
     /// <summary>
     /// 観測性に関するオプションをまとめて設定するヘルパ。
     /// </summary>
-    public static BitflyerClientOptions WithObservability(
-        this BitflyerClientOptions options,
+    public static ClientOptions WithObservability(
+        this ClientOptions options,
         IRestCallObserver observer,
         IRestClientLogger? logger = null)
     {
-        return new BitflyerClientOptions
+        return new ClientOptions
         {
             HttpClient = options.HttpClient,
             Policy = options.Policy,

@@ -9,13 +9,13 @@ using ExchangeApi.Transport.Time;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 
-internal sealed class BitflyerRequestSigner : IRequestSigner
+internal sealed class RequestSigner : IRequestSigner
 {
     private readonly string _apiKey;
     private readonly string _apiSecret;
     private readonly IExchangeClock _clock;
 
-    public BitflyerRequestSigner(string apiKey, string apiSecret, IExchangeClock clock)
+    public RequestSigner(string apiKey, string apiSecret, IExchangeClock clock)
     {
         _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
         _apiSecret = apiSecret ?? throw new ArgumentNullException(nameof(apiSecret));

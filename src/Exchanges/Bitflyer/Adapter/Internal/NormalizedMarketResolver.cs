@@ -10,11 +10,11 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 
-internal sealed class BitflyerNormalizedMarketResolver : IMarketResolver
+internal sealed class NormalizedMarketResolver : IMarketResolver
 {
     private readonly IExchangeMarketResolver _inner;
 
-    public BitflyerNormalizedMarketResolver(IExchangeMarketResolver inner) =>
+    public NormalizedMarketResolver(IExchangeMarketResolver inner) =>
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
 
     public async Task<Call<ResolveMarketRequest, MarketInfo>> ResolveCallAsync(
@@ -49,7 +49,7 @@ internal sealed class BitflyerNormalizedMarketResolver : IMarketResolver
     {
         var meta = new CallMeta(
             Layer: "Adapter",
-            Component: "BitflyerNormalizedMarketResolver",
+            Component: "NormalizedMarketResolver",
             EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
@@ -70,7 +70,7 @@ internal sealed class BitflyerNormalizedMarketResolver : IMarketResolver
     {
         var meta = new CallMeta(
             Layer: "Adapter",
-            Component: "BitflyerNormalizedMarketResolver",
+            Component: "NormalizedMarketResolver",
             EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });

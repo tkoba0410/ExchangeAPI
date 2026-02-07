@@ -19,11 +19,11 @@ using ExchangeApi.Utilities.Account;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
-internal sealed class BitflyerPrivateApi
+internal sealed class PrivateApi
 {
     private readonly INormalizedApi _normalized;
 
-    public BitflyerPrivateApi(INormalizedApi normalized)
+    public PrivateApi(INormalizedApi normalized)
     {
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
@@ -40,7 +40,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                BitflyerOperations.Account.GetBalance,
+                Operations.Account.GetBalance,
                 ok => new BalanceResponse(MapBalances(ok)));
         }
         catch (Exception ex)
@@ -48,7 +48,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.FromException<BalanceRequest, BalanceResponse>(
                 request,
                 startedAt,
-                BitflyerOperations.Account.GetBalance,
+                Operations.Account.GetBalance,
                 ex);
         }
     }
@@ -65,7 +65,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                BitflyerOperations.History.GetOrders,
+                Operations.History.GetOrders,
                 ok => BuildOrderResponse(request, ok));
         }
         catch (Exception ex)
@@ -73,7 +73,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.FromException<OrdersRequest, OrdersResponse>(
                 request,
                 startedAt,
-                BitflyerOperations.History.GetOrders,
+                Operations.History.GetOrders,
                 ex);
         }
     }
@@ -91,7 +91,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                BitflyerOperations.History.GetExecutions,
+                Operations.History.GetExecutions,
                 ok => BuildExecutionResponse(request, ok));
         }
         catch (Exception ex)
@@ -99,7 +99,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.FromException<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
                 request,
                 startedAt,
-                BitflyerOperations.History.GetExecutions,
+                Operations.History.GetExecutions,
                 ex);
         }
     }
@@ -128,7 +128,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                BitflyerOperations.Trading.PlaceOrder,
+                Operations.Trading.PlaceOrder,
                 ok => new OrderLimitResponse(
                     Key: ok.Key,
                     ExchangeOrderId: ok.ExchangeOrderId,
@@ -139,7 +139,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.FromException<OrderLimitRequest, OrderLimitResponse>(
                 request,
                 startedAt,
-                BitflyerOperations.Trading.PlaceOrder,
+                Operations.Trading.PlaceOrder,
                 ex);
         }
     }
@@ -158,7 +158,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.MapCall(
                 request,
                 call,
-                BitflyerOperations.Trading.CancelOrder,
+                Operations.Trading.CancelOrder,
                 ok => new CancelOrderResponse(ok.IsSuccess));
         }
         catch (Exception ex)
@@ -166,7 +166,7 @@ internal sealed class BitflyerPrivateApi
             return ApiCallMapper.FromException<CancelOrderRequest, CancelOrderResponse>(
                 request,
                 startedAt,
-                BitflyerOperations.Trading.CancelOrder,
+                Operations.Trading.CancelOrder,
                 ex);
         }
     }

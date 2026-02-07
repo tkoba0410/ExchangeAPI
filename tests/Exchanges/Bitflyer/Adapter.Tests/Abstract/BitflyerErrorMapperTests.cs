@@ -15,7 +15,7 @@ public class BitflyerErrorMapperTests
     [InlineData("INVALID_ORDER", ExchangeErrorCategory.Request)]
     public void MapErrorCategory_FromExchangeCode(string code, ExchangeErrorCategory expected)
     {
-        var category = BitflyerErrorMapper.MapErrorCategory(null, code);
+        var category = ErrorMapper.MapErrorCategory(null, code);
         Assert.Equal(expected, category);
     }
 
@@ -27,7 +27,7 @@ public class BitflyerErrorMapperTests
     [InlineData(HttpStatusCode.InternalServerError, ExchangeErrorCategory.Server)]
     public void MapErrorCategory_FromStatusCode(HttpStatusCode status, ExchangeErrorCategory expected)
     {
-        var category = BitflyerErrorMapper.MapErrorCategory(status, null);
+        var category = ErrorMapper.MapErrorCategory(status, null);
         Assert.Equal(expected, category);
     }
 }

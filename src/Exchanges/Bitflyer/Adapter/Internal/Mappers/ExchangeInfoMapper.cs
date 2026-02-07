@@ -5,7 +5,7 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 
-internal static class BitflyerExchangeInfoMapper
+internal static class ExchangeInfoMapper
 {
     public static ExchangeInfoDto MapExchangeInfo(
         IReadOnlyList<ExchangeMarketInfo> markets,

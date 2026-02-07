@@ -514,6 +514,10 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 #### 8.5.1 取引所プレフィックス排除時の例外
 
 * 取引所層（Wire / Raw / Normalized / Adapter）は、型名から取引所プレフィックスを排除する（MUST）。
+* 取引所層の Composition は、公開型名に取引所プレフィックスを付与する（MUST）。
+  例: `BitflyerFactory`, `BitflyerFactoryOptions`
+* 取引所層の Application（`Application/ExchangeInfo` を含む）は、公開型名に取引所プレフィックスを付与する（MUST）。
+  例: `BitflyerExchangeInfoService`, `BitflyerExchangeInfoSnapshot`
 * ただし、同一コンパイル単位で型衝突または曖昧参照が生じる場合は、衝突回避のための意味名を付与すること（MUST）。
   例: `ExchangeSide`, `OpenOrderNormalized`
 * 衝突回避の意味名は次の優先順で選択する（MUST）。

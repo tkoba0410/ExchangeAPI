@@ -1,6 +1,6 @@
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
 
-internal static class BitflyerOperations
+internal static class Operations
 {
     internal static class MarketData
     {

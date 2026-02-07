@@ -2,7 +2,7 @@ using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 
-internal static class BitflyerErrorMapper
+internal static class ErrorMapper
 {
     public static ExchangeErrorCategory? MapErrorCategory(System.Net.HttpStatusCode? statusCode, string? exchangeCode)
     {

@@ -11,21 +11,21 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 /// <summary>
 /// テスト専用のファクトリ。公開 API を汚さずにモックやカスタム Transport を注入できる。
 /// </summary>
-internal static class BitflyerTestClientFactory
+internal static class TestClientFactory
 {
     private static readonly Uri BitflyerApiBaseUri = new("https://api.bitflyer.com");
 
-    public static BitflyerExchangeClient Create(BitflyerApiBundle bundle)
+    public static ExchangeClient Create(ApiBundle bundle)
     {
-        return new BitflyerExchangeClient(bundle);
+        return new ExchangeClient(bundle);
     }
 
-    public static BitflyerExchangeClient Create(IRestClient restClient)
+    public static ExchangeClient Create(IRestClient restClient)
     {
-        return new BitflyerExchangeClient(BitflyerApiBundle.FromRestClient(restClient));
+        return new ExchangeClient(ApiBundle.FromRestClient(restClient));
     }
 
-    public static BitflyerExchangeClient CreateWithTransport(
+    public static ExchangeClient CreateWithTransport(
         IHttpTransport transport,
         IRequestSigner? signer = null,
         IHttpPolicy? policy = null,
@@ -42,8 +42,8 @@ internal static class BitflyerTestClientFactory
             policy: policy ?? HttpPolicyFactory.CreateDefault(),
             logger: logger,
             observer: observer,
-            errorClassifier: errorClassifier ?? BitflyerErrorClassifier.Instance);
+            errorClassifier: errorClassifier ?? ErrorClassifier.Instance);
 
-        return new BitflyerExchangeClient(BitflyerApiBundle.FromRestClient(restClient));
+        return new ExchangeClient(ApiBundle.FromRestClient(restClient));
     }
 }

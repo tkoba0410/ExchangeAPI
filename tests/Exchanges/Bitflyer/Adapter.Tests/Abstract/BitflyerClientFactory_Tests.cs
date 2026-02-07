@@ -9,12 +9,12 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
     [Fact]
     public void Create_WithOptions_Succeeds()
     {
-        var options = new BitflyerClientOptions
+        var options = new ClientOptions
         {
             PolicyOptions = new HttpPolicyOptions { RequestsPerSecond = 10 }
         };
 
-        var client = BitflyerClientFactory.Create("key-1", "secret-1", options);
+        var client = ClientFactory.Create("key-1", "secret-1", options);
 
         Assert.NotNull(client);
     }

@@ -15,14 +15,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 /// bitFlyer API 実装のセットをまとめるバンドル。
 /// テスト向けにモック実装を差し替えやすくする。
 /// </summary>
-internal sealed class BitflyerApiBundle
+internal sealed class ApiBundle
 {
     public NormalizedPublicApi Public { get; }
     public INormalizedApi Normalized { get; }
     public BitflyerExchangeInfoApi ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
 
-    public BitflyerApiBundle(
+    public ApiBundle(
         INormalizedApi normalized,
         NormalizedPublicApi publicApi,
         BitflyerExchangeInfoApi exchangeInfo,
@@ -34,7 +34,7 @@ internal sealed class BitflyerApiBundle
         Markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public static BitflyerApiBundle FromRestClient(IRestClient restClient)
+    public static ApiBundle FromRestClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
         var wireTransport = new WireTransport(restClient);
@@ -43,8 +43,8 @@ internal sealed class BitflyerApiBundle
         var publicApi = new NormalizedPublicApi(raw);
         var exchangeInfo = new BitflyerExchangeInfoApi(publicApi);
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
+        var markets = new NormalizedMarketResolver(contractMarkets);
         var normalized = NormalizedApi.FromRaw(raw, markets);
-        return new BitflyerApiBundle(normalized, publicApi, exchangeInfo, contractMarkets);
+        return new ApiBundle(normalized, publicApi, exchangeInfo, contractMarkets);
     }
 }

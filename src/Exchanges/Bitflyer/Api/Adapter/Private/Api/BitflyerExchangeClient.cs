@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
@@ -11,11 +12,14 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Operations;
+using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
+using ExchangeApi.Primitives.Errors;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
 
 /// <summary>
@@ -23,7 +27,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
 /// </summary>
 public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 {
-    private readonly MarketApi _marketApi;
+    private readonly IBitflyerNormalizedApi _normalized;
+    private readonly IExchangeMarketResolver _markets;
     private readonly BitflyerTradingApi _tradingApi;
     private readonly BitflyerAccountApi _accountApi;
     private readonly BitflyerSpotHistoryApi _historyApi;
@@ -38,38 +43,23 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         object? rawBundle = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        var exchangeInfo = new BitflyerExchangeInfoApi(normalized);
-        var markets = new ExchangeInfoMarketResolver(exchangeInfo);
-        _marketApi = new MarketApi(normalized, markets);
+        _normalized = normalized;
+        _exchangeInfoApi = new BitflyerExchangeInfoApi(normalized);
+        _markets = new ExchangeInfoMarketResolver(_exchangeInfoApi);
         _tradingApi = new BitflyerTradingApi(normalized);
         _accountApi = new BitflyerAccountApi(normalized);
         _historyApi = new BitflyerSpotHistoryApi(normalized);
-        _exchangeInfoApi = exchangeInfo;
-    }
-
-    internal BitflyerExchangeClient(
-        MarketApi marketApi,
-        BitflyerTradingApi tradingApi,
-        BitflyerAccountApi accountApi,
-        BitflyerSpotHistoryApi historyApi,
-        BitflyerExchangeInfoApi exchangeInfoApi,
-        object? rawBundle = null)
-    {
-        _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
-        _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
-        _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
-        _historyApi = historyApi ?? throw new ArgumentNullException(nameof(historyApi));
-        _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
     }
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
-        : this(
-            marketApi: new MarketApi(bundle.Normalized, bundle.Markets),
-            tradingApi: new BitflyerTradingApi(bundle.Normalized),
-            accountApi: new BitflyerAccountApi(bundle.Normalized),
-            historyApi: new BitflyerSpotHistoryApi(bundle.Normalized),
-            exchangeInfoApi: bundle.ExchangeInfo)
     {
+        if (bundle is null) throw new ArgumentNullException(nameof(bundle));
+        _normalized = bundle.Normalized;
+        _markets = bundle.Markets;
+        _exchangeInfoApi = bundle.ExchangeInfo;
+        _tradingApi = new BitflyerTradingApi(bundle.Normalized);
+        _accountApi = new BitflyerAccountApi(bundle.Normalized);
+        _historyApi = new BitflyerSpotHistoryApi(bundle.Normalized);
         ApiBundle = bundle;
     }
 
@@ -84,29 +74,233 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
     public Task<Call<TickerRequest, CommonTicker>> GetTickerAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerAsync(symbol, cancellationToken);
+        GetTickerInternalAsync(symbol, cancellationToken);
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardAsync(symbol, cancellationToken);
+        GetBoardInternalAsync(symbol, cancellationToken);
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicAsync(symbol, cancellationToken);
+        GetExecutionsPublicInternalAsync(symbol, cancellationToken);
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
         Symbol symbol,
         PeriodDto period,
         int? size = null,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetCandlesticksAsync(symbol, period, size, cancellationToken);
+        GetCandlesticksInternalAsync(symbol, period, size, cancellationToken);
 
     // ExchangeInfo
     public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
         CancellationToken cancellationToken = default) =>
         _exchangeInfoApi.GetExchangeInfoAsync(cancellationToken);
+
+    private async Task<Call<TickerRequest, CommonTicker>> GetTickerInternalAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken)
+    {
+        var request = new TickerRequest(symbol);
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<TickerRequest, CommonTicker>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    BitflyerOperations.MarketData.GetTicker);
+            }
+
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+            var call = await _normalized.GetTickerCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.MarketData.GetTicker,
+                ok => MarketMapper.MapTicker(symbol, ok));
+        }
+        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
+        {
+            return SymbolNotSupported<TickerRequest, CommonTicker>(
+                request,
+                startedAt,
+                BitflyerOperations.MarketData.GetTicker,
+                ex);
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<TickerRequest, CommonTicker>(
+                request,
+                startedAt,
+                BitflyerOperations.MarketData.GetTicker,
+                ex);
+        }
+    }
+
+    private async Task<Call<BoardRequest, BoardResponse>> GetBoardInternalAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken)
+    {
+        var request = new BoardRequest(symbol);
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<BoardRequest, BoardResponse>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    BitflyerOperations.MarketData.GetBoard);
+            }
+
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+            var call = await _normalized.GetBoardCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.MarketData.GetBoard,
+                MarketMapper.MapOrderBook);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
+        {
+            return SymbolNotSupported<BoardRequest, BoardResponse>(
+                request,
+                startedAt,
+                BitflyerOperations.MarketData.GetBoard,
+                ex);
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<BoardRequest, BoardResponse>(
+                request,
+                startedAt,
+                BitflyerOperations.MarketData.GetBoard,
+                ex);
+        }
+    }
+
+    private async Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicInternalAsync(
+        Symbol symbol,
+        CancellationToken cancellationToken)
+    {
+        var request = new ExecutionsPublicRequest(symbol);
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
+            {
+                return MarketResolutionError<ExecutionsPublicRequest, ExecutionsPublicResponse>(
+                    request,
+                    marketCall,
+                    err.Error,
+                    BitflyerOperations.MarketData.GetExecutions);
+            }
+
+            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+            var call = await _normalized.GetExecutionsPublicCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.MarketData.GetExecutions,
+                ok => new ExecutionsPublicResponse(ToExecutionList(symbol, ok)));
+        }
+        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
+        {
+            return SymbolNotSupported<ExecutionsPublicRequest, ExecutionsPublicResponse>(
+                request,
+                startedAt,
+                BitflyerOperations.MarketData.GetExecutions,
+                ex);
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<ExecutionsPublicRequest, ExecutionsPublicResponse>(
+                request,
+                startedAt,
+                BitflyerOperations.MarketData.GetExecutions,
+                ex);
+        }
+    }
+
+    private Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksInternalAsync(
+        Symbol symbol,
+        PeriodDto period,
+        int? size,
+        CancellationToken cancellationToken)
+    {
+        var request = new CandlesticksRequest(symbol, period, size);
+        return Task.FromResult(NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
+            "Contracts",
+            BitflyerOperations.MarketData.GetCandlesticks,
+            request,
+            "Candlesticks"));
+    }
+
+    private static IReadOnlyList<ExecutionsPublicItem> ToExecutionList(
+        Symbol symbol,
+        IReadOnlyList<BitflyerExecutionNormalized> executions)
+    {
+        IReadOnlyList<ExecutionsPublicItem> mapped = executions
+            .Select(e => MarketMapper.MapExecution(symbol, e))
+            .ToArray();
+        return mapped;
+    }
+
+    private static Call<TReq, TOk> MarketResolutionError<TReq, TOk>(
+        TReq request,
+        Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
+        CallError error,
+        string component)
+    {
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: component,
+            EndpointId: marketCall.Meta.EndpointId,
+            Tags: null,
+            Children: new[] { marketCall.Id });
+
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: marketCall.StartedAt,
+            Duration: marketCall.Duration,
+            Request: request,
+            Result: new CallResult<TOk>.Err(error),
+            Meta: meta);
+    }
+
+    private static Call<TReq, TOk> SymbolNotSupported<TReq, TOk>(
+        TReq request,
+        DateTimeOffset startedAt,
+        string component,
+        Exception ex)
+    {
+        var meta = new CallMeta(
+            Layer: "Contracts",
+            Component: component,
+            EndpointId: CallMeta.InternalEndpointId,
+            Tags: null,
+            Children: null);
+        var error = new CallError(CallErrorKind.Semantic, ex.Message, ex);
+
+        return new Call<TReq, TOk>(
+            Id: CallId.New(),
+            StartedAt: startedAt,
+            Duration: DateTimeOffset.UtcNow - startedAt,
+            Request: request,
+            Result: new CallResult<TOk>.Err(error),
+            Meta: meta);
+    }
 
     // Trading
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(

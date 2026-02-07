@@ -61,6 +61,17 @@
 
 ---
 
+## Layer / MappingType 補足
+
+Contracts inventory では、`PresentIn` を以下の考え方で解釈する。
+
+- `Single`: 単一 API 呼び出しからの写像（主に Raw / Normalized / Adapter）
+- `Composite`: 複数情報の統合・解決（Application）
+
+`ExchangeInfo` のような複合写像は、API 層だけでなく `Application` 層での実装有無も考慮して管理する。
+
+---
+
 ## Public
 
 | ContractScope | ContractApiId        | ContractMethod                | Parameters | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | DecisionNote |

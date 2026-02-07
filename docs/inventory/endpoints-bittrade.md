@@ -154,3 +154,32 @@ alias を記録する場合は、本セクションに `EndpointId` との対応
 6. 分割された各単語を PascalCase 化し、連結する
 
 7. HTTP Method を PascalCase 化し、EndpointId の **先頭**に付与する（例：`GET`→`Get`、`POST`→`Post`）
+
+---
+
+## 配置移行（対象部分）
+
+### 目標ツリー（Bittrade）
+
+```text
+src/Exchanges/Bittrade/
+  Wire/{Public,Private,Internal}
+  Raw/{Public,Private,Internal}
+  Normalized/{Public,Private,Internal}
+  Adapter/{Public,Private,Internal}
+  Application/
+    ExchangeInfo/
+  Composition/
+```
+
+### ExchangeInfo の移行対応
+
+| 現在パス | 目標パス | Phase |
+| --- | --- | --- |
+| `src/Exchanges/Common/ExchangeInfo/...` | `src/Exchanges/Common/Application/ExchangeInfo/...` | 1 |
+| `src/Exchanges/Bittrade/ExchangeInfo/...` | `src/Exchanges/Bittrade/Application/ExchangeInfo/...` | 2 |
+
+### 移行時の検証コマンド
+
+- `dotnet build`
+- `dotnet test`

@@ -148,6 +148,71 @@ Contracts の公開 API は **Request DTO を第一の契約**とする（MUST�
 
 ---
 
+## 6.4 取引所実装の物理配置ルール
+
+取引所実装の物理構造は、以下の 3 軸を基本とする（MUST）。
+
+- 取引所: `Bitflyer`, `Bittrade`, ...
+- レイヤ: `Wire`, `Raw`, `Normalized`, `Adapter`, `Application`
+- 可視性: `Public`, `Private`, `Internal`
+
+意味分類（例: `Account` / `Trading` / `Market`）は、公開構造の第一軸としては採用しない（MUST NOT）。
+
+### ExchangeInfo の位置づけ
+
+`ExchangeInfo` は単一写像ではなく、複数情報の統合・解決を行う複合写像である。
+そのため、`Application` 層として扱う（MUST）。
+
+- 共通処理: `src/Exchanges/Common/Application/ExchangeInfo`
+- 取引所固有処理: `src/Exchanges/{Exchange}/Application/ExchangeInfo`
+
+### Application / Composition の責務分担
+
+- `src/Application`: 取引所横断のユースケース
+- `src/Exchanges/{Exchange}/Application`: 取引所固有ユースケース
+- `src/Composition`: 取引所横断の配線（DI / Bootstrap）
+- `src/Exchanges/{Exchange}/Composition`: 取引所固有の配線
+
+### 目標ディレクトリツリー
+
+```text
+src/
+  Application/
+  Composition/
+  Contracts/
+  Primitives/
+  Utilities/
+  Transport/
+  Exchanges/
+    Common/
+      Application/
+        ExchangeInfo/
+    Bitflyer/
+      Wire/{Public,Private,Internal}
+      Raw/{Public,Private,Internal}
+      Normalized/{Public,Private,Internal}
+      Adapter/{Public,Private,Internal}
+      Application/ExchangeInfo/
+      Composition/
+    Bittrade/
+      Wire/{Public,Private,Internal}
+      Raw/{Public,Private,Internal}
+      Normalized/{Public,Private,Internal}
+      Adapter/{Public,Private,Internal}
+      Application/ExchangeInfo/
+      Composition/
+```
+
+### 移行フェーズ
+
+1. Common の ExchangeInfo を `Application` 配下へ移動する。
+2. 各取引所の ExchangeInfo を `Application` 配下へ移動する。
+3. namespace / using / 参照を統一する。
+4. `dotnet build` / `dotnet test` を通す。
+5. inventory / 契約文書を同期更新する。
+
+---
+
 ## 7. 層境界の型制約
 
 - Contracts の公開メソッド（インターフェイス）は、Contracts で許可された型のみを in/out に用いる（MUST）。

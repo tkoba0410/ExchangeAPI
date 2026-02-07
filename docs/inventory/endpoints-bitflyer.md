@@ -150,3 +150,32 @@ alias を記録する場合は、本セクションに `EndpointId` との対応
   prefix（Get / Post など）を付与する方式は採用していない。
 - 一方で、API 操作の意味を表す慣用的な接頭辞としての
   Get / Send / Cancel 等は EndpointId に含まれている。
+
+---
+
+## 配置移行（対象部分）
+
+### 目標ツリー（Bitflyer）
+
+```text
+src/Exchanges/Bitflyer/
+  Wire/{Public,Private,Internal}
+  Raw/{Public,Private,Internal}
+  Normalized/{Public,Private,Internal}
+  Adapter/{Public,Private,Internal}
+  Application/
+    ExchangeInfo/
+  Composition/
+```
+
+### ExchangeInfo の移行対応
+
+| 現在パス | 目標パス | Phase |
+| --- | --- | --- |
+| `src/Exchanges/Common/ExchangeInfo/...` | `src/Exchanges/Common/Application/ExchangeInfo/...` | 1 |
+| `src/Exchanges/Bitflyer/ExchangeInfo/...` | `src/Exchanges/Bitflyer/Application/ExchangeInfo/...` | 2 |
+
+### 移行時の検証コマンド
+
+- `dotnet build`
+- `dotnet test`

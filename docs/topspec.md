@@ -366,6 +366,17 @@ API 系統の Adapter とは **役割分離**して扱う。
 * 自由記述（message/status/notes 等）は **`FreeText` 等の明示的なラッパ型**として表現する。
 * 例外がある場合は Decisions に記録する。
 
+#### 4.3.1 Normalized / Contract の専用型化（MUST）
+
+* **Contract 層および Normalized 層**では、意味が確定できる値を専用型で表現しなければならない（MUST）。
+* 専用型化の対象は少なくとも以下を含む（MUST）。
+  * 識別子（`OrderId` / `AccountId` / `ExchangeOrderId` 等）
+  * 価格・数量・金額・時刻・シンボル
+  * 状態・種別・売買方向などの列挙的概念
+* 列挙的概念は、未知値を保持できる表現（例: `Closed<T>`）で扱うこと（MUST）。
+* `FreeText` は「自由記述」または「外部仕様上、意味確定不能な値」に限定して使用すること（MUST）。
+* 専用型化できる値を `FreeText` で保持し続けてはならない（MUST NOT）。
+
 ### 4.4 取引所差分の配置（MUST）
 
 * 取引所固有の既定値・ポリシーは `Exchanges/<Exchange>` 配下に閉じる。

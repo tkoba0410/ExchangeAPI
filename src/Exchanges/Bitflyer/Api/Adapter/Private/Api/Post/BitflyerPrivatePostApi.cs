@@ -1,34 +1,25 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 using BitflyerOrderRequest = ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Requests.BitflyerOrderRequest;
-using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Primitives.DomainCommon.Types;
+using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Primitives.Errors;
-using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
-using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter;
-using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Operations;
-namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
+using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
-/// <summary>
-/// bitFlyer の Trading API 実装（REST）。
-/// </summary>
-internal sealed class BitflyerTradingApi
+namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api.Post;
+
+internal sealed class BitflyerPrivatePostApi
 {
     private readonly IBitflyerNormalizedApi _normalized;
 
-    public BitflyerTradingApi(
-        IBitflyerNormalizedApi normalized)
+    public BitflyerPrivatePostApi(IBitflyerNormalizedApi normalized)
     {
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
@@ -99,6 +90,4 @@ internal sealed class BitflyerTradingApi
                 ex);
         }
     }
-
-
 }

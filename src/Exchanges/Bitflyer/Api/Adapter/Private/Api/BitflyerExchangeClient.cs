@@ -19,6 +19,8 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api.Get;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api.Post;
 using ExchangeApi.Primitives.Errors;
 namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
 
@@ -29,9 +31,8 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
 {
     private readonly IBitflyerNormalizedApi _normalized;
     private readonly IExchangeMarketResolver _markets;
-    private readonly BitflyerTradingApi _tradingApi;
-    private readonly BitflyerAccountApi _accountApi;
-    private readonly BitflyerSpotHistoryApi _historyApi;
+    private readonly BitflyerPrivatePostApi _privatePostApi;
+    private readonly BitflyerPrivateGetApi _privateGetApi;
     private readonly BitflyerExchangeInfoApi _exchangeInfoApi;
     internal BitflyerApiBundle? ApiBundle { get; }
     // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
@@ -46,9 +47,8 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         _normalized = normalized;
         _exchangeInfoApi = new BitflyerExchangeInfoApi(normalized);
         _markets = new ExchangeInfoMarketResolver(_exchangeInfoApi);
-        _tradingApi = new BitflyerTradingApi(normalized);
-        _accountApi = new BitflyerAccountApi(normalized);
-        _historyApi = new BitflyerSpotHistoryApi(normalized);
+        _privatePostApi = new BitflyerPrivatePostApi(normalized);
+        _privateGetApi = new BitflyerPrivateGetApi(normalized);
     }
 
     internal BitflyerExchangeClient(BitflyerApiBundle bundle)
@@ -57,9 +57,8 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         _normalized = bundle.Normalized;
         _markets = bundle.Markets;
         _exchangeInfoApi = bundle.ExchangeInfo;
-        _tradingApi = new BitflyerTradingApi(bundle.Normalized);
-        _accountApi = new BitflyerAccountApi(bundle.Normalized);
-        _historyApi = new BitflyerSpotHistoryApi(bundle.Normalized);
+        _privatePostApi = new BitflyerPrivatePostApi(bundle.Normalized);
+        _privateGetApi = new BitflyerPrivateGetApi(bundle.Normalized);
         ApiBundle = bundle;
     }
 
@@ -309,29 +308,29 @@ public sealed class BitflyerExchangeClient : IPublicApi, IPrivateApi, IExchangeC
         Size size,
         Price price,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.OrderLimitAsync(symbol, side, size, price, cancellationToken);
+        _privatePostApi.OrderLimitAsync(symbol, side, size, price, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
+        _privatePostApi.CancelOrderAsync(symbol, orderKey, cancellationToken);
 
     // Account
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         CancellationToken cancellationToken = default) =>
-        _accountApi.GetBalanceAsync(cancellationToken);
+        _privateGetApi.GetBalanceAsync(cancellationToken);
 
     // SpotHistory
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
         OrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _historyApi.GetOrdersAsync(request, cancellationToken);
+        _privateGetApi.GetOrdersAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default) =>
-        _historyApi.GetExecutionsPrivateAsync(request, cancellationToken);
+        _privateGetApi.GetExecutionsPrivateAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

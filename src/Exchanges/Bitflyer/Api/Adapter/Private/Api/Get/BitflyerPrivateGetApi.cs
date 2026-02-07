@@ -3,27 +3,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Api.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Utilities.Account;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api.Get;
 
-internal sealed class BitflyerSpotHistoryApi
+internal sealed class BitflyerPrivateGetApi
 {
     private readonly IBitflyerNormalizedApi _normalized;
 
-    public BitflyerSpotHistoryApi(
-        IBitflyerNormalizedApi normalized)
+    public BitflyerPrivateGetApi(IBitflyerNormalizedApi normalized)
     {
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
+    }
+
+    public async Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var request = new BalanceRequest();
+        var startedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            var call = await _normalized.GetBalanceCallAsync(cancellationToken).ConfigureAwait(false);
+            return ApiCallMapper.MapCall(
+                request,
+                call,
+                BitflyerOperations.Account.GetBalance,
+                ok => new BalanceResponse(MapBalances(ok)));
+        }
+        catch (Exception ex)
+        {
+            return ApiCallMapper.FromException<BalanceRequest, BalanceResponse>(
+                request,
+                startedAt,
+                BitflyerOperations.Account.GetBalance,
+                ex);
+        }
     }
 
     public async Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
@@ -76,6 +101,14 @@ internal sealed class BitflyerSpotHistoryApi
                 ex);
         }
     }
+
+    private static IReadOnlyList<BalanceEntry> MapBalances(IReadOnlyList<BitflyerBalanceEntryNormalized> balances) =>
+        balances
+            .Select(b => BalanceFactory.Create(
+                currency: b.CurrencyCode,
+                amount: b.Amount,
+                available: b.Available))
+            .ToArray();
 
     private static OrdersResponse BuildOrderResponse(
         OrdersRequest request,

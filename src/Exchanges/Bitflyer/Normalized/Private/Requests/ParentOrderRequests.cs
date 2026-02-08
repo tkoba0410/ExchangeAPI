@@ -27,9 +27,9 @@ public sealed record CancelParentOrderRequest(
 public sealed record GetParentOrdersRequest(
     ProductCode ProductCode,
     ParentOrderState? ParentOrderState = null,
-    int? Count = null,
-    long? Before = null,
-    long? After = null);
+    RequestCount? Count = null,
+    RequestBefore? Before = null,
+    RequestAfter? After = null);
 
 public sealed record GetParentOrderRequest(
     ExchangeOrderId? ParentOrderId = null,

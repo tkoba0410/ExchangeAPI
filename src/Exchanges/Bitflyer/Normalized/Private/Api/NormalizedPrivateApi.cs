@@ -12,6 +12,7 @@ using ExchangeApi.Exchanges.Bitflyer.Normalized;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Markets;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests;
 using PrivateRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
@@ -430,9 +431,9 @@ internal sealed class NormalizedPrivateApi
         var rawRequest = new RawPrivateRequests.GetParentOrdersRequest(
             request.ProductCode,
             parentOrderState is null ? null : new FreeText(parentOrderState),
-            request.Count,
-            request.Before,
-            request.After);
+            request.Count?.Value,
+            request.Before?.Value,
+            request.After?.Value);
 
         var rawCall = await _raw
             .GetParentOrdersCallAsync(rawRequest, cancellationToken)
@@ -588,10 +589,13 @@ internal sealed class NormalizedPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
+        RequestCount? requestCount = count.HasValue ? new RequestCount(count.Value) : null;
+        RequestBefore? requestBefore = before.HasValue ? new RequestBefore(before.Value) : null;
+        RequestAfter? requestAfter = after.HasValue ? new RequestAfter(after.Value) : null;
         var rawCall = await _raw
             .GetCoinInsCallAsync(new RawPrivateRequests.GetCoinInsRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
-        var request = new PrivateRequests.GetCoinInsRequest(count, before, after);
+        var request = new PrivateRequests.GetCoinInsRequest(requestCount, requestBefore, requestAfter);
         return CreateCall(
             rawCall,
             request,
@@ -606,10 +610,13 @@ internal sealed class NormalizedPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
+        RequestCount? requestCount = count.HasValue ? new RequestCount(count.Value) : null;
+        RequestBefore? requestBefore = before.HasValue ? new RequestBefore(before.Value) : null;
+        RequestAfter? requestAfter = after.HasValue ? new RequestAfter(after.Value) : null;
         var rawCall = await _raw
             .GetCoinOutsCallAsync(new RawPrivateRequests.GetCoinOutsRequest(messageId, count, before, after), cancellationToken)
             .ConfigureAwait(false);
-        var request = new PrivateRequests.GetCoinOutsRequest(messageId, count, before, after);
+        var request = new PrivateRequests.GetCoinOutsRequest(messageId, requestCount, requestBefore, requestAfter);
         return CreateCall(
             rawCall,
             request,
@@ -637,10 +644,13 @@ internal sealed class NormalizedPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
+        RequestCount? requestCount = count.HasValue ? new RequestCount(count.Value) : null;
+        RequestBefore? requestBefore = before.HasValue ? new RequestBefore(before.Value) : null;
+        RequestAfter? requestAfter = after.HasValue ? new RequestAfter(after.Value) : null;
         var rawCall = await _raw
             .GetDepositsCallAsync(new RawPrivateRequests.GetDepositsRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
-        var request = new PrivateRequests.GetDepositsRequest(count, before, after);
+        var request = new PrivateRequests.GetDepositsRequest(requestCount, requestBefore, requestAfter);
         return CreateCall(
             rawCall,
             request,
@@ -655,17 +665,19 @@ internal sealed class NormalizedPrivateApi
         FreeText? code = null,
         CancellationToken cancellationToken = default)
     {
+        var normalizedBankAccountId = new BankAccountId(bankAccountId);
+        var withdrawAmount = new WithdrawAmount(amount);
         var currencyText = CurrencyCodeConverter.ToCurrencyString(currencyCode);
         var rawCall = await _raw
             .WithdrawCallAsync(new RawPrivateRequests.WithdrawRequest
             {
                 CurrencyCode = new FreeText(currencyText),
-                BankAccountId = bankAccountId,
-                Amount = amount,
+                BankAccountId = normalizedBankAccountId.Value,
+                Amount = withdrawAmount.Value,
                 Code = code,
             }, cancellationToken)
             .ConfigureAwait(false);
-        var request = new PrivateRequests.WithdrawRequest(currencyCode, bankAccountId, amount, code);
+        var request = new PrivateRequests.WithdrawRequest(currencyCode, normalizedBankAccountId, withdrawAmount, code);
         return CreateCall(
             rawCall,
             request,
@@ -679,10 +691,13 @@ internal sealed class NormalizedPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
+        RequestCount? requestCount = count.HasValue ? new RequestCount(count.Value) : null;
+        RequestBefore? requestBefore = before.HasValue ? new RequestBefore(before.Value) : null;
+        RequestAfter? requestAfter = after.HasValue ? new RequestAfter(after.Value) : null;
         var rawCall = await _raw
             .GetWithdrawalsCallAsync(new RawPrivateRequests.GetWithdrawalsRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
-        var request = new PrivateRequests.GetWithdrawalsRequest(count, before, after);
+        var request = new PrivateRequests.GetWithdrawalsRequest(requestCount, requestBefore, requestAfter);
         return CreateCall(
             rawCall,
             request,
@@ -697,10 +712,13 @@ internal sealed class NormalizedPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
+        RequestCount? requestCount = count.HasValue ? new RequestCount(count.Value) : null;
+        RequestBefore? requestBefore = before.HasValue ? new RequestBefore(before.Value) : null;
+        RequestAfter? requestAfter = after.HasValue ? new RequestAfter(after.Value) : null;
         var rawCall = await _raw
             .GetBalanceHistoryCallAsync(new RawPrivateRequests.GetBalanceHistoryRequest(currencyCode, count, before, after), cancellationToken)
             .ConfigureAwait(false);
-        var request = new PrivateRequests.GetBalanceHistoryRequest(currencyCode, count, before, after);
+        var request = new PrivateRequests.GetBalanceHistoryRequest(currencyCode, requestCount, requestBefore, requestAfter);
         return CreateCall(
             rawCall,
             request,
@@ -781,10 +799,13 @@ internal sealed class NormalizedPrivateApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
+        RequestCount? requestCount = count.HasValue ? new RequestCount(count.Value) : null;
+        RequestBefore? requestBefore = before.HasValue ? new RequestBefore(before.Value) : null;
+        RequestAfter? requestAfter = after.HasValue ? new RequestAfter(after.Value) : null;
         var rawCall = await _raw
             .GetCollateralHistoryCallAsync(new RawPrivateRequests.GetCollateralHistoryRequest(count, before, after), cancellationToken)
             .ConfigureAwait(false);
-        var request = new PrivateRequests.GetCollateralHistoryRequest(count, before, after);
+        var request = new PrivateRequests.GetCollateralHistoryRequest(requestCount, requestBefore, requestAfter);
         return CreateCall(
             rawCall,
             request,

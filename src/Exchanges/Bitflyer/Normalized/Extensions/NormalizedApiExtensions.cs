@@ -40,10 +40,16 @@ public static class NormalizedApiExtensions
         int? count = null,
         long? before = null,
         long? after = null,
-        CancellationToken cancellationToken = default) =>
+        CancellationToken cancellationToken = default)
+    {
+        RequestCount? requestCount = count.HasValue ? new RequestCount(count.Value) : null;
+        RequestBefore? requestBefore = before.HasValue ? new RequestBefore(before.Value) : null;
+        RequestAfter? requestAfter = after.HasValue ? new RequestAfter(after.Value) : null;
+        return
         api.GetParentOrdersCallAsync(
-            new GetParentOrdersRequest(productCode, parentOrderState, count, before, after),
+            new GetParentOrdersRequest(productCode, parentOrderState, requestCount, requestBefore, requestAfter),
             cancellationToken);
+    }
 
     public static Task<Call<GetParentOrderRequest, GetParentOrderResponse>> GetParentOrderCallAsync(
         this INormalizedApi api,

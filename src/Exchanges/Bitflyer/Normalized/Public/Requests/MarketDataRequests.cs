@@ -1,4 +1,5 @@
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests;
 
@@ -8,9 +9,9 @@ public sealed record GetBoardRequest(ProductCode ProductCode);
 
 public sealed record GetExecutionsPublicRequest(
     ProductCode ProductCode,
-    int? Count = null,
-    long? Before = null,
-    long? After = null);
+    RequestCount? Count = null,
+    RequestBefore? Before = null,
+    RequestAfter? After = null);
 
 public sealed record GetHealthRequest(ProductCode ProductCode);
 

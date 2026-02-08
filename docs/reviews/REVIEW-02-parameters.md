@@ -36,6 +36,10 @@
   Bittrade 旧 `ClientFactory` の internal `CreatePrivate` 境界を `AccountId` 受けへ統一した。
 - `P2-3` の追加対応として、Bitflyer Normalized の `SymbolMapper/CommonMapper` で
   `productCode` の受け渡しを `string` から `ProductCode` に統一した（内部 mapper 境界の文字列流通を縮小）。
+- `P2-2` の追加対応として、Bitflyer Normalized の request で `count/before/after` を
+  `RequestCount/RequestBefore/RequestAfter` に型昇格し、Raw 呼び出し直前でのみプリミティブへ変換する形に変更した。
+- `P2-2` の追加対応として、Bitflyer Normalized `WithdrawRequest` の
+  `bankAccountId/amount` を `BankAccountId/WithdrawAmount` に型昇格した。
 
 ---
 

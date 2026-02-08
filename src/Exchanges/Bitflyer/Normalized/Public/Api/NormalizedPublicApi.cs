@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
@@ -115,10 +116,14 @@ internal sealed class NormalizedPublicApi
         long? after = null,
         CancellationToken cancellationToken = default)
     {
+        RequestCount? requestCount = count.HasValue ? new RequestCount(count.Value) : null;
+        RequestBefore? requestBefore = before.HasValue ? new RequestBefore(before.Value) : null;
+        RequestAfter? requestAfter = after.HasValue ? new RequestAfter(after.Value) : null;
+
         var rawCall = await _raw
             .GetExecutionsPublicCallAsync(new RawPublicRequests.GetExecutionsPublicRequest(productCode, count, before, after), cancellationToken)
             .ConfigureAwait(false);
-        var request = new PublicRequests.GetExecutionsPublicRequest(productCode, count, before, after);
+        var request = new PublicRequests.GetExecutionsPublicRequest(productCode, requestCount, requestBefore, requestAfter);
 
         return CreateCall(
             rawCall,

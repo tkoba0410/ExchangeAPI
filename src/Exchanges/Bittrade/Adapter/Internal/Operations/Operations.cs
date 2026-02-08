@@ -28,8 +28,6 @@ public static class Operations
     public static class ExchangeInfo
     {
         public const string GetExchangeInfo = "Bittrade.ExchangeInfo.GetExchangeInfo";
-        public const string GetCurrencys = "Bittrade.ExchangeInfo.GetCurrencys";
-        public const string GetTimestamp = "Bittrade.ExchangeInfo.GetTimestamp";
     }
 
     public static class History

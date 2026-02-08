@@ -98,7 +98,7 @@ public sealed class NormalizedApi : INormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.CancelChildOrderCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrderNormalized>>> GetChildOrdersCallAsync(
+    public Task<Call<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetChildOrdersCallAsync(symbol, cancellationToken);
@@ -175,7 +175,7 @@ public sealed class NormalizedApi : INormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.GetDepositsCallAsync(count, before, after, cancellationToken);
 
-    public Task<Call<PrivateRequests.WithdrawRequest, WithdrawResultNormalized>> WithdrawCallAsync(
+    public Task<Call<PrivateRequests.WithdrawRequest, WithdrawResult>> WithdrawCallAsync(
         CurrencyCode currencyCode,
         int bankAccountId,
         decimal amount,

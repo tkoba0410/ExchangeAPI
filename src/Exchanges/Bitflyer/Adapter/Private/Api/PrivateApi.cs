@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using OrderRequest = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.OrderRequest;
+using NormalizedOpenOrder = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.OpenOrder;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
@@ -181,7 +182,7 @@ internal sealed class PrivateApi
 
     private static OrdersResponse BuildOrderResponse(
         OrdersRequest request,
-        IReadOnlyList<OpenOrderNormalized> orders)
+        IReadOnlyList<NormalizedOpenOrder> orders)
     {
         var items = orders.Select(MapSnapshot).ToList();
         var (requestedLimit, appliedLimit) = GetLimits(request);
@@ -238,7 +239,7 @@ internal sealed class PrivateApi
             AsOf: asOf);
     }
 
-    private static OrdersItem MapSnapshot(OpenOrderNormalized order)
+    private static OrdersItem MapSnapshot(NormalizedOpenOrder order)
     {
         var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
         var orderType = order.OrderType switch

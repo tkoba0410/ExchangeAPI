@@ -58,6 +58,7 @@
 2. 実装は本 inventory に従うこと。
 3. `DecisionNote` には **裁定理由のみ**を記載する（事実や仕様説明は書かない）。
 4. 取引所側の事実（Method / Path / URL 等）は取引所 inventory にのみ記載する。
+5. Contracts の API 境界 DTO 名（`RequestType` / `ResponseType`）は実装命名の正本とし、Facade / Adapter はこれに一致させる。
 
 ---
 

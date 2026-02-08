@@ -31,8 +31,6 @@ internal static class Operations
     internal static class ExchangeInfo
     {
         public const string GetExchangeInfo = "Bitflyer.ExchangeInfo.GetExchangeInfo";
-        public const string GetCurrencys = "Bitflyer.ExchangeInfo.GetCurrencys";
-        public const string GetTimestamp = "Bitflyer.ExchangeInfo.GetTimestamp";
     }
 
     internal static class History

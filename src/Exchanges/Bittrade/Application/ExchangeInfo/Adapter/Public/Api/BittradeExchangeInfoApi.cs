@@ -71,56 +71,6 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         }
     }
 
-    public async Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetCurrencysRequest();
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _normalized.GetCurrencysCallAsync(cancellationToken).ConfigureAwait(false);
-            return ExchangeInfoCallMapper.MapCall(
-                request,
-                call,
-                BittradeExchangeInfoOperations.GetCurrencys,
-                ok => ok);
-        }
-        catch (Exception ex)
-        {
-            return ExchangeInfoCallMapper.FromException<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
-                request,
-                startedAt,
-                BittradeExchangeInfoOperations.GetCurrencys,
-                ex);
-        }
-    }
-
-    public async Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetTimestampRequest();
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _normalized.GetTimestampCallAsync(cancellationToken).ConfigureAwait(false);
-            return ExchangeInfoCallMapper.MapCall(
-                request,
-                call,
-                BittradeExchangeInfoOperations.GetTimestamp,
-                ok => ok);
-        }
-        catch (Exception ex)
-        {
-            return ExchangeInfoCallMapper.FromException<GetTimestampRequest, DateTimeOffset>(
-                request,
-                startedAt,
-                BittradeExchangeInfoOperations.GetTimestamp,
-                ex);
-        }
-    }
-
     internal static string ToApiSymbol(ExchangeMarketInfo market)
     {
         if (!ExchangeSymbol.TryParse(market.ProductCode.Value, out var parsed))

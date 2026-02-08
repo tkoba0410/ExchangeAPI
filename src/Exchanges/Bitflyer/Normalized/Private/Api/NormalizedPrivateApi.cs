@@ -201,14 +201,14 @@ internal sealed class NormalizedPrivateApi
             _ => MapResult<CancelResult>.Ok(new CancelResult(true)));
     }
 
-    public async Task<Call<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrderNormalized>>> GetChildOrdersCallAsync(
+    public async Task<Call<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
         var callRequest = new PrivateRequests.GetChildOrdersRequest(symbol);
         if (symbol.IsEmpty)
         {
-            return CreateImmediateError<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrderNormalized>>(
+            return CreateImmediateError<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrder>>(
                 callRequest,
                 Component(EndpointIds.GetChildOrders),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
@@ -217,7 +217,7 @@ internal sealed class NormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetProductCode(marketCall, out var productCode, out var marketError))
         {
-            return CreateCallError<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrderNormalized>>(
+            return CreateCallError<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrder>>(
                 marketCall,
                 callRequest,
                 "Bitflyer.GetOpenOrders",
@@ -239,7 +239,7 @@ internal sealed class NormalizedPrivateApi
             "Bitflyer.GetOpenOrders",
             rawOrders =>
             {
-                var mapped = new List<OpenOrderNormalized>(rawOrders.Count);
+                var mapped = new List<OpenOrder>(rawOrders.Count);
                 foreach (var o in rawOrders)
                 {
                     var acceptanceId = AcceptanceId.TryParse(o.ChildOrderAcceptanceId, out var parsedAcceptanceId)
@@ -250,7 +250,7 @@ internal sealed class NormalizedPrivateApi
                         : (ExchangeOrderId?)null;
                     if (acceptanceId is null && exchangeOrderId is null)
                     {
-                        return MapResult<IReadOnlyList<OpenOrderNormalized>>.Fail(
+                        return MapResult<IReadOnlyList<OpenOrder>>.Fail(
                             new CallError(CallErrorKind.Mapping, "bitFlyer order is missing both acceptanceId and exchangeOrderId."));
                     }
 
@@ -260,20 +260,20 @@ internal sealed class NormalizedPrivateApi
 
                     if (!CommonMapper.TryMapSide(o.Side, out var side, out var sideError))
                     {
-                        return MapResult<IReadOnlyList<OpenOrderNormalized>>.Fail(sideError!);
+                        return MapResult<IReadOnlyList<OpenOrder>>.Fail(sideError!);
                     }
 
                     if (!TradingMapper.TryParseChildOrderType(o.ChildOrderType, out var parsedOrderType, out var orderTypeError))
                     {
-                        return MapResult<IReadOnlyList<OpenOrderNormalized>>.Fail(orderTypeError!);
+                        return MapResult<IReadOnlyList<OpenOrder>>.Fail(orderTypeError!);
                     }
 
                     if (!TradingMapper.TryToOrderType(parsedOrderType, out var mappedOrderType, out var mapError))
                     {
-                        return MapResult<IReadOnlyList<OpenOrderNormalized>>.Fail(mapError!);
+                        return MapResult<IReadOnlyList<OpenOrder>>.Fail(mapError!);
                     }
 
-                    mapped.Add(new OpenOrderNormalized(
+                    mapped.Add(new OpenOrder(
                         Symbol: symbol,
                         Key: key,
                         Side: side,
@@ -290,7 +290,7 @@ internal sealed class NormalizedPrivateApi
                         AcceptanceId: acceptanceId));
                 }
 
-                return MapResult<IReadOnlyList<OpenOrderNormalized>>.Ok(mapped.ToArray());
+                return MapResult<IReadOnlyList<OpenOrder>>.Ok(mapped.ToArray());
             });
     }
 
@@ -712,7 +712,7 @@ internal sealed class NormalizedPrivateApi
             raw => MapResult<RawJsonNormalized>.Ok(new RawJsonNormalized(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.WithdrawRequest, WithdrawResultNormalized>> WithdrawCallAsync(
+    public async Task<Call<PrivateRequests.WithdrawRequest, WithdrawResult>> WithdrawCallAsync(
         CurrencyCode currencyCode,
         int bankAccountId,
         decimal amount,
@@ -734,7 +734,7 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.Withdraw),
-            raw => MapResult<WithdrawResultNormalized>.Ok(new WithdrawResultNormalized(FreeText.Parse(raw.MessageId))));
+            raw => MapResult<WithdrawResult>.Ok(new WithdrawResult(FreeText.Parse(raw.MessageId))));
     }
 
     public async Task<Call<PrivateRequests.GetWithdrawalsRequest, RawJsonNormalized>> GetWithdrawalsCallAsync(

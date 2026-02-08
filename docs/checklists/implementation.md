@@ -16,6 +16,7 @@ TopSpec / inventory / governance により定義された規範が、
 
   * 公式 API ドキュメント（取引所公式）
   * TopSpec（docs/ 配下の規範文書）
+  * Naming Rules（`docs/naming-rules.md`）
   * 該当 inventory（例：endpoints-bitflyer.md）
 * [ ] 「この実装判断はどの正本に基づくか」を PR / 作業メモに明記した
 

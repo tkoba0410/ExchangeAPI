@@ -8,7 +8,7 @@
 ## 評価サマリ
 
 - 現状は `EndpointId` 由来命名を中心に整っているが、
-  - **同一概念の語彙揺れ**（例: `OpenOrder` vs `OpenOrderNormalized`）
+  - **同一概念の語彙揺れ**（例: `Result` 語の責務混在）
   - **Layer内での接尾辞ポリシー不一致**（`*Normalized` 有無）
   - **EndpointId規則の文書間不整合**（Bitflyer と Bittrade の方針差 + Bitflyer inventory 内の重複候補併記）
   が残る。
@@ -41,14 +41,14 @@
 
 ### P1-1. 同一Layer・同一概念で `*Normalized` 接尾辞の有無が揺れている
 
-**具体箇所**
-- Bitflyer: `OpenOrderNormalized`  
-  - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/OpenOrderNormalized.cs`
-- Bittrade: `OpenOrder`（同等フィールド構造）  
+**具体箇所（現状）**
+- Bitflyer: `OpenOrder`  
+  - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/OpenOrder.cs`
+- Bittrade: `OpenOrder`  
   - `src/Exchanges/Bittrade/Normalized/Private/Dtos/OpenOrder.cs`
 
-- Bitflyer: `WithdrawResultNormalized`  
-  - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/WithdrawResultNormalized.cs`
+- Bitflyer: `WithdrawResult`  
+  - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/WithdrawResult.cs`
 - Bittrade: `WithdrawResult`  
   - `src/Exchanges/Bittrade/Normalized/Private/Dtos/WithdrawResult.cs`
 
@@ -58,8 +58,9 @@
 - 「Normalized DTO には接尾辞を付けるか否か」の判断が都度発生。
 
 **統一ルール案**
-1. Normalized層DTOは **原則 `*Normalized` を付ける**（境界可視化優先）。
-2. 例外は `docs/exceptions.md` に理由付き登録（契約語彙に完全一致させる必要がある場合のみ）。
+1. `*Normalized` は原則付与しない。
+2. 同一コンパイル単位で型衝突または曖昧参照が発生する場合に限り `*Normalized` を許可する。
+3. 付与時は衝突元と解消理由を記録する（必要に応じて `docs/exceptions.md`）。
 
 ---
 
@@ -116,27 +117,36 @@
 
 ---
 
-## 命名「統一ルール案」（提案版 v1）
+## 命名「統一ルール案」（再策定 v2）
 
-1. **Layer語彙固定**
+> 旧「提案版 v1」は不採用とする。  
+> 理由: EndpointId を取引所横断で単一正準化する方針が、現行 TopSpec の「取引所固有ルール許容」と衝突するため。
+
+1. **EndpointId 統一方針（取引所内一貫 + 取引所間差異許容）**
+   - EndpointId は「取引所ごとの SoT（inventory）」を正本とし、取引所横断で同名統一は要求しない。
+   - 新規取引所における初期命名方針（HTTP Method 語の採用/省略、単語境界粒度、衝突時の解消規則）は、裁定者が決定する。
+   - 初期命名方針の決定後は、当該取引所 inventory の EndpointId ルールを唯一の基準として運用する。
+   - 各 inventory の主表（EndpointId 列）には「正規 EndpointId」のみを記載する。
+   - `duplicate candidate` / 旧呼称 / 別名は主表に置かず、`Aliases` セクションに分離する。
+
+2. **Layer語彙固定（命名の責務境界）**
    - Wire: `Endpoint/Path/Query/Spec`
-   - Raw: `Request/Response/Raw/Json`
-   - Normalized: `*Normalized` を原則
-   - Contracts: 取引所非依存の業務語彙のみ
+   - Raw: API境界DTOのみ `Request/Response`
+   - Normalized: 層接尾辞は通常付与せず、衝突回避時のみ許可
+   - Contracts: 公開 Facade 境界は取引所非依存の業務語彙を優先
 
-2. **EndpointId運用**
-   - 正準IDは method非依存の意味名。
-   - method付き表記は Alias 管理。
-   - typoを含むIDは Raw境界内に閉じ込める。
+3. **DTO接尾辞ルール**
+   - `Request/Response` は API 境界 DTO のみに使用する。
+   - 内部中間モデルは `Payload/Envelope/Entry/Item/Body/Encoded/Document` を使用する。
+   - `Result` は曖昧性が高いため新規導入を抑制し、内部結果は `Outcome` 優先とする。
 
-3. **DTO命名**
-   - 境界DTOのみ `Request/Response`。
-   - 内部中間モデルは `Payload/Envelope/Entry/Item/Outcome` を使用。
-   - `Result` は `CallResult` 系に限定し、ドメイン結果は `Outcome` 優先。
+4. **typo/外部仕様追従ルール**
+   - 外部仕様由来の typo（例: `Currencys`）は EndpointId およびその直結 DTO まで許容する。
+   - Contracts 公開境界へ露出する名称は正規英語（例: `Currencies`）を優先する。
 
-4. **Cross-Exchange同一概念**
-   - 同じ意味・同じフィールド契約なら同名化（例: `OpenOrderNormalized`）。
-   - 例外は `docs/exceptions.md` に必ず登録。
+5. **Cross-Exchange 命名整合ルール**
+   - 同一 Layer・同一責務・同等フィールド契約の DTO は、可能な限り同名化する。
+   - 互換性や段階移行で同名化できない場合は、`docs/exceptions.md` に理由・影響範囲・解消条件を登録する。
 
 ---
 
@@ -146,10 +156,10 @@
    - `docs/inventory/endpoints-bitflyer.md`（`GetMarkets` と `Markets` の重複候補併記、prefix方針記述とのねじれ）
    - `docs/inventory/endpoints-bittrade.md`（`Get/Post` prefix 許容）
 
-2. Normalized DTO 接尾辞揺れ
-   - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/OpenOrderNormalized.cs`
+2. Normalized DTO 接尾辞揺れ（現時点では主要例は解消）
+   - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/OpenOrder.cs`
    - `src/Exchanges/Bittrade/Normalized/Private/Dtos/OpenOrder.cs`
-   - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/WithdrawResultNormalized.cs`
+   - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/WithdrawResult.cs`
    - `src/Exchanges/Bittrade/Normalized/Private/Dtos/WithdrawResult.cs`
 
 3. Contracts語彙の揺れ（業務語彙 vs EndpointId語彙）
@@ -175,4 +185,3 @@
   1. EndpointId は正準規則に一致しているか
   2. Contracts 名は取引所非依存語彙か
   3. Cross-Exchange 既存同義語と命名一致しているか
-

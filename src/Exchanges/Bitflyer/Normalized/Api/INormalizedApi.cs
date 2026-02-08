@@ -59,7 +59,7 @@ public interface INormalizedApi
         OrderKey orderKey,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetChildOrdersRequest, IReadOnlyList<OpenOrderNormalized>>> GetChildOrdersCallAsync(
+    Task<Call<GetChildOrdersRequest, IReadOnlyList<OpenOrder>>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
@@ -121,7 +121,7 @@ public interface INormalizedApi
         long? after = null,
         CancellationToken cancellationToken = default);
 
-    Task<Call<WithdrawRequest, WithdrawResultNormalized>> WithdrawCallAsync(
+    Task<Call<WithdrawRequest, WithdrawResult>> WithdrawCallAsync(
         CurrencyCode currencyCode,
         int bankAccountId,
         decimal amount,

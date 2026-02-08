@@ -71,13 +71,9 @@ Note 欄には、採用可否・実装判断・設計判断を記載してはな
 | Scope | Method | Path | CanonicalSourceUrl | EndpointId | PresentIn | Note | RequestType | ResponseType |
 | ------ | ------ | ------------------------ | ------------------------------------------------------------------- | -------------------- | --------------------- | ---- | ----------- | ------------ |
 | public | GET | /v1/getmarkets | https://lightning.bitflyer.com/docs#マーケットの一覧 | GetMarkets | Wire, Raw, Normalized |  | GetMarketsRequest | GetMarketsResponse |
-| public | GET | /v1/markets | https://lightning.bitflyer.com/docs#マーケットの一覧 | Markets | None | duplicate candidate | None | None |
 | public | GET | /v1/getboard | https://lightning.bitflyer.com/docs#板情報 | GetBoard | Wire, Raw, Normalized |  | GetBoardRequest | GetBoardResponse |
-| public | GET | /v1/board | https://lightning.bitflyer.com/docs#板情報 | Board | None | duplicate candidate | None | None |
 | public | GET | /v1/getticker | https://lightning.bitflyer.com/docs#ticker | GetTicker | Wire, Raw, Normalized |  | GetTickerRequest | GetTickerResponse |
-| public | GET | /v1/ticker | https://lightning.bitflyer.com/docs#ticker | Ticker | None | duplicate candidate | None | None |
 | public | GET | /v1/getexecutions | https://lightning.bitflyer.com/docs#約定履歴 | GetExecutionsPublic | Wire, Raw, Normalized |  | GetExecutionsPublicRequest | GetExecutionsPublicResponse |
-| public | GET | /v1/executions | https://lightning.bitflyer.com/docs#約定履歴 | Executions | None | duplicate candidate | None | None |
 | public | GET | /v1/getboardstate | https://lightning.bitflyer.com/docs#板情報state | GetBoardState | Wire, Raw, Normalized |  | GetBoardStateRequest | GetBoardStateResponse |
 | public | GET | /v1/gethealth | https://lightning.bitflyer.com/docs#取引所の状態 | GetHealth | Wire, Raw, Normalized |  | GetHealthRequest | GetHealthResponse |
 | public | GET | /v1/getfundingrate | https://lightning.bitflyer.com/docs#ファンディングレート | GetFundingRate | Wire, Raw, Normalized |  | GetFundingRateRequest | GetFundingRateResponse |
@@ -124,6 +120,10 @@ alias を記録する場合は、本セクションに `EndpointId` との対応
 
 | EndpointId | Alias | Notes |
 |---|---|---|
+| GetMarkets | Markets | duplicate candidate |
+| GetBoard | Board | duplicate candidate |
+| GetTicker | Ticker | duplicate candidate |
+| GetExecutionsPublic | Executions | duplicate candidate |
 
 ## 並び順について
 

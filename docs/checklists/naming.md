@@ -1,7 +1,7 @@
 # 命名チェックリスト（Non-Normative）
 
 本書は命名の揺らぎを検出するためのチェックリストであり、仕様を定義しない。  
-正本は `docs/topspec.md` / `docs/contracts/contracts.md` / `docs/governance.md` とする。
+正本は `docs/topspec.md` / `docs/naming-rules.md` / `docs/contracts/contracts.md` / `docs/governance.md` とする。
 
 ---
 
@@ -52,7 +52,7 @@
 - [ ] 仕様起因の例外は `docs/exceptions.md` に記録する
 - [ ] `Exchanges/<Exchange>/Composition` の公開型は取引所プレフィックス付き（例: `BitflyerFactory`）
 - [ ] `Exchanges/<Exchange>/Application`（`Application/ExchangeInfo` を含む）の公開型は取引所プレフィックス付き（例: `BitflyerExchangeInfoService`）
-- [ ] 取引所プレフィックスを排除した結果、型衝突が起きる場合は意味名で回避している（例: `ExchangeSide`, `OpenOrderNormalized`）
+- [ ] 取引所プレフィックスを排除した結果、型衝突が起きる場合は意味名で回避している（例: `ExchangeSide`, `ExchangeSymbol`）
 - [ ] 衝突回避のために取引所名プレフィックスへ戻す前に、役割語での解決を検討している
 - [ ] 衝突回避の意味名が優先順 `Contract -> Exchange -> Normalized -> Raw -> Wire` に従っている
 - [ ] 型衝突時に、上位層で逃がさず下位層の型名を修正して解消している

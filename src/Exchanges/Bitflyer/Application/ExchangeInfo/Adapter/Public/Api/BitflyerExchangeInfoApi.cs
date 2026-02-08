@@ -89,28 +89,6 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         }
     }
 
-    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetCurrencysRequest();
-        return Task.FromResult(NotSupportedCall.Create<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
-            "Contracts",
-            BitflyerExchangeInfoOperations.GetCurrencys,
-            request,
-            "Currencys"));
-    }
-
-    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
-        CancellationToken cancellationToken = default)
-    {
-        var request = new GetTimestampRequest();
-        return Task.FromResult(NotSupportedCall.Create<GetTimestampRequest, DateTimeOffset>(
-            "Contracts",
-            BitflyerExchangeInfoOperations.GetTimestamp,
-            request,
-            "Timestamp"));
-    }
-
     private static ExchangeInfoDto MapExchangeInfo(BitflyerStaticExchangeInfo info)
     {
         var mapped = info.Markets.Select(MapMarket).ToList();

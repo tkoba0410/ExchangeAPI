@@ -34,6 +34,8 @@
   間の配線を VO 境界へ揃えた。
 - `P2-3` の追加対応として、`WindowsCredentialManagerApiCredentialProvider` の内部 `BuildTarget` 境界と、
   Bittrade 旧 `ClientFactory` の internal `CreatePrivate` 境界を `AccountId` 受けへ統一した。
+- `P2-3` の追加対応として、Bitflyer Normalized の `SymbolMapper/CommonMapper` で
+  `productCode` の受け渡しを `string` から `ProductCode` に統一した（内部 mapper 境界の文字列流通を縮小）。
 
 ---
 

@@ -1,5 +1,6 @@
 using System;
 using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
 using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
@@ -63,12 +64,12 @@ internal static class CommonMapper
         return true;
     }
 
-    public static bool TryToApiProductCode(string productCode, out string apiProductCode, out CallError? error)
+    public static bool TryToApiProductCode(ProductCode productCode, out ProductCode apiProductCode, out CallError? error)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (productCode.IsEmpty)
         {
-            apiProductCode = string.Empty;
-            error = new CallError(CallErrorKind.Mapping, $"SymbolNotSupported:{productCode ?? string.Empty}");
+            apiProductCode = ProductCode.Empty;
+            error = new CallError(CallErrorKind.Mapping, "SymbolNotSupported:<empty>");
             return false;
         }
 
@@ -77,12 +78,12 @@ internal static class CommonMapper
         return true;
     }
 
-    public static bool TryParseProductCode(string productCode, out string parsed, out CallError? error)
+    public static bool TryParseProductCode(ProductCode productCode, out ProductCode parsed, out CallError? error)
     {
-        if (string.IsNullOrWhiteSpace(productCode))
+        if (productCode.IsEmpty)
         {
-            parsed = string.Empty;
-            error = new CallError(CallErrorKind.Mapping, $"SymbolNotSupported:{productCode ?? string.Empty}");
+            parsed = ProductCode.Empty;
+            error = new CallError(CallErrorKind.Mapping, "SymbolNotSupported:<empty>");
             return false;
         }
 

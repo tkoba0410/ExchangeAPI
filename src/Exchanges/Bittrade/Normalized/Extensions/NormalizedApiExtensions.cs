@@ -136,7 +136,7 @@ public static class NormalizedApiExtensions
         CancellationToken ct = default) =>
         api.PostRetailOrderPlaceCallAsync(new PostRetailOrderPlaceRequest(request), ct);
 
-    public static Task<Call<GetRetailOrderListRequest, IReadOnlyList<RetailOrderEntryNormalized>>> GetRetailOrderListCallAsync(
+    public static Task<Call<GetRetailOrderListRequest, GetRetailOrderListResponse>> GetRetailOrderListCallAsync(
         this IBittradeNormalizedApi api,
         int direct,
         int? status = null,
@@ -153,7 +153,7 @@ public static class NormalizedApiExtensions
         CancellationToken ct = default) =>
         api.GetRetailOrderDetailByOrderIdCallAsync(new GetRetailOrderDetailByOrderIdRequest(orderId), ct);
 
-    public static Task<Call<PostRetailOrderHistoryRequest, IReadOnlyList<RetailOrderEntryNormalized>>> PostRetailOrderHistoryCallAsync(
+    public static Task<Call<PostRetailOrderHistoryRequest, PostRetailOrderHistoryResponse>> PostRetailOrderHistoryCallAsync(
         this IBittradeNormalizedApi api,
         Symbol? symbol = null,
         int? direct = null,

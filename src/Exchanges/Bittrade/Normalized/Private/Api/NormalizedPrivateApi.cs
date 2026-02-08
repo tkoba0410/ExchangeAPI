@@ -166,7 +166,7 @@ internal sealed class NormalizedPrivateApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetRetailAccountBalanceRequest, IReadOnlyList<RetailBalanceEntryNormalized>>> GetRetailAccountBalanceCallAsync(
+    public async Task<Call<NormalizedRequests.GetRetailAccountBalanceRequest, GetRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
         CancellationToken ct = default)
     {
         var rawCall = await _trading
@@ -182,16 +182,17 @@ internal sealed class NormalizedPrivateApi
             {
                 if (ok.Success is not true)
                 {
-                    return MapResult<IReadOnlyList<RetailBalanceEntryNormalized>>.Fail(
+                    return MapResult<GetRetailAccountBalanceResponse>.Fail(
                         new CallError(CallErrorKind.Mapping, "Bittrade retail balance response invalid."));
                 }
 
                 if (!Normalizer.TryNormalizeRetailBalances(ok.Data, out var balances, out var normalizeError))
                 {
-                    return MapResult<IReadOnlyList<RetailBalanceEntryNormalized>>.Fail(normalizeError!);
+                    return MapResult<GetRetailAccountBalanceResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<IReadOnlyList<RetailBalanceEntryNormalized>>.Ok(balances!);
+                return MapResult<GetRetailAccountBalanceResponse>.Ok(
+                    new GetRetailAccountBalanceResponse(balances!));
             });
     }
 
@@ -560,7 +561,7 @@ internal sealed class NormalizedPrivateApi
             raw => MapResult<RetailOrderResult>.Ok(TradingMapper.ToRetailOrderResult(raw)));
     }
 
-    public async Task<Call<NormalizedRequests.GetRetailOrderListRequest, IReadOnlyList<RetailOrderEntryNormalized>>> GetRetailOrderListCallAsync(
+    public async Task<Call<NormalizedRequests.GetRetailOrderListRequest, GetRetailOrderListResponse>> GetRetailOrderListCallAsync(
         NormalizedRequests.GetRetailOrderListRequest request,
         CancellationToken ct = default)
     {
@@ -582,16 +583,17 @@ internal sealed class NormalizedPrivateApi
             {
                 if (raw.Success is not true)
                 {
-                    return MapResult<IReadOnlyList<RetailOrderEntryNormalized>>.Fail(
+                    return MapResult<GetRetailOrderListResponse>.Fail(
                         new CallError(CallErrorKind.Mapping, "Bittrade retail order list response invalid."));
                 }
 
                 if (!TradingMapper.TryToRetailOrders(raw.Data, out var orders, out var mapError))
                 {
-                    return MapResult<IReadOnlyList<RetailOrderEntryNormalized>>.Fail(mapError!);
+                    return MapResult<GetRetailOrderListResponse>.Fail(mapError!);
                 }
 
-                return MapResult<IReadOnlyList<RetailOrderEntryNormalized>>.Ok(orders!);
+                return MapResult<GetRetailOrderListResponse>.Ok(
+                    new GetRetailOrderListResponse(orders!));
             });
     }
 
@@ -629,7 +631,7 @@ internal sealed class NormalizedPrivateApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.PostRetailOrderHistoryRequest, IReadOnlyList<RetailOrderEntryNormalized>>> PostRetailOrderHistoryCallAsync(
+    public async Task<Call<NormalizedRequests.PostRetailOrderHistoryRequest, PostRetailOrderHistoryResponse>> PostRetailOrderHistoryCallAsync(
         NormalizedRequests.PostRetailOrderHistoryRequest request,
         CancellationToken ct = default)
     {
@@ -640,7 +642,7 @@ internal sealed class NormalizedPrivateApi
         {
             if (!ExchangeSymbol.TryParse(request.Symbol.Value.Value, out var parsedSymbol))
             {
-                return CreateImmediateError<NormalizedRequests.PostRetailOrderHistoryRequest, IReadOnlyList<RetailOrderEntryNormalized>>(
+                return CreateImmediateError<NormalizedRequests.PostRetailOrderHistoryRequest, PostRetailOrderHistoryResponse>(
                     request,
                     Component(EndpointIds.PostRetailOrderHistory),
                     new CallError(CallErrorKind.Mapping, "Bittrade symbol is invalid."));
@@ -667,16 +669,17 @@ internal sealed class NormalizedPrivateApi
             {
                 if (raw.Success is not true)
                 {
-                    return MapResult<IReadOnlyList<RetailOrderEntryNormalized>>.Fail(
+                    return MapResult<PostRetailOrderHistoryResponse>.Fail(
                         new CallError(CallErrorKind.Mapping, "Bittrade retail order history response invalid."));
                 }
 
                 if (!TradingMapper.TryToRetailOrders(raw.Data, out var orders, out var mapError))
                 {
-                    return MapResult<IReadOnlyList<RetailOrderEntryNormalized>>.Fail(mapError!);
+                    return MapResult<PostRetailOrderHistoryResponse>.Fail(mapError!);
                 }
 
-                return MapResult<IReadOnlyList<RetailOrderEntryNormalized>>.Ok(orders!);
+                return MapResult<PostRetailOrderHistoryResponse>.Ok(
+                    new PostRetailOrderHistoryResponse(orders!));
             });
     }
 

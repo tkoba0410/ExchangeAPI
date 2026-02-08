@@ -32,6 +32,15 @@ internal sealed class SpotHistoryApi
         OrdersRequest request,
         CancellationToken cancellationToken = default)
     {
+        if (request.Cursor is not null)
+        {
+            return NotSupportedCall.Create<OrdersRequest, OrdersResponse>(
+                "Contracts",
+                Operations.History.GetOrders,
+                request,
+                "OrdersCursor");
+        }
+
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -61,6 +70,15 @@ internal sealed class SpotHistoryApi
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default)
     {
+        if (request.Cursor is not null)
+        {
+            return NotSupportedCall.Create<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
+                "Contracts",
+                Operations.History.GetExecutions,
+                request,
+                "ExecutionsPrivateCursor");
+        }
+
         var startedAt = DateTimeOffset.UtcNow;
 
         try

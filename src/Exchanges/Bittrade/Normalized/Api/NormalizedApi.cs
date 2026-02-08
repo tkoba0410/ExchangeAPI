@@ -14,40 +14,6 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using GetAccountsBalanceByAccountIdResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.BalanceEntryNormalized>;
-using GetAccountsResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.AccountNormalized>;
-using GetCurrencysResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Primitives.DomainCommon.Enums.CurrencyCode>;
-using GetDepositWithdrawResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.DepositWithdrawNormalized>;
-using GetDepthResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.OrderBookNormalized;
-using GetDetailMergedResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.TickerNormalized;
-using GetHistoryKlineResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.KlineNormalized>;
-using GetHistoryTradeResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.ExecutionNormalized>;
-using GetMatchResultsResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.ExecutionNormalized>;
-using GetOpenOrdersResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.OpenOrder>;
-using GetOrdersByOrderIdResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.OrderStatus;
-using GetOrdersMatchResultsByOrderIdResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.ExecutionNormalized>;
-using GetOrdersResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.OrderSummaryNormalized>;
-using GetRetailAccountBalanceResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.GetRetailAccountBalanceResponse;
-using GetRetailOrderDetailByOrderIdResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.GetRetailOrderDetailByOrderIdResponse;
-using GetRetailOrderListResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.GetRetailOrderListResponse;
-using GetSymbolsResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.SymbolNormalized>;
-using GetTickersResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.TickerEntryNormalized>;
-using GetTimestampResponse = global::System.DateTimeOffset;
-using GetTradeResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.ExecutionNormalized>;
-using GetWithdrawVirtualAddressesResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.WithdrawVirtualAddressNormalized>;
-using PostOrdersBatchCancelOpenOrdersResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.CancelResult;
-using PostOrdersBatchCancelResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.CancelResult;
-using PostOrdersPlaceResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.OrderResult;
-using PostOrdersSubmitCancelByOrderIdResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.CancelResult;
-using PostRetailOrderCancelByOrderIdResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderResult;
-using PostRetailOrderCreateResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderResult;
-using PostRetailOrderDetailResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.PostRetailOrderDetailResponse;
-using PostRetailOrderHistoryResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.PostRetailOrderHistoryResponse;
-using PostRetailOrderPlaceResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderResult;
-using PostWithdrawApiCreateResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.WithdrawResult;
-using PostWithdrawVirtualByAddressIdCreateResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.WithdrawResult;
-using PostWithdrawVirtualByWithdrawIdCancelResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.WithdrawResult;
-using PostWithdrawVirtualByWithdrawIdPlaceResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.WithdrawResult;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 
@@ -90,64 +56,64 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
             accountId: normalizedAccountId);
     }
 
-    public Task<Call<GetDetailMergedRequest, GetDetailMergedResponse>> GetDetailMergedCallAsync(
+    public Task<Call<GetDetailMergedRequest, TickerNormalized>> GetDetailMergedCallAsync(
         ProductCode productCode,
         CancellationToken ct = default) =>
         _publicApi.GetDetailMergedCallAsync(productCode, ct);
 
-    public Task<Call<GetDepthRequest, GetDepthResponse>> GetDepthCallAsync(
+    public Task<Call<GetDepthRequest, OrderBookNormalized>> GetDepthCallAsync(
         ProductCode productCode,
         DepthType? depthType = null,
         CancellationToken ct = default) =>
         _publicApi.GetDepthCallAsync(productCode, depthType, ct);
 
-    public Task<Call<GetTradeRequest, GetTradeResponse>> GetTradeCallAsync(
+    public Task<Call<GetTradeRequest, IReadOnlyList<ExecutionNormalized>>> GetTradeCallAsync(
         ProductCode productCode,
         CancellationToken ct = default) =>
         _publicApi.GetTradeCallAsync(productCode, ct);
 
-    public Task<Call<GetSymbolsRequest, GetSymbolsResponse>> GetSymbolsCallAsync(
+    public Task<Call<GetSymbolsRequest, IReadOnlyList<SymbolNormalized>>> GetSymbolsCallAsync(
         CancellationToken ct = default) =>
         _publicApi.GetSymbolsCallAsync(ct);
 
-    public Task<Call<GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
+    public Task<Call<GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
         CancellationToken ct = default) =>
         _publicApi.GetCurrencysCallAsync(ct);
 
-    public Task<Call<GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(
+    public Task<Call<GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
         CancellationToken ct = default) =>
         _publicApi.GetTimestampCallAsync(ct);
 
-    public Task<Call<GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
+    public Task<Call<GetHistoryKlineRequest, IReadOnlyList<KlineNormalized>>> GetHistoryKlineCallAsync(
         ProductCode productCode,
         Period period,
         int? size = null,
         CancellationToken ct = default) =>
         _publicApi.GetHistoryKlineCallAsync(productCode, period, size, ct);
 
-    public Task<Call<GetTickersRequest, GetTickersResponse>> GetTickersCallAsync(
+    public Task<Call<GetTickersRequest, IReadOnlyList<TickerEntryNormalized>>> GetTickersCallAsync(
         CancellationToken ct = default) =>
         _publicApi.GetTickersCallAsync(ct);
 
-    public Task<Call<GetHistoryTradeRequest, GetHistoryTradeResponse>> GetHistoryTradeCallAsync(
+    public Task<Call<GetHistoryTradeRequest, IReadOnlyList<ExecutionNormalized>>> GetHistoryTradeCallAsync(
         ProductCode productCode,
         CancellationToken ct = default) =>
         _publicApi.GetHistoryTradeCallAsync(productCode, ct);
 
-    public Task<Call<GetAccountsRequest, GetAccountsResponse>> GetAccountsCallAsync(
+    public Task<Call<GetAccountsRequest, IReadOnlyList<AccountNormalized>>> GetAccountsCallAsync(
         CancellationToken ct = default) =>
         _privateApi.GetAccountsCallAsync(ct);
 
-    public Task<Call<GetAccountsBalanceByAccountIdRequest, GetAccountsBalanceByAccountIdResponse>> GetAccountsBalanceByAccountIdCallAsync(
+    public Task<Call<GetAccountsBalanceByAccountIdRequest, IReadOnlyList<BalanceEntryNormalized>>> GetAccountsBalanceByAccountIdCallAsync(
         CancellationToken ct = default) =>
         _privateApi.GetAccountsBalanceByAccountIdCallAsync(ct);
 
-    public Task<Call<GetDepositWithdrawRequest, GetDepositWithdrawResponse>> GetDepositWithdrawCallAsync(
+    public Task<Call<GetDepositWithdrawRequest, IReadOnlyList<DepositWithdrawNormalized>>> GetDepositWithdrawCallAsync(
         GetDepositWithdrawRequest request,
         CancellationToken ct = default) =>
         _privateApi.GetDepositWithdrawCallAsync(request, ct);
 
-    public Task<Call<GetWithdrawVirtualAddressesRequest, GetWithdrawVirtualAddressesResponse>> GetWithdrawVirtualAddressesCallAsync(
+    public Task<Call<GetWithdrawVirtualAddressesRequest, IReadOnlyList<WithdrawVirtualAddressNormalized>>> GetWithdrawVirtualAddressesCallAsync(
         CancellationToken ct = default) =>
         _privateApi.GetWithdrawVirtualAddressesCallAsync(ct);
 
@@ -155,72 +121,72 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
         CancellationToken ct = default) =>
         _privateApi.GetRetailAccountBalanceCallAsync(ct);
 
-    public Task<Call<PostOrdersPlaceRequest, PostOrdersPlaceResponse>> PostOrdersPlaceCallAsync(
+    public Task<Call<PostOrdersPlaceRequest, OrderResult>> PostOrdersPlaceCallAsync(
         PostOrdersPlaceRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostOrdersPlaceCallAsync(request, ct);
 
-    public Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
+    public Task<Call<GetOrdersRequest, IReadOnlyList<OrderSummaryNormalized>>> GetOrdersCallAsync(
         GetOrdersRequest request,
         CancellationToken ct = default) =>
         _privateApi.GetOrdersCallAsync(ct);
 
-    public Task<Call<PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
+    public Task<Call<PostOrdersSubmitCancelByOrderIdRequest, CancelResult>> PostOrdersSubmitCancelByOrderIdCallAsync(
         PostOrdersSubmitCancelByOrderIdRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostOrdersSubmitCancelByOrderIdCallAsync(request.Symbol, request.OrderKey, ct);
 
-    public Task<Call<PostOrdersBatchCancelRequest, PostOrdersBatchCancelResponse>> PostOrdersBatchCancelCallAsync(
+    public Task<Call<PostOrdersBatchCancelRequest, CancelResult>> PostOrdersBatchCancelCallAsync(
         PostOrdersBatchCancelRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostOrdersBatchCancelCallAsync(request, ct);
 
-    public Task<Call<PostOrdersBatchCancelOpenOrdersRequest, PostOrdersBatchCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
+    public Task<Call<PostOrdersBatchCancelOpenOrdersRequest, CancelResult>> PostOrdersBatchCancelOpenOrdersCallAsync(
         PostOrdersBatchCancelOpenOrdersRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostOrdersBatchCancelOpenOrdersCallAsync(request, ct);
 
-    public Task<Call<GetOpenOrdersRequest, GetOpenOrdersResponse>> GetOpenOrdersCallAsync(
+    public Task<Call<GetOpenOrdersRequest, IReadOnlyList<OpenOrder>>> GetOpenOrdersCallAsync(
         GetOpenOrdersRequest request,
         CancellationToken ct = default) =>
         _privateApi.GetOpenOrdersCallAsync(request.Symbol, ct);
 
-    public Task<Call<GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>> GetOrdersByOrderIdCallAsync(
+    public Task<Call<GetOrdersByOrderIdRequest, OrderStatus>> GetOrdersByOrderIdCallAsync(
         GetOrdersByOrderIdRequest request,
         CancellationToken ct = default) =>
         _privateApi.GetOrdersByOrderIdCallAsync(request.Symbol, request.OrderKey, ct);
 
-    public Task<Call<GetOrdersMatchResultsByOrderIdRequest, GetOrdersMatchResultsByOrderIdResponse>> GetOrdersMatchResultsByOrderIdCallAsync(
+    public Task<Call<GetOrdersMatchResultsByOrderIdRequest, IReadOnlyList<ExecutionNormalized>>> GetOrdersMatchResultsByOrderIdCallAsync(
         GetOrdersMatchResultsByOrderIdRequest request,
         CancellationToken ct = default) =>
         _privateApi.GetOrdersMatchResultsByOrderIdCallAsync(request, ct);
 
-    public Task<Call<GetMatchResultsRequest, GetMatchResultsResponse>> GetMatchResultsCallAsync(
+    public Task<Call<GetMatchResultsRequest, IReadOnlyList<ExecutionNormalized>>> GetMatchResultsCallAsync(
         GetMatchResultsRequest request,
         CancellationToken ct = default) =>
         _privateApi.GetMatchResultsCallAsync(request.Symbol, request.Limit, ct);
 
-    public Task<Call<PostWithdrawApiCreateRequest, PostWithdrawApiCreateResponse>> PostWithdrawApiCreateCallAsync(
+    public Task<Call<PostWithdrawApiCreateRequest, WithdrawResult>> PostWithdrawApiCreateCallAsync(
         PostWithdrawApiCreateRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostWithdrawApiCreateCallAsync(request, ct);
 
-    public Task<Call<PostWithdrawVirtualByAddressIdCreateRequest, PostWithdrawVirtualByAddressIdCreateResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
+    public Task<Call<PostWithdrawVirtualByAddressIdCreateRequest, WithdrawResult>> PostWithdrawVirtualByAddressIdCreateCallAsync(
         PostWithdrawVirtualByAddressIdCreateRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostWithdrawVirtualByAddressIdCreateCallAsync(request, ct);
 
-    public Task<Call<PostWithdrawVirtualByWithdrawIdPlaceRequest, PostWithdrawVirtualByWithdrawIdPlaceResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
+    public Task<Call<PostWithdrawVirtualByWithdrawIdPlaceRequest, WithdrawResult>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
         PostWithdrawVirtualByWithdrawIdPlaceRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostWithdrawVirtualByWithdrawIdPlaceCallAsync(request, ct);
 
-    public Task<Call<PostWithdrawVirtualByWithdrawIdCancelRequest, PostWithdrawVirtualByWithdrawIdCancelResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
+    public Task<Call<PostWithdrawVirtualByWithdrawIdCancelRequest, WithdrawResult>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
         PostWithdrawVirtualByWithdrawIdCancelRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostWithdrawVirtualByWithdrawIdCancelCallAsync(request, ct);
 
-    public Task<Call<PostRetailOrderPlaceRequest, PostRetailOrderPlaceResponse>> PostRetailOrderPlaceCallAsync(
+    public Task<Call<PostRetailOrderPlaceRequest, RetailOrderResult>> PostRetailOrderPlaceCallAsync(
         PostRetailOrderPlaceRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostRetailOrderPlaceCallAsync(request, ct);
@@ -245,12 +211,12 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
         CancellationToken ct = default) =>
         _privateApi.PostRetailOrderDetailCallAsync(request, ct);
 
-    public Task<Call<PostRetailOrderCreateRequest, PostRetailOrderCreateResponse>> PostRetailOrderCreateCallAsync(
+    public Task<Call<PostRetailOrderCreateRequest, RetailOrderResult>> PostRetailOrderCreateCallAsync(
         PostRetailOrderCreateRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostRetailOrderCreateCallAsync(request, ct);
 
-    public Task<Call<PostRetailOrderCancelByOrderIdRequest, PostRetailOrderCancelByOrderIdResponse>> PostRetailOrderCancelByOrderIdCallAsync(
+    public Task<Call<PostRetailOrderCancelByOrderIdRequest, RetailOrderResult>> PostRetailOrderCancelByOrderIdCallAsync(
         PostRetailOrderCancelByOrderIdRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostRetailOrderCancelByOrderIdCallAsync(request, ct);

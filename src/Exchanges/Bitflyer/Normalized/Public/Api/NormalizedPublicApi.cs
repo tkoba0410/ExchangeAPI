@@ -73,7 +73,12 @@ internal sealed class NormalizedPublicApi
                     return MapResult<GetTickerResponse>.Fail(error!);
                 }
 
-                return MapResult<GetTickerResponse>.Ok(new GetTickerResponse(ticker!));
+                return MapResult<GetTickerResponse>.Ok(new GetTickerResponse(
+                    ticker!.ProductCode,
+                    ticker.LastTradedPrice,
+                    ticker.Timestamp,
+                    ticker.RawSnapshot,
+                    ticker.Extras));
             });
     }
 
@@ -97,7 +102,9 @@ internal sealed class NormalizedPublicApi
                     return MapResult<GetBoardResponse>.Fail(error!);
                 }
 
-                return MapResult<GetBoardResponse>.Ok(new GetBoardResponse(orderBook!));
+                return MapResult<GetBoardResponse>.Ok(new GetBoardResponse(
+                    orderBook!.Bids,
+                    orderBook.Asks));
             });
     }
 
@@ -149,7 +156,7 @@ internal sealed class NormalizedPublicApi
                     return MapResult<GetHealthResponse>.Fail(error!);
                 }
 
-                return MapResult<GetHealthResponse>.Ok(new GetHealthResponse(normalized!));
+                return MapResult<GetHealthResponse>.Ok(new GetHealthResponse(normalized!.Status));
             });
     }
 
@@ -173,7 +180,10 @@ internal sealed class NormalizedPublicApi
                     return MapResult<GetBoardStateResponse>.Fail(error!);
                 }
 
-                return MapResult<GetBoardStateResponse>.Ok(new GetBoardStateResponse(normalized!));
+                return MapResult<GetBoardStateResponse>.Ok(new GetBoardStateResponse(
+                    normalized!.Health,
+                    normalized.State,
+                    normalized.Data));
             });
     }
 
@@ -222,11 +232,11 @@ internal sealed class NormalizedPublicApi
             request,
             Component(EndpointIds.GetCorporateLeverage),
             raw => MapResult<GetCorporateLeverageResponse>.Ok(
-                new GetCorporateLeverageResponse(new CorporateLeverageNormalized(
+                new GetCorporateLeverageResponse(
                     raw.CurrentMax,
                     raw.CurrentStartDate,
                     raw.NextMax,
-                    raw.NextStartDate))));
+                    raw.NextStartDate)));
     }
 
     public async Task<Call<PublicRequests.GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateCallAsync(
@@ -243,9 +253,9 @@ internal sealed class NormalizedPublicApi
             request,
             Component(EndpointIds.GetFundingRate),
             raw => MapResult<GetFundingRateResponse>.Ok(
-                new GetFundingRateResponse(new FundingRateNormalized(
+                new GetFundingRateResponse(
                     raw.CurrentFundingRate,
-                    raw.NextFundingRateSettleDate))));
+                    raw.NextFundingRateSettleDate)));
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(

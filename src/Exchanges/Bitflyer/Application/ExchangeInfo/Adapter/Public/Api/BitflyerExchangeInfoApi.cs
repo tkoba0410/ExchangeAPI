@@ -245,12 +245,12 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             }
 
             var ok = (CallResult<GetTradingCommissionResponse>.Ok)call.Result;
-            if (ok.Response.Item.CommissionRate is null)
+            if (ok.Response.CommissionRate is null)
             {
                 continue;
             }
 
-            market.TakerFeeRate = ok.Response.Item.CommissionRate;
+            market.TakerFeeRate = ok.Response.CommissionRate;
             market.FeeType = "Percentage";
         }
     }
@@ -267,7 +267,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
                 var call = await _getHealth(productCode, cancellationToken).ConfigureAwait(false);
                 if (call.Result is CallResult<GetHealthResponse>.Ok ok)
                 {
-                    maintenanceFromHealth = MapMaintenanceFromHealth(ok.Response.Item.Status);
+                    maintenanceFromHealth = MapMaintenanceFromHealth(ok.Response.Status);
                 }
             }
             catch
@@ -283,7 +283,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
                 var call = await _getBoardState(productCode, cancellationToken).ConfigureAwait(false);
                 if (call.Result is CallResult<GetBoardStateResponse>.Ok ok)
                 {
-                    var fromBoardState = MapMaintenanceFromBoardState(ok.Response.Item);
+                    var fromBoardState = MapMaintenanceFromBoardState(ok.Response);
                     if (fromBoardState is not null)
                     {
                         return fromBoardState;
@@ -325,7 +325,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         return null;
     }
 
-    private static BitflyerDynamicMaintenance? MapMaintenanceFromBoardState(BoardStateNormalized state)
+    private static BitflyerDynamicMaintenance? MapMaintenanceFromBoardState(GetBoardStateResponse state)
     {
         if (state.Health is not null && !state.Health.Value.IsEmpty)
         {

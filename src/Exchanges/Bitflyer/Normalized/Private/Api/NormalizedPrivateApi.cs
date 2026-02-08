@@ -378,7 +378,7 @@ internal sealed class NormalizedPrivateApi
             callRequest,
             "Bitflyer.CreateParentOrder",
             ok => MapResult<SendParentOrderResponse>.Ok(
-                new SendParentOrderResponse(new ParentOrderAcceptance(new AcceptanceId(ok.ParentOrderAcceptanceId)))));
+                new SendParentOrderResponse(new AcceptanceId(ok.ParentOrderAcceptanceId))));
     }
 
     public async Task<Call<PrivateRequests.CancelParentOrderRequest, CancelParentOrderResponse>> CancelParentOrderCallAsync(
@@ -403,7 +403,7 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             callRequest,
             Component(EndpointIds.CancelParentOrder),
-            _ => MapResult<CancelParentOrderResponse>.Ok(new CancelParentOrderResponse(new ParentOrderCancelResult(true))));
+            _ => MapResult<CancelParentOrderResponse>.Ok(new CancelParentOrderResponse(true)));
     }
 
     public async Task<Call<PrivateRequests.GetParentOrdersRequest, GetParentOrdersResponse>> GetParentOrdersCallAsync(
@@ -480,7 +480,16 @@ internal sealed class NormalizedPrivateApi
                     return MapResult<GetParentOrderResponse>.Fail(error!);
                 }
 
-                return MapResult<GetParentOrderResponse>.Ok(new GetParentOrderResponse(normalized!));
+                return MapResult<GetParentOrderResponse>.Ok(new GetParentOrderResponse(
+                    normalized!.Id,
+                    normalized.ParentOrderId,
+                    normalized.OrderMethod,
+                    normalized.ExpireDate,
+                    normalized.TimeInForce,
+                    normalized.Parameters,
+                    normalized.ParentOrderAcceptanceId,
+                    normalized.RawSnapshot,
+                    normalized.Extras));
             });
     }
 
@@ -534,11 +543,11 @@ internal sealed class NormalizedPrivateApi
             request,
             Component(EndpointIds.GetCollateral),
             raw => MapResult<GetCollateralResponse>.Ok(
-                new GetCollateralResponse(new CollateralNormalized(
+                new GetCollateralResponse(
                     raw.Collateral,
                     raw.OpenPositionPnl,
                     raw.RequireCollateral,
-                    raw.KeepRate))));
+                    raw.KeepRate)));
     }
 
     public async Task<Call<PrivateRequests.GetCollateralAccountsRequest, GetCollateralAccountsResponse>> GetCollateralAccountsCallAsync(
@@ -661,7 +670,7 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.Withdraw),
-            raw => MapResult<WithdrawResponse>.Ok(new WithdrawResponse(new WithdrawResult(FreeText.Parse(raw.MessageId)))));
+            raw => MapResult<WithdrawResponse>.Ok(new WithdrawResponse(FreeText.Parse(raw.MessageId))));
     }
 
     public async Task<Call<PrivateRequests.GetWithdrawalsRequest, GetWithdrawalsResponse>> GetWithdrawalsCallAsync(
@@ -888,7 +897,9 @@ internal sealed class NormalizedPrivateApi
                     return MapResult<GetTradingCommissionResponse>.Fail(error!);
                 }
 
-                return MapResult<GetTradingCommissionResponse>.Ok(new GetTradingCommissionResponse(parsed!));
+                return MapResult<GetTradingCommissionResponse>.Ok(new GetTradingCommissionResponse(
+                    parsed!.ProductCode,
+                    parsed.CommissionRate));
             });
     }
 

@@ -6,6 +6,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Composition;
 
@@ -33,7 +34,8 @@ public static class BittradeFactory
             throw new InvalidOperationException("Bittrade accountId is required to create a private client.");
         }
 
-        var bundle = ApiBundle.FromRestClient(restClient, settings.AccountId);
+        var accountId = AccountId.ParseOrThrow(settings.AccountId);
+        var bundle = ApiBundle.FromRestClient(restClient, accountId);
         return new ExchangeClient(bundle);
     }
 

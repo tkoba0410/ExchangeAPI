@@ -26,7 +26,7 @@ internal sealed class ApiBundle
     public IExchangeInfoProvider ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
     public IRestClient RestClient { get; }
-    public FreeText? AccountId { get; }
+    public AccountId? AccountId { get; }
 
     public ApiBundle(
         NormalizedPublicApi publicApi,
@@ -34,7 +34,7 @@ internal sealed class ApiBundle
         IExchangeInfoProvider exchangeInfo,
         IExchangeMarketResolver markets,
         IRestClient restClient,
-        FreeText? accountId = null)
+        AccountId? accountId = null)
     {
         Public = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
         Private = privateApi;
@@ -44,10 +44,10 @@ internal sealed class ApiBundle
         AccountId = accountId is null || accountId.Value.IsEmpty ? null : accountId;
     }
 
-    public static ApiBundle FromRestClient(IRestClient restClient, string? accountId = null)
+    public static ApiBundle FromRestClient(IRestClient restClient, AccountId? accountId = null)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        var hasAccountId = !string.IsNullOrWhiteSpace(accountId);
+        var hasAccountId = accountId is { IsEmpty: false };
 
         var wireTransport = new WireTransport(restClient);
         var wire = new WireCallExecutor(wireTransport);
@@ -67,7 +67,7 @@ internal sealed class ApiBundle
                 accountId: null);
         }
 
-        var normalizedAccountId = FreeText.ParseOrThrow(accountId);
+        var normalizedAccountId = accountId!.Value;
         var components = NormalizedComponentFactory.FromRaw(
             raw,
             exchangeInfo =>
@@ -76,7 +76,7 @@ internal sealed class ApiBundle
                 var markets = new ExchangeInfoMarketResolver(exchangeInfoApi);
                 return new NormalizedMarketResolver(markets);
             },
-            normalizedAccountId);
+            FreeText.ParseOrThrow(normalizedAccountId.Value));
 
         var exchangeInfoFull = new BittradeExchangeInfoApi(components.Public);
         var marketsFull = new ExchangeInfoMarketResolver(exchangeInfoFull);

@@ -15,6 +15,8 @@
   `Bittrade/Bitflyer Adapter.Private` で `NotSupported` を明示的に返すガードを追加した（黙殺を解消）。
 - `P1-2` について、`BalanceRequest` を受ける公開メソッドで request 未使用だった経路を修正し、
   `ExchangeClient -> Private/Account API` で request を受け渡す形に揃えた。
+- `P2-3` について、Bittrade の配線境界で `accountId` を `AccountId` に変換してから内部へ渡すよう変更し、
+  `ApiBundle.FromRestClient` の内部境界は `AccountId?` 受けに統一した。
 
 ---
 

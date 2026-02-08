@@ -51,6 +51,7 @@ public static class ClientFactory
         string secretKey,
         string accountId)
     {
+        var normalizedAccountId = AccountId.ParseOrThrow(accountId);
         var restClient = CreateRestClient(new RequestSigner(accessKey, secretKey));
         var wireTransport = new WireTransport(restClient);
         var wire = new WireCallExecutor(wireTransport);
@@ -59,7 +60,7 @@ public static class ClientFactory
         var exchangeInfo = new BittradeExchangeInfoApi(normalizedPublic);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var normalizedMarkets = new NormalizedMarketResolver(markets);
-        var normalizedPrivate = new NormalizedPrivateApi(raw, normalizedMarkets, new FreeText(accountId));
+        var normalizedPrivate = new NormalizedPrivateApi(raw, normalizedMarkets, FreeText.ParseOrThrow(normalizedAccountId.Value));
         var trading = new TradingApi(normalizedPrivate);
         var account = new AccountApi(normalizedPrivate);
         return (new MarketApi(normalizedPublic, markets), trading, account, exchangeInfo);
@@ -70,8 +71,9 @@ public static class ClientFactory
         string secretKey,
         string accountId)
     {
+        var normalizedAccountId = AccountId.ParseOrThrow(accountId);
         var restClient = CreateRestClient(new RequestSigner(accessKey, secretKey));
-        var bundle = ApiBundle.FromRestClient(restClient, accountId);
+        var bundle = ApiBundle.FromRestClient(restClient, normalizedAccountId);
         return new ExchangeClient(bundle);
     }
 

@@ -17,6 +17,8 @@
   `ExchangeClient -> Private/Account API` で request を受け渡す形に揃えた。
 - `P2-3` について、Bittrade の配線境界で `accountId` を `AccountId` に変換してから内部へ渡すよう変更し、
   `ApiBundle.FromRestClient` の内部境界は `AccountId?` 受けに統一した。
+- `P2-3` の追加対応として、`IApiCredentialProvider` の境界を `Get(AccountId accountId)` に統一し、
+  Bittrade/Bitflyer の Composition から provider 呼び出し時に `AccountId` を渡す形へ変更した。
 
 ---
 

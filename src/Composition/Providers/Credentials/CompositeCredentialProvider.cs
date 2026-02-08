@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Composition.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Composition.Providers.Credentials;
 
 /// <summary>
@@ -28,8 +29,13 @@ public sealed class CompositeCredentialProvider : IApiCredentialProvider
         _providers = list;
     }
 
-    public ApiCredentials Get(string accountId)
+    public ApiCredentials Get(AccountId accountId)
     {
+        if (accountId.IsEmpty)
+        {
+            throw new ArgumentException("AccountId is required.", nameof(accountId));
+        }
+
         var errors = new List<string>();
 
         foreach (var provider in _providers)
@@ -51,7 +57,7 @@ public sealed class CompositeCredentialProvider : IApiCredentialProvider
         }
 
         throw new InvalidOperationException(
-            $"No credential provider could supply credentials for '{accountId}'. Details: {string.Join(" | ", errors)}");
+            $"No credential provider could supply credentials for '{accountId.Value}'. Details: {string.Join(" | ", errors)}");
     }
 
     private static bool IsValid(ApiCredentials creds)

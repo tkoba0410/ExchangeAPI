@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Composition.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 namespace ExchangeApi.Composition.Providers.Credentials;
 
@@ -24,9 +25,9 @@ public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredenti
         _exchangeId = exchangeId;
     }
 
-    public ApiCredentials Get(string accountId)
+    public ApiCredentials Get(AccountId accountId)
     {
-        if (string.IsNullOrWhiteSpace(accountId))
+        if (accountId.IsEmpty)
         {
             throw new ArgumentException("AccountId is required.", nameof(accountId));
         }
@@ -36,8 +37,8 @@ public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredenti
             throw new PlatformNotSupportedException("Windows Credential Manager is only available on Windows.");
         }
 
-        var apiKeyTarget = BuildTarget(_exchangeId, accountId, "api_key");
-        var apiSecretTarget = BuildTarget(_exchangeId, accountId, "api_secret");
+        var apiKeyTarget = BuildTarget(_exchangeId, accountId.Value, "api_key");
+        var apiSecretTarget = BuildTarget(_exchangeId, accountId.Value, "api_secret");
 
         var apiKey = ReadCredential(apiKeyTarget);
         var apiSecret = ReadCredential(apiSecretTarget);

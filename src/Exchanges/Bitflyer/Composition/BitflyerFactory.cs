@@ -9,6 +9,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Composition;
 
@@ -76,8 +77,12 @@ public static class BitflyerFactory
 
     private static IRequestSigner? CreateSigner(BitflyerFactoryOptions settings)
     {
-        var credentials = settings.Credentials
-            ?? settings.CredentialProvider?.Get(settings.AccountId);
+        var credentials = settings.Credentials;
+        if (credentials is null && settings.CredentialProvider is not null)
+        {
+            var accountId = AccountId.ParseOrThrow(settings.AccountId);
+            credentials = settings.CredentialProvider.Get(accountId);
+        }
 
         if (credentials is null)
         {

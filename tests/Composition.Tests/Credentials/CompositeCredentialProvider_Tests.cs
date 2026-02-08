@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Providers.Credentials;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 
@@ -22,7 +23,7 @@ public class CompositeCredentialProvider_Tests
         var composite = new CompositeCredentialProvider(providers);
 
         // Act
-        var result = composite.Get("default");
+        var result = composite.Get(AccountId.ParseOrThrow("default"));
 
         // Assert
         Assert.Equal(expected, result);
@@ -40,7 +41,7 @@ public class CompositeCredentialProvider_Tests
         var composite = new CompositeCredentialProvider(providers);
 
         // Act & Assert
-        var ex = Assert.Throws<InvalidOperationException>(() => composite.Get("default"));
+        var ex = Assert.Throws<InvalidOperationException>(() => composite.Get(AccountId.ParseOrThrow("default")));
         Assert.Contains("ThrowingProvider", ex.Message);
         Assert.Contains("EmptyProvider", ex.Message);
     }
@@ -54,12 +55,12 @@ public class CompositeCredentialProvider_Tests
             _creds = creds;
         }
 
-        public ApiCredentials Get(string accountId) => _creds;
+        public ApiCredentials Get(AccountId accountId) => _creds;
     }
 
     private sealed class ThrowingProvider : IApiCredentialProvider
     {
-        public ApiCredentials Get(string accountId)
+        public ApiCredentials Get(AccountId accountId)
         {
             throw new InvalidOperationException("fail");
         }
@@ -67,7 +68,7 @@ public class CompositeCredentialProvider_Tests
 
     private sealed class EmptyProvider : IApiCredentialProvider
     {
-        public ApiCredentials Get(string accountId)
+        public ApiCredentials Get(AccountId accountId)
         {
             return new ApiCredentials(string.Empty, string.Empty);
         }

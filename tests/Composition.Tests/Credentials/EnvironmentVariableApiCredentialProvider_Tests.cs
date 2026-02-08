@@ -1,5 +1,6 @@
 using System;
 using ExchangeApi.Composition.Providers.Credentials;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 
@@ -10,7 +11,7 @@ public class EnvironmentVariableApiCredentialProvider_Tests
     {
         // Arrange
         var provider = new EnvironmentVariableApiCredentialProvider("bitflyer");
-        var account = "default";
+        var account = AccountId.ParseOrThrow("default");
 
         var apiKeyName = "BITFLYER_DEFAULT_API_KEY";
         var apiSecretName = "BITFLYER_DEFAULT_API_SECRET";
@@ -39,7 +40,7 @@ public class EnvironmentVariableApiCredentialProvider_Tests
     {
         // Arrange
         var provider = new EnvironmentVariableApiCredentialProvider("bitflyer");
-        var account = "trading";
+        var account = AccountId.ParseOrThrow("trading");
 
         var apiKeyName = "BITFLYER_TRADING_API_KEY";
         var apiSecretName = "BITFLYER_TRADING_API_SECRET";

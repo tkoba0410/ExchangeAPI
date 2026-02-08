@@ -398,51 +398,51 @@ internal static class TradingMapper
     }
 
 
-    public static RetailOrderResult ToRetailOrderResult(RawPrivateDtos.PostRetailOrderPlaceResponse raw)
+    public static PostRetailOrderPlaceResponse ToPostRetailOrderPlaceResponse(RawPrivateDtos.PostRetailOrderPlaceResponse raw)
     {
-        return new RetailOrderResult(
+        return new PostRetailOrderPlaceResponse(
             Code: raw.Code,
             OrderId: raw.Data,
             Success: raw.Success,
             Message: ParseOptional(raw.Message));
     }
 
-    public static RetailOrderResult ToRetailOrderResult(RawPrivateDtos.PostRetailOrderCreateResponse raw)
+    public static PostRetailOrderCreateResponse ToPostRetailOrderCreateResponse(RawPrivateDtos.PostRetailOrderCreateResponse raw)
     {
-        return new RetailOrderResult(
+        return new PostRetailOrderCreateResponse(
             Code: raw.Code,
             OrderId: raw.Data,
             Success: raw.Success,
             Message: ParseOptional(raw.Message));
     }
 
-    public static RetailOrderResult ToRetailOrderResult(RawPrivateDtos.PostRetailOrderCancelByOrderIdResponse raw)
+    public static PostRetailOrderCancelByOrderIdResponse ToPostRetailOrderCancelByOrderIdResponse(RawPrivateDtos.PostRetailOrderCancelByOrderIdResponse raw)
     {
-        return new RetailOrderResult(
+        return new PostRetailOrderCancelByOrderIdResponse(
             Code: raw.Code,
             OrderId: raw.Data,
             Success: raw.Success,
             Message: ParseOptional(raw.Message));
     }
 
-    public static WithdrawResult ToWithdrawResult(RawPrivateDtos.PostWithdrawApiCreateResponse raw)
+    public static PostWithdrawApiCreateResponse ToPostWithdrawApiCreateResponse(RawPrivateDtos.PostWithdrawApiCreateResponse raw)
     {
-        return new WithdrawResult(FreeText.Parse(raw.Status), raw.Data);
+        return new PostWithdrawApiCreateResponse(FreeText.Parse(raw.Status), raw.Data);
     }
 
-    public static WithdrawResult ToWithdrawResult(RawPrivateDtos.PostWithdrawVirtualByAddressIdCreateResponse raw)
+    public static PostWithdrawVirtualByAddressIdCreateResponse ToPostWithdrawVirtualByAddressIdCreateResponse(RawPrivateDtos.PostWithdrawVirtualByAddressIdCreateResponse raw)
     {
-        return new WithdrawResult(FreeText.Parse(raw.Status), raw.Data);
+        return new PostWithdrawVirtualByAddressIdCreateResponse(FreeText.Parse(raw.Status), raw.Data);
     }
 
-    public static WithdrawResult ToWithdrawResult(RawPrivateDtos.PostWithdrawVirtualByWithdrawIdPlaceResponse raw)
+    public static PostWithdrawVirtualByWithdrawIdPlaceResponse ToPostWithdrawVirtualByWithdrawIdPlaceResponse(RawPrivateDtos.PostWithdrawVirtualByWithdrawIdPlaceResponse raw)
     {
-        return new WithdrawResult(FreeText.Parse(raw.Status), raw.Data);
+        return new PostWithdrawVirtualByWithdrawIdPlaceResponse(FreeText.Parse(raw.Status), raw.Data);
     }
 
-    public static WithdrawResult ToWithdrawResult(RawPrivateDtos.PostWithdrawVirtualByWithdrawIdCancelResponse raw)
+    public static PostWithdrawVirtualByWithdrawIdCancelResponse ToPostWithdrawVirtualByWithdrawIdCancelResponse(RawPrivateDtos.PostWithdrawVirtualByWithdrawIdCancelResponse raw)
     {
-        return new WithdrawResult(FreeText.Parse(raw.Status), raw.Data);
+        return new PostWithdrawVirtualByWithdrawIdCancelResponse(FreeText.Parse(raw.Status), raw.Data);
     }
 
     public static bool TryToRawRetailOrder(

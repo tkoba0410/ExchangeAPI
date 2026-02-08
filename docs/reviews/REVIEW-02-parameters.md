@@ -21,6 +21,8 @@
   Bittrade/Bitflyer の Composition から provider 呼び出し時に `AccountId` を渡す形へ変更した。
 - `P1-1` の追加対応として、Bittrade/Bitflyer の `ExchangeClient -> Trading/PrivateApi` 境界における
   `OrderLimitAsync` / `CancelOrderAsync` の委譲をプリミティブ分解から DTO 受けへ統一した。
+- `P2-2` の追加対応として、Bittrade Normalized の retail 系 request で `direct/status` を
+  `int` から `RetailOrderDirection` / `RetailOrderStatus` に型昇格し、Raw 直前でのみ数値へ変換する形に変更した。
 
 ---
 
@@ -116,8 +118,8 @@
 ### 5)
 - **Issue:** 下位層でプリミティブ（`int`, `decimal`, `long`）が業務値として露出し、型での制約表現が弱い（規約違反候補）。
 - **Evidence:**
-  - `src/Exchanges/Bittrade/Normalized/Extensions/NormalizedApiExtensions.cs` `GetRetailOrderListCallAsync(int direct, int? status = null, ...)`。
-  - 同ファイル `PostWithdrawApiCreateCallAsync(..., decimal amount, ..., decimal? fee = null, ...)`。
+  - `src/Exchanges/Bittrade/Normalized/Private/Requests/TradingRequests.cs` `RetailOrderRequest` で `Type` が `int`。
+  - `src/Exchanges/Bittrade/Normalized/Extensions/NormalizedApiExtensions.cs` `PostWithdrawApiCreateCallAsync(..., decimal amount, ..., decimal? fee = null, ...)`。
   - 同ファイル `GetDepositWithdrawCallAsync(..., long? from = null, int? size = null, ...)`。
 - **Why it matters:** 値域や単位がシグネチャから読めず、exchange 差分吸収時に誤値混入を型で防げない。
 - **Proposed rule:** `direct/status/from/size/amount/fee` などは VO / enum / 専用 record に昇格し、Raw 境界でのみプリミティブに落とす。Normalized 入口で昇格し、下流ではプリミティブを禁止する。

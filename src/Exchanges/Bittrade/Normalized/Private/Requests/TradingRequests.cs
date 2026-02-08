@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 
@@ -29,8 +30,8 @@ public sealed record GetOrdersMatchResultsByOrderIdRequest(OrderKey OrderKey);
 public sealed record GetMatchResultsRequest(Symbol Symbol, int? Limit = null);
 
 public sealed record GetRetailOrderListRequest(
-    int Direct,
-    int? Status = null,
+    RetailOrderDirection Direct,
+    RetailOrderStatus? Status = null,
     DateTimeOffset? StartTime = null,
     DateTimeOffset? EndTime = null);
 
@@ -38,8 +39,8 @@ public sealed record GetRetailOrderDetailByOrderIdRequest(OrderId OrderId);
 
 public sealed record PostRetailOrderHistoryRequest(
     Symbol? Symbol = null,
-    int? Direct = null,
-    int? Status = null,
+    RetailOrderDirection? Direct = null,
+    RetailOrderStatus? Status = null,
     DateTimeOffset? StartTime = null,
     DateTimeOffset? EndTime = null,
     int? Size = null);

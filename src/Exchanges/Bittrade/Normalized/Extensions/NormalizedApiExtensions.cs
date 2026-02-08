@@ -138,8 +138,8 @@ public static class NormalizedApiExtensions
 
     public static Task<Call<GetRetailOrderListRequest, GetRetailOrderListResponse>> GetRetailOrderListCallAsync(
         this IBittradeNormalizedApi api,
-        int direct,
-        int? status = null,
+        RetailOrderDirection direct,
+        RetailOrderStatus? status = null,
         DateTimeOffset? startTime = null,
         DateTimeOffset? endTime = null,
         CancellationToken cancellationToken = default) =>
@@ -156,8 +156,8 @@ public static class NormalizedApiExtensions
     public static Task<Call<PostRetailOrderHistoryRequest, PostRetailOrderHistoryResponse>> PostRetailOrderHistoryCallAsync(
         this IBittradeNormalizedApi api,
         Symbol? symbol = null,
-        int? direct = null,
-        int? status = null,
+        RetailOrderDirection? direct = null,
+        RetailOrderStatus? status = null,
         DateTimeOffset? startTime = null,
         DateTimeOffset? endTime = null,
         int? size = null,

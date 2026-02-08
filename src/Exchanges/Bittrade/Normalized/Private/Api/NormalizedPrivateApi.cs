@@ -594,8 +594,8 @@ internal sealed class NormalizedPrivateApi
 
         var rawCall = await _trading
             .GetRetailOrderListCallAsync(new RawPrivateRequests.GetRetailOrderListRequest(
-                Direct: request.Direct,
-                Status: request.Status,
+                Direct: request.Direct.Value,
+                Status: request.Status?.Value,
                 StartTime: request.StartTime,
                 EndTime: request.EndTime), cancellationToken)
             .ConfigureAwait(false);
@@ -677,8 +677,8 @@ internal sealed class NormalizedPrivateApi
         }
         var body = new RawPrivateRequests.RawPostRetailOrderHistoryRequest(
             Symbol: symbolText is null ? null : new Symbol(symbolText),
-            Direct: request.Direct,
-            Status: request.Status,
+            Direct: request.Direct?.Value,
+            Status: request.Status?.Value,
             StartTime: request.StartTime?.ToUnixTimeMilliseconds(),
             EndTime: request.EndTime?.ToUnixTimeMilliseconds(),
             Size: request.Size);

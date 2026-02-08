@@ -139,3 +139,24 @@
 - Facade 層の「`Request DTO + CancellationToken`」は概ね維持されており、方向性は良い。
 - ただし Exchange 実装層・Normalized 拡張層で引数設計が多重化しており、**将来の endpoint 追加時に最も事故を生みやすいのは “DTOとプリミティブの往復フォワード”**。
 - 次アクションは、まず **(1) DTO受けの層境界固定**, **(2) Cursor 契約の実装整合**, **(3) CT 命名統一** の3点を規約化するのが効果的。
+
+---
+
+## P2-1（CancellationToken 命名揺れ）解決方針
+
+### ルール
+- `CancellationToken` 引数名は **`cancellationToken` に固定**する。
+- `CancellationToken` 引数は **末尾配置**とする。
+- 既定値は原則 **`= default`** とする。
+
+### 段階移行
+1. Phase 1（即時）: `internal` / `private` の `ct` を `cancellationToken` に統一。
+2. Phase 2（計画）: `public` / `protected` は named argument 互換性を考慮し、メジャー更新タイミングで統一。
+3. Phase 3（固定化）: CI で `ct` 新規流入を禁止し、最終的に全層で `cancellationToken` のみ許可。
+
+### 互換性メモ
+- C# では引数名変更が named argument 利用者に破壊的影響を与えるため、公開APIは段階移行を前提とする。
+
+### 検査ルール（CI）
+- `CancellationToken` 引数名が `cancellationToken` 以外なら失敗。
+- `CancellationToken` が末尾でない場合は失敗。

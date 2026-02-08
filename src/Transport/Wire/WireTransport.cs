@@ -25,7 +25,7 @@ public sealed class WireTransport : IWireTransport
     /// </summary>
     public async Task<Call<WireCallSpec, WireResponse>> SendAsync(
         WireCallSpec request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -33,7 +33,7 @@ public sealed class WireTransport : IWireTransport
         try
         {
             var responseMeta = await _restClient
-                .SendRawAsync(request.Method, request.Path, request.Query, request.BodyJson, request.Headers, ct)
+                .SendRawAsync(request.Method, request.Path, request.Query, request.BodyJson, request.Headers, cancellationToken)
                 .ConfigureAwait(false);
             var elapsed = DateTimeOffset.UtcNow - startedAt;
 

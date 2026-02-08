@@ -24,10 +24,10 @@ internal sealed class NormalizedPublicApi
     }
 
     public async Task<Call<PublicRequests.GetMarketsRequest, GetMarketsResponse>> GetMarketsCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetMarketsCallAsync(new RawPublicRequests.GetMarketsRequest(), ct)
+            .GetMarketsCallAsync(new RawPublicRequests.GetMarketsRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetMarketsRequest();
 
@@ -55,10 +55,10 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<PublicRequests.GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
         ProductCode productCode,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetTickerCallAsync(new RawPublicRequests.GetTickerRequest(productCode), ct)
+            .GetTickerCallAsync(new RawPublicRequests.GetTickerRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetTickerRequest(productCode);
 
@@ -84,10 +84,10 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<PublicRequests.GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
         ProductCode productCode,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetBoardCallAsync(new RawPublicRequests.GetBoardRequest(productCode), ct)
+            .GetBoardCallAsync(new RawPublicRequests.GetBoardRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetBoardRequest(productCode);
 
@@ -113,10 +113,10 @@ internal sealed class NormalizedPublicApi
         int? count = null,
         long? before = null,
         long? after = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetExecutionsPublicCallAsync(new RawPublicRequests.GetExecutionsPublicRequest(productCode, count, before, after), ct)
+            .GetExecutionsPublicCallAsync(new RawPublicRequests.GetExecutionsPublicRequest(productCode, count, before, after), cancellationToken)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetExecutionsPublicRequest(productCode, count, before, after);
 
@@ -138,10 +138,10 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<PublicRequests.GetHealthRequest, GetHealthResponse>> GetHealthCallAsync(
         ProductCode productCode,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetHealthCallAsync(new RawPublicRequests.GetHealthRequest(productCode), ct)
+            .GetHealthCallAsync(new RawPublicRequests.GetHealthRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetHealthRequest(productCode);
 
@@ -162,10 +162,10 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<PublicRequests.GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
         ProductCode productCode,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetBoardStateCallAsync(new RawPublicRequests.GetBoardStateRequest(productCode), ct)
+            .GetBoardStateCallAsync(new RawPublicRequests.GetBoardStateRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetBoardStateRequest(productCode);
 
@@ -189,11 +189,11 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<PublicRequests.GetChatsRequest, GetChatsResponse>> GetChatsCallAsync(
         FreeText? fromDate = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var fromDateText = fromDate?.Value;
         var rawCall = await _raw
-            .GetChatsCallAsync(new RawPublicRequests.GetChatsRequest(fromDateText is null ? null : new FreeText(fromDateText)), ct)
+            .GetChatsCallAsync(new RawPublicRequests.GetChatsRequest(fromDateText is null ? null : new FreeText(fromDateText)), cancellationToken)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetChatsRequest(fromDate);
 
@@ -220,10 +220,10 @@ internal sealed class NormalizedPublicApi
     }
 
     public async Task<Call<PublicRequests.GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetCorporateLeverageCallAsync(new RawPublicRequests.GetCorporateLeverageRequest(), ct)
+            .GetCorporateLeverageCallAsync(new RawPublicRequests.GetCorporateLeverageRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetCorporateLeverageRequest();
 
@@ -241,10 +241,10 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<PublicRequests.GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateCallAsync(
         ProductCode productCode,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetFundingRateCallAsync(new RawPublicRequests.GetFundingRateRequest(productCode), ct)
+            .GetFundingRateCallAsync(new RawPublicRequests.GetFundingRateRequest(productCode), cancellationToken)
             .ConfigureAwait(false);
         var request = new PublicRequests.GetFundingRateRequest(productCode);
 

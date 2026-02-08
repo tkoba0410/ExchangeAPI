@@ -23,36 +23,36 @@ public static class NormalizedApiExtensions
         long? from = null,
         int? size = null,
         FreeText? direct = null,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.GetDepositWithdrawCallAsync(
             new GetDepositWithdrawRequest(type, currency, from, size, direct),
-            ct);
+            cancellationToken);
 
     public static Task<Call<PostOrdersPlaceRequest, PostOrdersPlaceResponse>> PostOrdersPlaceCallAsync(
         this IBittradeNormalizedApi api,
         OrderRequest request,
-        CancellationToken ct = default) =>
-        api.PostOrdersPlaceCallAsync(new PostOrdersPlaceRequest(request), ct);
+        CancellationToken cancellationToken = default) =>
+        api.PostOrdersPlaceCallAsync(new PostOrdersPlaceRequest(request), cancellationToken);
 
     public static Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
         this IBittradeNormalizedApi api,
-        CancellationToken ct = default) =>
-        api.GetOrdersCallAsync(new GetOrdersRequest(), ct);
+        CancellationToken cancellationToken = default) =>
+        api.GetOrdersCallAsync(new GetOrdersRequest(), cancellationToken);
 
     public static Task<Call<PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
         this IBittradeNormalizedApi api,
         Symbol symbol,
         OrderKey orderKey,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.PostOrdersSubmitCancelByOrderIdCallAsync(
             new PostOrdersSubmitCancelByOrderIdRequest(symbol, orderKey),
-            ct);
+            cancellationToken);
 
     public static Task<Call<PostOrdersBatchCancelRequest, PostOrdersBatchCancelResponse>> PostOrdersBatchCancelCallAsync(
         this IBittradeNormalizedApi api,
         IReadOnlyList<OrderId> orderIds,
-        CancellationToken ct = default) =>
-        api.PostOrdersBatchCancelCallAsync(new PostOrdersBatchCancelRequest(orderIds), ct);
+        CancellationToken cancellationToken = default) =>
+        api.PostOrdersBatchCancelCallAsync(new PostOrdersBatchCancelRequest(orderIds), cancellationToken);
 
     public static Task<Call<PostOrdersBatchCancelOpenOrdersRequest, PostOrdersBatchCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
         this IBittradeNormalizedApi api,
@@ -61,38 +61,38 @@ public static class NormalizedApiExtensions
         decimal? size = null,
         decimal? price = null,
         DateTimeOffset? createdAt = null,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.PostOrdersBatchCancelOpenOrdersCallAsync(
             new PostOrdersBatchCancelOpenOrdersRequest(symbol, side, size, price, createdAt),
-            ct);
+            cancellationToken);
 
     public static Task<Call<GetOpenOrdersRequest, GetOpenOrdersResponse>> GetOpenOrdersCallAsync(
         this IBittradeNormalizedApi api,
         Symbol symbol,
-        CancellationToken ct = default) =>
-        api.GetOpenOrdersCallAsync(new GetOpenOrdersRequest(symbol), ct);
+        CancellationToken cancellationToken = default) =>
+        api.GetOpenOrdersCallAsync(new GetOpenOrdersRequest(symbol), cancellationToken);
 
     public static Task<Call<GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>> GetOrdersByOrderIdCallAsync(
         this IBittradeNormalizedApi api,
         Symbol symbol,
         OrderKey orderKey,
-        CancellationToken ct = default) =>
-        api.GetOrdersByOrderIdCallAsync(new GetOrdersByOrderIdRequest(symbol, orderKey), ct);
+        CancellationToken cancellationToken = default) =>
+        api.GetOrdersByOrderIdCallAsync(new GetOrdersByOrderIdRequest(symbol, orderKey), cancellationToken);
 
     public static Task<Call<GetOrdersMatchResultsByOrderIdRequest, GetOrdersMatchResultsByOrderIdResponse>> GetOrdersMatchResultsByOrderIdCallAsync(
         this IBittradeNormalizedApi api,
         OrderKey orderKey,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.GetOrdersMatchResultsByOrderIdCallAsync(
             new GetOrdersMatchResultsByOrderIdRequest(orderKey),
-            ct);
+            cancellationToken);
 
     public static Task<Call<GetMatchResultsRequest, GetMatchResultsResponse>> GetMatchResultsCallAsync(
         this IBittradeNormalizedApi api,
         Symbol symbol,
         int? limit = null,
-        CancellationToken ct = default) =>
-        api.GetMatchResultsCallAsync(new GetMatchResultsRequest(symbol, limit), ct);
+        CancellationToken cancellationToken = default) =>
+        api.GetMatchResultsCallAsync(new GetMatchResultsRequest(symbol, limit), cancellationToken);
 
     public static Task<Call<PostWithdrawApiCreateRequest, PostWithdrawApiCreateResponse>> PostWithdrawApiCreateCallAsync(
         this IBittradeNormalizedApi api,
@@ -101,40 +101,40 @@ public static class NormalizedApiExtensions
         FreeText currency,
         decimal? fee = null,
         FreeText? addressTag = null,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.PostWithdrawApiCreateCallAsync(
             new PostWithdrawApiCreateRequest(address, amount, currency, fee, addressTag),
-            ct);
+            cancellationToken);
 
     public static Task<Call<PostWithdrawVirtualByAddressIdCreateRequest, PostWithdrawVirtualByAddressIdCreateResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
         this IBittradeNormalizedApi api,
         FreeText addressId,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.PostWithdrawVirtualByAddressIdCreateCallAsync(
             new PostWithdrawVirtualByAddressIdCreateRequest(addressId),
-            ct);
+            cancellationToken);
 
     public static Task<Call<PostWithdrawVirtualByWithdrawIdPlaceRequest, PostWithdrawVirtualByWithdrawIdPlaceResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
         this IBittradeNormalizedApi api,
         FreeText withdrawId,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
             new PostWithdrawVirtualByWithdrawIdPlaceRequest(withdrawId),
-            ct);
+            cancellationToken);
 
     public static Task<Call<PostWithdrawVirtualByWithdrawIdCancelRequest, PostWithdrawVirtualByWithdrawIdCancelResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
         this IBittradeNormalizedApi api,
         FreeText withdrawId,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.PostWithdrawVirtualByWithdrawIdCancelCallAsync(
             new PostWithdrawVirtualByWithdrawIdCancelRequest(withdrawId),
-            ct);
+            cancellationToken);
 
     public static Task<Call<PostRetailOrderPlaceRequest, PostRetailOrderPlaceResponse>> PostRetailOrderPlaceCallAsync(
         this IBittradeNormalizedApi api,
         RetailOrderRequest request,
-        CancellationToken ct = default) =>
-        api.PostRetailOrderPlaceCallAsync(new PostRetailOrderPlaceRequest(request), ct);
+        CancellationToken cancellationToken = default) =>
+        api.PostRetailOrderPlaceCallAsync(new PostRetailOrderPlaceRequest(request), cancellationToken);
 
     public static Task<Call<GetRetailOrderListRequest, GetRetailOrderListResponse>> GetRetailOrderListCallAsync(
         this IBittradeNormalizedApi api,
@@ -142,16 +142,16 @@ public static class NormalizedApiExtensions
         int? status = null,
         DateTimeOffset? startTime = null,
         DateTimeOffset? endTime = null,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.GetRetailOrderListCallAsync(
             new GetRetailOrderListRequest(direct, status, startTime, endTime),
-            ct);
+            cancellationToken);
 
     public static Task<Call<GetRetailOrderDetailByOrderIdRequest, GetRetailOrderDetailByOrderIdResponse>> GetRetailOrderDetailByOrderIdCallAsync(
         this IBittradeNormalizedApi api,
         OrderId orderId,
-        CancellationToken ct = default) =>
-        api.GetRetailOrderDetailByOrderIdCallAsync(new GetRetailOrderDetailByOrderIdRequest(orderId), ct);
+        CancellationToken cancellationToken = default) =>
+        api.GetRetailOrderDetailByOrderIdCallAsync(new GetRetailOrderDetailByOrderIdRequest(orderId), cancellationToken);
 
     public static Task<Call<PostRetailOrderHistoryRequest, PostRetailOrderHistoryResponse>> PostRetailOrderHistoryCallAsync(
         this IBittradeNormalizedApi api,
@@ -161,26 +161,26 @@ public static class NormalizedApiExtensions
         DateTimeOffset? startTime = null,
         DateTimeOffset? endTime = null,
         int? size = null,
-        CancellationToken ct = default) =>
+        CancellationToken cancellationToken = default) =>
         api.PostRetailOrderHistoryCallAsync(
             new PostRetailOrderHistoryRequest(symbol, direct, status, startTime, endTime, size),
-            ct);
+            cancellationToken);
 
     public static Task<Call<PostRetailOrderDetailRequest, PostRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
         this IBittradeNormalizedApi api,
         OrderId orderId,
-        CancellationToken ct = default) =>
-        api.PostRetailOrderDetailCallAsync(new PostRetailOrderDetailRequest(orderId), ct);
+        CancellationToken cancellationToken = default) =>
+        api.PostRetailOrderDetailCallAsync(new PostRetailOrderDetailRequest(orderId), cancellationToken);
 
     public static Task<Call<PostRetailOrderCreateRequest, PostRetailOrderCreateResponse>> PostRetailOrderCreateCallAsync(
         this IBittradeNormalizedApi api,
         RetailOrderRequest request,
-        CancellationToken ct = default) =>
-        api.PostRetailOrderCreateCallAsync(new PostRetailOrderCreateRequest(request), ct);
+        CancellationToken cancellationToken = default) =>
+        api.PostRetailOrderCreateCallAsync(new PostRetailOrderCreateRequest(request), cancellationToken);
 
     public static Task<Call<PostRetailOrderCancelByOrderIdRequest, PostRetailOrderCancelByOrderIdResponse>> PostRetailOrderCancelByOrderIdCallAsync(
         this IBittradeNormalizedApi api,
         OrderId orderId,
-        CancellationToken ct = default) =>
-        api.PostRetailOrderCancelByOrderIdCallAsync(new PostRetailOrderCancelByOrderIdRequest(orderId), ct);
+        CancellationToken cancellationToken = default) =>
+        api.PostRetailOrderCancelByOrderIdCallAsync(new PostRetailOrderCancelByOrderIdRequest(orderId), cancellationToken);
 }

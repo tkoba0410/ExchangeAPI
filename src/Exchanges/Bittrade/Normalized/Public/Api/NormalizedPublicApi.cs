@@ -26,10 +26,10 @@ internal sealed class NormalizedPublicApi
     }
 
     public async Task<Call<NormalizedRequests.GetSymbolsRequest, GetSymbolsResponse>> GetSymbolsCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetSymbolsCallAsync(new RawPublicRequests.GetSymbolsRequest(), ct)
+            .GetSymbolsCallAsync(new RawPublicRequests.GetSymbolsRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetSymbolsRequest();
 
@@ -60,10 +60,10 @@ internal sealed class NormalizedPublicApi
     }
 
     public async Task<Call<NormalizedRequests.GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetCurrencysCallAsync(new RawPublicRequests.GetCurrencysRequest(), ct)
+            .GetCurrencysCallAsync(new RawPublicRequests.GetCurrencysRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetCurrencysRequest();
 
@@ -93,10 +93,10 @@ internal sealed class NormalizedPublicApi
     }
 
     public async Task<Call<NormalizedRequests.GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetTimestampCallAsync(new RawPublicRequests.GetTimestampRequest(), ct)
+            .GetTimestampCallAsync(new RawPublicRequests.GetTimestampRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetTimestampRequest();
 
@@ -117,7 +117,7 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<NormalizedRequests.GetDetailMergedRequest, GetDetailMergedResponse>> GetDetailMergedCallAsync(
         ProductCode productCode,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var request = new NormalizedRequests.GetDetailMergedRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
@@ -131,7 +131,7 @@ internal sealed class NormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetDetailMergedCallAsync(new RawPublicRequests.GetDetailMergedRequest(new Symbol(symbolText)), ct)
+            .GetDetailMergedCallAsync(new RawPublicRequests.GetDetailMergedRequest(new Symbol(symbolText)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -161,7 +161,7 @@ internal sealed class NormalizedPublicApi
     public async Task<Call<NormalizedRequests.GetDepthRequest, GetDepthResponse>> GetDepthCallAsync(
         ProductCode productCode,
         DepthType? depthType = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var normalizedDepthType = depthType ?? DepthType.Step0;
         var request = new NormalizedRequests.GetDepthRequest(productCode, depthType);
@@ -187,7 +187,7 @@ internal sealed class NormalizedPublicApi
         var rawCall = await _raw
             .GetDepthCallAsync(new RawPublicRequests.GetDepthRequest(
                 new Symbol(symbolText),
-                rawDepth is null ? null : new FreeText(rawDepth)), ct)
+                rawDepth is null ? null : new FreeText(rawDepth)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -214,7 +214,7 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<NormalizedRequests.GetTradeRequest, GetTradeResponse>> GetTradeCallAsync(
         ProductCode productCode,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var request = new NormalizedRequests.GetTradeRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
@@ -228,7 +228,7 @@ internal sealed class NormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetTradeCallAsync(new RawPublicRequests.GetTradeRequest(new Symbol(symbolText)), ct)
+            .GetTradeCallAsync(new RawPublicRequests.GetTradeRequest(new Symbol(symbolText)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -256,7 +256,7 @@ internal sealed class NormalizedPublicApi
         ProductCode productCode,
         Period period,
         int? size = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var request = new NormalizedRequests.GetHistoryKlineRequest(productCode, period, size);
         var startedAt = DateTimeOffset.UtcNow;
@@ -270,7 +270,7 @@ internal sealed class NormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetHistoryKlineCallAsync(new RawPublicRequests.GetHistoryKlineRequest(new Symbol(symbolText), period, size), ct)
+            .GetHistoryKlineCallAsync(new RawPublicRequests.GetHistoryKlineRequest(new Symbol(symbolText), period, size), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -294,10 +294,10 @@ internal sealed class NormalizedPublicApi
     }
 
     public async Task<Call<NormalizedRequests.GetTickersRequest, GetTickersResponse>> GetTickersCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var request = new NormalizedRequests.GetTickersRequest();
-        var rawCall = await _raw.GetTickersCallAsync(new RawPublicRequests.GetTickersRequest(), ct).ConfigureAwait(false);
+        var rawCall = await _raw.GetTickersCallAsync(new RawPublicRequests.GetTickersRequest(), cancellationToken).ConfigureAwait(false);
 
         return CreateCall(
             rawCall,
@@ -321,7 +321,7 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<NormalizedRequests.GetHistoryTradeRequest, GetHistoryTradeResponse>> GetHistoryTradeCallAsync(
         ProductCode productCode,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var request = new NormalizedRequests.GetHistoryTradeRequest(productCode);
         var startedAt = DateTimeOffset.UtcNow;
@@ -335,7 +335,7 @@ internal sealed class NormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetHistoryTradeCallAsync(new RawPublicRequests.GetHistoryTradeRequest(new Symbol(symbolText)), ct)
+            .GetHistoryTradeCallAsync(new RawPublicRequests.GetHistoryTradeRequest(new Symbol(symbolText)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

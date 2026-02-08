@@ -44,10 +44,10 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.GetAccountsBalanceByAccountIdRequest, GetAccountsBalanceByAccountIdResponse>> GetAccountsBalanceByAccountIdCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _trading
-            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountsBalanceByAccountIdRequest(new AccountId(_accountId.Value)), ct)
+            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountsBalanceByAccountIdRequest(new AccountId(_accountId.Value)), cancellationToken)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetAccountsBalanceByAccountIdRequest(new AccountId(_accountId.Value));
 
@@ -74,10 +74,10 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.GetAccountsRequest, GetAccountsResponse>> GetAccountsCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _trading
-            .GetAccountsCallAsync(new RawPrivateRequests.GetAccountsRequest(), ct)
+            .GetAccountsCallAsync(new RawPrivateRequests.GetAccountsRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetAccountsRequest();
 
@@ -105,7 +105,7 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.GetDepositWithdrawRequest, GetDepositWithdrawResponse>> GetDepositWithdrawCallAsync(
         NormalizedRequests.GetDepositWithdrawRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -115,7 +115,7 @@ internal sealed class NormalizedPrivateApi
                 request.Currency.HasValue ? new FreeText(CurrencyCodeConverter.ToCurrencyString(request.Currency.Value)) : null,
                 request.From,
                 request.Size,
-                request.Direct), ct)
+                request.Direct), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -141,10 +141,10 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.GetWithdrawVirtualAddressesRequest, GetWithdrawVirtualAddressesResponse>> GetWithdrawVirtualAddressesCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _trading
-            .GetWithdrawVirtualAddressesCallAsync(new RawPrivateRequests.GetWithdrawVirtualAddressesRequest(), ct)
+            .GetWithdrawVirtualAddressesCallAsync(new RawPrivateRequests.GetWithdrawVirtualAddressesRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetWithdrawVirtualAddressesRequest();
 
@@ -171,10 +171,10 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.GetRetailAccountBalanceRequest, GetRetailAccountBalanceResponse>> GetRetailAccountBalanceCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var rawCall = await _trading
-            .GetRetailAccountBalanceCallAsync(new RawPrivateRequests.GetRetailAccountBalanceRequest(), ct)
+            .GetRetailAccountBalanceCallAsync(new RawPrivateRequests.GetRetailAccountBalanceRequest(), cancellationToken)
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetRetailAccountBalanceRequest();
 
@@ -202,11 +202,11 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostOrdersPlaceRequest, PostOrdersPlaceResponse>> PostOrdersPlaceCallAsync(
         NormalizedRequests.PostOrdersPlaceRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
         var callRequest = request;
-        var marketCall = await _markets.ResolveCallAsync(request.Request.Symbol, ct).ConfigureAwait(false);
+        var marketCall = await _markets.ResolveCallAsync(request.Request.Symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
         {
             return CreateCallError<NormalizedRequests.PostOrdersPlaceRequest, PostOrdersPlaceResponse>(
@@ -225,7 +225,7 @@ internal sealed class NormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .PostOrdersPlaceCallAsync(new RawPrivateRequests.PostOrdersPlaceRequest(rawRequest!), ct)
+            .PostOrdersPlaceCallAsync(new RawPrivateRequests.PostOrdersPlaceRequest(rawRequest!), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -237,11 +237,11 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var request = new NormalizedRequests.GetOrdersRequest();
         var rawCall = await _trading
-            .GetOrdersCallAsync(new RawPrivateRequests.GetOrdersRequest(), ct)
+            .GetOrdersCallAsync(new RawPrivateRequests.GetOrdersRequest(), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -269,7 +269,7 @@ internal sealed class NormalizedPrivateApi
     public async Task<Call<NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var callRequest = new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(symbol, orderKey);
         if (symbol.IsEmpty)
@@ -291,7 +291,7 @@ internal sealed class NormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .PostOrdersSubmitCancelByOrderIdCallAsync(new RawPrivateRequests.PostOrdersSubmitCancelByOrderIdRequest(new OrderId(orderKey.Value)), ct)
+            .PostOrdersSubmitCancelByOrderIdCallAsync(new RawPrivateRequests.PostOrdersSubmitCancelByOrderIdRequest(new OrderId(orderKey.Value)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -304,13 +304,13 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostOrdersBatchCancelRequest, PostOrdersBatchCancelResponse>> PostOrdersBatchCancelCallAsync(
         NormalizedRequests.PostOrdersBatchCancelRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
             .PostOrdersBatchCancelCallAsync(new RawPrivateRequests.PostOrdersBatchCancelRequest(
-                new RawPrivateRequests.RawPostOrdersBatchCancelRequest(request.OrderIds.ToList())), ct)
+                new RawPrivateRequests.RawPostOrdersBatchCancelRequest(request.OrderIds.ToList())), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -324,13 +324,13 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest, PostOrdersBatchCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
         NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
         string? apiSymbol = null;
         if (request.Symbol is { IsEmpty: false })
         {
-            var marketCall = await _markets.ResolveCallAsync(request.Symbol.Value, ct).ConfigureAwait(false);
+            var marketCall = await _markets.ResolveCallAsync(request.Symbol.Value, cancellationToken).ConfigureAwait(false);
             if (!TryGetApiSymbol(marketCall, out apiSymbol, out var marketError))
             {
                 return CreateCallError<NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest, PostOrdersBatchCancelOpenOrdersResponse>(
@@ -356,7 +356,7 @@ internal sealed class NormalizedPrivateApi
             CreatedAt: request.CreatedAt);
 
         var rawCall = await _trading
-            .PostOrdersBatchCancelOpenOrdersCallAsync(new RawPrivateRequests.PostOrdersBatchCancelOpenOrdersRequest(rawRequest), ct)
+            .PostOrdersBatchCancelOpenOrdersCallAsync(new RawPrivateRequests.PostOrdersBatchCancelOpenOrdersRequest(rawRequest), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -370,10 +370,10 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.GetOpenOrdersRequest, GetOpenOrdersResponse>> GetOpenOrdersCallAsync(
         Symbol symbol,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var callRequest = new NormalizedRequests.GetOpenOrdersRequest(symbol);
-        var marketCall = await _markets.ResolveCallAsync(symbol, ct).ConfigureAwait(false);
+        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
         {
             return CreateCallError<NormalizedRequests.GetOpenOrdersRequest, GetOpenOrdersResponse>(
@@ -384,7 +384,7 @@ internal sealed class NormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(new Symbol(apiSymbol!), new AccountId(_accountId.Value)), ct)
+            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(new Symbol(apiSymbol!), new AccountId(_accountId.Value)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -405,7 +405,7 @@ internal sealed class NormalizedPrivateApi
     public async Task<Call<NormalizedRequests.GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>> GetOrdersByOrderIdCallAsync(
         Symbol symbol,
         OrderKey orderKey,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var callRequest = new NormalizedRequests.GetOrdersByOrderIdRequest(symbol, orderKey);
         if (symbol.IsEmpty)
@@ -425,7 +425,7 @@ internal sealed class NormalizedPrivateApi
                 reason: $"orderKey.Kind={orderKey.Kind}",
                 meta: CallMeta.CreateInternal("Normalized", "Bittrade.Trading"));
         }
-        var marketCall = await _markets.ResolveCallAsync(symbol, ct).ConfigureAwait(false);
+        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (marketCall.Result is CallResult<MarketInfo>.Err marketError)
         {
             return CreateCallError<NormalizedRequests.GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>(
@@ -441,7 +441,7 @@ internal sealed class NormalizedPrivateApi
             : new OrderKey(OrderIdKind.ExchangeOrderId, orderKey.Value);
 
         var rawCall = await _trading
-            .GetOrdersByOrderIdCallAsync(new RawPrivateRequests.GetOrdersByOrderIdRequest(new OrderId(orderKey.Value)), ct)
+            .GetOrdersByOrderIdCallAsync(new RawPrivateRequests.GetOrdersByOrderIdRequest(new OrderId(orderKey.Value)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -468,12 +468,12 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.GetOrdersMatchResultsByOrderIdRequest, GetOrdersMatchResultsByOrderIdResponse>> GetOrdersMatchResultsByOrderIdCallAsync(
         NormalizedRequests.GetOrdersMatchResultsByOrderIdRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .GetOrdersMatchResultsByOrderIdCallAsync(new RawPrivateRequests.GetOrdersMatchResultsByOrderIdRequest(new OrderId(request.OrderKey.Value)), ct)
+            .GetOrdersMatchResultsByOrderIdCallAsync(new RawPrivateRequests.GetOrdersMatchResultsByOrderIdRequest(new OrderId(request.OrderKey.Value)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -495,10 +495,10 @@ internal sealed class NormalizedPrivateApi
     public async Task<Call<NormalizedRequests.GetMatchResultsRequest, GetMatchResultsResponse>> GetMatchResultsCallAsync(
         Symbol symbol,
         int? limit = null,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         var callRequest = new NormalizedRequests.GetMatchResultsRequest(symbol, limit);
-        var marketCall = await _markets.ResolveCallAsync(symbol, ct).ConfigureAwait(false);
+        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
         {
             return CreateCallError<NormalizedRequests.GetMatchResultsRequest, GetMatchResultsResponse>(
@@ -511,7 +511,7 @@ internal sealed class NormalizedPrivateApi
         var requestedLimit = limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);
         var rawCall = await _trading
-            .GetMatchResultsCallAsync(new RawPrivateRequests.GetMatchResultsRequest(Symbol: new Symbol(apiSymbol!), Size: appliedLimit), ct)
+            .GetMatchResultsCallAsync(new RawPrivateRequests.GetMatchResultsRequest(Symbol: new Symbol(apiSymbol!), Size: appliedLimit), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -531,7 +531,7 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostWithdrawApiCreateRequest, PostWithdrawApiCreateResponse>> PostWithdrawApiCreateCallAsync(
         NormalizedRequests.PostWithdrawApiCreateRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -543,7 +543,7 @@ internal sealed class NormalizedPrivateApi
             request.AddressTag);
 
         var rawCall = await _trading
-            .PostWithdrawApiCreateCallAsync(new RawPrivateRequests.PostWithdrawApiCreateRequest(rawRequest), ct)
+            .PostWithdrawApiCreateCallAsync(new RawPrivateRequests.PostWithdrawApiCreateRequest(rawRequest), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -556,7 +556,7 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostRetailOrderPlaceRequest, PostRetailOrderPlaceResponse>> PostRetailOrderPlaceCallAsync(
         NormalizedRequests.PostRetailOrderPlaceRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -569,7 +569,7 @@ internal sealed class NormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .PostRetailOrderPlaceCallAsync(new RawPrivateRequests.PostRetailOrderPlaceRequest(rawRequest!), ct)
+            .PostRetailOrderPlaceCallAsync(new RawPrivateRequests.PostRetailOrderPlaceRequest(rawRequest!), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -582,7 +582,7 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.GetRetailOrderListRequest, GetRetailOrderListResponse>> GetRetailOrderListCallAsync(
         NormalizedRequests.GetRetailOrderListRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -591,7 +591,7 @@ internal sealed class NormalizedPrivateApi
                 Direct: request.Direct,
                 Status: request.Status,
                 StartTime: request.StartTime,
-                EndTime: request.EndTime), ct)
+                EndTime: request.EndTime), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -618,12 +618,12 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.GetRetailOrderDetailByOrderIdRequest, GetRetailOrderDetailByOrderIdResponse>> GetRetailOrderDetailByOrderIdCallAsync(
         NormalizedRequests.GetRetailOrderDetailByOrderIdRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .GetRetailOrderDetailByOrderIdCallAsync(new RawPrivateRequests.GetRetailOrderDetailByOrderIdRequest(request.OrderId), ct)
+            .GetRetailOrderDetailByOrderIdCallAsync(new RawPrivateRequests.GetRetailOrderDetailByOrderIdRequest(request.OrderId), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -652,7 +652,7 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostRetailOrderHistoryRequest, PostRetailOrderHistoryResponse>> PostRetailOrderHistoryCallAsync(
         NormalizedRequests.PostRetailOrderHistoryRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -677,7 +677,7 @@ internal sealed class NormalizedPrivateApi
             EndTime: request.EndTime?.ToUnixTimeMilliseconds(),
             Size: request.Size);
         var rawCall = await _trading
-            .PostRetailOrderHistoryCallAsync(new RawPrivateRequests.PostRetailOrderHistoryRequest(body), ct)
+            .PostRetailOrderHistoryCallAsync(new RawPrivateRequests.PostRetailOrderHistoryRequest(body), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -704,13 +704,13 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostRetailOrderDetailRequest, PostRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
         NormalizedRequests.PostRetailOrderDetailRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var body = new RawPrivateRequests.RawPostRetailOrderDetailRequest(request.OrderId);
         var rawCall = await _trading
-            .PostRetailOrderDetailCallAsync(new RawPrivateRequests.PostRetailOrderDetailRequest(body), ct)
+            .PostRetailOrderDetailCallAsync(new RawPrivateRequests.PostRetailOrderDetailRequest(body), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -739,7 +739,7 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostRetailOrderCreateRequest, PostRetailOrderCreateResponse>> PostRetailOrderCreateCallAsync(
         NormalizedRequests.PostRetailOrderCreateRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -753,7 +753,7 @@ internal sealed class NormalizedPrivateApi
 
         var rawCall = await _trading
             .PostRetailOrderCreateCallAsync(new RawPrivateRequests.PostRetailOrderCreateRequest(
-                new RawPrivateRequests.RawPostRetailOrderCreateRequest(rawRequest!.Symbol, rawRequest.Type, rawRequest.Price, rawRequest.Amount, rawRequest.CashAmount)), ct)
+                new RawPrivateRequests.RawPostRetailOrderCreateRequest(rawRequest!.Symbol, rawRequest.Type, rawRequest.Price, rawRequest.Amount, rawRequest.CashAmount)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -766,12 +766,12 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostRetailOrderCancelByOrderIdRequest, PostRetailOrderCancelByOrderIdResponse>> PostRetailOrderCancelByOrderIdCallAsync(
         NormalizedRequests.PostRetailOrderCancelByOrderIdRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostRetailOrderCancelByOrderIdCallAsync(new RawPrivateRequests.PostRetailOrderCancelByOrderIdRequest(request.OrderId), ct)
+            .PostRetailOrderCancelByOrderIdCallAsync(new RawPrivateRequests.PostRetailOrderCancelByOrderIdRequest(request.OrderId), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -784,12 +784,12 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostWithdrawVirtualByAddressIdCreateRequest, PostWithdrawVirtualByAddressIdCreateResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
         NormalizedRequests.PostWithdrawVirtualByAddressIdCreateRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostWithdrawVirtualByAddressIdCreateCallAsync(new RawPrivateRequests.PostWithdrawVirtualByAddressIdCreateRequest(new AddressId(request.AddressId.Value)), ct)
+            .PostWithdrawVirtualByAddressIdCreateCallAsync(new RawPrivateRequests.PostWithdrawVirtualByAddressIdCreateRequest(new AddressId(request.AddressId.Value)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -802,12 +802,12 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest, PostWithdrawVirtualByWithdrawIdPlaceResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
         NormalizedRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostWithdrawVirtualByWithdrawIdPlaceCallAsync(new RawPrivateRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest(new WithdrawId(request.WithdrawId.Value)), ct)
+            .PostWithdrawVirtualByWithdrawIdPlaceCallAsync(new RawPrivateRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest(new WithdrawId(request.WithdrawId.Value)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -820,12 +820,12 @@ internal sealed class NormalizedPrivateApi
 
     public async Task<Call<NormalizedRequests.PostWithdrawVirtualByWithdrawIdCancelRequest, PostWithdrawVirtualByWithdrawIdCancelResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
         NormalizedRequests.PostWithdrawVirtualByWithdrawIdCancelRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
         var rawCall = await _trading
-            .PostWithdrawVirtualByWithdrawIdCancelCallAsync(new RawPrivateRequests.PostWithdrawVirtualByWithdrawIdCancelRequest(new WithdrawId(request.WithdrawId.Value)), ct)
+            .PostWithdrawVirtualByWithdrawIdCancelCallAsync(new RawPrivateRequests.PostWithdrawVirtualByWithdrawIdCancelRequest(new WithdrawId(request.WithdrawId.Value)), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

@@ -115,7 +115,7 @@ internal sealed class MarketApi
             }
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _marketData.GetDepthCallAsync(productCode, ct: cancellationToken).ConfigureAwait(false);
+            var call = await _marketData.GetDepthCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

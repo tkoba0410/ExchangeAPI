@@ -78,3 +78,11 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
   - 影響範囲
   - 採用理由
   - 解消条件
+
+## 8. CancellationToken 命名規約
+
+- `CancellationToken` 型の引数名は `cancellationToken` のみ許可する。
+- `CancellationToken` 引数はメソッド引数の末尾に配置する。
+- 既定値は原則 `= default` を付与する。
+- `ct` は新規追加を禁止する。
+- 既存 `public`/`protected` API の改名は named argument 互換性に配慮し、メジャー更新時に実施する。

@@ -38,7 +38,7 @@ public class ExchangeInfoApiTests
     {
         public override Task<Call<RawPublicRequests.GetSymbolsRequest, RawPublicDtos.GetSymbolsResponse>> GetSymbolsCallAsync(
             RawPublicRequests.GetSymbolsRequest request,
-            System.Threading.CancellationToken ct = default)
+            System.Threading.CancellationToken cancellationToken = default)
         {
             IReadOnlyList<RawPublicDtos.RawSymbolInfo> symbols = new[]
             {
@@ -66,7 +66,7 @@ public class ExchangeInfoApiTests
 
         public override Task<Call<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse>> GetCurrencysCallAsync(
             RawPublicRequests.GetCurrencysRequest request,
-            System.Threading.CancellationToken ct = default)
+            System.Threading.CancellationToken cancellationToken = default)
         {
             IReadOnlyList<string> data = new[] { "btc", "jpy" };
             var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
@@ -82,7 +82,7 @@ public class ExchangeInfoApiTests
 
         public override Task<Call<RawPublicRequests.GetTimestampRequest, RawPublicDtos.GetTimestampResponse>> GetTimestampCallAsync(
             RawPublicRequests.GetTimestampRequest request,
-            System.Threading.CancellationToken ct = default)
+            System.Threading.CancellationToken cancellationToken = default)
         {
             var data = System.DateTimeOffset.UtcNow;
             var meta = CallMeta.CreateInternal("Raw", "StubRawApi");

@@ -123,7 +123,7 @@ public sealed class SpotHistoryApiTests
 
         public Task<Call<ResolveBittradeMarketRequest, MarketInfo>> ResolveCallAsync(
             Symbol symbol,
-            CancellationToken ct = default)
+            CancellationToken cancellationToken = default)
         {
             var request = new ResolveBittradeMarketRequest(symbol);
             var meta = CallMeta.CreateInternal("Normalized", "StubMarketResolver");

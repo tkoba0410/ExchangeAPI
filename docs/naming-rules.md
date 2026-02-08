@@ -51,9 +51,13 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - `nullable` は API 境界 DTO そのもの（`TOk?`）ではなく、`ResponseType` 内部の表現として扱う。
 - 配列応答は `ResponseType` を endpoint 直結名で維持し、DTO 内の `Items`（`IReadOnlyList<TItem>`）で表現する。
 - 0..1 応答は `ResponseType` を endpoint 直結名で維持し、DTO 内の `Found` + `Item`（`TItem?`）で表現する。
+- 単一オブジェクト応答（非配列・非nullable）は `ResponseType` をフラットに定義する。
+- 上記ケースでの `Item` 単一プロパティによるラップは原則禁止とする。
+- `Item` は `Items`（配列）または `Found + Item`（0..1）を表現する場合に限定して使用する。
 - 要素 DTO 名は `Response` を付けず `*Item` を用いる。
 - `Nullable` は型名・プロパティ名に含めない（nullable は型注釈で表す）。
 - API 境界での `using XxxResponse = ...` による alias は段階的に廃止し、最終的に endpoint 直結の実体 DTO に統一する。
+- 後方互換性維持や段階移行で単一 `Item` ラップを残す場合は、`docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
 - `Result` 命名の採用可否は個別に判断し、混線リスクがある場合はレビューで明示する。
 - `CallResult<T>`（呼出結果）と業務 DTO 名の `*Result` は責務が異なることを前提に扱う。
 

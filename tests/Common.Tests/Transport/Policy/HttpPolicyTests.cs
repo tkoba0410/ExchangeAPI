@@ -55,9 +55,9 @@ public class HttpPolicyTests
         await Assert.ThrowsAsync<TaskCanceledException>(() =>
             policy.ExecuteAsync(
                 request,
-                async ct =>
+                async cancellationToken =>
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(1), ct);
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 },
                 CancellationToken.None));

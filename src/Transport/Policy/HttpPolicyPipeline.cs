@@ -41,7 +41,7 @@ public sealed class HttpPolicyPipeline : IHttpPolicy
 
         return _policies[index].ExecuteAsync(
             request,
-            ct => ExecuteInternal(index + 1, request, sendAsync, ct),
+            cancellationToken => ExecuteInternal(index + 1, request, sendAsync, cancellationToken),
             cancellationToken);
     }
 }

@@ -118,7 +118,7 @@ namespace ExchangeApi.Transport.Protocol
                 }
 
                 using var response = await _policy
-                    .ExecuteAsync(request, ct => _transport.SendAsync(request, ct), cancellationToken)
+                    .ExecuteAsync(request, cancellationToken => _transport.SendAsync(request, cancellationToken), cancellationToken)
                     .ConfigureAwait(false);
 
                 var content = response.Content is null

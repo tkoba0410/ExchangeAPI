@@ -42,9 +42,9 @@ public sealed class RestClientSendRawAsyncTests
     [Fact]
     public async Task SendRawAsync_propagates_cancellation()
     {
-        var transport = new StubTransport((_, ct) =>
+        var transport = new StubTransport((_, cancellationToken) =>
         {
-            ct.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(CreateResponse(HttpStatusCode.OK, "{}"));
         });
         var client = CreateClient(transport);

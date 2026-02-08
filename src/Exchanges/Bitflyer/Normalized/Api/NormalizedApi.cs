@@ -15,6 +15,39 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Api;
 using ExchangeApi.Primitives.CallCommon;
+using CancelAllChildOrdersResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.CancelResult;
+using CancelChildOrderResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.CancelResult;
+using CancelParentOrderResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.ParentOrderCancelResult;
+using GetAddressesResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.RawJsonNormalized;
+using GetBalanceHistoryResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.RawJsonNormalized;
+using GetBalanceResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.BalanceEntryNormalized>;
+using GetBankAccountsResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.RawJsonNormalized;
+using GetBoardResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.OrderBookNormalized;
+using GetBoardStateResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BoardStateNormalized;
+using GetChatsResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.ChatNormalized>;
+using GetChildOrdersResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.OpenOrder>;
+using GetCoinInsResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.RawJsonNormalized;
+using GetCoinOutsResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.RawJsonNormalized;
+using GetCollateralAccountsResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.CollateralAccountNormalized>;
+using GetCollateralHistoryResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.RawJsonNormalized;
+using GetCollateralResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.CollateralNormalized;
+using GetCorporateLeverageResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.CorporateLeverageNormalized;
+using GetDepositsResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.RawJsonNormalized;
+using GetExecutionsPrivateResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.ExecutionAccountNormalized>;
+using GetExecutionsPublicResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.ExecutionNormalized>;
+using GetFundingRateResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.FundingRateNormalized;
+using GetHealthResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.HealthNormalized;
+using GetMarketsResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.MarketNormalized>;
+using GetParentOrderResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.ParentOrderDetailNormalized;
+using GetParentOrdersResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.ParentOrderNormalized>;
+using GetPermissionsResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Primitives.DomainCommon.Types.FreeText>;
+using GetPositionsResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.PositionNormalized>;
+using GetTickerResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.TickerNormalized;
+using GetTradingCommissionResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.TradingCommissionNormalized;
+using GetWithdrawalsResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.RawJsonNormalized;
+using SendChildOrderResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.OrderResult;
+using SendParentOrderResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.ParentOrderAcceptance;
+using WithdrawResponse = global::ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.WithdrawResult;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 
@@ -41,21 +74,21 @@ public sealed class NormalizedApi : INormalizedApi
             privateApi: new NormalizedPrivateApi(raw, markets));
     }
 
-    public Task<Call<PublicRequests.GetMarketsRequest, IReadOnlyList<MarketNormalized>>> GetMarketsCallAsync(
+    public Task<Call<PublicRequests.GetMarketsRequest, GetMarketsResponse>> GetMarketsCallAsync(
         CancellationToken cancellationToken = default) =>
         _publicApi.GetMarketsCallAsync(cancellationToken);
 
-    public Task<Call<PublicRequests.GetTickerRequest, TickerNormalized>> GetTickerCallAsync(
+    public Task<Call<PublicRequests.GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
         ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetTickerCallAsync(productCode, cancellationToken);
 
-    public Task<Call<PublicRequests.GetBoardRequest, OrderBookNormalized>> GetBoardCallAsync(
+    public Task<Call<PublicRequests.GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
         ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetBoardCallAsync(productCode, cancellationToken);
 
-    public Task<Call<PublicRequests.GetExecutionsPublicRequest, IReadOnlyList<ExecutionNormalized>>> GetExecutionsPublicCallAsync(
+    public Task<Call<PublicRequests.GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
         ProductCode productCode,
         int? count = null,
         long? before = null,
@@ -63,42 +96,42 @@ public sealed class NormalizedApi : INormalizedApi
         CancellationToken cancellationToken = default) =>
         _publicApi.GetExecutionsPublicCallAsync(productCode, count, before, after, cancellationToken);
 
-    public Task<Call<PublicRequests.GetHealthRequest, HealthNormalized>> GetHealthCallAsync(
+    public Task<Call<PublicRequests.GetHealthRequest, GetHealthResponse>> GetHealthCallAsync(
         ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetHealthCallAsync(productCode, cancellationToken);
 
-    public Task<Call<PublicRequests.GetBoardStateRequest, BoardStateNormalized>> GetBoardStateCallAsync(
+    public Task<Call<PublicRequests.GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
         ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetBoardStateCallAsync(productCode, cancellationToken);
 
-    public Task<Call<PublicRequests.GetCorporateLeverageRequest, CorporateLeverageNormalized>> GetCorporateLeverageCallAsync(
+    public Task<Call<PublicRequests.GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
         CancellationToken cancellationToken = default) =>
         _publicApi.GetCorporateLeverageCallAsync(cancellationToken);
 
-    public Task<Call<PublicRequests.GetFundingRateRequest, FundingRateNormalized>> GetFundingRateCallAsync(
+    public Task<Call<PublicRequests.GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateCallAsync(
         ProductCode productCode,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetFundingRateCallAsync(productCode, cancellationToken);
 
-    public Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<ChatNormalized>>> GetChatsCallAsync(
+    public Task<Call<PublicRequests.GetChatsRequest, GetChatsResponse>> GetChatsCallAsync(
         FreeText? fromDate = null,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetChatsCallAsync(fromDate, cancellationToken);
 
-    public Task<Call<PrivateRequests.SendChildOrderRequest, OrderResult>> SendChildOrderCallAsync(
+    public Task<Call<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>> SendChildOrderCallAsync(
         PrivateRequests.OrderRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.SendChildOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<PrivateRequests.CancelChildOrderRequest, CancelResult>> CancelChildOrderCallAsync(
+    public Task<Call<PrivateRequests.CancelChildOrderRequest, CancelChildOrderResponse>> CancelChildOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default) =>
         _privateApi.CancelChildOrderCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrder>>> GetChildOrdersCallAsync(
+    public Task<Call<PrivateRequests.GetChildOrdersRequest, GetChildOrdersResponse>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetChildOrdersCallAsync(symbol, cancellationToken);
@@ -109,54 +142,54 @@ public sealed class NormalizedApi : INormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.GetChildOrdersCallAsync(symbol, orderKey, cancellationToken);
 
-    public Task<Call<PrivateRequests.SendParentOrderRequest, ParentOrderAcceptance>> SendParentOrderCallAsync(
+    public Task<Call<PrivateRequests.SendParentOrderRequest, SendParentOrderResponse>> SendParentOrderCallAsync(
         PrivateRequests.SendParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.SendParentOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<PrivateRequests.CancelParentOrderRequest, ParentOrderCancelResult>> CancelParentOrderCallAsync(
+    public Task<Call<PrivateRequests.CancelParentOrderRequest, CancelParentOrderResponse>> CancelParentOrderCallAsync(
         PrivateRequests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.CancelParentOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetParentOrdersRequest, IReadOnlyList<ParentOrderNormalized>>> GetParentOrdersCallAsync(
+    public Task<Call<PrivateRequests.GetParentOrdersRequest, GetParentOrdersResponse>> GetParentOrdersCallAsync(
         PrivateRequests.GetParentOrdersRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetParentOrdersCallAsync(request, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetParentOrderRequest, ParentOrderDetailNormalized>> GetParentOrderCallAsync(
+    public Task<Call<PrivateRequests.GetParentOrderRequest, GetParentOrderResponse>> GetParentOrderCallAsync(
         PrivateRequests.GetParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetParentOrderCallAsync(request, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetBalanceRequest, IReadOnlyList<BalanceEntryNormalized>>> GetBalanceCallAsync(
+    public Task<Call<PrivateRequests.GetBalanceRequest, GetBalanceResponse>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default) =>
         _privateApi.GetBalanceCallAsync(cancellationToken);
 
-    public Task<Call<PrivateRequests.GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
+    public Task<Call<PrivateRequests.GetPermissionsRequest, GetPermissionsResponse>> GetPermissionsCallAsync(
         CancellationToken cancellationToken = default) =>
         _privateApi.GetPermissionsCallAsync(cancellationToken);
 
-    public Task<Call<PrivateRequests.GetCollateralRequest, CollateralNormalized>> GetCollateralCallAsync(
+    public Task<Call<PrivateRequests.GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(
         CancellationToken cancellationToken = default) =>
         _privateApi.GetCollateralCallAsync(cancellationToken);
 
-    public Task<Call<PrivateRequests.GetCollateralAccountsRequest, IReadOnlyList<CollateralAccountNormalized>>> GetCollateralAccountsCallAsync(
+    public Task<Call<PrivateRequests.GetCollateralAccountsRequest, GetCollateralAccountsResponse>> GetCollateralAccountsCallAsync(
         CancellationToken cancellationToken = default) =>
         _privateApi.GetCollateralAccountsCallAsync(cancellationToken);
 
-    public Task<Call<PrivateRequests.GetAddressesRequest, RawJsonNormalized>> GetAddressesCallAsync(
+    public Task<Call<PrivateRequests.GetAddressesRequest, GetAddressesResponse>> GetAddressesCallAsync(
         CancellationToken cancellationToken = default) =>
         _privateApi.GetAddressesCallAsync(cancellationToken);
 
-    public Task<Call<PrivateRequests.GetCoinInsRequest, RawJsonNormalized>> GetCoinInsCallAsync(
+    public Task<Call<PrivateRequests.GetCoinInsRequest, GetCoinInsResponse>> GetCoinInsCallAsync(
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetCoinInsCallAsync(count, before, after, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetCoinOutsRequest, RawJsonNormalized>> GetCoinOutsCallAsync(
+    public Task<Call<PrivateRequests.GetCoinOutsRequest, GetCoinOutsResponse>> GetCoinOutsCallAsync(
         FreeText? messageId = null,
         int? count = null,
         long? before = null,
@@ -164,18 +197,18 @@ public sealed class NormalizedApi : INormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.GetCoinOutsCallAsync(messageId, count, before, after, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetBankAccountsRequest, RawJsonNormalized>> GetBankAccountsCallAsync(
+    public Task<Call<PrivateRequests.GetBankAccountsRequest, GetBankAccountsResponse>> GetBankAccountsCallAsync(
         CancellationToken cancellationToken = default) =>
         _privateApi.GetBankAccountsCallAsync(cancellationToken);
 
-    public Task<Call<PrivateRequests.GetDepositsRequest, RawJsonNormalized>> GetDepositsCallAsync(
+    public Task<Call<PrivateRequests.GetDepositsRequest, GetDepositsResponse>> GetDepositsCallAsync(
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetDepositsCallAsync(count, before, after, cancellationToken);
 
-    public Task<Call<PrivateRequests.WithdrawRequest, WithdrawResult>> WithdrawCallAsync(
+    public Task<Call<PrivateRequests.WithdrawRequest, WithdrawResponse>> WithdrawCallAsync(
         CurrencyCode currencyCode,
         int bankAccountId,
         decimal amount,
@@ -183,19 +216,19 @@ public sealed class NormalizedApi : INormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.WithdrawCallAsync(currencyCode, bankAccountId, amount, code, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetWithdrawalsRequest, RawJsonNormalized>> GetWithdrawalsCallAsync(
+    public Task<Call<PrivateRequests.GetWithdrawalsRequest, GetWithdrawalsResponse>> GetWithdrawalsCallAsync(
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetWithdrawalsCallAsync(count, before, after, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<ExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
+    public Task<Call<PrivateRequests.GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetExecutionsPrivateCallAsync(symbol, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetBalanceHistoryRequest, RawJsonNormalized>> GetBalanceHistoryCallAsync(
+    public Task<Call<PrivateRequests.GetBalanceHistoryRequest, GetBalanceHistoryResponse>> GetBalanceHistoryCallAsync(
         CurrencyCode? currencyCode = null,
         int? count = null,
         long? before = null,
@@ -203,24 +236,24 @@ public sealed class NormalizedApi : INormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.GetBalanceHistoryCallAsync(currencyCode, count, before, after, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetPositionsRequest, IReadOnlyList<PositionNormalized>>> GetPositionsCallAsync(
+    public Task<Call<PrivateRequests.GetPositionsRequest, GetPositionsResponse>> GetPositionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetPositionsCallAsync(symbol, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetCollateralHistoryRequest, RawJsonNormalized>> GetCollateralHistoryCallAsync(
+    public Task<Call<PrivateRequests.GetCollateralHistoryRequest, GetCollateralHistoryResponse>> GetCollateralHistoryCallAsync(
         int? count = null,
         long? before = null,
         long? after = null,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetCollateralHistoryCallAsync(count, before, after, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetTradingCommissionRequest, TradingCommissionNormalized>> GetTradingCommissionCallAsync(
+    public Task<Call<PrivateRequests.GetTradingCommissionRequest, GetTradingCommissionResponse>> GetTradingCommissionCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetTradingCommissionCallAsync(symbol, cancellationToken);
 
-    public Task<Call<PrivateRequests.CancelAllChildOrdersRequest, CancelResult>> CancelAllChildOrdersCallAsync(
+    public Task<Call<PrivateRequests.CancelAllChildOrdersRequest, CancelAllChildOrdersResponse>> CancelAllChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default) =>
         _privateApi.CancelAllChildOrdersCallAsync(symbol, cancellationToken);

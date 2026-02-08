@@ -46,6 +46,9 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - `Contracts` 層は `docs/inventory/endpoints-contracts.md` の `RequestType` / `ResponseType` を正本とする。
 - `Raw` / `Normalized` 層は、各取引所 inventory（`docs/inventory/endpoints-*.md`）の `RequestType` / `ResponseType` を正本とする。
 - inventory に未定義の API 境界 DTO 名を新設してはならない。必要な場合は先に inventory を更新する。
+- API 境界の `Call<TRequest, TOk>` における `TOk` は原則 non-null とする。
+- `該当なし` / `空結果` / `0件` は、`ResponseType` 内の機構（例: `Found` / `Item` / `Items`）で表現する。
+- `nullable` は API 境界 DTO そのもの（`TOk?`）ではなく、`ResponseType` 内部の表現として扱う。
 - `Result` 命名の採用可否は個別に判断し、混線リスクがある場合はレビューで明示する。
 - `CallResult<T>`（呼出結果）と業務 DTO 名の `*Result` は責務が異なることを前提に扱う。
 

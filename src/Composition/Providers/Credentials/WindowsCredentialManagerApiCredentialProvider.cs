@@ -37,8 +37,8 @@ public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredenti
             throw new PlatformNotSupportedException("Windows Credential Manager is only available on Windows.");
         }
 
-        var apiKeyTarget = BuildTarget(_exchangeId, accountId.Value, "api_key");
-        var apiSecretTarget = BuildTarget(_exchangeId, accountId.Value, "api_secret");
+        var apiKeyTarget = BuildTarget(_exchangeId, accountId, "api_key");
+        var apiSecretTarget = BuildTarget(_exchangeId, accountId, "api_secret");
 
         var apiKey = ReadCredential(apiKeyTarget);
         var apiSecret = ReadCredential(apiSecretTarget);
@@ -56,9 +56,9 @@ public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredenti
         return new ApiCredentials(apiKey, apiSecret);
     }
 
-    private static string BuildTarget(string exchangeId, string accountId, string keyName)
+    private static string BuildTarget(string exchangeId, AccountId accountId, string keyName)
     {
-        return $"{exchangeId.Trim()}/{accountId.Trim()}/{keyName}".ToLowerInvariant();
+        return $"{exchangeId.Trim()}/{accountId.Value.Trim()}/{keyName}".ToLowerInvariant();
     }
 
     private static string ReadCredential(string targetName)

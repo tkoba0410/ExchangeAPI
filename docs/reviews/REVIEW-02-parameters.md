@@ -32,6 +32,8 @@
 - `P2-3` の追加対応として、Bittrade Normalized の内部境界で `accountId` を `FreeText` ではなく
   `AccountId` で受け渡すよう統一し、`NormalizedApi/NormalizedPrivateApi/NormalizedComponentFactory/ApiBundle`
   間の配線を VO 境界へ揃えた。
+- `P2-3` の追加対応として、`WindowsCredentialManagerApiCredentialProvider` の内部 `BuildTarget` 境界と、
+  Bittrade 旧 `ClientFactory` の internal `CreatePrivate` 境界を `AccountId` 受けへ統一した。
 
 ---
 

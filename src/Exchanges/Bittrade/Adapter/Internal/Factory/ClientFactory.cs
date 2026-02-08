@@ -49,9 +49,14 @@ public static class ClientFactory
     internal static (MarketApi Market, TradingApi Trading, AccountApi Account, BittradeExchangeInfoApi ExchangeInfo) CreatePrivate(
         string accessKey,
         string secretKey,
-        string accountId)
+        AccountId accountId)
     {
-        var normalizedAccountId = AccountId.ParseOrThrow(accountId);
+        if (accountId.IsEmpty)
+        {
+            throw new ArgumentException("accountId is required.", nameof(accountId));
+        }
+
+        var normalizedAccountId = accountId;
         var restClient = CreateRestClient(new RequestSigner(accessKey, secretKey));
         var wireTransport = new WireTransport(restClient);
         var wire = new WireCallExecutor(wireTransport);

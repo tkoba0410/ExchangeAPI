@@ -595,7 +595,7 @@ internal sealed class NormalizedPrivateApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetRetailOrderDetailByOrderIdRequest, RetailOrderEntryNormalized?>> GetRetailOrderDetailByOrderIdCallAsync(
+    public async Task<Call<NormalizedRequests.GetRetailOrderDetailByOrderIdRequest, GetRetailOrderDetailByOrderIdResponse>> GetRetailOrderDetailByOrderIdCallAsync(
         NormalizedRequests.GetRetailOrderDetailByOrderIdRequest request,
         CancellationToken ct = default)
     {
@@ -613,16 +613,19 @@ internal sealed class NormalizedPrivateApi
             {
                 if (raw.Success is not true)
                 {
-                    return MapResult<RetailOrderEntryNormalized?>.Fail(
+                    return MapResult<GetRetailOrderDetailByOrderIdResponse>.Fail(
                         new CallError(CallErrorKind.Mapping, "Bittrade retail order detail response invalid."));
                 }
 
                 if (!TradingMapper.TryToRetailOrder(raw.Data, out var order, out var mapError))
                 {
-                    return MapResult<RetailOrderEntryNormalized?>.Fail(mapError!);
+                    return MapResult<GetRetailOrderDetailByOrderIdResponse>.Fail(mapError!);
                 }
 
-                return MapResult<RetailOrderEntryNormalized?>.Ok(order);
+                return MapResult<GetRetailOrderDetailByOrderIdResponse>.Ok(
+                    new GetRetailOrderDetailByOrderIdResponse(
+                        Found: order is not null,
+                        Item: order));
             });
     }
 
@@ -677,7 +680,7 @@ internal sealed class NormalizedPrivateApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.PostRetailOrderDetailRequest, RetailOrderEntryNormalized?>> PostRetailOrderDetailCallAsync(
+    public async Task<Call<NormalizedRequests.PostRetailOrderDetailRequest, PostRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
         NormalizedRequests.PostRetailOrderDetailRequest request,
         CancellationToken ct = default)
     {
@@ -696,16 +699,19 @@ internal sealed class NormalizedPrivateApi
             {
                 if (raw.Success is not true)
                 {
-                    return MapResult<RetailOrderEntryNormalized?>.Fail(
+                    return MapResult<PostRetailOrderDetailResponse>.Fail(
                         new CallError(CallErrorKind.Mapping, "Bittrade retail order detail response invalid."));
                 }
 
                 if (!TradingMapper.TryToRetailOrder(raw.Data, out var order, out var mapError))
                 {
-                    return MapResult<RetailOrderEntryNormalized?>.Fail(mapError!);
+                    return MapResult<PostRetailOrderDetailResponse>.Fail(mapError!);
                 }
 
-                return MapResult<RetailOrderEntryNormalized?>.Ok(order);
+                return MapResult<PostRetailOrderDetailResponse>.Ok(
+                    new PostRetailOrderDetailResponse(
+                        Found: order is not null,
+                        Item: order));
             });
     }
 

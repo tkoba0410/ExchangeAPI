@@ -147,7 +147,7 @@ public static class NormalizedApiExtensions
             new GetRetailOrderListRequest(direct, status, startTime, endTime),
             ct);
 
-    public static Task<Call<GetRetailOrderDetailByOrderIdRequest, RetailOrderEntryNormalized?>> GetRetailOrderDetailByOrderIdCallAsync(
+    public static Task<Call<GetRetailOrderDetailByOrderIdRequest, GetRetailOrderDetailByOrderIdResponse>> GetRetailOrderDetailByOrderIdCallAsync(
         this IBittradeNormalizedApi api,
         OrderId orderId,
         CancellationToken ct = default) =>
@@ -166,7 +166,7 @@ public static class NormalizedApiExtensions
             new PostRetailOrderHistoryRequest(symbol, direct, status, startTime, endTime, size),
             ct);
 
-    public static Task<Call<PostRetailOrderDetailRequest, RetailOrderEntryNormalized?>> PostRetailOrderDetailCallAsync(
+    public static Task<Call<PostRetailOrderDetailRequest, PostRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
         this IBittradeNormalizedApi api,
         OrderId orderId,
         CancellationToken ct = default) =>

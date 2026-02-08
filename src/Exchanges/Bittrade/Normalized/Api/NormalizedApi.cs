@@ -28,7 +28,7 @@ using GetOrdersByOrderIdResponse = global::ExchangeApi.Exchanges.Bittrade.Normal
 using GetOrdersMatchResultsByOrderIdResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.ExecutionNormalized>;
 using GetOrdersResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.OrderSummaryNormalized>;
 using GetRetailAccountBalanceResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailBalanceEntryNormalized>;
-using GetRetailOrderDetailByOrderIdResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderEntryNormalized;
+using GetRetailOrderDetailByOrderIdResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.GetRetailOrderDetailByOrderIdResponse;
 using GetRetailOrderListResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderEntryNormalized>;
 using GetSymbolsResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.SymbolNormalized>;
 using GetTickersResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.TickerEntryNormalized>;
@@ -41,7 +41,7 @@ using PostOrdersPlaceResponse = global::ExchangeApi.Exchanges.Bittrade.Normalize
 using PostOrdersSubmitCancelByOrderIdResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.CancelResult;
 using PostRetailOrderCancelByOrderIdResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderResult;
 using PostRetailOrderCreateResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderResult;
-using PostRetailOrderDetailResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderEntryNormalized;
+using PostRetailOrderDetailResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.PostRetailOrderDetailResponse;
 using PostRetailOrderHistoryResponse = global::System.Collections.Generic.IReadOnlyList<global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderEntryNormalized>;
 using PostRetailOrderPlaceResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.RetailOrderResult;
 using PostWithdrawApiCreateResponse = global::ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos.WithdrawResult;
@@ -230,7 +230,7 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
         CancellationToken ct = default) =>
         _privateApi.GetRetailOrderListCallAsync(request, ct);
 
-    public Task<Call<GetRetailOrderDetailByOrderIdRequest, GetRetailOrderDetailByOrderIdResponse?>> GetRetailOrderDetailByOrderIdCallAsync(
+    public Task<Call<GetRetailOrderDetailByOrderIdRequest, GetRetailOrderDetailByOrderIdResponse>> GetRetailOrderDetailByOrderIdCallAsync(
         GetRetailOrderDetailByOrderIdRequest request,
         CancellationToken ct = default) =>
         _privateApi.GetRetailOrderDetailByOrderIdCallAsync(request, ct);
@@ -240,7 +240,7 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
         CancellationToken ct = default) =>
         _privateApi.PostRetailOrderHistoryCallAsync(request, ct);
 
-    public Task<Call<PostRetailOrderDetailRequest, PostRetailOrderDetailResponse?>> PostRetailOrderDetailCallAsync(
+    public Task<Call<PostRetailOrderDetailRequest, PostRetailOrderDetailResponse>> PostRetailOrderDetailCallAsync(
         PostRetailOrderDetailRequest request,
         CancellationToken ct = default) =>
         _privateApi.PostRetailOrderDetailCallAsync(request, ct);

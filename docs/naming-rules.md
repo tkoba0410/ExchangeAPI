@@ -49,6 +49,11 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - API 境界の `Call<TRequest, TOk>` における `TOk` は原則 non-null とする。
 - `該当なし` / `空結果` / `0件` は、`ResponseType` 内の機構（例: `Found` / `Item` / `Items`）で表現する。
 - `nullable` は API 境界 DTO そのもの（`TOk?`）ではなく、`ResponseType` 内部の表現として扱う。
+- 配列応答は `ResponseType` を endpoint 直結名で維持し、DTO 内の `Items`（`IReadOnlyList<TItem>`）で表現する。
+- 0..1 応答は `ResponseType` を endpoint 直結名で維持し、DTO 内の `Found` + `Item`（`TItem?`）で表現する。
+- 要素 DTO 名は `Response` を付けず `*Item` を用いる。
+- `Nullable` は型名・プロパティ名に含めない（nullable は型注釈で表す）。
+- API 境界での `using XxxResponse = ...` による alias は段階的に廃止し、最終的に endpoint 直結の実体 DTO に統一する。
 - `Result` 命名の採用可否は個別に判断し、混線リスクがある場合はレビューで明示する。
 - `CallResult<T>`（呼出結果）と業務 DTO 名の `*Result` は責務が異なることを前提に扱う。
 

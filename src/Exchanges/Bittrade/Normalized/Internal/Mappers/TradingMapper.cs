@@ -467,7 +467,7 @@ internal static class TradingMapper
         raw = new RawPrivateRequests.RawPostRetailOrderPlaceRequest(
             Symbol: new Symbol(symbol.Value),
             Type: request.Type.Value,
-            Price: request.Price is null ? null : new FreeText(FormatDecimal(request.Price.Value)),
+            Price: request.Price is null ? null : new FreeText(FormatDecimal(request.Price.Value.Value)),
             Amount: request.Amount is null ? null : new FreeText(FormatDecimal(request.Amount.Value.Value)),
             CashAmount: request.CashAmount is null ? null : new FreeText(FormatDecimal(request.CashAmount.Value.Value)));
         error = null;

@@ -18,7 +18,7 @@ public sealed record PostOrdersBatchCancelOpenOrdersRequest(
     Symbol? Symbol = null,
     Side? Side = null,
     Size? Size = null,
-    decimal? Price = null,
+    Price? Price = null,
     DateTimeOffset? CreatedAt = null);
 
 public sealed record GetOpenOrdersRequest(Symbol Symbol);
@@ -50,7 +50,7 @@ public sealed record PostRetailOrderDetailRequest(OrderId OrderId);
 public sealed record RetailOrderRequest(
     Symbol Symbol,
     RetailOrderType Type,
-    decimal? Price = null,
+    Price? Price = null,
     RetailOrderAmount? Amount = null,
     RetailOrderAmount? CashAmount = null);
 

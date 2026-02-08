@@ -354,7 +354,7 @@ internal sealed class NormalizedPrivateApi
                 ? new FreeText(request.Size.Value.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))
                 : null,
             Price: request.Price.HasValue
-                ? new FreeText(request.Price.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))
+                ? new FreeText(request.Price.Value.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))
                 : null,
             CreatedAt: request.CreatedAt);
 

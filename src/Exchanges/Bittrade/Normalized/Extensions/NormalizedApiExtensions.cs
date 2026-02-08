@@ -59,7 +59,7 @@ public static class NormalizedApiExtensions
         Symbol? symbol = null,
         Side? side = null,
         Size? size = null,
-        decimal? price = null,
+        Price? price = null,
         DateTimeOffset? createdAt = null,
         CancellationToken cancellationToken = default) =>
         api.PostOrdersBatchCancelOpenOrdersCallAsync(

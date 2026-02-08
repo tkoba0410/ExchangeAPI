@@ -40,6 +40,9 @@
   `RequestCount/RequestBefore/RequestAfter` に型昇格し、Raw 呼び出し直前でのみプリミティブへ変換する形に変更した。
 - `P2-2` の追加対応として、Bitflyer Normalized `WithdrawRequest` の
   `bankAccountId/amount` を `BankAccountId/WithdrawAmount` に型昇格した。
+- `P2-2` の追加対応として、Bittrade Normalized `TradingRequests` の
+  `PostOrdersBatchCancelOpenOrdersRequest.Price` と `RetailOrderRequest.Price` を
+  `decimal` から `Price` に型昇格し、Raw 直前でのみ数値文字列へ変換する形に変更した。
 
 ---
 

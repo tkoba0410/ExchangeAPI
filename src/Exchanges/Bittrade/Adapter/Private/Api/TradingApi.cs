@@ -85,7 +85,9 @@ internal sealed class TradingApi
         try
         {
             var call = await _trading
-                .PostOrdersSubmitCancelByOrderIdCallAsync(symbol, orderKey, cancellationToken)
+                .PostOrdersSubmitCancelByOrderIdCallAsync(
+                    new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(symbol, orderKey),
+                    cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,

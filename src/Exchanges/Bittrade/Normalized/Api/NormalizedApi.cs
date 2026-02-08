@@ -129,12 +129,12 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
     public Task<Call<GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
         GetOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetOrdersCallAsync(cancellationToken);
+        _privateApi.GetOrdersCallAsync(request, cancellationToken);
 
     public Task<Call<PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
         PostOrdersSubmitCancelByOrderIdRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.PostOrdersSubmitCancelByOrderIdCallAsync(request.Symbol, request.OrderKey, cancellationToken);
+        _privateApi.PostOrdersSubmitCancelByOrderIdCallAsync(request, cancellationToken);
 
     public Task<Call<PostOrdersBatchCancelRequest, PostOrdersBatchCancelResponse>> PostOrdersBatchCancelCallAsync(
         PostOrdersBatchCancelRequest request,
@@ -149,12 +149,12 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
     public Task<Call<GetOpenOrdersRequest, GetOpenOrdersResponse>> GetOpenOrdersCallAsync(
         GetOpenOrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetOpenOrdersCallAsync(request.Symbol, cancellationToken);
+        _privateApi.GetOpenOrdersCallAsync(request, cancellationToken);
 
     public Task<Call<GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>> GetOrdersByOrderIdCallAsync(
         GetOrdersByOrderIdRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetOrdersByOrderIdCallAsync(request.Symbol, request.OrderKey, cancellationToken);
+        _privateApi.GetOrdersByOrderIdCallAsync(request, cancellationToken);
 
     public Task<Call<GetOrdersMatchResultsByOrderIdRequest, GetOrdersMatchResultsByOrderIdResponse>> GetOrdersMatchResultsByOrderIdCallAsync(
         GetOrdersMatchResultsByOrderIdRequest request,
@@ -164,7 +164,7 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
     public Task<Call<GetMatchResultsRequest, GetMatchResultsResponse>> GetMatchResultsCallAsync(
         GetMatchResultsRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetMatchResultsCallAsync(request.Symbol, request.Limit, cancellationToken);
+        _privateApi.GetMatchResultsCallAsync(request, cancellationToken);
 
     public Task<Call<PostWithdrawApiCreateRequest, PostWithdrawApiCreateResponse>> PostWithdrawApiCreateCallAsync(
         PostWithdrawApiCreateRequest request,

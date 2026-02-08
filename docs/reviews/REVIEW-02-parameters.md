@@ -5,6 +5,15 @@
 
 ---
 
+## 対応状況メモ（2026-02-08）
+
+- `P1-1` のうち Bittrade Normalized 境界の一部を DTO 受けに寄せた。
+- 対象: `GetOrders` / `PostOrdersSubmitCancelByOrderId` / `GetOpenOrders` / `GetOrdersByOrderId` / `GetMatchResults`。
+- `NormalizedApi -> NormalizedPrivateApi` の委譲は、上記操作で `request` をそのまま渡す形へ変更した。
+- `Adapter` 側の呼び出し（`TradingApi` / `SpotHistoryApi`）も DTO 生成経由に追従した。
+
+---
+
 ## A. 引数設計の「統一ルール案 v1」
 
 ### 0) 適用スコープ

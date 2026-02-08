@@ -237,9 +237,10 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
+        NormalizedRequests.GetOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new NormalizedRequests.GetOrdersRequest();
+        if (request is null) throw new ArgumentNullException(nameof(request));
         var rawCall = await _trading
             .GetOrdersCallAsync(new RawPrivateRequests.GetOrdersRequest(), cancellationToken)
             .ConfigureAwait(false);
@@ -267,12 +268,12 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>> PostOrdersSubmitCancelByOrderIdCallAsync(
-        Symbol symbol,
-        OrderKey orderKey,
+        NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest request,
         CancellationToken cancellationToken = default)
     {
-        var callRequest = new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(symbol, orderKey);
-        if (symbol.IsEmpty)
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        var callRequest = request;
+        if (request.Symbol.IsEmpty)
         {
             return CreateImmediateError<NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>(
                 callRequest,
@@ -280,18 +281,20 @@ internal sealed class NormalizedPrivateApi
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
         }
 
-        if (orderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
+        if (request.OrderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
         {
             return CreateNotSupported<NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>(
                 callRequest,
                 component: "Bittrade.Trading",
                 feature: "CancelOrder",
-                reason: $"orderKey.Kind={orderKey.Kind}",
+                reason: $"orderKey.Kind={request.OrderKey.Kind}",
                 meta: CallMeta.CreateInternal("Normalized", "Bittrade.Trading"));
         }
 
         var rawCall = await _trading
-            .PostOrdersSubmitCancelByOrderIdCallAsync(new RawPrivateRequests.PostOrdersSubmitCancelByOrderIdRequest(new OrderId(orderKey.Value)), cancellationToken)
+            .PostOrdersSubmitCancelByOrderIdCallAsync(
+                new RawPrivateRequests.PostOrdersSubmitCancelByOrderIdRequest(new OrderId(request.OrderKey.Value)),
+                cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -369,11 +372,12 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.GetOpenOrdersRequest, GetOpenOrdersResponse>> GetOpenOrdersCallAsync(
-        Symbol symbol,
+        NormalizedRequests.GetOpenOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
-        var callRequest = new NormalizedRequests.GetOpenOrdersRequest(symbol);
-        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        var callRequest = request;
+        var marketCall = await _markets.ResolveCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
         {
             return CreateCallError<NormalizedRequests.GetOpenOrdersRequest, GetOpenOrdersResponse>(
@@ -391,9 +395,9 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             callRequest,
             Component(EndpointIds.GetOpenOrders),
-            raw =>
+                raw =>
             {
-                if (!TradingMapper.TryToOpenOrders(symbol, raw, out var orders, out var mapError))
+                if (!TradingMapper.TryToOpenOrders(request.Symbol, raw, out var orders, out var mapError))
                 {
                     return MapResult<GetOpenOrdersResponse>.Fail(mapError!);
                 }
@@ -403,12 +407,12 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>> GetOrdersByOrderIdCallAsync(
-        Symbol symbol,
-        OrderKey orderKey,
+        NormalizedRequests.GetOrdersByOrderIdRequest request,
         CancellationToken cancellationToken = default)
     {
-        var callRequest = new NormalizedRequests.GetOrdersByOrderIdRequest(symbol, orderKey);
-        if (symbol.IsEmpty)
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        var callRequest = request;
+        if (request.Symbol.IsEmpty)
         {
             return CreateImmediateError<NormalizedRequests.GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>(
                 callRequest,
@@ -416,16 +420,16 @@ internal sealed class NormalizedPrivateApi
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
         }
 
-        if (orderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
+        if (request.OrderKey.Kind is not (OrderIdKind.ExchangeOrderId or OrderIdKind.AcceptanceId))
         {
             return CreateNotSupported<NormalizedRequests.GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>(
                 callRequest,
                 component: "Bittrade.Trading",
                 feature: "GetOrder",
-                reason: $"orderKey.Kind={orderKey.Kind}",
+                reason: $"orderKey.Kind={request.OrderKey.Kind}",
                 meta: CallMeta.CreateInternal("Normalized", "Bittrade.Trading"));
         }
-        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        var marketCall = await _markets.ResolveCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
         if (marketCall.Result is CallResult<MarketInfo>.Err marketError)
         {
             return CreateCallError<NormalizedRequests.GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>(
@@ -436,12 +440,14 @@ internal sealed class NormalizedPrivateApi
         }
 
         var market = ((CallResult<MarketInfo>.Ok)marketCall.Result).Response;
-        var key = orderKey.Kind == OrderIdKind.AcceptanceId
-            ? new OrderKey(OrderIdKind.AcceptanceId, orderKey.Value)
-            : new OrderKey(OrderIdKind.ExchangeOrderId, orderKey.Value);
+        var key = request.OrderKey.Kind == OrderIdKind.AcceptanceId
+            ? new OrderKey(OrderIdKind.AcceptanceId, request.OrderKey.Value)
+            : new OrderKey(OrderIdKind.ExchangeOrderId, request.OrderKey.Value);
 
         var rawCall = await _trading
-            .GetOrdersByOrderIdCallAsync(new RawPrivateRequests.GetOrdersByOrderIdRequest(new OrderId(orderKey.Value)), cancellationToken)
+            .GetOrdersByOrderIdCallAsync(
+                new RawPrivateRequests.GetOrdersByOrderIdRequest(new OrderId(request.OrderKey.Value)),
+                cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -493,12 +499,12 @@ internal sealed class NormalizedPrivateApi
     }
 
     public async Task<Call<NormalizedRequests.GetMatchResultsRequest, GetMatchResultsResponse>> GetMatchResultsCallAsync(
-        Symbol symbol,
-        int? limit = null,
+        NormalizedRequests.GetMatchResultsRequest request,
         CancellationToken cancellationToken = default)
     {
-        var callRequest = new NormalizedRequests.GetMatchResultsRequest(symbol, limit);
-        var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        var callRequest = request;
+        var marketCall = await _markets.ResolveCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetApiSymbol(marketCall, out var apiSymbol, out var marketError))
         {
             return CreateCallError<NormalizedRequests.GetMatchResultsRequest, GetMatchResultsResponse>(
@@ -508,7 +514,7 @@ internal sealed class NormalizedPrivateApi
                 marketError!);
         }
 
-        var requestedLimit = limit ?? 1000;
+        var requestedLimit = request.Limit ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);
         var rawCall = await _trading
             .GetMatchResultsCallAsync(new RawPrivateRequests.GetMatchResultsRequest(Symbol: new Symbol(apiSymbol!), Size: appliedLimit), cancellationToken)

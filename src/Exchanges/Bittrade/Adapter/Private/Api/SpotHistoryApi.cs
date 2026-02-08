@@ -36,7 +36,11 @@ internal sealed class SpotHistoryApi
 
         try
         {
-            var call = await _trading.GetOpenOrdersCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
+            var call = await _trading
+                .GetOpenOrdersCallAsync(
+                    new ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.GetOpenOrdersRequest(request.Symbol),
+                    cancellationToken)
+                .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,
@@ -62,7 +66,9 @@ internal sealed class SpotHistoryApi
         try
         {
             var call = await _trading
-                .GetMatchResultsCallAsync(request.Symbol, request.Limit, cancellationToken)
+                .GetMatchResultsCallAsync(
+                    new ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.GetMatchResultsRequest(request.Symbol, request.Limit),
+                    cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,

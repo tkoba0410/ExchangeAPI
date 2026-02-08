@@ -113,8 +113,8 @@ internal sealed class NormalizedPrivateApi
             .GetDepositWithdrawCallAsync(new RawPrivateRequests.GetDepositWithdrawRequest(
                 new FreeText(request.Type.ToString()),
                 request.Currency.HasValue ? new FreeText(CurrencyCodeConverter.ToCurrencyString(request.Currency.Value)) : null,
-                request.From,
-                request.Size,
+                request.From?.Value,
+                request.Size?.Value,
                 request.Direct), cancellationToken)
             .ConfigureAwait(false);
 
@@ -543,9 +543,9 @@ internal sealed class NormalizedPrivateApi
 
         var rawRequest = new RawPrivateRequests.RawPostWithdrawApiCreateRequest(
             request.Address,
-            new FreeText(request.Amount.ToString(System.Globalization.CultureInfo.InvariantCulture)),
+            new FreeText(request.Amount.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),
             request.Currency,
-            request.Fee.HasValue ? new FreeText(request.Fee.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)) : null,
+            request.Fee.HasValue ? new FreeText(request.Fee.Value.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)) : null,
             request.AddressTag);
 
         var rawCall = await _trading
@@ -681,7 +681,7 @@ internal sealed class NormalizedPrivateApi
             Status: request.Status?.Value,
             StartTime: request.StartTime?.ToUnixTimeMilliseconds(),
             EndTime: request.EndTime?.ToUnixTimeMilliseconds(),
-            Size: request.Size);
+            Size: request.Size?.Value);
         var rawCall = await _trading
             .PostRetailOrderHistoryCallAsync(new RawPrivateRequests.PostRetailOrderHistoryRequest(body), cancellationToken)
             .ConfigureAwait(false);

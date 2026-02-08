@@ -12,8 +12,8 @@ public sealed record GetAccountsBalanceByAccountIdRequest(AccountId AccountId);
 public sealed record GetDepositWithdrawRequest(
     Closed<ExchangeDepositWithdrawType> Type,
     CurrencyCode? Currency = null,
-    long? From = null,
-    int? Size = null,
+    RequestFrom? From = null,
+    RequestSize? Size = null,
     FreeText? Direct = null);
 
 public sealed record GetWithdrawVirtualAddressesRequest;

@@ -43,16 +43,16 @@ public sealed record PostRetailOrderHistoryRequest(
     RetailOrderStatus? Status = null,
     DateTimeOffset? StartTime = null,
     DateTimeOffset? EndTime = null,
-    int? Size = null);
+    RequestSize? Size = null);
 
 public sealed record PostRetailOrderDetailRequest(OrderId OrderId);
 
 public sealed record RetailOrderRequest(
     Symbol Symbol,
-    int Type,
+    RetailOrderType Type,
     decimal? Price = null,
-    decimal? Amount = null,
-    decimal? CashAmount = null);
+    RetailOrderAmount? Amount = null,
+    RetailOrderAmount? CashAmount = null);
 
 public sealed record PostRetailOrderCreateRequest(RetailOrderRequest Request);
 
@@ -62,9 +62,9 @@ public sealed record PostRetailOrderCancelByOrderIdRequest(OrderId OrderId);
 
 public sealed record PostWithdrawApiCreateRequest(
     FreeText Address,
-    decimal Amount,
+    WithdrawAmount Amount,
     FreeText Currency,
-    decimal? Fee = null,
+    WithdrawFee? Fee = null,
     FreeText? AddressTag = null);
 
 public sealed record PostWithdrawVirtualByAddressIdCreateRequest(FreeText AddressId);

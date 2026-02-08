@@ -20,8 +20,8 @@ public static class NormalizedApiExtensions
         this IBittradeNormalizedApi api,
         Closed<ExchangeDepositWithdrawType> type,
         CurrencyCode? currency = null,
-        long? from = null,
-        int? size = null,
+        RequestFrom? from = null,
+        RequestSize? size = null,
         FreeText? direct = null,
         CancellationToken cancellationToken = default) =>
         api.GetDepositWithdrawCallAsync(
@@ -97,9 +97,9 @@ public static class NormalizedApiExtensions
     public static Task<Call<PostWithdrawApiCreateRequest, PostWithdrawApiCreateResponse>> PostWithdrawApiCreateCallAsync(
         this IBittradeNormalizedApi api,
         FreeText address,
-        decimal amount,
+        WithdrawAmount amount,
         FreeText currency,
-        decimal? fee = null,
+        WithdrawFee? fee = null,
         FreeText? addressTag = null,
         CancellationToken cancellationToken = default) =>
         api.PostWithdrawApiCreateCallAsync(
@@ -160,7 +160,7 @@ public static class NormalizedApiExtensions
         RetailOrderStatus? status = null,
         DateTimeOffset? startTime = null,
         DateTimeOffset? endTime = null,
-        int? size = null,
+        RequestSize? size = null,
         CancellationToken cancellationToken = default) =>
         api.PostRetailOrderHistoryCallAsync(
             new PostRetailOrderHistoryRequest(symbol, direct, status, startTime, endTime, size),

@@ -29,6 +29,9 @@
 - `P2-2` の追加対応として、残差分だった `GetMatchResultsRequest.Limit` / 
   `PostOrdersBatchCancelOpenOrdersRequest.Size` / `Public.GetHistoryKlineRequest.Size` を
   `RequestSize` / `Size` / `RequestSize` へ型昇格した。
+- `P2-3` の追加対応として、Bittrade Normalized の内部境界で `accountId` を `FreeText` ではなく
+  `AccountId` で受け渡すよう統一し、`NormalizedApi/NormalizedPrivateApi/NormalizedComponentFactory/ApiBundle`
+  間の配線を VO 境界へ揃えた。
 
 ---
 

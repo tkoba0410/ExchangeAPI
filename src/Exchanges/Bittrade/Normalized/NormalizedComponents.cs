@@ -8,12 +8,12 @@ internal sealed class NormalizedComponents
 {
     public NormalizedPublicApi Public { get; }
     public NormalizedPrivateApi Private { get; }
-    public FreeText AccountId { get; }
+    public AccountId AccountId { get; }
 
     public NormalizedComponents(
         NormalizedPublicApi publicApi,
         NormalizedPrivateApi privateApi,
-        FreeText accountId)
+        AccountId accountId)
     {
         Public = publicApi;
         Private = privateApi;

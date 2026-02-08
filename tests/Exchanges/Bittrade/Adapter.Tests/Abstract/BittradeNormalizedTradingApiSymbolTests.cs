@@ -48,7 +48,7 @@ public sealed class NormalizedTradingApiSymbolTests
     {
         raw ??= new ThrowingRawApi();
         var markets = new StubMarketResolver(productCode);
-        return new NormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
+        return new NormalizedPrivateApi(raw, markets, accountId: new AccountId("account"));
     }
 
     private sealed class ThrowingRawApi : RawApiStub

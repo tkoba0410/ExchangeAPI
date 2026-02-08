@@ -26,12 +26,12 @@ internal sealed class NormalizedPrivateApi
 {
     private readonly IBittradeRawApi _trading;
     private readonly IBittradeMarketResolver _markets;
-    private readonly FreeText _accountId;
+    private readonly AccountId _accountId;
 
     public NormalizedPrivateApi(
         IBittradeRawApi trading,
         IBittradeMarketResolver markets,
-        FreeText accountId)
+        AccountId accountId)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
@@ -47,9 +47,9 @@ internal sealed class NormalizedPrivateApi
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _trading
-            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountsBalanceByAccountIdRequest(new AccountId(_accountId.Value)), cancellationToken)
+            .GetAccountsBalanceByAccountIdCallAsync(new RawPrivateRequests.GetAccountsBalanceByAccountIdRequest(_accountId), cancellationToken)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetAccountsBalanceByAccountIdRequest(new AccountId(_accountId.Value));
+        var request = new NormalizedRequests.GetAccountsBalanceByAccountIdRequest(_accountId);
 
         return CreateCall(
             rawCall,
@@ -216,7 +216,7 @@ internal sealed class NormalizedPrivateApi
                 marketError!);
         }
 
-        if (!TradingMapper.TryToRaw(new AccountId(_accountId.Value), new Symbol(apiSymbol!), request.Request, out var rawRequest, out var mapError))
+        if (!TradingMapper.TryToRaw(_accountId, new Symbol(apiSymbol!), request.Request, out var rawRequest, out var mapError))
         {
             return CreateImmediateError<NormalizedRequests.PostOrdersPlaceRequest, PostOrdersPlaceResponse>(
                 callRequest,
@@ -345,7 +345,7 @@ internal sealed class NormalizedPrivateApi
         }
 
         var rawRequest = new RawPrivateRequests.RawPostOrdersBatchCancelOpenOrdersRequest(
-            AccountId: new AccountId(_accountId.Value),
+            AccountId: _accountId,
             Symbol: apiSymbol is null ? null : new Symbol(apiSymbol),
             Side: request.Side is null
                 ? null
@@ -388,7 +388,7 @@ internal sealed class NormalizedPrivateApi
         }
 
         var rawCall = await _trading
-            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(new Symbol(apiSymbol!), new AccountId(_accountId.Value)), cancellationToken)
+            .GetOpenOrdersCallAsync(new RawPrivateRequests.GetOpenOrdersRequest(new Symbol(apiSymbol!), _accountId), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(

@@ -50,7 +50,7 @@ public sealed class SpotHistoryApiTests
     private static SpotHistoryApi CreateApi(StubRawApi raw)
     {
         var markets = new StubMarketResolver("btcjpy");
-        var normalized = new NormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
+        var normalized = new NormalizedPrivateApi(raw, markets, accountId: new AccountId("account"));
         return new SpotHistoryApi(normalized);
     }
 

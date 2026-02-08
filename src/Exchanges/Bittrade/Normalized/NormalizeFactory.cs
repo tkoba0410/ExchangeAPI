@@ -11,7 +11,7 @@ internal static class NormalizeFactory
     public static NormalizedApi FromRaw(
         IBittradeRawApi raw,
         IBittradeMarketResolver markets,
-        FreeText accountId)
+        AccountId accountId)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
         if (markets is null) throw new ArgumentNullException(nameof(markets));

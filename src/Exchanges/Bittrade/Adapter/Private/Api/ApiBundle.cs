@@ -76,7 +76,7 @@ internal sealed class ApiBundle
                 var markets = new ExchangeInfoMarketResolver(exchangeInfoApi);
                 return new NormalizedMarketResolver(markets);
             },
-            FreeText.ParseOrThrow(normalizedAccountId.Value));
+            normalizedAccountId);
 
         var exchangeInfoFull = new BittradeExchangeInfoApi(components.Public);
         var marketsFull = new ExchangeInfoMarketResolver(exchangeInfoFull);

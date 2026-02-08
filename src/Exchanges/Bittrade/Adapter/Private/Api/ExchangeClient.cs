@@ -78,19 +78,6 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
 
-    internal ExchangeClient(
-        MarketApi marketApi,
-        TradingApi tradingApi,
-        AccountApi accountApi,
-        SpotHistoryApi historyApi,
-        BittradeExchangeInfoApi exchangeInfoApi,
-        IRestClient restClient,
-        string accountId)
-        : this(marketApi, tradingApi, accountApi, historyApi, exchangeInfoApi)
-    {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-    }
-
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         TickerRequest request,
         CancellationToken cancellationToken = default) =>

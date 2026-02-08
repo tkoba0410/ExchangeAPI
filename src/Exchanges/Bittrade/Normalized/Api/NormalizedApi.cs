@@ -21,12 +21,12 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
 {
     private readonly NormalizedPublicApi _publicApi;
     private readonly NormalizedPrivateApi _privateApi;
-    public FreeText AccountId { get; }
+    public AccountId AccountId { get; }
 
     private NormalizedApi(
         NormalizedPublicApi publicApi,
         NormalizedPrivateApi privateApi,
-        FreeText accountId)
+        AccountId accountId)
     {
         _publicApi = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
@@ -36,7 +36,7 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
     internal static NormalizedApi FromRaw(
         IBittradeRawApi raw,
         IBittradeMarketResolver markets,
-        FreeText accountId)
+        AccountId accountId)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
         if (markets is null) throw new ArgumentNullException(nameof(markets));

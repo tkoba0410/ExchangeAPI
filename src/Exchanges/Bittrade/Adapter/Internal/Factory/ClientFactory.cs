@@ -60,7 +60,7 @@ public static class ClientFactory
         var exchangeInfo = new BittradeExchangeInfoApi(normalizedPublic);
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var normalizedMarkets = new NormalizedMarketResolver(markets);
-        var normalizedPrivate = new NormalizedPrivateApi(raw, normalizedMarkets, FreeText.ParseOrThrow(normalizedAccountId.Value));
+        var normalizedPrivate = new NormalizedPrivateApi(raw, normalizedMarkets, normalizedAccountId);
         var trading = new TradingApi(normalizedPrivate);
         var account = new AccountApi(normalizedPrivate);
         return (new MarketApi(normalizedPublic, markets), trading, account, exchangeInfo);

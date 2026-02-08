@@ -12,7 +12,7 @@ internal static class NormalizedComponentFactory
     public static NormalizedComponents FromRaw(
         IBittradeRawApi raw,
         Func<NormalizedPublicApi, IBittradeMarketResolver> marketResolverFactory,
-        FreeText accountId)
+        AccountId accountId)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));
         if (marketResolverFactory is null) throw new ArgumentNullException(nameof(marketResolverFactory));

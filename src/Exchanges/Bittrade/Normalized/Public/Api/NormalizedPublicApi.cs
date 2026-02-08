@@ -25,7 +25,7 @@ internal sealed class NormalizedPublicApi
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<Call<NormalizedRequests.GetSymbolsRequest, IReadOnlyList<SymbolNormalized>>> GetSymbolsCallAsync(
+    public async Task<Call<NormalizedRequests.GetSymbolsRequest, GetSymbolsResponse>> GetSymbolsCallAsync(
         CancellationToken ct = default)
     {
         var rawCall = await _raw
@@ -41,25 +41,25 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TryRequireOk(ok.Status, "symbols", out var error))
                 {
-                    return MapResult<IReadOnlyList<SymbolNormalized>>.Fail(error);
+                    return MapResult<GetSymbolsResponse>.Fail(error);
                 }
 
                 if (ok.Data is null)
                 {
-                    return MapResult<IReadOnlyList<SymbolNormalized>>.Fail(
+                    return MapResult<GetSymbolsResponse>.Fail(
                         new CallError(CallErrorKind.Mapping, "Bittrade symbols response invalid."));
                 }
 
                 if (!Normalizer.TryNormalizeSymbols(ok.Data, out var symbols, out var normalizeError))
                 {
-                    return MapResult<IReadOnlyList<SymbolNormalized>>.Fail(normalizeError!);
+                    return MapResult<GetSymbolsResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<IReadOnlyList<SymbolNormalized>>.Ok(symbols!);
+                return MapResult<GetSymbolsResponse>.Ok(new GetSymbolsResponse(symbols!));
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetCurrencysRequest, IReadOnlyList<CurrencyCode>>> GetCurrencysCallAsync(
+    public async Task<Call<NormalizedRequests.GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
         CancellationToken ct = default)
     {
         var rawCall = await _raw
@@ -67,7 +67,7 @@ internal sealed class NormalizedPublicApi
             .ConfigureAwait(false);
         var request = new NormalizedRequests.GetCurrencysRequest();
 
-        return CreateCall<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse, NormalizedRequests.GetCurrencysRequest, IReadOnlyList<CurrencyCode>>(
+        return CreateCall<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse, NormalizedRequests.GetCurrencysRequest, GetCurrencysResponse>(
             rawCall,
             request,
             Component(EndpointIds.GetCurrencys),
@@ -75,12 +75,12 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TryRequireOk(ok.Status, "currencys", out var error))
                 {
-                    return MapResult<IReadOnlyList<CurrencyCode>>.Fail(error);
+                    return MapResult<GetCurrencysResponse>.Fail(error);
                 }
 
                 if (ok.Data is null)
                 {
-                    return MapResult<IReadOnlyList<CurrencyCode>>.Ok(Array.Empty<CurrencyCode>());
+                    return MapResult<GetCurrencysResponse>.Ok(new GetCurrencysResponse(Array.Empty<CurrencyCode>()));
                 }
                 var codes = new List<CurrencyCode>(ok.Data.Count);
                 foreach (var code in ok.Data)
@@ -88,11 +88,11 @@ internal sealed class NormalizedPublicApi
                     codes.Add(CurrencyCodeConverter.FromString(code));
                 }
 
-                return MapResult<IReadOnlyList<CurrencyCode>>.Ok(codes);
+                return MapResult<GetCurrencysResponse>.Ok(new GetCurrencysResponse(codes));
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetTimestampRequest, DateTimeOffset>> GetTimestampCallAsync(
+    public async Task<Call<NormalizedRequests.GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(
         CancellationToken ct = default)
     {
         var rawCall = await _raw
@@ -108,14 +108,14 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TryRequireOk(ok.Status, "timestamp", out var error))
                 {
-                    return MapResult<DateTimeOffset>.Fail(error);
+                    return MapResult<GetTimestampResponse>.Fail(error);
                 }
 
-                return MapResult<DateTimeOffset>.Ok(ok.Data);
+                return MapResult<GetTimestampResponse>.Ok(new GetTimestampResponse(ok.Data));
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetDetailMergedRequest, TickerNormalized>> GetDetailMergedCallAsync(
+    public async Task<Call<NormalizedRequests.GetDetailMergedRequest, GetDetailMergedResponse>> GetDetailMergedCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
@@ -123,7 +123,7 @@ internal sealed class NormalizedPublicApi
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
-            return CreateCallError<NormalizedRequests.GetDetailMergedRequest, TickerNormalized>(
+            return CreateCallError<NormalizedRequests.GetDetailMergedRequest, GetDetailMergedResponse>(
                 request,
                 Component(EndpointIds.GetDetailMerged),
                 error!,
@@ -142,19 +142,19 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TryRequireOk(ok.Status, "ticker", out var error))
                 {
-                    return MapResult<TickerNormalized>.Fail(error);
+                    return MapResult<GetDetailMergedResponse>.Fail(error);
                 }
 
                 if (!Normalizer.TryNormalizeTicker(ok, rawCall.Meta.RawJson, out var ticker, out var normalizeError))
                 {
-                    return MapResult<TickerNormalized>.Fail(normalizeError!);
+                    return MapResult<GetDetailMergedResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<TickerNormalized>.Ok(ticker!);
+                return MapResult<GetDetailMergedResponse>.Ok(new GetDetailMergedResponse(ticker!));
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetDepthRequest, OrderBookNormalized>> GetDepthCallAsync(
+    public async Task<Call<NormalizedRequests.GetDepthRequest, GetDepthResponse>> GetDepthCallAsync(
         ProductCode productCode,
         DepthType? depthType = null,
         CancellationToken ct = default)
@@ -164,7 +164,7 @@ internal sealed class NormalizedPublicApi
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
-            return CreateCallError<NormalizedRequests.GetDepthRequest, OrderBookNormalized>(
+            return CreateCallError<NormalizedRequests.GetDepthRequest, GetDepthResponse>(
                 request,
                 Component(EndpointIds.GetDepth),
                 error!,
@@ -173,7 +173,7 @@ internal sealed class NormalizedPublicApi
 
         if (!TryGetRawDepthType(normalizedDepthType, out var rawDepth, out var depthError))
         {
-            return CreateCallError<NormalizedRequests.GetDepthRequest, OrderBookNormalized>(
+            return CreateCallError<NormalizedRequests.GetDepthRequest, GetDepthResponse>(
                 request,
                 Component(EndpointIds.GetDepth),
                 depthError!,
@@ -194,19 +194,19 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TryRequireOk(ok.Status, "orderbook", out var error))
                 {
-                    return MapResult<OrderBookNormalized>.Fail(error);
+                    return MapResult<GetDepthResponse>.Fail(error);
                 }
 
                 if (!Normalizer.TryNormalizeOrderBook(ok.Tick!, out var orderBook, out var normalizeError))
                 {
-                    return MapResult<OrderBookNormalized>.Fail(normalizeError!);
+                    return MapResult<GetDepthResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<OrderBookNormalized>.Ok(orderBook!);
+                return MapResult<GetDepthResponse>.Ok(new GetDepthResponse(orderBook!));
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetTradeRequest, IReadOnlyList<ExecutionNormalized>>> GetTradeCallAsync(
+    public async Task<Call<NormalizedRequests.GetTradeRequest, GetTradeResponse>> GetTradeCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
@@ -214,7 +214,7 @@ internal sealed class NormalizedPublicApi
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
-            return CreateCallError<NormalizedRequests.GetTradeRequest, IReadOnlyList<ExecutionNormalized>>(
+            return CreateCallError<NormalizedRequests.GetTradeRequest, GetTradeResponse>(
                 request,
                 Component(EndpointIds.GetTrade),
                 error!,
@@ -233,20 +233,20 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TryRequireOk(ok.Status, "trades", out var error))
                 {
-                    return MapResult<IReadOnlyList<ExecutionNormalized>>.Fail(error);
+                    return MapResult<GetTradeResponse>.Fail(error);
                 }
 
                 var entries = ok.Tick?.Data;
                 if (!Normalizer.TryNormalizeExecutions(entries!, rawCall.Meta.RawJson, out var executions, out var normalizeError))
                 {
-                    return MapResult<IReadOnlyList<ExecutionNormalized>>.Fail(normalizeError!);
+                    return MapResult<GetTradeResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<IReadOnlyList<ExecutionNormalized>>.Ok(executions!);
+                return MapResult<GetTradeResponse>.Ok(new GetTradeResponse(executions!));
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetHistoryKlineRequest, IReadOnlyList<KlineNormalized>>> GetHistoryKlineCallAsync(
+    public async Task<Call<NormalizedRequests.GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
         ProductCode productCode,
         Period period,
         int? size = null,
@@ -256,7 +256,7 @@ internal sealed class NormalizedPublicApi
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
-            return CreateCallError<NormalizedRequests.GetHistoryKlineRequest, IReadOnlyList<KlineNormalized>>(
+            return CreateCallError<NormalizedRequests.GetHistoryKlineRequest, GetHistoryKlineResponse>(
                 request,
                 Component(EndpointIds.GetHistoryKline),
                 error!,
@@ -275,19 +275,19 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TryRequireOk(ok.Status, "klines", out var error))
                 {
-                    return MapResult<IReadOnlyList<KlineNormalized>>.Fail(error);
+                    return MapResult<GetHistoryKlineResponse>.Fail(error);
                 }
 
                 if (!Normalizer.TryNormalizeKlines(ok.Data, out var klines, out var normalizeError))
                 {
-                    return MapResult<IReadOnlyList<KlineNormalized>>.Fail(normalizeError!);
+                    return MapResult<GetHistoryKlineResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<IReadOnlyList<KlineNormalized>>.Ok(klines!);
+                return MapResult<GetHistoryKlineResponse>.Ok(new GetHistoryKlineResponse(klines!));
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetTickersRequest, IReadOnlyList<TickerEntryNormalized>>> GetTickersCallAsync(
+    public async Task<Call<NormalizedRequests.GetTickersRequest, GetTickersResponse>> GetTickersCallAsync(
         CancellationToken ct = default)
     {
         var request = new NormalizedRequests.GetTickersRequest();
@@ -301,19 +301,19 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TryRequireOk(ok.Status, "tickers", out var error))
                 {
-                    return MapResult<IReadOnlyList<TickerEntryNormalized>>.Fail(error);
+                    return MapResult<GetTickersResponse>.Fail(error);
                 }
 
                 if (!Normalizer.TryNormalizeTickers(ok.Data, out var tickers, out var normalizeError))
                 {
-                    return MapResult<IReadOnlyList<TickerEntryNormalized>>.Fail(normalizeError!);
+                    return MapResult<GetTickersResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<IReadOnlyList<TickerEntryNormalized>>.Ok(tickers!);
+                return MapResult<GetTickersResponse>.Ok(new GetTickersResponse(tickers!));
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetHistoryTradeRequest, IReadOnlyList<ExecutionNormalized>>> GetHistoryTradeCallAsync(
+    public async Task<Call<NormalizedRequests.GetHistoryTradeRequest, GetHistoryTradeResponse>> GetHistoryTradeCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
@@ -321,7 +321,7 @@ internal sealed class NormalizedPublicApi
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
         {
-            return CreateCallError<NormalizedRequests.GetHistoryTradeRequest, IReadOnlyList<ExecutionNormalized>>(
+            return CreateCallError<NormalizedRequests.GetHistoryTradeRequest, GetHistoryTradeResponse>(
                 request,
                 Component(EndpointIds.GetHistoryTrade),
                 error!,
@@ -340,15 +340,15 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TryRequireOk(ok.Status, "history trades", out var error))
                 {
-                    return MapResult<IReadOnlyList<ExecutionNormalized>>.Fail(error);
+                    return MapResult<GetHistoryTradeResponse>.Fail(error);
                 }
 
                 if (!Normalizer.TryNormalizeTradeHistory(ok.Data, out var history, out var normalizeError))
                 {
-                    return MapResult<IReadOnlyList<ExecutionNormalized>>.Fail(normalizeError!);
+                    return MapResult<GetHistoryTradeResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<IReadOnlyList<ExecutionNormalized>>.Ok(history!);
+                return MapResult<GetHistoryTradeResponse>.Ok(new GetHistoryTradeResponse(history!));
             });
     }
 

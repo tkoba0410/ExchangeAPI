@@ -17,7 +17,7 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
-using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests.GetSymbolsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.SymbolNormalized>>;
+using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests.GetSymbolsRequest, ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.GetSymbolsResponse>;
 
 namespace ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 
@@ -169,12 +169,12 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         if (_getSymbols is null) return null;
 
         var symbolsCall = await _getSymbols(cancellationToken).ConfigureAwait(false);
-        if (symbolsCall.Result is CallResult<IReadOnlyList<SymbolNormalized>>.Err)
+        if (symbolsCall.Result is CallResult<GetSymbolsResponse>.Err)
         {
             return null;
         }
 
-        var symbols = ((CallResult<IReadOnlyList<SymbolNormalized>>.Ok)symbolsCall.Result).Response;
+        var symbols = ((CallResult<GetSymbolsResponse>.Ok)symbolsCall.Result).Response.Items;
         var markets = symbols.Select(MapDynamicMarket).ToList();
         return new BittradeDynamicExchangeInfo { Markets = markets };
     }

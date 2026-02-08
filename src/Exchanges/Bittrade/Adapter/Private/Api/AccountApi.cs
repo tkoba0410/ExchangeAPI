@@ -48,7 +48,7 @@ internal sealed class AccountApi
                 request,
                 call,
                 Operations.Account.GetBalance,
-                ok => new BalanceResponse(Mapper.MapBalances(ok)));
+                ok => new BalanceResponse(Mapper.MapBalances(ok.Items)));
         }
         catch (Exception ex)
         {

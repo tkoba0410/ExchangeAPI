@@ -71,7 +71,7 @@ internal sealed class MarketApi
                 request,
                 call,
                 Operations.MarketData.GetTicker,
-                ok => MarketMapper.MapTicker(symbol, ok));
+                ok => MarketMapper.MapTicker(symbol, ok.Item));
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
@@ -116,7 +116,7 @@ internal sealed class MarketApi
                 request,
                 call,
                 Operations.MarketData.GetBoard,
-                MarketMapper.MapOrderBook);
+                ok => MarketMapper.MapOrderBook(ok.Item));
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
@@ -161,7 +161,7 @@ internal sealed class MarketApi
                 request,
                 call,
                 Operations.MarketData.GetExecutions,
-                ok => new ExecutionsPublicResponse(ToExecutionList(symbol, ok)));
+                ok => new ExecutionsPublicResponse(ToExecutionList(symbol, ok.Items)));
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
@@ -229,7 +229,7 @@ internal sealed class MarketApi
                 request,
                 call,
                 Operations.MarketData.GetCandlesticks,
-                ok => new CandlesticksResponse(MarketMapper.MapCandlesticks(symbol, period, ok)));
+                ok => new CandlesticksResponse(MarketMapper.MapCandlesticks(symbol, period, ok.Items)));
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {

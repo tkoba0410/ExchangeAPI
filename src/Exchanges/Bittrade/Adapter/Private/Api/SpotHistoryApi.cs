@@ -41,7 +41,7 @@ internal sealed class SpotHistoryApi
                 request,
                 call,
                 Operations.History.GetOrders,
-                ok => BuildOrderResponse(request, ok));
+                ok => BuildOrderResponse(request, ok.Items));
         }
         catch (Exception ex)
         {
@@ -68,7 +68,7 @@ internal sealed class SpotHistoryApi
                 request,
                 call,
                 Operations.History.GetExecutions,
-                ok => BuildExecutionResponse(request, ok));
+                ok => BuildExecutionResponse(request, ok.Items));
         }
         catch (Exception ex)
         {

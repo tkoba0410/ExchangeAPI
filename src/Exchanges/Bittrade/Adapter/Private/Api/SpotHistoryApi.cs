@@ -83,9 +83,10 @@ internal sealed class SpotHistoryApi
 
         try
         {
+            var requestLimit = request.Limit.HasValue ? new RequestSize(request.Limit.Value) : (RequestSize?)null;
             var call = await _trading
                 .GetMatchResultsCallAsync(
-                    new ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.GetMatchResultsRequest(request.Symbol, request.Limit),
+                    new ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.GetMatchResultsRequest(request.Symbol, requestLimit),
                     cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(

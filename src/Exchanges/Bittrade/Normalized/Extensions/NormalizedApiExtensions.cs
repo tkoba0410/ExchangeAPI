@@ -58,7 +58,7 @@ public static class NormalizedApiExtensions
         this IBittradeNormalizedApi api,
         Symbol? symbol = null,
         Side? side = null,
-        decimal? size = null,
+        Size? size = null,
         decimal? price = null,
         DateTimeOffset? createdAt = null,
         CancellationToken cancellationToken = default) =>
@@ -90,7 +90,7 @@ public static class NormalizedApiExtensions
     public static Task<Call<GetMatchResultsRequest, GetMatchResultsResponse>> GetMatchResultsCallAsync(
         this IBittradeNormalizedApi api,
         Symbol symbol,
-        int? limit = null,
+        RequestSize? limit = null,
         CancellationToken cancellationToken = default) =>
         api.GetMatchResultsCallAsync(new GetMatchResultsRequest(symbol, limit), cancellationToken);
 

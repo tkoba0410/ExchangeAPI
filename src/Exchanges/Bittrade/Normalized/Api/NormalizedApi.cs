@@ -87,7 +87,7 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
     public Task<Call<GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
         ProductCode productCode,
         Period period,
-        int? size = null,
+        RequestSize? size = null,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetHistoryKlineCallAsync(productCode, period, size, cancellationToken);
 

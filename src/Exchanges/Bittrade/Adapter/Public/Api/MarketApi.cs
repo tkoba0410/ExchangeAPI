@@ -15,6 +15,7 @@ using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
@@ -225,8 +226,9 @@ internal sealed class MarketApi
             }
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+            var requestSize = size.HasValue ? new RequestSize(size.Value) : (RequestSize?)null;
             var call = await _marketData
-                .GetHistoryKlineCallAsync(productCode, new Period(period.Code), size, cancellationToken)
+                .GetHistoryKlineCallAsync(productCode, new Period(period.Code), requestSize, cancellationToken)
                 .ConfigureAwait(false);
 
             return ApiCallMapper.MapCall(

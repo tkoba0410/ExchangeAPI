@@ -26,6 +26,9 @@
 - `P2-2` の追加対応として、Bittrade Normalized の request で `type/amount/fee/from/size` を
   `RetailOrderType` / `RetailOrderAmount` / `WithdrawAmount` / `WithdrawFee` / `RequestFrom` / `RequestSize`
   に型昇格し、Raw 直前でのみプリミティブへ変換する形に変更した。
+- `P2-2` の追加対応として、残差分だった `GetMatchResultsRequest.Limit` / 
+  `PostOrdersBatchCancelOpenOrdersRequest.Size` / `Public.GetHistoryKlineRequest.Size` を
+  `RequestSize` / `Size` / `RequestSize` へ型昇格した。
 
 ---
 

@@ -17,7 +17,7 @@ public sealed record PostOrdersBatchCancelRequest(IReadOnlyList<OrderId> OrderId
 public sealed record PostOrdersBatchCancelOpenOrdersRequest(
     Symbol? Symbol = null,
     Side? Side = null,
-    decimal? Size = null,
+    Size? Size = null,
     decimal? Price = null,
     DateTimeOffset? CreatedAt = null);
 
@@ -27,7 +27,7 @@ public sealed record GetOrdersByOrderIdRequest(Symbol Symbol, OrderKey OrderKey)
 
 public sealed record GetOrdersMatchResultsByOrderIdRequest(OrderKey OrderKey);
 
-public sealed record GetMatchResultsRequest(Symbol Symbol, int? Limit = null);
+public sealed record GetMatchResultsRequest(Symbol Symbol, RequestSize? Limit = null);
 
 public sealed record GetRetailOrderListRequest(
     RetailOrderDirection Direct,

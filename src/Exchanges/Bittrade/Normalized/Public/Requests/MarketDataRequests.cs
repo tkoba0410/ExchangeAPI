@@ -9,7 +9,7 @@ public sealed record GetDepthRequest(ProductCode ProductCode, DepthType? DepthTy
 
 public sealed record GetTradeRequest(ProductCode ProductCode);
 
-public sealed record GetHistoryKlineRequest(ProductCode ProductCode, Period Period, int? Size = null);
+public sealed record GetHistoryKlineRequest(ProductCode ProductCode, Period Period, RequestSize? Size = null);
 
 public sealed record GetTickersRequest;
 

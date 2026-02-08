@@ -40,7 +40,7 @@ public interface IBittradeNormalizedApi
     Task<Call<GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
         ProductCode productCode,
         Period period,
-        int? size = null,
+        RequestSize? size = null,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetTickersRequest, GetTickersResponse>> GetTickersCallAsync(

@@ -351,7 +351,7 @@ internal sealed class NormalizedPrivateApi
                 ? null
                 : new FreeText(request.Side.Value == Side.Buy ? "buy" : "sell"),
             Size: request.Size.HasValue
-                ? new FreeText(request.Size.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))
+                ? new FreeText(request.Size.Value.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))
                 : null,
             Price: request.Price.HasValue
                 ? new FreeText(request.Price.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))
@@ -514,7 +514,7 @@ internal sealed class NormalizedPrivateApi
                 marketError!);
         }
 
-        var requestedLimit = request.Limit ?? 1000;
+        var requestedLimit = request.Limit?.Value ?? 1000;
         var appliedLimit = Math.Min(requestedLimit, 1000);
         var rawCall = await _trading
             .GetMatchResultsCallAsync(new RawPrivateRequests.GetMatchResultsRequest(Symbol: new Symbol(apiSymbol!), Size: appliedLimit), cancellationToken)

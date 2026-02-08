@@ -120,7 +120,7 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         BalanceRequest request,
         CancellationToken cancellationToken = default) =>
-        _accountApi.GetBalanceAsync(cancellationToken);
+        _accountApi.GetBalanceAsync(request, cancellationToken);
 
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         OrderLimitRequest request,

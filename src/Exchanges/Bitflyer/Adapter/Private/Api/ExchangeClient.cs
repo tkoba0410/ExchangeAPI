@@ -312,7 +312,7 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         BalanceRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetBalanceAsync(cancellationToken);
+        _privateApi.GetBalanceAsync(request, cancellationToken);
 
     // SpotHistory
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(

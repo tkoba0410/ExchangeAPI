@@ -30,9 +30,10 @@ internal sealed class PrivateApi
     }
 
     public async Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
+        BalanceRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new BalanceRequest();
+        if (request is null) throw new ArgumentNullException(nameof(request));
         var startedAt = DateTimeOffset.UtcNow;
 
         try

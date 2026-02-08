@@ -32,13 +32,15 @@ internal sealed class AccountApi
     }
 
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
+        BalanceRequest request,
         CancellationToken cancellationToken = default) =>
-        GetAccountsBalanceByAccountIdCallAsync(cancellationToken);
+        GetAccountsBalanceByAccountIdCallAsync(request, cancellationToken);
 
     public async Task<Call<BalanceRequest, BalanceResponse>> GetAccountsBalanceByAccountIdCallAsync(
+        BalanceRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new BalanceRequest();
+        if (request is null) throw new ArgumentNullException(nameof(request));
         var startedAt = DateTimeOffset.UtcNow;
 
         try

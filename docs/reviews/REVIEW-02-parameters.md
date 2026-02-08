@@ -13,6 +13,8 @@
 - `Adapter` 側の呼び出し（`TradingApi` / `SpotHistoryApi`）も DTO 生成経由に追従した。
 - `P1-3` について、`OrdersRequest.Cursor` / `ExecutionsPrivateRequest.Cursor` が指定された場合は
   `Bittrade/Bitflyer Adapter.Private` で `NotSupported` を明示的に返すガードを追加した（黙殺を解消）。
+- `P1-2` について、`BalanceRequest` を受ける公開メソッドで request 未使用だった経路を修正し、
+  `ExchangeClient -> Private/Account API` で request を受け渡す形に揃えた。
 
 ---
 

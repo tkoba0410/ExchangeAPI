@@ -66,7 +66,7 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
                 request,
                 call,
                 Operations.MarketData.GetTicker,
-                ok => MarketMapper.MapTicker(symbol, ok));
+                ok => MarketMapper.MapTicker(symbol, ok.Item));
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
@@ -111,7 +111,7 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
                 request,
                 call,
                 Operations.MarketData.GetBoard,
-                MarketMapper.MapOrderBook);
+                ok => MarketMapper.MapOrderBook(ok.Item));
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
@@ -194,10 +194,10 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
 
     private static IReadOnlyList<ExecutionsPublicItem> ToExecutionList(
         Symbol symbol,
-        IReadOnlyList<ExecutionNormalized> executions)
+        GetExecutionsPublicResponse executions)
     {
-        IReadOnlyList<ExecutionsPublicItem> mapped = executions
-            .Select(e => MarketMapper.MapExecution(symbol, e))
+        IReadOnlyList<ExecutionsPublicItem> mapped = executions.Items
+            .Select(e => MarketMapper.MapExecution(symbol, e.Value))
             .ToArray();
         return mapped;
     }

@@ -34,7 +34,7 @@ internal sealed class NormalizedPrivateApi
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public async Task<Call<PrivateRequests.SendChildOrderRequest, OrderResult>> SendChildOrderCallAsync(
+    public async Task<Call<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>> SendChildOrderCallAsync(
         OrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -42,7 +42,7 @@ internal sealed class NormalizedPrivateApi
 
         if (!TradingMapper.TryValidateOrderRequest(request, out var validationError))
         {
-            return CreateImmediateError<PrivateRequests.SendChildOrderRequest, OrderResult>(
+            return CreateImmediateError<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>(
                 new PrivateRequests.SendChildOrderRequest(request),
                 "Bitflyer.CreateChildOrder",
                 validationError!);
@@ -52,7 +52,7 @@ internal sealed class NormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetProductCode(marketCall, out var productCode, out var marketError))
         {
-            return CreateCallError<PrivateRequests.SendChildOrderRequest, OrderResult>(
+            return CreateCallError<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>(
                 marketCall,
                 callRequest,
                 "Bitflyer.CreateChildOrder",
@@ -61,7 +61,7 @@ internal sealed class NormalizedPrivateApi
 
         if (!TradingMapper.TryMapOrderType(request.OrderType, request.Price, out var childOrderType, out var orderTypeError))
         {
-            return CreateImmediateError<PrivateRequests.SendChildOrderRequest, OrderResult>(
+            return CreateImmediateError<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>(
                 callRequest,
                 "Bitflyer.CreateChildOrder",
                 orderTypeError!);
@@ -69,7 +69,7 @@ internal sealed class NormalizedPrivateApi
 
         if (!CommonMapper.TryMapSideToExchange(request.Side, out var apiSide, out var sideError))
         {
-            return CreateImmediateError<PrivateRequests.SendChildOrderRequest, OrderResult>(
+            return CreateImmediateError<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>(
                 callRequest,
                 "Bitflyer.CreateChildOrder",
                 sideError!);
@@ -77,7 +77,7 @@ internal sealed class NormalizedPrivateApi
 
         if (!TradingMapper.TryToApiChildOrderType(childOrderType, out var apiChildOrderType, out var childOrderError))
         {
-            return CreateImmediateError<PrivateRequests.SendChildOrderRequest, OrderResult>(
+            return CreateImmediateError<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>(
                 callRequest,
                 "Bitflyer.CreateChildOrder",
                 childOrderError!);
@@ -100,13 +100,13 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             callRequest,
             "Bitflyer.CreateChildOrder",
-            ok => MapResult<OrderResult>.Ok(
-                new OrderResult(
+            ok => MapResult<SendChildOrderResponse>.Ok(
+                new SendChildOrderResponse(new OrderResult(
                     new OrderKey(OrderIdKind.AcceptanceId, ok.ChildOrderAcceptanceId),
-                    AcceptanceId: new AcceptanceId(ok.ChildOrderAcceptanceId))));
+                    AcceptanceId: new AcceptanceId(ok.ChildOrderAcceptanceId)))));
     }
 
-    public async Task<Call<PrivateRequests.CancelChildOrderRequest, CancelResult>> CancelChildOrderCallAsync(
+    public async Task<Call<PrivateRequests.CancelChildOrderRequest, CancelChildOrderResponse>> CancelChildOrderCallAsync(
         Symbol symbol,
         OrderKey orderKey,
         CancellationToken cancellationToken = default)
@@ -114,7 +114,7 @@ internal sealed class NormalizedPrivateApi
         var callRequest = new PrivateRequests.CancelChildOrderRequest(symbol, orderKey);
         if (symbol.IsEmpty)
         {
-            return CreateImmediateError<PrivateRequests.CancelChildOrderRequest, CancelResult>(
+            return CreateImmediateError<PrivateRequests.CancelChildOrderRequest, CancelChildOrderResponse>(
                 callRequest,
                 Component(EndpointIds.CancelChildOrder),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
@@ -123,7 +123,7 @@ internal sealed class NormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetProductCode(marketCall, out var productCode, out var marketError))
         {
-            return CreateCallError<PrivateRequests.CancelChildOrderRequest, CancelResult>(
+            return CreateCallError<PrivateRequests.CancelChildOrderRequest, CancelChildOrderResponse>(
                 marketCall,
                 callRequest,
                 Component(EndpointIds.CancelChildOrder),
@@ -148,7 +148,7 @@ internal sealed class NormalizedPrivateApi
                 };
                 break;
             default:
-                return CreateNotSupported<PrivateRequests.CancelChildOrderRequest, CancelResult>(
+                return CreateNotSupported<PrivateRequests.CancelChildOrderRequest, CancelChildOrderResponse>(
                     callRequest,
                     component: "Bitflyer.Trading",
                     feature: "CancelOrder",
@@ -164,17 +164,17 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             callRequest,
             Component(EndpointIds.CancelChildOrder),
-            _ => MapResult<CancelResult>.Ok(new CancelResult(true)));
+            _ => MapResult<CancelChildOrderResponse>.Ok(new CancelChildOrderResponse(new CancelResult(true))));
     }
 
-    public async Task<Call<PrivateRequests.CancelAllChildOrdersRequest, CancelResult>> CancelAllChildOrdersCallAsync(
+    public async Task<Call<PrivateRequests.CancelAllChildOrdersRequest, CancelAllChildOrdersResponse>> CancelAllChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
         var callRequest = new PrivateRequests.CancelAllChildOrdersRequest(symbol);
         if (symbol.IsEmpty)
         {
-            return CreateImmediateError<PrivateRequests.CancelAllChildOrdersRequest, CancelResult>(
+            return CreateImmediateError<PrivateRequests.CancelAllChildOrdersRequest, CancelAllChildOrdersResponse>(
                 callRequest,
                 Component(EndpointIds.CancelAllChildOrders),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
@@ -183,7 +183,7 @@ internal sealed class NormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetProductCode(marketCall, out var productCode, out var marketError))
         {
-            return CreateCallError<PrivateRequests.CancelAllChildOrdersRequest, CancelResult>(
+            return CreateCallError<PrivateRequests.CancelAllChildOrdersRequest, CancelAllChildOrdersResponse>(
                 marketCall,
                 callRequest,
                 Component(EndpointIds.CancelAllChildOrders),
@@ -198,17 +198,17 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             callRequest,
             Component(EndpointIds.CancelAllChildOrders),
-            _ => MapResult<CancelResult>.Ok(new CancelResult(true)));
+            _ => MapResult<CancelAllChildOrdersResponse>.Ok(new CancelAllChildOrdersResponse(new CancelResult(true))));
     }
 
-    public async Task<Call<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrder>>> GetChildOrdersCallAsync(
+    public async Task<Call<PrivateRequests.GetChildOrdersRequest, GetChildOrdersResponse>> GetChildOrdersCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
         var callRequest = new PrivateRequests.GetChildOrdersRequest(symbol);
         if (symbol.IsEmpty)
         {
-            return CreateImmediateError<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrder>>(
+            return CreateImmediateError<PrivateRequests.GetChildOrdersRequest, GetChildOrdersResponse>(
                 callRequest,
                 Component(EndpointIds.GetChildOrders),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
@@ -217,7 +217,7 @@ internal sealed class NormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (!TryGetProductCode(marketCall, out var productCode, out var marketError))
         {
-            return CreateCallError<PrivateRequests.GetChildOrdersRequest, IReadOnlyList<OpenOrder>>(
+            return CreateCallError<PrivateRequests.GetChildOrdersRequest, GetChildOrdersResponse>(
                 marketCall,
                 callRequest,
                 "Bitflyer.GetOpenOrders",
@@ -250,7 +250,7 @@ internal sealed class NormalizedPrivateApi
                         : (ExchangeOrderId?)null;
                     if (acceptanceId is null && exchangeOrderId is null)
                     {
-                        return MapResult<IReadOnlyList<OpenOrder>>.Fail(
+                            return MapResult<GetChildOrdersResponse>.Fail(
                             new CallError(CallErrorKind.Mapping, "bitFlyer order is missing both acceptanceId and exchangeOrderId."));
                     }
 
@@ -260,17 +260,17 @@ internal sealed class NormalizedPrivateApi
 
                     if (!CommonMapper.TryMapSide(o.Side, out var side, out var sideError))
                     {
-                        return MapResult<IReadOnlyList<OpenOrder>>.Fail(sideError!);
+                        return MapResult<GetChildOrdersResponse>.Fail(sideError!);
                     }
 
                     if (!TradingMapper.TryParseChildOrderType(o.ChildOrderType, out var parsedOrderType, out var orderTypeError))
                     {
-                        return MapResult<IReadOnlyList<OpenOrder>>.Fail(orderTypeError!);
+                        return MapResult<GetChildOrdersResponse>.Fail(orderTypeError!);
                     }
 
                     if (!TradingMapper.TryToOrderType(parsedOrderType, out var mappedOrderType, out var mapError))
                     {
-                        return MapResult<IReadOnlyList<OpenOrder>>.Fail(mapError!);
+                        return MapResult<GetChildOrdersResponse>.Fail(mapError!);
                     }
 
                     mapped.Add(new OpenOrder(
@@ -290,7 +290,8 @@ internal sealed class NormalizedPrivateApi
                         AcceptanceId: acceptanceId));
                 }
 
-                return MapResult<IReadOnlyList<OpenOrder>>.Ok(mapped.ToArray());
+                return MapResult<GetChildOrdersResponse>.Ok(
+                    new GetChildOrdersResponse(mapped.Select(static x => new GetChildOrdersItem(x)).ToArray()));
             });
     }
 
@@ -374,7 +375,7 @@ internal sealed class NormalizedPrivateApi
             });
     }
 
-    public async Task<Call<PrivateRequests.SendParentOrderRequest, ParentOrderAcceptance>> SendParentOrderCallAsync(
+    public async Task<Call<PrivateRequests.SendParentOrderRequest, SendParentOrderResponse>> SendParentOrderCallAsync(
         PrivateRequests.SendParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -386,7 +387,7 @@ internal sealed class NormalizedPrivateApi
         {
             if (!ParentOrderMapper.TryToApiConditionType(p.ConditionType, out var conditionType, out var conditionError))
             {
-                return CreateImmediateError<PrivateRequests.SendParentOrderRequest, ParentOrderAcceptance>(
+                return CreateImmediateError<PrivateRequests.SendParentOrderRequest, SendParentOrderResponse>(
                     callRequest,
                     "Bitflyer.CreateParentOrder",
                     conditionError!);
@@ -394,7 +395,7 @@ internal sealed class NormalizedPrivateApi
 
             if (!SideMapper.TryToApi(p.Side, out var side, out var sideError))
             {
-                return CreateImmediateError<PrivateRequests.SendParentOrderRequest, ParentOrderAcceptance>(
+                return CreateImmediateError<PrivateRequests.SendParentOrderRequest, SendParentOrderResponse>(
                     callRequest,
                     "Bitflyer.CreateParentOrder",
                     sideError!);
@@ -417,7 +418,7 @@ internal sealed class NormalizedPrivateApi
         {
             if (!ParentOrderMapper.TryToApiOrderMethod(request.OrderMethod.Value, out var method, out var methodError))
             {
-                return CreateImmediateError<PrivateRequests.SendParentOrderRequest, ParentOrderAcceptance>(
+                return CreateImmediateError<PrivateRequests.SendParentOrderRequest, SendParentOrderResponse>(
                     callRequest,
                     "Bitflyer.CreateParentOrder",
                     methodError!);
@@ -431,7 +432,7 @@ internal sealed class NormalizedPrivateApi
         {
             if (!ParentOrderMapper.TryToApiTimeInForce(request.TimeInForce.Value, out var tif, out var tifError))
             {
-                return CreateImmediateError<PrivateRequests.SendParentOrderRequest, ParentOrderAcceptance>(
+                return CreateImmediateError<PrivateRequests.SendParentOrderRequest, SendParentOrderResponse>(
                     callRequest,
                     "Bitflyer.CreateParentOrder",
                     tifError!);
@@ -456,10 +457,11 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             callRequest,
             "Bitflyer.CreateParentOrder",
-            ok => MapResult<ParentOrderAcceptance>.Ok(new ParentOrderAcceptance(new AcceptanceId(ok.ParentOrderAcceptanceId))));
+            ok => MapResult<SendParentOrderResponse>.Ok(
+                new SendParentOrderResponse(new ParentOrderAcceptance(new AcceptanceId(ok.ParentOrderAcceptanceId)))));
     }
 
-    public async Task<Call<PrivateRequests.CancelParentOrderRequest, ParentOrderCancelResult>> CancelParentOrderCallAsync(
+    public async Task<Call<PrivateRequests.CancelParentOrderRequest, CancelParentOrderResponse>> CancelParentOrderCallAsync(
         PrivateRequests.CancelParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -481,10 +483,10 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             callRequest,
             Component(EndpointIds.CancelParentOrder),
-            _ => MapResult<ParentOrderCancelResult>.Ok(new ParentOrderCancelResult(true)));
+            _ => MapResult<CancelParentOrderResponse>.Ok(new CancelParentOrderResponse(new ParentOrderCancelResult(true))));
     }
 
-    public async Task<Call<PrivateRequests.GetParentOrdersRequest, IReadOnlyList<ParentOrderNormalized>>> GetParentOrdersCallAsync(
+    public async Task<Call<PrivateRequests.GetParentOrdersRequest, GetParentOrdersResponse>> GetParentOrdersCallAsync(
         PrivateRequests.GetParentOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -496,7 +498,7 @@ internal sealed class NormalizedPrivateApi
         {
             if (!ParentOrderMapper.TryToApiParentOrderState(request.ParentOrderState.Value, out var state, out var stateError))
             {
-                return CreateImmediateError<PrivateRequests.GetParentOrdersRequest, IReadOnlyList<ParentOrderNormalized>>(
+                return CreateImmediateError<PrivateRequests.GetParentOrdersRequest, GetParentOrdersResponse>(
                     callRequest,
                     Component(EndpointIds.GetParentOrders),
                     stateError!);
@@ -524,14 +526,15 @@ internal sealed class NormalizedPrivateApi
             {
                 if (!ParentOrderNormalizer.TryNormalizeList(ok, rawCall.Meta.RawJson, out var normalized, out var error))
                 {
-                    return MapResult<IReadOnlyList<ParentOrderNormalized>>.Fail(error!);
+                    return MapResult<GetParentOrdersResponse>.Fail(error!);
                 }
 
-                return MapResult<IReadOnlyList<ParentOrderNormalized>>.Ok(normalized!);
+                return MapResult<GetParentOrdersResponse>.Ok(
+                    new GetParentOrdersResponse(normalized!.Select(static x => new GetParentOrdersItem(x)).ToArray()));
             });
     }
 
-    public async Task<Call<PrivateRequests.GetParentOrderRequest, ParentOrderDetailNormalized>> GetParentOrderCallAsync(
+    public async Task<Call<PrivateRequests.GetParentOrderRequest, GetParentOrderResponse>> GetParentOrderCallAsync(
         PrivateRequests.GetParentOrderRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -554,14 +557,14 @@ internal sealed class NormalizedPrivateApi
             {
                 if (!ParentOrderNormalizer.TryNormalizeDetail(ok, rawCall.Meta.RawJson, out var normalized, out var error))
                 {
-                    return MapResult<ParentOrderDetailNormalized>.Fail(error!);
+                    return MapResult<GetParentOrderResponse>.Fail(error!);
                 }
 
-                return MapResult<ParentOrderDetailNormalized>.Ok(normalized!);
+                return MapResult<GetParentOrderResponse>.Ok(new GetParentOrderResponse(normalized!));
             });
     }
 
-    public async Task<Call<PrivateRequests.GetBalanceRequest, IReadOnlyList<BalanceEntryNormalized>>> GetBalanceCallAsync(
+    public async Task<Call<PrivateRequests.GetBalanceRequest, GetBalanceResponse>> GetBalanceCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
@@ -576,14 +579,15 @@ internal sealed class NormalizedPrivateApi
             {
                 if (!AccountMapper.TryMapBalances(raw, out var balances, out var mapError))
                 {
-                    return MapResult<IReadOnlyList<BalanceEntryNormalized>>.Fail(mapError!);
+                    return MapResult<GetBalanceResponse>.Fail(mapError!);
                 }
 
-                return MapResult<IReadOnlyList<BalanceEntryNormalized>>.Ok(balances!);
+                return MapResult<GetBalanceResponse>.Ok(
+                    new GetBalanceResponse(balances!.Select(static x => new GetBalanceItem(x)).ToArray()));
             });
     }
 
-    public async Task<Call<PrivateRequests.GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
+    public async Task<Call<PrivateRequests.GetPermissionsRequest, GetPermissionsResponse>> GetPermissionsCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
@@ -594,10 +598,11 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetPermissions),
-            raw => MapResult<IReadOnlyList<FreeText>>.Ok(raw.ToArray()));
+            raw => MapResult<GetPermissionsResponse>.Ok(
+                new GetPermissionsResponse(raw.Select(static x => new GetPermissionsItem(x)).ToArray())));
     }
 
-    public async Task<Call<PrivateRequests.GetCollateralRequest, CollateralNormalized>> GetCollateralCallAsync(
+    public async Task<Call<PrivateRequests.GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
@@ -608,15 +613,15 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetCollateral),
-            raw => MapResult<CollateralNormalized>.Ok(
-                new CollateralNormalized(
+            raw => MapResult<GetCollateralResponse>.Ok(
+                new GetCollateralResponse(new CollateralNormalized(
                     raw.Collateral,
                     raw.OpenPositionPnl,
                     raw.RequireCollateral,
-                    raw.KeepRate)));
+                    raw.KeepRate))));
     }
 
-    public async Task<Call<PrivateRequests.GetCollateralAccountsRequest, IReadOnlyList<CollateralAccountNormalized>>> GetCollateralAccountsCallAsync(
+    public async Task<Call<PrivateRequests.GetCollateralAccountsRequest, GetCollateralAccountsResponse>> GetCollateralAccountsCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
@@ -627,12 +632,14 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetCollateralAccounts),
-            raw => MapResult<IReadOnlyList<CollateralAccountNormalized>>.Ok(
-                raw.Select(item => new CollateralAccountNormalized(CurrencyCodeConverter.FromString(item.CurrencyCode), item.Amount, item.Available))
-                    .ToArray()));
+            raw => MapResult<GetCollateralAccountsResponse>.Ok(
+                new GetCollateralAccountsResponse(
+                    raw.Select(item => new GetCollateralAccountsItem(
+                            new CollateralAccountNormalized(CurrencyCodeConverter.FromString(item.CurrencyCode), item.Amount, item.Available)))
+                        .ToArray())));
     }
 
-    public async Task<Call<PrivateRequests.GetAddressesRequest, RawJsonNormalized>> GetAddressesCallAsync(
+    public async Task<Call<PrivateRequests.GetAddressesRequest, GetAddressesResponse>> GetAddressesCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
@@ -643,10 +650,10 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetAddresses),
-            raw => MapResult<RawJsonNormalized>.Ok(new RawJsonNormalized(FreeText.Parse(raw.RawJson))));
+            raw => MapResult<GetAddressesResponse>.Ok(new GetAddressesResponse(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.GetCoinInsRequest, RawJsonNormalized>> GetCoinInsCallAsync(
+    public async Task<Call<PrivateRequests.GetCoinInsRequest, GetCoinInsResponse>> GetCoinInsCallAsync(
         int? count = null,
         long? before = null,
         long? after = null,
@@ -660,10 +667,10 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetCoinIns),
-            raw => MapResult<RawJsonNormalized>.Ok(new RawJsonNormalized(FreeText.Parse(raw.RawJson))));
+            raw => MapResult<GetCoinInsResponse>.Ok(new GetCoinInsResponse(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.GetCoinOutsRequest, RawJsonNormalized>> GetCoinOutsCallAsync(
+    public async Task<Call<PrivateRequests.GetCoinOutsRequest, GetCoinOutsResponse>> GetCoinOutsCallAsync(
         FreeText? messageId = null,
         int? count = null,
         long? before = null,
@@ -678,10 +685,10 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetCoinOuts),
-            raw => MapResult<RawJsonNormalized>.Ok(new RawJsonNormalized(FreeText.Parse(raw.RawJson))));
+            raw => MapResult<GetCoinOutsResponse>.Ok(new GetCoinOutsResponse(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.GetBankAccountsRequest, RawJsonNormalized>> GetBankAccountsCallAsync(
+    public async Task<Call<PrivateRequests.GetBankAccountsRequest, GetBankAccountsResponse>> GetBankAccountsCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
@@ -692,10 +699,10 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetBankAccounts),
-            raw => MapResult<RawJsonNormalized>.Ok(new RawJsonNormalized(FreeText.Parse(raw.RawJson))));
+            raw => MapResult<GetBankAccountsResponse>.Ok(new GetBankAccountsResponse(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.GetDepositsRequest, RawJsonNormalized>> GetDepositsCallAsync(
+    public async Task<Call<PrivateRequests.GetDepositsRequest, GetDepositsResponse>> GetDepositsCallAsync(
         int? count = null,
         long? before = null,
         long? after = null,
@@ -709,10 +716,10 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetDeposits),
-            raw => MapResult<RawJsonNormalized>.Ok(new RawJsonNormalized(FreeText.Parse(raw.RawJson))));
+            raw => MapResult<GetDepositsResponse>.Ok(new GetDepositsResponse(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.WithdrawRequest, WithdrawResult>> WithdrawCallAsync(
+    public async Task<Call<PrivateRequests.WithdrawRequest, WithdrawResponse>> WithdrawCallAsync(
         CurrencyCode currencyCode,
         int bankAccountId,
         decimal amount,
@@ -734,10 +741,10 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.Withdraw),
-            raw => MapResult<WithdrawResult>.Ok(new WithdrawResult(FreeText.Parse(raw.MessageId))));
+            raw => MapResult<WithdrawResponse>.Ok(new WithdrawResponse(new WithdrawResult(FreeText.Parse(raw.MessageId)))));
     }
 
-    public async Task<Call<PrivateRequests.GetWithdrawalsRequest, RawJsonNormalized>> GetWithdrawalsCallAsync(
+    public async Task<Call<PrivateRequests.GetWithdrawalsRequest, GetWithdrawalsResponse>> GetWithdrawalsCallAsync(
         int? count = null,
         long? before = null,
         long? after = null,
@@ -751,10 +758,10 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetWithdrawals),
-            raw => MapResult<RawJsonNormalized>.Ok(new RawJsonNormalized(FreeText.Parse(raw.RawJson))));
+            raw => MapResult<GetWithdrawalsResponse>.Ok(new GetWithdrawalsResponse(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.GetBalanceHistoryRequest, RawJsonNormalized>> GetBalanceHistoryCallAsync(
+    public async Task<Call<PrivateRequests.GetBalanceHistoryRequest, GetBalanceHistoryResponse>> GetBalanceHistoryCallAsync(
         CurrencyCode? currencyCode = null,
         int? count = null,
         long? before = null,
@@ -769,17 +776,17 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetBalanceHistory),
-            raw => MapResult<RawJsonNormalized>.Ok(new RawJsonNormalized(FreeText.Parse(raw.RawJson))));
+            raw => MapResult<GetBalanceHistoryResponse>.Ok(new GetBalanceHistoryResponse(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.GetPositionsRequest, IReadOnlyList<PositionNormalized>>> GetPositionsCallAsync(
+    public async Task<Call<PrivateRequests.GetPositionsRequest, GetPositionsResponse>> GetPositionsCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
         var request = new PrivateRequests.GetPositionsRequest(symbol);
         if (symbol.IsEmpty)
         {
-            return CreateImmediateError<PrivateRequests.GetPositionsRequest, IReadOnlyList<PositionNormalized>>(
+            return CreateImmediateError<PrivateRequests.GetPositionsRequest, GetPositionsResponse>(
                 request,
                 Component(EndpointIds.GetPositions),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
@@ -788,7 +795,7 @@ internal sealed class NormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (marketCall.Result is CallResult<MarketInfo>.Err marketError)
         {
-            return CreateCallError<PrivateRequests.GetPositionsRequest, IReadOnlyList<PositionNormalized>>(
+            return CreateCallError<PrivateRequests.GetPositionsRequest, GetPositionsResponse>(
                 marketCall,
                 request,
                 Component(EndpointIds.GetPositions),
@@ -800,7 +807,7 @@ internal sealed class NormalizedPrivateApi
             : ProductCode.Empty;
         if (productCode.IsEmpty)
         {
-            return CreateCallError<PrivateRequests.GetPositionsRequest, IReadOnlyList<PositionNormalized>>(
+            return CreateCallError<PrivateRequests.GetPositionsRequest, GetPositionsResponse>(
                 marketCall,
                 request,
                 Component(EndpointIds.GetPositions),
@@ -822,7 +829,7 @@ internal sealed class NormalizedPrivateApi
                 {
                     if (!CommonMapper.TryMapSide(item.Side, out var side, out var sideError))
                     {
-                        return MapResult<IReadOnlyList<PositionNormalized>>.Fail(sideError!);
+                        return MapResult<GetPositionsResponse>.Fail(sideError!);
                     }
 
                     mapped.Add(new PositionNormalized(
@@ -834,11 +841,12 @@ internal sealed class NormalizedPrivateApi
                         item.OpenDate));
                 }
 
-                return MapResult<IReadOnlyList<PositionNormalized>>.Ok(mapped.ToArray());
+                return MapResult<GetPositionsResponse>.Ok(
+                    new GetPositionsResponse(mapped.Select(static x => new GetPositionsItem(x)).ToArray()));
             });
     }
 
-    public async Task<Call<PrivateRequests.GetCollateralHistoryRequest, RawJsonNormalized>> GetCollateralHistoryCallAsync(
+    public async Task<Call<PrivateRequests.GetCollateralHistoryRequest, GetCollateralHistoryResponse>> GetCollateralHistoryCallAsync(
         int? count = null,
         long? before = null,
         long? after = null,
@@ -852,17 +860,17 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             request,
             Component(EndpointIds.GetCollateralHistory),
-            raw => MapResult<RawJsonNormalized>.Ok(new RawJsonNormalized(FreeText.Parse(raw.RawJson))));
+            raw => MapResult<GetCollateralHistoryResponse>.Ok(new GetCollateralHistoryResponse(FreeText.Parse(raw.RawJson))));
     }
 
-    public async Task<Call<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<ExecutionAccountNormalized>>> GetExecutionsPrivateCallAsync(
+    public async Task<Call<PrivateRequests.GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
         var request = new PrivateRequests.GetExecutionsPrivateRequest(symbol);
         if (symbol.IsEmpty)
         {
-            return CreateImmediateError<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<ExecutionAccountNormalized>>(
+            return CreateImmediateError<PrivateRequests.GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>(
                 request,
                 Component(EndpointIds.GetExecutionsPrivate),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
@@ -871,7 +879,7 @@ internal sealed class NormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (marketCall.Result is CallResult<MarketInfo>.Err marketError)
         {
-            return CreateCallError<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<ExecutionAccountNormalized>>(
+            return CreateCallError<PrivateRequests.GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>(
                 marketCall,
                 request,
                 Component(EndpointIds.GetExecutionsPrivate),
@@ -883,7 +891,7 @@ internal sealed class NormalizedPrivateApi
             : ProductCode.Empty;
         if (productCode.IsEmpty)
         {
-            return CreateCallError<PrivateRequests.GetExecutionsPrivateRequest, IReadOnlyList<ExecutionAccountNormalized>>(
+            return CreateCallError<PrivateRequests.GetExecutionsPrivateRequest, GetExecutionsPrivateResponse>(
                 marketCall,
                 request,
                 Component(EndpointIds.GetExecutionsPrivate),
@@ -902,21 +910,22 @@ internal sealed class NormalizedPrivateApi
             {
                 if (!AccountMapper.TryMapAccountExecutions(symbol, raw, out var executions, out var error))
                 {
-                    return MapResult<IReadOnlyList<ExecutionAccountNormalized>>.Fail(error!);
+                    return MapResult<GetExecutionsPrivateResponse>.Fail(error!);
                 }
 
-                return MapResult<IReadOnlyList<ExecutionAccountNormalized>>.Ok(executions!);
+                return MapResult<GetExecutionsPrivateResponse>.Ok(
+                    new GetExecutionsPrivateResponse(executions!.Select(static x => new GetExecutionsPrivateItem(x)).ToArray()));
             });
     }
 
-    public async Task<Call<PrivateRequests.GetTradingCommissionRequest, TradingCommissionNormalized>> GetTradingCommissionCallAsync(
+    public async Task<Call<PrivateRequests.GetTradingCommissionRequest, GetTradingCommissionResponse>> GetTradingCommissionCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
         var request = new PrivateRequests.GetTradingCommissionRequest(symbol);
         if (symbol.IsEmpty)
         {
-            return CreateImmediateError<PrivateRequests.GetTradingCommissionRequest, TradingCommissionNormalized>(
+            return CreateImmediateError<PrivateRequests.GetTradingCommissionRequest, GetTradingCommissionResponse>(
                 request,
                 Component(EndpointIds.GetTradingCommission),
                 new CallError(CallErrorKind.Semantic, "Symbol is required."));
@@ -925,7 +934,7 @@ internal sealed class NormalizedPrivateApi
         var marketCall = await _markets.ResolveCallAsync(symbol, cancellationToken).ConfigureAwait(false);
         if (marketCall.Result is CallResult<MarketInfo>.Err marketError)
         {
-            return CreateCallError<PrivateRequests.GetTradingCommissionRequest, TradingCommissionNormalized>(
+            return CreateCallError<PrivateRequests.GetTradingCommissionRequest, GetTradingCommissionResponse>(
                 marketCall,
                 request,
                 Component(EndpointIds.GetTradingCommission),
@@ -937,7 +946,7 @@ internal sealed class NormalizedPrivateApi
             : ProductCode.Empty;
         if (productCode.IsEmpty)
         {
-            return CreateCallError<PrivateRequests.GetTradingCommissionRequest, TradingCommissionNormalized>(
+            return CreateCallError<PrivateRequests.GetTradingCommissionRequest, GetTradingCommissionResponse>(
                 marketCall,
                 request,
                 Component(EndpointIds.GetTradingCommission),
@@ -956,10 +965,10 @@ internal sealed class NormalizedPrivateApi
             {
                 if (!TryParseTradingCommission(raw.RawJson, productCode, out var parsed, out var error))
                 {
-                    return MapResult<TradingCommissionNormalized>.Fail(error!);
+                    return MapResult<GetTradingCommissionResponse>.Fail(error!);
                 }
 
-                return MapResult<TradingCommissionNormalized>.Ok(parsed!);
+                return MapResult<GetTradingCommissionResponse>.Ok(new GetTradingCommissionResponse(parsed!));
             });
     }
 

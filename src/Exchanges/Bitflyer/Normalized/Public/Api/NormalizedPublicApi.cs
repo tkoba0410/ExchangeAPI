@@ -23,7 +23,7 @@ internal sealed class NormalizedPublicApi
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }
 
-    public async Task<Call<PublicRequests.GetMarketsRequest, IReadOnlyList<MarketNormalized>>> GetMarketsCallAsync(
+    public async Task<Call<PublicRequests.GetMarketsRequest, GetMarketsResponse>> GetMarketsCallAsync(
         CancellationToken ct = default)
     {
         var rawCall = await _raw
@@ -42,17 +42,18 @@ internal sealed class NormalizedPublicApi
                 {
                     if (!MarketNormalizer.TryNormalize(entry, out var market, out var error))
                     {
-                        return MapResult<IReadOnlyList<MarketNormalized>>.Fail(error!);
+                        return MapResult<GetMarketsResponse>.Fail(error!);
                     }
 
                     mapped.Add(market!);
                 }
 
-                return MapResult<IReadOnlyList<MarketNormalized>>.Ok(mapped.ToArray());
+                return MapResult<GetMarketsResponse>.Ok(
+                    new GetMarketsResponse(mapped.Select(static x => new GetMarketsItem(x)).ToArray()));
             });
     }
 
-    public async Task<Call<PublicRequests.GetTickerRequest, TickerNormalized>> GetTickerCallAsync(
+    public async Task<Call<PublicRequests.GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
@@ -69,14 +70,14 @@ internal sealed class NormalizedPublicApi
             {
                 if (!TickerNormalizer.TryNormalize(raw, rawCall.Meta.RawJson, out var ticker, out var error))
                 {
-                    return MapResult<TickerNormalized>.Fail(error!);
+                    return MapResult<GetTickerResponse>.Fail(error!);
                 }
 
-                return MapResult<TickerNormalized>.Ok(ticker!);
+                return MapResult<GetTickerResponse>.Ok(new GetTickerResponse(ticker!));
             });
     }
 
-    public async Task<Call<PublicRequests.GetBoardRequest, OrderBookNormalized>> GetBoardCallAsync(
+    public async Task<Call<PublicRequests.GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
@@ -93,14 +94,14 @@ internal sealed class NormalizedPublicApi
             {
                 if (!OrderBookNormalizer.TryNormalize(raw, out var orderBook, out var error))
                 {
-                    return MapResult<OrderBookNormalized>.Fail(error!);
+                    return MapResult<GetBoardResponse>.Fail(error!);
                 }
 
-                return MapResult<OrderBookNormalized>.Ok(orderBook!);
+                return MapResult<GetBoardResponse>.Ok(new GetBoardResponse(orderBook!));
             });
     }
 
-    public async Task<Call<PublicRequests.GetExecutionsPublicRequest, IReadOnlyList<ExecutionNormalized>>> GetExecutionsPublicCallAsync(
+    public async Task<Call<PublicRequests.GetExecutionsPublicRequest, GetExecutionsPublicResponse>> GetExecutionsPublicCallAsync(
         ProductCode productCode,
         int? count = null,
         long? before = null,
@@ -120,14 +121,15 @@ internal sealed class NormalizedPublicApi
             {
                 if (!ExecutionNormalizer.TryNormalizeList(raw, rawCall.Meta.RawJson, out var executions, out var error))
                 {
-                    return MapResult<IReadOnlyList<ExecutionNormalized>>.Fail(error!);
+                    return MapResult<GetExecutionsPublicResponse>.Fail(error!);
                 }
 
-                return MapResult<IReadOnlyList<ExecutionNormalized>>.Ok(executions!);
+                return MapResult<GetExecutionsPublicResponse>.Ok(
+                    new GetExecutionsPublicResponse(executions!.Select(static x => new GetExecutionsPublicItem(x)).ToArray()));
             });
     }
 
-    public async Task<Call<PublicRequests.GetHealthRequest, HealthNormalized>> GetHealthCallAsync(
+    public async Task<Call<PublicRequests.GetHealthRequest, GetHealthResponse>> GetHealthCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
@@ -144,14 +146,14 @@ internal sealed class NormalizedPublicApi
             {
                 if (!HealthNormalizer.TryNormalize(raw, out var normalized, out var error))
                 {
-                    return MapResult<HealthNormalized>.Fail(error!);
+                    return MapResult<GetHealthResponse>.Fail(error!);
                 }
 
-                return MapResult<HealthNormalized>.Ok(normalized!);
+                return MapResult<GetHealthResponse>.Ok(new GetHealthResponse(normalized!));
             });
     }
 
-    public async Task<Call<PublicRequests.GetBoardStateRequest, BoardStateNormalized>> GetBoardStateCallAsync(
+    public async Task<Call<PublicRequests.GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
@@ -168,14 +170,14 @@ internal sealed class NormalizedPublicApi
             {
                 if (!BoardStateNormalizer.TryNormalize(raw, out var normalized, out var error))
                 {
-                    return MapResult<BoardStateNormalized>.Fail(error!);
+                    return MapResult<GetBoardStateResponse>.Fail(error!);
                 }
 
-                return MapResult<BoardStateNormalized>.Ok(normalized!);
+                return MapResult<GetBoardStateResponse>.Ok(new GetBoardStateResponse(normalized!));
             });
     }
 
-    public async Task<Call<PublicRequests.GetChatsRequest, IReadOnlyList<ChatNormalized>>> GetChatsCallAsync(
+    public async Task<Call<PublicRequests.GetChatsRequest, GetChatsResponse>> GetChatsCallAsync(
         FreeText? fromDate = null,
         CancellationToken ct = default)
     {
@@ -196,17 +198,18 @@ internal sealed class NormalizedPublicApi
                 {
                     if (!ChatNormalizer.TryNormalize(entry, out var chat, out var error))
                     {
-                        return MapResult<IReadOnlyList<ChatNormalized>>.Fail(error!);
+                        return MapResult<GetChatsResponse>.Fail(error!);
                     }
 
                     mapped.Add(chat!);
                 }
 
-                return MapResult<IReadOnlyList<ChatNormalized>>.Ok(mapped.ToArray());
+                return MapResult<GetChatsResponse>.Ok(
+                    new GetChatsResponse(mapped.Select(static x => new GetChatsItem(x)).ToArray()));
             });
     }
 
-    public async Task<Call<PublicRequests.GetCorporateLeverageRequest, CorporateLeverageNormalized>> GetCorporateLeverageCallAsync(
+    public async Task<Call<PublicRequests.GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
         CancellationToken ct = default)
     {
         var rawCall = await _raw
@@ -218,15 +221,15 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetCorporateLeverage),
-            raw => MapResult<CorporateLeverageNormalized>.Ok(
-                new CorporateLeverageNormalized(
+            raw => MapResult<GetCorporateLeverageResponse>.Ok(
+                new GetCorporateLeverageResponse(new CorporateLeverageNormalized(
                     raw.CurrentMax,
                     raw.CurrentStartDate,
                     raw.NextMax,
-                    raw.NextStartDate)));
+                    raw.NextStartDate))));
     }
 
-    public async Task<Call<PublicRequests.GetFundingRateRequest, FundingRateNormalized>> GetFundingRateCallAsync(
+    public async Task<Call<PublicRequests.GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateCallAsync(
         ProductCode productCode,
         CancellationToken ct = default)
     {
@@ -239,10 +242,10 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetFundingRate),
-            raw => MapResult<FundingRateNormalized>.Ok(
-                new FundingRateNormalized(
+            raw => MapResult<GetFundingRateResponse>.Ok(
+                new GetFundingRateResponse(new FundingRateNormalized(
                     raw.CurrentFundingRate,
-                    raw.NextFundingRateSettleDate)));
+                    raw.NextFundingRateSettleDate))));
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(

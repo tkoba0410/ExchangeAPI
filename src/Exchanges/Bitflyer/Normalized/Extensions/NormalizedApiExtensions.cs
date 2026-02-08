@@ -12,7 +12,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Extensions;
 
 public static class NormalizedApiExtensions
 {
-    public static Task<Call<SendParentOrderRequest, ParentOrderAcceptance>> SendParentOrderCallAsync(
+    public static Task<Call<SendParentOrderRequest, SendParentOrderResponse>> SendParentOrderCallAsync(
         this INormalizedApi api,
         IReadOnlyList<ParentOrderParameterRequest> parameters,
         OrderMethod? orderMethod = null,
@@ -23,7 +23,7 @@ public static class NormalizedApiExtensions
             new SendParentOrderRequest(parameters, orderMethod, minuteToExpire, timeInForce),
             cancellationToken);
 
-    public static Task<Call<CancelParentOrderRequest, ParentOrderCancelResult>> CancelParentOrderCallAsync(
+    public static Task<Call<CancelParentOrderRequest, CancelParentOrderResponse>> CancelParentOrderCallAsync(
         this INormalizedApi api,
         ProductCode productCode,
         ExchangeOrderId? parentOrderId = null,
@@ -33,7 +33,7 @@ public static class NormalizedApiExtensions
             new CancelParentOrderRequest(productCode, parentOrderId, parentOrderAcceptanceId),
             cancellationToken);
 
-    public static Task<Call<GetParentOrdersRequest, IReadOnlyList<ParentOrderNormalized>>> GetParentOrdersCallAsync(
+    public static Task<Call<GetParentOrdersRequest, GetParentOrdersResponse>> GetParentOrdersCallAsync(
         this INormalizedApi api,
         ProductCode productCode,
         ParentOrderState? parentOrderState = null,
@@ -45,7 +45,7 @@ public static class NormalizedApiExtensions
             new GetParentOrdersRequest(productCode, parentOrderState, count, before, after),
             cancellationToken);
 
-    public static Task<Call<GetParentOrderRequest, ParentOrderDetailNormalized>> GetParentOrderCallAsync(
+    public static Task<Call<GetParentOrderRequest, GetParentOrderResponse>> GetParentOrderCallAsync(
         this INormalizedApi api,
         ExchangeOrderId? parentOrderId = null,
         AcceptanceId? parentOrderAcceptanceId = null,

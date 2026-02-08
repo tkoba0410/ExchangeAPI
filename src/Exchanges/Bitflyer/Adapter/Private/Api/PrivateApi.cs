@@ -131,9 +131,9 @@ internal sealed class PrivateApi
                 call,
                 Operations.Trading.PlaceOrder,
                 ok => new OrderLimitResponse(
-                    Key: ok.Key,
-                    ExchangeOrderId: ok.ExchangeOrderId,
-                    AcceptanceId: ok.AcceptanceId));
+                    Key: ok.Item.Key,
+                    ExchangeOrderId: ok.Item.ExchangeOrderId,
+                    AcceptanceId: ok.Item.AcceptanceId));
         }
         catch (Exception ex)
         {
@@ -160,7 +160,7 @@ internal sealed class PrivateApi
                 request,
                 call,
                 Operations.Trading.CancelOrder,
-                ok => new CancelOrderResponse(ok.IsSuccess));
+                ok => new CancelOrderResponse(ok.Item.IsSuccess));
         }
         catch (Exception ex)
         {
@@ -172,19 +172,19 @@ internal sealed class PrivateApi
         }
     }
 
-    private static IReadOnlyList<BalanceEntry> MapBalances(IReadOnlyList<BalanceEntryNormalized> balances) =>
-        balances
+    private static IReadOnlyList<BalanceEntry> MapBalances(GetBalanceResponse balances) =>
+        balances.Items
             .Select(b => BalanceFactory.Create(
-                currency: b.CurrencyCode,
-                amount: b.Amount,
-                available: b.Available))
+                currency: b.Value.CurrencyCode,
+                amount: b.Value.Amount,
+                available: b.Value.Available))
             .ToArray();
 
     private static OrdersResponse BuildOrderResponse(
         OrdersRequest request,
-        IReadOnlyList<NormalizedOpenOrder> orders)
+        GetChildOrdersResponse orders)
     {
-        var items = orders.Select(MapSnapshot).ToList();
+        var items = orders.Items.Select(x => MapSnapshot(x.Value)).ToList();
         var (requestedLimit, appliedLimit) = GetLimits(request);
         items = items.Take(appliedLimit).ToList();
         var (returnedCount, limitClamped, completeness, reason, asOf) = BuildMeta(
@@ -208,15 +208,15 @@ internal sealed class PrivateApi
 
     private static ExecutionsPrivateResponse BuildExecutionResponse(
         ExecutionsPrivateRequest request,
-        IReadOnlyList<ExecutionAccountNormalized> executions)
+        GetExecutionsPrivateResponse executions)
     {
-        var items = executions.Select(e => new ExecutionsPrivateItem(
-            Timestamp: e.ExecutedAt,
-            ExecutionId: ExecutionId.ParseOrThrow(e.OrderId.ToString()),
-            Market: e.Symbol,
-            Side: e.Side,
-            Price: e.Price,
-            Size: e.Size)).ToList();
+        var items = executions.Items.Select(e => new ExecutionsPrivateItem(
+            Timestamp: e.Value.ExecutedAt,
+            ExecutionId: ExecutionId.ParseOrThrow(e.Value.OrderId.ToString()),
+            Market: e.Value.Symbol,
+            Side: e.Value.Side,
+            Price: e.Value.Price,
+            Size: e.Value.Size)).ToList();
 
         var (requestedLimit, appliedLimit) = GetLimits(request);
         items = items.Take(appliedLimit).ToList();

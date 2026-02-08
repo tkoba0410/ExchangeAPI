@@ -18,10 +18,10 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
-using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetMarketsRequest, System.Collections.Generic.IReadOnlyList<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.MarketNormalized>>;
-using TradingCommissionCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.GetTradingCommissionRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.TradingCommissionNormalized>;
-using HealthCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetHealthRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.HealthNormalized>;
-using BoardStateCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetBoardStateRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.BoardStateNormalized>;
+using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetMarketsRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.GetMarketsResponse>;
+using TradingCommissionCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.GetTradingCommissionRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.GetTradingCommissionResponse>;
+using HealthCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetHealthRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.GetHealthResponse>;
+using BoardStateCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetBoardStateRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.GetBoardStateResponse>;
 namespace ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
 
 /// <summary>
@@ -175,12 +175,12 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         if (_getMarkets is null) return null;
 
         var marketsCall = await _getMarkets(cancellationToken).ConfigureAwait(false);
-        if (marketsCall.Result is CallResult<IReadOnlyList<MarketNormalized>>.Err)
+        if (marketsCall.Result is CallResult<GetMarketsResponse>.Err)
         {
             return null;
         }
 
-        var markets = ((CallResult<IReadOnlyList<MarketNormalized>>.Ok)marketsCall.Result).Response;
+        var markets = ((CallResult<GetMarketsResponse>.Ok)marketsCall.Result).Response.Items.Select(static x => x.Value);
         var marketInfos = markets.Select(MapDynamicMarket).ToList();
 
         if (_getTradingCommission is not null)
@@ -239,18 +239,18 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
                 continue;
             }
 
-            if (call.Result is CallResult<TradingCommissionNormalized>.Err)
+            if (call.Result is CallResult<GetTradingCommissionResponse>.Err)
             {
                 continue;
             }
 
-            var ok = (CallResult<TradingCommissionNormalized>.Ok)call.Result;
-            if (ok.Response.CommissionRate is null)
+            var ok = (CallResult<GetTradingCommissionResponse>.Ok)call.Result;
+            if (ok.Response.Item.CommissionRate is null)
             {
                 continue;
             }
 
-            market.TakerFeeRate = ok.Response.CommissionRate;
+            market.TakerFeeRate = ok.Response.Item.CommissionRate;
             market.FeeType = "Percentage";
         }
     }
@@ -265,9 +265,9 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             try
             {
                 var call = await _getHealth(productCode, cancellationToken).ConfigureAwait(false);
-                if (call.Result is CallResult<HealthNormalized>.Ok ok)
+                if (call.Result is CallResult<GetHealthResponse>.Ok ok)
                 {
-                    maintenanceFromHealth = MapMaintenanceFromHealth(ok.Response.Status);
+                    maintenanceFromHealth = MapMaintenanceFromHealth(ok.Response.Item.Status);
                 }
             }
             catch
@@ -281,9 +281,9 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             try
             {
                 var call = await _getBoardState(productCode, cancellationToken).ConfigureAwait(false);
-                if (call.Result is CallResult<BoardStateNormalized>.Ok ok)
+                if (call.Result is CallResult<GetBoardStateResponse>.Ok ok)
                 {
-                    var fromBoardState = MapMaintenanceFromBoardState(ok.Response);
+                    var fromBoardState = MapMaintenanceFromBoardState(ok.Response.Item);
                     if (fromBoardState is not null)
                     {
                         return fromBoardState;

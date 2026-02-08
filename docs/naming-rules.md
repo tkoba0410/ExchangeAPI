@@ -86,3 +86,12 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - 既定値は原則 `= default` を付与する。
 - `ct` は新規追加を禁止する。
 - 既存 `public`/`protected` API の改名は named argument 互換性に配慮し、メジャー更新時に実施する。
+
+## 9. Normalized 以降の型ルール
+
+- Raw 層を除き、業務意味を持つ値を `string` / `int` / `long` / `decimal` で受け渡してはならない。
+- Normalized / Adapter / Contracts では、業務値は ValueObject または enum で表現する。
+- `string` は外部 I/O 境界（HTTP/JSON, 設定入力）でのみ許可し、境界通過時に VO/enum へ変換する。
+- 変換責務は Raw -> Normalized 入口に集約し、下流層で再変換しない。
+- `DateTimeOffset` / `bool` / `CancellationToken` / コレクションは本規約の対象外とする。
+- 例外が必要な場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。

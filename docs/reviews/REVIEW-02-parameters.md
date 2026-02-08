@@ -42,12 +42,19 @@
 4. オプション（flags / options / filter）
 5. `CancellationToken cancellationToken = default`
 
-### 4) Optional 表現規約
+### 4) 型ルール（プリミティブ抑制）
+- Raw 層以外（Normalized / Adapter / Contracts）では、業務意味を持つ `string` / `int` / `long` / `decimal` を直接使わない。
+- 原則として **Normalized 以降は全項目を VO/enum 化**する。
+- 例外は `DateTimeOffset` / `bool` / `CancellationToken` / コレクションのみ。
+- `string` は外部I/O境界（Raw HTTP/JSON、設定入力）でのみ使用し、境界通過時に VO/enum へ変換する。
+- 例外運用が必要な場合は `docs/exceptions.md` に記録する。
+
+### 5) Optional 表現規約
 - Optional は **DTO内 nullable + default 値**を標準にし、公開メソッドでの過剰 overload を抑制。
 - `nullable` / `default value` / `overload` を同一責務で多重化しない。
 - “primitive convenience overload” を置く場合は **Facade Extensions のみに限定**（実装層には置かない）。
 
-### 5) Cross-Exchange 規約
+### 6) Cross-Exchange 規約
 - 同じ業務操作（Ticker/Board/Orders/Executions/Order/Cancel）は、取引所ごとに
   - 引数の形（DTOかプリミティブか）
   - Optional の運び方（DTOかメソッド引数か）
@@ -101,13 +108,13 @@
 - **Severity:** P1
 
 ### 5)
-- **Issue:** 下位層でプリミティブ（`int`, `decimal`, `long`）が業務値として露出し、型での制約表現が弱い。
+- **Issue:** 下位層でプリミティブ（`int`, `decimal`, `long`）が業務値として露出し、型での制約表現が弱い（規約違反候補）。
 - **Evidence:**
   - `src/Exchanges/Bittrade/Normalized/Extensions/NormalizedApiExtensions.cs` `GetRetailOrderListCallAsync(int direct, int? status = null, ...)`。
   - 同ファイル `PostWithdrawApiCreateCallAsync(..., decimal amount, ..., decimal? fee = null, ...)`。
   - 同ファイル `GetDepositWithdrawCallAsync(..., long? from = null, int? size = null, ...)`。
 - **Why it matters:** 値域や単位がシグネチャから読めず、exchange 差分吸収時に誤値混入を型で防げない。
-- **Proposed rule:** `direct/status/from/size/amount/fee` などは VO / enum / 専用 record に昇格し、Raw 境界でのみプリミティブに落とす。
+- **Proposed rule:** `direct/status/from/size/amount/fee` などは VO / enum / 専用 record に昇格し、Raw 境界でのみプリミティブに落とす。Normalized 入口で昇格し、下流ではプリミティブを禁止する。
 - **Severity:** P2
 
 ### 6)
@@ -173,3 +180,11 @@
 ### 検査ルール（CI）
 - `CancellationToken` 引数名が `cancellationToken` 以外なら失敗。
 - `CancellationToken` が末尾でない場合は失敗。
+
+---
+
+## 運用ルール（追加）
+
+1. 新規 endpoint 追加時は、Raw Request/Response から Normalized Request/Dto へ変換する時点で VO/enum 化を完了させる。
+2. Normalized 以降で primitive を新規導入した PR は原則差し戻す。
+3. 既存 primitive はバックログ管理し、型昇格の対象・優先度・解消期限を明記する。

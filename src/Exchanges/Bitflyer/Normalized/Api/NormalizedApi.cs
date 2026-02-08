@@ -103,12 +103,6 @@ public sealed class NormalizedApi : INormalizedApi
         CancellationToken cancellationToken = default) =>
         _privateApi.GetChildOrdersCallAsync(symbol, cancellationToken);
 
-    public Task<Call<PrivateRequests.GetChildOrdersByOrderKeyRequest, OrderStatus>> GetChildOrdersCallAsync(
-        Symbol symbol,
-        OrderKey orderKey,
-        CancellationToken cancellationToken = default) =>
-        _privateApi.GetChildOrdersCallAsync(symbol, orderKey, cancellationToken);
-
     public Task<Call<PrivateRequests.SendParentOrderRequest, SendParentOrderResponse>> SendParentOrderCallAsync(
         PrivateRequests.SendParentOrderRequest request,
         CancellationToken cancellationToken = default) =>

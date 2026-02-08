@@ -63,11 +63,6 @@ public interface INormalizedApi
         Symbol symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetChildOrdersByOrderKeyRequest, OrderStatus>> GetChildOrdersCallAsync(
-        Symbol symbol,
-        OrderKey orderKey,
-        CancellationToken cancellationToken = default);
-
     Task<Call<SendParentOrderRequest, SendParentOrderResponse>> SendParentOrderCallAsync(
         SendParentOrderRequest request,
         CancellationToken cancellationToken = default);

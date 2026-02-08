@@ -142,6 +142,34 @@ Normalized の一部 Mapper に例外ベースの旧実装が残っているが�
 
 ---
 
+## Normalized Suffix Coexistence (Bitflyer/Bittrade)
+
+### Summary
+`*Normalized` 接尾辞は原則不使用だが、既存 DTO 群に接尾辞付き名称が残っている。
+
+### Reason
+命名ルール更新前に導入された型が広範囲で参照されており、段階移行を採用しているため。
+
+### Affected Area
+- Exchange: bitFlyer / Bittrade
+- Layer: Normalized
+- API / Type: `*Normalized` 命名の DTO（例: `ExecutionAccountNormalized`, `PositionNormalized`）
+
+### Impact
+新規型との命名統一時に、接尾辞の要否判断が再発する可能性がある。
+
+### Mitigation
+新規 DTO は `docs/naming-rules.md` の「原則不使用・衝突時のみ許可」に従う。
+既存 DTO は API 境界直結化の修正時に順次整理する。
+
+### Future Plan
+参照影響が局所化した単位で、接尾辞を外すか、衝突理由を個別記録して恒久化するかを裁定する。
+
+### Status
+- [x] Temporary
+
+---
+
 ## Authority
 
 本台帳は、例外的判断に関する **唯一の正本**である。

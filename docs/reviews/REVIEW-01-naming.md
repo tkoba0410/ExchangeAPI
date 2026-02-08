@@ -8,12 +8,10 @@
 ## 評価サマリ
 
 - 現状は `EndpointId` 由来命名を中心に整っているが、
-  - **同一概念の語彙揺れ**（例: `Result` 語の責務混在）
-  - **Layer内での接尾辞ポリシー不一致**（`*Normalized` 有無）
-  - **EndpointId規則の文書間不整合**（Bitflyer と Bittrade の方針差 + Bitflyer inventory 内の重複候補併記）
-  が残る。
-- 重大事故に直結する命名崩れ（型衝突や誤マッピング誘発）は少ないが、
-  将来の拡張速度を落とす「命名意思決定の分岐点」が増えている。
+  - `EndpointId` 方針差（Bitflyer / Bittrade）は、取引所差異許容の新ルールで運用可能な状態になった。
+  - API 境界 DTO 直結は進み、`Result` 語の責務混在は主要箇所で解消した。
+  - `*Normalized` 接尾辞は「原則不使用・衝突時のみ許可」に更新済み。
+- 実装面の主要な命名不整合は収束し、残件は文書整合（レビュー本文・例外台帳の追従）が中心。
 
 ---
 
@@ -30,10 +28,10 @@
 - 新規取引所追加時、`EndpointId` 命名の初期判断が担当者依存になる。
 - Raw/Normalized/Tests の自動生成・自動検証の規則化が困難になり、命名差分レビューが都度必要になる。
 
-**統一ルール案**
-1. `EndpointId` は「**Method 非依存の意味名**」を正準とし、Method 衝突時のみ `Public/Private` または `ByXxx` で解消。  
-2. 互換のため Method 付きIDが必要な場合は「Alias」としてのみ管理し、Inventory主表には載せない。  
-3. `EndpointId` 規則は 1 文書（TopSpec相当）に一本化し、各取引所inventoryは参照のみ。
+**対応状況**
+- 方針: `docs/naming-rules.md` に「取引所内一貫 + 取引所間差異許容」を明文化済み。
+- inventory: alias は `Aliases` セクションへ分離済み（主表には正規 EndpointId のみ記載）。
+- 判定: **対応済み**（運用ルール化完了）。
 
 ---
 
@@ -41,44 +39,39 @@
 
 ### P1-1. 同一Layer・同一概念で `*Normalized` 接尾辞の有無が揺れている
 
-**具体箇所（現状）**
-- Bitflyer: `OpenOrder`  
+**具体箇所（更新後）**
+- `OpenOrder` は Bitflyer / Bittrade で同名化済み。  
   - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/OpenOrder.cs`
-- Bittrade: `OpenOrder`  
   - `src/Exchanges/Bittrade/Normalized/Private/Dtos/OpenOrder.cs`
-
-- Bitflyer: `WithdrawResult`  
-  - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/WithdrawResult.cs`
-- Bittrade: `WithdrawResult`  
-  - `src/Exchanges/Bittrade/Normalized/Private/Dtos/WithdrawResult.cs`
+- `WithdrawResult` は内部 DTO から削除済み（API 境界 `...Response` へ統合）。
 
 **リスク**
 - 取引所横断で mapper / contract adapter を作る際に、
   型名だけで責務判定できず IDE 検索効率が落ちる。
 - 「Normalized DTO には接尾辞を付けるか否か」の判断が都度発生。
 
-**統一ルール案**
-1. `*Normalized` は原則付与しない。
-2. 同一コンパイル単位で型衝突または曖昧参照が発生する場合に限り `*Normalized` を許可する。
-3. 付与時は衝突元と解消理由を記録する（必要に応じて `docs/exceptions.md`）。
+**対応状況**
+1. ルール: `docs/naming-rules.md` に反映済み。  
+2. 実装: 主要不一致は解消済み。  
+3. 判定: **方針更新済み / 実装概ね収束**。
 
 ---
 
 ### P1-2. Contracts層に EndpointId 直結語彙が混入し、語彙ポリシーが分岐している
 
 **具体箇所**
-- Contracts Request で通常語彙（`TickerRequest`, `BoardRequest`）と EndpointId 由来語彙（`GetCurrencysRequest`, `GetTimestampRequest`）が混在。  
+- 現行 Contracts Request は業務語彙へ統一済み。  
   - `src/Contracts/Facade/Requests/TickerRequest.cs`  
-  - `src/Contracts/Facade/Requests/GetCurrencysRequest.cs`  
-  - `src/Contracts/Facade/Requests/GetTimestampRequest.cs`
+  - `src/Contracts/Facade/Requests/BoardRequest.cs`
 
 **リスク**
 - Contracts が「取引所非依存語彙」なのか「EndpointId鏡像」なのかが曖昧になり、
   新規 endpoint 追加時の命名判断が二択化する。
 
-**統一ルール案**
-1. Contracts層は **業務語彙（非EndpointId）固定**（例: `CurrenciesRequest`, `ServerTimeRequest`）。
-2. EndpointId由来名は Raw/Normalized までに閉じ込め、Contracts へは mapper で吸収。
+**対応状況**
+1. ルール: 業務語彙優先で明文化済み。  
+2. 実装: `GetCurrencysRequest` / `GetTimestampRequest` は Contracts から解消済み。  
+3. 判定: **対応済み**。
 
 ---
 
@@ -87,33 +80,29 @@
 ### P2-1. `Currencys` の綴りを許容する範囲が明文化不足
 
 **具体箇所**
-- `GetCurrencys` 系が Raw/Normalized/Contracts まで浸透。  
-  - 例: `src/Contracts/Facade/Requests/GetCurrencysRequest.cs`  
-  - 例: `docs/inventory/endpoints-bittrade.md`
+- typo 語彙 `Currencys` は Bittrade EndpointId 側に残る。  
+  - `docs/inventory/endpoints-bittrade.md`（`GetCurrencys`）
 
 **リスク**
 - typo由来命名が上位層へ漏れ、検索性と学習コストが継続的に悪化。
 
-**統一ルール案**
-1. typoを含む名称は **EndpointId（およびその直結型）に限定**。  
-2. 上位層（Contracts / Application公開API）では正規英語へ正規化。
+**対応状況**
+1. ルール: typo は endpoint 直結範囲に限定する方針を明文化済み。  
+2. 実装: Contracts 露出は解消済み。  
+3. 判定: **対応済み**。
 
 ---
 
 ### P2-2. `Request / Response / Call / Result` の責務境界を型名だけで判定しにくい箇所がある
 
-**具体箇所（代表）**
-- Normalized Private DTO に `OrderResult` / `CancelResult` 等が存在し、
-  Contracts の `*Response` と並んだ時に「API境界DTOか内部結果DTOか」が名前だけでは直感しづらい。  
-  - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/OrderResult.cs`  
-  - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/CancelResult.cs`  
-  - `src/Exchanges/Bittrade/Normalized/Private/Dtos/OrderResult.cs`  
-  - `src/Exchanges/Bittrade/Normalized/Private/Dtos/CancelResult.cs`
+**具体箇所（更新後）**
+- `OrderResult` / `CancelResult` / `WithdrawResult` / `RetailOrderResult` は API 境界 DTO 直結化の過程で削除済み。
+- API 境界 DTO は `...Response` に集約され、`CallResult<T>` との責務分離が明確化された。
 
-**統一ルール案**
-1. API境界: `Request/Response`。
-2. 呼出メタ: `Call<TReq, TOk>`（既存運用を維持）。
-3. 内部変換結果: `*Outcome`（`*Result` との混線回避）を推奨。
+**対応状況**
+1. API 境界 DTO 直結ルールは `docs/naming-rules.md` に反映済み。  
+2. 主要実装は `...Response` 直結へ移行済み。  
+3. 判定: **主要指摘は解消**。
 
 ---
 
@@ -150,32 +139,27 @@
 
 ---
 
-## 逸脱箇所一覧（抽出）
+## 対応状況（2026-02-08）
 
-1. `EndpointId` 方針の不整合
-   - `docs/inventory/endpoints-bitflyer.md`（`GetMarkets` と `Markets` の重複候補併記、prefix方針記述とのねじれ）
-   - `docs/inventory/endpoints-bittrade.md`（`Get/Post` prefix 許容）
+1. P0-1 EndpointId 規則分岐
+   - 状態: **対応済み**
+   - 根拠: `docs/naming-rules.md` と各 inventory の `Aliases` 分離運用。
 
-2. Normalized DTO 接尾辞揺れ（現時点では主要例は解消）
-   - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/OpenOrder.cs`
-   - `src/Exchanges/Bittrade/Normalized/Private/Dtos/OpenOrder.cs`
-   - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/WithdrawResult.cs`
-   - `src/Exchanges/Bittrade/Normalized/Private/Dtos/WithdrawResult.cs`
+2. P1-1 `*Normalized` 接尾辞揺れ
+   - 状態: **方針更新済み / 実装概ね収束**
+   - 根拠: `OpenOrder` 同名化、`WithdrawResult` 系削除、ルール明文化。
 
-3. Contracts語彙の揺れ（業務語彙 vs EndpointId語彙）
-   - `src/Contracts/Facade/Requests/TickerRequest.cs`
-   - `src/Contracts/Facade/Requests/GetCurrencysRequest.cs`
-   - `src/Contracts/Facade/Requests/GetTimestampRequest.cs`
+3. P1-2 Contracts 語彙揺れ
+   - 状態: **対応済み**
+   - 根拠: EndpointId 直結語彙の Contracts 露出解消。
 
-4. typo語彙の上位層露出
-   - `src/Contracts/Facade/Requests/GetCurrencysRequest.cs`
-   - `docs/inventory/endpoints-bittrade.md`
+4. P2-1 typo 語彙上位露出
+   - 状態: **対応済み**
+   - 根拠: typo は endpoint 直結範囲に限定、Contracts 露出なし。
 
-5. `Result` 語の責務混在余地
-   - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/OrderResult.cs`
-   - `src/Exchanges/Bitflyer/Normalized/Private/Dtos/CancelResult.cs`
-   - `src/Exchanges/Bittrade/Normalized/Private/Dtos/OrderResult.cs`
-   - `src/Exchanges/Bittrade/Normalized/Private/Dtos/CancelResult.cs`
+5. P2-2 `Result` 語の責務混在
+   - 状態: **主要指摘は解消**
+   - 根拠: API 境界 DTO を `...Response` へ統一し、内部 `*Result` DTO を整理。
 
 ---
 

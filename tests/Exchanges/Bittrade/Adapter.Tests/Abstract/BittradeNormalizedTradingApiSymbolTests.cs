@@ -27,7 +27,7 @@ public sealed class NormalizedTradingApiSymbolTests
 
         var call = await api.PostOrdersPlaceCallAsync(request, CancellationToken.None);
 
-        var err = Assert.IsType<CallResult<OrderResult>.Err>(call.Result);
+        var err = Assert.IsType<CallResult<PostOrdersPlaceResponse>.Err>(call.Result);
         Assert.NotNull(err.Error);
     }
 

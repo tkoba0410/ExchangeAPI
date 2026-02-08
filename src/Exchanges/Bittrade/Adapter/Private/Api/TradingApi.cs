@@ -60,9 +60,9 @@ internal sealed class TradingApi
                 call,
                 Operations.Trading.PlaceOrder,
                 ok => new OrderLimitResponse(
-                    Key: ok.Item.Key,
-                    ExchangeOrderId: ok.Item.ExchangeOrderId,
-                    AcceptanceId: ok.Item.AcceptanceId));
+                    Key: ok.Key,
+                    ExchangeOrderId: ok.ExchangeOrderId,
+                    AcceptanceId: ok.AcceptanceId));
         }
         catch (Exception ex)
         {
@@ -91,7 +91,7 @@ internal sealed class TradingApi
                 request,
                 call,
                 Operations.Trading.CancelOrder,
-                ok => new CancelOrderResponse(ok.Item.IsSuccess));
+                ok => new CancelOrderResponse(ok.IsSuccess));
         }
         catch (Exception ex)
         {

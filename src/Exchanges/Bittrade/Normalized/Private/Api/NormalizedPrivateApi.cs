@@ -233,7 +233,7 @@ internal sealed class NormalizedPrivateApi
             callRequest,
             Component(EndpointIds.PostOrdersPlace),
             raw => MapResult<PostOrdersPlaceResponse>.Ok(
-                new PostOrdersPlaceResponse(TradingMapper.ToOrderResult(raw))));
+                TradingMapper.ToPostOrdersPlaceResponse(raw)));
     }
 
     public async Task<Call<NormalizedRequests.GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
@@ -299,7 +299,7 @@ internal sealed class NormalizedPrivateApi
             callRequest,
             Component(EndpointIds.PostOrdersSubmitCancelByOrderId),
             _ => MapResult<PostOrdersSubmitCancelByOrderIdResponse>.Ok(
-                new PostOrdersSubmitCancelByOrderIdResponse(new CancelResult(true))));
+                new PostOrdersSubmitCancelByOrderIdResponse(true)));
     }
 
     public async Task<Call<NormalizedRequests.PostOrdersBatchCancelRequest, PostOrdersBatchCancelResponse>> PostOrdersBatchCancelCallAsync(
@@ -319,7 +319,7 @@ internal sealed class NormalizedPrivateApi
             Component(EndpointIds.PostOrdersBatchCancel),
             raw => MapResult<PostOrdersBatchCancelResponse>.Ok(
                 new PostOrdersBatchCancelResponse(
-                    new CancelResult(string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase)))));
+                    string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase))));
     }
 
     public async Task<Call<NormalizedRequests.PostOrdersBatchCancelOpenOrdersRequest, PostOrdersBatchCancelOpenOrdersResponse>> PostOrdersBatchCancelOpenOrdersCallAsync(
@@ -365,7 +365,7 @@ internal sealed class NormalizedPrivateApi
             Component(EndpointIds.PostOrdersBatchCancelOpenOrders),
             raw => MapResult<PostOrdersBatchCancelOpenOrdersResponse>.Ok(
                 new PostOrdersBatchCancelOpenOrdersResponse(
-                    new CancelResult(string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase)))));
+                    string.Equals(raw.Status, "ok", StringComparison.OrdinalIgnoreCase))));
     }
 
     public async Task<Call<NormalizedRequests.GetOpenOrdersRequest, GetOpenOrdersResponse>> GetOpenOrdersCallAsync(

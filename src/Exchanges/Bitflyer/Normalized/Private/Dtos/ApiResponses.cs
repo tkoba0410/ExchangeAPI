@@ -3,9 +3,12 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
-public sealed record SendChildOrderResponse(OrderResult Item);
-public sealed record CancelChildOrderResponse(CancelResult Item);
-public sealed record CancelAllChildOrdersResponse(CancelResult Item);
+public sealed record SendChildOrderResponse(
+    OrderKey Key,
+    ExchangeOrderId? ExchangeOrderId = null,
+    AcceptanceId? AcceptanceId = null);
+public sealed record CancelChildOrderResponse(bool IsSuccess);
+public sealed record CancelAllChildOrdersResponse(bool IsSuccess);
 
 public sealed record GetChildOrdersItem(OpenOrder Value);
 public sealed record GetChildOrdersResponse(IReadOnlyList<GetChildOrdersItem> Items);

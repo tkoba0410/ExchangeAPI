@@ -101,9 +101,9 @@ internal sealed class NormalizedPrivateApi
             callRequest,
             "Bitflyer.CreateChildOrder",
             ok => MapResult<SendChildOrderResponse>.Ok(
-                new SendChildOrderResponse(new OrderResult(
+                new SendChildOrderResponse(
                     new OrderKey(OrderIdKind.AcceptanceId, ok.ChildOrderAcceptanceId),
-                    AcceptanceId: new AcceptanceId(ok.ChildOrderAcceptanceId)))));
+                    AcceptanceId: new AcceptanceId(ok.ChildOrderAcceptanceId))));
     }
 
     public async Task<Call<PrivateRequests.CancelChildOrderRequest, CancelChildOrderResponse>> CancelChildOrderCallAsync(
@@ -164,7 +164,7 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             callRequest,
             Component(EndpointIds.CancelChildOrder),
-            _ => MapResult<CancelChildOrderResponse>.Ok(new CancelChildOrderResponse(new CancelResult(true))));
+            _ => MapResult<CancelChildOrderResponse>.Ok(new CancelChildOrderResponse(true)));
     }
 
     public async Task<Call<PrivateRequests.CancelAllChildOrdersRequest, CancelAllChildOrdersResponse>> CancelAllChildOrdersCallAsync(
@@ -198,7 +198,7 @@ internal sealed class NormalizedPrivateApi
             rawCall,
             callRequest,
             Component(EndpointIds.CancelAllChildOrders),
-            _ => MapResult<CancelAllChildOrdersResponse>.Ok(new CancelAllChildOrdersResponse(new CancelResult(true))));
+            _ => MapResult<CancelAllChildOrdersResponse>.Ok(new CancelAllChildOrdersResponse(true)));
     }
 
     public async Task<Call<PrivateRequests.GetChildOrdersRequest, GetChildOrdersResponse>> GetChildOrdersCallAsync(

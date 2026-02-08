@@ -67,12 +67,12 @@ internal static class TradingMapper
         return true;
     }
 
-    public static OrderResult ToOrderResult(RawPrivateDtos.PostOrdersPlaceResponse raw)
+    public static PostOrdersPlaceResponse ToPostOrdersPlaceResponse(RawPrivateDtos.PostOrdersPlaceResponse raw)
     {
         var orderId = raw.OrderId;
         var key = new OrderKey(OrderIdKind.ExchangeOrderId, orderId);
         var exchangeOrderId = string.IsNullOrWhiteSpace(orderId) ? (ExchangeOrderId?)null : new ExchangeOrderId(orderId);
-        return new OrderResult(key, ExchangeOrderId: exchangeOrderId);
+        return new PostOrdersPlaceResponse(key, ExchangeOrderId: exchangeOrderId);
     }
 
     public static bool TryToOpenOrders(

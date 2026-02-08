@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using OrderRequest = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.OrderRequest;
 using NormalizedOpenOrder = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.OpenOrder;
-using ContractSide = ExchangeApi.Primitives.DomainCommon.Enums.Side;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
@@ -125,23 +124,20 @@ internal sealed class PrivateApi
     }
 
     public async Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
-        Symbol symbol,
-        ContractSide side,
-        Size size,
-        Price price,
+        OrderLimitRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new OrderLimitRequest(symbol, side, size, price);
+        if (request is null) throw new ArgumentNullException(nameof(request));
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
             var normalizedRequest = new OrderRequest(
-                Symbol: symbol,
-                Side: side,
+                Symbol: request.Symbol,
+                Side: request.Side,
                 OrderType: OrderType.Limit,
-                Size: size,
-                Price: price);
+                Size: request.Size,
+                Price: request.Price);
             var call = await _normalized
                 .SendChildOrderCallAsync(normalizedRequest, cancellationToken)
                 .ConfigureAwait(false);
@@ -165,16 +161,15 @@ internal sealed class PrivateApi
     }
 
     public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
-        Symbol symbol,
-        OrderKey orderKey,
+        CancelOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new CancelOrderRequest(symbol, orderKey);
+        if (request is null) throw new ArgumentNullException(nameof(request));
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
-            var call = await _normalized.CancelChildOrderCallAsync(symbol, orderKey, cancellationToken).ConfigureAwait(false);
+            var call = await _normalized.CancelChildOrderCallAsync(request.Symbol, request.OrderKey, cancellationToken).ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
                 call,

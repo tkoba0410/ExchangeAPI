@@ -19,6 +19,8 @@
   `ApiBundle.FromRestClient` の内部境界は `AccountId?` 受けに統一した。
 - `P2-3` の追加対応として、`IApiCredentialProvider` の境界を `Get(AccountId accountId)` に統一し、
   Bittrade/Bitflyer の Composition から provider 呼び出し時に `AccountId` を渡す形へ変更した。
+- `P1-1` の追加対応として、Bittrade/Bitflyer の `ExchangeClient -> Trading/PrivateApi` 境界における
+  `OrderLimitAsync` / `CancelOrderAsync` の委譲をプリミティブ分解から DTO 受けへ統一した。
 
 ---
 

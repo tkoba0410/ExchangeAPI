@@ -301,12 +301,12 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         OrderLimitRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.OrderLimitAsync(request.Symbol, request.Side, request.Size, request.Price, cancellationToken);
+        _privateApi.OrderLimitAsync(request, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.CancelOrderAsync(request.Symbol, request.OrderKey, cancellationToken);
+        _privateApi.CancelOrderAsync(request, cancellationToken);
 
     // Account
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(

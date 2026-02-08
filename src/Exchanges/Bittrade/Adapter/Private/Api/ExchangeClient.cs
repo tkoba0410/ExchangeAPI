@@ -125,12 +125,12 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         OrderLimitRequest request,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.OrderLimitAsync(request.Symbol, request.Side, request.Size, request.Price, cancellationToken);
+        _tradingApi.OrderLimitAsync(request, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.CancelOrderAsync(request.Symbol, request.OrderKey, cancellationToken);
+        _tradingApi.CancelOrderAsync(request, cancellationToken);
 
     // SpotHistory
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.Errors;
@@ -33,13 +32,10 @@ internal sealed class TradingApi
     }
 
     public async Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
-        CommonSymbol symbol,
-        Side side,
-        Size size,
-        Price price,
+        OrderLimitRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new OrderLimitRequest(symbol, side, size, price);
+        if (request is null) throw new ArgumentNullException(nameof(request));
         var startedAt = DateTimeOffset.UtcNow;
 
         try
@@ -48,11 +44,11 @@ internal sealed class TradingApi
                 .PostOrdersPlaceCallAsync(
                     new NormalizedRequests.PostOrdersPlaceRequest(
                         new OrderRequest(
-                            Symbol: symbol,
-                            Side: side,
+                            Symbol: request.Symbol,
+                            Side: request.Side,
                             OrderType: OrderType.Limit,
-                            Size: size,
-                            Price: price)),
+                            Size: request.Size,
+                            Price: request.Price)),
                     cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
@@ -75,18 +71,17 @@ internal sealed class TradingApi
     }
 
     public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
-        CommonSymbol symbol,
-        OrderKey orderKey,
+        CancelOrderRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new CancelOrderRequest(symbol, orderKey);
+        if (request is null) throw new ArgumentNullException(nameof(request));
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
             var call = await _trading
                 .PostOrdersSubmitCancelByOrderIdCallAsync(
-                    new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(symbol, orderKey),
+                    new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(request.Symbol, request.OrderKey),
                     cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(

@@ -150,7 +150,11 @@ internal sealed class NormalizedPublicApi
                     return MapResult<GetDetailMergedResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<GetDetailMergedResponse>.Ok(new GetDetailMergedResponse(ticker!));
+                return MapResult<GetDetailMergedResponse>.Ok(new GetDetailMergedResponse(
+                    ticker!.LastTradedPrice,
+                    ticker.Timestamp,
+                    ticker.RawSnapshot,
+                    ticker.Extras));
             });
     }
 
@@ -202,7 +206,9 @@ internal sealed class NormalizedPublicApi
                     return MapResult<GetDepthResponse>.Fail(normalizeError!);
                 }
 
-                return MapResult<GetDepthResponse>.Ok(new GetDepthResponse(orderBook!));
+                return MapResult<GetDepthResponse>.Ok(new GetDepthResponse(
+                    orderBook!.Bids,
+                    orderBook.Asks));
             });
     }
 

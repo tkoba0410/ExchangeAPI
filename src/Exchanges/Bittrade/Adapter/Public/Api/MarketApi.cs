@@ -71,7 +71,11 @@ internal sealed class MarketApi
                 request,
                 call,
                 Operations.MarketData.GetTicker,
-                ok => MarketMapper.MapTicker(symbol, ok.Item));
+                ok => MarketMapper.MapTicker(symbol, new TickerNormalized(
+                    ok.LastTradedPrice,
+                    ok.Timestamp,
+                    ok.RawSnapshot,
+                    ok.Extras)));
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
@@ -116,7 +120,7 @@ internal sealed class MarketApi
                 request,
                 call,
                 Operations.MarketData.GetBoard,
-                ok => MarketMapper.MapOrderBook(ok.Item));
+                ok => MarketMapper.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)));
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {

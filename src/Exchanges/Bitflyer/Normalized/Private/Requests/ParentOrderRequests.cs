@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests;
 public sealed record SendParentOrderRequest(
     IReadOnlyList<ParentOrderParameterRequest> Parameters,
     OrderMethod? OrderMethod = null,
-    int? MinuteToExpire = null,
+    MinuteToExpire? MinuteToExpire = null,
     TimeInForce? TimeInForce = null);
 
 public sealed record ParentOrderParameterRequest(
@@ -17,7 +17,7 @@ public sealed record ParentOrderParameterRequest(
     Size Size,
     Price? Price = null,
     Price? TriggerPrice = null,
-    decimal? Offset = null);
+    PriceOffset? Offset = null);
 
 public sealed record CancelParentOrderRequest(
     ProductCode ProductCode,

@@ -18,10 +18,14 @@ public static class NormalizedApiExtensions
         OrderMethod? orderMethod = null,
         int? minuteToExpire = null,
         TimeInForce? timeInForce = null,
-        CancellationToken cancellationToken = default) =>
+        CancellationToken cancellationToken = default)
+    {
+        MinuteToExpire? normalizedMinuteToExpire = minuteToExpire.HasValue ? new MinuteToExpire(minuteToExpire.Value) : null;
+        return
         api.SendParentOrderCallAsync(
-            new SendParentOrderRequest(parameters, orderMethod, minuteToExpire, timeInForce),
+            new SendParentOrderRequest(parameters, orderMethod, normalizedMinuteToExpire, timeInForce),
             cancellationToken);
+    }
 
     public static Task<Call<CancelParentOrderRequest, CancelParentOrderResponse>> CancelParentOrderCallAsync(
         this INormalizedApi api,

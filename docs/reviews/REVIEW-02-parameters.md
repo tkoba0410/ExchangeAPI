@@ -43,6 +43,9 @@
 - `P2-2` の追加対応として、Bittrade Normalized `TradingRequests` の
   `PostOrdersBatchCancelOpenOrdersRequest.Price` と `RetailOrderRequest.Price` を
   `decimal` から `Price` に型昇格し、Raw 直前でのみ数値文字列へ変換する形に変更した。
+- `P2-2` の追加対応として、Bitflyer Normalized `ParentOrderRequests` の
+  `minuteToExpire/offset` を `MinuteToExpire/PriceOffset` に型昇格し、Raw 直前でのみ
+  `int/decimal` に変換する形に変更した。
 
 ---
 

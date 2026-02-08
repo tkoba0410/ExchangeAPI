@@ -330,7 +330,7 @@ internal sealed class NormalizedPrivateApi
                 Price = p.Price?.Value,
                 Size = p.Size.Value,
                 TriggerPrice = p.TriggerPrice?.Value,
-                Offset = p.Offset,
+                Offset = p.Offset?.Value,
             });
         }
 
@@ -365,7 +365,7 @@ internal sealed class NormalizedPrivateApi
         var rawRequest = new RawPrivateRequests.SendParentOrderRequest
         {
             OrderMethod = orderMethod is null ? null : new FreeText(orderMethod),
-            MinuteToExpire = request.MinuteToExpire,
+            MinuteToExpire = request.MinuteToExpire?.Value,
             TimeInForce = timeInForce is null ? null : new FreeText(timeInForce),
             Parameters = rawParameters.ToArray()
         };

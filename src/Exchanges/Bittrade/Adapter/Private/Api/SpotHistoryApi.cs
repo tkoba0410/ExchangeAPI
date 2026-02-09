@@ -13,7 +13,6 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
@@ -83,11 +82,8 @@ internal sealed class SpotHistoryApi
 
         try
         {
-            var requestLimit = request.Limit.HasValue ? new RequestSize(request.Limit.Value) : (RequestSize?)null;
             var call = await _trading
-                .GetMatchResultsCallAsync(
-                    new ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.GetMatchResultsRequest(request.Symbol, requestLimit),
-                    cancellationToken)
+                .GetMatchResultsCallAsync(request.Symbol, request.Limit, cancellationToken)
                 .ConfigureAwait(false);
             return ApiCallMapper.MapCall(
                 request,
@@ -139,12 +135,7 @@ internal sealed class SpotHistoryApi
             Timestamp: e.Timestamp,
             ExecutionId: ExecutionId.ParseOrThrow(e.OrderId.Value),
             Market: request.Symbol,
-            Side: e.Side switch
-            {
-                OrderSide.Buy => Side.Buy,
-                OrderSide.Sell => Side.Sell,
-                _ => throw new InvalidOperationException($"Unsupported side: {e.Side}.")
-            },
+            Side: MapSide(e.Side),
             Price: new Price(e.Price),
             Size: new Size(e.Size))).ToList();
 
@@ -213,5 +204,21 @@ internal sealed class SpotHistoryApi
     {
         var clamped = appliedLimit != requestedLimit;
         return (returnedCount, clamped, completeness, reason, DateTimeOffset.UtcNow);
+    }
+
+    private static Side MapSide(object side)
+    {
+        var sideText = side.ToString();
+        if (string.Equals(sideText, "Buy", StringComparison.OrdinalIgnoreCase))
+        {
+            return Side.Buy;
+        }
+
+        if (string.Equals(sideText, "Sell", StringComparison.OrdinalIgnoreCase))
+        {
+            return Side.Sell;
+        }
+
+        throw new InvalidOperationException($"Unsupported side: {sideText}.");
     }
 }

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Utilities.Account;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 
@@ -16,7 +16,7 @@ internal static class Mapper
         {
             var total = group.Sum(e => e.Balance);
             var available = group
-                .Where(x => x.Type.IsKnown && x.Type.Known == ExchangeBalanceType.Trade)
+                .Where(x => x.Type.IsKnown && string.Equals(x.Type.ToString(), "Trade", StringComparison.OrdinalIgnoreCase))
                 .Sum(e => e.Balance);
             result.Add(BalanceFactory.Create(
                 currency: group.Key.ToString().ToUpperInvariant(),

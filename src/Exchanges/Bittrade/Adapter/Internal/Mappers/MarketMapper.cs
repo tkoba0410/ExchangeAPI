@@ -4,7 +4,6 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Constants;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Utilities.OrderBook;
@@ -84,13 +83,21 @@ internal static class MarketMapper
             .ToList();
     }
 
-    private static Side MapSide(OrderSide side) =>
-        side switch
+    private static Side MapSide(object side)
+    {
+        var sideText = side.ToString();
+        if (string.Equals(sideText, "Buy", StringComparison.OrdinalIgnoreCase))
         {
-            OrderSide.Buy => Side.Buy,
-            OrderSide.Sell => Side.Sell,
-            _ => throw new ExchangeApiException($"Unsupported side: {side}.")
-        };
+            return Side.Buy;
+        }
+
+        if (string.Equals(sideText, "Sell", StringComparison.OrdinalIgnoreCase))
+        {
+            return Side.Sell;
+        }
+
+        throw new ExchangeApiException($"Unsupported side: {sideText}.");
+    }
 
     private static DateTimeOffset ParseUnixTimestamp(FreeText openTimeUnix)
     {

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Constants;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
@@ -18,7 +19,6 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using RawPrivateDtos = ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
 using RawPrivateRequests = ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 
@@ -533,6 +533,15 @@ internal sealed class NormalizedPrivateApi
 
                 return MapResult<GetMatchResultsResponse>.Ok(new GetMatchResultsResponse(executions!));
             });
+    }
+
+    public Task<Call<NormalizedRequests.GetMatchResultsRequest, GetMatchResultsResponse>> GetMatchResultsCallAsync(
+        Symbol symbol,
+        int? limit = null,
+        CancellationToken cancellationToken = default)
+    {
+        RequestSize? requestLimit = limit.HasValue ? new RequestSize(limit.Value) : (RequestSize?)null;
+        return GetMatchResultsCallAsync(new NormalizedRequests.GetMatchResultsRequest(symbol, requestLimit), cancellationToken);
     }
 
     public async Task<Call<NormalizedRequests.PostWithdrawApiCreateRequest, PostWithdrawApiCreateResponse>> PostWithdrawApiCreateCallAsync(

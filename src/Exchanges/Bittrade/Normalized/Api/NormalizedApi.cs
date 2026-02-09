@@ -9,7 +9,6 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
@@ -63,7 +62,7 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
 
     public Task<Call<GetDepthRequest, GetDepthResponse>> GetDepthCallAsync(
         ProductCode productCode,
-        DepthType? depthType = null,
+        string? depthType = null,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetDepthCallAsync(productCode, depthType, cancellationToken);
 
@@ -87,7 +86,7 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
     public Task<Call<GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
         ProductCode productCode,
         Period period,
-        RequestSize? size = null,
+        int? size = null,
         CancellationToken cancellationToken = default) =>
         _publicApi.GetHistoryKlineCallAsync(productCode, period, size, cancellationToken);
 

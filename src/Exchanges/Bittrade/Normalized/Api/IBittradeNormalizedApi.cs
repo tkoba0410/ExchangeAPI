@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
@@ -21,7 +20,7 @@ public interface IBittradeNormalizedApi
 
     Task<Call<GetDepthRequest, GetDepthResponse>> GetDepthCallAsync(
         ProductCode productCode,
-        DepthType? depthType = null,
+        string? depthType = null,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetTradeRequest, GetTradeResponse>> GetTradeCallAsync(
@@ -40,7 +39,7 @@ public interface IBittradeNormalizedApi
     Task<Call<GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
         ProductCode productCode,
         Period period,
-        RequestSize? size = null,
+        int? size = null,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetTickersRequest, GetTickersResponse>> GetTickersCallAsync(

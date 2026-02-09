@@ -8,18 +8,15 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
-using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Constants;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 
@@ -59,7 +56,7 @@ internal sealed class MarketApi
             var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
-                return MarketResolutionError<TickerRequest, TickerResponse>(
+                return MarketResolutionCallMapper.FromResolverError<TickerRequest, TickerResponse>(
                     request,
                     marketCall,
                     err.Error,
@@ -80,7 +77,7 @@ internal sealed class MarketApi
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            return SymbolNotSupported<TickerRequest, TickerResponse>(
+            return MarketResolutionCallMapper.SymbolNotSupported<TickerRequest, TickerResponse>(
                 request,
                 startedAt,
                 Operations.MarketData.GetTicker,
@@ -108,7 +105,7 @@ internal sealed class MarketApi
             var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
-                return MarketResolutionError<BoardRequest, BoardResponse>(
+                return MarketResolutionCallMapper.FromResolverError<BoardRequest, BoardResponse>(
                     request,
                     marketCall,
                     err.Error,
@@ -125,7 +122,7 @@ internal sealed class MarketApi
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            return SymbolNotSupported<BoardRequest, BoardResponse>(
+            return MarketResolutionCallMapper.SymbolNotSupported<BoardRequest, BoardResponse>(
                 request,
                 startedAt,
                 Operations.MarketData.GetBoard,
@@ -153,7 +150,7 @@ internal sealed class MarketApi
             var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
-                return MarketResolutionError<ExecutionsPublicRequest, ExecutionsPublicResponse>(
+                return MarketResolutionCallMapper.FromResolverError<ExecutionsPublicRequest, ExecutionsPublicResponse>(
                     request,
                     marketCall,
                     err.Error,
@@ -170,7 +167,7 @@ internal sealed class MarketApi
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            return SymbolNotSupported<ExecutionsPublicRequest, ExecutionsPublicResponse>(
+            return MarketResolutionCallMapper.SymbolNotSupported<ExecutionsPublicRequest, ExecutionsPublicResponse>(
                 request,
                 startedAt,
                 Operations.MarketData.GetExecutions,
@@ -218,7 +215,7 @@ internal sealed class MarketApi
             var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
             if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
             {
-                return MarketResolutionError<CandlesticksRequest, CandlesticksResponse>(
+                return MarketResolutionCallMapper.FromResolverError<CandlesticksRequest, CandlesticksResponse>(
                     request,
                     marketCall,
                     err.Error,
@@ -226,9 +223,8 @@ internal sealed class MarketApi
             }
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var requestSize = size.HasValue ? new RequestSize(size.Value) : (RequestSize?)null;
             var call = await _marketData
-                .GetHistoryKlineCallAsync(productCode, new Period(period.Code), requestSize, cancellationToken)
+                .GetHistoryKlineCallAsync(productCode, new Period(period.Code), size, cancellationToken)
                 .ConfigureAwait(false);
 
             return ApiCallMapper.MapCall(
@@ -239,7 +235,7 @@ internal sealed class MarketApi
         }
         catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
         {
-            return SymbolNotSupported<CandlesticksRequest, CandlesticksResponse>(
+            return MarketResolutionCallMapper.SymbolNotSupported<CandlesticksRequest, CandlesticksResponse>(
                 request,
                 startedAt,
                 Operations.MarketData.GetCandlesticks,
@@ -265,49 +261,4 @@ internal sealed class MarketApi
         return mapped;
     }
 
-
-    private static Call<TReq, TOk> MarketResolutionError<TReq, TOk>(
-        TReq request,
-        Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> marketCall,
-        CallError error,
-        string component)
-    {
-        var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: component,
-            EndpointId: marketCall.Meta.EndpointId,
-            Tags: null,
-            Children: new[] { marketCall.Id });
-
-        return new Call<TReq, TOk>(
-            Id: CallId.New(),
-            StartedAt: marketCall.StartedAt,
-            Duration: marketCall.Duration,
-            Request: request,
-            Result: new CallResult<TOk>.Err(error),
-            Meta: meta);
-    }
-
-    private static Call<TReq, TOk> SymbolNotSupported<TReq, TOk>(
-        TReq request,
-        DateTimeOffset startedAt,
-        string component,
-        Exception ex)
-    {
-        var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: component,
-            EndpointId: CallMeta.InternalEndpointId,
-            Tags: null,
-            Children: null);
-        var error = new CallError(CallErrorKind.Semantic, ex.Message, ex);
-
-        return new Call<TReq, TOk>(
-            Id: CallId.New(),
-            StartedAt: startedAt,
-            Duration: DateTimeOffset.UtcNow - startedAt,
-            Request: request,
-            Result: new CallResult<TOk>.Err(error),
-            Meta: meta);
-    }
 }

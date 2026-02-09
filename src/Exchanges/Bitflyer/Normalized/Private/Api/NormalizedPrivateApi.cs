@@ -10,6 +10,7 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Constants;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Markets;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
@@ -18,7 +19,6 @@ using PrivateRequests = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Reques
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using RawPrivateRequests = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Api;
 

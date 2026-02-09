@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Utilities.OrderBook;
 using UtilityOrderBookNormalizer = ExchangeApi.Utilities.OrderBook.OrderBookNormalizer;
@@ -48,10 +48,7 @@ internal static class MarketMapper
     public static ExecutionsPublicItem MapExecution(Symbol symbol, ExecutionNormalized normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        if (!CommonMapper.TryMapSide(normalized.Side, out var side, out var error))
-        {
-            throw new ExchangeApiException(error?.Message ?? "bitFlyer side mapping failed.");
-        }
+        var side = MapSide(normalized.Side.ToString());
 
         return new ExecutionsPublicItem(
             Symbol: symbol,
@@ -62,4 +59,18 @@ internal static class MarketMapper
             ExecutedAt: normalized.ExecutedAt);
     }
 
+    private static Side MapSide(string sideText)
+    {
+        if (string.Equals(sideText, "Buy", StringComparison.OrdinalIgnoreCase))
+        {
+            return Side.Buy;
+        }
+
+        if (string.Equals(sideText, "Sell", StringComparison.OrdinalIgnoreCase))
+        {
+            return Side.Sell;
+        }
+
+        throw new ExchangeApiException($"Unsupported side: {sideText}.");
+    }
 }

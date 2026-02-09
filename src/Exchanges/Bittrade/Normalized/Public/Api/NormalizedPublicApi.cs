@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Constants;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using RawPublicDtos = ExchangeApi.Exchanges.Bittrade.Raw.Public.Dtos;
 using RawPublicRequests = ExchangeApi.Exchanges.Bittrade.Raw.Public.Requests;
-using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 
@@ -160,10 +160,10 @@ internal sealed class NormalizedPublicApi
 
     public async Task<Call<NormalizedRequests.GetDepthRequest, GetDepthResponse>> GetDepthCallAsync(
         ProductCode productCode,
-        DepthType? depthType = null,
+        string? depthType = null,
         CancellationToken cancellationToken = default)
     {
-        var normalizedDepthType = depthType ?? DepthType.Step0;
+        var normalizedDepthType = depthType ?? "step0";
         var request = new NormalizedRequests.GetDepthRequest(productCode, depthType);
         var startedAt = DateTimeOffset.UtcNow;
         if (!TryGetApiSymbol(productCode.Value, out var symbolText, out var error))
@@ -255,7 +255,7 @@ internal sealed class NormalizedPublicApi
     public async Task<Call<NormalizedRequests.GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
         ProductCode productCode,
         Period period,
-        RequestSize? size = null,
+        int? size = null,
         CancellationToken cancellationToken = default)
     {
         var request = new NormalizedRequests.GetHistoryKlineRequest(productCode, period, size);
@@ -270,7 +270,7 @@ internal sealed class NormalizedPublicApi
         }
 
         var rawCall = await _raw
-            .GetHistoryKlineCallAsync(new RawPublicRequests.GetHistoryKlineRequest(new Symbol(symbolText), period, size?.Value), cancellationToken)
+            .GetHistoryKlineCallAsync(new RawPublicRequests.GetHistoryKlineRequest(new Symbol(symbolText), period, size), cancellationToken)
             .ConfigureAwait(false);
 
         return CreateCall(
@@ -477,31 +477,31 @@ internal sealed class NormalizedPublicApi
         return true;
     }
 
-    private static bool TryGetRawDepthType(DepthType depthType, out string rawDepth, out CallError? error)
+    private static bool TryGetRawDepthType(string? depthType, out string rawDepth, out CallError? error)
     {
-        switch (depthType)
+        switch (depthType?.Trim().ToLowerInvariant())
         {
-            case DepthType.Step0:
+            case "step0":
                 rawDepth = "step0";
                 error = null;
                 return true;
-            case DepthType.Step1:
+            case "step1":
                 rawDepth = "step1";
                 error = null;
                 return true;
-            case DepthType.Step2:
+            case "step2":
                 rawDepth = "step2";
                 error = null;
                 return true;
-            case DepthType.Step3:
+            case "step3":
                 rawDepth = "step3";
                 error = null;
                 return true;
-            case DepthType.Step4:
+            case "step4":
                 rawDepth = "step4";
                 error = null;
                 return true;
-            case DepthType.Step5:
+            case "step5":
                 rawDepth = "step5";
                 error = null;
                 return true;

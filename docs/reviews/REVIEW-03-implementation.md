@@ -20,7 +20,8 @@
    - HTTP エラーと payload 業務エラーを混ぜない。
 3. **Raw → Normalized 変換（Mapper/Normalizer）**
    - 日時・decimal・null の扱いは「失敗時のルール」を共通化（例: `Fail-fast` か `Null許容` かをドキュメント化）し、取引所間で同形にする。
-   - 変換例外は `CallErrorKind.Mapping` へ集約する。
+   - 変換失敗（例外/戻り値エラー）は `CallErrorKind.Mapping` へ集約する。
+   - `CallErrorKind.Semantic` は **BusinessErrorDetector で検出した業務ルール違反に限定**する（例外型では分類しない）。
 4. **Contracts 変換（Adapter）**
    - `Normalized` の `Call` を `ApiCallMapper` で `Contracts` DTO へ変換。
    - メタ情報（`children`, `endpointId`, `component`）の伝播を共通化。
@@ -75,7 +76,7 @@ function UseCase(request):
   - Bittrade は `NormalizedPublicApi` で `status == ok` を業務エラー判定しているが、同形の判定ステージが他実装では明示的に見えにくい。
 - Evidence:
   - `src/Exchanges/Bittrade/Normalized/Public/Api/NormalizedPublicApi.cs` / `TryRequireOk`, 各 API メソッド内 `TryRequireOk(...)` 呼び出し
-  - `src/Exchanges/Bitflyer/Raw/Api/RawCallExecutor.cs` / HTTP 2xx と Codec 判定はあるが payload business error 判定はここでは扱わない
+  - `src/Exchanges/Bitflyer/Normalized/Public/Api/NormalizedPublicApi.cs` / `CreateCall(...)` 内で各 Normalizer は実行されるが、`TryRequireOk` 相当の専用 business error detector 関数が明示されていない
 - Why it matters:
   - 「HTTPエラー」と「業務エラー」の責務境界が取引所別に読み取りづらく、障害切り分けと共通テストテンプレート作成が難しくなる。
 - Proposed rule:
@@ -92,7 +93,9 @@ function UseCase(request):
 - Why it matters:
   - 同種の失敗でも `CallErrorKind` が取引所でズレ、横断監視・アラート・テスト期待値が分岐する。
 - Proposed rule:
-  - Mapping 段の例外分類を統一（`InvalidOperationException` を全取引所で Semantic 扱い or Mapping 扱いのどちらかに固定）。
+  - 例外型ベース分類を禁止し、**発生段ベース**で分類を固定する。
+  - `BusinessErrorDetector` 段の失敗のみ `CallErrorKind.Semantic`。
+  - `Mapper/Normalizer` 段の失敗（`InvalidOperationException` を含む）は `CallErrorKind.Mapping`。
 - Severity:
   - P1
 
@@ -119,7 +122,8 @@ function UseCase(request):
 - Why it matters:
   - 実データ時刻と観測時刻が混在し、時系列比較・再現テストで取引所間の意味が揃わない。
 - Proposed rule:
-  - timestamp 欠損時ポリシーを統一（`null許容` / `エラー` / `観測時刻補完` のいずれか）し、取引所別の独自補完を原則禁止。
+  - timestamp 欠損時は `UtcNow` で埋めず、ポリシーを `null許容` または `エラー` のいずれかに固定する。
+  - 観測時刻が必要な場合は timestamp 本体へ混在させず、`ObservedAt` など別メタ項目で保持する。
 - Severity:
   - P1
 

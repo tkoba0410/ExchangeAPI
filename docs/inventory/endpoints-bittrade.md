@@ -77,7 +77,7 @@ Note 欄には、採用可否・実装判断・設計判断を記載してはな
 | Scope | Method | Path | CanonicalSourceUrl | EndpointId | PresentIn | Note | RequestType | ResponseType |
 | ------ | ------ | --------------------- | ------------------------------- | --------------- | --------------------- | ---- | ----------- | ------------ |
 | public | GET | /v1/common/symbols | https://api-doc.bittrade.co.jp/#384f6851b3 | GetSymbols | Wire, Raw, Normalized |  | GetSymbolsRequest | GetSymbolsResponse |
-| public | GET | /v1/common/currencys | https://api-doc.bittrade.co.jp/#3cb389c6a0 | GetCurrencys | Wire, Raw, Normalized |  | GetCurrencysRequest | GetCurrencysResponse |
+| public | GET | /v1/common/currencys | https://api-doc.bittrade.co.jp/#3cb389c6a0 | GetCurrencies | Wire, Raw, Normalized |  | GetCurrenciesRequest | GetCurrenciesResponse |
 | public | GET | /v1/common/timestamp | https://api-doc.bittrade.co.jp/#de96e45aa6 | GetTimestamp | Wire, Raw, Normalized |  | GetTimestampRequest | GetTimestampResponse |
 | public | GET | /market/history/kline | https://api-doc.bittrade.co.jp/#ed8d1d68d7 | GetHistoryKline | Wire, Raw, Normalized |  | GetHistoryKlineRequest | GetHistoryKlineResponse |
 | public | GET | /market/detail/merged | https://api-doc.bittrade.co.jp/#83bc409c24 | GetDetailMerged | Wire, Raw, Normalized |  | GetDetailMergedRequest | GetDetailMergedResponse |

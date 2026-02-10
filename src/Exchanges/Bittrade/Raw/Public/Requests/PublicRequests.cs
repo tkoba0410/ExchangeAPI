@@ -11,7 +11,7 @@ public sealed record GetTradeRequest(Symbol Symbol);
 
 public sealed record GetSymbolsRequest;
 
-public sealed record GetCurrencysRequest;
+public sealed record GetCurrenciesRequest;
 
 public sealed record GetTimestampRequest;
 

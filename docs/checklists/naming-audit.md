@@ -37,14 +37,15 @@
 
 ---
 
-## 許容（EndpointId 由来）
+## 許容（外部仕様追従）
 
-1. `GetCurrencys` の綴り
-- 状況: 一般英語では `Currencies` だが、EndpointId は `GetCurrencys`
+1. Bittrade public path の `/currencys` 表記
+- 状況: 外部仕様の path 表記は `/v1/common/currencys` だが、内部命名は `GetCurrencies*` に統一済み。
 - 根拠:
-  - `docs/inventory/endpoints-bittrade.md:80` `GetCurrencys`
-  - `src/Exchanges/Bittrade/Wire/Constants/EndpointIds.cs:7` `GetCurrencys`
-- 判断: EndpointId 由来として許容（仕様準拠）
+  - `docs/inventory/endpoints-bittrade.md:80` `Path=/v1/common/currencys` / `EndpointId=GetCurrencies`
+  - `src/Exchanges/Bittrade/Wire/Constants/Paths.cs:13` `CommonCurrenciesPath`
+  - `src/Exchanges/Bittrade/Wire/Constants/EndpointIds.cs:7` `GetCurrencies`
+- 判断: path は外部仕様に追従、内部命名は正規英語で管理。
 
 ---
 

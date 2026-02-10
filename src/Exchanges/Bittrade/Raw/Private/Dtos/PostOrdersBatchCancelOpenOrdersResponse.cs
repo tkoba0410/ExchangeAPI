@@ -4,9 +4,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
 
 public sealed record PostOrdersBatchCancelOpenOrdersResponse(
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("data")] PostOrdersBatchCancelOpenOrdersResult? Data);
+    [property: JsonPropertyName("data")] PostOrdersBatchCancelOpenOrdersItem? Data);
 
-public sealed record PostOrdersBatchCancelOpenOrdersResult(
+public sealed record PostOrdersBatchCancelOpenOrdersItem(
     [property: JsonPropertyName("success-count")] int SuccessCount,
     [property: JsonPropertyName("failed-count")] int FailedCount,
     [property: JsonPropertyName("next-id")]

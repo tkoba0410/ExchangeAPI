@@ -70,25 +70,27 @@
 
 **対応状況**
 1. ルール: 業務語彙優先で明文化済み。  
-2. 実装: `GetCurrencysRequest` / `GetTimestampRequest` は Contracts から解消済み。  
+2. 実装: `GetCurrenciesRequest` / `GetTimestampRequest` は Contracts から解消済み。  
 3. 判定: **対応済み**。
 
 ---
 
 ## P2（中優先: 事故率は低いがレビューコストを増やす）
 
-### P2-1. `Currencys` の綴りを許容する範囲が明文化不足
+### P2-1. 外部仕様由来の `/currencys` 表記と内部命名の整合管理
 
 **具体箇所**
-- typo 語彙 `Currencys` は Bittrade EndpointId 側に残る。  
-  - `docs/inventory/endpoints-bittrade.md`（`GetCurrencys`）
+- 外部 API path は `/v1/common/currencys` 表記を使用する。  
+  - `docs/inventory/endpoints-bittrade.md`（Path 列）
+- 内部命名は `GetCurrencies` / `GetCurrenciesRequest` / `GetCurrenciesResponse` へ統一済み。
 
 **リスク**
-- typo由来命名が上位層へ漏れ、検索性と学習コストが継続的に悪化。
+- 外部 path typo と内部命名規則の境界が曖昧だと、将来追加時に追従範囲の判断が再発する。
+- EndpointId/DTO と Path の修正責務を混同すると、互換性を壊す変更が混入する。
 
 **対応状況**
-1. ルール: typo は endpoint 直結範囲に限定する方針を明文化済み。  
-2. 実装: Contracts 露出は解消済み。  
+1. ルール: typo 検出時は正本（inventory）を先に修正する方針へ更新済み。  
+2. 実装: EndpointId / API 境界 DTO は `GetCurrencies*` へ修正済み。  
 3. 判定: **対応済み**。
 
 ---
@@ -130,8 +132,8 @@
    - `Result` は曖昧性が高いため新規導入を抑制し、内部結果は `Outcome` 優先とする。
 
 4. **typo/外部仕様追従ルール**
-   - 外部仕様由来の typo（例: `Currencys`）は EndpointId およびその直結 DTO まで許容する。
-   - Contracts 公開境界へ露出する名称は正規英語（例: `Currencies`）を優先する。
+   - typo を検出した場合は、まず正本（inventory の EndpointId / RequestType / ResponseType）を修正する。
+   - typo を既知のまま新規 API 境界 DTO や Contracts 公開境界へ導入しない。
 
 5. **Cross-Exchange 命名整合ルール**
    - 同一 Layer・同一責務・同等フィールド契約の DTO は、可能な限り同名化する。
@@ -155,7 +157,7 @@
 
 4. P2-1 typo 語彙上位露出
    - 状態: **対応済み**
-   - 根拠: typo は endpoint 直結範囲に限定、Contracts 露出なし。
+   - 根拠: EndpointId / API 境界 DTO は `GetCurrencies*` へ統一し、外部 path `/currencys` のみ仕様追従として維持。
 
 5. P2-2 `Result` 語の責務混在
    - 状態: **主要指摘は解消**

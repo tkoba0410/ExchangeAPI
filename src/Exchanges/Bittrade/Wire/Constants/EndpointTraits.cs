@@ -7,7 +7,7 @@ internal static class EndpointTraits
         return endpointId switch
         {
             EndpointIds.GetSymbols => false,
-            EndpointIds.GetCurrencys => false,
+            EndpointIds.GetCurrencies => false,
             EndpointIds.GetTimestamp => false,
             EndpointIds.GetHistoryKline => false,
             EndpointIds.GetDetailMerged => false,

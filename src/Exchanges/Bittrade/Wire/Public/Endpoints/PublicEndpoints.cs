@@ -9,8 +9,8 @@ internal static class PublicEndpoints
     public static WireCallSpec GetSymbols() =>
         WireSpecBuilder.Get(EndpointIds.GetSymbols, Paths.CommonSymbolsPath, query: null);
 
-    public static WireCallSpec GetCurrencys() =>
-        WireSpecBuilder.Get(EndpointIds.GetCurrencys, Paths.CommonCurrenciesPath, query: null);
+    public static WireCallSpec GetCurrencies() =>
+        WireSpecBuilder.Get(EndpointIds.GetCurrencies, Paths.CommonCurrenciesPath, query: null);
 
     public static WireCallSpec GetTimestamp() =>
         WireSpecBuilder.Get(EndpointIds.GetTimestamp, Paths.CommonTimestampPath, query: null);

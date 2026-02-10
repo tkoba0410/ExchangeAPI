@@ -68,15 +68,15 @@ internal sealed class PublicApi
             cancellationToken,
             json => RawJson.DeserializeOrThrow<GetSymbolsResponse>(json, Component(EndpointIds.GetSymbols)));
 
-    public Task<Call<GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
-        GetCurrencysRequest request,
+    public Task<Call<GetCurrenciesRequest, GetCurrenciesResponse>> GetCurrenciesCallAsync(
+        GetCurrenciesRequest request,
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
-            Component(EndpointIds.GetCurrencys),
-            PublicEndpoints.GetCurrencys(),
+            Component(EndpointIds.GetCurrencies),
+            PublicEndpoints.GetCurrencies(),
             cancellationToken,
-            json => RawJson.DeserializeOrThrow<GetCurrencysResponse>(json, Component(EndpointIds.GetCurrencys)));
+            json => RawJson.DeserializeOrThrow<GetCurrenciesResponse>(json, Component(EndpointIds.GetCurrencies)));
 
     public Task<Call<GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(
         GetTimestampRequest request,

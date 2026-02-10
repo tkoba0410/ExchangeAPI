@@ -59,28 +59,28 @@ internal sealed class NormalizedPublicApi
             });
     }
 
-    public async Task<Call<NormalizedRequests.GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
+    public async Task<Call<NormalizedRequests.GetCurrenciesRequest, GetCurrenciesResponse>> GetCurrenciesCallAsync(
         CancellationToken cancellationToken = default)
     {
         var rawCall = await _raw
-            .GetCurrencysCallAsync(new RawPublicRequests.GetCurrencysRequest(), cancellationToken)
+            .GetCurrenciesCallAsync(new RawPublicRequests.GetCurrenciesRequest(), cancellationToken)
             .ConfigureAwait(false);
-        var request = new NormalizedRequests.GetCurrencysRequest();
+        var request = new NormalizedRequests.GetCurrenciesRequest();
 
-        return CreateCall<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse, NormalizedRequests.GetCurrencysRequest, GetCurrencysResponse>(
+        return CreateCall<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.GetCurrenciesResponse, NormalizedRequests.GetCurrenciesRequest, GetCurrenciesResponse>(
             rawCall,
             request,
-            Component(EndpointIds.GetCurrencys),
+            Component(EndpointIds.GetCurrencies),
             ok =>
             {
                 if (!TryRequireOk(ok.Status, "currencys", out var error))
                 {
-                    return MapResult<GetCurrencysResponse>.Fail(error);
+                    return MapResult<GetCurrenciesResponse>.Fail(error);
                 }
 
                 if (ok.Data is null)
                 {
-                    return MapResult<GetCurrencysResponse>.Ok(new GetCurrencysResponse(Array.Empty<CurrencyCode>()));
+                    return MapResult<GetCurrenciesResponse>.Ok(new GetCurrenciesResponse(Array.Empty<CurrencyCode>()));
                 }
                 var codes = new List<CurrencyCode>(ok.Data.Count);
                 foreach (var code in ok.Data)
@@ -88,7 +88,7 @@ internal sealed class NormalizedPublicApi
                     codes.Add(CurrencyCodeConverter.FromString(code));
                 }
 
-                return MapResult<GetCurrencysResponse>.Ok(new GetCurrencysResponse(codes));
+                return MapResult<GetCurrenciesResponse>.Ok(new GetCurrenciesResponse(codes));
             });
     }
 

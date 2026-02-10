@@ -75,9 +75,9 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
         CancellationToken cancellationToken = default) =>
         _publicApi.GetSymbolsCallAsync(cancellationToken);
 
-    public Task<Call<GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
+    public Task<Call<GetCurrenciesRequest, GetCurrenciesResponse>> GetCurrenciesCallAsync(
         CancellationToken cancellationToken = default) =>
-        _publicApi.GetCurrencysCallAsync(cancellationToken);
+        _publicApi.GetCurrenciesCallAsync(cancellationToken);
 
     public Task<Call<GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(
         CancellationToken cancellationToken = default) =>

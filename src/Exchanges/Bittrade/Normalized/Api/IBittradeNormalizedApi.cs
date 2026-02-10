@@ -30,7 +30,7 @@ public interface IBittradeNormalizedApi
     Task<Call<GetSymbolsRequest, GetSymbolsResponse>> GetSymbolsCallAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
+    Task<Call<GetCurrenciesRequest, GetCurrenciesResponse>> GetCurrenciesCallAsync(
         CancellationToken cancellationToken = default);
 
     Task<Call<GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(

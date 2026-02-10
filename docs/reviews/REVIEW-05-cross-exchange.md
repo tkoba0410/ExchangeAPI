@@ -41,8 +41,9 @@
 - Proposed rule: Adapter の「Contracts 入口」の分割単位を全取引所で統一（単一 PrivateApi か固定3分割のどちらか）し、内部実装の委譲のみ可変とする。  
 - Severity: P1  
 
-- Issue: `Operations` の domain 命名語彙が非対称（`MarketData` vs `Market`、アクセシビリティも `internal` vs `public`）。  
-- Evidence: Bitflyer `Operations.MarketData.*` / `internal static class`、Bittrade `Operations.Market.*` / `public static class`。  
+- Issue: `Operations` の domain 命名語彙が非対称（`component` 文字列が `MarketData` vs `Market`、アクセシビリティも `internal` vs `public`）。  
+- Evidence: Bitflyer は `Operations.MarketData` 配下で `Bitflyer.MarketData.*`、Bittrade は `Operations.MarketData` 配下だが `Bittrade.Market.*`。  
+  かつ `Operations` の公開範囲が Bitflyer `internal static class`、Bittrade `public static class` で異なる。  
   （`src/Exchanges/Bitflyer/Adapter/Internal/Operations/Operations.cs` / `src/Exchanges/Bittrade/Adapter/Internal/Operations/Operations.cs`）  
 - Why it matters: `component` 軸でログ・メトリクス比較する際にドメイン単位の集計キーが割れ、横断比較を妨げる。  
 - Proposed rule: `Operations` の Domain 語彙とアクセス修飾子を横断固定（例: `internal static class Operations` + `MarketData/Trading/Account/History/ExchangeInfo`）。  

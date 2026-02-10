@@ -64,18 +64,18 @@ public class ExchangeInfoApiTests
             return Task.FromResult(call);
         }
 
-        public override Task<Call<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse>> GetCurrencysCallAsync(
-            RawPublicRequests.GetCurrencysRequest request,
+        public override Task<Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.GetCurrenciesResponse>> GetCurrenciesCallAsync(
+            RawPublicRequests.GetCurrenciesRequest request,
             System.Threading.CancellationToken cancellationToken = default)
         {
             IReadOnlyList<string> data = new[] { "btc", "jpy" };
             var meta = CallMeta.CreateInternal("Raw", "StubRawApi");
-            var call = new Call<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse>(
+            var call = new Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.GetCurrenciesResponse>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<RawPublicDtos.GetCurrencysResponse>.Ok(new RawPublicDtos.GetCurrencysResponse("ok", data)),
+                Result: new CallResult<RawPublicDtos.GetCurrenciesResponse>.Ok(new RawPublicDtos.GetCurrenciesResponse("ok", data)),
                 Meta: meta);
             return Task.FromResult(call);
         }

@@ -26,8 +26,8 @@ public interface IBittradeRawApi
         GetSymbolsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
-        GetCurrencysRequest request,
+    Task<Call<GetCurrenciesRequest, GetCurrenciesResponse>> GetCurrenciesCallAsync(
+        GetCurrenciesRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(

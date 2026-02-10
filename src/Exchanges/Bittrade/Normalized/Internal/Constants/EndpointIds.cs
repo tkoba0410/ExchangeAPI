@@ -3,7 +3,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Constants;
 internal static class EndpointIds
 {
     public const string GetSymbols = "GetSymbols";
-    public const string GetCurrencys = "GetCurrencys";
+    public const string GetCurrencies = "GetCurrencies";
     public const string GetTimestamp = "GetTimestamp";
     public const string GetHistoryKline = "GetHistoryKline";
     public const string GetDetailMerged = "GetDetailMerged";

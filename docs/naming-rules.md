@@ -58,8 +58,9 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - `Nullable` は型名・プロパティ名に含めない（nullable は型注釈で表す）。
 - API 境界での `using XxxResponse = ...` による alias は段階的に廃止し、最終的に endpoint 直結の実体 DTO に統一する。
 - 後方互換性維持や段階移行で単一 `Item` ラップを残す場合は、`docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
-- `Result` 命名の採用可否は個別に判断し、混線リスクがある場合はレビューで明示する。
-- `CallResult<T>`（呼出結果）と業務 DTO 名の `*Result` は責務が異なることを前提に扱う。
+- `Result` は `CallResult<T>`（呼出結果コンテナ）に限定して使用する。
+- API 境界 DTO / 内部 DTO に新規 `*Result` 命名を導入してはならない。
+- 内部結果モデルは `Outcome` を優先し、やむを得ず逸脱する場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
 
 ### 6.1 例外
 
@@ -79,7 +80,13 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
   - 採用理由
   - 解消条件
 
-## 8. CancellationToken 命名規約
+## 8. 外部仕様由来 typo の扱い
+
+- typo を検出した場合は、まず正本（各取引所 inventory の EndpointId / RequestType / ResponseType）を修正する。
+- typo を既知のまま残した名称を、新規の API 境界 DTO や Contracts 公開境界（RequestType / ResponseType / ContractApiId）に導入してはならない。
+- 正本修正に伴い影響が出る場合は、`docs/inventory/endpoints-contracts.md` と関連実装を同一変更で追従させる。
+
+## 9. CancellationToken 命名規約
 
 - `CancellationToken` 型の引数名は `cancellationToken` のみ許可する。
 - `CancellationToken` 引数はメソッド引数の末尾に配置する。
@@ -87,7 +94,7 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - `ct` は新規追加を禁止する。
 - 既存 `public`/`protected` API の改名は named argument 互換性に配慮し、メジャー更新時に実施する。
 
-## 9. Normalized 以降の型ルール
+## 10. Normalized 以降の型ルール
 
 - Raw 層を除き、業務意味を持つ値を `string` / `int` / `long` / `decimal` で受け渡してはならない。
 - Normalized / Adapter / Contracts では、業務値は ValueObject または enum で表現する。

@@ -7,7 +7,7 @@ public static class EndpointIdCatalog
     private static readonly string[] All =
     {
         EndpointIds.GetSymbols,
-        EndpointIds.GetCurrencys,
+        EndpointIds.GetCurrencies,
         EndpointIds.GetTimestamp,
         EndpointIds.GetHistoryKline,
         EndpointIds.GetDetailMerged,

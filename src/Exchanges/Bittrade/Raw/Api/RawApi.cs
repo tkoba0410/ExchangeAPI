@@ -56,10 +56,10 @@ public sealed class RawApi : IBittradeRawApi
         CancellationToken cancellationToken = default) =>
         _publicApi.GetSymbolsCallAsync(request, cancellationToken);
 
-    public Task<Call<GetCurrencysRequest, GetCurrencysResponse>> GetCurrencysCallAsync(
-        GetCurrencysRequest request,
+    public Task<Call<GetCurrenciesRequest, GetCurrenciesResponse>> GetCurrenciesCallAsync(
+        GetCurrenciesRequest request,
         CancellationToken cancellationToken = default) =>
-        _publicApi.GetCurrencysCallAsync(request, cancellationToken);
+        _publicApi.GetCurrenciesCallAsync(request, cancellationToken);
 
     public Task<Call<GetTimestampRequest, GetTimestampResponse>> GetTimestampCallAsync(
         GetTimestampRequest request,

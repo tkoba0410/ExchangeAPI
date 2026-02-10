@@ -3,5 +3,5 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 
-public sealed record GetCurrencysResponse(
+public sealed record GetCurrenciesResponse(
     IReadOnlyList<CurrencyCode> Items);

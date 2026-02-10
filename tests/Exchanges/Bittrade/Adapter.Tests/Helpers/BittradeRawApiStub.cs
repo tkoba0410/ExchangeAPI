@@ -31,8 +31,8 @@ internal abstract class RawApiStub : IBittradeRawApi
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 
-    public virtual Task<Call<RawPublicRequests.GetCurrencysRequest, RawPublicDtos.GetCurrencysResponse>> GetCurrencysCallAsync(
-        RawPublicRequests.GetCurrencysRequest request,
+    public virtual Task<Call<RawPublicRequests.GetCurrenciesRequest, RawPublicDtos.GetCurrenciesResponse>> GetCurrenciesCallAsync(
+        RawPublicRequests.GetCurrenciesRequest request,
         CancellationToken cancellationToken = default) =>
         throw CreateException();
 

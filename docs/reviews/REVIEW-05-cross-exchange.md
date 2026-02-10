@@ -27,6 +27,13 @@
 
 ### B-1. 揃えるべき（将来追加の足かせになる差分）
 
+- Issue: Optional 表現の多重入口が取引所間で非対称（Facade Extensions + Normalized Extensions + Adapter primitive optional）。  
+- Evidence: `Contracts/Facade/Extensions` に加え、Bittrade は `Normalized/Extensions/NormalizedApiExtensions.cs` と `Adapter/Public/Api/MarketApi.cs` でも optional の convenience 入口を持つ。Bitflyer は同種の多重入口が相対的に少ない。  
+  （`src/Contracts/Facade/Extensions/PublicApiExtensions.cs` / `src/Contracts/Facade/Extensions/PrivateApiExtensions.cs` / `src/Exchanges/Bittrade/Normalized/Extensions/NormalizedApiExtensions.cs` / `src/Exchanges/Bittrade/Adapter/Public/Api/MarketApi.cs`）  
+- Why it matters: 仕様追加時の forwarding 修正点が exchange ごとに増減し、回帰漏れの確率が非対称になる。  
+- Proposed rule: convenience overload は Facade Extensions のみに限定し、Adapter/Normalized 実装は request DTO の単一路線へ寄せる。  
+- Severity: P1  
+
 - Issue: 層内インターフェース命名の非対称（交換所プレフィックス有無）が混在している。  
 - Evidence: `Raw` は `IRawApi`（Bitflyer）と `IBittradeRawApi`（Bittrade）、`Normalized` は `INormalizedApi` と `IBittradeNormalizedApi`、`Wire/Internal` は `IWireCallExecutor` と `IBittradeWireCallExecutor`。  
   （`src/Exchanges/Bitflyer/Raw/Api/IRawApi.cs` / `src/Exchanges/Bittrade/Raw/Api/IBittradeRawApi.cs` / `src/Exchanges/Bitflyer/Normalized/Api/INormalizedApi.cs` / `src/Exchanges/Bittrade/Normalized/Api/IBittradeNormalizedApi.cs` / `src/Exchanges/Bitflyer/Wire/Internal/WireCallExecutor.cs` / `src/Exchanges/Bittrade/Wire/Internal/WireCallExecutor.cs`）  
@@ -108,9 +115,11 @@
 7. Adapter の Contracts 入口構造（単一/固定分割）が既存標準に一致しているか。  
 8. `Operations` の domain 語彙（MarketData/Trading/Account/History/ExchangeInfo）と公開範囲が一致しているか。  
 9. `component` 文字列が `<Exchange>.<Domain>.<Operation>` 形式で一貫しているか。  
-10. endpointId 整合テスト（Inventory consistency / Api naming / WireRequestAssertions）を追加し、既存2取引所と同種の失敗検知ができるか。  
-11. `CallErrorKind -> ExchangeErrorCategory` の mapper テストを実装し、errorKind 比較可能性を確保したか。  
-12. 仕様差による非対称は inventory/例外文書で理由を記録し、「揃えない理由」を1文で説明できるか。  
+10. Contracts 同一操作の Adapter 内部境界で、DTO 受けを維持し primitive 分解を下流直前に限定しているか（例: `Candlesticks`）。  
+11. Optional 入口が多重化していないか（convenience overload は Facade Extensions のみか）。  
+12. endpointId 整合テスト（Inventory consistency / Api naming / WireRequestAssertions）を追加し、既存2取引所と同種の失敗検知ができるか。  
+13. `CallErrorKind -> ExchangeErrorCategory` の mapper テストを実装し、errorKind 比較可能性を確保したか。  
+14. 仕様差による非対称は inventory/例外文書で理由を記録し、「揃えない理由」を1文で説明できるか。  
 
 ---
 

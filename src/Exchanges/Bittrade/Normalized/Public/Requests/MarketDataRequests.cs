@@ -1,3 +1,4 @@
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
@@ -8,7 +9,7 @@ public sealed record GetDepthRequest(ProductCode ProductCode, string? DepthType 
 
 public sealed record GetTradeRequest(ProductCode ProductCode);
 
-public sealed record GetHistoryKlineRequest(ProductCode ProductCode, Period Period, int? Size = null);
+public sealed record GetHistoryKlineRequest(ProductCode ProductCode, Period Period, RequestSize? Size = null);
 
 public sealed record GetTickersRequest;
 

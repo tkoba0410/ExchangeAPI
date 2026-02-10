@@ -66,7 +66,7 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
         CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetCandlesticksAsync(request.Symbol, request.Period, request.Size, cancellationToken);
+        _marketApi.GetCandlesticksAsync(request, cancellationToken);
 
     public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
         ExchangeInfoRequest request,

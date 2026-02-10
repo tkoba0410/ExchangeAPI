@@ -27,13 +27,6 @@
 
 ### B-1. 揃えるべき（将来追加の足かせになる差分）
 
-- Issue: Optional 表現の多重入口が取引所間で非対称（Facade Extensions + Normalized Extensions + Adapter primitive optional）。  
-- Evidence: `Contracts/Facade/Extensions` に加え、Bittrade は `Normalized/Extensions/NormalizedApiExtensions.cs` と `Adapter/Public/Api/MarketApi.cs` でも optional の convenience 入口を持つ。Bitflyer は同種の多重入口が相対的に少ない。  
-  （`src/Contracts/Facade/Extensions/PublicApiExtensions.cs` / `src/Contracts/Facade/Extensions/PrivateApiExtensions.cs` / `src/Exchanges/Bittrade/Normalized/Extensions/NormalizedApiExtensions.cs` / `src/Exchanges/Bittrade/Adapter/Public/Api/MarketApi.cs`）  
-- Why it matters: 仕様追加時の forwarding 修正点が exchange ごとに増減し、回帰漏れの確率が非対称になる。  
-- Proposed rule: convenience overload は Facade Extensions のみに限定し、Adapter/Normalized 実装は request DTO の単一路線へ寄せる。  
-- Severity: P1  
-
 - Issue: 層内インターフェース命名の非対称（交換所プレフィックス有無）が混在している。  
 - Evidence: `Raw` は `IRawApi`（Bitflyer）と `IBittradeRawApi`（Bittrade）、`Normalized` は `INormalizedApi` と `IBittradeNormalizedApi`、`Wire/Internal` は `IWireCallExecutor` と `IBittradeWireCallExecutor`。  
   （`src/Exchanges/Bitflyer/Raw/Api/IRawApi.cs` / `src/Exchanges/Bittrade/Raw/Api/IBittradeRawApi.cs` / `src/Exchanges/Bitflyer/Normalized/Api/INormalizedApi.cs` / `src/Exchanges/Bittrade/Normalized/Api/IBittradeNormalizedApi.cs` / `src/Exchanges/Bitflyer/Wire/Internal/WireCallExecutor.cs` / `src/Exchanges/Bittrade/Wire/Internal/WireCallExecutor.cs`）  

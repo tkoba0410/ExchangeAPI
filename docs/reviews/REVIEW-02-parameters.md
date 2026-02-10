@@ -15,7 +15,7 @@
 - `P2-2`（Bittrade/Bitflyer の複数 request 型昇格）は反映済み（`GetHistoryKlineRequest.Size` の `RequestSize` 化を含む）。
 - `P2-3`（`AccountId` 境界統一、`IApiCredentialProvider.Get(AccountId)` への統一、Composition からの `AccountId` 渡し）は反映済み。
 - `P2-3`（Bitflyer Normalized `productCode` の `ProductCode` 化）は反映済み。
-- 未解消の主要論点は Optional 多重入口。
+- 未解消の主要論点はなし（本レビュー対象）。
 
 ---
 
@@ -97,13 +97,13 @@
 - **Severity:** Closed
 
 ### 4)
-- **Issue:** Optional 表現で `DTO + extension overload + 実装層のプリミティブ引数(default付き)` が重なり、同一責務の入口が多重化している。
+- **Issue:** （解消済み）Optional 表現で `DTO + extension overload + 実装層のプリミティブ引数(default付き)` が重なり、同一責務の入口が多重化していた。
 - **Evidence:**
   - `src/Contracts/Facade/Extensions/PrivateApiExtensions.cs` と `PublicApiExtensions.cs` に convenience overload。
-  - `src/Exchanges/Bittrade/Normalized/Extensions/NormalizedApiExtensions.cs` でさらに多数の primitive overload を提供。
+  - `src/Exchanges/Bittrade/Normalized/Extensions/NormalizedApiExtensions.cs` および `src/Exchanges/Bitflyer/Normalized/Extensions/NormalizedApiExtensions.cs` は削除済み。
 - **Why it matters:** 追加項目が入るたびに同等の forwarding が多層で増殖し、ボイラーコードと変更漏れのリスクが上がる。
 - **Proposed rule:** overload は Facade Extensions のみに限定し、Adapter/Normalized 実装は request DTO の単一路線に寄せる。
-- **Severity:** P1
+- **Severity:** Closed
 
 ### 5)
 - **Issue:** （解消済み）下位層でプリミティブ（`int`, `decimal`, `long`）が業務値として露出し、型での制約表現が弱かった箇所。
@@ -135,7 +135,7 @@
 ### Group G2: Optional の多重入口（DTO + extension overload + implementation primitive default）
 - 典型: 同一機能に 2〜3 種類の入り口。
 - 影響: 仕様追加時の修正点が散らばり、回帰漏れが増える。
-- 代表例: Facade Extensions + Bittrade Normalized Extensions + Adapter メソッド default 引数。
+- 現状: convenience は Facade Extensions に限定し、Normalized Extensions は削除済み。
 
 ### Group G3: ページング契約と実装差
 - 典型: DTO には `Cursor` があるが実装が追従しない。
@@ -156,8 +156,7 @@
 
 ## 総評
 - Facade 層の「`Request DTO + CancellationToken`」は概ね維持されており、方向性は良い。
-- ただし Exchange 実装層・Normalized 拡張層で引数設計が多重化しており、**将来の endpoint 追加時に最も事故を生みやすいのは “DTOとプリミティブの往復フォワード”**。
-- 2026-02-10 時点の優先アクションは、**Optional 多重入口の整理（Facade Extensions へ集約）**。
+- 本レビューで列挙した論点は解消し、現在は運用ルールの継続監視フェーズ。
 
 ---
 

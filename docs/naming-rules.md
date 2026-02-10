@@ -102,3 +102,9 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - 変換責務は Raw -> Normalized 入口に集約し、下流層で再変換しない。
 - `DateTimeOffset` / `bool` / `CancellationToken` / コレクションは本規約の対象外とする。
 - 例外が必要な場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
+
+## 11. Convenience Extension の配置
+
+- primitive/convenience extension は `src/Contracts/Facade/Extensions` のみに配置する。
+- `src/Exchanges/*/Normalized/Extensions` に convenience extension を新規追加してはならない。
+- `Normalized` 層の公開 API は request DTO 受けを本線とし、利用者向け sugar は Facade 側へ集約する。

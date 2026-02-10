@@ -4,5 +4,4 @@ namespace ExchangeApi.Contracts.Facade.Requests;
 
 public sealed record ExecutionsPrivateRequest(
     Symbol Symbol,
-    int? Limit = null,
-    Cursor? Cursor = null);
+    int? Limit = null);

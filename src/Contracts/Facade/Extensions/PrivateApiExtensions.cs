@@ -36,15 +36,13 @@ public static class PrivateApiExtensions
         this IPrivateApi api,
         Symbol symbol,
         int? limit = null,
-        Cursor? cursor = null,
         CancellationToken cancellationToken = default) =>
-        api.GetOrdersAsync(new OrdersRequest(symbol, limit, cursor), cancellationToken);
+        api.GetOrdersAsync(new OrdersRequest(symbol, limit), cancellationToken);
 
     public static Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
         this IPrivateApi api,
         Symbol symbol,
         int? limit = null,
-        Cursor? cursor = null,
         CancellationToken cancellationToken = default) =>
-        api.GetExecutionsPrivateAsync(new ExecutionsPrivateRequest(symbol, limit, cursor), cancellationToken);
+        api.GetExecutionsPrivateAsync(new ExecutionsPrivateRequest(symbol, limit), cancellationToken);
 }

@@ -10,12 +10,12 @@
 - `P1-1`（`ExchangeClient -> Trading/PrivateApi` の `OrderLimitAsync` / `CancelOrderAsync` DTO 委譲）は Bittrade/Bitflyer とも反映済み。
 - `P1-1`（Bittrade Normalized の `GetOrders` / `PostOrdersSubmitCancelByOrderId` / `GetOpenOrders` / `GetOrdersByOrderId` / `GetMatchResults` の request 委譲）は反映済み。
 - `P1-2`（`BalanceRequest` の受け渡し統一）は反映済み。`ExchangeClient -> Private/Account API` で request を渡している。
-- `P1-3`（`Cursor` 黙殺の解消）は反映済み。`OrdersRequest.Cursor` / `ExecutionsPrivateRequest.Cursor` 指定時に Bittrade/Bitflyer Adapter.Private で `NotSupported` を返す。
+- `P1-3`（Cursor 契約の扱い）は方針決定済み。共通 Contract（`OrdersRequest` / `ExecutionsPrivateRequest`）から `Cursor` を除去した。
 - `P2-1`（`CancellationToken` 命名揺れ）は反映済み。少なくとも `src` 配下で `CancellationToken ct` は未検出。
 - `P2-2`（Bittrade/Bitflyer の複数 request 型昇格）は反映済み（`GetHistoryKlineRequest.Size` の `RequestSize` 化を含む）。
 - `P2-3`（`AccountId` 境界統一、`IApiCredentialProvider.Get(AccountId)` への統一、Composition からの `AccountId` 渡し）は反映済み。
 - `P2-3`（Bitflyer Normalized `productCode` の `ProductCode` 化）は反映済み。
-- 未解消の主要論点は Optional 多重入口と Cursor 契約の扱い確定。
+- 未解消の主要論点は Optional 多重入口。
 
 ---
 
@@ -77,15 +77,14 @@
 - **Severity:** Closed
 
 ### 2)
-- **Issue:** `OrdersRequest` / `ExecutionsPrivateRequest` の `Cursor` は契約上存在するが、現時点では実データ取得には未対応（`NotSupported` 応答）。
+- **Issue:** （解消済み）`OrdersRequest` / `ExecutionsPrivateRequest` の `Cursor` 契約。
 - **Evidence:**
-  - `src/Contracts/Facade/Requests/OrdersRequest.cs` は `Cursor? Cursor` を保持。
-  - `src/Contracts/Facade/Requests/ExecutionsPrivateRequest.cs` は `Cursor? Cursor` を保持。
-  - `src/Exchanges/Bitflyer/Adapter/Private/Api/PrivateApi.cs` `GetOrdersAsync` / `GetExecutionsPrivateAsync` は `request.Cursor is not null` の場合に `NotSupported` を返す。
-  - `src/Exchanges/Bittrade/Adapter/Private/Api/SpotHistoryApi.cs` `GetOrdersAsync` / `GetExecutionsPrivateAsync` も同様に `NotSupported` を返す。
+  - `src/Contracts/Facade/Requests/OrdersRequest.cs` から `Cursor` を除去。
+  - `src/Contracts/Facade/Requests/ExecutionsPrivateRequest.cs` から `Cursor` を除去。
+  - `src/Contracts/Facade/Extensions/PrivateApiExtensions.cs` の `GetOrdersAsync` / `GetExecutionsPrivateAsync` から cursor 引数を除去。
 - **Why it matters:** API 契約として cursor pagination を想定して見える一方、実装が追従していないため、取引所追加時に誤解・実装漏れ・不完全互換の温床になる。
 - **Proposed rule:** `Cursor` を契約に残すなら全 exchange 実装で “使用・無視理由・NotSupported 応答” のいずれかを明示する。未対応が確定なら DTO から除去。
-- **Severity:** P1
+- **Severity:** Closed
 
 ### 3)
 - **Issue:** （解消済み）`CancellationToken` の命名揺れ。
@@ -139,9 +138,9 @@
 - 代表例: Facade Extensions + Bittrade Normalized Extensions + Adapter メソッド default 引数。
 
 ### Group G3: ページング契約と実装差
-- 典型: DTO には `Cursor` があるが実装は `NotSupported` 応答で、実ページングは未実装。
+- 典型: DTO には `Cursor` があるが実装が追従しない。
 - 影響: “対応済みの見かけ” による誤利用。
-- 代表例: `OrdersRequest`, `ExecutionsPrivateRequest` の Adapter 実装。
+- 現状: 共通 Contract から `Cursor` を除去し、本レビュー対象の乖離は解消済み。
 
 ### Group G4: CT 命名揺れ
 - 典型: `cancellationToken` と `ct` の混在。
@@ -158,7 +157,7 @@
 ## 総評
 - Facade 層の「`Request DTO + CancellationToken`」は概ね維持されており、方向性は良い。
 - ただし Exchange 実装層・Normalized 拡張層で引数設計が多重化しており、**将来の endpoint 追加時に最も事故を生みやすいのは “DTOとプリミティブの往復フォワード”**。
-- 2026-02-10 時点の優先アクションは、**(1) Cursor 契約の扱い確定（実装 or DTO から除去）**, **(2) Optional 多重入口の整理（Facade Extensions へ集約）**。
+- 2026-02-10 時点の優先アクションは、**Optional 多重入口の整理（Facade Extensions へ集約）**。
 
 ---
 

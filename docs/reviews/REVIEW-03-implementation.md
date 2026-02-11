@@ -216,3 +216,6 @@ function UseCase(request):
 - 指摘 4（decimal 不正値ハンドリング不統一）は対応済み。
 - decimal 方針を「必須は Fail-fast（Mapping）／任意は null 許容。ただし不正フォーマットは Mapping」に固定。
 - `Bitflyer` の `TradingCommissionResponse.commission_rate` は空/null を `null` 許容し、不正値は `Mapping` で失敗する実装へ変更。
+- 指摘 5（timestamp 欠損時の補完戦略不統一）は対応済み。
+- `Bittrade` の `UtcNow` 補完を除去し、endpoint ごとの `TimestampPolicy`（`Required` / `Optional`）で欠損時挙動を固定。
+- `GetDetailMerged` は `Required`（欠損時 `Mapping`）、`GetTickers` は `Optional`（欠損時 `null`）として実装。

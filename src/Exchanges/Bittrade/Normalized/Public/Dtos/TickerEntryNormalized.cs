@@ -9,6 +9,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 public sealed record TickerEntryNormalized(
     Symbol Symbol,
     decimal LastTradedPrice,
-    DateTimeOffset Timestamp,
+    DateTimeOffset? Timestamp,
     JsonElement RawSnapshot,
     IReadOnlyDictionary<FreeText, JsonElement> Extras) : ILosslessNormalized;

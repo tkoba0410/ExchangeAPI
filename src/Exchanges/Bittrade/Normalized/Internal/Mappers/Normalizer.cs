@@ -23,6 +23,7 @@ internal static class Normalizer
 
     internal static bool TryNormalizeTicker(
         RawPublicDtos.GetDetailMergedResponse response,
+        TimestampPolicy timestampPolicy,
         string? rawJson,
         out TickerNormalized? normalized,
         out CallError? error)
@@ -42,11 +43,21 @@ internal static class Normalizer
         }
 
         var tick = response.Tick;
-        var timestamp = tick.Ts ?? response.Ts ?? DateTimeOffset.UtcNow;
+        if (!TryResolveTimestamp(
+            tick.Ts ?? response.Ts,
+            timestampPolicy,
+            "GetDetailMergedResponse.timestamp",
+            out var timestamp,
+            out error))
+        {
+            normalized = null;
+            return false;
+        }
+
         var snapshot = ExtractSnapshot(rawJson ?? Serialize(response));
         normalized = new TickerNormalized(
             tick.Close,
-            timestamp,
+            timestamp!.Value,
             snapshot,
             new Dictionary<FreeText, JsonElement>());
         error = null;
@@ -193,12 +204,13 @@ internal static class Normalizer
 
     internal static bool TryNormalizeTickers(
         IReadOnlyList<RawPublicDtos.RawTickerEntry>? entries,
+        TimestampPolicy timestampPolicy,
         out IReadOnlyList<TickerEntryNormalized>? normalized,
         out CallError? error)
     {
         try
         {
-            normalized = BuildTickers(entries);
+            normalized = BuildTickers(entries, timestampPolicy);
             error = null;
             return true;
         }
@@ -211,22 +223,58 @@ internal static class Normalizer
     }
 
     private static IReadOnlyList<TickerEntryNormalized> BuildTickers(
-        IReadOnlyList<RawPublicDtos.RawTickerEntry>? entries)
+        IReadOnlyList<RawPublicDtos.RawTickerEntry>? entries,
+        TimestampPolicy timestampPolicy)
     {
         if (entries is null || entries.Count == 0)
         {
             return Array.Empty<TickerEntryNormalized>();
         }
 
-        var now = DateTimeOffset.UtcNow;
+        if (!TryResolveTimestamp(
+            timestamp: null,
+            timestampPolicy,
+            "GetTickersResponse.data[].timestamp",
+            out var timestamp,
+            out var error))
+        {
+            throw new InvalidOperationException(error?.Message ?? "GetTickersResponse timestamp resolution failed.");
+        }
+
         return entries
             .Select(entry => new TickerEntryNormalized(
                 Symbol.Parse(entry.Symbol),
                 entry.Close,
-                now,
-                ExtractSnapshot(Serialize(entry)),
+                timestamp,
+                EmptySnapshot(),
                 new Dictionary<FreeText, JsonElement>()))
             .ToList();
+    }
+
+    private static bool TryResolveTimestamp(
+        DateTimeOffset? timestamp,
+        TimestampPolicy policy,
+        string field,
+        out DateTimeOffset? resolved,
+        out CallError? error)
+    {
+        if (timestamp.HasValue)
+        {
+            resolved = timestamp;
+            error = null;
+            return true;
+        }
+
+        if (policy == TimestampPolicy.Optional)
+        {
+            resolved = null;
+            error = null;
+            return true;
+        }
+
+        resolved = null;
+        error = new CallError(CallErrorKind.Mapping, $"Missing required timestamp: {field}.");
+        return false;
     }
 
     internal static bool TryNormalizeBalances(

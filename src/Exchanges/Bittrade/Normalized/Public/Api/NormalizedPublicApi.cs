@@ -129,7 +129,7 @@ internal sealed class NormalizedPublicApi
             ok => DetectInvalidStatus(ok.Status, "ticker"),
             ok =>
             {
-                if (!Normalizer.TryNormalizeTicker(ok, rawCall.Meta.RawJson, out var ticker, out var normalizeError))
+                if (!Normalizer.TryNormalizeTicker(ok, TimestampPolicy.Required, rawCall.Meta.RawJson, out var ticker, out var normalizeError))
                 {
                     return MapResult<GetDetailMergedResponse>.Fail(normalizeError!);
                 }
@@ -280,7 +280,7 @@ internal sealed class NormalizedPublicApi
             ok => DetectInvalidStatus(ok.Status, "tickers"),
             ok =>
             {
-                if (!Normalizer.TryNormalizeTickers(ok.Data, out var tickers, out var normalizeError))
+                if (!Normalizer.TryNormalizeTickers(ok.Data, TimestampPolicy.Optional, out var tickers, out var normalizeError))
                 {
                     return MapResult<GetTickersResponse>.Fail(normalizeError!);
                 }

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Markets;
+namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Api.Markets;
 
 public interface IMarketResolver
 {

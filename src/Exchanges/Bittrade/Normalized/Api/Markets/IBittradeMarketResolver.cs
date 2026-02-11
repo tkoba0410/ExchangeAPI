@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
+namespace ExchangeApi.Exchanges.Bittrade.Normalized.Api.Markets;
 
 public interface IBittradeMarketResolver
 {

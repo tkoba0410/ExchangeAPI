@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Api.Markets;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Primitives.DomainCommon.Types;
 

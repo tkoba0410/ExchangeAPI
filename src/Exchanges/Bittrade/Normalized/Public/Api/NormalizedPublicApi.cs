@@ -231,7 +231,7 @@ internal sealed class NormalizedPublicApi
     public async Task<Call<NormalizedRequests.GetHistoryKlineRequest, GetHistoryKlineResponse>> GetHistoryKlineCallAsync(
         ProductCode productCode,
         Period period,
-        RequestSize? size = null,
+        int? size = null,
         CancellationToken cancellationToken = default)
     {
         var request = new NormalizedRequests.GetHistoryKlineRequest(productCode, period, size);
@@ -247,7 +247,7 @@ internal sealed class NormalizedPublicApi
 
         var rawCall = await _raw
             .GetHistoryKlineCallAsync(
-                new RawPublicRequests.GetHistoryKlineRequest(new Symbol(symbolText), period, size?.Value),
+                new RawPublicRequests.GetHistoryKlineRequest(new Symbol(symbolText), period, size),
                 cancellationToken)
             .ConfigureAwait(false);
 

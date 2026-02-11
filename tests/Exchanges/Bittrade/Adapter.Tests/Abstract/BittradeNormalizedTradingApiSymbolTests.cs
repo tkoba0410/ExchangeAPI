@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Api.Markets;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Helpers;
 using ExchangeApi.Primitives.CallCommon;

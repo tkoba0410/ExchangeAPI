@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Markets;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api.Markets;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized;

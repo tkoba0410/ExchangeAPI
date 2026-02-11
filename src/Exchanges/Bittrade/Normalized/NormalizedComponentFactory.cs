@@ -1,5 +1,5 @@
 using System;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Markets;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Api.Markets;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;

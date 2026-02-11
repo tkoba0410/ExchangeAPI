@@ -219,3 +219,5 @@ function UseCase(request):
 - 指摘 5（timestamp 欠損時の補完戦略不統一）は対応済み。
 - `Bittrade` の `UtcNow` 補完を除去し、endpoint ごとの `TimestampPolicy`（`Required` / `Optional`）で欠損時挙動を固定。
 - `GetDetailMerged` は `Required`（欠損時 `Mapping`）、`GetTickers` は `Optional`（欠損時 `null`）として実装。
+- 指摘 6（Endpoint component 直書き）は対応済み。
+- `Bittrade RawPrivateClient.PostWithdrawVirtualByAddressIdCreateCallAsync` の component 直書きを廃止し、`Component(EndpointIds.PostWithdrawVirtualByAddressIdCreate)` へ統一。

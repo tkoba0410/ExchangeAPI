@@ -274,12 +274,12 @@ internal sealed class RawPrivateClient
         CancellationToken cancellationToken = default) =>
         SendAndParse(
             request,
-            "Bittrade.PostWithdrawApiCreateByAddressId",
+            Component(EndpointIds.PostWithdrawVirtualByAddressIdCreate),
             PrivateEndpoints.PostWithdrawVirtualByAddressIdCreate(request.AddressId.Value),
             cancellationToken,
             json => RawJson.DeserializeOrThrow<PostWithdrawVirtualByAddressIdCreateResponse>(
                 json,
-                "Bittrade.PostWithdrawApiCreateByAddressId"));
+                Component(EndpointIds.PostWithdrawVirtualByAddressIdCreate)));
 
     public Task<Call<PostWithdrawVirtualByWithdrawIdCancelRequest, PostWithdrawVirtualByWithdrawIdCancelResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
         PostWithdrawVirtualByWithdrawIdCancelRequest request,

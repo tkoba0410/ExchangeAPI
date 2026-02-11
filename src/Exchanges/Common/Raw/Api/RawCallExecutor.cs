@@ -3,7 +3,7 @@ using System.Text.Json;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Raw.Api;
+namespace ExchangeApi.Exchanges.Common.Raw.Api;
 
 internal sealed class RawCallExecutor
 {

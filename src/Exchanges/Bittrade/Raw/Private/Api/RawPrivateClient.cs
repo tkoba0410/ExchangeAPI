@@ -2,13 +2,13 @@ using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Common.Raw.Api;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 using ExchangeApi.Exchanges.Bittrade.Wire.Internal;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;

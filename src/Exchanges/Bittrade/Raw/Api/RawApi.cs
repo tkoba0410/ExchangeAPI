@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bittrade.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Requests;
+using ExchangeApi.Exchanges.Common.Raw.Api;
 using ExchangeApi.Exchanges.Bittrade.Wire.Internal;
 using ExchangeApi.Primitives.CallCommon;
 

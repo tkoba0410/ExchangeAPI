@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Common.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;

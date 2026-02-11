@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bitflyer.Raw.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Dtos;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Public.Requests;
+using ExchangeApi.Exchanges.Common.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Internal;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;

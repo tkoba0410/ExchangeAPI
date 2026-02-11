@@ -5,11 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Requests;
+using ExchangeApi.Exchanges.Common.Raw.Api;
 using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 using ExchangeApi.Exchanges.Bittrade.Wire.Internal;
 using ExchangeApi.Exchanges.Bittrade.Wire.Public.Endpoints;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;

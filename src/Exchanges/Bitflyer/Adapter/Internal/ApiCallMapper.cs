@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Primitives.CallCommon;
 
@@ -11,25 +12,25 @@ internal static class ApiCallMapper
         TReq request,
         Call<TNormReq, TOk> normalizedCall,
         string component) =>
-        ApiCallMapperBase.FromCall(request, normalizedCall, component);
+        AdapterCallMapper.FromCall(request, normalizedCall, component);
 
     public static Call<TReq, TOk> MapCall<TReq, TNormReq, TNormRes, TOk>(
         TReq request,
         Call<TNormReq, TNormRes> normalizedCall,
         string component,
         Func<TNormRes, TOk> mapper) =>
-        ApiCallMapperBase.MapCall(request, normalizedCall, component, mapper);
+        AdapterCallMapper.MapCall(request, normalizedCall, component, mapper);
 
     public static Call<TReq, TOk> FromException<TReq, TOk>(
         TReq request,
         DateTimeOffset startedAt,
         string component,
         Exception ex) =>
-        ApiCallMapperBase.FromException<TReq, TOk>(request, startedAt, component, ex);
+        AdapterCallMapper.FromException<TReq, TOk>(request, startedAt, component, ex);
 
     public static ExchangeErrorCategory? ToExchangeErrorCategory(CallError error) =>
-        ApiCallMapperBase.ToExchangeErrorCategory(error);
+        AdapterCallMapper.ToExchangeErrorCategory(error);
 
     public static HttpStatusCode? ToStatusCode(int? statusCode) =>
-        ApiCallMapperBase.ToStatusCode(statusCode);
+        AdapterCallMapper.ToStatusCode(statusCode);
 }

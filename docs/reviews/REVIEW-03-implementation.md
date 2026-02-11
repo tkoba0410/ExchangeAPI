@@ -221,3 +221,6 @@ function UseCase(request):
 - `GetDetailMerged` は `Required`（欠損時 `Mapping`）、`GetTickers` は `Optional`（欠損時 `null`）として実装。
 - 指摘 6（Endpoint component 直書き）は対応済み。
 - `Bittrade RawPrivateClient.PostWithdrawVirtualByAddressIdCreateCallAsync` の component 直書きを廃止し、`Component(EndpointIds.PostWithdrawVirtualByAddressIdCreate)` へ統一。
+- 指摘 7（`RawCallExecutor` / `ApiCallMapperBase` 重複）は対応済み。
+- `RawCallExecutor` は `src/Exchanges/Common/Raw/Api/RawCallExecutor.cs` へ一本化し、Bitflyer/Bittrade Raw から共通実装を利用。
+- `ApiCallMapperBase` は Bitflyer/Bittrade 両方で削除し、`ApiCallMapper` から `AdapterCallMapper` へ直接委譲する形に統一。

@@ -37,13 +37,9 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetSymbols),
+            ok => DetectInvalidStatus(ok.Status, "symbols"),
             ok =>
             {
-                if (!TryRequireOk(ok.Status, "symbols", out var error))
-                {
-                    return MapResult<GetSymbolsResponse>.Fail(error);
-                }
-
                 if (ok.Data is null)
                 {
                     return MapResult<GetSymbolsResponse>.Fail(
@@ -71,13 +67,9 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetCurrencies),
+            ok => DetectInvalidStatus(ok.Status, "currencys"),
             ok =>
             {
-                if (!TryRequireOk(ok.Status, "currencys", out var error))
-                {
-                    return MapResult<GetCurrenciesResponse>.Fail(error);
-                }
-
                 if (ok.Data is null)
                 {
                     return MapResult<GetCurrenciesResponse>.Ok(new GetCurrenciesResponse(Array.Empty<CurrencyCode>()));
@@ -104,13 +96,9 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetTimestamp),
+            ok => DetectInvalidStatus(ok.Status, "timestamp"),
             ok =>
             {
-                if (!TryRequireOk(ok.Status, "timestamp", out var error))
-                {
-                    return MapResult<GetTimestampResponse>.Fail(error);
-                }
-
                 return MapResult<GetTimestampResponse>.Ok(new GetTimestampResponse(ok.Data));
             });
     }
@@ -138,13 +126,9 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetDetailMerged),
+            ok => DetectInvalidStatus(ok.Status, "ticker"),
             ok =>
             {
-                if (!TryRequireOk(ok.Status, "ticker", out var error))
-                {
-                    return MapResult<GetDetailMergedResponse>.Fail(error);
-                }
-
                 if (!Normalizer.TryNormalizeTicker(ok, rawCall.Meta.RawJson, out var ticker, out var normalizeError))
                 {
                     return MapResult<GetDetailMergedResponse>.Fail(normalizeError!);
@@ -194,13 +178,9 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetDepth),
+            ok => DetectInvalidStatus(ok.Status, "orderbook"),
             ok =>
             {
-                if (!TryRequireOk(ok.Status, "orderbook", out var error))
-                {
-                    return MapResult<GetDepthResponse>.Fail(error);
-                }
-
                 if (!Normalizer.TryNormalizeOrderBook(ok.Tick!, out var orderBook, out var normalizeError))
                 {
                     return MapResult<GetDepthResponse>.Fail(normalizeError!);
@@ -235,13 +215,9 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetTrade),
+            ok => DetectInvalidStatus(ok.Status, "trades"),
             ok =>
             {
-                if (!TryRequireOk(ok.Status, "trades", out var error))
-                {
-                    return MapResult<GetTradeResponse>.Fail(error);
-                }
-
                 var entries = ok.Tick?.Data;
                 if (!Normalizer.TryNormalizeExecutions(entries!, rawCall.Meta.RawJson, out var executions, out var normalizeError))
                 {
@@ -279,13 +255,9 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetHistoryKline),
+            ok => DetectInvalidStatus(ok.Status, "klines"),
             ok =>
             {
-                if (!TryRequireOk(ok.Status, "klines", out var error))
-                {
-                    return MapResult<GetHistoryKlineResponse>.Fail(error);
-                }
-
                 if (!Normalizer.TryNormalizeKlines(ok.Data, out var klines, out var normalizeError))
                 {
                     return MapResult<GetHistoryKlineResponse>.Fail(normalizeError!);
@@ -305,13 +277,9 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetTickers),
+            ok => DetectInvalidStatus(ok.Status, "tickers"),
             ok =>
             {
-                if (!TryRequireOk(ok.Status, "tickers", out var error))
-                {
-                    return MapResult<GetTickersResponse>.Fail(error);
-                }
-
                 if (!Normalizer.TryNormalizeTickers(ok.Data, out var tickers, out var normalizeError))
                 {
                     return MapResult<GetTickersResponse>.Fail(normalizeError!);
@@ -344,13 +312,9 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetHistoryTrade),
+            ok => DetectInvalidStatus(ok.Status, "history trades"),
             ok =>
             {
-                if (!TryRequireOk(ok.Status, "history trades", out var error))
-                {
-                    return MapResult<GetHistoryTradeResponse>.Fail(error);
-                }
-
                 if (!Normalizer.TryNormalizeTradeHistory(ok.Data, out var history, out var normalizeError))
                 {
                     return MapResult<GetHistoryTradeResponse>.Fail(normalizeError!);
@@ -364,6 +328,7 @@ internal sealed class NormalizedPublicApi
         Call<TRawReq, TRaw> rawCall,
         TReq request,
         string component,
+        Func<TRaw, CallError?> businessErrorDetector,
         Func<TRaw, MapResult<TOk>> mapper)
     {
         return rawCall.Result switch
@@ -375,7 +340,7 @@ internal sealed class NormalizedPublicApi
                 Request: request,
                 Result: new CallResult<TOk>.Err(err.Error),
                 Meta: rawCall.Meta),
-            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, businessErrorDetector, mapper),
             _ => new Call<TReq, TOk>(
                 Id: CallId.New(),
                 StartedAt: rawCall.StartedAt,
@@ -429,10 +394,23 @@ internal sealed class NormalizedPublicApi
         TReq request,
         string component,
         TRaw raw,
+        Func<TRaw, CallError?> businessErrorDetector,
         Func<TRaw, MapResult<TOk>> mapper)
     {
         try
         {
+            var businessError = businessErrorDetector(raw);
+            if (businessError is not null)
+            {
+                return new Call<TReq, TOk>(
+                    Id: CallId.New(),
+                    StartedAt: rawCall.StartedAt,
+                    Duration: rawCall.Duration,
+                    Request: request,
+                    Result: new CallResult<TOk>.Err(businessError),
+                    Meta: rawCall.Meta);
+            }
+
             var result = mapper(raw);
             if (result.Error is not null)
             {
@@ -467,16 +445,14 @@ internal sealed class NormalizedPublicApi
         }
     }
 
-    private static bool TryRequireOk(string? status, string operation, out CallError error)
+    private static CallError? DetectInvalidStatus(string? status, string operation)
     {
         if (!string.Equals(status, "ok", StringComparison.OrdinalIgnoreCase))
         {
-            error = new CallError(CallErrorKind.Semantic, $"Bittrade {operation} response status invalid: {status}.");
-            return false;
+            return new CallError(CallErrorKind.Semantic, $"Bittrade {operation} response status invalid: {status}.");
         }
 
-        error = null!;
-        return true;
+        return null;
     }
 
     private static bool TryGetRawDepthType(string? depthType, out string rawDepth, out CallError? error)

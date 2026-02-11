@@ -952,7 +952,11 @@ internal sealed class NormalizedPrivateApi
 
             if (root.TryGetProperty("commission_rate", out var commissionElement))
             {
-                commissionRate = TryParseDecimal(commissionElement);
+                if (!TryParseOptionalDecimal(commissionElement, "commission_rate", "TradingCommissionResponse", out commissionRate, out error))
+                {
+                    normalized = null;
+                    return false;
+                }
             }
         }
 
@@ -963,26 +967,66 @@ internal sealed class NormalizedPrivateApi
         return true;
     }
 
-    private static decimal? TryParseDecimal(JsonElement element)
+    private static bool TryParseOptionalDecimal(
+        JsonElement element,
+        string field,
+        string dto,
+        out decimal? parsed,
+        out CallError? error)
     {
-        return element.ValueKind switch
+        switch (element.ValueKind)
         {
-            JsonValueKind.Number => element.GetDecimal(),
-            JsonValueKind.String => TryParseDecimalString(element.GetString()),
-            _ => null
-        };
+            case JsonValueKind.Null:
+            case JsonValueKind.Undefined:
+                parsed = null;
+                error = null;
+                return true;
+            case JsonValueKind.Number:
+                try
+                {
+                    parsed = element.GetDecimal();
+                    error = null;
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    parsed = null;
+                    error = new CallError(CallErrorKind.Mapping, $"Invalid decimal for {dto}.{field}.", ex);
+                    return false;
+                }
+            case JsonValueKind.String:
+                return TryParseOptionalDecimalString(element.GetString(), field, dto, out parsed, out error);
+            default:
+                parsed = null;
+                error = new CallError(CallErrorKind.Mapping, $"Invalid decimal token for {dto}.{field}: {element.ValueKind}.");
+                return false;
+        }
     }
 
-    private static decimal? TryParseDecimalString(string? value)
+    private static bool TryParseOptionalDecimalString(
+        string? value,
+        string field,
+        string dto,
+        out decimal? parsed,
+        out CallError? error)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return null;
+            parsed = null;
+            error = null;
+            return true;
         }
 
-        return decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed)
-            ? parsed
-            : null;
+        if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var decimalValue))
+        {
+            parsed = decimalValue;
+            error = null;
+            return true;
+        }
+
+        parsed = null;
+        error = new CallError(CallErrorKind.Mapping, $"Invalid decimal for {dto}.{field}: '{value}'.");
+        return false;
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(
@@ -1039,17 +1083,6 @@ internal sealed class NormalizedPrivateApi
                 Duration: rawCall.Duration,
                 Request: request,
                 Result: new CallResult<TOk>.Ok(mapped),
-                Meta: rawCall.Meta);
-        }
-        catch (InvalidOperationException ex)
-        {
-            var error = new CallError(CallErrorKind.Semantic, ex.Message, ex);
-            return new Call<TReq, TOk>(
-                Id: CallId.New(),
-                StartedAt: rawCall.StartedAt,
-                Duration: rawCall.Duration,
-                Request: request,
-                Result: new CallResult<TOk>.Err(error),
                 Meta: rawCall.Meta);
         }
         catch (Exception ex)

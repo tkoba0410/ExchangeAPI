@@ -203,3 +203,16 @@ function UseCase(request):
   - 共通骨格コードの重複
   にズレがある。
 - まずは **Group-1〜3** の規約化（ドキュメント化）を先行し、その後に段階的な共通化を進めると、テスト分岐と運用ドリフトを最小化できる。
+
+---
+
+## 実施メモ（2026-02-11）
+- 指摘 2（業務エラー判定の位置/有無の不統一）は対応済み。
+- `Bitflyer` / `Bittrade` の `NormalizedPublicApi.CreateCall` に business error detector を必須引数として追加し、`MapOk` の先頭で必ず評価する形へ統一。
+- `Bittrade` は `TryRequireOk` のインライン呼び出しを廃止し、`DetectInvalidStatus` を detector 段として適用。
+- `Bitflyer` は payload 業務エラーがない endpoint でも `NoBusinessError` detector を明示的に通す構成に変更。
+- 指摘 3（Mapping 例外分類の不統一）は対応済み。
+- `Bitflyer NormalizedPrivateApi.MapOk` の `InvalidOperationException => Semantic` 特例を削除し、`MapOk` 例外は `Mapping` に一本化。
+- 指摘 4（decimal 不正値ハンドリング不統一）は対応済み。
+- decimal 方針を「必須は Fail-fast（Mapping）／任意は null 許容。ただし不正フォーマットは Mapping」に固定。
+- `Bitflyer` の `TradingCommissionResponse.commission_rate` は空/null を `null` 許容し、不正値は `Mapping` で失敗する実装へ変更。

@@ -36,6 +36,7 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetMarkets),
+            NoBusinessError,
             raw =>
             {
                 var mapped = new List<MarketNormalized>(raw.Count);
@@ -67,6 +68,7 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetTicker),
+            NoBusinessError,
             raw =>
             {
                 if (!TickerNormalizer.TryNormalize(raw, rawCall.Meta.RawJson, out var ticker, out var error))
@@ -96,6 +98,7 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetBoard),
+            NoBusinessError,
             raw =>
             {
                 if (!OrderBookNormalizer.TryNormalize(raw, out var orderBook, out var error))
@@ -129,6 +132,7 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetExecutionsPublic),
+            NoBusinessError,
             raw =>
             {
                 if (!ExecutionNormalizer.TryNormalizeList(raw, rawCall.Meta.RawJson, out var executions, out var error))
@@ -154,6 +158,7 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetHealth),
+            NoBusinessError,
             raw =>
             {
                 if (!HealthNormalizer.TryNormalize(raw, out var normalized, out var error))
@@ -178,6 +183,7 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetBoardState),
+            NoBusinessError,
             raw =>
             {
                 if (!BoardStateNormalizer.TryNormalize(raw, out var normalized, out var error))
@@ -206,6 +212,7 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetChats),
+            NoBusinessError,
             raw =>
             {
                 var mapped = new List<ChatNormalized>(raw.Count);
@@ -236,6 +243,7 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetCorporateLeverage),
+            NoBusinessError,
             raw => MapResult<GetCorporateLeverageResponse>.Ok(
                 new GetCorporateLeverageResponse(
                     raw.CurrentMax,
@@ -257,6 +265,7 @@ internal sealed class NormalizedPublicApi
             rawCall,
             request,
             Component(EndpointIds.GetFundingRate),
+            NoBusinessError,
             raw => MapResult<GetFundingRateResponse>.Ok(
                 new GetFundingRateResponse(
                     raw.CurrentFundingRate,
@@ -267,6 +276,7 @@ internal sealed class NormalizedPublicApi
         Call<TRawReq, TRaw> rawCall,
         TReq request,
         string component,
+        Func<TRaw, CallError?> businessErrorDetector,
         Func<TRaw, MapResult<TOk>> mapper)
     {
         return rawCall.Result switch
@@ -278,7 +288,7 @@ internal sealed class NormalizedPublicApi
                 Request: request,
                 Result: new CallResult<TOk>.Err(err.Error),
                 Meta: rawCall.Meta),
-            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, mapper),
+            CallResult<TRaw>.Ok ok => MapOk(rawCall, request, component, ok.Response, businessErrorDetector, mapper),
             _ => new Call<TReq, TOk>(
                 Id: CallId.New(),
                 StartedAt: rawCall.StartedAt,
@@ -294,10 +304,23 @@ internal sealed class NormalizedPublicApi
         TReq request,
         string component,
         TRaw raw,
+        Func<TRaw, CallError?> businessErrorDetector,
         Func<TRaw, MapResult<TOk>> mapper)
     {
         try
         {
+            var businessError = businessErrorDetector(raw);
+            if (businessError is not null)
+            {
+                return new Call<TReq, TOk>(
+                    Id: CallId.New(),
+                    StartedAt: rawCall.StartedAt,
+                    Duration: rawCall.Duration,
+                    Request: request,
+                    Result: new CallResult<TOk>.Err(businessError),
+                    Meta: rawCall.Meta);
+            }
+
             var result = mapper(raw);
             if (result.Error is not null)
             {
@@ -333,6 +356,8 @@ internal sealed class NormalizedPublicApi
     }
 
     private static string Component(string endpointId) => $"Bitflyer.{endpointId}";
+
+    private static CallError? NoBusinessError<TRaw>(TRaw _) => null;
 
     private readonly record struct MapResult<TOk>(TOk? Value, CallError? Error)
     {

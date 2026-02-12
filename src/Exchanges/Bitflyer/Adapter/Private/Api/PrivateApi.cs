@@ -10,6 +10,7 @@ using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Primitives.CallCommon;
@@ -38,7 +39,7 @@ internal sealed class PrivateApi
         try
         {
             var call = await _normalized.GetBalanceCallAsync(cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.Account.GetBalance,
@@ -46,7 +47,7 @@ internal sealed class PrivateApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<BalanceRequest, BalanceResponse>(
+            return AdapterCallMapper.FromException<BalanceRequest, BalanceResponse>(
                 request,
                 startedAt,
                 Operations.Account.GetBalance,
@@ -63,7 +64,7 @@ internal sealed class PrivateApi
         try
         {
             var call = await _normalized.GetChildOrdersCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.History.GetOrders,
@@ -71,7 +72,7 @@ internal sealed class PrivateApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<OrdersRequest, OrdersResponse>(
+            return AdapterCallMapper.FromException<OrdersRequest, OrdersResponse>(
                 request,
                 startedAt,
                 Operations.History.GetOrders,
@@ -89,7 +90,7 @@ internal sealed class PrivateApi
         {
             var call = await _normalized.GetExecutionsPrivateCallAsync(request.Symbol, cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.History.GetExecutions,
@@ -97,7 +98,7 @@ internal sealed class PrivateApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
+            return AdapterCallMapper.FromException<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
                 request,
                 startedAt,
                 Operations.History.GetExecutions,
@@ -123,7 +124,7 @@ internal sealed class PrivateApi
             var call = await _normalized
                 .SendChildOrderCallAsync(normalizedRequest, cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.Trading.PlaceOrder,
@@ -134,7 +135,7 @@ internal sealed class PrivateApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<OrderLimitRequest, OrderLimitResponse>(
+            return AdapterCallMapper.FromException<OrderLimitRequest, OrderLimitResponse>(
                 request,
                 startedAt,
                 Operations.Trading.PlaceOrder,
@@ -152,7 +153,7 @@ internal sealed class PrivateApi
         try
         {
             var call = await _normalized.CancelChildOrderCallAsync(request.Symbol, request.OrderKey, cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.Trading.CancelOrder,
@@ -160,7 +161,7 @@ internal sealed class PrivateApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<CancelOrderRequest, CancelOrderResponse>(
+            return AdapterCallMapper.FromException<CancelOrderRequest, CancelOrderResponse>(
                 request,
                 startedAt,
                 Operations.Trading.CancelOrder,

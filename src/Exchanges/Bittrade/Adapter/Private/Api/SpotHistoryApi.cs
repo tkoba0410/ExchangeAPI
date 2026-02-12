@@ -10,6 +10,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
@@ -40,7 +41,7 @@ internal sealed class SpotHistoryApi
                     new ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.GetOpenOrdersRequest(request.Symbol),
                     cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.History.GetOrders,
@@ -48,7 +49,7 @@ internal sealed class SpotHistoryApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<OrdersRequest, OrdersResponse>(
+            return AdapterCallMapper.FromException<OrdersRequest, OrdersResponse>(
                 request,
                 startedAt,
                 Operations.History.GetOrders,
@@ -67,7 +68,7 @@ internal sealed class SpotHistoryApi
             var call = await _trading
                 .GetMatchResultsCallAsync(request.Symbol, request.Limit, cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.History.GetExecutions,
@@ -75,7 +76,7 @@ internal sealed class SpotHistoryApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
+            return AdapterCallMapper.FromException<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
                 request,
                 startedAt,
                 Operations.History.GetExecutions,

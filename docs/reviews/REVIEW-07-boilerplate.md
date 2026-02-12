@@ -333,3 +333,12 @@
 - Normalized/Adapter の mapper scalar変換
 - Exchange別テストの assertion helper / inventory整合テスト
 
+---
+
+## E. 対応状況（2026-02-12）
+
+- P0-4（ApiCallMapper薄ラッパの整理）: **解消済み**  
+  `Exchanges/*/Adapter/Internal/ApiCallMapper.cs` を廃止し、`AdapterCallMapper` 直接参照へ統一。
+- P0-1（Endpoint語彙の単一正本化）: **未対応**  
+- P0-2（Call骨格のテンプレート化）: **未対応**  
+- P0-3（Operations定数の生成/一元管理）: **未対応**

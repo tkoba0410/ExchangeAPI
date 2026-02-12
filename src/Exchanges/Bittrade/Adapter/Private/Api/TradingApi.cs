@@ -15,6 +15,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using OrderRequest = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.OrderRequest;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
@@ -51,7 +52,7 @@ internal sealed class TradingApi
                             Price: request.Price)),
                     cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.Trading.PlaceOrder,
@@ -62,7 +63,7 @@ internal sealed class TradingApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<OrderLimitRequest, OrderLimitResponse>(
+            return AdapterCallMapper.FromException<OrderLimitRequest, OrderLimitResponse>(
                 request,
                 startedAt,
                 Operations.Trading.PlaceOrder,
@@ -84,7 +85,7 @@ internal sealed class TradingApi
                     new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(request.Symbol, request.OrderKey),
                     cancellationToken)
                 .ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.Trading.CancelOrder,
@@ -92,7 +93,7 @@ internal sealed class TradingApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<CancelOrderRequest, CancelOrderResponse>(
+            return AdapterCallMapper.FromException<CancelOrderRequest, CancelOrderResponse>(
                 request,
                 startedAt,
                 Operations.Trading.CancelOrder,

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
@@ -45,7 +46,7 @@ internal sealed class AccountApi
         try
         {
             var call = await _account.GetAccountsBalanceByAccountIdCallAsync(cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.Account.GetBalance,
@@ -53,7 +54,7 @@ internal sealed class AccountApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<BalanceRequest, BalanceResponse>(
+            return AdapterCallMapper.FromException<BalanceRequest, BalanceResponse>(
                 request,
                 startedAt,
                 Operations.Account.GetBalance,

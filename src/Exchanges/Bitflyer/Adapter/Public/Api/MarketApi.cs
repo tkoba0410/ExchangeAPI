@@ -51,7 +51,7 @@ internal sealed class MarketApi
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _normalized.GetTickerCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.MarketData.GetTicker,
@@ -72,7 +72,7 @@ internal sealed class MarketApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<TickerRequest, CommonTicker>(
+            return AdapterCallMapper.FromException<TickerRequest, CommonTicker>(
                 request,
                 startedAt,
                 Operations.MarketData.GetTicker,
@@ -101,7 +101,7 @@ internal sealed class MarketApi
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _normalized.GetBoardCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.MarketData.GetBoard,
@@ -117,7 +117,7 @@ internal sealed class MarketApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<BoardRequest, BoardResponse>(
+            return AdapterCallMapper.FromException<BoardRequest, BoardResponse>(
                 request,
                 startedAt,
                 Operations.MarketData.GetBoard,
@@ -146,7 +146,7 @@ internal sealed class MarketApi
 
             var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
             var call = await _normalized.GetExecutionsPublicCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return ApiCallMapper.MapCall(
+            return AdapterCallMapper.MapCall(
                 request,
                 call,
                 Operations.MarketData.GetExecutions,
@@ -162,7 +162,7 @@ internal sealed class MarketApi
         }
         catch (Exception ex)
         {
-            return ApiCallMapper.FromException<ExecutionsPublicRequest, ExecutionsPublicResponse>(
+            return AdapterCallMapper.FromException<ExecutionsPublicRequest, ExecutionsPublicResponse>(
                 request,
                 startedAt,
                 Operations.MarketData.GetExecutions,

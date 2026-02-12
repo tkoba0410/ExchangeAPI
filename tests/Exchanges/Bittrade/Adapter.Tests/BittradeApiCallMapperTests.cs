@@ -1,6 +1,6 @@
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests;
 
@@ -15,7 +15,7 @@ public sealed class BittradeApiCallMapperTests
         ExchangeErrorCategory expected)
     {
         var error = new CallError(kind, "test", HttpStatus: statusCode);
-        var category = ApiCallMapper.ToExchangeErrorCategory(error);
+        var category = AdapterCallMapper.ToExchangeErrorCategory(error);
 
         Assert.Equal(expected, category);
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Tests.Inventory;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Raw.Endpoints.Tests;

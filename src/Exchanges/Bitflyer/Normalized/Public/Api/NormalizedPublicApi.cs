@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;

@@ -1,5 +1,5 @@
-// Exchanges/Bitflyer/Wire/Constants/EndpointIds.cs
-namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
+// Exchanges/Bitflyer/Vocabulary/EndpointIds.cs
+namespace ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 public static class EndpointIds
 {

@@ -2,7 +2,7 @@ using ExchangeApi.Exchanges.Bittrade.Raw;
 using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Raw.Internal;
-using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
+using ExchangeApi.Exchanges.Bittrade.Vocabulary;
 using ExchangeApi.Exchanges.Bittrade.Wire.Private.Endpoints;
 using ExchangeApi.Exchanges.Bittrade.Wire.Public.Endpoints;
 using ExchangeApi.Primitives.DomainCommon.Types;

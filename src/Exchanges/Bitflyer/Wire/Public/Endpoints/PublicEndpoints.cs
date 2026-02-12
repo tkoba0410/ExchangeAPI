@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Internal;
 using ExchangeApi.Transport.Wire;
 

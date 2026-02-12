@@ -25,6 +25,9 @@ TopSpec / inventory / governance により定義された規範が、
 ## 1. EndpointId の確認（最重要）
 
 * [ ] 実装対象のエンドポイントが inventory に列挙されていることを確認した
+* [ ] 新規 endpoint 追加時、`src/Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` を更新した
+* [ ] `Wire/Raw/Normalized/Adapter` 配下に `EndpointIds.cs` を新設していないことを確認した
+* [ ] `EndpointIdCatalog` と inventory 記載の EndpointId が一致していることを確認した
 * [ ] inventory に存在しない EndpointId を新規実装していない
 * [ ] EndpointId の構成（HTTP Method を表す語を採用する/省略する等）が、当該取引所 inventory の EndpointId ルールと一致していることを確認した
 * [ ] EndpointId が識別子用途に限定され、意味・分類・ナビゲーションを背負っていないことを確認した

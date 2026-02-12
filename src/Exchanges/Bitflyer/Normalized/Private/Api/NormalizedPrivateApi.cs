@@ -10,7 +10,7 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api.Markets;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;

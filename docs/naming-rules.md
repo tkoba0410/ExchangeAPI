@@ -18,6 +18,13 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - inventory 主表には正規 EndpointId のみを記載する。
 - 旧呼称・別名・重複候補は `Aliases` または別表に分離する。
 
+### 2.1 EndpointIds 配置規約（コード）
+
+- `EndpointIds` の正本は `src/Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` とする。
+- `Wire` / `Raw` / `Normalized` / `Adapter` 配下に `EndpointIds.cs` を重複定義してはならない。
+- 各層は `Vocabulary.EndpointIds` を参照のみ行う。
+- 例外を設ける場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
+
 ## 3. 未実装 API の記録
 
 - 公式に存在するが実装しない API は、inventory 主表とは別表で管理する。

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 

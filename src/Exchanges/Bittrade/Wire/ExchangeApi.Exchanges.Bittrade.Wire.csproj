@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Vocabulary\EndpointIds.cs" Link="Vocabulary/EndpointIds.cs" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ExchangeApi.Exchanges.Bittrade.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 

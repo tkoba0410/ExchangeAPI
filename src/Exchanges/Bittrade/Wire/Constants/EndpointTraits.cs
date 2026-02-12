@@ -1,3 +1,5 @@
+using ExchangeApi.Exchanges.Bittrade.Vocabulary;
+
 namespace ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 
 internal static class EndpointTraits

@@ -240,10 +240,12 @@
 ## C. 優先度付きロードマップ
 
 ## P0（やらないとドリフト進行）
-1. **Endpoint語彙の単一正本化（生成導入）**
+1. **Endpoint語彙の単一正本化（Exchange直下 Vocabulary・generator不採用）**
    - 狙い: `EndpointIds` 転記ミス防止。
-   - 影響範囲: `Exchanges/*/Wire`, `Exchanges/*/Normalized/Internal/Constants`, endpoint inventory tests。
-   - リスク: 生成物の差分ノイズ。初期セットアップが必要。
+   - 影響範囲: `Exchanges/*/Vocabulary`, `Exchanges/*/Wire/Constants`, `Exchanges/*/Normalized/Internal/Constants`, endpoint inventory tests。
+   - 方針: source generator は導入しない。`src/Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` を正本に固定し、層内の `EndpointIds.cs` は廃止して共通語彙を参照する。
+   - 理由: 目的（転記ミス防止）を最小変更で達成しつつ、`Normalized -> Wire` 依存を作らない。
+   - リスク: 参照先移行時の namespace 変更漏れ。
 
 2. **Call骨格のテンプレート化（Adapter層）**
    - 狙い: endpoint追加時の例外処理/MapCallの漏れ防止。
@@ -303,7 +305,7 @@
 
 以下は「機械的にYes/No判定しやすい」文面に寄せたチェック項目。
 
-1. 新規 endpoint を追加した場合、`Wire/Constants/EndpointIds.cs` に ID を追加した。  
+1. 新規 endpoint を追加した場合、`src/Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` に ID を追加した。  
 2. 新規 endpoint を追加した場合、`Wire/Constants/EndpointIdCatalog.cs` に ID を登録した。  
 3. 新規 endpoint を追加した場合、`Wire/Constants/EndpointTraits.cs` の `RequiresAuth` を更新した。  
 4. 新規 endpoint を追加した場合、`Wire/Public|Private/Endpoints/*.cs` に spec builder を追加した。  
@@ -340,5 +342,6 @@
 - P0-4（ApiCallMapper薄ラッパの整理）: **解消済み**  
   `Exchanges/*/Adapter/Internal/ApiCallMapper.cs` を廃止し、`AdapterCallMapper` 直接参照へ統一。
 - P0-1（Endpoint語彙の単一正本化）: **未対応**  
+- P0-1 方針補足: **generator不採用で実施**（`Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` を単一正本化、層内重複定義を廃止）。
 - P0-2（Call骨格のテンプレート化）: **未対応**  
 - P0-3（Operations定数の生成/一元管理）: **未対応**

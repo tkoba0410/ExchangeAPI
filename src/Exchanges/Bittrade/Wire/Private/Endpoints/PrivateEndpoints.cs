@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
+using ExchangeApi.Exchanges.Bittrade.Vocabulary;
 using ExchangeApi.Exchanges.Bittrade.Wire.Internal;
 using ExchangeApi.Transport.Wire;
 

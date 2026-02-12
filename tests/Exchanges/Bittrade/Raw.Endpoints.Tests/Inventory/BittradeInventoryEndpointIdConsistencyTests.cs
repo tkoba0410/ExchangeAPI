@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
+using ExchangeApi.Exchanges.Bittrade.Vocabulary;
 using ExchangeApi.Tests.Inventory;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;

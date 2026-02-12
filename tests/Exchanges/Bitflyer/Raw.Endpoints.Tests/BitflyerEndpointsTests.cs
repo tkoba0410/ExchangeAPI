@@ -1,7 +1,7 @@
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 using ExchangeApi.Exchanges.Bitflyer.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Private.Endpoints;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Public.Endpoints;
 using ExchangeApi.Primitives.DomainCommon.Types;

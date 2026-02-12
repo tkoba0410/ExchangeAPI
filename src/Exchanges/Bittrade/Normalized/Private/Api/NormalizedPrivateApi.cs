@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Constants;
+using ExchangeApi.Exchanges.Bittrade.Vocabulary;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Api.Markets;

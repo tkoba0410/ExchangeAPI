@@ -1,3 +1,4 @@
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 using Xunit;
 

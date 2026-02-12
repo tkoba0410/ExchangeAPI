@@ -1,6 +1,7 @@
-namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Constants;
+// Exchanges/Bittrade/Vocabulary/EndpointIds.cs
+namespace ExchangeApi.Exchanges.Bittrade.Vocabulary;
 
-internal static class EndpointIds
+public static class EndpointIds
 {
     public const string GetSymbols = "GetSymbols";
     public const string GetCurrencies = "GetCurrencies";

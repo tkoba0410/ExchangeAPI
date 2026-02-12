@@ -1,3 +1,5 @@
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
+
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 
 internal static class EndpointTraits

@@ -93,7 +93,7 @@ public class MarketApiTests
         """;
         var api = CreateApi("/market/trade?symbol=btcjpy", json);
 
-        var call = await api.GetExecutionsPublicAsync(new Symbol("BTC/JPY"));
+        var call = await api.GetExecutionsPublicAsync(new ExecutionsPublicRequest(new Symbol("BTC/JPY")));
         var ok = Assert.IsType<CallResult<ExecutionsPublicResponse>.Ok>(call.Result);
         var executions = ok.Response.Items;
 

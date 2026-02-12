@@ -70,17 +70,17 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         TickerRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerAsync(request.Symbol, cancellationToken);
+        _marketApi.GetTickerAsync(request, cancellationToken);
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         BoardRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardAsync(request.Symbol, cancellationToken);
+        _marketApi.GetBoardAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicAsync(request.Symbol, cancellationToken);
+        _marketApi.GetExecutionsPublicAsync(request, cancellationToken);
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
         CandlesticksRequest request,

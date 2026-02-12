@@ -4,7 +4,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests;
 
-public sealed class ApiCallMapperTests
+public sealed class BittradeApiCallMapperTests
 {
     [Theory]
     [InlineData(CallErrorKind.Http, 500, ExchangeErrorCategory.Server)]

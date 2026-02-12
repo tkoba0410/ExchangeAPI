@@ -35,14 +35,20 @@ internal sealed class MarketApi
     }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        GetDetailMergedCallAsync(symbol, cancellationToken);
+        TickerRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        return GetDetailMergedCallAsync(request.Symbol, cancellationToken);
+    }
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
-        CommonSymbol symbol,
-        CancellationToken cancellationToken = default) =>
-        GetDepthCallAsync(symbol, cancellationToken);
+        BoardRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        return GetDepthCallAsync(request.Symbol, cancellationToken);
+    }
 
     public async Task<Call<TickerRequest, TickerResponse>> GetDetailMergedCallAsync(
         CommonSymbol symbol,
@@ -139,10 +145,11 @@ internal sealed class MarketApi
     }
 
     public async Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
-        CommonSymbol symbol,
+        ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new ExecutionsPublicRequest(symbol);
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        var symbol = request.Symbol;
         var startedAt = DateTimeOffset.UtcNow;
 
         try

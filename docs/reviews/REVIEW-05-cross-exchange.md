@@ -88,3 +88,12 @@
 
 - 全体として、層構造・EndpointIdトレース・NotSupported・エラー分類テストは高い並列性を維持できている。  
 - 主な改善余地は、**Adapter Public 境界での DTO 保持ルールの統一**（P1）であり、ここを固定すると将来の取引所追加時レビューコストが最小化される。
+
+---
+
+## D. 対応状況（2026-02-12）
+
+- B-1 #1（Adapter Public の DTO 保持境界）: **解消済み**。  
+  Bittrade 側も `ExchangeClient/PublicClient -> MarketApi` を Request DTO 委譲に統一。
+- B-1 #2（Adapter テスト命名）: **解消済み**。  
+  `BittradeApiCallMapperTests` へ統一。

@@ -28,6 +28,7 @@
   <ItemGroup>
     <Compile Include="..\..\..\Inventory\InventoryEndpointIdParser.cs" Link="Inventory/InventoryEndpointIdParser.cs" />
     <Compile Include="..\..\..\Inventory\EndpointIdNamingAssertions.cs" Link="Inventory/EndpointIdNamingAssertions.cs" />
+    <Compile Include="..\..\..\Inventory\InventoryPaths.cs" Link="Inventory/InventoryPaths.cs" />
   </ItemGroup>
 
 </Project>

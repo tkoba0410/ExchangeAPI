@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 using ExchangeApi.Tests.Inventory;
@@ -22,8 +21,7 @@ public sealed class EndpointIdApiNamingTests
         EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(INormalizedApi));
     }
 
-    private static string InventoryFilePath =>
-        Path.Combine(InventoryEndpointIdParser.FindRepoRoot(), "docs", "inventory", "endpoints-bittrade.md");
+    private static string InventoryFilePath => InventoryPaths.BittradeAbsolute();
 
     private static IReadOnlyCollection<string> LoadInventoryEndpointIds() =>
         InventoryEndpointIdParser.ParseEndpointIdsFromFile(InventoryFilePath);

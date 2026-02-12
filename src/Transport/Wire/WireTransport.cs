@@ -47,8 +47,8 @@ public sealed class WireTransport : IWireTransport
                 RequestId: null,
                 ElapsedMs: (long)elapsed.TotalMilliseconds);
             var meta = new CallMeta(
-                Layer: "Wire",
-                Component: "Wire.SendRawAsync",
+                Layer: CallMetaVocabulary.Layer.Wire,
+                Component: CallMetaVocabulary.Component.WireSendRawAsync,
                 EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null)
@@ -69,8 +69,8 @@ public sealed class WireTransport : IWireTransport
             var elapsed = DateTimeOffset.UtcNow - startedAt;
             var error = new CallError(CallErrorKind.Transport, "Wire transport canceled.");
             var meta = new CallMeta(
-                Layer: "Wire",
-                Component: "Wire.SendRawAsync",
+                Layer: CallMetaVocabulary.Layer.Wire,
+                Component: CallMetaVocabulary.Component.WireSendRawAsync,
                 EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null);
@@ -87,8 +87,8 @@ public sealed class WireTransport : IWireTransport
             var elapsed = DateTimeOffset.UtcNow - startedAt;
             var error = new CallError(CallErrorKind.Transport, "Wire transport failed.", ex);
             var meta = new CallMeta(
-                Layer: "Wire",
-                Component: "Wire.SendRawAsync",
+                Layer: CallMetaVocabulary.Layer.Wire,
+                Component: CallMetaVocabulary.Component.WireSendRawAsync,
                 EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null);

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Constants;
 using ExchangeApi.Transport.Protocol;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
@@ -34,10 +35,10 @@ public sealed class RequestSigner : IRequestSigner
         var timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
         var query = HttpUtility.ParseQueryString(uri.Query ?? string.Empty);
-        query["AccessKeyId"] = _accessKey;
-        query["SignatureMethod"] = "HmacSHA256";
-        query["SignatureVersion"] = "2";
-        query["Timestamp"] = timestamp;
+        query[AuthKeys.AccessKeyId] = _accessKey;
+        query[AuthKeys.SignatureMethod] = AuthKeys.SignatureMethodHmacSha256;
+        query[AuthKeys.SignatureVersion] = AuthKeys.SignatureVersion2;
+        query[AuthKeys.Timestamp] = timestamp;
 
         var sorted = query.AllKeys!
             .Where(k => k is not null)
@@ -48,7 +49,7 @@ public sealed class RequestSigner : IRequestSigner
         var canonical = $"{request.Method.Method}\n{uri.Host}\n{uri.AbsolutePath}\n{canonicalQuery}";
 
         var signature = Sign(canonical, _secretKey);
-        query["Signature"] = signature;
+        query[AuthKeys.Signature] = signature;
 
         var builder = new UriBuilder(uri)
         {

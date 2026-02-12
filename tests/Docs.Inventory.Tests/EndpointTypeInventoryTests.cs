@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using ExchangeApi.Tests.Inventory;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -18,12 +19,13 @@ public sealed class EndpointTypeInventoryTests
     }
 
     [Theory]
-    [InlineData("docs/inventory/endpoints-bittrade.md")]
-    [InlineData("docs/inventory/endpoints-bitflyer.md")]
+    [InlineData(InventoryPaths.BittradeRelative)]
+    [InlineData(InventoryPaths.BitflyerRelative)]
     public void Inventory_Request_Response_Types_Should_Exist(string relativePath)
     {
-        var repoRoot = FindRepoRoot();
-        var path = Path.Combine(repoRoot.FullName, relativePath.Replace('/', Path.DirectorySeparatorChar));
+        var path = Path.Combine(
+            InventoryEndpointIdParser.FindRepoRoot(),
+            relativePath.Replace('/', Path.DirectorySeparatorChar));
         Assert.True(File.Exists(path), $"Inventory file not found: {path}");
 
         var lines = File.ReadAllLines(path);
@@ -58,22 +60,6 @@ public sealed class EndpointTypeInventoryTests
                 }
             }
         }
-    }
-
-    private static DirectoryInfo FindRepoRoot()
-    {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "docs", "inventory")))
-        {
-            dir = dir.Parent;
-        }
-
-        if (dir is null)
-        {
-            throw new DirectoryNotFoundException("Repository root not found (missing docs/inventory). ");
-        }
-
-        return dir;
     }
 
     private static IReadOnlyList<InventoryTable> ParseEndpointTables(string[] lines)

@@ -433,7 +433,7 @@ internal sealed class RawPrivateClient
             CallErrorKind.Codec,
             $"{component} failed to serialize request.",
             error);
-        var meta = CallMeta.CreateInternal("Raw", component);
+        var meta = CallMeta.CreateInternal(CallMetaVocabulary.Layer.Raw, component);
         var now = DateTimeOffset.UtcNow;
 
         return new Call<TReq, TRes>(

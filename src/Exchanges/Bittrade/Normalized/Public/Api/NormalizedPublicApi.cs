@@ -378,7 +378,7 @@ internal sealed class NormalizedPublicApi
         CallError error,
         DateTimeOffset startedAt)
     {
-        var meta = CallMeta.CreateInternal("Normalized", component);
+        var meta = CallMeta.CreateInternal(CallMetaVocabulary.Layer.Normalized, component);
 
         return new Call<TReq, TOk>(
             Id: CallId.New(),

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 using ExchangeApi.Tests.Inventory;
@@ -34,8 +33,7 @@ public sealed class BitflyerInventoryEndpointIdConsistencyTests
         Assert.True(extra.Length == 0, $"Extra EndpointIds: {string.Join(", ", extra)}");
     }
 
-    private static string InventoryFilePath =>
-        Path.Combine(InventoryEndpointIdParser.FindRepoRoot(), "docs", "inventory", "endpoints-bitflyer.md");
+    private static string InventoryFilePath => InventoryPaths.BitflyerAbsolute();
 
     private static System.Collections.Generic.HashSet<string> LoadInventoryEndpointIds() =>
         InventoryEndpointIdParser.ParseEndpointIdsFromFile(InventoryFilePath);

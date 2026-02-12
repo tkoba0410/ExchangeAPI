@@ -26,4 +26,9 @@
     <ProjectReference Include="../../src/Exchanges/Bittrade/Raw/ExchangeApi.Exchanges.Bittrade.Raw.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Inventory\InventoryEndpointIdParser.cs" Link="Inventory/InventoryEndpointIdParser.cs" />
+    <Compile Include="..\Inventory\InventoryPaths.cs" Link="Inventory/InventoryPaths.cs" />
+  </ItemGroup>
+
 </Project>

@@ -1165,7 +1165,7 @@ internal sealed class NormalizedPrivateApi
         CallError error)
     {
         var now = DateTimeOffset.UtcNow;
-        var meta = CallMeta.CreateInternal("Normalized", component);
+        var meta = CallMeta.CreateInternal(CallMetaVocabulary.Layer.Normalized, component);
         return new Call<TReq, TOk>(
             Id: CallId.New(),
             StartedAt: now,

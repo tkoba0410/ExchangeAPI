@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Constants;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 
@@ -44,9 +45,9 @@ internal sealed class RequestSigner : IRequestSigner
         var hashBytes = hmac.ComputeHash(textBytes);
         var sign = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
 
-        request.Headers.Add("ACCESS-KEY", _apiKey);
-        request.Headers.Add("ACCESS-TIMESTAMP", timestamp);
-        request.Headers.Add("ACCESS-SIGN", sign);
-        request.Headers.TryAddWithoutValidation("Content-Type", "application/json");
+        request.Headers.Add(AuthKeys.AccessKey, _apiKey);
+        request.Headers.Add(AuthKeys.AccessTimestamp, timestamp);
+        request.Headers.Add(AuthKeys.AccessSign, sign);
+        request.Headers.TryAddWithoutValidation(AuthKeys.ContentType, AuthKeys.JsonContentType);
     }
 }

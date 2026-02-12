@@ -66,7 +66,7 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
             var composed = BitflyerExchangeInfoComposer.Compose(staticInfo, dynamicInfo);
             var response = MapExchangeInfo(composed);
             var meta = new CallMeta(
-                Layer: "Contracts",
+                Layer: CallMetaVocabulary.Layer.Contracts,
                 Component: BitflyerExchangeInfoOperations.GetExchangeInfo,
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,

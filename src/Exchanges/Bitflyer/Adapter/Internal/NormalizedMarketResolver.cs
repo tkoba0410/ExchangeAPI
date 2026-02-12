@@ -48,8 +48,8 @@ internal sealed class NormalizedMarketResolver : IMarketResolver
         MarketInfo market)
     {
         var meta = new CallMeta(
-            Layer: "Adapter",
-            Component: "NormalizedMarketResolver",
+            Layer: CallMetaVocabulary.Layer.Adapter,
+            Component: CallMetaVocabulary.Component.NormalizedMarketResolver,
             EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
@@ -69,8 +69,8 @@ internal sealed class NormalizedMarketResolver : IMarketResolver
         CallError error)
     {
         var meta = new CallMeta(
-            Layer: "Adapter",
-            Component: "NormalizedMarketResolver",
+            Layer: CallMetaVocabulary.Layer.Adapter,
+            Component: CallMetaVocabulary.Component.NormalizedMarketResolver,
             EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });

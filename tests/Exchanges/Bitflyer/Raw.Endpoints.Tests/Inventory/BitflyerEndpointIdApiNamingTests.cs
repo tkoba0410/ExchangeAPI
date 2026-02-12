@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Tests.Inventory;
@@ -22,8 +21,7 @@ public sealed class BitflyerEndpointIdApiNamingTests
         EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(INormalizedApi));
     }
 
-    private static string InventoryFilePath =>
-        Path.Combine(InventoryEndpointIdParser.FindRepoRoot(), "docs", "inventory", "endpoints-bitflyer.md");
+    private static string InventoryFilePath => InventoryPaths.BitflyerAbsolute();
 
     private static IReadOnlyCollection<string> LoadInventoryEndpointIds()
     {

@@ -24,6 +24,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 
 internal sealed class NormalizedPrivateApi
 {
+    private const string TradingComponent = "Bittrade.Trading";
     private readonly IRawApi _trading;
     private readonly IMarketResolver _markets;
     private readonly AccountId _accountId;
@@ -285,10 +286,10 @@ internal sealed class NormalizedPrivateApi
         {
             return CreateNotSupported<NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>(
                 callRequest,
-                component: "Bittrade.Trading",
+                component: TradingComponent,
                 feature: "CancelOrder",
                 reason: $"orderKey.Kind={request.OrderKey.Kind}",
-                meta: CallMeta.CreateInternal("Normalized", "Bittrade.Trading"));
+                meta: CallMeta.CreateInternal(CallMetaVocabulary.Layer.Normalized, TradingComponent));
         }
 
         var rawCall = await _trading
@@ -424,10 +425,10 @@ internal sealed class NormalizedPrivateApi
         {
             return CreateNotSupported<NormalizedRequests.GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>(
                 callRequest,
-                component: "Bittrade.Trading",
+                component: TradingComponent,
                 feature: "GetOrder",
                 reason: $"orderKey.Kind={request.OrderKey.Kind}",
-                meta: CallMeta.CreateInternal("Normalized", "Bittrade.Trading"));
+                meta: CallMeta.CreateInternal(CallMetaVocabulary.Layer.Normalized, TradingComponent));
         }
         var marketCall = await _markets.ResolveCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
         if (marketCall.Result is CallResult<MarketInfo>.Err marketError)
@@ -1000,7 +1001,7 @@ internal sealed class NormalizedPrivateApi
         CallError error)
     {
         var now = DateTimeOffset.UtcNow;
-        var meta = CallMeta.CreateInternal("Normalized", component);
+        var meta = CallMeta.CreateInternal(CallMetaVocabulary.Layer.Normalized, component);
         return new Call<TReq, TOk>(
             Id: CallId.New(),
             StartedAt: now,

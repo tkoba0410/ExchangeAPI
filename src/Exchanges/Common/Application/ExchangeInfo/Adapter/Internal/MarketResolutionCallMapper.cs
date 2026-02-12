@@ -15,7 +15,7 @@ internal static class MarketResolutionCallMapper
         string component)
     {
         var meta = new CallMeta(
-            Layer: "Contracts",
+            Layer: CallMetaVocabulary.Layer.Contracts,
             Component: component,
             EndpointId: marketCall.Meta.EndpointId,
             Tags: null,
@@ -37,7 +37,7 @@ internal static class MarketResolutionCallMapper
         Exception ex)
     {
         var meta = new CallMeta(
-            Layer: "Contracts",
+            Layer: CallMetaVocabulary.Layer.Contracts,
             Component: component,
             EndpointId: CallMeta.InternalEndpointId,
             Tags: null,

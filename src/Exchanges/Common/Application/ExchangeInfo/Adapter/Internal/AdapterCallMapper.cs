@@ -14,7 +14,7 @@ internal static class AdapterCallMapper
         Func<TNormRes, TOk> mapper)
     {
         var meta = new CallMeta(
-            Layer: "Contracts",
+            Layer: CallMetaVocabulary.Layer.Contracts,
             Component: component,
             EndpointId: normalizedCall.Meta.EndpointId,
             Tags: null,
@@ -46,7 +46,7 @@ internal static class AdapterCallMapper
         string component)
     {
         var meta = new CallMeta(
-            Layer: "Contracts",
+            Layer: CallMetaVocabulary.Layer.Contracts,
             Component: component,
             EndpointId: normalizedCall.Meta.EndpointId,
             Tags: null,
@@ -68,7 +68,7 @@ internal static class AdapterCallMapper
         Exception ex)
     {
         var meta = new CallMeta(
-            Layer: "Contracts",
+            Layer: CallMetaVocabulary.Layer.Contracts,
             Component: component,
             EndpointId: CallMeta.InternalEndpointId,
             Tags: null,

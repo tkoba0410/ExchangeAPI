@@ -65,8 +65,8 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         ExchangeMarketInfo market)
     {
         var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: "ExchangeInfoMarketResolver",
+            Layer: CallMetaVocabulary.Layer.Contracts,
+            Component: CallMetaVocabulary.Component.ExchangeInfoMarketResolver,
             EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
@@ -86,8 +86,8 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         CallError error)
     {
         var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: "ExchangeInfoMarketResolver",
+            Layer: CallMetaVocabulary.Layer.Contracts,
+            Component: CallMetaVocabulary.Component.ExchangeInfoMarketResolver,
             EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
@@ -107,8 +107,8 @@ internal sealed class ExchangeInfoMarketResolver : IExchangeMarketResolver
         CallError error)
     {
         var meta = new CallMeta(
-            Layer: "Contracts",
-            Component: "ExchangeInfoMarketResolver",
+            Layer: CallMetaVocabulary.Layer.Contracts,
+            Component: CallMetaVocabulary.Component.ExchangeInfoMarketResolver,
             EndpointId: CallMeta.InternalEndpointId,
             Tags: null,
             Children: null);

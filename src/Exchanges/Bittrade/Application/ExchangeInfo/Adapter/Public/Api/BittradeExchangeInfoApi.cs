@@ -48,7 +48,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
             var composed = BittradeExchangeInfoComposer.Compose(staticInfo, dynamicInfo);
             var response = MapExchangeInfo(composed);
             var meta = new CallMeta(
-                Layer: "Contracts",
+                Layer: CallMetaVocabulary.Layer.Contracts,
                 Component: BittradeExchangeInfoOperations.GetExchangeInfo,
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,

@@ -52,8 +52,8 @@ public sealed class JsonExchangeInfoApi : IPublicApi
             var info = GetCachedInfo();
             var response = info;
             var meta = new CallMeta(
-                Layer: "Contracts",
-                Component: "JsonExchangeInfo",
+                Layer: CallMetaVocabulary.Layer.Contracts,
+                Component: CallMetaVocabulary.Component.JsonExchangeInfo,
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
@@ -68,8 +68,8 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         catch (Exception ex)
         {
             var meta = new CallMeta(
-                Layer: "Contracts",
-                Component: "JsonExchangeInfo",
+                Layer: CallMetaVocabulary.Layer.Contracts,
+                Component: CallMetaVocabulary.Component.JsonExchangeInfo,
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
@@ -89,8 +89,8 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(NotSupportedCall.Create<TickerRequest, TickerResponse>(
-            "Contracts",
-            "JsonExchangeInfo",
+            CallMetaVocabulary.Layer.Contracts,
+            CallMetaVocabulary.Component.JsonExchangeInfo,
             request,
             "Ticker"));
     }
@@ -100,8 +100,8 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(NotSupportedCall.Create<BoardRequest, BoardResponse>(
-            "Contracts",
-            "JsonExchangeInfo",
+            CallMetaVocabulary.Layer.Contracts,
+            CallMetaVocabulary.Component.JsonExchangeInfo,
             request,
             "OrderBook"));
     }
@@ -111,8 +111,8 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(NotSupportedCall.Create<ExecutionsPublicRequest, ExecutionsPublicResponse>(
-            "Contracts",
-            "JsonExchangeInfo",
+            CallMetaVocabulary.Layer.Contracts,
+            CallMetaVocabulary.Component.JsonExchangeInfo,
             request,
             "MarketExecutions"));
     }
@@ -122,8 +122,8 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
-            "Contracts",
-            "JsonExchangeInfo",
+            CallMetaVocabulary.Layer.Contracts,
+            CallMetaVocabulary.Component.JsonExchangeInfo,
             request,
             "Candlesticks"));
     }

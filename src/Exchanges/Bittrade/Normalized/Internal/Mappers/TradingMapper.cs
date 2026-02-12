@@ -19,6 +19,13 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 internal static class TradingMapper
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
+    private static class FieldNames
+    {
+        public const string Amount = "amount";
+        public const string FilledAmount = "field-amount";
+        public const string Price = "price";
+        public const string CashAmount = "cash_amount";
+    }
 
     public static bool TryToRaw(
         AccountId accountId,
@@ -124,14 +131,14 @@ internal static class TradingMapper
             return false;
         }
 
-        if (!TryParseRequiredDecimal(raw.Amount, "amount", out var sizeValue, out error))
+        if (!TryParseRequiredDecimal(raw.Amount, FieldNames.Amount, out var sizeValue, out error))
         {
             order = null;
             return false;
         }
 
         var size = new Size(sizeValue);
-        if (!TryParseDecimal(raw.FilledAmount, "field-amount", out var executedValue, out error))
+        if (!TryParseDecimal(raw.FilledAmount, FieldNames.FilledAmount, out var executedValue, out error))
         {
             order = null;
             return false;
@@ -140,7 +147,7 @@ internal static class TradingMapper
         var executed = new Size(executedValue ?? 0m);
         var outstanding = new Size(Math.Max(0m, size.Value - executed.Value));
 
-        if (!TryParseDecimal(raw.Price, "price", out var priceValue, out error))
+        if (!TryParseDecimal(raw.Price, FieldNames.Price, out var priceValue, out error))
         {
             order = null;
             return false;
@@ -194,7 +201,7 @@ internal static class TradingMapper
             return false;
         }
 
-        if (!TryParseDecimal(raw.Data.Price, "price", out var priceValue, out error))
+        if (!TryParseDecimal(raw.Data.Price, FieldNames.Price, out var priceValue, out error))
         {
             status = null;
             return false;
@@ -202,13 +209,13 @@ internal static class TradingMapper
 
         var price = priceValue is null ? (Price?)null : new Price(priceValue.Value);
 
-        if (!TryParseRequiredDecimal(raw.Data.Amount, "amount", out var sizeValue, out error))
+        if (!TryParseRequiredDecimal(raw.Data.Amount, FieldNames.Amount, out var sizeValue, out error))
         {
             status = null;
             return false;
         }
 
-        if (!TryParseDecimal(raw.Data.FilledAmount, "field-amount", out var executedValue, out error))
+        if (!TryParseDecimal(raw.Data.FilledAmount, FieldNames.FilledAmount, out var executedValue, out error))
         {
             status = null;
             return false;
@@ -287,19 +294,19 @@ internal static class TradingMapper
         var mapped = new List<OrderSummaryNormalized>(entries.Count);
         foreach (var entry in entries)
         {
-            if (!TryParseRequiredDecimal(entry.Amount, "amount", out var amount, out error))
+            if (!TryParseRequiredDecimal(entry.Amount, FieldNames.Amount, out var amount, out error))
             {
                 normalized = null;
                 return false;
             }
 
-            if (!TryParseDecimal(entry.Price, "price", out var price, out error))
+            if (!TryParseDecimal(entry.Price, FieldNames.Price, out var price, out error))
             {
                 normalized = null;
                 return false;
             }
 
-            if (!TryParseRequiredDecimal(entry.FilledAmount, "field-amount", out var filled, out error))
+            if (!TryParseRequiredDecimal(entry.FilledAmount, FieldNames.FilledAmount, out var filled, out error))
             {
                 normalized = null;
                 return false;
@@ -339,9 +346,9 @@ internal static class TradingMapper
         var mapped = new List<RetailOrderEntryNormalized>(entries.Count);
         foreach (var entry in entries)
         {
-            if (!TryParseDecimal(entry.Price, "price", out var price, out error)
-                || !TryParseDecimal(entry.Amount, "amount", out var amount, out error)
-                || !TryParseDecimal(entry.CashAmount, "cash_amount", out var cashAmount, out error))
+            if (!TryParseDecimal(entry.Price, FieldNames.Price, out var price, out error)
+                || !TryParseDecimal(entry.Amount, FieldNames.Amount, out var amount, out error)
+                || !TryParseDecimal(entry.CashAmount, FieldNames.CashAmount, out var cashAmount, out error))
             {
                 normalized = null;
                 return false;
@@ -376,9 +383,9 @@ internal static class TradingMapper
             return true;
         }
 
-        if (!TryParseDecimal(entry.Price, "price", out var price, out error)
-            || !TryParseDecimal(entry.Amount, "amount", out var amount, out error)
-            || !TryParseDecimal(entry.CashAmount, "cash_amount", out var cashAmount, out error))
+        if (!TryParseDecimal(entry.Price, FieldNames.Price, out var price, out error)
+            || !TryParseDecimal(entry.Amount, FieldNames.Amount, out var amount, out error)
+            || !TryParseDecimal(entry.CashAmount, FieldNames.CashAmount, out var cashAmount, out error))
         {
             normalized = null;
             return false;
@@ -628,20 +635,7 @@ internal static class TradingMapper
 
     private static bool TryToRawOrderType(ExchangeOrderType type, out string raw, out CallError? error)
     {
-        raw = type switch
-        {
-            ExchangeOrderType.BuyLimit => "buy-limit",
-            ExchangeOrderType.SellLimit => "sell-limit",
-            ExchangeOrderType.BuyMarket => "buy-market",
-            ExchangeOrderType.SellMarket => "sell-market",
-            ExchangeOrderType.BuyLimitMaker => "buy-limit-maker",
-            ExchangeOrderType.SellLimitMaker => "sell-limit-maker",
-            ExchangeOrderType.BuyIoc => "buy-ioc",
-            ExchangeOrderType.SellIoc => "sell-ioc",
-            _ => string.Empty
-        };
-
-        if (string.IsNullOrWhiteSpace(raw))
+        if (!ExchangeOrderLexicon.TryToRawOrderType(type, out raw))
         {
             error = new CallError(CallErrorKind.Mapping, $"Unsupported order type: {type}.");
             return false;
@@ -653,102 +647,33 @@ internal static class TradingMapper
 
     private static bool TryParseOrderType(string type, out ExchangeOrderType parsed, out CallError? error)
     {
-        switch (type)
+        if (!ExchangeOrderLexicon.TryParseOrderType(type, out parsed))
         {
-            case "buy-limit":
-                parsed = ExchangeOrderType.BuyLimit;
-                error = null;
-                return true;
-            case "sell-limit":
-                parsed = ExchangeOrderType.SellLimit;
-                error = null;
-                return true;
-            case "buy-market":
-                parsed = ExchangeOrderType.BuyMarket;
-                error = null;
-                return true;
-            case "sell-market":
-                parsed = ExchangeOrderType.SellMarket;
-                error = null;
-                return true;
-            case "buy-limit-maker":
-                parsed = ExchangeOrderType.BuyLimitMaker;
-                error = null;
-                return true;
-            case "sell-limit-maker":
-                parsed = ExchangeOrderType.SellLimitMaker;
-                error = null;
-                return true;
-            case "buy-ioc":
-                parsed = ExchangeOrderType.BuyIoc;
-                error = null;
-                return true;
-            case "sell-ioc":
-                parsed = ExchangeOrderType.SellIoc;
-                error = null;
-                return true;
-            default:
-                parsed = default;
-                error = new CallError(CallErrorKind.Mapping, $"Unsupported order type: {type}.");
-                return false;
+            error = new CallError(CallErrorKind.Mapping, $"Unsupported order type: {type}.");
+            return false;
         }
+
+        error = null;
+        return true;
     }
 
     private static Closed<ExchangeOrderType> ParseOrderTypeClosed(string? type) =>
-        (type ?? string.Empty) switch
-        {
-            "buy-limit" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.BuyLimit),
-            "sell-limit" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.SellLimit),
-            "buy-market" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.BuyMarket),
-            "sell-market" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.SellMarket),
-            "buy-limit-maker" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.BuyLimitMaker),
-            "sell-limit-maker" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.SellLimitMaker),
-            "buy-ioc" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.BuyIoc),
-            "sell-ioc" => Closed<ExchangeOrderType>.KnownValue(ExchangeOrderType.SellIoc),
-            _ => Closed<ExchangeOrderType>.UnknownValue(type ?? string.Empty),
-        };
+        ExchangeOrderLexicon.ParseOrderTypeClosed(type);
 
     private static bool TryParseOrderState(string state, out ExchangeOrderState parsed, out CallError? error)
     {
-        switch (state)
+        if (!ExchangeOrderLexicon.TryParseOrderState(state, out parsed))
         {
-            case "submitted":
-                parsed = ExchangeOrderState.Submitted;
-                error = null;
-                return true;
-            case "partial-filled":
-                parsed = ExchangeOrderState.PartialFilled;
-                error = null;
-                return true;
-            case "filled":
-                parsed = ExchangeOrderState.Filled;
-                error = null;
-                return true;
-            case "partial-canceled":
-                parsed = ExchangeOrderState.PartialCanceled;
-                error = null;
-                return true;
-            case "canceled":
-                parsed = ExchangeOrderState.Canceled;
-                error = null;
-                return true;
-            default:
-                parsed = default;
-                error = new CallError(CallErrorKind.Mapping, $"Unsupported order state: {state}.");
-                return false;
+            error = new CallError(CallErrorKind.Mapping, $"Unsupported order state: {state}.");
+            return false;
         }
+
+        error = null;
+        return true;
     }
 
     private static Closed<ExchangeOrderState> ParseOrderStateClosed(string? state) =>
-        (state ?? string.Empty) switch
-        {
-            "submitted" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.Submitted),
-            "partial-filled" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.PartialFilled),
-            "filled" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.Filled),
-            "partial-canceled" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.PartialCanceled),
-            "canceled" => Closed<ExchangeOrderState>.KnownValue(ExchangeOrderState.Canceled),
-            _ => Closed<ExchangeOrderState>.UnknownValue(state ?? string.Empty),
-        };
+        ExchangeOrderLexicon.ParseOrderStateClosed(state);
 
     private static string FormatDecimal(decimal value) =>
         value.ToString(CultureInfo.InvariantCulture);

@@ -341,7 +341,9 @@
 
 - P0-4（ApiCallMapper薄ラッパの整理）: **解消済み**  
   `Exchanges/*/Adapter/Internal/ApiCallMapper.cs` を廃止し、`AdapterCallMapper` 直接参照へ統一。
-- P0-1（Endpoint語彙の単一正本化）: **未対応**  
-- P0-1 方針補足: **generator不採用で実施**（`Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` を単一正本化、層内重複定義を廃止）。
+- P0-1（Endpoint語彙の単一正本化）: **解消済み**  
+  `src/Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` を正本化し、`Wire/Constants/EndpointIds.cs` と
+  `Normalized/Internal/Constants/EndpointIds.cs` を廃止。参照先を `Vocabulary.EndpointIds` に統一。
+- P0-1 方針補足: **generator不採用で実施**（単一正本化で目的達成、ビルド複雑性を増やさない）。
 - P0-2（Call骨格のテンプレート化）: **未対応**  
 - P0-3（Operations定数の生成/一元管理）: **未対応**

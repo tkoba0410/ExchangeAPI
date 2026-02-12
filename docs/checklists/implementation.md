@@ -87,6 +87,9 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] 取引所差分が `src/Exchanges/<Exchange>/` 配下に閉じていることを確認した
 * [ ] 物理配置と namespace が既存のリファレンス実装と同型であることを確認した
 * [ ] 共通層へ取引所固有の都合が逆流していないことを確認した
+* [ ] Adapter の API 実装で `try/catch + MapCall/FromException` を直書きせず、共通テンプレート経由で実装した
+* [ ] `Operations.*` の指定漏れがないことを確認した
+* [ ] テンプレート非適用ケースは `docs/exceptions.md` に記録した
 
 ---
 

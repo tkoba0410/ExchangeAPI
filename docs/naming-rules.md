@@ -115,3 +115,10 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - primitive/convenience extension は `src/Contracts/Facade/Extensions` のみに配置する。
 - `src/Exchanges/*/Normalized/Extensions` に convenience extension を新規追加してはならない。
 - `Normalized` 層の公開 API は request DTO 受けを本線とし、利用者向け sugar は Facade 側へ集約する。
+
+## 12. Adapter Call骨格規約
+
+- Adapter 層の標準実装は、共通テンプレート（`startedAt` 採取 / `MapCall` / `FromException`）を使用する。
+- `try/catch + AdapterCallMapper.MapCall/FromException` の直書き追加を禁止する。
+- 業務固有の例外分岐（例: market 解決失敗など）は最小範囲で許可する。
+- 逸脱する場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。

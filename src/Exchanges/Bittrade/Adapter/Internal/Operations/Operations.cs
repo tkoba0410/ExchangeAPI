@@ -1,18 +1,18 @@
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 
-public static class Operations
+internal static class Operations
 {
-    public static class MarketData
+    internal static class MarketData
     {
-        public const string GetTicker = "Bittrade.Market.GetTicker";
-        public const string GetBoard = "Bittrade.Market.GetBoard";
-        public const string GetExecutions = "Bittrade.Market.GetExecutions";
-        public const string GetCandlesticks = "Bittrade.Market.GetCandlesticks";
-        public const string GetTickers = "Bittrade.Market.GetTickers";
-        public const string GetHistoryTrade = "Bittrade.Market.GetHistoryTrade";
+        public const string GetTicker = "Bittrade.MarketData.GetTicker";
+        public const string GetBoard = "Bittrade.MarketData.GetBoard";
+        public const string GetExecutions = "Bittrade.MarketData.GetExecutions";
+        public const string GetCandlesticks = "Bittrade.MarketData.GetCandlesticks";
+        public const string GetTickers = "Bittrade.MarketData.GetTickers";
+        public const string GetHistoryTrade = "Bittrade.MarketData.GetHistoryTrade";
     }
 
-    public static class Trading
+    internal static class Trading
     {
         public const string PlaceOrder = "Bittrade.Trading.PlaceOrder";
         public const string CancelOrder = "Bittrade.Trading.CancelOrder";
@@ -20,17 +20,17 @@ public static class Operations
         public const string GetOrder = "Bittrade.Trading.GetOrder";
     }
 
-    public static class Account
+    internal static class Account
     {
         public const string GetBalance = "Bittrade.Account.GetBalance";
     }
 
-    public static class ExchangeInfo
+    internal static class ExchangeInfo
     {
         public const string GetExchangeInfo = "Bittrade.ExchangeInfo.GetExchangeInfo";
     }
 
-    public static class History
+    internal static class History
     {
         public const string GetOrders = "Bittrade.History.GetOrders";
         public const string GetExecutions = "Bittrade.History.GetExecutions";

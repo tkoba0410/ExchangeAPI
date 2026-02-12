@@ -17,7 +17,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 
-public sealed class NormalizedApi : IBittradeNormalizedApi
+public sealed class NormalizedApi : INormalizedApi
 {
     private readonly NormalizedPublicApi _publicApi;
     private readonly NormalizedPrivateApi _privateApi;
@@ -34,8 +34,8 @@ public sealed class NormalizedApi : IBittradeNormalizedApi
     }
 
     internal static NormalizedApi FromRaw(
-        IBittradeRawApi raw,
-        IBittradeMarketResolver markets,
+        IRawApi raw,
+        IMarketResolver markets,
         AccountId accountId)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));

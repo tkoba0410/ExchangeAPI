@@ -18,10 +18,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
 /// </summary>
 internal sealed class RawPrivateClient
 {
-    private readonly IBittradeWireCallExecutor _wire;
+    private readonly IWireCallExecutor _wire;
     private readonly RawCallExecutor _executor;
 
-    public RawPrivateClient(IBittradeWireCallExecutor wire, RawCallExecutor executor)
+    public RawPrivateClient(IWireCallExecutor wire, RawCallExecutor executor)
     {
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
         _executor = executor ?? throw new ArgumentNullException(nameof(executor));

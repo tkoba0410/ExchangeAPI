@@ -8,7 +8,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Api;
 
-public interface IBittradeRawApi
+public interface IRawApi
 {
     Task<Call<GetDetailMergedRequest, GetDetailMergedResponse>> GetDetailMergedCallAsync(
         GetDetailMergedRequest request,

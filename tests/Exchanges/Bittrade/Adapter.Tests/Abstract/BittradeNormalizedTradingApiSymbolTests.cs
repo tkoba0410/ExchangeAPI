@@ -76,7 +76,7 @@ public sealed class NormalizedTradingApiSymbolTests
         }
     }
 
-    private sealed class StubMarketResolver : IBittradeMarketResolver
+    private sealed class StubMarketResolver : IMarketResolver
     {
         private readonly MarketInfo _market;
 

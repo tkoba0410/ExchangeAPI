@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -20,9 +19,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
-    private readonly TradingApi _tradingApi;
-    private readonly AccountApi _accountApi;
-    private readonly SpotHistoryApi _historyApi;
+    private readonly PrivateApi _privateApi;
     private readonly BittradeExchangeInfoApi _exchangeInfoApi;
     private readonly IRestClient? _restClient;
     internal ApiBundle? ApiBundle { get; }
@@ -33,15 +30,11 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 
     internal ExchangeClient(
         MarketApi marketApi,
-        TradingApi tradingApi,
-        AccountApi accountApi,
-        SpotHistoryApi historyApi,
+        PrivateApi privateApi,
         BittradeExchangeInfoApi exchangeInfoApi)
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
-        _tradingApi = tradingApi ?? throw new ArgumentNullException(nameof(tradingApi));
-        _accountApi = accountApi ?? throw new ArgumentNullException(nameof(accountApi));
-        _historyApi = historyApi ?? throw new ArgumentNullException(nameof(historyApi));
+        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
     }
 
@@ -58,9 +51,7 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         }
 
         _marketApi = new MarketApi(bundle.Public, bundle.Markets);
-        _tradingApi = new TradingApi(bundle.Private);
-        _accountApi = new AccountApi(bundle.Private);
-        _historyApi = new SpotHistoryApi(bundle.Private);
+        _privateApi = new PrivateApi(bundle.Private);
         _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.Public);
         _restClient = bundle.RestClient;
         ApiBundle = bundle;
@@ -68,12 +59,10 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 
     internal ExchangeClient(
         MarketApi marketApi,
-        TradingApi tradingApi,
-        AccountApi accountApi,
-        SpotHistoryApi historyApi,
+        PrivateApi privateApi,
         BittradeExchangeInfoApi exchangeInfoApi,
         IRestClient restClient)
-        : this(marketApi, tradingApi, accountApi, historyApi, exchangeInfoApi)
+        : this(marketApi, privateApi, exchangeInfoApi)
     {
         _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
@@ -107,28 +96,28 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         BalanceRequest request,
         CancellationToken cancellationToken = default) =>
-        _accountApi.GetBalanceAsync(request, cancellationToken);
+        _privateApi.GetBalanceAsync(request, cancellationToken);
 
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         OrderLimitRequest request,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.OrderLimitAsync(request, cancellationToken);
+        _privateApi.OrderLimitAsync(request, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _tradingApi.CancelOrderAsync(request, cancellationToken);
+        _privateApi.CancelOrderAsync(request, cancellationToken);
 
     // SpotHistory
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
         OrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _historyApi.GetOrdersAsync(request, cancellationToken);
+        _privateApi.GetOrdersAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default) =>
-        _historyApi.GetExecutionsPrivateAsync(request, cancellationToken);
+        _privateApi.GetExecutionsPrivateAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

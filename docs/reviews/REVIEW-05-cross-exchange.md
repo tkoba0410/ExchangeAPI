@@ -28,8 +28,8 @@
 ### B-1. 揃えるべき（将来追加の足かせになる差分）
 
 - Issue: 層内インターフェース命名の非対称（交換所プレフィックス有無）が混在している。  
-- Evidence: `Raw` は `IRawApi`（Bitflyer）と `IBittradeRawApi`（Bittrade）、`Normalized` は `INormalizedApi` と `IBittradeNormalizedApi`、`Wire/Internal` は `IWireCallExecutor` と `IBittradeWireCallExecutor`。  
-  （`src/Exchanges/Bitflyer/Raw/Api/IRawApi.cs` / `src/Exchanges/Bittrade/Raw/Api/IBittradeRawApi.cs` / `src/Exchanges/Bitflyer/Normalized/Api/INormalizedApi.cs` / `src/Exchanges/Bittrade/Normalized/Api/IBittradeNormalizedApi.cs` / `src/Exchanges/Bitflyer/Wire/Internal/WireCallExecutor.cs` / `src/Exchanges/Bittrade/Wire/Internal/WireCallExecutor.cs`）  
+- Evidence: （修正前）`Raw` は `IRawApi`（Bitflyer）と `IBittradeRawApi`（Bittrade）、`Normalized` は `INormalizedApi` と `IBittradeNormalizedApi`、`Wire/Internal` は `IWireCallExecutor` と `IBittradeWireCallExecutor`。  
+  （現状参照: `src/Exchanges/Bitflyer/Raw/Api/IRawApi.cs` / `src/Exchanges/Bittrade/Raw/Api/IRawApi.cs` / `src/Exchanges/Bitflyer/Normalized/Api/INormalizedApi.cs` / `src/Exchanges/Bittrade/Normalized/Api/INormalizedApi.cs` / `src/Exchanges/Bitflyer/Wire/Internal/WireCallExecutor.cs` / `src/Exchanges/Bittrade/Wire/Internal/WireCallExecutor.cs`）  
 - Why it matters: 新規取引所追加時に「交換所名を型名へ付けるか」の判断が揺れ、DI 登録・検索・テンプレート化のコストが上がる。  
 - Proposed rule: 交換所配下層の主I/F名は「常に非プレフィックス」または「常にプレフィックス」のどちらかへ全取引所で統一し、例外は `docs/exceptions.md` へ期限付きでのみ許可。  
 - Severity: P1  
@@ -120,3 +120,16 @@
 
 - 現状は「層構造・Endpoint 1:1 検証・NotSupported の基本線」が概ね並列化されている。  
 - 主要リスクは、**同責務の命名規則/入口粒度/メトリクス語彙の揺らぎ**であり、ここを標準化すれば新規取引所追加時の判断コストを大きく下げられる。  
+
+---
+
+## D. 対応状況（2026-02-12）
+
+- B-1 #1（層内 I/F 命名の非対称）: **解消済み**。  
+  Bittrade 側を非プレフィックスへ統一（`IRawApi` / `INormalizedApi` / `IWireCallExecutor` / `IMarketResolver`）。
+- B-1 #2（Adapter Private 公開面の分割粒度）: **解消済み**。  
+  Bittrade `ExchangeClient` の private 入口を `PrivateApi` 単一委譲へ統一。
+- B-1 #3（Operations の domain 語彙・可視性）: **解消済み**。  
+  Bittrade 側を `internal static class Operations` + `Bittrade.MarketData.*` へ統一。
+- B-1 #4（EndpointIdCatalog の NotImplemented 表現）: **解消済み**。  
+  Bitflyer 側の空 `NotImplemented` 表現を削除し、`GetAllEndpointIds()` のみに統一。

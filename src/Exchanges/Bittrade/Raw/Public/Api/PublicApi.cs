@@ -19,10 +19,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
 /// </summary>
 internal sealed class PublicApi
 {
-    private readonly IBittradeWireCallExecutor _wire;
+    private readonly IWireCallExecutor _wire;
     private readonly RawCallExecutor _executor;
 
-    public PublicApi(IBittradeWireCallExecutor wire, RawCallExecutor executor)
+    public PublicApi(IWireCallExecutor wire, RawCallExecutor executor)
     {
         _wire = wire ?? throw new ArgumentNullException(nameof(wire));
         _executor = executor ?? throw new ArgumentNullException(nameof(executor));

@@ -46,7 +46,7 @@ public static class ClientFactory
         return new BittradeExchangeInfoApi(normalizedExchangeInfo);
     }
 
-    internal static (MarketApi Market, TradingApi Trading, AccountApi Account, BittradeExchangeInfoApi ExchangeInfo) CreatePrivate(
+    internal static (MarketApi Market, PrivateApi Private, BittradeExchangeInfoApi ExchangeInfo) CreatePrivate(
         string accessKey,
         string secretKey,
         AccountId accountId)
@@ -66,9 +66,8 @@ public static class ClientFactory
         var markets = new ExchangeInfoMarketResolver(exchangeInfo);
         var normalizedMarkets = new NormalizedMarketResolver(markets);
         var normalizedPrivate = new NormalizedPrivateApi(raw, normalizedMarkets, normalizedAccountId);
-        var trading = new TradingApi(normalizedPrivate);
-        var account = new AccountApi(normalizedPrivate);
-        return (new MarketApi(normalizedPublic, markets), trading, account, exchangeInfo);
+        var privateApi = new PrivateApi(normalizedPrivate);
+        return (new MarketApi(normalizedPublic, markets), privateApi, exchangeInfo);
     }
 
     public static ExchangeClient CreateDefault(

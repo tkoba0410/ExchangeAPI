@@ -16,12 +16,12 @@ namespace ExchangeApi.Exchanges.Bittrade.Raw.Api;
 /// <summary>
 /// Bittrade の Raw API アクセス（Public/Private/Trading をまとめた単一入口）。
 /// </summary>
-public sealed class RawApi : IBittradeRawApi
+public sealed class RawApi : IRawApi
 {
     private readonly PublicApi _publicApi;
     private readonly RawPrivateClient _privateClient;
 
-    public RawApi(IBittradeWireCallExecutor wire)
+    public RawApi(IWireCallExecutor wire)
     {
         if (wire is null) throw new ArgumentNullException(nameof(wire));
         var executor = new RawCallExecutor();

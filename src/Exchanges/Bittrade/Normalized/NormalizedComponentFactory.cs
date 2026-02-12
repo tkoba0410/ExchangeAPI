@@ -10,8 +10,8 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized;
 internal static class NormalizedComponentFactory
 {
     public static NormalizedComponents FromRaw(
-        IBittradeRawApi raw,
-        Func<NormalizedPublicApi, IBittradeMarketResolver> marketResolverFactory,
+        IRawApi raw,
+        Func<NormalizedPublicApi, IMarketResolver> marketResolverFactory,
         AccountId accountId)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));

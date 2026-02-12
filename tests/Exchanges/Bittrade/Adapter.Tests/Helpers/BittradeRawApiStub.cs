@@ -7,7 +7,7 @@ using ExchangeApi.Primitives.CallCommon;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Helpers;
 
-internal abstract class RawApiStub : IBittradeRawApi
+internal abstract class RawApiStub : IRawApi
 {
     protected static Exception CreateException() => new InvalidOperationException("Raw API should not be called.");
 

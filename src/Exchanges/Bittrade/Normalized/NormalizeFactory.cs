@@ -9,8 +9,8 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized;
 internal static class NormalizeFactory
 {
     public static NormalizedApi FromRaw(
-        IBittradeRawApi raw,
-        IBittradeMarketResolver markets,
+        IRawApi raw,
+        IMarketResolver markets,
         AccountId accountId)
     {
         if (raw is null) throw new ArgumentNullException(nameof(raw));

@@ -30,7 +30,7 @@ public sealed class ErrorEnrichTests
         var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
 
         var err = Assert.IsType<CallResult<TickerResponse>.Err>(call.Result);
-        Assert.Equal("Bittrade.Market.GetTicker", call.Meta.Component);
+        Assert.Equal("Bittrade.MarketData.GetTicker", call.Meta.Component);
         Assert.Equal("boom", err.Error.Message);
     }
 

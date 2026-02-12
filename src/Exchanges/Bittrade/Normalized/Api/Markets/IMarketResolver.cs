@@ -5,7 +5,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Api.Markets;
 
-public interface IBittradeMarketResolver
+public interface IMarketResolver
 {
     Task<Call<ResolveBittradeMarketRequest, MarketInfo>> ResolveCallAsync(
         Symbol symbol,

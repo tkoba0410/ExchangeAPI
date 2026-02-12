@@ -12,7 +12,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 
-public interface IBittradeNormalizedApi
+public interface INormalizedApi
 {
     Task<Call<GetDetailMergedRequest, GetDetailMergedResponse>> GetDetailMergedCallAsync(
         ProductCode productCode,

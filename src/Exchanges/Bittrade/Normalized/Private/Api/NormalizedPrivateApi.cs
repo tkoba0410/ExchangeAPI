@@ -24,13 +24,13 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 
 internal sealed class NormalizedPrivateApi
 {
-    private readonly IBittradeRawApi _trading;
-    private readonly IBittradeMarketResolver _markets;
+    private readonly IRawApi _trading;
+    private readonly IMarketResolver _markets;
     private readonly AccountId _accountId;
 
     public NormalizedPrivateApi(
-        IBittradeRawApi trading,
-        IBittradeMarketResolver markets,
+        IRawApi trading,
+        IMarketResolver markets,
         AccountId accountId)
     {
         _trading = trading ?? throw new ArgumentNullException(nameof(trading));

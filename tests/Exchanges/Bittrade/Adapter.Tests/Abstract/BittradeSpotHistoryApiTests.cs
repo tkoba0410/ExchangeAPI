@@ -112,7 +112,7 @@ public sealed class SpotHistoryApiTests
         }
     }
 
-    private sealed class StubMarketResolver : IBittradeMarketResolver
+    private sealed class StubMarketResolver : IMarketResolver
     {
         private readonly MarketInfo _market;
 

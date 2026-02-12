@@ -10,7 +10,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 
-internal sealed class NormalizedMarketResolver : IBittradeMarketResolver
+internal sealed class NormalizedMarketResolver : IMarketResolver
 {
     private readonly IExchangeMarketResolver _inner;
 

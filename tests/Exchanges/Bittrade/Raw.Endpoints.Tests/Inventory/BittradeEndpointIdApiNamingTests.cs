@@ -12,14 +12,14 @@ public sealed class EndpointIdApiNamingTests
     public void Bittrade_InventoryEndpointIds_MustHave_RawCallAsyncMethods()
     {
         var inventory = LoadInventoryEndpointIds();
-        EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(IBittradeRawApi));
+        EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(IRawApi));
     }
 
     [Fact]
     public void Bittrade_InventoryEndpointIds_MustHave_NormalizedCallAsyncMethods()
     {
         var inventory = LoadInventoryEndpointIds();
-        EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(IBittradeNormalizedApi));
+        EndpointIdNamingAssertions.AssertCallAsyncMethodsExist(inventory, typeof(INormalizedApi));
     }
 
     private static string InventoryFilePath =>

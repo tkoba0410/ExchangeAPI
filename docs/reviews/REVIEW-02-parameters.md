@@ -91,7 +91,7 @@
 - **Evidence:**
   - `src` 配下の `CancellationToken ct` は再確認時点で未検出。
   - `src/Contracts/Facade/Interfaces/IPublicApi.cs` / `IPrivateApi.cs` は `cancellationToken`。
-  - `src/Exchanges/Bittrade/Normalized/Api/IBittradeNormalizedApi.cs` / `Normalized/Private/Api/NormalizedPrivateApi.cs` / `Normalized/Public/Api/NormalizedPublicApi.cs` も `cancellationToken`。
+  - `src/Exchanges/Bittrade/Normalized/Api/INormalizedApi.cs` / `Normalized/Private/Api/NormalizedPrivateApi.cs` / `Normalized/Public/Api/NormalizedPublicApi.cs` も `cancellationToken`。
 - **Why it matters:** 大規模検索・置換・Analyzer 運用時に揺れがノイズ化し、規約自動化しにくい。
 - **Proposed rule:** すべて `cancellationToken` に統一（ローカル変数短縮は許容しても、公開シグネチャは固定）。
 - **Severity:** Closed

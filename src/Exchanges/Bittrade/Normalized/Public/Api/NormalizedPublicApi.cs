@@ -18,9 +18,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 
 internal sealed class NormalizedPublicApi
 {
-    private readonly IBittradeRawApi _raw;
+    private readonly IRawApi _raw;
 
-    internal NormalizedPublicApi(IBittradeRawApi raw)
+    internal NormalizedPublicApi(IRawApi raw)
     {
         _raw = raw ?? throw new ArgumentNullException(nameof(raw));
     }

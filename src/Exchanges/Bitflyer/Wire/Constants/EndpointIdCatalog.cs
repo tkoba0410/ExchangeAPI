@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
@@ -42,10 +41,6 @@ public static class EndpointIdCatalog
         EndpointIds.GetTradingCommission,
     };
 
-    private static readonly string[] NotImplemented = Array.Empty<string>();
-
     public static IReadOnlyCollection<string> GetAllEndpointIds() =>
         Endpoints;
-
-    public static IReadOnlyCollection<string> GetNotImplementedEndpointIds() => NotImplemented;
 }

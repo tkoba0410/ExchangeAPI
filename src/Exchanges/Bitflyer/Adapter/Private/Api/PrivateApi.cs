@@ -34,76 +34,39 @@ internal sealed class PrivateApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _normalized.GetBalanceCallAsync(cancellationToken).ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                call,
                 Operations.Account.GetBalance,
-                ok => new BalanceResponse(MapBalances(ok)));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<BalanceRequest, BalanceResponse>(
-                request,
-                startedAt,
-                Operations.Account.GetBalance,
-                ex);
-        }
+                ct => _normalized.GetBalanceCallAsync(ct),
+                ok => new BalanceResponse(MapBalances(ok)),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
         OrdersRequest request,
         CancellationToken cancellationToken = default)
     {
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _normalized.GetChildOrdersCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                call,
                 Operations.History.GetOrders,
-                ok => BuildOrderResponse(request, ok));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<OrdersRequest, OrdersResponse>(
-                request,
-                startedAt,
-                Operations.History.GetOrders,
-                ex);
-        }
+                ct => _normalized.GetChildOrdersCallAsync(request.Symbol, ct),
+                ok => BuildOrderResponse(request, ok),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default)
     {
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _normalized.GetExecutionsPrivateCallAsync(request.Symbol, cancellationToken)
-                .ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                call,
                 Operations.History.GetExecutions,
-                ok => BuildExecutionResponse(request, ok));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
-                request,
-                startedAt,
-                Operations.History.GetExecutions,
-                ex);
-        }
+                ct => _normalized.GetExecutionsPrivateCallAsync(request.Symbol, ct),
+                ok => BuildExecutionResponse(request, ok),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
@@ -111,36 +74,22 @@ internal sealed class PrivateApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var normalizedRequest = new OrderRequest(
-                Symbol: request.Symbol,
-                Side: request.Side,
-                OrderType: OrderType.Limit,
-                Size: request.Size,
-                Price: request.Price);
-            var call = await _normalized
-                .SendChildOrderCallAsync(normalizedRequest, cancellationToken)
-                .ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+        var normalizedRequest = new OrderRequest(
+            Symbol: request.Symbol,
+            Side: request.Side,
+            OrderType: OrderType.Limit,
+            Size: request.Size,
+            Price: request.Price);
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                call,
                 Operations.Trading.PlaceOrder,
+                ct => _normalized.SendChildOrderCallAsync(normalizedRequest, ct),
                 ok => new OrderLimitResponse(
                     Key: ok.Key,
                     ExchangeOrderId: ok.ExchangeOrderId,
-                    AcceptanceId: ok.AcceptanceId));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<OrderLimitRequest, OrderLimitResponse>(
-                request,
-                startedAt,
-                Operations.Trading.PlaceOrder,
-                ex);
-        }
+                    AcceptanceId: ok.AcceptanceId),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
@@ -148,25 +97,13 @@ internal sealed class PrivateApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _normalized.CancelChildOrderCallAsync(request.Symbol, request.OrderKey, cancellationToken).ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                call,
                 Operations.Trading.CancelOrder,
-                ok => new CancelOrderResponse(ok.IsSuccess));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<CancelOrderRequest, CancelOrderResponse>(
-                request,
-                startedAt,
-                Operations.Trading.CancelOrder,
-                ex);
-        }
+                ct => _normalized.CancelChildOrderCallAsync(request.Symbol, request.OrderKey, ct),
+                ok => new CancelOrderResponse(ok.IsSuccess),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     private static IReadOnlyList<BalanceEntry> MapBalances(GetBalanceResponse balances) =>

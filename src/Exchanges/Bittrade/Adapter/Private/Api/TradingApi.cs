@@ -37,12 +37,10 @@ internal sealed class TradingApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _trading
-                .PostOrdersPlaceCallAsync(
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
+                request,
+                Operations.Trading.PlaceOrder,
+                ct => _trading.PostOrdersPlaceCallAsync(
                     new NormalizedRequests.PostOrdersPlaceRequest(
                         new OrderRequest(
                             Symbol: request.Symbol,
@@ -50,25 +48,13 @@ internal sealed class TradingApi
                             OrderType: OrderType.Limit,
                             Size: request.Size,
                             Price: request.Price)),
-                    cancellationToken)
-                .ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
-                request,
-                call,
-                Operations.Trading.PlaceOrder,
+                    ct),
                 ok => new OrderLimitResponse(
                     Key: ok.Key,
                     ExchangeOrderId: ok.ExchangeOrderId,
-                    AcceptanceId: ok.AcceptanceId));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<OrderLimitRequest, OrderLimitResponse>(
-                request,
-                startedAt,
-                Operations.Trading.PlaceOrder,
-                ex);
-        }
+                    AcceptanceId: ok.AcceptanceId),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
@@ -76,29 +62,15 @@ internal sealed class TradingApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _trading
-                .PostOrdersSubmitCancelByOrderIdCallAsync(
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
+                request,
+                Operations.Trading.CancelOrder,
+                ct => _trading.PostOrdersSubmitCancelByOrderIdCallAsync(
                     new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(request.Symbol, request.OrderKey),
-                    cancellationToken)
-                .ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
-                request,
-                call,
-                Operations.Trading.CancelOrder,
-                ok => new CancelOrderResponse(ok.IsSuccess));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<CancelOrderRequest, CancelOrderResponse>(
-                request,
-                startedAt,
-                Operations.Trading.CancelOrder,
-                ex);
-        }
+                    ct),
+                ok => new CancelOrderResponse(ok.IsSuccess),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
 

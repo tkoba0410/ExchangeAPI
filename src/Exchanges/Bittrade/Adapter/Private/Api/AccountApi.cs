@@ -41,25 +41,13 @@ internal sealed class AccountApi
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _account.GetAccountsBalanceByAccountIdCallAsync(cancellationToken).ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                call,
                 Operations.Account.GetBalance,
-                ok => new BalanceResponse(Mapper.MapBalances(ok.Items)));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<BalanceRequest, BalanceResponse>(
-                request,
-                startedAt,
-                Operations.Account.GetBalance,
-                ex);
-        }
+                ct => _account.GetAccountsBalanceByAccountIdCallAsync(ct),
+                ok => new BalanceResponse(Mapper.MapBalances(ok.Items)),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
 }

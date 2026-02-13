@@ -32,56 +32,28 @@ internal sealed class SpotHistoryApi
         OrdersRequest request,
         CancellationToken cancellationToken = default)
     {
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _trading
-                .GetOpenOrdersCallAsync(
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
+                request,
+                Operations.History.GetOrders,
+                ct => _trading.GetOpenOrdersCallAsync(
                     new ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.GetOpenOrdersRequest(request.Symbol),
-                    cancellationToken)
-                .ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
-                request,
-                call,
-                Operations.History.GetOrders,
-                ok => BuildOrderResponse(request, ok.Items));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<OrdersRequest, OrdersResponse>(
-                request,
-                startedAt,
-                Operations.History.GetOrders,
-                ex);
-        }
+                    ct),
+                ok => BuildOrderResponse(request, ok.Items),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default)
     {
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
-        {
-            var call = await _trading
-                .GetMatchResultsCallAsync(request.Symbol, request.Limit, cancellationToken)
-                .ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                call,
                 Operations.History.GetExecutions,
-                ok => BuildExecutionResponse(request, ok.Items));
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<ExecutionsPrivateRequest, ExecutionsPrivateResponse>(
-                request,
-                startedAt,
-                Operations.History.GetExecutions,
-                ex);
-        }
+                ct => _trading.GetMatchResultsCallAsync(request.Symbol, request.Limit, ct),
+                ok => BuildExecutionResponse(request, ok.Items),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     private static OrdersResponse BuildOrderResponse(

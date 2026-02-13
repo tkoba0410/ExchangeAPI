@@ -35,49 +35,34 @@ internal sealed class MarketApi
         CancellationToken cancellationToken = default)
     {
         var symbol = request.Symbol;
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
+        var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
+        if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
         {
-            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
-            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
-            {
-                return MarketResolutionCallMapper.FromResolverError<TickerRequest, CommonTicker>(
-                    request,
-                    marketCall,
-                    err.Error,
-                    Operations.MarketData.GetTicker);
-            }
-
-            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _normalized.GetTickerCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+            return MarketResolutionCallMapper.FromResolverError<TickerRequest, CommonTicker>(
                 request,
-                call,
-                Operations.MarketData.GetTicker,
-                ok => MarketMapper.MapTicker(symbol, new TickerNormalized(
-                    ok.ProductCode,
-                    ok.LastTradedPrice,
-                    ok.Timestamp,
-                    ok.RawSnapshot,
-                    ok.Extras)));
+                marketCall,
+                err.Error,
+                Operations.MarketData.GetTicker);
         }
-        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
-        {
-            return MarketResolutionCallMapper.SymbolNotSupported<TickerRequest, CommonTicker>(
+
+        var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
+            request,
+            Operations.MarketData.GetTicker,
+            ct => _normalized.GetTickerCallAsync(productCode, cancellationToken: ct),
+            ok => MarketMapper.MapTicker(symbol, new TickerNormalized(
+                ok.ProductCode,
+                ok.LastTradedPrice,
+                ok.Timestamp,
+                ok.RawSnapshot,
+                ok.Extras)),
+            cancellationToken,
+            (startedAt, ex) => TryMapSymbolNotSupported<TickerRequest, CommonTicker>(
                 request,
                 startedAt,
                 Operations.MarketData.GetTicker,
-                ex);
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<TickerRequest, CommonTicker>(
-                request,
-                startedAt,
-                Operations.MarketData.GetTicker,
-                ex);
-        }
+                ex))
+            .ConfigureAwait(false);
     }
 
     public async Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
@@ -85,44 +70,29 @@ internal sealed class MarketApi
         CancellationToken cancellationToken = default)
     {
         var symbol = request.Symbol;
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
+        var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
+        if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
         {
-            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
-            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
-            {
-                return MarketResolutionCallMapper.FromResolverError<BoardRequest, BoardResponse>(
-                    request,
-                    marketCall,
-                    err.Error,
-                    Operations.MarketData.GetBoard);
-            }
-
-            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _normalized.GetBoardCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+            return MarketResolutionCallMapper.FromResolverError<BoardRequest, BoardResponse>(
                 request,
-                call,
-                Operations.MarketData.GetBoard,
-                ok => MarketMapper.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)));
+                marketCall,
+                err.Error,
+                Operations.MarketData.GetBoard);
         }
-        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
-        {
-            return MarketResolutionCallMapper.SymbolNotSupported<BoardRequest, BoardResponse>(
+
+        var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
+            request,
+            Operations.MarketData.GetBoard,
+            ct => _normalized.GetBoardCallAsync(productCode, cancellationToken: ct),
+            ok => MarketMapper.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
+            cancellationToken,
+            (startedAt, ex) => TryMapSymbolNotSupported<BoardRequest, BoardResponse>(
                 request,
                 startedAt,
                 Operations.MarketData.GetBoard,
-                ex);
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<BoardRequest, BoardResponse>(
-                request,
-                startedAt,
-                Operations.MarketData.GetBoard,
-                ex);
-        }
+                ex))
+            .ConfigureAwait(false);
     }
 
     public async Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
@@ -130,44 +100,29 @@ internal sealed class MarketApi
         CancellationToken cancellationToken = default)
     {
         var symbol = request.Symbol;
-        var startedAt = DateTimeOffset.UtcNow;
-
-        try
+        var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
+        if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
         {
-            var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
-            if (marketCall.Result is CallResult<ExchangeMarketInfo>.Err err)
-            {
-                return MarketResolutionCallMapper.FromResolverError<ExecutionsPublicRequest, ExecutionsPublicResponse>(
-                    request,
-                    marketCall,
-                    err.Error,
-                    Operations.MarketData.GetExecutions);
-            }
-
-            var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-            var call = await _normalized.GetExecutionsPublicCallAsync(productCode, cancellationToken: cancellationToken).ConfigureAwait(false);
-            return AdapterCallMapper.MapCall(
+            return MarketResolutionCallMapper.FromResolverError<ExecutionsPublicRequest, ExecutionsPublicResponse>(
                 request,
-                call,
-                Operations.MarketData.GetExecutions,
-                ok => new ExecutionsPublicResponse(ToExecutionList(symbol, ok)));
+                marketCall,
+                err.Error,
+                Operations.MarketData.GetExecutions);
         }
-        catch (InvalidOperationException ex) when (ex.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
-        {
-            return MarketResolutionCallMapper.SymbolNotSupported<ExecutionsPublicRequest, ExecutionsPublicResponse>(
+
+        var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
+            request,
+            Operations.MarketData.GetExecutions,
+            ct => _normalized.GetExecutionsPublicCallAsync(productCode, cancellationToken: ct),
+            ok => new ExecutionsPublicResponse(ToExecutionList(symbol, ok)),
+            cancellationToken,
+            (startedAt, ex) => TryMapSymbolNotSupported<ExecutionsPublicRequest, ExecutionsPublicResponse>(
                 request,
                 startedAt,
                 Operations.MarketData.GetExecutions,
-                ex);
-        }
-        catch (Exception ex)
-        {
-            return AdapterCallMapper.FromException<ExecutionsPublicRequest, ExecutionsPublicResponse>(
-                request,
-                startedAt,
-                Operations.MarketData.GetExecutions,
-                ex);
-        }
+                ex))
+            .ConfigureAwait(false);
     }
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
@@ -189,5 +144,24 @@ internal sealed class MarketApi
             .Select(e => MarketMapper.MapExecution(symbol, e.Value))
             .ToArray();
         return mapped;
+    }
+
+    private static Call<TReq, TOk>? TryMapSymbolNotSupported<TReq, TOk>(
+        TReq request,
+        DateTimeOffset startedAt,
+        string operation,
+        Exception ex)
+    {
+        if (ex is InvalidOperationException invalidOperationException &&
+            invalidOperationException.Message.StartsWith("SymbolNotSupported:", StringComparison.Ordinal))
+        {
+            return MarketResolutionCallMapper.SymbolNotSupported<TReq, TOk>(
+                request,
+                startedAt,
+                operation,
+                invalidOperationException);
+        }
+
+        return null;
     }
 }

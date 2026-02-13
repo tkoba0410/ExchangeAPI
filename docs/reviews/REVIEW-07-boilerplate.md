@@ -349,6 +349,6 @@
 - P0-1 方針補足: **generator不採用で実施**（単一正本化で目的達成、ビルド複雑性を増やさない）。
 - P0-2（Call骨格のテンプレート化）: **解消済み**  
   `AdapterCallExecutor` を導入し、Adapter API の `try/catch + MapCall/FromException` 骨格を共通化。
-- P0-3（Operations語彙の単一正本化）: **対応中**  
-  `ContractOperations` は導入済み。現状は `Exchanges/*/Adapter/Internal/Operations/Operations.cs` がプレフィックス付与ラッパとして残存。
-  完了条件: Adapter API を `ContractOperations` 直接参照へ移行し、取引所別 `Operations.cs` を廃止。
+- P0-3（Operations語彙の単一正本化）: **解消済み**  
+  `ContractOperations` を正本化し、Adapter API は `ContractOperations` を直接参照する構成へ移行済み。
+  `Exchanges/*/Adapter/Internal/Operations/Operations.cs` は廃止。

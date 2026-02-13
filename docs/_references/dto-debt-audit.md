@@ -47,12 +47,13 @@ Status:
 
 ## Needs review
 
-| File path | Type name(s) | Category | Evidence (refs in src/tests) | Notes |
-|---|---|---|---|---|
-| `src/Exchanges/Bittrade/Raw/Public/Dtos/RawCurrenciesResponse.cs` | `RawCurrenciesResponse` | Needs review | `RawCurrenciesResponse:0` | `Json*` attributes present (serialization coupling) |
-| `src/Exchanges/Bittrade/Raw/Public/Dtos/RawTimestampResponse.cs` | `RawTimestampResponse` | Needs review | `RawTimestampResponse:0` | `Json*` attributes present (serialization coupling) |
+| File path | Type name(s) | Category | Evidence (refs in src/tests) | Notes | Status |
+|---|---|---|---|---|---|
+| `src/Exchanges/Bittrade/Raw/Public/Dtos/RawCurrenciesResponse.cs` | `RawCurrenciesResponse` | Needs review | `RawCurrenciesResponse:0` | duplicate of `GetCurrenciesResponse`, no parse target usage | Deleted after review |
+| `src/Exchanges/Bittrade/Raw/Public/Dtos/RawTimestampResponse.cs` | `RawTimestampResponse` | Needs review | `RawTimestampResponse:0` | duplicate of `GetTimestampResponse`, no parse target usage | Deleted after review |
 
 ## Deletion summary
 
 - B2 deleted 4 high-confidence unused DTO files.
+- B4 review deleted 2 previously `Needs review` duplicates after parse-target verification.
 - `dotnet build` and `dotnet test` both passed after deletion.

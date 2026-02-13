@@ -168,6 +168,11 @@ public class LayerBoundaryGuardTests
         if (type == typeof(void)) return false;
 
         var ns = type.Namespace ?? string.Empty;
+        if (ns.StartsWith("ExchangeApi.Exchanges.", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
         if (ns.Contains(".Raw", StringComparison.Ordinal) || ns.Contains(".Wire", StringComparison.Ordinal))
         {
             return true;

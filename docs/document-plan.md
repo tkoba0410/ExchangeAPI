@@ -1,6 +1,9 @@
 # 文書整備計画書（再検証版）
 
 ※ 本書は当時の計画を記録した文書であり、
+※ **履歴資料（Archive）**として扱う。
+※ 現在の運用判断・文書分類には使用しない。
+※ 参照先は `docs/index.md` / `docs/process.md` / 各 Normative 文書とする。
 ※ 現在の Normative 区分は `docs/process.md` を正とする。
 
 ## 1. 目的（Why）

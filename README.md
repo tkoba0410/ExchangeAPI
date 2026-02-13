@@ -20,6 +20,12 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基
 - **Contracts**（横断契約・公開 API の形状）  
   `docs/contracts/contracts.md`
 
+- **Resilience Contracts**（429 / Timeout / Partial Failure）  
+  `docs/contracts/resilience.md`
+
+- **Governance**（裁定ルール）  
+  `docs/governance.md`
+
 ---
 
 ### 運用（Process）

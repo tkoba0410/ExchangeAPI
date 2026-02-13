@@ -25,6 +25,9 @@
 
 ### TopSpec（技術正本）
 
+> 補足: レジリエンス契約（429 / Timeout / Partial Failure）は
+> `docs/contracts/resilience.md` を正本とする。
+
 * **`docs/topspec.md`**
   本ライブラリの層構造、責務分離、API サーフェス規則、Call 抽象、公開範囲を定義する唯一の技術規範。
 

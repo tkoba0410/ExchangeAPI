@@ -2,6 +2,10 @@
 
 本書は実装監査の参考資料（Informative）であり、規範は `docs/contracts/resilience.md` を正本とする。
 
+> Status: 実装後更新済み
+> Last Updated: 2026-02-13
+> Note: 旧「実装前監査」の記述は本更新で置換した。
+
 ## 1) HTTP 呼び出し箇所
 
 ### 1.1 共通送信経路
@@ -23,29 +27,28 @@
   - `src/Exchanges/Bitflyer/Adapter/Internal/Factory/ClientFactory.cs`
   - `src/Exchanges/Bittrade/Adapter/Internal/Factory/ClientFactory.cs`
 
-## 2) 現状の 429 / Timeout / Retry ロジック
+## 2) 現状の 429 / Timeout / Retry ロジック（実装後）
 
 ### 2.1 429
 
 - `src/Transport/Policy/RetryHttpPolicy.cs`
   - 429 をリトライ対象として扱う。
-  - ただし `Retry-After` 未対応。
+  - `Retry-After` を優先し、未指定時は指数バックオフ + ジッターを適用。
 
 ### 2.2 バックオフ
 
 - `src/Transport/Policy/RetryHttpPolicy.cs`
-  - 指数バックオフあり（`baseDelay * 2^(attempt-1)`）。
-  - ジッター未実装。
-  - 総リトライ時間上限未実装。
+  - 指数バックオフあり（ジッターあり）。
+  - `HttpPolicyOptions.MaxTotalRetryTime` で総リトライ時間上限を実装。
 
 ### 2.3 Timeout / Cancellation
 
 - `src/Transport/Policy/TimeoutHttpPolicy.cs`
   - linked CTS で timeout を実装。
-  - timeout 時は `TaskCanceledException` で上流へ伝搬。
+  - timeout 時は `TimeoutException` に分類。
 - `src/Transport/Protocol/RestClient.cs`
-  - `TaskCanceledException` を `TransportException("timed out or was canceled")` へ統合。
-  - 呼び出し元キャンセルと client timeout の区別なし。
+  - caller cancellation と timeout を `TransportFailureKind` で区別。
+  - `TransportException` で `IsCanceled` / `IsTimeout` 判定が可能。
 
 ## 3) 例外変換（Wire/Raw/Normalized/Adapter/Contracts）
 

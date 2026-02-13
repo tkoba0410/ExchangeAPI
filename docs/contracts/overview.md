@@ -82,10 +82,10 @@ Normalized/Adapter で `NotSupported` を返す通常制御を行わない。
 * 未対応 capability は **Facade の nullable capability により事前に判定可能**でなければならない。
 * `NotSupported` を通常制御フロー（取引所判別・分岐）として利用することは禁止される（原則使用しない）。
 
-#### 3.3.1 CallAsync 命名（Call-only）
+#### 3.3.1 Async 命名
 
-* Contracts の公開 I/F は Call-only で提供されるため、I/O を伴う公開メソッド名は末尾を **`CallAsync`** とする。
-* `Async` のみ（例：`GetBalanceAsync`）は使用しない。
+* Contracts の公開 I/F メソッド名は末尾を **`Async`** とする。
+* 命名は **`Get` + `<ContractApiId>` + `Async`** を基本とする（例：`GetBalanceAsync`）。
 
 ---
 

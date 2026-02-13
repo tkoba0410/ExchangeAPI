@@ -29,6 +29,7 @@
 ### 2.1 Normative（規範）
 - `docs/topspec.md`：技術仕様・設計規範の正本（層・境界・禁止事項）
 - `docs/contracts/contracts.md`：公開 API 契約の正本（Contract 層）
+- `docs/contracts/resilience.md`：429 / Timeout / Partial Failure 契約の正本
 - `docs/governance.md`：設計判断の裁定ルールの正本
 
 ### 2.2 Inventory（事実一覧）
@@ -38,8 +39,8 @@
 ※ Inventory に仕様本文（公式APIの写経）を書いてはならない。
 
 #### 2.2.1 公式仕様の正本（MUST）
-- 公式 API 仕様の正本は `doc-api.zip` とする。
-- Inventory の CanonicalSourceUrl は `doc-api.zip` を根拠として一致検証できなければならない。
+- 公式 API 仕様の正本は、各取引所の公式 API ドキュメント（公開 URL）とする。
+- Inventory の CanonicalSourceUrl は、公式 API ドキュメント上の到達可能な URL を根拠として一致検証できなければならない。
 
 ### 2.3 Decisions（例外台帳）
 - `docs/exceptions.md`：原則からの逸脱（差分と理由）

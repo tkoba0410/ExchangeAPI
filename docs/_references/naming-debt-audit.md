@@ -30,6 +30,7 @@ Result:
 Assessment:
 - This scan includes many **intentional EndpointId-derived names** and is not directly actionable as-is.
 - No targeted rename was applied in this sprint to avoid breaking established EndpointId traceability.
+- Policy decision: EndpointId 由来の `Get*` 命名は許容し、命名違反として扱わない。
 
 ### A-3. Layer vocabulary bleed scan (`Wire|Json|Http|Dto`)
 Command:
@@ -42,6 +43,7 @@ Result summary:
 Assessment:
 - `Contracts` side is acceptable.
 - `Normalized` `Json` references are existing design choices; no minimal safe rename/removal identified in this sprint without broader refactor.
+- Policy decision: `Json` 参照は実装内部では許容。ただし公開境界型名への `Json/Wire/Http` 混入は禁止する。
 
 ## B. DTO Debt
 
@@ -72,3 +74,8 @@ Decision:
 1. Remove dead DTO `ExecutionAccount` and unused extension.
 2. Add lightweight guard lock for Contracts -> Exchanges namespace exposure.
 
+## Closure
+
+- `ExecutionAccount` と未使用 extension は削除済み。
+- Contracts 公開シグネチャに `ExchangeApi.Exchanges.*` が露出したら失敗するガードを追加済み。
+- A-2/A-3 は方針決定でクローズ（追加改名は不要）。

@@ -89,6 +89,8 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] 共通層へ取引所固有の都合が逆流していないことを確認した
 * [ ] Adapter の API 実装で `try/catch + MapCall/FromException` を直書きせず、共通テンプレート経由で実装した
 * [ ] `Operations.*` の指定漏れがないことを確認した
+* [ ] `Operations` が共通正本（`ContractOperations`）由来であることを確認した
+* [ ] Adapter API に component 文字列リテラルを新規追加していないことを確認した
 * [ ] テンプレート非適用ケースは `docs/exceptions.md` に記録した
 
 ---

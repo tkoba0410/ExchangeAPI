@@ -38,6 +38,7 @@
 * RawJson や Exchange 固有要素を上位層に露出せざるを得ない場合
 * 将来的に解消予定だが、現時点では避けられない場合
 * Adapter の共通 Call 骨格を適用できず、個別 `try/catch` 実装を維持する場合
+* 共通 `Operations` 正本を使用できず、取引所別 `Operations.cs` に固有ラベルを追加する場合
 
 ---
 

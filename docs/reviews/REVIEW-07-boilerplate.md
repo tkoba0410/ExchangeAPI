@@ -252,9 +252,11 @@
    - 影響範囲: `Exchanges/*/Adapter/Public/Api`, `Exchanges/*/Adapter/Private/Api`。
    - リスク: 過抽象化でデバッグ性が下がる可能性。
 
-3. **Operations定数の生成 or 一元管理**
+3. **Operations語彙の単一正本化（ContractOperations・generator不採用）**
    - 狙い: component名ドリフト（観測軸ずれ）防止。
-   - 影響範囲: `Exchanges/*/Adapter/Internal/Operations`, 各Api実装。
+   - 影響範囲: `Contracts/*`（または `Primitives/*`）の Operations 正本, `Exchanges/*/Adapter/Internal/Operations`, 各Api実装。
+   - 方針: source generator は導入しない。`ContractOperations` を単一正本とし、取引所別 `Operations.cs` は参照・縮退（最終的に廃止）する。
+   - 理由: 監視ラベルを機械的に統一しつつ、ビルド複雑性を増やさない。
    - リスク: 既存監視クエリのラベル変更に注意。
 
 4. **ApiCallMapper薄ラッパの整理方針決定**
@@ -345,5 +347,7 @@
   `src/Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` を正本化し、`Wire/Constants/EndpointIds.cs` と
   `Normalized/Internal/Constants/EndpointIds.cs` を廃止。参照先を `Vocabulary.EndpointIds` に統一。
 - P0-1 方針補足: **generator不採用で実施**（単一正本化で目的達成、ビルド複雑性を増やさない）。
-- P0-2（Call骨格のテンプレート化）: **未対応**  
-- P0-3（Operations定数の生成/一元管理）: **未対応**
+- P0-2（Call骨格のテンプレート化）: **解消済み**  
+  `AdapterCallExecutor` を導入し、Adapter API の `try/catch + MapCall/FromException` 骨格を共通化。
+- P0-3（Operations語彙の単一正本化）: **未対応**  
+  `ContractOperations` 導入による正本化は未着手。現状は `Exchanges/*/Adapter/Internal/Operations/Operations.cs` を手動管理。

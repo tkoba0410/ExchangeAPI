@@ -12,7 +12,7 @@
 
 * Contracts が提供する **API（ContractApiId）** の一覧
 * 各 Contracts API の **Public / Private** 区分
-* 各 Contracts API の **メソッド署名（Parameters）**
+* 各 Contracts API の **Facade メソッド名（ContractMethod）**
 * 各 Contracts API の **RequestType / ResponseType**
 * 各取引所への **対応関係（Mapping）** と、未対応の明示（`None` / `Internal`）
 * 採用・不採用・留保に関する **裁定理由（DecisionNote）**
@@ -28,6 +28,7 @@
 ## Canonical Source（参照）
 
 * Contracts API 署名の正本: `src/Contracts/Facade/Interfaces/*`
+* 利便呼び出し（非規範）: `src/Contracts/Facade/Extensions/*`
 * 取引所 endpoint inventory: `docs/inventory/endpoints-*.md`
 * Contracts 契約条文の正本: `docs/contracts/contracts.md`
 
@@ -38,13 +39,12 @@
 
 ## Columns
 
-| ContractScope | ContractApiId | ContractMethod | Parameters | RequestType | ResponseType | PresentIn | BitflyerEndpointId | BittradeEndpointId | DecisionNote |
-| ------------- | ------------- | -------------- | ---------- | ----------- | ------------ | --------- | ------------------ | ------------------ | ------------ |
+| ContractScope | ContractApiId | ContractMethod | RequestType | ResponseType | PresentIn | BitflyerEndpointId | BittradeEndpointId | DecisionNote |
+| ------------- | ------------- | -------------- | ----------- | ------------ | --------- | ------------------ | ------------------ | ------------ |
 
 * **ContractScope**: `public` / `private`
 * **ContractApiId**: Contracts 側の論理識別子（例: `Ticker`, `OrderLimit`）
 * **ContractMethod**: Facade の公開メソッド名（例: `GetTickerAsync`）
-* **Parameters**: メソッド引数の型一覧（例: `Symbol` / `Symbol, Side, Size, Price` / `GetOrdersRequest`）
 * **RequestType / ResponseType**: Contracts の `Call<TRequest, TOk>` における `TRequest` / `TOk` 型
 * **PresentIn**: 当該 Contracts API が存在する層（`Contracts`, `Adapter`, `Normalized`, `Application` 等）。通常は `Contracts`
 * **BitflyerEndpointId / BittradeEndpointId**: 各取引所 inventory における EndpointId。未対応は `None` / `Internal`。
@@ -75,22 +75,31 @@ Contracts inventory では、`PresentIn` を以下の考え方で解釈する。
 
 ## Public
 
-| ContractScope | ContractApiId        | ContractMethod                | Parameters | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | DecisionNote |
-| ------------- | -------------------- | ----------------------------- | ---------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------ |
-| public        | ExchangeInfo         | GetExchangeInfoAsync          | (none)     | ExchangeInfoRequest         | ExchangeInfoResponse           | Contracts | Internal             | None               |              |
-| public        | Ticker               | GetTickerAsync                | Symbol     | TickerRequest               | TickerResponse                 | Contracts | GetTicker            | GetDetailMerged    |              |
-| public        | Board                | GetBoardAsync                 | Symbol     | BoardRequest                | BoardResponse                  | Contracts | GetBoard             | GetDepth           |              |
-| public        | ExecutionsPublic     | GetExecutionsPublicAsync      | Symbol     | ExecutionsPublicRequest     | ExecutionsPublicResponse       | Contracts | GetExecutionsPublic  | GetTrade           |              |
-| public        | Candlestick          | GetCandlesticksAsync          | Symbol, PeriodDto, int? | CandlesticksRequest     | CandlesticksResponse           | Contracts | None                 | GetHistoryKline    | Bitflyer NotSupported           |
+| ContractScope | ContractApiId        | ContractMethod                | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | DecisionNote |
+| ------------- | -------------------- | ----------------------------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------ |
+| public        | ExchangeInfo         | GetExchangeInfoAsync          | ExchangeInfoRequest         | ExchangeInfoResponse           | Contracts | Internal             | None               |              |
+| public        | Ticker               | GetTickerAsync                | TickerRequest               | TickerResponse                 | Contracts | GetTicker            | GetDetailMerged    |              |
+| public        | Board                | GetBoardAsync                 | BoardRequest                | BoardResponse                  | Contracts | GetBoard             | GetDepth           |              |
+| public        | ExecutionsPublic     | GetExecutionsPublicAsync      | ExecutionsPublicRequest     | ExecutionsPublicResponse       | Contracts | GetExecutionsPublic  | GetTrade           |              |
+| public        | Candlestick          | GetCandlesticksAsync          | CandlesticksRequest         | CandlesticksResponse           | Contracts | None                 | GetHistoryKline    | Bitflyer NotSupported           |
 
 ---
 
 ## Private
 
-| ContractScope | ContractApiId         | ContractMethod                 | Parameters         | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId              | DecisionNote |
-| ------------- | --------------------- | ------------------------------ | ------------------ | ---------------------------- | -------------------------------- | --------- | --------------------- | -------------------------------- | ------------ |
-| private       | Balance               | GetBalanceAsync               | (none)             | BalanceRequest              | BalanceResponse                 | Contracts | GetBalance            | GetAccountsBalanceByAccountId   |              |
-| private       | ExecutionsPrivate     | GetExecutionsPrivateAsync     | GetExecutionsPrivateRequest | ExecutionsPrivateRequest   | ExecutionsPrivateResponse        | Contracts | GetExecutionsPrivate  | GetMatchResults                 |              |
-| private       | Orders                | GetOrdersAsync                | GetOrdersRequest   | OrdersRequest               | OrdersResponse                   | Contracts | GetChildOrders        | GetOpenOrders                    |              |
-| private       | OrderLimit            | OrderLimitAsync               | Symbol, Side, Size, Price | OrderLimitRequest         | OrderLimitResponse               | Contracts | SendChildOrder        | PostOrdersPlace                  |              |
-| private       | CancelOrder           | CancelOrderAsync              | CancelOrderRequest | CancelOrderRequest           | CancelOrderResponse              | Contracts | CancelChildOrder      | PostOrdersSubmitCancelByOrderId  |              |
+| ContractScope | ContractApiId         | ContractMethod                 | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId              | DecisionNote |
+| ------------- | --------------------- | ------------------------------ | ---------------------------- | -------------------------------- | --------- | --------------------- | -------------------------------- | ------------ |
+| private       | Balance               | GetBalanceAsync                | BalanceRequest               | BalanceResponse                  | Contracts | GetBalance            | GetAccountsBalanceByAccountId   |              |
+| private       | ExecutionsPrivate     | GetExecutionsPrivateAsync      | ExecutionsPrivateRequest     | ExecutionsPrivateResponse        | Contracts | GetExecutionsPrivate  | GetMatchResults                 |              |
+| private       | Orders                | GetOrdersAsync                 | OrdersRequest                | OrdersResponse                   | Contracts | GetChildOrders        | GetOpenOrders                    |              |
+| private       | OrderLimit            | OrderLimitAsync                | OrderLimitRequest            | OrderLimitResponse               | Contracts | SendChildOrder        | PostOrdersPlace                  |              |
+| private       | CancelOrder           | CancelOrderAsync               | CancelOrderRequest           | CancelOrderResponse              | Contracts | CancelChildOrder      | PostOrdersSubmitCancelByOrderId  |              |
+
+---
+
+## Non-Normative Convenience Overloads
+
+以下は開発者向けの利便 API であり、契約正本ではない。
+
+- `GetTickerAsync(Symbol)` など: `src/Contracts/Facade/Extensions/PublicApiExtensions.cs`
+- `OrderLimitAsync(Symbol, Side, Size, Price)` など: `src/Contracts/Facade/Extensions/PrivateApiExtensions.cs`

@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/Primitives/ExchangeApi.Primitives.csproj" />
+    <ProjectReference Include="../../src/Contracts/Facade/ExchangeApi.Contracts.Facade.csproj" />
     <ProjectReference Include="../../src/Exchanges/Bitflyer/Raw/ExchangeApi.Exchanges.Bitflyer.Raw.csproj" />
     <ProjectReference Include="../../src/Exchanges/Bittrade/Raw/ExchangeApi.Exchanges.Bittrade.Raw.csproj" />
   </ItemGroup>

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using OrderRequest = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.OrderRequest;
 using NormalizedOpenOrder = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.OpenOrder;
 using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
@@ -22,6 +22,12 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 internal sealed class PrivateApi
 {
+    private static readonly string OpGetBalance = OperationComponent.WithExchange("Bitflyer", ContractOperations.Account.GetBalance);
+    private static readonly string OpGetOrders = OperationComponent.WithExchange("Bitflyer", ContractOperations.History.GetOrders);
+    private static readonly string OpGetExecutions = OperationComponent.WithExchange("Bitflyer", ContractOperations.History.GetExecutions);
+    private static readonly string OpPlaceOrder = OperationComponent.WithExchange("Bitflyer", ContractOperations.Trading.PlaceOrder);
+    private static readonly string OpCancelOrder = OperationComponent.WithExchange("Bitflyer", ContractOperations.Trading.CancelOrder);
+
     private readonly INormalizedApi _normalized;
 
     public PrivateApi(INormalizedApi normalized)
@@ -36,7 +42,7 @@ internal sealed class PrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.Account.GetBalance,
+                OpGetBalance,
                 ct => _normalized.GetBalanceCallAsync(ct),
                 ok => new BalanceResponse(MapBalances(ok)),
                 cancellationToken)
@@ -49,7 +55,7 @@ internal sealed class PrivateApi
     {
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.History.GetOrders,
+                OpGetOrders,
                 ct => _normalized.GetChildOrdersCallAsync(request.Symbol, ct),
                 ok => BuildOrderResponse(request, ok),
                 cancellationToken)
@@ -62,7 +68,7 @@ internal sealed class PrivateApi
     {
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.History.GetExecutions,
+                OpGetExecutions,
                 ct => _normalized.GetExecutionsPrivateCallAsync(request.Symbol, ct),
                 ok => BuildExecutionResponse(request, ok),
                 cancellationToken)
@@ -82,7 +88,7 @@ internal sealed class PrivateApi
             Price: request.Price);
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.Trading.PlaceOrder,
+                OpPlaceOrder,
                 ct => _normalized.SendChildOrderCallAsync(normalizedRequest, ct),
                 ok => new OrderLimitResponse(
                     Key: ok.Key,
@@ -99,7 +105,7 @@ internal sealed class PrivateApi
         if (request is null) throw new ArgumentNullException(nameof(request));
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.Trading.CancelOrder,
+                OpCancelOrder,
                 ct => _normalized.CancelChildOrderCallAsync(request.Symbol, request.OrderKey, ct),
                 ok => new CancelOrderResponse(ok.IsSuccess),
                 cancellationToken)

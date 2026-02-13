@@ -7,9 +7,9 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
@@ -20,6 +20,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 internal sealed class SpotHistoryApi
 {
+    private static readonly string OpGetOrders = OperationComponent.WithExchange("Bittrade", ContractOperations.History.GetOrders);
+    private static readonly string OpGetExecutions = OperationComponent.WithExchange("Bittrade", ContractOperations.History.GetExecutions);
+
     private readonly NormalizedPrivateApi _trading;
 
     public SpotHistoryApi(
@@ -34,7 +37,7 @@ internal sealed class SpotHistoryApi
     {
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.History.GetOrders,
+                OpGetOrders,
                 ct => _trading.GetOpenOrdersCallAsync(
                     new ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.GetOpenOrdersRequest(request.Symbol),
                     ct),
@@ -49,7 +52,7 @@ internal sealed class SpotHistoryApi
     {
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.History.GetExecutions,
+                OpGetExecutions,
                 ct => _trading.GetMatchResultsCallAsync(request.Symbol, request.Limit, ct),
                 ok => BuildExecutionResponse(request, ok.Items),
                 cancellationToken)

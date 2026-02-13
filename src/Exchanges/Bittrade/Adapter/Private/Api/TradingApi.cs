@@ -6,6 +6,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
@@ -17,7 +18,6 @@ using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Req
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 /// <summary>
@@ -25,6 +25,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 internal sealed class TradingApi
 {
+    private static readonly string OpPlaceOrder = OperationComponent.WithExchange("Bittrade", ContractOperations.Trading.PlaceOrder);
+    private static readonly string OpCancelOrder = OperationComponent.WithExchange("Bittrade", ContractOperations.Trading.CancelOrder);
+
     private readonly NormalizedPrivateApi _trading;
 
     public TradingApi(NormalizedPrivateApi trading)
@@ -39,7 +42,7 @@ internal sealed class TradingApi
         if (request is null) throw new ArgumentNullException(nameof(request));
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.Trading.PlaceOrder,
+                OpPlaceOrder,
                 ct => _trading.PostOrdersPlaceCallAsync(
                     new NormalizedRequests.PostOrdersPlaceRequest(
                         new OrderRequest(
@@ -64,7 +67,7 @@ internal sealed class TradingApi
         if (request is null) throw new ArgumentNullException(nameof(request));
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.Trading.CancelOrder,
+                OpCancelOrder,
                 ct => _trading.PostOrdersSubmitCancelByOrderIdCallAsync(
                     new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(request.Symbol, request.OrderKey),
                     ct),

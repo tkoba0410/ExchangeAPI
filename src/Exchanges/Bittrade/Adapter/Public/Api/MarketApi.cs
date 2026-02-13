@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
@@ -25,6 +25,11 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// </summary>
 internal sealed class MarketApi
 {
+    private static readonly string OpGetTicker = OperationComponent.WithExchange("Bittrade", ContractOperations.MarketData.GetTicker);
+    private static readonly string OpGetBoard = OperationComponent.WithExchange("Bittrade", ContractOperations.MarketData.GetBoard);
+    private static readonly string OpGetExecutions = OperationComponent.WithExchange("Bittrade", ContractOperations.MarketData.GetExecutions);
+    private static readonly string OpGetCandlesticks = OperationComponent.WithExchange("Bittrade", ContractOperations.MarketData.GetCandlesticks);
+
     private readonly NormalizedPublicApi _marketData;
     private readonly IExchangeMarketResolver _markets;
 
@@ -62,13 +67,13 @@ internal sealed class MarketApi
                 request,
                 marketCall,
                 err.Error,
-                Operations.MarketData.GetTicker);
+                OpGetTicker);
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.MarketData.GetTicker,
+                OpGetTicker,
                 ct => _marketData.GetDetailMergedCallAsync(productCode, ct),
                 ok => MarketMapper.MapTicker(symbol, new TickerNormalized(
                     ok.LastTradedPrice,
@@ -79,7 +84,7 @@ internal sealed class MarketApi
                 (startedAt, ex) => TryMapSymbolNotSupported<TickerRequest, TickerResponse>(
                     request,
                     startedAt,
-                    Operations.MarketData.GetTicker,
+                    OpGetTicker,
                     ex))
             .ConfigureAwait(false);
     }
@@ -96,20 +101,20 @@ internal sealed class MarketApi
                 request,
                 marketCall,
                 err.Error,
-                Operations.MarketData.GetBoard);
+                OpGetBoard);
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.MarketData.GetBoard,
+                OpGetBoard,
                 ct => _marketData.GetDepthCallAsync(productCode, cancellationToken: ct),
                 ok => MarketMapper.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
                 cancellationToken,
                 (startedAt, ex) => TryMapSymbolNotSupported<BoardRequest, BoardResponse>(
                     request,
                     startedAt,
-                    Operations.MarketData.GetBoard,
+                    OpGetBoard,
                     ex))
             .ConfigureAwait(false);
     }
@@ -127,20 +132,20 @@ internal sealed class MarketApi
                 request,
                 marketCall,
                 err.Error,
-                Operations.MarketData.GetExecutions);
+                OpGetExecutions);
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.MarketData.GetExecutions,
+                OpGetExecutions,
                 ct => _marketData.GetTradeCallAsync(productCode, ct),
                 ok => new ExecutionsPublicResponse(ToExecutionList(symbol, ok.Items)),
                 cancellationToken,
                 (startedAt, ex) => TryMapSymbolNotSupported<ExecutionsPublicRequest, ExecutionsPublicResponse>(
                     request,
                     startedAt,
-                    Operations.MarketData.GetExecutions,
+                    OpGetExecutions,
                     ex))
             .ConfigureAwait(false);
     }
@@ -156,7 +161,7 @@ internal sealed class MarketApi
         {
             return NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
                 "Contracts",
-                Operations.MarketData.GetCandlesticks,
+                OpGetCandlesticks,
                 request,
                 "CandlesticksPeriod");
         }
@@ -165,7 +170,7 @@ internal sealed class MarketApi
         {
             return NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
                 "Contracts",
-                Operations.MarketData.GetCandlesticks,
+                OpGetCandlesticks,
                 request,
                 $"CandlesticksPeriod:{period.Code}");
         }
@@ -177,20 +182,20 @@ internal sealed class MarketApi
                 request,
                 marketCall,
                 err.Error,
-                Operations.MarketData.GetCandlesticks);
+                OpGetCandlesticks);
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
-                Operations.MarketData.GetCandlesticks,
+                OpGetCandlesticks,
                 ct => _marketData.GetHistoryKlineCallAsync(productCode, new Period(period.Code), size, ct),
                 ok => new CandlesticksResponse(MarketMapper.MapCandlesticks(symbol, period, ok.Items)),
                 cancellationToken,
                 (startedAt, ex) => TryMapSymbolNotSupported<CandlesticksRequest, CandlesticksResponse>(
                     request,
                     startedAt,
-                    Operations.MarketData.GetCandlesticks,
+                    OpGetCandlesticks,
                     ex))
             .ConfigureAwait(false);
     }

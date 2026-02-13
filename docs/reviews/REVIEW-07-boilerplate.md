@@ -252,10 +252,10 @@
    - 影響範囲: `Exchanges/*/Adapter/Public/Api`, `Exchanges/*/Adapter/Private/Api`。
    - リスク: 過抽象化でデバッグ性が下がる可能性。
 
-3. **Operations語彙の単一正本化（ContractOperations・generator不採用）**
+3. **Operations語彙の単一正本化（ContractOperations直参照・generator不採用）**
    - 狙い: component名ドリフト（観測軸ずれ）防止。
-   - 影響範囲: `Contracts/*`（または `Primitives/*`）の Operations 正本, `Exchanges/*/Adapter/Internal/Operations`, 各Api実装。
-   - 方針: source generator は導入しない。`ContractOperations` を単一正本とし、取引所別 `Operations.cs` は参照・縮退（最終的に廃止）する。
+   - 影響範囲: `Contracts/*` の Operations 正本, `Exchanges/*/Adapter/Internal/Operations`, 各Api実装。
+   - 方針: source generator は導入しない。`ContractOperations` を単一正本とし、Adapter API は最終的に `ContractOperations` を直接参照する。取引所別 `Operations.cs` は廃止する。
    - 理由: 監視ラベルを機械的に統一しつつ、ビルド複雑性を増やさない。
    - リスク: 既存監視クエリのラベル変更に注意。
 
@@ -349,5 +349,6 @@
 - P0-1 方針補足: **generator不採用で実施**（単一正本化で目的達成、ビルド複雑性を増やさない）。
 - P0-2（Call骨格のテンプレート化）: **解消済み**  
   `AdapterCallExecutor` を導入し、Adapter API の `try/catch + MapCall/FromException` 骨格を共通化。
-- P0-3（Operations語彙の単一正本化）: **未対応**  
-  `ContractOperations` 導入による正本化は未着手。現状は `Exchanges/*/Adapter/Internal/Operations/Operations.cs` を手動管理。
+- P0-3（Operations語彙の単一正本化）: **対応中**  
+  `ContractOperations` は導入済み。現状は `Exchanges/*/Adapter/Internal/Operations/Operations.cs` がプレフィックス付与ラッパとして残存。
+  完了条件: Adapter API を `ContractOperations` 直接参照へ移行し、取引所別 `Operations.cs` を廃止。

@@ -91,6 +91,8 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] `Operations.*` の指定漏れがないことを確認した
 * [ ] `Operations` が共通正本（`ContractOperations`）由来であることを確認した
 * [ ] Adapter API に component 文字列リテラルを新規追加していないことを確認した
+* [ ] 新規/変更した Adapter API が `ContractOperations` を直接参照していることを確認した
+* [ ] 取引所別 `Operations.cs` に新規定数を追加していないことを確認した
 * [ ] テンプレート非適用ケースは `docs/exceptions.md` に記録した
 
 ---

@@ -127,5 +127,6 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 
 - `Operations`（component 名）の正本は取引所別 `Operations.cs` ではなく、共通語彙（`ContractOperations`）で管理する。
 - Adapter 実装は共通語彙を参照し、文字列リテラルの直接記述を禁止する。
-- 取引所固有ラベルが必要な場合のみ、取引所別 `Operations.cs` に限定追加する。
+- 取引所別 `Operations.cs` は移行用ラッパに限定し、新規機能での恒久利用を禁止する。
+- 目標状態は Adapter API から `ContractOperations` 直接参照とし、移行完了後に `Operations.cs` を廃止する。
 - 逸脱する場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。

@@ -53,12 +53,12 @@ internal static class MarketMapper
 
     public static IReadOnlyList<Candlestick> MapCandlesticks(
         CommonSymbol symbol,
-        PeriodDto period,
+        Period period,
         IReadOnlyList<KlineNormalized> klines)
     {
-        if (!CandlestickPeriods.TryGetTimescale(period.Code, out var timescale))
+        if (!CandlestickPeriods.TryGetTimescale(period.Value, out var timescale))
         {
-            throw new ExchangeApiException($"Unsupported candlestick period: {period.Code}");
+            throw new ExchangeApiException($"Unsupported candlestick period: {period.Value}");
         }
 
         return klines

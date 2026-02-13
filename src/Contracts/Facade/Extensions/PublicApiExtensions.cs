@@ -31,7 +31,7 @@ public static class PublicApiExtensions
     public static Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
         this IPublicApi api,
         Symbol symbol,
-        PeriodDto period,
+        Period period,
         int? size = null,
         CancellationToken cancellationToken = default) =>
         api.GetCandlesticksAsync(new CandlesticksRequest(symbol, period, size), cancellationToken);

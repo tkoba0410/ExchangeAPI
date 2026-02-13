@@ -115,7 +115,7 @@ public class MarketApiTests
         """;
         var api = CreateApi("/market/history/kline?period=1min&symbol=btcjpy&size=1", json);
 
-        var call = await api.GetCandlesticksAsync(new CandlesticksRequest(new Symbol("BTC/JPY"), new PeriodDto("1min"), Size: 1));
+        var call = await api.GetCandlesticksAsync(new CandlesticksRequest(new Symbol("BTC/JPY"), new Period("1min"), Size: 1));
         var ok = Assert.IsType<CallResult<CandlesticksResponse>.Ok>(call.Result);
         var item = Assert.Single(ok.Response.Items);
 

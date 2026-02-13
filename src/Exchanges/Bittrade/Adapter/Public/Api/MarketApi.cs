@@ -157,7 +157,7 @@ internal sealed class MarketApi
         var symbol = request.Symbol;
         var period = request.Period;
         var size = request.Size;
-        if (period is null || period.IsEmpty)
+        if (period.IsEmpty)
         {
             return NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
                 "Contracts",
@@ -166,13 +166,13 @@ internal sealed class MarketApi
                 "CandlesticksPeriod");
         }
 
-        if (!CandlestickPeriods.TryGetTimescale(period.Code, out _))
+        if (!CandlestickPeriods.TryGetTimescale(period.Value, out _))
         {
             return NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
                 "Contracts",
                 OpGetCandlesticks,
                 request,
-                $"CandlesticksPeriod:{period.Code}");
+                $"CandlesticksPeriod:{period.Value}");
         }
 
         var marketCall = await _markets.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
@@ -189,7 +189,7 @@ internal sealed class MarketApi
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetCandlesticks,
-                ct => _marketData.GetHistoryKlineCallAsync(productCode, new Period(period.Code), size, ct),
+                ct => _marketData.GetHistoryKlineCallAsync(productCode, period, size, ct),
                 ok => new CandlesticksResponse(MarketMapper.MapCandlesticks(symbol, period, ok.Items)),
                 cancellationToken,
                 (startedAt, ex) => TryMapSymbolNotSupported<CandlesticksRequest, CandlesticksResponse>(

@@ -99,8 +99,38 @@ public class RestClientFaultInjectionTests
             transport,
             policy: HttpPolicyFactory.CreateDefault(options));
 
-        await Assert.ThrowsAsync<TransportException>(() => rest.SendRawAsync("GET", "/api"));
+        var ex = await Assert.ThrowsAsync<TransportException>(() => rest.SendRawAsync("GET", "/api"));
+        Assert.True(ex.IsTimeout);
+        Assert.False(ex.IsCanceled);
+        Assert.Equal(HttpStatusCode.RequestTimeout, ex.StatusCode);
         Assert.Equal(1, transport.SendCount);
+    }
+
+    [Fact]
+    public async Task RestClient_Uses_Canceled_Classification_For_CallerCancellation()
+    {
+        var transport = new DelayTransport(TimeSpan.FromMilliseconds(150));
+        var options = new HttpPolicyOptions
+        {
+            Timeout = TimeSpan.FromSeconds(5),
+            RequestsPerSecond = 100,
+            RetryBaseDelay = TimeSpan.FromMilliseconds(1),
+            RetryMaxDelay = TimeSpan.FromMilliseconds(5),
+            MaxRetryAttemptsForGet = 3,
+            MaxRetryAttemptsForOther = 1,
+            CircuitBreakerFailureThreshold = 10
+        };
+        var rest = new RestClient(
+            new Uri("https://example.com"),
+            transport,
+            policy: HttpPolicyFactory.CreateDefault(options));
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(20));
+        var ex = await Assert.ThrowsAsync<TransportException>(() => rest.SendRawAsync("GET", "/api", cancellationToken: cts.Token));
+
+        Assert.True(ex.IsCanceled);
+        Assert.False(ex.IsTimeout);
+        Assert.Null(ex.StatusCode);
     }
 
     [Fact]

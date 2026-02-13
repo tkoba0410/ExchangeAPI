@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -161,12 +162,31 @@ namespace ExchangeApi.Transport.Protocol
                 _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt, ex.StatusCode);
                 throw wrapped;
             }
+            catch (TimeoutException ex)
+            {
+                var category = _errorClassifier?.Classify(HttpStatusCode.RequestTimeout, null) ?? TransportErrorCategory.Network;
+                var wrapped = new TransportException(
+                    "HTTP request timed out.",
+                    statusCode: HttpStatusCode.RequestTimeout,
+                    errorCategory: category,
+                    failureKind: TransportFailureKind.Timeout,
+                    innerException: ex);
+                _logger.LogError(wrapped, request);
+                _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt, HttpStatusCode.RequestTimeout);
+                throw wrapped;
+            }
             catch (TaskCanceledException ex)
             {
-                var category = _errorClassifier?.Classify(null, null) ?? TransportErrorCategory.Network;
+                var callerCanceled = cancellationToken.IsCancellationRequested;
+                var category = callerCanceled
+                    ? TransportErrorCategory.Unknown
+                    : _errorClassifier?.Classify(null, null) ?? TransportErrorCategory.Network;
                 var wrapped = new TransportException(
-                    "HTTP request timed out or was canceled.",
+                    callerCanceled
+                        ? "HTTP request was canceled by caller."
+                        : "HTTP request timed out or was canceled.",
                     errorCategory: category,
+                    failureKind: callerCanceled ? TransportFailureKind.Canceled : TransportFailureKind.Timeout,
                     innerException: ex);
                 _logger.LogError(wrapped, request);
                 _observer.OnError(context, wrapped, DateTimeOffset.UtcNow - startedAt);

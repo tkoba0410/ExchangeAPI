@@ -16,6 +16,8 @@ public sealed class HttpPolicyOptions
 
     public TimeSpan RetryMaxDelay { get; init; } = TimeSpan.FromSeconds(2);
 
+    public TimeSpan MaxTotalRetryTime { get; init; } = TimeSpan.FromSeconds(10);
+
     public double RequestsPerSecond { get; init; } = 5d;
 
     public int RateLimitBurst { get; init; } = 2;

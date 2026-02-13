@@ -45,6 +45,9 @@
 * `docs/contracts/contracts.md`
   共通 DTO、Capability I/F、契約上の意味論を定義。
 
+* `docs/contracts/resilience.md`
+  429 / Timeout / Partial Failure の公開契約を定義。
+
 ※ Raw / Normalized / Wire 層は内部実装または高度利用向けであり、公開安定 API ではありません。
 
 ---

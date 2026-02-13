@@ -27,16 +27,24 @@ public sealed class TimeoutHttpPolicy : IHttpPolicy
         var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         linkedCts.CancelAfter(_timeout);
 
-        return ExecuteWithTimeoutAsync(sendAsync, linkedCts);
+        return ExecuteWithTimeoutAsync(sendAsync, linkedCts, cancellationToken);
     }
 
     private static async Task<HttpResponseMessage> ExecuteWithTimeoutAsync(
         Func<CancellationToken, Task<HttpResponseMessage>> sendAsync,
-        CancellationTokenSource cts)
+        CancellationTokenSource cts,
+        CancellationToken callerToken)
     {
         using (cts)
         {
-            return await sendAsync(cts.Token).ConfigureAwait(false);
+            try
+            {
+                return await sendAsync(cts.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException ex) when (!callerToken.IsCancellationRequested && cts.IsCancellationRequested)
+            {
+                throw new TimeoutException("HTTP request timed out.", ex);
+            }
         }
     }
 }

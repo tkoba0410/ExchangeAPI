@@ -19,7 +19,8 @@ public static class HttpPolicyFactory
                 opts.MaxRetryAttemptsForOther,
                 opts.RetryBaseDelay,
                 opts.RetryMaxDelay,
-                observer: obs),
+                observer: obs,
+                maxTotalRetryTime: opts.MaxTotalRetryTime),
             new TimeoutHttpPolicy(opts.Timeout));
     }
 }

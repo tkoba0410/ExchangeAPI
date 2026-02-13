@@ -29,3 +29,9 @@
 
 - **新規取引所の追加**: まず `REVIEW-05-cross-exchange.md` と `REVIEW-07-boilerplate.md` を参照する。
 - **新規 endpoint の追加**: まず `REVIEW-05-cross-exchange.md` と `REVIEW-07-boilerplate.md` を参照し、必要に応じて `REVIEW-02-parameters.md` / `REVIEW-03-implementation.md` を確認する。
+
+
+## Normative 反映先（採用ルール）
+
+- REVIEW-01〜06 で採用された運用ルールは `docs/governance.md` の「8. REVIEW 採用ルール（Normative）」を正本とする。
+- 各 REVIEW は引き続き検討過程・比較観点を残す **Reference（非規範）** として扱う。

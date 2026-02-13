@@ -140,3 +140,47 @@ TopSpec および inventory に記載された事実に従う。
   **設計判断の裁定ルール**のみを定める
 * 本書と TopSpec の役割が重なる場合、
   **TopSpec を必ず優先**する
+
+
+## 8. REVIEW 採用ルール（Normative）
+
+本章は `docs/reviews/REVIEW-01`〜`REVIEW-06` のうち、採用済みルールのみを規範化したものである。
+`docs/reviews` 配下は引き続き Reference とし、規範判断は本章を正とする。
+
+### 8.1 命名・語彙（REVIEW-01）
+
+- EndpointId は取引所ごとの inventory を正本とし、取引所横断で同名統一を要求しない。
+- inventory 主表には正規 EndpointId のみを記載し、別名・重複候補は `Aliases` に分離する。
+- `Request/Response` は API 境界 DTO に限定し、`Result` は `CallResult<T>` 用語としてのみ使用する。
+- 外部仕様由来 typo は Wire/inventory に閉じ込め、Contracts や API 境界 DTO へ拡散させない。
+
+### 8.2 引数・型（REVIEW-02）
+
+- `CancellationToken` 引数名は `cancellationToken` に固定し、末尾配置・既定値 `= default` を原則とする。
+- 新規 endpoint では Raw Request/Response から Normalized へ変換する時点で VO/enum 化を完了させる。
+- Normalized 以降で primitive を新規導入してはならない。
+
+### 8.3 実装フロー（REVIEW-03）
+
+- 業務エラー判定は Normalized 層の detector に集約し、`MapOk` の先頭で必ず評価する。
+- Mapping 例外は `CallErrorKind.Mapping` に統一し、`Semantic` へ混在させない。
+- scalar 変換は「必須は Fail-fast、任意は null 許容（不正フォーマットは Mapping）」を標準とする。
+- timestamp 欠損は endpoint ごとの `Required/Optional` ポリシーで固定し、暗黙補完を禁止する。
+
+### 8.4 依存境界（REVIEW-04）
+
+- Adapter は `Normalized.Internal.*` を直接参照してはならない。
+- Normalized は `Wire.Constants` / `Wire.Internal` を直接参照してはならない。
+- `PublicClient` は entrypoint 専用とし、実オーケストレーションは `MarketApi` 側に集約する。
+
+### 8.5 取引所間並列性（REVIEW-05）
+
+- Adapter Public 境界では Request DTO を保持し、`ExchangeClient/PublicClient -> MarketApi` 委譲を取引所間で統一する。
+- Adapter テスト命名は取引所間で同一規約に合わせる。
+
+### 8.6 定数・語彙定義（REVIEW-06）
+
+- HTTP method 等の共通語彙は共通層で定義し、取引所別の文字列直書きを禁止する。
+- 監視・CallMeta で使う Layer/Component 語彙は正本を一元化し、直書きを禁止する。
+- 認証キー名・仕様 typo・raw lexicon は取引所固有定数として取引所配下に閉じ込める。
+

@@ -1,38 +1,42 @@
+using ExchangeApi.Contracts.Facade.Operations;
+
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Operations;
 
 internal static class Operations
 {
+    private const string ExchangePrefix = "Bittrade";
+
     internal static class MarketData
     {
-        public const string GetTicker = "Bittrade.MarketData.GetTicker";
-        public const string GetBoard = "Bittrade.MarketData.GetBoard";
-        public const string GetExecutions = "Bittrade.MarketData.GetExecutions";
-        public const string GetCandlesticks = "Bittrade.MarketData.GetCandlesticks";
-        public const string GetTickers = "Bittrade.MarketData.GetTickers";
-        public const string GetHistoryTrade = "Bittrade.MarketData.GetHistoryTrade";
+        public const string GetTicker = ExchangePrefix + "." + ContractOperations.MarketData.GetTicker;
+        public const string GetBoard = ExchangePrefix + "." + ContractOperations.MarketData.GetBoard;
+        public const string GetExecutions = ExchangePrefix + "." + ContractOperations.MarketData.GetExecutions;
+        public const string GetCandlesticks = ExchangePrefix + "." + ContractOperations.MarketData.GetCandlesticks;
+        public const string GetTickers = ExchangePrefix + "." + ContractOperations.MarketData.GetTickers;
+        public const string GetHistoryTrade = ExchangePrefix + "." + ContractOperations.MarketData.GetHistoryTrade;
     }
 
     internal static class Trading
     {
-        public const string PlaceOrder = "Bittrade.Trading.PlaceOrder";
-        public const string CancelOrder = "Bittrade.Trading.CancelOrder";
-        public const string GetOrders = "Bittrade.Trading.GetOrders";
-        public const string GetOrder = "Bittrade.Trading.GetOrder";
+        public const string PlaceOrder = ExchangePrefix + "." + ContractOperations.Trading.PlaceOrder;
+        public const string CancelOrder = ExchangePrefix + "." + ContractOperations.Trading.CancelOrder;
+        public const string GetOrders = ExchangePrefix + "." + ContractOperations.Trading.GetOrders;
+        public const string GetOrder = ExchangePrefix + "." + ContractOperations.Trading.GetOrder;
     }
 
     internal static class Account
     {
-        public const string GetBalance = "Bittrade.Account.GetBalance";
+        public const string GetBalance = ExchangePrefix + "." + ContractOperations.Account.GetBalance;
     }
 
     internal static class ExchangeInfo
     {
-        public const string GetExchangeInfo = "Bittrade.ExchangeInfo.GetExchangeInfo";
+        public const string GetExchangeInfo = ExchangePrefix + "." + ContractOperations.ExchangeInfo.GetExchangeInfo;
     }
 
     internal static class History
     {
-        public const string GetOrders = "Bittrade.History.GetOrders";
-        public const string GetExecutions = "Bittrade.History.GetExecutions";
+        public const string GetOrders = ExchangePrefix + "." + ContractOperations.History.GetOrders;
+        public const string GetExecutions = ExchangePrefix + "." + ContractOperations.History.GetExecutions;
     }
 }

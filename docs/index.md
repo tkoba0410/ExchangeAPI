@@ -84,6 +84,7 @@
 以下は設計正本ではなく、**運用・作業・計画のための補助資料**です。
 
 * `docs/process.md`
+* `docs/stages/stage8.md`
 * `docs/document-plan.md`
 * `docs/utilities.md`
 

@@ -1,6 +1,7 @@
 # ExchangeAPI
 
 ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基盤です。
+ドキュメントの参照起点は `docs/index.md` です。
 
 ## Quick Links
 
@@ -11,7 +12,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基
 
 ## 安定保証の境界
 
-- 公開安定面は Contract 層のみです。詳細は `docs/contracts/overview.md` を参照してください。
+- 公開安定面は Contract 層のみです。詳細は `docs/contracts/overview.md` と `docs/index.md` を参照してください。
 
 ## Contributions / Development
 

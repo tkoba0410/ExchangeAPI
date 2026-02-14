@@ -38,7 +38,7 @@ Note 欄には、以下のような **事実関係（状況）** を記載して
 * 非機能の可能性（non-functional candidate）
 * version 並立の事実
 
-Note 欄には、採用可否・実装判断・設計判断を記載してはならない。
+Note 欄は、採用可否・実装判断・設計判断を扱わず、事実の補足のみを記録する。
 
 ---
 
@@ -92,8 +92,7 @@ Note 欄には、採用可否・実装判断・設計判断を記載してはな
 
 ## Aliases（任意）
 
-本 inventory の `EndpointId` 列に alias を記載してはならない。
-alias を記録する場合は、本セクションに `EndpointId` との対応として記載する。
+本 inventory の `EndpointId` 列には alias を置かず、alias 情報は本セクションで `EndpointId` との対応として記録する。
 
 | EndpointId | Alias | Notes |
 |---|---|---|

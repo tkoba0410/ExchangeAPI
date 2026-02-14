@@ -1,5 +1,19 @@
 # Stage8
 
+## Stage8 ゴール（確定）
+
+TopSpec / Contracts / Governance / Process / Exceptions / Inventory の役割が重複せず、設計判断の参照先が常に一意で、README と _references が判断を含まない状態を完成させる。
+
+## DoD（完了条件チェックリスト）
+
+- [ ] README が導線のみで、SSOT指定や判断文が存在しない（→ docs/index.md / docs/process.md に寄せる）
+- [ ] docs/index.md が Exceptions を「逸脱台帳/決定記録」として案内し、エラー分類とは混同しない
+- [ ] docs/process.md の文書カテゴリ定義と docs 配下の実ファイルが矛盾しない
+- [ ] `_references/` が Normative を匂わせる表現を持たない（informative である旨が明確）
+- [ ] Inventory（endpoints-*.md）が Fact のみで、判断文を含まない
+
+---
+
 Stage8 のゴールは、  
 **設計・実装・文書のどれを見ても同じ判断に到達する状態を作ること**である。
 

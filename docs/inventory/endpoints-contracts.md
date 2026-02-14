@@ -1,14 +1,13 @@
 # Inventory — Contracts APIs
 
-> 本文書は **一覧（inventory）** である。
-> 本書は、裁定者により決定された **Contracts API の採用・対応関係** を列挙する **Normative Inventory（SSOT）** とする。
-> 取引所の公式 API 仕様（Method / Path / 公式URL 等）の正本は、各取引所 inventory（例: `docs/inventory/endpoints-*.md`）および公式 API 文書である。
+> 本文書は **inventory（事実一覧）** です。
+> Contracts API の採用状況と取引所 EndpointId との対応関係を記録します。
+> 仕様判断や運用判断の根拠は `docs/contracts/contracts.md` / `docs/governance.md` / `docs/process.md` を参照してください。
 
----
 
-## Normative Scope
+## Scope
 
-本書は、以下を **正（SSOT）**として記録する。
+本書は、以下の対応関係を記録する。
 
 * Contracts が提供する **API（ContractApiId）** の一覧
 * 各 Contracts API の **Public / Private** 区分
@@ -27,12 +26,12 @@
 
 ## Canonical Source（参照）
 
-* Contracts API 署名の正本: `src/Contracts/Facade/Interfaces/*`
+* Contracts API 署名参照: `src/Contracts/Facade/Interfaces/*`
 * 利便呼び出し（非規範）: `src/Contracts/Facade/Extensions/*`
 * 取引所 endpoint inventory: `docs/inventory/endpoints-*.md`
-* Contracts 契約条文の正本: `docs/contracts/contracts.md`
+* Contracts 契約条文参照: `docs/contracts/contracts.md`
 
-※ 本書は「どの Contracts API を採用し、どの取引所 EndpointId に対応づけるか」を記録する正本であり、
+※ 本書は「どの Contracts API を採用し、どの取引所 EndpointId に対応づけるか」の記録であり、
 　署名の詳細や命名規範そのものは上記文書を参照する。
 
 ---
@@ -48,17 +47,7 @@
 * **RequestType / ResponseType**: Contracts の `Call<TRequest, TOk>` における `TRequest` / `TOk` 型
 * **PresentIn**: 当該 Contracts API が存在する層（`Contracts`, `Adapter`, `Normalized`, `Application` 等）。通常は `Contracts`
 * **BitflyerEndpointId / BittradeEndpointId**: 各取引所 inventory における EndpointId。未対応は `None` / `Internal`。
-* **DecisionNote**: 裁定者による判断理由・留保理由（NotSupported もここに記す）
-
----
-
-## Rules（運用ルール）
-
-1. 本 inventory は **Contracts API 採用可否・対応関係の正本**である。
-2. 実装は本 inventory に従うこと。
-3. `DecisionNote` には **裁定理由のみ**を記載する（事実や仕様説明は書かない）。
-4. 取引所側の事実（Method / Path / URL 等）は取引所 inventory にのみ記載する。
-5. Contracts の API 境界 DTO 名（`RequestType` / `ResponseType`）は実装命名の正本とし、Facade / Adapter はこれに一致させる。
+* **DecisionNote**: 対応状況に関する補足（例: NotSupported）
 
 ---
 
@@ -99,7 +88,7 @@ Contracts inventory では、`PresentIn` を以下の考え方で解釈する。
 
 ## Non-Normative Convenience Overloads
 
-以下は開発者向けの利便 API であり、契約正本ではない。
+以下は開発者向けの利便 API であり、契約仕様本文ではない。
 
 - `GetTickerAsync(Symbol)` など: `src/Contracts/Facade/Extensions/PublicApiExtensions.cs`
 - `OrderLimitAsync(Symbol, Side, Size, Price)` など: `src/Contracts/Facade/Extensions/PrivateApiExtensions.cs`

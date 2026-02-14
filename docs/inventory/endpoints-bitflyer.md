@@ -1,38 +1,9 @@
 # Inventory — Bitflyer Endpoints
 
-> 本文書は **一覧（inventory）** である。
-> 技術規範・共通方針は **TopSpec（docs/topspec.md）** を正本とする。
-> 公式 API 文書を最上位の正本とし、ここでは対応関係と命名規約を管理する。
+> 本文書は **inventory（事実一覧）** です。
+> 公式 API 文書を参照し、Method / Path / CanonicalSourceUrl / EndpointId / PresentIn の対応関係のみを記録します。
+> 本文書は判断規則を定義しません。
 
-## Normative Scope
-
-本書は、EndpointId および対応する事実（Method, Path, Scope 等）を列挙する **Normative Inventory** である。
-
-以下は本書の対象外とする。
-
-* 通称、代表名、便宜的名称
-* ナビゲーション目的の分類語
-* EndpointId の命名規範や導出・派生規則そのもの
-* 実装上の補助的な識別子
-
-これらは、本書の内容から直接または間接に導出されてはならない。
-
-※ Get / Send / Cancel 等の接頭辞は、EndpointId の構文要素であり、
-  便宜的名称・通称・代表名には該当しない。
-
-本文書は、TopSpec に基づき決定された EndpointId の一覧を記録するものであり、
-命名規範や派生規則そのものを定義するものではない。
-
-## EndpointId ルール（Bitflyer）
-
-- EndpointId は **取引所スコープ**の識別子とする。
-- HTTP Method（GET / POST 等）をそのまま表す語は原則として含めない。
-- ただし、API 操作の意味を表す **慣用的な接頭辞**（Get / Send / Cancel 等）については、
-  既存 EndpointId の識別上必要な範囲で採用を許容する。
-- 単語境界は比較的細かく区切り、可読性を優先する。
-- Public / Private の差分は、必要に応じて suffix 等で表現する。
-- 本文書に記載された EndpointId が、
-  Bitflyer における正本である。
 
 ## Canonical Source（Entrypoint）
 

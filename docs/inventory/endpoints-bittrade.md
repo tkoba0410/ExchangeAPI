@@ -1,37 +1,8 @@
 # Inventory — Bittrade Endpoints
 
-> 本文書は **一覧（inventory）** である。
-> 技術規範・共通方針は **TopSpec（docs/topspec.md）** を正本とする。
-> 公式 API 文書を最上位の正本とし、ここでは対応関係と命名規約を管理する。
-
-## Normative Scope
-
-本書は、EndpointId および対応する事実（Method, Path, Scope 等）を列挙する **Normative Inventory** である。
-
-以下は本書の対象外とする。
-
-* 通称、代表名、便宜的名称
-* ナビゲーション目的の分類語
-* EndpointId の命名規範や導出・派生規則そのもの
-* 実装上の補助的な識別子
-
-これらは、本書の内容から直接または間接に導出されてはならない。
-
-※ Get / Send / Cancel 等の接頭辞は、EndpointId の構文要素であり、
-  便宜的名称・通称・代表名には該当しない。
-
-本文書は、TopSpec に基づき決定された EndpointId の一覧を記録するものであり、
-命名規範や派生規則そのものを定義するものではない。
-
-## EndpointId ルール（Bittrade）
-
-- EndpointId は **取引所スコープ**の識別子とする。
-- Endpoint の区別や衝突回避のため、
-  HTTP Method を表す語（Get / Post 等）を
-  prefix として用いることを許容する。
-- 命名は、公式 API の操作単位を優先して表現する。
-- 本文書に記載された EndpointId が、
-  Bittrade における正本である。
+> 本文書は **inventory（事実一覧）** です。
+> 公式 API 文書を参照し、Method / Path / CanonicalSourceUrl / EndpointId / PresentIn の対応関係のみを記録します。
+> 本文書は判断規則を定義しません。
 
 ## Canonical Source（Entrypoint）
 
@@ -41,8 +12,7 @@
 
 ## 並び順について
 
-本 inventory の endpoint 一覧は、**公式 API 文書における記載順**を正とする。
-可読性や実装都合を理由とした並び替えは行わない。
+本 inventory の endpoint 一覧は、公式 API 文書の記載順を基準として記録している。
 
 ---
 

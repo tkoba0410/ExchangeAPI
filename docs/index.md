@@ -70,10 +70,11 @@
 
 ---
 
-## 4. 例外・エラー
+## 4. Exceptions（逸脱台帳 / 決定記録）
 
 * `docs/exceptions.md`
-  Call 抽象を前提としたエラー／失敗の分類と扱い方を定義します。
+  原則からの逸脱理由・影響範囲・将来対応を記録する台帳です。
+  runtime のエラー契約は `docs/contracts/resilience.md` を参照してください。
 
 ---
 
@@ -104,4 +105,4 @@
 2. Governance で裁定ルールを把握
 3. Contracts 文書で公開 API を確認
 4. inventory で公式 API との対応関係を確認
-5. 必要に応じて例外・参考文書を参照
+5. 必要に応じて Exceptions（逸脱台帳）と参考文書を参照

@@ -1,7 +1,6 @@
 # ExchangeAPI
 
-ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基盤です。  
-設計判断・運用判断は `docs/` 側の文書を参照してください。
+ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基盤です。
 
 ## Quick Links
 

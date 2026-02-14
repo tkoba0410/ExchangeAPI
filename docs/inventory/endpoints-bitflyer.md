@@ -98,55 +98,9 @@ alias を記録する場合は、本セクションに `EndpointId` との対応
 
 ## 並び順について
 
-本 inventory の endpoint 一覧は、**公式 API 文書における記載順**を正とする。
-可読性や実装都合を理由とした並び替えは行わない。
+本 inventory の endpoint 一覧は、公式 API 文書の記載順に合わせて記録している。
 
 ## 補足
 
 * 本 inventory は **一覧のみ** を目的とする。
 * EndpointId の意味・命名・層対応は TopSpec を参照する。
-
-### EndpointId 導出手順（参考）
-
-以下は、本 inventory に記載された EndpointId を導出する際に用いた手順の一例である。
-この手順自体は **設計規範ではない**（衝突時は TopSpec を優先する）。
-
-1. Path 先頭の version セグメント（`/v1/` または `/v1/me/`）を除去する
-2. 残りを `/` で分割し、空要素を除外する
-3. 各セグメントを TopSpec が定める一般単語境界に基づいて分割する
-4. 分割された各単語を PascalCase 化し、連結する
-5. 上記規則で EndpointId が重複する場合は、末尾に Scope（`Public` / `Private`）を付与して解決する
-
-- Bitflyer では、HTTP Method（GET / POST 等）を直接反映した
-  prefix（Get / Post など）を付与する方式は採用していない。
-- 一方で、API 操作の意味を表す慣用的な接頭辞としての
-  Get / Send / Cancel 等は EndpointId に含まれている。
-
----
-
-## 配置移行（対象部分）
-
-### 目標ツリー（Bitflyer）
-
-```text
-src/Exchanges/Bitflyer/
-  Wire/{Public,Private,Internal}
-  Raw/{Public,Private,Internal}
-  Normalized/{Public,Private,Internal}
-  Adapter/{Public,Private,Internal}
-  Application/
-    ExchangeInfo/
-  Composition/
-```
-
-### ExchangeInfo の移行対応
-
-| 現在パス | 目標パス | Phase |
-| --- | --- | --- |
-| `src/Exchanges/Common/ExchangeInfo/...` | `src/Exchanges/Common/Application/ExchangeInfo/...` | 1 |
-| `src/Exchanges/Bitflyer/ExchangeInfo/...` | `src/Exchanges/Bitflyer/Application/ExchangeInfo/...` | 2 |
-
-### 移行時の検証コマンド
-
-- `dotnet build`
-- `dotnet test`

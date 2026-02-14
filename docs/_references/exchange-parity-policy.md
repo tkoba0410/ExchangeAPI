@@ -5,6 +5,8 @@
 
 本書は **非規範（Reference）** である。技術規範の正本は `docs/topspec.md`、
 EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
+本文中の MUST / MUST NOT / SHOULD / MAY は、当時の方針メモを保存した語であり、
+現行判断の拘束力を持たない。
 
 ## 1. 目的
 

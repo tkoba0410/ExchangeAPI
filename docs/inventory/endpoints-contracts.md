@@ -1,7 +1,7 @@
 # Inventory — Contracts APIs
 
 > 本文書は **inventory（事実一覧）** です。
-> Contracts API の採用状況と取引所 EndpointId との対応関係を記録します。
+> Contracts API の実装対応状況と取引所 EndpointId との対応関係を記録します。
 > 仕様判断や運用判断の根拠は `docs/contracts/contracts.md` / `docs/governance.md` / `docs/process.md` を参照してください。
 
 
@@ -14,7 +14,7 @@
 * 各 Contracts API の **Facade メソッド名（ContractMethod）**
 * 各 Contracts API の **RequestType / ResponseType**
 * 各取引所への **対応関係（Mapping）** と、未対応の明示（`None` / `Internal`）
-* 採用・不採用・留保に関する **裁定理由（DecisionNote）**
+* 対応状態に関する **補足メモ（MappingStatus）**
 
 以下は本書の対象外とする。
 
@@ -31,14 +31,14 @@
 * 取引所 endpoint inventory: `docs/inventory/endpoints-*.md`
 * Contracts 契約条文参照: `docs/contracts/contracts.md`
 
-※ 本書は「どの Contracts API を採用し、どの取引所 EndpointId に対応づけるか」の記録であり、
+※ 本書は「どの Contracts API がどの取引所 EndpointId に対応しているか」の記録であり、
 　署名の詳細や命名規範そのものは上記文書を参照する。
 
 ---
 
 ## Columns
 
-| ContractScope | ContractApiId | ContractMethod | RequestType | ResponseType | PresentIn | BitflyerEndpointId | BittradeEndpointId | DecisionNote |
+| ContractScope | ContractApiId | ContractMethod | RequestType | ResponseType | PresentIn | BitflyerEndpointId | BittradeEndpointId | MappingStatus |
 | ------------- | ------------- | -------------- | ----------- | ------------ | --------- | ------------------ | ------------------ | ------------ |
 
 * **ContractScope**: `public` / `private`
@@ -47,36 +47,25 @@
 * **RequestType / ResponseType**: Contracts の `Call<TRequest, TOk>` における `TRequest` / `TOk` 型
 * **PresentIn**: 当該 Contracts API が存在する層（`Contracts`, `Adapter`, `Normalized`, `Application` 等）。通常は `Contracts`
 * **BitflyerEndpointId / BittradeEndpointId**: 各取引所 inventory における EndpointId。未対応は `None` / `Internal`。
-* **DecisionNote**: 対応状況に関する補足（例: NotSupported）
-
----
-
-## Layer / MappingType 補足
-
-Contracts inventory では、`PresentIn` を以下の考え方で解釈する。
-
-- `Single`: 単一 API 呼び出しからの写像（主に Raw / Normalized / Adapter）
-- `Composite`: 複数情報の統合・解決（Application）
-
-`ExchangeInfo` のような複合写像は、API 層だけでなく `Application` 層での実装有無も考慮して管理する。
+* **MappingStatus**: 対応状況に関する事実メモ（例: `bitflyer: NotSupported`）
 
 ---
 
 ## Public
 
-| ContractScope | ContractApiId        | ContractMethod                | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | DecisionNote |
+| ContractScope | ContractApiId        | ContractMethod                | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | MappingStatus |
 | ------------- | -------------------- | ----------------------------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------ |
 | public        | ExchangeInfo         | GetExchangeInfoAsync          | ExchangeInfoRequest         | ExchangeInfoResponse           | Contracts | Internal             | None               |              |
 | public        | Ticker               | GetTickerAsync                | TickerRequest               | TickerResponse                 | Contracts | GetTicker            | GetDetailMerged    |              |
 | public        | Board                | GetBoardAsync                 | BoardRequest                | BoardResponse                  | Contracts | GetBoard             | GetDepth           |              |
 | public        | ExecutionsPublic     | GetExecutionsPublicAsync      | ExecutionsPublicRequest     | ExecutionsPublicResponse       | Contracts | GetExecutionsPublic  | GetTrade           |              |
-| public        | Candlestick          | GetCandlesticksAsync          | CandlesticksRequest         | CandlesticksResponse           | Contracts | None                 | GetHistoryKline    | Bitflyer NotSupported           |
+| public        | Candlestick          | GetCandlesticksAsync          | CandlesticksRequest         | CandlesticksResponse           | Contracts | None                 | GetHistoryKline    | bitflyer: NotSupported |
 
 ---
 
 ## Private
 
-| ContractScope | ContractApiId         | ContractMethod                 | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId              | DecisionNote |
+| ContractScope | ContractApiId         | ContractMethod                 | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId              | MappingStatus |
 | ------------- | --------------------- | ------------------------------ | ---------------------------- | -------------------------------- | --------- | --------------------- | -------------------------------- | ------------ |
 | private       | Balance               | GetBalanceAsync                | BalanceRequest               | BalanceResponse                  | Contracts | GetBalance            | GetAccountsBalanceByAccountId   |              |
 | private       | ExecutionsPrivate     | GetExecutionsPrivateAsync      | ExecutionsPrivateRequest     | ExecutionsPrivateResponse        | Contracts | GetExecutionsPrivate  | GetMatchResults                 |              |

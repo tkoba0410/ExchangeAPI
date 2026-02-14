@@ -56,6 +56,13 @@
 - 禁止：仕様本文の写経、実装手順の解説、TopSpec の代替
 - 必須：対象スコープを明示し、スコープ外へ波及させない
 
+### 2.5 Reference（参考）
+- `docs/navigation.md`：用語ナビゲーション（非規範）
+- `docs/utilities.md`：補助的な運用メモ（非規範）
+- `docs/document-plan.md`：履歴資料（Archive）
+- `docs/reviews/*`：レビュー記録
+- `docs/_references/*`：過去検討・監査ログ（Informative）
+
 ---
 
 #### 2.x 例外の例外（記録ルール）

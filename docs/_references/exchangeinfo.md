@@ -1,6 +1,7 @@
 > ✅ Reference / Frozen
 > この文書は ExchangeInfo の実装方針・具体例をまとめた **参考資料** であり、正本ではない。
-> 規範（MUST/NG）は docs/topspec.md を正とする。
+> 本文中に規範語（MUST/NG 等）が現れても、現行判断の拘束力は持たない。
+> 現行の判断は `docs/index.md` から参照される文書を用いる。
 
 # ExchangeInfo 実装ノート（参考）
 

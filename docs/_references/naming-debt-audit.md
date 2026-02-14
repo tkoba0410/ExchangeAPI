@@ -1,5 +1,7 @@
 # Naming / DTO / Layer Debt Audit (Phase A/B/C)
 
+> Informative only: 本文書は監査ログであり、設計判断の正本ではない。
+
 Date: 2026-02-13
 Branch: `feature/stage8`
 

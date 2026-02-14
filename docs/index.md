@@ -74,6 +74,7 @@
 
 * `docs/exceptions.md`
   原則からの逸脱理由・影響範囲・将来対応を記録する台帳です。
+  本章の「Exceptions」は設計上の逸脱記録を指し、runtime エラー分類は扱いません。
   runtime のエラー契約は `docs/contracts/resilience.md` を参照してください。
 
 ---

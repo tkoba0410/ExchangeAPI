@@ -37,6 +37,9 @@
 * Contracts の形状・意味論を守れない場合
 * RawJson や Exchange 固有要素を上位層に露出せざるを得ない場合
 * 将来的に解消予定だが、現時点では避けられない場合
+* Adapter の共通 Call 骨格を適用できず、個別 `try/catch` 実装を維持する場合
+* 共通 `Operations` 正本を使用できず、`ContractOperations` 直接参照を回避する場合
+* 移行完了までの暫定措置として、取引所別 `Operations.cs` ラッパを維持する場合
 
 ---
 
@@ -136,6 +139,34 @@ Normalized の一部 Mapper に例外ベースの旧実装が残っているが�
 
 ### Future Plan
 旧 API の使用箇所を完全に排除し、例外ベースの実装を整理・削除する。
+
+### Status
+- [x] Temporary
+
+---
+
+## Normalized Suffix Coexistence (Bitflyer/Bittrade)
+
+### Summary
+`*Normalized` 接尾辞は原則不使用だが、既存 DTO 群に接尾辞付き名称が残っている。
+
+### Reason
+命名ルール更新前に導入された型が広範囲で参照されており、段階移行を採用しているため。
+
+### Affected Area
+- Exchange: bitFlyer / Bittrade
+- Layer: Normalized
+- API / Type: `*Normalized` 命名の DTO（例: `ExecutionAccountNormalized`, `PositionNormalized`）
+
+### Impact
+新規型との命名統一時に、接尾辞の要否判断が再発する可能性がある。
+
+### Mitigation
+新規 DTO は `docs/naming-rules.md` の「原則不使用・衝突時のみ許可」に従う。
+既存 DTO は API 境界直結化の修正時に順次整理する。
+
+### Future Plan
+参照影響が局所化した単位で、接尾辞を外すか、衝突理由を個別記録して恒久化するかを裁定する。
 
 ### Status
 - [x] Temporary

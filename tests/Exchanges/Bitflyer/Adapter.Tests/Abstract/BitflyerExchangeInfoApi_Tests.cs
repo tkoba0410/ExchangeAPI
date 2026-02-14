@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Contracts.Facade.Requests;
+using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -11,8 +12,8 @@ public class BitflyerExchangeInfoApi_Tests
     {
         var api = new BitflyerExchangeInfoApi();
 
-        var call = await api.GetExchangeInfoCallAsync();
-        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfo>.Ok>(call.Result);
+        var call = await api.GetExchangeInfoAsync(new ExchangeInfoRequest());
+        var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse>.Ok>(call.Result);
         var info = ok.Response;
 
         Assert.Contains(info.Markets, market => market.Symbol.Value == "BTC/JPY" && market.ProductCode.Value == "BTC_JPY");

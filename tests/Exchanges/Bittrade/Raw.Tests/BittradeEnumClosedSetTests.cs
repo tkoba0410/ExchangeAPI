@@ -3,7 +3,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
-public sealed class BittradeEnumClosedSetTests
+public sealed class EnumClosedSetTests
 {
     [Fact]
     public void OrderDetail_KnownTypeAndState_Deserialize()
@@ -26,7 +26,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var detail = JsonSerializer.Deserialize<RawPrivateDtos.RawOrderDetail>(json);
+        var detail = JsonSerializer.Deserialize<RawPrivateDtos.GetOrdersByOrderIdDetail>(json);
 
         Assert.NotNull(detail);
         Assert.Equal("submitted", detail!.State);
@@ -54,7 +54,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var detail = JsonSerializer.Deserialize<RawPrivateDtos.RawOrderDetail>(json);
+        var detail = JsonSerializer.Deserialize<RawPrivateDtos.GetOrdersByOrderIdDetail>(json);
         Assert.NotNull(detail);
         Assert.Equal("mystery", detail!.State);
     }
@@ -80,13 +80,13 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var detail = JsonSerializer.Deserialize<RawPrivateDtos.RawOrderDetail>(json);
+        var detail = JsonSerializer.Deserialize<RawPrivateDtos.GetOrdersByOrderIdDetail>(json);
         Assert.NotNull(detail);
         Assert.Equal("buy-unknown", detail!.Type);
     }
 
     [Fact]
-    public void CreateRetailOrderRequest_UnknownType_Deserializes()
+    public void PostRetailOrderPlaceRequest_UnknownType_Deserializes()
     {
         var json = """
         {
@@ -98,13 +98,13 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var request = JsonSerializer.Deserialize<RawPrivateRequests.RawCreateRetailOrderRequest>(json);
+        var request = JsonSerializer.Deserialize<RawPrivateRequests.RawPostRetailOrderPlaceRequest>(json);
         Assert.NotNull(request);
         Assert.Equal(3, request!.Type);
     }
 
     [Fact]
-    public void CancelOpenOrdersRequest_KnownSide_Deserialize()
+    public void PostOrdersBatchCancelOpenOrdersRequest_KnownSide_Deserialize()
     {
         var json = """
         {
@@ -112,7 +112,7 @@ public sealed class BittradeEnumClosedSetTests
         }
         """;
 
-        var request = JsonSerializer.Deserialize<RawPrivateRequests.RawCancelOpenOrdersRequest>(json);
+        var request = JsonSerializer.Deserialize<RawPrivateRequests.RawPostOrdersBatchCancelOpenOrdersRequest>(json);
 
         Assert.NotNull(request);
         Assert.Equal("buy", request!.Side?.Value);

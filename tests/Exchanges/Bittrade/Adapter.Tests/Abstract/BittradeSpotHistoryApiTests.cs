@@ -6,17 +6,17 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Markets;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Api.Markets;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Helpers;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public sealed class BittradeSpotHistoryApiTests
+public sealed class SpotHistoryApiTests
 {
     [Fact]
     public async Task GetOrdersAsync_LimitApplied()
@@ -24,12 +24,12 @@ public sealed class BittradeSpotHistoryApiTests
         var raw = new StubRawApi();
         var api = CreateApi(raw);
 
-        var call = await api.GetOrdersCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
-        var ok = Assert.IsType<CallResult<Page<OrderSnapshotItem>>.Ok>(call.Result);
+        var call = await api.GetOrdersAsync(new OrdersRequest(new Symbol("BTC/JPY"), Limit: 1));
+        var ok = Assert.IsType<CallResult<OrdersResponse>.Ok>(call.Result);
 
         Assert.Single(ok.Response.Items);
-        Assert.Equal(1, ok.Response.Meta.AppliedLimit);
-        Assert.Equal(1, ok.Response.Meta.ReturnedCount);
+        Assert.Equal(1, ok.Response.AppliedLimit);
+        Assert.Equal(1, ok.Response.ReturnedCount);
     }
 
     [Fact]
@@ -38,32 +38,25 @@ public sealed class BittradeSpotHistoryApiTests
         var raw = new StubRawApi();
         var api = CreateApi(raw);
 
-        var call = await api.GetExecutionsPrivateCallAsync(new MarketLimitCursorRequest(new Symbol("BTC/JPY"), Limit: 1));
-        var resultType = call.Result.GetType();
-        var responseProp = resultType.GetProperty("Response");
-        if (responseProp is null)
-        {
-            var errorProp = resultType.GetProperty("Error");
-            var error = errorProp?.GetValue(call.Result);
-            Assert.Fail($"Expected Ok but got Err: {error}");
-        }
-        var response = Assert.IsType<Page<ExecutionItem>>(responseProp.GetValue(call.Result));
+        var call = await api.GetExecutionsPrivateAsync(new ExecutionsPrivateRequest(new Symbol("BTC/JPY"), Limit: 1));
+        var ok = Assert.IsType<CallResult<ExecutionsPrivateResponse>.Ok>(call.Result);
+        var response = ok.Response;
 
         Assert.Empty(response.Items);
-        Assert.Equal(1, response.Meta.AppliedLimit);
-        Assert.Equal(0, response.Meta.ReturnedCount);
+        Assert.Equal(1, response.AppliedLimit);
+        Assert.Equal(0, response.ReturnedCount);
     }
 
-    private static BittradeSpotHistoryApi CreateApi(StubRawApi raw)
+    private static SpotHistoryApi CreateApi(StubRawApi raw)
     {
         var markets = new StubMarketResolver("btcjpy");
-        var normalized = new BittradeNormalizedPrivateApi(raw, markets, accountId: new FreeText("account"));
-        return new BittradeSpotHistoryApi(normalized);
+        var normalized = new NormalizedPrivateApi(raw, markets, accountId: new AccountId("account"));
+        return new SpotHistoryApi(normalized);
     }
 
-    private sealed class StubRawApi : BittradeRawApiStub
+    private sealed class StubRawApi : RawApiStub
     {
-        public override Task<Call<RawPrivateRequests.GetOpenOrdersRequest, RawPrivateDtos.RawOpenOrdersResponse>> GetOpenOrdersCallAsync(
+        public override Task<Call<RawPrivateRequests.GetOpenOrdersRequest, RawPrivateDtos.GetOpenOrdersResponse>> GetOpenOrdersCallAsync(
             RawPrivateRequests.GetOpenOrdersRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -92,15 +85,15 @@ public sealed class BittradeSpotHistoryApiTests
                     CreatedAt: DateTimeOffset.UtcNow,
                     FilledAmount: "0"),
             };
-            var response = new RawPrivateDtos.RawOpenOrdersResponse("ok", data);
+            var response = new RawPrivateDtos.GetOpenOrdersResponse("ok", data);
             return Task.FromResult(CreateOkCall(request, response));
         }
 
-        public override Task<Call<RawPrivateRequests.GetMatchResultsRequest, RawPrivateDtos.RawMatchResultsResponse>> GetMatchResultsCallAsync(
+        public override Task<Call<RawPrivateRequests.GetMatchResultsRequest, RawPrivateDtos.GetMatchResultsResponse>> GetMatchResultsCallAsync(
             RawPrivateRequests.GetMatchResultsRequest request,
             CancellationToken cancellationToken = default)
         {
-            var response = new RawPrivateDtos.RawMatchResultsResponse(
+            var response = new RawPrivateDtos.GetMatchResultsResponse(
                 "ok",
                 Array.Empty<RawPrivateDtos.RawMatchResultEntry>());
             return Task.FromResult(CreateOkCall(request, response));
@@ -119,28 +112,28 @@ public sealed class BittradeSpotHistoryApiTests
         }
     }
 
-    private sealed class StubMarketResolver : IBittradeMarketResolver
+    private sealed class StubMarketResolver : IMarketResolver
     {
-        private readonly BittradeMarketInfo _market;
+        private readonly MarketInfo _market;
 
         public StubMarketResolver(string productCode)
         {
-            _market = new BittradeMarketInfo(new Symbol("BTC/JPY"), ProductCode.Parse(productCode));
+            _market = new MarketInfo(new Symbol("BTC/JPY"), ProductCode.Parse(productCode));
         }
 
-        public Task<Call<ResolveBittradeMarketRequest, BittradeMarketInfo>> ResolveCallAsync(
+        public Task<Call<ResolveBittradeMarketRequest, MarketInfo>> ResolveCallAsync(
             Symbol symbol,
-            CancellationToken ct = default)
+            CancellationToken cancellationToken = default)
         {
             var request = new ResolveBittradeMarketRequest(symbol);
             var meta = CallMeta.CreateInternal("Normalized", "StubMarketResolver");
 
-            return Task.FromResult(new Call<ResolveBittradeMarketRequest, BittradeMarketInfo>(
+            return Task.FromResult(new Call<ResolveBittradeMarketRequest, MarketInfo>(
                 Id: CallId.New(),
                 StartedAt: DateTimeOffset.UtcNow,
                 Duration: TimeSpan.Zero,
                 Request: request,
-                Result: new CallResult<BittradeMarketInfo>.Ok(_market),
+                Result: new CallResult<MarketInfo>.Ok(_market),
                 Meta: meta));
         }
     }

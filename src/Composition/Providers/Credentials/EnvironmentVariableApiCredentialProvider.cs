@@ -1,6 +1,7 @@
 using System;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Composition.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Composition.Providers.Credentials;
 
 /// <summary>
@@ -21,14 +22,14 @@ public sealed class EnvironmentVariableApiCredentialProvider : IApiCredentialPro
         _exchangeId = exchangeId;
     }
 
-    public ApiCredentials Get(string accountId)
+    public ApiCredentials Get(AccountId accountId)
     {
-        if (string.IsNullOrWhiteSpace(accountId))
+        if (accountId.IsEmpty)
         {
             throw new ArgumentException("AccountId is required.", nameof(accountId));
         }
 
-        var prefix = $"{Normalize(_exchangeId)}_{Normalize(accountId)}";
+        var prefix = $"{Normalize(_exchangeId)}_{Normalize(accountId.Value)}";
         var apiKeyName = $"{prefix}_API_KEY";
         var apiSecretName = $"{prefix}_API_SECRET";
 

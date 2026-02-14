@@ -1,8 +1,9 @@
 # Process（運用ルール）
 
 本書は、開発および文書整備の進め方を示す **参考文書**である。
-設計規範・層責務・公開範囲・API 契約の正本は  
-**TopSpec（docs/topspec.md）** とする。
+設計規範・層責務・公開範囲の正本は  
+**TopSpec（docs/topspec.md）** とする。  
+公開 API 契約の正本は **docs/contracts/contracts.md** とする。
 
 なお、`docs/contracts/*` は外部公開向けの **契約文書（公開安定 API の説明）** であり、
 設計規範ではないが、**公開 API 契約としては Normative** である。
@@ -26,7 +27,10 @@
 本リポジトリの文書は、次の種類に限定する（新カテゴリの増設は禁止）。
 
 ### 2.1 Normative（規範）
-- `docs/topspec.md`：最上位規範（層・境界・禁止事項）
+- `docs/topspec.md`：技術仕様・設計規範の正本（層・境界・禁止事項）
+- `docs/contracts/contracts.md`：公開 API 契約の正本（Contract 層）
+- `docs/contracts/resilience.md`：429 / Timeout / Partial Failure 契約の正本
+- `docs/governance.md`：設計判断の裁定ルールの正本
 
 ### 2.2 Inventory（事実一覧）
 - `docs/inventory/endpoints-<exchange>.md`：取引所別インベントリ
@@ -35,8 +39,8 @@
 ※ Inventory に仕様本文（公式APIの写経）を書いてはならない。
 
 #### 2.2.1 公式仕様の正本（MUST）
-- 公式 API 仕様の正本は `doc-api.zip` とする。
-- Inventory の CanonicalSourceUrl は `doc-api.zip` を根拠として一致検証できなければならない。
+- 公式 API 仕様の正本は、各取引所の公式 API ドキュメント（公開 URL）とする。
+- Inventory の CanonicalSourceUrl は、公式 API ドキュメント上の到達可能な URL を根拠として一致検証できなければならない。
 
 ### 2.3 Decisions（例外台帳）
 - `docs/exceptions.md`：原則からの逸脱（差分と理由）
@@ -44,12 +48,21 @@
 ### 2.4 Process（運用）
 - 本書：文書化ルール・レビュー手順・例外運用
 
-#### 2.4.1 Governance（運用補助・配置のみ）
-`docs/governance.md` は **新しい文書カテゴリではない**。Process（運用）の一部として扱う。
+#### 2.4.1 Governance（補足）
+`docs/governance.md` 自体は「裁定ルールの正本」であり、文書カテゴリとしては追加しない。
+運用上は Process と密接に扱うが、内容の優先順位は Normative に従う。
 
 - 目的：特定スコープの「揺らぎ止め」を、短いルールで固定する（例：Exchanges 配下のみの統一）
 - 禁止：仕様本文の写経、実装手順の解説、TopSpec の代替
 - 必須：対象スコープを明示し、スコープ外へ波及させない
+
+### 2.5 Reference（参考）
+- `docs/navigation.md`：用語ナビゲーション（非規範）
+- `docs/utilities.md`：補助的な運用メモ（非規範）
+- `docs/stages/stage8.md`：Stage8 完了判定チェック（非規範）
+- `docs/document-plan.md`：履歴資料（Archive）
+- `docs/reviews/*`：レビュー記録
+- `docs/_references/*`：過去検討・監査ログ（Informative）
 
 ---
 
@@ -151,6 +164,7 @@ governance に従って裁定を行う。
 - [ ] `string` が Wire から下流へ漏れていない（in/out の型制約が守られている）
 - [ ] Raw が lossless であり、意味確定（単位換算・時刻統一・解釈・デフォルト補完）をしていない
 - [ ] Raw DTO / RawJson が公開面（Contracts）へ漏れていない
+- [ ] 単一の API 呼び出し実装／単一インスタンス内部で、複数取引所の Raw / Normalized 型を混在させていない（TopSpec 3.4.4）
 
 #### A2. 非層カテゴリ（TopSpec）
 - [ ] `Application` は横断ユースケースの置き場であり、`Contracts.*` を参照していない

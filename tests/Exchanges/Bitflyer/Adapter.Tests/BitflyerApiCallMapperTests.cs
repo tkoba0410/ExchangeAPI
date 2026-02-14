@@ -1,6 +1,6 @@
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests;
 
@@ -15,7 +15,7 @@ public sealed class BitflyerApiCallMapperTests
         ExchangeErrorCategory expected)
     {
         var error = new CallError(kind, "test", HttpStatus: statusCode);
-        var category = ApiCallMapper.ToExchangeErrorCategory(error);
+        var category = AdapterCallMapper.ToExchangeErrorCategory(error);
 
         Assert.Equal(expected, category);
     }

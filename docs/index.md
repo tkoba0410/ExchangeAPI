@@ -3,6 +3,8 @@
 ## はじめに
 
 本リポジトリの文書は、対象領域ごとに正本（Normative）を定義する。
+本リポジトリでは「正本（Normative）」「Source of Truth（SSOT）」を同義として扱う。
+ただし inventory は「事実の正本（Fact SSOT）」であり、設計規範の正本ではない。
 
 以下は、それぞれの領域における正本である。
 
@@ -22,6 +24,9 @@
 ## 1. 設計仕様（Normative）
 
 ### TopSpec（技術正本）
+
+> 補足: レジリエンス契約（429 / Timeout / Partial Failure）は
+> `docs/contracts/resilience.md` を正本とする。
 
 * **`docs/topspec.md`**
   本ライブラリの層構造、責務分離、API サーフェス規則、Call 抽象、公開範囲を定義する唯一の技術規範。
@@ -43,6 +48,9 @@
 * `docs/contracts/contracts.md`
   共通 DTO、Capability I/F、契約上の意味論を定義。
 
+* `docs/contracts/resilience.md`
+  429 / Timeout / Partial Failure の公開契約を定義。
+
 ※ Raw / Normalized / Wire 層は内部実装または高度利用向けであり、公開安定 API ではありません。
 
 ---
@@ -62,10 +70,12 @@
 
 ---
 
-## 4. 例外・エラー
+## 4. Exceptions（逸脱台帳 / 決定記録）
 
 * `docs/exceptions.md`
-  Call 抽象を前提としたエラー／失敗の分類と扱い方を定義します。
+  原則からの逸脱理由・影響範囲・将来対応を記録する台帳です。
+  本章の「Exceptions」は設計上の逸脱記録を指し、runtime エラー分類は扱いません。
+  runtime のエラー契約は `docs/contracts/resilience.md` を参照してください。
 
 ---
 
@@ -74,9 +84,11 @@
 以下は設計正本ではなく、**運用・作業・計画のための補助資料**です。
 
 * `docs/process.md`
+* `docs/stages/stage8.md`
 * `docs/document-plan.md`
+* `docs/utilities.md`
 
-これらの文書は TopSpec および Governance に反しない範囲でのみ有効です。
+これらの文書は TopSpec / Contracts / Governance に反しない範囲でのみ有効です。
 
 ---
 
@@ -95,4 +107,4 @@
 2. Governance で裁定ルールを把握
 3. Contracts 文書で公開 API を確認
 4. inventory で公式 API との対応関係を確認
-5. 必要に応じて例外・参考文書を参照
+5. 必要に応じて Exceptions（逸脱台帳）と参考文書を参照

@@ -26,9 +26,10 @@
 
 1. 各取引所の**公式 API 文書**（最上位の正本）
 2. **TopSpec（docs/topspec.md）**（内部技術規範の唯一の正本）
-3. 本書（governance.md）（設計判断の裁定ルール）
-4. inventory 文書（事実の一覧 / Fact）
-5. _references 配下の文書（参考資料）
+3. **Contracts（docs/contracts/contracts.md）**（公開 API 契約の正本）
+4. 本書（governance.md）（設計判断の裁定ルール）
+5. inventory 文書（事実の一覧 / Fact）
+6. _references 配下の文書（参考資料）
 
 上位の正本と矛盾する記述は、下位文書に存在しても**無効**とする。
 
@@ -139,3 +140,47 @@ TopSpec および inventory に記載された事実に従う。
   **設計判断の裁定ルール**のみを定める
 * 本書と TopSpec の役割が重なる場合、
   **TopSpec を必ず優先**する
+
+
+## 8. REVIEW 採用ルール（Normative）
+
+本章は `docs/reviews/REVIEW-01`〜`REVIEW-06` のうち、採用済みルールのみを規範化したものである。
+`docs/reviews` 配下は引き続き Reference とし、規範判断は本章を正とする。
+本章の規範語は `MUST` / `MUST NOT` / `SHOULD` / `MAY` を用いる。
+
+### 8.1 命名・語彙（REVIEW-01）
+
+- EndpointId は取引所ごとの inventory を正本とし、取引所横断で同名統一を要求してはならない（MUST NOT）。
+- inventory 主表には正規 EndpointId のみを記載し、別名・重複候補は `Aliases` に分離しなければならない（MUST）。
+- `Request/Response` は API 境界 DTO に限定し、`Result` は `CallResult<T>` 用語としてのみ使用しなければならない（MUST）。
+- 外部仕様由来 typo は Wire/inventory に閉じ込め、Contracts や API 境界 DTO へ拡散させてはならない（MUST NOT）。
+
+### 8.2 引数・型（REVIEW-02）
+
+- `CancellationToken` 引数名は `cancellationToken` に固定し、末尾配置・既定値 `= default` とする（SHOULD）。
+- 新規 endpoint では Raw Request/Response から Normalized へ変換する時点で VO/enum 化を完了させなければならない（MUST）。
+- Normalized 以降で primitive を新規導入してはならない（MUST NOT）。
+
+### 8.3 実装フロー（REVIEW-03）
+
+- 業務エラー判定は Normalized 層の detector に集約し、`MapOk` の先頭で評価しなければならない（MUST）。
+- Mapping 例外は `CallErrorKind.Mapping` に統一し、`Semantic` へ混在させてはならない（MUST NOT）。
+- scalar 変換は「必須は Fail-fast、任意は null 許容（不正フォーマットは Mapping）」を標準とする（SHOULD）。
+- timestamp 欠損は endpoint ごとの `Required/Optional` ポリシーで固定し、暗黙補完を禁止する（MUST NOT）。
+
+### 8.4 依存境界（REVIEW-04）
+
+- Adapter は `Normalized.Internal.*` を直接参照してはならない（MUST NOT）。
+- Normalized は `Wire.Constants` / `Wire.Internal` を直接参照してはならない（MUST NOT）。
+- `PublicClient` は entrypoint 専用とし、実オーケストレーションは `MarketApi` 側に集約しなければならない（MUST）。
+
+### 8.5 取引所間並列性（REVIEW-05）
+
+- Adapter Public 境界では Request DTO を保持し、`ExchangeClient/PublicClient -> MarketApi` 委譲を取引所間で統一しなければならない（MUST）。
+- Adapter テスト命名は取引所間で同一規約に合わせなければならない（MUST）。
+
+### 8.6 定数・語彙定義（REVIEW-06）
+
+- HTTP method 等の共通語彙は共通層で定義し、取引所別の文字列直書きを禁止する（MUST NOT）。
+- 監視・CallMeta で使う Layer/Component 語彙は正本を一元化し、直書きを禁止する（MUST NOT）。
+- 認証キー名・仕様 typo・raw lexicon は取引所固有定数として取引所配下に閉じ込めなければならない（MUST）。

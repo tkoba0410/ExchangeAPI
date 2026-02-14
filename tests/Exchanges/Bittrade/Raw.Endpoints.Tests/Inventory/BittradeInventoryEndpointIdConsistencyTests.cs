@@ -1,18 +1,18 @@
 using System;
-using System.IO;
 using System.Linq;
-using ExchangeApi.Exchanges.Bittrade.Api.Wire.Constants;
+using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
+using ExchangeApi.Exchanges.Bittrade.Vocabulary;
 using ExchangeApi.Tests.Inventory;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Endpoints.Tests;
 
-public sealed class BittradeInventoryEndpointIdConsistencyTests
+public sealed class InventoryEndpointIdConsistencyTests
 {
     [Fact]
     public void Bittrade_InventoryEndpointIds_MustMatch_CodeEndpointIds()
     {
         var inventory = LoadInventoryEndpointIds();
-        var code = BittradeEndpointIdCatalog.GetAllEndpointIds();
+        var code = EndpointIdCatalog.GetAllEndpointIds();
 
         var missing = inventory.Except(code, StringComparer.Ordinal)
             .OrderBy(id => id, StringComparer.Ordinal)
@@ -25,7 +25,7 @@ public sealed class BittradeInventoryEndpointIdConsistencyTests
     public void Bittrade_CodeEndpointIds_MustMatch_InventoryEndpointIds()
     {
         var inventory = LoadInventoryEndpointIds();
-        var code = BittradeEndpointIdCatalog.GetAllEndpointIds();
+        var code = EndpointIdCatalog.GetAllEndpointIds();
 
         var extra = code.Except(inventory, StringComparer.Ordinal)
             .OrderBy(id => id, StringComparer.Ordinal)
@@ -34,8 +34,7 @@ public sealed class BittradeInventoryEndpointIdConsistencyTests
         Assert.True(extra.Length == 0, $"Extra EndpointIds: {string.Join(", ", extra)}");
     }
 
-    private static string InventoryFilePath =>
-        Path.Combine(InventoryEndpointIdParser.FindRepoRoot(), "docs", "inventory", "endpoints-bittrade.md");
+    private static string InventoryFilePath => InventoryPaths.BittradeAbsolute();
 
     private static System.Collections.Generic.HashSet<string> LoadInventoryEndpointIds() =>
         InventoryEndpointIdParser.ParseEndpointIdsFromFile(InventoryFilePath);

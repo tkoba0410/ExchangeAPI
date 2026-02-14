@@ -2,29 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
+using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using Xunit;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
 {
     public class BitflyerExchangeClient_GetBalances_Tests
     {
         [Fact]
-        public async Task GetBalanceCallAsync_ReturnsMappedBalanceList()
+        public async Task GetBalanceAsync_ReturnsMappedBalanceList()
         {
             // Arrange
             var rawBalances = new[]
             {
-                new RawPrivateDtos.BalanceResponse
+                new RawPrivateDtos.GetBalanceItem
                 {
                     CurrencyCode = "JPY",
                     Amount = 100000m,
                     Available = 80000m,
                 },
-                new RawPrivateDtos.BalanceResponse
+                new RawPrivateDtos.GetBalanceItem
                 {
                     CurrencyCode = "BTC",
                     Amount = 0.01m,
@@ -33,15 +34,15 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             };
 
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.RawSendChildOrderResponse());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.SendChildOrderResponse());
 
             var raw = CreateDummyPublicApi(fakePrivateApi, fakeTradingApi);
             var client = CreateClient(raw);
 
             // Act
-            var call = await client.GetBalanceCallAsync();
-            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
-            IReadOnlyList<Balance> result = ok.Response;
+            var call = await client.GetBalanceAsync(new BalanceRequest());
+            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<BalanceResponse>.Ok>(call.Result);
+            IReadOnlyList<BalanceEntry> result = ok.Response.Balances;
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -58,39 +59,39 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         }
 
         [Fact]
-        public async Task GetBalanceCallAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
+        public async Task GetBalanceAsync_WhenRawReturnsEmptyList_ReturnsEmptyList()
         {
             // Arrange
-            var rawBalances = Array.Empty<RawPrivateDtos.BalanceResponse>();
+            var rawBalances = Array.Empty<RawPrivateDtos.GetBalanceItem>();
 
             var fakePrivateApi = new FakeBitflyerPrivateApi(rawBalances);
-            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.RawSendChildOrderResponse());
+            var fakeTradingApi = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.SendChildOrderResponse());
 
             var raw = CreateDummyPublicApi(fakePrivateApi, fakeTradingApi);
             var client = CreateClient(raw);
 
             // Act
-            var call = await client.GetBalanceCallAsync();
-            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<IReadOnlyList<Balance>>.Ok>(call.Result);
-            IReadOnlyList<Balance> result = ok.Response;
+            var call = await client.GetBalanceAsync(new BalanceRequest());
+            var ok = Assert.IsType<ExchangeApi.Primitives.CallCommon.CallResult<BalanceResponse>.Ok>(call.Result);
+            IReadOnlyList<BalanceEntry> result = ok.Response.Balances;
 
             // Assert
             Assert.Empty(result);
         }
 
-        private static BitflyerExchangeClient CreateClient(IBitflyerRawApi raw)
+        private static ExchangeClient CreateClient(IRawApi raw)
         {
             var markets = BitflyerTestHelpers.CreateResolver();
             var normalized = BitflyerTestHelpers.CreateNormalizedApi(raw, markets);
-            return new BitflyerExchangeClient(normalized);
+            return new ExchangeClient(normalized);
         }
 
-        private static IBitflyerRawApi CreateDummyPublicApi(
+        private static IRawApi CreateDummyPublicApi(
             FakeBitflyerPrivateApi privateApi,
             FakeBitflyerPrivateTradingApi tradingApi)
         {
-            // 既存の RawPublicDtos.Ticker 用テストと揃えるため、適当な値のダミーを作って流用する。
-            var rawTicker = new RawPublicDtos.Ticker
+            // 既存の RawPublicDtos.GetTickerResponse 用テストと揃えるため、適当な値のダミーを作って流用する。
+            var rawTicker = new RawPublicDtos.GetTickerResponse
             {
                 ProductCode = "BTC_JPY",
                 Timestamp = DateTimeOffset.UnixEpoch,

@@ -4,12 +4,12 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
-public sealed class BittradeCreateOrderRequestTests
+public sealed class PostOrdersPlaceRequestTests
 {
     [Fact]
-    public void CreateOrderRequest_SerializesWithExpectedKeys()
+    public void PostOrdersPlaceRequest_SerializesWithExpectedKeys()
     {
-        var request = new RawPrivateRequests.RawCreateOrderRequest(
+        var request = new RawPrivateRequests.RawPostOrdersPlaceRequest(
             AccountId: new AccountId("account-1"),
             Symbol: new Symbol("btcjpy"),
             Type: new FreeText("buy-limit"),

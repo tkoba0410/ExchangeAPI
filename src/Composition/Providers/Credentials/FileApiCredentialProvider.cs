@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Composition.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Composition.Providers.Credentials;
 
 /// <summary>
@@ -50,14 +51,14 @@ public sealed class FileApiCredentialProvider : IApiCredentialProvider
         _store = dict ?? throw new InvalidOperationException("Credential file is empty or invalid.");
     }
 
-    public ApiCredentials Get(string accountId)
+    public ApiCredentials Get(AccountId accountId)
     {
-        if (string.IsNullOrWhiteSpace(accountId))
+        if (accountId.IsEmpty)
         {
             throw new ArgumentException("AccountId is required.", nameof(accountId));
         }
 
-        var key = $"{_exchangeId}/{accountId}";
+        var key = $"{_exchangeId}/{accountId.Value}";
         if (_store.TryGetValue(key, out var creds) && IsValid(creds))
         {
             return creds;

@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Composition.Dtos;
+using ExchangeApi.Primitives.DomainCommon.Types;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 namespace ExchangeApi.Composition.Providers.Credentials;
 
@@ -24,9 +25,9 @@ public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredenti
         _exchangeId = exchangeId;
     }
 
-    public ApiCredentials Get(string accountId)
+    public ApiCredentials Get(AccountId accountId)
     {
-        if (string.IsNullOrWhiteSpace(accountId))
+        if (accountId.IsEmpty)
         {
             throw new ArgumentException("AccountId is required.", nameof(accountId));
         }
@@ -55,9 +56,9 @@ public sealed class WindowsCredentialManagerApiCredentialProvider : IApiCredenti
         return new ApiCredentials(apiKey, apiSecret);
     }
 
-    private static string BuildTarget(string exchangeId, string accountId, string keyName)
+    private static string BuildTarget(string exchangeId, AccountId accountId, string keyName)
     {
-        return $"{exchangeId.Trim()}/{accountId.Trim()}/{keyName}".ToLowerInvariant();
+        return $"{exchangeId.Trim()}/{accountId.Value.Trim()}/{keyName}".ToLowerInvariant();
     }
 
     private static string ReadCredential(string targetName)

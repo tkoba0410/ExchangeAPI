@@ -3,7 +3,7 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
-public sealed class BittradeIdNormalizationTests
+public sealed class IdNormalizationTests
 {
     [Fact]
     public void TradeEntry_Id_AllowsNumber()
@@ -12,7 +12,7 @@ public sealed class BittradeIdNormalizationTests
         { "id": 1, "price": 100, "amount": 0.1, "direction": "buy", "ts": 1700000000001 }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPublicDtos.RawTradeEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPublicDtos.GetHistoryTradeEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("1", entry!.Id);
@@ -25,7 +25,7 @@ public sealed class BittradeIdNormalizationTests
         { "id": "trade-1", "price": 100, "amount": 0.1, "direction": "buy", "ts": 1700000000001 }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPublicDtos.RawTradeEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPublicDtos.GetHistoryTradeEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("trade-1", entry!.Id);
@@ -73,7 +73,7 @@ public sealed class BittradeIdNormalizationTests
         }
         """;
 
-        var entry = JsonSerializer.Deserialize<RawPrivateDtos.RawDepositWithdrawEntry>(json);
+        var entry = JsonSerializer.Deserialize<RawPrivateDtos.GetDepositWithdrawEntry>(json);
 
         Assert.NotNull(entry);
         Assert.Equal("200", entry!.Id);
@@ -115,7 +115,7 @@ public sealed class BittradeIdNormalizationTests
         }
         """;
 
-        var response = JsonSerializer.Deserialize<RawPublicDtos.RawKlinesResponse>(json);
+        var response = JsonSerializer.Deserialize<RawPublicDtos.GetHistoryKlineResponse>(json);
 
         Assert.NotNull(response);
         Assert.NotNull(response!.Data);
@@ -130,7 +130,7 @@ public sealed class BittradeIdNormalizationTests
         { "status": "ok", "data": { "success-count": 1, "failed-count": 0, "next-id": 10 } }
         """;
 
-        var response = JsonSerializer.Deserialize<RawPrivateDtos.RawCancelOpenOrdersResponse>(json);
+        var response = JsonSerializer.Deserialize<RawPrivateDtos.PostOrdersBatchCancelOpenOrdersResponse>(json);
 
         Assert.NotNull(response);
         Assert.NotNull(response!.Data);

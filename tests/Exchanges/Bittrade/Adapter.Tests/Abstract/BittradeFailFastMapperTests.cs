@@ -2,22 +2,22 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using System;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public sealed class BittradeFailFastMapperTests
+public sealed class FailFastMapperTests
 {
     [Fact]
     public void ToOpenOrder_UnknownSide_Throws()
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        var ok = BittradeTradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
+        var ok = TradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
         Assert.False(ok);
         Assert.Null(orders);
         Assert.NotNull(error);
@@ -28,7 +28,7 @@ public sealed class BittradeFailFastMapperTests
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        var ok = BittradeTradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
+        var ok = TradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
         Assert.False(ok);
         Assert.Null(orders);
         Assert.NotNull(error);
@@ -37,9 +37,9 @@ public sealed class BittradeFailFastMapperTests
     [Fact]
     public void ToOrderStatus_UnknownState_Throws()
     {
-        var raw = new RawPrivateDtos.RawOrderDetailResponse(
+        var raw = new RawPrivateDtos.GetOrdersByOrderIdResponse(
             Status: "ok",
-            Data: new RawPrivateDtos.RawOrderDetail(
+            Data: new RawPrivateDtos.GetOrdersByOrderIdDetail(
                 Id: "1",
                 Symbol: "btcjpy",
                 AccountId: "1",
@@ -54,7 +54,7 @@ public sealed class BittradeFailFastMapperTests
                 FilledCashAmount: "0",
                 Fees: "0"));
 
-        var ok = BittradeTradingMapper.TryToOrderStatus(
+        var ok = TradingMapper.TryToOrderStatus(
             ProductCode.Parse("BTC_JPY"),
             raw,
             new OrderKey(OrderIdKind.ExchangeOrderId, "1"),
@@ -65,7 +65,7 @@ public sealed class BittradeFailFastMapperTests
         Assert.NotNull(error);
     }
 
-    private static RawPrivateDtos.RawOpenOrdersResponse CreateOpenOrdersResponse(string type) =>
+    private static RawPrivateDtos.GetOpenOrdersResponse CreateOpenOrdersResponse(string type) =>
         new(
             Status: "ok",
             Data:

@@ -1,12 +1,12 @@
-using ExchangeApi.Exchanges.Bittrade.Api.Raw;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Raw.Internal;
+using ExchangeApi.Exchanges.Bittrade.Raw;
+using ExchangeApi.Exchanges.Bittrade.Raw.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Raw.Internal;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Raw.Tests;
 
-public sealed class BittradeSymbolsRawTests
+public sealed class SymbolsRawTests
 {
     [Fact]
     public void Deserialize_Symbols_MinOrderFields_AreString()
@@ -30,7 +30,7 @@ public sealed class BittradeSymbolsRawTests
             }
             """;
 
-        var response = BittradeRawJson.DeserializeOrThrow<RawPublicDtos.RawSymbolsResponse>(json, "Bittrade.GetSymbols");
+        var response = RawJson.DeserializeOrThrow<RawPublicDtos.GetSymbolsResponse>(json, "Bittrade.GetSymbols");
         var symbol = Assert.Single(response.Data!);
 
         Assert.Equal("0.0001", symbol.MinOrderAmount);

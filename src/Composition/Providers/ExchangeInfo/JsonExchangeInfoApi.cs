@@ -12,7 +12,8 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.Errors;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
+using ExchangeInfoResponse = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 namespace ExchangeApi.Composition.Providers.ExchangeInfo;
 
 /// <summary>
@@ -40,82 +41,91 @@ public sealed class JsonExchangeInfoApi : IPublicApi
         _options = options ?? CreateDefaultOptions();
     }
 
-    public async Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
+    public async Task<Call<ExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoAsync(
+        ExchangeInfoRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetExchangeInfoRequest();
         var startedAt = DateTimeOffset.UtcNow;
 
         try
         {
             var info = GetCachedInfo();
+            var response = info;
             var meta = new CallMeta(
-                Layer: "Contracts",
-                Component: "JsonExchangeInfo",
+                Layer: CallMetaVocabulary.Layer.Contracts,
+                Component: CallMetaVocabulary.Component.JsonExchangeInfo,
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
-            return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+            return new Call<ExchangeInfoRequest, ExchangeInfoResponse>(
                 Id: CallId.New(),
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
                 Request: request,
-                Result: new CallResult<ExchangeInfoDto>.Ok(info),
+                Result: new CallResult<ExchangeInfoResponse>.Ok(response),
                 Meta: meta);
         }
         catch (Exception ex)
         {
             var meta = new CallMeta(
-                Layer: "Contracts",
-                Component: "JsonExchangeInfo",
+                Layer: CallMetaVocabulary.Layer.Contracts,
+                Component: CallMetaVocabulary.Component.JsonExchangeInfo,
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
-            return new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+            return new Call<ExchangeInfoRequest, ExchangeInfoResponse>(
                 Id: CallId.New(),
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
                 Request: request,
-                Result: new CallResult<ExchangeInfoDto>.Err(
+                Result: new CallResult<ExchangeInfoResponse>.Err(
                     new CallError(CallErrorKind.Unknown, ex.Message, ex)),
                 Meta: meta);
         }
     }
 
-    public Task<Call<GetTickerRequest, Ticker>> GetTickerCallAsync(
-        Symbol symbol,
+    public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
+        TickerRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetTickerRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetTickerRequest, Ticker>(
-            "Contracts",
-            "JsonExchangeInfo",
+        return Task.FromResult(NotSupportedCall.Create<TickerRequest, TickerResponse>(
+            CallMetaVocabulary.Layer.Contracts,
+            CallMetaVocabulary.Component.JsonExchangeInfo,
             request,
             "Ticker"));
     }
 
-    public Task<Call<GetOrderBookRequest, OrderBook>> GetBoardCallAsync(
-        Symbol symbol,
+    public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
+        BoardRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetOrderBookRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetOrderBookRequest, OrderBook>(
-            "Contracts",
-            "JsonExchangeInfo",
+        return Task.FromResult(NotSupportedCall.Create<BoardRequest, BoardResponse>(
+            CallMetaVocabulary.Layer.Contracts,
+            CallMetaVocabulary.Component.JsonExchangeInfo,
             request,
             "OrderBook"));
     }
 
-    public Task<Call<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>> GetExecutionsPublicCallAsync(
-        Symbol symbol,
+    public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
+        ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetMarketExecutionsRequest(symbol);
-        return Task.FromResult(NotSupportedCall.Create<GetMarketExecutionsRequest, IReadOnlyList<ExecutionMarket>>(
-            "Contracts",
-            "JsonExchangeInfo",
+        return Task.FromResult(NotSupportedCall.Create<ExecutionsPublicRequest, ExecutionsPublicResponse>(
+            CallMetaVocabulary.Layer.Contracts,
+            CallMetaVocabulary.Component.JsonExchangeInfo,
             request,
             "MarketExecutions"));
+    }
+
+    public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
+        CandlesticksRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
+            CallMetaVocabulary.Layer.Contracts,
+            CallMetaVocabulary.Component.JsonExchangeInfo,
+            request,
+            "Candlesticks"));
     }
 
     private ExchangeInfoDto GetCachedInfo()

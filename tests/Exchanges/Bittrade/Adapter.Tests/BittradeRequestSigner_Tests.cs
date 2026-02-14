@@ -1,17 +1,17 @@
 using System.Net.Http;
 using System.Web;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests;
 
-public sealed class BittradeRequestSigner_Tests
+public sealed class RequestSigner_Tests
 {
     [Fact]
     public async Task SignAsync_AppendsRequiredSignatureQuery()
     {
-        var signer = new BittradeRequestSigner("access", "secret");
+        var signer = new RequestSigner("access", "secret");
         var request = new HttpRequestMessage(HttpMethod.Get, "https://api-cloud.bittrade.co.jp/v1/order/orders?symbol=btcjpy");
 
         await signer.SignAsync(request);

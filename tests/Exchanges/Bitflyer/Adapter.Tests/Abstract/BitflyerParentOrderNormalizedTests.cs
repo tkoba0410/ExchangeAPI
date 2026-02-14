@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Private.Dtos;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Types;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal.Encoding;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -38,17 +38,17 @@ public sealed class BitflyerParentOrderNormalizedTests
         ]
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>>(
+        var raw = RawJson.DeserializeOrThrow<IReadOnlyList<RawPrivateDtos.GetParentOrdersItem>>(
             json,
             "Bitflyer.GetParentOrders");
-        var ok = BitflyerParentOrderNormalizer.TryNormalizeList(raw, json, out var normalized, out var error);
+        var ok = ParentOrderNormalizer.TryNormalizeList(raw, json, out var normalized, out var error);
         Assert.True(ok);
         Assert.NotNull(normalized);
         Assert.Null(error);
 
         Assert.Single(normalized!);
         Assert.True(normalized[0].ParentOrderState.IsKnown);
-        Assert.Equal(BitflyerParentOrderState.Completed, normalized[0].ParentOrderState.Known);
+        Assert.Equal(ParentOrderState.Completed, normalized[0].ParentOrderState.Known);
         Assert.Equal(JsonValueKind.Object, normalized[0].RawSnapshot.ValueKind);
     }
 
@@ -75,16 +75,16 @@ public sealed class BitflyerParentOrderNormalizedTests
         }
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<RawPrivateDtos.RawGetParentOrderResponse>(
+        var raw = RawJson.DeserializeOrThrow<RawPrivateDtos.GetParentOrderResponse>(
             json,
             "Bitflyer.GetParentOrder");
-        var ok = BitflyerParentOrderNormalizer.TryNormalizeDetail(raw, json, out var normalized, out var error);
+        var ok = ParentOrderNormalizer.TryNormalizeDetail(raw, json, out var normalized, out var error);
         Assert.True(ok);
         Assert.NotNull(normalized);
         Assert.Null(error);
 
         Assert.True(normalized!.OrderMethod.IsKnown);
-        Assert.Equal(BitflyerOrderMethod.IfdOco, normalized.OrderMethod.Known);
+        Assert.Equal(OrderMethod.IfdOco, normalized.OrderMethod.Known);
         Assert.Single(normalized.Parameters);
         Assert.Equal(JsonValueKind.Object, normalized.RawSnapshot.ValueKind);
     }

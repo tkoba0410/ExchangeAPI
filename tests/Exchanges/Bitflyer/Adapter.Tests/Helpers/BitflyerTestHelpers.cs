@@ -1,17 +1,17 @@
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.ExchangeInfo.Adapter.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Api.Adapter.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Api;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Markets;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Api;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api.Markets;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 using ExchangeApi.Primitives.CallCommon;
 
@@ -19,48 +19,48 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Helpers;
 
 internal static class BitflyerTestHelpers
 {
-    public static IBitflyerNormalizedApi CreateNormalizedApi(IBitflyerRawApi raw, IBitflyerMarketResolver markets) =>
-        BitflyerNormalizedApi.FromRaw(raw, markets);
+    public static INormalizedApi CreateNormalizedApi(IRawApi raw, IMarketResolver markets) =>
+        NormalizedApi.FromRaw(raw, markets);
 
-    public static IBitflyerNormalizedApi CreateNormalizedApi(
-        RawPublicDtos.Ticker ticker,
-        IBitflyerMarketResolver markets,
-        RawPublicDtos.Board? board = null,
+    public static INormalizedApi CreateNormalizedApi(
+        RawPublicDtos.GetTickerResponse ticker,
+        IMarketResolver markets,
+        RawPublicDtos.GetBoardResponse? board = null,
         FakeBitflyerPrivateApi? privateApi = null,
         FakeBitflyerPrivateTradingApi? tradingApi = null)
     {
         var raw = new FakeBitflyerPublicApi(ticker, board, privateApi, tradingApi);
-        return BitflyerNormalizedApi.FromRaw(raw, markets);
+        return NormalizedApi.FromRaw(raw, markets);
     }
 
-    public static IBitflyerNormalizedApi CreateTradingApi(
+    public static INormalizedApi CreateTradingApi(
         FakeBitflyerPrivateTradingApi tradingApi,
-        IBitflyerMarketResolver markets,
+        IMarketResolver markets,
         FakeBitflyerPrivateApi? privateApi = null) =>
         CreateNormalizedApi(
-            new RawPublicDtos.Ticker { ProductCode = "BTC_JPY" },
+            new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" },
             markets,
             privateApi: privateApi,
             tradingApi: tradingApi);
 
-    public static IBitflyerMarketResolver CreateResolver()
+    public static IMarketResolver CreateResolver()
     {
         var resolver = new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
             new[] { new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("BTC_JPY"), MarketType.ParseOrThrow("Spot")) },
             null,
             null,
             null)));
-        return new BitflyerNormalizedMarketResolver(resolver);
+        return new NormalizedMarketResolver(resolver);
     }
 
-    public static BitflyerApiBundle CreateBundle(IBitflyerRawApi raw)
+    public static ApiBundle CreateBundle(IRawApi raw)
     {
-        var publicApi = new BitflyerNormalizedPublicApi(raw);
+        var publicApi = new NormalizedPublicApi(raw);
         var exchangeInfo = new BitflyerExchangeInfoApi();
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var markets = new BitflyerNormalizedMarketResolver(contractMarkets);
-        var normalized = BitflyerNormalizedApi.FromRaw(raw, markets);
-        return new BitflyerApiBundle(normalized, publicApi, exchangeInfo, contractMarkets);
+        var markets = new NormalizedMarketResolver(contractMarkets);
+        var normalized = NormalizedApi.FromRaw(raw, markets);
+        return new ApiBundle(normalized, publicApi, exchangeInfo, contractMarkets);
     }
 
     private sealed class StubExchangeInfoApi : IExchangeInfoProvider
@@ -69,15 +69,16 @@ internal static class BitflyerTestHelpers
 
         public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
-        public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
+        public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+            ExchangeInfoRequest request,
             CancellationToken cancellationToken = default)
         {
             var meta = CallMeta.CreateInternal("Contracts", "StubExchangeInfoApi");
-            var call = new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+            var call = new Call<ExchangeInfoRequest, ExchangeInfoDto>(
                 Id: CallId.New(),
                 StartedAt: System.DateTimeOffset.UtcNow,
                 Duration: System.TimeSpan.Zero,
-                Request: new GetExchangeInfoRequest(),
+                Request: new ExchangeInfoRequest(),
                 Result: new CallResult<ExchangeInfoDto>.Ok(_info),
                 Meta: meta);
             return Task.FromResult(call);

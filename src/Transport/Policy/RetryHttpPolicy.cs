@@ -15,19 +15,35 @@ public sealed class RetryHttpPolicy : IHttpPolicy
     private readonly int _maxAttemptsForOther;
     private readonly TimeSpan _baseDelay;
     private readonly TimeSpan _maxDelay;
+    private readonly TimeSpan? _maxTotalRetryTime;
+    private readonly Func<double> _nextJitter;
+    private readonly Func<DateTimeOffset> _clock;
     private readonly IPolicyObserver _observer;
 
-    public RetryHttpPolicy(int maxAttemptsForGet, int maxAttemptsForOther, TimeSpan baseDelay, TimeSpan maxDelay, IPolicyObserver? observer = null)
+    public RetryHttpPolicy(
+        int maxAttemptsForGet,
+        int maxAttemptsForOther,
+        TimeSpan baseDelay,
+        TimeSpan maxDelay,
+        IPolicyObserver? observer = null,
+        TimeSpan? maxTotalRetryTime = null,
+        Func<double>? nextJitter = null,
+        Func<DateTimeOffset>? clock = null)
     {
         if (maxAttemptsForGet < 1) throw new ArgumentOutOfRangeException(nameof(maxAttemptsForGet));
         if (maxAttemptsForOther < 1) throw new ArgumentOutOfRangeException(nameof(maxAttemptsForOther));
         if (baseDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(baseDelay));
         if (maxDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(maxDelay));
+        if (maxTotalRetryTime is { } maxTotal && maxTotal <= TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(maxTotalRetryTime));
 
         _maxAttemptsForGet = maxAttemptsForGet;
         _maxAttemptsForOther = maxAttemptsForOther;
         _baseDelay = baseDelay;
         _maxDelay = maxDelay;
+        _maxTotalRetryTime = maxTotalRetryTime;
+        _nextJitter = nextJitter ?? Random.Shared.NextDouble;
+        _clock = clock ?? (() => DateTimeOffset.UtcNow);
         _observer = observer ?? NoOpPolicyObserver.Instance;
     }
 
@@ -40,6 +56,7 @@ public sealed class RetryHttpPolicy : IHttpPolicy
         if (sendAsync is null) throw new ArgumentNullException(nameof(sendAsync));
 
         var maxAttempts = GetMaxAttempts(request.Method);
+        var startedAt = _clock();
 
         for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
@@ -47,28 +64,30 @@ public sealed class RetryHttpPolicy : IHttpPolicy
             {
                 var response = await sendAsync(cancellationToken).ConfigureAwait(false);
 
-                if (ShouldRetryResponse(response))
+                if (ShouldRetryResponse(response)
+                    && attempt < maxAttempts
+                    && TryGetRetryDelay(request, response, attempt, startedAt, out var responseDelay))
                 {
-                    var delay = GetDelay(attempt);
-                    _observer.OnRetry(request, attempt, maxAttempts, delay, null, response);
+                    _observer.OnRetry(request, attempt, maxAttempts, responseDelay, null, response);
                     response.Dispose();
-                    await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(responseDelay, cancellationToken).ConfigureAwait(false);
                     continue;
                 }
 
                 return response;
             }
-            catch (Exception ex) when (ShouldRetryException(ex, cancellationToken) && attempt < maxAttempts)
+            catch (Exception ex) when (
+                ShouldRetryException(ex, cancellationToken)
+                && attempt < maxAttempts
+                && TryGetRetryDelay(request, null, attempt, startedAt, out var exceptionDelay))
             {
-                var delay = GetDelay(attempt);
-                _observer.OnRetry(request, attempt, maxAttempts, delay, ex, null);
-                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                _observer.OnRetry(request, attempt, maxAttempts, exceptionDelay, ex, null);
+                await Task.Delay(exceptionDelay, cancellationToken).ConfigureAwait(false);
                 continue;
             }
         }
 
-        // 最終試行の結果を返却（リトライ条件を満たさないか、最後の成功レスポンス）
-        return await sendAsync(cancellationToken).ConfigureAwait(false);
+        throw new InvalidOperationException("Retry policy exhausted without response.");
     }
 
     private int GetMaxAttempts(HttpMethod method)
@@ -82,6 +101,8 @@ public sealed class RetryHttpPolicy : IHttpPolicy
 
         var status = response.StatusCode;
         return status == HttpStatusCode.TooManyRequests
+               || status == HttpStatusCode.RequestTimeout
+               || status == HttpStatusCode.GatewayTimeout
                || (int)status >= 500;
     }
 
@@ -92,6 +113,7 @@ public sealed class RetryHttpPolicy : IHttpPolicy
         return exception switch
         {
             HttpRequestException => true,
+            TimeoutException => true,
             TaskCanceledException => true,
             TransportException apiEx => apiEx.ErrorCategory is TransportErrorCategory.RateLimit
                 or TransportErrorCategory.Network
@@ -100,10 +122,89 @@ public sealed class RetryHttpPolicy : IHttpPolicy
         };
     }
 
-    private TimeSpan GetDelay(int attempt)
+    private bool TryGetRetryDelay(
+        HttpRequestMessage request,
+        HttpResponseMessage? response,
+        int attempt,
+        DateTimeOffset startedAt,
+        out TimeSpan delay)
+    {
+        delay = response is not null
+            ? GetDelayFromResponseOrBackoff(response, attempt)
+            : GetExponentialBackoffDelay(attempt);
+
+        if (delay < TimeSpan.Zero)
+        {
+            delay = TimeSpan.Zero;
+        }
+
+        if (_maxTotalRetryTime is null)
+        {
+            return true;
+        }
+
+        var elapsed = _clock() - startedAt;
+        if (elapsed + delay <= _maxTotalRetryTime.Value)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private TimeSpan GetDelayFromResponseOrBackoff(HttpResponseMessage response, int attempt)
+    {
+        if (response.StatusCode == HttpStatusCode.TooManyRequests
+            && TryGetRetryAfterDelay(response, out var retryAfter))
+        {
+            return retryAfter;
+        }
+
+        return GetExponentialBackoffDelay(attempt);
+    }
+
+    private TimeSpan GetExponentialBackoffDelay(int attempt)
     {
         var delay = TimeSpan.FromMilliseconds(_baseDelay.TotalMilliseconds * Math.Pow(2, attempt - 1));
+        var jitterFactor = 0.8d + (_nextJitter() * 0.4d); // 80% - 120%
+        delay = TimeSpan.FromMilliseconds(delay.TotalMilliseconds * jitterFactor);
         if (delay > _maxDelay) delay = _maxDelay;
         return delay;
+    }
+
+    private static bool TryGetRetryAfterDelay(HttpResponseMessage response, out TimeSpan delay)
+    {
+        delay = TimeSpan.Zero;
+        var retryAfter = response.Headers.RetryAfter;
+        if (retryAfter is null)
+        {
+            return false;
+        }
+
+        if (retryAfter.Delta is { } delta)
+        {
+            if (delta < TimeSpan.Zero)
+            {
+                return false;
+            }
+
+            delay = delta;
+            return true;
+        }
+
+        if (retryAfter.Date is { } date)
+        {
+            var remaining = date - DateTimeOffset.UtcNow;
+            if (remaining < TimeSpan.Zero)
+            {
+                delay = TimeSpan.Zero;
+                return true;
+            }
+
+            delay = remaining;
+            return true;
+        }
+
+        return false;
     }
 }

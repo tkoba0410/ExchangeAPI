@@ -125,7 +125,7 @@ public sealed class CircuitBreakerHttpPolicy : IHttpPolicy
                 or TransportErrorCategory.Unknown;
         }
 
-        return exception is HttpRequestException or TaskCanceledException;
+        return exception is HttpRequestException or TaskCanceledException or TimeoutException;
     }
 
     private enum CircuitState

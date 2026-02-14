@@ -6,14 +6,14 @@ using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests;
 
-public sealed class BittradeAdapterShapeGuardTests
+public sealed class AdapterShapeGuardTests
 {
     [Fact]
     public void AdapterApi_DoesNotContainOperationLiterals()
     {
         var root = FindRepoRoot();
-        var adapterPath = Path.Combine(root, "src", "Exchanges", "Bittrade", "Api", "Adapter");
-        var operationsFile = Path.Combine(adapterPath, "Internal", "Operations", "BittradeOperations.cs");
+        var adapterPath = Path.Combine(root, "src", "Exchanges", "Bittrade", "Adapter");
+        var operationsFile = Path.Combine(adapterPath, "Internal", "Operations", "Operations.cs");
 
         var files = Directory.GetFiles(adapterPath, "*.cs", SearchOption.AllDirectories)
             .Where(path => !PathEquals(path, operationsFile))
@@ -35,11 +35,10 @@ public sealed class BittradeAdapterShapeGuardTests
             "src",
             "Exchanges",
             "Bittrade",
-            "Api",
             "Adapter",
             "Public",
             "Api",
-            "BittradeMarketApi.cs");
+            "MarketApi.cs");
 
         var text = File.ReadAllText(marketApiPath);
         Assert.DoesNotContain("Replace(\"_\"", text, StringComparison.Ordinal);

@@ -14,7 +14,7 @@ public static class ExchangeInfoExtensions
     /// <summary>
     /// シンボルまたは productCode でマーケット情報を探す。
     /// </summary>
-    public static ExchangeMarketInfo? FindMarket(this ExchangeInfo info, Symbol symbol, ProductCode? productCode = null)
+    public static ExchangeMarketInfo? FindMarket(this ExchangeInfoResponse info, Symbol symbol, ProductCode? productCode = null)
     {
         if (info is null) throw new ArgumentNullException(nameof(info));
 
@@ -27,7 +27,7 @@ public static class ExchangeInfoExtensions
     /// 手数料レート/通貨/種別を取得する。見つからない場合は false を返し、出力は null。
     /// </summary>
     public static bool TryGetFeeRates(
-        this ExchangeInfo info,
+        this ExchangeInfoResponse info,
         Symbol symbol,
         out decimal? makerFeeRate,
         out decimal? takerFeeRate,

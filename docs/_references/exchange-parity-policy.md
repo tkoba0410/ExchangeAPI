@@ -3,8 +3,9 @@
 本書は **取引所実装間**（例：Bitflyer / Bittrade）において、
 「どこまで統一し、どこから差異を許容するか」を運用上の方針として記録する。
 
-本書は **非規範（Reference）** である。技術規範の正本は `docs/topspec.md`、
-EndpointId の正本は各 `docs/inventory/endpoints-*.md` とする。
+本書は **非規範（Reference）** であり、現行判断の参照先ではない。
+本文中の MUST / MUST NOT / SHOULD / MAY は、当時の方針メモを保存した語であり、
+現行判断の拘束力を持たない。現行の参照先は `docs/index.md` を起点に確認する。
 
 ## 1. 目的
 

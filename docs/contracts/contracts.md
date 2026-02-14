@@ -111,12 +111,117 @@ Contracts の Facade API は Public / Private に分離する（MUST）。
 
 ---
 
+## 6.2 Facade API 引数順序（Argument Order）
+
+Contracts の公開メソッドは、**引数順序を一貫した規則**で定義する（MUST）。
+順序は呼び出し時の認知負荷を下げる目的で固定し、メソッドごとに恣意的に変更してはならない（MUST NOT）。
+
+**標準順序（必須）**
+
+1. **ルーティング要素**: `Symbol` / `Market` など対象市場を特定する引数
+2. **主要操作パラメータ**: `Side` / `Size` / `Price` / `OrderKey` など
+3. **絞り込み・ページング**: `Limit` / `Cursor` / `From` / `To` / `Since` など
+4. **`CancellationToken`**: 常に最後
+
+**補足**
+
+- 引数が無い API は `CancellationToken` のみを受け取る（MUST）。
+- 追加引数が必要になった場合も、上記順序に従って挿入する（MUST）。
+
+---
+
+## 6.3 Request DTO と利便性オーバーロード
+
+Contracts の公開 API は **Request DTO を第一の契約**とする（MUST）。  
+利用者の使い勝手を確保するため、必要に応じて **DTO を生成する利便性オーバーロード**を追加してよい（MAY）。
+
+**ルール（必須）**
+
+- DTO 受け取り版を **正本（canonical）** とする（MUST）。
+- オーバーロードは **DTO を内部で生成して委譲するだけ**に留める（MUST）。
+- オーバーロードの引数順序は **6.2 の順序規則**に従う（MUST）。
+
+**配置ポリシー（層）**
+
+- 利便性オーバーロードを置いてよい層は **Contracts と Normalized** のみ（MUST）。
+- Adapter / Raw / Wire には **置いてはならない**（MUST NOT）。
+
+---
+
+## 6.4 取引所実装の物理配置ルール
+
+取引所実装の物理構造は、以下の 3 軸を基本とする（MUST）。
+
+- 取引所: `Bitflyer`, `Bittrade`, ...
+- レイヤ: `Wire`, `Raw`, `Normalized`, `Adapter`, `Application`
+- 可視性: `Public`, `Private`, `Internal`
+
+意味分類（例: `Account` / `Trading` / `Market`）は、公開構造の第一軸としては採用しない（MUST NOT）。
+
+### ExchangeInfo の位置づけ
+
+`ExchangeInfo` は単一写像ではなく、複数情報の統合・解決を行う複合写像である。
+そのため、`Application` 層として扱う（MUST）。
+
+- 共通処理: `src/Exchanges/Common/Application/ExchangeInfo`
+- 取引所固有処理: `src/Exchanges/{Exchange}/Application/ExchangeInfo`
+
+### Application / Composition の責務分担
+
+- `src/Application`: 取引所横断のユースケース
+- `src/Exchanges/{Exchange}/Application`: 取引所固有ユースケース
+- `src/Composition`: 取引所横断の配線（DI / Bootstrap）
+- `src/Exchanges/{Exchange}/Composition`: 取引所固有の配線
+
+### 目標ディレクトリツリー
+
+```text
+src/
+  Application/
+  Composition/
+  Contracts/
+  Primitives/
+  Utilities/
+  Transport/
+  Exchanges/
+    Common/
+      Application/
+        ExchangeInfo/
+    Bitflyer/
+      Wire/{Public,Private,Internal}
+      Raw/{Public,Private,Internal}
+      Normalized/{Public,Private,Internal}
+      Adapter/{Public,Private,Internal}
+      Application/ExchangeInfo/
+      Composition/
+    Bittrade/
+      Wire/{Public,Private,Internal}
+      Raw/{Public,Private,Internal}
+      Normalized/{Public,Private,Internal}
+      Adapter/{Public,Private,Internal}
+      Application/ExchangeInfo/
+      Composition/
+```
+
+### 移行フェーズ
+
+1. Common の ExchangeInfo を `Application` 配下へ移動する。
+2. 各取引所の ExchangeInfo を `Application` 配下へ移動する。
+3. namespace / using / 参照を統一する。
+4. `dotnet build` / `dotnet test` を通す。
+5. inventory / 契約文書を同期更新する。
+
+---
+
 ## 7. 層境界の型制約
 
 - Contracts の公開メソッド（インターフェイス）は、Contracts で許可された型のみを in/out に用いる（MUST）。
 - Raw DTO / Exchange DTO / Wire string を Contracts の in/out に含めてはならない（MUST NOT）。
 - Contracts の公開 API で **生の `string`** を in/out に使用してはならない（MUST NOT）。
 - 自由記述は `FreeText` 等の明示的なラッパ型で表現する（MUST）。
+- Contracts で意味が確定できる値（識別子・価格/数量・列挙的概念等）は専用型で表現する（MUST）。
+- 列挙的概念は未知値を保持できる表現（例: `Closed<T>`）を用いる（MUST）。
+- 専用型化可能な値を `FreeText` に留めてはならない（MUST NOT）。
 - `string` を保持する DTO が必要な場合は、例外として Decisions に記録する（MUST）。
 
 ---
@@ -134,6 +239,12 @@ Contracts の Facade API は Public / Private に分離する（MUST）。
 - 公開プロパティは PascalCase とする（MUST）。
 - 略語は一般的なもののみ使用する（MUST）。
 - 取引所固有の語彙をそのまま転記してはならない（MUST NOT）。
+
+### 8.3 Contracts API 命名
+
+- ContractApiId は **動詞を省略した名詞**で表現する（MUST）。例: `Ticker`, `Board`, `ExecutionsPublic`。
+- Request/Response 型は **`<ContractApiId>Request` / `<ContractApiId>Response`** とする（MUST）。
+- Facade メソッド名は **`Get` + `<ContractApiId>` + `Async`** を基本とし、`Call` は付与しない（MUST）。例: `GetTickerAsync`。
 
 ---
 

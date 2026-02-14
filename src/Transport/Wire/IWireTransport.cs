@@ -16,5 +16,5 @@ public interface IWireTransport
     /// </summary>
     Task<Call<WireCallSpec, WireResponse>> SendAsync(
         WireCallSpec request,
-        CancellationToken ct = default);
+        CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,19 @@
 # Stage8
 
+## Stage8 ゴール（確定）
+
+TopSpec / Contracts / Governance / Process / Exceptions / Inventory の役割が重複せず、設計判断の参照先が常に一意で、README と _references が判断を含まない状態を完成させる。
+
+## DoD（完了条件チェックリスト）
+
+- [ ] README が導線のみで、SSOT指定や判断文が存在しない（→ docs/index.md / docs/process.md に寄せる）
+- [ ] docs/index.md が Exceptions を「逸脱台帳/決定記録」として案内し、エラー分類とは混同しない
+- [ ] docs/process.md の文書カテゴリ定義と docs 配下の実ファイルが矛盾しない
+- [ ] `_references/` が Normative を匂わせる表現を持たない（informative である旨が明確）
+- [ ] Inventory（endpoints-*.md）が Fact のみで、判断文を含まない
+
+---
+
 Stage8 のゴールは、  
 **設計・実装・文書のどれを見ても同じ判断に到達する状態を作ること**である。
 
@@ -14,6 +28,29 @@ Stage8 のゴールは、
 
 Stage8 終了後は、  
 「どこに何を書くか」「どこで判断するか」を考える必要がなくなっていなければならない。
+
+---
+
+## 現在ステータス（2026-02-13）
+
+### 実施済み
+
+- Phase8.x（429 / Timeout / Partial Failure 規約化）を実装まで完了
+  - Normative 追加: `docs/contracts/resilience.md`
+  - 監査更新: `docs/_references/resilience-audit.md`
+  - 共通実装: `src/Transport/Policy/*` / `src/Transport/Protocol/*` を規約準拠へ更新
+  - Contracts 追加: `BatchResult<TItem>` / `BatchError` / `BatchErrorKind`
+  - テスト固定: `tests/Common.Tests/Transport/*` と `tests/Common.Tests/Contracts/BatchResultTests.cs`
+- 文書導線の整備を実施
+  - `README.md` に Resilience / Governance 導線を追加
+  - `docs/process.md` の Normative 一覧と公式仕様記述を現状へ整合
+  - `docs/contracts/overview.md` の API 命名記述を実装と整合
+  - `docs/document-plan.md` を履歴資料（Archive）として明示
+
+### 継続対象
+
+- 各 `_references` 文書の stale 記述監視（実装変更時に随時更新）
+- 新規取引所追加時の同規約適用確認（429 / Timeout / Partial Failure）
 
 ---
 

@@ -4,27 +4,27 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Common.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.ExchangeInfo.Adapter.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Api.Wire.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Wire.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfo;
+using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
-using ExchangeApi.Exchanges.Bittrade.Api.Normalized;
+using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bittrade.Adapter.Tests.Abstract;
 
-public class BittradeMarketApiTests
+public class MarketApiTests
 {
     [Fact]
     public async Task GetDetailMergedCallAsync_MapsMergedResponse()
@@ -47,7 +47,7 @@ public class BittradeMarketApiTests
         var api = CreateApi("/market/detail/merged?symbol=btcjpy", json);
 
         var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"));
-        var ok = Assert.IsType<CallResult<Ticker>.Ok>(call.Result);
+        var ok = Assert.IsType<CallResult<TickerResponse>.Ok>(call.Result);
         var ticker = ok.Response;
 
         Assert.Equal(new Symbol("BTC/JPY"), ticker.Symbol);
@@ -69,7 +69,7 @@ public class BittradeMarketApiTests
         var api = CreateApi("/market/depth?symbol=btcjpy&type=step0", json);
 
         var call = await api.GetDepthCallAsync(new Symbol("BTC/JPY"));
-        var ok = Assert.IsType<CallResult<OrderBook>.Ok>(call.Result);
+        var ok = Assert.IsType<CallResult<BoardResponse>.Ok>(call.Result);
         var book = ok.Response;
 
         Assert.Equal(2, book.Bids.Count);
@@ -93,9 +93,9 @@ public class BittradeMarketApiTests
         """;
         var api = CreateApi("/market/trade?symbol=btcjpy", json);
 
-        var call = await api.GetExecutionsPublicCallAsync(new Symbol("BTC/JPY"));
-        var ok = Assert.IsType<CallResult<IReadOnlyList<ExecutionMarket>>.Ok>(call.Result);
-        var executions = ok.Response;
+        var call = await api.GetExecutionsPublicAsync(new ExecutionsPublicRequest(new Symbol("BTC/JPY")));
+        var ok = Assert.IsType<CallResult<ExecutionsPublicResponse>.Ok>(call.Result);
+        var executions = ok.Response.Items;
 
         Assert.Equal(2, executions.Count);
         Assert.Equal(Side.Buy, executions[0].Side);
@@ -104,12 +104,33 @@ public class BittradeMarketApiTests
     }
 
     [Fact]
+    public async Task GetCandlesticksAsync_MapsKlines()
+    {
+        var json = """
+        { "status":"ok", "ts":1700000000000,
+          "data": [
+            { "id": 1700000000, "open": 90, "close": 100, "low": 80, "high": 110, "amount": 1.2, "vol": 1200000, "count": 10 }
+          ]
+        }
+        """;
+        var api = CreateApi("/market/history/kline?period=1min&symbol=btcjpy&size=1", json);
+
+        var call = await api.GetCandlesticksAsync(new CandlesticksRequest(new Symbol("BTC/JPY"), new Period("1min"), Size: 1));
+        var ok = Assert.IsType<CallResult<CandlesticksResponse>.Ok>(call.Result);
+        var item = Assert.Single(ok.Response.Items);
+
+        Assert.Equal(TimeSpan.FromMinutes(1), item.Timescale);
+        Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1700000000), item.OpenTime);
+        Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1700000000).AddMinutes(1), item.CloseTime);
+    }
+
+    [Fact]
     public async Task GetDetailMergedCallAsync_UnknownSymbol_Throws()
     {
         var api = CreateApi("/market/detail/merged?symbol=btcjpy", "{}");
 
         var call = await api.GetDetailMergedCallAsync(new Symbol("DOGE/JPY"));
-        var err = Assert.IsType<CallResult<Ticker>.Err>(call.Result);
+        var err = Assert.IsType<CallResult<TickerResponse>.Err>(call.Result);
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }
 
@@ -121,9 +142,9 @@ public class BittradeMarketApiTests
         var restClient = new RestClient(client.BaseAddress!, transport);
         var markets = CreateResolver(new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("btcjpy"), MarketType.ParseOrThrow("Spot")));
         var wireTransport = new ExchangeApi.Transport.Wire.WireTransport(restClient);
-        var wire = new BittradeWireCallExecutor(wireTransport);
-        var raw = new ExchangeApi.Exchanges.Bittrade.Api.Raw.Api.BittradeRawApi(wire);
-        var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Api.Normalized.Public.Api.BittradeNormalizedPublicApi(raw);
+        var wire = new WireCallExecutor(wireTransport);
+        var raw = new ExchangeApi.Exchanges.Bittrade.Raw.Api.RawApi(wire);
+        var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api.NormalizedPublicApi(raw);
         return new MarketApi(normalizedMarketData, markets);
     }
 
@@ -136,15 +157,16 @@ public class BittradeMarketApiTests
 
         public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
 
-        public Task<Call<GetExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoCallAsync(
+        public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+            ExchangeInfoRequest request,
             CancellationToken cancellationToken = default)
         {
             var meta = CallMeta.CreateInternal("Contracts", "StubExchangeInfoApi");
-            var call = new Call<GetExchangeInfoRequest, ExchangeInfoDto>(
+            var call = new Call<ExchangeInfoRequest, ExchangeInfoDto>(
                 Id: CallId.New(),
                 StartedAt: DateTimeOffset.UtcNow,
                 Duration: TimeSpan.Zero,
-                Request: new GetExchangeInfoRequest(),
+                Request: new ExchangeInfoRequest(),
                 Result: new CallResult<ExchangeInfoDto>.Ok(_info),
                 Meta: meta);
             return Task.FromResult(call);

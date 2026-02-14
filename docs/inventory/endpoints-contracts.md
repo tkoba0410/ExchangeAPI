@@ -1,21 +1,20 @@
 # Inventory — Contracts APIs
 
-> 本文書は **一覧（inventory）** である。
-> 本書は、裁定者により決定された **Contracts API の採用・対応関係** を列挙する **Normative Inventory（SSOT）** とする。
-> 取引所の公式 API 仕様（Method / Path / 公式URL 等）の正本は、各取引所 inventory（例: `docs/inventory/endpoints-*.md`）および公式 API 文書である。
+> 本文書は **inventory（事実一覧）** です。
+> Contracts API の実装対応状況と取引所 EndpointId との対応関係を記録します。
+> 仕様判断や運用判断の根拠は `docs/contracts/contracts.md` / `docs/governance.md` / `docs/process.md` を参照してください。
 
----
 
-## Normative Scope
+## Scope
 
-本書は、以下を **正（SSOT）**として記録する。
+本書は、以下の対応関係を記録する。
 
 * Contracts が提供する **API（ContractApiId）** の一覧
 * 各 Contracts API の **Public / Private** 区分
-* 各 Contracts API の **メソッド署名（Parameters）**
+* 各 Contracts API の **Facade メソッド名（ContractMethod）**
 * 各 Contracts API の **RequestType / ResponseType**
 * 各取引所への **対応関係（Mapping）** と、未対応の明示（`None` / `Internal`）
-* 採用・不採用・留保に関する **裁定理由（DecisionNote）**
+* 対応状態に関する **補足メモ（MappingStatus）**
 
 以下は本書の対象外とする。
 
@@ -27,56 +26,58 @@
 
 ## Canonical Source（参照）
 
-* Contracts API 署名の正本: `src/Contracts/Facade/Interfaces/*`
+* Contracts API 署名参照: `src/Contracts/Facade/Interfaces/*`
+* 利便呼び出し（非規範）: `src/Contracts/Facade/Extensions/*`
 * 取引所 endpoint inventory: `docs/inventory/endpoints-*.md`
+* Contracts 契約条文参照: `docs/contracts/contracts.md`
 
-※ 本書は「どの Contracts API を採用し、どの取引所 EndpointId に対応づけるか」を記録する正本であり、
-　署名の詳細や命名規範そのものは上記文書を参照する。
+※ 本書は「どの Contracts API がどの取引所 EndpointId に対応しているか」の対応一覧を記録する。
+　署名定義や命名ルールの説明は、参照先文書に集約されている。
 
 ---
 
 ## Columns
 
-| ContractScope | ContractApiId | ContractMethod | Parameters | RequestType | ResponseType | PresentIn | BitflyerEndpointId | BittradeEndpointId | DecisionNote |
-| ------------- | ------------- | -------------- | ---------- | ----------- | ------------ | --------- | ------------------ | ------------------ | ------------ |
+| ContractScope | ContractApiId | ContractMethod | RequestType | ResponseType | PresentIn | BitflyerEndpointId | BittradeEndpointId | MappingStatus |
+| ------------- | ------------- | -------------- | ----------- | ------------ | --------- | ------------------ | ------------------ | ------------ |
 
 * **ContractScope**: `public` / `private`
-* **ContractApiId**: Contracts 側の論理識別子（例: `GetTicker`, `OrderLimit`）
-* **ContractMethod**: Facade の公開メソッド名（例: `GetTickerCallAsync`）
-* **Parameters**: メソッド引数の型一覧（例: `Symbol` / `Symbol, Side, Size, Price` / `MarketLimitCursorRequest`）
-* **RequestType / ResponseType**: `Call<TRequest, TOk>` の `TRequest` / `TOk` 型
-* **PresentIn**: 当該 Contracts API が存在する層（`Contracts`, `Adapter`, `Normalized` 等）。通常は `Contracts`
-* **BitflyerEndpointId / BittradeEndpointId**: 各取引所 inventory における EndpointId。未対応は `None`。
-* **DecisionNote**: 裁定者による判断理由・留保理由（NotSupported もここに記す）
-
----
-
-## Rules（運用ルール）
-
-1. 本 inventory は **Contracts API 採用可否・対応関係の正本**である。
-2. 実装は本 inventory に従うこと。
-3. `DecisionNote` には **裁定理由のみ**を記載する（事実や仕様説明は書かない）。
-4. 取引所側の事実（Method / Path / URL 等）は取引所 inventory にのみ記載する。
+* **ContractApiId**: Contracts 側の論理識別子（例: `Ticker`, `OrderLimit`）
+* **ContractMethod**: Facade の公開メソッド名（例: `GetTickerAsync`）
+* **RequestType / ResponseType**: Contracts の `Call<TRequest, TOk>` における `TRequest` / `TOk` 型
+* **PresentIn**: 当該 Contracts API が存在する層（`Contracts`, `Adapter`, `Normalized`, `Application` 等）。通常は `Contracts`
+* **BitflyerEndpointId / BittradeEndpointId**: 各取引所 inventory における EndpointId。未対応は `None` / `Internal`。
+* **MappingStatus**: 対応状況に関する事実メモ（例: `bitflyer: NotSupported`）
 
 ---
 
 ## Public
 
-| ContractScope | ContractApiId        | ContractMethod                | Parameters | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | DecisionNote        |
-| ------------- | -------------------- | ----------------------------- | ---------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------------- |
-| public        | GetExchangeInfo      | GetExchangeInfoCallAsync      | (none)     | GetExchangeInfoRequest      | ExchangeInfo                   | Contracts | Internal             | None               |                     |
-| public        | GetTicker            | GetTickerCallAsync            | Symbol     | GetTickerRequest            | Ticker                         | Contracts | GetTicker            | GetDetailMerged    |                     |
-| public        | GetBoard             | GetBoardCallAsync             | Symbol     | GetOrderBookRequest         | OrderBook                      | Contracts | GetBoard             | GetDepth           |                     |
-| public        | GetExecutionsPublic  | GetExecutionsPublicCallAsync  | Symbol     | GetMarketExecutionsRequest  | IReadOnlyList<ExecutionMarket> | Contracts | GetExecutionsPublic  | GetTrade           |                     |
+| ContractScope | ContractApiId        | ContractMethod                | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | MappingStatus |
+| ------------- | -------------------- | ----------------------------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------ |
+| public        | ExchangeInfo         | GetExchangeInfoAsync          | ExchangeInfoRequest         | ExchangeInfoResponse           | Contracts | Internal             | None               |              |
+| public        | Ticker               | GetTickerAsync                | TickerRequest               | TickerResponse                 | Contracts | GetTicker            | GetDetailMerged    |              |
+| public        | Board                | GetBoardAsync                 | BoardRequest                | BoardResponse                  | Contracts | GetBoard             | GetDepth           |              |
+| public        | ExecutionsPublic     | GetExecutionsPublicAsync      | ExecutionsPublicRequest     | ExecutionsPublicResponse       | Contracts | GetExecutionsPublic  | GetTrade           |              |
+| public        | Candlestick          | GetCandlesticksAsync          | CandlesticksRequest         | CandlesticksResponse           | Contracts | None                 | GetHistoryKline    | bitflyer: NotSupported |
 
 ---
 
 ## Private
 
-| ContractScope | ContractApiId         | ContractMethod                 | Parameters         | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId | DecisionNote |
-| ------------- | --------------------- | ------------------------------ | ------------------ | ---------------------------- | -------------------------------- | --------- | --------------------- | ------------------ | ------------ |
-| private       | GetBalance            | GetBalanceCallAsync            | (none)             | GetBalancesRequest           | IReadOnlyList<Balance>           | Contracts | GetBalance            | GetAccountsBalanceByAccountId |              |
-| private       | GetExecutionsPrivate  | GetExecutionsPrivateCallAsync  | MarketLimitCursorRequest | MarketLimitCursorRequest  | Page<ExecutionItem>              | Contracts | GetExecutionsPrivate  | GetMatchResults     |              |
-| private       | GetOrders             | GetOrdersCallAsync             | MarketLimitCursorRequest | MarketLimitCursorRequest  | Page<OrderSnapshotItem>          | Contracts | GetChildOrders        | GetOpenOrders        |              |
-| private       | OrderLimit            | OrderLimitCallAsync            | Symbol, Side, Size, Price | PlaceLimitOrderRequest   | OrderResult                      | Contracts | SendChildOrder        | PostOrdersPlace      |              |
-| private       | CancelOrder           | CancelOrderCallAsync           | CancelOrderRequest | CancelOrderRequest           | CancelResult                     | Contracts | CancelChildOrder      | PostOrdersSubmitCancelByOrderId |              |
+| ContractScope | ContractApiId         | ContractMethod                 | RequestType                  | ResponseType                     | PresentIn | BitflyerEndpointId    | BittradeEndpointId              | MappingStatus |
+| ------------- | --------------------- | ------------------------------ | ---------------------------- | -------------------------------- | --------- | --------------------- | -------------------------------- | ------------ |
+| private       | Balance               | GetBalanceAsync                | BalanceRequest               | BalanceResponse                  | Contracts | GetBalance            | GetAccountsBalanceByAccountId   |              |
+| private       | ExecutionsPrivate     | GetExecutionsPrivateAsync      | ExecutionsPrivateRequest     | ExecutionsPrivateResponse        | Contracts | GetExecutionsPrivate  | GetMatchResults                 |              |
+| private       | Orders                | GetOrdersAsync                 | OrdersRequest                | OrdersResponse                   | Contracts | GetChildOrders        | GetOpenOrders                    |              |
+| private       | OrderLimit            | OrderLimitAsync                | OrderLimitRequest            | OrderLimitResponse               | Contracts | SendChildOrder        | PostOrdersPlace                  |              |
+| private       | CancelOrder           | CancelOrderAsync               | CancelOrderRequest           | CancelOrderResponse              | Contracts | CancelChildOrder      | PostOrdersSubmitCancelByOrderId  |              |
+
+---
+
+## Non-Normative Convenience Overloads
+
+以下は開発者向けの利便 API であり、契約仕様本文ではない。
+
+- `GetTickerAsync(Symbol)` など: `src/Contracts/Facade/Extensions/PublicApiExtensions.cs`
+- `OrderLimitAsync(Symbol, Side, Size, Price)` など: `src/Contracts/Facade/Extensions/PrivateApiExtensions.cs`

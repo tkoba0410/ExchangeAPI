@@ -88,7 +88,7 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Wire 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Api/Wire/
+src/Exchanges/<Exchange>/Wire/
   Public/
     Endpoints/
   Private/
@@ -138,21 +138,13 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Raw 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Api/Raw/
-  Api/
+src/Exchanges/<Exchange>/Raw/
   Public/
-    Api/
-    Dtos/
-    Requests/
   Private/
-    Api/
-    Dtos/
-    Requests/
   Internal/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Raw.Api.*`
   * `ExchangeApi.Exchanges.<Exchange>.Raw.Public.*`
   * `ExchangeApi.Exchanges.<Exchange>.Raw.Private.*`
   * `ExchangeApi.Exchanges.<Exchange>.Raw.Internal.*`
@@ -188,21 +180,13 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Normalized 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Api/Normalized/
-  Api/
+src/Exchanges/<Exchange>/Normalized/
   Public/
-    Api/
-    Dtos/
-    Requests/
   Private/
-    Api/
-    Dtos/
-    Requests/
   Internal/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Normalized.Api.*`
   * `ExchangeApi.Exchanges.<Exchange>.Normalized.Public.*`
   * `ExchangeApi.Exchanges.<Exchange>.Normalized.Private.*`
   * `ExchangeApi.Exchanges.<Exchange>.Normalized.Internal.*`
@@ -212,51 +196,47 @@ src/Exchanges/<Exchange>/Api/Normalized/
 
 ---
 
-#### 3.3.2 ExchangeInfo 独立系統（MUST）
+#### 3.3.2 ExchangeInfo の Application 配置（MUST）
 
-ExchangeInfo は「取引所仕様メタ情報」であり、Wire/Raw/Normalized/Adapter の
-API 系統とは性質が異なる。例外として **独立系統**として扱う。
+ExchangeInfo は「取引所仕様メタ情報」の統合・解決を担う
+**複合写像（オーケストレーション）**である。
+そのため、ExchangeInfo は Application 層として扱う。
 
-* ExchangeInfo は **取引所配下の独立モジュール**として配置する。
 * ExchangeInfo の DTO は **独自定義**とするが、**Contracts と同構成**を必須とする。
-  * 独自 DTO とする理由は「契約安定性・取引所固有運用のための境界」を明確化するため。
-  * 独自 DTO は **Contracts と同構成 + 追加情報**の形を許容する（例: `Local` 拡張）。
+  * 独自 DTO は **Contracts と同構成 + 追加情報**を許容する（例: `Local` 拡張）。
   * Contracts への変換では **追加情報を落とす**（欠落ではなく境界）。
 * ExchangeInfo は **Static + Dynamic の合成**で構成する。
   * Static: 仕様・固定値・手動更新が必要な情報（市場一覧、手数料テーブル等）
   * Dynamic: API から取得可能な状態・制約（稼働状態、手数料率、最小数量等）
   * Compose: Static をベースに Dynamic で上書き・拡張する（市場の増減を許可）
-* ExchangeInfo の **Contracts への適合は ExchangeInfo/Adapter で行う**。
+* ExchangeInfo の **Contracts への適合は Application/ExchangeInfo 配下の Adapter で行う**。
   * 変換元は **Local（独自）DTO** を正とし、Contracts へ写像する。
 * ExchangeInfo は **Normalized への依存を許容**し、API Adapter への依存を禁止する。
   * Dynamic 取得のために Normalized API を呼び出してよい。
 * ExchangeInfo は **共通サブシステム**を持てる。
   * 共通化対象（例）: CallMapper / MarketResolver / Compose Merge / Static JSON Loader
-  * 共通サブシステムの配置は `src/Exchanges/Common/ExchangeInfo/` を基準とする。
+  * 共通サブシステムの配置は `src/Exchanges/Common/Application/ExchangeInfo/` を基準とする。
 * 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/ExchangeInfo/
-  Static/
-  Dynamic/
-  Compose/
-  Adapter/
+src/Exchanges/<Exchange>/Application/ExchangeInfo/
+  Public/
+  Private/
+  Internal/
 ```
 
 * 取引所横断で共通化する場合は次を追加してよい。
 
 ```
-src/Exchanges/Common/ExchangeInfo/
+src/Exchanges/Common/Application/ExchangeInfo/
   Adapter/
   Compose/
   Static/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Static.*`
-  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Dynamic.*`
-  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Compose.*`
-  * `ExchangeApi.Exchanges.<Exchange>.ExchangeInfo.Adapter.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Application.ExchangeInfo.*`
+  * `ExchangeApi.Exchanges.Common.Application.ExchangeInfo.*`
 
 * 詳細な合成規則・マッピングは `_references/exchangeinfo.md` に記載する（非正本）。
 
@@ -287,20 +267,16 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 * 取引所配下の Adapter 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Api/Adapter/
+src/Exchanges/<Exchange>/Adapter/
   Public/
-    Api/
-    Dtos/
   Private/
-    Api/
-    Dtos/
   Internal/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Api.Adapter.Public.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Api.Adapter.Private.*`
-  * `ExchangeApi.Exchanges.<Exchange>.Api.Adapter.Internal.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Public.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Private.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Internal.*`
 
 * Adapter の Public/Private は「署名の有無」を表す。意味分類の代替として用いない（= Public/Private 以外で分けない）。
 
@@ -315,14 +291,29 @@ src/Exchanges/<Exchange>/Api/Adapter/
 
 #### 3.4.3 Adapter と ExchangeInfo の関係（MUST）
 
-ExchangeInfo は独立系統であり、Contracts への適合は
-`ExchangeInfo/Adapter` で完結させる。
-API 系統の Adapter とは **別系統**として扱う。
+ExchangeInfo は Application 系統であり、Contracts への適合は
+`Application/ExchangeInfo` 配下で完結させる。
+API 系統の Adapter とは **役割分離**して扱う。
 
-* API 系統の Adapter は `src/Exchanges/<Exchange>/Api/Adapter/` に置く。
-* ExchangeInfo の Adapter は `src/Exchanges/<Exchange>/ExchangeInfo/Adapter/` に置く。
+* API 系統の Adapter は `src/Exchanges/<Exchange>/Adapter/` に置く。
+* ExchangeInfo の Adapter は `src/Exchanges/<Exchange>/Application/ExchangeInfo/` 配下に置く。
 
 ---
+
+#### 3.4.4 取引所スコープと混線防止（MUST）
+
+取引所ごとの Raw / Normalized 層は、
+**単一の API 呼び出し実装、または単一の Adapter / Raw / Normalized API インスタンスの内部**において、
+複数取引所の Raw / Normalized API や DTO を混在させてはならない。
+
+ここでいう「単一の API 呼び出し実装」とは、
+1つの公開 API メソッド実装、または 1つの Adapter / Raw / Normalized クラス内部を指す。
+
+例として、複数のメソッドに分割されていても、同一クラス内で同一の公開 API 呼び出し（同一 EndpointId）を構成する範囲は、1つの API 呼び出し実装とみなす。
+
+ただし、取引所選択・ルーティング・フォールバック等を目的とした構成は、
+設計上の例外として許容される。
+これらの例外は、governance の裁定ルールに従い、採用理由および判断根拠を文書として記録すること。
 
 ### 3.5 Contract 層（取引所横断契約）
 
@@ -374,6 +365,17 @@ API 系統の Adapter とは **別系統**として扱う。
 * 文字列は entry point でのみ許可し、必ず TryParse/OrThrow で明示的に型化する。
 * 自由記述（message/status/notes 等）は **`FreeText` 等の明示的なラッパ型**として表現する。
 * 例外がある場合は Decisions に記録する。
+
+#### 4.3.1 Normalized / Contract の専用型化（MUST）
+
+* **Contract 層および Normalized 層**では、意味が確定できる値を専用型で表現しなければならない（MUST）。
+* 専用型化の対象は少なくとも以下を含む（MUST）。
+  * 識別子（`OrderId` / `AccountId` / `ExchangeOrderId` 等）
+  * 価格・数量・金額・時刻・シンボル
+  * 状態・種別・売買方向などの列挙的概念
+* 列挙的概念は、未知値を保持できる表現（例: `Closed<T>`）で扱うこと（MUST）。
+* `FreeText` は「自由記述」または「外部仕様上、意味確定不能な値」に限定して使用すること（MUST）。
+* 専用型化できる値を `FreeText` で保持し続けてはならない（MUST NOT）。
 
 ### 4.4 取引所差分の配置（MUST）
 
@@ -445,6 +447,32 @@ Call は以下を表現する。
 1. 層の責務を越えない
 2. 直下層の Request へ **機械的に変換可能**
 3. 意味判断を行わない
+
+---
+
+### 6.3 Request / Response 命名の予約（MUST）
+
+* 層の公開 API 契約（in/out）を表す型は、`Request` / `Response` を基本形として命名する（MUST）。
+* `Request` / `Response` 接尾辞を付与できる対象は、API 境界の第1階層 DTO に限定する（MUST）。
+  * ルートがオブジェクトの場合: そのルート DTO
+  * ルートが配列の場合: その配列要素 DTO（通常 `<EndpointId>Item`）
+* 本節でいう Internal 補助モデルは、次を指す（MUST）。
+  * 送信前エンコードモデル（Wire に渡す body/query/header 生成用）
+  * 受信後中間表現モデル（Raw JSON からの一時構造）
+  * 変換専用モデル（Mapper 内部の入出力補助）
+* 第1階層 DTO 以外（ネスト要素 DTO・Internal 補助モデル）に `Request` / `Response` を付与してはならない（MUST NOT）。
+* Internal 補助モデルは、役割を表す接尾辞を必ず付与する（MUST）。
+  例: `Payload`, `Body`, `Envelope`, `Document`, `Encoded`, `Item`, `Entry`, `Record`
+* 同一 EndpointId で API 境界 DTO と補助モデルが併存する場合、`Request` / `Response` は API 境界 DTO 側にのみ付与し、補助モデル側は役割名で分離する（MUST）。
+
+---
+
+### 6.4 配列 DTO の型方針
+
+* オブジェクト内の配列プロパティは `IReadOnlyList<T>` で公開する（MUST）。
+* ルートが配列の Response DTO は `<EndpointId>Response : List<<EndpointId>Item>` を許容する（SHOULD）。
+* ルート配列の要素型は `<EndpointId>Item` を基本とする（SHOULD）。
+* Raw 層で `List<T>` を使用しても、Normalized/Contracts への境界では読み取り専用表現に変換する（MUST）。
 
 ---
 
@@ -520,11 +548,35 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * HTTP Method を表す語（Get / Post 等）や Path 由来の語彙の採用・省略は、
   当該取引所の inventory に定義された命名規約に従う。
 
+#### 8.5.1 取引所プレフィックス排除時の例外
+
+* 取引所層（Wire / Raw / Normalized / Adapter）は、型名から取引所プレフィックスを排除する（MUST）。
+* 取引所層の Composition は、公開型名に取引所プレフィックスを付与する（MUST）。
+  例: `BitflyerFactory`, `BitflyerFactoryOptions`
+* 取引所層の Application（`Application/ExchangeInfo` を含む）は、公開型名に取引所プレフィックスを付与する（MUST）。
+  例: `BitflyerExchangeInfoService`, `BitflyerExchangeInfoSnapshot`
+* ただし、同一コンパイル単位で型衝突または曖昧参照が生じる場合は、衝突回避のための意味名を付与すること（MUST）。
+  例: `ExchangeSide`, `ExchangeSymbol`
+* 衝突回避の意味名は次の優先順で選択する（MUST）。
+  1. `Contract`
+  2. `Exchange`
+  3. `Normalized`
+  4. `Raw`
+  5. `Wire`
+* 衝突回避においては、取引所名プレフィックスよりも、役割を表す語（`Exchange`, `Normalized` など）を優先すること（SHOULD）。
+* 型衝突または曖昧参照が発生した場合は、衝突の発生源となった下位層の型名を変更して解消する（MUST）。
+* 上位層での `using alias` 等による回避は、下位層修正までの暫定対応に限定する（SHOULD）。
+* 衝突回避を理由に取引所プレフィックスを再導入してはならない（MUST NOT）。
+* 衝突回避目的の命名は例外ではなく、設計上の正規ルールとして扱う。
+
 ### 8.6 レイヤ別派生規則
 
 * EndpointId は各層で 1:1 に対応する
 * Raw / Normalized 層の API は `<EndpointId>CallAsync` を基本形とする
 * EndpointId と API メソッド名は意味的に一致しなければならない
+* コレクション応答は、コンテナ型を `<EndpointId>Response`、要素型を `<EndpointId>Item` とする（SHOULD）。
+  例: `GetChildOrdersResponse` / `GetChildOrdersItem`
+* `Request` / `Response` は API 境界の第1階層 DTO に限定し、内部モデルには付与しない（MUST）。
 * 上記の 1:1 対応は、inventory において当該層が実装対象として指定されている場合に限る。
   実装対象の指定は inventory の `PresentIn` 列により行う。
 
@@ -553,7 +605,16 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 
 ※ 取引所実装間で「統一する/しない」を運用として管理する場合は、参考として `docs/_references/exchange-parity-policy.md` を用いる。
 
-### 8.9 禁止事項
+### 8.9 CallMeta.EndpointId の運用（MUST）
+
+* `CallMeta.EndpointId` は、観測用途（ログ・表示・トレース・メトリクス）に限定して使用する（MUST）。
+* 規範的な識別・分岐・対応可否判定は、EndpointId 定数または型で行う（MUST）。
+* `CallMeta.EndpointId` の文字列比較を、仕様判断や業務分岐の根拠にしてはならない（MUST NOT）。
+* `CallMeta.InternalEndpointId` 等の補助識別子は、規範的識別子として扱ってはならない（MUST NOT）。
+* `CallMeta.EndpointId` と規範識別子が乖離した場合、規範識別子を正とし、`CallMeta` は観測値として補正する（MUST）。
+* 乖離補正の責務は Adapter 層に置く（MUST）。
+
+### 8.10 禁止事項
 
 * EndpointId に取引所名を含めること
 * 当該取引所の inventory に明示的な規定がない場合、

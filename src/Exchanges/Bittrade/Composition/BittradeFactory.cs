@@ -2,10 +2,11 @@ using System;
 using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Api.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Exchanges.Bittrade.Composition;
 
@@ -25,7 +26,7 @@ public static class BittradeFactory
         // 認証が無い場合は PublicClient を返す（Private capability は提供しない）。
         if (signer is null)
         {
-            return new BittradePublicClient(restClient);
+            return new PublicClient(restClient);
         }
 
         if (string.IsNullOrWhiteSpace(settings.AccountId))
@@ -33,13 +34,14 @@ public static class BittradeFactory
             throw new InvalidOperationException("Bittrade accountId is required to create a private client.");
         }
 
-        var bundle = BittradeApiBundle.FromRestClient(restClient, settings.AccountId);
-        return new BittradeExchangeClient(bundle);
+        var accountId = AccountId.ParseOrThrow(settings.AccountId);
+        var bundle = ApiBundle.FromRestClient(restClient, accountId);
+        return new ExchangeClient(bundle);
     }
 
     [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]
-    internal static BittradeExchangeClient CreateAdapter(BittradeFactoryOptions? options = null) =>
-        (BittradeExchangeClient)CreateClient(options);
+    internal static ExchangeClient CreateAdapter(BittradeFactoryOptions? options = null) =>
+        (ExchangeClient)CreateClient(options);
 
     private static RestClient CreateRestClient(BittradeFactoryOptions settings, IRequestSigner? signer)
     {
@@ -59,8 +61,12 @@ public static class BittradeFactory
 
     private static IRequestSigner? CreateSigner(BittradeFactoryOptions settings, bool requireCredentials)
     {
-        var credentials = settings.Credentials
-            ?? settings.CredentialProvider?.Get(settings.AccountId);
+        var credentials = settings.Credentials;
+        if (credentials is null && settings.CredentialProvider is not null)
+        {
+            var accountId = AccountId.ParseOrThrow(settings.AccountId);
+            credentials = settings.CredentialProvider.Get(accountId);
+        }
 
         if (credentials is null)
         {
@@ -72,6 +78,6 @@ public static class BittradeFactory
             return null;
         }
 
-        return new BittradeRequestSigner(credentials.ApiKey, credentials.ApiSecret);
+        return new RequestSigner(credentials.ApiKey, credentials.ApiSecret);
     }
 }

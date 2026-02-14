@@ -16,6 +16,7 @@ TopSpec / inventory / governance により定義された規範が、
 
   * 公式 API ドキュメント（取引所公式）
   * TopSpec（docs/ 配下の規範文書）
+  * Naming Rules（`docs/naming-rules.md`）
   * 該当 inventory（例：endpoints-bitflyer.md）
 * [ ] 「この実装判断はどの正本に基づくか」を PR / 作業メモに明記した
 
@@ -24,6 +25,9 @@ TopSpec / inventory / governance により定義された規範が、
 ## 1. EndpointId の確認（最重要）
 
 * [ ] 実装対象のエンドポイントが inventory に列挙されていることを確認した
+* [ ] 新規 endpoint 追加時、`src/Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` を更新した
+* [ ] `Wire/Raw/Normalized/Adapter` 配下に `EndpointIds.cs` を新設していないことを確認した
+* [ ] `EndpointIdCatalog` と inventory 記載の EndpointId が一致していることを確認した
 * [ ] inventory に存在しない EndpointId を新規実装していない
 * [ ] EndpointId の構成（HTTP Method を表す語を採用する/省略する等）が、当該取引所 inventory の EndpointId ルールと一致していることを確認した
 * [ ] EndpointId が識別子用途に限定され、意味・分類・ナビゲーションを背負っていないことを確認した
@@ -50,6 +54,7 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] Raw / Normalized 層のメソッド名が `<EndpointId>CallAsync` になっていることを確認した
 * [ ] `<EndpointId>` / `<EndpointId>CallAsync` の派生規則に反する独自命名を導入していないことを確認した
   * [ ] EndpointId 自体に Method 語を含める取引所ルールの場合、その Method 語は「独自補助語」ではなく EndpointId の一部として扱われていることを確認した
+* [ ] `Request` / `Response` 接尾辞が API 境界の第1階層 DTO のみに使われていることを確認した
 * [ ] 例外命名が必要な場合、exceptions.md に記録したことを確認した
 
 ---
@@ -58,7 +63,11 @@ TopSpec / inventory / governance により定義された規範が、
 
 * [ ] Wire 層では文字列 / Json ミラーを使用していることを確認した
 * [ ] Raw / Normalized / 共通層へ文字列が流入していないことを確認した（例外がある場合は例外として記録した）
+* [ ] 配列DTOが「ルート配列=List継承（許容） / 内部配列=IReadOnlyList（必須）」の方針に一致していることを確認した
 * [ ] Price / Size 等が専用型で表現されていることを確認した
+* [ ] Normalized / Contracts で識別子（OrderId/AccountId 等）が専用型で表現されていることを確認した
+* [ ] Normalized / Contracts で `State` / `Type` / `Side` 等の列挙的概念が専用型（未知値保持を含む）で表現されていることを確認した
+* [ ] 専用型化可能な値が `FreeText` のまま残っていないことを確認した
 * [ ] parsing が Try 系を本流とし、OrThrow 系が補助として併設されていることを確認した
 
 ---
@@ -68,6 +77,8 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] `CallMeta.EndpointId` がログ・表示用途の識別子であることを確認した
 * [ ] 規範的な識別は EndpointId 定数・型で行っていることを確認した
 * [ ] この運用方針が文書（TopSpec / governance 等）に明文化されていることを確認した
+* [ ] `CallMeta.EndpointId` 文字列を仕様分岐キーとして使用していないことを確認した
+* [ ] `CallMeta.EndpointId` と規範識別子の乖離補正が Adapter 層で実施されていることを確認した
 
 ---
 
@@ -76,6 +87,13 @@ TopSpec / inventory / governance により定義された規範が、
 * [ ] 取引所差分が `src/Exchanges/<Exchange>/` 配下に閉じていることを確認した
 * [ ] 物理配置と namespace が既存のリファレンス実装と同型であることを確認した
 * [ ] 共通層へ取引所固有の都合が逆流していないことを確認した
+* [ ] Adapter の API 実装で `try/catch + MapCall/FromException` を直書きせず、共通テンプレート経由で実装した
+* [ ] `Operations.*` の指定漏れがないことを確認した
+* [ ] `Operations` が共通正本（`ContractOperations`）由来であることを確認した
+* [ ] Adapter API に component 文字列リテラルを新規追加していないことを確認した
+* [ ] 新規/変更した Adapter API が `ContractOperations` を直接参照していることを確認した
+* [ ] 取引所別 `Operations.cs` に新規定数を追加していないことを確認した
+* [ ] テンプレート非適用ケースは `docs/exceptions.md` に記録した
 
 ---
 

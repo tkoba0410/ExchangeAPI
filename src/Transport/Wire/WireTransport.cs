@@ -25,7 +25,7 @@ public sealed class WireTransport : IWireTransport
     /// </summary>
     public async Task<Call<WireCallSpec, WireResponse>> SendAsync(
         WireCallSpec request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -33,7 +33,7 @@ public sealed class WireTransport : IWireTransport
         try
         {
             var responseMeta = await _restClient
-                .SendRawAsync(request.Method, request.Path, request.Query, request.BodyJson, request.Headers, ct)
+                .SendRawAsync(request.Method, request.Path, request.Query, request.BodyJson, request.Headers, cancellationToken)
                 .ConfigureAwait(false);
             var elapsed = DateTimeOffset.UtcNow - startedAt;
 
@@ -47,8 +47,8 @@ public sealed class WireTransport : IWireTransport
                 RequestId: null,
                 ElapsedMs: (long)elapsed.TotalMilliseconds);
             var meta = new CallMeta(
-                Layer: "Wire",
-                Component: "Wire.SendRawAsync",
+                Layer: CallMetaVocabulary.Layer.Wire,
+                Component: CallMetaVocabulary.Component.WireSendRawAsync,
                 EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null)
@@ -69,8 +69,8 @@ public sealed class WireTransport : IWireTransport
             var elapsed = DateTimeOffset.UtcNow - startedAt;
             var error = new CallError(CallErrorKind.Transport, "Wire transport canceled.");
             var meta = new CallMeta(
-                Layer: "Wire",
-                Component: "Wire.SendRawAsync",
+                Layer: CallMetaVocabulary.Layer.Wire,
+                Component: CallMetaVocabulary.Component.WireSendRawAsync,
                 EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null);
@@ -87,8 +87,8 @@ public sealed class WireTransport : IWireTransport
             var elapsed = DateTimeOffset.UtcNow - startedAt;
             var error = new CallError(CallErrorKind.Transport, "Wire transport failed.", ex);
             var meta = new CallMeta(
-                Layer: "Wire",
-                Component: "Wire.SendRawAsync",
+                Layer: CallMetaVocabulary.Layer.Wire,
+                Component: CallMetaVocabulary.Component.WireSendRawAsync,
                 EndpointId: request.EndpointId,
                 Tags: null,
                 Children: null);

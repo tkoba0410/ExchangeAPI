@@ -17,17 +17,17 @@ public class NoTestFactoryUsageTests
         }
 
         Assert.NotNull(dir);
-        var srcRoot = Path.Combine(dir!.FullName, "src");
+        var srcRoot = Path.Combine(dir!.FullName, "src", "Exchanges", "Bitflyer", "Adapter");
         var files = Directory.GetFiles(srcRoot, "*.cs", SearchOption.AllDirectories)
-            .Where(f => !f.EndsWith("BitflyerTestClientFactory.cs", StringComparison.OrdinalIgnoreCase)
-                        && !f.EndsWith("BitflyerApiBundle.cs", StringComparison.OrdinalIgnoreCase)
-                        && !f.EndsWith("BitflyerExchangeClient.cs", StringComparison.OrdinalIgnoreCase))
+            .Where(f => !f.EndsWith("TestClientFactory.cs", StringComparison.OrdinalIgnoreCase)
+                        && !f.EndsWith("ApiBundle.cs", StringComparison.OrdinalIgnoreCase)
+                        && !f.EndsWith("ExchangeClient.cs", StringComparison.OrdinalIgnoreCase))
             .ToArray();
 
         var forbidden = new[]
         {
-            "BitflyerTestClientFactory",
-            "BitflyerApiBundle"
+            "TestClientFactory",
+            "ApiBundle"
         };
 
         var offenders = files

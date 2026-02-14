@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using ExchangeApi.Composition.Providers.Credentials;
+using ExchangeApi.Primitives.DomainCommon.Types;
 
 namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 
@@ -22,7 +23,7 @@ public class FileApiCredentialProvider_Tests
 
             var provider = new FileApiCredentialProvider(path, "bitflyer");
 
-            var creds = provider.Get("default");
+            var creds = provider.Get(AccountId.ParseOrThrow("default"));
 
             Assert.Equal("key1", creds.ApiKey);
             Assert.Equal("sec1", creds.ApiSecret);

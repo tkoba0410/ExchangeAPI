@@ -1,8 +1,8 @@
 using System.Text.Json;
-using ExchangeApi.Exchanges.Bitflyer.Api.Normalized.Internal.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Api.Raw.Internal.Encoding;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Raw;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Raw.Internal.Encoding;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -29,8 +29,8 @@ public sealed class BitflyerTickerNormalizedTests
         }
         """;
 
-        var raw = BitflyerRawJson.DeserializeOrThrow<RawPublicDtos.Ticker>(json, "Bitflyer.GetTicker");
-        var ok = BitflyerTickerNormalizer.TryNormalize(raw, json, out var normalized, out var error);
+        var raw = RawJson.DeserializeOrThrow<RawPublicDtos.GetTickerResponse>(json, "Bitflyer.GetTicker");
+        var ok = TickerNormalizer.TryNormalize(raw, json, out var normalized, out var error);
         Assert.True(ok);
         Assert.NotNull(normalized);
         Assert.Null(error);

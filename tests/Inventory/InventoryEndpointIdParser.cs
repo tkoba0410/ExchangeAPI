@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace ExchangeApi.Tests.Inventory;
 
 internal static class InventoryEndpointIdParser
 {
-    private const int EndpointIdColumnIndex = 5;
-    private const int PresentInColumnIndex = 6;
+    private const string EndpointIdColumnName = "EndpointId";
+    private const string PresentInColumnName = "PresentIn";
 
     public static HashSet<string> ParseEndpointIdsFromFile(string path)
     {
@@ -20,51 +21,58 @@ internal static class InventoryEndpointIdParser
         var ids = new HashSet<string>(StringComparer.Ordinal);
 
         var lines = markdown.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-        foreach (var line in lines)
+        for (var i = 0; i < lines.Length; i++)
         {
-            if (!line.StartsWith("|", StringComparison.Ordinal))
+            var line = lines[i];
+            if (!line.TrimStart().StartsWith("|", StringComparison.Ordinal))
             {
                 continue;
             }
 
-            var trimmed = line.Trim();
-            if (trimmed.Length == 0)
+            var header = SplitRow(line);
+            if (!TryResolveHeader(header, out var endpointIdColumnIndex, out var presentInColumnIndex))
             {
                 continue;
             }
 
-            var cells = trimmed.Split('|');
-            if (cells.Length <= EndpointIdColumnIndex)
+            if (i + 1 >= lines.Length || !IsSeparatorRow(SplitRow(lines[i + 1])))
             {
                 continue;
             }
 
-            var endpointId = cells[EndpointIdColumnIndex].Trim();
-            if (endpointId.Length == 0)
+            for (var j = i + 2; j < lines.Length; j++)
             {
-                continue;
-            }
+                var rowLine = lines[j];
+                if (!rowLine.TrimStart().StartsWith("|", StringComparison.Ordinal))
+                {
+                    i = j - 1;
+                    break;
+                }
 
-            if (string.Equals(endpointId, "EndpointId", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            if (IsSeparatorToken(endpointId))
-            {
-                continue;
-            }
-
-            if (cells.Length > PresentInColumnIndex)
-            {
-                var presentIn = cells[PresentInColumnIndex].Trim();
-                if (string.Equals(presentIn, "None", StringComparison.OrdinalIgnoreCase))
+                var row = SplitRow(rowLine);
+                if (row.Count == 0 || IsSeparatorRow(row) || row.Count <= endpointIdColumnIndex)
                 {
                     continue;
                 }
-            }
 
-            ids.Add(endpointId);
+                var endpointId = row[endpointIdColumnIndex];
+                if (endpointId.Length == 0 || IsSeparatorToken(endpointId))
+                {
+                    continue;
+                }
+
+                if (presentInColumnIndex >= 0 && row.Count > presentInColumnIndex)
+                {
+                    var presentIn = row[presentInColumnIndex];
+                    if (string.Equals(presentIn, "None", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+                }
+
+                ids.Add(endpointId);
+                i = j;
+            }
         }
 
         return ids;
@@ -99,5 +107,61 @@ internal static class InventoryEndpointIdParser
         }
 
         return true;
+    }
+
+    private static List<string> SplitRow(string row)
+    {
+        if (string.IsNullOrWhiteSpace(row))
+        {
+            return new List<string>();
+        }
+
+        return row.Trim()
+            .Trim('|')
+            .Split('|', StringSplitOptions.None)
+            .Select(cell => cell.Trim())
+            .ToList();
+    }
+
+    private static bool IsSeparatorRow(IReadOnlyList<string> cells)
+    {
+        foreach (var cell in cells)
+        {
+            if (!IsSeparatorToken(cell))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool TryResolveHeader(
+        IReadOnlyList<string> cells,
+        out int endpointIdColumnIndex,
+        out int presentInColumnIndex)
+    {
+        endpointIdColumnIndex = IndexOfColumn(cells, EndpointIdColumnName);
+        if (endpointIdColumnIndex < 0)
+        {
+            presentInColumnIndex = -1;
+            return false;
+        }
+
+        presentInColumnIndex = IndexOfColumn(cells, PresentInColumnName);
+        return true;
+    }
+
+    private static int IndexOfColumn(IReadOnlyList<string> cells, string name)
+    {
+        for (var i = 0; i < cells.Count; i++)
+        {
+            if (string.Equals(cells[i], name, StringComparison.OrdinalIgnoreCase))
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

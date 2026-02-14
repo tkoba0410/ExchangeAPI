@@ -10,67 +10,86 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Fakes;
 
 public sealed class FakeBitflyerPrivateApi
 {
-    private readonly IReadOnlyList<RawPrivateDtos.BalanceResponse> _response;
-    private readonly IReadOnlyList<RawPrivateDtos.PositionResponse> _positions;
-    private readonly IReadOnlyList<RawPrivateDtos.ExecutionPrivateResponse> _executions;
-    private readonly RawPrivateDtos.CollateralResponse _collateral;
-    private readonly IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse> _childOrders;
-    private readonly IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse> _parentOrders;
-    private readonly IReadOnlyList<RawPrivateDtos.CollateralAccount> _collateralAccounts;
+    private readonly IReadOnlyList<RawPrivateDtos.GetBalanceItem> _response;
+    private readonly IReadOnlyList<RawPrivateDtos.GetPositionsItem> _positions;
+    private readonly IReadOnlyList<RawPrivateDtos.GetExecutionsPrivateItem> _executions;
+    private readonly RawPrivateDtos.GetCollateralResponse _collateral;
+    private readonly IReadOnlyList<RawPrivateDtos.GetChildOrdersItem> _childOrders;
+    private readonly IReadOnlyList<RawPrivateDtos.GetParentOrdersItem> _parentOrders;
+    private readonly IReadOnlyList<RawPrivateDtos.GetCollateralAccountsItem> _collateralAccounts;
     private readonly RawPrivateDtos.RawJsonResponse _rawJsonList = new("[]");
     private readonly RawPrivateDtos.RawJsonResponse _rawJsonObject = new("{}");
     private readonly RawPrivateDtos.RawJsonResponse _tradingCommission;
 
     public FakeBitflyerPrivateApi(
-        IReadOnlyList<RawPrivateDtos.BalanceResponse> response,
-        IReadOnlyList<RawPrivateDtos.PositionResponse>? positions = null,
-        IReadOnlyList<RawPrivateDtos.ExecutionPrivateResponse>? executions = null,
-        RawPrivateDtos.CollateralResponse? collateral = null,
-        IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>? childOrders = null,
-        IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>? parentOrders = null,
+        IReadOnlyList<RawPrivateDtos.GetBalanceItem> response,
+        IReadOnlyList<RawPrivateDtos.GetPositionsItem>? positions = null,
+        IReadOnlyList<RawPrivateDtos.GetExecutionsPrivateItem>? executions = null,
+        RawPrivateDtos.GetCollateralResponse? collateral = null,
+        IReadOnlyList<RawPrivateDtos.GetChildOrdersItem>? childOrders = null,
+        IReadOnlyList<RawPrivateDtos.GetParentOrdersItem>? parentOrders = null,
         string? tradingCommissionJson = null)
     {
         _response = response;
-        _positions = positions ?? Array.Empty<RawPrivateDtos.PositionResponse>();
-        _executions = executions ?? Array.Empty<RawPrivateDtos.ExecutionPrivateResponse>();
-        _collateral = collateral ?? new RawPrivateDtos.CollateralResponse();
-        _childOrders = childOrders ?? Array.Empty<RawPrivateDtos.RawGetChildOrdersResponse>();
-        _parentOrders = parentOrders ?? Array.Empty<RawPrivateDtos.RawGetParentOrdersResponse>();
-        _collateralAccounts = Array.Empty<RawPrivateDtos.CollateralAccount>();
+        _positions = positions ?? Array.Empty<RawPrivateDtos.GetPositionsItem>();
+        _executions = executions ?? Array.Empty<RawPrivateDtos.GetExecutionsPrivateItem>();
+        _collateral = collateral ?? new RawPrivateDtos.GetCollateralResponse();
+        _childOrders = childOrders ?? Array.Empty<RawPrivateDtos.GetChildOrdersItem>();
+        _parentOrders = parentOrders ?? Array.Empty<RawPrivateDtos.GetParentOrdersItem>();
+        _collateralAccounts = Array.Empty<RawPrivateDtos.GetCollateralAccountsItem>();
         _tradingCommission = new RawPrivateDtos.RawJsonResponse(tradingCommissionJson ?? "{}");
     }
 
-    public Task<Call<RawPrivateRequests.GetPermissionsRequest, IReadOnlyList<FreeText>>> GetPermissionsCallAsync(
+    public Task<Call<RawPrivateRequests.GetPermissionsRequest, RawPrivateDtos.GetPermissionsResponse>> GetPermissionsCallAsync(
         RawPrivateRequests.GetPermissionsRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, (IReadOnlyList<FreeText>)Array.Empty<FreeText>()));
+        CancellationToken cancellationToken = default)
+    {
+        var response = new RawPrivateDtos.GetPermissionsResponse();
+        return Task.FromResult(MakeOkCall(request, response));
+    }
 
-    public Task<Call<RawPrivateRequests.GetBalancesRequest, IReadOnlyList<RawPrivateDtos.BalanceResponse>>> GetBalanceCallAsync(
-        RawPrivateRequests.GetBalancesRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _response));
+    public Task<Call<RawPrivateRequests.GetBalanceRequest, RawPrivateDtos.GetBalanceResponse>> GetBalanceCallAsync(
+        RawPrivateRequests.GetBalanceRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = new RawPrivateDtos.GetBalanceResponse();
+        response.AddRange(_response);
+        return Task.FromResult(MakeOkCall(request, response));
+    }
 
-    public Task<Call<RawPrivateRequests.GetPositionsRequest, IReadOnlyList<RawPrivateDtos.PositionResponse>>> GetPositionsCallAsync(
+    public Task<Call<RawPrivateRequests.GetPositionsRequest, RawPrivateDtos.GetPositionsResponse>> GetPositionsCallAsync(
         RawPrivateRequests.GetPositionsRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _positions));
+        CancellationToken cancellationToken = default)
+    {
+        var response = new RawPrivateDtos.GetPositionsResponse();
+        response.AddRange(_positions);
+        return Task.FromResult(MakeOkCall(request, response));
+    }
 
-    public Task<Call<RawPrivateRequests.GetAccountExecutionsRequest, IReadOnlyList<RawPrivateDtos.ExecutionPrivateResponse>>> GetExecutionsPrivateCallAsync(
-        RawPrivateRequests.GetAccountExecutionsRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _executions));
+    public Task<Call<RawPrivateRequests.GetExecutionsPrivateRequest, RawPrivateDtos.GetExecutionsPrivateResponse>> GetExecutionsPrivateCallAsync(
+        RawPrivateRequests.GetExecutionsPrivateRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = new RawPrivateDtos.GetExecutionsPrivateResponse();
+        response.AddRange(_executions);
+        return Task.FromResult(MakeOkCall(request, response));
+    }
 
-    public Task<Call<RawPrivateRequests.GetCollateralRequest, RawPrivateDtos.CollateralResponse>> GetCollateralCallAsync(
+    public Task<Call<RawPrivateRequests.GetCollateralRequest, RawPrivateDtos.GetCollateralResponse>> GetCollateralCallAsync(
         RawPrivateRequests.GetCollateralRequest request,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(MakeOkCall(request, _collateral));
 
-    public Task<Call<RawPrivateRequests.GetCollateralAccountsRequest, IReadOnlyList<RawPrivateDtos.CollateralAccount>>> GetCollateralAccountsCallAsync(
+    public Task<Call<RawPrivateRequests.GetCollateralAccountsRequest, RawPrivateDtos.GetCollateralAccountsResponse>> GetCollateralAccountsCallAsync(
         RawPrivateRequests.GetCollateralAccountsRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _collateralAccounts));
+        CancellationToken cancellationToken = default)
+    {
+        var response = new RawPrivateDtos.GetCollateralAccountsResponse();
+        response.AddRange(_collateralAccounts);
+        return Task.FromResult(MakeOkCall(request, response));
+    }
 
-    public Task<Call<RawPrivateRequests.GetChildOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>>> GetChildOrdersCallAsync(
+    public Task<Call<RawPrivateRequests.GetChildOrdersRequest, RawPrivateDtos.GetChildOrdersResponse>> GetChildOrdersCallAsync(
         RawPrivateRequests.GetChildOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -79,66 +98,74 @@ public sealed class FakeBitflyerPrivateApi
             var filtered = _childOrders
                 .Where(o => o.ChildOrderAcceptanceId == request.ChildOrderAcceptanceId.Value.Value)
                 .ToArray();
-            return Task.FromResult(MakeOkCall(request, (IReadOnlyList<RawPrivateDtos.RawGetChildOrdersResponse>)filtered));
+            var response = new RawPrivateDtos.GetChildOrdersResponse();
+            response.AddRange(filtered);
+            return Task.FromResult(MakeOkCall(request, response));
         }
 
-        return Task.FromResult(MakeOkCall(request, _childOrders));
+        var all = new RawPrivateDtos.GetChildOrdersResponse();
+        all.AddRange(_childOrders);
+        return Task.FromResult(MakeOkCall(request, all));
     }
 
-    public Task<Call<RawPrivateRequests.GetParentOrdersRequest, IReadOnlyList<RawPrivateDtos.RawGetParentOrdersResponse>>> GetParentOrdersCallAsync(
+    public Task<Call<RawPrivateRequests.GetParentOrdersRequest, RawPrivateDtos.GetParentOrdersResponse>> GetParentOrdersCallAsync(
         RawPrivateRequests.GetParentOrdersRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _parentOrders));
+        CancellationToken cancellationToken = default)
+    {
+        var response = new RawPrivateDtos.GetParentOrdersResponse();
+        response.AddRange(_parentOrders);
+        return Task.FromResult(MakeOkCall(request, response));
+    }
 
-    public Task<Call<RawPrivateRequests.GetParentOrderRequest, RawPrivateDtos.RawGetParentOrderResponse>> GetParentOrderCallAsync(
+    public Task<Call<RawPrivateRequests.GetParentOrderRequest, RawPrivateDtos.GetParentOrderResponse>> GetParentOrderCallAsync(
         RawPrivateRequests.GetParentOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.RawGetParentOrderResponse()));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetParentOrderResponse()));
 
-    public Task<Call<RawPrivateRequests.GetBalanceHistoryRequest, RawPrivateDtos.RawJsonResponse>> GetBalanceHistoryCallAsync(
+    public Task<Call<RawPrivateRequests.GetBalanceHistoryRequest, RawPrivateDtos.GetBalanceHistoryResponse>> GetBalanceHistoryCallAsync(
         RawPrivateRequests.GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _rawJsonList));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetBalanceHistoryResponse(_rawJsonList.RawJson)));
 
-    public Task<Call<RawPrivateRequests.GetCollateralHistoryRequest, RawPrivateDtos.RawJsonResponse>> GetCollateralHistoryCallAsync(
+    public Task<Call<RawPrivateRequests.GetCollateralHistoryRequest, RawPrivateDtos.GetCollateralHistoryResponse>> GetCollateralHistoryCallAsync(
         RawPrivateRequests.GetCollateralHistoryRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _rawJsonList));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetCollateralHistoryResponse(_rawJsonList.RawJson)));
 
-    public Task<Call<RawPrivateRequests.GetTradingCommissionRequest, RawPrivateDtos.RawJsonResponse>> GetTradingCommissionCallAsync(
+    public Task<Call<RawPrivateRequests.GetTradingCommissionRequest, RawPrivateDtos.GetTradingCommissionResponse>> GetTradingCommissionCallAsync(
         RawPrivateRequests.GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _tradingCommission));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetTradingCommissionResponse(_tradingCommission.RawJson)));
 
-    public Task<Call<RawPrivateRequests.GetAddressesRequest, RawPrivateDtos.RawJsonResponse>> GetAddressesCallAsync(
+    public Task<Call<RawPrivateRequests.GetAddressesRequest, RawPrivateDtos.GetAddressesResponse>> GetAddressesCallAsync(
         RawPrivateRequests.GetAddressesRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _rawJsonList));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetAddressesResponse(_rawJsonList.RawJson)));
 
-    public Task<Call<RawPrivateRequests.GetCoinInsRequest, RawPrivateDtos.RawJsonResponse>> GetCoinInsCallAsync(
+    public Task<Call<RawPrivateRequests.GetCoinInsRequest, RawPrivateDtos.GetCoinInsResponse>> GetCoinInsCallAsync(
         RawPrivateRequests.GetCoinInsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _rawJsonList));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetCoinInsResponse(_rawJsonList.RawJson)));
 
-    public Task<Call<RawPrivateRequests.GetCoinOutsRequest, RawPrivateDtos.RawJsonResponse>> GetCoinOutsCallAsync(
+    public Task<Call<RawPrivateRequests.GetCoinOutsRequest, RawPrivateDtos.GetCoinOutsResponse>> GetCoinOutsCallAsync(
         RawPrivateRequests.GetCoinOutsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _rawJsonList));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetCoinOutsResponse(_rawJsonList.RawJson)));
 
-    public Task<Call<RawPrivateRequests.GetDepositsRequest, RawPrivateDtos.RawJsonResponse>> GetDepositsCallAsync(
+    public Task<Call<RawPrivateRequests.GetDepositsRequest, RawPrivateDtos.GetDepositsResponse>> GetDepositsCallAsync(
         RawPrivateRequests.GetDepositsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _rawJsonList));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetDepositsResponse(_rawJsonList.RawJson)));
 
-    public Task<Call<RawPrivateRequests.GetWithdrawalsRequest, RawPrivateDtos.RawJsonResponse>> GetWithdrawalsCallAsync(
+    public Task<Call<RawPrivateRequests.GetWithdrawalsRequest, RawPrivateDtos.GetWithdrawalsResponse>> GetWithdrawalsCallAsync(
         RawPrivateRequests.GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _rawJsonList));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetWithdrawalsResponse(_rawJsonList.RawJson)));
 
-    public Task<Call<RawPrivateRequests.GetBankAccountsRequest, RawPrivateDtos.RawJsonResponse>> GetBankAccountsCallAsync(
+    public Task<Call<RawPrivateRequests.GetBankAccountsRequest, RawPrivateDtos.GetBankAccountsResponse>> GetBankAccountsCallAsync(
         RawPrivateRequests.GetBankAccountsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(MakeOkCall(request, _rawJsonList));
+        Task.FromResult(MakeOkCall(request, new RawPrivateDtos.GetBankAccountsResponse(_rawJsonList.RawJson)));
 
     private static Call<TReq, TResponse> MakeOkCall<TReq, TResponse>(TReq request, TResponse response)
     {

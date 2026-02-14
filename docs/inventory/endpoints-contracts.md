@@ -31,8 +31,8 @@
 * 取引所 endpoint inventory: `docs/inventory/endpoints-*.md`
 * Contracts 契約条文参照: `docs/contracts/contracts.md`
 
-※ 本書は「どの Contracts API がどの取引所 EndpointId に対応しているか」の記録であり、
-　署名の詳細や命名規範そのものは上記文書を参照する。
+※ 本書は「どの Contracts API がどの取引所 EndpointId に対応しているか」の対応一覧を記録する。
+　署名定義や命名ルールの説明は、参照先文書に集約されている。
 
 ---
 

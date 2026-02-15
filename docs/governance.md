@@ -189,6 +189,7 @@ TopSpec および inventory に記載された事実に従う。
 
 本章は Stage9-1 の設計拘束を定義する。ここでの対象は、
 **Facade が ExecutionContext の塊（AccountInfo 相当を含む）に依存する構造**である。
+本規約は、当該構造に固有名を与えず、構造（塊依存）としてのみ扱う。
 本規約は、取引所仕様メタ情報の存否や配置を規定しない。
 Facade の公開入力境界（引数・必須依存）に関する拘束のみを規定する。
 
@@ -201,7 +202,7 @@ Facade の公開入力境界（引数・必須依存）に関する拘束のみ�
 
 - 本章の Facade は、ライブラリ外部から呼び出される最上位の Client/API 境界を指す（SHOULD）。
 - Facade は `ClientOptions` を必須入力としなければならない（MUST）。
-- Facade が認証を必要とする場合、依存してよい情報は `Credentials` に限定する（MUST）。
+- Facade が認証を必要とする場合、依存してよい情報は `ClientCredentials` に限定する（MUST）。
 - ExecutionContext の塊を、Facade の引数または必須依存として導入してはならない（MUST NOT）。
 
 ### 9.3 ClientOptions の責務境界
@@ -209,10 +210,10 @@ Facade の公開入力境界（引数・必須依存）に関する拘束のみ�
 - `ClientOptions` には `BaseUrl` / `Timeout` など、公開可能な実行パラメータのみを含める（MUST）。
 - `ClientOptions` に、複数アカウント選択・secrets 読込・ガードレール等の運用設定を含めてはならない（MUST NOT）。
 
-### 9.4 Credentials の責務境界
+### 9.4 ClientCredentials の責務境界
 
-- `Credentials` は署名に必要な最小情報（`ApiKey` / `Secret` / `Passphrase` 等）のみを保持する（MUST）。
-- `Credentials` に、権限・複数アカウント管理・状態（balance 等）を含めてはならない（MUST NOT）。
+- `ClientCredentials` は署名に必要な最小情報（`ApiKey` / `Secret` / `Passphrase` 等）のみを保持する（MUST）。
+- `ClientCredentials` に、権限・複数アカウント管理・状態（balance 等）を含めてはならない（MUST NOT）。
 
 ### 9.5 Exchange 差分の扱い
 

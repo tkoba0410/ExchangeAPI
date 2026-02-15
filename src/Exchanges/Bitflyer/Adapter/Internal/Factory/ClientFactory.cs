@@ -7,15 +7,8 @@ using ExchangeApi.Transport.Time;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
-using ExchangeApi.Exchanges.Bitflyer.Wire.Internal;
-using ExchangeApi.Transport.Wire;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 
 /// <summary>
@@ -31,13 +24,17 @@ public static class ClientFactory
     /// 署名を行わず、マーケット/ExchangeInfo 取得に限定する。
     /// </summary>
     public static PublicClient CreatePublic(
-        ClientOptions? options = null,
+        ClientOptions options,
         HttpClient? httpClient = null,
         IHttpTransport? transportOverride = null)
     {
-        options ??= new ClientOptions();
-
-        var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = BitflyerApiBaseUri };
+        if (options is null) throw new ArgumentNullException(nameof(options));
+        var baseUri = options.BaseUri ?? BitflyerApiBaseUri;
+        var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = baseUri };
+        if (options.Timeout is { } timeout)
+        {
+            http.Timeout = timeout;
+        }
         IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
 
         var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
@@ -47,27 +44,83 @@ public static class ClientFactory
         var errorClassifier = options.ErrorClassifier ?? ErrorClassifier.Instance;
 
         IRestClient restClient = new RestClient(
-            BitflyerApiBaseUri,
+            baseUri,
             baseTransport,
             policy: policy,
             logger: logger,
             observer: observer,
             errorClassifier: errorClassifier);
 
-        var wireTransport = new WireTransport(restClient);
-        var wire = new WireCallExecutor(wireTransport);
-        var raw = new RawApi(wire);
-        var publicApi = new NormalizedPublicApi(raw);
-        var exchangeInfo = new BitflyerExchangeInfoApi(publicApi);
-        var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var markets = new NormalizedMarketResolver(contractMarkets);
-        var normalized = NormalizedApi.FromRaw(raw, markets);
-        return new PublicClient(normalized, exchangeInfo);
+        var components = BitflyerClientComponents.FromRestClient(restClient);
+        return new PublicClient(components.Normalized, components.ExchangeInfo);
+    }
+
+    /// <summary>
+    /// Public API のみを利用する軽量クライアントを作成する。
+    /// </summary>
+    [Obsolete("Pass ClientOptions explicitly. This overload will be removed in a future major release.")]
+    public static PublicClient CreatePublic(
+        HttpClient? httpClient = null,
+        IHttpTransport? transportOverride = null) =>
+        CreatePublic(new ClientOptions(), httpClient, transportOverride);
+
+    /// <summary>
+    /// Create bitFlyer client with explicit credentials supplied by the caller.
+    /// </summary>
+    public static ExchangeClient Create(
+        ClientCredentials credentials,
+        ClientOptions options,
+        HttpClient? httpClient = null,
+        IHttpTransport? transportOverride = null)
+    {
+        if (credentials is null) throw new ArgumentNullException(nameof(credentials));
+        if (string.IsNullOrWhiteSpace(credentials.ApiKey))
+        {
+            throw new ArgumentException("API key is required.", nameof(credentials));
+        }
+
+        if (string.IsNullOrWhiteSpace(credentials.ApiSecret))
+        {
+            throw new ArgumentException("API secret is required.", nameof(credentials));
+        }
+
+        if (options is null) throw new ArgumentNullException(nameof(options));
+
+        var baseUri = options.BaseUri ?? BitflyerApiBaseUri;
+        var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = baseUri };
+        if (options.Timeout is { } timeout)
+        {
+            http.Timeout = timeout;
+        }
+
+        IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
+
+        IExchangeClock clock = new SystemClock();
+        var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
+            options.PolicyOptions ?? HttpPolicyDefaults.Create());
+        var logger = options.Logger;
+        var observer = options.Observer;
+        var errorClassifier = options.ErrorClassifier ?? ErrorClassifier.Instance;
+
+        IRequestSigner signer = new RequestSigner(credentials.ApiKey, credentials.ApiSecret, clock);
+
+        IRestClient restClient = new RestClient(
+            baseUri,
+            baseTransport,
+            requestSigner: signer,
+            policy: policy,
+            logger: logger,
+            observer: observer,
+            errorClassifier: errorClassifier);
+
+        var components = BitflyerClientComponents.FromRestClient(restClient);
+        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
     }
 
     /// <summary>
     /// Create bitFlyer client with explicit API key/secret supplied by the caller.
     /// </summary>
+    [Obsolete("Use Create(ClientCredentials, ClientOptions, ...) instead. This overload will be removed in a future major release.")]
     public static ExchangeClient Create(
         string apiKey,
         string apiSecret,
@@ -86,53 +139,18 @@ public static class ClientFactory
             HttpClient = httpClient,
         };
 
-        return Create(apiKey, apiSecret, options, httpClient: httpClient);
+        return Create(new ClientCredentials(apiKey, apiSecret), options, httpClient: httpClient);
     }
 
     /// <summary>
     /// Create bitFlyer client with explicit API key/secret supplied by the caller using options.
     /// </summary>
+    [Obsolete("Use Create(ClientCredentials, ClientOptions, ...) instead. This overload will be removed in a future major release.")]
     public static ExchangeClient Create(
         string apiKey,
         string apiSecret,
         ClientOptions? options,
         HttpClient? httpClient = null,
-        IHttpTransport? transportOverride = null)
-    {
-        if (string.IsNullOrWhiteSpace(apiKey))
-        {
-            throw new ArgumentException("API key is required.", nameof(apiKey));
-        }
-
-        if (string.IsNullOrWhiteSpace(apiSecret))
-        {
-            throw new ArgumentException("API secret is required.", nameof(apiSecret));
-        }
-
-        options ??= new ClientOptions();
-
-        var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = BitflyerApiBaseUri };
-
-        IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
-
-        IExchangeClock clock = new SystemClock();
-        var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
-            options.PolicyOptions ?? HttpPolicyDefaults.Create());
-        var logger = options.Logger;
-        var observer = options.Observer;
-        var errorClassifier = options.ErrorClassifier ?? ErrorClassifier.Instance;
-
-        IRequestSigner signer = new RequestSigner(apiKey, apiSecret, clock);
-
-        IRestClient restClient = new RestClient(
-            BitflyerApiBaseUri,
-            baseTransport,
-            requestSigner: signer,
-            policy: policy,
-            logger: logger,
-            observer: observer,
-            errorClassifier: errorClassifier);
-
-        return ExchangeClient.FromRestClient(restClient);
-    }
+        IHttpTransport? transportOverride = null) =>
+        Create(new ClientCredentials(apiKey, apiSecret), options ?? new ClientOptions(), httpClient, transportOverride);
 }

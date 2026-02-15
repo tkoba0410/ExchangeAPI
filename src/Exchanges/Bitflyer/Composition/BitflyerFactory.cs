@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
@@ -24,39 +25,42 @@ public static class BitflyerFactory
     public static IExchangeClient CreateClient(BitflyerFactoryOptions? options = null)
     {
         var settings = options ?? new BitflyerFactoryOptions();
+        var clientOptions = ToClientOptions(settings);
         // 署名（認証）が無い場合は PublicClient を返し、未対応 capability は null とする。
-        var signer = settings.RequestSigner ?? CreateSigner(settings);
-        if (signer is null)
+        var credentials = ResolveCredentials(settings);
+        if (credentials is null && settings.RequestSigner is null)
         {
-            var httpClient = settings.HttpClient;
-            if (httpClient is null && settings.BaseUri is not null)
-            {
-                httpClient = new HttpClient { BaseAddress = settings.BaseUri };
-            }
-
-            var clientOptions = new ClientOptions
-            {
-                HttpClient = httpClient,
-                Policy = settings.Policy,
-                PolicyOptions = settings.PolicyOptions,
-                Logger = settings.Logger,
-                Observer = settings.Observer,
-                ErrorClassifier = settings.ErrorClassifier,
-            };
-
-            return ClientFactory.CreatePublic(
-                clientOptions,
-                httpClient: httpClient,
-                transportOverride: settings.Transport);
+            return new PublicClient(clientOptions, settings.HttpClient, settings.Transport);
         }
 
-        var restClient = CreateRestClient(settings, signer);
-        return ExchangeClient.FromRestClient(restClient);
+        if (settings.RequestSigner is not null)
+        {
+            var restClient = CreateRestClient(settings, settings.RequestSigner);
+            return ExchangeClient.FromRestClient(restClient);
+        }
+
+        var clientCredentials = new ClientCredentials(credentials!.ApiKey, credentials.ApiSecret);
+        return new ExchangeClient(clientOptions, clientCredentials, settings.HttpClient, settings.Transport);
     }
 
     [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]
     internal static ExchangeClient CreateAdapter(BitflyerFactoryOptions? options = null) =>
         (ExchangeClient)CreateClient(options);
+
+    private static ClientOptions ToClientOptions(BitflyerFactoryOptions settings)
+    {
+        if (settings is null) throw new ArgumentNullException(nameof(settings));
+        return new ClientOptions
+        {
+            BaseUri = settings.BaseUri ?? DefaultBaseUri,
+            HttpClient = settings.HttpClient,
+            Policy = settings.Policy,
+            PolicyOptions = settings.PolicyOptions,
+            Logger = settings.Logger,
+            Observer = settings.Observer,
+            ErrorClassifier = settings.ErrorClassifier,
+        };
+    }
 
     private static RestClient CreateRestClient(BitflyerFactoryOptions settings, IRequestSigner? signer)
     {
@@ -75,7 +79,7 @@ public static class BitflyerFactory
             httpClient: settings.HttpClient);
     }
 
-    private static IRequestSigner? CreateSigner(BitflyerFactoryOptions settings)
+    private static ApiCredentials? ResolveCredentials(BitflyerFactoryOptions settings)
     {
         var credentials = settings.Credentials;
         if (credentials is null && settings.CredentialProvider is not null)
@@ -88,8 +92,6 @@ public static class BitflyerFactory
         {
             return null;
         }
-
-        var clock = settings.Clock ?? new SystemClock();
-        return new RequestSigner(credentials.ApiKey, credentials.ApiSecret, clock);
+        return credentials;
     }
 }

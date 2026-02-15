@@ -6,11 +6,13 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 /// <summary>
@@ -21,12 +23,28 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     private readonly MarketApi _marketApi;
     private readonly PrivateApi _privateApi;
     private readonly BittradeExchangeInfoApi _exchangeInfoApi;
-    private readonly IRestClient? _restClient;
-    internal ApiBundle? ApiBundle { get; }
 
     // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
     public IPublicApi? Public => this;
     public IPrivateApi? Private => this;
+
+    public ExchangeClient(
+        ClientOptions options,
+        ClientCredentials credentials,
+        string accountId = "default")
+    {
+        if (options is null) throw new ArgumentNullException(nameof(options));
+        if (credentials is null) throw new ArgumentNullException(nameof(credentials));
+        var (components, _) = BittradeClientBootstrap.CreatePrivateComponents(options, credentials, accountId);
+        if (components.Private is null)
+        {
+            throw new InvalidOperationException("Private components are required to create ExchangeClient.");
+        }
+
+        _marketApi = new MarketApi(components.Public, components.Markets);
+        _privateApi = new PrivateApi(components.Private);
+        _exchangeInfoApi = components.ExchangeInfo;
+    }
 
     internal ExchangeClient(
         MarketApi marketApi,
@@ -38,23 +56,18 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
     }
 
-    internal ExchangeClient(ApiBundle bundle)
+    internal ExchangeClient(BittradeClientComponents components, AccountId accountId)
     {
-        if (bundle is null) throw new ArgumentNullException(nameof(bundle));
-        if (bundle.AccountId is null || bundle.AccountId.Value.IsEmpty)
+        if (components is null) throw new ArgumentNullException(nameof(components));
+        if (accountId.IsEmpty) throw new ArgumentException("accountId is required.", nameof(accountId));
+        if (components.Private is null)
         {
-            throw new InvalidOperationException("ApiBundle.AccountId is required to create ExchangeClient.");
-        }
-        if (bundle.Private is null)
-        {
-            throw new InvalidOperationException("ApiBundle.Private is required to create ExchangeClient.");
+            throw new InvalidOperationException("Private components are required to create ExchangeClient.");
         }
 
-        _marketApi = new MarketApi(bundle.Public, bundle.Markets);
-        _privateApi = new PrivateApi(bundle.Private);
-        _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.Public);
-        _restClient = bundle.RestClient;
-        ApiBundle = bundle;
+        _marketApi = new MarketApi(components.Public, components.Markets);
+        _privateApi = new PrivateApi(components.Private);
+        _exchangeInfoApi = components.ExchangeInfo;
     }
 
     internal ExchangeClient(
@@ -62,10 +75,7 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         PrivateApi privateApi,
         BittradeExchangeInfoApi exchangeInfoApi,
         IRestClient restClient)
-        : this(marketApi, privateApi, exchangeInfoApi)
-    {
-        _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-    }
+        : this(marketApi, privateApi, exchangeInfoApi) { }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         TickerRequest request,

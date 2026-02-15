@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -7,10 +8,12 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Transport.Http;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
@@ -22,10 +25,24 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     private readonly MarketApi _marketApi;
     private readonly PrivateApi _privateApi;
     private readonly BitflyerExchangeInfoApi _exchangeInfoApi;
-    internal ApiBundle? ApiBundle { get; }
     // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
     public IPublicApi? Public => this;
     public IPrivateApi? Private => this;
+
+    public ExchangeClient(
+        ClientOptions options,
+        ClientCredentials credentials,
+        HttpClient? httpClient = null,
+        IHttpTransport? transportOverride = null)
+    {
+        if (options is null) throw new ArgumentNullException(nameof(options));
+        if (credentials is null) throw new ArgumentNullException(nameof(credentials));
+
+        var client = ClientFactory.Create(credentials, options, httpClient, transportOverride);
+        _exchangeInfoApi = client._exchangeInfoApi;
+        _marketApi = client._marketApi;
+        _privateApi = client._privateApi;
+    }
 
     internal ExchangeClient(
         INormalizedApi normalized,
@@ -37,20 +54,23 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         _privateApi = new PrivateApi(normalized);
     }
 
-    internal ExchangeClient(ApiBundle bundle)
+    internal ExchangeClient(
+        INormalizedApi normalized,
+        IExchangeMarketResolver markets,
+        BitflyerExchangeInfoApi exchangeInfoApi)
     {
-        if (bundle is null) throw new ArgumentNullException(nameof(bundle));
-        _exchangeInfoApi = bundle.ExchangeInfo;
-        _marketApi = new MarketApi(bundle.Normalized, bundle.Markets);
-        _privateApi = new PrivateApi(bundle.Normalized);
-        ApiBundle = bundle;
+        if (normalized is null) throw new ArgumentNullException(nameof(normalized));
+        if (markets is null) throw new ArgumentNullException(nameof(markets));
+        _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
+        _marketApi = new MarketApi(normalized, markets);
+        _privateApi = new PrivateApi(normalized);
     }
 
     public static ExchangeClient FromRestClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
-        var bundle = ApiBundle.FromRestClient(restClient);
-        return new ExchangeClient(bundle);
+        var components = BitflyerClientComponents.FromRestClient(restClient);
+        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
     }
 
     // Market

@@ -53,16 +53,6 @@ internal static class BitflyerTestHelpers
         return new NormalizedMarketResolver(resolver);
     }
 
-    public static ApiBundle CreateBundle(IRawApi raw)
-    {
-        var publicApi = new NormalizedPublicApi(raw);
-        var exchangeInfo = new BitflyerExchangeInfoApi();
-        var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
-        var markets = new NormalizedMarketResolver(contractMarkets);
-        var normalized = NormalizedApi.FromRaw(raw, markets);
-        return new ApiBundle(normalized, publicApi, exchangeInfo, contractMarkets);
-    }
-
     private sealed class StubExchangeInfoApi : IExchangeInfoProvider
     {
         private readonly ExchangeInfoDto _info;

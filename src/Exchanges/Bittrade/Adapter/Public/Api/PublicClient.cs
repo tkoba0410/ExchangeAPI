@@ -8,8 +8,8 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Primitives.CallCommon;
@@ -22,30 +22,33 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
     private readonly BittradeExchangeInfoApi _exchangeInfoApi;
-    private readonly IRestClient? _restClient;
-    internal ApiBundle? ApiBundle { get; }
 
     public IPublicApi? Public => this;
     public IPrivateApi? Private => null;
+
+    public PublicClient(ClientOptions options)
+    {
+        if (options is null) throw new ArgumentNullException(nameof(options));
+        var components = BittradeClientBootstrap.CreatePublicComponents(options);
+        _marketApi = new MarketApi(components.Public, components.Markets);
+        _exchangeInfoApi = components.ExchangeInfo;
+    }
 
     public PublicClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
 
         // 公開APIのみ: market/exchangeInfo 取得に限定し、Trading/Account/History は提供しない。
-        var bundle = ApiBundle.FromRestClient(restClient, accountId: null);
-        _marketApi = new MarketApi(bundle.Public, bundle.Markets);
-        _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.Public);
-        _restClient = restClient;
+        var components = BittradeClientComponents.FromRestClient(restClient, accountId: null);
+        _marketApi = new MarketApi(components.Public, components.Markets);
+        _exchangeInfoApi = components.ExchangeInfo;
     }
 
-    internal PublicClient(ApiBundle bundle)
+    internal PublicClient(BittradeClientComponents components)
     {
-        if (bundle is null) throw new ArgumentNullException(nameof(bundle));
-        _marketApi = new MarketApi(bundle.Public, bundle.Markets);
-        _exchangeInfoApi = new BittradeExchangeInfoApi(bundle.Public);
-        _restClient = bundle.RestClient;
-        ApiBundle = bundle;
+        if (components is null) throw new ArgumentNullException(nameof(components));
+        _marketApi = new MarketApi(components.Public, components.Markets);
+        _exchangeInfoApi = components.ExchangeInfo;
     }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(

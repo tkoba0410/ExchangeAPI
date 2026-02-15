@@ -15,14 +15,16 @@ internal static class TestClientFactory
 {
     private static readonly Uri BitflyerApiBaseUri = new("https://api.bitflyer.com");
 
-    public static ExchangeClient Create(ApiBundle bundle)
+    public static ExchangeClient Create(BitflyerClientComponents components)
     {
-        return new ExchangeClient(bundle);
+        if (components is null) throw new ArgumentNullException(nameof(components));
+        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
     }
 
     public static ExchangeClient Create(IRestClient restClient)
     {
-        return new ExchangeClient(ApiBundle.FromRestClient(restClient));
+        var components = BitflyerClientComponents.FromRestClient(restClient);
+        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
     }
 
     public static ExchangeClient CreateWithTransport(
@@ -44,6 +46,7 @@ internal static class TestClientFactory
             observer: observer,
             errorClassifier: errorClassifier ?? ErrorClassifier.Instance);
 
-        return new ExchangeClient(ApiBundle.FromRestClient(restClient));
+        var components = BitflyerClientComponents.FromRestClient(restClient);
+        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
     }
 }

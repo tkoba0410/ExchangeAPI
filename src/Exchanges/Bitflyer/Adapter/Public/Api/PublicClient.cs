@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -8,8 +9,10 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Protocol;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
@@ -23,6 +26,17 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
 
     public IPublicApi? Public => this;
     public IPrivateApi? Private => null;
+
+    public PublicClient(
+        ClientOptions options,
+        HttpClient? httpClient = null,
+        IHttpTransport? transportOverride = null)
+    {
+        if (options is null) throw new ArgumentNullException(nameof(options));
+        var client = ClientFactory.CreatePublic(options, httpClient, transportOverride);
+        _marketApi = client._marketApi;
+        _exchangeInfoApi = client._exchangeInfoApi;
+    }
 
     internal PublicClient(INormalizedApi normalized, BitflyerExchangeInfoApi exchangeInfo)
     {

@@ -1,42 +1,37 @@
 using System;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
 using ExchangeApi.Exchanges.Bitflyer.Wire.Internal;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Wire;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
-/// <summary>
-/// bitFlyer API 実装のセットをまとめるバンドル。
-/// テスト向けにモック実装を差し替えやすくする。
-/// </summary>
-internal sealed class ApiBundle
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+
+internal sealed class BitflyerClientComponents
 {
-    public NormalizedPublicApi Public { get; }
     public INormalizedApi Normalized { get; }
     public BitflyerExchangeInfoApi ExchangeInfo { get; }
     public IExchangeMarketResolver Markets { get; }
 
-    public ApiBundle(
+    private BitflyerClientComponents(
         INormalizedApi normalized,
-        NormalizedPublicApi publicApi,
         BitflyerExchangeInfoApi exchangeInfo,
         IExchangeMarketResolver markets)
     {
         Normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
-        Public = publicApi ?? throw new ArgumentNullException(nameof(publicApi));
         ExchangeInfo = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
         Markets = markets ?? throw new ArgumentNullException(nameof(markets));
     }
 
-    public static ApiBundle FromRestClient(IRestClient restClient)
+    public static BitflyerClientComponents FromRestClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+
         var wireTransport = new WireTransport(restClient);
         var wire = new WireCallExecutor(wireTransport);
         var raw = new RawApi(wire);
@@ -45,6 +40,6 @@ internal sealed class ApiBundle
         var contractMarkets = new ExchangeInfoMarketResolver(exchangeInfo);
         var markets = new NormalizedMarketResolver(contractMarkets);
         var normalized = NormalizedApi.FromRaw(raw, markets);
-        return new ApiBundle(normalized, publicApi, exchangeInfo, contractMarkets);
+        return new BitflyerClientComponents(normalized, exchangeInfo, contractMarkets);
     }
 }

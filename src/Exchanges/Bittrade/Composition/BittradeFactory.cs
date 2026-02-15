@@ -1,8 +1,10 @@
 using System;
+using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -20,13 +22,12 @@ public static class BittradeFactory
     public static IExchangeClient CreateClient(BittradeFactoryOptions? options = null)
     {
         var settings = options ?? new BittradeFactoryOptions();
-        var signer = settings.RequestSigner ?? CreateSigner(settings, requireCredentials: false);
-        var restClient = CreateRestClient(settings, signer);
+        var adapterOptions = ToAdapterOptions(settings);
+        var credentials = ResolveCredentials(settings);
 
-        // 認証が無い場合は PublicClient を返す（Private capability は提供しない）。
-        if (signer is null)
+        if (credentials is null)
         {
-            return new PublicClient(restClient);
+            return new PublicClient(adapterOptions);
         }
 
         if (string.IsNullOrWhiteSpace(settings.AccountId))
@@ -34,32 +35,30 @@ public static class BittradeFactory
             throw new InvalidOperationException("Bittrade accountId is required to create a private client.");
         }
 
-        var accountId = AccountId.ParseOrThrow(settings.AccountId);
-        var bundle = ApiBundle.FromRestClient(restClient, accountId);
-        return new ExchangeClient(bundle);
+        var adapterCredentials = new ClientCredentials(credentials.ApiKey, credentials.ApiSecret);
+        return new ExchangeClient(adapterOptions, adapterCredentials, settings.AccountId);
     }
 
     [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]
     internal static ExchangeClient CreateAdapter(BittradeFactoryOptions? options = null) =>
         (ExchangeClient)CreateClient(options);
 
-    private static RestClient CreateRestClient(BittradeFactoryOptions settings, IRequestSigner? signer)
+    private static ClientOptions ToAdapterOptions(BittradeFactoryOptions settings)
     {
-        var baseUri = settings.BaseUri ?? DefaultBaseUri;
-        var policy = settings.Policy ?? HttpPolicyFactory.CreateDefault(settings.PolicyOptions);
-
-        return RestClientFactory.Create(
-            baseUri,
-            transport: settings.Transport,
-            signer: signer,
-            policy: policy,
-            logger: settings.Logger,
-            observer: settings.Observer,
-            errorClassifier: settings.ErrorClassifier,
-            httpClient: settings.HttpClient);
+        if (settings is null) throw new ArgumentNullException(nameof(settings));
+        return new ClientOptions
+        {
+            BaseUri = settings.BaseUri ?? DefaultBaseUri,
+            HttpClient = settings.HttpClient,
+            Policy = settings.Policy,
+            PolicyOptions = settings.PolicyOptions,
+            Logger = settings.Logger,
+            Observer = settings.Observer,
+            ErrorClassifier = settings.ErrorClassifier,
+        };
     }
 
-    private static IRequestSigner? CreateSigner(BittradeFactoryOptions settings, bool requireCredentials)
+    private static ApiCredentials? ResolveCredentials(BittradeFactoryOptions settings)
     {
         var credentials = settings.Credentials;
         if (credentials is null && settings.CredentialProvider is not null)
@@ -70,14 +69,8 @@ public static class BittradeFactory
 
         if (credentials is null)
         {
-            if (requireCredentials)
-            {
-                throw new InvalidOperationException("Bittrade credentials are required to create the client.");
-            }
-
             return null;
         }
-
-        return new RequestSigner(credentials.ApiKey, credentials.ApiSecret);
+        return credentials;
     }
 }

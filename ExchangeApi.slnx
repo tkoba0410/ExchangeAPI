@@ -28,6 +28,5 @@
     <Project Path="tests/Exchanges/Bittrade/Raw.Tests/Exchange.Bittrade.Raw.Tests.csproj" />
     <Project Path="tests/Exchanges/Bittrade/Raw.Endpoints.Tests/Exchange.Bittrade.Raw.Endpoints.Tests.csproj" />
     <Project Path="tests/Exchanges/Bittrade/Adapter.Tests/Exchange.Bittrade.Adapter.Tests.csproj" />
-    <Project Path="tests/Integration.Public.Tests/Integration.Public.Tests.csproj" />
   </Folder>
 </Solution>

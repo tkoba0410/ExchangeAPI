@@ -11,6 +11,16 @@ internal static class BitflyerStaticExchangeInfoLoader
 
     public static BitflyerStaticExchangeInfo Load() => Cache.Value;
 
-    private static BitflyerStaticExchangeInfo LoadInternal() =>
-        StaticJsonLoader.Load<BitflyerStaticExchangeInfo>(ResourceName);
+    private static BitflyerStaticExchangeInfo LoadInternal()
+    {
+        var info = StaticJsonLoader.Load<BitflyerStaticExchangeInfo>(ResourceName);
+        return new BitflyerStaticExchangeInfo
+        {
+            Markets = BitflyerMarketCatalog.Markets,
+            Features = info.Features,
+            RateLimits = info.RateLimits,
+            Maintenance = info.Maintenance,
+            FeeSchedule = info.FeeSchedule
+        };
+    }
 }

@@ -18,7 +18,6 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
-using MarketsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetMarketsRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.GetMarketsResponse>;
 using TradingCommissionCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.GetTradingCommissionRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.GetTradingCommissionResponse>;
 using HealthCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetHealthRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.GetHealthResponse>;
 using BoardStateCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Requests.GetBoardStateRequest, ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos.GetBoardStateResponse>;
@@ -29,7 +28,6 @@ namespace ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public
 /// </summary>
 public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 {
-    private readonly Func<CancellationToken, Task<MarketsCall>>? _getMarkets;
     private readonly Func<Symbol, CancellationToken, Task<TradingCommissionCall>>? _getTradingCommission;
     private readonly Func<ProductCode, CancellationToken, Task<HealthCall>>? _getHealth;
     private readonly Func<ProductCode, CancellationToken, Task<BoardStateCall>>? _getBoardState;
@@ -39,7 +37,6 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
     internal BitflyerExchangeInfoApi(NormalizedPublicApi normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _getMarkets = normalized.GetMarketsCallAsync;
         _getHealth = normalized.GetHealthCallAsync;
         _getBoardState = normalized.GetBoardStateCallAsync;
     }
@@ -47,7 +44,6 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
     internal BitflyerExchangeInfoApi(INormalizedApi normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _getMarkets = normalized.GetMarketsCallAsync;
         _getTradingCommission = normalized.GetTradingCommissionCallAsync;
         _getHealth = normalized.GetHealthCallAsync;
         _getBoardState = normalized.GetBoardStateCallAsync;
@@ -172,16 +168,15 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
 
     private async Task<BitflyerDynamicExchangeInfo?> GetDynamicInfoAsync(CancellationToken cancellationToken)
     {
-        if (_getMarkets is null) return null;
-
-        var marketsCall = await _getMarkets(cancellationToken).ConfigureAwait(false);
-        if (marketsCall.Result is CallResult<GetMarketsResponse>.Err)
-        {
-            return null;
-        }
-
-        var markets = ((CallResult<GetMarketsResponse>.Ok)marketsCall.Result).Response.Items.Select(static x => x.Value);
-        var marketInfos = markets.Select(MapDynamicMarket).ToList();
+        var marketInfos = BitflyerMarketCatalog.Markets
+            .Select(static market => new BitflyerDynamicMarketInfo
+            {
+                ProductCode = market.ProductCode,
+                Symbol = market.Symbol,
+                Type = market.Type,
+                IsSupported = market.IsSupported
+            })
+            .ToList();
 
         if (_getTradingCommission is not null)
         {
@@ -189,9 +184,9 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         }
 
         BitflyerDynamicMaintenance? maintenance = null;
-        if (marketInfos.Count > 0 && (_getHealth is not null || _getBoardState is not null))
+        if (_getHealth is not null || _getBoardState is not null)
         {
-            var productCode = ProductCode.ParseNormalized(marketInfos[0].ProductCode);
+            var productCode = ProductCode.ParseOrThrow(BitflyerMarketCatalog.DefaultBoardProductCode);
             maintenance = await GetMaintenanceAsync(productCode, cancellationToken).ConfigureAwait(false);
         }
 
@@ -199,21 +194,6 @@ public sealed class BitflyerExchangeInfoApi : IExchangeInfoProvider
         {
             Markets = marketInfos,
             Maintenance = maintenance
-        };
-    }
-
-    private static BitflyerDynamicMarketInfo MapDynamicMarket(MarketNormalized market)
-    {
-        var productCodeText = market.ProductCode.Value;
-        var symbol = productCodeText.Contains('_', StringComparison.Ordinal)
-            ? productCodeText.Replace('_', '/')
-            : productCodeText;
-
-        return new BitflyerDynamicMarketInfo
-        {
-            ProductCode = productCodeText,
-            Symbol = symbol,
-            Type = market.Alias is null ? "Spot" : "Spot"
         };
     }
 

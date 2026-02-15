@@ -185,17 +185,17 @@ TopSpec および inventory に記載された事実に従う。
 - 監視・CallMeta で使う Layer/Component 語彙は正本を一元化し、直書きを禁止する（MUST NOT）。
 - 認証キー名・仕様 typo・raw lexicon は取引所固有定数として取引所配下に閉じ込めなければならない（MUST）。
 
-## 9. Stage9-1: ExchangeInfo（概念）廃止規約（Normative）
+## 9. Stage9-1: ExecutionContext 塊依存 廃止規約（Normative）
 
-本章は Stage9-1 の設計拘束を定義する。ここでの「ExchangeInfo（概念）」は、
-型名そのものではなく **Facade が ExecutionContext の塊（ExchangeInfo / AccountInfo 相当）に依存する構造** を指す。
-本規約は、取引所仕様メタ情報としての ExchangeInfo（ドメイン/サブシステム）の存否や配置を規定しない。
+本章は Stage9-1 の設計拘束を定義する。ここでの対象は、
+**Facade が ExecutionContext の塊（AccountInfo 相当を含む）に依存する構造**である。
+本規約は、取引所仕様メタ情報の存否や配置を規定しない。
 Facade の公開入力境界（引数・必須依存）に関する拘束のみを規定する。
 
 ### 9.1 廃止対象の定義
 
-- 廃止対象は「`ExchangeInfo` という型名」ではなく、「ExecutionContext の塊依存構造」である（MUST）。
-- Facade が ExchangeInfo / AccountInfo を丸ごと受け取る構造を禁止する（MUST NOT）。
+- 廃止対象は「型名」ではなく、「ExecutionContext の塊依存構造」である（MUST）。
+- Facade が AccountInfo 相当の塊を丸ごと受け取る構造を禁止する（MUST NOT）。
 
 ### 9.2 Facade 入力規約
 

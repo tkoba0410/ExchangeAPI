@@ -14,7 +14,7 @@
 4. Raw は inventory の `EndpointId` と 1:1 で `*CallAsync` を持ち、Wire 経由実行を強制する。  
 5. Normalized は `NormalizedPublicApi / NormalizedPrivateApi` の2分割を標準とし、NotSupported は `Internal/NotSupported` に統一する。  
 6. Adapter は Contracts 入口責務に限定し、`ApiCallMapper` を必ず通して `component` と `errorKind` の比較可能性を担保する。  
-7. `component` 命名は `<Exchange>.<Domain>.<Operation>` を標準とし、Domain 語彙（MarketData/Trading/Account/History/ExchangeInfo）を固定する。  
+7. `component` 命名は `<Exchange>.<Domain>.<Operation>` を標準とし、Domain 語彙（MarketData/Trading/Account/History）を固定する。  
 8. 同一 Contracts endpoint は、Adapter 内部境界で Request DTO を保持し、下流直前でのみ primitive 分解を許容する。  
 9. 片側のみ存在する endpoint は仕様差として許容するが、inventory で「なぜ片側のみか」を1文で説明可能にしておく。  
 10. endpoint 追加時は `Wire -> Raw -> Normalized -> Adapter` の4層に同じ `EndpointId` トレースを残す。  
@@ -77,7 +77,7 @@
 4. `WireRequestAssertions`・Inventory整合テスト・ApiNamingテストの3点セットがあるか。  
 5. `Adapter/Public` 入口は Request DTO を受け、primitive 分解は下流直前に限定されているか。  
 6. `Normalized/Internal/NotSupported` が存在し、NotSupported 応答生成が集中管理されているか。  
-7. `Operations` の Domain 語彙（MarketData/Trading/Account/History/ExchangeInfo）が一致しているか。  
+7. `Operations` の Domain 語彙（MarketData/Trading/Account/History）が一致しているか。  
 8. `component` が `<Exchange>.<Domain>.<Operation>` 形式か。  
 9. `ApiCallMapperTests` で `CallErrorKind -> ExchangeErrorCategory` 対応を検証しているか。  
 10. 仕様差による非対称は inventory かレビュー文書に理由（1文）を残しているか。

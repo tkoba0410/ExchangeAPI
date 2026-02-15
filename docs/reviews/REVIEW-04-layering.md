@@ -17,7 +17,7 @@
 7. **Adapter層**は Facade契約（Contracts）への最終写像とオーケストレーションのみを担当する。
 8. **Adapter層**は `Normalized.Public/Private.Api` と `Contracts` のみを境界依存とし、`Normalized.Internal.*` を直接参照しない。
 9. **PublicClient** は「Facade entry point」に限定し、実処理オーケストレーションは `*MarketApi` 等の専用クラスに委譲する。
-10. **MarketResolver** は Common境界（ExchangeInfo resolver）で共通化し、実装差は ExchangeInfo Provider 側に閉じ込める。
+10. **MarketResolver** は Common境界で共通化し、実装差は取引所モジュール内部へ閉じ込める。
 11. `CallMeta` 構築/例外→Call変換は共通ユーティリティに集約し、各取引所で同一アルゴリズムを重複実装しない。
 12. 依存方向は常に `Adapter -> Normalized -> Raw -> Wire` の単方向とし、逆方向参照は禁止。
 13. ただし composition root（`ApiBundle`/`ClientFactory`）での生成時依存は例外許容し、実処理ロジックでの逆参照は禁止。
@@ -43,13 +43,13 @@
 - Severity: P1
 
 - Issue: `Call`写像ユーティリティがExchange単位で重複し、Common境界が曖昧。
-- Evidence: 修正前は取引所ごとに `ApiCallMapperBase` 相当実装が重複していた。現在は `src/Exchanges/Common/Application/ExchangeInfo/Adapter/Internal/AdapterCallMapper.cs` に集約され、`src/Exchanges/Bitflyer/Adapter/Internal/ApiCallMapper.cs` / `src/Exchanges/Bittrade/Adapter/Internal/ApiCallMapper.cs` / `src/Exchanges/Common/Application/ExchangeInfo/Adapter/Internal/ExchangeInfoCallMapper.cs` から委譲される構成。
+- Evidence: 修正前は取引所ごとに `ApiCallMapperBase` 相当実装が重複していた。現在は `src/Exchanges/Common/Application/Adapter/Internal/AdapterCallMapper.cs` に集約され、`src/Exchanges/Bitflyer/Adapter/Internal/ApiCallMapper.cs` / `src/Exchanges/Bittrade/Adapter/Internal/ApiCallMapper.cs` から委譲される構成。
 - Why it matters: エラー変換・meta構築方針の微差が将来発生し、取引所ごとの挙動差（監視/障害解析の非対称）を招く。
 - Proposed rule: `Call<TReq,TOk>` 生成テンプレート（FromCall/MapCall/FromException）をCommonへ一本化し、Exchange固有差分はフック関数で注入する。
 - Severity: P2
 
 - Issue: 市場解決エラー組み立て（`MarketResolutionError` / `SymbolNotSupported`）が各実装クラスに重複している。
-- Evidence: 修正前は `src/Exchanges/Bitflyer/Adapter/Public/Api/PublicClient.cs` / `src/Exchanges/Bitflyer/Adapter/Private/Api/ExchangeClient.cs` / `src/Exchanges/Bittrade/Adapter/Public/Api/MarketApi.cs` に同型ヘルパー。修正後は `src/Exchanges/Common/Application/ExchangeInfo/Adapter/Internal/MarketResolutionCallMapper.cs` に集約。
+- Evidence: 修正前は `src/Exchanges/Bitflyer/Adapter/Public/Api/PublicClient.cs` / `src/Exchanges/Bitflyer/Adapter/Private/Api/ExchangeClient.cs` / `src/Exchanges/Bittrade/Adapter/Public/Api/MarketApi.cs` に同型ヘルパー。修正後は `src/Exchanges/Common/Application/Adapter/Internal/MarketResolutionCallMapper.cs` に集約。
 - Why it matters: 例外分類や `CallMeta` 仕様の変更時に二重修正が必要になり、片側のみ修正の事故が起こりやすい。
 - Proposed rule: resolver起因エラー変換は Common.Adapter ヘルパーへ寄せ、取引所側は operation名だけを渡す。
 - Severity: P2
@@ -66,7 +66,7 @@
 - Raw DTO定義・JSON decode仕様・Wire endpoint定義（Path/Query/HTTP method）。
 - Normalizedの交換所仕様吸収ロジック（status判定、symbol/period変換、型変換）。
 - Adapter最終マッピングの交換所固有差分（Contracts DTOへの個別整形）。
-- ExchangeInfoの静的データ（json）と動的差分取得実装。
+- MarketCatalog の静的定義と resolver 実装。
 
 ---
 
@@ -79,5 +79,5 @@
 - `PublicClient = entrypoint only` に統一し、bitFlyer 側へ `src/Exchanges/Bitflyer/Adapter/Public/Api/MarketApi.cs` を新設。
 - Adapter の `Normalized.Internal.*` 直接参照は除去済み（例外なし）。
 - Normalized の `Wire.Constants` 直接参照を除去（`rg -n "Wire\\.(Constants|Internal)" src/Exchanges/Bitflyer/Normalized src/Exchanges/Bittrade/Normalized` で 0 件）。
-- `Call` 写像を `src/Exchanges/Common/Application/ExchangeInfo/Adapter/Internal/AdapterCallMapper.cs` に共通化。
-- resolver起因エラー変換を `src/Exchanges/Common/Application/ExchangeInfo/Adapter/Internal/MarketResolutionCallMapper.cs` に共通化。
+- `Call` 写像を `src/Exchanges/Common/Application/Adapter/Internal/AdapterCallMapper.cs` に共通化。
+- resolver起因エラー変換を `src/Exchanges/Common/Application/Adapter/Internal/MarketResolutionCallMapper.cs` に共通化。

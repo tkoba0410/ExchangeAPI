@@ -55,7 +55,6 @@
 
 | ContractScope | ContractApiId        | ContractMethod                | RequestType                 | ResponseType                   | PresentIn | BitflyerEndpointId   | BittradeEndpointId | MappingStatus |
 | ------------- | -------------------- | ----------------------------- | --------------------------- | ------------------------------ | --------- | -------------------- | ------------------ | ------------ |
-| public        | ExchangeInfo         | GetExchangeInfoAsync          | ExchangeInfoRequest         | ExchangeInfoResponse           | Contracts | Internal             | None               |              |
 | public        | Ticker               | GetTickerAsync                | TickerRequest               | TickerResponse                 | Contracts | GetTicker            | GetDetailMerged    |              |
 | public        | Board                | GetBoardAsync                 | BoardRequest                | BoardResponse                  | Contracts | GetBoard             | GetDepth           |              |
 | public        | ExecutionsPublic     | GetExecutionsPublicAsync      | ExecutionsPublicRequest     | ExecutionsPublicResponse       | Contracts | GetExecutionsPublic  | GetTrade           |              |

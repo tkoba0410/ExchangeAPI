@@ -71,7 +71,7 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 
 ### 6.1 例外
 
-- `Internal` / `Composite`（例: `ExchangeInfo`）は endpoint 直結の対象外とする。
+- `Internal` / `Composite`（例: `MarketCatalog`）は endpoint 直結の対象外とする。
 - 例外を採用する場合は、`docs/exceptions.md` に以下を記録する。
   - 対象 API
   - 非直結とする理由

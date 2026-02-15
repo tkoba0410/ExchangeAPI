@@ -51,7 +51,7 @@
 - [ ] 命名の例外を許容する場合、理由が EndpointId 由来などで説明可能
 - [ ] 仕様起因の例外は `docs/exceptions.md` に記録する
 - [ ] `Exchanges/<Exchange>/Composition` の公開型は取引所プレフィックス付き（例: `BitflyerFactory`）
-- [ ] `Exchanges/<Exchange>/Application`（`Application/ExchangeInfo` を含む）の公開型は取引所プレフィックス付き（例: `BitflyerExchangeInfoService`）
+- [ ] `Exchanges/<Exchange>/Application` の公開型は取引所プレフィックス付き
 - [ ] 取引所プレフィックスを排除した結果、型衝突が起きる場合は意味名で回避している（例: `ExchangeSide`, `ExchangeSymbol`）
 - [ ] 衝突回避のために取引所名プレフィックスへ戻す前に、役割語での解決を検討している
 - [ ] 衝突回避の意味名が優先順 `Contract -> Exchange -> Normalized -> Raw -> Wire` に従っている

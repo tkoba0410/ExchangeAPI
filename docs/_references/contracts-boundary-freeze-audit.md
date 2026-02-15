@@ -17,7 +17,6 @@ Scope:
 | `IPublicApi` | `GetBoardAsync(BoardRequest, CancellationToken)` | None | - |
 | `IPublicApi` | `GetExecutionsPublicAsync(ExecutionsPublicRequest, CancellationToken)` | None | - |
 | `IPublicApi` | `GetCandlesticksAsync(CandlesticksRequest, CancellationToken)` | None | - |
-| `IPublicApi` | `GetExchangeInfoAsync(ExchangeInfoRequest, CancellationToken)` | None | - |
 
 ### `src/Contracts/Facade/Interfaces/IPrivateApi.cs`
 

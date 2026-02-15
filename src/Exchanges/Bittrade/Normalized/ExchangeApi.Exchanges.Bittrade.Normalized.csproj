@@ -16,17 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Application\ExchangeInfo\Static\**\*.cs" Link="ExchangeInfo/Static/%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\Application\ExchangeInfo\Dynamic\**\*.cs" Link="ExchangeInfo/Dynamic/%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\Application\ExchangeInfo\Compose\**\*.cs" Link="ExchangeInfo/Compose/%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\..\Common\Application\ExchangeInfo\Static\**\*.cs" Link="Common/ExchangeInfo/Static/%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\..\Common\Application\ExchangeInfo\Compose\**\*.cs" Link="Common/ExchangeInfo/Compose/%(RecursiveDir)%(Filename)%(Extension)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="..\Application\ExchangeInfo\Static\bittrade-exchange-info.json"
-                      Link="ExchangeInfo/Static/bittrade-exchange-info.json"
-                      LogicalName="ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Static.bittrade-exchange-info.json" />
+    <Compile Include="..\Application\MarketCatalog\**\*.cs" Link="MarketCatalog/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

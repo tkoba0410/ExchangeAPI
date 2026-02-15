@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Static;
+namespace ExchangeApi.Exchanges.Bitflyer.Application.MarketCatalog;
 
 internal static class BitflyerMarketCatalog
 {
@@ -29,7 +28,7 @@ internal static class BitflyerMarketCatalog
 
     public static string DefaultBoardProductCode => BtcJpyProductCode;
 
-    public static IReadOnlyList<BitflyerStaticMarketInfo> Markets { get; } =
+    public static IReadOnlyList<MarketCatalogEntry> Markets { get; } =
         new[]
         {
             CreateSpot(BtcJpySymbol, BtcJpyProductCode),
@@ -43,15 +42,11 @@ internal static class BitflyerMarketCatalog
             CreateMarket(FxBtcJpySymbol, FxBtcJpyProductCode, Fx),
         };
 
-    private static BitflyerStaticMarketInfo CreateSpot(string symbol, string productCode) =>
+    private static MarketCatalogEntry CreateSpot(string symbol, string productCode) =>
         CreateMarket(symbol, productCode, Spot);
 
-    private static BitflyerStaticMarketInfo CreateMarket(string symbol, string productCode, string type) =>
-        new()
-        {
-            Symbol = symbol,
-            ProductCode = productCode,
-            Type = type,
-            IsSupported = true
-        };
+    private static MarketCatalogEntry CreateMarket(string symbol, string productCode, string type) =>
+        new(symbol, productCode, type);
+
+    internal sealed record MarketCatalogEntry(string Symbol, string ProductCode, string Type);
 }

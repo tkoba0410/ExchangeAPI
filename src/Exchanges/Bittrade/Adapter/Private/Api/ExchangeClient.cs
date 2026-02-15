@@ -3,11 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Transport.Protocol;
@@ -22,7 +19,6 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
     private readonly PrivateApi _privateApi;
-    private readonly BittradeExchangeInfoApi _exchangeInfoApi;
 
     // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
     public IPublicApi? Public => this;
@@ -43,17 +39,14 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 
         _marketApi = new MarketApi(components.Public, components.Markets);
         _privateApi = new PrivateApi(components.Private);
-        _exchangeInfoApi = components.ExchangeInfo;
     }
 
     internal ExchangeClient(
         MarketApi marketApi,
-        PrivateApi privateApi,
-        BittradeExchangeInfoApi exchangeInfoApi)
+        PrivateApi privateApi)
     {
         _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
-        _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
     }
 
     internal ExchangeClient(BittradeClientComponents components, AccountId accountId)
@@ -67,15 +60,13 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 
         _marketApi = new MarketApi(components.Public, components.Markets);
         _privateApi = new PrivateApi(components.Private);
-        _exchangeInfoApi = components.ExchangeInfo;
     }
 
     internal ExchangeClient(
         MarketApi marketApi,
         PrivateApi privateApi,
-        BittradeExchangeInfoApi exchangeInfoApi,
         IRestClient restClient)
-        : this(marketApi, privateApi, exchangeInfoApi) { }
+        : this(marketApi, privateApi) { }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         TickerRequest request,
@@ -96,12 +87,6 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(request, cancellationToken);
-
-    // ExchangeInfo
-    public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
-        ExchangeInfoRequest request,
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoAsync(request, cancellationToken);
 
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         BalanceRequest request,

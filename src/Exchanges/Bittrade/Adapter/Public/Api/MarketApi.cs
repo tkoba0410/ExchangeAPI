@@ -16,7 +16,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Constants;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 

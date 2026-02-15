@@ -16,7 +16,7 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using OrderRequest = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.OrderRequest;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
 using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 

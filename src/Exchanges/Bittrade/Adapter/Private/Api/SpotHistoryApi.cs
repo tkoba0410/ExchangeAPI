@@ -10,7 +10,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;

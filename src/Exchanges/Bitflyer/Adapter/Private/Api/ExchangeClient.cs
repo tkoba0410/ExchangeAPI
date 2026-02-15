@@ -4,12 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
-using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Primitives.CallCommon;
@@ -24,7 +22,6 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
     private readonly PrivateApi _privateApi;
-    private readonly BitflyerExchangeInfoApi _exchangeInfoApi;
     // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
     public IPublicApi? Public => this;
     public IPrivateApi? Private => this;
@@ -39,7 +36,6 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         if (credentials is null) throw new ArgumentNullException(nameof(credentials));
 
         var client = ClientFactory.Create(credentials, options, httpClient, transportOverride);
-        _exchangeInfoApi = client._exchangeInfoApi;
         _marketApi = client._marketApi;
         _privateApi = client._privateApi;
     }
@@ -49,19 +45,16 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         object? rawBundle = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _exchangeInfoApi = new BitflyerExchangeInfoApi(normalized);
         _marketApi = new MarketApi(normalized, new BitflyerMarketCatalogResolver());
         _privateApi = new PrivateApi(normalized);
     }
 
     internal ExchangeClient(
         INormalizedApi normalized,
-        IExchangeMarketResolver markets,
-        BitflyerExchangeInfoApi exchangeInfoApi)
+        IExchangeMarketResolver markets)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         if (markets is null) throw new ArgumentNullException(nameof(markets));
-        _exchangeInfoApi = exchangeInfoApi ?? throw new ArgumentNullException(nameof(exchangeInfoApi));
         _marketApi = new MarketApi(normalized, markets);
         _privateApi = new PrivateApi(normalized);
     }
@@ -70,7 +63,7 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
         var components = BitflyerClientComponents.FromRestClient(restClient);
-        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
+        return new ExchangeClient(components.Normalized, components.Markets);
     }
 
     // Market
@@ -93,12 +86,6 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(request, cancellationToken);
-
-    // ExchangeInfo
-    public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
-        ExchangeInfoRequest request,
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoAsync(request, cancellationToken);
 
     // Trading
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(

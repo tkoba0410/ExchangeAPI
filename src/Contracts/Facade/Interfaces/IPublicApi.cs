@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
@@ -8,7 +7,7 @@ using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Contracts.Facade.Interfaces;
 
 /// <summary>
-/// Public API (no signature). Market data + exchange info.
+/// Public API (no signature). Market data only.
 /// </summary>
 public interface IPublicApi
 {
@@ -28,7 +27,4 @@ public interface IPublicApi
         CandlesticksRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<ExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoAsync(
-        ExchangeInfoRequest request,
-        CancellationToken cancellationToken = default);
 }

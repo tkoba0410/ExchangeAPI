@@ -18,8 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Application\ExchangeInfo\Adapter\**\*.cs" Link="ExchangeInfo/Adapter/%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\..\Common\Application\ExchangeInfo\Adapter\**\*.cs" Link="Common/ExchangeInfo/Adapter/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\Common\Application\Adapter\**\*.cs" Link="Common/Adapter/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

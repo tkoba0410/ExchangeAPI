@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
@@ -21,7 +17,6 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 public sealed class PublicClient : IPublicApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
-    private readonly BittradeExchangeInfoApi _exchangeInfoApi;
 
     public IPublicApi? Public => this;
     public IPrivateApi? Private => null;
@@ -31,24 +26,21 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
         if (options is null) throw new ArgumentNullException(nameof(options));
         var components = BittradeClientBootstrap.CreatePublicComponents(options);
         _marketApi = new MarketApi(components.Public, components.Markets);
-        _exchangeInfoApi = components.ExchangeInfo;
     }
 
     public PublicClient(IRestClient restClient)
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
 
-        // 公開APIのみ: market/exchangeInfo 取得に限定し、Trading/Account/History は提供しない。
+        // 公開APIのみ: market 取得に限定し、Trading/Account/History は提供しない。
         var components = BittradeClientComponents.FromRestClient(restClient, accountId: null);
         _marketApi = new MarketApi(components.Public, components.Markets);
-        _exchangeInfoApi = components.ExchangeInfo;
     }
 
     internal PublicClient(BittradeClientComponents components)
     {
         if (components is null) throw new ArgumentNullException(nameof(components));
         _marketApi = new MarketApi(components.Public, components.Markets);
-        _exchangeInfoApi = components.ExchangeInfo;
     }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
@@ -70,11 +62,6 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
         CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(request, cancellationToken);
-
-    public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
-        ExchangeInfoRequest request,
-        CancellationToken cancellationToken = default) =>
-        _exchangeInfoApi.GetExchangeInfoAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

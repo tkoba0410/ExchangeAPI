@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Static;
+using ExchangeApi.Exchanges.Bittrade.Application.MarketCatalog;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
@@ -87,7 +87,7 @@ internal sealed class BittradeMarketCatalogResolver : IExchangeMarketResolver
     private static CallMeta CreateMeta() =>
         new(
             Layer: CallMetaVocabulary.Layer.Contracts,
-            Component: CallMetaVocabulary.Component.ExchangeInfoMarketResolver,
+            Component: CallMetaVocabulary.Component.MarketCatalogResolver,
             EndpointId: CallMeta.InternalEndpointId,
             Tags: null,
             Children: null);

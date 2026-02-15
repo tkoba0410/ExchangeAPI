@@ -18,13 +18,13 @@ internal static class TestClientFactory
     public static ExchangeClient Create(BitflyerClientComponents components)
     {
         if (components is null) throw new ArgumentNullException(nameof(components));
-        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
+        return new ExchangeClient(components.Normalized, components.Markets);
     }
 
     public static ExchangeClient Create(IRestClient restClient)
     {
         var components = BitflyerClientComponents.FromRestClient(restClient);
-        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
+        return new ExchangeClient(components.Normalized, components.Markets);
     }
 
     public static ExchangeClient CreateWithTransport(
@@ -47,6 +47,6 @@ internal static class TestClientFactory
             errorClassifier: errorClassifier ?? ErrorClassifier.Instance);
 
         var components = BitflyerClientComponents.FromRestClient(restClient);
-        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
+        return new ExchangeClient(components.Normalized, components.Markets);
     }
 }

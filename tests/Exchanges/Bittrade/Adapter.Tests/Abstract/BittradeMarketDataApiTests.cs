@@ -2,19 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Facade.Interfaces;
+using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Wire.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
-using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
@@ -140,7 +137,7 @@ public class MarketApiTests
         var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost/") };
         var transport = new HttpTransport(client, disposeHttpClient: true);
         var restClient = new RestClient(client.BaseAddress!, transport);
-        var markets = CreateResolver(new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("btcjpy"), MarketType.ParseOrThrow("Spot")));
+        var markets = CreateResolver();
         var wireTransport = new ExchangeApi.Transport.Wire.WireTransport(restClient);
         var wire = new WireCallExecutor(wireTransport);
         var raw = new ExchangeApi.Exchanges.Bittrade.Raw.Api.RawApi(wire);
@@ -148,31 +145,8 @@ public class MarketApiTests
         return new MarketApi(normalizedMarketData, markets);
     }
 
-    private static IExchangeMarketResolver CreateResolver(params ExchangeMarketInfo[] markets) =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(markets, null, null, null)));
-
-    private sealed class StubExchangeInfoApi : IExchangeInfoProvider
-    {
-        private readonly ExchangeInfoDto _info;
-
-        public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
-
-        public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
-            ExchangeInfoRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            var meta = CallMeta.CreateInternal("Contracts", "StubExchangeInfoApi");
-            var call = new Call<ExchangeInfoRequest, ExchangeInfoDto>(
-                Id: CallId.New(),
-                StartedAt: DateTimeOffset.UtcNow,
-                Duration: TimeSpan.Zero,
-                Request: new ExchangeInfoRequest(),
-                Result: new CallResult<ExchangeInfoDto>.Ok(_info),
-                Meta: meta);
-            return Task.FromResult(call);
-        }
-
-    }
+    private static IExchangeMarketResolver CreateResolver() =>
+        new BittradeMarketCatalogResolver();
 
     private sealed class StubHandler : HttpMessageHandler
     {

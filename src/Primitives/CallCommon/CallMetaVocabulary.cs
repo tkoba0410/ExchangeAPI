@@ -14,9 +14,8 @@ public static class CallMetaVocabulary
 
     public static class Component
     {
-        public const string ExchangeInfoMarketResolver = "ExchangeInfoMarketResolver";
+        public const string MarketCatalogResolver = "MarketCatalogResolver";
         public const string NormalizedMarketResolver = "NormalizedMarketResolver";
-        public const string JsonExchangeInfo = "JsonExchangeInfo";
         public const string WireSendRawAsync = "Wire.SendRawAsync";
     }
 }

@@ -21,7 +21,7 @@ public static class ClientFactory
 
     /// <summary>
     /// Public API のみを利用する軽量クライアントを作成する。
-    /// 署名を行わず、マーケット/ExchangeInfo 取得に限定する。
+    /// 署名を行わず、マーケット取得に限定する。
     /// </summary>
     public static PublicClient CreatePublic(
         ClientOptions options,
@@ -52,7 +52,7 @@ public static class ClientFactory
             errorClassifier: errorClassifier);
 
         var components = BitflyerClientComponents.FromRestClient(restClient);
-        return new PublicClient(components.Normalized, components.ExchangeInfo);
+        return new PublicClient(components.Normalized);
     }
 
     /// <summary>
@@ -114,7 +114,7 @@ public static class ClientFactory
             errorClassifier: errorClassifier);
 
         var components = BitflyerClientComponents.FromRestClient(restClient);
-        return new ExchangeClient(components.Normalized, components.Markets, components.ExchangeInfo);
+        return new ExchangeClient(components.Normalized, components.Markets);
     }
 
     /// <summary>

@@ -10,7 +10,7 @@ using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Primitives.CallCommon;

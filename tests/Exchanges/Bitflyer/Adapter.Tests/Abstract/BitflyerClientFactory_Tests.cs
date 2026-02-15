@@ -14,7 +14,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
             PolicyOptions = new HttpPolicyOptions { RequestsPerSecond = 10 }
         };
 
-        var client = ClientFactory.Create("key-1", "secret-1", options);
+        var client = ClientFactory.Create(new ClientCredentials("key-1", "secret-1"), options);
 
         Assert.NotNull(client);
     }

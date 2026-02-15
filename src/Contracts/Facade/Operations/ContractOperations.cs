@@ -28,11 +28,6 @@ public static class ContractOperations
         public const string GetTradingCommission = "Account.GetTradingCommission";
     }
 
-    public static class ExchangeInfo
-    {
-        public const string GetExchangeInfo = "ExchangeInfo.GetExchangeInfo";
-    }
-
     public static class History
     {
         public const string GetOrders = "History.GetOrders";

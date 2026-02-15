@@ -2,16 +2,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ContractsRequests = ExchangeApi.Contracts.Facade.Requests;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
 using Xunit;
@@ -68,28 +66,5 @@ public sealed class ErrorEnrichTests
     }
 
     private static IExchangeMarketResolver CreateResolver() =>
-        new ExchangeInfoMarketResolver(new StubExchangeInfoApi(new ExchangeInfoDto(
-            new[] { new ExchangeMarketInfo(Symbol.ParseOrThrow("BTC/JPY"), ProductCode.ParseOrThrow("btcjpy"), MarketType.ParseOrThrow("Spot")) },
-            null,
-            null,
-            null)));
-
-    private sealed class StubExchangeInfoApi : IExchangeInfoProvider
-    {
-        private readonly ExchangeInfoDto _info;
-
-        public StubExchangeInfoApi(ExchangeInfoDto info) => _info = info;
-
-        public Task<Call<ContractsRequests.ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
-            ContractsRequests.ExchangeInfoRequest request,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(new Call<ContractsRequests.ExchangeInfoRequest, ExchangeInfoDto>(
-                CallId.New(),
-                DateTimeOffset.UtcNow,
-                TimeSpan.Zero,
-                new ContractsRequests.ExchangeInfoRequest(),
-                new CallResult<ExchangeInfoDto>.Ok(_info),
-                CallMeta.CreateInternal("Contracts", "StubExchangeInfo")));
-
-    }
+        new BittradeMarketCatalogResolver();
 }

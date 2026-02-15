@@ -36,8 +36,4 @@ public static class PublicApiExtensions
         CancellationToken cancellationToken = default) =>
         api.GetCandlesticksAsync(new CandlesticksRequest(symbol, period, size), cancellationToken);
 
-    public static Task<Call<ExchangeInfoRequest, ExchangeInfoResponse>> GetExchangeInfoAsync(
-        this IPublicApi api,
-        CancellationToken cancellationToken = default) =>
-        api.GetExchangeInfoAsync(new ExchangeInfoRequest(), cancellationToken);
 }

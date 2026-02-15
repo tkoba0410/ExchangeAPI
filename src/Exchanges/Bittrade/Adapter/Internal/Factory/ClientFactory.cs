@@ -1,6 +1,5 @@
 using System;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -32,13 +31,7 @@ public static class ClientFactory
         IRestClientLogger? logger = null) =>
         CreatePublicClient(new ClientOptions { Observer = observer, Logger = logger });
 
-    public static BittradeExchangeInfoApi CreateExchangeInfo()
-    {
-        var components = BittradeClientBootstrap.CreatePublicComponents(new ClientOptions());
-        return components.ExchangeInfo;
-    }
-
-    internal static (MarketApi Market, PrivateApi Private, BittradeExchangeInfoApi ExchangeInfo) CreatePrivate(
+    internal static (MarketApi Market, PrivateApi Private) CreatePrivate(
         string accessKey,
         string secretKey,
         AccountId accountId)
@@ -58,7 +51,7 @@ public static class ClientFactory
         }
 
         var privateApi = new PrivateApi(components.Private);
-        return (new MarketApi(components.Public, components.Markets), privateApi, components.ExchangeInfo);
+        return (new MarketApi(components.Public, components.Markets), privateApi);
     }
 
     public static ExchangeClient Create(

@@ -3,7 +3,7 @@ using System.Net;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.Errors;
 
-namespace ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
+namespace ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
 
 internal static class AdapterCallMapper
 {

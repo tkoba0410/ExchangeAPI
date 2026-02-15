@@ -13,6 +13,7 @@ Exchange 拡張や機能拡張ではなく、構造の整理と保証体系の�
 ### 9-1 ExchangeInfo（概念）の廃止
 
 ExecutionContext の塊としての ExchangeInfo 依存を解消する。
+ここでの「ExchangeInfo（概念）」は型名ではなく、Facade の ExecutionContext 塊依存構造を指す（定義は governance を正本とする）。
 
 規約の正本は `docs/governance.md` の
 「9. Stage9-1: ExchangeInfo（概念）廃止規約（Normative）」とする。
@@ -20,7 +21,7 @@ ExecutionContext の塊としての ExchangeInfo 依存を解消する。
 * Facade は薄い入力（ClientOptions + 必要最小限の Credentials）で呼び出せる状態にする
 * 取引所差分は部品（Signer / Canonicalizer / EndpointCatalog 等）として Core に残す
 * 複数アカウント管理・環境選択・secrets 管理は Core から分離する
-* Facade が ExecutionContext の塊（ExchangeInfo / AccountInfo 相当）を受け取る構造は禁止する
+* Facade が ExecutionContext の塊（ExchangeInfo / AccountInfo 相当）を受け取る構造は規約で禁止する
 
 ---
 

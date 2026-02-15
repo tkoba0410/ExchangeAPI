@@ -189,6 +189,8 @@ TopSpec および inventory に記載された事実に従う。
 
 本章は Stage9-1 の設計拘束を定義する。ここでの「ExchangeInfo（概念）」は、
 型名そのものではなく **Facade が ExecutionContext の塊（ExchangeInfo / AccountInfo 相当）に依存する構造** を指す。
+本規約は、取引所仕様メタ情報としての ExchangeInfo（ドメイン/サブシステム）の存否や配置を規定しない。
+Facade の公開入力境界（引数・必須依存）に関する拘束のみを規定する。
 
 ### 9.1 廃止対象の定義
 
@@ -197,6 +199,7 @@ TopSpec および inventory に記載された事実に従う。
 
 ### 9.2 Facade 入力規約
 
+- 本章の Facade は、ライブラリ外部から呼び出される最上位の Client/API 境界を指す（SHOULD）。
 - Facade は `ClientOptions` を必須入力としなければならない（MUST）。
 - Facade が認証を必要とする場合、依存してよい情報は `Credentials` に限定する（MUST）。
 - ExecutionContext の塊を、Facade の引数または必須依存として導入してはならない（MUST NOT）。

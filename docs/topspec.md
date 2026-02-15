@@ -196,49 +196,23 @@ src/Exchanges/<Exchange>/Normalized/
 
 ---
 
-#### 3.3.2 ExchangeInfo の Application 配置（MUST）
+#### 3.3.2 MarketCatalog の Application 配置（MUST）
 
-ExchangeInfo は「取引所仕様メタ情報」の統合・解決を担う
-**複合写像（オーケストレーション）**である。
-そのため、ExchangeInfo は Application 層として扱う。
+MarketCatalog は「取引所仕様メタ情報（市場定義）」を保持する
+**取引所モジュール内部の部品**として扱う。
 
-* ExchangeInfo の DTO は **独自定義**とするが、**Contracts と同構成**を必須とする。
-  * 独自 DTO は **Contracts と同構成 + 追加情報**を許容する（例: `Local` 拡張）。
-  * Contracts への変換では **追加情報を落とす**（欠落ではなく境界）。
-* ExchangeInfo は **Static + Dynamic の合成**で構成する。
-  * Static: 仕様・固定値・手動更新が必要な情報（市場一覧、手数料テーブル等）
-  * Dynamic: API から取得可能な状態・制約（稼働状態、手数料率、最小数量等）
-  * Compose: Static をベースに Dynamic で上書き・拡張する（市場の増減を許可）
-* ExchangeInfo の **Contracts への適合は Application/ExchangeInfo 配下の Adapter で行う**。
-  * 変換元は **Local（独自）DTO** を正とし、Contracts へ写像する。
-* ExchangeInfo は **Normalized への依存を許容**し、API Adapter への依存を禁止する。
-  * Dynamic 取得のために Normalized API を呼び出してよい。
-* ExchangeInfo は **共通サブシステム**を持てる。
-  * 共通化対象（例）: CallMapper / MarketResolver / Compose Merge / Static JSON Loader
-  * 共通サブシステムの配置は `src/Exchanges/Common/Application/ExchangeInfo/` を基準とする。
+* MarketCatalog は Application 層配下に配置してよい。
+* MarketCatalog は Facade 公開境界へ露出させない（MUST）。
+* 取引所差分（resolver / signer / canonicalizer / endpoint catalog 等）は
+  外部から塊注入せず、取引所モジュール内部で構成する（MUST）。
 * 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Application/ExchangeInfo/
-  Public/
-  Private/
-  Internal/
-```
-
-* 取引所横断で共通化する場合は次を追加してよい。
-
-```
-src/Exchanges/Common/Application/ExchangeInfo/
-  Adapter/
-  Compose/
-  Static/
+src/Exchanges/<Exchange>/Application/MarketCatalog/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Application.ExchangeInfo.*`
-  * `ExchangeApi.Exchanges.Common.Application.ExchangeInfo.*`
-
-* 詳細な合成規則・マッピングは `_references/exchangeinfo.md` に記載する（非正本）。
+  * `ExchangeApi.Exchanges.<Exchange>.Application.MarketCatalog.*`
 
 ---
 
@@ -285,18 +259,16 @@ src/Exchanges/<Exchange>/Adapter/
 * Adapter は **Contracts の I/F・DTO を実装するための変換層**である。
 * Adapter は取引所固有の endpoint を公開しない（取引所固有 endpoint は Normalized まで）。
 * 変換は「Normalized（取引所内正規化）→ Contracts（取引所横断）」の一方向とする。
-  * 本項は **API 系統の Adapter**に適用する。ExchangeInfo 系統は 3.3.2 の規定に従う。
 
 ---
 
-#### 3.4.3 Adapter と ExchangeInfo の関係（MUST）
+#### 3.4.3 Adapter と MarketCatalog の関係（MUST）
 
-ExchangeInfo は Application 系統であり、Contracts への適合は
-`Application/ExchangeInfo` 配下で完結させる。
-API 系統の Adapter とは **役割分離**して扱う。
+API 系統の Adapter は `IExchangeMarketResolver` 経由で市場解決を行う。
+resolver 実装差分は取引所モジュール内部に閉じ込める。
 
 * API 系統の Adapter は `src/Exchanges/<Exchange>/Adapter/` に置く。
-* ExchangeInfo の Adapter は `src/Exchanges/<Exchange>/Application/ExchangeInfo/` 配下に置く。
+* MarketCatalog は `src/Exchanges/<Exchange>/Application/MarketCatalog/` に置く。
 
 ---
 
@@ -553,8 +525,8 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * 取引所層（Wire / Raw / Normalized / Adapter）は、型名から取引所プレフィックスを排除する（MUST）。
 * 取引所層の Composition は、公開型名に取引所プレフィックスを付与する（MUST）。
   例: `BitflyerFactory`, `BitflyerFactoryOptions`
-* 取引所層の Application（`Application/ExchangeInfo` を含む）は、公開型名に取引所プレフィックスを付与する（MUST）。
-  例: `BitflyerExchangeInfoService`, `BitflyerExchangeInfoSnapshot`
+* 取引所層の Application は、公開型名に取引所プレフィックスを付与する（MUST）。
+  例: `BitflyerMarketCatalogService`
 * ただし、同一コンパイル単位で型衝突または曖昧参照が生じる場合は、衝突回避のための意味名を付与すること（MUST）。
   例: `ExchangeSide`, `ExchangeSymbol`
 * 衝突回避の意味名は次の優先順で選択する（MUST）。

@@ -198,7 +198,7 @@ TopSpec および inventory に記載された事実に従う。
 ### 9.2 Facade 入力規約
 
 - Facade は `ClientOptions` を必須入力としなければならない（MUST）。
-- Private / Trading 呼び出し時のみ、署名に必要な最小情報として `Credentials` を渡す（MUST）。
+- Facade が認証を必要とする場合、依存してよい情報は `Credentials` に限定する（MUST）。
 - ExecutionContext の塊を、Facade の引数または必須依存として導入してはならない（MUST NOT）。
 
 ### 9.3 ClientOptions の責務境界
@@ -215,6 +215,7 @@ TopSpec および inventory に記載された事実に従う。
 
 - 取引所差分（`Signer` / `Canonicalizer` / `EndpointCatalog` 等）は Core 側に残してよい（MAY）。
 - ただし差分部品を「ExecutionContext の塊」として外部から注入してはならない（MUST NOT）。
+- 差分部品は Facade の内部実装、または取引所モジュール内部に閉じなければならない（SHOULD）。
 
 ### 9.6 Core の責務外（明示）
 

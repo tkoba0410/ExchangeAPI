@@ -7,8 +7,8 @@ using ExchangeApi.Contracts.Common.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Application.ExchangeInfo.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Primitives.CallCommon;
@@ -42,7 +42,7 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         _exchangeInfoApi = exchangeInfo ?? throw new ArgumentNullException(nameof(exchangeInfo));
-        _marketApi = new MarketApi(normalized, new ExchangeInfoMarketResolver(_exchangeInfoApi));
+        _marketApi = new MarketApi(normalized, new BitflyerMarketCatalogResolver());
     }
 
     public Task<Call<TickerRequest, CommonTicker>> GetTickerAsync(

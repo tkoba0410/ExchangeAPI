@@ -2,14 +2,13 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Internal.Operations;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Compose;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Static;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
+using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Internal.Operations;
+using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Static;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
+using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
@@ -18,7 +17,7 @@ using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
 namespace ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 
 /// <summary>
-/// Bittrade の ExchangeInfo API 実装（/v1/common/symbols を使用）。
+/// Bittrade の ExchangeInfo API 実装。
 /// </summary>
 public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
 {
@@ -27,7 +26,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         _ = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
-    public async Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
+    public Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
         ExchangeInfoRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -36,29 +35,30 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         try
         {
             var staticInfo = BittradeStaticExchangeInfoLoader.Load();
-            var composed = BittradeExchangeInfoComposer.Compose(staticInfo, dynamic: null);
-            var response = MapExchangeInfo(composed);
+            var response = MapExchangeInfo(staticInfo);
             var meta = new CallMeta(
                 Layer: CallMetaVocabulary.Layer.Contracts,
                 Component: BittradeExchangeInfoOperations.GetExchangeInfo,
                 EndpointId: CallMeta.InternalEndpointId,
                 Tags: null,
                 Children: null);
-            return new Call<ExchangeInfoRequest, ExchangeInfoDto>(
+            var call = new Call<ExchangeInfoRequest, ExchangeInfoDto>(
                 Id: CallId.New(),
                 StartedAt: startedAt,
                 Duration: DateTimeOffset.UtcNow - startedAt,
                 Request: request,
                 Result: new CallResult<ExchangeInfoDto>.Ok(response),
                 Meta: meta);
+            return Task.FromResult(call);
         }
         catch (Exception ex)
         {
-            return ExchangeInfoCallMapper.FromException<ExchangeInfoRequest, ExchangeInfoDto>(
+            var call = ExchangeInfoCallMapper.FromException<ExchangeInfoRequest, ExchangeInfoDto>(
                 request,
                 startedAt,
                 BittradeExchangeInfoOperations.GetExchangeInfo,
                 ex);
+            return Task.FromResult(call);
         }
     }
 

@@ -7,7 +7,6 @@ using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Raw.Api;
 using ExchangeApi.Exchanges.Bittrade.Wire.Internal;
-using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Wire;
@@ -46,7 +45,7 @@ internal sealed class BittradeClientComponents
         {
             var publicApi = new NormalizedPublicApi(raw);
             var exchangeInfo = new BittradeExchangeInfoApi(publicApi);
-            var markets = new ExchangeInfoMarketResolver(exchangeInfo);
+            var markets = new BittradeMarketCatalogResolver();
             return new BittradeClientComponents(publicApi, privateApi: null, exchangeInfo, markets);
         }
 
@@ -55,14 +54,12 @@ internal sealed class BittradeClientComponents
             raw,
             publicApi =>
             {
-                var exchangeInfoApi = new BittradeExchangeInfoApi(publicApi);
-                var exchangeMarkets = new ExchangeInfoMarketResolver(exchangeInfoApi);
-                return new NormalizedMarketResolver(exchangeMarkets);
+                return new NormalizedMarketResolver(new BittradeMarketCatalogResolver());
             },
             normalizedAccountId);
 
         var exchangeInfoFull = new BittradeExchangeInfoApi(normalizedComponents.Public);
-        var marketsFull = new ExchangeInfoMarketResolver(exchangeInfoFull);
+        var marketsFull = new BittradeMarketCatalogResolver();
         return new BittradeClientComponents(normalizedComponents.Public, normalizedComponents.Private, exchangeInfoFull, marketsFull);
     }
 }

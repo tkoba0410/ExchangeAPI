@@ -11,6 +11,15 @@ internal static class BittradeStaticExchangeInfoLoader
 
     public static BittradeStaticExchangeInfo Load() => Cache.Value;
 
-    private static BittradeStaticExchangeInfo LoadInternal() =>
-        StaticJsonLoader.Load<BittradeStaticExchangeInfo>(ResourceName);
+    private static BittradeStaticExchangeInfo LoadInternal()
+    {
+        var info = StaticJsonLoader.Load<BittradeStaticExchangeInfo>(ResourceName);
+        return new BittradeStaticExchangeInfo
+        {
+            Markets = BittradeMarketCatalog.Markets,
+            Features = info.Features,
+            RateLimits = info.RateLimits,
+            Maintenance = info.Maintenance
+        };
+    }
 }

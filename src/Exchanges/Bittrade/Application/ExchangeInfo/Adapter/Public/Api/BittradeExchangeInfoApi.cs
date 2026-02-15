@@ -1,15 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Common.Application.ExchangeInfo.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Internal.Operations;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;
 using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Compose;
-using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Dynamic;
 using ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Static;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
@@ -17,7 +14,6 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeInfoDto = ExchangeApi.Contracts.Common.Dtos.ExchangeInfoResponse;
-using SymbolsCall = ExchangeApi.Primitives.CallCommon.Call<ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests.GetSymbolsRequest, ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos.GetSymbolsResponse>;
 
 namespace ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public.Api;
 
@@ -26,13 +22,9 @@ namespace ExchangeApi.Exchanges.Bittrade.Application.ExchangeInfo.Adapter.Public
 /// </summary>
 public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
 {
-    private readonly NormalizedPublicApi _normalized;
-    private readonly Func<CancellationToken, Task<SymbolsCall>>? _getSymbols;
-
     internal BittradeExchangeInfoApi(NormalizedPublicApi normalized)
     {
-        _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
-        _getSymbols = normalized.GetSymbolsCallAsync;
+        _ = normalized ?? throw new ArgumentNullException(nameof(normalized));
     }
 
     public async Task<Call<ExchangeInfoRequest, ExchangeInfoDto>> GetExchangeInfoAsync(
@@ -44,8 +36,7 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
         try
         {
             var staticInfo = BittradeStaticExchangeInfoLoader.Load();
-            var dynamicInfo = await GetDynamicInfoAsync(cancellationToken).ConfigureAwait(false);
-            var composed = BittradeExchangeInfoComposer.Compose(staticInfo, dynamicInfo);
+            var composed = BittradeExchangeInfoComposer.Compose(staticInfo, dynamic: null);
             var response = MapExchangeInfo(composed);
             var meta = new CallMeta(
                 Layer: CallMetaVocabulary.Layer.Contracts,
@@ -163,55 +154,4 @@ public sealed class BittradeExchangeInfoApi : IExchangeInfoProvider
 
     private static Price? ToPrice(decimal? value) =>
         value is null ? null : new Price(value.Value);
-
-    private async Task<BittradeDynamicExchangeInfo?> GetDynamicInfoAsync(CancellationToken cancellationToken)
-    {
-        if (_getSymbols is null) return null;
-
-        var symbolsCall = await _getSymbols(cancellationToken).ConfigureAwait(false);
-        if (symbolsCall.Result is CallResult<GetSymbolsResponse>.Err)
-        {
-            return null;
-        }
-
-        var symbols = ((CallResult<GetSymbolsResponse>.Ok)symbolsCall.Result).Response.Items;
-        var markets = symbols.Select(MapDynamicMarket).ToList();
-        return new BittradeDynamicExchangeInfo { Markets = markets };
-    }
-
-    private static BittradeDynamicMarketInfo MapDynamicMarket(SymbolNormalized symbol)
-    {
-        var baseCurrency = CurrencyCodeConverter.ToCurrencyString(symbol.BaseCurrency);
-        var quoteCurrency = CurrencyCodeConverter.ToCurrencyString(symbol.QuoteCurrency);
-        var displaySymbol = $"{baseCurrency.ToUpperInvariant()}/{quoteCurrency.ToUpperInvariant()}";
-        if (!ExchangeSymbol.TryParse(symbol.Symbol.Value, out var parsed))
-        {
-            throw new ArgumentException(
-                $"Bittrade symbol is invalid: '{symbol.Symbol.Value}'. Expected lowercase alphanumeric like 'btcjpy'.",
-                nameof(symbol));
-        }
-
-        var product = parsed.Value;
-        var priceIncrement = Pow10(-symbol.PricePrecision);
-        var sizeIncrement = Pow10(-symbol.AmountPrecision);
-        var minSize = symbol.MinOrderAmount;
-        var minNotional = symbol.MinOrderValue;
-        var supported = symbol.State.IsKnown && symbol.State.Known == ExchangeSymbolState.Online;
-
-        return new BittradeDynamicMarketInfo
-        {
-            Symbol = displaySymbol,
-            ProductCode = product,
-            Type = "Spot",
-            MinSize = minSize,
-            MinNotional = minNotional,
-            PriceIncrement = priceIncrement,
-            SizeIncrement = sizeIncrement,
-            IsSupported = supported,
-            StatusNote = symbol.State.ToString()
-        };
-    }
-
-    private static decimal Pow10(int power) =>
-        (decimal)Math.Pow(10, power);
 }

@@ -184,3 +184,44 @@ TopSpec および inventory に記載された事実に従う。
 - HTTP method 等の共通語彙は共通層で定義し、取引所別の文字列直書きを禁止する（MUST NOT）。
 - 監視・CallMeta で使う Layer/Component 語彙は正本を一元化し、直書きを禁止する（MUST NOT）。
 - 認証キー名・仕様 typo・raw lexicon は取引所固有定数として取引所配下に閉じ込めなければならない（MUST）。
+
+## 9. Stage9-1: ExchangeInfo（概念）廃止規約（Normative）
+
+本章は Stage9-1 の設計拘束を定義する。ここでの「ExchangeInfo（概念）」は、
+型名そのものではなく **Facade が ExecutionContext の塊（ExchangeInfo / AccountInfo 相当）に依存する構造** を指す。
+
+### 9.1 廃止対象の定義
+
+- 廃止対象は「`ExchangeInfo` という型名」ではなく、「ExecutionContext の塊依存構造」である（MUST）。
+- Facade が ExchangeInfo / AccountInfo を丸ごと受け取る構造を禁止する（MUST NOT）。
+
+### 9.2 Facade 入力規約
+
+- Facade は `ClientOptions` を必須入力としなければならない（MUST）。
+- Private / Trading 呼び出し時のみ、署名に必要な最小情報として `Credentials` を渡す（MUST）。
+- ExecutionContext の塊を、Facade の引数または必須依存として導入してはならない（MUST NOT）。
+
+### 9.3 ClientOptions の責務境界
+
+- `ClientOptions` には `BaseUrl` / `Timeout` など、公開可能な実行パラメータのみを含める（MUST）。
+- `ClientOptions` に、複数アカウント選択・secrets 読込・ガードレール等の運用設定を含めてはならない（MUST NOT）。
+
+### 9.4 Credentials の責務境界
+
+- `Credentials` は署名に必要な最小情報（`ApiKey` / `Secret` / `Passphrase` 等）のみを保持する（MUST）。
+- `Credentials` に、権限・複数アカウント管理・状態（balance 等）を含めてはならない（MUST NOT）。
+
+### 9.5 Exchange 差分の扱い
+
+- 取引所差分（`Signer` / `Canonicalizer` / `EndpointCatalog` 等）は Core 側に残してよい（MAY）。
+- ただし差分部品を「ExecutionContext の塊」として外部から注入してはならない（MUST NOT）。
+
+### 9.6 Core の責務外（明示）
+
+Core は以下を責務として持たない（MUST NOT）。
+
+- 複数アカウント管理
+- 環境選択ロジック
+- secrets 管理
+- 運用ポリシー（ガードレール）
+- state / metrics 管理

@@ -9,6 +9,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 
 /// <summary>
@@ -53,6 +54,42 @@ public static class ClientFactory
 
         var components = BitflyerClientComponents.FromRestClient(restClient);
         return new PublicClient(components.Normalized);
+    }
+
+    /// <summary>
+    /// Normalized API を直接利用するクライアントを作成する。
+    /// 署名を行わず、公開 endpoint の疎通確認に利用できる。
+    /// </summary>
+    public static INormalizedApi CreateNormalized(
+        ClientOptions options,
+        HttpClient? httpClient = null,
+        IHttpTransport? transportOverride = null)
+    {
+        if (options is null) throw new ArgumentNullException(nameof(options));
+        var baseUri = options.BaseUri ?? BitflyerApiBaseUri;
+        var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = baseUri };
+        if (options.Timeout is { } timeout)
+        {
+            http.Timeout = timeout;
+        }
+        IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
+
+        var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
+            options.PolicyOptions ?? HttpPolicyDefaults.Create());
+        var logger = options.Logger;
+        var observer = options.Observer;
+        var errorClassifier = options.ErrorClassifier ?? ErrorClassifier.Instance;
+
+        IRestClient restClient = new RestClient(
+            baseUri,
+            baseTransport,
+            policy: policy,
+            logger: logger,
+            observer: observer,
+            errorClassifier: errorClassifier);
+
+        var components = BitflyerClientComponents.FromRestClient(restClient);
+        return components.Normalized;
     }
 
     /// <summary>

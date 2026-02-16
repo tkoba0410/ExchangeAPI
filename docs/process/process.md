@@ -59,7 +59,7 @@
 ### 2.5 Reference（参考）
 - `docs/reference/navigation.md`：用語ナビゲーション（非規範）
 - `docs/reference/utilities.md`：補助的な運用メモ（非規範）
-- `docs/process/stage9.md`：Stage9 完了判定チェック（非規範）
+- `stage9.md`：Stage9 完了判定チェック（非規範）
 - `docs/archive/document-plan.md`：履歴資料（Archive）
 - `docs/reference/reviews/*`：レビュー記録
 - `docs/archive/references/*`：過去検討・監査ログ（Informative）

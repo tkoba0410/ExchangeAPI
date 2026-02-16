@@ -85,7 +85,7 @@
 
 * `docs/process.md`
 * `docs/public-surface.md`
-* `docs/stages/stage9.md`
+* `stage9/stage9.md`
 * `docs/document-plan.md`
 * `docs/utilities.md`
 

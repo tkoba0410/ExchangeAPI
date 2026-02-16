@@ -20,7 +20,7 @@ Contracts は取引所非依存の公開安定 API であり、
 取引所固有の Raw / Normalized Request / Response / DTO を公開面に露出しない。
 取引所スコープ、混線防止、例外の扱いは TopSpec の該当規定（例: 3.4.4）を正とする。
 
-取引所実装間の「統一/例外」の運用方針は `docs/_references/exchange-parity-policy.md` を参照する。
+取引所実装間の「統一/例外」の運用方針は `docs/_archive/references/exchange-parity-policy.md` を参照する。
 Contracts API 署名の正本は `src/Contracts/Facade/Interfaces/*` とする。
 
 本書の目的は次の 2 点に限定される。

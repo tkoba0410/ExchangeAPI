@@ -231,7 +231,7 @@ docs/
   process.md
 
   _archive/
-    _references/
+    references/
       documentation-design-notes.md
 ```
 
@@ -440,7 +440,7 @@ docs/
 
 ---
 
-### 10.11 `docs/_archive/_references/documentation-design-notes.md`
+### 10.11 `docs/_archive/references/documentation-design-notes.md`
 
 **区分**: 既存（移設済・凍結）
 

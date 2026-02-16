@@ -1,8 +1,8 @@
-# _references
+# references
 
 このディレクトリは **Informative（参考）専用** です。
 
-- audit/notes 系の過去記録は `docs/_archive/_references/` へ移動しています。
+- audit/notes 系の過去記録は `docs/_archive/references/` へ移動しています。
 
 - 設計・実装の最終判断には使用しません。
 

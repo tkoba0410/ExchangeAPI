@@ -338,7 +338,7 @@ docs/
 
 #### Phase C：収束
 
-* 旧 TopSpec / boundaries / guide を `docs/_references/` 配下へ移動する
+* 旧 TopSpec / boundaries / guide を `docs/_archive/references/` 配下へ移動する
 * `index.md` を新文書構成前提で再生成する
 * Normative 文書は TopSpec / Contracts の 2 本のみとする
 

@@ -62,7 +62,7 @@
 - `docs/stages/stage9.md`：Stage9 完了判定チェック（非規範）
 - `docs/document-plan.md`：履歴資料（Archive）
 - `docs/reviews/*`：レビュー記録
-- `docs/_references/*`：過去検討・監査ログ（Informative）
+- `docs/_archive/references/*`：過去検討・監査ログ（Informative）
 
 ---
 
@@ -191,8 +191,8 @@ governance に従って裁定を行う。
 
 ## 8. Legacy（参考文書）
 
-- 旧文書は互換・参照のため `docs/_references/` に保管する。
-- `_references` 配下は **Normative ではない**。
+- 旧文書は互換・参照のため `docs/_archive/references/` に保管する。
+- `references` 配下は **Normative ではない**。
 # 注意
 
 本書は、本リポジトリにおける **運用・手順・進め方** に関する参考文書である。

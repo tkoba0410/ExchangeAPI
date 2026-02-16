@@ -29,7 +29,7 @@
 3. **Contracts（docs/contracts/contracts.md）**（公開 API 契約の正本）
 4. 本書（governance.md）（設計判断の裁定ルール）
 5. inventory 文書（事実の一覧 / Fact）
-6. _references 配下の文書（参考資料）
+6. references 配下の文書（参考資料）
 
 上位の正本と矛盾する記述は、下位文書に存在しても**無効**とする。
 

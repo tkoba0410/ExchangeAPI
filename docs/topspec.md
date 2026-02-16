@@ -575,7 +575,7 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * 取引所固有の差異は、8.1 の構成要素と表現方法を前提とした取捨選択として扱う。
 * 差異は inventory に事実として記載する
 
-※ 取引所実装間で「統一する/しない」を運用として管理する場合は、参考として `docs/_references/exchange-parity-policy.md` を用いる。
+※ 取引所実装間で「統一する/しない」を運用として管理する場合は、参考として `docs/_archive/references/exchange-parity-policy.md` を用いる。
 
 ### 8.9 CallMeta.EndpointId の運用（MUST）
 

@@ -84,6 +84,7 @@
 以下は設計正本ではなく、**運用・作業・計画のための補助資料**です。
 
 * `docs/process.md`
+* `docs/public-surface.md`
 * `docs/stages/stage9.md`
 * `docs/document-plan.md`
 * `docs/utilities.md`
@@ -94,7 +95,7 @@
 
 ## 6. 参考資料（Reference）
 
-* `docs/_references/`
+* `docs/_archive/references/`
 
 過去の設計検討、実装ガイド、対応関係メモなどを格納します。
 本ディレクトリ配下の文書は **いかなる場合も規範ではありません**。

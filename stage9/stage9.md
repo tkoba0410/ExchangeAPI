@@ -29,7 +29,7 @@ Stage9 は、すでに固まりつつある設計の骨格を
 * 破壊的変更は必ず記録する
 * 文書階層構造を固定する
 
-詳細は `docs/review-framework.md` を正本とする。
+詳細は `stage9/review-framework.md` を正本とする。
 
 ---
 
@@ -49,7 +49,7 @@ Stage9 は、すでに固まりつつある設計の骨格を
 
 Stage9 完了とは、以下を満たす状態を指す。
 
-* `docs/review-framework.md` が確立している
+* `stage9/review-framework.md` が確立している
 * レビュー運用（L1 / L2）が実際に機能している
 * 構造安定化対象に関する Must 指摘が存在しない
 * 破壊的変更が発生した場合、変更記録が残されている

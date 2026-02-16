@@ -15,8 +15,8 @@
 # Checklist
 
 * [ ] 文書の配置が適切である（正本 / 参照 / 記録の混線がない）
-* [ ] review-framework.md と矛盾していない
-* [ ] Stage文書に永続ルールを書いていない
+* [ ] stage9/review-framework.md と矛盾していない
+* [ ] ルールは stage9/review-framework.md に集約され、テンプレ/changes は派生資産に留まっている
 * [ ] READMEに判断や規約を書き込んでいない（導線のみ）
 * [ ] 用語が既存文書と一致している
 * [ ] 重複文書が発生していない

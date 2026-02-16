@@ -26,7 +26,7 @@
 # Checklist
 
 * [ ] Breaking Change の有無が明示されている
-* [ ] 必要な場合、docs/changes に記録が追加されている
+* [ ] 必要な場合、stage9/changes に記録が追加されている
 * [ ] 影響範囲が明確である
 * [ ] 移行方法が具体的である
 * [ ] Bot 影響が明示されている（該当時）
@@ -51,7 +51,7 @@
 
 # レビュー文書の位置づけ
 
-- 本書（review-framework.md）はレビュー体系の正本である
-- docs/reviews/ 配下は具体レビュー資産（成果物）である
-- docs/reviews/templates/ は L2 / L3 用の雛形である
-- docs/changes/ は Breaking Change の記録場所である
+- 本書（stage9/review-framework.md）はレビュー体系案（草案）の正本（暫定SSOT）である
+- stage9/reviews/ 配下は具体レビュー資産（成果物）である
+- stage9/reviews/templates/ は L2 / L3 用の雛形である
+- stage9/changes/ は Breaking Change の記録場所である

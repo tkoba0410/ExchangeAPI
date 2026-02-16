@@ -67,4 +67,4 @@ Botリポジトリへの影響（あれば）
 
 ---
 
-本ポリシーは review-framework.md の Change 軸に基づく。
+本ポリシーは `stage9/review-framework.md` の Change 軸に基づく。

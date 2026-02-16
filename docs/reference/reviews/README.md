@@ -32,5 +32,5 @@
 
 ## Normative 反映先（採用ルール）
 
-- REVIEW-01〜06 で採用された運用ルールは [`../governance.md`](../governance.md) の「8. REVIEW 採用ルール（Normative）」を正本とする。
+- REVIEW-01〜06 で採用された運用ルールは [`../../normative/governance.md`](../../normative/governance.md) の「8. REVIEW 採用ルール（Normative）」を正本とする。
 - 各 REVIEW は引き続き検討過程・比較観点を残す **Reference（非規範）** として扱う。

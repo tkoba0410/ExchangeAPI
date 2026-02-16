@@ -2,7 +2,7 @@
 
 > 本文書は **inventory（事実一覧）** です。
 > Contracts API の実装対応状況と取引所 EndpointId との対応関係を記録します。
-> 仕様判断や運用判断の根拠は `docs/contracts/contracts.md` / `docs/governance.md` / `docs/process.md` を参照してください。
+> 仕様判断や運用判断の根拠は `docs/normative/contracts/contracts.md` / `docs/normative/governance.md` / `docs/process/process.md` を参照してください。
 
 
 ## Scope
@@ -29,7 +29,7 @@
 * Contracts API 署名参照: `src/Contracts/Facade/Interfaces/*`
 * 利便呼び出し（非規範）: `src/Contracts/Facade/Extensions/*`
 * 取引所 endpoint inventory: `docs/inventory/endpoints-*.md`
-* Contracts 契約条文参照: `docs/contracts/contracts.md`
+* Contracts 契約条文参照: `docs/normative/contracts/contracts.md`
 
 ※ 本書は「どの Contracts API がどの取引所 EndpointId に対応しているか」の対応一覧を記録する。
 　署名定義や命名ルールの説明は、参照先文書に集約されている。

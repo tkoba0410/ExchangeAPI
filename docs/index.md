@@ -8,9 +8,9 @@
 
 以下は、それぞれの領域における正本である。
 
-* **技術仕様・設計規範**：`docs/topspec.md`
-* **公開 API 契約**：`docs/contracts/contracts.md`
-* **設計判断の裁定**：`docs/governance.md`
+* **技術仕様・設計規範**：`docs/normative/topspec.md`
+* **公開 API 契約**：`docs/normative/contracts/contracts.md`
+* **設計判断の裁定**：`docs/normative/governance.md`
 
 以降に配置されている文書は、上記正本を基準とした
 補助文書（Informative / Reference）である。
@@ -26,14 +26,14 @@
 ### TopSpec（技術正本）
 
 > 補足: レジリエンス契約（429 / Timeout / Partial Failure）は
-> `docs/contracts/resilience.md` を正本とする。
+> `docs/normative/contracts/resilience.md` を正本とする。
 
-* **`docs/topspec.md`**
+* **`docs/normative/topspec.md`**
   本ライブラリの層構造、責務分離、API サーフェス規則、Call 抽象、公開範囲を定義する唯一の技術規範。
 
 ### Governance（裁定ルール）
 
-* **`docs/governance.md`**
+* **`docs/normative/governance.md`**
   技術仕様を再定義せず、設計判断の衝突時における優先順位・禁止事項・差異の閉じ込め先を定める裁定文書。
 
 ---
@@ -42,13 +42,13 @@
 
 以下の文書は、**外部利用者に公開される安定 API（Contract 層）**の語彙と契約を定義します。
 
-* `docs/contracts/overview.md`
+* `docs/normative/contracts/overview.md`
   利用者向け契約の概要。公開安定面は Contract 層のみであることを説明。
 
-* `docs/contracts/contracts.md`
+* `docs/normative/contracts/contracts.md`
   共通 DTO、Capability I/F、契約上の意味論を定義。
 
-* `docs/contracts/resilience.md`
+* `docs/normative/contracts/resilience.md`
   429 / Timeout / Partial Failure の公開契約を定義。
 
 ※ Raw / Normalized / Wire 層は内部実装または高度利用向けであり、公開安定 API ではありません。
@@ -72,10 +72,10 @@
 
 ## 4. Exceptions（逸脱台帳 / 決定記録）
 
-* `docs/exceptions.md`
+* `docs/process/exceptions.md`
   原則からの逸脱理由・影響範囲・将来対応を記録する台帳です。
   本章の「Exceptions」は設計上の逸脱記録を指し、runtime エラー分類は扱いません。
-  runtime のエラー契約は `docs/contracts/resilience.md` を参照してください。
+  runtime のエラー契約は `docs/normative/contracts/resilience.md` を参照してください。
 
 ---
 
@@ -83,11 +83,11 @@
 
 以下は設計正本ではなく、**運用・作業・計画のための補助資料**です。
 
-* `docs/process.md`
-* `docs/public-surface.md`
-* `stage9/stage9.md`
-* `docs/document-plan.md`
-* `docs/utilities.md`
+* `docs/process/process.md`
+* `docs/process/public-surface.md`
+* `docs/process/stage9.md`
+* `docs/archive/document-plan.md`
+* `docs/reference/utilities.md`
 
 これらの文書は TopSpec / Contracts / Governance に反しない範囲でのみ有効です。
 
@@ -95,7 +95,7 @@
 
 ## 6. 参考資料（Reference）
 
-* `docs/_archive/references/`
+* `docs/archive/references/`
 
 過去の設計検討、実装ガイド、対応関係メモなどを格納します。
 本ディレクトリ配下の文書は **いかなる場合も規範ではありません**。

@@ -7,7 +7,7 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 
 - 本書は命名規則の集約先とする。
 - TopSpec と矛盾する場合は TopSpec を優先する。
-- チェックリスト (`docs/checklists/*.md`) は本書を参照する。
+- チェックリスト (`docs/reference/checklists/*.md`) は本書を参照する。
 
 ## 2. EndpointId 運用
 
@@ -23,7 +23,7 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - `EndpointIds` の正本は `src/Exchanges/<Exchange>/Vocabulary/EndpointIds.cs` とする。
 - `Wire` / `Raw` / `Normalized` / `Adapter` 配下に `EndpointIds.cs` を重複定義してはならない。
 - 各層は `Vocabulary.EndpointIds` を参照のみ行う。
-- 例外を設ける場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
+- 例外を設ける場合は `docs/process/exceptions.md` に理由・影響範囲・解消条件を記録する。
 
 ## 3. 未実装 API の記録
 
@@ -64,15 +64,15 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - 要素 DTO 名は `Response` を付けず `*Item` を用いる。
 - `Nullable` は型名・プロパティ名に含めない（nullable は型注釈で表す）。
 - API 境界での `using XxxResponse = ...` による alias は段階的に廃止し、最終的に endpoint 直結の実体 DTO に統一する。
-- 後方互換性維持や段階移行で単一 `Item` ラップを残す場合は、`docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
+- 後方互換性維持や段階移行で単一 `Item` ラップを残す場合は、`docs/process/exceptions.md` に理由・影響範囲・解消条件を記録する。
 - `Result` は `CallResult<T>`（呼出結果コンテナ）に限定して使用する。
 - API 境界 DTO / 内部 DTO に新規 `*Result` 命名を導入してはならない。
-- 内部結果モデルは `Outcome` を優先し、やむを得ず逸脱する場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
+- 内部結果モデルは `Outcome` を優先し、やむを得ず逸脱する場合は `docs/process/exceptions.md` に理由・影響範囲・解消条件を記録する。
 
 ### 6.1 例外
 
 - `Internal` / `Composite`（例: `MarketCatalog`）は endpoint 直結の対象外とする。
-- 例外を採用する場合は、`docs/exceptions.md` に以下を記録する。
+- 例外を採用する場合は、`docs/process/exceptions.md` に以下を記録する。
   - 対象 API
   - 非直結とする理由
   - 影響範囲
@@ -80,7 +80,7 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 
 ## 7. 例外運用
 
-- 命名例外は `docs/exceptions.md` に登録する。
+- 命名例外は `docs/process/exceptions.md` に登録する。
 - 登録時は以下を必須とする。
   - 例外内容
   - 影響範囲
@@ -108,7 +108,7 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - `string` は外部 I/O 境界（HTTP/JSON, 設定入力）でのみ許可し、境界通過時に VO/enum へ変換する。
 - 変換責務は Raw -> Normalized 入口に集約し、下流層で再変換しない。
 - `DateTimeOffset` / `bool` / `CancellationToken` / コレクションは本規約の対象外とする。
-- 例外が必要な場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
+- 例外が必要な場合は `docs/process/exceptions.md` に理由・影響範囲・解消条件を記録する。
 
 ## 11. Convenience Extension の配置
 
@@ -121,7 +121,7 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - Adapter 層の標準実装は、共通テンプレート（`startedAt` 採取 / `MapCall` / `FromException`）を使用する。
 - `try/catch + AdapterCallMapper.MapCall/FromException` の直書き追加を禁止する。
 - 業務固有の例外分岐（例: market 解決失敗など）は最小範囲で許可する。
-- 逸脱する場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
+- 逸脱する場合は `docs/process/exceptions.md` に理由・影響範囲・解消条件を記録する。
 
 ## 13. Operations 語彙規約
 
@@ -129,4 +129,4 @@ TopSpec の原則を補完し、命名判断を機械的に再現可能にする
 - Adapter 実装は共通語彙を参照し、文字列リテラルの直接記述を禁止する。
 - 取引所別 `Operations.cs` は移行用ラッパに限定し、新規機能での恒久利用を禁止する。
 - 目標状態は Adapter API から `ContractOperations` 直接参照とし、移行完了後に `Operations.cs` を廃止する。
-- 逸脱する場合は `docs/exceptions.md` に理由・影響範囲・解消条件を記録する。
+- 逸脱する場合は `docs/process/exceptions.md` に理由・影響範囲・解消条件を記録する。

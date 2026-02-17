@@ -39,7 +39,9 @@
 - Error / Retry / 429 / timeout 変更: `docs/process/reviews/templates/REVIEW-RELIABILITY.md`
 - Normalized / Cross-exchange 構造変更: `docs/process/reviews/templates/REVIEW-BOUNDARY.md` と `docs/process/reviews/templates/REVIEW-CONSISTENCY.md`
 - Breaking change 含む: `docs/process/reviews/templates/REVIEW-CHANGE.md`
-- 文書構造 / SSOT 変更: `docs/process/reviews/templates/REVIEW-DOCS.md`
+- 文書構造 / SSOT 変更: `docs/process/reviews/templates/REVIEW-DOCS.md`（補助監査）
+
+※ `REVIEW-DOCS` は `review-framework` の 7品質軸とは別の補助監査であり、軸件数集計には含めない。
 
 ---
 
@@ -170,7 +172,7 @@ Must / Should / Nit の形式で、重要な順に指摘してください。
 1. 監査対象ブランチを固定する（例: `stage9` / `main`）。
 2. 監査スコープを明示する（コード + 文書、または文書のみ）。
 3. 7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
-4. 出力を `Must / Should / Nit` に統一し、`file:line` を必須化する。
+4. 出力を `Must / Should / Nit` に統一し、`file:line` を必須化する（`Docs` は補助監査として別枠）。
 5. 軸ごとの件数サマリを作成する。
 6. 最後に `最優先 Must Top10` を提示する。
 7. 例外が必要な項目は `docs/process/exceptions.md` への記録要否を明示する。
@@ -185,6 +187,7 @@ Must / Should / Nit の形式で、重要な順に指摘してください。
 実施手順:
 1. PR差分ではなく、現行ブランチの全体を監査する。
 2. 7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
+   Docs は補助監査（REVIEW-DOCS）として別枠で実施する。
 3. 各指摘は次の1行形式を使う:
    [Severity] <要約> - <file:line> - <根拠（どの規約か）>
 4. 軸ごとに Must / Should / Nit 件数を集計する。

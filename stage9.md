@@ -57,6 +57,14 @@ Stage9 完了とは、以下を満たす状態を指す。
 
 ---
 
+## 廃止条件（Sunset）
+
+Stage9 文書は初回リリース前の暫定文書である。
+`v1.0.0` リリース時に本書を `docs/archive/` へ移動し、
+以後の変更追跡は `docs/process/revision-history.md` に一本化する。
+
+---
+
 Stage9 は「完成」ではない。
 
 構造を安定化させ、

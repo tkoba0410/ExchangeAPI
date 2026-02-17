@@ -78,6 +78,8 @@
 - `docs/` 配下のリンクは相対リンクのみを使用する。
 - ルート直下に新たな設計・運用文書を追加してはならない。
 - 例外として、Stage 文書（`stage*.md`）はルート直下への配置を許可する。
+- Stage 文書（`stage*.md`）は **初回リリース前の暫定文書** とし、`v1.0.0` 到達時に `docs/archive/` へ移動する。
+- リリース後の変更追跡は `docs/process/revision-history.md` を正本とする。
 
 ---
 
@@ -111,6 +113,8 @@
   → `docs/process/exceptions.md`（差分と理由を記録）
 - PR を作成する場合：
   → 本書の「レビュー・チェックリスト」を自己確認する
+- リリースに伴う変更履歴を記録する場合：
+  → `docs/process/revision-history.md`
 
 ---
 

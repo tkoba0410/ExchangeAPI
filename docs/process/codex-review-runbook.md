@@ -100,3 +100,53 @@ Must / Should / Nit の形式で、重要な順に指摘してください。
 
 `[Severity] <要約> - <file:line> - <根拠（どの規約か）>`
 
+---
+
+## 9. codex-cli コピペ用指示
+
+以下は `codex-cli` にそのまま貼り付けて使うテンプレートである。
+
+### 9.1 標準（L1 + 必要時L2）
+
+```text
+対象: このPR差分のみ（branch: <feature-branch>, base: <base-branch>）
+出力: Must / Should / Nit（各項目に file:line 必須）
+基準: docs/process/codex-review-runbook.md と関連テンプレートに厳密準拠
+
+実施手順:
+1. まず L1 を実施する（docs/process/process.md 7.2 を基準）。
+2. 差分内容から L2 トリガを判定し、該当軸のみ追加レビューする。
+3. 例外が必要な指摘は docs/process/exceptions.md への記録要否を明示する。
+4. 形式は必ず次の1行形式を使う:
+   [Severity] <要約> - <file:line> - <根拠（どの規約か）>
+5. 最後に未解消 Must 件数を出す。
+```
+
+### 9.2 再レビュー（Mustのみ）
+
+```text
+対象: このPR差分のみ（branch: <feature-branch>, base: <base-branch>）
+出力: Must のみ（各項目に file:line 必須）
+基準: 前回レビュー結果と docs/process/codex-review-runbook.md に厳密準拠
+
+実施手順:
+1. 前回の Must 指摘が解消されたかのみ判定する。
+2. 未解消 Must だけ列挙する。
+3. 新規指摘は重大な回帰に限定する。
+4. 最後に未解消 Must 件数を出す。
+```
+
+### 9.3 軸固定（L2個別）
+
+```text
+対象: このPR差分のみ（branch: <feature-branch>, base: <base-branch>）
+出力: Must / Should / Nit（各項目に file:line 必須）
+基準: docs/process/reviews/templates/REVIEW-<AXIS>.md に厳密準拠
+例: REVIEW-CONTRACTS.md / REVIEW-SECURITY.md / REVIEW-BOUNDARY.md
+
+実施手順:
+1. 指定軸のみでレビューする。
+2. 形式は次の1行形式を使う:
+   [Severity] <要約> - <file:line> - <根拠（どの規約か）>
+3. 最後に未解消 Must 件数を出す。
+```

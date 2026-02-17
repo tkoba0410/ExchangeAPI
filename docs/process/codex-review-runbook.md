@@ -150,3 +150,58 @@ Must / Should / Nit の形式で、重要な順に指摘してください。
    [Severity] <要約> - <file:line> - <根拠（どの規約か）>
 3. 最後に未解消 Must 件数を出す。
 ```
+
+---
+
+## 10. 全体監査モード（Repository-Wide Audit）
+
+本章は PR 差分ではなく、リポジトリ全体を対象に監査する場合の運用を定義する。
+通常の `L1/L2` 運用に置き換えるものではなく、`L3` 相当の節目監査として実施する。
+
+### 10.1 実施タイミング
+
+- Stage 締め前
+- リリース前（例: `v1.0.0` 直前）
+- 大規模リファクタ後
+- 規範文書を横断的に更新した後
+
+### 10.2 手順
+
+1. 監査対象ブランチを固定する（例: `stage9` / `main`）。
+2. 監査スコープを明示する（コード + 文書、または文書のみ）。
+3. 7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
+4. 出力を `Must / Should / Nit` に統一し、`file:line` を必須化する。
+5. 軸ごとの件数サマリを作成する。
+6. 最後に `最優先 Must Top10` を提示する。
+7. 例外が必要な項目は `docs/process/exceptions.md` への記録要否を明示する。
+
+### 10.3 codex-cli / codex-web 共通テンプレート
+
+```text
+対象: リポジトリ全体（branch: <target-branch>）
+出力: Must / Should / Nit（各項目に file:line 必須）
+基準: docs/process/review-framework.md と docs/process/codex-review-runbook.md に厳密準拠
+
+実施手順:
+1. PR差分ではなく、現行ブランチの全体を監査する。
+2. 7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
+3. 各指摘は次の1行形式を使う:
+   [Severity] <要約> - <file:line> - <根拠（どの規約か）>
+4. 軸ごとに Must / Should / Nit 件数を集計する。
+5. 最後に「最優先 Must Top10」と「未解消 Must 総件数」を出す。
+6. 例外が必要な項目は docs/process/exceptions.md への記録要否を明示する。
+```
+
+### 10.4 再監査テンプレート（全体）
+
+```text
+対象: リポジトリ全体（branch: <target-branch>）
+出力: Must のみ（各項目に file:line 必須）
+基準: 前回全体監査結果と docs/process/codex-review-runbook.md に厳密準拠
+
+実施手順:
+1. 前回の Must 指摘の解消状況のみ再判定する。
+2. 未解消 Must を重大順で列挙する。
+3. 新規指摘は重大な回帰に限定する。
+4. 最後に「未解消 Must 総件数」を出す。
+```

@@ -25,6 +25,7 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
     // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
     public IPublicApi? Public => this;
     public IPrivateApi? Private => this;
+    public ICandlesticksApi? Candlesticks => null;
 
     public ExchangeClient(
         ClientOptions options,
@@ -81,11 +82,6 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
         ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetExecutionsPublicAsync(request, cancellationToken);
-
-    public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        CandlesticksRequest request,
-        CancellationToken cancellationToken = default) =>
-        _marketApi.GetCandlesticksAsync(request, cancellationToken);
 
     // Trading
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(

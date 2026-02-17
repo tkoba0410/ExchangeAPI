@@ -38,7 +38,7 @@ public sealed class ContractInventoryInterfaceConsistencyTests
                 var requestTypeName = Required(row, "RequestType");
                 var responseTypeName = Required(row, "ResponseType");
 
-                var apiInterface = ResolveApiInterface(scope);
+                var apiInterface = ResolveApiInterface(scope, methodName);
                 var method = apiInterface.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
                 Assert.True(method is not null, $"Method '{methodName}' was not found on {apiInterface.Name}.");
 
@@ -124,14 +124,31 @@ public sealed class ContractInventoryInterfaceConsistencyTests
         return trimmed.Length > 0 && trimmed.All(c => c == '-' || c == ' ');
     }
 
-    private static Type ResolveApiInterface(string scope)
+    private static Type ResolveApiInterface(string scope, string methodName)
     {
         return scope switch
         {
-            "public" => typeof(IPublicApi),
+            "public" => ResolvePublicInterface(methodName),
             "private" => typeof(IPrivateApi),
             _ => throw new InvalidOperationException($"Unknown ContractScope: '{scope}'."),
         };
+    }
+
+    private static Type ResolvePublicInterface(string methodName)
+    {
+        var publicMethod = typeof(IPublicApi).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+        if (publicMethod is not null)
+        {
+            return typeof(IPublicApi);
+        }
+
+        var capabilityMethod = typeof(ICandlesticksApi).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+        if (capabilityMethod is not null)
+        {
+            return typeof(ICandlesticksApi);
+        }
+
+        throw new InvalidOperationException($"Unknown public ContractMethod: '{methodName}'.");
     }
 
     private static Type ResolveCallType(MethodInfo method)

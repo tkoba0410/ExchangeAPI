@@ -24,7 +24,6 @@ internal sealed class MarketApi
     private static readonly string OpGetTicker = OperationComponent.WithExchange("Bitflyer", ContractOperations.MarketData.GetTicker);
     private static readonly string OpGetBoard = OperationComponent.WithExchange("Bitflyer", ContractOperations.MarketData.GetBoard);
     private static readonly string OpGetExecutions = OperationComponent.WithExchange("Bitflyer", ContractOperations.MarketData.GetExecutions);
-    private static readonly string OpGetCandlesticks = OperationComponent.WithExchange("Bitflyer", ContractOperations.MarketData.GetCandlesticks);
 
     private readonly INormalizedApi _normalized;
     private readonly IExchangeMarketResolver _markets;
@@ -128,17 +127,6 @@ internal sealed class MarketApi
                 OpGetExecutions,
                 ex))
             .ConfigureAwait(false);
-    }
-
-    public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        CandlesticksRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        return Task.FromResult(NotSupportedCall.Create<CandlesticksRequest, CandlesticksResponse>(
-            "Contracts",
-            OpGetCandlesticks,
-            request,
-            "Candlesticks"));
     }
 
     private static IReadOnlyList<ExecutionsPublicItem> ToExecutionList(

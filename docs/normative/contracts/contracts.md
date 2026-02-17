@@ -47,6 +47,9 @@ Contracts は **取引所非依存**であり、Contracts の公開型（Contrac
 - `ExchangeCode` / `ExchangeId` / `ExchangeName` 等の取引所識別子
 - 「どの取引所から取得されたか」を表すフィールド全般
 
+この禁止は、Contracts の公開型全体（`Request` / `Response` / `Error` / `Result`）に適用する（MUST）。
+`BatchError` を含むエラー DTO も例外ではない（MUST）。
+
 取引所の選択・識別・束ねは Contracts の責務ではない。
 それらは `Composition` / `Application`（利用者境界）側で完結させなければならない（MUST）。
 
@@ -92,6 +95,9 @@ NotSupported を通常制御フローとして常用してはならない（原�
 - Message:
   - "NotSupported:<feature>"
 
+未対応機能の公開契約は、`NotSupported` の返却ではなく **nullable capability の非提供**で表現する（MUST）。
+取引所差で有無が揺れる機能は、`IPublicApi` / `IPrivateApi` に混在させず、単独 capability I/F として分離してよい（MAY）。
+
 ## 6. 型の所有権と返却責務
 
 - Abstract DTO（公開契約の型）は **Contracts 層が定義元（オーナー）**である（MUST）。
@@ -107,7 +113,7 @@ Contracts の Facade API は Public / Private に分離する（MUST）。
 
 - Public/Private を MarketData / Trading / Account 等の意味分類の代替として用いてはならない（MUST NOT）。
 - 分離の目的は「認証境界の明確化」であり、Contracts の Shape / Semantics を変更してはならない（MUST NOT）。
- - 公開 API 面の分類は **Public / Private のみ**とし、意味分類語彙を公開 I/F 名称や namespace に使用してはならない（MUST NOT）。
+- ただし、取引所差で有無が揺れる機能については、事前判定可能性を満たすために単独 capability I/F（nullable）へ分離してよい（MAY）。
 
 ---
 

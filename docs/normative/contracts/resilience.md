@@ -96,10 +96,12 @@
 
 `BatchError` は少なくとも次を持つ（MUST）。
 
-- `Exchange`
 - `EndpointId`
 - `ErrorKind`
 - `Message`
+
+`BatchError` に取引所識別情報（例: `ExchangeCode` / `ExchangeId` / `ExchangeName`）を含めてはならない（MUST NOT）。
+呼び出し文脈で取引所識別が必要な場合は、Composition / Application 側で付与・管理する（MUST）。
 
 ドメイン DTO にエラー情報を混在させてはならない（MUST NOT）。
 エラーはトランザクション結果オブジェクトに保持する（MUST）。

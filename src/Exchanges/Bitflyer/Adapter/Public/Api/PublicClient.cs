@@ -23,6 +23,7 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
 
     public IPublicApi? Public => this;
     public IPrivateApi? Private => null;
+    public ICandlesticksApi? Candlesticks => null;
 
     public PublicClient(
         ClientOptions options,
@@ -54,11 +55,6 @@ public sealed class PublicClient : IPublicApi, IExchangeClient
         ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetExecutionsPublicAsync(request, cancellationToken);
-
-    public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        CandlesticksRequest request,
-        CancellationToken cancellationToken = default) =>
-        _marketApi.GetCandlesticksAsync(request, cancellationToken);
 
     // Raw access removed from public facade.
 }

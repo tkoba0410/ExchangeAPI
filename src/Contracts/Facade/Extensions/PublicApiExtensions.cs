@@ -28,12 +28,4 @@ public static class PublicApiExtensions
         CancellationToken cancellationToken = default) =>
         api.GetExecutionsPublicAsync(new ExecutionsPublicRequest(symbol), cancellationToken);
 
-    public static Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        this IPublicApi api,
-        Symbol symbol,
-        Period period,
-        int? size = null,
-        CancellationToken cancellationToken = default) =>
-        api.GetCandlesticksAsync(new CandlesticksRequest(symbol, period, size), cancellationToken);
-
 }

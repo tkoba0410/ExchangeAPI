@@ -14,12 +14,13 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// <summary>
 /// Bittrade の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class PublicClient : IPublicApi, IExchangeClient
+public sealed class PublicClient : IPublicApi, ICandlesticksApi, IExchangeClient
 {
     private readonly MarketApi _marketApi;
 
     public IPublicApi? Public => this;
     public IPrivateApi? Private => null;
+    public ICandlesticksApi? Candlesticks => this;
 
     public PublicClient(ClientOptions options)
     {

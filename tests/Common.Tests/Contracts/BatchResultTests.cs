@@ -22,7 +22,7 @@ public class BatchResultTests
     public void BatchResult_CanRepresent_FailureOnly()
     {
         var result = BatchResult<int>.Failure(
-            new BatchError("bitflyer", "Ticker", BatchErrorKind.Transient, "timeout"));
+            new BatchError("Ticker", BatchErrorKind.Transient, "timeout"));
 
         Assert.False(result.HasSuccesses);
         Assert.True(result.HasErrors);
@@ -38,7 +38,7 @@ public class BatchResultTests
             successes: new[] { 1, 2 },
             errors: new[]
             {
-                new BatchError("bittrade", "Board", BatchErrorKind.Transient, "rate limited")
+                new BatchError("Board", BatchErrorKind.Transient, "rate limited")
             });
 
         Assert.True(result.HasSuccesses);
@@ -51,8 +51,7 @@ public class BatchResultTests
     [Fact]
     public void BatchError_Validates_RequiredFields()
     {
-        Assert.Throws<ArgumentException>(() => new BatchError("", "Ticker", BatchErrorKind.Unknown, "x"));
-        Assert.Throws<ArgumentException>(() => new BatchError("bitflyer", "", BatchErrorKind.Unknown, "x"));
-        Assert.Throws<ArgumentException>(() => new BatchError("bitflyer", "Ticker", BatchErrorKind.Unknown, ""));
+        Assert.Throws<ArgumentException>(() => new BatchError("", BatchErrorKind.Unknown, "x"));
+        Assert.Throws<ArgumentException>(() => new BatchError("Ticker", BatchErrorKind.Unknown, ""));
     }
 }

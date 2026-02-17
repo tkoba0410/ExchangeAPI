@@ -58,6 +58,7 @@ Contracts の公開 API は Public / Private に分離する。
 
 * Contracts API の戻り値（`Call<TRequest, TResponse>`）および `TResponse`（ContractDTO）には、
   取引所識別情報（例：`ExchangeCode`）は含まれない。
+* `BatchError` を含むエラー DTO / 結果 DTO にも、取引所識別情報は含めない。
 * 利用者は「どの取引所か」を前提とした分岐を、Contracts API の戻り値から行ってはならない。
   - 分岐が必要な場合は、capability / 構築形態（Composition）によって **事前に** 分離・選択する。
 
@@ -112,6 +113,7 @@ Normalized/Adapter で `NotSupported` を返す通常制御を行わない。
 * 取引所によって提供されない機能が存在し得る。
 * 利用可否は Facade の capability（nullable）により **事前に判定可能でなければならない**。
 * 利用可否判定を `NotSupported` の捕捉に依存してはならない。
+* 取引所差で有無が揺れる機能は、単独 capability I/F（nullable）として分離してよい。
 
 ---
 

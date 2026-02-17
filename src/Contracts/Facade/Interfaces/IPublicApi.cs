@@ -22,9 +22,4 @@ public interface IPublicApi
     Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default);
-
-    Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
-        CandlesticksRequest request,
-        CancellationToken cancellationToken = default);
-
 }

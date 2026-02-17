@@ -5,4 +5,5 @@ public interface IExchangeClient
     // Facade capability は nullable。未対応は null でのみ表現する。
     IPublicApi? Public { get; }
     IPrivateApi? Private { get; }
+    ICandlesticksApi? Candlesticks { get; }
 }

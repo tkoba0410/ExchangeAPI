@@ -58,7 +58,7 @@
 | public        | Ticker               | GetTickerAsync                | TickerRequest               | TickerResponse                 | Contracts | GetTicker            | GetDetailMerged    |              |
 | public        | Board                | GetBoardAsync                 | BoardRequest                | BoardResponse                  | Contracts | GetBoard             | GetDepth           |              |
 | public        | ExecutionsPublic     | GetExecutionsPublicAsync      | ExecutionsPublicRequest     | ExecutionsPublicResponse       | Contracts | GetExecutionsPublic  | GetTrade           |              |
-| public        | Candlestick          | GetCandlesticksAsync          | CandlesticksRequest         | CandlesticksResponse           | Contracts | None                 | GetHistoryKline    | bitflyer: NotSupported |
+| public        | Candlestick          | GetCandlesticksAsync          | CandlesticksRequest         | CandlesticksResponse           | Contracts | None                 | GetHistoryKline    | bitflyer: capability=null |
 
 ---
 

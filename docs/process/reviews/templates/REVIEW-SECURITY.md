@@ -1,49 +1,50 @@
 # REVIEW-SECURITY
 
-本レビューは Security（安全性）軸に基づく確認を行う。
+本レビューは Security（署名 / 認証 / 秘密情報）軸に基づく確認を行う。
 
-対象: （PR番号 / 対象範囲を記載）
-
----
-
-# Scope
-
-変更対象の概要を記載。
+重大度定義は PROJECT-FATAL-DEFINITION.md を参照する。
 
 ---
 
-# Threat Focus
+## 0. 対象
 
-以下の観点を確認する。
-
-* Signer / Signature
-* Canonicalize 処理
-* 認証情報（APIキー等）の扱い
-* nonce / timestamp 処理
-* ログ出力内容
+* PR番号:
+* 変更概要:
 
 ---
 
-# Checklist
+## 1. 判定サマリ
 
-* [ ] 署名対象データの順序・形式が仕様と一致している
-* [ ] Canonicalize の整合性が保たれている
-* [ ] 秘密情報（APIキー/署名素材）がログや例外に出力されない
-* [ ] nonce / timestamp の扱いが安全
-* [ ] 認証情報が不要に長期保存されていない
-
----
-
-# Findings
-
-## Must
-
-## Should
-
-## Nit
+| 観点                | 判定 | 重大度 (F番号明示) | 備考 |
+| ----------------- | -- | ----------- | -- |
+| 署名順序整合            |    |             |    |
+| Canonicalize整合    |    |             |    |
+| secret非露出         |    |             |    |
+| nonce/timestamp安全 |    |             |    |
 
 ---
 
-# Conclusion
+## 2. 観点詳細
 
-本変更は Security 軸において重大な問題はない / 修正が必要。
+### 署名順序整合
+
+* 判定基準: 署名対象データが仕様と一致
+* 該当Fatal: F4（Security重大違反）
+
+### secret非露出
+
+* 判定基準: APIキー/署名素材がログや例外に出ない
+* 該当Fatal: F4
+
+---
+
+## 3. CI自動化候補
+
+* 署名順序テスト
+* ログ出力検査
+
+---
+
+## 4. 最終結論
+
+* OK / 要修正 / NG

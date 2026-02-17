@@ -2,56 +2,46 @@
 
 本レビューは Change（変更統治）軸に基づく確認を行う。
 
-対象: （PR番号 / 対象範囲を記載）
+重大度定義は PROJECT-FATAL-DEFINITION.md を参照する。
+Fatal判定時は F番号を明示すること。
 
 ---
 
-# Scope
+## 0. 対象
 
-変更内容の概要を記載。
-
----
-
-# Breaking Change 判定
-
-* public surface に変更があるか
-* 既存APIの挙動に変更があるか
-* 呼び出しコード修正が必要か
-* DTO構造に変更があるか
-
-該当する場合は CHANGE 記録を作成する。
+* PR番号:
+* 変更概要:
+* Public Surface影響:
 
 ---
 
-# Checklist
+## 1. 判定サマリ
 
-* [ ] Breaking Change の有無が明示されている
-* [ ] 必要な場合、docs/process に記録が追加されている
-* [ ] 影響範囲が明確である
-* [ ] 移行方法が具体的である
-* [ ] Bot 影響が明示されている（該当時）
-
----
-
-# Findings
-
-## Must
-
-## Should
-
-## Nit
+| 観点                | 判定 | 重大度 (F番号明示) | CI化可否 | 備考 |
+| ----------------- | -- | ----------- | ----- | -- |
+| Breaking Change明示 |    |             |       |    |
+| 影響範囲明確化           |    |             |       |    |
+| 移行方法提示            |    |             |       |    |
+| Bot影響記載           |    |             |       |    |
 
 ---
 
-# Conclusion
+## 2. 観点詳細
 
-本変更は Change 軸において重大な問題はない / 修正が必要。
+### Breaking Change未記録
+
+* 判定基準: public surface変更時はCHANGE記録必須
+* NG例: DTO変更だが記録なし
+* 該当Fatal: F2（SSOT逸脱）
 
 ---
 
-# レビュー文書の位置づけ
+## 3. CI自動化候補
 
-- 本書（docs/process/review-framework.md）はレビュー体系案（草案）の正本（暫定SSOT）である
-- docs/process/reviews/ 配下は具体レビュー資産（成果物）である
-- docs/process/reviews/templates/ は L2 / L3 用の雛形である
-- docs/process/ は Breaking Change の記録場所である
+* public surface diff検出
+
+---
+
+## 4. 最終結論
+
+* OK / 要修正 / NG

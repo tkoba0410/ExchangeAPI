@@ -2,48 +2,44 @@
 
 本レビューは Reliability（信頼性）軸に基づく確認を行う。
 
-対象: （PR番号 / 対象範囲を記載）
+重大度定義は PROJECT-FATAL-DEFINITION.md を参照する。
 
 ---
 
-# Scope
+## 0. 対象
 
-変更対象の概要を記載。
-
----
-
-# Failure Modes
-
-以下の観点を確認する。
-
-* 429（Rate Limit）
-* timeout
-* partial failure
-* retry
-* idempotency
+* PR番号:
+* 変更概要:
 
 ---
 
-# Checklist
+## 1. 判定サマリ
 
-* [ ] 429 / timeout / partial failure が混在していない
-* [ ] Expected / Unexpected の分類が維持されている
-* [ ] 再試行が安全である（重複実行の危険がない）
-* [ ] エラー種別が呼び出し側に予測可能
-* [ ] 診断可能な情報が残る（secret除外）
-
----
-
-# Findings
-
-## Must
-
-## Should
-
-## Nit
+| 観点          | 判定 | 重大度 (F番号明示) | 備考 |
+| ----------- | -- | ----------- | -- |
+| 429処理       |    |             |    |
+| timeout処理   |    |             |    |
+| retry安全性    |    |             |    |
+| idempotency |    |             |    |
 
 ---
 
-# Conclusion
+## 2. 観点詳細
 
-本変更は Reliability 軸において重大な問題はない / 修正が必要。
+### retry安全性
+
+* 判定基準: 再試行で重複実行の危険がない
+* NG例: POST再送で二重注文
+* 該当Fatal: F5（Reliability重大欠陥）
+
+---
+
+## 3. CI自動化候補
+
+* retryロジック単体テスト
+
+---
+
+## 4. 最終結論
+
+* OK / 要修正 / NG

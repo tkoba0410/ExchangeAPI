@@ -9,6 +9,7 @@
 以下は、それぞれの領域における正本である。
 
 * **技術仕様・設計規範**：`docs/normative/topspec.md`
+* **命名規則**：`docs/normative/naming-rules.md`
 * **公開 API 契約**：`docs/normative/contracts/contracts.md`
 * **設計判断の裁定**：`docs/normative/governance.md`
 
@@ -30,6 +31,11 @@
 
 * **`docs/normative/topspec.md`**
   本ライブラリの層構造、責務分離、API サーフェス規則、Call 抽象、公開範囲を定義する唯一の技術規範。
+
+### Naming Rules（命名規則）
+
+* **`docs/normative/naming-rules.md`**
+  命名・語彙・DTO 接尾辞などの規則を定義する補助規範。
 
 ### Governance（裁定ルール）
 
@@ -95,6 +101,7 @@
 
 ## 6. 参考資料（Reference）
 
+* `docs/reference/`
 * `docs/archive/references/`
 
 過去の設計検討、実装ガイド、対応関係メモなどを格納します。

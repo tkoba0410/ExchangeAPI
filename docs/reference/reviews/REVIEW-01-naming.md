@@ -29,7 +29,7 @@
 - Raw/Normalized/Tests の自動生成・自動検証の規則化が困難になり、命名差分レビューが都度必要になる。
 
 **対応状況**
-- 方針: `docs/naming-rules.md` に「取引所内一貫 + 取引所間差異許容」を明文化済み。
+- 方針: `docs/normative/naming-rules.md` に「取引所内一貫 + 取引所間差異許容」を明文化済み。
 - inventory: alias は `Aliases` セクションへ分離済み（主表には正規 EndpointId のみ記載）。
 - 判定: **対応済み**（運用ルール化完了）。
 
@@ -51,7 +51,7 @@
 - 「Normalized DTO には接尾辞を付けるか否か」の判断が都度発生。
 
 **対応状況**
-1. ルール: `docs/naming-rules.md` に反映済み。  
+1. ルール: `docs/normative/naming-rules.md` に反映済み。  
 2. 実装: 主要不一致は解消済み。  
 3. 判定: **方針更新済み / 実装概ね収束**。
 
@@ -102,7 +102,7 @@
 - API 境界 DTO は `...Response` に集約され、`CallResult<T>` との責務分離が明確化された。
 
 **対応状況**
-1. API 境界 DTO 直結ルールは `docs/naming-rules.md` に反映済み。  
+1. API 境界 DTO 直結ルールは `docs/normative/naming-rules.md` に反映済み。  
 2. 主要実装は `...Response` 直結へ移行済み。  
 3. 判定: **主要指摘は解消**。
 
@@ -145,7 +145,7 @@
 
 1. P0-1 EndpointId 規則分岐
    - 状態: **対応済み**
-   - 根拠: `docs/naming-rules.md` と各 inventory の `Aliases` 分離運用。
+   - 根拠: `docs/normative/naming-rules.md` と各 inventory の `Aliases` 分離運用。
 
 2. P1-1 `*Normalized` 接尾辞揺れ
    - 状態: **方針更新済み / 実装概ね収束**

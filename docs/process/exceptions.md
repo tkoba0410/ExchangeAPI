@@ -162,7 +162,7 @@ Normalized の一部 Mapper に例外ベースの旧実装が残っているが�
 新規型との命名統一時に、接尾辞の要否判断が再発する可能性がある。
 
 ### Mitigation
-新規 DTO は `docs/naming-rules.md` の「原則不使用・衝突時のみ許可」に従う。
+新規 DTO は `docs/normative/naming-rules.md` の「原則不使用・衝突時のみ許可」に従う。
 既存 DTO は API 境界直結化の修正時に順次整理する。
 
 ### Future Plan

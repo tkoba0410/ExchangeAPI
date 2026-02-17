@@ -1,7 +1,7 @@
 # 命名チェックリスト（Non-Normative）
 
 本書は命名の揺らぎを検出するためのチェックリストであり、仕様を定義しない。  
-正本は `docs/normative/topspec.md` / `docs/naming-rules.md` / `docs/normative/contracts/contracts.md` / `docs/normative/governance.md` とする。
+正本は `docs/normative/topspec.md` / `docs/normative/naming-rules.md` / `docs/normative/contracts/contracts.md` / `docs/normative/governance.md` とする。
 
 ---
 

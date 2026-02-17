@@ -28,6 +28,7 @@
 
 ### 2.1 Normative（規範）
 - `docs/normative/topspec.md`：技術仕様・設計規範の正本（層・境界・禁止事項）
+- `docs/normative/naming-rules.md`：命名・語彙・DTO 接尾辞などの補助規範
 - `docs/normative/contracts/contracts.md`：公開 API 契約の正本（Contract 層）
 - `docs/normative/contracts/resilience.md`：429 / Timeout / Partial Failure 契約の正本
 - `docs/normative/governance.md`：設計判断の裁定ルールの正本
@@ -76,6 +77,7 @@
 - `README.md` 以外の文書は、すべて `docs/` 配下に置く。
 - `docs/` 配下のリンクは相対リンクのみを使用する。
 - ルート直下に新たな設計・運用文書を追加してはならない。
+- 例外として、Stage 文書（`stage*.md`）はルート直下への配置を許可する。
 
 ---
 

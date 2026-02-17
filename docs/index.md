@@ -3,8 +3,11 @@
 ## はじめに
 
 本リポジトリの文書は、対象領域ごとに正本（Normative）を定義する。
-本リポジトリでは「正本（Normative）」「Source of Truth（SSOT）」を同義として扱う。
-ただし inventory は「事実の正本（Fact SSOT）」であり、設計規範の正本ではない。
+本リポジトリでは SSOT（Source of Truth）を「参照すべき正本」という広い意味で用いる。
+そのうち **Normative** は「拘束力（MUST / MUST NOT）を持つ正本」を指す。
+
+※ inventory は「事実の正本（Fact SSOT）」であり、設計規範（拘束力）の正本ではない。
+※ Process 配下には運用上の SSOT（例: review-framework）も存在するが、設計規範の正本ではない。
 
 以下は、それぞれの領域における正本である。
 
@@ -91,6 +94,7 @@
 
 * `docs/process/process.md`
 * `docs/process/public-surface.md`
+* `docs/process/review-framework.md`
 * `stage9.md`
 * `docs/archive/document-plan.md`
 * `docs/reference/utilities.md`

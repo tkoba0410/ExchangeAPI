@@ -181,7 +181,7 @@ governance に従って裁定を行う。
 #### C. Inventory（事実一覧）
 - [ ] 外部 API の追加/変更がある場合、`docs/inventory/endpoints-<exchange>.md` に反映されている
 - [ ] Official Reference（公式ドキュメントへの参照）が明示されている
-- [ ] inventory に `PresentIn` 列が存在し、語彙が規定通り `{Wire, Raw, Normalized, Contracts, None}` のみである
+- [ ] 取引所 endpoint inventory（`docs/inventory/endpoints-<exchange>.md`）に `PresentIn` 列が存在し、語彙が規定通り `{Wire, Raw, Normalized, Contracts, None}` のみである
 - [ ] `PresentIn` に `Raw` を含む endpoint について、Raw 層に `<EndpointId>CallAsync` が存在する
 - [ ] `PresentIn` に `Normalized` を含む endpoint について、Normalized 層に `<EndpointId>CallAsync` が存在する
 - [ ] inventory の `EndpointId` 列に alias が混入していない（alias は `Aliases` 表にのみ記載されている）

@@ -12,6 +12,7 @@ Fatal判定時は F番号を明示すること。
 * PR番号:
 * 変更概要:
 * Public Surface影響:
+* 対象層（Contracts / Application / Composition / Docs）:
 
 ---
 
@@ -31,8 +32,11 @@ Fatal判定時は F番号を明示すること。
 ### Breaking Change未記録
 
 * 判定基準: public surface変更時はCHANGE記録必須
-* NG例: DTO変更だが記録なし
+* OK条件: Public Surface変更がCHANGEに明示され、影響と移行が記録済み
+* NG条件: 破壊的変更または挙動変更が記録されていない
+* 不合格例: DTO変更だが記録なし
 * 該当Fatal: F2（SSOT逸脱）
+* 修正方針: CHANGE文書に影響範囲・移行方法・Bot影響を追記
 
 ---
 
@@ -42,6 +46,15 @@ Fatal判定時は F番号を明示すること。
 
 ---
 
-## 4. 最終結論
+## 4. 関連Normative / 判例
+
+* docs/process/CHANGE-*.md
+* docs/process/process.md（7.2）
+* docs/normative/contracts/contracts.md
+* docs/process/reviews/templates/PROJECT-FATAL-DEFINITION.md
+
+---
+
+## 5. 最終結論
 
 * OK / 要修正 / NG

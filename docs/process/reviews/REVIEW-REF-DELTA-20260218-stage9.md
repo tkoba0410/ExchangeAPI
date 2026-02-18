@@ -2,7 +2,7 @@
 
 対象: `stage9`  
 実施日: 2026-02-18  
-基準: `docs/process/reviews/templates/REVIEW-REF-DELTA.md`
+基準: `docs/archive/references/review-ref-delta-template.md`（旧テンプレ）
 
 ---
 

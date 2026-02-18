@@ -15,7 +15,7 @@ public class StructuredRestClientLoggerTests
 
         using var request = new HttpRequestMessage(
             HttpMethod.Get,
-            "https://api-cloud.bittrade.co.jp/v1/order?symbol=btc_jpy&AccessKeyId=abc123&Signature=sig-value&order_id=12345&foo=bar");
+            "https://api-cloud.bittrade.co.jp/v1/order?symbol=btc_jpy&AccessKeyId=abc123&Signature=sig-value&SignatureMethod=HmacSHA256&SignatureVersion=2&Timestamp=2026-01-01T00:00:00&order_id=12345&foo=bar");
 
         logger.LogRequest(request);
 
@@ -23,6 +23,9 @@ public class StructuredRestClientLoggerTests
         Assert.Contains("symbol=btc_jpy", line);
         Assert.Contains("AccessKeyId=***", line);
         Assert.Contains("Signature=***", line);
+        Assert.Contains("SignatureMethod=***", line);
+        Assert.Contains("SignatureVersion=***", line);
+        Assert.Contains("Timestamp=***", line);
         Assert.Contains("foo=***", line);
         Assert.Matches(".*order_id=oidp_v1_[A-Z2-7]{16}.*", line);
         Assert.DoesNotContain("abc123", line);

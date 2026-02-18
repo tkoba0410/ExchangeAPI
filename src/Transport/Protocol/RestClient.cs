@@ -39,7 +39,10 @@ namespace ExchangeApi.Transport.Protocol
             _transport = transport ?? throw new ArgumentNullException(nameof(transport));
             _requestSigner = requestSigner;
             _policy = policy ?? NoOpHttpPolicy.Instance;
-            _logger = logger ?? NoOpRestClientLogger.Instance;
+            var rawLogger = logger ?? NoOpRestClientLogger.Instance;
+            _logger = rawLogger is SanitizingRestClientLogger
+                ? rawLogger
+                : new SanitizingRestClientLogger(rawLogger);
             _observer = observer ?? NoOpRestCallObserver.Instance;
             _errorClassifier = errorClassifier;
         }

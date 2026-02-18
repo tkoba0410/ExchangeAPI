@@ -181,6 +181,7 @@ NG が Fatal の場合は F番号（F1〜F5）を必ず付与してください�
 1. 監査対象ブランチを固定する（例: `stage9` / `main`）。
 2. 監査スコープを明示する（コード + 文書、または文書のみ）。
 3. 7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
+   Security は logger 差し替え時の secret 非露出（共通サニタイズ経路）まで確認する。
 4. 出力を `OK / 要修正 / NG` に統一し、`file:line` を必須化する（`Docs` は補助監査として別枠）。
 5. 軸ごとの件数サマリ（OK / 要修正 / NG + Fatal件数）を作成する。
 6. 最後に `最優先 NG Top10（Fatal優先）` を提示する。
@@ -230,6 +231,7 @@ NG が Fatal の場合は F番号（F1〜F5）を必ず付与してください�
 2. 裁定が必要な項目を先に分離する（規範衝突 / 設計方針の分岐）。
 3. 規範変更が必要なら、実装より先に `docs/normative/*` を更新する。
 4. 規範に合わせて `src/` と関連文書（inventory/process）を修正する。
+   Security 修正では、特定 logger 依存ではなく共通サニタイズ経路で再発防止する。
 5. `L2` テンプレートで該当軸のみレビューする（例: Contracts/Change）。
 6. `NGのみ再監査` を実施し、未解消 NG / Fatal 件数を更新する。
 7. `docs/process/process.md` の 7.2 チェックリストで Merge 前最終確認を行う。

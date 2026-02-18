@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
@@ -252,6 +253,38 @@ public sealed class RestClientTests
         Assert.NotEqual(Guid.Empty, observer.LastRequestId);
     }
 
+    [Fact]
+    public async Task CustomLogger_ReceivesSanitizedSignedRequestOnError()
+    {
+        var transport = new FakeTransport
+        {
+            ResponseFactory = () => throw new HttpRequestException("boom", null, HttpStatusCode.BadGateway)
+        };
+        var logger = new CapturingLogger();
+        var signer = new SensitiveQuerySigner();
+        var rest = new RestClient(
+            new Uri("https://example.com"),
+            transport,
+            requestSigner: signer,
+            logger: logger);
+
+        await Assert.ThrowsAsync<TransportException>(() => rest.SendRawAsync("GET", "/api", query: "symbol=btc_jpy"));
+
+        Assert.NotNull(logger.LastErrorUri);
+        var query = HttpUtility.ParseQueryString(new Uri(logger.LastErrorUri!).Query);
+
+        Assert.Equal("btc_jpy", query["symbol"]);
+        Assert.Equal("***", query["AccessKeyId"]);
+        Assert.Equal("***", query["Signature"]);
+        Assert.StartsWith("oidp_v1_", query["order_id"]);
+        Assert.DoesNotContain("key123", logger.LastErrorUri!, StringComparison.Ordinal);
+        Assert.DoesNotContain("sig123", logger.LastErrorUri!, StringComparison.Ordinal);
+        Assert.DoesNotContain("12345", logger.LastErrorUri!, StringComparison.Ordinal);
+
+        Assert.Equal("***", Assert.Single(logger.LastErrorHeaders["ACCESS-KEY"]));
+        Assert.Equal("***", Assert.Single(logger.LastErrorHeaders["ACCESS-SIGN"]));
+    }
+
 
 
     private static RestClient CreateRestClient(out FakeTransport transport)
@@ -329,6 +362,48 @@ public sealed class RestClientTests
         {
             ErrorCalled = true;
             LastStatus = statusCode;
+        }
+    }
+
+    private sealed class CapturingLogger : IRestClientLogger
+    {
+        public string? LastErrorUri { get; private set; }
+        public Dictionary<string, IReadOnlyList<string>> LastErrorHeaders { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
+
+        public void LogRequest(HttpRequestMessage request) { }
+
+        public void LogResponse(HttpResponseMessage response, string content) { }
+
+        public void LogError(Exception exception, HttpRequestMessage request)
+        {
+            LastErrorUri = request.RequestUri?.ToString();
+            LastErrorHeaders = request.Headers.ToDictionary(
+                header => header.Key,
+                header => (IReadOnlyList<string>)header.Value.ToArray(),
+                StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    private sealed class SensitiveQuerySigner : IRequestSigner
+    {
+        public Task SignAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
+        {
+            if (request.RequestUri is null)
+            {
+                throw new InvalidOperationException("RequestUri is required.");
+            }
+
+            var builder = new UriBuilder(request.RequestUri);
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            query["AccessKeyId"] = "key123";
+            query["Signature"] = "sig123";
+            query["order_id"] = "12345";
+            builder.Query = query.ToString() ?? string.Empty;
+            request.RequestUri = builder.Uri;
+
+            request.Headers.TryAddWithoutValidation("ACCESS-KEY", "key123");
+            request.Headers.TryAddWithoutValidation("ACCESS-SIGN", "sig123");
+            return Task.CompletedTask;
         }
     }
 

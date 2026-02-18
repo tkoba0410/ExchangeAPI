@@ -24,6 +24,7 @@ Fatal判定時は F番号を明示すること。
 | review-framework整合 |    |             |       |    |
 | 用語統一               |    |             |       |    |
 | 重複文書               |    |             |       |    |
+| Reference非規範境界     |    |             |       |    |
 
 ---
 
@@ -65,13 +66,24 @@ Fatal判定時は F番号を明示すること。
 * 該当Fatal: F2（正本衝突がある場合）
 * 修正方針: 正本を1つに統合し、重複文書は廃止または参照化する
 
+### Reference非規範境界
+
+* 判定基準: `docs/reference/*` が非規範として運用され、規範化は Normative / Process に限定される
+* OK条件: Reference 文書が判断材料に留まり、規約本文は正本へ移管されている
+* OK条件: `docs/reference` で一過性になった文書は archive への退避方針が明示される
+* NG条件: Reference 文書に実質的な必須ルールが残置され、正本更新なしで運用される
+* NG条件: 廃止候補文書が残り続け、導線を曇らせる
+* 不合格例: 非規範文書に「必ず〜する」とだけ記載し、正本へ未反映
+* 該当Fatal: F2（非規範から正本への逆流）
+* 修正方針: 規範本文を正本へ移管し、Reference は非規範明示と参照リンクのみ残す
+
 ---
 
 ## 3. CI自動化候補
 
 * 正本リンク先の解決性検査（dead link / 相対リンク崩れ）
 * docs変更時の CHANGE / exceptions 更新漏れ検査
-* docs/reference の Non-Normative 明示検査（将来導入時）
+* docs/reference の Non-Normative 明示検査
 
 ---
 

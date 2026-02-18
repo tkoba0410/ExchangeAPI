@@ -40,7 +40,8 @@
 - Normalized / Cross-exchange 構造変更: `docs/process/reviews/templates/REVIEW-BOUNDARY.md` と `docs/process/reviews/templates/REVIEW-CONSISTENCY.md`
 - Breaking change 含む: `docs/process/reviews/templates/REVIEW-CHANGE.md`
 - 文書構造 / SSOT 変更: `docs/process/reviews/templates/REVIEW-DOCS.md`（補助監査）
-- docs/reference 新規 / 思想改訂: `docs/process/reviews/templates/REVIEW-REF-DELTA.md`（深度監査・Merge Gate外）
+- docs/reference 新規 / 改訂: `docs/process/reviews/templates/REVIEW-DOCS.md`（非規範境界・重複/退避判断を含む）
+- docs/reference 深掘り（命名/引数/実装/パリティ/DX）: `docs/process/reviews/templates/REVIEW-REF-DELTA.md`（任意・Merge Gate外）
 
 ※ `REVIEW-DOCS` は `review-framework` の 7品質軸とは別の補助監査であり、軸件数集計には含めない。
 

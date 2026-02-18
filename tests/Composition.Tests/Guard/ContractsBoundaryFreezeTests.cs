@@ -68,6 +68,22 @@ public sealed class ContractsBoundaryFreezeTests
             "Contracts boundary freeze violation(s):\n" + string.Join("\n", violations.OrderBy(v => v, StringComparer.Ordinal)));
     }
 
+    [Fact]
+    public void Contracts_MustNotExpose_WithExchange_Composer()
+    {
+        var assembly = typeof(IPublicApi).Assembly;
+        var violations = assembly.GetExportedTypes()
+            .SelectMany(type => type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            .Where(method => string.Equals(method.Name, "WithExchange", StringComparison.Ordinal))
+            .Select(method => $"{method.DeclaringType?.FullName}.{method.Name}")
+            .OrderBy(x => x, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.True(
+            violations.Length == 0,
+            "Contracts must not expose exchange-aware operation composers:\n" + string.Join("\n", violations));
+    }
+
     private static void CollectStringPaths(
         Type type,
         string path,

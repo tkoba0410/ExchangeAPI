@@ -30,7 +30,7 @@
 
 ---
 
-## 3. 最優先 NG Top10（Fatal優先）
+## 3. 解消済み主要事項（参考）
 
 1. `OperationComponent.WithExchange` を `OperationNameBuilder` へ移設し、Contracts 依存違反を解消 - `src/Utilities/Operations/OperationNameBuilder.cs:5`
 
@@ -52,3 +52,4 @@
 ## 6. 補足検証
 
 - `dotnet test tests/Common.Tests/Common.Tests.csproj --nologo` 実行: **全テスト成功（失敗 0）**
+- `dotnet test tests/Composition.Tests/Composition.Tests.csproj --nologo` 実行: **全テスト成功（失敗 0）**

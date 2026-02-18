@@ -8,6 +8,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Operations;
+using ExchangeApi.Utilities.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
@@ -20,8 +21,8 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 internal sealed class SpotHistoryApi
 {
-    private static readonly string OpGetOrders = OperationComponent.WithExchange("Bittrade", ContractOperations.History.GetOrders);
-    private static readonly string OpGetExecutions = OperationComponent.WithExchange("Bittrade", ContractOperations.History.GetExecutions);
+    private static readonly string OpGetOrders = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.History.GetOrders);
+    private static readonly string OpGetExecutions = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.History.GetExecutions);
 
     private readonly NormalizedPrivateApi _trading;
 

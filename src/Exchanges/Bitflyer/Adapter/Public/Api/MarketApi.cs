@@ -7,6 +7,7 @@ using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Operations;
+using ExchangeApi.Utilities.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
@@ -21,9 +22,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
 internal sealed class MarketApi
 {
-    private static readonly string OpGetTicker = OperationComponent.WithExchange("Bitflyer", ContractOperations.MarketData.GetTicker);
-    private static readonly string OpGetBoard = OperationComponent.WithExchange("Bitflyer", ContractOperations.MarketData.GetBoard);
-    private static readonly string OpGetExecutions = OperationComponent.WithExchange("Bitflyer", ContractOperations.MarketData.GetExecutions);
+    private static readonly string OpGetTicker = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.MarketData.GetTicker);
+    private static readonly string OpGetBoard = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.MarketData.GetBoard);
+    private static readonly string OpGetExecutions = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.MarketData.GetExecutions);
 
     private readonly INormalizedApi _normalized;
     private readonly IExchangeMarketResolver _markets;

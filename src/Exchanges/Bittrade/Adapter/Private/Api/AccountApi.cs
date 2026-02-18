@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Operations;
+using ExchangeApi.Utilities.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
@@ -24,7 +25,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 internal sealed class AccountApi
 {
-    private static readonly string OpGetBalance = OperationComponent.WithExchange("Bittrade", ContractOperations.Account.GetBalance);
+    private static readonly string OpGetBalance = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.Account.GetBalance);
 
     private readonly NormalizedPrivateApi _account;
 

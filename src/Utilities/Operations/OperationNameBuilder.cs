@@ -1,8 +1,8 @@
 using System;
 
-namespace ExchangeApi.Contracts.Facade.Operations;
+namespace ExchangeApi.Utilities.Operations;
 
-public static class OperationComponent
+public static class OperationNameBuilder
 {
     public static string WithExchange(string exchange, string contractOperation)
     {

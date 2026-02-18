@@ -12,7 +12,7 @@
 | --- | --- | --- | --- | --- |
 | Boundary | 0 | 0 | 0 | 0 |
 | Consistency | 0 | 0 | 0 | 0 |
-| Contracts | 0 | 0 | 1 | 0 |
+| Contracts | 1 | 0 | 0 | 0 |
 | Reliability | 0 | 0 | 0 | 0 |
 | Security | 1 | 0 | 0 | 0 |
 | DX | 1 | 0 | 0 | 0 |
@@ -20,31 +20,32 @@
 | Docs（補助監査） | 0 | 0 | 0 | 0 |
 
 注記: `StructuredRestClientLogger` + `SanitizingRestClientLogger` により署名クエリ露出経路は解消済み。
+注記: `OperationComponent.WithExchange` は `Utilities` へ移設し、Contracts の取引所依存を解消済み。
 
 ---
 
 ## 2. 指摘一覧（重大順）
 
-`[NG] Contracts 層で取引所名を含む識別子を生成する API が公開されている - src/Contracts/Facade/Operations/OperationComponent.cs:7 - NonFatal - docs/normative/contracts/contracts.md 3章（取引所非依存）`
+`[OK] Contracts 層の取引所依存識別子生成を解消（OperationNameBuilder へ移設） - src/Utilities/Operations/OperationNameBuilder.cs:5 - NonFatal(Resolved) - docs/normative/contracts/contracts.md 3章（取引所非依存）`
 
 ---
 
 ## 3. 最優先 NG Top10（Fatal優先）
 
-1. `OperationComponent.WithExchange` による Contracts 取引所依存の導入（NonFatal） - `src/Contracts/Facade/Operations/OperationComponent.cs:7`
+1. `OperationComponent.WithExchange` を `OperationNameBuilder` へ移設し、Contracts 依存違反を解消 - `src/Utilities/Operations/OperationNameBuilder.cs:5`
 
 ---
 
 ## 4. 未解消件数
 
-- 未解消 NG 総件数（重複除外）: **1**
+- 未解消 NG 総件数（重複除外）: **0**
 - 未解消 Fatal 件数（重複除外）: **0**
 
 ---
 
 ## 5. 例外記録要否
 
-- Contracts 非依存違反（NonFatal）を意図維持する場合も `docs/process/exceptions.md` への記録が必要。
+- 現時点で例外記録が必要な未解消項目はなし。
 
 ---
 

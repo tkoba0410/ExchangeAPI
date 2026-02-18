@@ -7,6 +7,7 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Operations;
+using ExchangeApi.Utilities.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
@@ -25,8 +26,8 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 internal sealed class TradingApi
 {
-    private static readonly string OpPlaceOrder = OperationComponent.WithExchange("Bittrade", ContractOperations.Trading.PlaceOrder);
-    private static readonly string OpCancelOrder = OperationComponent.WithExchange("Bittrade", ContractOperations.Trading.CancelOrder);
+    private static readonly string OpPlaceOrder = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.Trading.PlaceOrder);
+    private static readonly string OpCancelOrder = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.Trading.CancelOrder);
 
     private readonly NormalizedPrivateApi _trading;
 

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Operations;
+using ExchangeApi.Utilities.Operations;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Contracts.Common.Dtos;
@@ -25,10 +26,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// </summary>
 internal sealed class MarketApi
 {
-    private static readonly string OpGetTicker = OperationComponent.WithExchange("Bittrade", ContractOperations.MarketData.GetTicker);
-    private static readonly string OpGetBoard = OperationComponent.WithExchange("Bittrade", ContractOperations.MarketData.GetBoard);
-    private static readonly string OpGetExecutions = OperationComponent.WithExchange("Bittrade", ContractOperations.MarketData.GetExecutions);
-    private static readonly string OpGetCandlesticks = OperationComponent.WithExchange("Bittrade", ContractOperations.MarketData.GetCandlesticks);
+    private static readonly string OpGetTicker = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.MarketData.GetTicker);
+    private static readonly string OpGetBoard = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.MarketData.GetBoard);
+    private static readonly string OpGetExecutions = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.MarketData.GetExecutions);
+    private static readonly string OpGetCandlesticks = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.MarketData.GetCandlesticks);
 
     private readonly NormalizedPublicApi _marketData;
     private readonly IExchangeMarketResolver _markets;

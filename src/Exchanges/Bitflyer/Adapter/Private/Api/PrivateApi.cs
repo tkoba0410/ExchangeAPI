@@ -7,6 +7,7 @@ using OrderRequest = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests.
 using NormalizedOpenOrder = ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos.OpenOrder;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Operations;
+using ExchangeApi.Utilities.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
@@ -22,11 +23,11 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 internal sealed class PrivateApi
 {
-    private static readonly string OpGetBalance = OperationComponent.WithExchange("Bitflyer", ContractOperations.Account.GetBalance);
-    private static readonly string OpGetOrders = OperationComponent.WithExchange("Bitflyer", ContractOperations.History.GetOrders);
-    private static readonly string OpGetExecutions = OperationComponent.WithExchange("Bitflyer", ContractOperations.History.GetExecutions);
-    private static readonly string OpPlaceOrder = OperationComponent.WithExchange("Bitflyer", ContractOperations.Trading.PlaceOrder);
-    private static readonly string OpCancelOrder = OperationComponent.WithExchange("Bitflyer", ContractOperations.Trading.CancelOrder);
+    private static readonly string OpGetBalance = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.Account.GetBalance);
+    private static readonly string OpGetOrders = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.History.GetOrders);
+    private static readonly string OpGetExecutions = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.History.GetExecutions);
+    private static readonly string OpPlaceOrder = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.Trading.PlaceOrder);
+    private static readonly string OpCancelOrder = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.Trading.CancelOrder);
 
     private readonly INormalizedApi _normalized;
 

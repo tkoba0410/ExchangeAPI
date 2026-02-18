@@ -38,7 +38,7 @@ public class StructuredRestClientLoggerTests
     {
         var lines = new List<string>();
         var logger = new StructuredRestClientLogger(lines.Add);
-        var exception = new InvalidOperationException("failed");
+        var exception = new InvalidOperationException("failed account-id=10001");
 
         using var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -50,8 +50,11 @@ public class StructuredRestClientLoggerTests
         Assert.Contains("account-id=***", line);
         Assert.Contains("message_id=***", line);
         Assert.Contains("status=open", line);
+        Assert.Contains("message=<redacted>", line);
+        Assert.Matches(".*error_ref=errp_v1_[0-9A-F]{16}.*", line);
         Assert.DoesNotContain("10001", line);
         Assert.DoesNotContain("abcdef", line);
+        Assert.DoesNotContain("failed account-id=10001", line);
     }
 
     [Fact]

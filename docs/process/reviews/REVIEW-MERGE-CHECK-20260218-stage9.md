@@ -55,4 +55,5 @@
 
 - 全体監査サマリ: `docs/process/reviews/REVIEW-SUMMARY-20260218-stage9.md`
 - 署名クエリ漏えい対策: `src/Transport/Protocol/RestClient.cs`
+- 例外メッセージ秘匿化（error_ref）: `src/Transport/Observability/StructuredRestClientLogger.cs`
 - Contracts 境界修正: `src/Utilities/Operations/OperationNameBuilder.cs`

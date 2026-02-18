@@ -20,6 +20,7 @@
 | Docs（補助監査） | 0 | 0 | 0 | 0 |
 
 注記: `StructuredRestClientLogger` + `SanitizingRestClientLogger` により署名クエリ露出経路は解消済み。
+注記: `exception.Message` の生出力を廃止し、ログ/トレースは `error_ref` 追跡へ統一済み。
 注記: `OperationComponent.WithExchange` は `Utilities` へ移設し、Contracts の取引所依存を解消済み。
 
 ---
@@ -27,6 +28,7 @@
 ## 2. 指摘一覧（重大順）
 
 `[OK] Contracts 層の取引所依存識別子生成を解消（OperationNameBuilder へ移設） - src/Utilities/Operations/OperationNameBuilder.cs:5 - NonFatal(Resolved) - docs/normative/contracts/contracts.md 3章（取引所非依存）`
+`[OK] エラーログ/トレースで exception.Message 生出力を廃止（error_ref 化） - src/Transport/Observability/StructuredRestClientLogger.cs:34 - Security(Resolved) - docs/process/reviews/templates/REVIEW-SECURITY.md secret非露出`
 
 ---
 

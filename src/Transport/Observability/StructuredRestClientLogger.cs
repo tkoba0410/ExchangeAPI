@@ -31,6 +31,7 @@ public sealed class StructuredRestClientLogger : IRestClientLogger
     public void LogError(Exception exception, HttpRequestMessage request)
     {
         var uri = RequestLogSanitizer.SanitizeUri(request.RequestUri);
-        _write($"timestamp={DateTimeOffset.UtcNow:O} event_type=error method={request.Method.Method} uri={uri} error={exception.GetType().Name} message={exception.Message}");
+        var errorReference = ExceptionLogSanitizer.CreateErrorReference(exception);
+        _write($"timestamp={DateTimeOffset.UtcNow:O} event_type=error method={request.Method.Method} uri={uri} error={exception.GetType().Name} message={ExceptionLogSanitizer.RedactedMessage} error_ref={errorReference}");
     }
 }

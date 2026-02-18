@@ -56,7 +56,7 @@ public sealed class RestCallOpenTelemetryObserver : IRestCallObserver, IDisposab
         var tags = BuildTags(context, statusCode, exception.GetType().Name);
         _requestsTotal.Add(1, tags);
         _requestDuration.Record(duration.TotalSeconds, tags);
-        StopActivity(context, ActivityStatusCode.Error, exception.Message);
+        StopActivity(context, ActivityStatusCode.Error, ExceptionLogSanitizer.CreateStatusDescription(exception));
     }
 
     private static TagList BuildTags(RestCallContext context, HttpStatusCode? statusCode, string? error)

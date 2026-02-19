@@ -69,6 +69,14 @@ public sealed class ExchangeClient : IPublicApi, IPrivateApi, ICandlesticksApi, 
         IRestClient restClient)
         : this(marketApi, privateApi) { }
 
+    public static ExchangeClient FromRestClient(IRestClient restClient, AccountId accountId)
+    {
+        if (restClient is null) throw new ArgumentNullException(nameof(restClient));
+        if (accountId.IsEmpty) throw new ArgumentException("accountId is required.", nameof(accountId));
+        var components = BittradeClientComponents.FromRestClient(restClient, accountId);
+        return new ExchangeClient(components, accountId);
+    }
+
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         TickerRequest request,
         CancellationToken cancellationToken = default) =>

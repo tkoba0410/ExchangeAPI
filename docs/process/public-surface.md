@@ -16,7 +16,8 @@
 - `src/Exchanges/<Exchange>/Normalized/Api`（取引所別 Normalized API）
 - `src/Exchanges/<Exchange>/Composition`（当該取引所の構成エントリ）
   - `CreateClient(...)` は Normalized API を返す
-  - `CreateContractClient(...)` は最小横断（Contracts）利用向け
+  - `CreateContractPublicClient(...)` は最小横断（Contracts, Public）利用向け
+  - `CreateContractPrivateClient(...)` は最小横断（Contracts, Private）利用向け
 
 ### Level B（最小横断面 / 補助）
 

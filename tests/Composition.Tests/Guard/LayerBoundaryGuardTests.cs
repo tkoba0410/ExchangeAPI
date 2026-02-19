@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Text.Json;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Composition;
 using ExchangeApi.Exchanges.Bittrade.Composition;
+using ExchangeApi.Transport.Protocol;
 using BitflyerNormalizedClient = ExchangeApi.Exchanges.Bitflyer.Normalized.Api.INormalizedApi;
 using BittradeNormalizedClient = ExchangeApi.Exchanges.Bittrade.Normalized.Api.INormalizedApi;
 using BitflyerNormalizedApi = ExchangeApi.Exchanges.Bitflyer.Normalized.Api.NormalizedApi;
@@ -26,13 +30,62 @@ public class LayerBoundaryGuardTests
     }
 
     [Fact]
-    public void CreateContractClient_ReturnsExchangeClient()
+    public void CreateContractPublicClient_ReturnsExchangeClient()
     {
-        var bitflyerMethod = GetPublicStaticMethod(typeof(BitflyerFactory), "CreateContractClient");
-        var bittradeMethod = GetPublicStaticMethod(typeof(BittradeFactory), "CreateContractClient");
+        var bitflyerMethod = GetPublicStaticMethod(typeof(BitflyerFactory), "CreateContractPublicClient");
+        var bittradeMethod = GetPublicStaticMethod(typeof(BittradeFactory), "CreateContractPublicClient");
 
         Assert.Equal(typeof(IExchangeClient), bitflyerMethod.ReturnType);
         Assert.Equal(typeof(IExchangeClient), bittradeMethod.ReturnType);
+    }
+
+    [Fact]
+    public void CreateContractPrivateClient_ReturnsExchangeClient()
+    {
+        var bitflyerMethod = GetPublicStaticMethod(typeof(BitflyerFactory), "CreateContractPrivateClient");
+        var bittradeMethod = GetPublicStaticMethod(typeof(BittradeFactory), "CreateContractPrivateClient");
+
+        Assert.Equal(typeof(IExchangeClient), bitflyerMethod.ReturnType);
+        Assert.Equal(typeof(IExchangeClient), bittradeMethod.ReturnType);
+    }
+
+    [Fact]
+    public void CreateContractPublicClient_CreatesPublicOnlyCapabilities()
+    {
+        var bitflyerClient = BitflyerFactory.CreateContractPublicClient();
+        var bittradeClient = BittradeFactory.CreateContractPublicClient();
+
+        Assert.NotNull(bitflyerClient.Public);
+        Assert.Null(bitflyerClient.Private);
+        Assert.NotNull(bittradeClient.Public);
+        Assert.Null(bittradeClient.Private);
+    }
+
+    [Fact]
+    public void CreateContractPrivateClient_WithoutAuth_Throws()
+    {
+        Assert.Throws<InvalidOperationException>(() => BitflyerFactory.CreateContractPrivateClient());
+        Assert.Throws<InvalidOperationException>(() => BittradeFactory.CreateContractPrivateClient());
+    }
+
+    [Fact]
+    public void CreateContractPrivateClient_WithRequestSigner_CreatesPrivateCapabilities()
+    {
+        var signer = new NoOpSigner();
+
+        var bitflyerClient = BitflyerFactory.CreateContractPrivateClient(new BitflyerFactoryOptions
+        {
+            RequestSigner = signer,
+        });
+
+        var bittradeClient = BittradeFactory.CreateContractPrivateClient(new BittradeFactoryOptions
+        {
+            RequestSigner = signer,
+            AccountId = "default",
+        });
+
+        Assert.NotNull(bitflyerClient.Private);
+        Assert.NotNull(bittradeClient.Private);
     }
 
     [Fact]
@@ -196,5 +249,13 @@ public class LayerBoundaryGuardTests
         }
 
         return false;
+    }
+
+    private sealed class NoOpSigner : IRequestSigner
+    {
+        public Task SignAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

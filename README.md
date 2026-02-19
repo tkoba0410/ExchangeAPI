@@ -33,7 +33,7 @@ using ExchangeApi.Exchanges.Bitflyer.Composition;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-var client = BitflyerFactory.CreateContractClient();
+var client = BitflyerFactory.CreateContractPublicClient();
 var publicApi = client.Public ?? throw new InvalidOperationException("Public API is not available.");
 
 var call = await publicApi.GetTickerAsync(Symbol.ParseOrThrow("BTC_JPY"));

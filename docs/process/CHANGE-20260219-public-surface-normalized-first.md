@@ -19,7 +19,7 @@
 
 1. Bot/高度利用の導線を `Normalized` 主体へ移す（`<Exchange>Factory.CreateClient(...)`）。
 2. 取引所横断で共通化が必要な箇所のみ `Contracts` を使う。
-   （`<Exchange>Factory.CreateContractClient(...)` を使用）
+   （`<Exchange>Factory.CreateContractPublicClient(...)` / `CreateContractPrivateClient(...)` を使用）
 3. Contracts 依存の過剰共通化を削減する。
 
 ## Bot impact

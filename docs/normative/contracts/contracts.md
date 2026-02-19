@@ -114,6 +114,8 @@ Contracts の Facade API は Public / Private に分離する（MUST）。
 - Public/Private を MarketData / Trading / Account 等の意味分類の代替として用いてはならない（MUST NOT）。
 - 分離の目的は「認証境界の明確化」であり、Contracts の Shape / Semantics を変更してはならない（MUST NOT）。
 - ただし、取引所差で有無が揺れる機能については、事前判定可能性を満たすために単独 capability I/F（nullable）へ分離してよい（MAY）。
+- Composition の Contracts 入口は Public / Private を明示的に分離してよい（MAY）。
+- Private 入口で前提条件（署名・資格情報等）が不足する場合、Public へ暗黙フォールバックしてはならない（MUST NOT）。
 
 ---
 

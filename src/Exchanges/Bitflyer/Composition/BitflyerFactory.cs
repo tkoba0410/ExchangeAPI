@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Transport.Policy;
@@ -32,7 +31,7 @@ public static class BitflyerFactory
         {
             throw new InvalidOperationException(
                 "Bitflyer normalized client requires credentials or RequestSigner. " +
-                "Use CreateContractClient(...) for minimal cross-exchange usage.");
+                "Use CreateContractPublicClient(...) for minimal cross-exchange usage.");
         }
 
         var restClient = CreateRestClient(settings, signer);
@@ -40,30 +39,31 @@ public static class BitflyerFactory
         return components.Normalized;
     }
 
-    public static IExchangeClient CreateContractClient(BitflyerFactoryOptions? options = null)
+    public static IExchangeClient CreateContractPublicClient(BitflyerFactoryOptions? options = null)
     {
         var settings = options ?? new BitflyerFactoryOptions();
         var clientOptions = ToClientOptions(settings);
-        // 署名（認証）が無い場合は PublicClient を返し、未対応 capability は null とする。
-        var credentials = ResolveCredentials(settings);
-        if (credentials is null && settings.RequestSigner is null)
-        {
-            return new PublicClient(clientOptions, settings.HttpClient, settings.Transport);
-        }
-
-        if (settings.RequestSigner is not null)
-        {
-            var restClient = CreateRestClient(settings, settings.RequestSigner);
-            return ExchangeClient.FromRestClient(restClient);
-        }
-
-        var clientCredentials = new ClientCredentials(credentials!.ApiKey, credentials.ApiSecret);
-        return new ExchangeClient(clientOptions, clientCredentials, settings.HttpClient, settings.Transport);
+        return new PublicClient(clientOptions, settings.HttpClient, settings.Transport);
     }
 
-    [Obsolete("Use CreateContractClient(...) instead. This method will be removed in a future major release.")]
+    public static IExchangeClient CreateContractPrivateClient(BitflyerFactoryOptions? options = null)
+    {
+        var settings = options ?? new BitflyerFactoryOptions();
+        var credentials = ResolveCredentials(settings);
+        var signer = ResolveSigner(settings, credentials);
+        if (signer is null)
+        {
+            throw new InvalidOperationException(
+                "Bitflyer contract private client requires credentials or RequestSigner.");
+        }
+
+        var restClient = CreateRestClient(settings, signer);
+        return ExchangeClient.FromRestClient(restClient);
+    }
+
+    [Obsolete("Use CreateContractPrivateClient(...) instead. This method will be removed in a future major release.")]
     internal static ExchangeClient CreateAdapter(BitflyerFactoryOptions? options = null) =>
-        (ExchangeClient)CreateContractClient(options);
+        (ExchangeClient)CreateContractPrivateClient(options);
 
     private static ClientOptions ToClientOptions(BitflyerFactoryOptions settings)
     {

@@ -81,6 +81,8 @@ Contracts の公開 API は Public / Private に分離する。
 
   * Composition により **自動的に前提条件を満たす**（利用者に追加入力を要求しない）
   * **別 API として明示的に分離する**（同名 API のまま成功可否が分かれる状態を禁止）
+* Composition の Contracts 入口は、Public / Private を別エントリとして明示分離してよい。
+* Private 入口で前提条件（署名・資格情報等）を満たさない場合、Public へ暗黙フォールバックせず fail-fast で失敗を返す。
 
 例:
 Bittrade の Private API で accountId が必要な場合は、Composition で accountId を必須注入し、

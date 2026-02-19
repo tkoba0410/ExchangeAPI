@@ -29,7 +29,7 @@ public static class BittradeFactory
         {
             throw new InvalidOperationException(
                 "Bittrade normalized client requires credentials or RequestSigner. " +
-                "Use CreateContractClient(...) for minimal cross-exchange usage.");
+                "Use CreateContractPublicClient(...) for minimal cross-exchange usage.");
         }
 
         if (string.IsNullOrWhiteSpace(settings.AccountId))
@@ -48,15 +48,23 @@ public static class BittradeFactory
         return components.Normalized;
     }
 
-    public static IExchangeClient CreateContractClient(BittradeFactoryOptions? options = null)
+    public static IExchangeClient CreateContractPublicClient(BittradeFactoryOptions? options = null)
     {
         var settings = options ?? new BittradeFactoryOptions();
         var adapterOptions = ToAdapterOptions(settings);
-        var credentials = ResolveCredentials(settings);
+        return new PublicClient(adapterOptions);
+    }
 
-        if (credentials is null)
+    public static IExchangeClient CreateContractPrivateClient(BittradeFactoryOptions? options = null)
+    {
+        var settings = options ?? new BittradeFactoryOptions();
+        var credentials = ResolveCredentials(settings);
+        var signer = ResolveSigner(settings, credentials);
+
+        if (signer is null)
         {
-            return new PublicClient(adapterOptions);
+            throw new InvalidOperationException(
+                "Bittrade contract private client requires credentials or RequestSigner.");
         }
 
         if (string.IsNullOrWhiteSpace(settings.AccountId))
@@ -64,13 +72,14 @@ public static class BittradeFactory
             throw new InvalidOperationException("Bittrade accountId is required to create a private client.");
         }
 
-        var adapterCredentials = new ClientCredentials(credentials.ApiKey, credentials.ApiSecret);
-        return new ExchangeClient(adapterOptions, adapterCredentials, settings.AccountId);
+        var restClient = CreateRestClient(settings, signer);
+        var accountId = AccountId.ParseOrThrow(settings.AccountId);
+        return ExchangeClient.FromRestClient(restClient, accountId);
     }
 
-    [Obsolete("Use CreateContractClient(...) instead. This method will be removed in a future major release.")]
+    [Obsolete("Use CreateContractPrivateClient(...) instead. This method will be removed in a future major release.")]
     internal static ExchangeClient CreateAdapter(BittradeFactoryOptions? options = null) =>
-        (ExchangeClient)CreateContractClient(options);
+        (ExchangeClient)CreateContractPrivateClient(options);
 
     private static ClientOptions ToAdapterOptions(BittradeFactoryOptions settings)
     {

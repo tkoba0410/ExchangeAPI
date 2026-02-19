@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using ExchangeApi.Composition.Abstractions;
@@ -26,6 +27,8 @@ namespace ExchangeApi.Composition.Providers.Credentials;
 /// </summary>
 public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvider
 {
+    private const string UtcDateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
     private readonly string _encryptedFilePath;
     private readonly string _secretKeyPath;
     private readonly string _exchangeId;
@@ -231,9 +234,14 @@ public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvid
             return null;
         }
 
-        if (!DateTimeOffset.TryParse(value, out var parsed))
+        if (!DateTimeOffset.TryParseExact(
+                value,
+                UtcDateTimeFormat,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                out var parsed))
         {
-            throw new InvalidOperationException($"CRED_SCHEMA_INVALID: '{entryKey}.{propertyName}' must be ISO-8601.");
+            throw new InvalidOperationException($"CRED_SCHEMA_INVALID: '{entryKey}.{propertyName}' must use UTC format '{UtcDateTimeFormat}'.");
         }
 
         return parsed;

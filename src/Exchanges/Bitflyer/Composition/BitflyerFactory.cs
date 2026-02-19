@@ -7,6 +7,7 @@ using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
@@ -22,7 +23,24 @@ public static class BitflyerFactory
 {
     private static readonly Uri DefaultBaseUri = new("https://api.bitflyer.com");
 
-    public static IExchangeClient CreateClient(BitflyerFactoryOptions? options = null)
+    public static INormalizedApi CreateClient(BitflyerFactoryOptions? options = null)
+    {
+        var settings = options ?? new BitflyerFactoryOptions();
+        var credentials = ResolveCredentials(settings);
+        var signer = ResolveSigner(settings, credentials);
+        if (signer is null)
+        {
+            throw new InvalidOperationException(
+                "Bitflyer normalized client requires credentials or RequestSigner. " +
+                "Use CreateContractClient(...) for minimal cross-exchange usage.");
+        }
+
+        var restClient = CreateRestClient(settings, signer);
+        var components = BitflyerClientComponents.FromRestClient(restClient);
+        return components.Normalized;
+    }
+
+    public static IExchangeClient CreateContractClient(BitflyerFactoryOptions? options = null)
     {
         var settings = options ?? new BitflyerFactoryOptions();
         var clientOptions = ToClientOptions(settings);
@@ -43,9 +61,9 @@ public static class BitflyerFactory
         return new ExchangeClient(clientOptions, clientCredentials, settings.HttpClient, settings.Transport);
     }
 
-    [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]
+    [Obsolete("Use CreateContractClient(...) instead. This method will be removed in a future major release.")]
     internal static ExchangeClient CreateAdapter(BitflyerFactoryOptions? options = null) =>
-        (ExchangeClient)CreateClient(options);
+        (ExchangeClient)CreateContractClient(options);
 
     private static ClientOptions ToClientOptions(BitflyerFactoryOptions settings)
     {
@@ -93,5 +111,21 @@ public static class BitflyerFactory
             return null;
         }
         return credentials;
+    }
+
+    private static IRequestSigner? ResolveSigner(BitflyerFactoryOptions settings, ApiCredentials? credentials)
+    {
+        if (settings.RequestSigner is not null)
+        {
+            return settings.RequestSigner;
+        }
+
+        if (credentials is null)
+        {
+            return null;
+        }
+
+        var clock = settings.Clock ?? new SystemClock();
+        return new RequestSigner(credentials.ApiKey, credentials.ApiSecret, clock);
     }
 }

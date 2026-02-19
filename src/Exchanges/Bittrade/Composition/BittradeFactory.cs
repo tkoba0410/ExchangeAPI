@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
@@ -19,7 +20,35 @@ public static class BittradeFactory
 {
     private static readonly Uri DefaultBaseUri = new("https://api-cloud.bittrade.co.jp/");
 
-    public static IExchangeClient CreateClient(BittradeFactoryOptions? options = null)
+    public static INormalizedApi CreateClient(BittradeFactoryOptions? options = null)
+    {
+        var settings = options ?? new BittradeFactoryOptions();
+        var credentials = ResolveCredentials(settings);
+        var signer = ResolveSigner(settings, credentials);
+        if (signer is null)
+        {
+            throw new InvalidOperationException(
+                "Bittrade normalized client requires credentials or RequestSigner. " +
+                "Use CreateContractClient(...) for minimal cross-exchange usage.");
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.AccountId))
+        {
+            throw new InvalidOperationException("Bittrade accountId is required to create a normalized client.");
+        }
+
+        var restClient = CreateRestClient(settings, signer);
+        var accountId = AccountId.ParseOrThrow(settings.AccountId);
+        var components = BittradeClientComponents.FromRestClient(restClient, accountId);
+        if (components.Normalized is null)
+        {
+            throw new InvalidOperationException("Failed to create Bittrade normalized client.");
+        }
+
+        return components.Normalized;
+    }
+
+    public static IExchangeClient CreateContractClient(BittradeFactoryOptions? options = null)
     {
         var settings = options ?? new BittradeFactoryOptions();
         var adapterOptions = ToAdapterOptions(settings);
@@ -39,9 +68,9 @@ public static class BittradeFactory
         return new ExchangeClient(adapterOptions, adapterCredentials, settings.AccountId);
     }
 
-    [Obsolete("Use CreateClient(...) instead. This method will be removed in a future major release.")]
+    [Obsolete("Use CreateContractClient(...) instead. This method will be removed in a future major release.")]
     internal static ExchangeClient CreateAdapter(BittradeFactoryOptions? options = null) =>
-        (ExchangeClient)CreateClient(options);
+        (ExchangeClient)CreateContractClient(options);
 
     private static ClientOptions ToAdapterOptions(BittradeFactoryOptions settings)
     {
@@ -58,6 +87,23 @@ public static class BittradeFactory
         };
     }
 
+    private static RestClient CreateRestClient(BittradeFactoryOptions settings, IRequestSigner? signer)
+    {
+        var baseUri = settings.BaseUri ?? DefaultBaseUri;
+        var policy = settings.Policy ?? HttpPolicyFactory.CreateDefault(
+            settings.PolicyOptions);
+
+        return RestClientFactory.Create(
+            baseUri,
+            transport: settings.Transport,
+            signer: signer,
+            policy: policy,
+            logger: settings.Logger,
+            observer: settings.Observer,
+            errorClassifier: settings.ErrorClassifier,
+            httpClient: settings.HttpClient);
+    }
+
     private static ApiCredentials? ResolveCredentials(BittradeFactoryOptions settings)
     {
         var credentials = settings.Credentials;
@@ -72,5 +118,20 @@ public static class BittradeFactory
             return null;
         }
         return credentials;
+    }
+
+    private static IRequestSigner? ResolveSigner(BittradeFactoryOptions settings, ApiCredentials? credentials)
+    {
+        if (settings.RequestSigner is not null)
+        {
+            return settings.RequestSigner;
+        }
+
+        if (credentials is null)
+        {
+            return null;
+        }
+
+        return new RequestSigner(credentials.ApiKey, credentials.ApiSecret);
     }
 }

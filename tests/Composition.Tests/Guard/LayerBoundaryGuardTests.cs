@@ -6,6 +6,8 @@ using System.Text.Json;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Exchanges.Bitflyer.Composition;
 using ExchangeApi.Exchanges.Bittrade.Composition;
+using BitflyerNormalizedClient = ExchangeApi.Exchanges.Bitflyer.Normalized.Api.INormalizedApi;
+using BittradeNormalizedClient = ExchangeApi.Exchanges.Bittrade.Normalized.Api.INormalizedApi;
 using BitflyerNormalizedApi = ExchangeApi.Exchanges.Bitflyer.Normalized.Api.NormalizedApi;
 using BittradeNormalizedApi = ExchangeApi.Exchanges.Bittrade.Normalized.Api.NormalizedApi;
 
@@ -14,10 +16,20 @@ namespace ExchangeApi.Tests.Composition.Tests.Guard;
 public class LayerBoundaryGuardTests
 {
     [Fact]
-    public void CreateClient_ReturnsExchangeClient()
+    public void CreateClient_ReturnsNormalizedApi()
     {
-        var bitflyerMethod = GetCreateClientMethod(typeof(BitflyerFactory));
-        var bittradeMethod = GetCreateClientMethod(typeof(BittradeFactory));
+        var bitflyerMethod = GetPublicStaticMethod(typeof(BitflyerFactory), "CreateClient");
+        var bittradeMethod = GetPublicStaticMethod(typeof(BittradeFactory), "CreateClient");
+
+        Assert.Equal(typeof(BitflyerNormalizedClient), bitflyerMethod.ReturnType);
+        Assert.Equal(typeof(BittradeNormalizedClient), bittradeMethod.ReturnType);
+    }
+
+    [Fact]
+    public void CreateContractClient_ReturnsExchangeClient()
+    {
+        var bitflyerMethod = GetPublicStaticMethod(typeof(BitflyerFactory), "CreateContractClient");
+        var bittradeMethod = GetPublicStaticMethod(typeof(BittradeFactory), "CreateContractClient");
 
         Assert.Equal(typeof(IExchangeClient), bitflyerMethod.ReturnType);
         Assert.Equal(typeof(IExchangeClient), bittradeMethod.ReturnType);
@@ -71,11 +83,11 @@ public class LayerBoundaryGuardTests
         }
     }
 
-    private static MethodInfo GetCreateClientMethod(Type factoryType)
+    private static MethodInfo GetPublicStaticMethod(Type factoryType, string methodName)
     {
         return factoryType
             .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Single(m => m.Name == "CreateClient");
+            .Single(m => m.Name == methodName);
     }
 
     private static IEnumerable<Type> GetFacadeTypes()

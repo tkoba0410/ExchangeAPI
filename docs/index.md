@@ -25,6 +25,15 @@
 
 ---
 
+## 最短導線（目的別）
+
+* **初見でまず動かしたい（最初の1コール）**：`README.md`（Quickstart）
+* **安定重視（取引所横断）**：`docs/normative/contracts/overview.md` → `docs/normative/contracts/contracts.md` → `docs/inventory/`
+* **Bot / 高度利用（取引所別の機能網羅）**：`docs/process/public-surface.md` → `src/Exchanges/*/Normalized/Api` → `docs/inventory/`
+* **実装/貢献**：`docs/normative/topspec.md` → `docs/process/process.md` → `docs/process/review-framework.md`
+
+---
+
 ## 1. 設計仕様（Normative）
 
 ### TopSpec（技術正本）
@@ -64,6 +73,12 @@
 ※ 取引所別の機能網羅を優先する場合（Bot / 高度利用）、Normalized を主利用面として利用できます（追従前提）。
 ※ 取引所横断で安定性を優先する場合、Contracts を最小横断面として利用します。
 ※ 安定保証の対象は Contracts のみです。
+
+### 失敗時の対処（最小）
+
+* 429 / Timeout / Partial Failure: `docs/normative/contracts/resilience.md`
+* 認証キー/資格情報（暗号化運用）: `docs/process/templates/README.md`
+* 公開面の選択（Contracts / Normalized）: `docs/process/public-surface.md`
 
 ---
 

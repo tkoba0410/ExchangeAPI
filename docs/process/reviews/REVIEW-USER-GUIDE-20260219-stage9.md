@@ -25,29 +25,29 @@
 
 | 観点 | 判定 | 重大度 (F番号明示) | CI化可否 | 備考 |
 | --- | --- | --- | --- | --- |
-| 初回成功導線（Quickstart） | 要修正 | NonFatal | 一部可 | リンク中心で「最初の1コール」までの手順がない |
+| 初回成功導線（Quickstart） | OK | NonFatal | 一部可 | README に Contracts/Normalized の最短例（コマンド+期待結果）を追加 |
 | 認証/秘密情報の扱い | OK | NonFatal | 一部可 | テンプレ運用で平文秘匿を明示 |
-| 失敗時の対処（Troubleshooting） | 要修正 | NonFatal | 可 | 典型失敗と復旧手順がガイドとして未整備 |
+| 失敗時の対処（Troubleshooting） | OK | NonFatal | 可 | index から resilience / templates / public-surface に誘導 |
 | 安定保証境界の明示 | OK | NonFatal | 可 | Contracts only / Normalized follow が明示 |
-| コピペ実行性（再現可能性） | 要修正 | NonFatal | 一部可 | コピペで動く最小コード/コマンドがない |
+| コピペ実行性（再現可能性） | OK | NonFatal | 一部可 | Contracts は認証不要でコピペ可。Normalized は secret 運用が前提 |
 | SSOT参照/保守容易性 | OK | NonFatal | 可 | SSOTへリンク中心で写経を避けている |
 
 ---
 
 ## 2. 指摘一覧（重大順）
 
-`[要修正] README と index がリンク中心で、最初の1コール（コマンド+期待結果）の導線がない - README.md:6 - NonFatal - REVIEW-USER-GUIDE（初回成功導線）`
-`[要修正] 推奨読了順はあるが、実行可能な最短手順（例: 3分セットアップ）が定義されていない - docs/index.md:122 - NonFatal - REVIEW-USER-GUIDE（初回成功導線）`
-`[OK] 安定保証境界（Contracts only）が明示されている - README.md:15 - NonFatal - REVIEW-USER-GUIDE（安定保証境界）`
-`[OK] Normalized 利用は追従前提（互換保証外）であることが明示されている - docs/index.md:63 - NonFatal - REVIEW-USER-GUIDE（安定保証境界）`
+`[OK] README に「最初の1コール」（Contracts/Normalized の2パス）を追加 - README.md:13 - NonFatal - REVIEW-USER-GUIDE（初回成功導線）`
+`[OK] 目的別の最短導線（読了パス）を追加 - docs/index.md:28 - NonFatal - REVIEW-USER-GUIDE（初回成功導線）`
+`[OK] 安定保証境界（Contracts only）が明示されている - README.md:117 - NonFatal - REVIEW-USER-GUIDE（安定保証境界）`
+`[OK] Normalized 利用は追従前提（互換保証外）であることが明示されている - docs/index.md:73 - NonFatal - REVIEW-USER-GUIDE（安定保証境界）`
 `[OK] 公開面の利用レベルと入口（CreateClient / CreateContractClient）が明示されている - docs/process/public-surface.md:14 - NonFatal - REVIEW-USER-GUIDE（安定保証境界/導線）`
 `[OK] 資格情報テンプレ運用で「平文/秘密鍵を置かない」方針が明示されている - docs/process/templates/README.md:3 - NonFatal - REVIEW-USER-GUIDE（認証/秘密情報）`
-`[要修正] 失敗時の対処（認証失敗/429/timeout）の判断フローがガイドとして未整備 - docs/index.md:50 - NonFatal - REVIEW-USER-GUIDE（Troubleshooting）`
-`[要修正] コピペ実行できる最小コード（Contracts/Normalized の選択例）が存在しない - README.md:1 - NonFatal - REVIEW-USER-GUIDE（コピペ実行性）`
+`[OK] 失敗時の対処（429/timeout/認証）の最小導線を追加 - docs/index.md:77 - NonFatal - REVIEW-USER-GUIDE（Troubleshooting）`
+`[OK] コピペ実行できる最小コード（Contracts/Normalized の選択例）を追加 - README.md:28 - NonFatal - REVIEW-USER-GUIDE（コピペ実行性）`
 
 ---
 
-## 3. 改善案（最小）
+## 3. 改善案（最小 / 実施済み）
 
 1. `README.md` に「最初の1コール」導線を追加（Contracts版 + Normalized版の2パス、secretはplaceholder）
 2. `docs/index.md` に「利用目的別の最短読了パス」を追加（Bot/高度利用/安定重視）
@@ -57,5 +57,4 @@
 
 ## 4. 最終結論
 
-* 要修正（初見導線の不足。SSOT/安全性は維持できている）
-
+* OK（初見導線を追加し、SSOT/安全性を維持したまま「最初の1コール」まで到達可能）

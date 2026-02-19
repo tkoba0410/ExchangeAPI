@@ -22,7 +22,7 @@
 ## B. 問題箇所一覧（マジックストリング / 置き場所不統一 / 混在）
 
 - Issue: `Layer` / `Component` が文字列直書きで散在し、観測語彙の単一正本がない。
-- Evidence: `src/Exchanges/Bitflyer/Adapter/Internal/BitflyerMarketCatalogResolver.cs` / `src/Exchanges/Bittrade/Adapter/Internal/BittradeMarketCatalogResolver.cs` の `Component` と、`src/Exchanges/Common/Application/Adapter/Internal/AdapterCallMapper.cs` の `Layer`。
+- Evidence: `src/Exchanges/Bitflyer/Adapter/Internal/BitflyerMarketCatalogResolver.cs` / `src/Exchanges/Bittrade/Adapter/Internal/BittradeMarketCatalogResolver.cs` の `Component` と、`src/Exchanges/Common/Adapter/Internal/AdapterCallMapper.cs` の `Layer`。
 - Why it matters: 監視タグ・ログ軸の表記揺れが起きると、集計クエリや障害解析が取引所追加時に壊れやすい。
 - Proposed rule: `CallMetaVocabulary`（Common）を作り、`Layer/Component` 直書きを禁止する。
 - Severity: P1
@@ -73,7 +73,7 @@
 - Severity: P1
 
 - Issue: `Layer` 文字列語彙（Contracts/Raw/Normalized など）の正本がない。
-- Evidence: `src/Exchanges/Common/Application/Adapter/Internal/*.cs` と `CallMeta.CreateInternal("Raw", ...)` を使う複数箇所。
+- Evidence: `src/Exchanges/Common/Adapter/Internal/*.cs` と `CallMeta.CreateInternal("Raw", ...)` を使う複数箇所。
 - Why it matters: 観測軸の表記揺れを全取引所で一括抑止できる。
 - Proposed rule: `CallMeta` 周辺へ Layer 定数群を追加して共通利用する。
 - Severity: P1

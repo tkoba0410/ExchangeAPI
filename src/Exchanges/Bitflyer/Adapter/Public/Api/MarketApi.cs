@@ -13,7 +13,7 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.Adapter.Internal;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Transport.Protocol;

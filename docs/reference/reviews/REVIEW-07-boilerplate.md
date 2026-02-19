@@ -45,7 +45,7 @@
 **典型ファイル例（Evidence）**
 - `src/Exchanges/Bitflyer/Adapter/Internal/ApiCallMapper.cs`
 - `src/Exchanges/Bittrade/Adapter/Internal/ApiCallMapper.cs`
-- `src/Exchanges/Common/Application/Adapter/Internal/AdapterCallMapper.cs`（実体）
+- `src/Exchanges/Common/Adapter/Internal/AdapterCallMapper.cs`（実体）
 
 **原因**
 - namespace分離を保つために、exchange配下で同一Facadeを再定義。

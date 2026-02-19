@@ -196,23 +196,23 @@ src/Exchanges/<Exchange>/Normalized/
 
 ---
 
-#### 3.3.2 MarketCatalog の Application 配置（MUST）
+#### 3.3.2 MarketCatalog の内部配置（MUST）
 
 MarketCatalog は「取引所仕様メタ情報（市場定義）」を保持する
 **取引所モジュール内部の部品**として扱う。
 
-* MarketCatalog は Application 層配下に配置してよい。
+* MarketCatalog は Adapter の Internal 配下に配置する。
 * MarketCatalog は Facade 公開境界へ露出させない（MUST）。
 * 取引所差分（resolver / signer / canonicalizer / endpoint catalog 等）は
   外部から塊注入せず、取引所モジュール内部で構成する（MUST）。
 * 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Application/MarketCatalog/
+src/Exchanges/<Exchange>/Adapter/Internal/MarketCatalog/
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Application.MarketCatalog.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Internal.MarketCatalog.*`
 
 ---
 
@@ -268,7 +268,7 @@ API 系統の Adapter は `IExchangeMarketResolver` 経由で市場解決を行�
 resolver 実装差分は取引所モジュール内部に閉じ込める。
 
 * API 系統の Adapter は `src/Exchanges/<Exchange>/Adapter/` に置く。
-* MarketCatalog は `src/Exchanges/<Exchange>/Application/MarketCatalog/` に置く。
+* MarketCatalog は `src/Exchanges/<Exchange>/Adapter/Internal/MarketCatalog/` に置く。
 
 ---
 
@@ -525,8 +525,7 @@ EndpointId は、**API の意味的単位を識別するための論理識別子
 * 取引所層（Wire / Raw / Normalized / Adapter）は、型名から取引所プレフィックスを排除する（MUST）。
 * 取引所層の Composition は、公開型名に取引所プレフィックスを付与する（MUST）。
   例: `BitflyerFactory`, `BitflyerFactoryOptions`
-* 取引所層の Application は、公開型名に取引所プレフィックスを付与する（MUST）。
-  例: `BitflyerMarketCatalogService`
+* MarketCatalog は Internal 補助型として扱い、公開型名規約の対象外とする（MUST）。
 * ただし、同一コンパイル単位で型衝突または曖昧参照が生じる場合は、衝突回避のための意味名を付与すること（MUST）。
   例: `ExchangeSide`, `ExchangeSymbol`
 * 衝突回避の意味名は次の優先順で選択する（MUST）。

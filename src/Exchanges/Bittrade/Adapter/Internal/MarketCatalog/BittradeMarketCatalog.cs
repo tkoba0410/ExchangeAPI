@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ExchangeApi.Exchanges.Bittrade.Application.MarketCatalog;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.MarketCatalog;
 
 internal static class BittradeMarketCatalog
 {

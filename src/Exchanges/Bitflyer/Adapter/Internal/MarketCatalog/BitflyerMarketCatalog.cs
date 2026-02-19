@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Application.MarketCatalog;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.MarketCatalog;
 
 internal static class BitflyerMarketCatalog
 {

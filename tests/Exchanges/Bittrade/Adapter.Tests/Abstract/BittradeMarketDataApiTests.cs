@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
+using ExchangeApi.Exchanges.Common.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;

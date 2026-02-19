@@ -15,8 +15,4 @@
     <ProjectReference Include="..\..\..\Primitives\ExchangeApi.Primitives.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\Application\MarketCatalog\**\*.cs" Link="MarketCatalog/%(RecursiveDir)%(Filename)%(Extension)" />
-  </ItemGroup>
-
 </Project>

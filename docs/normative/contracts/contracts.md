@@ -159,7 +159,7 @@ Contracts の公開 API は **Request DTO を第一の契約**とする（MUST�
 取引所実装の物理構造は、以下の 3 軸を基本とする（MUST）。
 
 - 取引所: `Bitflyer`, `Bittrade`, ...
-- レイヤ: `Wire`, `Raw`, `Normalized`, `Adapter`, `Application`
+- レイヤ: `Wire`, `Raw`, `Normalized`, `Adapter`
 - 可視性: `Public`, `Private`, `Internal`
 
 意味分類（例: `Account` / `Trading` / `Market`）は、公開構造の第一軸としては採用しない（MUST NOT）。
@@ -167,15 +167,15 @@ Contracts の公開 API は **Request DTO を第一の契約**とする（MUST�
 ### MarketCatalog の位置づけ
 
 `MarketCatalog` は取引所固有の市場定義（`Symbol` / `ProductCode` / `Type` など）を保持する
-Application 配下の内部要素として扱う（MUST）。
+Adapter/Internal 配下の内部要素として扱う（MUST）。
 
-- 取引所固有処理: `src/Exchanges/{Exchange}/Application/MarketCatalog`
+- 取引所固有処理: `src/Exchanges/{Exchange}/Adapter/Internal/MarketCatalog`
 - Facade 公開境界は ExecutionContext の塊（AccountInfo 相当を含む）に依存しない（MUST）。
 
 ### Application / Composition の責務分担
 
 - `src/Application`: 取引所横断のユースケース
-- `src/Exchanges/{Exchange}/Application`: 取引所固有ユースケース
+- `src/Exchanges/{Exchange}/Adapter/Internal/MarketCatalog`: 取引所固有の市場定義
 - `src/Composition`: 取引所横断の配線（DI / Bootstrap）
 - `src/Exchanges/{Exchange}/Composition`: 取引所固有の配線
 
@@ -191,27 +191,27 @@ src/
   Transport/
   Exchanges/
     Common/
-      Application/
+      Adapter/
     Bitflyer/
       Wire/{Public,Private,Internal}
       Raw/{Public,Private,Internal}
       Normalized/{Public,Private,Internal}
       Adapter/{Public,Private,Internal}
-      Application/MarketCatalog/
+      Adapter/Internal/MarketCatalog/
       Composition/
     Bittrade/
       Wire/{Public,Private,Internal}
       Raw/{Public,Private,Internal}
       Normalized/{Public,Private,Internal}
       Adapter/{Public,Private,Internal}
-      Application/MarketCatalog/
+      Adapter/Internal/MarketCatalog/
       Composition/
 ```
 
 ### 移行フェーズ
 
 1. Facade 公開境界から ExecutionContext の塊依存を除去する。
-2. 取引所差分を `Application/MarketCatalog` と resolver 実装へ集約する。
+2. 取引所差分を `Adapter/Internal/MarketCatalog` と resolver 実装へ集約する。
 3. namespace / using / 参照を統一する。
 4. `dotnet build` / `dotnet test` を通す。
 5. inventory / 契約文書を同期更新する。

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Exchanges.Common.Application.Adapter.Internal;
+namespace ExchangeApi.Exchanges.Common.Adapter.Internal;
 
 internal static class AdapterCallExecutor
 {

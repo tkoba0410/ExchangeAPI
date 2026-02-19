@@ -44,6 +44,7 @@
 - docs/reference 深掘り（命名/引数/実装/パリティ/DX）: `REVIEW-REF-DELTA` は廃止。必要時は `REVIEW-DOCS` で補助監査し、過去テンプレは `docs/archive/references/review-ref-delta-template.md` を参照する。
 
 ※ `REVIEW-DOCS` は `review-framework` の 7品質軸とは別の補助監査であり、軸件数集計には含めない。
+※ Security 監査では、機密を扱うファイルベース設定に対応するテンプレート（`docs/process/templates/`）の更新有無を確認する。
 
 ---
 

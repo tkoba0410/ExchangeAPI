@@ -96,6 +96,7 @@
 * `docs/process/public-surface.md`
 * `docs/process/review-framework.md`
 * `docs/process/codex-review-runbook.md`
+* `docs/process/templates/README.md`
 * `docs/process/revision-history.md`
 * `stage9.md`
 * `docs/archive/document-plan.md`

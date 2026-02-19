@@ -7,6 +7,9 @@
 - **Contract 層**：外部公開（安定契約）。語彙・DTO・意味論（Shape / Semantics）は Contracts 文書群（例：`docs/normative/contracts/contracts.md`）で定義する。
 - **Normalized / Raw / Wire 層**：内部実装（または高度利用向け）。外部互換性は保証しない。
 
+実務上、取引所別の機能網羅が必要な利用者は Normalized を利用できるが、
+その場合は「公開安定契約外（追従前提）」として扱う。
+
 ## 1. Purpose
 
 本書は Contract 層における **公開安定 API の契約文書**である。

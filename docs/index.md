@@ -61,6 +61,7 @@
   429 / Timeout / Partial Failure の公開契約を定義。
 
 ※ Raw / Normalized / Wire 層は内部実装または高度利用向けであり、公開安定 API ではありません。
+※ 取引所別の機能網羅を優先する場合、Normalized を利用できるが、互換保証は限定的（追従前提）です。
 
 ---
 

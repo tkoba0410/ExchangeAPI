@@ -229,9 +229,14 @@ public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvid
         }
 
         var value = element.GetString();
+        if (value is null)
+        {
+            throw new InvalidOperationException($"CRED_SCHEMA_INVALID: '{entryKey}.{propertyName}' must be string or null.");
+        }
+
         if (string.IsNullOrWhiteSpace(value))
         {
-            return null;
+            throw new InvalidOperationException($"CRED_SCHEMA_INVALID: '{entryKey}.{propertyName}' must not be empty.");
         }
 
         if (!DateTimeOffset.TryParseExact(

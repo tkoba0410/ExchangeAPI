@@ -154,6 +154,42 @@ public class AgeEncryptedFileApiCredentialProvider_Tests
     }
 
     [Fact]
+    public void Constructor_Throws_WhenExpiresAtIsEmpty()
+    {
+        var encryptedPath = Path.GetTempFileName();
+        var keyPath = Path.GetTempFileName();
+        try
+        {
+            var json = """
+            {
+              "bitflyer/default": {
+                "ApiKey": "key-1",
+                "ApiSecret": "secret-1",
+                "ExpiresAt": "",
+                "Version": null,
+                "UpdatedAt": null,
+                "Comment": null
+              }
+            }
+            """;
+
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                new AgeEncryptedFileApiCredentialProvider(
+                    encryptedPath,
+                    "bitflyer",
+                    keyPath,
+                    decryptor: (_, _) => json));
+
+            Assert.Contains("ExpiresAt", exception.Message);
+        }
+        finally
+        {
+            File.Delete(encryptedPath);
+            File.Delete(keyPath);
+        }
+    }
+
+    [Fact]
     public void Constructor_Throws_WhenUpdatedAtIsNotUtcZFormat()
     {
         var encryptedPath = Path.GetTempFileName();
@@ -168,6 +204,42 @@ public class AgeEncryptedFileApiCredentialProvider_Tests
                 "ExpiresAt": null,
                 "Version": null,
                 "UpdatedAt": "2026-02-19T09:00:00+09:00",
+                "Comment": null
+              }
+            }
+            """;
+
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                new AgeEncryptedFileApiCredentialProvider(
+                    encryptedPath,
+                    "bitflyer",
+                    keyPath,
+                    decryptor: (_, _) => json));
+
+            Assert.Contains("UpdatedAt", exception.Message);
+        }
+        finally
+        {
+            File.Delete(encryptedPath);
+            File.Delete(keyPath);
+        }
+    }
+
+    [Fact]
+    public void Constructor_Throws_WhenUpdatedAtIsWhitespace()
+    {
+        var encryptedPath = Path.GetTempFileName();
+        var keyPath = Path.GetTempFileName();
+        try
+        {
+            var json = """
+            {
+              "bitflyer/default": {
+                "ApiKey": "key-1",
+                "ApiSecret": "secret-1",
+                "ExpiresAt": null,
+                "Version": null,
+                "UpdatedAt": "   ",
                 "Comment": null
               }
             }

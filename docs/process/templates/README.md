@@ -15,6 +15,7 @@
 ## 運用ルール
 
 - `ApiKey` / `ApiSecret` は null/空文字不可。
+- `ExpiresAt` はキー必須、値は null または ISO-8601 文字列。
 - `Version` / `UpdatedAt` / `Comment` はキー必須、値は null 可。
 - 平文ファイルは作業後に削除する。
 - `credentials.enc.json` と `age.key` は別ディレクトリで管理する。

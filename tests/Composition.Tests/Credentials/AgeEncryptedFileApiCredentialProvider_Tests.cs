@@ -19,6 +19,7 @@ public class AgeEncryptedFileApiCredentialProvider_Tests
               "bitflyer/default": {
                 "ApiKey": "key-1",
                 "ApiSecret": "secret-1",
+                "ExpiresAt": "2026-03-01T00:00:00Z",
                 "Version": null,
                 "UpdatedAt": "2026-02-19T00:00:00Z",
                 "Comment": null
@@ -36,7 +37,7 @@ public class AgeEncryptedFileApiCredentialProvider_Tests
 
             Assert.Equal("key-1", credentials.ApiKey);
             Assert.Equal("secret-1", credentials.ApiSecret);
-            Assert.Equal(DateTimeOffset.Parse("2026-02-19T00:00:00Z"), credentials.ExpiresAt);
+            Assert.Equal(DateTimeOffset.Parse("2026-03-01T00:00:00Z"), credentials.ExpiresAt);
         }
         finally
         {
@@ -57,6 +58,7 @@ public class AgeEncryptedFileApiCredentialProvider_Tests
               "bitflyer/default": {
                 "ApiKey": "key-1",
                 "ApiSecret": "secret-1",
+                "ExpiresAt": null,
                 "UpdatedAt": null,
                 "Comment": null
               }
@@ -91,6 +93,7 @@ public class AgeEncryptedFileApiCredentialProvider_Tests
               "bitflyer/default": {
                 "ApiKey": "key-1",
                 "ApiSecret": "secret-1",
+                "ExpiresAt": null,
                 "Version": null,
                 "UpdatedAt": "not-a-date",
                 "Comment": null
@@ -115,6 +118,42 @@ public class AgeEncryptedFileApiCredentialProvider_Tests
     }
 
     [Fact]
+    public void Constructor_Throws_WhenExpiresAtIsInvalid()
+    {
+        var encryptedPath = Path.GetTempFileName();
+        var keyPath = Path.GetTempFileName();
+        try
+        {
+            var json = """
+            {
+              "bitflyer/default": {
+                "ApiKey": "key-1",
+                "ApiSecret": "secret-1",
+                "ExpiresAt": "invalid-date",
+                "Version": null,
+                "UpdatedAt": null,
+                "Comment": null
+              }
+            }
+            """;
+
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                new AgeEncryptedFileApiCredentialProvider(
+                    encryptedPath,
+                    "bitflyer",
+                    keyPath,
+                    decryptor: (_, _) => json));
+
+            Assert.Contains("ExpiresAt", exception.Message);
+        }
+        finally
+        {
+            File.Delete(encryptedPath);
+            File.Delete(keyPath);
+        }
+    }
+
+    [Fact]
     public void Get_Throws_WhenAccountCredentialsMissing()
     {
         var encryptedPath = Path.GetTempFileName();
@@ -126,6 +165,7 @@ public class AgeEncryptedFileApiCredentialProvider_Tests
               "bitflyer/default": {
                 "ApiKey": "key-1",
                 "ApiSecret": "secret-1",
+                "ExpiresAt": null,
                 "Version": null,
                 "UpdatedAt": null,
                 "Comment": null

@@ -17,6 +17,7 @@ namespace ExchangeApi.Composition.Providers.Credentials;
 ///   "bitflyer/default": {
 ///     "ApiKey": "...",
 ///     "ApiSecret": "...",
+///     "ExpiresAt": null,
 ///     "Version": null,
 ///     "UpdatedAt": null,
 ///     "Comment": null
@@ -157,14 +158,16 @@ public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvid
     {
         var apiKeyElement = RequireProperty(entryElement, "ApiKey", entryKey);
         var apiSecretElement = RequireProperty(entryElement, "ApiSecret", entryKey);
+        var expiresAtElement = RequireProperty(entryElement, "ExpiresAt", entryKey);
         var versionElement = RequireProperty(entryElement, "Version", entryKey);
         var updatedAtElement = RequireProperty(entryElement, "UpdatedAt", entryKey);
         _ = RequireProperty(entryElement, "Comment", entryKey);
 
         var apiKey = ExtractRequiredString(apiKeyElement, "ApiKey", entryKey);
         var apiSecret = ExtractRequiredString(apiSecretElement, "ApiSecret", entryKey);
+        var expiresAt = ParseDateTimeOffsetOrNull(expiresAtElement, "ExpiresAt", entryKey);
         _ = ValidateOptionalStringOrNull(versionElement, "Version", entryKey);
-        var expiresAt = ParseUpdatedAtOrNull(updatedAtElement, entryKey);
+        _ = ParseDateTimeOffsetOrNull(updatedAtElement, "UpdatedAt", entryKey);
 
         return new ApiCredentials(apiKey, apiSecret, ExpiresAt: expiresAt);
     }
@@ -210,7 +213,7 @@ public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvid
         return element.GetString();
     }
 
-    private static DateTimeOffset? ParseUpdatedAtOrNull(JsonElement element, string entryKey)
+    private static DateTimeOffset? ParseDateTimeOffsetOrNull(JsonElement element, string propertyName, string entryKey)
     {
         if (element.ValueKind is JsonValueKind.Null)
         {
@@ -219,18 +222,18 @@ public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvid
 
         if (element.ValueKind != JsonValueKind.String)
         {
-            throw new InvalidOperationException($"CRED_SCHEMA_INVALID: '{entryKey}.UpdatedAt' must be string or null.");
+            throw new InvalidOperationException($"CRED_SCHEMA_INVALID: '{entryKey}.{propertyName}' must be string or null.");
         }
 
-        var updatedAt = element.GetString();
-        if (string.IsNullOrWhiteSpace(updatedAt))
+        var value = element.GetString();
+        if (string.IsNullOrWhiteSpace(value))
         {
             return null;
         }
 
-        if (!DateTimeOffset.TryParse(updatedAt, out var parsed))
+        if (!DateTimeOffset.TryParse(value, out var parsed))
         {
-            throw new InvalidOperationException($"CRED_SCHEMA_INVALID: '{entryKey}.UpdatedAt' must be ISO-8601.");
+            throw new InvalidOperationException($"CRED_SCHEMA_INVALID: '{entryKey}.{propertyName}' must be ISO-8601.");
         }
 
         return parsed;

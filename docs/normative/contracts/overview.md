@@ -7,8 +7,17 @@
 - **Contract 層**：外部公開（安定契約）。語彙・DTO・意味論（Shape / Semantics）は Contracts 文書群（例：`docs/normative/contracts/contracts.md`）で定義する。
 - **Normalized / Raw / Wire 層**：内部実装（または高度利用向け）。外部互換性は保証しない。
 
-実務上、取引所別の機能網羅が必要な利用者は Normalized を利用できるが、
+実務上、取引所別の機能網羅が必要な利用者（Bot / 高度利用）は Normalized を利用できるが、
 その場合は「公開安定契約外（追従前提）」として扱う。
+Contracts は、取引所横断で共通に成立する最小機能に限定する。
+
+## 利用モデル（運用指針）
+
+- **Level A（主利用面）**: 取引所別機能網羅を優先する場合は `Normalized` を利用する。
+- **Level B（横断補助面）**: 取引所横断で安定的に共通化できる最小機能のみ `Contracts` を利用する。
+
+※ 安定保証の対象は Level B（Contracts）のみである。  
+※ Level A（Normalized）は利用可能だが、互換保証外である。
 
 ## 1. Purpose
 

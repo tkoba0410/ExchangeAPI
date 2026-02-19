@@ -17,13 +17,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 /// <summary>
 /// bitFlyer の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class PublicClient : IPublicApi, IExchangeClient
+public sealed class PublicClient : IContractPublicClient
 {
     private readonly MarketApi _marketApi;
-
-    public IPublicApi? Public => this;
-    public IPrivateApi? Private => null;
-    public ICandlesticksApi? Candlesticks => null;
 
     public PublicClient(
         ClientOptions options,

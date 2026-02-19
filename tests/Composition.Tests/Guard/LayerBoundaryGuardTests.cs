@@ -30,23 +30,23 @@ public class LayerBoundaryGuardTests
     }
 
     [Fact]
-    public void CreateContractPublicClient_ReturnsExchangeClient()
+    public void CreateContractPublicClient_ReturnsPublicContractClient()
     {
         var bitflyerMethod = GetPublicStaticMethod(typeof(BitflyerFactory), "CreateContractPublicClient");
         var bittradeMethod = GetPublicStaticMethod(typeof(BittradeFactory), "CreateContractPublicClient");
 
-        Assert.Equal(typeof(IExchangeClient), bitflyerMethod.ReturnType);
-        Assert.Equal(typeof(IExchangeClient), bittradeMethod.ReturnType);
+        Assert.Equal(typeof(IContractPublicClient), bitflyerMethod.ReturnType);
+        Assert.Equal(typeof(IContractPublicClient), bittradeMethod.ReturnType);
     }
 
     [Fact]
-    public void CreateContractPrivateClient_ReturnsExchangeClient()
+    public void CreateContractPrivateClient_ReturnsPrivateContractClient()
     {
         var bitflyerMethod = GetPublicStaticMethod(typeof(BitflyerFactory), "CreateContractPrivateClient");
         var bittradeMethod = GetPublicStaticMethod(typeof(BittradeFactory), "CreateContractPrivateClient");
 
-        Assert.Equal(typeof(IExchangeClient), bitflyerMethod.ReturnType);
-        Assert.Equal(typeof(IExchangeClient), bittradeMethod.ReturnType);
+        Assert.Equal(typeof(IContractPrivateClient), bitflyerMethod.ReturnType);
+        Assert.Equal(typeof(IContractPrivateClient), bittradeMethod.ReturnType);
     }
 
     [Fact]
@@ -55,10 +55,10 @@ public class LayerBoundaryGuardTests
         var bitflyerClient = BitflyerFactory.CreateContractPublicClient();
         var bittradeClient = BittradeFactory.CreateContractPublicClient();
 
-        Assert.NotNull(bitflyerClient.Public);
-        Assert.Null(bitflyerClient.Private);
-        Assert.NotNull(bittradeClient.Public);
-        Assert.Null(bittradeClient.Private);
+        Assert.IsAssignableFrom<IContractPublicClient>(bitflyerClient);
+        Assert.IsAssignableFrom<IContractPublicClient>(bittradeClient);
+        Assert.False(bitflyerClient is IContractCandlesticksClient);
+        Assert.True(bittradeClient is IContractCandlesticksClient);
     }
 
     [Fact]
@@ -84,8 +84,10 @@ public class LayerBoundaryGuardTests
             AccountId = "default",
         });
 
-        Assert.NotNull(bitflyerClient.Private);
-        Assert.NotNull(bittradeClient.Private);
+        Assert.IsAssignableFrom<IContractPrivateClient>(bitflyerClient);
+        Assert.IsAssignableFrom<IContractPrivateClient>(bittradeClient);
+        Assert.False(bitflyerClient is IContractCandlesticksClient);
+        Assert.True(bittradeClient is IContractCandlesticksClient);
     }
 
     [Fact]
@@ -115,7 +117,7 @@ public class LayerBoundaryGuardTests
     [Fact]
     public void Contracts_PublicSurface_DoesNotExposeRawWireOrJson()
     {
-        var contracts = typeof(IExchangeClient).Assembly;
+        var contracts = typeof(IContractPublicClient).Assembly;
         var forbidden = new List<string>();
 
         foreach (var type in contracts.GetExportedTypes())

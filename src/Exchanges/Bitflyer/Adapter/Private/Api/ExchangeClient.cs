@@ -18,14 +18,10 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class ExchangeClient : IPublicApi, IPrivateApi, IExchangeClient
+public sealed class ExchangeClient : IContractPrivateClient
 {
     private readonly MarketApi _marketApi;
     private readonly PrivateApi _privateApi;
-    // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
-    public IPublicApi? Public => this;
-    public IPrivateApi? Private => this;
-    public ICandlesticksApi? Candlesticks => null;
 
     public ExchangeClient(
         ClientOptions options,

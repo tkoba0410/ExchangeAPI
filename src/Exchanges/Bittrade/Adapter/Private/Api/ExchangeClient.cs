@@ -15,15 +15,10 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// <summary>
 /// Bittrade 用のファサード。各 API 実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class ExchangeClient : IPublicApi, IPrivateApi, ICandlesticksApi, IExchangeClient
+public sealed class ExchangeClient : IContractPrivateClient, IContractCandlesticksClient
 {
     private readonly MarketApi _marketApi;
     private readonly PrivateApi _privateApi;
-
-    // IExchangeClient (nullable capability) に合わせる。実体は常に non-null。
-    public IPublicApi? Public => this;
-    public IPrivateApi? Private => this;
-    public ICandlesticksApi? Candlesticks => this;
 
     public ExchangeClient(
         ClientOptions options,

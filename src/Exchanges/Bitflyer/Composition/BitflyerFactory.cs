@@ -39,14 +39,14 @@ public static class BitflyerFactory
         return components.Normalized;
     }
 
-    public static IExchangeClient CreateContractPublicClient(BitflyerFactoryOptions? options = null)
+    public static IContractPublicClient CreateContractPublicClient(BitflyerFactoryOptions? options = null)
     {
         var settings = options ?? new BitflyerFactoryOptions();
         var clientOptions = ToClientOptions(settings);
         return new PublicClient(clientOptions, settings.HttpClient, settings.Transport);
     }
 
-    public static IExchangeClient CreateContractPrivateClient(BitflyerFactoryOptions? options = null)
+    public static IContractPrivateClient CreateContractPrivateClient(BitflyerFactoryOptions? options = null)
     {
         var settings = options ?? new BitflyerFactoryOptions();
         var credentials = ResolveCredentials(settings);

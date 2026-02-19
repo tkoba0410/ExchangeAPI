@@ -86,7 +86,7 @@ Contracts は、API 資格情報（API Key / Secret 等）の **取得方法・�
 ## 5.1 NotSupported（Shape / Semantics）
 
 NotSupported は、Contracts API における **capability 不足**を示す語彙として予約する。
-ただし、未対応 capability は Facade の nullable capability により **事前に判定可能**でなければならず、
+ただし、未対応 capability は Facade の capability I/F 非実装により **事前に判定可能**でなければならず、
 NotSupported を通常制御フローとして常用してはならない（原則使用しない）。
 
 - CallErrorKind: Semantic
@@ -95,7 +95,7 @@ NotSupported を通常制御フローとして常用してはならない（原�
 - Message:
   - "NotSupported:<feature>"
 
-未対応機能の公開契約は、`NotSupported` の返却ではなく **nullable capability の非提供**で表現する（MUST）。
+未対応機能の公開契約は、`NotSupported` の返却ではなく **capability I/F の非実装**で表現する（MUST）。
 取引所差で有無が揺れる機能は、`IPublicApi` / `IPrivateApi` に混在させず、単独 capability I/F として分離してよい（MAY）。
 
 ## 6. 型の所有権と返却責務
@@ -113,7 +113,7 @@ Contracts の Facade API は Public / Private に分離する（MUST）。
 
 - Public/Private を MarketData / Trading / Account 等の意味分類の代替として用いてはならない（MUST NOT）。
 - 分離の目的は「認証境界の明確化」であり、Contracts の Shape / Semantics を変更してはならない（MUST NOT）。
-- ただし、取引所差で有無が揺れる機能については、事前判定可能性を満たすために単独 capability I/F（nullable）へ分離してよい（MAY）。
+- ただし、取引所差で有無が揺れる機能については、事前判定可能性を満たすために単独 capability I/F へ分離してよい（MAY）。
 - Composition の Contracts 入口は Public / Private を明示的に分離してよい（MAY）。
 - Private 入口で前提条件（署名・資格情報等）が不足する場合、Public へ暗黙フォールバックしてはならない（MUST NOT）。
 

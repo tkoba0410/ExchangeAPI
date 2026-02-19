@@ -33,6 +33,7 @@
 
 - Bot の基本実装は取引所別 Normalized API を利用する。
 - Contracts は「複数取引所で共通に成立する最小機能」のみを横断利用する。
+- 取引所差で有無が揺れる機能は、nullable ではなく capability I/F（例: `IContractCandlesticksClient`）で判定する。
 - Normalized は公開安定契約ではない（互換保証外）ため、更新時は追従前提で運用する。
 - 公開安定面の正本は `docs/normative/contracts/contracts.md` と `docs/normative/contracts/overview.md` を参照する。
 

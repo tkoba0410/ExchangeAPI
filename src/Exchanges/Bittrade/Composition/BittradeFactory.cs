@@ -48,14 +48,14 @@ public static class BittradeFactory
         return components.Normalized;
     }
 
-    public static IExchangeClient CreateContractPublicClient(BittradeFactoryOptions? options = null)
+    public static IContractPublicClient CreateContractPublicClient(BittradeFactoryOptions? options = null)
     {
         var settings = options ?? new BittradeFactoryOptions();
         var adapterOptions = ToAdapterOptions(settings);
         return new PublicClient(adapterOptions);
     }
 
-    public static IExchangeClient CreateContractPrivateClient(BittradeFactoryOptions? options = null)
+    public static IContractPrivateClient CreateContractPrivateClient(BittradeFactoryOptions? options = null)
     {
         var settings = options ?? new BittradeFactoryOptions();
         var credentials = ResolveCredentials(settings);

@@ -94,7 +94,7 @@ Normalized/Adapter で `NotSupported` を返す通常制御を行わない。
 
 * Contracts API の戻り値は常に `Call<TRequest, TResponse>` である。
 * 失敗は `Call` の失敗として表現され、例外は制御フローとして用いてはならない。
-* 未対応 capability は **Facade の nullable capability により事前に判定可能**でなければならない。
+* 未対応 capability は **Facade の capability I/F 非実装により事前に判定可能**でなければならない。
 * `NotSupported` を通常制御フロー（取引所判別・分岐）として利用することは禁止される（原則使用しない）。
 
 #### 3.3.1 Async 命名
@@ -125,9 +125,9 @@ Normalized/Adapter で `NotSupported` を返す通常制御を行わない。
 ### 4.1 機能の有無
 
 * 取引所によって提供されない機能が存在し得る。
-* 利用可否は Facade の capability（nullable）により **事前に判定可能でなければならない**。
+* 利用可否は Facade の capability I/F（例: `IContractCandlesticksClient`）により **事前に判定可能でなければならない**。
 * 利用可否判定を `NotSupported` の捕捉に依存してはならない。
-* 取引所差で有無が揺れる機能は、単独 capability I/F（nullable）として分離してよい。
+* 取引所差で有無が揺れる機能は、単独 capability I/F として分離してよい。
 
 ---
 

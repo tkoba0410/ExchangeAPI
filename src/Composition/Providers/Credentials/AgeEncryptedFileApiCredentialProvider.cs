@@ -134,8 +134,8 @@ public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvid
 
             if (process.ExitCode != 0)
             {
-                var details = string.IsNullOrWhiteSpace(error) ? "unknown error" : error.Trim();
-                throw new InvalidOperationException($"CRED_DECRYPT_FAILED: age exited with code {process.ExitCode}. {details}");
+                _ = error;
+                throw new InvalidOperationException($"CRED_DECRYPT_FAILED: age exited with code {process.ExitCode}.");
             }
 
             return output;

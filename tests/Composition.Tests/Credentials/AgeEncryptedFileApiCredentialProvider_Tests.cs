@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using ExchangeApi.Composition.Providers.Credentials;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
@@ -7,6 +8,11 @@ namespace ExchangeApi.Tests.Composition.Tests.Credentials;
 
 public class AgeEncryptedFileApiCredentialProvider_Tests
 {
+    public AgeEncryptedFileApiCredentialProvider_Tests()
+    {
+        AgeEncryptedFileApiCredentialProvider.InvalidateCache();
+    }
+
     [Fact]
     public void Get_ReturnsCredentials_WhenSchemaIsValid()
     {
@@ -291,6 +297,106 @@ public class AgeEncryptedFileApiCredentialProvider_Tests
                 provider.Get(AccountId.ParseOrThrow("trading")));
 
             Assert.Contains("CRED_NOT_FOUND", exception.Message);
+        }
+        finally
+        {
+            File.Delete(encryptedPath);
+            File.Delete(keyPath);
+        }
+    }
+
+    [Fact]
+    public void Constructor_UsesSharedCache_ForSameInput()
+    {
+        var encryptedPath = Path.GetTempFileName();
+        var keyPath = Path.GetTempFileName();
+        var decryptCount = 0;
+
+        try
+        {
+            var json = """
+            {
+              "bitflyer/default": {
+                "ApiKey": "key-1",
+                "ApiSecret": "secret-1",
+                "ExpiresAt": null,
+                "Version": null,
+                "UpdatedAt": null,
+                "Comment": null
+              }
+            }
+            """;
+
+            Func<string, string, string> decryptor = (_, _) =>
+            {
+                Interlocked.Increment(ref decryptCount);
+                return json;
+            };
+
+            _ = new AgeEncryptedFileApiCredentialProvider(encryptedPath, "bitflyer", keyPath, decryptor);
+            _ = new AgeEncryptedFileApiCredentialProvider(encryptedPath, "bitflyer", keyPath, decryptor);
+
+            Assert.Equal(1, decryptCount);
+        }
+        finally
+        {
+            File.Delete(encryptedPath);
+            File.Delete(keyPath);
+        }
+    }
+
+    [Fact]
+    public void Constructor_DoesNotShareCache_AcrossDifferentExchangeId()
+    {
+        var encryptedPath = Path.GetTempFileName();
+        var keyPath = Path.GetTempFileName();
+        var decryptCount = 0;
+
+        try
+        {
+            var json = """
+            {
+              "bitflyer/default": {
+                "ApiKey": "key-1",
+                "ApiSecret": "secret-1",
+                "ExpiresAt": null,
+                "Version": null,
+                "UpdatedAt": null,
+                "Comment": null
+              }
+            }
+            """;
+
+            Func<string, string, string> decryptor = (_, _) =>
+            {
+                Interlocked.Increment(ref decryptCount);
+                return json;
+            };
+
+            _ = new AgeEncryptedFileApiCredentialProvider(encryptedPath, "bitflyer", keyPath, decryptor);
+
+            var otherExchangeJson = """
+            {
+              "bittrade/default": {
+                "ApiKey": "key-2",
+                "ApiSecret": "secret-2",
+                "ExpiresAt": null,
+                "Version": null,
+                "UpdatedAt": null,
+                "Comment": null
+              }
+            }
+            """;
+
+            Func<string, string, string> otherDecryptor = (_, _) =>
+            {
+                Interlocked.Increment(ref decryptCount);
+                return otherExchangeJson;
+            };
+
+            _ = new AgeEncryptedFileApiCredentialProvider(encryptedPath, "bittrade", keyPath, otherDecryptor);
+
+            Assert.Equal(2, decryptCount);
         }
         finally
         {

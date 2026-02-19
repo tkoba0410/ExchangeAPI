@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Types;
@@ -28,6 +30,7 @@ namespace ExchangeApi.Composition.Providers.Credentials;
 public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvider
 {
     private const string UtcDateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private static readonly ConcurrentDictionary<string, Lazy<IReadOnlyDictionary<string, ApiCredentials>>> SharedStoreCache = new(StringComparer.Ordinal);
 
     private readonly string _encryptedFilePath;
     private readonly string _secretKeyPath;
@@ -71,8 +74,22 @@ public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvid
         _exchangeId = exchangeId;
         _decryptor = decryptor ?? DecryptWithAgeCli;
 
-        var plaintextJson = _decryptor(_encryptedFilePath, _secretKeyPath);
-        _store = ParseAndValidateStore(plaintextJson);
+        var cacheKey = BuildCacheKey(_encryptedFilePath, _secretKeyPath, _exchangeId);
+        var lazyStore = SharedStoreCache.GetOrAdd(
+            cacheKey,
+            _ => new Lazy<IReadOnlyDictionary<string, ApiCredentials>>(
+                LoadStore,
+                LazyThreadSafetyMode.ExecutionAndPublication));
+
+        try
+        {
+            _store = lazyStore.Value;
+        }
+        catch
+        {
+            SharedStoreCache.TryRemove(cacheKey, out _);
+            throw;
+        }
     }
 
     public ApiCredentials Get(AccountId accountId)
@@ -127,6 +144,24 @@ public sealed class AgeEncryptedFileApiCredentialProvider : IApiCredentialProvid
         {
             throw new InvalidOperationException("CRED_DECRYPT_TOOL_MISSING: 'age' command was not found.", ex);
         }
+    }
+
+    private IReadOnlyDictionary<string, ApiCredentials> LoadStore()
+    {
+        var plaintextJson = _decryptor(_encryptedFilePath, _secretKeyPath);
+        return ParseAndValidateStore(plaintextJson);
+    }
+
+    private static string BuildCacheKey(string encryptedFilePath, string secretKeyPath, string exchangeId)
+    {
+        var normalizedEncryptedPath = Path.GetFullPath(encryptedFilePath);
+        var normalizedSecretKeyPath = Path.GetFullPath(secretKeyPath);
+        return $"{normalizedEncryptedPath}|{normalizedSecretKeyPath}|{exchangeId}";
+    }
+
+    public static void InvalidateCache()
+    {
+        SharedStoreCache.Clear();
     }
 
     private static IReadOnlyDictionary<string, ApiCredentials> ParseAndValidateStore(string plaintextJson)

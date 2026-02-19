@@ -59,5 +59,8 @@
 - 対象修正: `src/Exchanges/Bittrade/Adapter/Internal/Factory/BittradeClientComponents.cs`
 - 回帰防止: `tests/Composition.Tests/Guard/LayerBoundaryGuardTests.cs`
 - 方針文書: `docs/process/public-surface.md`
+- 利用開始導線: `README.md`
+- 利用開始導線: `docs/index.md`
+- 運用ルール（Quickstart例外）: `docs/process/process.md`
+- 監査結果（User Guide）: `docs/process/reviews/REVIEW-USER-GUIDE-20260219-stage9.md`
 - 監査サマリ: `docs/process/reviews/REVIEW-SUMMARY-20260219-stage9.md`
-

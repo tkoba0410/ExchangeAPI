@@ -1,12 +1,12 @@
 using System;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Error;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Wire.Internal.Auth;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Bootstrap;
 
 internal static class BittradeClientBootstrap
 {

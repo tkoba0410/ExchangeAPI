@@ -5,7 +5,7 @@ using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Orchestration;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Primitives.DomainCommon.Types;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Bootstrap;
 
 /// <summary>
 /// Bittrade API クライアントを構築するファクトリ。

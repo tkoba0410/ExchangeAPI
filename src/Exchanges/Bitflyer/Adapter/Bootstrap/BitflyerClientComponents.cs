@@ -8,7 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Wire.Internal;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Wire;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Bootstrap;
 
 internal sealed class BitflyerClientComponents
 {

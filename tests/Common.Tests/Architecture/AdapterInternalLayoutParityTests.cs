@@ -15,14 +15,18 @@ public sealed class AdapterInternalLayoutParityTests
         foreach (var exchange in new[] { "Bitflyer", "Bittrade" })
         {
             var adapterPath = Path.Combine(root, "src", "Exchanges", exchange, "Adapter");
+            var wirePath = Path.Combine(root, "src", "Exchanges", exchange, "Wire");
 
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Public", "Api")));
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Private", "Api")));
+            Assert.True(Directory.Exists(Path.Combine(adapterPath, "Bootstrap")));
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Orchestration")));
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Resolve")));
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Execute")));
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Map")));
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Error")));
+            Assert.True(Directory.Exists(Path.Combine(wirePath, "Internal", "Auth")));
+            Assert.True(Directory.Exists(Path.Combine(wirePath, "Constants")));
 
             Assert.True(File.Exists(Path.Combine(adapterPath, "Public", "Api", "PublicClient.cs")));
             Assert.True(File.Exists(Path.Combine(adapterPath, "Private", "Api", "ExchangeClient.cs")));
@@ -34,6 +38,8 @@ public sealed class AdapterInternalLayoutParityTests
             Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Execute", "NormalizedExecutor.cs")));
             Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Error", "CallErrorTranslator.cs")));
             Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Error", "ErrorClassifier.cs")));
+            Assert.True(File.Exists(Path.Combine(wirePath, "Internal", "Auth", "RequestSigner.cs")));
+            Assert.True(File.Exists(Path.Combine(wirePath, "Constants", "AuthKeys.cs")));
 
             var mapperFiles = Directory
                 .GetFiles(Path.Combine(adapterPath, "Internal", "Map"), "ContractMapper*.cs", SearchOption.TopDirectoryOnly)
@@ -43,6 +49,9 @@ public sealed class AdapterInternalLayoutParityTests
 
             Assert.False(Directory.Exists(Path.Combine(adapterPath, "Internal", "Mappers")));
             Assert.False(Directory.Exists(Path.Combine(adapterPath, "Internal", "MarketCatalog")));
+            Assert.False(Directory.Exists(Path.Combine(adapterPath, "Internal", "Factory")));
+            Assert.False(Directory.Exists(Path.Combine(adapterPath, "Internal", "Constants")));
+            Assert.False(File.Exists(Path.Combine(adapterPath, "Internal", "RequestSigner.cs")));
         }
     }
 

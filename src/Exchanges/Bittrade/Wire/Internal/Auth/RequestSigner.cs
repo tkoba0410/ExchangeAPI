@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Constants;
+using ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+namespace ExchangeApi.Exchanges.Bittrade.Wire.Internal.Auth;
 
 /// <summary>
 /// Bittrade (Huobi 系) HmacSHA256 署名。

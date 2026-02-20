@@ -235,10 +235,10 @@ src/Exchanges/<Exchange>/Adapter/Internal/Resolve/
 
 #### 3.4.1 Adapter 層の物理配置（MUST）
 
-Adapter 層の API/実装は、Wire/Raw/Normalized と同様に
+Adapter 層の**公開 API 面**は、Wire/Raw/Normalized と同様に
 **署名有無（Public / Private）によってのみ分離**する。
 MarketData / Trading / Account 等の**意味分類（種類別フォルダ分割）は行わない**。
-`Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
+`Bootstrap` / `Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
 意味分類語彙は**物理配置・namespace・公開 API・internal 実装の主分類軸**に使用してはならない。
 
 * 取引所配下の Adapter 物理配置は次を基準形（Canon）とする。
@@ -247,15 +247,19 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 src/Exchanges/<Exchange>/Adapter/
   Public/
   Private/
+  Bootstrap/
   Internal/
 ```
 
 * namespace は物理配置に一致させる（例）:
   * `ExchangeApi.Exchanges.<Exchange>.Adapter.Public.*`
   * `ExchangeApi.Exchanges.<Exchange>.Adapter.Private.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Bootstrap.*`
   * `ExchangeApi.Exchanges.<Exchange>.Adapter.Internal.*`
 
 * Adapter の Public/Private は「署名の有無」を表す。意味分類の代替として用いない（= Public/Private 以外で分けない）。
+* `Bootstrap` は `ClientOptions` / `ClientCredentials` / `ClientFactory` / `*ClientComponents` など、
+  Adapter API 入口を構成する初期化部品の置き場とする（MUST）。
 
 #### 3.4.2 Adapter の責務境界（MUST）
 
@@ -304,6 +308,10 @@ src/Exchanges/<Exchange>/Adapter/
 ```
 
 * namespace は物理配置に一致させる（MUST）。
+* `Internal` 配下に `Factory` / `Constants` / `RequestSigner` を配置してはならない（MUST NOT）。
+* `RequestSigner` は `src/Exchanges/<Exchange>/Wire/Internal/Auth/RequestSigner.cs`、
+  認証キー定数は `src/Exchanges/<Exchange>/Wire/Constants/AuthKeys.cs` に配置する（MUST）。
+* `Map` 専用の変換定数（例: 足種変換テーブル）は `Internal/Map` に配置する（SHOULD）。
 
 ---
 

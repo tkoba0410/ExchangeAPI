@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Constants;
+namespace ExchangeApi.Exchanges.Bittrade.Wire.Constants;
 
 internal static class AuthKeys
 {

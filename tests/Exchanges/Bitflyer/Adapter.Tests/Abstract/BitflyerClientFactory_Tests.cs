@@ -1,5 +1,5 @@
 using ExchangeApi.Transport.Policy;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Bootstrap;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;

@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Constants;
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 
 internal static class AuthKeys
 {

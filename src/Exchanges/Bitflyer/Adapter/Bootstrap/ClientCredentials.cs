@@ -1,4 +1,4 @@
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Bootstrap;
 
 /// <summary>
 /// bitFlyer 署名に必要な最小資格情報。

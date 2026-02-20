@@ -1,5 +1,5 @@
 using System;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Internal.Auth;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Error;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
@@ -9,7 +9,7 @@ using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Bootstrap;
 
 /// <summary>
 /// Factory for constructing bitFlyer client instances.

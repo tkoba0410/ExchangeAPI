@@ -6,7 +6,7 @@ using ExchangeApi.Contracts.Common.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Resolve;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Bootstrap;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Orchestration;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Primitives.CallCommon;

@@ -11,7 +11,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Wire;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Bootstrap;
 
 internal sealed class BittradeClientComponents
 {

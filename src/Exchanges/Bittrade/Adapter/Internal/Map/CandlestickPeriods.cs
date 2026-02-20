@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Constants;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Map;
 
 internal static class CandlestickPeriods
 {

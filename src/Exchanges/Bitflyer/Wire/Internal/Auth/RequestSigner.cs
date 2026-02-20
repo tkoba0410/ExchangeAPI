@@ -4,13 +4,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Constants;
+using ExchangeApi.Exchanges.Bitflyer.Wire.Constants;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+namespace ExchangeApi.Exchanges.Bitflyer.Wire.Internal.Auth;
 
-internal sealed class RequestSigner : IRequestSigner
+public sealed class RequestSigner : IRequestSigner
 {
     private readonly string _apiKey;
     private readonly string _apiSecret;

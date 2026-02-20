@@ -4,7 +4,6 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Constants;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Utilities.OrderBook;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;

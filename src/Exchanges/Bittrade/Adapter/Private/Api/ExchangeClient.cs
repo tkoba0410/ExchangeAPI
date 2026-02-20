@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Bootstrap;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Orchestration;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Transport.Protocol;

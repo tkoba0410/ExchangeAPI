@@ -1,6 +1,6 @@
 using ExchangeApi.Transport.Policy;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Bootstrap;
 
 /// <summary>
 /// bitFlyer 向けの HTTP ポリシー既定値。

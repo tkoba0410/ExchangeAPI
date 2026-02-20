@@ -4,7 +4,7 @@ using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Bootstrap;
 
 /// <summary>
 /// Bittrade クライアントの構成オプション。

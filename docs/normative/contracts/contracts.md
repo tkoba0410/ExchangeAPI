@@ -162,9 +162,11 @@ Contracts の公開 API は **Request DTO を第一の契約**とする（MUST�
 
 - 取引所: `Bitflyer`, `Bittrade`, ...
 - レイヤ: `Wire`, `Raw`, `Normalized`, `Adapter`
-- 可視性: `Public`, `Private`, `Internal`
+- 公開面: `Public`, `Private`（署名有無）
+- 非公開補助: `Internal`（各レイヤ）, `Bootstrap`（Adapter）
 
 意味分類（例: `Account` / `Trading` / `Market`）は、公開構造の第一軸としては採用しない（MUST NOT）。
+取引所配下の物理配置の正本は TopSpec 3.1〜3.4 とし、本章は契約観点の要点のみを記す（MUST）。
 
 ### MarketCatalog / Resolver の位置づけ
 
@@ -195,10 +197,11 @@ src/
     Common/
       Adapter/
     Bitflyer/
-      Wire/{Public,Private,Internal}
+      Wire/{Public,Private,Constants,Internal}
+      Wire/Internal/Auth/
       Raw/{Public,Private,Internal}
       Normalized/{Public,Private,Internal}
-      Adapter/{Public,Private,Internal}
+      Adapter/{Public,Private,Bootstrap,Internal}
       Adapter/Internal/Orchestration/
       Adapter/Internal/Resolve/
       Adapter/Internal/Execute/
@@ -206,10 +209,11 @@ src/
       Adapter/Internal/Error/
       Composition/
     Bittrade/
-      Wire/{Public,Private,Internal}
+      Wire/{Public,Private,Constants,Internal}
+      Wire/Internal/Auth/
       Raw/{Public,Private,Internal}
       Normalized/{Public,Private,Internal}
-      Adapter/{Public,Private,Internal}
+      Adapter/{Public,Private,Bootstrap,Internal}
       Adapter/Internal/Orchestration/
       Adapter/Internal/Resolve/
       Adapter/Internal/Execute/
@@ -217,6 +221,12 @@ src/
       Adapter/Internal/Error/
       Composition/
 ```
+
+補足（MUST / MUST NOT）:
+
+- `Adapter/Internal` 配下に `Factory` / `Constants` / `RequestSigner` を置いてはならない。
+- `ClientOptions` / `ClientCredentials` / `ClientFactory` / `*ClientComponents` は `Adapter/Bootstrap` に置く。
+- Private endpoint 実装を持つ取引所では、`RequestSigner` を `Wire/Internal/Auth`、認証キー定数を `Wire/Constants` に置く。
 
 ### 移行フェーズ
 

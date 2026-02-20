@@ -309,7 +309,7 @@ src/Exchanges/<Exchange>/Adapter/
 
 * namespace は物理配置に一致させる（MUST）。
 * `Internal` 配下に `Factory` / `Constants` / `RequestSigner` を配置してはならない（MUST NOT）。
-* `RequestSigner` は `src/Exchanges/<Exchange>/Wire/Internal/Auth/RequestSigner.cs`、
+* Private endpoint 実装を持つ取引所では、`RequestSigner` は `src/Exchanges/<Exchange>/Wire/Internal/Auth/RequestSigner.cs`、
   認証キー定数は `src/Exchanges/<Exchange>/Wire/Constants/AuthKeys.cs` に配置する（MUST）。
 * `Map` 専用の変換定数（例: 足種変換テーブル）は `Internal/Map` に配置する（SHOULD）。
 

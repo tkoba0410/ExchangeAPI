@@ -25,8 +25,6 @@ public sealed class AdapterInternalLayoutParityTests
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Execute")));
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Map")));
             Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Error")));
-            Assert.True(Directory.Exists(Path.Combine(wirePath, "Internal", "Auth")));
-            Assert.True(Directory.Exists(Path.Combine(wirePath, "Constants")));
 
             Assert.True(File.Exists(Path.Combine(adapterPath, "Public", "Api", "PublicClient.cs")));
             Assert.True(File.Exists(Path.Combine(adapterPath, "Private", "Api", "ExchangeClient.cs")));
@@ -38,8 +36,17 @@ public sealed class AdapterInternalLayoutParityTests
             Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Execute", "NormalizedExecutor.cs")));
             Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Error", "CallErrorTranslator.cs")));
             Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Error", "ErrorClassifier.cs")));
-            Assert.True(File.Exists(Path.Combine(wirePath, "Internal", "Auth", "RequestSigner.cs")));
-            Assert.True(File.Exists(Path.Combine(wirePath, "Constants", "AuthKeys.cs")));
+
+            var privateEndpointsPath = Path.Combine(wirePath, "Private", "Endpoints");
+            var hasPrivateEndpoints = Directory.Exists(privateEndpointsPath) &&
+                Directory.GetFiles(privateEndpointsPath, "*.cs", SearchOption.TopDirectoryOnly).Length > 0;
+            if (hasPrivateEndpoints)
+            {
+                Assert.True(Directory.Exists(Path.Combine(wirePath, "Internal", "Auth")));
+                Assert.True(Directory.Exists(Path.Combine(wirePath, "Constants")));
+                Assert.True(File.Exists(Path.Combine(wirePath, "Internal", "Auth", "RequestSigner.cs")));
+                Assert.True(File.Exists(Path.Combine(wirePath, "Constants", "AuthKeys.cs")));
+            }
 
             var mapperFiles = Directory
                 .GetFiles(Path.Combine(adapterPath, "Internal", "Map"), "ContractMapper*.cs", SearchOption.TopDirectoryOnly)

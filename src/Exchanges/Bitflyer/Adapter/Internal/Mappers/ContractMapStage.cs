@@ -11,7 +11,7 @@ using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using CommonBoard = ExchangeApi.Contracts.Common.Dtos.BoardResponse;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 
-internal static class MarketMapper
+internal static class ContractMapStage
 {
     public static CommonTicker MapTicker(Symbol symbol, TickerNormalized normalized)
     {

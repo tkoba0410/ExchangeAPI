@@ -17,7 +17,7 @@ public sealed class FailFastMapperTests
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        var ok = TradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
+        var ok = PrivateCallMapStage.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
         Assert.False(ok);
         Assert.Null(orders);
         Assert.NotNull(error);
@@ -28,7 +28,7 @@ public sealed class FailFastMapperTests
     {
         var raw = CreateOpenOrdersResponse("unknown-type");
 
-        var ok = TradingMapper.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
+        var ok = PrivateCallMapStage.TryToOpenOrders(new Symbol("BTC/JPY"), raw, out var orders, out var error);
         Assert.False(ok);
         Assert.Null(orders);
         Assert.NotNull(error);
@@ -54,7 +54,7 @@ public sealed class FailFastMapperTests
                 FilledCashAmount: "0",
                 Fees: "0"));
 
-        var ok = TradingMapper.TryToOrderStatus(
+        var ok = PrivateCallMapStage.TryToOrderStatus(
             ProductCode.Parse("BTC_JPY"),
             raw,
             new OrderKey(OrderIdKind.ExchangeOrderId, "1"),

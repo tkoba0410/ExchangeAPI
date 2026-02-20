@@ -3,33 +3,97 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeApi.Primitives.DomainCommon.Enums;
-using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
-using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Utilities.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Common.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
+using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Primitives.DomainCommon.Enums;
+using ExchangeApi.Primitives.DomainCommon.Types;
+using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
+using OrderRequest = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.OrderRequest;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
-internal sealed class SpotHistoryApi
+internal sealed class PrivateFlow
 {
+    private static readonly string OpPlaceOrder = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.Trading.PlaceOrder);
+    private static readonly string OpCancelOrder = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.Trading.CancelOrder);
+    private static readonly string OpGetBalance = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.Account.GetBalance);
     private static readonly string OpGetOrders = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.History.GetOrders);
     private static readonly string OpGetExecutions = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.History.GetExecutions);
 
-    private readonly NormalizedPrivateApi _trading;
+    private readonly NormalizedPrivateApi _normalized;
 
-    public SpotHistoryApi(
-        NormalizedPrivateApi trading)
+    public PrivateFlow(NormalizedPrivateApi normalized)
     {
-        _trading = trading ?? throw new ArgumentNullException(nameof(trading));
+        _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
+    }
+
+    public async Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
+        OrderLimitRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
+                request,
+                OpPlaceOrder,
+                ct => _normalized.PostOrdersPlaceCallAsync(
+                    new NormalizedRequests.PostOrdersPlaceRequest(
+                        new OrderRequest(
+                            Symbol: request.Symbol,
+                            Side: request.Side,
+                            OrderType: OrderType.Limit,
+                            Size: request.Size,
+                            Price: request.Price)),
+                    ct),
+                ok => new OrderLimitResponse(
+                    Key: ok.Key,
+                    ExchangeOrderId: ok.ExchangeOrderId,
+                    AcceptanceId: ok.AcceptanceId),
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
+        CancelOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
+                request,
+                OpCancelOrder,
+                ct => _normalized.PostOrdersSubmitCancelByOrderIdCallAsync(
+                    new NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest(request.Symbol, request.OrderKey),
+                    ct),
+                ok => new CancelOrderResponse(ok.IsSuccess),
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
+        BalanceRequest request,
+        CancellationToken cancellationToken = default) =>
+        GetAccountsBalanceByAccountIdCallAsync(request, cancellationToken);
+
+    public async Task<Call<BalanceRequest, BalanceResponse>> GetAccountsBalanceByAccountIdCallAsync(
+        BalanceRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        return await AdapterCallExecutor.ExecuteMapCallAsync(
+                request,
+                OpGetBalance,
+                ct => _normalized.GetAccountsBalanceByAccountIdCallAsync(ct),
+                ok => new BalanceResponse(Mapper.MapBalances(ok.Items)),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
@@ -39,7 +103,7 @@ internal sealed class SpotHistoryApi
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetOrders,
-                ct => _trading.GetOpenOrdersCallAsync(
+                ct => _normalized.GetOpenOrdersCallAsync(
                     new ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.GetOpenOrdersRequest(request.Symbol),
                     ct),
                 ok => BuildOrderResponse(request, ok.Items),
@@ -54,7 +118,7 @@ internal sealed class SpotHistoryApi
         return await AdapterCallExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetExecutions,
-                ct => _trading.GetMatchResultsCallAsync(request.Symbol, request.Limit, ct),
+                ct => _normalized.GetMatchResultsCallAsync(request.Symbol, request.Limit, ct),
                 ok => BuildExecutionResponse(request, ok.Items),
                 cancellationToken)
             .ConfigureAwait(false);

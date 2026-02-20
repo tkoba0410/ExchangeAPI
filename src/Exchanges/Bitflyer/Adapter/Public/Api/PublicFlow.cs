@@ -20,7 +20,7 @@ using ExchangeApi.Transport.Protocol;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 
-internal sealed class MarketApi
+internal sealed class PublicFlow
 {
     private static readonly string OpGetTicker = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.MarketData.GetTicker);
     private static readonly string OpGetBoard = OperationNameBuilder.WithExchange("Bitflyer", ContractOperations.MarketData.GetBoard);
@@ -29,7 +29,7 @@ internal sealed class MarketApi
     private readonly INormalizedApi _normalized;
     private readonly IExchangeMarketResolver _markets;
 
-    public MarketApi(INormalizedApi normalized, IExchangeMarketResolver markets)
+    public PublicFlow(INormalizedApi normalized, IExchangeMarketResolver markets)
     {
         _normalized = normalized ?? throw new ArgumentNullException(nameof(normalized));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
@@ -55,7 +55,7 @@ internal sealed class MarketApi
             request,
             OpGetTicker,
             ct => _normalized.GetTickerCallAsync(productCode, cancellationToken: ct),
-            ok => MarketMapper.MapTicker(symbol, new TickerNormalized(
+            ok => ContractMapStage.MapTicker(symbol, new TickerNormalized(
                 ok.ProductCode,
                 ok.LastTradedPrice,
                 ok.Timestamp,
@@ -90,7 +90,7 @@ internal sealed class MarketApi
             request,
             OpGetBoard,
             ct => _normalized.GetBoardCallAsync(productCode, cancellationToken: ct),
-            ok => MarketMapper.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
+            ok => ContractMapStage.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
             cancellationToken,
             (startedAt, ex) => TryMapSymbolNotSupported<BoardRequest, BoardResponse>(
                 request,
@@ -135,7 +135,7 @@ internal sealed class MarketApi
         GetExecutionsPublicResponse executions)
     {
         IReadOnlyList<ExecutionsPublicItem> mapped = executions.Items
-            .Select(e => MarketMapper.MapExecution(symbol, e.Value))
+            .Select(e => ContractMapStage.MapExecution(symbol, e.Value))
             .ToArray();
         return mapped;
     }

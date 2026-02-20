@@ -217,7 +217,7 @@ internal sealed class NormalizedPrivateApi
                 marketError!);
         }
 
-        if (!TradingMapper.TryToRaw(_accountId, new Symbol(apiSymbol!), request.Request, out var rawRequest, out var mapError))
+        if (!PrivateCallMapStage.TryToRaw(_accountId, new Symbol(apiSymbol!), request.Request, out var rawRequest, out var mapError))
         {
             return CreateImmediateError<NormalizedRequests.PostOrdersPlaceRequest, PostOrdersPlaceResponse>(
                 callRequest,
@@ -234,7 +234,7 @@ internal sealed class NormalizedPrivateApi
             callRequest,
             Component(EndpointIds.PostOrdersPlace),
             raw => MapResult<PostOrdersPlaceResponse>.Ok(
-                TradingMapper.ToPostOrdersPlaceResponse(raw)));
+                PrivateCallMapStage.ToPostOrdersPlaceResponse(raw)));
     }
 
     public async Task<Call<NormalizedRequests.GetOrdersRequest, GetOrdersResponse>> GetOrdersCallAsync(
@@ -258,7 +258,7 @@ internal sealed class NormalizedPrivateApi
                         new CallError(CallErrorKind.Mapping, "Bittrade orders response invalid."));
                 }
 
-                if (!TradingMapper.TryToOrderSummaries(raw.Data, out var summaries, out var mapError))
+                if (!PrivateCallMapStage.TryToOrderSummaries(raw.Data, out var summaries, out var mapError))
                 {
                     return MapResult<GetOrdersResponse>.Fail(mapError!);
                 }
@@ -398,7 +398,7 @@ internal sealed class NormalizedPrivateApi
             Component(EndpointIds.GetOpenOrders),
                 raw =>
             {
-                if (!TradingMapper.TryToOpenOrders(request.Symbol, raw, out var orders, out var mapError))
+                if (!PrivateCallMapStage.TryToOpenOrders(request.Symbol, raw, out var orders, out var mapError))
                 {
                     return MapResult<GetOpenOrdersResponse>.Fail(mapError!);
                 }
@@ -457,7 +457,7 @@ internal sealed class NormalizedPrivateApi
             Component(EndpointIds.GetOrdersByOrderId),
             raw =>
             {
-                if (!TradingMapper.TryToOrderStatus(market.ProductCode, raw, key, out var status, out var mapError))
+                if (!PrivateCallMapStage.TryToOrderStatus(market.ProductCode, raw, key, out var status, out var mapError))
                 {
                     return MapResult<GetOrdersByOrderIdResponse>.Fail(mapError!);
                 }
@@ -489,7 +489,7 @@ internal sealed class NormalizedPrivateApi
             Component(EndpointIds.GetOrdersMatchResultsByOrderId),
             raw =>
             {
-                if (!TradingMapper.TryToExecutions(raw.Data ?? Array.Empty<RawPrivateDtos.RawMatchResultEntry>(), out var executions, out var mapError))
+                if (!PrivateCallMapStage.TryToExecutions(raw.Data ?? Array.Empty<RawPrivateDtos.RawMatchResultEntry>(), out var executions, out var mapError))
                 {
                     return MapResult<GetOrdersMatchResultsByOrderIdResponse>.Fail(mapError!);
                 }
@@ -527,7 +527,7 @@ internal sealed class NormalizedPrivateApi
             Component(EndpointIds.GetMatchResults),
             raw =>
             {
-                if (!TradingMapper.TryToExecutions(raw.Data ?? Array.Empty<RawPrivateDtos.RawMatchResultEntry>(), out var executions, out var mapError))
+                if (!PrivateCallMapStage.TryToExecutions(raw.Data ?? Array.Empty<RawPrivateDtos.RawMatchResultEntry>(), out var executions, out var mapError))
                 {
                     return MapResult<GetMatchResultsResponse>.Fail(mapError!);
                 }
@@ -567,7 +567,7 @@ internal sealed class NormalizedPrivateApi
             request,
             Component(EndpointIds.PostWithdrawApiCreate),
             raw => MapResult<PostWithdrawApiCreateResponse>.Ok(
-                TradingMapper.ToPostWithdrawApiCreateResponse(raw)));
+                PrivateCallMapStage.ToPostWithdrawApiCreateResponse(raw)));
     }
 
     public async Task<Call<NormalizedRequests.PostRetailOrderPlaceRequest, PostRetailOrderPlaceResponse>> PostRetailOrderPlaceCallAsync(
@@ -576,7 +576,7 @@ internal sealed class NormalizedPrivateApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        if (!TradingMapper.TryToRawRetailOrder(request.Request, out var rawRequest, out var mapError))
+        if (!PrivateCallMapStage.TryToRawRetailOrder(request.Request, out var rawRequest, out var mapError))
         {
             return CreateImmediateError<NormalizedRequests.PostRetailOrderPlaceRequest, PostRetailOrderPlaceResponse>(
                 request,
@@ -593,7 +593,7 @@ internal sealed class NormalizedPrivateApi
             request,
             Component(EndpointIds.PostRetailOrderPlace),
             raw => MapResult<PostRetailOrderPlaceResponse>.Ok(
-                TradingMapper.ToPostRetailOrderPlaceResponse(raw)));
+                PrivateCallMapStage.ToPostRetailOrderPlaceResponse(raw)));
     }
 
     public async Task<Call<NormalizedRequests.GetRetailOrderListRequest, GetRetailOrderListResponse>> GetRetailOrderListCallAsync(
@@ -622,7 +622,7 @@ internal sealed class NormalizedPrivateApi
                         new CallError(CallErrorKind.Mapping, "Bittrade retail order list response invalid."));
                 }
 
-                if (!TradingMapper.TryToRetailOrders(raw.Data, out var orders, out var mapError))
+                if (!PrivateCallMapStage.TryToRetailOrders(raw.Data, out var orders, out var mapError))
                 {
                     return MapResult<GetRetailOrderListResponse>.Fail(mapError!);
                 }
@@ -654,7 +654,7 @@ internal sealed class NormalizedPrivateApi
                         new CallError(CallErrorKind.Mapping, "Bittrade retail order detail response invalid."));
                 }
 
-                if (!TradingMapper.TryToRetailOrder(raw.Data, out var order, out var mapError))
+                if (!PrivateCallMapStage.TryToRetailOrder(raw.Data, out var order, out var mapError))
                 {
                     return MapResult<GetRetailOrderDetailByOrderIdResponse>.Fail(mapError!);
                 }
@@ -708,7 +708,7 @@ internal sealed class NormalizedPrivateApi
                         new CallError(CallErrorKind.Mapping, "Bittrade retail order history response invalid."));
                 }
 
-                if (!TradingMapper.TryToRetailOrders(raw.Data, out var orders, out var mapError))
+                if (!PrivateCallMapStage.TryToRetailOrders(raw.Data, out var orders, out var mapError))
                 {
                     return MapResult<PostRetailOrderHistoryResponse>.Fail(mapError!);
                 }
@@ -741,7 +741,7 @@ internal sealed class NormalizedPrivateApi
                         new CallError(CallErrorKind.Mapping, "Bittrade retail order detail response invalid."));
                 }
 
-                if (!TradingMapper.TryToRetailOrder(raw.Data, out var order, out var mapError))
+                if (!PrivateCallMapStage.TryToRetailOrder(raw.Data, out var order, out var mapError))
                 {
                     return MapResult<PostRetailOrderDetailResponse>.Fail(mapError!);
                 }
@@ -759,7 +759,7 @@ internal sealed class NormalizedPrivateApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        if (!TradingMapper.TryToRawRetailOrder(request.Request, out var rawRequest, out var mapError))
+        if (!PrivateCallMapStage.TryToRawRetailOrder(request.Request, out var rawRequest, out var mapError))
         {
             return CreateImmediateError<NormalizedRequests.PostRetailOrderCreateRequest, PostRetailOrderCreateResponse>(
                 request,
@@ -777,7 +777,7 @@ internal sealed class NormalizedPrivateApi
             request,
             Component(EndpointIds.PostRetailOrderCreate),
             raw => MapResult<PostRetailOrderCreateResponse>.Ok(
-                TradingMapper.ToPostRetailOrderCreateResponse(raw)));
+                PrivateCallMapStage.ToPostRetailOrderCreateResponse(raw)));
     }
 
     public async Task<Call<NormalizedRequests.PostRetailOrderCancelByOrderIdRequest, PostRetailOrderCancelByOrderIdResponse>> PostRetailOrderCancelByOrderIdCallAsync(
@@ -795,7 +795,7 @@ internal sealed class NormalizedPrivateApi
             request,
             Component(EndpointIds.PostRetailOrderCancelByOrderId),
             raw => MapResult<PostRetailOrderCancelByOrderIdResponse>.Ok(
-                TradingMapper.ToPostRetailOrderCancelByOrderIdResponse(raw)));
+                PrivateCallMapStage.ToPostRetailOrderCancelByOrderIdResponse(raw)));
     }
 
     public async Task<Call<NormalizedRequests.PostWithdrawVirtualByAddressIdCreateRequest, PostWithdrawVirtualByAddressIdCreateResponse>> PostWithdrawVirtualByAddressIdCreateCallAsync(
@@ -813,7 +813,7 @@ internal sealed class NormalizedPrivateApi
             request,
             Component(EndpointIds.PostWithdrawVirtualByAddressIdCreate),
             raw => MapResult<PostWithdrawVirtualByAddressIdCreateResponse>.Ok(
-                TradingMapper.ToPostWithdrawVirtualByAddressIdCreateResponse(raw)));
+                PrivateCallMapStage.ToPostWithdrawVirtualByAddressIdCreateResponse(raw)));
     }
 
     public async Task<Call<NormalizedRequests.PostWithdrawVirtualByWithdrawIdPlaceRequest, PostWithdrawVirtualByWithdrawIdPlaceResponse>> PostWithdrawVirtualByWithdrawIdPlaceCallAsync(
@@ -831,7 +831,7 @@ internal sealed class NormalizedPrivateApi
             request,
             Component(EndpointIds.PostWithdrawVirtualByWithdrawIdPlace),
             raw => MapResult<PostWithdrawVirtualByWithdrawIdPlaceResponse>.Ok(
-                TradingMapper.ToPostWithdrawVirtualByWithdrawIdPlaceResponse(raw)));
+                PrivateCallMapStage.ToPostWithdrawVirtualByWithdrawIdPlaceResponse(raw)));
     }
 
     public async Task<Call<NormalizedRequests.PostWithdrawVirtualByWithdrawIdCancelRequest, PostWithdrawVirtualByWithdrawIdCancelResponse>> PostWithdrawVirtualByWithdrawIdCancelCallAsync(
@@ -849,7 +849,7 @@ internal sealed class NormalizedPrivateApi
             request,
             Component(EndpointIds.PostWithdrawVirtualByWithdrawIdCancel),
             raw => MapResult<PostWithdrawVirtualByWithdrawIdCancelResponse>.Ok(
-                TradingMapper.ToPostWithdrawVirtualByWithdrawIdCancelResponse(raw)));
+                PrivateCallMapStage.ToPostWithdrawVirtualByWithdrawIdCancelResponse(raw)));
     }
 
     private static Call<TReq, TOk> CreateCall<TRawReq, TRaw, TReq, TOk>(

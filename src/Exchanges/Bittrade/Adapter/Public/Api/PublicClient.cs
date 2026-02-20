@@ -16,14 +16,14 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// </summary>
 public sealed class PublicClient : IContractPublicClient, IContractCandlesticksClient, IDisposable
 {
-    private readonly MarketApi _marketApi;
+    private readonly PublicFlow _publicFlow;
     private IDisposable? _ownedDisposable;
 
     public PublicClient(ClientOptions options)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
         var (components, restClient) = BittradeClientBootstrap.CreatePublicComponents(options);
-        _marketApi = new MarketApi(components.Public, components.Markets);
+        _publicFlow = new PublicFlow(components.Public, components.Markets);
         _ownedDisposable = restClient;
     }
 
@@ -33,35 +33,35 @@ public sealed class PublicClient : IContractPublicClient, IContractCandlesticksC
 
         // 公開APIのみ: market 取得に限定し、Trading/Account/History は提供しない。
         var components = BittradeClientComponents.FromRestClient(restClient, accountId: null);
-        _marketApi = new MarketApi(components.Public, components.Markets);
+        _publicFlow = new PublicFlow(components.Public, components.Markets);
     }
 
     internal PublicClient(BittradeClientComponents components, IDisposable? ownedDisposable = null)
     {
         if (components is null) throw new ArgumentNullException(nameof(components));
-        _marketApi = new MarketApi(components.Public, components.Markets);
+        _publicFlow = new PublicFlow(components.Public, components.Markets);
         _ownedDisposable = ownedDisposable;
     }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         TickerRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerAsync(request, cancellationToken);
+        _publicFlow.GetTickerAsync(request, cancellationToken);
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         BoardRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardAsync(request, cancellationToken);
+        _publicFlow.GetBoardAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicAsync(request, cancellationToken);
+        _publicFlow.GetExecutionsPublicAsync(request, cancellationToken);
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
         CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetCandlesticksAsync(request, cancellationToken);
+        _publicFlow.GetCandlesticksAsync(request, cancellationToken);
 
     public void Dispose()
     {

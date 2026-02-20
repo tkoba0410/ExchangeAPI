@@ -24,7 +24,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// <summary>
 /// Bittrade の Public REST 実装（Ticker/OrderBook/Executions）。
 /// </summary>
-internal sealed class MarketApi
+internal sealed class PublicFlow
 {
     private static readonly string OpGetTicker = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.MarketData.GetTicker);
     private static readonly string OpGetBoard = OperationNameBuilder.WithExchange("Bittrade", ContractOperations.MarketData.GetBoard);
@@ -34,7 +34,7 @@ internal sealed class MarketApi
     private readonly NormalizedPublicApi _marketData;
     private readonly IExchangeMarketResolver _markets;
 
-    public MarketApi(NormalizedPublicApi marketData, IExchangeMarketResolver markets)
+    public PublicFlow(NormalizedPublicApi marketData, IExchangeMarketResolver markets)
     {
         _marketData = marketData ?? throw new ArgumentNullException(nameof(marketData));
         _markets = markets ?? throw new ArgumentNullException(nameof(markets));
@@ -76,7 +76,7 @@ internal sealed class MarketApi
                 request,
                 OpGetTicker,
                 ct => _marketData.GetDetailMergedCallAsync(productCode, ct),
-                ok => MarketMapper.MapTicker(symbol, new TickerNormalized(
+                ok => ContractMapStage.MapTicker(symbol, new TickerNormalized(
                     ok.LastTradedPrice,
                     ok.Timestamp,
                     ok.RawSnapshot,
@@ -110,7 +110,7 @@ internal sealed class MarketApi
                 request,
                 OpGetBoard,
                 ct => _marketData.GetDepthCallAsync(productCode, cancellationToken: ct),
-                ok => MarketMapper.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
+                ok => ContractMapStage.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
                 cancellationToken,
                 (startedAt, ex) => TryMapSymbolNotSupported<BoardRequest, BoardResponse>(
                     request,
@@ -191,7 +191,7 @@ internal sealed class MarketApi
                 request,
                 OpGetCandlesticks,
                 ct => _marketData.GetHistoryKlineCallAsync(productCode, period, size, ct),
-                ok => new CandlesticksResponse(MarketMapper.MapCandlesticks(symbol, period, ok.Items)),
+                ok => new CandlesticksResponse(ContractMapStage.MapCandlesticks(symbol, period, ok.Items)),
                 cancellationToken,
                 (startedAt, ex) => TryMapSymbolNotSupported<CandlesticksRequest, CandlesticksResponse>(
                     request,
@@ -206,7 +206,7 @@ internal sealed class MarketApi
         IReadOnlyList<ExecutionNormalized> executions)
     {
         IReadOnlyList<ExecutionsPublicItem> mapped = executions
-            .Select(n => MarketMapper.MapExecution(symbol, n))
+            .Select(n => ContractMapStage.MapExecution(symbol, n))
             .ToList();
         return mapped;
     }

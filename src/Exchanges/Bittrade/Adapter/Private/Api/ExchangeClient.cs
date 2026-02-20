@@ -17,7 +17,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// </summary>
 public sealed class ExchangeClient : IContractPrivateClient, IContractCandlesticksClient, IDisposable
 {
-    private readonly MarketApi _marketApi;
+    private readonly PublicFlow _publicFlow;
     private readonly PrivateApi _privateApi;
     private IDisposable? _ownedDisposable;
 
@@ -34,16 +34,16 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
             throw new InvalidOperationException("Private components are required to create ExchangeClient.");
         }
 
-        _marketApi = new MarketApi(components.Public, components.Markets);
+        _publicFlow = new PublicFlow(components.Public, components.Markets);
         _privateApi = new PrivateApi(components.Private);
         _ownedDisposable = restClient;
     }
 
     internal ExchangeClient(
-        MarketApi marketApi,
+        PublicFlow publicFlow,
         PrivateApi privateApi)
     {
-        _marketApi = marketApi ?? throw new ArgumentNullException(nameof(marketApi));
+        _publicFlow = publicFlow ?? throw new ArgumentNullException(nameof(publicFlow));
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
     }
 
@@ -56,16 +56,16 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
             throw new InvalidOperationException("Private components are required to create ExchangeClient.");
         }
 
-        _marketApi = new MarketApi(components.Public, components.Markets);
+        _publicFlow = new PublicFlow(components.Public, components.Markets);
         _privateApi = new PrivateApi(components.Private);
         _ownedDisposable = ownedDisposable;
     }
 
     internal ExchangeClient(
-        MarketApi marketApi,
+        PublicFlow publicFlow,
         PrivateApi privateApi,
         IRestClient restClient)
-        : this(marketApi, privateApi)
+        : this(publicFlow, privateApi)
     {
         _ownedDisposable = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
@@ -81,22 +81,22 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
         TickerRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerAsync(request, cancellationToken);
+        _publicFlow.GetTickerAsync(request, cancellationToken);
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         BoardRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardAsync(request, cancellationToken);
+        _publicFlow.GetBoardAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicAsync(request, cancellationToken);
+        _publicFlow.GetExecutionsPublicAsync(request, cancellationToken);
 
     public Task<Call<CandlesticksRequest, CandlesticksResponse>> GetCandlesticksAsync(
         CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetCandlesticksAsync(request, cancellationToken);
+        _publicFlow.GetCandlesticksAsync(request, cancellationToken);
 
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         BalanceRequest request,
@@ -113,7 +113,6 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
         CancellationToken cancellationToken = default) =>
         _privateApi.CancelOrderAsync(request, cancellationToken);
 
-    // SpotHistory
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
         OrdersRequest request,
         CancellationToken cancellationToken = default) =>

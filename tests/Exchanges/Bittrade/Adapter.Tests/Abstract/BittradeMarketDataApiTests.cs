@@ -131,7 +131,7 @@ public class MarketApiTests
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
     }
 
-    private static MarketApi CreateApi(string expectedPath, string responseJson)
+    private static PublicFlow CreateApi(string expectedPath, string responseJson)
     {
         var handler = new StubHandler(expectedPath, responseJson);
         var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost/") };
@@ -142,7 +142,7 @@ public class MarketApiTests
         var wire = new WireCallExecutor(wireTransport);
         var raw = new ExchangeApi.Exchanges.Bittrade.Raw.Api.RawApi(wire);
         var normalizedMarketData = new ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api.NormalizedPublicApi(raw);
-        return new MarketApi(normalizedMarketData, markets);
+        return new PublicFlow(normalizedMarketData, markets);
     }
 
     private static IExchangeMarketResolver CreateResolver() =>

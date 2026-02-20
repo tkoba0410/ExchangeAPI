@@ -18,7 +18,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 /// </summary>
 public sealed class ExchangeClient : IContractPrivateClient, IDisposable
 {
-    private readonly MarketApi _marketApi;
+    private readonly PublicFlow _publicFlow;
     private readonly PrivateApi _privateApi;
     private IDisposable? _ownedDisposable;
 
@@ -30,7 +30,7 @@ public sealed class ExchangeClient : IContractPrivateClient, IDisposable
         if (credentials is null) throw new ArgumentNullException(nameof(credentials));
 
         var client = ClientFactory.Create(credentials, options);
-        _marketApi = client._marketApi;
+        _publicFlow = client._publicFlow;
         _privateApi = client._privateApi;
         _ownedDisposable = client._ownedDisposable;
     }
@@ -40,7 +40,7 @@ public sealed class ExchangeClient : IContractPrivateClient, IDisposable
         object? rawBundle = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _marketApi = new MarketApi(normalized, new BitflyerMarketCatalogResolver());
+        _publicFlow = new PublicFlow(normalized, new BitflyerMarketCatalogResolver());
         _privateApi = new PrivateApi(normalized);
     }
 
@@ -51,7 +51,7 @@ public sealed class ExchangeClient : IContractPrivateClient, IDisposable
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         if (markets is null) throw new ArgumentNullException(nameof(markets));
-        _marketApi = new MarketApi(normalized, markets);
+        _publicFlow = new PublicFlow(normalized, markets);
         _privateApi = new PrivateApi(normalized);
         _ownedDisposable = ownedDisposable;
     }
@@ -63,23 +63,21 @@ public sealed class ExchangeClient : IContractPrivateClient, IDisposable
         return new ExchangeClient(components.Normalized, components.Markets);
     }
 
-    // Market
     public Task<Call<TickerRequest, CommonTicker>> GetTickerAsync(
         TickerRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerAsync(request, cancellationToken);
+        _publicFlow.GetTickerAsync(request, cancellationToken);
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         BoardRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardAsync(request, cancellationToken);
+        _publicFlow.GetBoardAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicAsync(request, cancellationToken);
+        _publicFlow.GetExecutionsPublicAsync(request, cancellationToken);
 
-    // Trading
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         OrderLimitRequest request,
         CancellationToken cancellationToken = default) =>
@@ -90,13 +88,11 @@ public sealed class ExchangeClient : IContractPrivateClient, IDisposable
         CancellationToken cancellationToken = default) =>
         _privateApi.CancelOrderAsync(request, cancellationToken);
 
-    // Account
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         BalanceRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetBalanceAsync(request, cancellationToken);
 
-    // SpotHistory
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
         OrdersRequest request,
         CancellationToken cancellationToken = default) =>

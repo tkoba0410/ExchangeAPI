@@ -38,7 +38,7 @@ public sealed class AdapterShapeGuardTests
             "Adapter",
             "Public",
             "Api",
-            "MarketApi.cs");
+            "PublicFlow.cs");
 
         var text = File.ReadAllText(marketApiPath);
         Assert.DoesNotContain("Replace(\"_\"", text, StringComparison.Ordinal);

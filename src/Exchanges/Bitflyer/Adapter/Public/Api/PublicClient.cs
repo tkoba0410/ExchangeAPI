@@ -17,38 +17,38 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 /// </summary>
 public sealed class PublicClient : IContractPublicClient, IDisposable
 {
-    private readonly MarketApi _marketApi;
+    private readonly PublicFlow _publicFlow;
     private IDisposable? _ownedDisposable;
 
     public PublicClient(ClientOptions options)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
         var client = ClientFactory.CreatePublic(options);
-        _marketApi = client._marketApi;
+        _publicFlow = client._publicFlow;
         _ownedDisposable = client._ownedDisposable;
     }
 
     internal PublicClient(INormalizedApi normalized, IDisposable? ownedDisposable = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _marketApi = new MarketApi(normalized, new BitflyerMarketCatalogResolver());
+        _publicFlow = new PublicFlow(normalized, new BitflyerMarketCatalogResolver());
         _ownedDisposable = ownedDisposable;
     }
 
     public Task<Call<TickerRequest, CommonTicker>> GetTickerAsync(
         TickerRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetTickerAsync(request, cancellationToken);
+        _publicFlow.GetTickerAsync(request, cancellationToken);
 
     public Task<Call<BoardRequest, BoardResponse>> GetBoardAsync(
         BoardRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetBoardAsync(request, cancellationToken);
+        _publicFlow.GetBoardAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPublicRequest, ExecutionsPublicResponse>> GetExecutionsPublicAsync(
         ExecutionsPublicRequest request,
         CancellationToken cancellationToken = default) =>
-        _marketApi.GetExecutionsPublicAsync(request, cancellationToken);
+        _publicFlow.GetExecutionsPublicAsync(request, cancellationToken);
 
     public void Dispose()
     {

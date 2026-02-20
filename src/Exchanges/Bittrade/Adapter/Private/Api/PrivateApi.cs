@@ -10,50 +10,41 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 
 internal sealed class PrivateApi
 {
-    private readonly TradingApi _trading;
-    private readonly AccountApi _account;
-    private readonly SpotHistoryApi _history;
+    private readonly PrivateFlow _flow;
 
     public PrivateApi(NormalizedPrivateApi normalized)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _trading = new TradingApi(normalized);
-        _account = new AccountApi(normalized);
-        _history = new SpotHistoryApi(normalized);
+        _flow = new PrivateFlow(normalized);
     }
 
-    internal PrivateApi(
-        TradingApi trading,
-        AccountApi account,
-        SpotHistoryApi history)
+    internal PrivateApi(PrivateFlow flow)
     {
-        _trading = trading ?? throw new ArgumentNullException(nameof(trading));
-        _account = account ?? throw new ArgumentNullException(nameof(account));
-        _history = history ?? throw new ArgumentNullException(nameof(history));
+        _flow = flow ?? throw new ArgumentNullException(nameof(flow));
     }
 
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         BalanceRequest request,
         CancellationToken cancellationToken = default) =>
-        _account.GetBalanceAsync(request, cancellationToken);
+        _flow.GetBalanceAsync(request, cancellationToken);
 
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         OrderLimitRequest request,
         CancellationToken cancellationToken = default) =>
-        _trading.OrderLimitAsync(request, cancellationToken);
+        _flow.OrderLimitAsync(request, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _trading.CancelOrderAsync(request, cancellationToken);
+        _flow.CancelOrderAsync(request, cancellationToken);
 
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
         OrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _history.GetOrdersAsync(request, cancellationToken);
+        _flow.GetOrdersAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default) =>
-        _history.GetExecutionsPrivateAsync(request, cancellationToken);
+        _flow.GetExecutionsPrivateAsync(request, cancellationToken);
 }

@@ -41,7 +41,7 @@ internal sealed class NormalizedPrivateApi
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
 
-        if (!TradingMapper.TryValidateOrderRequest(request, out var validationError))
+        if (!PrivateCallMapStage.TryValidateOrderRequest(request, out var validationError))
         {
             return CreateImmediateError<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>(
                 new PrivateRequests.SendChildOrderRequest(request),
@@ -60,7 +60,7 @@ internal sealed class NormalizedPrivateApi
                 marketError!);
         }
 
-        if (!TradingMapper.TryMapOrderType(request.OrderType, request.Price, out var childOrderType, out var orderTypeError))
+        if (!PrivateCallMapStage.TryMapOrderType(request.OrderType, request.Price, out var childOrderType, out var orderTypeError))
         {
             return CreateImmediateError<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>(
                 callRequest,
@@ -76,7 +76,7 @@ internal sealed class NormalizedPrivateApi
                 sideError!);
         }
 
-        if (!TradingMapper.TryToApiChildOrderType(childOrderType, out var apiChildOrderType, out var childOrderError))
+        if (!PrivateCallMapStage.TryToApiChildOrderType(childOrderType, out var apiChildOrderType, out var childOrderError))
         {
             return CreateImmediateError<PrivateRequests.SendChildOrderRequest, SendChildOrderResponse>(
                 callRequest,
@@ -264,12 +264,12 @@ internal sealed class NormalizedPrivateApi
                         return MapResult<GetChildOrdersResponse>.Fail(sideError!);
                     }
 
-                    if (!TradingMapper.TryParseChildOrderType(o.ChildOrderType, out var parsedOrderType, out var orderTypeError))
+                    if (!PrivateCallMapStage.TryParseChildOrderType(o.ChildOrderType, out var parsedOrderType, out var orderTypeError))
                     {
                         return MapResult<GetChildOrdersResponse>.Fail(orderTypeError!);
                     }
 
-                    if (!TradingMapper.TryToOrderType(parsedOrderType, out var mappedOrderType, out var mapError))
+                    if (!PrivateCallMapStage.TryToOrderType(parsedOrderType, out var mappedOrderType, out var mapError))
                     {
                         return MapResult<GetChildOrdersResponse>.Fail(mapError!);
                     }
@@ -507,7 +507,7 @@ internal sealed class NormalizedPrivateApi
             "Bitflyer.GetBalances",
             raw =>
             {
-                if (!AccountMapper.TryMapBalances(raw, out var balances, out var mapError))
+                if (!PrivateCallMapStage.TryMapBalances(raw, out var balances, out var mapError))
                 {
                     return MapResult<GetBalanceResponse>.Fail(mapError!);
                 }
@@ -858,7 +858,7 @@ internal sealed class NormalizedPrivateApi
             Component(EndpointIds.GetExecutionsPrivate),
             raw =>
             {
-                if (!AccountMapper.TryMapAccountExecutions(symbol, raw, out var executions, out var error))
+                if (!PrivateCallMapStage.TryMapAccountExecutions(symbol, raw, out var executions, out var error))
                 {
                     return MapResult<GetExecutionsPrivateResponse>.Fail(error!);
                 }

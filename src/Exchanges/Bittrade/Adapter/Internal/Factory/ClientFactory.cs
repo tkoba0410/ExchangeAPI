@@ -31,7 +31,7 @@ public static class ClientFactory
         IRestClientLogger? logger = null) =>
         CreatePublicClient(new ClientOptions { Observer = observer, Logger = logger });
 
-    internal static (MarketApi Market, PrivateApi Private) CreatePrivate(
+    internal static (PublicFlow PublicFlow, PrivateApi Private) CreatePrivate(
         string accessKey,
         string secretKey,
         AccountId accountId)
@@ -51,7 +51,7 @@ public static class ClientFactory
         }
 
         var privateApi = new PrivateApi(components.Private);
-        return (new MarketApi(components.Public, components.Markets), privateApi);
+        return (new PublicFlow(components.Public, components.Markets), privateApi);
     }
 
     public static ExchangeClient Create(

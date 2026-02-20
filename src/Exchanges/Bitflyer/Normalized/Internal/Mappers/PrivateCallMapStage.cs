@@ -1,13 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Requests;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Types;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 using ExchangeApi.Primitives.CallCommon;
+using RawPrivateDtos = ExchangeApi.Exchanges.Bitflyer.Raw.Private.Dtos;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Internal.Mappers;
 
-internal static class TradingMapper
+internal static class PrivateCallMapStage
 {
     public static bool TryMapOrderType(OrderType orderType, Price? price, out ChildOrderType mapped, out CallError? error)
     {
@@ -132,6 +137,67 @@ internal static class TradingMapper
                 return false;
         }
 
+        error = null;
+        return true;
+    }
+
+    public static bool TryMapBalances(
+        IReadOnlyList<RawPrivateDtos.GetBalanceItem> rawBalances,
+        out IReadOnlyList<BalanceEntryNormalized>? normalized,
+        out CallError? error)
+    {
+        if (rawBalances is null)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "bitFlyer balances response is null.");
+            return false;
+        }
+
+        normalized = rawBalances
+            .Select(balance => new BalanceEntryNormalized(
+                CurrencyCode: CurrencyCodeConverter.FromString(balance.CurrencyCode),
+                Amount: balance.Amount,
+                Available: balance.Available))
+            .ToArray();
+        error = null;
+        return true;
+    }
+
+    public static bool TryMapAccountExecutions(
+        Symbol symbol,
+        IReadOnlyList<RawPrivateDtos.GetExecutionsPrivateItem> rawExecutions,
+        out IReadOnlyList<ExecutionAccountNormalized>? normalized,
+        out CallError? error)
+    {
+        if (rawExecutions is null)
+        {
+            normalized = null;
+            error = new CallError(CallErrorKind.Mapping, "bitFlyer executions response is null.");
+            return false;
+        }
+
+        var mapped = new List<ExecutionAccountNormalized>(rawExecutions.Count);
+        foreach (var execution in rawExecutions)
+        {
+            if (!CommonMapper.TryMapSide(execution.Side, out var side, out error))
+            {
+                normalized = null;
+                return false;
+            }
+
+            mapped.Add(new ExecutionAccountNormalized(
+                Symbol: symbol,
+                OrderId: new OrderId(execution.Id.ToString(CultureInfo.InvariantCulture)),
+                Side: side,
+                Price: new Price(execution.Price),
+                Size: new Size(execution.Size),
+                ExecutedAt: execution.ExecDate,
+                Commission: null,
+                Pnl: null,
+                Liquidity: null));
+        }
+
+        normalized = mapped.ToArray();
         error = null;
         return true;
     }

@@ -23,7 +23,7 @@ public sealed class ErrorEnrichTests
     [Fact]
     public async Task GetDetailMergedCallAsync_EnrichesExchangeAndOperation()
     {
-        var api = new MarketApi(new NormalizedPublicApi(new ThrowingRawApi()), CreateResolver());
+        var api = new PublicFlow(new NormalizedPublicApi(new ThrowingRawApi()), CreateResolver());
 
         var call = await api.GetDetailMergedCallAsync(new Symbol("BTC/JPY"), CancellationToken.None);
 

@@ -47,11 +47,11 @@ public sealed class SpotHistoryApiTests
         Assert.Equal(0, response.ReturnedCount);
     }
 
-    private static SpotHistoryApi CreateApi(StubRawApi raw)
+    private static PrivateFlow CreateApi(StubRawApi raw)
     {
         var markets = new StubMarketResolver("btcjpy");
         var normalized = new NormalizedPrivateApi(raw, markets, accountId: new AccountId("account"));
-        return new SpotHistoryApi(normalized);
+        return new PrivateFlow(normalized);
     }
 
     private sealed class StubRawApi : RawApiStub

@@ -11,7 +11,7 @@ using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 
 namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 
-internal static class MarketMapper
+internal static class ContractMapStage
 {
     public static TickerResponse MapTicker(CommonSymbol symbol, TickerNormalized normalized)
     {

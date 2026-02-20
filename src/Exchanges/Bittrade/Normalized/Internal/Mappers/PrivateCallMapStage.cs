@@ -16,7 +16,7 @@ using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 
 namespace ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Mappers;
 
-internal static class TradingMapper
+internal static class PrivateCallMapStage
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
     private static class FieldNames

@@ -14,15 +14,17 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 /// <summary>
 /// Bittrade の Public API だけを利用する軽量クライアント。
 /// </summary>
-public sealed class PublicClient : IContractPublicClient, IContractCandlesticksClient
+public sealed class PublicClient : IContractPublicClient, IContractCandlesticksClient, IDisposable
 {
     private readonly MarketApi _marketApi;
+    private IDisposable? _ownedDisposable;
 
     public PublicClient(ClientOptions options)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
-        var components = BittradeClientBootstrap.CreatePublicComponents(options);
+        var (components, restClient) = BittradeClientBootstrap.CreatePublicComponents(options);
         _marketApi = new MarketApi(components.Public, components.Markets);
+        _ownedDisposable = restClient;
     }
 
     public PublicClient(IRestClient restClient)
@@ -34,10 +36,11 @@ public sealed class PublicClient : IContractPublicClient, IContractCandlesticksC
         _marketApi = new MarketApi(components.Public, components.Markets);
     }
 
-    internal PublicClient(BittradeClientComponents components)
+    internal PublicClient(BittradeClientComponents components, IDisposable? ownedDisposable = null)
     {
         if (components is null) throw new ArgumentNullException(nameof(components));
         _marketApi = new MarketApi(components.Public, components.Markets);
+        _ownedDisposable = ownedDisposable;
     }
 
     public Task<Call<TickerRequest, TickerResponse>> GetTickerAsync(
@@ -59,6 +62,12 @@ public sealed class PublicClient : IContractPublicClient, IContractCandlesticksC
         CandlesticksRequest request,
         CancellationToken cancellationToken = default) =>
         _marketApi.GetCandlesticksAsync(request, cancellationToken);
+
+    public void Dispose()
+    {
+        _ownedDisposable?.Dispose();
+        _ownedDisposable = null;
+    }
 
     // Raw access removed from public facade.
 }

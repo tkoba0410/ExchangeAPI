@@ -25,6 +25,8 @@ namespace ExchangeApi.Transport.Protocol
         private readonly IRestClientLogger _logger;
         private readonly IRestCallObserver _observer;
         private readonly IExchangeErrorClassifier? _errorClassifier;
+        private readonly bool _disposeTransport;
+        private bool _disposed;
 
         public RestClient(
             Uri baseUri,
@@ -33,7 +35,8 @@ namespace ExchangeApi.Transport.Protocol
             IHttpPolicy? policy = null,
             IRestClientLogger? logger = null,
             IRestCallObserver? observer = null,
-            IExchangeErrorClassifier? errorClassifier = null)
+            IExchangeErrorClassifier? errorClassifier = null,
+            bool disposeTransport = false)
         {
             _baseUri = baseUri ?? throw new ArgumentNullException(nameof(baseUri));
             _transport = transport ?? throw new ArgumentNullException(nameof(transport));
@@ -45,6 +48,7 @@ namespace ExchangeApi.Transport.Protocol
                 : new SanitizingRestClientLogger(rawLogger);
             _observer = observer ?? NoOpRestCallObserver.Instance;
             _errorClassifier = errorClassifier;
+            _disposeTransport = disposeTransport;
         }
 
         public async Task<HttpResponseMeta> GetRawAsync(
@@ -52,6 +56,7 @@ namespace ExchangeApi.Transport.Protocol
             IReadOnlyDictionary<string, string?>? query = null,
             CancellationToken cancellationToken = default)
         {
+            ThrowIfDisposed();
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentException("Path must not be null or whitespace.", nameof(path));
@@ -74,6 +79,7 @@ namespace ExchangeApi.Transport.Protocol
             IReadOnlyDictionary<string, string>? headers = null,
             CancellationToken cancellationToken = default)
         {
+            ThrowIfDisposed();
             if (string.IsNullOrWhiteSpace(method))
             {
                 throw new ArgumentException("Method must not be null or whitespace.", nameof(method));
@@ -104,6 +110,7 @@ namespace ExchangeApi.Transport.Protocol
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
+            ThrowIfDisposed();
             _logger.LogRequest(request);
             var context = new RestCallContext(request);
             var startedAt = DateTimeOffset.UtcNow;
@@ -286,5 +293,23 @@ namespace ExchangeApi.Transport.Protocol
             }
         }
 
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+
+            if (_disposeTransport && _transport is IDisposable disposableTransport)
+            {
+                disposableTransport.Dispose();
+            }
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(RestClient));
+            }
+        }
     }
 }

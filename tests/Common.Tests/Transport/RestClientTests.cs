@@ -285,6 +285,27 @@ public sealed class RestClientTests
         Assert.Equal("***", Assert.Single(logger.LastErrorHeaders["ACCESS-SIGN"]));
     }
 
+    [Fact]
+    public void Dispose_DisposesOwnedTransport_OnlyWhenConfigured()
+    {
+        var ownedTransport = new DisposableTransport();
+        var nonOwnedTransport = new DisposableTransport();
+
+        var ownedClient = new RestClient(
+            new Uri("https://example.com"),
+            ownedTransport,
+            disposeTransport: true);
+        var nonOwnedClient = new RestClient(
+            new Uri("https://example.com"),
+            nonOwnedTransport,
+            disposeTransport: false);
+
+        ownedClient.Dispose();
+        nonOwnedClient.Dispose();
+
+        Assert.True(ownedTransport.IsDisposed);
+        Assert.False(nonOwnedTransport.IsDisposed);
+    }
 
 
     private static RestClient CreateRestClient(out FakeTransport transport)
@@ -335,6 +356,29 @@ public sealed class RestClientTests
                     Content = new StringContent("{\"Value\":\"ok\"}", Encoding.UTF8, "application/json"),
                 };
             return Task.FromResult(response);
+        }
+    }
+
+    private sealed class DisposableTransport : IHttpTransport, IDisposable
+    {
+        public bool IsDisposed { get; private set; }
+
+        public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
+        {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(DisposableTransport));
+            }
+
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{}"),
+            });
+        }
+
+        public void Dispose()
+        {
+            IsDisposed = true;
         }
     }
 

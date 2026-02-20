@@ -25,7 +25,12 @@ public class RestClientFactory_Tests
         var policy = new FakePolicy();
         var logger = new FakeLogger();
 
-        var client = RestClientFactory.Create(baseUri, transport, signer, policy, logger);
+        var client = RestClientFactory.Create(
+            baseUri,
+            transportConfig: new TransportConfig.ExternalTransport(transport),
+            signer: signer,
+            policy: policy,
+            logger: logger);
 
         var raw = await client.SendRawAsync("GET", "/api");
         var result = JsonSerializer.Deserialize<TestDto>(raw.Body!);

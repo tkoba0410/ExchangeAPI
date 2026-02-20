@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
@@ -15,26 +14,27 @@ public static class RestClientFactory
 {
     public static RestClient Create(
         Uri baseUri,
-        IHttpTransport? transport = null,
+        TransportConfig transportConfig,
         IRequestSigner? signer = null,
         IHttpPolicy? policy = null,
         IRestClientLogger? logger = null,
         IRestCallObserver? observer = null,
-        IExchangeErrorClassifier? errorClassifier = null,
-        HttpClient? httpClient = null)
+        IExchangeErrorClassifier? errorClassifier = null)
     {
         if (baseUri is null) throw new ArgumentNullException(nameof(baseUri));
+        if (transportConfig is null) throw new ArgumentNullException(nameof(transportConfig));
 
-        transport ??= new HttpTransport(httpClient ?? new HttpClient { BaseAddress = baseUri }, disposeHttpClient: httpClient is null);
+        var resolved = TransportConfigResolver.Resolve(baseUri, transportConfig);
         policy ??= HttpPolicyFactory.CreateDefault();
 
         return new RestClient(
             baseUri,
-            transport,
+            resolved.Transport,
             requestSigner: signer,
             policy: policy,
             logger: logger,
             observer: observer,
-            errorClassifier: errorClassifier);
+            errorClassifier: errorClassifier,
+            disposeTransport: resolved.DisposeTransport);
     }
 }

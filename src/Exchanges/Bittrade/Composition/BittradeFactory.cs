@@ -1,6 +1,7 @@
 using System;
 using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Bootstrap.Transport;
+using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
@@ -87,7 +88,7 @@ public static class BittradeFactory
         return new ClientOptions
         {
             BaseUri = settings.BaseUri ?? DefaultBaseUri,
-            HttpClient = settings.HttpClient,
+            TransportConfig = settings.TransportConfig,
             Policy = settings.Policy,
             PolicyOptions = settings.PolicyOptions,
             Logger = settings.Logger,
@@ -104,13 +105,12 @@ public static class BittradeFactory
 
         return RestClientFactory.Create(
             baseUri,
-            transport: settings.Transport,
+            transportConfig: settings.TransportConfig,
             signer: signer,
             policy: policy,
             logger: settings.Logger,
             observer: settings.Observer,
-            errorClassifier: settings.ErrorClassifier,
-            httpClient: settings.HttpClient);
+            errorClassifier: settings.ErrorClassifier);
     }
 
     private static ApiCredentials? ResolveCredentials(BittradeFactoryOptions settings)

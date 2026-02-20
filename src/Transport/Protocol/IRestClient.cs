@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Transport.Models;
@@ -8,7 +9,7 @@ namespace ExchangeApi.Transport.Protocol;
 /// REST API を呼び出すための最小限のクライアント インターフェース。
 /// transport は JSON を解釈しない（TopSpec 9）。
 /// </summary>
-public interface IRestClient
+public interface IRestClient : IDisposable
 {
     /// <summary>
     /// 指定されたパスに対して HTTP GET を実行し、レスポンスの生データを返す。

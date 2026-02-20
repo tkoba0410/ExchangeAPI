@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Abstractions;
 using ExchangeApi.Transport.Http;
@@ -25,9 +24,7 @@ public sealed class BitflyerFactoryOptions
 
     public Uri? BaseUri { get; init; }
 
-    public HttpClient? HttpClient { get; init; }
-
-    public IHttpTransport? Transport { get; init; }
+    public TransportConfig TransportConfig { get; init; } = new TransportConfig.ManagedHttp();
 
     public IHttpPolicy? Policy { get; init; }
 

@@ -18,8 +18,8 @@ public static class ClientFactory
     public static PublicClient CreatePublicClient(ClientOptions options)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
-        var components = BittradeClientBootstrap.CreatePublicComponents(options);
-        return new PublicClient(components);
+        var (components, restClient) = BittradeClientBootstrap.CreatePublicComponents(options);
+        return new PublicClient(components, restClient);
     }
 
     [Obsolete("Pass ClientOptions explicitly. This overload will be removed in a future major release.")]
@@ -41,7 +41,7 @@ public static class ClientFactory
             throw new ArgumentException("accountId is required.", nameof(accountId));
         }
 
-        var (components, _) = BittradeClientBootstrap.CreatePrivateComponents(
+        var (components, _, _) = BittradeClientBootstrap.CreatePrivateComponents(
             new ClientOptions(),
             new ClientCredentials(accessKey, secretKey),
             accountId.Value);
@@ -59,8 +59,8 @@ public static class ClientFactory
         ClientCredentials credentials,
         string accountId = "default")
     {
-        var (components, normalizedAccountId) = BittradeClientBootstrap.CreatePrivateComponents(options, credentials, accountId);
-        return new ExchangeClient(components, normalizedAccountId);
+        var (components, normalizedAccountId, restClient) = BittradeClientBootstrap.CreatePrivateComponents(options, credentials, accountId);
+        return new ExchangeClient(components, normalizedAccountId, restClient);
     }
 
     [Obsolete("Use Create(ClientOptions, ClientCredentials, ...) instead. This overload will be removed in a future major release.")]

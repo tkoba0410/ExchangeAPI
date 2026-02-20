@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
@@ -11,30 +10,29 @@ using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Transport.Http;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 
 /// <summary>
 /// bitFlyer 用のファサード。各API実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class ExchangeClient : IContractPrivateClient
+public sealed class ExchangeClient : IContractPrivateClient, IDisposable
 {
     private readonly MarketApi _marketApi;
     private readonly PrivateApi _privateApi;
+    private IDisposable? _ownedDisposable;
 
     public ExchangeClient(
         ClientOptions options,
-        ClientCredentials credentials,
-        HttpClient? httpClient = null,
-        IHttpTransport? transportOverride = null)
+        ClientCredentials credentials)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
         if (credentials is null) throw new ArgumentNullException(nameof(credentials));
 
-        var client = ClientFactory.Create(credentials, options, httpClient, transportOverride);
+        var client = ClientFactory.Create(credentials, options);
         _marketApi = client._marketApi;
         _privateApi = client._privateApi;
+        _ownedDisposable = client._ownedDisposable;
     }
 
     internal ExchangeClient(
@@ -48,12 +46,14 @@ public sealed class ExchangeClient : IContractPrivateClient
 
     internal ExchangeClient(
         INormalizedApi normalized,
-        IExchangeMarketResolver markets)
+        IExchangeMarketResolver markets,
+        IDisposable? ownedDisposable = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         if (markets is null) throw new ArgumentNullException(nameof(markets));
         _marketApi = new MarketApi(normalized, markets);
         _privateApi = new PrivateApi(normalized);
+        _ownedDisposable = ownedDisposable;
     }
 
     public static ExchangeClient FromRestClient(IRestClient restClient)
@@ -106,6 +106,12 @@ public sealed class ExchangeClient : IContractPrivateClient
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetExecutionsPrivateAsync(request, cancellationToken);
+
+    public void Dispose()
+    {
+        _ownedDisposable?.Dispose();
+        _ownedDisposable = null;
+    }
 
     // Raw access removed from public facade.
 }

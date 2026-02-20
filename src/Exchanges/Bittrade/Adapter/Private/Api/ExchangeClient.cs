@@ -15,10 +15,11 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 /// <summary>
 /// Bittrade 用のファサード。各 API 実装を委譲するだけの薄いラッパー。
 /// </summary>
-public sealed class ExchangeClient : IContractPrivateClient, IContractCandlesticksClient
+public sealed class ExchangeClient : IContractPrivateClient, IContractCandlesticksClient, IDisposable
 {
     private readonly MarketApi _marketApi;
     private readonly PrivateApi _privateApi;
+    private IDisposable? _ownedDisposable;
 
     public ExchangeClient(
         ClientOptions options,
@@ -27,7 +28,7 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
         if (credentials is null) throw new ArgumentNullException(nameof(credentials));
-        var (components, _) = BittradeClientBootstrap.CreatePrivateComponents(options, credentials, accountId);
+        var (components, _, restClient) = BittradeClientBootstrap.CreatePrivateComponents(options, credentials, accountId);
         if (components.Private is null)
         {
             throw new InvalidOperationException("Private components are required to create ExchangeClient.");
@@ -35,6 +36,7 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
 
         _marketApi = new MarketApi(components.Public, components.Markets);
         _privateApi = new PrivateApi(components.Private);
+        _ownedDisposable = restClient;
     }
 
     internal ExchangeClient(
@@ -45,7 +47,7 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
         _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
     }
 
-    internal ExchangeClient(BittradeClientComponents components, AccountId accountId)
+    internal ExchangeClient(BittradeClientComponents components, AccountId accountId, IDisposable? ownedDisposable = null)
     {
         if (components is null) throw new ArgumentNullException(nameof(components));
         if (accountId.IsEmpty) throw new ArgumentException("accountId is required.", nameof(accountId));
@@ -56,13 +58,17 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
 
         _marketApi = new MarketApi(components.Public, components.Markets);
         _privateApi = new PrivateApi(components.Private);
+        _ownedDisposable = ownedDisposable;
     }
 
     internal ExchangeClient(
         MarketApi marketApi,
         PrivateApi privateApi,
         IRestClient restClient)
-        : this(marketApi, privateApi) { }
+        : this(marketApi, privateApi)
+    {
+        _ownedDisposable = restClient ?? throw new ArgumentNullException(nameof(restClient));
+    }
 
     public static ExchangeClient FromRestClient(IRestClient restClient, AccountId accountId)
     {
@@ -117,6 +123,12 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default) =>
         _privateApi.GetExecutionsPrivateAsync(request, cancellationToken);
+
+    public void Dispose()
+    {
+        _ownedDisposable?.Dispose();
+        _ownedDisposable = null;
+    }
 
     // Raw access removed from public facade.
 }

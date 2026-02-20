@@ -1,6 +1,7 @@
 using System;
 using ExchangeApi.Composition.Dtos;
 using ExchangeApi.Composition.Bootstrap.Transport;
+using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
@@ -43,7 +44,7 @@ public static class BitflyerFactory
     {
         var settings = options ?? new BitflyerFactoryOptions();
         var clientOptions = ToClientOptions(settings);
-        return new PublicClient(clientOptions, settings.HttpClient, settings.Transport);
+        return new PublicClient(clientOptions);
     }
 
     public static IContractPrivateClient CreateContractPrivateClient(BitflyerFactoryOptions? options = null)
@@ -71,7 +72,7 @@ public static class BitflyerFactory
         return new ClientOptions
         {
             BaseUri = settings.BaseUri ?? DefaultBaseUri,
-            HttpClient = settings.HttpClient,
+            TransportConfig = settings.TransportConfig,
             Policy = settings.Policy,
             PolicyOptions = settings.PolicyOptions,
             Logger = settings.Logger,
@@ -88,13 +89,12 @@ public static class BitflyerFactory
 
         return RestClientFactory.Create(
             baseUri,
-            transport: settings.Transport,
+            transportConfig: settings.TransportConfig,
             signer: signer,
             policy: policy,
             logger: settings.Logger,
             observer: settings.Observer,
-            errorClassifier: settings.ErrorClassifier,
-            httpClient: settings.HttpClient);
+            errorClassifier: settings.ErrorClassifier);
     }
 
     private static ApiCredentials? ResolveCredentials(BitflyerFactoryOptions settings)

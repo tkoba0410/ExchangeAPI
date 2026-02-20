@@ -1,19 +1,19 @@
 using System;
-using System.Net.Http;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
+using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Time;
-using ExchangeApi.Transport.Http;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
+
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 
 /// <summary>
 /// Factory for constructing bitFlyer client instances.
-/// HttpClient -> HttpTransport -> RestClient(署名/ポリシー/ログ) -> Raw/Private API -> ExchangeClient.
+/// TransportConfig -> IHttpTransport -> RestClient(署名/ポリシー/ログ) -> Raw/Private API -> ExchangeClient.
 /// </summary>
 public static class ClientFactory
 {
@@ -23,19 +23,11 @@ public static class ClientFactory
     /// Public API のみを利用する軽量クライアントを作成する。
     /// 署名を行わず、マーケット取得に限定する。
     /// </summary>
-    public static PublicClient CreatePublic(
-        ClientOptions options,
-        HttpClient? httpClient = null,
-        IHttpTransport? transportOverride = null)
+    public static PublicClient CreatePublic(ClientOptions options)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
         var baseUri = options.BaseUri ?? BitflyerApiBaseUri;
-        var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = baseUri };
-        if (options.Timeout is { } timeout)
-        {
-            http.Timeout = timeout;
-        }
-        IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
+        var resolved = TransportConfigResolver.Resolve(baseUri, options.TransportConfig);
 
         var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
             options.PolicyOptions ?? HttpPolicyDefaults.Create());
@@ -45,33 +37,30 @@ public static class ClientFactory
 
         IRestClient restClient = new RestClient(
             baseUri,
-            baseTransport,
+            resolved.Transport,
             policy: policy,
             logger: logger,
             observer: observer,
-            errorClassifier: errorClassifier);
+            errorClassifier: errorClassifier,
+            disposeTransport: resolved.DisposeTransport);
 
         var components = BitflyerClientComponents.FromRestClient(restClient);
-        return new PublicClient(components.Normalized);
+        return new PublicClient(components.Normalized, restClient);
     }
 
     /// <summary>
     /// Public API のみを利用する軽量クライアントを作成する。
     /// </summary>
     [Obsolete("Pass ClientOptions explicitly. This overload will be removed in a future major release.")]
-    public static PublicClient CreatePublic(
-        HttpClient? httpClient = null,
-        IHttpTransport? transportOverride = null) =>
-        CreatePublic(new ClientOptions(), httpClient, transportOverride);
+    public static PublicClient CreatePublic() =>
+        CreatePublic(new ClientOptions());
 
     /// <summary>
     /// Create bitFlyer client with explicit credentials supplied by the caller.
     /// </summary>
     public static ExchangeClient Create(
         ClientCredentials credentials,
-        ClientOptions options,
-        HttpClient? httpClient = null,
-        IHttpTransport? transportOverride = null)
+        ClientOptions options)
     {
         if (credentials is null) throw new ArgumentNullException(nameof(credentials));
         if (string.IsNullOrWhiteSpace(credentials.ApiKey))
@@ -87,13 +76,7 @@ public static class ClientFactory
         if (options is null) throw new ArgumentNullException(nameof(options));
 
         var baseUri = options.BaseUri ?? BitflyerApiBaseUri;
-        var http = httpClient ?? options.HttpClient ?? new HttpClient { BaseAddress = baseUri };
-        if (options.Timeout is { } timeout)
-        {
-            http.Timeout = timeout;
-        }
-
-        IHttpTransport baseTransport = transportOverride ?? new HttpTransport(http, disposeHttpClient: false);
+        var resolved = TransportConfigResolver.Resolve(baseUri, options.TransportConfig);
 
         IExchangeClock clock = new SystemClock();
         var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
@@ -106,29 +89,29 @@ public static class ClientFactory
 
         IRestClient restClient = new RestClient(
             baseUri,
-            baseTransport,
+            resolved.Transport,
             requestSigner: signer,
             policy: policy,
             logger: logger,
             observer: observer,
-            errorClassifier: errorClassifier);
+            errorClassifier: errorClassifier,
+            disposeTransport: resolved.DisposeTransport);
 
         var components = BitflyerClientComponents.FromRestClient(restClient);
-        return new ExchangeClient(components.Normalized, components.Markets);
+        return new ExchangeClient(components.Normalized, components.Markets, restClient);
     }
 
     /// <summary>
     /// Create bitFlyer client with explicit API key/secret supplied by the caller.
     /// </summary>
-    [Obsolete("Use Create(ClientCredentials, ClientOptions, ...) instead. This overload will be removed in a future major release.")]
+    [Obsolete("Use Create(ClientCredentials, ClientOptions) instead. This overload will be removed in a future major release.")]
     public static ExchangeClient Create(
         string apiKey,
         string apiSecret,
         IHttpPolicy? policy = null,
         IRestClientLogger? logger = null,
         IRestCallObserver? observer = null,
-        IExchangeErrorClassifier? errorClassifier = null,
-        HttpClient? httpClient = null)
+        IExchangeErrorClassifier? errorClassifier = null)
     {
         var options = new ClientOptions
         {
@@ -136,21 +119,18 @@ public static class ClientFactory
             Logger = logger,
             Observer = observer,
             ErrorClassifier = errorClassifier,
-            HttpClient = httpClient,
         };
 
-        return Create(new ClientCredentials(apiKey, apiSecret), options, httpClient: httpClient);
+        return Create(new ClientCredentials(apiKey, apiSecret), options);
     }
 
     /// <summary>
     /// Create bitFlyer client with explicit API key/secret supplied by the caller using options.
     /// </summary>
-    [Obsolete("Use Create(ClientCredentials, ClientOptions, ...) instead. This overload will be removed in a future major release.")]
+    [Obsolete("Use Create(ClientCredentials, ClientOptions) instead. This overload will be removed in a future major release.")]
     public static ExchangeClient Create(
         string apiKey,
         string apiSecret,
-        ClientOptions? options,
-        HttpClient? httpClient = null,
-        IHttpTransport? transportOverride = null) =>
-        Create(new ClientCredentials(apiKey, apiSecret), options ?? new ClientOptions(), httpClient, transportOverride);
+        ClientOptions? options) =>
+        Create(new ClientCredentials(apiKey, apiSecret), options ?? new ClientOptions());
 }

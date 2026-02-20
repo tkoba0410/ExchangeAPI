@@ -1,5 +1,5 @@
 using System;
-using System.Net.Http;
+using ExchangeApi.Transport.Http;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
@@ -11,8 +11,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 public sealed class ClientOptions
 {
     public Uri? BaseUri { get; init; }
-    public TimeSpan? Timeout { get; init; }
-    public HttpClient? HttpClient { get; init; }
+    public TransportConfig TransportConfig { get; init; } = new TransportConfig.ManagedHttp();
     public IHttpPolicy? Policy { get; init; }
     public HttpPolicyOptions? PolicyOptions { get; init; }
     public IRestClientLogger? Logger { get; init; }
@@ -33,8 +32,7 @@ public static class ClientOptionsExtensions
         return new ClientOptions
         {
             BaseUri = options.BaseUri,
-            Timeout = options.Timeout,
-            HttpClient = options.HttpClient,
+            TransportConfig = options.TransportConfig,
             Policy = options.Policy,
             PolicyOptions = options.PolicyOptions,
             Logger = logger ?? options.Logger,

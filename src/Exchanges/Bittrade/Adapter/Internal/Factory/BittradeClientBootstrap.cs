@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Primitives.DomainCommon.Types;
@@ -13,14 +12,15 @@ internal static class BittradeClientBootstrap
 {
     private static readonly Uri DefaultBaseUri = new("https://api-cloud.bittrade.co.jp/");
 
-    public static BittradeClientComponents CreatePublicComponents(ClientOptions options)
+    public static (BittradeClientComponents Components, IRestClient RestClient) CreatePublicComponents(ClientOptions options)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
         var restClient = CreateRestClient(options, signer: null);
-        return BittradeClientComponents.FromRestClient(restClient, accountId: null);
+        var components = BittradeClientComponents.FromRestClient(restClient, accountId: null);
+        return (components, restClient);
     }
 
-    public static (BittradeClientComponents Components, AccountId AccountId) CreatePrivateComponents(
+    public static (BittradeClientComponents Components, AccountId AccountId, IRestClient RestClient) CreatePrivateComponents(
         ClientOptions options,
         ClientCredentials credentials,
         string accountId)
@@ -45,32 +45,27 @@ internal static class BittradeClientBootstrap
         var normalizedAccountId = AccountId.ParseOrThrow(accountId);
         var restClient = CreateRestClient(options, new RequestSigner(credentials.ApiKey, credentials.ApiSecret));
         var components = BittradeClientComponents.FromRestClient(restClient, normalizedAccountId);
-        return (components, normalizedAccountId);
+        return (components, normalizedAccountId, restClient);
     }
 
-    private static RestClient CreateRestClient(
+    private static IRestClient CreateRestClient(
         ClientOptions options,
         IRequestSigner? signer)
     {
         var baseUri = options.BaseUri ?? DefaultBaseUri;
-        var httpClient = options.HttpClient ?? new HttpClient(new HttpClientHandler(), disposeHandler: true);
-        if (options.Timeout is { } timeout)
-        {
-            httpClient.Timeout = timeout;
-        }
-
-        var transport = new HttpTransport(httpClient, disposeHttpClient: true);
+        var resolved = TransportConfigResolver.Resolve(baseUri, options.TransportConfig);
         var policyObserver = NoOpPolicyObserver.Instance;
         var policy = options.Policy ?? HttpPolicyFactory.CreateDefault(
             options.PolicyOptions,
             observer: policyObserver);
         return new RestClient(
             baseUri,
-            transport,
+            resolved.Transport,
             policy: policy,
             errorClassifier: options.ErrorClassifier ?? ErrorClassifier.Instance,
             requestSigner: signer,
             observer: options.Observer,
-            logger: options.Logger);
+            logger: options.Logger,
+            disposeTransport: resolved.DisposeTransport);
     }
 }

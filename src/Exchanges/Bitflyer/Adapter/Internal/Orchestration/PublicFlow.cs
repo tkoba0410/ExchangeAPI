@@ -9,8 +9,8 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Utilities.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Map;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Execute;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 using ExchangeApi.Exchanges.Common.Adapter.Internal;
@@ -18,7 +18,7 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Transport.Protocol;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Orchestration;
 
 internal sealed class PublicFlow
 {
@@ -51,11 +51,11 @@ internal sealed class PublicFlow
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
             request,
             OpGetTicker,
             ct => _normalized.GetTickerCallAsync(productCode, cancellationToken: ct),
-            ok => ContractMapStage.MapTicker(symbol, new TickerNormalized(
+            ok => ContractMapper.MapTicker(symbol, new TickerNormalized(
                 ok.ProductCode,
                 ok.LastTradedPrice,
                 ok.Timestamp,
@@ -86,11 +86,11 @@ internal sealed class PublicFlow
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
             request,
             OpGetBoard,
             ct => _normalized.GetBoardCallAsync(productCode, cancellationToken: ct),
-            ok => ContractMapStage.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
+            ok => ContractMapper.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
             cancellationToken,
             (startedAt, ex) => TryMapSymbolNotSupported<BoardRequest, BoardResponse>(
                 request,
@@ -116,7 +116,7 @@ internal sealed class PublicFlow
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
             request,
             OpGetExecutions,
             ct => _normalized.GetExecutionsPublicCallAsync(productCode, cancellationToken: ct),
@@ -135,7 +135,7 @@ internal sealed class PublicFlow
         GetExecutionsPublicResponse executions)
     {
         IReadOnlyList<ExecutionsPublicItem> mapped = executions.Items
-            .Select(e => ContractMapStage.MapExecution(symbol, e.Value))
+            .Select(e => ContractMapper.MapExecution(symbol, e.Value))
             .ToArray();
         return mapped;
     }

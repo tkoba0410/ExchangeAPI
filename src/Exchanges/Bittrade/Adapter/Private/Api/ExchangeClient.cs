@@ -5,7 +5,7 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Factory;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Orchestration;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Primitives.CallCommon;
@@ -18,7 +18,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
 public sealed class ExchangeClient : IContractPrivateClient, IContractCandlesticksClient, IDisposable
 {
     private readonly PublicFlow _publicFlow;
-    private readonly PrivateApi _privateApi;
+    private readonly PrivateFlow _privateFlow;
     private IDisposable? _ownedDisposable;
 
     public ExchangeClient(
@@ -35,16 +35,16 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
         }
 
         _publicFlow = new PublicFlow(components.Public, components.Markets);
-        _privateApi = new PrivateApi(components.Private);
+        _privateFlow = new PrivateFlow(components.Private);
         _ownedDisposable = restClient;
     }
 
     internal ExchangeClient(
         PublicFlow publicFlow,
-        PrivateApi privateApi)
+        PrivateFlow privateFlow)
     {
         _publicFlow = publicFlow ?? throw new ArgumentNullException(nameof(publicFlow));
-        _privateApi = privateApi ?? throw new ArgumentNullException(nameof(privateApi));
+        _privateFlow = privateFlow ?? throw new ArgumentNullException(nameof(privateFlow));
     }
 
     internal ExchangeClient(BittradeClientComponents components, AccountId accountId, IDisposable? ownedDisposable = null)
@@ -57,15 +57,15 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
         }
 
         _publicFlow = new PublicFlow(components.Public, components.Markets);
-        _privateApi = new PrivateApi(components.Private);
+        _privateFlow = new PrivateFlow(components.Private);
         _ownedDisposable = ownedDisposable;
     }
 
     internal ExchangeClient(
         PublicFlow publicFlow,
-        PrivateApi privateApi,
+        PrivateFlow privateFlow,
         IRestClient restClient)
-        : this(publicFlow, privateApi)
+        : this(publicFlow, privateFlow)
     {
         _ownedDisposable = restClient ?? throw new ArgumentNullException(nameof(restClient));
     }
@@ -101,27 +101,27 @@ public sealed class ExchangeClient : IContractPrivateClient, IContractCandlestic
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         BalanceRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetBalanceAsync(request, cancellationToken);
+        _privateFlow.GetBalanceAsync(request, cancellationToken);
 
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         OrderLimitRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.OrderLimitAsync(request, cancellationToken);
+        _privateFlow.OrderLimitAsync(request, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.CancelOrderAsync(request, cancellationToken);
+        _privateFlow.CancelOrderAsync(request, cancellationToken);
 
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
         OrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetOrdersAsync(request, cancellationToken);
+        _privateFlow.GetOrdersAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetExecutionsPrivateAsync(request, cancellationToken);
+        _privateFlow.GetExecutionsPrivateAsync(request, cancellationToken);
 
     public void Dispose()
     {

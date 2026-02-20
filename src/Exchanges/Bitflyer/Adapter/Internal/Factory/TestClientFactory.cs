@@ -4,7 +4,7 @@ using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
 using ExchangeApi.Transport.Http;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Error;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
 

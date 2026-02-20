@@ -9,9 +9,9 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Utilities.OrderBook;
 using CommonSymbol = ExchangeApi.Primitives.DomainCommon.Types.Symbol;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Map;
 
-internal static class ContractMapStage
+internal static partial class ContractMapper
 {
     public static TickerResponse MapTicker(CommonSymbol symbol, TickerNormalized normalized)
     {

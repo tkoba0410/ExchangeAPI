@@ -9,9 +9,9 @@ using ExchangeApi.Utilities.OrderBook;
 using UtilityOrderBookNormalizer = ExchangeApi.Utilities.OrderBook.OrderBookNormalizer;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using CommonBoard = ExchangeApi.Contracts.Common.Dtos.BoardResponse;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Map;
 
-internal static class ContractMapStage
+internal static class ContractMapper
 {
     public static CommonTicker MapTicker(Symbol symbol, TickerNormalized normalized)
     {

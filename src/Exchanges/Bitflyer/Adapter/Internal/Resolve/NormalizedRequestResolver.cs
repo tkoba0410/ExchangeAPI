@@ -4,24 +4,24 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Normalized.Api.Markets;
+using ExchangeApi.Exchanges.Bitflyer.Normalized.Api.Markets;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Resolve;
 
-internal sealed class NormalizedMarketResolver : IMarketResolver
+internal sealed class NormalizedRequestResolver : IMarketResolver
 {
     private readonly IExchangeMarketResolver _inner;
 
-    public NormalizedMarketResolver(IExchangeMarketResolver inner) =>
+    public NormalizedRequestResolver(IExchangeMarketResolver inner) =>
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
 
-    public async Task<Call<ResolveBittradeMarketRequest, MarketInfo>> ResolveCallAsync(
+    public async Task<Call<ResolveMarketRequest, MarketInfo>> ResolveCallAsync(
         Symbol symbol,
         CancellationToken cancellationToken = default)
     {
-        var request = new ResolveBittradeMarketRequest(symbol);
+        var request = new ResolveMarketRequest(symbol);
         var innerCall = await _inner.ResolveCallAsync(new ResolveExchangeMarketRequest(symbol), cancellationToken).ConfigureAwait(false);
 
         if (innerCall.Result is CallResult<ExchangeMarketInfo>.Err err)
@@ -42,19 +42,19 @@ internal sealed class NormalizedMarketResolver : IMarketResolver
             new CallError(CallErrorKind.Unknown, "Market resolution returned empty product code."));
     }
 
-    private static Call<ResolveBittradeMarketRequest, MarketInfo> OkFromChild(
-        ResolveBittradeMarketRequest request,
+    private static Call<ResolveMarketRequest, MarketInfo> OkFromChild(
+        ResolveMarketRequest request,
         Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> child,
         MarketInfo market)
     {
         var meta = new CallMeta(
             Layer: CallMetaVocabulary.Layer.Adapter,
-            Component: CallMetaVocabulary.Component.NormalizedMarketResolver,
+            Component: CallMetaVocabulary.Component.NormalizedRequestResolver,
             EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
 
-        return new Call<ResolveBittradeMarketRequest, MarketInfo>(
+        return new Call<ResolveMarketRequest, MarketInfo>(
             Id: CallId.New(),
             StartedAt: child.StartedAt,
             Duration: child.Duration,
@@ -63,19 +63,19 @@ internal sealed class NormalizedMarketResolver : IMarketResolver
             Meta: meta);
     }
 
-    private static Call<ResolveBittradeMarketRequest, MarketInfo> ErrorFromChild(
-        ResolveBittradeMarketRequest request,
+    private static Call<ResolveMarketRequest, MarketInfo> ErrorFromChild(
+        ResolveMarketRequest request,
         Call<ResolveExchangeMarketRequest, ExchangeMarketInfo> child,
         CallError error)
     {
         var meta = new CallMeta(
             Layer: CallMetaVocabulary.Layer.Adapter,
-            Component: CallMetaVocabulary.Component.NormalizedMarketResolver,
+            Component: CallMetaVocabulary.Component.NormalizedRequestResolver,
             EndpointId: child.Meta.EndpointId,
             Tags: null,
             Children: new[] { child.Id });
 
-        return new Call<ResolveBittradeMarketRequest, MarketInfo>(
+        return new Call<ResolveMarketRequest, MarketInfo>(
             Id: CallId.New(),
             StartedAt: child.StartedAt,
             Duration: child.Duration,

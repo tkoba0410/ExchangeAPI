@@ -6,7 +6,7 @@ using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Orchestration;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Api.Markets;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Internal.Types;

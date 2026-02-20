@@ -1,7 +1,7 @@
 using System;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Orchestration;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Primitives.DomainCommon.Types;
@@ -31,7 +31,7 @@ public static class ClientFactory
         IRestClientLogger? logger = null) =>
         CreatePublicClient(new ClientOptions { Observer = observer, Logger = logger });
 
-    internal static (PublicFlow PublicFlow, PrivateApi Private) CreatePrivate(
+    internal static (PublicFlow PublicFlow, PrivateFlow Private) CreatePrivate(
         string accessKey,
         string secretKey,
         AccountId accountId)
@@ -50,8 +50,8 @@ public static class ClientFactory
             throw new InvalidOperationException("Private components are required to create a private client.");
         }
 
-        var privateApi = new PrivateApi(components.Private);
-        return (new PublicFlow(components.Public, components.Markets), privateApi);
+        var privateFlow = new PrivateFlow(components.Private);
+        return (new PublicFlow(components.Public, components.Markets), privateFlow);
     }
 
     public static ExchangeClient Create(

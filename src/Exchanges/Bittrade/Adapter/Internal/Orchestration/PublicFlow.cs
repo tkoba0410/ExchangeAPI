@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Utilities.Operations;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Map;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Execute;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Primitives.DomainCommon.Types;
@@ -19,7 +19,7 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Constants;
 using ExchangeApi.Exchanges.Common.Adapter.Internal;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Orchestration;
 
 /// <summary>
 /// Bittrade の Public REST 実装（Ticker/OrderBook/Executions）。
@@ -72,11 +72,11 @@ internal sealed class PublicFlow
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetTicker,
                 ct => _marketData.GetDetailMergedCallAsync(productCode, ct),
-                ok => ContractMapStage.MapTicker(symbol, new TickerNormalized(
+                ok => ContractMapper.MapTicker(symbol, new TickerNormalized(
                     ok.LastTradedPrice,
                     ok.Timestamp,
                     ok.RawSnapshot,
@@ -106,11 +106,11 @@ internal sealed class PublicFlow
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetBoard,
                 ct => _marketData.GetDepthCallAsync(productCode, cancellationToken: ct),
-                ok => ContractMapStage.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
+                ok => ContractMapper.MapOrderBook(new OrderBookNormalized(ok.Bids, ok.Asks)),
                 cancellationToken,
                 (startedAt, ex) => TryMapSymbolNotSupported<BoardRequest, BoardResponse>(
                     request,
@@ -137,7 +137,7 @@ internal sealed class PublicFlow
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetExecutions,
                 ct => _marketData.GetTradeCallAsync(productCode, ct),
@@ -187,11 +187,11 @@ internal sealed class PublicFlow
         }
 
         var productCode = ((CallResult<ExchangeMarketInfo>.Ok)marketCall.Result).Response.ProductCode;
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetCandlesticks,
                 ct => _marketData.GetHistoryKlineCallAsync(productCode, period, size, ct),
-                ok => new CandlesticksResponse(ContractMapStage.MapCandlesticks(symbol, period, ok.Items)),
+                ok => new CandlesticksResponse(ContractMapper.MapCandlesticks(symbol, period, ok.Items)),
                 cancellationToken,
                 (startedAt, ex) => TryMapSymbolNotSupported<CandlesticksRequest, CandlesticksResponse>(
                     request,
@@ -206,7 +206,7 @@ internal sealed class PublicFlow
         IReadOnlyList<ExecutionNormalized> executions)
     {
         IReadOnlyList<ExecutionsPublicItem> mapped = executions
-            .Select(n => ContractMapStage.MapExecution(symbol, n))
+            .Select(n => ContractMapper.MapExecution(symbol, n))
             .ToList();
         return mapped;
     }

@@ -1,5 +1,5 @@
 using System;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Error;
 using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Transport.Http;

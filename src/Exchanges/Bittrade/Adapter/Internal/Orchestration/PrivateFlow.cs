@@ -7,8 +7,8 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Operations;
 using ExchangeApi.Utilities.Operations;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Map;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Execute;
 using ExchangeApi.Exchanges.Common.Adapter.Internal;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
@@ -19,7 +19,7 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests;
 using OrderRequest = ExchangeApi.Exchanges.Bittrade.Normalized.Private.Requests.OrderRequest;
 
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Private.Api;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Orchestration;
 
 internal sealed class PrivateFlow
 {
@@ -41,7 +41,7 @@ internal sealed class PrivateFlow
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
                 request,
                 OpPlaceOrder,
                 ct => _normalized.PostOrdersPlaceCallAsync(
@@ -66,7 +66,7 @@ internal sealed class PrivateFlow
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
                 request,
                 OpCancelOrder,
                 ct => _normalized.PostOrdersSubmitCancelByOrderIdCallAsync(
@@ -87,11 +87,11 @@ internal sealed class PrivateFlow
         CancellationToken cancellationToken = default)
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetBalance,
                 ct => _normalized.GetAccountsBalanceByAccountIdCallAsync(ct),
-                ok => new BalanceResponse(Mapper.MapBalances(ok.Items)),
+                ok => new BalanceResponse(ContractMapper.MapBalances(ok.Items)),
                 cancellationToken)
             .ConfigureAwait(false);
     }
@@ -100,7 +100,7 @@ internal sealed class PrivateFlow
         OrdersRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetOrders,
                 ct => _normalized.GetOpenOrdersCallAsync(
@@ -115,7 +115,7 @@ internal sealed class PrivateFlow
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await AdapterCallExecutor.ExecuteMapCallAsync(
+        return await NormalizedExecutor.ExecuteMapCallAsync(
                 request,
                 OpGetExecutions,
                 ct => _normalized.GetMatchResultsCallAsync(request.Symbol, request.Limit, ct),

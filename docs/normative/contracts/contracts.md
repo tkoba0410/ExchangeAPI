@@ -166,18 +166,18 @@ Contracts の公開 API は **Request DTO を第一の契約**とする（MUST�
 
 意味分類（例: `Account` / `Trading` / `Market`）は、公開構造の第一軸としては採用しない（MUST NOT）。
 
-### MarketCatalog の位置づけ
+### MarketCatalog / Resolver の位置づけ
 
-`MarketCatalog` は取引所固有の市場定義（`Symbol` / `ProductCode` / `Type` など）を保持する
+`ExchangeMarketCatalog` は取引所固有の市場定義（`Symbol` / `ProductCode` / `Type` など）を保持する
 Adapter/Internal 配下の内部要素として扱う（MUST）。
 
-- 取引所固有処理: `src/Exchanges/{Exchange}/Adapter/Internal/MarketCatalog`
+- 取引所固有処理: `src/Exchanges/{Exchange}/Adapter/Internal/Resolve`
 - Facade 公開境界は ExecutionContext の塊（AccountInfo 相当を含む）に依存しない（MUST）。
 
 ### Application / Composition の責務分担
 
 - `src/Application`: 取引所横断のユースケース
-- `src/Exchanges/{Exchange}/Adapter/Internal/MarketCatalog`: 取引所固有の市場定義
+- `src/Exchanges/{Exchange}/Adapter/Internal/Resolve`: 取引所固有の市場定義と resolver
 - `src/Composition`: 取引所横断の配線（DI / Bootstrap）
 - `src/Exchanges/{Exchange}/Composition`: 取引所固有の配線
 
@@ -199,21 +199,29 @@ src/
       Raw/{Public,Private,Internal}
       Normalized/{Public,Private,Internal}
       Adapter/{Public,Private,Internal}
-      Adapter/Internal/MarketCatalog/
+      Adapter/Internal/Orchestration/
+      Adapter/Internal/Resolve/
+      Adapter/Internal/Execute/
+      Adapter/Internal/Map/
+      Adapter/Internal/Error/
       Composition/
     Bittrade/
       Wire/{Public,Private,Internal}
       Raw/{Public,Private,Internal}
       Normalized/{Public,Private,Internal}
       Adapter/{Public,Private,Internal}
-      Adapter/Internal/MarketCatalog/
+      Adapter/Internal/Orchestration/
+      Adapter/Internal/Resolve/
+      Adapter/Internal/Execute/
+      Adapter/Internal/Map/
+      Adapter/Internal/Error/
       Composition/
 ```
 
 ### 移行フェーズ
 
 1. Facade 公開境界から ExecutionContext の塊依存を除去する。
-2. 取引所差分を `Adapter/Internal/MarketCatalog` と resolver 実装へ集約する。
+2. 取引所差分を `Adapter/Internal/Resolve` と resolver 実装へ集約する。
 3. namespace / using / 参照を統一する。
 4. `dotnet build` / `dotnet test` を通す。
 5. inventory / 契約文書を同期更新する。

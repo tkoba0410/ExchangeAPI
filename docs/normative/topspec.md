@@ -196,23 +196,26 @@ src/Exchanges/<Exchange>/Normalized/
 
 ---
 
-#### 3.3.2 MarketCatalog の内部配置（MUST）
+#### 3.3.2 MarketCatalog / Resolver の内部配置（MUST）
 
 MarketCatalog は「取引所仕様メタ情報（市場定義）」を保持する
 **取引所モジュール内部の部品**として扱う。
 
-* MarketCatalog は Adapter の Internal 配下に配置する。
+* MarketCatalog と市場解決 resolver は Adapter の Internal 配下に配置する。
 * MarketCatalog は Facade 公開境界へ露出させない（MUST）。
 * 取引所差分（resolver / signer / canonicalizer / endpoint catalog 等）は
   外部から塊注入せず、取引所モジュール内部で構成する（MUST）。
 * 物理配置は次を基準形（Canon）とする。
 
 ```
-src/Exchanges/<Exchange>/Adapter/Internal/MarketCatalog/
+src/Exchanges/<Exchange>/Adapter/Internal/Resolve/
+  ExchangeMarketCatalog.cs
+  ExchangeRequestResolver.cs
+  NormalizedRequestResolver.cs
 ```
 
 * namespace は物理配置に一致させる（例）:
-  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Internal.MarketCatalog.*`
+  * `ExchangeApi.Exchanges.<Exchange>.Adapter.Internal.Resolve.*`
 
 ---
 
@@ -268,11 +271,43 @@ API 系統の Adapter は `IExchangeMarketResolver` 経由で市場解決を行�
 resolver 実装差分は取引所モジュール内部に閉じ込める。
 
 * API 系統の Adapter は `src/Exchanges/<Exchange>/Adapter/` に置く。
-* MarketCatalog は `src/Exchanges/<Exchange>/Adapter/Internal/MarketCatalog/` に置く。
+* MarketCatalog と resolver は `src/Exchanges/<Exchange>/Adapter/Internal/Resolve/` に置く。
 
 ---
 
-#### 3.4.4 取引所スコープと混線防止（MUST）
+#### 3.4.4 Adapter Internal の標準フェーズ配置（MUST）
+
+Adapter の Internal 実装は、意味分類ではなく処理フェーズで配置する。
+取引所配下の標準形は次とする。
+
+```
+src/Exchanges/<Exchange>/Adapter/
+  Public/Api/
+    PublicClient.cs
+  Private/Api/
+    ExchangeClient.cs
+  Internal/
+    Orchestration/
+      PublicFlow.cs
+      PrivateFlow.cs
+    Resolve/
+      ExchangeMarketCatalog.cs
+      ExchangeRequestResolver.cs
+      NormalizedRequestResolver.cs
+    Execute/
+      NormalizedExecutor.cs
+    Map/
+      ContractMapper.*.cs
+    Error/
+      CallErrorTranslator.cs
+      ErrorClassifier.cs
+```
+
+* namespace は物理配置に一致させる（MUST）。
+
+---
+
+#### 3.4.5 取引所スコープと混線防止（MUST）
 
 取引所ごとの Raw / Normalized 層は、
 **単一の API 呼び出し実装、または単一の Adapter / Raw / Normalized API インスタンスの内部**において、

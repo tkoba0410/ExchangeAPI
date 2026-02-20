@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.MarketCatalog;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Resolve;
 
-internal static class BitflyerMarketCatalog
+internal static class ExchangeMarketCatalog
 {
     public const string BtcJpySymbol = "BTC/JPY";
     public const string BtcJpyProductCode = "BTC_JPY";

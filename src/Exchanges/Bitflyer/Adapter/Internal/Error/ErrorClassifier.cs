@@ -1,6 +1,6 @@
 using System.Net;
 using ExchangeApi.Transport.Protocol;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
+namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Error;
 
 internal sealed class ErrorClassifier : IExchangeErrorClassifier
 {
@@ -10,6 +10,6 @@ internal sealed class ErrorClassifier : IExchangeErrorClassifier
 
     public TransportErrorCategory? Classify(HttpStatusCode? statusCode, string? exchangeErrorCode)
     {
-        return ErrorMapper.MapTransportErrorCategory(statusCode, exchangeErrorCode);
+        return CallErrorTranslator.MapTransportErrorCategory(statusCode, exchangeErrorCode);
     }
 }

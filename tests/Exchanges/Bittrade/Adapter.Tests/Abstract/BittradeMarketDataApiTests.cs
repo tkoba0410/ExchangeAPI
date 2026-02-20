@@ -4,12 +4,12 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ExchangeApi.Exchanges.Common.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Orchestration;
 using ExchangeApi.Primitives.DomainCommon.Enums;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Resolve;
 using ExchangeApi.Exchanges.Bittrade.Wire.Internal;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.Errors;
@@ -146,7 +146,7 @@ public class MarketApiTests
     }
 
     private static IExchangeMarketResolver CreateResolver() =>
-        new BittradeMarketCatalogResolver();
+        new ExchangeRequestResolver();
 
     private sealed class StubHandler : HttpMessageHandler
     {

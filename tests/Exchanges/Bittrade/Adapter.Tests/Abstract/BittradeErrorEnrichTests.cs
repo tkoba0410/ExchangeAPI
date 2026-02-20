@@ -3,11 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Common.Adapter.Internal;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Resolve;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.Errors;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Public.Api;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Orchestration;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Public.Dtos;
 using NormalizedRequests = ExchangeApi.Exchanges.Bittrade.Normalized.Public.Requests;
@@ -66,5 +66,5 @@ public sealed class ErrorEnrichTests
     }
 
     private static IExchangeMarketResolver CreateResolver() =>
-        new BittradeMarketCatalogResolver();
+        new ExchangeRequestResolver();
 }

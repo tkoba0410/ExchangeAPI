@@ -5,8 +5,9 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Resolve;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Orchestration;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Protocol;
@@ -31,7 +32,7 @@ public sealed class PublicClient : IContractPublicClient, IDisposable
     internal PublicClient(INormalizedApi normalized, IDisposable? ownedDisposable = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _publicFlow = new PublicFlow(normalized, new BitflyerMarketCatalogResolver());
+        _publicFlow = new PublicFlow(normalized, new ExchangeRequestResolver());
         _ownedDisposable = ownedDisposable;
     }
 

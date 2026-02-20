@@ -1,6 +1,6 @@
 using System.Net;
 using ExchangeApi.Primitives.Errors;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Error;
 using Xunit;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract;
@@ -15,7 +15,7 @@ public class BitflyerErrorMapperTests
     [InlineData("INVALID_ORDER", ExchangeErrorCategory.Request)]
     public void MapErrorCategory_FromExchangeCode(string code, ExchangeErrorCategory expected)
     {
-        var category = ErrorMapper.MapErrorCategory(null, code);
+        var category = CallErrorTranslator.MapErrorCategory(null, code);
         Assert.Equal(expected, category);
     }
 
@@ -27,7 +27,7 @@ public class BitflyerErrorMapperTests
     [InlineData(HttpStatusCode.InternalServerError, ExchangeErrorCategory.Server)]
     public void MapErrorCategory_FromStatusCode(HttpStatusCode status, ExchangeErrorCategory expected)
     {
-        var category = ErrorMapper.MapErrorCategory(status, null);
+        var category = CallErrorTranslator.MapErrorCategory(status, null);
         Assert.Equal(expected, category);
     }
 }

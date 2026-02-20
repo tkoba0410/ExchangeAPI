@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Exchanges.Bittrade.Adapter.Internal;
+using ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Resolve;
 using ExchangeApi.Exchanges.Bittrade.Normalized;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Api;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
@@ -44,23 +44,23 @@ internal sealed class BittradeClientComponents
         if (!hasAccountId)
         {
             var publicApi = new NormalizedPublicApi(raw);
-            var markets = new BittradeMarketCatalogResolver();
+            var markets = new ExchangeRequestResolver();
             return new BittradeClientComponents(publicApi, privateApi: null, normalizedApi: null, markets);
         }
 
         var normalizedAccountId = accountId!.Value;
-        var marketsFull = new BittradeMarketCatalogResolver();
+        var marketsFull = new ExchangeRequestResolver();
         var normalizedComponents = NormalizedComponentFactory.FromRaw(
             raw,
             publicApi =>
             {
-                return new NormalizedMarketResolver(marketsFull);
+                return new NormalizedRequestResolver(marketsFull);
             },
             normalizedAccountId);
 
         var normalizedApi = NormalizeFactory.FromRaw(
             raw,
-            new NormalizedMarketResolver(marketsFull),
+            new NormalizedRequestResolver(marketsFull),
             normalizedAccountId);
 
         return new BittradeClientComponents(

@@ -36,8 +36,8 @@ public sealed class AdapterShapeGuardTests
             "Exchanges",
             "Bittrade",
             "Adapter",
-            "Public",
-            "Api",
+            "Internal",
+            "Orchestration",
             "PublicFlow.cs");
 
         var text = File.ReadAllText(marketApiPath);

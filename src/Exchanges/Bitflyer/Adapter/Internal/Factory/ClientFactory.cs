@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Error;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Transport.Http;

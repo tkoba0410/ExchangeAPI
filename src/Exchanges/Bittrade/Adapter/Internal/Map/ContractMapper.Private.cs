@@ -5,9 +5,9 @@ using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Primitives.DomainCommon.Types;
 using ExchangeApi.Exchanges.Bittrade.Normalized.Private.Dtos;
 using ExchangeApi.Utilities.Account;
-namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Mappers;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Map;
 
-internal static class Mapper
+internal static partial class ContractMapper
 {
     public static IReadOnlyList<BalanceEntry> MapBalances(IReadOnlyList<BalanceEntryNormalized> entries)
     {

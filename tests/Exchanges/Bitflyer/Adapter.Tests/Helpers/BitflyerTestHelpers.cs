@@ -1,4 +1,4 @@
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Resolve;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api.Markets;
@@ -36,6 +36,6 @@ internal static class BitflyerTestHelpers
 
     public static IMarketResolver CreateResolver()
     {
-        return new NormalizedMarketResolver(new BitflyerMarketCatalogResolver());
+        return new NormalizedRequestResolver(new ExchangeRequestResolver());
     }
 }

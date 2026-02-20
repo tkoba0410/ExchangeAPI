@@ -1,6 +1,6 @@
 using System;
 using ExchangeApi.Contracts.Facade.Interfaces;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Resolve;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Raw.Api;
@@ -31,8 +31,8 @@ internal sealed class BitflyerClientComponents
         var wire = new WireCallExecutor(wireTransport);
         var raw = new RawApi(wire);
         var publicApi = new NormalizedPublicApi(raw);
-        var contractMarkets = new BitflyerMarketCatalogResolver();
-        var markets = new NormalizedMarketResolver(contractMarkets);
+        var contractMarkets = new ExchangeRequestResolver();
+        var markets = new NormalizedRequestResolver(contractMarkets);
         var normalized = NormalizedApi.FromRaw(raw, markets);
         return new BitflyerClientComponents(normalized, contractMarkets);
     }

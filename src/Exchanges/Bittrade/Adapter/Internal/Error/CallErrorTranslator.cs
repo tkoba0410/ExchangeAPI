@@ -1,33 +1,12 @@
 using ExchangeApi.Primitives.Errors;
 using ExchangeApi.Transport.Protocol;
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Mappers;
 
-internal static class ErrorMapper
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Error;
+
+internal static class CallErrorTranslator
 {
-    public static ExchangeErrorCategory? MapErrorCategory(System.Net.HttpStatusCode? statusCode, string? exchangeCode)
+    private static ExchangeErrorCategory? MapErrorCategory(System.Net.HttpStatusCode? statusCode, string? exchangeCode)
     {
-        var normalizedCode = string.IsNullOrWhiteSpace(exchangeCode)
-            ? null
-            : exchangeCode.Trim().ToUpperInvariant();
-
-        if (normalizedCode is not null)
-        {
-            return normalizedCode switch
-            {
-                "INSUFFICIENT_FUNDS" => ExchangeErrorCategory.Balance,
-                "NO_POSITION" => ExchangeErrorCategory.Balance,
-                "INVALID_ORDER" or "INVALID_PRODUCT" or "PRODUCT_NOT_FOUND" => ExchangeErrorCategory.Request,
-                "LIMIT_OVER" or "ORDER_NOT_ACCEPTABLE" => ExchangeErrorCategory.Request,
-                "INVALID_REQUEST" => ExchangeErrorCategory.Request,
-                "PARAM_ERROR" => ExchangeErrorCategory.Request,
-                "AUTHENTICATION_ERROR" or "PERMISSION_DENIED" => ExchangeErrorCategory.Auth,
-                "TOO_MANY_REQUESTS" => ExchangeErrorCategory.RateLimit,
-                "SERVICE_UNAVAILABLE" or "INTERNAL_ERROR" => ExchangeErrorCategory.Server,
-                "TIMEOUT" => ExchangeErrorCategory.Network,
-                _ => ExchangeErrorCategory.Unknown,
-            };
-        }
-
         if (statusCode is null) return null;
 
         return statusCode.Value switch
@@ -45,7 +24,7 @@ internal static class ErrorMapper
         return ToTransportErrorCategory(MapErrorCategory(statusCode, exchangeCode));
     }
 
-    public static ExchangeApiException EnrichBitflyerException(ExchangeApiException ex, string operation)
+    public static ExchangeApiException EnrichBittradeException(ExchangeApiException ex, string operation)
     {
         var category = MapErrorCategory(ex.StatusCode, ex.ExchangeErrorCode);
 

@@ -5,10 +5,10 @@ using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Requests;
 using ExchangeApi.Transport.Protocol;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Resolve;
 using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.Orchestration;
 using ExchangeApi.Exchanges.Bitflyer.Normalized.Api;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Public.Api;
 using ExchangeApi.Primitives.CallCommon;
 using CommonTicker = ExchangeApi.Contracts.Common.Dtos.TickerResponse;
 namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
@@ -19,7 +19,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Private.Api;
 public sealed class ExchangeClient : IContractPrivateClient, IDisposable
 {
     private readonly PublicFlow _publicFlow;
-    private readonly PrivateApi _privateApi;
+    private readonly PrivateFlow _privateFlow;
     private IDisposable? _ownedDisposable;
 
     public ExchangeClient(
@@ -31,7 +31,7 @@ public sealed class ExchangeClient : IContractPrivateClient, IDisposable
 
         var client = ClientFactory.Create(credentials, options);
         _publicFlow = client._publicFlow;
-        _privateApi = client._privateApi;
+        _privateFlow = client._privateFlow;
         _ownedDisposable = client._ownedDisposable;
     }
 
@@ -40,8 +40,8 @@ public sealed class ExchangeClient : IContractPrivateClient, IDisposable
         object? rawBundle = null)
     {
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
-        _publicFlow = new PublicFlow(normalized, new BitflyerMarketCatalogResolver());
-        _privateApi = new PrivateApi(normalized);
+        _publicFlow = new PublicFlow(normalized, new ExchangeRequestResolver());
+        _privateFlow = new PrivateFlow(normalized);
     }
 
     internal ExchangeClient(
@@ -52,7 +52,7 @@ public sealed class ExchangeClient : IContractPrivateClient, IDisposable
         if (normalized is null) throw new ArgumentNullException(nameof(normalized));
         if (markets is null) throw new ArgumentNullException(nameof(markets));
         _publicFlow = new PublicFlow(normalized, markets);
-        _privateApi = new PrivateApi(normalized);
+        _privateFlow = new PrivateFlow(normalized);
         _ownedDisposable = ownedDisposable;
     }
 
@@ -81,27 +81,27 @@ public sealed class ExchangeClient : IContractPrivateClient, IDisposable
     public Task<Call<OrderLimitRequest, OrderLimitResponse>> OrderLimitAsync(
         OrderLimitRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.OrderLimitAsync(request, cancellationToken);
+        _privateFlow.OrderLimitAsync(request, cancellationToken);
 
     public Task<Call<CancelOrderRequest, CancelOrderResponse>> CancelOrderAsync(
         CancelOrderRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.CancelOrderAsync(request, cancellationToken);
+        _privateFlow.CancelOrderAsync(request, cancellationToken);
 
     public Task<Call<BalanceRequest, BalanceResponse>> GetBalanceAsync(
         BalanceRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetBalanceAsync(request, cancellationToken);
+        _privateFlow.GetBalanceAsync(request, cancellationToken);
 
     public Task<Call<OrdersRequest, OrdersResponse>> GetOrdersAsync(
         OrdersRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetOrdersAsync(request, cancellationToken);
+        _privateFlow.GetOrdersAsync(request, cancellationToken);
 
     public Task<Call<ExecutionsPrivateRequest, ExecutionsPrivateResponse>> GetExecutionsPrivateAsync(
         ExecutionsPrivateRequest request,
         CancellationToken cancellationToken = default) =>
-        _privateApi.GetExecutionsPrivateAsync(request, cancellationToken);
+        _privateFlow.GetExecutionsPrivateAsync(request, cancellationToken);
 
     public void Dispose()
     {

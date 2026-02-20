@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 using ExchangeApi.Contracts.Common.Dtos;
 using ExchangeApi.Contracts.Facade.Interfaces;
 using ExchangeApi.Contracts.Facade.Requests;
-using ExchangeApi.Exchanges.Bitflyer.Adapter.Internal.MarketCatalog;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Primitives.DomainCommon.Types;
 
-namespace ExchangeApi.Exchanges.Bitflyer.Adapter.Internal;
+namespace ExchangeApi.Exchanges.Bittrade.Adapter.Internal.Resolve;
 
-internal sealed class BitflyerMarketCatalogResolver : IExchangeMarketResolver
+internal sealed class ExchangeRequestResolver : IExchangeMarketResolver
 {
     private static readonly IReadOnlyDictionary<string, ExchangeMarketInfo> MarketBySymbol =
         BuildMarketIndex();
@@ -42,7 +41,7 @@ internal sealed class BitflyerMarketCatalogResolver : IExchangeMarketResolver
     private static IReadOnlyDictionary<string, ExchangeMarketInfo> BuildMarketIndex()
     {
         var map = new Dictionary<string, ExchangeMarketInfo>(StringComparer.OrdinalIgnoreCase);
-        foreach (var market in BitflyerMarketCatalog.Markets)
+        foreach (var market in ExchangeMarketCatalog.Markets)
         {
             var mapped = new ExchangeMarketInfo(
                 Symbol: Symbol.ParseOrThrow(market.Symbol),

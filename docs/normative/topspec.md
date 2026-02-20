@@ -83,7 +83,7 @@ Contracts/Primitives から Utilities への依存は禁止する。
 Wire 層の API/実装は、**署名有無（Public / Private）によってのみ分離**する。
 MarketData / Trading / Account 等の**意味分類（種類別フォルダ分割）は行わない**。
 `Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
-意味分類語彙は**物理配置・namespace・公開 API**に使用してはならない。
+意味分類語彙は**物理配置・namespace・公開 API・internal 実装の主分類軸**に使用してはならない。
 
 * 取引所配下の Wire 物理配置は次を基準形（Canon）とする。
 
@@ -133,7 +133,7 @@ src/Exchanges/<Exchange>/Wire/
 Raw 層の API/実装は、Wire と同様に **署名有無（Public / Private）によってのみ分離**する。
 MarketData / Trading / Account 等の**意味分類（種類別フォルダ分割）は行わない**。
 `Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
-意味分類語彙は**物理配置・namespace・公開 API**に使用してはならない。
+意味分類語彙は**物理配置・namespace・公開 API・internal 実装の主分類軸**に使用してはならない。
 
 * 取引所配下の Raw 物理配置は次を基準形（Canon）とする。
 
@@ -175,7 +175,7 @@ src/Exchanges/<Exchange>/Raw/
 Normalized 層の API/実装は、Wire/Raw と同様に **署名有無（Public / Private）によってのみ分離**する。
 MarketData / Trading / Account 等の**意味分類（種類別フォルダ分割）は行わない**。
 `Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
-意味分類語彙は**物理配置・namespace・公開 API**に使用してはならない。
+意味分類語彙は**物理配置・namespace・公開 API・internal 実装の主分類軸**に使用してはならない。
 
 * 取引所配下の Normalized 物理配置は次を基準形（Canon）とする。
 
@@ -236,7 +236,7 @@ Adapter 層の API/実装は、Wire/Raw/Normalized と同様に
 **署名有無（Public / Private）によってのみ分離**する。
 MarketData / Trading / Account 等の**意味分類（種類別フォルダ分割）は行わない**。
 `Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
-意味分類語彙は**物理配置・namespace・公開 API**に使用してはならない。
+意味分類語彙は**物理配置・namespace・公開 API・internal 実装の主分類軸**に使用してはならない。
 
 * 取引所配下の Adapter 物理配置は次を基準形（Canon）とする。
 

@@ -102,6 +102,18 @@ TopSpec および inventory に記載された事実に従う。
 
 * 物理構造で意味を表現してはならない。
 
+### 4.3 Internal 実装の分類軸（必須）
+
+* `internal` 実装においても、意味分類（MarketData / Trading / Account / History 等）を
+  **主分類軸として使用してはならない**（MUST NOT）。
+* `internal` 実装の主分類は、処理フェーズ（例: Resolve / Execute / Map / Error）または
+  EndpointId 由来の識別子で固定する（SHOULD）。
+* 意味分類語彙を使用できるのは、以下の限定用途に限る（MAY）。
+  - EndpointTraits
+  - Capability
+  - Inventory（事実記録）
+  - 公式 API 名称との対応維持が必要な局所識別子
+
 ---
 
 ## 5. 文書間衝突時の裁定
@@ -172,11 +184,11 @@ TopSpec および inventory に記載された事実に従う。
 
 - Adapter は `Normalized.Internal.*` を直接参照してはならない（MUST NOT）。
 - Normalized は `Wire.Constants` / `Wire.Internal` を直接参照してはならない（MUST NOT）。
-- `PublicClient` は entrypoint 専用とし、実オーケストレーションは `MarketApi` 側に集約しなければならない（MUST）。
+- `PublicClient` は entrypoint 専用とし、実オーケストレーションは専用の internal オーケストレータへ集約しなければならない（MUST）。
 
 ### 8.5 取引所間並列性（REVIEW-05）
 
-- Adapter Public 境界では Request DTO を保持し、`ExchangeClient/PublicClient -> MarketApi` 委譲を取引所間で統一しなければならない（MUST）。
+- Adapter Public 境界では Request DTO を保持し、`ExchangeClient/PublicClient -> internal オーケストレータ` 委譲を取引所間で統一しなければならない（MUST）。
 - Adapter テスト命名は取引所間で同一規約に合わせなければならない（MUST）。
 
 ### 8.6 定数・語彙定義（REVIEW-06）

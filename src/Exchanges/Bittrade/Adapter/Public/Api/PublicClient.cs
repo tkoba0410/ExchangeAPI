@@ -31,7 +31,7 @@ public sealed class PublicClient : IContractPublicClient, IContractCandlesticksC
     {
         if (restClient is null) throw new ArgumentNullException(nameof(restClient));
 
-        // 公開APIのみ: market 取得に限定し、Trading/Account/History は提供しない。
+        // 公開 API の呼び出しのみを提供する。
         var components = BittradeClientComponents.FromRestClient(restClient, accountId: null);
         _publicFlow = new PublicFlow(components.Public, components.Markets);
     }

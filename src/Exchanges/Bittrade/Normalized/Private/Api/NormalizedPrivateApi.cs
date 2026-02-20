@@ -24,7 +24,7 @@ namespace ExchangeApi.Exchanges.Bittrade.Normalized.Private.Api;
 
 internal sealed class NormalizedPrivateApi
 {
-    private const string TradingComponent = "Bittrade.Trading";
+    private const string PrivateComponent = "Bittrade.NormalizedPrivateApi";
     private readonly IRawApi _trading;
     private readonly IMarketResolver _markets;
     private readonly AccountId _accountId;
@@ -286,10 +286,10 @@ internal sealed class NormalizedPrivateApi
         {
             return CreateNotSupported<NormalizedRequests.PostOrdersSubmitCancelByOrderIdRequest, PostOrdersSubmitCancelByOrderIdResponse>(
                 callRequest,
-                component: TradingComponent,
+                component: PrivateComponent,
                 feature: "CancelOrder",
                 reason: $"orderKey.Kind={request.OrderKey.Kind}",
-                meta: CallMeta.CreateInternal(CallMetaVocabulary.Layer.Normalized, TradingComponent));
+                meta: CallMeta.CreateInternal(CallMetaVocabulary.Layer.Normalized, PrivateComponent));
         }
 
         var rawCall = await _trading
@@ -425,10 +425,10 @@ internal sealed class NormalizedPrivateApi
         {
             return CreateNotSupported<NormalizedRequests.GetOrdersByOrderIdRequest, GetOrdersByOrderIdResponse>(
                 callRequest,
-                component: TradingComponent,
+                component: PrivateComponent,
                 feature: "GetOrder",
                 reason: $"orderKey.Kind={request.OrderKey.Kind}",
-                meta: CallMeta.CreateInternal(CallMetaVocabulary.Layer.Normalized, TradingComponent));
+                meta: CallMeta.CreateInternal(CallMetaVocabulary.Layer.Normalized, PrivateComponent));
         }
         var marketCall = await _markets.ResolveCallAsync(request.Symbol, cancellationToken).ConfigureAwait(false);
         if (marketCall.Result is CallResult<MarketInfo>.Err marketError)

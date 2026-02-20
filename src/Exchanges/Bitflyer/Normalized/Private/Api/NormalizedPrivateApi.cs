@@ -151,7 +151,7 @@ internal sealed class NormalizedPrivateApi
             default:
                 return CreateNotSupported<PrivateRequests.CancelChildOrderRequest, CancelChildOrderResponse>(
                     callRequest,
-                    component: "Bitflyer.Trading",
+                    component: "Bitflyer.NormalizedPrivateApi",
                     feature: "CancelOrder",
                     reason: $"orderKey.Kind={orderKey.Kind}",
                     meta: marketCall.Meta);

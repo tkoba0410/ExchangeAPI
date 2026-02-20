@@ -14,7 +14,7 @@ using ExchangeApi.Primitives.CallCommon;
 namespace ExchangeApi.Exchanges.Bittrade.Raw.Api;
 
 /// <summary>
-/// Bittrade の Raw API アクセス（Public/Private/Trading をまとめた単一入口）。
+/// Bittrade の Raw API アクセス（Public/Private をまとめた単一入口）。
 /// </summary>
 public sealed class RawApi : IRawApi
 {

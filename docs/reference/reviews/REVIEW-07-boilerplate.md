@@ -1,4 +1,5 @@
 # REVIEW-07: ボイラーコード総点検（共通化・自動化・規約化）
+Status: Active
 
 ## 対象と前提
 - 対象: `src/` 全体（特に `Exchanges` / `Contracts`）および `tests/Exchanges`。

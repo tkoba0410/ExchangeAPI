@@ -1,4 +1,5 @@
 # REVIEW-04: Layering / Dependency Boundary Review (`src/Exchanges`)
+Status: Active
 
 対象: `src/Exchanges/Bitflyer` / `src/Exchanges/Bittrade` / `src/Exchanges/Common`
 

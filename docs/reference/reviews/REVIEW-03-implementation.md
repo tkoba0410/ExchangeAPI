@@ -1,4 +1,5 @@
 # REVIEW-03 実装パターン統一レビュー（Exchanges）
+Status: Active
 
 対象: `src/Exchanges` 配下（Bitflyer / Bittrade / Common）
 

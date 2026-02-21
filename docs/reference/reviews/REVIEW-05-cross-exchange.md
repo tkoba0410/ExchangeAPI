@@ -1,4 +1,5 @@
 # REVIEW-05: Bitflyer / Bittrade Cross-Exchange Parallelism Review
+Status: Active
 
 目的: 取引所間（Bitflyer / Bittrade）で「並列性・対称性」が保たれているかを確認し、将来の取引所追加・endpoint追加時の事故防止と保守コスト最小化に資する提案を整理する。
 

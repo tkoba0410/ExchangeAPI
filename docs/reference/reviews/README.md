@@ -12,6 +12,24 @@
 - [REVIEW-06 constants](./REVIEW-06-constants.md)
 - [REVIEW-07 boilerplate](./REVIEW-07-boilerplate.md)
 
+## Status管理（SSOT）
+
+- 正本は各レビュー本文の `Status:` ヘッダ（`Active` / `Archived`）とする。
+- 本READMEの管理表は、レビュー本文の `Status` を一覧表示する投影とする。
+
+<!-- review-status-table:start -->
+| File | Status | Note |
+| --- | --- | --- |
+| [REVIEW-01 naming](./REVIEW-01-naming.md) | Active | 現行参照 |
+| [REVIEW-02 parameters](./REVIEW-02-parameters.md) | Active | 現行参照 |
+| [REVIEW-03 implementation](./REVIEW-03-implementation.md) | Active | 現行参照 |
+| [REVIEW-04 layering](./REVIEW-04-layering.md) | Active | 現行参照 |
+| [REVIEW-05 cross exchange](./REVIEW-05-cross-exchange.md) | Active | 現行参照 |
+| [REVIEW-06 constants](./REVIEW-06-constants.md) | Active | 現行参照 |
+| [REVIEW-07 boilerplate](./REVIEW-07-boilerplate.md) | Active | 現行参照 |
+| [user experience review](./user-experience-review.md) | Active | 現行参照 |
+<!-- review-status-table:end -->
+
 ## 読む順（推奨）
 
 1. [REVIEW-01 naming](./REVIEW-01-naming.md) 〜 [REVIEW-04 layering](./REVIEW-04-layering.md) で基本方針（命名・引数・実装・責務分離）を確認

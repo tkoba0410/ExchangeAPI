@@ -1,4 +1,5 @@
 # REVIEW-06: 定数・enum・文字列表現（マジックストリング）統一レビュー
+Status: Active
 
 ## 対象と前提
 - 対象: `src/` 全般（特に `Exchanges` / `Contracts`）および `docs/inventory` の endpointId/path 関連。

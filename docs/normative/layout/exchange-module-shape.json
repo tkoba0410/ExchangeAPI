@@ -7,7 +7,8 @@
       "Adapter",
       "Composition",
       "Vocabulary"
-    ]
+    ],
+    "allowFiles": false
   },
   "directoryRules": [
     {
@@ -18,19 +19,22 @@
         "Constants",
         "Properties",
         "Internal"
-      ]
+      ],
+      "allowFiles": true
     },
     {
       "path": "Wire/Public",
       "requiredDirectories": [
         "Endpoints"
-      ]
+      ],
+      "allowFiles": false
     },
     {
       "path": "Wire/Private",
       "requiredDirectories": [
         "Endpoints"
-      ]
+      ],
+      "allowFiles": false
     },
     {
       "path": "Raw",
@@ -41,7 +45,8 @@
       ],
       "optionalDirectories": [
         "Api"
-      ]
+      ],
+      "allowFiles": true
     },
     {
       "path": "Normalized",
@@ -53,7 +58,8 @@
       "optionalDirectories": [
         "Api",
         "Properties"
-      ]
+      ],
+      "allowFiles": true
     },
     {
       "path": "Adapter",
@@ -65,7 +71,8 @@
       ],
       "optionalDirectories": [
         "Properties"
-      ]
+      ],
+      "allowFiles": true
     },
     {
       "path": "Adapter/Public",
@@ -74,7 +81,8 @@
       ],
       "optionalDirectories": [
         "Dtos"
-      ]
+      ],
+      "allowFiles": false
     },
     {
       "path": "Adapter/Private",
@@ -83,7 +91,8 @@
       ],
       "optionalDirectories": [
         "Dtos"
-      ]
+      ],
+      "allowFiles": false
     },
     {
       "path": "Adapter/Internal",

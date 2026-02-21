@@ -34,7 +34,7 @@ public sealed class ExchangeModuleLayoutParityTests
                 shape.ExchangeRoot.RequiredDirectories,
                 shape.ExchangeRoot.OptionalDirectories,
                 shape.ExchangeRoot.ForbiddenDirectories,
-                shape.ExchangeRoot.AllowFiles,
+                shape.ExchangeRoot.AllowFiles!.Value,
                 scope: $"{exchange} root");
 
             foreach (var rule in shape.DirectoryRules)
@@ -47,7 +47,7 @@ public sealed class ExchangeModuleLayoutParityTests
                     rule.RequiredDirectories,
                     rule.OptionalDirectories,
                     rule.ForbiddenDirectories,
-                    rule.AllowFiles,
+                    rule.AllowFiles!.Value,
                     scope: $"{exchange}/{rule.Path}");
             }
 

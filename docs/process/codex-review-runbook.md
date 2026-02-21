@@ -203,6 +203,13 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 本章は PR 差分ではなく、リポジトリ全体を対象に監査する場合の運用を定義する。
 通常の `L1/L2` 運用に置き換えるものではなく、`L3` 相当の節目監査として実施する。
 
+### 10.0 運用原則（PR差分レビュー資産の流用）
+
+- 節目監査では、PR差分レビューで使用する既存テンプレート（`REVIEW-BOUNDARY` / `REVIEW-CONSISTENCY` / `REVIEW-CONTRACTS` / `REVIEW-RELIABILITY` / `REVIEW-SECURITY` / `REVIEW-DX` / `REVIEW-CHANGE`）をそのまま流用する。
+- ただし全体監査では、`L2` トリガ判定は行わず、7軸を常時全適用する。
+- `REVIEW-DOCS` / `REVIEW-USER-GUIDE` は補助監査として別枠で扱い、7軸件数集計には含めない。
+- 出力要件は全体監査モードの要件を優先し、軸別件数・Fatal件数・Top10・未解消NG総数を必須とする。
+
 ### 10.1 実施タイミング
 
 - Stage 締め前
@@ -214,7 +221,7 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 
 1. 監査対象ブランチを固定する（例: `stage9` / `main`）。
 2. 監査スコープを明示する（コード + 文書、または文書のみ）。
-3. 7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
+3. `L2` トリガ判定は省略し、7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
    Security は logger 差し替え時の secret 非露出（共通サニタイズ経路）まで確認する。
 4. 出力を `OK / 要修正 / NG` に統一し、`file:line` を必須化する（`Docs` は補助監査として別枠）。
 5. 軸ごとの件数サマリ（OK / 要修正 / NG + Fatal件数）を作成する。
@@ -230,7 +237,8 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 
 実施手順:
 1. PR差分ではなく、現行ブランチの全体を監査する。
-2. 7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
+2. `L2` トリガ判定は行わず、7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
+   7軸は既存の PR差分レビュー用テンプレート（`REVIEW-<AXIS>.md`）を流用して判定する。
    Docs は補助監査（REVIEW-DOCS）として別枠で実施する。
 3. 各指摘は次の1行形式を使う:
    [判定] <要約> - <file:line> - <優先度(Fatal/High/Medium/Low/Nit)> - <Fatal分類(F1-F5/None)> - <根拠（どの規約か）>

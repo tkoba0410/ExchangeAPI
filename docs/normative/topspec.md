@@ -57,6 +57,25 @@ Contracts/Primitives から Utilities への依存は禁止する。
 
 ## 3. 各層の責務
 
+### 3.0 取引所モジュールの物理配置（MUST）
+
+`src/Exchanges/<Exchange>/` 配下は、取引所実装の物理境界として次を基準形（Canon）とする。
+
+```
+src/Exchanges/<Exchange>/
+  Wire/
+  Raw/
+  Normalized/
+  Adapter/
+  Composition/
+  Vocabulary/
+```
+
+* 取引所配下の新規要素は、上記いずれかの配下に配置する（MUST）。
+* `Wire` / `Raw` / `Normalized` / `Adapter` の詳細配置は 3.1〜3.4 を正本とする（MUST）。
+* `Vocabulary` は命名正本（例: `EndpointIds`）の置き場とし、運用規約は `docs/normative/naming-rules.md` を正本とする（MUST）。
+* 取引所固有の配線は `Composition` に配置する（MUST）。
+
 ### 3.1 Wire 層（I/O / Transport）
 
 **責務**

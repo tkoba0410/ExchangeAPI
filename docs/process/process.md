@@ -201,6 +201,10 @@ governance に従って裁定を行う。
 #### D. 例外（Decisions）
 - [ ] 原則からの逸脱がある場合、`docs/process/exceptions.md` に記録がある（未登録の例外は禁止）
 
+#### E. 物理配置変更時の文書同期
+- [ ] `<exchange>` 配下の物理配置を変更した場合、`docs/normative/topspec.md` と `docs/normative/contracts/contracts.md` の該当条文を同一 PR で同期更新している
+- [ ] 物理配置の変更を `tests/Common.Tests/Architecture/*LayoutParityTests.cs` へ反映し、`dotnet test` で検証している
+
 ---
 
 ## 8. Legacy（参考文書）

@@ -167,6 +167,7 @@ Contracts の公開 API は **Request DTO を第一の契約**とする（MUST�
 
 意味分類（例: `Account` / `Trading` / `Market`）は、公開構造の第一軸としては採用しない（MUST NOT）。
 取引所配下の物理配置の正本は TopSpec 3.1〜3.4 とし、本章は契約観点の要点のみを記す（MUST）。
+`src/Exchanges/{Exchange}` 直下は `Wire` / `Raw` / `Normalized` / `Adapter` / `Composition` / `Vocabulary` を基準形とする（MUST）。
 
 ### MarketCatalog / Resolver の位置づけ
 
@@ -208,6 +209,7 @@ src/
       Adapter/Internal/Map/
       Adapter/Internal/Error/
       Composition/
+      Vocabulary/
     Bittrade/
       Wire/{Public,Private,Constants,Internal}
       Wire/Internal/Auth/
@@ -220,6 +222,7 @@ src/
       Adapter/Internal/Map/
       Adapter/Internal/Error/
       Composition/
+      Vocabulary/
 ```
 
 補足（MUST / MUST NOT）:

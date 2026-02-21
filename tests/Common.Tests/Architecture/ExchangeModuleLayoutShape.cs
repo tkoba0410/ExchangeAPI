@@ -77,7 +77,7 @@ internal sealed class ExchangeModuleLayoutShape
                 rule,
                 location,
                 requirePath: true,
-                requireRequiredDirectories: false,
+                requireRequiredDirectories: true,
                 sourcePath);
 
             if (!paths.Add(rule.Path))
@@ -99,6 +99,11 @@ internal sealed class ExchangeModuleLayoutShape
             ValidateNonEmptyValue(conditional.WhenDirectory, $"{location}.whenDirectory", sourcePath);
             ValidateArrayEntries(conditional.RequiredDirectories, $"{location}.requiredDirectories", sourcePath);
             ValidateArrayEntries(conditional.RequiredFiles, $"{location}.requiredFiles", sourcePath);
+            if (conditional.RequiredDirectories.Length == 0 && conditional.RequiredFiles.Length == 0)
+            {
+                throw new InvalidDataException(
+                    $"'{location}' must define at least one required directory or file: {sourcePath}");
+            }
         }
     }
 
@@ -125,10 +130,17 @@ internal sealed class ExchangeModuleLayoutShape
 
         ValidateArrayEntries(rule.OptionalDirectories, $"{location}.optionalDirectories", sourcePath);
         ValidateArrayEntries(rule.ForbiddenDirectories, $"{location}.forbiddenDirectories", sourcePath);
+        ValidateArrayEntries(rule.AllowedFiles, $"{location}.allowedFiles", sourcePath);
+        ValidateArrayEntries(rule.AllowedFilePatterns, $"{location}.allowedFilePatterns", sourcePath);
 
         if (rule.AllowFiles is null)
         {
             throw new InvalidDataException($"Missing required '{location}.allowFiles' value: {sourcePath}");
+        }
+        if (rule.AllowFiles.Value && (rule.AllowedFiles.Length > 0 || rule.AllowedFilePatterns.Length > 0))
+        {
+            throw new InvalidDataException(
+                $"'{location}.allowedFiles' / '{location}.allowedFilePatterns' must be empty when '{location}.allowFiles' is true: {sourcePath}");
         }
 
         EnsureNoSetIntersection(
@@ -214,6 +226,10 @@ internal sealed class DirectoryRule
     public string[] ForbiddenDirectories { get; set; } = Array.Empty<string>();
 
     public bool? AllowFiles { get; set; }
+
+    public string[] AllowedFiles { get; set; } = Array.Empty<string>();
+
+    public string[] AllowedFilePatterns { get; set; } = Array.Empty<string>();
 }
 
 internal sealed class ConditionalRule

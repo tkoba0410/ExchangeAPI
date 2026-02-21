@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Enumeration;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -35,6 +36,8 @@ public sealed class ExchangeModuleLayoutParityTests
                 shape.ExchangeRoot.OptionalDirectories,
                 shape.ExchangeRoot.ForbiddenDirectories,
                 shape.ExchangeRoot.AllowFiles!.Value,
+                ExpandTemplates(shape.ExchangeRoot.AllowedFiles, exchange),
+                ExpandTemplates(shape.ExchangeRoot.AllowedFilePatterns, exchange),
                 scope: $"{exchange} root");
 
             foreach (var rule in shape.DirectoryRules)
@@ -48,6 +51,8 @@ public sealed class ExchangeModuleLayoutParityTests
                     rule.OptionalDirectories,
                     rule.ForbiddenDirectories,
                     rule.AllowFiles!.Value,
+                    ExpandTemplates(rule.AllowedFiles, exchange),
+                    ExpandTemplates(rule.AllowedFilePatterns, exchange),
                     scope: $"{exchange}/{rule.Path}");
             }
 
@@ -98,6 +103,8 @@ public sealed class ExchangeModuleLayoutParityTests
         IReadOnlyCollection<string> optionalNames,
         IReadOnlyCollection<string> forbiddenNames,
         bool allowFiles,
+        IReadOnlyCollection<string> allowedFiles,
+        IReadOnlyCollection<string> allowedFilePatterns,
         string scope)
     {
         Assert.True(Directory.Exists(basePath), $"Directory not found: {basePath}");
@@ -140,14 +147,43 @@ public sealed class ExchangeModuleLayoutParityTests
         {
             var files = Directory
                 .GetFiles(basePath, "*", SearchOption.TopDirectoryOnly)
-                .Select(Path.GetFileName)
-                .Where(static name => !string.IsNullOrEmpty(name))
+                .Select(static path => Path.GetFileName(path) ?? string.Empty)
+                .Where(static name => name.Length > 0)
                 .OrderBy(name => name, StringComparer.Ordinal)
                 .ToArray();
+            var unexpectedFiles = files
+                .Where(file => !IsAllowedFile(file, allowedFiles, allowedFilePatterns))
+                .ToArray();
             Assert.True(
-                files.Length == 0,
-                $"Files are not allowed in {scope}: {string.Join(", ", files)}");
+                unexpectedFiles.Length == 0,
+                $"Unexpected files in {scope}: {string.Join(", ", unexpectedFiles)}");
         }
+    }
+
+    private static string[] ExpandTemplates(IEnumerable<string> templates, string exchange) =>
+        templates
+            .Select(template => ExchangeModuleLayoutShape.ExpandPathTemplate(template, exchange))
+            .ToArray();
+
+    private static bool IsAllowedFile(
+        string fileName,
+        IReadOnlyCollection<string> allowedFiles,
+        IReadOnlyCollection<string> allowedFilePatterns)
+    {
+        if (allowedFiles.Contains(fileName))
+        {
+            return true;
+        }
+
+        foreach (var pattern in allowedFilePatterns)
+        {
+            if (FileSystemName.MatchesSimpleExpression(pattern, fileName, ignoreCase: false))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsBuildArtifactDirectory(string name) =>

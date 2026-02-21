@@ -20,7 +20,10 @@
         "Properties",
         "Internal"
       ],
-      "allowFiles": true
+      "allowFiles": false,
+      "allowedFiles": [
+        "ExchangeApi.Exchanges.{Exchange}.Wire.csproj"
+      ]
     },
     {
       "path": "Wire/Public",
@@ -46,7 +49,12 @@
       "optionalDirectories": [
         "Api"
       ],
-      "allowFiles": true
+      "allowFiles": false,
+      "allowedFiles": [
+        "ExchangeApi.Exchanges.{Exchange}.Raw.csproj",
+        "GlobalUsings.cs",
+        "InternalsVisibleTo.cs"
+      ]
     },
     {
       "path": "Normalized",
@@ -59,7 +67,13 @@
         "Api",
         "Properties"
       ],
-      "allowFiles": true
+      "allowFiles": false,
+      "allowedFiles": [
+        "ExchangeApi.Exchanges.{Exchange}.Normalized.csproj",
+        "NormalizeFactory.cs",
+        "NormalizedComponentFactory.cs",
+        "NormalizedComponents.cs"
+      ]
     },
     {
       "path": "Adapter",
@@ -72,7 +86,10 @@
       "optionalDirectories": [
         "Properties"
       ],
-      "allowFiles": true
+      "allowFiles": false,
+      "allowedFiles": [
+        "ExchangeApi.Exchanges.{Exchange}.Adapter.csproj"
+      ]
     },
     {
       "path": "Adapter/Public",

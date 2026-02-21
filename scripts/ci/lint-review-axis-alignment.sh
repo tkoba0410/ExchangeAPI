@@ -47,18 +47,57 @@ if (( ${#runbook_l2_axes[@]} == 0 )); then
   exit 1
 fi
 
-replacement_line="$(grep -E '置き換えて使用' "${runbook_path}" | grep -E '`[A-Za-z-]+`' | head -n 1 || true)"
+allowed_non_framework_axes=("DOCS" "USER-GUIDE")
+axis_universe=("${framework_axes[@]}" "${allowed_non_framework_axes[@]}")
+
+mapfile -t replacement_section_lines < <(
+  awk '
+  /### 5\.2 L2（軸別）レビュー/ {in_section=1; next}
+  in_section && /^### / {exit}
+  in_section {print}
+  ' "${runbook_path}"
+)
+
+replacement_line=""
+replacement_axis_count=0
+
+for line in "${replacement_section_lines[@]}"; do
+  mapfile -t line_tokens < <(
+    printf '%s\n' "${line}" \
+      | grep -oE '`[A-Za-z-]+`' \
+      | tr -d '`' \
+      | tr '[:lower:]' '[:upper:]' \
+      | sort -u || true
+  )
+
+  if (( ${#line_tokens[@]} == 0 )); then
+    continue
+  fi
+
+  line_axis_count=0
+  for token in "${line_tokens[@]}"; do
+    if printf '%s\n' "${axis_universe[@]}" | grep -qx "${token}"; then
+      line_axis_count=$((line_axis_count + 1))
+    fi
+  done
+
+  if (( line_axis_count > replacement_axis_count )); then
+    replacement_axis_count="${line_axis_count}"
+    replacement_line="${line}"
+  fi
+done
+
 mapfile -t replacement_axes < <(
   printf '%s\n' "${replacement_line}" \
     | grep -oE '`[A-Za-z-]+`' \
     | tr -d '`' \
     | tr '[:lower:]' '[:upper:]' \
-    | sort -u
+    | sort -u || true
 )
 
 errors=0
 
-if [[ -z "${replacement_line}" || ${#replacement_axes[@]} -eq 0 ]]; then
+if [[ -z "${replacement_line}" || ${#replacement_axes[@]} -eq 0 || ${replacement_axis_count} -eq 0 ]]; then
   echo "ERROR: Failed to parse L2 axis replacement note from ${runbook_path}" >&2
   errors=1
 fi
@@ -78,6 +117,13 @@ done
 for axis in "${runbook_l2_axes[@]}"; do
   if ! printf '%s\n' "${framework_axes[@]}" | grep -qx "${axis}"; then
     echo "ERROR: L2 trigger table contains unknown axis ${axis}" >&2
+    errors=1
+  fi
+done
+
+for axis in "${replacement_axes[@]}"; do
+  if ! printf '%s\n' "${axis_universe[@]}" | grep -qx "${axis}"; then
+    echo "ERROR: L2 axis replacement note contains unknown axis ${axis}" >&2
     errors=1
   fi
 done

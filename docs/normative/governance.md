@@ -25,13 +25,16 @@
 以下の優先順位に従って裁定する。
 
 1. 各取引所の**公式 API 文書**（最上位の正本）
-2. **TopSpec（docs/normative/topspec.md）**（内部技術規範の唯一の正本）
-3. **Contracts（docs/normative/contracts/contracts.md）**（公開 API 契約の正本）
-4. 本書（governance.md）（設計判断の裁定ルール）
-5. inventory 文書（事実の一覧 / Fact）
-6. references 配下の文書（参考資料）
+2. **TopSpec（docs/normative/topspec.md）**（内部技術規範の正本）
+3. **Exchange Module Shape（docs/normative/layout/exchange-module-shape.json）**（`<exchange>` 物理構成の機械可読正本）
+4. **Contracts（docs/normative/contracts/contracts.md）**（公開 API 契約の正本）
+5. 本書（governance.md）（設計判断の裁定ルール）
+6. inventory 文書（事実の一覧 / Fact）
+7. references 配下の文書（参考資料）
 
 上位の正本と矛盾する記述は、下位文書に存在しても**無効**とする。
+物理構成に関する裁定では、TopSpec の規範文に従った上で
+`docs/normative/layout/exchange-module-shape.json` の定義を拘束判定の正として扱う（MUST）。
 
 ---
 
@@ -139,6 +142,7 @@ TopSpec および inventory に記載された事実に従う。
 * 差異の閉じ込め先が変更される場合
 * 公開 API 面に対する**禁止原則**が変更される場合
 * 正本階層（裁定順序）が変更される場合
+* `docs/normative/layout/exchange-module-shape.json` の拘束ルールが変更される場合
 
 技術的な詳細・実装上の工夫・具体構成は、
 **本書に追記してはならない**。

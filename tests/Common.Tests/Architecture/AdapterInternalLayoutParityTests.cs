@@ -11,54 +11,41 @@ public sealed class AdapterInternalLayoutParityTests
     public void AdapterInternalLayout_ShouldMatchCanonicalPhaseStructure()
     {
         var root = FindRepoRoot();
+        var shape = ExchangeModuleLayoutShape.Load(root);
+        var exchangesRoot = Path.Combine(root, "src", "Exchanges");
+        Assert.True(Directory.Exists(exchangesRoot));
 
-        foreach (var exchange in new[] { "Bitflyer", "Bittrade" })
+        var exchanges = Directory
+            .GetDirectories(exchangesRoot)
+            .Select(static path => Path.GetFileName(path) ?? string.Empty)
+            .Where(static name => name.Length > 0)
+            .Where(static name => !string.Equals(name, "Common", StringComparison.Ordinal))
+            .OrderBy(static name => name, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.NotEmpty(exchanges);
+
+        foreach (var exchange in exchanges)
         {
-            var adapterPath = Path.Combine(root, "src", "Exchanges", exchange, "Adapter");
-            var wirePath = Path.Combine(root, "src", "Exchanges", exchange, "Wire");
-
-            Assert.True(Directory.Exists(Path.Combine(adapterPath, "Public", "Api")));
-            Assert.True(Directory.Exists(Path.Combine(adapterPath, "Private", "Api")));
-            Assert.True(Directory.Exists(Path.Combine(adapterPath, "Bootstrap")));
-            Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Orchestration")));
-            Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Resolve")));
-            Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Execute")));
-            Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Map")));
-            Assert.True(Directory.Exists(Path.Combine(adapterPath, "Internal", "Error")));
-
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Public", "Api", "PublicClient.cs")));
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Private", "Api", "ExchangeClient.cs")));
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Orchestration", "PublicFlow.cs")));
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Orchestration", "PrivateFlow.cs")));
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Resolve", "ExchangeMarketCatalog.cs")));
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Resolve", "ExchangeRequestResolver.cs")));
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Resolve", "NormalizedRequestResolver.cs")));
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Execute", "NormalizedExecutor.cs")));
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Error", "CallErrorTranslator.cs")));
-            Assert.True(File.Exists(Path.Combine(adapterPath, "Internal", "Error", "ErrorClassifier.cs")));
-
-            var privateEndpointsPath = Path.Combine(wirePath, "Private", "Endpoints");
-            var hasPrivateEndpoints = Directory.Exists(privateEndpointsPath) &&
-                Directory.GetFiles(privateEndpointsPath, "*.cs", SearchOption.TopDirectoryOnly).Length > 0;
-            if (hasPrivateEndpoints)
+            var exchangePath = Path.Combine(exchangesRoot, exchange);
+            foreach (var template in shape.AdapterRequiredFiles)
             {
-                Assert.True(Directory.Exists(Path.Combine(wirePath, "Internal", "Auth")));
-                Assert.True(Directory.Exists(Path.Combine(wirePath, "Constants")));
-                Assert.True(File.Exists(Path.Combine(wirePath, "Internal", "Auth", "RequestSigner.cs")));
-                Assert.True(File.Exists(Path.Combine(wirePath, "Constants", "AuthKeys.cs")));
+                var requiredFilePath = Path.Combine(
+                    exchangePath,
+                    ExchangeModuleLayoutShape.ExpandPathTemplate(template, exchange));
+                Assert.True(File.Exists(requiredFilePath), $"Missing adapter required file: {requiredFilePath}");
             }
 
+            var mapPatternPath = ExchangeModuleLayoutShape.ExpandPathTemplate(shape.AdapterMapPattern, exchange);
+            var mapDirectoryPath = Path.Combine(exchangePath, Path.GetDirectoryName(mapPatternPath) ?? string.Empty);
+            Assert.True(Directory.Exists(mapDirectoryPath), $"Directory not found: {mapDirectoryPath}");
+
             var mapperFiles = Directory
-                .GetFiles(Path.Combine(adapterPath, "Internal", "Map"), "ContractMapper*.cs", SearchOption.TopDirectoryOnly)
+                .GetFiles(mapDirectoryPath, Path.GetFileName(mapPatternPath), SearchOption.TopDirectoryOnly)
                 .Select(Path.GetFileName)
+                .Where(static name => !string.IsNullOrEmpty(name))
                 .ToArray();
             Assert.NotEmpty(mapperFiles);
-
-            Assert.False(Directory.Exists(Path.Combine(adapterPath, "Internal", "Mappers")));
-            Assert.False(Directory.Exists(Path.Combine(adapterPath, "Internal", "MarketCatalog")));
-            Assert.False(Directory.Exists(Path.Combine(adapterPath, "Internal", "Factory")));
-            Assert.False(Directory.Exists(Path.Combine(adapterPath, "Internal", "Constants")));
-            Assert.False(File.Exists(Path.Combine(adapterPath, "Internal", "RequestSigner.cs")));
         }
     }
 

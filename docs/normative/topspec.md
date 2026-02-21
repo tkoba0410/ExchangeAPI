@@ -59,20 +59,14 @@ Contracts/Primitives から Utilities への依存は禁止する。
 
 ### 3.0 取引所モジュールの物理配置（MUST）
 
-`src/Exchanges/<Exchange>/` 配下は、取引所実装の物理境界として次を基準形（Canon）とする。
-
-```
-src/Exchanges/<Exchange>/
-  Wire/
-  Raw/
-  Normalized/
-  Adapter/
-  Composition/
-  Vocabulary/
-```
+`src/Exchanges/<Exchange>/` 配下は取引所実装の物理境界であり、
+物理構成の拘束判定は `docs/normative/layout/exchange-module-shape.json` を正本とする。
+TopSpec 本章は規範文（責務・禁止・分類軸）を定義し、詳細な required/optional/forbidden 判定は
+機械可読正本と Architecture テストで行う（MUST）。
 
 * 取引所配下の新規要素は、上記いずれかの配下に配置する（MUST）。
-* `Wire` / `Raw` / `Normalized` / `Adapter` の詳細配置は 3.1〜3.4 を正本とする（MUST）。
+* `src/Exchanges/<Exchange>/` 直下は `Wire` / `Raw` / `Normalized` / `Adapter` / `Composition` / `Vocabulary` を基準形とする（MUST）。
+* `Wire` / `Raw` / `Normalized` / `Adapter` の詳細配置は 3.1〜3.4 および `docs/normative/layout/exchange-module-shape.json` を正本とする（MUST）。
 * `Vocabulary` は命名正本（例: `EndpointIds`）の置き場とし、運用規約は `docs/normative/naming-rules.md` を正本とする（MUST）。
 * 取引所固有の配線は `Composition` に配置する（MUST）。
 
@@ -104,18 +98,8 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 `Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
 意味分類語彙は**物理配置・namespace・公開 API・internal 実装の主分類軸**に使用してはならない。
 
-* 取引所配下の Wire 物理配置は次を基準形（Canon）とする。
-
-```
-src/Exchanges/<Exchange>/Wire/
-  Public/
-    Endpoints/
-  Private/
-    Endpoints/
-  Constants/
-  Properties/
-  Internal/
-```
+* 取引所配下の Wire 物理配置（required/optional/forbidden）は
+  `docs/normative/layout/exchange-module-shape.json` の `Wire` ルールを正本とする（MUST）。
 
 * namespace は物理配置に一致させる（例）:
   * `ExchangeApi.Exchanges.<Exchange>.Wire.Public.*`
@@ -154,14 +138,8 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 `Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
 意味分類語彙は**物理配置・namespace・公開 API・internal 実装の主分類軸**に使用してはならない。
 
-* 取引所配下の Raw 物理配置は次を基準形（Canon）とする。
-
-```
-src/Exchanges/<Exchange>/Raw/
-  Public/
-  Private/
-  Internal/
-```
+* 取引所配下の Raw 物理配置（required/optional/forbidden）は
+  `docs/normative/layout/exchange-module-shape.json` の `Raw` ルールを正本とする（MUST）。
 
 * namespace は物理配置に一致させる（例）:
   * `ExchangeApi.Exchanges.<Exchange>.Raw.Public.*`
@@ -196,14 +174,8 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 `Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
 意味分類語彙は**物理配置・namespace・公開 API・internal 実装の主分類軸**に使用してはならない。
 
-* 取引所配下の Normalized 物理配置は次を基準形（Canon）とする。
-
-```
-src/Exchanges/<Exchange>/Normalized/
-  Public/
-  Private/
-  Internal/
-```
+* 取引所配下の Normalized 物理配置（required/optional/forbidden）は
+  `docs/normative/layout/exchange-module-shape.json` の `Normalized` ルールを正本とする（MUST）。
 
 * namespace は物理配置に一致させる（例）:
   * `ExchangeApi.Exchanges.<Exchange>.Normalized.Public.*`
@@ -224,14 +196,8 @@ MarketCatalog は「取引所仕様メタ情報（市場定義）」を保持す
 * MarketCatalog は Facade 公開境界へ露出させない（MUST）。
 * 取引所差分（resolver / signer / canonicalizer / endpoint catalog 等）は
   外部から塊注入せず、取引所モジュール内部で構成する（MUST）。
-* 物理配置は次を基準形（Canon）とする。
-
-```
-src/Exchanges/<Exchange>/Adapter/Internal/Resolve/
-  ExchangeMarketCatalog.cs
-  ExchangeRequestResolver.cs
-  NormalizedRequestResolver.cs
-```
+* `Resolve` 配下の required file は
+  `docs/normative/layout/exchange-module-shape.json` を正本とする（MUST）。
 
 * namespace は物理配置に一致させる（例）:
   * `ExchangeApi.Exchanges.<Exchange>.Adapter.Internal.Resolve.*`
@@ -260,15 +226,8 @@ MarketData / Trading / Account 等の**意味分類（種類別フォルダ分�
 `Bootstrap` / `Internal` は実装補助の**非公開置き場**であり、分類軸として扱わない。
 意味分類語彙は**物理配置・namespace・公開 API・internal 実装の主分類軸**に使用してはならない。
 
-* 取引所配下の Adapter 物理配置は次を基準形（Canon）とする。
-
-```
-src/Exchanges/<Exchange>/Adapter/
-  Public/
-  Private/
-  Bootstrap/
-  Internal/
-```
+* 取引所配下の Adapter 物理配置（required/optional/forbidden）は
+  `docs/normative/layout/exchange-module-shape.json` の `Adapter` ルールを正本とする（MUST）。
 
 * namespace は物理配置に一致させる（例）:
   * `ExchangeApi.Exchanges.<Exchange>.Adapter.Public.*`
@@ -301,30 +260,8 @@ resolver 実装差分は取引所モジュール内部に閉じ込める。
 #### 3.4.4 Adapter Internal の標準フェーズ配置（MUST）
 
 Adapter の Internal 実装は、意味分類ではなく処理フェーズで配置する。
-取引所配下の標準形は次とする。
-
-```
-src/Exchanges/<Exchange>/Adapter/
-  Public/Api/
-    PublicClient.cs
-  Private/Api/
-    ExchangeClient.cs
-  Internal/
-    Orchestration/
-      PublicFlow.cs
-      PrivateFlow.cs
-    Resolve/
-      ExchangeMarketCatalog.cs
-      ExchangeRequestResolver.cs
-      NormalizedRequestResolver.cs
-    Execute/
-      NormalizedExecutor.cs
-    Map/
-      ContractMapper.*.cs
-    Error/
-      CallErrorTranslator.cs
-      ErrorClassifier.cs
-```
+取引所配下の標準形（required directories/files、禁止ディレクトリ、`allowFiles`）は
+`docs/normative/layout/exchange-module-shape.json` を正本とする（MUST）。
 
 * namespace は物理配置に一致させる（MUST）。
 * `Internal` 配下に `Factory` / `Constants` / `RequestSigner` を配置してはならない（MUST NOT）。

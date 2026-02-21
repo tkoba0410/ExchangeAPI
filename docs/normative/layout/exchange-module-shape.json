@@ -1,0 +1,142 @@
+{
+  "exchangeRoot": {
+    "requiredDirectories": [
+      "Wire",
+      "Raw",
+      "Normalized",
+      "Adapter",
+      "Composition",
+      "Vocabulary"
+    ]
+  },
+  "directoryRules": [
+    {
+      "path": "Wire",
+      "requiredDirectories": [
+        "Public",
+        "Private",
+        "Constants",
+        "Properties",
+        "Internal"
+      ]
+    },
+    {
+      "path": "Wire/Public",
+      "requiredDirectories": [
+        "Endpoints"
+      ]
+    },
+    {
+      "path": "Wire/Private",
+      "requiredDirectories": [
+        "Endpoints"
+      ]
+    },
+    {
+      "path": "Raw",
+      "requiredDirectories": [
+        "Public",
+        "Private",
+        "Internal"
+      ],
+      "optionalDirectories": [
+        "Api"
+      ]
+    },
+    {
+      "path": "Normalized",
+      "requiredDirectories": [
+        "Public",
+        "Private",
+        "Internal"
+      ],
+      "optionalDirectories": [
+        "Api",
+        "Properties"
+      ]
+    },
+    {
+      "path": "Adapter",
+      "requiredDirectories": [
+        "Public",
+        "Private",
+        "Bootstrap",
+        "Internal"
+      ],
+      "optionalDirectories": [
+        "Properties"
+      ]
+    },
+    {
+      "path": "Adapter/Public",
+      "requiredDirectories": [
+        "Api"
+      ],
+      "optionalDirectories": [
+        "Dtos"
+      ]
+    },
+    {
+      "path": "Adapter/Private",
+      "requiredDirectories": [
+        "Api"
+      ],
+      "optionalDirectories": [
+        "Dtos"
+      ]
+    },
+    {
+      "path": "Adapter/Internal",
+      "requiredDirectories": [
+        "Orchestration",
+        "Resolve",
+        "Execute",
+        "Map",
+        "Error"
+      ],
+      "forbiddenDirectories": [
+        "Mappers",
+        "MarketCatalog",
+        "Factory",
+        "Constants"
+      ],
+      "allowFiles": false
+    }
+  ],
+  "requiredFiles": [
+    "Vocabulary/EndpointIds.cs",
+    "Wire/ExchangeApi.Exchanges.{Exchange}.Wire.csproj",
+    "Raw/ExchangeApi.Exchanges.{Exchange}.Raw.csproj",
+    "Normalized/ExchangeApi.Exchanges.{Exchange}.Normalized.csproj",
+    "Adapter/ExchangeApi.Exchanges.{Exchange}.Adapter.csproj",
+    "Composition/ExchangeApi.Exchanges.{Exchange}.Composition.csproj"
+  ],
+  "adapterRequiredFiles": [
+    "Adapter/Public/Api/PublicClient.cs",
+    "Adapter/Private/Api/ExchangeClient.cs",
+    "Adapter/Internal/Orchestration/PublicFlow.cs",
+    "Adapter/Internal/Orchestration/PrivateFlow.cs",
+    "Adapter/Internal/Resolve/ExchangeMarketCatalog.cs",
+    "Adapter/Internal/Resolve/ExchangeRequestResolver.cs",
+    "Adapter/Internal/Resolve/NormalizedRequestResolver.cs",
+    "Adapter/Internal/Execute/NormalizedExecutor.cs",
+    "Adapter/Internal/Error/CallErrorTranslator.cs",
+    "Adapter/Internal/Error/ErrorClassifier.cs"
+  ],
+  "adapterMapPattern": "Adapter/Internal/Map/ContractMapper*.cs",
+  "conditionalRules": [
+    {
+      "name": "PrivateSignerPlacement",
+      "whenDirectory": "Wire/Private/Endpoints",
+      "whenHasCsFiles": true,
+      "requiredDirectories": [
+        "Wire/Internal/Auth",
+        "Wire/Constants"
+      ],
+      "requiredFiles": [
+        "Wire/Internal/Auth/RequestSigner.cs",
+        "Wire/Constants/AuthKeys.cs"
+      ]
+    }
+  ]
+}

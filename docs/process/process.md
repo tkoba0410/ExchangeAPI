@@ -4,6 +4,8 @@
 設計規範・層責務・公開範囲の正本は  
 **TopSpec（docs/normative/topspec.md）** とする。  
 公開 API 契約の正本は **docs/normative/contracts/contracts.md** とする。
+`<exchange>` 物理構成（機械可読）の正本は
+**docs/normative/layout/exchange-module-shape.json** とする。
 
 なお、`docs/normative/contracts/*` は外部公開向けの **契約文書（公開安定 API の説明）** であり、
 設計規範ではないが、**公開 API 契約としては Normative** である。
@@ -28,6 +30,7 @@
 
 ### 2.1 Normative（規範）
 - `docs/normative/topspec.md`：技術仕様・設計規範の正本（層・境界・禁止事項）
+- `docs/normative/layout/exchange-module-shape.json`：`<exchange>` 物理構成の機械可読正本（required/optional/forbidden）
 - `docs/normative/naming-rules.md`：命名・語彙・DTO 接尾辞などの補助規範
 - `docs/normative/contracts/contracts.md`：公開 API 契約の正本（Contract 層）
 - `docs/normative/contracts/resilience.md`：429 / Timeout / Partial Failure 契約の正本
@@ -112,7 +115,8 @@
 
 - 規範（設計判断・境界・契約）を変更した場合：
   → `docs/normative/topspec.md`
-- 物理構成の方針は `docs/normative/topspec.md` を参照する。
+- 物理構成の方針・拘束（required/optional/forbidden）を変更した場合：
+  → `docs/normative/topspec.md` と `docs/normative/layout/exchange-module-shape.json`
 - 外部 API を追加・削除・差し替えた場合：
   → `docs/inventory/endpoints-<exchange>.md`
 - 原則からの逸脱が必要になった場合：
@@ -202,7 +206,8 @@ governance に従って裁定を行う。
 - [ ] 原則からの逸脱がある場合、`docs/process/exceptions.md` に記録がある（未登録の例外は禁止）
 
 #### E. 物理配置変更時の文書同期
-- [ ] `<exchange>` 配下の物理配置を変更した場合、`docs/normative/topspec.md` と `docs/normative/contracts/contracts.md` の該当条文を同一 PR で同期更新している
+- [ ] `<exchange>` 配下の物理配置を変更した場合、`docs/normative/topspec.md` と `docs/normative/layout/exchange-module-shape.json` を同一 PR で同期更新している
+- [ ] `docs/normative/contracts/contracts.md` に物理配置の詳細を重複記載していないことを確認した
 - [ ] 物理配置の変更を `tests/Common.Tests/Architecture/*LayoutParityTests.cs` へ反映し、`dotnet test` で検証している
 
 ---
@@ -216,6 +221,7 @@ governance に従って裁定を行う。
 本書は、本リポジトリにおける **運用・手順・進め方** に関する参考文書である。
 設計規範・層責務・公開範囲・API 契約・Call 抽象などの正本は  
 **TopSpec（docs/normative/topspec.md）** とする。
+物理構成の機械可読正本は **docs/normative/layout/exchange-module-shape.json** とする。
 
 本書の内容は、TopSpec に反しない範囲でのみ有効であり、
 設計判断そのものの根拠として用いてはならない。

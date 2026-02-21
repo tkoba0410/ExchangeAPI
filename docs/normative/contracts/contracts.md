@@ -158,86 +158,21 @@ Contracts の公開 API は **Request DTO を第一の契約**とする（MUST�
 
 ## 6.4 取引所実装の物理配置ルール
 
-取引所実装の物理構造は、以下の 3 軸を基本とする（MUST）。
+本章は契約観点の拘束のみを定義する。
+物理配置の詳細（required/optional/forbidden、必須ファイル、条件付き拘束）の正本は
+`docs/normative/topspec.md` と
+`docs/normative/layout/exchange-module-shape.json` とする（MUST）。
 
-- 取引所: `Bitflyer`, `Bittrade`, ...
-- レイヤ: `Wire`, `Raw`, `Normalized`, `Adapter`
-- 公開面: `Public`, `Private`（署名有無）
-- 非公開補助: `Internal`（各レイヤ）, `Bootstrap`（Adapter）
+契約観点での拘束は次とする。
 
-意味分類（例: `Account` / `Trading` / `Market`）は、公開構造の第一軸としては採用しない（MUST NOT）。
-取引所配下の物理配置の正本は TopSpec 3.1〜3.4 とし、本章は契約観点の要点のみを記す（MUST）。
-`src/Exchanges/{Exchange}` 直下は `Wire` / `Raw` / `Normalized` / `Adapter` / `Composition` / `Vocabulary` を基準形とする（MUST）。
-
-### MarketCatalog / Resolver の位置づけ
-
-`ExchangeMarketCatalog` は取引所固有の市場定義（`Symbol` / `ProductCode` / `Type` など）を保持する
-Adapter/Internal 配下の内部要素として扱う（MUST）。
-
-- 取引所固有処理: `src/Exchanges/{Exchange}/Adapter/Internal/Resolve`
-- Facade 公開境界は ExecutionContext の塊（AccountInfo 相当を含む）に依存しない（MUST）。
-
-### Application / Composition の責務分担
-
-- `src/Application`: 取引所横断のユースケース
-- `src/Exchanges/{Exchange}/Adapter/Internal/Resolve`: 取引所固有の市場定義と resolver
-- `src/Composition`: 取引所横断の配線（DI / Bootstrap）
-- `src/Exchanges/{Exchange}/Composition`: 取引所固有の配線
-
-### 目標ディレクトリツリー
-
-```text
-src/
-  Application/
-  Composition/
-  Contracts/
-  Primitives/
-  Utilities/
-  Transport/
-  Exchanges/
-    Common/
-      Adapter/
-    Bitflyer/
-      Wire/{Public,Private,Constants,Properties,Internal}
-      Wire/Internal/Auth/
-      Raw/{Public,Private,Internal}
-      Normalized/{Public,Private,Internal}
-      Adapter/{Public,Private,Bootstrap,Internal}
-      Adapter/Internal/Orchestration/
-      Adapter/Internal/Resolve/
-      Adapter/Internal/Execute/
-      Adapter/Internal/Map/
-      Adapter/Internal/Error/
-      Composition/
-      Vocabulary/
-    Bittrade/
-      Wire/{Public,Private,Constants,Properties,Internal}
-      Wire/Internal/Auth/
-      Raw/{Public,Private,Internal}
-      Normalized/{Public,Private,Internal}
-      Adapter/{Public,Private,Bootstrap,Internal}
-      Adapter/Internal/Orchestration/
-      Adapter/Internal/Resolve/
-      Adapter/Internal/Execute/
-      Adapter/Internal/Map/
-      Adapter/Internal/Error/
-      Composition/
-      Vocabulary/
-```
-
-補足（MUST / MUST NOT）:
-
-- `Adapter/Internal` 配下に `Factory` / `Constants` / `RequestSigner` を置いてはならない。
-- `ClientOptions` / `ClientCredentials` / `ClientFactory` / `*ClientComponents` は `Adapter/Bootstrap` に置く。
-- Private endpoint 実装を持つ取引所では、`RequestSigner` を `Wire/Internal/Auth`、認証キー定数を `Wire/Constants` に置く。
-
-### 移行フェーズ
-
-1. Facade 公開境界から ExecutionContext の塊依存を除去する。
-2. 取引所差分を `Adapter/Internal/Resolve` と resolver 実装へ集約する。
-3. namespace / using / 参照を統一する。
-4. `dotnet build` / `dotnet test` を通す。
-5. inventory / 契約文書を同期更新する。
+- 取引所実装は `Public/Private`（署名有無）で分離し、意味分類を第一軸にしてはならない（MUST NOT）。
+- `Adapter/Internal` は処理フェーズ（Resolve/Execute/Map/Error/Orchestration）を主分類軸とし、
+  意味分類語彙を主分類軸としてはならない（MUST NOT）。
+- `MarketCatalog` / resolver は `Adapter/Internal/Resolve` に閉じ込め、Facade 公開境界へ露出させてはならない（MUST NOT）。
+- `Adapter/Internal` 配下に `Factory` / `Constants` / `RequestSigner` を配置してはならない（MUST NOT）。
+- `ClientOptions` / `ClientCredentials` / `ClientFactory` / `*ClientComponents` は `Adapter/Bootstrap` に配置しなければならない（MUST）。
+- Private endpoint 実装を持つ取引所では、`RequestSigner` を `Wire/Internal/Auth`、
+  認証キー定数を `Wire/Constants` に配置しなければならない（MUST）。
 
 ---
 

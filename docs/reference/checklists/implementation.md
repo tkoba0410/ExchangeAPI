@@ -16,6 +16,7 @@ TopSpec / inventory / governance により定義された規範が、
 
   * 公式 API ドキュメント（取引所公式）
   * TopSpec（docs/ 配下の規範文書）
+  * Exchange Module Shape（`docs/normative/layout/exchange-module-shape.json`）
   * Naming Rules（`docs/normative/naming-rules.md`）
   * 該当 inventory（例：endpoints-bitflyer.md）
 * [ ] 「この実装判断はどの正本に基づくか」を PR / 作業メモに明記した
@@ -86,7 +87,8 @@ TopSpec / inventory / governance により定義された規範が、
 
 * [ ] 取引所差分が `src/Exchanges/<Exchange>/` 配下に閉じていることを確認した
 * [ ] 物理配置と namespace が既存のリファレンス実装と同型であることを確認した
-* [ ] `<exchange>` 物理配置を変更した場合、`docs/normative/topspec.md` と `docs/normative/contracts/contracts.md` の該当節を同一変更で同期した
+* [ ] `<exchange>` 物理配置を変更した場合、`docs/normative/topspec.md` と `docs/normative/layout/exchange-module-shape.json` を同一変更で同期した
+* [ ] `docs/normative/contracts/contracts.md` に物理配置の詳細を重複記載していないことを確認した
 * [ ] `tests/Common.Tests/Architecture/*LayoutParityTests.cs` で、想定外ディレクトリ混入が検出できることを確認した
 * [ ] 共通層へ取引所固有の都合が逆流していないことを確認した
 * [ ] Adapter の API 実装で `try/catch + MapCall/FromException` を直書きせず、共通テンプレート経由で実装した

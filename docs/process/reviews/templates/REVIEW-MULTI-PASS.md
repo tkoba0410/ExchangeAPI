@@ -13,7 +13,7 @@ Fatal 判定時は F番号を明示すること。
 * PR番号:
 * 変更範囲:
 * 監査目的（例: 論理整合 / 回帰検出 / 規範整合）:
-* 正本（TopSpec / Contracts / Governance / Inventory）:
+* 正本（TopSpec / LayoutShape / Contracts / Governance / Inventory）:
 
 ---
 
@@ -43,7 +43,7 @@ Fatal 判定時は F番号を明示すること。
 
 ### P2（別モデル/環境: 規範整合）
 
-* [ ] TopSpec と Contracts の条文が衝突していない
+* [ ] TopSpec / LayoutShape / Contracts の条文・拘束が衝突していない
 * [ ] Process / Checklist の運用項目が正本に反していない
 * [ ] 重複規定がある場合、正本参照へ整理されている
 
@@ -102,6 +102,7 @@ Fatal 判定時は F番号を明示すること。
 ## 7. 関連Normative / 運用
 
 * `docs/normative/topspec.md`
+* `docs/normative/layout/exchange-module-shape.json`
 * `docs/normative/contracts/contracts.md`
 * `docs/normative/governance.md`
 * `docs/process/process.md`

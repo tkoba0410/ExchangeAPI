@@ -69,6 +69,7 @@
 - Error / Retry / 429 / timeout 変更: `docs/process/reviews/templates/REVIEW-RELIABILITY.md`
 - Normalized / Cross-exchange 構造変更: `docs/process/reviews/templates/REVIEW-BOUNDARY.md` と `docs/process/reviews/templates/REVIEW-CONSISTENCY.md`
 - Breaking change 含む: `docs/process/reviews/templates/REVIEW-CHANGE.md`
+- 利用導線 / 誤用耐性 / 診断可能性の変更（Factory/Facade入口、型/ガード、`CallError*`）: `docs/process/reviews/templates/REVIEW-DX.md`
 - 文書構造 / SSOT 変更: `docs/process/reviews/templates/REVIEW-DOCS.md`（補助監査）
 - ユーザ向けガイド（Quickstart / HowTo / Examples）変更: `docs/process/reviews/templates/REVIEW-USER-GUIDE.md`（補助監査）
 - docs/reference 新規 / 改訂: `docs/process/reviews/templates/REVIEW-DOCS.md`（非規範境界・重複/退避判断を含む）
@@ -77,6 +78,10 @@
 ※ `REVIEW-DOCS` は `review-framework` の 7品質軸とは別の補助監査であり、軸件数集計には含めない。
 ※ `REVIEW-USER-GUIDE` も補助監査であり、軸件数集計には含めない。
 ※ Security 監査では、機密を扱うファイルベース設定に対応するテンプレート（`docs/process/templates/`）の更新有無を確認する。
+※ Quickstart / HowTo / Examples など利用者向け文書のみの変更は `REVIEW-USER-GUIDE` を主軸とし、DXは原則トリガしない。
+※ 同一事象が複数軸に該当する場合は「1事象1主軸」で計上する（重複計上しない）。
+※ `secret非露出` は Security を主軸とし、DX は副次記録とする。
+※ 公開契約破壊に直接波及する事象は Contracts を主軸とし、DX は副次記録とする。
 
 ---
 
@@ -102,7 +107,7 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 各指摘で Severity/FatalClass を明示してください（`Severity=Fatal` は `FatalClass=F1〜F5` 必須）。
 ```
 
-※ `Contracts` を `Security` / `Reliability` / `Boundary` / `Consistency` / `Change` / `Docs` に置き換えて使用する。
+※ `Contracts` を `Security` / `Reliability` / `Boundary` / `Consistency` / `DX` / `Change` / `Docs` に置き換えて使用する。
 
 ### 5.3 再レビュー（差分最小）
 

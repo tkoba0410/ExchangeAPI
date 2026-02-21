@@ -70,7 +70,7 @@ Contracts の公開 API は Public / Private に分離する。
 
 * Contracts API の戻り値（`Call<TRequest, TResponse>`）および `TResponse`（ContractDTO）には、
   取引所識別情報（例：`ExchangeCode`）は含まれない。
-* `BatchError` を含むエラー DTO / 結果 DTO にも、取引所識別情報は含めない。
+* エラー DTO / 結果 DTO にも、取引所識別情報は含めない。
 * 利用者は「どの取引所か」を前提とした分岐を、Contracts API の戻り値から行ってはならない。
   - 分岐が必要な場合は、capability / 構築形態（Composition）によって **事前に** 分離・選択する。
 

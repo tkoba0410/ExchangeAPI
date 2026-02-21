@@ -10,7 +10,7 @@
 
 - 本書は `src/Transport/` の送信ポリシーと、`src/Contracts/` の公開結果型に適用される（MUST）。
 - 単発 endpoint（単一リモート呼び出し）では、失敗は失敗として返却し、部分成功を返してはならない（MUST NOT）。
-- 複数呼び出しを集約する API では、部分成功を公式結果型で表現しなければならない（MUST）。
+- 複数呼び出しを集約する API を Contracts に導入する場合、部分成功を公式結果型で表現しなければならない（MUST）。
 
 ---
 
@@ -54,7 +54,7 @@
 - リトライ終了条件は「最大試行回数」か「総リトライ時間上限」の早い方とする（MUST）。
 - `429` の扱いは呼び出し単位で次のどちらかを明示する（MUST）。
   - 単発 endpoint: 通常失敗として返す
-  - 集約 endpoint: 部分失敗（`BatchResult`）に格納する
+  - 集約 endpoint: 部分失敗を集約結果型に格納する
 
 ---
 
@@ -81,26 +81,23 @@
 
 ---
 
-## 6. Partial Failure（公式パターン）
+## 6. Partial Failure（導入時規約）
 
-複数呼び出しの集約結果は、Contracts の結果型で次を表現できなければならない（MUST）。
+本章は、複数呼び出しを集約する Contracts API を導入する場合に適用する。
+
+集約結果型は次を表現できなければならない（MUST）。
 
 - 成功集合
 - 失敗集合
 - 全成功 / 全失敗 / 部分成功の判定
 
-結果型は次の語彙を含む（MUST）。
-
-- `BatchResult<TItem>`
-- `BatchError`
-
-`BatchError` は少なくとも次を持つ（MUST）。
+失敗要素は少なくとも次を持つ（MUST）。
 
 - `EndpointId`
 - `ErrorKind`
 - `Message`
 
-`BatchError` に取引所識別情報（例: `ExchangeCode` / `ExchangeId` / `ExchangeName`）を含めてはならない（MUST NOT）。
+失敗要素に取引所識別情報（例: `ExchangeCode` / `ExchangeId` / `ExchangeName`）を含めてはならない（MUST NOT）。
 呼び出し文脈で取引所識別が必要な場合は、Composition / Application 側で付与・管理する（MUST）。
 
 ドメイン DTO にエラー情報を混在させてはならない（MUST NOT）。
@@ -110,7 +107,7 @@
 
 ## 7. 観測規約（呼び出し側）
 
-呼び出し側は次で状態判定を行う（MUST）。
+集約 endpoint を利用する呼び出し側は次で状態判定を行う（MUST）。
 
 - `HasErrors`
 - `HasSuccesses`

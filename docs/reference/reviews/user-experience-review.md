@@ -119,8 +119,7 @@ Facade Request DTO を毎回 new しなくても、`Symbol` / `Period` から直
 
 ### 5.2 分析用途（板・約定・OHLC大量取得、ページング/レート制限重視）
 - 評価: **B+**
-- 理由: Contract API の統一と `BatchResult` は扱いやすいが、ページング戦略の利用者向け実践ガイドが少なく、取引所差異は利用者側で設計補完が必要。
-- Evidence: src/Contracts/Common/Dtos/BatchResult.cs
+- 理由: Contract API の統一は扱いやすいが、ページング戦略の利用者向け実践ガイドが少なく、取引所差異は利用者側で設計補完が必要。
 - Evidence: docs/normative/contracts/resilience.md
 - Evidence: docs/inventory/endpoints-contracts.md
 

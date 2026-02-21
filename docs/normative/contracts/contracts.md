@@ -48,7 +48,6 @@ Contracts は **取引所非依存**であり、Contracts の公開型（Contrac
 - 「どの取引所から取得されたか」を表すフィールド全般
 
 この禁止は、Contracts の公開型全体（`Request` / `Response` / `Error` / `Result`）に適用する（MUST）。
-`BatchError` を含むエラー DTO も例外ではない（MUST）。
 
 取引所の選択・識別・束ねは Contracts の責務ではない。
 それらは `Composition` / `Application`（利用者境界）側で完結させなければならない（MUST）。

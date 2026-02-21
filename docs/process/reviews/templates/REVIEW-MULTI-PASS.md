@@ -4,7 +4,8 @@
 同一変更を複数回レビューするための実行様式を定義する。
 
 重大度定義は `PROJECT-FATAL-DEFINITION.md` を参照する。
-Fatal 判定時は F番号を明示すること。
+重大度は `Severity` と `FatalClass` の 2 軸で記録すること。
+`Severity=Fatal` の場合は `FatalClass=F1〜F5` を明示すること。
 
 ---
 
@@ -19,12 +20,12 @@ Fatal 判定時は F番号を明示すること。
 
 ## 判定サマリ表
 
-| 観点 | 判定 (OK / 要修正 / NG) | 重大度 (F番号明示) | 備考 |
-| --- | --- | --- | --- |
-| P1（CLI: 事実確認） |  |  |  |
-| P2（別モデル/環境: 規範整合） |  |  |  |
-| P3（CLI: 反証） |  |  |  |
-| 総合判定 |  |  |  |
+| 観点 | 判定 (OK / 要修正 / NG) | Severity (Fatal/High/Medium/Low/Nit) | FatalClass (F1-F5/None) | 備考 |
+| --- | --- | --- | --- | --- |
+| P1（CLI: 事実確認） |  |  |  |  |
+| P2（別モデル/環境: 規範整合） |  |  |  |  |
+| P3（CLI: 反証） |  |  |  |  |
+| 総合判定 |  |  |  |  |
 
 ---
 
@@ -71,13 +72,16 @@ Fatal 判定時は F番号を明示すること。
 
 すべての指摘は次の形式で記録する。
 
-| ID | Severity | Pass | File:Line | 事実 | 影響 | 最小修正案 | CI化可否 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| R-001 | High | P1 | path:line | 何が起きているか | 何が壊れるか | 最小変更 | Yes/No |
+| ID | Severity | FatalClass | Pass | File:Line | 事実 | 影響 | 最小修正案 | CI化可否 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| R-001 | High | None | P1 | path:line | 何が起きているか | 何が壊れるか | 最小変更 | Yes/No |
 
 記法:
 
 * `Severity` は `Fatal / High / Medium / Low / Nit` を使用する。
+* `FatalClass` は `F1 / F2 / F3 / F4 / F5 / None` を使用する。
+* `Severity=Fatal` の場合、`FatalClass` は `F1〜F5` のいずれか必須。
+* `Severity!=Fatal` の場合、`FatalClass` は `None` を使用する。
 * `File:Line` は 1-based で記載する。
 * 事実と推論を分離して記載する。
 
@@ -93,10 +97,10 @@ Fatal 判定時は F番号を明示すること。
 
 ## 5. マージ判定ゲート
 
-* Fatal: 1件でも存在したら NG
-* High: 0件であること（未解消は NG）
-* Medium: 修正または例外記録が必須
-* Low/Nit: 次PR繰越可（繰越理由を記録）
+* `Severity=Fatal`: 1件でも存在したら NG
+* `Severity=High`: 0件であること（未解消は NG）
+* `Severity=Medium`: 修正または例外記録が必須
+* `Severity=Low/Nit`: 次PR繰越可（繰越理由を記録）
 
 ---
 
@@ -113,8 +117,9 @@ Fatal 判定時は F番号を明示すること。
 ## CI自動化候補
 
 * `dotnet build ExchangeApi.slnx -warnaserror` / `dotnet test ExchangeApi.slnx` 実行結果の記録検査
-* 指摘フォーマット（`ID / Severity / Pass / File:Line / 事実 / 影響 / 最小修正案 / CI化可否`）の列欠落検査
+* 指摘フォーマット（`ID / Severity / FatalClass / Pass / File:Line / 事実 / 影響 / 最小修正案 / CI化可否`）の列欠落検査
 * `Severity` 語彙（`Fatal / High / Medium / Low / Nit`）の妥当性検査
+* `FatalClass` 語彙（`F1 / F2 / F3 / F4 / F5 / None`）と `Severity` の整合検査
 * マージ判定ゲート（Fatal/High未解消件数）の自動集計
 
 ---

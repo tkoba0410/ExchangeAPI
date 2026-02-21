@@ -2,8 +2,9 @@
 
 本レビューは Consistency（命名 / 語彙 / 構造整合）軸に基づく確認を行う。
 
-重大度定義は PROJECT-FATAL-DEFINITION.md を参照する。
-Fatal判定時は F番号を明示すること。
+重大度定義は `PROJECT-FATAL-DEFINITION.md` を参照する。
+重大度は `Severity` と `FatalClass` の 2 軸で記録すること。
+`Severity=Fatal` の場合は `FatalClass=F1〜F5` を明示すること。
 
 ---
 
@@ -18,12 +19,12 @@ Fatal判定時は F番号を明示すること。
 
 ## 1. 判定サマリ
 
-| 観点                    | 判定 | 重大度 (F番号明示) | CI化可否 | 備考 |
-| --------------------- | -- | ----------- | ----- | -- |
-| EndpointId整合          |    |             |       |    |
-| 概念分裂                  |    |             |       |    |
-| 定数/enum統一             |    |             |       |    |
-| Cross-exchange parity |    |             |       |    |
+| 観点 | 判定 | Severity (Fatal/High/Medium/Low/Nit) | FatalClass (F1-F5/None) | CI化可否 | 備考 |
+| --- | --- | --- | --- | --- | --- |
+| EndpointId整合 |  |  |  |  |  |
+| 概念分裂 |  |  |  |  |  |
+| 定数/enum統一 |  |  |  |  |  |
+| Cross-exchange parity |  |  |  |  |  |
 
 ---
 

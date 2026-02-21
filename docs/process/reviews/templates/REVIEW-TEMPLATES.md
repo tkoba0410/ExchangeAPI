@@ -22,14 +22,14 @@
 
 # 1. 判定サマリ
 
-| 観点     | 判定 (OK / 要修正 / NG) | 重大度 | 備考 |
-| ------ | ------------------ | --- | -- |
-| 判定可能性  |                    |     |    |
-| 重大度定義  |                    |     |    |
-| SSOT整合 |                    |     |    |
-| レイヤ明確性 |                    |     |    |
-| CI化余地  |                    |     |    |
-| 再利用性   |                    |     |    |
+| 観点 | 判定 (OK / 要修正 / NG) | Severity (Fatal/High/Medium/Low/Nit) | FatalClass (F1-F5/None) | 備考 |
+| --- | --- | --- | --- | --- |
+| 判定可能性 |  |  |  |  |
+| 重大度定義 |  |  |  |  |
+| SSOT整合 |  |  |  |  |
+| レイヤ明確性 |  |  |  |  |
+| CI化余地 |  |  |  |  |
+| 再利用性 |  |  |  |  |
 
 ---
 
@@ -57,15 +57,16 @@
 
 ### 必須条件
 
-* 重大度が明確に定義されている
-* Fatal がマージ不可条件と連動している
+* 重大度が「優先度（Severity）」と「Fatal分類（FatalClass）」の2軸で明確に定義されている
+* `Severity=Fatal` がマージ不可条件と連動している
+* `Severity=Fatal` の指摘は `FatalClass=F1〜F5` が必須
+* `Severity!=Fatal` の指摘は `FatalClass=None` を使用する
 
 ### 推奨定義
 
-* Fatal: マージ不可（Boundary破壊 / SSOT逸脱 / Contracts破壊 / Security重大違反）
-* Major: 修正必須
-* Minor: 改善推奨
-* Nit: 美観
+* Severity: `Fatal / High / Medium / Low / Nit`
+* FatalClass: `F1 / F2 / F3 / F4 / F5 / None`
+* 互換マッピング（旧語彙）: `Major -> High`, `Minor -> Medium`
 
 ---
 
@@ -129,7 +130,7 @@
 ```
 ## 判定サマリ表
 ## 観点詳細（判定基準 / OK条件 / NG条件 / 不合格例 / 修正方針）
-## 重大度明記
+## 重大度明記（Severity / FatalClass）
 ## CI自動化候補
 ## 関連Normative / 判例
 ```

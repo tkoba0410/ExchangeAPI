@@ -8,8 +8,22 @@
 ## 1. 目的
 
 - PR ごとのレビュー運用を定型化し、判断の揺らぎを減らす。
-- 判定を `OK / 要修正 / NG` に統一し、`NG` のうち Fatal は `F1〜F5` を明示してマージ可否を機械判定する。
+- 判定を `OK / 要修正 / NG` に統一し、各指摘を `Severity / FatalClass` で記録してマージ可否を機械判定する。
 - 例外が必要な場合は `docs/process/exceptions.md` への記録漏れを防ぐ。
+
+---
+
+## 1.1 重大度モデル（固定）
+
+レビュー結果の重大度は、次の 2 軸で記録する。
+
+- 優先度（Severity）: `Fatal / High / Medium / Low / Nit`
+- Fatal分類（FatalClass）: `F1 / F2 / F3 / F4 / F5 / None`
+
+運用ルール:
+
+- `Severity = Fatal` の場合、`FatalClass` は `F1〜F5` のいずれか必須
+- `Severity != Fatal` の場合、`FatalClass = None`
 
 ---
 
@@ -25,7 +39,7 @@
 ## 3. 実施フロー（推奨）
 
 1. `L1` 一括レビューを実施する。
-2. `NG`（特に Fatal: `F1〜F5`）を修正する。
+2. `NG`（特に `Severity=Fatal` かつ `FatalClass=F1〜F5`）を修正する。
 3. 必要な `L2` テンプレートだけ追加実施する。
 4. 未解消 `NG` のみ再レビューする。
 5. Merge 前に `docs/process/process.md` のチェックリストを再確認する。
@@ -59,7 +73,7 @@
 基準は docs/process/process.md の「7.2 必須（Merge 前に必ず確認）」です。
 出力は「判定サマリ（OK / 要修正 / NG）」と「指摘一覧」の順で、重大度順に列挙してください。
 各指摘に対象ファイルと行番号を付けてください。
-NG のうち Fatal は F番号（F1〜F5）を明示してください。
+各指摘で Severity/FatalClass を明示してください（`Severity=Fatal` は `FatalClass=F1〜F5` 必須）。
 最後に未解消 NG 件数と Fatal 件数を出してください。
 ```
 
@@ -69,7 +83,7 @@ NG のうち Fatal は F番号（F1〜F5）を明示してください。
 このPR差分は Contracts 変更を含みます。
 docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレビューしてください。
 判定サマリ（OK / 要修正 / NG）を作成し、重要な順に指摘してください。
-NG が Fatal の場合は F番号（F1〜F5）を必ず付与してください。
+各指摘で Severity/FatalClass を明示してください（`Severity=Fatal` は `FatalClass=F1〜F5` 必須）。
 ```
 
 ※ `Contracts` を `Security` / `Reliability` / `Boundary` / `Consistency` / `Change` / `Docs` に置き換えて使用する。
@@ -87,7 +101,7 @@ NG が Fatal の場合は F番号（F1〜F5）を必ず付与してください�
 ## 6. 巨大差分の扱い
 
 - まず PR を主題単位で分割する（Contracts、Security、Refactor、Docs など）。
-- 分割できない場合は、最初に `NG` のうち Fatal 候補（F1〜F5）のみ抽出させる。
+- 分割できない場合は、最初に `NG` のうち `Severity=Fatal` 候補（`FatalClass=F1〜F5`）のみ抽出させる。
 - Fatal 解消後に、非Fatal `NG` → 改善提案の順で再実行する。
 
 ---
@@ -101,8 +115,8 @@ NG が Fatal の場合は F番号（F1〜F5）を必ず付与してください�
 
 ## 8. 期待出力フォーマット
 
-- `NG (Fatal)`: Merge 前に必須修正（1件でもマージ不可）
-- `NG (Non-Fatal)`: 原則同PRで修正
+- `NG (Fatal)`: `Severity=Fatal` かつ `FatalClass=F1〜F5`。Merge 前に必須修正（1件でもマージ不可）
+- `NG (Non-Fatal)`: `Severity=High/Medium/Low/Nit` かつ `FatalClass=None`。原則同PRで修正
 - `要修正`: 修正計画を明示
 - `OK`: 問題なし（改善提案は任意）
 
@@ -113,7 +127,7 @@ NG が Fatal の場合は F番号（F1〜F5）を必ず付与してください�
 
 各項目は、以下の 1 行形式を推奨する。
 
-`[判定] <要約> - <file:line> - <重大度(F1-F5/NonFatal)> - <根拠（どの規約か）>`
+`[判定] <要約> - <file:line> - <優先度(Fatal/High/Medium/Low/Nit)> - <Fatal分類(F1-F5/None)> - <根拠（どの規約か）>`
 
 ---
 
@@ -133,7 +147,7 @@ NG が Fatal の場合は F番号（F1〜F5）を必ず付与してください�
 2. 差分内容から L2 トリガを判定し、該当軸のみ追加レビューする。
 3. 例外が必要な指摘は docs/process/exceptions.md への記録要否を明示する。
 4. 形式は必ず次の1行形式を使う:
-   [判定] <要約> - <file:line> - <重大度(F1-F5/NonFatal)> - <根拠（どの規約か）>
+   [判定] <要約> - <file:line> - <優先度(Fatal/High/Medium/Low/Nit)> - <Fatal分類(F1-F5/None)> - <根拠（どの規約か）>
 5. 最後に未解消 NG 件数と Fatal 件数を出す。
 ```
 
@@ -162,7 +176,7 @@ NG が Fatal の場合は F番号（F1〜F5）を必ず付与してください�
 実施手順:
 1. 指定軸のみでレビューする。
 2. 形式は次の1行形式を使う:
-   [判定] <要約> - <file:line> - <重大度(F1-F5/NonFatal)> - <根拠（どの規約か）>
+   [判定] <要約> - <file:line> - <優先度(Fatal/High/Medium/Low/Nit)> - <Fatal分類(F1-F5/None)> - <根拠（どの規約か）>
 3. 最後に未解消 NG 件数と Fatal 件数を出す。
 ```
 
@@ -203,7 +217,7 @@ NG が Fatal の場合は F番号（F1〜F5）を必ず付与してください�
 2. 7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
    Docs は補助監査（REVIEW-DOCS）として別枠で実施する。
 3. 各指摘は次の1行形式を使う:
-   [判定] <要約> - <file:line> - <重大度(F1-F5/NonFatal)> - <根拠（どの規約か）>
+   [判定] <要約> - <file:line> - <優先度(Fatal/High/Medium/Low/Nit)> - <Fatal分類(F1-F5/None)> - <根拠（どの規約か）>
 4. 軸ごとに OK / 要修正 / NG 件数と Fatal 件数を集計する。
 5. 最後に「最優先 NG Top10（Fatal優先）」と「未解消 NG 総件数」を出す。
 6. 例外が必要な項目は docs/process/exceptions.md への記録要否を明示する。

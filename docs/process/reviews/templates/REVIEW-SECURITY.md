@@ -2,8 +2,9 @@
 
 本レビューは Security（署名 / 認証 / 秘密情報）軸に基づく確認を行う。
 
-重大度定義は PROJECT-FATAL-DEFINITION.md を参照する。
-Fatal判定時は F番号を明示すること。
+重大度定義は `PROJECT-FATAL-DEFINITION.md` を参照する。
+重大度は `Severity` と `FatalClass` の 2 軸で記録すること。
+`Severity=Fatal` の場合は `FatalClass=F1〜F5` を明示すること。
 
 ---
 
@@ -17,12 +18,12 @@ Fatal判定時は F番号を明示すること。
 
 ## 1. 判定サマリ
 
-| 観点                | 判定 | 重大度 (F番号明示) | CI化可否 | 備考 |
-| ----------------- | -- | ----------- | ----- | -- |
-| 署名順序整合            |    |             |       |    |
-| Canonicalize整合    |    |             |       |    |
-| secret非露出         |    |             |       |    |
-| nonce/timestamp安全 |    |             |       |    |
+| 観点 | 判定 | Severity (Fatal/High/Medium/Low/Nit) | FatalClass (F1-F5/None) | CI化可否 | 備考 |
+| --- | --- | --- | --- | --- | --- |
+| 署名順序整合 |  |  |  |  |  |
+| Canonicalize整合 |  |  |  |  |  |
+| secret非露出 |  |  |  |  |  |
+| nonce/timestamp安全 |  |  |  |  |  |
 
 ---
 

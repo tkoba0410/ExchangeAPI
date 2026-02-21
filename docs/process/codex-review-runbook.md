@@ -27,6 +27,22 @@
 
 ---
 
+## 1.2 語彙Lintの適用範囲
+
+語彙Lint（`Severity` / `FatalClass` 語彙・整合チェック）を導入する場合、対象は次に限定する。
+
+- `docs/process/codex-review-runbook.md`
+- `docs/process/review-framework.md`
+- `docs/process/reviews/templates/*.md`
+
+次は履歴監査ログとして扱い、語彙Lintの対象外とする。
+
+- `docs/process/reviews/REVIEW-*.md`
+- `docs/process/reviews/STAGE*-*.md`
+- `docs/archive/**`
+
+---
+
 ## 2. 基本運用
 
 - 全 PR で `L1` を実施する。

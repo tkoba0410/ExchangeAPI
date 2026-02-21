@@ -120,6 +120,7 @@
 * 指摘フォーマット（`ID / Severity / FatalClass / Pass / File:Line / 事実 / 影響 / 最小修正案 / CI化可否`）の列欠落検査
 * `Severity` 語彙（`Fatal / High / Medium / Low / Nit`）の妥当性検査
 * `FatalClass` 語彙（`F1 / F2 / F3 / F4 / F5 / None`）と `Severity` の整合検査
+* 語彙Lintの対象範囲検査（対象: `docs/process/reviews/templates/*.md` / `docs/process/codex-review-runbook.md`、除外: `docs/process/reviews/REVIEW-*.md` / `docs/process/reviews/STAGE*-*.md` / `docs/archive/**`）
 * マージ判定ゲート（Fatal/High未解消件数）の自動集計
 
 ---

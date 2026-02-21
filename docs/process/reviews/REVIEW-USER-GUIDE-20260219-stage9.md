@@ -1,6 +1,7 @@
 # REVIEW-USER-GUIDE-20260219-stage9
 
 `docs/process/reviews/templates/REVIEW-USER-GUIDE.md` に基づく監査結果（利用者導線の現状評価）。
+本書は実施時点の語彙（例: `NonFatal` / `重大度 (F番号明示)`）を保持する履歴ログであり、語彙Lint対象外とする（`docs/process/reviews/README.md` 参照）。
 
 ---
 

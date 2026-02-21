@@ -3,6 +3,7 @@
 対象: `stage9`  
 実施日: 2026-02-18  
 基準: `docs/archive/references/review-ref-delta-template.md`（旧テンプレ）
+本書は実施時点の語彙（例: `NonFatal` / `重大度 (F番号明示)`）を保持する履歴ログであり、語彙Lint対象外とする（`docs/process/reviews/README.md` 参照）。
 
 ---
 

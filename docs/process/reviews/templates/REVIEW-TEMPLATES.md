@@ -101,6 +101,8 @@
 
 * 各観点に「CI自動化可否」欄がある
 * 自動化可能な観点が抽出されている
+* 重大度語彙Lintを導入する場合、対象を `docs/process/reviews/templates/*.md` と `docs/process/codex-review-runbook.md`（必要時 `docs/process/review-framework.md`）に限定している
+* 履歴監査ログ（`docs/process/reviews/REVIEW-*.md` / `docs/process/reviews/STAGE*-*.md` / `docs/archive/**`）を語彙Lint対象外として明示している
 
 ### NG例
 

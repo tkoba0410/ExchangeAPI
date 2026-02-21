@@ -17,6 +17,17 @@ Fatal 判定時は F番号を明示すること。
 
 ---
 
+## 判定サマリ表
+
+| 観点 | 判定 (OK / 要修正 / NG) | 重大度 (F番号明示) | 備考 |
+| --- | --- | --- | --- |
+| P1（CLI: 事実確認） |  |  |  |
+| P2（別モデル/環境: 規範整合） |  |  |  |
+| P3（CLI: 反証） |  |  |  |
+| 総合判定 |  |  |  |
+
+---
+
 ## 1. パス設計（固定）
 
 | Pass | 環境 | 深度 | 主目的 | 主な入力 | 期待成果 |
@@ -96,6 +107,15 @@ Fatal 判定時は F番号を明示すること。
 * 推奨改善（Medium 以下）
 * 未解決リスク
 * 実行ログ要約（build/test）
+
+---
+
+## CI自動化候補
+
+* `dotnet build ExchangeApi.slnx -warnaserror` / `dotnet test ExchangeApi.slnx` 実行結果の記録検査
+* 指摘フォーマット（`ID / Severity / Pass / File:Line / 事実 / 影響 / 最小修正案 / CI化可否`）の列欠落検査
+* `Severity` 語彙（`Fatal / High / Medium / Low / Nit`）の妥当性検査
+* マージ判定ゲート（Fatal/High未解消件数）の自動集計
 
 ---
 

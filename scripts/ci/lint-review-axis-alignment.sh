@@ -47,10 +47,21 @@ if (( ${#runbook_l2_axes[@]} == 0 )); then
   exit 1
 fi
 
-replacement_line="$(grep -E '※ `Contracts` を .* に置き換えて使用する。' "${runbook_path}" | head -n 1 || true)"
-replacement_upper="$(printf '%s' "${replacement_line}" | tr '[:lower:]' '[:upper:]')"
+replacement_line="$(grep -E '置き換えて使用' "${runbook_path}" | grep -E '`[A-Za-z-]+`' | head -n 1 || true)"
+mapfile -t replacement_axes < <(
+  printf '%s\n' "${replacement_line}" \
+    | grep -oE '`[A-Za-z-]+`' \
+    | tr -d '`' \
+    | tr '[:lower:]' '[:upper:]' \
+    | sort -u
+)
 
 errors=0
+
+if [[ -z "${replacement_line}" || ${#replacement_axes[@]} -eq 0 ]]; then
+  echo "ERROR: Failed to parse L2 axis replacement note from ${runbook_path}" >&2
+  errors=1
+fi
 
 for axis in "${framework_axes[@]}"; do
   if ! printf '%s\n' "${runbook_l2_axes[@]}" | grep -qx "${axis}"; then
@@ -58,7 +69,7 @@ for axis in "${framework_axes[@]}"; do
     errors=1
   fi
 
-  if [[ -z "${replacement_line}" || "${replacement_upper}" != *"${axis}"* ]]; then
+  if ! printf '%s\n' "${replacement_axes[@]}" | grep -qx "${axis}"; then
     echo "ERROR: L2 axis replacement note does not include ${axis}" >&2
     errors=1
   fi

@@ -198,7 +198,7 @@ src/
     Common/
       Adapter/
     Bitflyer/
-      Wire/{Public,Private,Constants,Internal}
+      Wire/{Public,Private,Constants,Properties,Internal}
       Wire/Internal/Auth/
       Raw/{Public,Private,Internal}
       Normalized/{Public,Private,Internal}
@@ -211,7 +211,7 @@ src/
       Composition/
       Vocabulary/
     Bittrade/
-      Wire/{Public,Private,Constants,Internal}
+      Wire/{Public,Private,Constants,Properties,Internal}
       Wire/Internal/Auth/
       Raw/{Public,Private,Internal}
       Normalized/{Public,Private,Internal}

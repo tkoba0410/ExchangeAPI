@@ -37,8 +37,8 @@ public sealed class ExchangeModuleLayoutParityTests
             var wirePath = Path.Combine(exchangePath, "Wire");
             AssertDirectoryShape(
                 wirePath,
-                new[] { "Public", "Private", "Constants", "Internal" },
-                new[] { "Properties" },
+                new[] { "Public", "Private", "Constants", "Properties", "Internal" },
+                Array.Empty<string>(),
                 scope: $"{exchange}/Wire");
             AssertDirectoryShape(
                 Path.Combine(wirePath, "Public"),

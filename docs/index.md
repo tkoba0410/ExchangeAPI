@@ -116,6 +116,9 @@
 * `docs/process/public-surface.md`
 * `docs/process/review-framework.md`
 * `docs/process/codex-review-runbook.md`
+* `docs/process/reviews/`（実施済みレビュー監査ログ）
+* `docs/process/reviews/README.md`
+* `docs/process/reviews/templates/`
 * `docs/process/templates/README.md`
 * `docs/process/revision-history.md`
 * `stage9.md`
@@ -128,7 +131,7 @@
 
 ## 6. 参考資料（Reference）
 
-* `docs/reference/`
+* `docs/reference/`（`docs/reference/reviews/` を含む。過去レビューの判例・参考）
 * `docs/archive/references/`
 
 過去の設計検討、実装ガイド、対応関係メモなどを格納します。

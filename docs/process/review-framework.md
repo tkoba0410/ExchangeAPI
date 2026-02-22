@@ -135,6 +135,14 @@ L3: 節目（Stage締め）
 * Error / Retry / 429 / timeout 変更
 * Normalized / Cross-exchange 構造変更
 * Breaking change を含む
+* 文書構造 / SSOT 変更（補助監査: `REVIEW-DOCS`）
+* ユーザ向けガイド（Quickstart / HowTo / Examples）変更（補助監査: `REVIEW-USER-GUIDE`）
+
+注記:
+
+* `REVIEW-DOCS` / `REVIEW-USER-GUIDE` は 7 品質軸の補助監査であり、軸件数集計には含めない。
+* 利用者向け文書のみの変更は `REVIEW-USER-GUIDE` を主軸とし、DX は原則トリガしない。
+* 軸別テンプレートへのマッピング詳細は `docs/process/codex-review-runbook.md` を正とする。
 
 ---
 
@@ -152,7 +160,7 @@ L3: 節目（Stage締め）
 
 1. すべての PR で L1 を確認
 2. L2 トリガを判定
-3. 該当する場合は L2 レビューを実施
+3. 該当する場合は L2 レビュー（軸レビュー + 必要に応じて補助監査）を実施
 4. Stage 終了前に L3 を実施
 
 ---

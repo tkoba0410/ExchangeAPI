@@ -115,7 +115,7 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 各指摘で Severity/FatalClass を明示してください（`Severity=Fatal` は `FatalClass=F1〜F5` 必須）。
 ```
 
-※ `Contracts` を `Security` / `Reliability` / `Boundary` / `Consistency` / `DX` / `Change` / `Docs` に置き換えて使用する。
+※ `Contracts` を `Security` / `Reliability` / `Boundary` / `Consistency` / `DX` / `Change` / `Docs` / `User-Guide` に置き換えて使用する。
 
 ### 5.3 再レビュー（差分最小）
 
@@ -131,7 +131,7 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 
 - まず PR を主題単位で分割する（Contracts、Security、Refactor、Docs など）。
 - 分割できない場合は、最初に `NG` のうち `Severity=Fatal` 候補（`FatalClass=F1〜F5`）のみ抽出させる。
-- Fatal 解消後に、非Fatal `NG` → 改善提案の順で再実行する。
+- Fatal 解消後に、`Severity=High`（NG）→ `Severity=Medium/Low`（要修正）→ `Severity=Nit`（任意改善）の順で再実行する。
 
 ---
 
@@ -144,14 +144,18 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 
 ## 8. 期待出力フォーマット
 
+判定（`OK / 要修正 / NG`）は「解消状態」、`Severity` は「優先度」として併記する。
+
 - `NG (Fatal)`: `Severity=Fatal` かつ `FatalClass=F1〜F5`。Merge 前に必須修正（1件でもマージ不可）
-- `NG (Non-Fatal)`: `Severity=High/Medium/Low/Nit` かつ `FatalClass=None`。原則同PRで修正
-- `要修正`: 修正計画を明示
-- `OK`: 問題なし（改善提案は任意）
+- `NG (High)`: `Severity=High` かつ `FatalClass=None`。未解消のままはマージ不可
+- `要修正`: `Severity=Medium/Low` かつ `FatalClass=None`
+  - `Medium`: 原則同PRで修正し、繰越す場合は例外記録を必須とする
+  - `Low`: 次PRへの繰越可（理由を記録）
+- `OK`: 問題なし、または `Severity=Nit` の改善提案のみ（任意対応）
 
 移行対応（旧ラベル）:
-- `Must` = `NG`
-- `Should` = `要修正`
+- `Must` = `NG (Fatal/High)`
+- `Should` = `要修正 (Medium/Low)`
 - `Nit` = `OK` + 任意改善提案
 
 各項目は、以下の 1 行形式を推奨する。
@@ -237,7 +241,7 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 2. 監査スコープを明示する（コード + 文書、または文書のみ）。
 3. `L2` トリガ判定は省略し、7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
    Security は logger 差し替え時の secret 非露出（共通サニタイズ経路）まで確認する。
-4. 出力を `OK / 要修正 / NG` に統一し、`file:line` を必須化する（`Docs` は補助監査として別枠）。
+4. 出力を `OK / 要修正 / NG` に統一し、`file:line` を必須化する（`Docs` / `User-Guide` は補助監査として別枠）。
 5. 軸ごとの件数サマリ（OK / 要修正 / NG + Fatal件数）を作成する。
 6. 最後に `最優先 NG Top10（Fatal優先）` を提示する。
 7. 例外が必要な項目は `docs/process/exceptions.md` への記録要否を明示する。
@@ -253,7 +257,7 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 1. PR差分ではなく、現行ブランチの全体を監査する。
 2. `L2` トリガ判定は行わず、7軸（Boundary / Consistency / Contracts / Reliability / Security / DX / Change）を全適用する。
    7軸は既存の PR差分レビュー用テンプレート（`REVIEW-<AXIS>.md`）を流用して判定する。
-   Docs は補助監査（REVIEW-DOCS）として別枠で実施する。
+   Docs / User-Guide は補助監査（REVIEW-DOCS / REVIEW-USER-GUIDE）として別枠で実施する。
 3. 各指摘は次の1行形式を使う:
    [判定] <要約> - <file:line> - <優先度(Fatal/High/Medium/Low/Nit)> - <Fatal分類(F1-F5/None)> - <根拠（どの規約か）>
 4. 軸ごとに OK / 要修正 / NG 件数と Fatal 件数を集計する。

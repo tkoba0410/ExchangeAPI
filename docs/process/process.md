@@ -52,22 +52,24 @@
 - `docs/process/exceptions.md`：原則からの逸脱（差分と理由）
 
 ### 2.4 Process（運用）
-- 本書：文書化ルール・レビュー手順・例外運用
+- `docs/process/process.md`：文書化ルール・レビュー手順・例外運用
+- `docs/process/review-framework.md`：レビュー体系（L1/L2/L3）と品質軸
+- `docs/process/codex-review-runbook.md`：Codex 実行手順
+- `docs/process/reviews/templates/*.md`：軸別レビューの判定テンプレート
+- `docs/process/reviews/README.md`：レビュー監査ログと語彙Lint範囲の運用ポリシー
+- `docs/process/reviews/REVIEW-*.md` / `docs/process/reviews/STAGE*-*.md`：実施済みレビューの監査ログ（履歴）
 
 #### 2.4.1 Governance（補足）
-`docs/normative/governance.md` 自体は「裁定ルールの正本」であり、文書カテゴリとしては追加しない。
-運用上は Process と密接に扱うが、内容の優先順位は Normative に従う。
-
-- 目的：特定スコープの「揺らぎ止め」を、短いルールで固定する（例：Exchanges 配下のみの統一）
-- 禁止：仕様本文の写経、実装手順の解説、TopSpec の代替
-- 必須：対象スコープを明示し、スコープ外へ波及させない
+`docs/normative/governance.md` は「裁定ルールの正本（Normative）」であり、Process ではない。
+Process 文書では Governance の内容を再定義せず、運用手順のみを記載する。
+運用文書と乖離した場合の裁定は、`docs/normative/governance.md` の正本優先順に従う。
 
 ### 2.5 Reference（参考）
 - `docs/reference/navigation.md`：用語ナビゲーション（非規範）
 - `docs/reference/utilities.md`：補助的な運用メモ（非規範）
+- `docs/reference/reviews/*`：過去レビューの判例・参考資料（Informative）
 - `stage9.md`：Stage9 完了判定チェック（非規範）
 - `docs/archive/document-plan.md`：履歴資料（Archive）
-- `docs/reference/reviews/*`：レビュー記録
 - `docs/archive/references/*`：過去検討・監査ログ（Informative）
 
 ---
@@ -225,16 +227,3 @@ governance に従って裁定を行う。
 
 - 旧文書は互換・参照のため `docs/archive/references/` に保管する。
 - `references` 配下は **Normative ではない**。
-# 注意
-
-本書は、本リポジトリにおける **運用・手順・進め方** に関する参考文書である。
-設計規範・層責務・公開範囲・Call 抽象などの正本は  
-**TopSpec（docs/normative/topspec.md）** とする。
-公開 API 契約の正本は **docs/normative/contracts/contracts.md**、
-429 / Timeout / Partial Failure の契約正本は **docs/normative/contracts/resilience.md** とする。
-物理構成の機械可読正本は **docs/normative/layout/exchange-module-shape.json** とする。
-
-本書の内容は、TopSpec に反しない範囲でのみ有効であり、
-設計判断そのものの根拠として用いてはならない。
-
----

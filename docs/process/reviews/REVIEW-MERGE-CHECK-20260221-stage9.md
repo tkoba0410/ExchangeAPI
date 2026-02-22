@@ -52,9 +52,9 @@
 
 ### E. 物理配置変更時の文書同期
 
-- [x] `<exchange>` 配下構造変更に対して `topspec.md` と `exchange-module-shape.json` を同期更新
-- [x] `contracts.md` への物理配置重複記載なし
-- [x] `*LayoutParityTests.cs` へ反映し、`dotnet test` で検証済み
+- [x] `<exchange>` 配下構造変更に対して `docs/normative/topspec.md` と `docs/normative/layout/exchange-module-shape.json` を同期更新
+- [x] `docs/normative/contracts/contracts.md` への物理配置重複記載なし
+- [x] `tests/Common.Tests/Architecture/*LayoutParityTests.cs` へ反映し、`dotnet test` で検証済み
 
 ---
 

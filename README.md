@@ -59,9 +59,10 @@ dotnet run
 
 期待結果: `BTC_JPY last=...` のような出力が1行出る（ネットワーク要）。
 
-### 2) Normalized（取引所別 / 追従前提 / 認証が必要）
+### 2) Normalized（取引所別 / 追従前提 / クライアント初期化時に資格情報が必要）
 
 `Normalized` は「取引所別の機能網羅」を優先する利用面です（互換保証外・追従前提）。
+この例の Ticker は public endpoint ですが、`CreateClient` は利用面を統一するため資格情報（または `RequestSigner`）を必須にしています。公開 endpoint だけを最短利用する場合は `CreateContractPublicClient` を使用してください。
 資格情報の安全な運用は `docs/process/templates/README.md` を参照してください。
 
 前提:

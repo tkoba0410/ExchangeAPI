@@ -32,7 +32,7 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
 - 深度モデルは固定（L1 常設 / L2 トリガ / L3 節目）
 - 重大度モデルは固定（`Severity` + `FatalClass`）
 - 破壊的変更は `docs/process/CHANGE-*.md` への記録を必須化
-- 文書運用は `process.md` の 7.2 最終チェックで機械的に確認
+- 文書運用は `docs/process/process.md` の 7.2 最終チェックで機械的に確認
 
 ---
 
@@ -55,8 +55,8 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
 
 ## 5. DoD 達成状況
 
-- [x] `review-framework.md` が確立している
-- [x] レビュー運用（L1/L2）が runbook と CI で機能している
+- [x] `docs/process/review-framework.md` が確立している
+- [x] レビュー運用（L1/L2）が `docs/process/codex-review-runbook.md` と CI で機能している
 - [x] 構造安定化対象の未解消 NG/Fatal がない（2026-02-21 監査）
 - [x] 破壊的変更は CHANGE 記録が残っている
 - [x] Stage 締めレビュー（L3相当）が実施済み

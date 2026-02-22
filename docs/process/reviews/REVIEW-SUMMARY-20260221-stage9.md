@@ -28,14 +28,16 @@
 
 ---
 
-## 2. 指摘一覧（重大順）
+## 2. 確認結果一覧（重大順）
 
 `[OK] layout shape を機械可読SSOTとして固定し、Exchange配下の必須/禁止構造を閉世界で検証可能化 - docs/normative/layout/exchange-module-shape.json:1 - Medium - None - REVIEW-BOUNDARY（境界拘束の明文化）`
 `[OK] Exchange配下のディレクトリ形状を規範JSONと照合する回帰テストを追加 - tests/Common.Tests/Architecture/ExchangeModuleLayoutParityTests.cs:13 - Medium - None - REVIEW-BOUNDARY（層境界/配置整合）`
 `[OK] shape定義ローダの fail-closed 検証を網羅し、壊れた規範JSONを早期検知 - tests/Common.Tests/Architecture/ExchangeModuleLayoutShapeValidationTests.cs:27 - Medium - None - REVIEW-CONSISTENCY（規範データ整合）`
 `[OK] L2トリガ表と品質軸の対応をlintで検証し、runbookの軸欠落をCIで防止 - scripts/ci/lint-review-axis-alignment.sh:33 - Low - None - REVIEW-CONSISTENCY（運用整合）`
 `[OK] Contracts未使用DTO（BatchResult/BatchError/BatchErrorKind）を削除し、公開契約の実装整合を維持 - docs/process/CHANGE-20260221-contracts-remove-batch-dtos.md:5 - Medium - None - REVIEW-CONTRACTS（公開面最小化）`
+`[OK] Contracts条文を現行実装に合わせ、物理配置拘束の正本参照（TopSpec + layout shape）を明示 - docs/normative/contracts/contracts.md:160 - Medium - None - REVIEW-CONTRACTS（契約条文整合）`
 `[OK] 破壊的変更をCHANGEに明示し、移行手順とBot影響を同時記録 - docs/process/CHANGE-20260221-contracts-remove-batch-dtos.md:13 - Low - None - REVIEW-CHANGE（変更統治）`
+`[OK] TransportConfig統一の破壊的変更をCHANGEで固定し、削除項目と移行手順を明確化 - docs/process/CHANGE-20260219-transport-config-unification.md:8 - Low - None - REVIEW-CHANGE（変更統治）`
 `[OK] Transport設定を排他的 `TransportConfig` に統一し、設定競合経路を除去 - src/Transport/Http/TransportConfig.cs:10 - Medium - None - REVIEW-RELIABILITY（設定一意性）`
 `[OK] Transport解決を `TransportConfigResolver` に集約し、所有権/timeout妥当性を明示的に制御 - src/Transport/Http/TransportConfigResolver.cs:11 - Medium - None - REVIEW-RELIABILITY（経路決定/障害予防）`
 `[OK] 外部HttpClient利用時にdispose責務を保持したラッピングでsecret露出経路を増やさずに運用可能 - src/Transport/Http/TransportConfigResolver.cs:22 - Low - None - REVIEW-SECURITY（機密/運用安全）`

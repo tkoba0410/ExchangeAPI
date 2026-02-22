@@ -12,6 +12,9 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための実装基
 
 ## 最初の1コール（Quickstart）
 
+この Quickstart は、リポジトリを clone した開発者が手元で最短確認するための手順です。
+利用導線の全体像は `docs/index.md` を参照してください。
+
 ### 1) Contracts（公開安定面 / 認証不要）
 
 bitFlyer の Public Ticker を `Contracts`（安定）で叩く最短例です。

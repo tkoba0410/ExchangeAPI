@@ -8,7 +8,7 @@
 Stage9 は、機能拡張フェーズではなく、構造と運用の安定化フェーズである。  
 目的は「変更を止めること」ではなく、「変更を統治可能にすること」にある。
 
-正本:
+運用正本（Process SSOT）:
 - `docs/process/review-framework.md`
 - `docs/process/codex-review-runbook.md`
 - `docs/process/process.md`

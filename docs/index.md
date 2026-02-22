@@ -14,13 +14,15 @@
 * **技術仕様・設計規範**：`docs/normative/topspec.md`
 * **取引所モジュール物理構成（機械可読）**：`docs/normative/layout/exchange-module-shape.json`
 * **命名規則**：`docs/normative/naming-rules.md`
-* **公開 API 契約（条文）**：`docs/normative/contracts/contracts.md` / `docs/normative/contracts/resilience.md`
+* **公開 API 契約（条文）**：`docs/normative/contracts/contracts.md`
+* **失敗時契約（429 / Timeout / Partial Failure）**：`docs/normative/contracts/resilience.md`
 * **設計判断の裁定**：`docs/normative/governance.md`
 
 以下では、上記正本を起点に、利用導線と補助文書を示す。
 
 技術仕様・設計規範については TopSpec と Layout Shape を、
-公開 API 契約については Contracts / Resilience を、
+公開 API 契約については Contracts を、
+失敗時契約については Resilience を、
 設計判断の裁定については Governance を基準として参照すること。
 
 ---
@@ -61,7 +63,7 @@
 以下の文書は、**外部利用者に公開される安定 API（Contract 層）**に関する文書群です。
 
 * `docs/normative/contracts/overview.md`
-  利用者向け契約の概要と導線。契約条文は `docs/normative/contracts/contracts.md` / `docs/normative/contracts/resilience.md` を参照。
+  利用者向け契約の概要と導線。公開 API 契約条文は `docs/normative/contracts/contracts.md`、失敗時契約は `docs/normative/contracts/resilience.md` を参照。
 
 * `docs/normative/contracts/contracts.md`
   共通 DTO、Capability I/F、契約上の意味論を定義。
@@ -120,7 +122,7 @@
 * `docs/archive/document-plan.md`
 * `docs/reference/utilities.md`
 
-これらの文書は TopSpec / Contracts / Governance に反しない範囲でのみ有効です。
+これらの文書は TopSpec / Layout Shape / Contracts / Resilience / Governance に反しない範囲でのみ有効です。
 
 ---
 

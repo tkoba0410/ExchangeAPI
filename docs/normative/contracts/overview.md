@@ -23,7 +23,8 @@ Contracts は、取引所横断で共通に成立する最小機能に限定す�
 
 本書は Contract 層における **公開安定 API の契約文書**である。
 
-本書（overview）は概要説明であり、拘束力（Normative）を持つ契約条文は `docs/normative/contracts/contracts.md` を正本とする。
+本書（overview）は概要説明であり、拘束力（Normative）を持つ公開 API 契約条文は `docs/normative/contracts/contracts.md` を正本とする。
+429 / Timeout / Partial Failure 契約は `docs/normative/contracts/resilience.md` を正本とする。
 
 設計規範（層構造、Call 抽象、公開範囲等）の正本は  
 **TopSpec（docs/normative/topspec.md）** とする。

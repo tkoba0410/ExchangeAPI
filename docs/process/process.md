@@ -4,6 +4,7 @@
 設計規範・層責務・公開範囲の正本は  
 **TopSpec（docs/normative/topspec.md）** とする。  
 公開 API 契約の正本は **docs/normative/contracts/contracts.md** とする。
+429 / Timeout / Partial Failure の契約正本は **docs/normative/contracts/resilience.md** とする。
 `<exchange>` 物理構成（機械可読）の正本は
 **docs/normative/layout/exchange-module-shape.json** とする。
 
@@ -220,8 +221,10 @@ governance に従って裁定を行う。
 # 注意
 
 本書は、本リポジトリにおける **運用・手順・進め方** に関する参考文書である。
-設計規範・層責務・公開範囲・API 契約・Call 抽象などの正本は  
+設計規範・層責務・公開範囲・Call 抽象などの正本は  
 **TopSpec（docs/normative/topspec.md）** とする。
+公開 API 契約の正本は **docs/normative/contracts/contracts.md**、
+429 / Timeout / Partial Failure の契約正本は **docs/normative/contracts/resilience.md** とする。
 物理構成の機械可読正本は **docs/normative/layout/exchange-module-shape.json** とする。
 
 本書の内容は、TopSpec に反しない範囲でのみ有効であり、

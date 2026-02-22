@@ -27,10 +27,11 @@
 1. 各取引所の**公式 API 文書**（最上位の正本）
 2. **TopSpec（docs/normative/topspec.md）**（内部技術規範の正本）
 3. **Exchange Module Shape（docs/normative/layout/exchange-module-shape.json）**（`<exchange>` 物理構成の機械可読正本）
-4. **Contracts（docs/normative/contracts/contracts.md）**（公開 API 契約の正本）
-5. 本書（governance.md）（設計判断の裁定ルール）
-6. inventory 文書（事実の一覧 / Fact）
-7. references 配下の文書（参考資料）
+4. **Contracts（docs/normative/contracts/contracts.md）**（公開 API 契約条文の正本）
+5. **Resilience（docs/normative/contracts/resilience.md）**（429 / Timeout / Partial Failure 契約の正本）
+6. 本書（governance.md）（設計判断の裁定ルール）
+7. inventory 文書（事実の一覧 / Fact）
+8. references 配下の文書（参考資料）
 
 上位の正本と矛盾する記述は、下位文書に存在しても**無効**とする。
 物理構成に関する裁定では、TopSpec の規範文に従った上で

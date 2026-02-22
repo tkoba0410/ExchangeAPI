@@ -2,12 +2,13 @@
 
 この文書は、Bot 別リポジトリから参照してよい公開面を定義する参考文書です。
 基本方針は「取引所別 Normalized を主利用面、Contracts を最小横断面」とする。  
-（安定保証の正本は `docs/normative/contracts/contracts.md` / `docs/normative/contracts/overview.md`）
+（安定保証の契約条文の正本は `docs/normative/contracts/contracts.md` / `docs/normative/contracts/resilience.md`。
+`docs/normative/contracts/overview.md` は概要導線）
 
 ## 対象読者
 
 - 取引所機能網羅を必要とする Bot / 高度利用者
-- 一般利用者向けの安定契約は Contracts を正本参照する
+- 一般利用者向けの安定契約は `docs/normative/contracts/contracts.md` / `docs/normative/contracts/resilience.md` を正本参照する
 
 ## 利用レベル
 
@@ -35,7 +36,7 @@
 - Contracts は「複数取引所で共通に成立する最小機能」のみを横断利用する。
 - 取引所差で有無が揺れる機能は、nullable ではなく capability I/F（例: `IContractCandlesticksClient`）で判定する。
 - Normalized は公開安定契約ではない（互換保証外）ため、更新時は追従前提で運用する。
-- 公開安定面の正本は `docs/normative/contracts/contracts.md` と `docs/normative/contracts/overview.md` を参照する。
+- 公開安定面は Contracts 層のみ。契約条文の正本は `docs/normative/contracts/contracts.md` と `docs/normative/contracts/resilience.md` を参照する。
 
 ## 非目標
 

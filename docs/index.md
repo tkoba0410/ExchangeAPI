@@ -9,18 +9,18 @@
 ※ inventory は「事実の正本（Fact SSOT）」であり、設計規範（拘束力）の正本ではない。
 ※ Process 配下には運用上の SSOT（例: review-framework）も存在するが、設計規範の正本ではない。
 
-以下は、それぞれの領域における正本である。
+以下は、それぞれの領域における正本（Normative）である。
 
 * **技術仕様・設計規範**：`docs/normative/topspec.md`
+* **取引所モジュール物理構成（機械可読）**：`docs/normative/layout/exchange-module-shape.json`
 * **命名規則**：`docs/normative/naming-rules.md`
-* **公開 API 契約**：`docs/normative/contracts/contracts.md`
+* **公開 API 契約（条文）**：`docs/normative/contracts/contracts.md` / `docs/normative/contracts/resilience.md`
 * **設計判断の裁定**：`docs/normative/governance.md`
 
-以降に配置されている文書は、上記正本を基準とした
-補助文書（Informative / Reference）である。
+以下では、上記正本を起点に、利用導線と補助文書を示す。
 
-技術仕様・設計規範については TopSpec を、
-公開 API 契約については Contracts を、
+技術仕様・設計規範については TopSpec と Layout Shape を、
+公開 API 契約については Contracts / Resilience を、
 設計判断の裁定については Governance を基準として参照すること。
 
 ---
@@ -58,10 +58,10 @@
 
 ## 2. 利用者向け契約（Contracts）
 
-以下の文書は、**外部利用者に公開される安定 API（Contract 層）**の語彙と契約を定義します。
+以下の文書は、**外部利用者に公開される安定 API（Contract 層）**に関する文書群です。
 
 * `docs/normative/contracts/overview.md`
-  利用者向け契約の概要。公開安定面は Contract 層のみであることを説明。
+  利用者向け契約の概要と導線。契約条文は `docs/normative/contracts/contracts.md` / `docs/normative/contracts/resilience.md` を参照。
 
 * `docs/normative/contracts/contracts.md`
   共通 DTO、Capability I/F、契約上の意味論を定義。

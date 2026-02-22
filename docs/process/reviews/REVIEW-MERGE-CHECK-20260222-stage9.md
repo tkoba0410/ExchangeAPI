@@ -63,15 +63,18 @@
 - [x] 再レビューは前回 NG のみ、新規指摘は重大回帰に限定
 - [x] 3回未収束時は裁定移行ルールを維持
 - [x] Stage9 終了判定で `docs/stage_9_close_policy.md` の必須条件・証跡要件を満たした
+- [x] Stage9 終了判定の追加要件（7.3）を満たした
 
 ---
 
 ## 根拠リンク
 
 - 7.2 基準: `docs/process/process.md:182`
+- 7.3 基準（Stage9終了判定）: `docs/process/process.md:226`
 - Stage9 close policy（必須条件）: `docs/stage_9_close_policy.md:40`
 - Stage9 close policy（証跡要件）: `docs/stage_9_close_policy.md:70`
 - Stage9 close checklist: `docs/process/stage9-close-checklist.md:1`
 - 節目監査サマリ: `docs/process/reviews/REVIEW-SUMMARY-20260222-stage9.md`
 - 直近最終判定（履歴）: `docs/process/reviews/STAGE9-FINAL-DECISION-20260221.md`
 - CI統制（review lint）: `.github/workflows/ci.yml:20`
+- 再検証コミット: `b027cf80`

@@ -68,7 +68,7 @@ CI/ログリンク:
 - Maintainer 明示承認:
   - 名前: `tkoba`
   - 日付: `2026-02-22`
-  - コメント: `Stage9 close procedure execution requested and accepted.`
+  - コメント: `Stage9 close procedure execution requested and accepted. Revalidated after 7.3 split (b027cf80).`
 
 クローズ後更新:
 - [x] `stage9.md` の最新判定リンクと日付を更新した

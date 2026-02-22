@@ -58,6 +58,8 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
   `docs/stage_9_close_policy.md`  
   `docs/process/review-framework.md`  
   `docs/process/codex-review-runbook.md`
+- PR共通最終ゲート（7.2）と Stage9専用要件（7.3）を分離  
+  `docs/process/process.md`
 - Stage9 クローズ実行チェックリストを追加し、実施ログを履歴化  
   `docs/process/stage9-close-checklist.md`  
   `docs/process/reviews/STAGE9-CLOSE-CHECKLIST-20260222.md`

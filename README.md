@@ -26,6 +26,8 @@ cd ExchangeApi.Quickstart
 dotnet add reference ../src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj
 ```
 
+再実行する場合は、既存の `ExchangeApi.Quickstart/` を削除するか別名を使用してください。
+
 `Program.cs` を次で置き換え:
 
 ```csharp
@@ -115,7 +117,7 @@ dotnet run
 
 ## 安定保証の境界
 
-- 公開安定面は Contract 層のみです。詳細は `docs/normative/contracts/overview.md` と `docs/index.md` を参照してください。
+- 公開安定面は Contracts 層のみです。詳細は `docs/normative/contracts/overview.md` と `docs/index.md` を参照してください。
 
 ## Contributions / Development
 

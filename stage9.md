@@ -17,12 +17,12 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
 
 ## 2. 現在の判定（2026-02-21 時点）
 
-- Stage9 完了宣言（基準判定日: 2026-02-19）: **可**（`docs/process/reviews/STAGE9-FINAL-DECISION-20260219.md`）
-- 補足: 2026-02-19 判定時点では未解消 NonFatal が 3 件（`docs/process/reviews/STAGE9-FINAL-DECISION-20260219.md`）。
+- Stage9 完了宣言（最新）: **可**（`docs/process/reviews/STAGE9-FINAL-DECISION-20260221.md`）
 - 節目レビュー（L3相当）: **PASS**（`NG=0 / Fatal=0`）
   - `docs/process/reviews/REVIEW-SUMMARY-20260221-stage9.md`
 - 最終レビュー（Merge前 7.2）: **Merge 可**（`NG=0 / Fatal=0`）
   - `docs/process/reviews/REVIEW-MERGE-CHECK-20260221-stage9.md`
+- 履歴判定: `docs/process/reviews/STAGE9-FINAL-DECISION-20260219.md`
 
 ---
 

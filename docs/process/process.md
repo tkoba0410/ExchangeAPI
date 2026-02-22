@@ -222,7 +222,10 @@ governance に従って裁定を行う。
 - [ ] 未解消論点を残していない（残す場合は `docs/process/exceptions.md` または `docs/process/CHANGE-*.md` に記録）
 - [ ] 再レビューは前回 NG 指摘のみで実施し、新規指摘は重大回帰に限定している
 - [ ] 同一論点が 3 回目でも未収束の場合、レビュー継続ではなく裁定へ切り替えている
-- [ ] Stage9 終了判定では `docs/stage_9_close_policy.md` の必須条件と証跡要件を満たしている
+
+### 7.3 Stage9 終了判定の追加要件（Stage9 クローズ時のみ）
+
+- [ ] `docs/stage_9_close_policy.md` の必須条件と証跡要件を満たしている
 
 ---
 

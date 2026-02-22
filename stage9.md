@@ -16,14 +16,17 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
 
 ---
 
-## 2. 現在の判定（最終判定日: 2026-02-21 / 文書更新日: 2026-02-22）
+## 2. 現在の判定（最終判定日: 2026-02-22 / 文書更新日: 2026-02-22）
 
-- Stage9 完了宣言（最新）: **可**（`docs/process/reviews/STAGE9-FINAL-DECISION-20260221.md`）
+- Stage9 完了宣言（最新）: **可**（`docs/process/reviews/STAGE9-FINAL-DECISION-20260222.md`）
 - 節目レビュー（L3相当）: **PASS**（`NG=0 / Fatal=0`）
-  - `docs/process/reviews/REVIEW-SUMMARY-20260221-stage9.md`
+  - `docs/process/reviews/REVIEW-SUMMARY-20260222-stage9.md`
 - 最終レビュー（Merge前 7.2）: **Merge 可**（`NG=0 / Fatal=0`）
-  - `docs/process/reviews/REVIEW-MERGE-CHECK-20260221-stage9.md`
-- 履歴判定: `docs/process/reviews/STAGE9-FINAL-DECISION-20260219.md`
+  - `docs/process/reviews/REVIEW-MERGE-CHECK-20260222-stage9.md`
+- クローズ実行チェック: **完了**（`docs/process/reviews/STAGE9-CLOSE-CHECKLIST-20260222.md`）
+- 履歴判定:
+  - `docs/process/reviews/STAGE9-FINAL-DECISION-20260221.md`
+  - `docs/process/reviews/STAGE9-FINAL-DECISION-20260219.md`
 
 ---
 
@@ -37,7 +40,7 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
 
 ---
 
-## 4. 直近で確定した安定化項目（2026-02-21）
+## 4. 直近で確定した安定化項目（2026-02-21〜2026-02-22）
 
 - Exchange 配下構造の機械可読 SSOT を導入  
   `docs/normative/layout/exchange-module-shape.json`
@@ -51,6 +54,13 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
   `scripts/ci/lint-review-axis-alignment.sh`  
   `scripts/ci/lint-reference-review-status.sh`  
   `.github/workflows/ci.yml`
+- Stage9 クローズ方針を Process 運用に接続  
+  `docs/stage_9_close_policy.md`  
+  `docs/process/review-framework.md`  
+  `docs/process/codex-review-runbook.md`
+- Stage9 クローズ実行チェックリストを追加し、実施ログを履歴化  
+  `docs/process/stage9-close-checklist.md`  
+  `docs/process/reviews/STAGE9-CLOSE-CHECKLIST-20260222.md`
 
 ---
 
@@ -58,7 +68,7 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
 
 - [x] `docs/process/review-framework.md` が確立している
 - [x] レビュー運用（L1/L2）が `docs/process/codex-review-runbook.md` と CI で機能している
-- [x] 構造安定化対象の未解消 NG/Fatal がない（2026-02-21 監査）
+- [x] 構造安定化対象の未解消 NG/Fatal がない（2026-02-22 監査）
 - [x] 破壊的変更は CHANGE 記録が残っている
 - [x] Stage 締めレビュー（L3相当）が実施済み
 

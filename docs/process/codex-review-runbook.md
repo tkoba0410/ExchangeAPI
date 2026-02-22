@@ -60,6 +60,13 @@
 4. 未解消 `NG` のみ再レビューする。
 5. Merge 前に `docs/process/process.md` のチェックリストを再確認する。
 
+### 3.1 収束運用（レビューループ回避）
+
+- レビュー開始時に、対象変更の `収束アンカー`（正本文書 1 つ + 主実装 1 箇所）を先に固定する。
+- 文書とコードが乖離した場合、修正方向は `docs/normative/governance.md` の正本優先順で決める。
+- 再レビューは前回 `NG` のみを対象とし、新規指摘は重大回帰に限定する。
+- 同一論点が 3 回目でも未収束の場合、レビュー継続を停止し、裁定（Normative更新 / `exceptions` / `CHANGE-*`）へ切り替える。
+
 ---
 
 ## 4. L2 トリガ対応表
@@ -91,6 +98,7 @@
 
 ```text
 このPR差分をレビューしてください。
+収束アンカー: <正本文書 path> + <主実装 path>
 基準は docs/process/process.md の「7.2 必須（Merge 前に必ず確認）」です。
 出力は「判定サマリ（OK / 要修正 / NG）」と「指摘一覧」の順で、重大度順に列挙してください。
 各指摘に対象ファイルと行番号を付けてください。
@@ -160,6 +168,7 @@ docs/process/reviews/templates/REVIEW-CONTRACTS.md のチェック項目でレ�
 
 ```text
 対象: このPR差分のみ（branch: <feature-branch>, base: <base-branch>）
+収束アンカー: <正本文書 path> + <主実装 path>
 出力: 判定サマリ（OK / 要修正 / NG）+ 指摘一覧（各項目に file:line 必須）
 基準: docs/process/codex-review-runbook.md と関連テンプレートに厳密準拠
 

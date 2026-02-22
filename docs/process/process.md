@@ -212,6 +212,13 @@ governance に従って裁定を行う。
 - [ ] `docs/normative/contracts/contracts.md` に物理配置の詳細を重複記載していないことを確認した
 - [ ] 物理配置の変更を `tests/Common.Tests/Architecture/*LayoutParityTests.cs` へ反映し、`dotnet test` で検証している
 
+#### F. 文書↔コード収束ゲート（レビューループ回避）
+- [ ] 変更ごとに「収束アンカー（正本文書 1 つ + 主実装 1 箇所）」を明示している
+- [ ] 乖離時の修正方向を `docs/normative/governance.md` の正本優先順で決定している
+- [ ] 未解消論点を残していない（残す場合は `docs/process/exceptions.md` または `docs/process/CHANGE-*.md` に記録）
+- [ ] 再レビューは前回 NG 指摘のみで実施し、新規指摘は重大回帰に限定している
+- [ ] 同一論点が 3 回目でも未収束の場合、レビュー継続ではなく裁定へ切り替えている
+
 ---
 
 ## 8. Legacy（参考文書）

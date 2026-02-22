@@ -55,6 +55,7 @@
 - `docs/process/process.md`：文書化ルール・レビュー手順・例外運用
 - `docs/process/review-framework.md`：レビュー体系（L1/L2/L3）と品質軸
 - `docs/process/codex-review-runbook.md`：Codex 実行手順
+- `docs/stage_9_close_policy.md`：Stage9 クローズ方針（終了判定・ループ抑止）
 - `docs/process/reviews/templates/*.md`：軸別レビューの判定テンプレート
 - `docs/process/reviews/README.md`：レビュー監査ログと語彙Lint範囲の運用ポリシー
 - `docs/process/reviews/REVIEW-*.md` / `docs/process/reviews/STAGE*-*.md`：実施済みレビューの監査ログ（履歴）
@@ -220,6 +221,7 @@ governance に従って裁定を行う。
 - [ ] 未解消論点を残していない（残す場合は `docs/process/exceptions.md` または `docs/process/CHANGE-*.md` に記録）
 - [ ] 再レビューは前回 NG 指摘のみで実施し、新規指摘は重大回帰に限定している
 - [ ] 同一論点が 3 回目でも未収束の場合、レビュー継続ではなく裁定へ切り替えている
+- [ ] Stage9 終了判定では `docs/stage_9_close_policy.md` の必須条件と証跡要件を満たしている
 
 ---
 

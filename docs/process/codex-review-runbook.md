@@ -2,6 +2,7 @@
 
 本書は、`docs/process/review-framework.md` の運用を Codex で実施するための実務手順書である。
 レビュー観点の正本は `docs/process/review-framework.md`、PR 最終チェックの正本は `docs/process/process.md` とする。
+Stage9 終了判定の停止規則と証跡要件は `docs/stage_9_close_policy.md` を正とする。
 
 ---
 
@@ -59,6 +60,7 @@
 3. 必要な `L2` テンプレートだけ追加実施する。
 4. 未解消 `NG` のみ再レビューする。
 5. Merge 前に `docs/process/process.md` のチェックリストを再確認する。
+6. Stage 終了判定時は `docs/stage_9_close_policy.md` の証跡要件を満たして最終裁定する。
 
 ### 3.1 収束運用（レビューループ回避）
 
@@ -66,6 +68,7 @@
 - 文書とコードが乖離した場合、修正方向は `docs/normative/governance.md` の正本優先順で決める。
 - 再レビューは前回 `NG` のみを対象とし、新規指摘は重大回帰に限定する。
 - 同一論点が 3 回目でも未収束の場合、レビュー継続を停止し、裁定（Normative更新 / `exceptions` / `CHANGE-*`）へ切り替える。
+- Stage9 終了判定では `docs/stage_9_close_policy.md` 9 章（Loop Suppression Rule）を優先適用する。
 
 ---
 

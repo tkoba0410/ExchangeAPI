@@ -12,6 +12,7 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
 - `docs/process/review-framework.md`
 - `docs/process/codex-review-runbook.md`
 - `docs/process/process.md`
+- `docs/stage_9_close_policy.md`
 
 ---
 
@@ -70,6 +71,7 @@ Stage9 は、機能拡張フェーズではなく、構造と運用の安定化�
 - DX 改善
 
 上記は、固定済み品質軸と運用ルールの範囲で継続的に更新する。
+クローズ判定時のループ抑止は `docs/stage_9_close_policy.md` の規則に従う。
 
 ---
 

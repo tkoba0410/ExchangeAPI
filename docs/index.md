@@ -117,6 +117,7 @@
 * `docs/process/review-framework.md`
 * `docs/process/codex-review-runbook.md`
 * `docs/stage_9_close_policy.md`
+* `docs/process/stage9-close-checklist.md`
 * `docs/process/reviews/`（実施済みレビュー監査ログ）
 * `docs/process/reviews/README.md`
 * `docs/process/reviews/templates/`

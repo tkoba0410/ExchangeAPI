@@ -56,6 +56,7 @@
 - `docs/process/review-framework.md`：レビュー体系（L1/L2/L3）と品質軸
 - `docs/process/codex-review-runbook.md`：Codex 実行手順
 - `docs/stage_9_close_policy.md`：Stage9 クローズ方針（終了判定・ループ抑止）
+- `docs/process/stage9-close-checklist.md`：Stage9 クローズ実行チェックリスト
 - `docs/process/reviews/templates/*.md`：軸別レビューの判定テンプレート
 - `docs/process/reviews/README.md`：レビュー監査ログと語彙Lint範囲の運用ポリシー
 - `docs/process/reviews/REVIEW-*.md` / `docs/process/reviews/STAGE*-*.md`：実施済みレビューの監査ログ（履歴）

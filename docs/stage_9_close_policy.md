@@ -70,6 +70,7 @@ Stage9 は「安定化」および「監査耐性強化」を目的とする。
 ## 5. 証跡要件（Evidence Pack）
 
 Stage9 終了判定では、少なくとも次の証跡を揃える。
+実行時は `docs/process/stage9-close-checklist.md` を使用する。
 
 1. `docs/process/reviews/REVIEW-SUMMARY-<date>-stage9.md`（L3 相当）
 2. `docs/process/reviews/REVIEW-MERGE-CHECK-<date>-stage9.md`（7.2 最終チェック）

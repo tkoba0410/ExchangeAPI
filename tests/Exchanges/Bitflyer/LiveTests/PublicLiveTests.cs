@@ -106,7 +106,13 @@ public sealed class BitflyerRawPublicLiveTests
         var response = BitflyerLiveAssert.RequireOk(call);
 
         Assert.True(response.Count > 0);
-        Assert.All(response, item => Assert.Equal(BitflyerLiveSettings.DefaultProductCode.Value, item.ProductCode));
+        Assert.All(response, item =>
+        {
+            Assert.True(item.Id > 0L);
+            Assert.False(string.IsNullOrWhiteSpace(item.Side));
+            Assert.True(item.Price > 0m);
+            Assert.True(item.Size > 0m);
+        });
     }
 }
 

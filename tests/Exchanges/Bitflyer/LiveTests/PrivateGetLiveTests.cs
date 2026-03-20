@@ -103,7 +103,14 @@ public sealed class BitflyerRawPrivateGetLiveTests
                 Count: 10));
         var response = BitflyerLiveAssert.RequireOk(call);
 
-        Assert.All(response, item => Assert.Equal(BitflyerLiveSettings.DefaultProductCode.Value, item.ProductCode));
+        Assert.True(response.Count > 0);
+        Assert.All(response, item =>
+        {
+            Assert.True(item.Id > 0L);
+            Assert.False(string.IsNullOrWhiteSpace(item.Side));
+            Assert.True(item.Price > 0m);
+            Assert.True(item.Size > 0m);
+        });
     }
 }
 

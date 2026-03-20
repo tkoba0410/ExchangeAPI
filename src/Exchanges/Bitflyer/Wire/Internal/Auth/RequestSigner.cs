@@ -28,7 +28,7 @@ public sealed class RequestSigner : IRequestSigner
         if (request is null) throw new ArgumentNullException(nameof(request));
         if (request.RequestUri is null) throw new InvalidOperationException("RequestUri must be set before signing.");
 
-        var timestamp = _clock.UtcNow.ToUnixTimeSeconds().ToString();
+        var timestamp = _clock.UtcNow.ToUnixTimeMilliseconds().ToString();
         var method = request.Method.Method.ToUpperInvariant();
         var pathAndQuery = request.RequestUri.PathAndQuery;
 

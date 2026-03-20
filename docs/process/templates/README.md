@@ -27,4 +27,6 @@
 - live test は通常の `dotnet test` / CI 既定経路に混ぜない。
 - live test の opt-in は `bitflyer-live.env.template` の環境変数を基準にする。
 - `EXCHANGEAPI_BITFLYER_API_KEY` / `EXCHANGEAPI_BITFLYER_API_SECRET` はテンプレートに値を書かず、実値は別管理とする。
+- 認証あり live test は、上記の direct env に加えて `CREDENTIAL_FILE_PATH` / `AGE_SECRET_KEY_PATH`（既存 age 運用）でも実行できる。
+- `CREDENTIAL_FILE_PATH` / `AGE_SECRET_KEY_PATH` が未指定でも、`~/.config/exchangeapi/secrets/credentials.enc.json` と `~/.config/exchangeapi/keys/age.key` が存在すればそれを既定値として使う。
 - `EXCHANGEAPI_BITFLYER_LIVE_ALLOW_POST=1` を使う場合は、専用口座・最小数量・即時約定しにくい指値を前提とする。

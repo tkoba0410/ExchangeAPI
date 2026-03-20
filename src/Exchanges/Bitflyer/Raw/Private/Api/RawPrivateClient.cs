@@ -295,7 +295,7 @@ internal sealed class RawPrivateClient
                 return (Spec: PrivateEndpoints.CancelChildOrder(body!), Error: (Exception?)null);
             },
             cancellationToken,
-            json => RawJson.DeserializeOrThrow<CancelChildOrderResponse>(
+            json => ParseEmptySuccess<CancelChildOrderResponse>(
                 json,
                 Component(EndpointIds.CancelChildOrder)));
 
@@ -315,7 +315,7 @@ internal sealed class RawPrivateClient
                 return (Spec: PrivateEndpoints.CancelParentOrder(body!), Error: (Exception?)null);
             },
             cancellationToken,
-            json => RawJson.DeserializeOrThrow<CancelParentOrderResponse>(
+            json => ParseEmptySuccess<CancelParentOrderResponse>(
                 json,
                 Component(EndpointIds.CancelParentOrder)));
 
@@ -335,7 +335,7 @@ internal sealed class RawPrivateClient
                 return (Spec: PrivateEndpoints.CancelAllChildOrders(body!), Error: (Exception?)null);
             },
             cancellationToken,
-            json => RawJson.DeserializeOrThrow<CancelAllChildOrdersResponse>(
+            json => ParseEmptySuccess<CancelAllChildOrdersResponse>(
                 json,
                 Component(EndpointIds.CancelAllChildOrders)));
 
@@ -436,6 +436,14 @@ internal sealed class RawPrivateClient
             Request: request,
             Result: new CallResult<TRes>.Err(callError),
             Meta: meta);
+    }
+
+    private static TRes ParseEmptySuccess<TRes>(string json, string context)
+        where TRes : new()
+    {
+        return string.IsNullOrWhiteSpace(json)
+            ? new TRes()
+            : RawJson.DeserializeOrThrow<TRes>(json, context);
     }
 
     private static string Component(string endpointId) => $"Bitflyer.{endpointId}";

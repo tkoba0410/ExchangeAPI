@@ -10,18 +10,37 @@ internal static class BitflyerLiveSettings
     private const string LiveEnabledEnv = "EXCHANGEAPI_BITFLYER_LIVE";
     private const string ApiKeyEnv = "EXCHANGEAPI_BITFLYER_API_KEY";
     private const string ApiSecretEnv = "EXCHANGEAPI_BITFLYER_API_SECRET";
+    private const string AccountIdEnv = "EXCHANGEAPI_BITFLYER_LIVE_ACCOUNT_ID";
     private const string AllowPostEnv = "EXCHANGEAPI_BITFLYER_LIVE_ALLOW_POST";
     private const string SymbolEnv = "EXCHANGEAPI_BITFLYER_LIVE_SYMBOL";
     private const string ProductCodeEnv = "EXCHANGEAPI_BITFLYER_LIVE_PRODUCT_CODE";
     private const string OrderSideEnv = "EXCHANGEAPI_BITFLYER_LIVE_ORDER_SIDE";
     private const string OrderSizeEnv = "EXCHANGEAPI_BITFLYER_LIVE_ORDER_SIZE";
     private const string OrderPriceEnv = "EXCHANGEAPI_BITFLYER_LIVE_ORDER_PRICE";
+    private const string CredentialFilePathEnv = "CREDENTIAL_FILE_PATH";
+    private const string AgeSecretKeyPathEnv = "AGE_SECRET_KEY_PATH";
+
+    private static readonly string DefaultCredentialFilePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        ".config",
+        "exchangeapi",
+        "secrets",
+        "credentials.enc.json");
+
+    private static readonly string DefaultAgeSecretKeyPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        ".config",
+        "exchangeapi",
+        "keys",
+        "age.key");
 
     public static ProductCode DefaultProductCode =>
         ProductCode.ParseOrThrowNormalized(GetOptional(ProductCodeEnv, "BTC_JPY"));
 
     public static Symbol DefaultSymbol =>
         Symbol.ParseOrThrow(GetOptional(SymbolEnv, "BTC/JPY"));
+
+    public static string DefaultAccountId => GetOptional(AccountIdEnv, "default");
 
     public static string? GetPublicSkipReason()
     {
@@ -41,10 +60,11 @@ internal static class BitflyerLiveSettings
             return publicSkip;
         }
 
-        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApiKeyEnv)) ||
-            string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApiSecretEnv)))
+        if (!HasAuthenticatedCredentialSource())
         {
-            return $"Set {ApiKeyEnv} and {ApiSecretEnv} to enable authenticated bitFlyer live tests.";
+            return
+                $"Set {ApiKeyEnv}/{ApiSecretEnv}, or provide {CredentialFilePathEnv}/{AgeSecretKeyPathEnv}, " +
+                "to enable authenticated bitFlyer live tests.";
         }
 
         return null;
@@ -78,10 +98,30 @@ internal static class BitflyerLiveSettings
         }
     }
 
-    public static ApiCredentials GetCredentials() =>
-        new(
-            GetRequired(ApiKeyEnv),
-            GetRequired(ApiSecretEnv));
+    public static ApiCredentials GetCredentials()
+    {
+        var directApiKey = Environment.GetEnvironmentVariable(ApiKeyEnv);
+        var directApiSecret = Environment.GetEnvironmentVariable(ApiSecretEnv);
+        if (!string.IsNullOrWhiteSpace(directApiKey) &&
+            !string.IsNullOrWhiteSpace(directApiSecret))
+        {
+            return new ApiCredentials(directApiKey.Trim(), directApiSecret.Trim());
+        }
+
+        var (credentialFilePath, ageSecretKeyPath) = ResolveCredentialPaths();
+        if (credentialFilePath is null || ageSecretKeyPath is null)
+        {
+            throw new InvalidOperationException(
+                $"Set {ApiKeyEnv}/{ApiSecretEnv}, or provide {CredentialFilePathEnv}/{AgeSecretKeyPathEnv}, before running this bitFlyer live test.");
+        }
+
+        var provider = new ExchangeApi.Composition.Providers.Credentials.AgeEncryptedFileApiCredentialProvider(
+            credentialFilePath,
+            "bitflyer",
+            ageSecretKeyPath);
+
+        return provider.Get(AccountId.ParseOrThrow(DefaultAccountId));
+    }
 
     public static BitflyerLivePostOrder GetPostOrder()
     {
@@ -139,6 +179,49 @@ internal static class BitflyerLiveSettings
         (value.Equals("1", StringComparison.OrdinalIgnoreCase) ||
          value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
          value.Equals("yes", StringComparison.OrdinalIgnoreCase));
+
+    private static bool HasAuthenticatedCredentialSource()
+    {
+        var directApiKey = Environment.GetEnvironmentVariable(ApiKeyEnv);
+        var directApiSecret = Environment.GetEnvironmentVariable(ApiSecretEnv);
+        if (!string.IsNullOrWhiteSpace(directApiKey) &&
+            !string.IsNullOrWhiteSpace(directApiSecret))
+        {
+            return true;
+        }
+
+        var (credentialFilePath, ageSecretKeyPath) = ResolveCredentialPaths();
+        return credentialFilePath is not null && ageSecretKeyPath is not null;
+    }
+
+    private static (string? CredentialFilePath, string? AgeSecretKeyPath) ResolveCredentialPaths()
+    {
+        var credentialFilePath = Environment.GetEnvironmentVariable(CredentialFilePathEnv);
+        var ageSecretKeyPath = Environment.GetEnvironmentVariable(AgeSecretKeyPathEnv);
+
+        if (!string.IsNullOrWhiteSpace(credentialFilePath) ||
+            !string.IsNullOrWhiteSpace(ageSecretKeyPath))
+        {
+            return (
+                NormalizeExistingPath(credentialFilePath),
+                NormalizeExistingPath(ageSecretKeyPath));
+        }
+
+        return (
+            File.Exists(DefaultCredentialFilePath) ? DefaultCredentialFilePath : null,
+            File.Exists(DefaultAgeSecretKeyPath) ? DefaultAgeSecretKeyPath : null);
+    }
+
+    private static string? NormalizeExistingPath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return null;
+        }
+
+        var trimmed = path.Trim();
+        return File.Exists(trimmed) ? trimmed : null;
+    }
 }
 
 internal sealed record BitflyerLivePostOrder(

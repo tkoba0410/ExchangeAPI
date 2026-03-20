@@ -124,6 +124,7 @@
 * `docs/process/templates/README.md`
 * `docs/process/revision-history.md`
 * `stage9.md`
+* `stage10.md`
 * `docs/archive/document-plan.md`
 * `docs/reference/utilities.md`
 

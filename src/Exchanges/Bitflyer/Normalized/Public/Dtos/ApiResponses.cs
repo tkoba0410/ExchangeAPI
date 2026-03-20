@@ -9,12 +9,22 @@ public sealed record GetMarketsItem(MarketNormalized Value);
 public sealed record GetMarketsResponse(IReadOnlyList<GetMarketsItem> Items);
 
 public sealed record GetBoardResponse(
+    decimal MidPrice,
     IReadOnlyList<OrderBookLevelNormalized> Bids,
     IReadOnlyList<OrderBookLevelNormalized> Asks);
 public sealed record GetTickerResponse(
     ProductCode ProductCode,
-    decimal LastTradedPrice,
     DateTimeOffset Timestamp,
+    long TickId,
+    decimal BestBid,
+    decimal BestAsk,
+    decimal BestBidSize,
+    decimal BestAskSize,
+    decimal TotalBidDepth,
+    decimal TotalAskDepth,
+    decimal LastTradedPrice,
+    decimal Volume,
+    decimal VolumeByProduct,
     JsonElement RawSnapshot,
     IReadOnlyDictionary<FreeText, JsonElement> Extras);
 

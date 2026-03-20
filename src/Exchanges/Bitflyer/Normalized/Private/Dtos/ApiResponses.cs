@@ -66,5 +66,5 @@ public sealed record GetPositionsResponse(IReadOnlyList<GetPositionsItem> Items)
 
 public sealed record GetCollateralHistoryResponse(FreeText RawJson);
 public sealed record GetTradingCommissionResponse(
-    ProductCode ProductCode,
+    ProductCode? ProductCode,
     decimal? CommissionRate);

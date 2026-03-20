@@ -5,16 +5,20 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
 public sealed record OpenOrder(
-    Symbol Symbol,
+    long Id,
+    ProductCode ProductCode,
     Side Side,
     OrderType OrderType,
     Size Size,
+    Price? AveragePrice,
+    FreeText? Status,
+    DateTimeOffset OrderedAt,
+    DateTimeOffset ExpireDate,
     Size OutstandingSize,
+    Size CancelSize,
     Size ExecutedSize,
     Price? Price,
-    DateTimeOffset? OrderedAt = null,
-    DateTimeOffset? UpdatedAt = null,
-    Price? StopPrice = null,
-    FreeText? Status = null,
+    decimal TotalCommission,
+    FreeText? TimeInForce = null,
     ExchangeOrderId? ExchangeOrderId = null,
     AcceptanceId? AcceptanceId = null);

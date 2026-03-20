@@ -50,6 +50,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             Assert.Single(result);
             var order = result[0];
             Assert.Equal(OrderId.ParseOrThrow("JRF-1"), order.OrderId);
+            Assert.Equal(new Symbol("BTC/JPY"), order.Market);
             Assert.Equal(Side.Buy, order.Side);
             Assert.Equal(OrdersOrderType.Limit, order.OrderType);
             Assert.Equal(new Size(0.1m), order.Size);
@@ -180,6 +181,42 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
             Assert.Equal(1, ok.Response.RequestedLimit);
             Assert.Equal(1, ok.Response.AppliedLimit);
             Assert.Equal(1, ok.Response.ReturnedCount);
+        }
+
+        [Fact]
+        public async Task GetExecutionsPrivateAsync_MapsExecutionIdAndRequestedMarket()
+        {
+            var rawTicker = new RawPublicDtos.GetTickerResponse();
+            var executions = new[]
+            {
+                new RawPrivateDtos.GetExecutionsPrivateItem
+                {
+                    Id = 42,
+                    ProductCode = "BTC_JPY",
+                    Side = "BUY",
+                    Price = 100m,
+                    Size = 0.1m,
+                    ExecDate = DateTimeOffset.UtcNow
+                }
+            };
+
+            var fakePrivate = new FakeBitflyerPrivateApi(
+                Array.Empty<RawPrivateDtos.GetBalanceItem>(),
+                executions: executions);
+            var fakeTrading = new FakeBitflyerPrivateTradingApi(new RawPrivateDtos.SendChildOrderResponse());
+            var raw = new FakeBitflyerPublicApi(
+                rawTicker,
+                new RawPublicDtos.GetBoardResponse { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() },
+                fakePrivate,
+                fakeTrading);
+            var client = CreateClient(raw);
+
+            var call = await client.GetExecutionsPrivateAsync(new ExecutionsPrivateRequest(new Symbol("BTC/JPY")));
+            var ok = Assert.IsType<CallResult<ExecutionsPrivateResponse>.Ok>(call.Result);
+
+            var execution = Assert.Single(ok.Response.Items);
+            Assert.Equal(ExecutionId.ParseOrThrow("42"), execution.ExecutionId);
+            Assert.Equal(new Symbol("BTC/JPY"), execution.Market);
         }
 
         private static ExchangeClient CreateClient(IRawApi raw)

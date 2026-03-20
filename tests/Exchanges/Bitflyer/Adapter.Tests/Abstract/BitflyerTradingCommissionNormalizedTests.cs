@@ -24,7 +24,7 @@ public sealed class BitflyerTradingCommissionNormalizedTests
         var call = await api.GetTradingCommissionCallAsync(new Symbol("BTC/JPY"));
         var ok = Assert.IsType<CallResult<GetTradingCommissionResponse>.Ok>(call.Result);
 
-        Assert.Equal(ProductCode.ParseOrThrow("BTC_JPY"), ok.Response.ProductCode);
+        Assert.Null(ok.Response.ProductCode);
         Assert.Equal(0.15m, ok.Response.CommissionRate);
     }
 
@@ -61,5 +61,23 @@ public sealed class BitflyerTradingCommissionNormalizedTests
         var ok = Assert.IsType<CallResult<GetTradingCommissionResponse>.Ok>(call.Result);
 
         Assert.Null(ok.Response.CommissionRate);
+    }
+
+    [Fact]
+    public async Task NormalizeTradingCommission_ProductCodeInPayload_IsPreserved()
+    {
+        var privateApi = new FakeBitflyerPrivateApi(
+            response: Array.Empty<RawPrivateDtos.GetBalanceItem>(),
+            tradingCommissionJson: "{\"product_code\":\"BTC_JPY\",\"commission_rate\":0.15}");
+        var api = BitflyerTestHelpers.CreateNormalizedApi(
+            new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" },
+            BitflyerTestHelpers.CreateResolver(),
+            privateApi: privateApi);
+
+        var call = await api.GetTradingCommissionCallAsync(new Symbol("BTC/JPY"));
+        var ok = Assert.IsType<CallResult<GetTradingCommissionResponse>.Ok>(call.Result);
+
+        Assert.Equal(ProductCode.ParseOrThrow("BTC_JPY"), ok.Response.ProductCode);
+        Assert.Equal(0.15m, ok.Response.CommissionRate);
     }
 }

@@ -78,8 +78,17 @@ internal sealed class NormalizedPublicApi
 
                 return MapResult<GetTickerResponse>.Ok(new GetTickerResponse(
                     ticker!.ProductCode,
-                    ticker.LastTradedPrice,
                     ticker.Timestamp,
+                    ticker.TickId,
+                    ticker.BestBid,
+                    ticker.BestAsk,
+                    ticker.BestBidSize,
+                    ticker.BestAskSize,
+                    ticker.TotalBidDepth,
+                    ticker.TotalAskDepth,
+                    ticker.LastTradedPrice,
+                    ticker.Volume,
+                    ticker.VolumeByProduct,
                     ticker.RawSnapshot,
                     ticker.Extras));
             });
@@ -107,6 +116,7 @@ internal sealed class NormalizedPublicApi
                 }
 
                 return MapResult<GetBoardResponse>.Ok(new GetBoardResponse(
+                    orderBook!.MidPrice,
                     orderBook!.Bids,
                     orderBook.Asks));
             });

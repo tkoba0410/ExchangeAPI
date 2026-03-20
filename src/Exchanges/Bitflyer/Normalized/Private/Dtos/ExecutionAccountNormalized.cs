@@ -5,12 +5,10 @@ using ExchangeApi.Primitives.DomainCommon.Types;
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
 public sealed record ExecutionAccountNormalized(
-    Symbol Symbol,
-    OrderId OrderId,
+    long Id,
+    ProductCode ProductCode,
     Side Side,
     Price Price,
     Size Size,
     DateTimeOffset ExecutedAt,
-    decimal? Commission = null,
-    decimal? Pnl = null,
-    FreeText? Liquidity = null);
+    AcceptanceId? ChildOrderAcceptanceId = null);

@@ -64,8 +64,17 @@ internal static class TickerNormalizer
         var snapshot = ExtractSnapshot(rawJson ?? Serialize(wire));
         return new TickerNormalized(
             ProductCode: ProductCode.ParseNormalized(wire.ProductCode),
-            LastTradedPrice: wire.LastTradedPrice,
             Timestamp: wire.Timestamp,
+            TickId: wire.TickId,
+            BestBid: wire.BestBid,
+            BestAsk: wire.BestAsk,
+            BestBidSize: wire.BestBidSize,
+            BestAskSize: wire.BestAskSize,
+            TotalBidDepth: wire.TotalBidDepth,
+            TotalAskDepth: wire.TotalAskDepth,
+            LastTradedPrice: wire.LastTradedPrice,
+            Volume: wire.Volume,
+            VolumeByProduct: wire.VolumeByProduct,
             RawSnapshot: snapshot,
             Extras: new Dictionary<FreeText, JsonElement>());
     }

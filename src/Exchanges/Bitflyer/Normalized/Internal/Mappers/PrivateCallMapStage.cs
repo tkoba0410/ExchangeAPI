@@ -164,7 +164,6 @@ internal static class PrivateCallMapStage
     }
 
     public static bool TryMapAccountExecutions(
-        Symbol symbol,
         IReadOnlyList<RawPrivateDtos.GetExecutionsPrivateItem> rawExecutions,
         out IReadOnlyList<ExecutionAccountNormalized>? normalized,
         out CallError? error)
@@ -186,15 +185,15 @@ internal static class PrivateCallMapStage
             }
 
             mapped.Add(new ExecutionAccountNormalized(
-                Symbol: symbol,
-                OrderId: new OrderId(execution.Id.ToString(CultureInfo.InvariantCulture)),
+                Id: execution.Id,
+                ProductCode: ProductCode.ParseNormalized(execution.ProductCode),
                 Side: side,
                 Price: new Price(execution.Price),
                 Size: new Size(execution.Size),
                 ExecutedAt: execution.ExecDate,
-                Commission: null,
-                Pnl: null,
-                Liquidity: null));
+                ChildOrderAcceptanceId: AcceptanceId.TryParse(execution.ChildOrderAcceptanceId, out var acceptanceId)
+                    ? acceptanceId
+                    : null));
         }
 
         normalized = mapped.ToArray();

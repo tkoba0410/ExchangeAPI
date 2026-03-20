@@ -141,7 +141,7 @@ public sealed class BitflyerNormalizedPrivateGetLiveTests
         var call = await api.GetChildOrdersCallAsync(BitflyerLiveSettings.DefaultSymbol);
         var response = BitflyerLiveAssert.RequireOk(call);
 
-        Assert.All(response.Items, item => Assert.Equal(BitflyerLiveSettings.DefaultSymbol, item.Value.Symbol));
+        Assert.All(response.Items, item => Assert.Equal(BitflyerLiveSettings.DefaultProductCode, item.Value.ProductCode));
     }
 
     [BitflyerLiveAuthFact]
@@ -155,6 +155,11 @@ public sealed class BitflyerNormalizedPrivateGetLiveTests
         var call = await api.GetExecutionsPrivateCallAsync(BitflyerLiveSettings.DefaultSymbol);
         var response = BitflyerLiveAssert.RequireOk(call);
 
-        Assert.All(response.Items, item => Assert.Equal(BitflyerLiveSettings.DefaultSymbol, item.Value.Symbol));
+        Assert.All(response.Items, item =>
+        {
+            Assert.True(item.Value.Id > 0L);
+            Assert.True(item.Value.Price.Value > 0m);
+            Assert.True(item.Value.Size.Value > 0m);
+        });
     }
 }

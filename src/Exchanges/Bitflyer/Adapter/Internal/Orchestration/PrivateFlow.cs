@@ -125,7 +125,7 @@ internal sealed class PrivateFlow
         OrdersRequest request,
         GetChildOrdersResponse orders)
     {
-        var items = orders.Items.Select(x => MapSnapshot(x.Value)).ToList();
+        var items = orders.Items.Select(x => MapSnapshot(request.Symbol, x.Value)).ToList();
         var (requestedLimit, appliedLimit) = GetLimits(request);
         items = items.Take(appliedLimit).ToList();
         var (returnedCount, limitClamped, completeness, reason, asOf) = BuildMeta(
@@ -153,8 +153,8 @@ internal sealed class PrivateFlow
     {
         var items = executions.Items.Select(e => new ExecutionsPrivateItem(
             Timestamp: e.Value.ExecutedAt,
-            ExecutionId: ExecutionId.ParseOrThrow(e.Value.OrderId.ToString()),
-            Market: e.Value.Symbol,
+            ExecutionId: ExecutionId.ParseOrThrow(e.Value.Id.ToString()),
+            Market: request.Symbol,
             Side: e.Value.Side,
             Price: e.Value.Price,
             Size: e.Value.Size)).ToList();
@@ -180,9 +180,9 @@ internal sealed class PrivateFlow
             AsOf: asOf);
     }
 
-    private static OrdersItem MapSnapshot(NormalizedOpenOrder order)
+    private static OrdersItem MapSnapshot(Symbol symbol, NormalizedOpenOrder order)
     {
-        var createdAt = order.OrderedAt ?? DateTimeOffset.UtcNow;
+        var createdAt = order.OrderedAt;
         var orderType = order.OrderType switch
         {
             OrderType.Limit => OrdersOrderType.Limit,
@@ -193,7 +193,7 @@ internal sealed class PrivateFlow
         return new OrdersItem(
             CreatedAt: createdAt,
             OrderId: ToOrderId(order.AcceptanceId, order.ExchangeOrderId),
-            Market: order.Symbol,
+            Market: symbol,
             Side: order.Side,
             OrderType: orderType,
             Price: order.Price,

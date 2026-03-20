@@ -8,7 +8,16 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Public.Dtos;
 
 public sealed record TickerNormalized(
     ProductCode ProductCode,
-    decimal LastTradedPrice,
     DateTimeOffset Timestamp,
+    long TickId,
+    decimal BestBid,
+    decimal BestAsk,
+    decimal BestBidSize,
+    decimal BestAskSize,
+    decimal TotalBidDepth,
+    decimal TotalAskDepth,
+    decimal LastTradedPrice,
+    decimal Volume,
+    decimal VolumeByProduct,
     JsonElement RawSnapshot,
     IReadOnlyDictionary<FreeText, JsonElement> Extras) : ILosslessNormalized;

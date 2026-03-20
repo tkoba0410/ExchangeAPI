@@ -270,17 +270,21 @@ internal sealed class NormalizedPrivateApi
                     }
 
                     mapped.Add(new OpenOrder(
-                        Symbol: symbol,
+                        Id: o.Id,
+                        ProductCode: ProductCode.ParseNormalized(o.ProductCode),
                         Side: side,
                         OrderType: mappedOrderType,
                         Size: new Size(o.Size),
+                        AveragePrice: o.AveragePrice == 0 ? null : new Price(o.AveragePrice),
+                        Status: FreeText.TryParse(o.ChildOrderStatusState, out var status) ? status : null,
+                        OrderedAt: o.ChildOrderDate,
+                        ExpireDate: o.ExpireDate,
                         OutstandingSize: new Size(o.OutstandingSize),
+                        CancelSize: new Size(o.CancelSize),
                         ExecutedSize: new Size(o.ExecutedSize),
                         Price: o.Price == 0 ? null : new Price(o.Price),
-                        OrderedAt: o.ChildOrderDate,
-                        UpdatedAt: null,
-                        StopPrice: null,
-                        Status: FreeText.Parse(o.ChildOrderStatusState),
+                        TotalCommission: o.TotalCommission,
+                        TimeInForce: FreeText.TryParse(o.TimeInForce, out var timeInForce) ? timeInForce : null,
                         ExchangeOrderId: exchangeOrderId,
                         AcceptanceId: acceptanceId));
                 }
@@ -852,7 +856,7 @@ internal sealed class NormalizedPrivateApi
             Component(EndpointIds.GetExecutionsPrivate),
             raw =>
             {
-                if (!PrivateCallMapStage.TryMapAccountExecutions(symbol, raw, out var executions, out var error))
+                if (!PrivateCallMapStage.TryMapAccountExecutions(raw, out var executions, out var error))
                 {
                     return MapResult<GetExecutionsPrivateResponse>.Fail(error!);
                 }
@@ -907,7 +911,7 @@ internal sealed class NormalizedPrivateApi
             Component(EndpointIds.GetTradingCommission),
             raw =>
             {
-                if (!TryParseTradingCommission(raw.RawJson, productCode, out var parsed, out var error))
+                if (!TryParseTradingCommission(raw.RawJson, out var parsed, out var error))
                 {
                     return MapResult<GetTradingCommissionResponse>.Fail(error!);
                 }
@@ -920,7 +924,6 @@ internal sealed class NormalizedPrivateApi
 
     private static bool TryParseTradingCommission(
         string? rawJson,
-        ProductCode productCode,
         out TradingCommissionNormalized? normalized,
         out CallError? error)
     {
@@ -955,7 +958,7 @@ internal sealed class NormalizedPrivateApi
         }
 
         normalized = new TradingCommissionNormalized(
-            ProductCode: parsedProductCode.IsEmpty ? productCode : parsedProductCode,
+            ProductCode: parsedProductCode.IsEmpty ? null : parsedProductCode,
             CommissionRate: commissionRate);
         error = null;
         return true;

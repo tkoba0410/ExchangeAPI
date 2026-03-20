@@ -131,6 +131,9 @@ public sealed class BitflyerNormalizedPublicLiveTests
 
         Assert.Equal(BitflyerLiveSettings.DefaultProductCode, response.ProductCode);
         Assert.True(response.LastTradedPrice > 0m);
+        Assert.True(response.TickId > 0L);
+        Assert.True(response.BestBid > 0m);
+        Assert.True(response.BestAsk > 0m);
     }
 
     [BitflyerLiveAuthFact]
@@ -146,6 +149,7 @@ public sealed class BitflyerNormalizedPublicLiveTests
 
         Assert.True(response.Bids.Count > 0);
         Assert.True(response.Asks.Count > 0);
+        Assert.True(response.MidPrice > 0m);
     }
 
     [BitflyerLiveAuthFact]

@@ -29,6 +29,7 @@ internal static class OrderBookNormalizer
 
     private static OrderBookNormalized Build(RawPublicDtos.GetBoardResponse wire) =>
         new(
+            MidPrice: wire.MidPrice,
             Bids: (wire.Bids ?? Array.Empty<RawPublicDtos.BoardEntry>())
                 .Select(b => new OrderBookLevelNormalized(b.Price, b.Size))
                 .ToArray(),

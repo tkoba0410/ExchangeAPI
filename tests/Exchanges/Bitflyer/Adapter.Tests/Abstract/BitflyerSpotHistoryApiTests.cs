@@ -103,6 +103,44 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         }
 
         [Fact]
+        public async Task GetOrdersAsync_FallsBackToExchangeOrderId_WhenAcceptanceIdIsMissing()
+        {
+            var rawTicker = new RawPublicDtos.GetTickerResponse();
+            var childOrders = new[]
+            {
+                new RawPrivateDtos.GetChildOrdersItem
+                {
+                    ChildOrderId = "JOR-ONLY-1",
+                    ChildOrderAcceptanceId = string.Empty,
+                    ProductCode = "BTC_JPY",
+                    Side = "BUY",
+                    ChildOrderType = "LIMIT",
+                    Price = 100m,
+                    Size = 0.1m,
+                    OutstandingSize = 0.1m,
+                    ExecutedSize = 0m
+                }
+            };
+
+            var fakePrivate = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateDtos.GetBalanceItem>());
+            var fakeTrading = new FakeBitflyerPrivateTradingApi(
+                new RawPrivateDtos.SendChildOrderResponse(),
+                childOrders);
+            var raw = new FakeBitflyerPublicApi(
+                rawTicker,
+                new RawPublicDtos.GetBoardResponse { Bids = Array.Empty<RawPublicDtos.BoardEntry>(), Asks = Array.Empty<RawPublicDtos.BoardEntry>() },
+                fakePrivate,
+                fakeTrading);
+            var client = CreateClient(raw);
+
+            var call = await client.GetOrdersAsync(new OrdersRequest(new Symbol("BTC/JPY")));
+            var ok = Assert.IsType<CallResult<OrdersResponse>.Ok>(call.Result);
+
+            var order = Assert.Single(ok.Response.Items);
+            Assert.Equal(OrderId.ParseOrThrow("JOR-ONLY-1"), order.OrderId);
+        }
+
+        [Fact]
         public async Task GetExecutions_Limit1_SlicesItemsAndAlignsMeta()
         {
             var rawTicker = new RawPublicDtos.GetTickerResponse();

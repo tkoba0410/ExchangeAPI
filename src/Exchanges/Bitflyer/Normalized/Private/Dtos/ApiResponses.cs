@@ -8,7 +8,6 @@ using ExchangeApi.Primitives.ValueCommon.ClosedSet;
 namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
 public sealed record SendChildOrderResponse(
-    OrderKey Key,
     ExchangeOrderId? ExchangeOrderId = null,
     AcceptanceId? AcceptanceId = null);
 public sealed record CancelChildOrderResponse(bool IsSuccess);

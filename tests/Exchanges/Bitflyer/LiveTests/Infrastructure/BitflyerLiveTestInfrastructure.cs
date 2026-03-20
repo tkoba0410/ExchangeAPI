@@ -588,12 +588,11 @@ internal static class BitflyerLiveAssert
     public static async Task CancelNormalizedChildOrderAsync(
         INormalizedApi api,
         Symbol symbol,
-        OrderKey key,
         string acceptanceId,
         CancellationToken cancellationToken = default)
     {
         var cancelCall = await api
-            .CancelChildOrderCallAsync(symbol, key, cancellationToken)
+            .CancelChildOrderCallAsync(symbol, new OrderKey(OrderIdKind.AcceptanceId, acceptanceId), cancellationToken)
             .ConfigureAwait(false);
         _ = RequireOk(cancelCall);
         await WaitForNormalizedChildOrderVisibilityAsync(api, symbol, acceptanceId, shouldExist: false, cancellationToken)

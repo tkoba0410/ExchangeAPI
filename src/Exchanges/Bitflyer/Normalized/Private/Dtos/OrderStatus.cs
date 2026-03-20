@@ -5,7 +5,8 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
 public sealed record OrderStatus(
     ProductCode ProductCode,
-    OrderKey Key,
+    ExchangeOrderId? ExchangeOrderId,
+    AcceptanceId? AcceptanceId,
     OrderState Status,
     Size ExecutedSize,
     Size OutstandingSize,

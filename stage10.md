@@ -144,7 +144,19 @@ Public / Private GET の拡張候補が未完でも、
 
 ---
 
-## 10. 廃止条件（Sunset）
+## 10. 実施状況（2026-03-20）
+
+- bitFlyer 専用 live test project を追加済み
+- `Public GET` 3 本、`Private GET` 3 本、`SendChildOrder -> GetChildOrders -> CancelChildOrder` のライフサイクル試験を `Wire` / `Raw` / `Normalized` で実装済み
+- 2026-03-20 に以下で live 実行し、`21 passed / 0 failed / 0 skipped` を確認済み  
+  `EXCHANGEAPI_BITFLYER_LIVE=1 EXCHANGEAPI_BITFLYER_LIVE_ALLOW_POST=1 EXCHANGEAPI_BITFLYER_LIVE_ORDER_SIDE=BUY EXCHANGEAPI_BITFLYER_LIVE_ORDER_SIZE=0.001 EXCHANGEAPI_BITFLYER_LIVE_ORDER_PRICE=9000000 dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj --nologo --verbosity minimal`
+- live 検証で発見した本体修正として、private auth timestamp のミリ秒化、および `CancelChildOrder` 系の `200 + empty body` 成功処理を反映済み
+- normalized の child order DTO は、`OrderKey` のような派生キーを持たず、API返り値由来の `AcceptanceId` / `ExchangeOrderId` のみを保持する
+- `Contracts` 境界では、必要な場合に限って `AcceptanceId` 優先で `OrderKey` / `OrderId` を再構成する
+
+---
+
+## 11. 廃止条件（Sunset）
 
 Stage 文書（`stage*.md`）は初回リリース前の暫定文書。  
 `v1.0.0` 時点で本書を `docs/archive/` へ移動し、以後の追跡は `docs/process/revision-history.md` に統合する。

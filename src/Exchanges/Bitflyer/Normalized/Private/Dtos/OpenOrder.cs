@@ -6,7 +6,6 @@ namespace ExchangeApi.Exchanges.Bitflyer.Normalized.Private.Dtos;
 
 public sealed record OpenOrder(
     Symbol Symbol,
-    OrderKey Key,
     Side Side,
     OrderType OrderType,
     Size Size,

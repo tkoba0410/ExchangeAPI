@@ -85,9 +85,8 @@ public sealed class BitflyerNormalizedPrivatePostLiveTests
 
         var sendCall = await api.SendChildOrderCallAsync(request);
         var sendResponse = BitflyerLiveAssert.RequireOk(sendCall);
-        Assert.Equal(OrderIdKind.AcceptanceId, sendResponse.Key.Kind);
-
-        var acceptanceId = sendResponse.AcceptanceId?.Value ?? sendResponse.Key.Value;
+        var acceptanceId = sendResponse.AcceptanceId?.Value;
+        Assert.False(string.IsNullOrWhiteSpace(acceptanceId));
         try
         {
             await BitflyerLiveAssert.WaitForNormalizedChildOrderVisibilityAsync(
@@ -101,7 +100,6 @@ public sealed class BitflyerNormalizedPrivatePostLiveTests
             await BitflyerLiveAssert.CancelNormalizedChildOrderAsync(
                 api,
                 order.Symbol,
-                sendResponse.Key,
                 acceptanceId);
         }
     }

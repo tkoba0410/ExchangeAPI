@@ -92,7 +92,7 @@ internal sealed class PrivateFlow
                 OpPlaceOrder,
                 ct => _normalized.SendChildOrderCallAsync(normalizedRequest, ct),
                 ok => new OrderLimitResponse(
-                    Key: ok.Key,
+                    Key: ToOrderKey(ok.AcceptanceId, ok.ExchangeOrderId),
                     ExchangeOrderId: ok.ExchangeOrderId,
                     AcceptanceId: ok.AcceptanceId),
                 cancellationToken)
@@ -192,7 +192,7 @@ internal sealed class PrivateFlow
 
         return new OrdersItem(
             CreatedAt: createdAt,
-            OrderId: OrderId.ParseOrThrow(order.Key.Value),
+            OrderId: ToOrderId(order.AcceptanceId, order.ExchangeOrderId),
             Market: order.Symbol,
             Side: order.Side,
             OrderType: orderType,
@@ -200,6 +200,28 @@ internal sealed class PrivateFlow
             Size: order.Size,
             Status: OrdersOrderStatus.Open);
     }
+
+    private static OrderKey ToOrderKey(
+        AcceptanceId? acceptanceId,
+        ExchangeOrderId? exchangeOrderId)
+    {
+        if (acceptanceId is not null)
+        {
+            return new OrderKey(OrderIdKind.AcceptanceId, acceptanceId.Value.Value);
+        }
+
+        if (exchangeOrderId is not null)
+        {
+            return new OrderKey(OrderIdKind.ExchangeOrderId, exchangeOrderId.Value.Value);
+        }
+
+        throw new InvalidOperationException("Bitflyer normalized order is missing both acceptanceId and exchangeOrderId.");
+    }
+
+    private static OrderId ToOrderId(
+        AcceptanceId? acceptanceId,
+        ExchangeOrderId? exchangeOrderId) =>
+        OrderId.ParseOrThrow(ToOrderKey(acceptanceId, exchangeOrderId).Value);
 
     private static (int RequestedLimit, int AppliedLimit) GetLimits(OrdersRequest request)
     {

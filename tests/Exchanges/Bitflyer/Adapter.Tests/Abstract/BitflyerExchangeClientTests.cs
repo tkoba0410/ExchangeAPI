@@ -163,6 +163,30 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Adapter.Tests.Abstract
         }
 
         [Fact]
+        public async Task OrderLimitAsync_ReturnsAcceptanceIdBackedContractKey()
+        {
+            var rawTicker = new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" };
+            var accountApi = new FakeBitflyerPrivateApi(Array.Empty<RawPrivateDtos.GetBalanceItem>());
+            var tradingApi = new FakeBitflyerPrivateTradingApi(
+                new RawPrivateDtos.SendChildOrderResponse { ChildOrderAcceptanceId = "JRF-20250320-000001" });
+            var rawApi = new FakeBitflyerPublicApi(rawTicker, privateApi: accountApi, tradingApi: tradingApi);
+            var client = CreateClient(rawApi);
+
+            var call = await client.OrderLimitAsync(
+                new OrderLimitRequest(
+                    Symbol: new Symbol("BTC/JPY"),
+                    Side: Side.Buy,
+                    Price: new Price(100m),
+                    Size: new Size(0.01m)));
+            var ok = Assert.IsType<CallResult<OrderLimitResponse>.Ok>(call.Result);
+
+            Assert.Equal(OrderIdKind.AcceptanceId, ok.Response.Key.Kind);
+            Assert.Equal("JRF-20250320-000001", ok.Response.Key.Value);
+            Assert.Equal(new AcceptanceId("JRF-20250320-000001"), ok.Response.AcceptanceId);
+            Assert.Null(ok.Response.ExchangeOrderId);
+        }
+
+        [Fact]
         public async Task CancelOrderAsync_NullResponse_Throws()
         {
             var rawTicker = new RawPublicDtos.GetTickerResponse { ProductCode = "BTC_JPY" };

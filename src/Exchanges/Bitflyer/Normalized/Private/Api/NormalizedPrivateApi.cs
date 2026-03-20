@@ -103,7 +103,6 @@ internal sealed class NormalizedPrivateApi
             "Bitflyer.CreateChildOrder",
             ok => MapResult<SendChildOrderResponse>.Ok(
                 new SendChildOrderResponse(
-                    new OrderKey(OrderIdKind.AcceptanceId, ok.ChildOrderAcceptanceId),
                     AcceptanceId: new AcceptanceId(ok.ChildOrderAcceptanceId))));
     }
 
@@ -251,13 +250,9 @@ internal sealed class NormalizedPrivateApi
                         : (ExchangeOrderId?)null;
                     if (acceptanceId is null && exchangeOrderId is null)
                     {
-                            return MapResult<GetChildOrdersResponse>.Fail(
+                        return MapResult<GetChildOrdersResponse>.Fail(
                             new CallError(CallErrorKind.Mapping, "bitFlyer order is missing both acceptanceId and exchangeOrderId."));
                     }
-
-                    var key = acceptanceId is not null
-                        ? new OrderKey(OrderIdKind.AcceptanceId, acceptanceId.Value.ToString())
-                        : new OrderKey(OrderIdKind.ExchangeOrderId, exchangeOrderId!.Value.ToString());
 
                     if (!CommonMapper.TryMapSide(o.Side, out var side, out var sideError))
                     {
@@ -276,7 +271,6 @@ internal sealed class NormalizedPrivateApi
 
                     mapped.Add(new OpenOrder(
                         Symbol: symbol,
-                        Key: key,
                         Side: side,
                         OrderType: mappedOrderType,
                         Size: new Size(o.Size),

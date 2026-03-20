@@ -114,9 +114,23 @@ Private POST は単発確認ではなく、次のライフサイクル試験と�
 
 - bitFlyer live test 用の専用 test project
 - `Wire` / `Raw` / `Normalized` ごとに実行可能な live test セット
-- `Public GET` / `Private GET` / `Private POST` を分離実行できるフィルタまたは同等の仕組み
+- `Public GET` / `Private GET` / `Private POST` を `Trait(Category / Flow / Layer)` で分離実行できる仕組み
 - live test 実行に必要な環境変数、資格情報導線、実行手順の文書
 - 実行結果を保存できる証跡フォーマット
+  - `docs/process/reviews/templates/STAGE10-LIVE-EVIDENCE.md`
+
+### 実行例
+
+- 全 live test
+  `dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj --nologo --verbosity minimal`
+- `Public GET` のみ
+  `dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj --filter "Category=Live&Flow=PublicGet"`
+- `Private GET` のみ
+  `dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj --filter "Category=Live&Flow=PrivateGet"`
+- `Private POST` のみ
+  `dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj --filter "Category=Live&Flow=PrivatePost"`
+- `Normalized` 層のみ
+  `dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj --filter "Category=Live&Layer=Normalized"`
 
 ---
 
@@ -148,10 +162,13 @@ Public / Private GET の拡張候補が未完でも、
 
 - bitFlyer 専用 live test project を追加済み
 - `Public GET` 3 本、`Private GET` 3 本、`SendChildOrder -> GetChildOrders -> CancelChildOrder` のライフサイクル試験を `Wire` / `Raw` / `Normalized` で実装済み
+- 実行単位は `Trait(Category=Live, Flow=PublicGet|PrivateGet|PrivatePost, Layer=Wire|Raw|Normalized)` で分離可能
 - 2026-03-20 に以下で live 実行し、`21 passed / 0 failed / 0 skipped` を確認済み  
   `EXCHANGEAPI_BITFLYER_LIVE=1 EXCHANGEAPI_BITFLYER_LIVE_ALLOW_POST=1 EXCHANGEAPI_BITFLYER_LIVE_ORDER_SIDE=BUY EXCHANGEAPI_BITFLYER_LIVE_ORDER_SIZE=0.001 EXCHANGEAPI_BITFLYER_LIVE_ORDER_PRICE=9000000 dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj --nologo --verbosity minimal`
 - live 検証で発見した本体修正として、private auth timestamp のミリ秒化、および `CancelChildOrder` 系の `200 + empty body` 成功処理を反映済み
+- live test の認証導線は direct env と既存 age 資格情報運用の両方をサポートし、`~/.config/exchangeapi/...` を既定値として使える
 - normalized の child order DTO は、`OrderKey` のような派生キーを持たず、API返り値由来の `AcceptanceId` / `ExchangeOrderId` のみを保持する
+- normalized の DTO は child order だけでなく、`Ticker` / `Board` / `GetExecutionsPrivate` / `GetTradingCommission` についても API返り値ベースへ整理済み
 - `Contracts` 境界では、必要な場合に限って `AcceptanceId` 優先で `OrderKey` / `OrderId` を再構成する
 
 ---

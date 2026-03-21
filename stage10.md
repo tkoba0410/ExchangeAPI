@@ -107,6 +107,7 @@ Private POST は単発確認ではなく、次のライフサイクル試験と�
 - `SendChildOrder` 後に `CancelChildOrder` できなかった注文は blocker とし、放置して close しない
 - live test は明示 opt-in 実行とし、通常の `dotnet test` / CI 既定経路には混ぜない
 - 実行ログには API key / secret / 秘密鍵 / 平文資格情報を残さない
+- 実行ログはサニタイズ済み JSONL として保存し、order/account 系 identifier は pseudonymize する
 
 ---
 
@@ -118,6 +119,9 @@ Private POST は単発確認ではなく、次のライフサイクル試験と�
 - live test 実行に必要な環境変数、資格情報導線、実行手順の文書
 - 実行結果を保存できる証跡フォーマット
   - `docs/process/reviews/templates/STAGE10-LIVE-EVIDENCE.md`
+- 自動保存される sanitized live log
+  - `artifacts/live-logs/bitflyer/<run-id>/run.json`
+  - `artifacts/live-logs/bitflyer/<run-id>/events.jsonl`
 
 ### 実行例
 
@@ -142,6 +146,7 @@ Private POST は単発確認ではなく、次のライフサイクル試験と�
 - `SendChildOrder` / `CancelChildOrder` のライフサイクル試験が成功する
 - ライフサイクル試験後に未取消の `ACTIVE` 注文が残らない
 - 失敗時ログで endpoint / layer / HTTP status / exchange error を追跡できる
+- 実行ごとの sanitized request / response / error ログ保存先を証跡へ残せる
 - 資格情報運用と実行手順が文書化されている
 - `Contracts` が本段階では未着手であることが文書上明示されている
 
@@ -167,6 +172,7 @@ Public / Private GET の拡張候補が未完でも、
   `EXCHANGEAPI_BITFLYER_LIVE=1 EXCHANGEAPI_BITFLYER_LIVE_ALLOW_POST=1 EXCHANGEAPI_BITFLYER_LIVE_ORDER_SIDE=BUY EXCHANGEAPI_BITFLYER_LIVE_ORDER_SIZE=0.001 EXCHANGEAPI_BITFLYER_LIVE_ORDER_PRICE=9000000 dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj --nologo --verbosity minimal`
 - live 検証で発見した本体修正として、private auth timestamp のミリ秒化、および `CancelChildOrder` 系の `200 + empty body` 成功処理を反映済み
 - live test の認証導線は direct env と既存 age 資格情報運用の両方をサポートし、`~/.config/exchangeapi/...` を既定値として使える
+- live test 実行時は sanitized request / response / error ログを `artifacts/live-logs/bitflyer/<run-id>/` へ自動保存する
 - normalized の child order DTO は、`OrderKey` のような派生キーを持たず、API返り値由来の `AcceptanceId` / `ExchangeOrderId` のみを保持する
 - normalized の DTO は child order だけでなく、`Ticker` / `Board` / `GetExecutionsPrivate` / `GetTradingCommission` についても API返り値ベースへ整理済み
 - `Contracts` 境界では、必要な場合に限って `AcceptanceId` 優先で `OrderKey` / `OrderId` を再構成する

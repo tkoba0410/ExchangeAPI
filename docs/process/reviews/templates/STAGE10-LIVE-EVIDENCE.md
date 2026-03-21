@@ -100,6 +100,13 @@ dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.cspro
 ## 6. 証跡
 
 * 実行ログ:
+  * 自動ログ root:
+  * `run.json`:
+  * `events.jsonl`:
+  * サニタイズ方針:
+    * auth 系: mask
+    * order/account 系 identifier: pseudonymize
+    * private balance/collateral 系数値: mask
 * 関連 test project:
   * `tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj`
 * 関連 stage 文書:

@@ -42,9 +42,15 @@ internal static class BitflyerLiveSettings
 
     public static string DefaultAccountId => GetOptional(AccountIdEnv, "default");
 
+    public static bool IsLiveEnabled() =>
+        IsTruthy(Environment.GetEnvironmentVariable(LiveEnabledEnv));
+
+    public static bool IsPostEnabled() =>
+        IsTruthy(Environment.GetEnvironmentVariable(AllowPostEnv));
+
     public static string? GetPublicSkipReason()
     {
-        if (IsTruthy(Environment.GetEnvironmentVariable(LiveEnabledEnv)))
+        if (IsLiveEnabled())
         {
             return null;
         }
@@ -78,7 +84,7 @@ internal static class BitflyerLiveSettings
             return authenticatedSkip;
         }
 
-        if (!IsTruthy(Environment.GetEnvironmentVariable(AllowPostEnv)))
+        if (!IsPostEnabled())
         {
             return $"Set {AllowPostEnv}=1 to enable bitFlyer live order placement/cancel tests.";
         }
@@ -155,6 +161,22 @@ internal static class BitflyerLiveSettings
         }
 
         return new BitflyerLivePostOrder(symbol, productCode, side, size, price);
+    }
+
+    public static string DescribeCredentialSource()
+    {
+        var directApiKey = Environment.GetEnvironmentVariable(ApiKeyEnv);
+        var directApiSecret = Environment.GetEnvironmentVariable(ApiSecretEnv);
+        if (!string.IsNullOrWhiteSpace(directApiKey) &&
+            !string.IsNullOrWhiteSpace(directApiSecret))
+        {
+            return "direct-env";
+        }
+
+        var (credentialFilePath, ageSecretKeyPath) = ResolveCredentialPaths();
+        return credentialFilePath is not null && ageSecretKeyPath is not null
+            ? "age-credential-store"
+            : "none";
     }
 
     private static string GetOptional(string envName, string fallback)
@@ -263,7 +285,8 @@ internal static class BitflyerLiveClientFactory
     public static IRestClient CreatePublicRestClient() =>
         RestClientFactory.Create(
             BaseUri,
-            new TransportConfig.ManagedHttp(Timeout));
+            new TransportConfig.ManagedHttp(Timeout),
+            observer: BitflyerLiveLogging.Observer);
 
     public static IRestClient CreatePrivateRestClient()
     {
@@ -273,7 +296,8 @@ internal static class BitflyerLiveClientFactory
         return RestClientFactory.Create(
             BaseUri,
             new TransportConfig.ManagedHttp(Timeout),
-            signer: signer);
+            signer: signer,
+            observer: BitflyerLiveLogging.Observer);
     }
 
     public static IRawApi CreateRawApi(IRestClient restClient)
@@ -289,6 +313,7 @@ internal static class BitflyerLiveClientFactory
         {
             Credentials = credentials,
             TransportConfig = new TransportConfig.ManagedHttp(Timeout),
+            Observer = BitflyerLiveLogging.Observer,
         });
     }
 }
@@ -386,7 +411,8 @@ internal static class BitflyerLiveAssert
             CallResult<TResponse>.Ok ok => ok.Response,
             CallResult<TResponse>.Err err => throw new XunitException(
                 $"Live call failed. endpoint={call.Meta.EndpointId}, layer={call.Meta.Layer}, component={call.Meta.Component}, " +
-                $"kind={err.Error.Kind}, http={err.Error.HttpStatus}, message={err.Error.Message}, body={Truncate(err.Error.BodySnippet)}"),
+                $"kind={err.Error.Kind}, http={err.Error.HttpStatus}, message={err.Error.Message}, body={Truncate(err.Error.BodySnippet)}, " +
+                $"log_dir={BitflyerLiveLogging.LogDirectory}"),
             _ => throw new XunitException("Unexpected call result type.")
         };
     }
@@ -399,12 +425,14 @@ internal static class BitflyerLiveAssert
         if (response.StatusCode != 200)
         {
             throw new XunitException(
-                $"Expected HTTP 200. endpoint={call.Request.EndpointId}, status={response.StatusCode}, body={Truncate(response.Json)}");
+                $"Expected HTTP 200. endpoint={call.Request.EndpointId}, status={response.StatusCode}, body={Truncate(response.Json)}, " +
+                $"log_dir={BitflyerLiveLogging.LogDirectory}");
         }
 
         if (requireJsonBody && string.IsNullOrWhiteSpace(response.Json))
         {
-            throw new XunitException($"Expected a JSON payload for endpoint={call.Request.EndpointId}.");
+            throw new XunitException(
+                $"Expected a JSON payload for endpoint={call.Request.EndpointId}. log_dir={BitflyerLiveLogging.LogDirectory}");
         }
 
         return response;
@@ -505,7 +533,8 @@ internal static class BitflyerLiveAssert
         }
 
         throw new XunitException(
-            $"Timed out waiting for wire child order visibility to become {shouldExist}. acceptanceId={acceptanceId}");
+            $"Timed out waiting for wire child order visibility to become {shouldExist}. acceptanceId={acceptanceId}, " +
+            $"log_dir={BitflyerLiveLogging.LogDirectory}");
     }
 
     public static async Task WaitForRawChildOrderVisibilityAsync(
@@ -530,7 +559,8 @@ internal static class BitflyerLiveAssert
         }
 
         throw new XunitException(
-            $"Timed out waiting for raw child order visibility to become {shouldExist}. acceptanceId={acceptanceId}");
+            $"Timed out waiting for raw child order visibility to become {shouldExist}. acceptanceId={acceptanceId}, " +
+            $"log_dir={BitflyerLiveLogging.LogDirectory}");
     }
 
     public static async Task WaitForNormalizedChildOrderVisibilityAsync(
@@ -554,7 +584,8 @@ internal static class BitflyerLiveAssert
         }
 
         throw new XunitException(
-            $"Timed out waiting for normalized child order visibility to become {shouldExist}. acceptanceId={acceptanceId}");
+            $"Timed out waiting for normalized child order visibility to become {shouldExist}. acceptanceId={acceptanceId}, " +
+            $"log_dir={BitflyerLiveLogging.LogDirectory}");
     }
 
     public static async Task CancelWireChildOrderAsync(

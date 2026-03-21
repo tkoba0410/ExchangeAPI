@@ -10,6 +10,7 @@ public sealed class BitflyerWirePublicLiveTests
     [Trait("Layer", "Wire")]
     public async Task GetTicker_Returns200AndTickerFields()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PublicGet", "Wire", nameof(GetTicker_Returns200AndTickerFields));
         using var restClient = BitflyerLiveClientFactory.CreatePublicRestClient();
         var wire = new WireTransport(restClient);
 
@@ -27,6 +28,7 @@ public sealed class BitflyerWirePublicLiveTests
     [Trait("Layer", "Wire")]
     public async Task GetBoard_Returns200AndBookLevels()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PublicGet", "Wire", nameof(GetBoard_Returns200AndBookLevels));
         using var restClient = BitflyerLiveClientFactory.CreatePublicRestClient();
         var wire = new WireTransport(restClient);
 
@@ -44,6 +46,7 @@ public sealed class BitflyerWirePublicLiveTests
     [Trait("Layer", "Wire")]
     public async Task GetExecutionsPublic_Returns200AndArrayPayload()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PublicGet", "Wire", nameof(GetExecutionsPublic_Returns200AndArrayPayload));
         using var restClient = BitflyerLiveClientFactory.CreatePublicRestClient();
         var wire = new WireTransport(restClient);
 
@@ -64,6 +67,7 @@ public sealed class BitflyerRawPublicLiveTests
     [Trait("Layer", "Raw")]
     public async Task GetTicker_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PublicGet", "Raw", nameof(GetTicker_ReturnsOkResponse));
         using var restClient = BitflyerLiveClientFactory.CreatePublicRestClient();
         var raw = BitflyerLiveClientFactory.CreateRawApi(restClient);
 
@@ -81,6 +85,7 @@ public sealed class BitflyerRawPublicLiveTests
     [Trait("Layer", "Raw")]
     public async Task GetBoard_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PublicGet", "Raw", nameof(GetBoard_ReturnsOkResponse));
         using var restClient = BitflyerLiveClientFactory.CreatePublicRestClient();
         var raw = BitflyerLiveClientFactory.CreateRawApi(restClient);
 
@@ -98,6 +103,7 @@ public sealed class BitflyerRawPublicLiveTests
     [Trait("Layer", "Raw")]
     public async Task GetExecutionsPublic_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PublicGet", "Raw", nameof(GetExecutionsPublic_ReturnsOkResponse));
         using var restClient = BitflyerLiveClientFactory.CreatePublicRestClient();
         var raw = BitflyerLiveClientFactory.CreateRawApi(restClient);
 
@@ -124,6 +130,7 @@ public sealed class BitflyerNormalizedPublicLiveTests
     [Trait("Layer", "Normalized")]
     public async Task GetTicker_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PublicGet", "Normalized", nameof(GetTicker_ReturnsOkResponse));
         var api = BitflyerLiveClientFactory.CreateNormalizedApi();
 
         var call = await api.GetTickerCallAsync(BitflyerLiveSettings.DefaultProductCode);
@@ -142,6 +149,7 @@ public sealed class BitflyerNormalizedPublicLiveTests
     [Trait("Layer", "Normalized")]
     public async Task GetBoard_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PublicGet", "Normalized", nameof(GetBoard_ReturnsOkResponse));
         var api = BitflyerLiveClientFactory.CreateNormalizedApi();
 
         var call = await api.GetBoardCallAsync(BitflyerLiveSettings.DefaultProductCode);
@@ -158,6 +166,7 @@ public sealed class BitflyerNormalizedPublicLiveTests
     [Trait("Layer", "Normalized")]
     public async Task GetExecutionsPublic_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PublicGet", "Normalized", nameof(GetExecutionsPublic_ReturnsOkResponse));
         var api = BitflyerLiveClientFactory.CreateNormalizedApi();
 
         var call = await api.GetExecutionsPublicCallAsync(BitflyerLiveSettings.DefaultProductCode, count: 10);

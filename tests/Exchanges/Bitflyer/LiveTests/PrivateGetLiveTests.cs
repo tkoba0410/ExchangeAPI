@@ -10,6 +10,7 @@ public sealed class BitflyerWirePrivateGetLiveTests
     [Trait("Layer", "Wire")]
     public async Task GetBalance_Returns200AndJsonArray()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivateGet", "Wire", nameof(GetBalance_Returns200AndJsonArray));
         using var restClient = BitflyerLiveClientFactory.CreatePrivateRestClient();
         var wire = new WireTransport(restClient);
 
@@ -26,6 +27,7 @@ public sealed class BitflyerWirePrivateGetLiveTests
     [Trait("Layer", "Wire")]
     public async Task GetChildOrders_Returns200AndJsonArray()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivateGet", "Wire", nameof(GetChildOrders_Returns200AndJsonArray));
         using var restClient = BitflyerLiveClientFactory.CreatePrivateRestClient();
         var wire = new WireTransport(restClient);
 
@@ -42,6 +44,7 @@ public sealed class BitflyerWirePrivateGetLiveTests
     [Trait("Layer", "Wire")]
     public async Task GetExecutionsPrivate_Returns200AndJsonArray()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivateGet", "Wire", nameof(GetExecutionsPrivate_Returns200AndJsonArray));
         using var restClient = BitflyerLiveClientFactory.CreatePrivateRestClient();
         var wire = new WireTransport(restClient);
 
@@ -61,6 +64,7 @@ public sealed class BitflyerRawPrivateGetLiveTests
     [Trait("Layer", "Raw")]
     public async Task GetBalance_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivateGet", "Raw", nameof(GetBalance_ReturnsOkResponse));
         using var restClient = BitflyerLiveClientFactory.CreatePrivateRestClient();
         var raw = BitflyerLiveClientFactory.CreateRawApi(restClient);
 
@@ -76,6 +80,7 @@ public sealed class BitflyerRawPrivateGetLiveTests
     [Trait("Layer", "Raw")]
     public async Task GetChildOrders_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivateGet", "Raw", nameof(GetChildOrders_ReturnsOkResponse));
         using var restClient = BitflyerLiveClientFactory.CreatePrivateRestClient();
         var raw = BitflyerLiveClientFactory.CreateRawApi(restClient);
 
@@ -94,6 +99,7 @@ public sealed class BitflyerRawPrivateGetLiveTests
     [Trait("Layer", "Raw")]
     public async Task GetExecutionsPrivate_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivateGet", "Raw", nameof(GetExecutionsPrivate_ReturnsOkResponse));
         using var restClient = BitflyerLiveClientFactory.CreatePrivateRestClient();
         var raw = BitflyerLiveClientFactory.CreateRawApi(restClient);
 
@@ -122,6 +128,7 @@ public sealed class BitflyerNormalizedPrivateGetLiveTests
     [Trait("Layer", "Normalized")]
     public async Task GetBalance_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivateGet", "Normalized", nameof(GetBalance_ReturnsOkResponse));
         var api = BitflyerLiveClientFactory.CreateNormalizedApi();
 
         var call = await api.GetBalanceCallAsync();
@@ -136,6 +143,7 @@ public sealed class BitflyerNormalizedPrivateGetLiveTests
     [Trait("Layer", "Normalized")]
     public async Task GetChildOrders_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivateGet", "Normalized", nameof(GetChildOrders_ReturnsOkResponse));
         var api = BitflyerLiveClientFactory.CreateNormalizedApi();
 
         var call = await api.GetChildOrdersCallAsync(BitflyerLiveSettings.DefaultSymbol);
@@ -150,6 +158,7 @@ public sealed class BitflyerNormalizedPrivateGetLiveTests
     [Trait("Layer", "Normalized")]
     public async Task GetExecutionsPrivate_ReturnsOkResponse()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivateGet", "Normalized", nameof(GetExecutionsPrivate_ReturnsOkResponse));
         var api = BitflyerLiveClientFactory.CreateNormalizedApi();
 
         var call = await api.GetExecutionsPrivateCallAsync(BitflyerLiveSettings.DefaultSymbol);

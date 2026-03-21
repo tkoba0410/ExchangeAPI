@@ -30,6 +30,10 @@
 - 認証あり live test は、上記の direct env に加えて `CREDENTIAL_FILE_PATH` / `AGE_SECRET_KEY_PATH`（既存 age 運用）でも実行できる。
 - `CREDENTIAL_FILE_PATH` / `AGE_SECRET_KEY_PATH` が未指定でも、`~/.config/exchangeapi/secrets/credentials.enc.json` と `~/.config/exchangeapi/keys/age.key` が存在すればそれを既定値として使う。
 - `EXCHANGEAPI_BITFLYER_LIVE_ALLOW_POST=1` を使う場合は、専用口座・最小数量・即時約定しにくい指値を前提とする。
+- live test 実行時は、サニタイズ済みの request / response / error ログを自動で `artifacts/live-logs/bitflyer/<run-id>/` へ保存する。
+- 既定のログ保存先を変えたい場合は `EXCHANGEAPI_BITFLYER_LIVE_LOG_DIR` を指定する。相対パスは repository root 基準で解決する。
+- 自動ログには `run.json` と `events.jsonl` が含まれる。`events.jsonl` は `test_scope` / `request` / `response` / `error` を 1 行 1 JSON で記録する。
+- 自動ログでは auth 系フィールドは mask、order/account 系 identifier は pseudonymize、private balance/collateral 系の数値は mask する。
 - live test は `Trait("Category", "Live")` に加えて、`Flow=PublicGet|PrivateGet|PrivatePost` と `Layer=Wire|Raw|Normalized` で分離実行できる。
 - 実行例:
   - `dotnet test tests/Exchanges/Bitflyer/LiveTests/Exchange.Bitflyer.LiveTests.csproj --filter "Category=Live&Flow=PublicGet"`

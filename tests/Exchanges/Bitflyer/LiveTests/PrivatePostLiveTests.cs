@@ -11,6 +11,7 @@ public sealed class BitflyerWirePrivatePostLiveTests
     [Trait("Layer", "Wire")]
     public async Task SendChildOrder_ThenCancelChildOrder_CompletesLifecycle()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivatePost", "Wire", nameof(SendChildOrder_ThenCancelChildOrder_CompletesLifecycle));
         var order = BitflyerLiveSettings.GetPostOrder();
         using var restClient = BitflyerLiveClientFactory.CreatePrivateRestClient();
         var wire = new WireTransport(restClient);
@@ -42,6 +43,7 @@ public sealed class BitflyerRawPrivatePostLiveTests
     [Trait("Layer", "Raw")]
     public async Task SendChildOrder_ThenCancelChildOrder_CompletesLifecycle()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivatePost", "Raw", nameof(SendChildOrder_ThenCancelChildOrder_CompletesLifecycle));
         var order = BitflyerLiveSettings.GetPostOrder();
         using var restClient = BitflyerLiveClientFactory.CreatePrivateRestClient();
         var raw = BitflyerLiveClientFactory.CreateRawApi(restClient);
@@ -74,6 +76,7 @@ public sealed class BitflyerNormalizedPrivatePostLiveTests
     [Trait("Layer", "Normalized")]
     public async Task SendChildOrder_ThenCancelChildOrder_CompletesLifecycle()
     {
+        using var scope = BitflyerLiveLogging.BeginScope("PrivatePost", "Normalized", nameof(SendChildOrder_ThenCancelChildOrder_CompletesLifecycle));
         var order = BitflyerLiveSettings.GetPostOrder();
         var api = BitflyerLiveClientFactory.CreateNormalizedApi();
         var request = new NormalizedPrivateRequests.OrderRequest(

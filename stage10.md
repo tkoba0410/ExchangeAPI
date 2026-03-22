@@ -276,6 +276,8 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - Stage10 の最終目標は、bitFlyer 用 `Normalized DTO` 全体を安定公開契約として固定することである
 - そのため、`Normalized DTO` は最終的に将来の MCP や外部公開面へ接続可能な意味契約へ収束させる
 - 最終固定形の `Normalized DTO` は、bitFlyer API の返却フィールド集合を正本とした鏡像であることを原則とする
+- 最終固定対象の `Normalized` response contract は object DTO だけでなく top-level collection 契約を含みうる
+- bitFlyer API の response が top-level array の endpoint では、synthetic wrapper を作らず `IReadOnlyList<T>` を最終固定形としてよい
 - 最終固定形では、bitFlyer API の返却 field 名に対して PascalCase 化、型変換、nullable 化、property-based immutable 化のみを許容する
 - bitFlyer API の返却 field に存在しない補助情報、raw diagnostics、意味補完による rename は最終固定形へ持ち込まない
 - ただし移行期間中は、先に安定形へ到達した DTO を `Stable Core DTO`、見直し前の DTO を `Transitional DTO` として区別してよい
@@ -398,7 +400,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Wire` の endpoint-level API は response DTO を返さず、必ず `WireResponse` を返す
 - `WireCallSpec` を直接受ける汎用 `SendAsync(...)` を持つ場合、それは internal / debug / 補助面に限定する
 - 初期 3 endpoint の署名方針は次の通りとする
-  - `GetTickerAsync(string productCode, CancellationToken ct = default)`
+  - `GetTickerAsync(string? productCode = null, CancellationToken ct = default)`
   - `GetBalanceAsync(CancellationToken ct = default)`
   - `SendChildOrderAsync(string bodyJson, CancellationToken ct = default)`
 - `SendChildOrderAsync(...)` の `bodyJson` は `Normalized/Internal/Encoder` が生成する
@@ -453,20 +455,23 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 初期実装対象の `GetTicker`、`GetBalance`、`SendChildOrder` については、抽象規則だけでなく具体契約も Stage10 文書で固定する
 - 各 endpoint で最低限固定する内容は、`Wire` 署名、`Normalized` request DTO、`Normalized` response DTO、`CallMeta`、`Encoder` の責務とする
 - `GetTicker`
-  - `Wire.Public.GetTickerAsync(string productCode, CancellationToken ct = default)`
+  - `Wire.Public.GetTickerAsync(string? productCode = null, CancellationToken ct = default)`
   - `Normalized` は request validation 後に `Wire.Public.GetTickerAsync(...)` を呼び、response を `JsonValidation -> Conversion -> MeaningValidation` で正規化する
-  - `GetTickerRequest` は `ProductCode?` を持つ request DTO とする
-  - `GetTickerResponse` は `ProductCode`、`Timestamp`、`TickId`、`BestBid`、`BestAsk`、`BestBidSize`、`BestAskSize`、`TotalBidDepth`、`TotalAskDepth`、`Ltp`、`Volume`、`VolumeByProduct` を持つ
+  - canonical path は `/v1/getticker` とし、`/v1/ticker` は `Wire` 内部の互換 alias path としてのみ扱ってよい
+  - `GetTickerRequest` は `ProductCode?` を持つ request DTO とし、`null` の場合は query の `product_code` を送らず bitFlyer 既定値 `BTC_JPY` に委ねる
+  - `GetTickerResponse` は `ProductCode`、`State`、`Timestamp`、`TickId`、`BestBid`、`BestAsk`、`BestBidSize`、`BestAskSize`、`TotalBidDepth`、`TotalAskDepth`、`MarketBidSize`、`MarketAskSize`、`Ltp`、`Volume`、`VolumeByProduct` を持つ
 - `GetBalance`
   - `Wire.Private.GetBalanceAsync(CancellationToken ct = default)`
   - `Normalized` は空 request DTO を受け、response 正規化だけを担う
   - `GetBalanceRequest` は空 request DTO に固定する
-  - `GetBalanceResponse` は synthetic wrapper を作らず、top-level array 契約として `IReadOnlyList<GetBalanceItem>` を返す
+  - `GetBalance` の `Normalized` response contract は `GetBalanceResponse` wrapper を作らず、top-level array 契約として `IReadOnlyList<GetBalanceItem>` を返す
   - `GetBalanceItem` は `CurrencyCode`、`Amount`、`Available` を持つ
 - `SendChildOrder`
   - `Wire.Private.SendChildOrderAsync(string bodyJson, CancellationToken ct = default)`
   - `Normalized/Internal/Encoder` が request DTO を body JSON に serialize し、その結果を `Wire.Private.SendChildOrderAsync(...)` へ渡す
   - `SendChildOrderRequest` は `ProductCode`、`ChildOrderType`、`Side`、`Size`、`Price?`、`MinuteToExpire?`、`TimeInForce?` を持つ
+  - `Price` は `ChildOrderType = LIMIT` のとき必須、`MARKET` のときは未指定とする
+  - `MinuteToExpire` と `TimeInForce` は省略可能とし、`Encoder` は未指定時に body へ出力せず bitFlyer API の既定値に委ねる
   - `SendChildOrderResponse` は `ChildOrderAcceptanceId` のみを持つ
 - `SendChildOrder` は request encode が最も強く現れる endpoint として、Stage10 の request 契約・encoder 契約の基準例とする
 

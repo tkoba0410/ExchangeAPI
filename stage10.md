@@ -25,7 +25,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 当初スコープを `bitFlyer` 専用に限定する
 - `Contract` 層は Stage10 の対象から外し、当初方針として廃止する
 - `Wire` / `Normalized` の 2 層を bitFlyer 専用 client 面として再定義する
-- `Wire` を実行基盤として定義し、認証・署名・transport・logging などの基本機能を集約する
+- `Wire` を実行基盤として定義し、認証・署名・transport・debug logging / diagnostics などの基本機能を集約する
 - `Normalized` は、transport を持たない request / response 契約層として再定義する
 - `Raw` 層は公開層としては廃止し、request encoding / response decode は internal codec として扱う
 - 上位層 client から下位層 client へアクセスできるようにする
@@ -63,7 +63,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - `Wire`
   - DTO を持たない
-  - HTTP 実行、認証、署名、logging、observer、baseUri、transport 設定を担う
+  - HTTP 実行、認証、署名、debug logging / diagnostics、baseUri、transport 設定を担う
   - 単独で使用可能とする
 - `Normalized`
   - 正規化 DTO を持つ
@@ -207,7 +207,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - 全エラーで `EndpointId` と発生層を追跡できることを前提とする
 - `Http` では `HttpStatus` を保持する
-- `Http` と `Codec` では、失敗時診断のためにサニタイズ済み `BodySnippet` を保持してよい
+- `Http` と `Codec` では、失敗時診断のために `BodySnippet` を保持してよい
 - `BodySnippet` は error 情報に限定し、success 時の raw diagnostics としては扱わない
 - 取引所固有 `error_code` や運用カテゴリを特定できる場合は、基底分類とは別軸の補助情報として保持してよい
 - 将来 MCP や外部公開面へ接続する場合も、まず基底分類を保ち、その上に表示用分類を重ねる
@@ -250,6 +250,22 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Tags[\"Retryable\"]` は `true` / `false` を取る
 - `CallMeta.Children` は orchestration や fan-out がある場合のみ使い、単純な 1 対 1 の `Normalized -> Wire` 呼び出しでは必須にしない
 - `CallMeta.InternalEndpointId` は endpoint 非対応の内部 call にのみ使い、公開 endpoint の代用にしない
+
+#### 3.7.9 Debug Logging / Diagnostics の方針
+
+- Stage10 の logging / diagnostics は、運用監査ログではなく debug と live test 証跡のための local trace として扱う
+- Stage10 では既存 `IRestClientLogger` / `IRestCallObserver` の sanitize 前提設計を、そのまま公開契約として継承しない
+- 安全性は event の sanitize / mask ではなく、出力先制約で担保する
+- debug log の出力先はローカルファイルに限定し、`stdout`、remote sink、telemetry export、CI artifact へ直接出力しない
+- request header は常に記録対象外とし、debug log に含めない
+- `OperationId` を必須とし、少なくとも `WireRequest`、`WireCall`、`NormalizedCall` を同一 `OperationId` で相関できるようにする
+- `Wire` は送信前に request text を、送信後に `Call<WireCallSpec, WireResponse>` 相当の結果を記録してよい
+- `Normalized` は正規化完了後に `Call<TRequest, TResponse>` 相当の結果を記録してよい
+- `Wire` 側の debug log は text / transport 結果を正本とし、`Normalized` 側の debug log は request DTO / response contract / error を正本とする
+- sanitize / mask は debug log 生成時には行わない
+- artifact が必要な場合は、ローカル debug log から別工程で mask 後に生成する
+- logging / diagnostics の具体 sink 実装は初手では no-op でもよいが、後続実装は本方針に従う
+- logging / diagnostics の失敗は API 呼び出し本体を失敗させる理由にしない
 
 ### 3.8 下位層アクセス
 
@@ -382,7 +398,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 ### 4.3 共有物
 
 - `CreateNormalizedClient(...)` は、内部で使う `Wire` 実体を公開できること
-- 認証、署名、transport、logger、observer は、同一 runtime を共有する
+- 認証、署名、transport、および有効化された debug logging / diagnostics 設定は、同一 runtime を共有する
 - `BaseUri` と `TransportConfig` は、同一 `Wire` runtime を識別する中核構成とする
 
 ### 4.4 Composition の扱い
@@ -688,6 +704,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - live test は、まず read path の `GetTicker` / `GetBalance` を押さえ、その後 write path の `SendChildOrder` を導入する
 - 既存 bitFlyer live test 資産は、Stage10 live test 設計の回帰資産・流用候補として扱う
 - `SendChildOrder` 以外の `POST` / 注文 lifecycle live test は、`Normalized` request 境界の固定後に後段で導入する
+- debug logging / diagnostics の具体 local-file sink は初手では no-op でもよく、初期 3 endpoint の core 実装後に追加してよい
 - その後、既存コードを利用しながら試作実装を進める
 - bitFlyer 専用設計が固まった後に、取引所横断共通化の再導入可否を判断する
 - 既存文書との整合は、試作で方針が固まった後に行う
@@ -715,6 +732,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - Stage10 の公開 API が `Call` を唯一の返却形式とし、`EndpointId` / `HttpStatus` / `BodySnippet` の保持場所が文書上で明確である
 - `WireCallSpec` が未署名 canonical request として公開契約に固定され、認証情報を露出しないことが文書上で明確である
 - `CallMeta.Layer` / `Component` / `Tags` / `Children` の語彙と運用粒度が文書上で明確である
+- Stage10 の debug logging / diagnostics が local-only、request header 非記録、`OperationId` 相関、artifact 後処理という方針で文書上明確である
 - request DTO の naming / null / transport 配置規則が文書上で明確である
 - `Wire` endpoint-level API の主公開面と初期 3 endpoint の署名方針が文書上で明確である
 - Stage10 endpoint matrix の列定義と用途が文書上で明確である

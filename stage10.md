@@ -67,8 +67,9 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Normalized`
   - 正規化 DTO を持つ
   - request 側では internal request encoder を用いて `Wire` request を構築する
-  - response 側では `Wire` の raw JSON text を internal decoder と `JsonConverter` を用いて bitFlyer 内意味へ正規化する
-  - `JsonConverter` は codec 的変換に限定し、再取得・再試行・fallback は持たない
+  - response 側では `Wire` の raw JSON text に対して、`JSON検証変換 -> 意味変換 -> 意味検証` の順に処理して正規化 DTO を返す
+  - `JsonConverter` は主に `JSON検証変換` と `意味変換` の段階で用い、再取得・再試行・fallback は持たない
+  - 物理構成上は `Public/`、`Private/`、`Internal/RequestEncoding/`、`Internal/JsonValidation/`、`Internal/MeaningConversion/`、`Internal/MeaningValidation/`、`Internal/Errors/` に責務を分割する
 
 ### 3.5 実行基盤の集中
 
@@ -79,7 +80,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Public` / `Private` の責務は各層で分離する
 - ただし、公開 client 面は `PublicXxxClient` / `PrivateXxxClient` を層ごとに乱立させず、bundle 形でまとめる
 - Stage10 では API 機能単位では公開面を分割しない
-- 層内分割は、まず `Public` / `Private`、次に request encoding / response decoding / converter / error などの責務単位で行う
+- 層内分割は、まず `Public` / `Private`、次に request encoding / JSON validation / meaning conversion / meaning validation / error の責務単位で行う
 - `Private` runtime は `Public` runtime を包含し、認証付き構成では `Public` と `Private` の両方にアクセスできる
 - `BaseUri` は `Wire` runtime の必須構成とする
 - `TransportConfig` は `Wire` runtime の必須構成とする
@@ -151,7 +152,10 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - レスポンスは下位層から上位層へ向かう
 - `Wire` は transport response を返す
 - `Wire` が返すのは status / headers / raw JSON text などの transport 結果であり、DTO 化は行わない
-- `Normalized` は `Wire` の raw JSON text を internal decoder と `JsonConverter` で decode し、正規化 DTO を返す
+- `Normalized` は `Wire` の raw JSON text を `TEXT -> JSON検証変換 -> 意味変換 -> 意味検証` の順に処理して、正規化 DTO を返す
+- `JSON検証変換` は raw JSON text を JSON object として読めるかを確認し、decode 開始可能な形へ変換する
+- `意味変換` は JSON object を bitFlyer 内意味の正規化 DTO へ落とす
+- `意味検証` は正規化 DTO が公開契約として成立しているかを確認する
 - `Normalized` は公開レスポンスとして中間 JSON object を露出しない
 
 #### 3.7.3 逆流禁止
@@ -160,6 +164,43 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Normalized -> Wire` の逆戻り制御を持たせない
 - 変換後にエラーが出た場合に、上位層内部で下位層へ戻って再取得する処理は持たせない
 - 変換後の回復戦略、再実行、別経路取得、fallback は外部で明示的に扱う
+
+#### 3.7.4 エラー分類の基本方針
+
+- Stage10 では、新しい独自分類を追加する前に、既存 `CallErrorKind` を基底分類として引き継ぐ
+- 基底分類は `Transport` / `Http` / `Codec` / `Mapping` / `Semantic` / `Unknown` の 6 種とする
+- この基底分類は「どの段階で失敗したか」を表す
+- 認証、rate limit、request 不正、server 異常などの運用上の意味分類は、基底分類とは別軸の補助情報として扱う
+- `Unknown` は最後の退避先であり、既知の失敗パターンを安易に `Unknown` へ逃がさない
+
+#### 3.7.5 層ごとのエラー確定責務
+
+- `Wire`
+  - 接続失敗、タイムアウト、キャンセル、TLS、送信失敗などの transport レベル失敗のみを `Transport` として扱う
+  - `Wire` は HTTP status を見て `Http` へ変換しない
+  - `Wire` 単独利用時は、利用者が status / headers / raw body を直接見る
+- `Normalized/Internal/JsonValidation`
+  - `Wire` response の status が非 `2xx` の場合は `Http` を確定する
+  - raw JSON text の parse 失敗、JSON shape decode 失敗は `Codec` を確定する
+- `Normalized/Internal/MeaningConversion`
+  - bitFlyer 値表現から正規化 DTO / 正規化値へ落とす過程の失敗は `Mapping` を確定する
+  - `JsonConverter` は主にこの段階で bitFlyer 値表現から正規化値への変換に用いる
+  - 例: 未知の enum 値、想定外の値型、symbol / product_code / market の変換不能
+- `Normalized/Internal/MeaningValidation`
+  - 正規化 DTO が公開契約として成立しない場合は `Semantic` を確定する
+- `Normalized/Internal/RequestEncoding`
+  - request 不足、値範囲不正、引数組み合わせ不正、上位 API 契約違反は `Semantic` を確定する
+- `Normalized/Public/` と `Normalized/Private/`
+  - 公開 API 面として internal pipeline を束ねるが、変換・検証ロジック本体の置き場にはしない
+- Stage10 では、変換後エラーを契機に `Normalized` 内部で `Wire` を再実行しない
+
+#### 3.7.6 エラー情報の保持方針
+
+- 全エラーで `EndpointId` と発生層を追跡できることを前提とする
+- `Http` では `HttpStatus` を保持する
+- `Http` と `Codec` では、診断用にサニタイズ済み `BodySnippet` を保持してよい
+- 取引所固有 `error_code` や運用カテゴリを特定できる場合は、基底分類とは別軸の補助情報として保持してよい
+- 将来 MCP や外部公開面へ接続する場合も、まず基底分類を保ち、その上に表示用分類を重ねる
 
 ### 3.8 下位層アクセス
 
@@ -180,6 +221,35 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Contract` は bitFlyer 専用設計が固まるまで設計対象外とする
 - 取引所横断 DTO / 取引所横断 client / 取引所横断 capability は Stage10 第1段階の対象外とする
 - 将来再導入する場合でも、bitFlyer 内部で固めた責務の上に後付けする
+
+### 3.11 Normalized DTO の安定方針
+
+- Stage10 の最終目標は、bitFlyer 用 `Normalized DTO` 全体を安定公開契約として固定することである
+- そのため、`Normalized DTO` は最終的に将来の MCP や外部公開面へ接続可能な意味契約へ収束させる
+- ただし移行期間中は、先に安定形へ到達した DTO を `Stable Core DTO`、見直し前の DTO を `Transitional DTO` として区別してよい
+- `Stable Core DTO` / `Transitional DTO` の区別は移行概念であり、最終状態では `Normalized DTO` 全体固定へ収束させる
+- `RawSnapshot`、`Extras`、`RawJson` などの lossless / diagnostics 用情報を含む DTO は、そのまま固定するのではなく、診断情報分離または安定公開形への再設計を経て最終固定対象へ取り込む
+
+#### 3.11.1 Breaking Change の扱い
+
+- 最終的に固定対象とする `Normalized DTO` では、以下を breaking change として扱う
+  - 型名変更
+  - プロパティ名変更
+  - プロパティ型変更
+  - プロパティ削除
+  - optional だったプロパティの必須化
+  - 同名プロパティの意味変更
+- 移行期間中も、`Stable Core DTO` へ昇格したものには同じ breaking 規則を先行適用する
+- optional な新規プロパティ追加を non-breaking として扱いたい場合、公開 CLR 形状は「プロパティ集合」を優先し、constructor 署名の変化を公開契約に含めない
+
+#### 3.11.2 DTO 形状の方針
+
+- 最終固定対象の `Normalized DTO` は primary-constructor record を採らない
+- 理由は、`public sealed record Xxx(...)` では constructor 引数列、引数順、`Deconstruct(...)` が公開契約に含まれ、後からの optional プロパティ追加でも CLR 的に breaking になりやすいため
+- 最終固定対象の `Normalized DTO` は property-based immutable type を基本とする
+- 第1候補は `sealed class` + `init` property とし、同等に constructor / deconstruct を公開契約へ過剰に含めない形であれば許容する
+- 最終固定対象の `Normalized DTO` の必須性は public constructor ではなく、`MeaningValidation` 完了時点で内部的に確定してから DTO 化する
+- `Transitional DTO` では既存 record 形を暫定利用してよいが、固定対象へ昇格させる時点で公開形状を見直す
 
 ---
 
@@ -315,6 +385,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 文書:
   - `stage10/architecture.md`
   - `stage10/runtime.md`
+  - `stage10/dto-stability.md`
   - `stage10/migration.md`
 - 新コード:
   - `src-stage10/Bitflyer/Wire`
@@ -329,10 +400,10 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
     - `Public/`
     - `Private/`
     - `Internal/RequestEncoding/`
-    - `Internal/ResponseDecoding/`
-    - `Internal/Converters/`
+    - `Internal/JsonValidation/`
+    - `Internal/MeaningConversion/`
+    - `Internal/MeaningValidation/`
     - `Internal/Errors/`
-    - `Internal/Markets/`
   - `src-stage10/Bitflyer/Composition`
     - `ExchangeApi.Stage10.Bitflyer.Composition.csproj`
     - `Bootstrap/`
@@ -356,6 +427,33 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Composition` project は `Wire`、`Normalized`、既存 `Composition`、`Primitives` に依存する
 - `Raw` は独立 project にせず、`Normalized/Internal` の codec 実装へ吸収する
 - live test project は `Wire`、`Normalized`、`Composition` を参照し、既存 live test 資産は流用候補とする
+
+### 9.3.2 Normalized の責務と物理配置
+
+- `Normalized/Public/`
+  - Public endpoint 向けの公開 API 面だけを置く
+  - response 変換ロジック本体は置かない
+- `Normalized/Private/`
+  - Private endpoint 向けの公開 API 面だけを置く
+  - response 変換ロジック本体は置かない
+- `Normalized/Internal/RequestEncoding/`
+  - 正規化 request を `Wire` request 材料へ落とす責務を置く
+  - request 側の意味検証もここで行う
+- `Normalized/Internal/JsonValidation/`
+  - `Wire` の raw JSON text を JSON object として検証・decode 開始可能な形へ変換する責務を置く
+  - response 側の `TEXT -> JSON検証変換` 段階に対応する
+- `Normalized/Internal/MeaningConversion/`
+  - JSON object を bitFlyer 内意味の正規化 DTO 候補へ変換する責務を置く
+  - `JsonConverter` と値揺れ吸収、symbol / product_code / market 変換補助をここへ置く
+  - response 側の `意味変換` 段階に対応する
+- `Normalized/Internal/MeaningValidation/`
+  - 正規化 DTO 候補が公開契約として成立しているかを検証する責務を置く
+  - response 側の `意味検証` 段階に対応する
+- `Normalized/Internal/Errors/`
+  - `Http` / `Codec` / `Mapping` / `Semantic` の確定規則と補助情報整形を置く
+  - `Unknown` は最後の退避先としてのみ扱い、既知ケースの常用先にしない
+- `Normalized` project では API 機能単位の物理分割を採らず、責務単位の物理分割を優先する
+- `Normalized` の response 側は、物理構成上も `JsonValidation -> MeaningConversion -> MeaningValidation` の順で読める形を維持する
 
 ### 9.4 この案を採用する理由
 
@@ -393,6 +491,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Contract` を Stage10 第1段階の対象外とすることが文書上で明確である
 - 案 A の展開方針、ブランチ、文書配置、新コード配置が文書上で明確である
 - Stage10 の物理構成案と project 境界が文書上で明確である
+- `Normalized` の責務と物理配置の対応が文書上で明確である
 - `Wire` が単独利用可能な実行基盤であることが文書上で明確である
 - 認証・署名・transport が `Wire` に集約されることが文書上で明確である
 - `BaseUri` と `TransportConfig` が `Wire` runtime の必須構成であることが文書上で明確である
@@ -400,6 +499,9 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 上位層がデータ変換のみを担うことが文書上で明確である
 - `Raw` を公開層として持たず、`Normalized` が internal codec と `JsonConverter` を用いて正規化することが文書上で明確である
 - 各層の request / response 境界が文書上で明確である
+- response 側の `TEXT -> JSON検証変換 -> 意味変換 -> 意味検証` の 4 段階が文書上で明確であり、物理構成と対応している
+- `Transport` / `Http` / `Codec` / `Mapping` / `Semantic` / `Unknown` の基底分類と、各層での確定責務が文書上で明確である
+- `Normalized DTO` 全体を最終的に固定する前提、移行中の `Stable Core DTO` / `Transitional DTO` の区別、および breaking change 規則が文書上で明確である
 - 各層で `Public` / `Private` の責務を分けつつ、公開面は bundle として整理することが文書上で明確である
 - 上位層が下位層へ戻って再取得・再試行しないことが文書上で明確である
 - 下位層アクセス可能だが暗黙 fallback は禁止することが文書上で明確である
@@ -412,8 +514,10 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 ## 12. 現時点の未確定事項
 
 - 各 bundle の具体名と公開プロパティ名をどう固定するか
-- internal request encoder / response decoder の配置と命名をどう固定するか
-- `Normalized/Internal` の責務分割を、request encoding / response decoding / converter / error のどこまで細分化するか
+- internal request encoder / `JsonValidation` / `MeaningConversion` / `MeaningValidation` の配置と命名をどう固定するか
+- `Normalized/Internal/*` の型名・namespace・ファイル分割粒度をどう固定するか
+- どの endpoint のどの `Transitional DTO` をどの順で固定対象へ収束させるか
+- 補助的な運用分類（Auth / RateLimit / Server / Request など）をどこまで Stage10 で固定するか
 - 共有 runtime の dispose 責務をどこに置くか
 - bitFlyer 専用 runtime のうち、どこまでを後に取引所横断共通化できるか
 - `POST` / 注文 lifecycle の live test をどの段階で導入するか

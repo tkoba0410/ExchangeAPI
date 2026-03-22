@@ -66,10 +66,10 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
   - 単独で使用可能とする
 - `Normalized`
   - 正規化 DTO を持つ
-  - request 側では internal request encoder を用いて `Wire` request を構築する
+  - request 側では internal encoder を用いて `Wire` request を構築する
   - response 側では `Wire` の raw JSON text に対して、`JSON検証変換 -> 意味変換 -> 意味検証` の順に処理して正規化 DTO を返す
   - `JsonConverter` は主に `JSON検証変換` と `意味変換` の段階で用い、再取得・再試行・fallback は持たない
-  - 物理構成上は `Public/`、`Private/`、`Internal/RequestEncoding/`、`Internal/JsonValidation/`、`Internal/MeaningConversion/`、`Internal/MeaningValidation/`、`Internal/Errors/` に責務を分割する
+  - 物理構成上は `Public/`、`Private/`、`Internal/Encoder/`、`Internal/JsonValidation/`、`Internal/Conversion/`、`Internal/MeaningValidation/`、`Internal/Errors/` に責務を分割する
 
 ### 3.5 実行基盤の集中
 
@@ -80,7 +80,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Public` / `Private` の責務は各層で分離する
 - ただし、公開 client 面は `PublicXxxClient` / `PrivateXxxClient` を層ごとに乱立させず、bundle 形でまとめる
 - Stage10 では API 機能単位では公開面を分割しない
-- 層内分割は、まず `Public` / `Private`、次に request encoding / JSON validation / meaning conversion / meaning validation / error の責務単位で行う
+- 層内分割は、まず `Public` / `Private`、次に `Encoder` / `JsonValidation` / `Conversion` / `MeaningValidation` / `Errors` の責務単位で行う
 - `Private` runtime は `Public` runtime を包含し、認証付き構成では `Public` と `Private` の両方にアクセスできる
 - `BaseUri` は `Wire` runtime の必須構成とする
 - `TransportConfig` は `Wire` runtime の必須構成とする
@@ -142,8 +142,12 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - リクエストは上位層から下位層へ向かう
 - `Normalized` は bitFlyer 内意味で整理された request を受け取る
 - `Normalized` は path / query / body / headers を直接構築しない
-- `Normalized` は internal request encoder を通じて `Wire` 用 request を構築する
-- request encoder は `Normalized` の内部実装であり、公開層は構成しない
+- `Normalized` は internal encoder を通じて `Wire` 用 request を構築する
+- encoder は `Normalized` の内部実装であり、公開層は構成しない
+- request 側では `null` を「未指定」として扱う
+- `null` の request パラメータは、encoder が query / body / path 上の項目として出力しない
+- 必須項目が `null` の場合は省略して送らず、`Semantic` error とする
+- bitFlyer API 仕様が明示的に `null` 送信を要求する場合のみ、endpoint 個別例外を許容する
 - `Wire` は transport request だけを受け取る
 - `Wire` が受け取るのは method / path / query / body / headers / endpoint identity などの transport 情報であり、上位層 DTO ではない
 
@@ -182,13 +186,13 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Normalized/Internal/JsonValidation`
   - `Wire` response の status が非 `2xx` の場合は `Http` を確定する
   - raw JSON text の parse 失敗、JSON shape decode 失敗は `Codec` を確定する
-- `Normalized/Internal/MeaningConversion`
+- `Normalized/Internal/Conversion`
   - bitFlyer 値表現から正規化 DTO / 正規化値へ落とす過程の失敗は `Mapping` を確定する
   - `JsonConverter` は主にこの段階で bitFlyer 値表現から正規化値への変換に用いる
   - 例: 未知の enum 値、想定外の値型、symbol / product_code / market の変換不能
 - `Normalized/Internal/MeaningValidation`
   - 正規化 DTO が公開契約として成立しない場合は `Semantic` を確定する
-- `Normalized/Internal/RequestEncoding`
+- `Normalized/Internal/Encoder`
   - request 不足、値範囲不正、引数組み合わせ不正、上位 API 契約違反は `Semantic` を確定する
 - `Normalized/Public/` と `Normalized/Private/`
   - 公開 API 面として internal pipeline を束ねるが、変換・検証ロジック本体の置き場にはしない
@@ -250,6 +254,44 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 第1候補は `sealed class` + `init` property とし、同等に constructor / deconstruct を公開契約へ過剰に含めない形であれば許容する
 - 最終固定対象の `Normalized DTO` の必須性は public constructor ではなく、`MeaningValidation` 完了時点で内部的に確定してから DTO 化する
 - `Transitional DTO` では既存 record 形を暫定利用してよいが、固定対象へ昇格させる時点で公開形状を見直す
+
+#### 3.11.3 Naming Rule の方針
+
+- 最終固定対象の `Normalized DTO` のプロパティ名は、bitFlyer API が返すフィールド名を唯一の語源とする
+- 公開名は raw field 名をそのまま露出せず、PascalCase へ正規化して用いる
+- 意味補完のために別語彙へ改名しない
+- 例:
+  - `product_code` -> `ProductCode`
+  - `tick_id` -> `TickId`
+  - `best_bid` -> `BestBid`
+  - `child_order_acceptance_id` -> `ChildOrderAcceptanceId`
+  - `exec_date` -> `ExecDate`
+- `RawJson`、`RawSnapshot`、`Extras` は bitFlyer API の返却フィールド名由来ではないため、最終固定対象の `Normalized DTO` の naming rule には含めない
+- 上記の情報は `Normalized DTO` の naming 例外として残すのではなく、diagnostics / metadata 側へ分離する
+- `GetAddressesResponse(FreeText RawJson)` のように、意味 DTO ではなく raw payload 保持を主目的とするものは、そのまま固定対象にしない
+
+#### 3.11.4 Nullability Rule の方針
+
+- 最終固定対象の `Normalized DTO` では、`null` は「値が存在しない / API が返していない」場合にのみ使う
+- `Closed<T>` は「値はあるが語彙が未知」という別概念であり、最終固定対象の `Normalized DTO` には原則出さない
+- unknown 値は `Closed<T>` で保持するのではなく、`Conversion` または `MeaningValidation` で `Mapping` error / `Semantic` error として確定する
+- `Empty` sentinel は最終固定対象の `Normalized DTO` に出さず、内部 parse / helper に限定する
+- API が実際に空文字を返す項目で、その空文字自体に意味がある場合のみ `""` を公開値として保持してよい
+- `ProductCode`、`AcceptanceId`、`ExchangeOrderId`、enum 相当値など、code / id / closed vocabulary 系の項目では `""` を `null` や unknown の代用品にしない
+- exposed DTO では `null` と `Closed<T>` と `Empty` を混在させない
+- request 側では `null` は「未指定」を意味し、response 側では「値が返っていない」を意味する
+
+#### 3.11.5 JSON Serializable Rule の方針
+
+- 最終固定対象の `Normalized DTO` は、`JsonSerializer.Serialize(dto)` が既定設定で通ることを必須条件とする
+- 呼び出し側に専用 `JsonSerializerOptions` や custom converter 登録を要求しない
+- 最終固定対象の `Normalized DTO` は serializer-native な公開形を優先し、`string` / `decimal` / `bool` / `DateTimeOffset` / `IReadOnlyList<T>` / `IReadOnlyDictionary<string, T>` など、既定 serializer で安定して扱える型を基本とする
+- `RawJson`、`RawSnapshot`、`Extras` などの diagnostics / lossless payload は `Normalized DTO` 本体に含めず、metadata / diagnostics 側へ分離する
+- `IReadOnlyDictionary<FreeText, JsonElement>` のような custom key 型 dictionary は最終固定対象の `Normalized DTO` で採用しない
+- key/value の追加保持が必要な場合は、key を `string` へ正規化した diagnostics 側構造へ退避する
+- `Price`、`Size`、`ProductCode`、`AcceptanceId` などの domain wrapper は、最終固定対象の `Normalized DTO` では原則として `decimal` / `string` などの serializer-native scalar へ寄せる
+- 既存 wrapper を内部表現として保持することは許容するが、最終固定対象の `Normalized DTO` の公開形には持ち込まない
+- `Transitional DTO` では既存 wrapper や diagnostics 混在を暫定利用してよいが、固定対象へ昇格させる時点で serializer-native な公開形へ再設計する
 
 ---
 
@@ -399,9 +441,9 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
     - `ExchangeApi.Stage10.Bitflyer.Normalized.csproj`
     - `Public/`
     - `Private/`
-    - `Internal/RequestEncoding/`
+    - `Internal/Encoder/`
     - `Internal/JsonValidation/`
-    - `Internal/MeaningConversion/`
+    - `Internal/Conversion/`
     - `Internal/MeaningValidation/`
     - `Internal/Errors/`
   - `src-stage10/Bitflyer/Composition`
@@ -436,13 +478,14 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Normalized/Private/`
   - Private endpoint 向けの公開 API 面だけを置く
   - response 変換ロジック本体は置かない
-- `Normalized/Internal/RequestEncoding/`
+- `Normalized/Internal/Encoder/`
   - 正規化 request を `Wire` request 材料へ落とす責務を置く
   - request 側の意味検証もここで行う
+  - `null` を「未指定」として扱い、query / body / path へ出力しない規則をここで担う
 - `Normalized/Internal/JsonValidation/`
   - `Wire` の raw JSON text を JSON object として検証・decode 開始可能な形へ変換する責務を置く
   - response 側の `TEXT -> JSON検証変換` 段階に対応する
-- `Normalized/Internal/MeaningConversion/`
+- `Normalized/Internal/Conversion/`
   - JSON object を bitFlyer 内意味の正規化 DTO 候補へ変換する責務を置く
   - `JsonConverter` と値揺れ吸収、symbol / product_code / market 変換補助をここへ置く
   - response 側の `意味変換` 段階に対応する
@@ -453,7 +496,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
   - `Http` / `Codec` / `Mapping` / `Semantic` の確定規則と補助情報整形を置く
   - `Unknown` は最後の退避先としてのみ扱い、既知ケースの常用先にしない
 - `Normalized` project では API 機能単位の物理分割を採らず、責務単位の物理分割を優先する
-- `Normalized` の response 側は、物理構成上も `JsonValidation -> MeaningConversion -> MeaningValidation` の順で読める形を維持する
+- `Normalized` の response 側は、物理構成上も `JsonValidation -> Conversion -> MeaningValidation` の順で読める形を維持する
 
 ### 9.4 この案を採用する理由
 
@@ -502,6 +545,9 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - response 側の `TEXT -> JSON検証変換 -> 意味変換 -> 意味検証` の 4 段階が文書上で明確であり、物理構成と対応している
 - `Transport` / `Http` / `Codec` / `Mapping` / `Semantic` / `Unknown` の基底分類と、各層での確定責務が文書上で明確である
 - `Normalized DTO` 全体を最終的に固定する前提、移行中の `Stable Core DTO` / `Transitional DTO` の区別、および breaking change 規則が文書上で明確である
+- 最終固定対象の `Normalized DTO` の naming rule が、bitFlyer API の返却フィールド名由来であることと、diagnostics 情報を DTO 外へ分離する方針が文書上で明確である
+- request 側の `null = 未指定` 規則と、最終固定対象 DTO の nullability rule が文書上で明確である
+- 最終固定対象の `Normalized DTO` が既定 `JsonSerializer.Serialize(dto)` を前提とし、serializer-native な公開形を採る方針が文書上で明確である
 - 各層で `Public` / `Private` の責務を分けつつ、公開面は bundle として整理することが文書上で明確である
 - 上位層が下位層へ戻って再取得・再試行しないことが文書上で明確である
 - 下位層アクセス可能だが暗黙 fallback は禁止することが文書上で明確である
@@ -514,7 +560,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 ## 12. 現時点の未確定事項
 
 - 各 bundle の具体名と公開プロパティ名をどう固定するか
-- internal request encoder / `JsonValidation` / `MeaningConversion` / `MeaningValidation` の配置と命名をどう固定するか
+- `Encoder` / `JsonValidation` / `Conversion` / `MeaningValidation` の配置と命名をどう固定するか
 - `Normalized/Internal/*` の型名・namespace・ファイル分割粒度をどう固定するか
 - どの endpoint のどの `Transitional DTO` をどの順で固定対象へ収束させるか
 - 補助的な運用分類（Auth / RateLimit / Server / Request など）をどこまで Stage10 で固定するか

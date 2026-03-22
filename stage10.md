@@ -57,6 +57,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - Stage10 では inventory の `PresentIn` と `Note` は引き継がない
 - Stage10 の対応 API 一覧は、inventory を入力として Stage10 側で新たに書き起こす
 - Stage10 では inventory に記載された endpoint を `Wire` / `Normalized` の 2 層へ再配置する前提で扱う
+- 初期実装対象は `GetTicker`、`GetBalance`、`SendChildOrder` の 3 endpoint に限定する
 
 ### 3.4 層の基本役割
 
@@ -67,6 +68,8 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Normalized`
   - 正規化 DTO を持つ
   - request 側では internal encoder を用いて `Wire` request を構築する
+  - `GetTicker` のような public GET では、`Normalized` が `Wire` の endpoint-level API を直接利用して解決してよい
+  - その場合も `Normalized` は `Wire` response を受けて `JSON検証変換 -> 意味変換 -> 意味検証` を担い、transport 実行責務は `Wire` に残す
   - response 側では `Wire` の raw JSON text に対して、`JSON検証変換 -> 意味変換 -> 意味検証` の順に処理して正規化 DTO を返す
   - `JsonConverter` は主に `JSON検証変換` と `意味変換` の段階で用い、再取得・再試行・fallback は持たない
   - 物理構成上は `Public/`、`Private/`、`Internal/Encoder/`、`Internal/JsonValidation/`、`Internal/Conversion/`、`Internal/MeaningValidation/`、`Internal/Errors/` に責務を分割する
@@ -144,6 +147,8 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Normalized` は path / query / body / headers を直接構築しない
 - `Normalized` は internal encoder を通じて `Wire` 用 request を構築する
 - encoder は `Normalized` の内部実装であり、公開層は構成しない
+- public GET のように `Wire` 側で endpoint-level API が成立している場合、`Normalized` はそれを直接利用してよい
+- ただしその場合も、request DTO の検証、`Wire` response の JSON 検証、意味変換、意味検証は `Normalized` 側の責務とする
 - request 側では `null` を「未指定」として扱う
 - `null` の request パラメータは、encoder が query / body / path 上の項目として出力しない
 - 必須項目が `null` の場合は省略して送らず、`Semantic` error とする
@@ -202,9 +207,27 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - 全エラーで `EndpointId` と発生層を追跡できることを前提とする
 - `Http` では `HttpStatus` を保持する
-- `Http` と `Codec` では、診断用にサニタイズ済み `BodySnippet` を保持してよい
+- `Http` と `Codec` では、失敗時診断のためにサニタイズ済み `BodySnippet` を保持してよい
+- `BodySnippet` は error 情報に限定し、success 時の raw diagnostics としては扱わない
 - 取引所固有 `error_code` や運用カテゴリを特定できる場合は、基底分類とは別軸の補助情報として保持してよい
 - 将来 MCP や外部公開面へ接続する場合も、まず基底分類を保ち、その上に表示用分類を重ねる
+
+#### 3.7.7 Call 型の扱い
+
+- Stage10 の公開 API は、`Wire` / `Normalized` のいずれも `Call` を唯一の返却形式とする
+- DTO や `WireResponse` を単体で直接返さない
+- `Wire` の公開 API は `Task<Call<WireCallSpec, WireResponse>>` を返す
+- `Normalized` の公開 API は `Task<Call<TRequest, TResponse>>` を返す
+- `Call` は、成功/失敗、対応する request/response、実行メタ情報を一体として表現する
+- `Call.Request` には、その層の公開 request を保持する
+- `Call.Result` は `CallResult.Ok` または `CallResult.Err` のいずれかとする
+- `Call.Meta` は `Layer`、`Component`、`EndpointId` を保持し、必要に応じて `Tags`、`Children` を保持してよい
+- `CallMeta.EndpointId` は観測用途に限定し、仕様判断、業務分岐、対応可否判定の根拠に使わない
+- `EndpointId` は `CallMeta` に置く
+- `HttpStatus` と `BodySnippet` は `CallError` に置く
+- `CallMeta.RawJson` は Stage10 の公開契約としては前提にしない
+- raw response の直接観測が必要な場合は、`WireResponse` または `Wire` 単独利用で扱う
+- 通常の成功/失敗は `CallResult` で表現し、throw はプログラミングエラー、設定不備、プロセス継続不能な内部不整合に限定する
 
 ### 3.8 下位層アクセス
 
@@ -230,9 +253,13 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - Stage10 の最終目標は、bitFlyer 用 `Normalized DTO` 全体を安定公開契約として固定することである
 - そのため、`Normalized DTO` は最終的に将来の MCP や外部公開面へ接続可能な意味契約へ収束させる
+- 最終固定形の `Normalized DTO` は、bitFlyer API の返却フィールド集合を正本とした鏡像であることを原則とする
+- 最終固定形では、bitFlyer API の返却 field 名に対して PascalCase 化、型変換、nullable 化、property-based immutable 化のみを許容する
+- bitFlyer API の返却 field に存在しない補助情報、raw diagnostics、意味補完による rename は最終固定形へ持ち込まない
 - ただし移行期間中は、先に安定形へ到達した DTO を `Stable Core DTO`、見直し前の DTO を `Transitional DTO` として区別してよい
 - `Stable Core DTO` / `Transitional DTO` の区別は移行概念であり、最終状態では `Normalized DTO` 全体固定へ収束させる
-- `RawSnapshot`、`Extras`、`RawJson` などの lossless / diagnostics 用情報を含む DTO は、そのまま固定するのではなく、診断情報分離または安定公開形への再設計を経て最終固定対象へ取り込む
+- Stage10 の `Normalized` 公開契約では、`RawSnapshot`、`Extras`、`RawJson` などの raw / diagnostics 情報をサポートしない
+- success 時の raw 観測や lossless 保持が必要な場合は、`Normalized` ではなく `Wire` を直接利用する
 
 #### 3.11.1 Breaking Change の扱い
 
@@ -267,7 +294,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
   - `child_order_acceptance_id` -> `ChildOrderAcceptanceId`
   - `exec_date` -> `ExecDate`
 - `RawJson`、`RawSnapshot`、`Extras` は bitFlyer API の返却フィールド名由来ではないため、最終固定対象の `Normalized DTO` の naming rule には含めない
-- 上記の情報は `Normalized DTO` の naming 例外として残すのではなく、diagnostics / metadata 側へ分離する
+- 上記の情報は `Normalized DTO` の naming 例外として残さず、`Normalized` 公開契約では非サポートとする
 - `GetAddressesResponse(FreeText RawJson)` のように、意味 DTO ではなく raw payload 保持を主目的とするものは、そのまま固定対象にしない
 
 #### 3.11.4 Nullability Rule の方針
@@ -286,12 +313,12 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 最終固定対象の `Normalized DTO` は、`JsonSerializer.Serialize(dto)` が既定設定で通ることを必須条件とする
 - 呼び出し側に専用 `JsonSerializerOptions` や custom converter 登録を要求しない
 - 最終固定対象の `Normalized DTO` は serializer-native な公開形を優先し、`string` / `decimal` / `bool` / `DateTimeOffset` / `IReadOnlyList<T>` / `IReadOnlyDictionary<string, T>` など、既定 serializer で安定して扱える型を基本とする
-- `RawJson`、`RawSnapshot`、`Extras` などの diagnostics / lossless payload は `Normalized DTO` 本体に含めず、metadata / diagnostics 側へ分離する
+- `RawJson`、`RawSnapshot`、`Extras` などの diagnostics / lossless payload は `Normalized DTO` 本体に含めず、`Normalized` 公開契約ではサポートしない
 - `IReadOnlyDictionary<FreeText, JsonElement>` のような custom key 型 dictionary は最終固定対象の `Normalized DTO` で採用しない
-- key/value の追加保持が必要な場合は、key を `string` へ正規化した diagnostics 側構造へ退避する
+- key/value の追加保持が必要な場合は、`Normalized` ではなく `Wire` を通じて raw response を参照する
 - `Price`、`Size`、`ProductCode`、`AcceptanceId` などの domain wrapper は、最終固定対象の `Normalized DTO` では原則として `decimal` / `string` などの serializer-native scalar へ寄せる
 - 既存 wrapper を内部表現として保持することは許容するが、最終固定対象の `Normalized DTO` の公開形には持ち込まない
-- `Transitional DTO` では既存 wrapper や diagnostics 混在を暫定利用してよいが、固定対象へ昇格させる時点で serializer-native な公開形へ再設計する
+- `Transitional DTO` では既存 wrapper や raw diagnostics 混在を暫定利用してよいが、固定対象へ昇格させる時点で serializer-native な公開形へ再設計する
 
 ---
 
@@ -394,6 +421,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 上位層の「変換のみ」原則と「下位層へ戻らない」原則を固定する
 - `Composition` の位置づけを「配線のみ」として固定する
 - Stage10 向け live test の配置方針と初期スコープを固定する
+- 初期実装 endpoint を `GetTicker`、`GetBalance`、`SendChildOrder` に固定する
 - 既存コードを使って、実装可能性と主要な衝突点を洗い出す
 
 ### Out of Scope
@@ -404,6 +432,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 既存文書との整合完了
 - 新仕様への全面移行
 - POST を含む live test の全面展開
+- 初期実装対象以外の endpoint 実装
 - stage10 以外の文書更新
 
 ---
@@ -482,6 +511,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
   - 正規化 request を `Wire` request 材料へ落とす責務を置く
   - request 側の意味検証もここで行う
   - `null` を「未指定」として扱い、query / body / path へ出力しない規則をここで担う
+  - `GetTicker` のように `Wire` 側 endpoint-level API を直接利用できる場合、この責務は最小化または不要としてよい
 - `Normalized/Internal/JsonValidation/`
   - `Wire` の raw JSON text を JSON object として検証・decode 開始可能な形へ変換する責務を置く
   - response 側の `TEXT -> JSON検証変換` 段階に対応する
@@ -518,9 +548,10 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - まず `stage10.md` で方針を固定する
 - 次に `stage10/` フォルダを作り、bitFlyer client モデル、runtime モデル、責務分解、移行計画を分割記述する
 - live test は `tests-stage10/Bitflyer/LiveTests` を第1配置候補とする
-- live test の初期対象は `GET` 系とし、`Wire` / `Normalized` の read path を先に押さえる
+- 初期実装対象は `GetTicker`、`GetBalance`、`SendChildOrder` とする
+- live test は、まず read path の `GetTicker` / `GetBalance` を押さえ、その後 write path の `SendChildOrder` を導入する
 - 既存 bitFlyer live test 資産は、Stage10 live test 設計の回帰資産・流用候補として扱う
-- `POST` / 注文 lifecycle を含む live test は、`Normalized` request 境界の固定後に後段で導入する
+- `SendChildOrder` 以外の `POST` / 注文 lifecycle live test は、`Normalized` request 境界の固定後に後段で導入する
 - その後、既存コードを利用しながら試作実装を進める
 - bitFlyer 専用設計が固まった後に、取引所横断共通化の再導入可否を判断する
 - 既存文書との整合は、試作で方針が固まった後に行う
@@ -544,14 +575,15 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 各層の request / response 境界が文書上で明確である
 - response 側の `TEXT -> JSON検証変換 -> 意味変換 -> 意味検証` の 4 段階が文書上で明確であり、物理構成と対応している
 - `Transport` / `Http` / `Codec` / `Mapping` / `Semantic` / `Unknown` の基底分類と、各層での確定責務が文書上で明確である
+- Stage10 の公開 API が `Call` を唯一の返却形式とし、`EndpointId` / `HttpStatus` / `BodySnippet` の保持場所が文書上で明確である
 - `Normalized DTO` 全体を最終的に固定する前提、移行中の `Stable Core DTO` / `Transitional DTO` の区別、および breaking change 規則が文書上で明確である
-- 最終固定対象の `Normalized DTO` の naming rule が、bitFlyer API の返却フィールド名由来であることと、diagnostics 情報を DTO 外へ分離する方針が文書上で明確である
+- 最終固定対象の `Normalized DTO` の naming rule が、bitFlyer API の返却フィールド名由来であることと、raw / diagnostics 情報を `Normalized` 公開契約でサポートしない方針が文書上で明確である
 - request 側の `null = 未指定` 規則と、最終固定対象 DTO の nullability rule が文書上で明確である
 - 最終固定対象の `Normalized DTO` が既定 `JsonSerializer.Serialize(dto)` を前提とし、serializer-native な公開形を採る方針が文書上で明確である
 - 各層で `Public` / `Private` の責務を分けつつ、公開面は bundle として整理することが文書上で明確である
 - 上位層が下位層へ戻って再取得・再試行しないことが文書上で明確である
 - 下位層アクセス可能だが暗黙 fallback は禁止することが文書上で明確である
-- Stage10 live test の配置先と `GET` 先行の初期スコープが文書上で明確である
+- 初期実装対象が `GetTicker` / `GetBalance` / `SendChildOrder` に固定されていることと、live test の導入順が文書上で明確である
 - bitFlyer 専用で開始する理由と、取引所横断共通化を後段へ送る理由が文書上で明確である
 - 次段階で `stage10/` フォルダへ分割する前提が明記されている
 
@@ -560,6 +592,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 ## 12. 現時点の未確定事項
 
 - 各 bundle の具体名と公開プロパティ名をどう固定するか
+- `CallMeta.Layer` / `Component` / `Tags` / `Children` の語彙と運用粒度をどう固定するか
 - `Encoder` / `JsonValidation` / `Conversion` / `MeaningValidation` の配置と命名をどう固定するか
 - `Normalized/Internal/*` の型名・namespace・ファイル分割粒度をどう固定するか
 - どの endpoint のどの `Transitional DTO` をどの順で固定対象へ収束させるか

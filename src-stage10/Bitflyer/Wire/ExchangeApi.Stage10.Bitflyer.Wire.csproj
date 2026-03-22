@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AssemblyName>ExchangeApi.Stage10.Bitflyer.Wire</AssemblyName>
+    <RootNamespace>ExchangeApi.Stage10.Bitflyer.Wire</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Transport/ExchangeApi.Transport.csproj" />
+    <ProjectReference Include="../../../src/Primitives/ExchangeApi.Primitives.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../Vocabulary/EndpointIds.cs" Link="Vocabulary/EndpointIds.cs" />
+    <Compile Include="../Vocabulary/ProductCodes.cs" Link="Vocabulary/ProductCodes.cs" />
+  </ItemGroup>
+
+</Project>

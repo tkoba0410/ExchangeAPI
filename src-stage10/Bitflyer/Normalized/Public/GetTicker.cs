@@ -1,0 +1,170 @@
+using System.Text.Json.Serialization;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Stage10.Bitflyer.Normalized.Internal.Conversion;
+using ExchangeApi.Stage10.Bitflyer.Normalized.Internal.Encoder;
+using ExchangeApi.Stage10.Bitflyer.Normalized.Internal.Errors;
+using ExchangeApi.Stage10.Bitflyer.Normalized.Internal.JsonValidation;
+using ExchangeApi.Stage10.Bitflyer.Normalized.Internal.MeaningValidation;
+using ExchangeApi.Transport.Wire;
+
+namespace ExchangeApi.Stage10.Bitflyer.Normalized.Public.Requests
+{
+    public sealed class GetTickerRequest
+    {
+        [JsonPropertyName("product_code")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ProductCode { get; init; }
+    }
+}
+
+namespace ExchangeApi.Stage10.Bitflyer.Normalized.Public.Dtos
+{
+    public sealed class GetTickerResponse
+    {
+        [JsonPropertyName("product_code")]
+        public string ProductCode { get; init; } = string.Empty;
+
+        [JsonPropertyName("state")]
+        public string State { get; init; } = string.Empty;
+
+        [JsonPropertyName("timestamp")]
+        public DateTimeOffset Timestamp { get; init; }
+
+        [JsonPropertyName("tick_id")]
+        public long TickId { get; init; }
+
+        [JsonPropertyName("best_bid")]
+        public decimal BestBid { get; init; }
+
+        [JsonPropertyName("best_ask")]
+        public decimal BestAsk { get; init; }
+
+        [JsonPropertyName("best_bid_size")]
+        public decimal BestBidSize { get; init; }
+
+        [JsonPropertyName("best_ask_size")]
+        public decimal BestAskSize { get; init; }
+
+        [JsonPropertyName("total_bid_depth")]
+        public decimal TotalBidDepth { get; init; }
+
+        [JsonPropertyName("total_ask_depth")]
+        public decimal TotalAskDepth { get; init; }
+
+        [JsonPropertyName("market_bid_size")]
+        public decimal MarketBidSize { get; init; }
+
+        [JsonPropertyName("market_ask_size")]
+        public decimal MarketAskSize { get; init; }
+
+        [JsonPropertyName("ltp")]
+        public decimal Ltp { get; init; }
+
+        [JsonPropertyName("volume")]
+        public decimal Volume { get; init; }
+
+        [JsonPropertyName("volume_by_product")]
+        public decimal VolumeByProduct { get; init; }
+    }
+}
+
+namespace ExchangeApi.Stage10.Bitflyer.Normalized.Public.Api
+{
+    public partial interface IBitflyerPublicNormalizedApi
+    {
+        Task<Call<Requests.GetTickerRequest, Dtos.GetTickerResponse>> GetTickerAsync(
+            Requests.GetTickerRequest request,
+            CancellationToken cancellationToken = default);
+    }
+
+    public sealed partial class BitflyerPublicNormalizedApi
+    {
+        public async Task<Call<Requests.GetTickerRequest, Dtos.GetTickerResponse>> GetTickerAsync(
+            Requests.GetTickerRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            if (!GetTickerRequestEncoder.TryEncode(request, out var encodedRequest, out var error))
+            {
+                return NormalizedCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
+                    request,
+                    Vocabulary.EndpointIds.GetTicker,
+                    component: "PublicApi",
+                    scope: "Public",
+                    auth: "None",
+                    error: error!,
+                    stage: "Encoder");
+            }
+
+            var wireCall = await _wire
+                .GetTickerAsync(encodedRequest.ProductCode, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (wireCall.Result is CallResult<WireResponse>.Err wireError)
+            {
+                return NormalizedCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
+                    request,
+                    Vocabulary.EndpointIds.GetTicker,
+                    component: "PublicApi",
+                    scope: "Public",
+                    auth: "None",
+                    error: wireError.Error,
+                    child: wireCall);
+            }
+
+            var wireResponse = ((CallResult<WireResponse>.Ok)wireCall.Result).Response;
+
+            if (!WireJsonValidator.TryValidateObjectResponse(wireResponse, out var json, out error))
+            {
+                return NormalizedCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
+                    request,
+                    Vocabulary.EndpointIds.GetTicker,
+                    component: "PublicApi",
+                    scope: "Public",
+                    auth: "None",
+                    error: error!,
+                    stage: "JsonValidation",
+                    child: wireCall);
+            }
+
+            using (json.Document)
+            {
+                if (!GetTickerResponseConverter.TryConvert(json.Root, out var candidate, out error))
+                {
+                    return NormalizedCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
+                        request,
+                        Vocabulary.EndpointIds.GetTicker,
+                        component: "PublicApi",
+                        scope: "Public",
+                        auth: "None",
+                        error: error!,
+                        stage: "Conversion",
+                        child: wireCall);
+                }
+
+                if (!GetTickerMeaningValidator.TryValidate(candidate!, out var response, out error))
+                {
+                    return NormalizedCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
+                        request,
+                        Vocabulary.EndpointIds.GetTicker,
+                        component: "PublicApi",
+                        scope: "Public",
+                        auth: "None",
+                        error: error!,
+                        stage: "MeaningValidation",
+                        child: wireCall);
+                }
+
+                return NormalizedCallFactory.CreateSuccess(
+                    request,
+                    Vocabulary.EndpointIds.GetTicker,
+                    component: "PublicApi",
+                    scope: "Public",
+                    auth: "None",
+                    response: response!,
+                    child: wireCall);
+            }
+        }
+    }
+}

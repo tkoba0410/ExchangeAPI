@@ -1,0 +1,90 @@
+using ExchangeApi.Stage10.Bitflyer.Normalized.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Normalized.Private.Requests;
+using ExchangeApi.Stage10.Bitflyer.Wire.Private.Api;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Transport.Wire;
+
+namespace ExchangeApi.Tests.Stage10.Bitflyer.Normalized.Tests;
+
+public sealed class GetBalanceNormalizedTests
+{
+    [Fact]
+    public async Task GetBalanceAsync_SuccessfullyMapsTopLevelArray()
+    {
+        var wire = new StubPrivateWireApi(
+            getBalanceCall: CreateWireOk(
+                "GetBalance",
+                """
+                [
+                  { "currency_code": "JPY", "amount": 1000, "available": 900 },
+                  { "currency_code": "BTC", "amount": 0.5, "available": 0.4 }
+                ]
+                """),
+            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
+        var api = new BitflyerPrivateNormalizedApi(wire);
+
+        var call = await api.GetBalanceAsync(new GetBalanceRequest());
+        var ok = Assert.IsType<CallResult<IReadOnlyList<ExchangeApi.Stage10.Bitflyer.Normalized.Private.Dtos.GetBalance.Item>>.Ok>(call.Result);
+
+        Assert.Collection(
+            ok.Response,
+            item =>
+            {
+                Assert.Equal("JPY", item.CurrencyCode);
+                Assert.Equal(1000m, item.Amount);
+                Assert.Equal(900m, item.Available);
+            },
+            item =>
+            {
+                Assert.Equal("BTC", item.CurrencyCode);
+                Assert.Equal(0.5m, item.Amount);
+                Assert.Equal(0.4m, item.Available);
+            });
+    }
+
+    [Fact]
+    public async Task GetBalanceAsync_WithNonArrayJson_ReturnsCodecError()
+    {
+        var wire = new StubPrivateWireApi(
+            getBalanceCall: CreateWireOk("GetBalance", """{ "currency_code": "JPY" }"""),
+            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
+        var api = new BitflyerPrivateNormalizedApi(wire);
+
+        var call = await api.GetBalanceAsync(new GetBalanceRequest());
+        var err = Assert.IsType<CallResult<IReadOnlyList<ExchangeApi.Stage10.Bitflyer.Normalized.Private.Dtos.GetBalance.Item>>.Err>(call.Result);
+
+        Assert.Equal(CallErrorKind.Codec, err.Error.Kind);
+    }
+
+    private static Call<WireCallSpec, WireResponse> CreateWireOk(string endpointId, string json, int statusCode = 200) =>
+        new(
+            Id: CallId.New(),
+            StartedAt: DateTimeOffset.UtcNow,
+            Duration: TimeSpan.Zero,
+            Request: new WireCallSpec("GET", "/test", endpointId),
+            Result: new CallResult<WireResponse>.Ok(new WireResponse(statusCode, json)),
+            Meta: new CallMeta("Wire", "Transport", endpointId));
+
+    private sealed class StubPrivateWireApi : IBitflyerPrivateWireApi
+    {
+        private readonly Call<WireCallSpec, WireResponse> _getBalanceCall;
+        private readonly Call<WireCallSpec, WireResponse> _sendChildOrderCall;
+
+        public StubPrivateWireApi(
+            Call<WireCallSpec, WireResponse> getBalanceCall,
+            Call<WireCallSpec, WireResponse> sendChildOrderCall)
+        {
+            _getBalanceCall = getBalanceCall;
+            _sendChildOrderCall = sendChildOrderCall;
+        }
+
+        public Task<Call<WireCallSpec, WireResponse>> GetBalanceAsync(
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(_getBalanceCall);
+
+        public Task<Call<WireCallSpec, WireResponse>> SendChildOrderAsync(
+            string bodyJson,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(_sendChildOrderCall);
+    }
+}

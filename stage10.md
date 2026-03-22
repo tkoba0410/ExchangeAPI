@@ -143,7 +143,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 #### 3.7.1 リクエスト境界
 
 - リクエストは上位層から下位層へ向かう
-- `Normalized` は bitFlyer 内意味で整理された request を受け取る
+- `Normalized` は bitFlyer API の入力 field 集合を鏡像化した request DTO を受け取る
 - `Normalized` の公開 API 面は path / query / body / headers を直接構築しない
 - `Normalized` は internal `Encoder` を通じて `Wire` endpoint-level API へ渡す request 材料を構築する
 - `Encoder` は `Normalized` の内部実装であり、公開層は構成しない
@@ -219,7 +219,8 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Wire` の主公開 API は endpoint-level API とし、各 endpoint-level API は `Task<Call<WireCallSpec, WireResponse>>` を返す
 - `WireCallSpec` を直接受ける汎用 `SendAsync(...)` を持つ場合、それは internal / debug / 補助面として扱い、主公開面にはしない
 - `Call.Request` に保持する `WireCallSpec` は、署名前の canonical request とし、公開契約として扱う
-- `WireCallSpec` には `EndpointId`、`Method`、`Path`、`Query`、`BodyJson`、公開して問題ない header のみを含める
+- `WireCallSpec.Headers` は原則空とし、header を公開契約へ持ち込む必要がある場合のみ allowlist 方式で保持してよい
+- `WireCallSpec` に保持してよい header の初期 allowlist は `Content-Type` と `Accept` に限定する
 - 署名値、`Authorization` header、nonce、timestamp、body hash などの認証情報は `WireCallSpec` に含めない
 - 認証・署名に必要な付加情報は `Wire/Internal/Auth` が実行直前に付与し、公開 `Call.Request` へは露出しない
 - `Normalized` の公開 API は `Task<Call<TRequest, TResponse>>` を返す
@@ -404,14 +405,20 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 ### 4.6 Endpoint Matrix の方針
 
-- Stage10 用の endpoint 一覧は、inventory を入力として `stage10-endpoints-bitflyer.md` に切り出す
+- Stage10 用の endpoint 一覧は、inventory を入力として `stage10/endpoints-bitflyer.md` に切り出す
 - 一覧は 1 endpoint 1 行を原則とする
 - 最低限の列は `EndpointId`、`Method`、`Path`、`Scope`、`ExposeInWire`、`ExposeInNormalized`、`LiveTestPhase`、`RequestDtoStatus`、`ResponseDtoStatus` とする
 - `DTOStatus` は request / response で意味が異なるため、単一列ではなく `RequestDtoStatus` と `ResponseDtoStatus` に分ける
 - `RequestDtoStatus` と `ResponseDtoStatus` は、少なくとも `Transitional` / `Fixed` を取る
 - 初期 3 endpoint 以外は、当初 `ExposeInNormalized = No`、`LiveTestPhase = Later` として明示してよい
 - endpoint matrix は Stage10 の実装対象、DTO 固定対象、live test 対象を同時に管理するための正本とする
-- `stage10-endpoints-bitflyer.md` は Stage10 第1段階で作成する成果物とする
+- `stage10/endpoints-bitflyer.md` は Stage10 第1段階で作成する成果物とする
+
+#### 4.6.1 DTO Status の昇格条件
+
+- `RequestDtoStatus = Fixed` は、API 入力 field 鏡像、naming / null / omission 規則固定、`Encoder` による path / query / body 配置固定、対応 unit test 通過を満たしたときに限る
+- `ResponseDtoStatus = Fixed` は、API 返却 field 鏡像、naming / nullability / JSON serializable 規則固定、raw diagnostics 非依存、`JsonValidation -> Conversion -> MeaningValidation` の境界固定、対応 test 通過を満たしたときに限る
+- live test 成功は強い証跡として扱うが、`Fixed` 判定の必須条件にはせず、`LiveTestPhase` と別軸で管理する
 
 ### 4.7 Runtime 所有権と Dispose 方針
 
@@ -437,6 +444,9 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Normalized/Internal/JsonValidation -> Conversion -> MeaningValidation` の response pipeline は一方向依存のみを許容する
 - 参照ガードは、文書ルールだけでなく arch test による機械検証を前提とする
 - Stage10 用の機械検証は `tests-stage10/Bitflyer/Architecture.Tests` を追加候補とし、project reference、公開面 forbidden type、namespace forbidden dependency を対象にする
+- `project reference` では `Wire -> Transport, Primitives, Vocabulary`、`Normalized -> Wire, Primitives, Vocabulary`、`Composition -> Wire, Normalized, ExchangeApi.Composition, Primitives` 以外を拒否する
+- `public surface forbidden type` では `Normalized.Public/Private` の公開面に `WireResponse`、`WireCallSpec`、`JsonElement`、`JsonDocument`、`HttpRequestMessage`、`HttpResponseMessage`、raw diagnostics 型が露出しないことを検査する
+- `namespace forbidden dependency` では `Wire -> Normalized`、`Composition -> *.Internal.*`、response pipeline の逆参照を禁止する
 
 ### 4.9 初期 3 endpoint の具体化方針
 
@@ -445,12 +455,19 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `GetTicker`
   - `Wire.Public.GetTickerAsync(string productCode, CancellationToken ct = default)`
   - `Normalized` は request validation 後に `Wire.Public.GetTickerAsync(...)` を呼び、response を `JsonValidation -> Conversion -> MeaningValidation` で正規化する
+  - `GetTickerRequest` は `ProductCode?` を持つ request DTO とする
+  - `GetTickerResponse` は `ProductCode`、`Timestamp`、`TickId`、`BestBid`、`BestAsk`、`BestBidSize`、`BestAskSize`、`TotalBidDepth`、`TotalAskDepth`、`Ltp`、`Volume`、`VolumeByProduct` を持つ
 - `GetBalance`
   - `Wire.Private.GetBalanceAsync(CancellationToken ct = default)`
-  - `Normalized` は空 request DTO または認証前提 request DTO を受け、response 正規化だけを担う
+  - `Normalized` は空 request DTO を受け、response 正規化だけを担う
+  - `GetBalanceRequest` は空 request DTO に固定する
+  - `GetBalanceResponse` は synthetic wrapper を作らず、top-level array 契約として `IReadOnlyList<GetBalanceItem>` を返す
+  - `GetBalanceItem` は `CurrencyCode`、`Amount`、`Available` を持つ
 - `SendChildOrder`
   - `Wire.Private.SendChildOrderAsync(string bodyJson, CancellationToken ct = default)`
   - `Normalized/Internal/Encoder` が request DTO を body JSON に serialize し、その結果を `Wire.Private.SendChildOrderAsync(...)` へ渡す
+  - `SendChildOrderRequest` は `ProductCode`、`ChildOrderType`、`Side`、`Size`、`Price?`、`MinuteToExpire?`、`TimeInForce?` を持つ
+  - `SendChildOrderResponse` は `ChildOrderAcceptanceId` のみを持つ
 - `SendChildOrder` は request encode が最も強く現れる endpoint として、Stage10 の request 契約・encoder 契約の基準例とする
 
 ---
@@ -541,7 +558,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - Stage10 は専用ブランチで進める
 - 既存 `src/Exchanges/Bitflyer/*` を直接崩さず、別配置で新実装を並行構築する
-- 文書は `stage10/` フォルダに集約する
+- root に残す Stage10 文書は `stage10.md` のみとし、補助文書は `stage10/` フォルダに集約する
 - 新実装が固まるまで、既存実装は比較対象・回帰対象として維持する
 
 ### 9.2 採用ブランチ
@@ -556,7 +573,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
   - `stage10/runtime.md`
   - `stage10/dto-stability.md`
   - `stage10/migration.md`
-  - `stage10-endpoints-bitflyer.md`
+  - `stage10/endpoints-bitflyer.md`
 - 新コード:
   - `src-stage10/Bitflyer/Vocabulary`
     - `EndpointIds.cs`
@@ -715,12 +732,11 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 ## 12. 現時点の未確定事項
 
-- 各 bundle の具体名と公開プロパティ名をどう固定するか
 - `Encoder` / `JsonValidation` / `Conversion` / `MeaningValidation` の配置と命名をどう固定するか
 - `Normalized/Internal/*` の型名・namespace・ファイル分割粒度をどう固定するか
 - どの endpoint のどの `Transitional DTO` をどの順で固定対象へ収束させるか
 - `WireBundle` / `NormalizedBundle` の具体名と公開プロパティ名をどう固定するか
-- `stage10-endpoints-bitflyer.md` の運用粒度をどう固定するか
+- `stage10/endpoints-bitflyer.md` の運用粒度をどう固定するか
 - 補助的な運用分類（Auth / RateLimit / Server / Request など）をどこまで Stage10 で固定するか
 - bitFlyer 専用 runtime のうち、どこまでを後に取引所横断共通化できるか
 - `POST` / 注文 lifecycle の live test をどの段階で導入するか

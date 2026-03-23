@@ -121,3 +121,96 @@
 - その後 `SendChildOrder` を移し、request encode が強い write endpoint の形を固定する
 - `CancelChildOrder` は注文 lifecycle 補助 endpoint としてその後に追従させる
 - `Composition` の wiring 変更は、少なくとも `GetTicker` と `GetBalance` の module 形が固まった後に行う
+
+## Initial Endpoint Contracts
+
+初期 4 endpoint の exact contract は以下とする。
+
+### GetTicker
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetTickerCallAsync(string? productCode, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(GetTickerRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string?`
+  - JSON body なし
+  - `ProductCode = null` のとき query omitted
+- response DTO
+  - `ProductCode: string`
+  - `State: string`
+  - `Timestamp: DateTimeOffset`
+  - `TickId: long`
+  - `BestBid: decimal`
+  - `BestAsk: decimal`
+  - `BestBidSize: decimal`
+  - `BestAskSize: decimal`
+  - `TotalBidDepth: decimal`
+  - `TotalAskDepth: decimal`
+  - `MarketBidSize: decimal`
+  - `MarketAskSize: decimal`
+  - `Ltp: decimal`
+  - `Volume: decimal`
+  - `VolumeByProduct: decimal`
+- `ExpectedStatus = 200`
+- `ResponseShape = Object`
+
+### GetBalance
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetBalanceCallAsync(CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceCallAsync(GetBalanceRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `GetBalanceRequest` は空 DTO
+  - JSON body なし
+- response DTO
+  - top-level array
+  - `GetBalance.Item`
+    - `CurrencyCode: string`
+    - `Amount: decimal`
+    - `Available: decimal`
+- `ExpectedStatus = 200`
+- `ResponseShape = Array`
+
+### SendChildOrder
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> SendChildOrderCallAsync(string bodyJson, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<SendChildOrderRequest, SendChildOrderResponse>> SendChildOrderCallAsync(SendChildOrderRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string`
+  - `ChildOrderType: string`
+  - `Side: string`
+  - `Price: decimal?`
+  - `Size: decimal`
+  - `MinuteToExpire: int?`
+  - `TimeInForce: string?`
+- request rule
+  - `ChildOrderType = LIMIT` のとき `Price` 必須
+  - `ChildOrderType = MARKET` のとき `Price` omitted
+  - `MinuteToExpire = null` のとき body omitted
+  - `TimeInForce = null` のとき body omitted
+- response DTO
+  - `ChildOrderAcceptanceId: string`
+- `ExpectedStatus = 200`
+- `ResponseShape = Object`
+
+### CancelChildOrder
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> CancelChildOrderCallAsync(string bodyJson, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<CancelChildOrderRequest, Unit>> CancelChildOrderCallAsync(CancelChildOrderRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string`
+  - `ChildOrderId: string?`
+  - `ChildOrderAcceptanceId: string?`
+- request rule
+  - `ChildOrderId` と `ChildOrderAcceptanceId` は exactly one
+- response DTO
+  - `Unit`
+  - empty body または `{}` を成功扱いにしてよい
+- `ExpectedStatus = 200`
+- `ResponseShape = EmptyOrObject`

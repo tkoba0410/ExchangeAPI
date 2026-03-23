@@ -100,11 +100,11 @@ sequenceDiagram
     NM->>NM: InputValidation / Encode
     NM->>PF: GetTickerCallAsync(productCode)
     PF->>PM: forward
-    PM->>RT: Send Call<WireCallSpec, WireResponse>
+    PM->>RT: Send Call<ProtocolRequest, ProtocolResponse>
     RT->>BF: HTTP GET /v1/getticker
     BF-->>RT: raw response
-    RT-->>PM: WireResponse
-    PM-->>PF: Call<WireCallSpec, WireResponse>
+    RT-->>PM: ProtocolResponse
+    PM-->>PF: Call<ProtocolRequest, ProtocolResponse>
     PF-->>NM: protocol call
     NM->>NM: JsonValidation / Conversion / ContractValidation
     NM-->>NF: Call<GetTickerRequest, GetTickerResponse>
@@ -219,7 +219,7 @@ Stage10 では実装対象外とする。
 
 依存方向の正本は以下とする。
 
-- `Protocol.Endpoints` -> `Protocol.Internal.Runtime` / `Protocol.Internal.Auth` / `Protocol.Internal.Shared` / `Vocabulary` / `Primitives` / shared transport
+- `Protocol.Endpoints` -> `Protocol.Internal.Runtime` / `Protocol.Internal.Auth` / `Protocol.Internal.Shared` / `Vocabulary` / `Primitives`
 - `Protocol.Api` -> `Protocol.Endpoints` の module interface または module 集約 object
 - `Native.Endpoints` -> `Native.Internal.Shared` / `Vocabulary` / `Primitives` / 対応する `Protocol` endpoint interface
 - `Native.Api` -> `Native.Endpoints` の module interface または module 集約 object
@@ -231,7 +231,7 @@ Stage10 では実装対象外とする。
 
 - facade から runtime / signer / transport へ直接触れること
 - endpoint module から sibling endpoint module を直接呼ぶこと
-- `Native` から shared transport runtime へ直接触れること
+- `Native` から `Protocol.Internal.Runtime` の concrete 実装へ直接触れること
 - `McpServer` から `Protocol` / `Native` を直接正本として使うこと
 
 ## 4. 公開面
@@ -258,7 +258,7 @@ Stage10 では実装対象外とする。
 ### 4.2.1 Facade Method Contract
 
 - facade の主公開面は `*CallAsync(...)` とする
-- `Protocol` facade は `Task<Call<WireCallSpec, WireResponse>>` を返す
+- `Protocol` facade は `Task<Call<ProtocolRequest, ProtocolResponse>>` を返す
 - `Native` facade は `Task<Call<TRequest, TResponse>>` を返す
 - `Call` を返さない ergonomic wrapper は Stage10 の必須要件に含めない
 - ergonomic wrapper を将来追加する場合でも、`Call` を返す主 API を置き換えてはならない
@@ -311,7 +311,7 @@ public interface INativeEndpoint<in TRequest, TResponse>
 ```csharp
 public interface IGetTickerProtocolEndpoint
 {
-    Task<Call<WireCallSpec, WireResponse>> SendAsync(
+    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         CancellationToken cancellationToken = default);
 }
@@ -320,17 +320,99 @@ public interface IGetTickerProtocolEndpoint
 ```csharp
 public interface ISendChildOrderProtocolEndpoint
 {
-    Task<Call<WireCallSpec, WireResponse>> SendAsync(
+    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
         string bodyJson,
         CancellationToken cancellationToken = default);
 }
 ```
 
+### 4.6 Foundation Contracts
+
+Stage10 の基盤契約は `Protocol` 語彙で定義する。
+
+- `ProtocolRequest`
+  - protocol 層の canonical request snapshot
+  - 少なくとも `EndpointId` / `Method` / `Path` / `Query` / `BodyText` を持つ
+  - request header は記録しない
+- `ProtocolResponse`
+  - protocol 層の raw response snapshot
+  - 少なくとも `StatusCode` / `Headers` / `BodyText` を持つ
+- `Call<TRequest, TResponse>`
+  - Stage10 の唯一の返却契約
+- `CallError`
+  - `Transport` / `Http` / `Codec` / `Semantic` / `Mapping` を表す
+- `CallMeta`
+  - 観測語彙と child call 情報を保持する
+- `Unit`
+  - successful response body が空であることを表す native response marker
+
+追加原則:
+
+- `ProtocolRequest` / `ProtocolResponse` は Stage10 の設計正本に属する
+- lower-level HTTP client や runtime 実装は、必要なら内部で別型を使ってよい
+- ただし facade と endpoint module の公開契約では `ProtocolRequest` / `ProtocolResponse` を正本にする
+
+最低 shape:
+
+```csharp
+public sealed class ProtocolRequest
+{
+    public required string EndpointId { get; init; }
+    public required string Method { get; init; }
+    public required string Path { get; init; }
+    public IReadOnlyDictionary<string, string>? Query { get; init; }
+    public string? BodyText { get; init; }
+}
+
+public sealed class ProtocolResponse
+{
+    public required int StatusCode { get; init; }
+    public IReadOnlyDictionary<string, string[]>? Headers { get; init; }
+    public string? BodyText { get; init; }
+}
+
+public sealed class CallError
+{
+    public required string Kind { get; init; }
+    public required string Message { get; init; }
+}
+
+public sealed class CallMeta
+{
+    public required string Layer { get; init; }
+    public required string Component { get; init; }
+    public required string EndpointId { get; init; }
+    public required string Scope { get; init; }
+    public required string Auth { get; init; }
+    public IReadOnlyList<object>? Children { get; init; }
+}
+
+public readonly struct Unit
+{
+}
+
+public sealed class Call<TRequest, TResponse>
+{
+    public required TRequest Request { get; init; }
+    public required TResponse? Response { get; init; }
+    public required bool IsSuccess { get; init; }
+    public required CallError? Error { get; init; }
+    public required CallMeta Meta { get; init; }
+}
+```
+
+規約:
+
+- `CallMeta.Children` は child call の保持場所として使う
+- `Native` call の `Children` には、対応する single `Protocol` call を 1 件だけ入れる
+- `ProtocolRequest.Headers` は持たない
+- `ProtocolResponse.BodyText` は body 未返却時のみ `null` を許容する
+
 ## 5. Call と観測語彙
 
 ### 5.1 Call
 
-- `Protocol` は `Task<Call<WireCallSpec, WireResponse>>` を返す
+- `Protocol` は `Task<Call<ProtocolRequest, ProtocolResponse>>` を返す
 - `Native` は `Task<Call<TRequest, TResponse>>` を返す
 
 `Call` の最低要件:
@@ -353,15 +435,14 @@ public interface ISendChildOrderProtocolEndpoint
   - `IsSuccess = false`
   - `Response = null`
   - `Error != null`
-- `Native` call は対応する `Protocol` call を child call として保持する
+- `Native` call は対応する `Protocol` call を child call として `Meta` 内に保持する
 - `Protocol` call を持てない `Native` success / failure を作らない
 - facade は `Call` を再構築せず、endpoint module が返した `Call` をそのまま返す
 
 補足:
 
-- `WireCallSpec` / `WireResponse` は shared transport project の既存型名を暫定流用している
-- これは shared transport 語彙の再利用であり、Stage10 の設計正本が `Wire` であることを意味しない
-- 設計判断は `Protocol` / `Native` を正本語彙として行う
+- `ProtocolRequest` / `ProtocolResponse` は Stage10 の基盤契約である
+- lower-level transport 実装を再利用する場合でも、設計判断と公開契約は `Protocol` / `Native` 語彙で行う
 
 ### 5.2 CallMeta
 
@@ -394,6 +475,42 @@ public interface ISendChildOrderProtocolEndpoint
 - request header は記録しない
 - API key / secret / 認証 header / 署名値は metadata や diagnostics に露出しない
 - request body に秘匿値が含まれる endpoint でも、秘匿値そのものは diagnostics の正本にしない
+
+### 5.4 Protocol Debug Logging
+
+debug logging は `Protocol` 層にのみ許可する。
+
+原則:
+
+- 目的は debug 用に限定する
+- `Native` / `Composition` / facade は raw request-response logging の正本を持たない
+- request header は logging しない
+- API key / secret / 認証 header / 署名値は logging しない
+- logging は通常時 no-op を既定とする
+- live test または明示 opt-in 実行時のみ有効化してよい
+
+記録してよい項目:
+
+- `EndpointId`
+- `Method`
+- `Path`
+- query
+- body text
+- `StatusCode`
+- response body text
+- local timestamp
+
+記録してはいけない項目:
+
+- request headers
+- response headers
+- `ACCESS-KEY`, `ACCESS-TIMESTAMP`, `ACCESS-SIGN`
+- API key / secret / signature payload
+
+出力先:
+
+- raw debug log は `local/logs/bitflyer/stage10/` 配下にのみ出力する
+- raw debug log は `.gitignore` 対象とし、repository に commit / push しない
 
 ## 6. Request / Response 境界
 
@@ -440,7 +557,7 @@ public interface ISendChildOrderProtocolEndpoint
 追加原則:
 
 - `Protocol` は `Transport` を新規に生成してよい
-- `Protocol` は HTTP response を受け取った時点で `WireResponse` を返し、status code を `Http` へ変換しない
+- `Protocol` は HTTP response を受け取った時点で `ProtocolResponse` を返し、status code を `Http` へ変換しない
 - `Protocol` は `Semantic` を新規に生成しない
 - `Protocol` は `Codec` / `Mapping` を新規に生成しない
 - `Native` の `Conversion` で起きる field-level decode failure は `Codec` とする
@@ -467,6 +584,21 @@ public interface ISendChildOrderProtocolEndpoint
 - `ContractValidation`
   - native candidate が API contract として成立するかを検証する
 - `MeaningValidation` という語は Stage10 の正本語彙としては使わない
+
+### 6.6 Private Auth / Signing 契約
+
+bitFlyer private endpoint の認証・署名は `Protocol` が担う。
+
+固定事項:
+
+- 認証 header は `ACCESS-KEY`, `ACCESS-TIMESTAMP`, `ACCESS-SIGN`
+- `ACCESS-TIMESTAMP` は Unix epoch milliseconds の decimal string
+- 署名文字列は `timestamp + method + path + bodyText`
+- query がある場合、`path` には query string を含める
+- body がない場合、署名に使う bodyText は空文字列
+- 署名算法は `HMACSHA256(secret, utf8(payload))` の lower-hex
+- `Native` は署名を行わない
+- `Native` は key / secret を知らない
 
 ## 7. Native Contract 方針
 
@@ -607,12 +739,12 @@ Stage10 の規約は文書だけで終わらせず、arch test で機械検証�
 検証対象:
 
 - `Protocol` から `Native` への参照禁止
-- `Native` から shared transport runtime への直接参照禁止
+- `Native` から `Protocol.Internal.Runtime` の concrete 実装への直接参照禁止
 - facade から runtime / signer / transport への直接参照禁止
 - endpoint module から sibling endpoint module への直接参照禁止
 - concrete endpoint 実装型を知ってよい場所を `Composition` に限定する
-- `Native` の公開面に `WireResponse`、`JsonElement`、raw diagnostics 型を露出しないこと
-- `Protocol` の公開面は契約上 `WireResponse` を返してよいが、`JsonElement` や raw diagnostics 型を露出しないこと
+- `Native` の公開面に `ProtocolResponse`、`JsonElement`、raw diagnostics 型を DTO 契約として露出しないこと
+- `Protocol` の公開面は契約上 `ProtocolResponse` を返してよいが、`JsonElement` や raw diagnostics 型を露出しないこと
 
 配置:
 
@@ -777,6 +909,51 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 - cleanup 失敗は silent ignore しない
 - write live test は read parity test と別 phase で実行する
 
+### 10.3 Live Debug Logging
+
+live test で `Protocol` debug logging を使う場合は、以下を正本とする。
+
+- `Protocol` logging は明示 opt-in 時のみ有効化する
+- 例:
+  - `BITFLYER_STAGE10_DEBUG_LOG=1`
+- raw log 出力先は `local/logs/bitflyer/stage10/`
+- raw log は test 実行ごとに local のみへ出力する
+- raw log 自体は repository artifact にしない
+
+### 10.4 Artifact Generation Policy
+
+repository に残す live artifact は、local raw log から生成した sanitize 済み artifact のみとする。
+
+原則:
+
+- raw debug log は commit しない
+- repository に残す artifact は deterministic であること
+- artifact は redacted 済みであること
+- artifact 生成は local raw log を入力に行う
+
+artifact に含めてよい項目:
+
+- test name
+- `EndpointId`
+- `Method`
+- `Path`
+- query
+- body text
+  - 秘匿値を含まない範囲
+- `StatusCode`
+- response body text
+- 実行 timestamp
+- 判定結果
+
+artifact に含めてはいけない項目:
+
+- request headers
+- response headers
+- API key / secret
+- 認証 header
+- 署名値
+- raw local filesystem path
+
 ## 11. 過去実装の扱い
 
 ### 11.1 正本にしないもの
@@ -824,6 +1001,42 @@ tests/Exchanges/Bitflyer/
 - 次に `Protocol.Tests` / `Native.Tests` / `Composition.Tests` を作る
 - `LiveTests` は read endpoint の parity が通ってから追加する
 - `ExchangeApi.slnx` は上記 project を追加するまで空のままでよい
+
+### 12.1 Bootstrap Manifest
+
+最初に作る project と root namespace は以下で固定する。
+
+```text
+src/Exchanges/Bitflyer/Protocol/ExchangeApi.Exchanges.Bitflyer.Protocol.csproj
+  RootNamespace: ExchangeApi.Exchanges.Bitflyer.Protocol
+
+src/Exchanges/Bitflyer/Native/ExchangeApi.Exchanges.Bitflyer.Native.csproj
+  RootNamespace: ExchangeApi.Exchanges.Bitflyer.Native
+
+src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj
+  RootNamespace: ExchangeApi.Exchanges.Bitflyer.Composition
+
+tests/Exchanges/Bitflyer/Protocol.Tests/ExchangeApi.Exchanges.Bitflyer.Protocol.Tests.csproj
+  RootNamespace: ExchangeApi.Tests.Exchanges.Bitflyer.Protocol.Tests
+
+tests/Exchanges/Bitflyer/Native.Tests/ExchangeApi.Exchanges.Bitflyer.Native.Tests.csproj
+  RootNamespace: ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests
+
+tests/Exchanges/Bitflyer/Composition.Tests/ExchangeApi.Exchanges.Bitflyer.Composition.Tests.csproj
+  RootNamespace: ExchangeApi.Tests.Exchanges.Bitflyer.Composition.Tests
+
+tests/Exchanges/Bitflyer/LiveTests/ExchangeApi.Exchanges.Bitflyer.LiveTests.csproj
+  RootNamespace: ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests
+```
+
+project reference の正本:
+
+- `Native` -> `Protocol`
+- `Composition` -> `Protocol`, `Native`
+- `Protocol.Tests` -> `Protocol`
+- `Native.Tests` -> `Native`, `Protocol`
+- `Composition.Tests` -> `Composition`, `Protocol`, `Native`
+- `LiveTests` -> `Composition`, `Protocol`, `Native`
 
 ## 13. 実装順
 

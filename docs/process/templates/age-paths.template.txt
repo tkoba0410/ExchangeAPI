@@ -1,5 +1,0 @@
-# age credentials paths (template)
-# copy to local-only file and do not commit secrets
-
-CREDENTIAL_FILE_PATH=/home/<user>/.config/exchangeapi/secrets/credentials.enc.json
-AGE_SECRET_KEY_PATH=/home/<user>/.config/exchangeapi/keys/age.key

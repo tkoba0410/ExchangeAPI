@@ -3,6 +3,9 @@
 本書は、[endpoints-bitflyer.md](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/inventory/endpoints-bitflyer.md) を入力として作成した Stage10 用の判断表である。  
 inventory が事実一覧であるのに対し、本書は Stage10 第1段階の実装・DTO 固定・live test 導入順を管理する。
 
+Stage10 では本書を endpoint 運用正本とし、既存 inventory は import source に留める。  
+現在の Stage10 コード配置は本書の従属物であり、判断根拠にはしない。
+
 ## Values
 
 - `ExposeInProtocol`
@@ -18,6 +21,20 @@ inventory が事実一覧であるのに対し、本書は Stage10 第1段階の
 - `RequestDtoStatus` / `ResponseDtoStatus`
   - `Transitional`: 最終固定前
   - `Fixed`: 最終固定済み
+
+## Facade + Endpoint Module Rule
+
+- `ExposeInProtocol = Yes`
+  - facade に endpoint-level method を公開する
+  - 対応する独立 module class を `Protocol/Public|Private/Endpoints/<EndpointName>/` 配下へ置く
+- `ExposeInNative = Yes`
+  - facade に native call method を公開する
+  - 対応する独立 module class を `Native/Public|Private/Endpoints/<EndpointName>/` 配下へ置く
+  - request DTO と response DTO は同 endpoint フォルダへ寄せてよい
+- matrix は「公開面に出すか」を管理する
+  - shared helper の配置
+  - converter / validator の細かい file 分割
+  は別途 `stage10.md` の物理構成方針に従う
 
 ## Matrix
 
@@ -63,3 +80,11 @@ inventory が事実一覧であるのに対し、本書は Stage10 第1段階の
 - `GetTicker` と `GetBalance` は read path のため `Phase1-Read` とする
 - `SendChildOrder` は write path のため `Phase2-Write` とする
 - 初版では DTO 固定前のため、全 endpoint の `RequestDtoStatus` / `ResponseDtoStatus` は `Transitional` から開始する
+
+## Implementation Order
+
+- まず `GetTicker` を `Protocol` / `Native` 両方の template endpoint として新構成へ移す
+- 次に `GetBalance` を同じ形で移し、top-level array 契約の扱いを固定する
+- その後 `SendChildOrder` を移し、request encode が強い write endpoint の形を固定する
+- `CancelChildOrder` は注文 lifecycle 補助 endpoint としてその後に追従させる
+- `Composition` の wiring 変更は、少なくとも `GetTicker` と `GetBalance` の module 形が固まった後に行う

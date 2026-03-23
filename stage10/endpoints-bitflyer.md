@@ -59,7 +59,7 @@ Stage10 では本書を endpoint 運用正本とし、既存 inventory は impor
 - matrix は「公開面に出すか」を管理する
   - shared helper の配置
   - converter / validator の細かい file 分割
-  は別途 `stage10b.md` の物理構成方針に従う
+  は別途 `stage10.md` の物理構成方針に従う
 
 ## Matrix
 

@@ -24,9 +24,9 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - 当初スコープを `bitFlyer` 専用に限定する
 - `Contract` 層は Stage10 の対象から外し、当初方針として廃止する
-- `Wire` / `Normalized` の 2 層を bitFlyer 専用 client 面として再定義する
-- `Wire` を実行基盤として定義し、認証・署名・transport・debug logging / diagnostics などの基本機能を集約する
-- `Normalized` は、transport を持たない request / response 契約層として再定義する
+- `Protocol` / `Native` の 2 層を bitFlyer 専用 client 面として再定義する
+- `Protocol` を実行基盤として定義し、認証・署名・transport・debug logging / diagnostics などの基本機能を集約する
+- `Native` は、transport を持たない request / response 契約層として再定義する
 - `Raw` 層は公開層としては廃止し、request encoding / response decode は internal codec として扱う
 - 上位層 client から下位層 client へアクセスできるようにする
 - 変換後に下位層へ戻って再取得・再試行・フォールバックする処理を上位層へ持たせない
@@ -46,7 +46,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - 取引所内共通化内容を固める前に取引所横断抽象化を入れると、責務境界が濁りやすい
 - `Contract` 層は取引所横断共通化のための層であり、Stage10 当初の焦点とずれる
-- まず bitFlyer だけで `Wire` / `Normalized` の責務と client モデルを固める
+- まず bitFlyer だけで `Protocol` / `Native` の責務と client モデルを固める
 - その後、取引所横断で本当に共通化すべき内容だけを別トラックで再抽出する
 
 ### 3.3 対応 API の基準
@@ -56,54 +56,54 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - Stage10 の設計判断は inventory ではなく本書 `stage10.md` で定義する
 - Stage10 では inventory の `PresentIn` と `Note` は引き継がない
 - Stage10 の対応 API 一覧は、inventory を入力として Stage10 側で新たに書き起こす
-- Stage10 では inventory に記載された endpoint を `Wire` / `Normalized` の 2 層へ再配置する前提で扱う
+- Stage10 では inventory に記載された endpoint を `Protocol` / `Native` の 2 層へ再配置する前提で扱う
 - 初期実装対象は `GetTicker`、`GetBalance`、`SendChildOrder` の 3 endpoint に限定する
 
 ### 3.4 層の基本役割
 
-- `Wire`
+- `Protocol`
   - DTO を持たない
   - HTTP 実行、認証、署名、debug logging / diagnostics、baseUri、transport 設定を担う
   - 単独で使用可能とする
-- `Normalized`
+- `Native`
   - 正規化 DTO を持つ
   - request 側では internal `Encoder` を用いて request validation、request marshalling、必要な serialize を行う
-  - すべての endpoint は、`Normalized` が `Wire` の endpoint-level API を利用して解決する
-  - `Normalized` は request shaping を内部 `Encoder` に閉じ込めた上で、`Wire` response を受けて `JSON検証変換 -> 意味変換 -> 意味検証` を担い、transport 実行責務は `Wire` に残す
-  - response 側では `Wire` の raw JSON text に対して、`JSON検証変換 -> 意味変換 -> 意味検証` の順に処理して正規化 DTO を返す
+  - すべての endpoint は、`Native` が `Protocol` の endpoint-level API を利用して解決する
+  - `Native` は request shaping を内部 `Encoder` に閉じ込めた上で、`Protocol` response を受けて `JSON検証変換 -> 意味変換 -> 意味検証` を担い、transport 実行責務は `Protocol` に残す
+  - response 側では `Protocol` の raw JSON text に対して、`JSON検証変換 -> 意味変換 -> 意味検証` の順に処理して正規化 DTO を返す
   - `JsonConverter` は主に `JSON検証変換` と `意味変換` の段階で用い、再取得・再試行・fallback は持たない
   - 物理構成上は `Public/`、`Private/`、`Internal/Encoder/`、`Internal/JsonValidation/`、`Internal/Conversion/`、`Internal/MeaningValidation/`、`Internal/Errors/` に責務を分割する
 
 ### 3.5 実行基盤の集中
 
 - 認証は全層で共通して使えるようにする
-- ただし、各層が独自に認証を持つのではなく、同一の `Wire` 実体を共有する形で達成する
+- ただし、各層が独自に認証を持つのではなく、同一の `Protocol` 実体を共有する形で達成する
 - 上位層は認証・署名・transport を再定義しない
-- Private/Public の差は、`Wire` 実行基盤が持つ資格情報・署名能力の有無で表現する
+- Private/Public の差は、`Protocol` 実行基盤が持つ資格情報・署名能力の有無で表現する
 - `Public` / `Private` の責務は各層で分離する
 - ただし、公開 client 面は `PublicXxxClient` / `PrivateXxxClient` を層ごとに乱立させず、bundle 形でまとめる
 - Stage10 では API 機能単位では公開面を分割しない
 - 層内分割は、まず `Public` / `Private`、次に `Encoder` / `JsonValidation` / `Conversion` / `MeaningValidation` / `Errors` の責務単位で行う
 - `Private` runtime は `Public` runtime を包含し、認証付き構成では `Public` と `Private` の両方にアクセスできる
-- `BaseUri` は `Wire` runtime の必須構成とする
-- `TransportConfig` は `Wire` runtime の必須構成とする
+- `BaseUri` は `Protocol` runtime の必須構成とする
+- `TransportConfig` は `Protocol` runtime の必須構成とする
 - `HttpPolicy` は Stage10 当初方針では採用しない
-- 再送、rate limit、circuit breaker、fallback などの回復戦略は `Wire` に持たせない
+- 再送、rate limit、circuit breaker、fallback などの回復戦略は `Protocol` に持たせない
 - 1 回の送信をどう再実行するかは、外部オーケストレーション側で明示的に制御する
 
-### 3.6 Wire runtime の必須構成
+### 3.6 Protocol runtime の必須構成
 
 #### 3.6.1 BaseUri
 
 - `BaseUri` は「どこへ送るか」を定義する
-- `BaseUri` は `Wire` client 生成時に必ず解決済みでなければならない
+- `BaseUri` は `Protocol` client 生成時に必ず解決済みでなければならない
 - 利用者入力としては省略可能でもよいが、その場合は bitFlyer 用既定値へ解決されなければならない
 - `BaseUri` は host / root path の決定までを責務とし、endpoint 選択や業務意味は持たない
 
 #### 3.6.2 TransportConfig
 
 - `TransportConfig` は「何で送るか」と「誰が送信資源を所有するか」を定義する
-- `TransportConfig` は `Wire` client 生成時に必ず解決済みでなければならない
+- `TransportConfig` は `Protocol` client 生成時に必ず解決済みでなければならない
 - `TransportConfig` は送信経路の差し替えと所有権の明示を責務とする
 - `TransportConfig` は `BaseUri`、認証、署名、再送戦略を責務に含めない
 - Stage10 当初方針では、少なくとも以下の 3 形態を持てること
@@ -143,34 +143,34 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 #### 3.7.1 リクエスト境界
 
 - リクエストは上位層から下位層へ向かう
-- `Normalized` は bitFlyer API の入力 field 集合を鏡像化した request DTO を受け取る
-- `Normalized` の公開 API 面は path / query / body / headers を直接構築しない
-- `Normalized` は internal `Encoder` を通じて `Wire` endpoint-level API へ渡す request 材料を構築する
-- `Encoder` は `Normalized` の内部実装であり、公開層は構成しない
-- query / path / body の組み立て、body JSON の serialize、request DTO の検証は `Normalized/Internal/Encoder` に閉じ込める
-- すべての endpoint で `Normalized` は `Wire` endpoint-level API を利用し、transport 実行は `Wire` に残す
+- `Native` は bitFlyer API の入力 field 集合を鏡像化した request DTO を受け取る
+- `Native` の公開 API 面は path / query / body / headers を直接構築しない
+- `Native` は internal `Encoder` を通じて `Protocol` endpoint-level API へ渡す request 材料を構築する
+- `Encoder` は `Native` の内部実装であり、公開層は構成しない
+- query / path / body の組み立て、body JSON の serialize、request DTO の検証は `Native/Internal/Encoder` に閉じ込める
+- すべての endpoint で `Native` は `Protocol` endpoint-level API を利用し、transport 実行は `Protocol` に残す
 - request 側では `null` を「未指定」として扱う
 - `null` の request パラメータは、`Encoder` が query / body / path 上の項目として出力しない
 - 必須項目が `null` の場合は省略して送らず、`Semantic` error とする
 - bitFlyer API 仕様が明示的に `null` 送信を要求する場合のみ、endpoint 個別例外を許容する
-- `Wire` は transport request だけを受け取る
-- `Wire` が受け取るのは method / path / query / body / headers / endpoint identity などの transport 情報であり、上位層 DTO ではない
+- `Protocol` は transport request だけを受け取る
+- `Protocol` が受け取るのは method / path / query / body / headers / endpoint identity などの transport 情報であり、上位層 DTO ではない
 
 #### 3.7.2 レスポンス境界
 
 - レスポンスは下位層から上位層へ向かう
-- `Wire` は transport response を返す
-- `Wire` が返すのは status / headers / raw JSON text などの transport 結果であり、DTO 化は行わない
-- `Normalized` は `Wire` の raw JSON text を `TEXT -> JSON検証変換 -> 意味変換 -> 意味検証` の順に処理して、正規化 DTO を返す
+- `Protocol` は transport response を返す
+- `Protocol` が返すのは status / headers / raw JSON text などの transport 結果であり、DTO 化は行わない
+- `Native` は `Protocol` の raw JSON text を `TEXT -> JSON検証変換 -> 意味変換 -> 意味検証` の順に処理して、正規化 DTO を返す
 - `JSON検証変換` は raw JSON text を JSON object として読めるかを確認し、decode 開始可能な形へ変換する
 - `意味変換` は JSON object を bitFlyer 内意味の正規化 DTO へ落とす
 - `意味検証` は正規化 DTO が公開契約として成立しているかを確認する
-- `Normalized` は公開レスポンスとして中間 JSON object を露出しない
+- `Native` は公開レスポンスとして中間 JSON object を露出しない
 
 #### 3.7.3 逆流禁止
 
-- `Wire` が `Normalized` request / response を知ることは禁止する
-- `Normalized -> Wire` の逆戻り制御を持たせない
+- `Protocol` が `Native` request / response を知ることは禁止する
+- `Native -> Protocol` の逆戻り制御を持たせない
 - 変換後にエラーが出た場合に、上位層内部で下位層へ戻って再取得する処理は持たせない
 - 変換後の回復戦略、再実行、別経路取得、fallback は外部で明示的に扱う
 
@@ -184,24 +184,24 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 #### 3.7.5 層ごとのエラー確定責務
 
-- `Wire`
+- `Protocol`
   - 接続失敗、タイムアウト、キャンセル、TLS、送信失敗などの transport レベル失敗のみを `Transport` として扱う
-  - `Wire` は HTTP status を見て `Http` へ変換しない
-  - `Wire` 単独利用時は、利用者が status / headers / raw body を直接見る
-- `Normalized/Internal/JsonValidation`
-  - `Wire` response の status が非 `2xx` の場合は `Http` を確定する
+  - `Protocol` は HTTP status を見て `Http` へ変換しない
+  - `Protocol` 単独利用時は、利用者が status / headers / raw body を直接見る
+- `Native/Internal/JsonValidation`
+  - `Protocol` response の status が非 `2xx` の場合は `Http` を確定する
   - raw JSON text の parse 失敗、JSON shape decode 失敗は `Codec` を確定する
-- `Normalized/Internal/Conversion`
+- `Native/Internal/Conversion`
   - bitFlyer 値表現から正規化 DTO / 正規化値へ落とす過程の失敗は `Mapping` を確定する
   - `JsonConverter` は主にこの段階で bitFlyer 値表現から正規化値への変換に用いる
   - 例: 未知の enum 値、想定外の値型、symbol / product_code / market の変換不能
-- `Normalized/Internal/MeaningValidation`
+- `Native/Internal/MeaningValidation`
   - 正規化 DTO が公開契約として成立しない場合は `Semantic` を確定する
-- `Normalized/Internal/Encoder`
+- `Native/Internal/Encoder`
   - request 不足、値範囲不正、引数組み合わせ不正、上位 API 契約違反は `Semantic` を確定する
-- `Normalized/Public/` と `Normalized/Private/`
+- `Native/Public/` と `Native/Private/`
   - 公開 API 面として internal pipeline を束ねるが、変換・検証ロジック本体の置き場にはしない
-- Stage10 では、変換後エラーを契機に `Normalized` 内部で `Wire` を再実行しない
+- Stage10 では、変換後エラーを契機に `Native` 内部で `Protocol` を再実行しない
 
 #### 3.7.6 エラー情報の保持方針
 
@@ -214,16 +214,16 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 #### 3.7.7 Call 型の扱い
 
-- Stage10 の公開 API は、`Wire` / `Normalized` のいずれも `Call` を唯一の返却形式とする
+- Stage10 の公開 API は、`Protocol` / `Native` のいずれも `Call` を唯一の返却形式とする
 - DTO や `WireResponse` を単体で直接返さない
-- `Wire` の主公開 API は endpoint-level API とし、各 endpoint-level API は `Task<Call<WireCallSpec, WireResponse>>` を返す
+- `Protocol` の主公開 API は endpoint-level API とし、各 endpoint-level API は `Task<Call<WireCallSpec, WireResponse>>` を返す
 - `WireCallSpec` を直接受ける汎用 `SendAsync(...)` を持つ場合、それは internal / debug / 補助面として扱い、主公開面にはしない
 - `Call.Request` に保持する `WireCallSpec` は、署名前の canonical request とし、公開契約として扱う
 - `WireCallSpec.Headers` は原則空とし、header を公開契約へ持ち込む必要がある場合のみ allowlist 方式で保持してよい
 - `WireCallSpec` に保持してよい header の初期 allowlist は `Content-Type` と `Accept` に限定する
 - 署名値、`Authorization` header、nonce、timestamp、body hash などの認証情報は `WireCallSpec` に含めない
-- 認証・署名に必要な付加情報は `Wire/Internal/Auth` が実行直前に付与し、公開 `Call.Request` へは露出しない
-- `Normalized` の公開 API は `Task<Call<TRequest, TResponse>>` を返す
+- 認証・署名に必要な付加情報は `Protocol/Internal/Auth` が実行直前に付与し、公開 `Call.Request` へは露出しない
+- `Native` の公開 API は `Task<Call<TRequest, TResponse>>` を返す
 - `Call` は、成功/失敗、対応する request/response、実行メタ情報を一体として表現する
 - `Call.Request` には、その層の公開 request を保持する
 - `Call.Result` は `CallResult.Ok` または `CallResult.Err` のいずれかとする
@@ -232,12 +232,12 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `EndpointId` は `CallMeta` に置く
 - `HttpStatus` と `BodySnippet` は `CallError` に置く
 - `CallMeta.RawJson` は Stage10 の公開契約としては前提にしない
-- raw response の直接観測が必要な場合は、`WireResponse` または `Wire` 単独利用で扱う
+- raw response の直接観測が必要な場合は、`WireResponse` または `Protocol` 単独利用で扱う
 - 通常の成功/失敗は `CallResult` で表現し、throw はプログラミングエラー、設定不備、プロセス継続不能な内部不整合に限定する
 
 #### 3.7.8 CallMeta の語彙と運用粒度
 
-- `CallMeta.Layer` は粗い責務層だけを表し、Stage10 では `Wire`、`Normalized`、`Composition`、`Tests` を基本語彙とする
+- `CallMeta.Layer` は粗い責務層だけを表し、Stage10 では `Protocol`、`Native`、`Composition`、`Tests` を基本語彙とする
 - `CallMeta.Layer` に endpoint 名、internal stage 名、詳細 component 名を混在させない
 - `CallMeta.Component` は call を返した責務単位を表し、Stage10 では `PublicApi`、`PrivateApi`、`Transport`、`Factory`、`Bootstrap` を基本語彙とする
 - `CallMeta.Component` に endpoint 名を重複して入れず、endpoint 固有性は `EndpointId` にのみ持たせる
@@ -248,7 +248,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Tags[\"Stage\"]` は `Encoder` / `JsonValidation` / `Conversion` / `MeaningValidation` を取る
 - `Tags[\"Auth\"]` は `None` / `Required` を取る
 - `Tags[\"Retryable\"]` は `true` / `false` を取る
-- `CallMeta.Children` は orchestration や fan-out がある場合のみ使い、単純な 1 対 1 の `Normalized -> Wire` 呼び出しでは必須にしない
+- `CallMeta.Children` は orchestration や fan-out がある場合のみ使い、単純な 1 対 1 の `Native -> Protocol` 呼び出しでは必須にしない
 - `CallMeta.InternalEndpointId` は endpoint 非対応の内部 call にのみ使い、公開 endpoint の代用にしない
 
 #### 3.7.9 Debug Logging / Diagnostics の方針
@@ -259,9 +259,9 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - debug log の出力先はローカルファイルに限定し、`stdout`、remote sink、telemetry export、CI artifact へ直接出力しない
 - request header は常に記録対象外とし、debug log に含めない
 - `OperationId` を必須とし、少なくとも `WireRequest`、`WireCall`、`NormalizedCall` を同一 `OperationId` で相関できるようにする
-- `Wire` は送信前に request text を、送信後に `Call<WireCallSpec, WireResponse>` 相当の結果を記録してよい
-- `Normalized` は正規化完了後に `Call<TRequest, TResponse>` 相当の結果を記録してよい
-- `Wire` 側の debug log は text / transport 結果を正本とし、`Normalized` 側の debug log は request DTO / response contract / error を正本とする
+- `Protocol` は送信前に request text を、送信後に `Call<WireCallSpec, WireResponse>` 相当の結果を記録してよい
+- `Native` は正規化完了後に `Call<TRequest, TResponse>` 相当の結果を記録してよい
+- `Protocol` 側の debug log は text / transport 結果を正本とし、`Native` 側の debug log は request DTO / response contract / error を正本とする
 - sanitize / mask は debug log 生成時には行わない
 - artifact が必要な場合は、ローカル debug log から別工程で mask 後に生成する
 - logging / diagnostics の具体 sink 実装は初手では no-op でもよいが、後続実装は本方針に従う
@@ -269,14 +269,14 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 ### 3.8 下位層アクセス
 
-- `Normalized` client は `Wire` client へアクセスできる
+- `Native` client は `Protocol` client へアクセスできる
 - ただし、この下位層アクセスは外部利用者の明示的制御のために提供するものであり、
   上位層内部での暗黙 fallback を正当化するものではない
 
 ### 3.9 Raw 層の扱い
 
 - Stage10 当初方針では `Raw` 層を公開層として扱わない
-- request encoding / response decode / JSON parse は `Normalized` 配下の internal codec として持ってよい
+- request encoding / response decode / JSON parse は `Native` 配下の internal codec として持ってよい
 - `Raw` 相当の中間表現は external client 面へ露出しない
 - 既存 `Raw` 実装は、Stage10 設計の試算材料・移行材料として利用してよい
 
@@ -287,23 +287,23 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 取引所横断 DTO / 取引所横断 client / 取引所横断 capability は Stage10 第1段階の対象外とする
 - 将来再導入する場合でも、bitFlyer 内部で固めた責務の上に後付けする
 
-### 3.11 Normalized DTO の安定方針
+### 3.11 Native DTO の安定方針
 
-- Stage10 の最終目標は、bitFlyer 用 `Normalized DTO` 全体を安定公開契約として固定することである
-- そのため、`Normalized DTO` は最終的に将来の MCP や外部公開面へ接続可能な意味契約へ収束させる
-- 最終固定形の `Normalized DTO` は、bitFlyer API の返却フィールド集合を正本とした鏡像であることを原則とする
-- 最終固定対象の `Normalized` response contract は object DTO だけでなく top-level collection 契約を含みうる
+- Stage10 の最終目標は、bitFlyer 用 `Native DTO` 全体を安定公開契約として固定することである
+- そのため、`Native DTO` は最終的に将来の MCP や外部公開面へ接続可能な意味契約へ収束させる
+- 最終固定形の `Native DTO` は、bitFlyer API の返却フィールド集合を正本とした鏡像であることを原則とする
+- 最終固定対象の `Native` response contract は object DTO だけでなく top-level collection 契約を含みうる
 - bitFlyer API の response が top-level array の endpoint では、synthetic wrapper を作らず `IReadOnlyList<T>` を最終固定形としてよい
 - 最終固定形では、bitFlyer API の返却 field 名に対して PascalCase 化、型変換、nullable 化、property-based immutable 化のみを許容する
 - bitFlyer API の返却 field に存在しない補助情報、raw diagnostics、意味補完による rename は最終固定形へ持ち込まない
 - ただし移行期間中は、先に安定形へ到達した DTO を `Stable Core DTO`、見直し前の DTO を `Transitional DTO` として区別してよい
-- `Stable Core DTO` / `Transitional DTO` の区別は移行概念であり、最終状態では `Normalized DTO` 全体固定へ収束させる
-- Stage10 の `Normalized` 公開契約では、`RawSnapshot`、`Extras`、`RawJson` などの raw / diagnostics 情報をサポートしない
-- success 時の raw 観測や lossless 保持が必要な場合は、`Normalized` ではなく `Wire` を直接利用する
+- `Stable Core DTO` / `Transitional DTO` の区別は移行概念であり、最終状態では `Native DTO` 全体固定へ収束させる
+- Stage10 の `Native` 公開契約では、`RawSnapshot`、`Extras`、`RawJson` などの raw / diagnostics 情報をサポートしない
+- success 時の raw 観測や lossless 保持が必要な場合は、`Native` ではなく `Protocol` を直接利用する
 
 #### 3.11.1 Breaking Change の扱い
 
-- 最終的に固定対象とする `Normalized DTO` では、以下を breaking change として扱う
+- 最終的に固定対象とする `Native DTO` では、以下を breaking change として扱う
   - 型名変更
   - プロパティ名変更
   - プロパティ型変更
@@ -315,16 +315,16 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 #### 3.11.2 DTO 形状の方針
 
-- 最終固定対象の `Normalized DTO` は primary-constructor record を採らない
+- 最終固定対象の `Native DTO` は primary-constructor record を採らない
 - 理由は、`public sealed record Xxx(...)` では constructor 引数列、引数順、`Deconstruct(...)` が公開契約に含まれ、後からの optional プロパティ追加でも CLR 的に breaking になりやすいため
-- 最終固定対象の `Normalized DTO` は property-based immutable type を基本とする
+- 最終固定対象の `Native DTO` は property-based immutable type を基本とする
 - 第1候補は `sealed class` + `init` property とし、同等に constructor / deconstruct を公開契約へ過剰に含めない形であれば許容する
-- 最終固定対象の `Normalized DTO` の必須性は public constructor ではなく、`MeaningValidation` 完了時点で内部的に確定してから DTO 化する
+- 最終固定対象の `Native DTO` の必須性は public constructor ではなく、`MeaningValidation` 完了時点で内部的に確定してから DTO 化する
 - `Transitional DTO` では既存 record 形を暫定利用してよいが、固定対象へ昇格させる時点で公開形状を見直す
 
 #### 3.11.3 Naming Rule の方針
 
-- 最終固定対象の `Normalized DTO` のプロパティ名は、bitFlyer API が返すフィールド名を唯一の語源とする
+- 最終固定対象の `Native DTO` のプロパティ名は、bitFlyer API が返すフィールド名を唯一の語源とする
 - 公開名は raw field 名をそのまま露出せず、PascalCase へ正規化して用いる
 - 意味補完のために別語彙へ改名しない
 - 例:
@@ -333,16 +333,16 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
   - `best_bid` -> `BestBid`
   - `child_order_acceptance_id` -> `ChildOrderAcceptanceId`
   - `exec_date` -> `ExecDate`
-- `RawJson`、`RawSnapshot`、`Extras` は bitFlyer API の返却フィールド名由来ではないため、最終固定対象の `Normalized DTO` の naming rule には含めない
-- 上記の情報は `Normalized DTO` の naming 例外として残さず、`Normalized` 公開契約では非サポートとする
+- `RawJson`、`RawSnapshot`、`Extras` は bitFlyer API の返却フィールド名由来ではないため、最終固定対象の `Native DTO` の naming rule には含めない
+- 上記の情報は `Native DTO` の naming 例外として残さず、`Native` 公開契約では非サポートとする
 - `GetAddressesResponse(FreeText RawJson)` のように、意味 DTO ではなく raw payload 保持を主目的とするものは、そのまま固定対象にしない
 
 #### 3.11.4 Nullability Rule の方針
 
-- 最終固定対象の `Normalized DTO` では、`null` は「値が存在しない / API が返していない」場合にのみ使う
-- `Closed<T>` は「値はあるが語彙が未知」という別概念であり、最終固定対象の `Normalized DTO` には原則出さない
+- 最終固定対象の `Native DTO` では、`null` は「値が存在しない / API が返していない」場合にのみ使う
+- `Closed<T>` は「値はあるが語彙が未知」という別概念であり、最終固定対象の `Native DTO` には原則出さない
 - unknown 値は `Closed<T>` で保持するのではなく、`Conversion` または `MeaningValidation` で `Mapping` error / `Semantic` error として確定する
-- `Empty` sentinel は最終固定対象の `Normalized DTO` に出さず、内部 parse / helper に限定する
+- `Empty` sentinel は最終固定対象の `Native DTO` に出さず、内部 parse / helper に限定する
 - API が実際に空文字を返す項目で、その空文字自体に意味がある場合のみ `""` を公開値として保持してよい
 - `ProductCode`、`AcceptanceId`、`ExchangeOrderId`、enum 相当値など、code / id / closed vocabulary 系の項目では `""` を `null` や unknown の代用品にしない
 - exposed DTO では `null` と `Closed<T>` と `Empty` を混在させない
@@ -350,23 +350,23 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 #### 3.11.5 JSON Serializable Rule の方針
 
-- 最終固定対象の `Normalized DTO` は、`JsonSerializer.Serialize(dto)` が既定設定で通ることを必須条件とする
+- 最終固定対象の `Native DTO` は、`JsonSerializer.Serialize(dto)` が既定設定で通ることを必須条件とする
 - 呼び出し側に専用 `JsonSerializerOptions` や custom converter 登録を要求しない
-- 最終固定対象の `Normalized DTO` は serializer-native な公開形を優先し、`string` / `decimal` / `bool` / `DateTimeOffset` / `IReadOnlyList<T>` / `IReadOnlyDictionary<string, T>` など、既定 serializer で安定して扱える型を基本とする
-- `RawJson`、`RawSnapshot`、`Extras` などの diagnostics / lossless payload は `Normalized DTO` 本体に含めず、`Normalized` 公開契約ではサポートしない
-- `IReadOnlyDictionary<FreeText, JsonElement>` のような custom key 型 dictionary は最終固定対象の `Normalized DTO` で採用しない
-- key/value の追加保持が必要な場合は、`Normalized` ではなく `Wire` を通じて raw response を参照する
-- `Price`、`Size`、`ProductCode`、`AcceptanceId` などの domain wrapper は、最終固定対象の `Normalized DTO` では原則として `decimal` / `string` などの serializer-native scalar へ寄せる
-- 既存 wrapper を内部表現として保持することは許容するが、最終固定対象の `Normalized DTO` の公開形には持ち込まない
+- 最終固定対象の `Native DTO` は serializer-native な公開形を優先し、`string` / `decimal` / `bool` / `DateTimeOffset` / `IReadOnlyList<T>` / `IReadOnlyDictionary<string, T>` など、既定 serializer で安定して扱える型を基本とする
+- `RawJson`、`RawSnapshot`、`Extras` などの diagnostics / lossless payload は `Native DTO` 本体に含めず、`Native` 公開契約ではサポートしない
+- `IReadOnlyDictionary<FreeText, JsonElement>` のような custom key 型 dictionary は最終固定対象の `Native DTO` で採用しない
+- key/value の追加保持が必要な場合は、`Native` ではなく `Protocol` を通じて raw response を参照する
+- `Price`、`Size`、`ProductCode`、`AcceptanceId` などの domain wrapper は、最終固定対象の `Native DTO` では原則として `decimal` / `string` などの serializer-native scalar へ寄せる
+- 既存 wrapper を内部表現として保持することは許容するが、最終固定対象の `Native DTO` の公開形には持ち込まない
 - `Transitional DTO` では既存 wrapper や raw diagnostics 混在を暫定利用してよいが、固定対象へ昇格させる時点で serializer-native な公開形へ再設計する
 
 ### 3.12 Request DTO の方針
 
-- `Normalized` の request DTO は、bitFlyer API の入力フィールド集合を正本とした鏡像であることを原則とする
+- `Native` の request DTO は、bitFlyer API の入力フィールド集合を正本とした鏡像であることを原則とする
 - request DTO のプロパティ名は、bitFlyer API の入力 field 名を唯一の語源とし、PascalCase 化して用いる
 - request DTO に対して許容する変換は、PascalCase 化、型変換、nullable 化、property-based immutable 化に限定する
 - request DTO は path / query / body の transport 配置を表現しない
-- path / query / body への配置決定は `Normalized/Internal/Encoder` が担う
+- path / query / body への配置決定は `Native/Internal/Encoder` が担う
 - request 側の `null` は「未指定」を意味し、`Encoder` はその項目を出力しない
 - 必須項目が `null` の場合は request DTO のまま送らず、`Semantic` error として確定する
 - bitFlyer API 仕様が明示的に `null` 送信を要求する場合のみ、endpoint 個別例外を許容する
@@ -379,27 +379,27 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 ### 4.1 生成単位
 
 - `CreateWireClient(...)`
-  - `Wire` のみを切り出して使用する
-  - `Wire` bundle を返し、`Public` 面を必須で持つ
+  - `Protocol` のみを切り出して使用する
+  - `Protocol` bundle を返し、`Public` 面を必須で持つ
 - `CreateNormalizedClient(...)`
-  - `Wire` + `Normalized` を切り出して使用する
-  - `Normalized` bundle を返し、`Normalized.Public` と `Wire` へアクセスできる
+  - `Protocol` + `Native` を切り出して使用する
+  - `Native` bundle を返し、`Native.Public` と `Protocol` へアクセスできる
 
 ### 4.2 Public / Private 公開面
 
 - 各層の内部責務は `Public` / `Private` で分離する
 - ただし、factory と top-level client は層ごとに `Public` / `Private` を完全二重化しない
 - Stage10 の公開 client 面は API 機能別には分割しない
-- 公開面の第一分割軸は `Wire` / `Normalized`、第二分割軸は `Public` / `Private` とする
+- 公開面の第一分割軸は `Protocol` / `Native`、第二分割軸は `Public` / `Private` とする
 - `bundle.Public` は常に利用可能とする
-- `bundle.Private` は認証情報を持つ `Wire` runtime が構築できる場合にのみ利用可能とする
+- `bundle.Private` は認証情報を持つ `Protocol` runtime が構築できる場合にのみ利用可能とする
 - `Private` 側を持つ bundle でも、`Public` 面は同じ runtime 共有のまま利用可能とする
 
 ### 4.3 共有物
 
-- `CreateNormalizedClient(...)` は、内部で使う `Wire` 実体を公開できること
+- `CreateNormalizedClient(...)` は、内部で使う `Protocol` 実体を公開できること
 - 認証、署名、transport、および有効化された debug logging / diagnostics 設定は、同一 runtime を共有する
-- `BaseUri` と `TransportConfig` は、同一 `Wire` runtime を識別する中核構成とする
+- `BaseUri` と `TransportConfig` は、同一 `Protocol` runtime を識別する中核構成とする
 
 ### 4.4 Composition の扱い
 
@@ -407,19 +407,19 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Composition` は client runtime の組み立てと共有資源の配線だけを担う
 - `Composition` は変換責務を持たない
 
-### 4.5 Wire endpoint-level API 署名方針
+### 4.5 Protocol endpoint-level API 署名方針
 
-- `Wire` の主公開面は endpoint-level API とする
+- `Protocol` の主公開面は endpoint-level API とする
 - 各 endpoint-level API は `Task<Call<WireCallSpec, WireResponse>>` を返す
-- `Wire` の endpoint-level API は transport-ready な scalar / primitive 引数だけを受ける
-- `Wire` の endpoint-level API は `Normalized` の request DTO 型を受けない
-- `Wire` の endpoint-level API は response DTO を返さず、必ず `WireResponse` を返す
+- `Protocol` の endpoint-level API は transport-ready な scalar / primitive 引数だけを受ける
+- `Protocol` の endpoint-level API は `Native` の request DTO 型を受けない
+- `Protocol` の endpoint-level API は response DTO を返さず、必ず `WireResponse` を返す
 - `WireCallSpec` を直接受ける汎用 `SendAsync(...)` を持つ場合、それは internal / debug / 補助面に限定する
 - 初期 3 endpoint の署名方針は次の通りとする
   - `GetTickerAsync(string? productCode = null, CancellationToken ct = default)`
   - `GetBalanceAsync(CancellationToken ct = default)`
   - `SendChildOrderAsync(string bodyJson, CancellationToken ct = default)`
-- `SendChildOrderAsync(...)` の `bodyJson` は `Normalized/Internal/Encoder` が生成する
+- `SendChildOrderAsync(...)` の `bodyJson` は `Native/Internal/Encoder` が生成する
 
 ### 4.6 Endpoint Matrix の方針
 
@@ -443,7 +443,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - shared runtime の owner は bundle のみとする
 - `CreateWireClient(...)` は `WireBundle` を返し、`WireBundle` が runtime を所有する
 - `CreateNormalizedClient(...)` は `NormalizedBundle` を返し、`NormalizedBundle` が runtime を所有する
-- bundle 配下の `Wire` / `Normalized` client は runtime の view であり、個別に `Dispose` しない
+- bundle 配下の `Protocol` / `Native` client は runtime の view であり、個別に `Dispose` しない
 - `ManagedHttp` では bundle が内部生成した送信資源を破棄する
 - `ExternalHttpClient` と `ExternalTransport` では、送信資源の所有権と破棄責務は呼び出し側に残す
 - runtime の所有権は 1 つに固定し、二重 dispose や所有権逆転を許容しない
@@ -453,38 +453,38 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - project 境界と namespace 境界の両方で依存方向を固定する
 - `Vocabulary` は `Primitives` まで、または完全独立とする
-- `Wire` は `Transport`、`Primitives`、`Vocabulary` にのみ依存する
-- `Normalized` は `Wire`、`Primitives`、`Vocabulary` に依存する
-- `Composition` は `Wire`、`Normalized`、既存 `Composition`、`Primitives` に依存する
-- `Wire` から `Normalized` への参照は禁止する
+- `Protocol` は `Transport`、`Primitives`、`Vocabulary` にのみ依存する
+- `Native` は `Protocol`、`Primitives`、`Vocabulary` に依存する
+- `Composition` は `Protocol`、`Native`、既存 `Composition`、`Primitives` に依存する
+- `Protocol` から `Native` への参照は禁止する
 - `Composition` から `*.Internal.*` への参照は禁止する
-- `Normalized/Public` と `Normalized/Private` は、公開面に `WireResponse`、`JsonElement`、raw diagnostics 型を露出しない
-- `Normalized/Internal/JsonValidation -> Conversion -> MeaningValidation` の response pipeline は一方向依存のみを許容する
+- `Native/Public` と `Native/Private` は、公開面に `WireResponse`、`JsonElement`、raw diagnostics 型を露出しない
+- `Native/Internal/JsonValidation -> Conversion -> MeaningValidation` の response pipeline は一方向依存のみを許容する
 - 参照ガードは、文書ルールだけでなく arch test による機械検証を前提とする
 - Stage10 用の機械検証は `tests-stage10/Bitflyer/Architecture.Tests` を追加候補とし、project reference、公開面 forbidden type、namespace forbidden dependency を対象にする
-- `project reference` では `Wire -> Transport, Primitives, Vocabulary`、`Normalized -> Wire, Primitives, Vocabulary`、`Composition -> Wire, Normalized, ExchangeApi.Composition, Primitives` 以外を拒否する
-- `public surface forbidden type` では `Normalized.Public/Private` の公開面に `WireResponse`、`WireCallSpec`、`JsonElement`、`JsonDocument`、`HttpRequestMessage`、`HttpResponseMessage`、raw diagnostics 型が露出しないことを検査する
-- `namespace forbidden dependency` では `Wire -> Normalized`、`Composition -> *.Internal.*`、response pipeline の逆参照を禁止する
+- `project reference` では `Protocol -> Transport, Primitives, Vocabulary`、`Native -> Protocol, Primitives, Vocabulary`、`Composition -> Protocol, Native, ExchangeApi.Composition, Primitives` 以外を拒否する
+- `public surface forbidden type` では `Native.Public/Private` の公開面に `WireResponse`、`WireCallSpec`、`JsonElement`、`JsonDocument`、`HttpRequestMessage`、`HttpResponseMessage`、raw diagnostics 型が露出しないことを検査する
+- `namespace forbidden dependency` では `Protocol -> Native`、`Composition -> *.Internal.*`、response pipeline の逆参照を禁止する
 
 ### 4.9 初期 3 endpoint の具体化方針
 
 - 初期実装対象の `GetTicker`、`GetBalance`、`SendChildOrder` については、抽象規則だけでなく具体契約も Stage10 文書で固定する
-- 各 endpoint で最低限固定する内容は、`Wire` 署名、`Normalized` request DTO、`Normalized` response DTO、`CallMeta`、`Encoder` の責務とする
+- 各 endpoint で最低限固定する内容は、`Protocol` 署名、`Native` request DTO、`Native` response DTO、`CallMeta`、`Encoder` の責務とする
 - `GetTicker`
-  - `Wire.Public.GetTickerAsync(string? productCode = null, CancellationToken ct = default)`
-  - `Normalized` は request validation 後に `Wire.Public.GetTickerAsync(...)` を呼び、response を `JsonValidation -> Conversion -> MeaningValidation` で正規化する
-  - canonical path は `/v1/getticker` とし、`/v1/ticker` は `Wire` 内部の互換 alias path としてのみ扱ってよい
+  - `Protocol.Public.GetTickerAsync(string? productCode = null, CancellationToken ct = default)`
+  - `Native` は request validation 後に `Protocol.Public.GetTickerAsync(...)` を呼び、response を `JsonValidation -> Conversion -> MeaningValidation` で正規化する
+  - canonical path は `/v1/getticker` とし、`/v1/ticker` は `Protocol` 内部の互換 alias path としてのみ扱ってよい
   - `GetTickerRequest` は `ProductCode?` を持つ request DTO とし、`null` の場合は query の `product_code` を送らず bitFlyer 既定値 `BTC_JPY` に委ねる
   - `GetTickerResponse` は `ProductCode`、`State`、`Timestamp`、`TickId`、`BestBid`、`BestAsk`、`BestBidSize`、`BestAskSize`、`TotalBidDepth`、`TotalAskDepth`、`MarketBidSize`、`MarketAskSize`、`Ltp`、`Volume`、`VolumeByProduct` を持つ
 - `GetBalance`
-  - `Wire.Private.GetBalanceAsync(CancellationToken ct = default)`
-  - `Normalized` は空 request DTO を受け、response 正規化だけを担う
+  - `Protocol.Private.GetBalanceAsync(CancellationToken ct = default)`
+  - `Native` は空 request DTO を受け、response 正規化だけを担う
   - `GetBalanceRequest` は空 request DTO に固定する
-  - `GetBalance` の `Normalized` response contract は `GetBalanceResponse` wrapper を作らず、top-level array 契約として `IReadOnlyList<GetBalanceItem>` を返す
+  - `GetBalance` の `Native` response contract は `GetBalanceResponse` wrapper を作らず、top-level array 契約として `IReadOnlyList<GetBalanceItem>` を返す
   - `GetBalanceItem` は `CurrencyCode`、`Amount`、`Available` を持つ
 - `SendChildOrder`
-  - `Wire.Private.SendChildOrderAsync(string bodyJson, CancellationToken ct = default)`
-  - `Normalized/Internal/Encoder` が request DTO を body JSON に serialize し、その結果を `Wire.Private.SendChildOrderAsync(...)` へ渡す
+  - `Protocol.Private.SendChildOrderAsync(string bodyJson, CancellationToken ct = default)`
+  - `Native/Internal/Encoder` が request DTO を body JSON に serialize し、その結果を `Protocol.Private.SendChildOrderAsync(...)` へ渡す
   - `SendChildOrderRequest` は `ProductCode`、`ChildOrderType`、`Side`、`Size`、`Price?`、`MinuteToExpire?`、`TimeInForce?` を持つ
   - `Price` は `ChildOrderType = LIMIT` のとき必須、`MARKET` のときは未指定とする
   - `MinuteToExpire` と `TimeInForce` は省略可能とし、`Encoder` は未指定時に body へ出力せず bitFlyer API の既定値に委ねる
@@ -497,10 +497,10 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 ### 5.1 Stage10 で扱うもの
 
-- bitFlyer の `Wire` 実行基盤
+- bitFlyer の `Protocol` 実行基盤
 - bitFlyer の正規化 DTO
-- `Wire` transport response から `Normalized` DTO への internal decode / `JsonConverter` ベース変換
-- `Normalized` request から `Wire` request への internal encode
+- `Protocol` transport response から `Native` DTO への internal decode / `JsonConverter` ベース変換
+- `Native` request から `Protocol` request への internal encode
 - bitFlyer 内での Public/Private 実行条件差分
 - bitFlyer 内で再利用可能な runtime / client 組み立て
 
@@ -523,10 +523,10 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - 取引所内共通化と取引所横断共通化を混ぜずに整理できる
 - `Contract` の都合で bitFlyer の責務を歪めずに済む
-- `Wire` を単独で使った低レベル検証やデバッグが可能になる
-- 公開 client 面が `Wire` / `Normalized` に絞られ、利用導線が明確になる
+- `Protocol` を単独で使った低レベル検証やデバッグが可能になる
+- 公開 client 面が `Protocol` / `Native` に絞られ、利用導線が明確になる
 - request encode / response decode を公開層から外せるため、client 面の肥大化を抑えやすい
-- 認証や transport 設定が `Wire` に集約され、実行条件の差異が減る
+- 認証や transport 設定が `Protocol` に集約され、実行条件の差異が減る
 - 上位層で暗黙 retry/fallback を持たないため、挙動の追跡がしやすい
 - 回復戦略を外部へ出すことで、再送条件と再送回数を利用側で明示制御できる
 
@@ -537,9 +537,9 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 当初は bitFlyer 専用となるため、Bittrade との parity は一旦後退する
 - `Contract` 廃止により、取引所横断利用の既存導線は Stage10 の主対象から外れる
 - 将来の再抽象化時に、再度境界整理が必要になる
-- `Wire` に責務を集約しすぎると肥大化しやすい
+- `Protocol` に責務を集約しすぎると肥大化しやすい
 - 中間の公開観測点が減るため、bitFlyer ネイティブ JSON を client 面から直接確認しにくくなる
-- request encoder / response decoder を internal で強く管理しないと、`Normalized` が肥大化しやすい
+- request encoder / response decoder を internal で強く管理しないと、`Native` が肥大化しやすい
 - 共有 runtime の所有権、dispose、ライフサイクル設計を先に決めないと破綻しやすい
 
 ---
@@ -549,12 +549,12 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 ### In Scope
 
 - 本書で bitFlyer 専用の新しい層モデルを固定する
-- `Wire` / `Normalized` client の責務と依存方向を固定する
+- `Protocol` / `Native` client の責務と依存方向を固定する
 - `Raw` 層を公開層から外し、internal codec として扱う方針を固定する
 - `Contract` を Stage10 対象から外すことを明記する
 - Stage10 の展開方法として案 A を採用することを明記する
-- 認証・署名・transport を `Wire` へ集約する方針を固定する
-- `Normalized` を transport を持たない request / response 契約層として定義し、「下位層へ戻らない」原則を固定する
+- 認証・署名・transport を `Protocol` へ集約する方針を固定する
+- `Native` を transport を持たない request / response 契約層として定義し、「下位層へ戻らない」原則を固定する
 - `Composition` の位置づけを「配線のみ」として固定する
 - Stage10 向け live test の配置方針と初期スコープを固定する
 - 初期実装 endpoint を `GetTicker`、`GetBalance`、`SendChildOrder` に固定する
@@ -598,8 +598,8 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 新コード:
   - `src-stage10/Bitflyer/Vocabulary`
     - `EndpointIds.cs`
-  - `src-stage10/Bitflyer/Wire`
-    - `ExchangeApi.Stage10.Bitflyer.Wire.csproj`
+  - `src-stage10/Bitflyer/Protocol`
+    - `ExchangeApi.Stage10.Bitflyer.Protocol.csproj`
     - `Public/`
       - `Api/`
       - `Endpoints/`
@@ -608,8 +608,8 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
       - `Endpoints/`
     - `Internal/Auth/`
     - `Internal/Runtime/`
-  - `src-stage10/Bitflyer/Normalized`
-    - `ExchangeApi.Stage10.Bitflyer.Normalized.csproj`
+  - `src-stage10/Bitflyer/Native`
+    - `ExchangeApi.Stage10.Bitflyer.Native.csproj`
     - `Public/`
       - `Api/`
       - `Endpoints/`
@@ -627,10 +627,10 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
     - `Factory/`
     - `Options/`
 - 新テスト:
-  - `tests-stage10/Bitflyer/Wire.Tests`
-    - `ExchangeApi.Stage10.Bitflyer.Wire.Tests.csproj`
-  - `tests-stage10/Bitflyer/Normalized.Tests`
-    - `ExchangeApi.Stage10.Bitflyer.Normalized.Tests.csproj`
+  - `tests-stage10/Bitflyer/Protocol.Tests`
+    - `ExchangeApi.Stage10.Bitflyer.Protocol.Tests.csproj`
+  - `tests-stage10/Bitflyer/Native.Tests`
+    - `ExchangeApi.Stage10.Bitflyer.Native.Tests.csproj`
   - `tests-stage10/Bitflyer/Composition.Tests`
     - `ExchangeApi.Stage10.Bitflyer.Composition.Tests.csproj`
   - `tests-stage10/Bitflyer/LiveTests`
@@ -639,47 +639,47 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 ### 9.3.1 Project 境界
 
-- `Wire` project は `Transport` と `Primitives` にのみ依存する
-- `Wire` project は `Vocabulary/EndpointIds.cs` を共有してよいが、`Normalized` や `Composition` には依存しない
-- `Normalized` project は `Wire` と `Primitives` に依存する
-- `Composition` project は `Wire`、`Normalized`、既存 `Composition`、`Primitives` に依存する
-- `Raw` は独立 project にせず、`Normalized/Internal` の codec 実装へ吸収する
-- live test project は `Wire`、`Normalized`、`Composition` を参照し、既存 live test 資産は流用候補とする
+- `Protocol` project は `Transport` と `Primitives` にのみ依存する
+- `Protocol` project は `Vocabulary/EndpointIds.cs` を共有してよいが、`Native` や `Composition` には依存しない
+- `Native` project は `Protocol` と `Primitives` に依存する
+- `Composition` project は `Protocol`、`Native`、既存 `Composition`、`Primitives` に依存する
+- `Raw` は独立 project にせず、`Native/Internal` の codec 実装へ吸収する
+- live test project は `Protocol`、`Native`、`Composition` を参照し、既存 live test 資産は流用候補とする
 
-### 9.3.2 Normalized の責務と物理配置
+### 9.3.2 Native の責務と物理配置
 
-- `Normalized/Public/`
+- `Native/Public/`
   - Public endpoint 向けの公開 API 面だけを置く
   - `Api/` と `Endpoints/` に分ける
   - `Endpoints/` では 1 endpoint = 1 file とし、request DTO、response DTO、normalized call を同じ file にまとめて読める形にする
   - response 変換ロジック本体は置かない
-- `Normalized/Private/`
+- `Native/Private/`
   - Private endpoint 向けの公開 API 面だけを置く
   - `Api/` と `Endpoints/` に分ける
   - `Endpoints/` では 1 endpoint = 1 file とし、request DTO、response DTO、normalized call を同じ file にまとめて読める形にする
   - response 変換ロジック本体は置かない
-- `Normalized/Internal/Encoder/`
-  - 正規化 request を `Wire` endpoint-level API へ渡す request 材料へ落とす責務を置く
+- `Native/Internal/Encoder/`
+  - 正規化 request を `Protocol` endpoint-level API へ渡す request 材料へ落とす責務を置く
   - request 側の意味検証、query / path の組み立て、body JSON の serialize をここで行う
   - `null` を「未指定」として扱い、query / body / path へ出力しない規則をここで担う
-- `Normalized/Internal/JsonValidation/`
-  - `Wire` の raw JSON text を JSON object として検証・decode 開始可能な形へ変換する責務を置く
+- `Native/Internal/JsonValidation/`
+  - `Protocol` の raw JSON text を JSON object として検証・decode 開始可能な形へ変換する責務を置く
   - response 側の `TEXT -> JSON検証変換` 段階に対応する
-- `Normalized/Internal/Conversion/`
+- `Native/Internal/Conversion/`
   - JSON object を bitFlyer 内意味の正規化 DTO 候補へ変換する責務を置く
   - `JsonConverter` と値揺れ吸収、symbol / product_code / market 変換補助をここへ置く
   - response 側の `意味変換` 段階に対応する
-- `Normalized/Internal/MeaningValidation/`
+- `Native/Internal/MeaningValidation/`
   - 正規化 DTO 候補が公開契約として成立しているかを検証する責務を置く
   - response 側の `意味検証` 段階に対応する
-- `Normalized/Internal/Errors/`
+- `Native/Internal/Errors/`
   - `Http` / `Codec` / `Mapping` / `Semantic` の確定規則と補助情報整形を置く
   - `Unknown` は最後の退避先としてのみ扱い、既知ケースの常用先にしない
-- `Normalized` project では、公開面は endpoint 単位の file 分割を採ってよい
-- `Normalized/Internal` では責務単位の物理分割を優先する
-- `Normalized` の response 側は、物理構成上も `JsonValidation -> Conversion -> MeaningValidation` の順で読める形を維持する
-- `Wire` project の endpoint 定義は `Public/Endpoints/` と `Private/Endpoints/` を主配置とし、endpoint-level API が主公開面であることを物理構成でも読めるようにする
-- `Vocabulary/EndpointIds.cs` は `Wire` と `Normalized` の両方が参照できる bitFlyer 共通語彙として独立配置する
+- `Native` project では、公開面は endpoint 単位の file 分割を採ってよい
+- `Native/Internal` では責務単位の物理分割を優先する
+- `Native` の response 側は、物理構成上も `JsonValidation -> Conversion -> MeaningValidation` の順で読める形を維持する
+- `Protocol` project の endpoint 定義は `Public/Endpoints/` と `Private/Endpoints/` を主配置とし、endpoint-level API が主公開面であることを物理構成でも読めるようにする
+- `Vocabulary/EndpointIds.cs` は `Protocol` と `Native` の両方が参照できる bitFlyer 共通語彙として独立配置する
 
 ### 9.4 この案を採用する理由
 
@@ -704,7 +704,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - 初期実装対象は `GetTicker`、`GetBalance`、`SendChildOrder` とする
 - live test は、まず read path の `GetTicker` / `GetBalance` を押さえ、その後 write path の `SendChildOrder` を導入する
 - 既存 bitFlyer live test 資産は、Stage10 live test 設計の回帰資産・流用候補として扱う
-- `SendChildOrder` 以外の `POST` / 注文 lifecycle live test は、`Normalized` request 境界の固定後に後段で導入する
+- `SendChildOrder` 以外の `POST` / 注文 lifecycle live test は、`Native` request 境界の固定後に後段で導入する
 - debug logging / diagnostics の具体 local-file sink は初手では no-op でもよく、初期 3 endpoint の core 実装後に追加してよい
 - その後、既存コードを利用しながら試作実装を進める
 - bitFlyer 専用設計が固まった後に、取引所横断共通化の再導入可否を判断する
@@ -714,19 +714,19 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 ## 11. DoD
 
-- `Wire` / `Normalized` の 2 層定義が文書上で明確である
+- `Protocol` / `Native` の 2 層定義が文書上で明確である
 - 各層のデータ表現と所有権が文書上で明確である
 - `Contract` を Stage10 第1段階の対象外とすることが文書上で明確である
 - 案 A の展開方針、ブランチ、文書配置、新コード配置が文書上で明確である
 - Stage10 の物理構成案と project 境界が文書上で明確である
-- `Normalized` の責務と物理配置の対応が文書上で明確である
+- `Native` の責務と物理配置の対応が文書上で明確である
 - `Vocabulary/EndpointIds.cs` を含む bitFlyer 共通語彙の配置が文書上で明確である
-- `Wire` が単独利用可能な実行基盤であることが文書上で明確である
-- 認証・署名・transport が `Wire` に集約されることが文書上で明確である
-- `BaseUri` と `TransportConfig` が `Wire` runtime の必須構成であることが文書上で明確である
+- `Protocol` が単独利用可能な実行基盤であることが文書上で明確である
+- 認証・署名・transport が `Protocol` に集約されることが文書上で明確である
+- `BaseUri` と `TransportConfig` が `Protocol` runtime の必須構成であることが文書上で明確である
 - `HttpPolicy` を採用せず、回復戦略を外部で扱うことが文書上で明確である
-- `Normalized` が transport を持たない request / response 契約層であることが文書上で明確である
-- `Raw` を公開層として持たず、`Normalized` が internal codec と `JsonConverter` を用いて正規化することが文書上で明確である
+- `Native` が transport を持たない request / response 契約層であることが文書上で明確である
+- `Raw` を公開層として持たず、`Native` が internal codec と `JsonConverter` を用いて正規化することが文書上で明確である
 - 各層の request / response 境界が文書上で明確である
 - response 側の `TEXT -> JSON検証変換 -> 意味変換 -> 意味検証` の 4 段階が文書上で明確であり、物理構成と対応している
 - `Transport` / `Http` / `Codec` / `Mapping` / `Semantic` / `Unknown` の基底分類と、各層での確定責務が文書上で明確である
@@ -735,16 +735,16 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `CallMeta.Layer` / `Component` / `Tags` / `Children` の語彙と運用粒度が文書上で明確である
 - Stage10 の debug logging / diagnostics が local-only、request header 非記録、`OperationId` 相関、artifact 後処理という方針で文書上明確である
 - request DTO の naming / null / transport 配置規則が文書上で明確である
-- `Wire` endpoint-level API の主公開面と初期 3 endpoint の署名方針が文書上で明確である
+- `Protocol` endpoint-level API の主公開面と初期 3 endpoint の署名方針が文書上で明確である
 - Stage10 endpoint matrix の列定義と用途が文書上で明確である
 - bundle を owner とする runtime 所有権と dispose 方針が文書上で明確である
 - project / namespace の参照ガード方針が文書上で明確である
 - 初期 3 endpoint の具体契約が文書上で明確である
 - Stage10 用 architecture test の追加候補と検査対象が文書上で明確である
-- `Normalized DTO` 全体を最終的に固定する前提、移行中の `Stable Core DTO` / `Transitional DTO` の区別、および breaking change 規則が文書上で明確である
-- 最終固定対象の `Normalized DTO` の naming rule が、bitFlyer API の返却フィールド名由来であることと、raw / diagnostics 情報を `Normalized` 公開契約でサポートしない方針が文書上で明確である
+- `Native DTO` 全体を最終的に固定する前提、移行中の `Stable Core DTO` / `Transitional DTO` の区別、および breaking change 規則が文書上で明確である
+- 最終固定対象の `Native DTO` の naming rule が、bitFlyer API の返却フィールド名由来であることと、raw / diagnostics 情報を `Native` 公開契約でサポートしない方針が文書上で明確である
 - request 側の `null = 未指定` 規則と、最終固定対象 DTO の nullability rule が文書上で明確である
-- 最終固定対象の `Normalized DTO` が既定 `JsonSerializer.Serialize(dto)` を前提とし、serializer-native な公開形を採る方針が文書上で明確である
+- 最終固定対象の `Native DTO` が既定 `JsonSerializer.Serialize(dto)` を前提とし、serializer-native な公開形を採る方針が文書上で明確である
 - 各層で `Public` / `Private` の責務を分けつつ、公開面は bundle として整理することが文書上で明確である
 - 上位層が下位層へ戻って再取得・再試行しないことが文書上で明確である
 - 下位層アクセス可能だが暗黙 fallback は禁止することが文書上で明確である
@@ -757,7 +757,7 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 ## 12. 現時点の未確定事項
 
 - `Encoder` / `JsonValidation` / `Conversion` / `MeaningValidation` の配置と命名をどう固定するか
-- `Normalized/Internal/*` の型名・namespace・ファイル分割粒度をどう固定するか
+- `Native/Internal/*` の型名・namespace・ファイル分割粒度をどう固定するか
 - どの endpoint のどの `Transitional DTO` をどの順で固定対象へ収束させるか
 - `WireBundle` / `NormalizedBundle` の具体名と公開プロパティ名をどう固定するか
 - `stage10/endpoints-bitflyer.md` の運用粒度をどう固定するか

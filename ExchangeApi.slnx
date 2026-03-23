@@ -19,8 +19,8 @@
     <Project Path="src/Exchanges/Bittrade/Composition/ExchangeApi.Exchanges.Bittrade.Composition.csproj" />
   </Folder>
   <Folder Name="/src-stage10/">
-    <Project Path="src-stage10/Bitflyer/Wire/ExchangeApi.Stage10.Bitflyer.Wire.csproj" />
-    <Project Path="src-stage10/Bitflyer/Normalized/ExchangeApi.Stage10.Bitflyer.Normalized.csproj" />
+    <Project Path="src-stage10/Bitflyer/Protocol/ExchangeApi.Stage10.Bitflyer.Protocol.csproj" />
+    <Project Path="src-stage10/Bitflyer/Native/ExchangeApi.Stage10.Bitflyer.Native.csproj" />
     <Project Path="src-stage10/Bitflyer/Composition/ExchangeApi.Stage10.Bitflyer.Composition.csproj" />
   </Folder>
   <Folder Name="/tests/">
@@ -35,8 +35,8 @@
     <Project Path="tests/Exchanges/Bittrade/Adapter.Tests/Exchange.Bittrade.Adapter.Tests.csproj" />
   </Folder>
   <Folder Name="/tests-stage10/">
-    <Project Path="tests-stage10/Bitflyer/Wire.Tests/ExchangeApi.Stage10.Bitflyer.Wire.Tests.csproj" />
-    <Project Path="tests-stage10/Bitflyer/Normalized.Tests/ExchangeApi.Stage10.Bitflyer.Normalized.Tests.csproj" />
+    <Project Path="tests-stage10/Bitflyer/Protocol.Tests/ExchangeApi.Stage10.Bitflyer.Protocol.Tests.csproj" />
+    <Project Path="tests-stage10/Bitflyer/Native.Tests/ExchangeApi.Stage10.Bitflyer.Native.Tests.csproj" />
     <Project Path="tests-stage10/Bitflyer/Composition.Tests/ExchangeApi.Stage10.Bitflyer.Composition.Tests.csproj" />
     <Project Path="tests-stage10/Bitflyer/LiveTests/ExchangeApi.Stage10.Bitflyer.LiveTests.csproj" />
   </Folder>

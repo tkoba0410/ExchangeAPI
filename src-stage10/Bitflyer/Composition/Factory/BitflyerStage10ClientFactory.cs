@@ -5,9 +5,9 @@ namespace ExchangeApi.Stage10.Bitflyer.Composition.Factory;
 
 public static class BitflyerStage10ClientFactory
 {
-    public static BitflyerWireClientBundle CreateWireClient(BitflyerStage10ClientOptions? options = null) =>
-        BitflyerRuntimeBootstrap.CreateWireBundle(options ?? new BitflyerStage10ClientOptions());
+    public static BitflyerProtocolClientBundle CreateProtocolClient(BitflyerStage10ClientOptions? options = null) =>
+        BitflyerRuntimeBootstrap.CreateProtocolBundle(options ?? new BitflyerStage10ClientOptions());
 
-    public static BitflyerNormalizedClientBundle CreateNormalizedClient(BitflyerStage10ClientOptions? options = null) =>
-        BitflyerRuntimeBootstrap.CreateNormalizedBundle(options ?? new BitflyerStage10ClientOptions());
+    public static BitflyerNativeClientBundle CreateNativeClient(BitflyerStage10ClientOptions? options = null) =>
+        BitflyerRuntimeBootstrap.CreateNativeBundle(options ?? new BitflyerStage10ClientOptions());
 }

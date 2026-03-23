@@ -22,8 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../src-stage10/Bitflyer/Composition/ExchangeApi.Stage10.Bitflyer.Composition.csproj" />
-    <ProjectReference Include="../../../src-stage10/Bitflyer/Normalized/ExchangeApi.Stage10.Bitflyer.Normalized.csproj" />
-    <ProjectReference Include="../../../src-stage10/Bitflyer/Wire/ExchangeApi.Stage10.Bitflyer.Wire.csproj" />
+    <ProjectReference Include="../../../src-stage10/Bitflyer/Native/ExchangeApi.Stage10.Bitflyer.Native.csproj" />
+    <ProjectReference Include="../../../src-stage10/Bitflyer/Protocol/ExchangeApi.Stage10.Bitflyer.Protocol.csproj" />
     <ProjectReference Include="../../../src/Transport/ExchangeApi.Transport.csproj" />
     <ProjectReference Include="../../../src/Primitives/ExchangeApi.Primitives.csproj" />
   </ItemGroup>

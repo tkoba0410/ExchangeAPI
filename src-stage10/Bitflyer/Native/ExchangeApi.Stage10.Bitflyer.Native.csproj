@@ -6,14 +6,12 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisLevel>latest</AnalysisLevel>
-    <AssemblyName>ExchangeApi.Stage10.Bitflyer.Composition</AssemblyName>
-    <RootNamespace>ExchangeApi.Stage10.Bitflyer.Composition</RootNamespace>
+    <AssemblyName>ExchangeApi.Stage10.Bitflyer.Native</AssemblyName>
+    <RootNamespace>ExchangeApi.Stage10.Bitflyer.Native</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="../Protocol/ExchangeApi.Stage10.Bitflyer.Protocol.csproj" />
-    <ProjectReference Include="../Native/ExchangeApi.Stage10.Bitflyer.Native.csproj" />
-    <ProjectReference Include="../../../src/Composition/ExchangeApi.Composition.csproj" />
+    <ProjectReference Include="../../../src/Primitives/ExchangeApi.Primitives.csproj" />
   </ItemGroup>
-
 </Project>

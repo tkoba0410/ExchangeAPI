@@ -11,10 +11,10 @@ namespace ExchangeApi.Tests.Stage10.Bitflyer.Composition.Tests;
 public sealed class BitflyerStage10ClientFactoryTests
 {
     [Fact]
-    public async Task CreateWireClient_WithoutCredentials_ExposesPublicOnly()
+    public async Task CreateProtocolClient_WithoutCredentials_ExposesPublicOnly()
     {
         var transport = new RoutingTransport();
-        using var bundle = BitflyerStage10ClientFactory.CreateWireClient(new BitflyerStage10ClientOptions
+        using var bundle = BitflyerStage10ClientFactory.CreateProtocolClient(new BitflyerStage10ClientOptions
         {
             BaseUri = new Uri("https://example.com"),
             TransportConfig = new TransportConfig.ExternalTransport(transport),
@@ -29,10 +29,10 @@ public sealed class BitflyerStage10ClientFactoryTests
     }
 
     [Fact]
-    public async Task CreateNormalizedClient_WithCredentials_ExposesPrivateAndSharesWireRuntime()
+    public async Task CreateNativeClient_WithCredentials_ExposesPrivateAndSharesProtocolRuntime()
     {
         var transport = new RoutingTransport();
-        using var bundle = BitflyerStage10ClientFactory.CreateNormalizedClient(new BitflyerStage10ClientOptions
+        using var bundle = BitflyerStage10ClientFactory.CreateNativeClient(new BitflyerStage10ClientOptions
         {
             BaseUri = new Uri("https://example.com"),
             TransportConfig = new TransportConfig.ExternalTransport(transport),
@@ -43,23 +43,23 @@ public sealed class BitflyerStage10ClientFactoryTests
             },
         });
 
-        var publicCall = await bundle.Public.GetTickerAsync(new ExchangeApi.Stage10.Bitflyer.Normalized.Public.Requests.GetTickerRequest());
-        var publicOk = Assert.IsType<CallResult<ExchangeApi.Stage10.Bitflyer.Normalized.Public.Dtos.GetTickerResponse>.Ok>(publicCall.Result);
+        var publicCall = await bundle.Public.GetTickerAsync(new ExchangeApi.Stage10.Bitflyer.Native.Public.Requests.GetTickerRequest());
+        var publicOk = Assert.IsType<CallResult<ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos.GetTickerResponse>.Ok>(publicCall.Result);
 
-        var privateCall = await bundle.Private!.GetBalanceAsync(new ExchangeApi.Stage10.Bitflyer.Normalized.Private.Requests.GetBalanceRequest());
-        var privateOk = Assert.IsType<CallResult<IReadOnlyList<ExchangeApi.Stage10.Bitflyer.Normalized.Private.Dtos.GetBalance.Item>>.Ok>(privateCall.Result);
+        var privateCall = await bundle.Private!.GetBalanceAsync(new ExchangeApi.Stage10.Bitflyer.Native.Private.Requests.GetBalanceRequest());
+        var privateOk = Assert.IsType<CallResult<IReadOnlyList<ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos.GetBalance.Item>>.Ok>(privateCall.Result);
 
-        Assert.NotNull(bundle.Wire.Private);
+        Assert.NotNull(bundle.Protocol.Private);
         Assert.Equal(ProductCodes.BtcJpy, publicOk.Response.ProductCode);
         Assert.Single(privateOk.Response);
         Assert.Equal(2, transport.CallCount);
     }
 
     [Fact]
-    public async Task CreateWireClient_WithTickerAliasEnabled_UsesAliasPathForTransport()
+    public async Task CreateProtocolClient_WithTickerAliasEnabled_UsesAliasPathForTransport()
     {
         var transport = new RoutingTransport();
-        using var bundle = BitflyerStage10ClientFactory.CreateWireClient(new BitflyerStage10ClientOptions
+        using var bundle = BitflyerStage10ClientFactory.CreateProtocolClient(new BitflyerStage10ClientOptions
         {
             BaseUri = new Uri("https://example.com"),
             TransportConfig = new TransportConfig.ExternalTransport(transport),

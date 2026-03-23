@@ -1,9 +1,9 @@
 using System.Text.Json;
 using ExchangeApi.Stage10.Bitflyer.Composition.Factory;
 using ExchangeApi.Stage10.Bitflyer.Composition.Options;
-using ExchangeApi.Stage10.Bitflyer.Normalized.Private.Dtos;
-using ExchangeApi.Stage10.Bitflyer.Normalized.Private.Requests;
-using ExchangeApi.Stage10.Bitflyer.Normalized.Public.Requests;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Requests;
+using ExchangeApi.Stage10.Bitflyer.Native.Public.Requests;
 using ExchangeApi.Tests.Stage10.Bitflyer.LiveTests.Infrastructure;
 
 namespace ExchangeApi.Tests.Stage10.Bitflyer.LiveTests;
@@ -14,22 +14,22 @@ public sealed class Stage10LiveParityTests
     [Trait("Category", "Live")]
     [Trait("Scope", "Public")]
     [Trait("Layer", "Parity")]
-    public async Task GetTicker_WireAndNormalized_AgreeOnContract()
+    public async Task GetTicker_ProtocolAndNative_AgreeOnContract()
     {
-        using var bundle = BitflyerStage10ClientFactory.CreateNormalizedClient(new BitflyerStage10ClientOptions
+        using var bundle = BitflyerStage10ClientFactory.CreateNativeClient(new BitflyerStage10ClientOptions
         {
             BaseUri = BitflyerStage10LiveTestSettings.ResolveBaseUri(),
         });
 
-        var wireCall = await bundle.Wire.Public.GetTickerAsync(BitflyerStage10LiveTestSettings.DefaultProductCode);
+        var wireCall = await bundle.Protocol.Public.GetTickerAsync(BitflyerStage10LiveTestSettings.DefaultProductCode);
         var wireResponse = BitflyerStage10LiveAssert.RequireWireSuccess(wireCall);
         using var wireJson = JsonDocument.Parse(wireResponse.Json);
 
-        var normalizedCall = await bundle.Public.GetTickerAsync(new GetTickerRequest
+        var nativeCall = await bundle.Public.GetTickerAsync(new GetTickerRequest
         {
             ProductCode = BitflyerStage10LiveTestSettings.DefaultProductCode,
         });
-        var response = BitflyerStage10LiveAssert.RequireOk(normalizedCall);
+        var response = BitflyerStage10LiveAssert.RequireOk(nativeCall);
         var root = wireJson.RootElement;
 
         Assert.Equal(root.GetProperty("product_code").GetString(), response.ProductCode);
@@ -53,42 +53,42 @@ public sealed class Stage10LiveParityTests
     [Trait("Category", "Live")]
     [Trait("Scope", "Private")]
     [Trait("Layer", "Parity")]
-    public async Task GetBalance_WireAndNormalized_AgreeOnTopLevelArrayContract()
+    public async Task GetBalance_ProtocolAndNative_AgreeOnTopLevelArrayContract()
     {
-        using var bundle = BitflyerStage10ClientFactory.CreateNormalizedClient(new BitflyerStage10ClientOptions
+        using var bundle = BitflyerStage10ClientFactory.CreateNativeClient(new BitflyerStage10ClientOptions
         {
             BaseUri = BitflyerStage10LiveTestSettings.ResolveBaseUri(),
             Credentials = BitflyerStage10LiveTestSettings.GetCredentials(),
         });
 
-        Assert.NotNull(bundle.Wire.Private);
+        Assert.NotNull(bundle.Protocol.Private);
         Assert.NotNull(bundle.Private);
 
-        var wireCall = await bundle.Wire.Private!.GetBalanceAsync();
+        var wireCall = await bundle.Protocol.Private!.GetBalanceAsync();
         var wireResponse = BitflyerStage10LiveAssert.RequireWireSuccess(wireCall);
         using var wireJson = JsonDocument.Parse(wireResponse.Json);
         Assert.Equal(JsonValueKind.Array, wireJson.RootElement.ValueKind);
 
-        var normalizedCall = await bundle.Private!.GetBalanceAsync(new GetBalanceRequest());
-        var response = BitflyerStage10LiveAssert.RequireOk(normalizedCall);
+        var nativeCall = await bundle.Private!.GetBalanceAsync(new GetBalanceRequest());
+        var response = BitflyerStage10LiveAssert.RequireOk(nativeCall);
         var responseByCurrency = response.ToDictionary(item => item.CurrencyCode, StringComparer.Ordinal);
 
         foreach (var element in wireJson.RootElement.EnumerateArray())
         {
             var currencyCode = element.GetProperty("currency_code").GetString();
             Assert.False(string.IsNullOrWhiteSpace(currencyCode));
-            Assert.True(responseByCurrency.Remove(currencyCode!, out var normalizedItem), $"Currency '{currencyCode}' was missing from Normalized response.");
-            Assert.Equal(element.GetProperty("amount").GetDecimal(), normalizedItem.Amount);
-            Assert.Equal(element.GetProperty("available").GetDecimal(), normalizedItem.Available);
+            Assert.True(responseByCurrency.Remove(currencyCode!, out var nativeItem), $"Currency '{currencyCode}' was missing from Native response.");
+            Assert.Equal(element.GetProperty("amount").GetDecimal(), nativeItem.Amount);
+            Assert.Equal(element.GetProperty("available").GetDecimal(), nativeItem.Available);
         }
 
         Assert.Empty(responseByCurrency);
     }
 
-    [Fact(Skip = "Wire-vs-Normalized live parity for SendChildOrder would place two real orders. Keep body/DTO validation in unit tests and run post live manually.")]
+    [Fact(Skip = "Protocol-vs-Native live parity for SendChildOrder would place two real orders. Keep body/DTO validation in unit tests and run post live manually.")]
     [Trait("Category", "Live")]
     [Trait("Scope", "Private")]
     [Trait("Layer", "Parity")]
-    public Task SendChildOrder_WireAndNormalized_Parity_IsNotSafeOnLive() =>
+    public Task SendChildOrder_ProtocolAndNative_Parity_IsNotSafeOnLive() =>
         Task.CompletedTask;
 }

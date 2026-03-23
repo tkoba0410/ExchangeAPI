@@ -1,12 +1,12 @@
 using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Stage10.Bitflyer.Composition.Factory;
 using ExchangeApi.Stage10.Bitflyer.Composition.Options;
-using ExchangeApi.Stage10.Bitflyer.Normalized.Private.Api;
-using ExchangeApi.Stage10.Bitflyer.Normalized.Public.Api;
-using ExchangeApi.Stage10.Bitflyer.Wire.Internal.Auth;
-using ExchangeApi.Stage10.Bitflyer.Wire.Internal.Runtime;
-using ExchangeApi.Stage10.Bitflyer.Wire.Private.Api;
-using ExchangeApi.Stage10.Bitflyer.Wire.Public.Api;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Native.Public.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Internal.Auth;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Internal.Runtime;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Public.Api;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
@@ -18,29 +18,29 @@ internal static class BitflyerRuntimeBootstrap
 {
     private static readonly Uri DefaultBaseUri = new("https://api.bitflyer.com");
 
-    public static BitflyerWireClientBundle CreateWireBundle(BitflyerStage10ClientOptions options)
+    public static BitflyerProtocolClientBundle CreateProtocolBundle(BitflyerStage10ClientOptions options)
     {
         var runtime = BuildRuntime(options);
 
-        return new BitflyerWireClientBundle(
+        return new BitflyerProtocolClientBundle(
             runtime.Owner,
-            runtime.PublicWire,
-            runtime.PrivateWire);
+            runtime.PublicProtocol,
+            runtime.PrivateProtocol);
     }
 
-    public static BitflyerNormalizedClientBundle CreateNormalizedBundle(BitflyerStage10ClientOptions options)
+    public static BitflyerNativeClientBundle CreateNativeBundle(BitflyerStage10ClientOptions options)
     {
         var runtime = BuildRuntime(options);
-        var publicNormalized = new BitflyerPublicNormalizedApi(runtime.PublicWire);
-        var privateNormalized = runtime.PrivateWire is null
+        var publicNative = new BitflyerPublicNativeApi(runtime.PublicProtocol);
+        var privateNative = runtime.PrivateProtocol is null
             ? null
-            : new BitflyerPrivateNormalizedApi(runtime.PrivateWire);
+            : new BitflyerPrivateNativeApi(runtime.PrivateProtocol);
 
-        return new BitflyerNormalizedClientBundle(
+        return new BitflyerNativeClientBundle(
             runtime.Owner,
-            new BitflyerWireClientView(runtime.PublicWire, runtime.PrivateWire),
-            publicNormalized,
-            privateNormalized);
+            new BitflyerProtocolClientView(runtime.PublicProtocol, runtime.PrivateProtocol),
+            publicNative,
+            privateNative);
     }
 
     private static RuntimeParts BuildRuntime(BitflyerStage10ClientOptions options)
@@ -67,15 +67,15 @@ internal static class BitflyerRuntimeBootstrap
             logger: NoOpRestClientLogger.Instance,
             observer: NoOpRestCallObserver.Instance);
 
-        var wireTransport = new BitflyerWireTransport(restClient, options.UseTickerAliasPath);
-        var publicWire = new BitflyerPublicWireApi(wireTransport);
-        var privateWire = signer is null ? null : new BitflyerPrivateWireApi(wireTransport);
+        var protocolTransport = new BitflyerProtocolTransport(restClient, options.UseTickerAliasPath);
+        var publicProtocol = new BitflyerPublicProtocolApi(protocolTransport);
+        var privateProtocol = signer is null ? null : new BitflyerPrivateProtocolApi(protocolTransport);
 
-        return new RuntimeParts(restClient, publicWire, privateWire);
+        return new RuntimeParts(restClient, publicProtocol, privateProtocol);
     }
 
     private sealed record RuntimeParts(
         IDisposable Owner,
-        IBitflyerPublicWireApi PublicWire,
-        IBitflyerPrivateWireApi? PrivateWire);
+        IBitflyerPublicProtocolApi PublicProtocol,
+        IBitflyerPrivateProtocolApi? PrivateProtocol);
 }

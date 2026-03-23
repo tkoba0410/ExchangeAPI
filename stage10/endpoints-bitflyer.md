@@ -5,11 +5,11 @@ inventory が事実一覧であるのに対し、本書は Stage10 第1段階の
 
 ## Values
 
-- `ExposeInWire`
-  - `Yes`: Stage10 第1段階で `Wire` 公開面に含める
+- `ExposeInProtocol`
+  - `Yes`: Stage10 第1段階で `Protocol` 公開面に含める
   - `Later`: Stage10 後段で扱う
-- `ExposeInNormalized`
-  - `Yes`: Stage10 第1段階で `Normalized` 公開面に含める
+- `ExposeInNative`
+  - `Yes`: Stage10 第1段階で `Native` 公開面に含める
   - `Later`: Stage10 後段で扱う
 - `LiveTestPhase`
   - `Phase1-Read`: 第1段階の read live test 対象
@@ -21,7 +21,7 @@ inventory が事実一覧であるのに対し、本書は Stage10 第1段階の
 
 ## Matrix
 
-| EndpointId | Method | Path | Scope | ExposeInWire | ExposeInNormalized | LiveTestPhase | RequestDtoStatus | ResponseDtoStatus |
+| EndpointId | Method | Path | Scope | ExposeInProtocol | ExposeInNative | LiveTestPhase | RequestDtoStatus | ResponseDtoStatus |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | GetMarkets | GET | /v1/getmarkets | public | Later | Later | Later | Transitional | Transitional |
 | GetBoard | GET | /v1/getboard | public | Later | Later | Later | Transitional | Transitional |

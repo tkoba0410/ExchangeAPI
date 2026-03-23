@@ -17,6 +17,20 @@
 既存 `src-stage10`、既存 test、既存 live test 資産は再利用してよい。  
 ただし、それらは設計判断の正本ではなく、固定した設計へ寄せるための材料として扱う。
 
+### 1.1 文書統治
+
+Stage10B における文書の主従は以下とする。
+
+- [`stage10b.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/stage10b.md)
+  - 設計正本
+  - 層モデル、依存規約、error 契約、test 契約、変更ポリシーを定義する
+- [`stage10/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/stage10/endpoints-bitflyer.md)
+  - endpoint 運用正本
+  - endpoint ごとの metadata と固定状況を定義する
+- [`stage10.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/stage10.md)
+  - 移行途中の判断を含む補助文書
+  - Stage10B と衝突した場合は Stage10B を優先する
+
 ## 2. ゴール
 
 - bitFlyer 専用の `Protocol` / `Native` client をまず完成させる
@@ -132,6 +146,7 @@ src-stage10/Bitflyer/
 - endpoint-level API
 - canonical request の保持
 - raw response の返却
+- timeout / cancellation の伝播
 
 責務に含めないもの:
 
@@ -139,9 +154,17 @@ src-stage10/Bitflyer/
 - response DTO
 - JSON decode
 - meaning validation
+- automatic retry
+- automatic rate limiting
 - 取引所横断抽象化
 
 公開面は facade とし、各 endpoint の送信実装は独立 endpoint module に切り出す。
+
+追加原則:
+
+- Stage10B の `Protocol` は 1 回の送信実行を正本とする
+- retry / rate limiting / circuit breaker は既定責務に含めない
+- 必要な場合でも `Protocol` の外側、または明示 opt-in の policy として扱う
 
 ### 3.2 Native
 
@@ -229,6 +252,14 @@ Stage10B では実装対象外とする。
   - 認証付きなら `Native.Private` も持つ
   - 内部で利用する `Protocol` へアクセスできる
 
+### 4.2.1 Facade Method Contract
+
+- facade の主公開面は `*CallAsync(...)` とする
+- `Protocol` facade は `Task<Call<WireCallSpec, WireResponse>>` を返す
+- `Native` facade は `Task<Call<TRequest, TResponse>>` を返す
+- `Call` を返さない ergonomic wrapper は Stage10B の必須要件に含めない
+- ergonomic wrapper を将来追加する場合でも、`Call` を返す主 API を置き換えてはならない
+
 ### 4.3 Public / Private
 
 - 各層で `Public` / `Private` を分ける
@@ -247,12 +278,53 @@ Stage10B では実装対象外とする。
 - endpoint 固有 DTO と endpoint 固有 helper は同じ endpoint フォルダに置いてよい
 - shared helper へ切り出してよいのは、複数 endpoint で再利用され、かつ endpoint identity に依存しないものに限る
 
+### 4.5 Endpoint Interface Contract
+
+Codex が endpoint module を生成する際の基本契約は以下とする。
+
+```csharp
+public interface INativeEndpoint<in TRequest, TResponse>
+{
+    Task<Call<TRequest, TResponse>> CallAsync(
+        TRequest request,
+        CancellationToken cancellationToken = default);
+}
+```
+
+```csharp
+public interface IProtocolEndpoint
+{
+    Task<Call<WireCallSpec, WireResponse>> SendAsync(
+        CancellationToken cancellationToken = default);
+}
+```
+
+補足:
+
+- `Protocol` endpoint は transport-ready scalar / primitive 引数を受けてよい
+- `Native` endpoint は request DTO を受ける
+- 実装都合で具体 interface を endpoint ごとに定義してよいが、契約の意味は上記に従う
+
 ## 5. Call と観測語彙
 
 ### 5.1 Call
 
 - `Protocol` は `Task<Call<WireCallSpec, WireResponse>>` を返す
 - `Native` は `Task<Call<TRequest, TResponse>>` を返す
+
+`Call` の最低要件:
+
+- `Request`
+- `Response`
+- `IsSuccess`
+- `Error`
+- `Meta`
+
+追加原則:
+
+- `Native` call は対応する `Protocol` call を child call として保持する
+- `Protocol` call を持てない `Native` success / failure を作らない
+- facade は `Call` を再構築せず、endpoint module が返した `Call` をそのまま返す
 
 補足:
 
@@ -313,8 +385,10 @@ Stage10B では実装対象外とする。
 
 `CallError.Kind` の解釈は以下を正本とする。
 
+- `Transport`
+  - DNS / socket / TLS / timeout / cancellation / send failure
+  - HTTP response を受け取る前の失敗
 - `Http`
-  - `Protocol` での送信失敗
   - non-success status
   - endpoint 固定の expected status 不一致
 - `Codec`
@@ -334,9 +408,23 @@ Stage10B では実装対象外とする。
 
 追加原則:
 
+- `Protocol` は `Transport` を新規に生成してよい
 - `Protocol` は `Semantic` を新規に生成しない
+- `Protocol` は `Codec` / `Mapping` を新規に生成しない
 - `Native` の `Conversion` で起きる field-level decode failure は `Codec` とする
 - `Native` の `MeaningValidation` で起きる rule violation は `Semantic` とする
+- `Native` は transport failure を `Http` へ畳み込まない
+
+### 6.4 API Contract Rule と Business Rule
+
+- Stage10B の `Native` が扱うのは API contract rule までとする
+- 例:
+  - required field
+  - mutually exclusive field
+  - conditional required field
+  - omission rule
+  - expected status
+- 取引戦略、資産判断、執行判断のような business rule は対象外とする
 
 ## 7. Native Contract 方針
 
@@ -470,6 +558,28 @@ src-stage10/Bitflyer/Composition/
 - facade constructor は unrelated helper を直接受け取らず、module interface または module 集約 object を受け取る
 - concrete type を知ってよいのは `Composition` のみとする
 
+### 8.5 Architecture Enforcement
+
+Stage10B の規約は文書だけで終わらせず、arch test で機械検証する前提とする。
+
+検証対象:
+
+- `Protocol` から `Native` への参照禁止
+- `Native` から shared transport runtime への直接参照禁止
+- facade から runtime / signer / transport への直接参照禁止
+- endpoint module から sibling endpoint module への直接参照禁止
+- concrete endpoint 実装型を知ってよい場所を `Composition` に限定する
+- 公開面に `WireResponse`、`JsonElement`、raw diagnostics 型を露出しないこと
+
+配置:
+
+- `tests-stage10/Bitflyer/Architecture.Tests` を追加候補とする
+- namespace forbidden dependency
+- project reference forbidden edge
+- public surface forbidden type
+- file placement rule
+  を機械検証対象に含めてよい
+
 ## 9. endpoint 運用正本
 
 Stage10B の endpoint 運用正本は [`stage10/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/stage10/endpoints-bitflyer.md) とする。  
@@ -497,6 +607,70 @@ matrix が担わないもの:
 - alias path、expected status、optional omission rule を変更する場合は endpoint module test を更新する
 - exchange 仕様差分を見つけた場合、まず `stage10b.md` と matrix を更新し、その後実装を寄せる
 
+### 9.2 Endpoint Metadata
+
+`stage10/endpoints-bitflyer.md` の matrix は、少なくとも以下の metadata を持つ。
+
+- `EndpointId`
+- `Method`
+- `Path`
+- `Scope`
+- `ExposeInProtocol`
+- `ExposeInNative`
+- `LiveTestPhase`
+- `RequestDtoStatus`
+- `ResponseDtoStatus`
+- `ExpectedStatus`
+- `ResponseShape`
+- `WritesState`
+- `NeedsCleanup`
+- `AliasPath`
+- `AuthType`
+- `OptionalOmissionRule`
+
+各列の役割:
+
+- `ExpectedStatus`
+  - endpoint が成功と見なす status code を定義する
+- `ResponseShape`
+  - `Object` / `Array` / `EmptyOrObject` など、top-level shape を定義する
+- `WritesState`
+  - venue state を変更する endpoint かどうかを示す
+- `NeedsCleanup`
+  - write live test 後に cleanup が必要かを示す
+- `AliasPath`
+  - canonical path 以外に `Protocol` が内部互換として許容する path を示す
+- `AuthType`
+  - `None` / `KeySecret` など、必要認証の型を示す
+- `OptionalOmissionRule`
+  - `null` や条件分岐で omission される query / body rule を簡潔に示す
+
+原則:
+
+- endpoint module 実装は matrix metadata に従う
+- matrix へない metadata をコード側で暗黙導入しない
+- metadata を増やす場合は `stage10b.md` と matrix を同時更新する
+
+### 9.3 Compatibility / Versioning
+
+`Native` contract の互換性方針は以下を正本とする。
+
+- `Transitional`
+  - DTO は変更可能
+  - additive field 追加、property rename、shape 調整を許容する
+  - 変更時は matrix と test を更新する
+- `Fixed`
+  - 既存 property の rename / remove / semantic change を禁止する
+  - additive field 追加は、既存契約を壊さず serializer 契約と test を維持する場合に限り許容する
+  - breaking change が必要な場合は、文書上で明示し、移行手順を先に定義する
+
+追加原則:
+
+- `Protocol` の `EndpointId` は alias path 変更で変えない
+- canonical path の変更は breaking とみなす
+- `ExpectedStatus`、`ResponseShape`、`AuthType` の変更は contract change として扱う
+- 互換性判断はコード差分ではなく matrix metadata を基準に行う
+
 ## 10. 初期対象 endpoint
 
 Stage10B で優先する endpoint:
@@ -521,11 +695,13 @@ Stage10B で優先する endpoint:
 
 - `Protocol` endpoint module test
   - method / path / query / body / expected canonical request を検証する
+  - transport failure と expected status を検証する
 - `Native` endpoint module test
   - request semantic rule
   - omission rule
   - response pipeline
   - error kind 分類
+  - nested `Protocol` call の保持
   を検証する
 - facade test
   - thin forward だけを検証する
@@ -536,6 +712,21 @@ Stage10B で優先する endpoint:
 - write live test
   - 明示 opt-in を必須とし、cleanup を含む
   - 同一 endpoint を `Protocol` と `Native` の parity で二重送信しない
+
+### 10.2 Write Safety
+
+state を変更する endpoint の live 実行には、以下を必須とする。
+
+- 明示 opt-in
+  - `BITFLYER_STAGE10_LIVE=1`
+  - `BITFLYER_STAGE10_ALLOW_WRITE=1`
+- 専用または影響を限定できる account を使う
+- matrix 上 `NeedsCleanup = Yes` の endpoint は cleanup 手順を同じ test に含める
+- write test は最小数量、最小影響の request を使う
+- `SendChildOrder` のような endpoint は `Protocol` と `Native` の parity 実行で二重送信しない
+- cleanup 用 endpoint がある場合は acceptance id / order id を保持し、後続 cleanup を必ず試みる
+- cleanup 失敗は silent ignore しない
+- write live test は read parity test と別 phase で実行する
 
 ## 11. 既存試作の扱い
 
@@ -574,13 +765,34 @@ Stage10B で優先する endpoint:
 9. test を facade / endpoint module / composition に役割分離する
 10. 旧 `partial` 構成と不要 helper を整理する
 
+### 12.1 Codex 実装戦略
+
+Codex は以下の順で実装する。
+
+1. endpoint metadata を確認する
+2. `Protocol` endpoint module を生成する
+3. `Native` DTO を生成する
+4. `Native` endpoint module を生成する
+5. facade forwarding method を生成する
+6. `Composition` で配線する
+7. endpoint test / facade test / composition test を追加する
+
 ## 13. DoD
 
 - `Protocol` / `Native` の責務境界が明確
 - facade と endpoint module の役割分担が明確
+- 文書統治が定義され、`stage10b.md` と matrix の主従が固定されている
 - 依存規約が文書化され、破ってよい場所が `Composition` に限定されている
+- architecture enforcement の対象が明記されている
+- facade の主公開面が `*CallAsync(...)` に固定されている
+- `Call` の最低要件と nested `Protocol` call が定義されている
 - error kind の使い分けが固定されている
+- `Transport` / `Http` / `Codec` / `Semantic` / `Mapping` の境界が定義されている
+- `Native` が API contract rule までを扱い、business rule を持たないことが定義されている
 - test の役割分担が固定されている
+- endpoint metadata の必須列が定義されている
+- compatibility / versioning 方針が定義されている
+- write safety 規約が定義されている
 - `Native` が bitFlyer-native contract として定義されている
 - `Unified` / `McpServer` を上位層として追加できる
 - endpoint 運用正本が `stage10/endpoints-bitflyer.md` に固定されている

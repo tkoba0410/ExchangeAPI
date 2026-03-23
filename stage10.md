@@ -612,12 +612,10 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
     - `ExchangeApi.Stage10.Bitflyer.Normalized.csproj`
     - `Public/`
       - `Api/`
-      - `Requests/`
-      - `Dtos/`
+      - `Endpoints/`
     - `Private/`
       - `Api/`
-      - `Requests/`
-      - `Dtos/`
+      - `Endpoints/`
     - `Internal/Encoder/`
     - `Internal/JsonValidation/`
     - `Internal/Conversion/`
@@ -652,11 +650,13 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 
 - `Normalized/Public/`
   - Public endpoint 向けの公開 API 面だけを置く
-  - `Api/`、`Requests/`、`Dtos/` に分けて、公開契約を物理的に読める形にする
+  - `Api/` と `Endpoints/` に分ける
+  - `Endpoints/` では 1 endpoint = 1 file とし、request DTO、response DTO、normalized call を同じ file にまとめて読める形にする
   - response 変換ロジック本体は置かない
 - `Normalized/Private/`
   - Private endpoint 向けの公開 API 面だけを置く
-  - `Api/`、`Requests/`、`Dtos/` に分けて、公開契約を物理的に読める形にする
+  - `Api/` と `Endpoints/` に分ける
+  - `Endpoints/` では 1 endpoint = 1 file とし、request DTO、response DTO、normalized call を同じ file にまとめて読める形にする
   - response 変換ロジック本体は置かない
 - `Normalized/Internal/Encoder/`
   - 正規化 request を `Wire` endpoint-level API へ渡す request 材料へ落とす責務を置く
@@ -675,7 +675,8 @@ Stage10 の展開方法は、既存実装を直接全面置換する方式では
 - `Normalized/Internal/Errors/`
   - `Http` / `Codec` / `Mapping` / `Semantic` の確定規則と補助情報整形を置く
   - `Unknown` は最後の退避先としてのみ扱い、既知ケースの常用先にしない
-- `Normalized` project では API 機能単位の物理分割を採らず、責務単位の物理分割を優先する
+- `Normalized` project では、公開面は endpoint 単位の file 分割を採ってよい
+- `Normalized/Internal` では責務単位の物理分割を優先する
 - `Normalized` の response 側は、物理構成上も `JsonValidation -> Conversion -> MeaningValidation` の順で読める形を維持する
 - `Wire` project の endpoint 定義は `Public/Endpoints/` と `Private/Endpoints/` を主配置とし、endpoint-level API が主公開面であることを物理構成でも読めるようにする
 - `Vocabulary/EndpointIds.cs` は `Wire` と `Normalized` の両方が参照できる bitFlyer 共通語彙として独立配置する

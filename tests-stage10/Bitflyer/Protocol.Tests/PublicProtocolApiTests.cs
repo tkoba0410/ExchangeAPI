@@ -1,5 +1,6 @@
 using ExchangeApi.Stage10.Bitflyer.Vocabulary;
 using ExchangeApi.Stage10.Bitflyer.Protocol.Public.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
@@ -8,12 +9,12 @@ namespace ExchangeApi.Tests.Stage10.Bitflyer.Protocol.Tests;
 public sealed class PublicProtocolApiTests
 {
     [Fact]
-    public async Task GetTickerAsync_WithProductCode_BuildsCanonicalRequest()
+    public async Task GetTickerCallAsync_WithProductCode_BuildsCanonicalRequest()
     {
         var transport = new CaptureWireTransport();
-        var api = new BitflyerPublicProtocolApi(transport);
+        var api = new BitflyerPublicProtocolApi(new GetTickerProtocolEndpoint(transport));
 
-        var call = await api.GetTickerAsync(ProductCodes.BtcJpy);
+        var call = await api.GetTickerCallAsync(ProductCodes.BtcJpy);
 
         Assert.Equal("GET", call.Request.Method);
         Assert.Equal("/v1/getticker", call.Request.Path);
@@ -24,12 +25,12 @@ public sealed class PublicProtocolApiTests
     }
 
     [Fact]
-    public async Task GetTickerAsync_WithNullProductCode_OmitsQuery()
+    public async Task GetTickerCallAsync_WithNullProductCode_OmitsQuery()
     {
         var transport = new CaptureWireTransport();
-        var api = new BitflyerPublicProtocolApi(transport);
+        var api = new BitflyerPublicProtocolApi(new GetTickerProtocolEndpoint(transport));
 
-        var call = await api.GetTickerAsync();
+        var call = await api.GetTickerCallAsync();
 
         Assert.Equal("GET", call.Request.Method);
         Assert.Equal("/v1/getticker", call.Request.Path);

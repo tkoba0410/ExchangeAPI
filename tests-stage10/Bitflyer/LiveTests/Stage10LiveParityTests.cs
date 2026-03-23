@@ -21,11 +21,11 @@ public sealed class Stage10LiveParityTests
             BaseUri = BitflyerStage10LiveTestSettings.ResolveBaseUri(),
         });
 
-        var wireCall = await bundle.Protocol.Public.GetTickerAsync(BitflyerStage10LiveTestSettings.DefaultProductCode);
+        var wireCall = await bundle.Protocol.Public.GetTickerCallAsync(BitflyerStage10LiveTestSettings.DefaultProductCode);
         var wireResponse = BitflyerStage10LiveAssert.RequireWireSuccess(wireCall);
         using var wireJson = JsonDocument.Parse(wireResponse.Json);
 
-        var nativeCall = await bundle.Public.GetTickerAsync(new GetTickerRequest
+        var nativeCall = await bundle.Public.GetTickerCallAsync(new GetTickerRequest
         {
             ProductCode = BitflyerStage10LiveTestSettings.DefaultProductCode,
         });
@@ -64,12 +64,12 @@ public sealed class Stage10LiveParityTests
         Assert.NotNull(bundle.Protocol.Private);
         Assert.NotNull(bundle.Private);
 
-        var wireCall = await bundle.Protocol.Private!.GetBalanceAsync();
+        var wireCall = await bundle.Protocol.Private!.GetBalanceCallAsync();
         var wireResponse = BitflyerStage10LiveAssert.RequireWireSuccess(wireCall);
         using var wireJson = JsonDocument.Parse(wireResponse.Json);
         Assert.Equal(JsonValueKind.Array, wireJson.RootElement.ValueKind);
 
-        var nativeCall = await bundle.Private!.GetBalanceAsync(new GetBalanceRequest());
+        var nativeCall = await bundle.Private!.GetBalanceCallAsync(new GetBalanceRequest());
         var response = BitflyerStage10LiveAssert.RequireOk(nativeCall);
         var responseByCurrency = response.ToDictionary(item => item.CurrencyCode, StringComparer.Ordinal);
 

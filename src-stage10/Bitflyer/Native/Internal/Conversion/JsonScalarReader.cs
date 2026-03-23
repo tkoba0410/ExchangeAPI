@@ -1,9 +1,8 @@
 using System.Globalization;
 using System.Text.Json;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 
 internal static class JsonScalarReader
 {
@@ -28,7 +27,7 @@ internal static class JsonScalarReader
         }
 
         value = null;
-        error = BitflyerErrorFactory.Mapping($"Property '{propertyName}' must be a string.");
+        error = BitflyerErrorFactory.Codec($"Property '{propertyName}' must be a string.");
         return false;
     }
 
@@ -65,7 +64,7 @@ internal static class JsonScalarReader
         }
 
         value = null;
-        error = BitflyerErrorFactory.Mapping($"Property '{propertyName}' must be a decimal number.");
+        error = BitflyerErrorFactory.Codec($"Property '{propertyName}' must be a decimal number.");
         return false;
     }
 
@@ -102,7 +101,7 @@ internal static class JsonScalarReader
         }
 
         value = null;
-        error = BitflyerErrorFactory.Mapping($"Property '{propertyName}' must be an integer.");
+        error = BitflyerErrorFactory.Codec($"Property '{propertyName}' must be an integer.");
         return false;
     }
 
@@ -132,7 +131,7 @@ internal static class JsonScalarReader
         }
 
         value = null;
-        error = BitflyerErrorFactory.Mapping($"Property '{propertyName}' must be an ISO-8601 timestamp.");
+        error = BitflyerErrorFactory.Codec($"Property '{propertyName}' must be an ISO-8601 timestamp.");
         return false;
     }
 }

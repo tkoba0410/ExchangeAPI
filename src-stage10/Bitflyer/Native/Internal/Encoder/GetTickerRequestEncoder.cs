@@ -1,4 +1,4 @@
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
+using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Stage10.Bitflyer.Native.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
 

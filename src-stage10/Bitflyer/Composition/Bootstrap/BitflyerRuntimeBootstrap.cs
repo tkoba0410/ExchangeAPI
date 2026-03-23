@@ -2,11 +2,19 @@ using ExchangeApi.Composition.Bootstrap.Transport;
 using ExchangeApi.Stage10.Bitflyer.Composition.Factory;
 using ExchangeApi.Stage10.Bitflyer.Composition.Options;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.GetBalance;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Stage10.Bitflyer.Native.Public.Api;
+using ExchangeApi.Stage10.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Stage10.Bitflyer.Protocol.Internal.Auth;
 using ExchangeApi.Stage10.Bitflyer.Protocol.Internal.Runtime;
 using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.CancelChildOrder;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.GetBalance;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Stage10.Bitflyer.Protocol.Public.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 using ExchangeApi.Transport.Observability;
 using ExchangeApi.Transport.Policy;
 using ExchangeApi.Transport.Protocol;
@@ -31,10 +39,13 @@ internal static class BitflyerRuntimeBootstrap
     public static BitflyerNativeClientBundle CreateNativeBundle(BitflyerStage10ClientOptions options)
     {
         var runtime = BuildRuntime(options);
-        var publicNative = new BitflyerPublicNativeApi(runtime.PublicProtocol);
+        var publicNative = new BitflyerPublicNativeApi(runtime.PublicNative.GetTicker);
         var privateNative = runtime.PrivateProtocol is null
             ? null
-            : new BitflyerPrivateNativeApi(runtime.PrivateProtocol);
+            : new BitflyerPrivateNativeApi(
+                runtime.PrivateNative!.GetBalance,
+                runtime.PrivateNative.SendChildOrder,
+                runtime.PrivateNative.CancelChildOrder);
 
         return new BitflyerNativeClientBundle(
             runtime.Owner,
@@ -68,14 +79,61 @@ internal static class BitflyerRuntimeBootstrap
             observer: NoOpRestCallObserver.Instance);
 
         var protocolTransport = new BitflyerProtocolTransport(restClient, options.UseTickerAliasPath);
-        var publicProtocol = new BitflyerPublicProtocolApi(protocolTransport);
-        var privateProtocol = signer is null ? null : new BitflyerPrivateProtocolApi(protocolTransport);
+        var publicProtocolModules = new PublicProtocolModules(
+            GetTicker: new GetTickerProtocolEndpoint(protocolTransport));
+        var publicProtocol = new BitflyerPublicProtocolApi(publicProtocolModules.GetTicker);
 
-        return new RuntimeParts(restClient, publicProtocol, privateProtocol);
+        PrivateProtocolModules? privateProtocolModules = null;
+        IBitflyerPrivateProtocolApi? privateProtocol = null;
+        PrivateNativeModules? privateNativeModules = null;
+
+        if (signer is not null)
+        {
+            privateProtocolModules = new PrivateProtocolModules(
+                GetBalance: new GetBalanceProtocolEndpoint(protocolTransport),
+                SendChildOrder: new SendChildOrderProtocolEndpoint(protocolTransport),
+                CancelChildOrder: new CancelChildOrderProtocolEndpoint(protocolTransport));
+            privateProtocol = new BitflyerPrivateProtocolApi(
+                privateProtocolModules.GetBalance,
+                privateProtocolModules.SendChildOrder,
+                privateProtocolModules.CancelChildOrder);
+            privateNativeModules = new PrivateNativeModules(
+                GetBalance: new GetBalanceNativeEndpoint(privateProtocolModules.GetBalance),
+                SendChildOrder: new SendChildOrderNativeEndpoint(privateProtocolModules.SendChildOrder),
+                CancelChildOrder: new CancelChildOrderNativeEndpoint(privateProtocolModules.CancelChildOrder));
+        }
+
+        var publicNativeModules = new PublicNativeModules(
+            GetTicker: new GetTickerNativeEndpoint(publicProtocolModules.GetTicker));
+
+        return new RuntimeParts(
+            restClient,
+            publicProtocol,
+            privateProtocol,
+            publicNativeModules,
+            privateNativeModules);
     }
 
     private sealed record RuntimeParts(
         IDisposable Owner,
         IBitflyerPublicProtocolApi PublicProtocol,
-        IBitflyerPrivateProtocolApi? PrivateProtocol);
+        IBitflyerPrivateProtocolApi? PrivateProtocol,
+        PublicNativeModules PublicNative,
+        PrivateNativeModules? PrivateNative);
+
+    private sealed record PublicProtocolModules(
+        IGetTickerProtocolEndpoint GetTicker);
+
+    private sealed record PrivateProtocolModules(
+        IGetBalanceProtocolEndpoint GetBalance,
+        ISendChildOrderProtocolEndpoint SendChildOrder,
+        ICancelChildOrderProtocolEndpoint CancelChildOrder);
+
+    private sealed record PublicNativeModules(
+        IGetTickerNativeEndpoint GetTicker);
+
+    private sealed record PrivateNativeModules(
+        IGetBalanceNativeEndpoint GetBalance,
+        ISendChildOrderNativeEndpoint SendChildOrder,
+        ICancelChildOrderNativeEndpoint CancelChildOrder);
 }

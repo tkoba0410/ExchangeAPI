@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
+using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
 

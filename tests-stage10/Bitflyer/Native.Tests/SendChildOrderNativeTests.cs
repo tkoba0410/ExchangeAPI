@@ -1,7 +1,7 @@
 using ExchangeApi.Stage10.Bitflyer.Vocabulary;
-using ExchangeApi.Stage10.Bitflyer.Native.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Requests;
-using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
@@ -10,17 +10,14 @@ namespace ExchangeApi.Tests.Stage10.Bitflyer.Native.Tests;
 public sealed class SendChildOrderNativeTests
 {
     [Fact]
-    public async Task SendChildOrderAsync_WithLimitAndPrice_EncodesBodyAndMapsResponse()
+    public async Task SendChildOrderCallAsync_WithLimitAndPrice_EncodesBodyAndMapsResponse()
     {
-        var protocol = new StubPrivateProtocolApi(
-            getBalanceCall: CreateWireOk("GetBalance", "[]"),
-            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
-            sendChildOrderCall: CreateWireOk(
-                "SendChildOrder",
-                """{ "child_order_acceptance_id": "JRF20240101-000000-000001" }"""));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var protocol = new StubSendChildOrderProtocolEndpoint(CreateWireOk(
+            "SendChildOrder",
+            """{ "child_order_acceptance_id": "JRF20240101-000000-000001" }"""));
+        var endpoint = new SendChildOrderNativeEndpoint(protocol);
 
-        var call = await api.SendChildOrderAsync(new SendChildOrderRequest
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderType = "LIMIT",
@@ -39,15 +36,12 @@ public sealed class SendChildOrderNativeTests
     }
 
     [Fact]
-    public async Task SendChildOrderAsync_WithLimitWithoutPrice_ReturnsSemanticError()
+    public async Task SendChildOrderCallAsync_WithLimitWithoutPrice_ReturnsSemanticError()
     {
-        var protocol = new StubPrivateProtocolApi(
-            getBalanceCall: CreateWireOk("GetBalance", "[]"),
-            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
-            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var protocol = new StubSendChildOrderProtocolEndpoint(CreateWireOk("SendChildOrder", "{}"));
+        var endpoint = new SendChildOrderNativeEndpoint(protocol);
 
-        var call = await api.SendChildOrderAsync(new SendChildOrderRequest
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderType = "LIMIT",
@@ -61,15 +55,12 @@ public sealed class SendChildOrderNativeTests
     }
 
     [Fact]
-    public async Task SendChildOrderAsync_WithMarketAndPrice_ReturnsSemanticError()
+    public async Task SendChildOrderCallAsync_WithMarketAndPrice_ReturnsSemanticError()
     {
-        var protocol = new StubPrivateProtocolApi(
-            getBalanceCall: CreateWireOk("GetBalance", "[]"),
-            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
-            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var protocol = new StubSendChildOrderProtocolEndpoint(CreateWireOk("SendChildOrder", "{}"));
+        var endpoint = new SendChildOrderNativeEndpoint(protocol);
 
-        var call = await api.SendChildOrderAsync(new SendChildOrderRequest
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderType = "MARKET",
@@ -83,15 +74,12 @@ public sealed class SendChildOrderNativeTests
     }
 
     [Fact]
-    public async Task SendChildOrderAsync_WithTooLargeMinuteToExpire_ReturnsSemanticError()
+    public async Task SendChildOrderCallAsync_WithTooLargeMinuteToExpire_ReturnsSemanticError()
     {
-        var protocol = new StubPrivateProtocolApi(
-            getBalanceCall: CreateWireOk("GetBalance", "[]"),
-            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
-            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var protocol = new StubSendChildOrderProtocolEndpoint(CreateWireOk("SendChildOrder", "{}"));
+        var endpoint = new SendChildOrderNativeEndpoint(protocol);
 
-        var call = await api.SendChildOrderAsync(new SendChildOrderRequest
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderType = "LIMIT",
@@ -108,18 +96,15 @@ public sealed class SendChildOrderNativeTests
     }
 
     [Fact]
-    public async Task SendChildOrderAsync_WithNon200Status_ReturnsHttpError()
+    public async Task SendChildOrderCallAsync_WithNon200Status_ReturnsHttpError()
     {
-        var protocol = new StubPrivateProtocolApi(
-            getBalanceCall: CreateWireOk("GetBalance", "[]"),
-            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
-            sendChildOrderCall: CreateWireOk(
-                "SendChildOrder",
-                """{ "child_order_acceptance_id": "JRF20240101-000000-000001" }""",
-                statusCode: 201));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var protocol = new StubSendChildOrderProtocolEndpoint(CreateWireOk(
+            "SendChildOrder",
+            """{ "child_order_acceptance_id": "JRF20240101-000000-000001" }""",
+            statusCode: 201));
+        var endpoint = new SendChildOrderNativeEndpoint(protocol);
 
-        var call = await api.SendChildOrderAsync(new SendChildOrderRequest
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderType = "LIMIT",
@@ -142,39 +127,23 @@ public sealed class SendChildOrderNativeTests
             Result: new CallResult<WireResponse>.Ok(new WireResponse(statusCode, json)),
             Meta: new CallMeta("Protocol", "Transport", endpointId));
 
-    private sealed class StubPrivateProtocolApi : IBitflyerPrivateProtocolApi
+    private sealed class StubSendChildOrderProtocolEndpoint : ISendChildOrderProtocolEndpoint
     {
-        private readonly Call<WireCallSpec, WireResponse> _getBalanceCall;
         private readonly Call<WireCallSpec, WireResponse> _sendChildOrderCall;
-        private readonly Call<WireCallSpec, WireResponse> _cancelChildOrderCall;
 
-        public StubPrivateProtocolApi(
-            Call<WireCallSpec, WireResponse> getBalanceCall,
-            Call<WireCallSpec, WireResponse> cancelChildOrderCall,
-            Call<WireCallSpec, WireResponse> sendChildOrderCall)
+        public StubSendChildOrderProtocolEndpoint(Call<WireCallSpec, WireResponse> sendChildOrderCall)
         {
-            _getBalanceCall = getBalanceCall;
-            _cancelChildOrderCall = cancelChildOrderCall;
             _sendChildOrderCall = sendChildOrderCall;
         }
 
         public string? LastBodyJson { get; private set; }
 
-        public Task<Call<WireCallSpec, WireResponse>> GetBalanceAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(_getBalanceCall);
-
-        public Task<Call<WireCallSpec, WireResponse>> SendChildOrderAsync(
+        public Task<Call<WireCallSpec, WireResponse>> SendAsync(
             string bodyJson,
             CancellationToken cancellationToken = default)
         {
             LastBodyJson = bodyJson;
             return Task.FromResult(_sendChildOrderCall);
         }
-
-        public Task<Call<WireCallSpec, WireResponse>> CancelChildOrderAsync(
-            string bodyJson,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(_cancelChildOrderCall);
     }
 }

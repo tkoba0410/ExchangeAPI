@@ -1,4 +1,7 @@
 using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.CancelChildOrder;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.GetBalance;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
@@ -7,12 +10,12 @@ namespace ExchangeApi.Tests.Stage10.Bitflyer.Protocol.Tests;
 public sealed class PrivateProtocolApiTests
 {
     [Fact]
-    public async Task GetBalanceAsync_BuildsCanonicalRequest()
+    public async Task GetBalanceCallAsync_BuildsCanonicalRequest()
     {
         var transport = new CaptureWireTransport();
-        var api = new BitflyerPrivateProtocolApi(transport);
+        var api = CreateApi(transport);
 
-        var call = await api.GetBalanceAsync();
+        var call = await api.GetBalanceCallAsync();
 
         Assert.Equal("GET", call.Request.Method);
         Assert.Equal("/v1/me/getbalance", call.Request.Path);
@@ -23,13 +26,13 @@ public sealed class PrivateProtocolApiTests
     }
 
     [Fact]
-    public async Task SendChildOrderAsync_BuildsCanonicalRequest()
+    public async Task SendChildOrderCallAsync_BuildsCanonicalRequest()
     {
         const string bodyJson = "{\"product_code\":\"BTC_JPY\"}";
         var transport = new CaptureWireTransport();
-        var api = new BitflyerPrivateProtocolApi(transport);
+        var api = CreateApi(transport);
 
-        var call = await api.SendChildOrderAsync(bodyJson);
+        var call = await api.SendChildOrderCallAsync(bodyJson);
 
         Assert.Equal("POST", call.Request.Method);
         Assert.Equal("/v1/me/sendchildorder", call.Request.Path);
@@ -40,13 +43,13 @@ public sealed class PrivateProtocolApiTests
     }
 
     [Fact]
-    public async Task CancelChildOrderAsync_BuildsCanonicalRequest()
+    public async Task CancelChildOrderCallAsync_BuildsCanonicalRequest()
     {
         const string bodyJson = "{\"product_code\":\"BTC_JPY\",\"child_order_acceptance_id\":\"JRF-1\"}";
         var transport = new CaptureWireTransport();
-        var api = new BitflyerPrivateProtocolApi(transport);
+        var api = CreateApi(transport);
 
-        var call = await api.CancelChildOrderAsync(bodyJson);
+        var call = await api.CancelChildOrderCallAsync(bodyJson);
 
         Assert.Equal("POST", call.Request.Method);
         Assert.Equal("/v1/me/cancelchildorder", call.Request.Path);
@@ -72,4 +75,10 @@ public sealed class PrivateProtocolApiTests
                     Meta: new CallMeta("Protocol", "Transport", request.EndpointId)));
         }
     }
+
+    private static BitflyerPrivateProtocolApi CreateApi(CaptureWireTransport transport) =>
+        new(
+            new GetBalanceProtocolEndpoint(transport),
+            new SendChildOrderProtocolEndpoint(transport),
+            new CancelChildOrderProtocolEndpoint(transport));
 }

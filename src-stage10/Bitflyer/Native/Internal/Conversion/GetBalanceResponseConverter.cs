@@ -1,6 +1,6 @@
 using System.Text.Json;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 
 namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
 
@@ -18,7 +18,7 @@ internal static class GetBalanceResponseConverter
             if (element.ValueKind != JsonValueKind.Object)
             {
                 candidates = null;
-                error = BitflyerErrorFactory.Mapping("Each balance item must be a JSON object.");
+                error = Internal.Shared.BitflyerErrorFactory.Codec("Each balance item must be a JSON object.");
                 return false;
             }
 

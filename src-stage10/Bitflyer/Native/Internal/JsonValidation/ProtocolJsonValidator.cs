@@ -1,9 +1,8 @@
 using System.Text.Json;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.JsonValidation;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 
 internal static class ProtocolJsonValidator
 {
@@ -29,7 +28,7 @@ internal static class ProtocolJsonValidator
         out JsonValidationResult result,
         out CallError? error)
     {
-        if (!TryValidateSuccessStatus(response, out result, out error))
+        if (!TryParse(response, out result, out error))
         {
             return false;
         }
@@ -50,7 +49,7 @@ internal static class ProtocolJsonValidator
         out JsonValidationResult result,
         out CallError? error)
     {
-        if (!TryValidateSuccessStatus(response, out result, out error))
+        if (!TryParse(response, out result, out error))
         {
             return false;
         }
@@ -66,20 +65,30 @@ internal static class ProtocolJsonValidator
         return true;
     }
 
-    private static bool TryValidateSuccessStatus(
+    public static bool TryValidateRequiredProperties(
+        JsonElement element,
+        IReadOnlyList<string> propertyNames,
+        out CallError? error)
+    {
+        foreach (var propertyName in propertyNames)
+        {
+            if (!element.TryGetProperty(propertyName, out var property) || property.ValueKind == JsonValueKind.Null)
+            {
+                error = BitflyerErrorFactory.Codec(
+                    $"Response JSON is missing required property '{propertyName}'.");
+                return false;
+            }
+        }
+
+        error = null;
+        return true;
+    }
+
+    private static bool TryParse(
         WireResponse response,
         out JsonValidationResult result,
         out CallError? error)
     {
-        if (response.StatusCode < 200 || response.StatusCode >= 300)
-        {
-            result = default;
-            error = BitflyerErrorFactory.Http(
-                $"HTTP status {response.StatusCode} returned from bitFlyer.",
-                response);
-            return false;
-        }
-
         try
         {
             var document = JsonDocument.Parse(response.Json);

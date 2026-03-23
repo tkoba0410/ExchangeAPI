@@ -1,7 +1,7 @@
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 
 internal static class NativeCallFactory
 {

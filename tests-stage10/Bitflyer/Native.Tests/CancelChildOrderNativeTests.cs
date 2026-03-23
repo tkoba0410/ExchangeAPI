@@ -1,7 +1,7 @@
 using ExchangeApi.Stage10.Bitflyer.Vocabulary;
-using ExchangeApi.Stage10.Bitflyer.Native.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Requests;
-using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
@@ -10,13 +10,13 @@ namespace ExchangeApi.Tests.Stage10.Bitflyer.Native.Tests;
 public sealed class CancelChildOrderNativeTests
 {
     [Fact]
-    public async Task CancelChildOrderAsync_WithAcceptanceId_EncodesBodyAndAcceptsEmptySuccess()
+    public async Task CancelChildOrderCallAsync_WithAcceptanceId_EncodesBodyAndAcceptsEmptySuccess()
     {
-        var protocol = new StubPrivateProtocolApi(
+        var protocol = new StubCancelChildOrderProtocolEndpoint(
             cancelChildOrderCall: CreateWireOk("CancelChildOrder", string.Empty));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var endpoint = new CancelChildOrderNativeEndpoint(protocol);
 
-        var call = await api.CancelChildOrderAsync(new CancelChildOrderRequest
+        var call = await endpoint.CallAsync(new CancelChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderAcceptanceId = "JRF20240101-000000-000001",
@@ -30,13 +30,13 @@ public sealed class CancelChildOrderNativeTests
     }
 
     [Fact]
-    public async Task CancelChildOrderAsync_WithChildOrderId_AcceptsEmptyObjectSuccess()
+    public async Task CancelChildOrderCallAsync_WithChildOrderId_AcceptsEmptyObjectSuccess()
     {
-        var protocol = new StubPrivateProtocolApi(
+        var protocol = new StubCancelChildOrderProtocolEndpoint(
             cancelChildOrderCall: CreateWireOk("CancelChildOrder", "{}"));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var endpoint = new CancelChildOrderNativeEndpoint(protocol);
 
-        var call = await api.CancelChildOrderAsync(new CancelChildOrderRequest
+        var call = await endpoint.CallAsync(new CancelChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderId = "JOR20150707-055555-022222",
@@ -49,13 +49,13 @@ public sealed class CancelChildOrderNativeTests
     }
 
     [Fact]
-    public async Task CancelChildOrderAsync_WithBothIds_ReturnsSemanticError()
+    public async Task CancelChildOrderCallAsync_WithBothIds_ReturnsSemanticError()
     {
-        var protocol = new StubPrivateProtocolApi(
+        var protocol = new StubCancelChildOrderProtocolEndpoint(
             cancelChildOrderCall: CreateWireOk("CancelChildOrder", string.Empty));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var endpoint = new CancelChildOrderNativeEndpoint(protocol);
 
-        var call = await api.CancelChildOrderAsync(new CancelChildOrderRequest
+        var call = await endpoint.CallAsync(new CancelChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderId = "JOR-1",
@@ -68,13 +68,13 @@ public sealed class CancelChildOrderNativeTests
     }
 
     [Fact]
-    public async Task CancelChildOrderAsync_WithNeitherId_ReturnsSemanticError()
+    public async Task CancelChildOrderCallAsync_WithNeitherId_ReturnsSemanticError()
     {
-        var protocol = new StubPrivateProtocolApi(
+        var protocol = new StubCancelChildOrderProtocolEndpoint(
             cancelChildOrderCall: CreateWireOk("CancelChildOrder", string.Empty));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var endpoint = new CancelChildOrderNativeEndpoint(protocol);
 
-        var call = await api.CancelChildOrderAsync(new CancelChildOrderRequest
+        var call = await endpoint.CallAsync(new CancelChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
         });
@@ -85,13 +85,13 @@ public sealed class CancelChildOrderNativeTests
     }
 
     [Fact]
-    public async Task CancelChildOrderAsync_WithNon200Status_ReturnsHttpError()
+    public async Task CancelChildOrderCallAsync_WithNon200Status_ReturnsHttpError()
     {
-        var protocol = new StubPrivateProtocolApi(
+        var protocol = new StubCancelChildOrderProtocolEndpoint(
             cancelChildOrderCall: CreateWireOk("CancelChildOrder", string.Empty, statusCode: 201));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var endpoint = new CancelChildOrderNativeEndpoint(protocol);
 
-        var call = await api.CancelChildOrderAsync(new CancelChildOrderRequest
+        var call = await endpoint.CallAsync(new CancelChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderAcceptanceId = "JRF-1",
@@ -103,13 +103,13 @@ public sealed class CancelChildOrderNativeTests
     }
 
     [Fact]
-    public async Task CancelChildOrderAsync_WithNonObjectJson_ReturnsCodecError()
+    public async Task CancelChildOrderCallAsync_WithNonObjectJson_ReturnsCodecError()
     {
-        var protocol = new StubPrivateProtocolApi(
+        var protocol = new StubCancelChildOrderProtocolEndpoint(
             cancelChildOrderCall: CreateWireOk("CancelChildOrder", "[]"));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var endpoint = new CancelChildOrderNativeEndpoint(protocol);
 
-        var call = await api.CancelChildOrderAsync(new CancelChildOrderRequest
+        var call = await endpoint.CallAsync(new CancelChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderAcceptanceId = "JRF-1",
@@ -128,27 +128,18 @@ public sealed class CancelChildOrderNativeTests
             Result: new CallResult<WireResponse>.Ok(new WireResponse(statusCode, json)),
             Meta: new CallMeta("Protocol", "Transport", endpointId));
 
-    private sealed class StubPrivateProtocolApi : IBitflyerPrivateProtocolApi
+    private sealed class StubCancelChildOrderProtocolEndpoint : ICancelChildOrderProtocolEndpoint
     {
         private readonly Call<WireCallSpec, WireResponse> _cancelChildOrderCall;
 
-        public StubPrivateProtocolApi(Call<WireCallSpec, WireResponse> cancelChildOrderCall)
+        public StubCancelChildOrderProtocolEndpoint(Call<WireCallSpec, WireResponse> cancelChildOrderCall)
         {
             _cancelChildOrderCall = cancelChildOrderCall;
         }
 
         public string? LastCancelBodyJson { get; private set; }
 
-        public Task<Call<WireCallSpec, WireResponse>> GetBalanceAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(CreateWireOk("GetBalance", "[]"));
-
-        public Task<Call<WireCallSpec, WireResponse>> SendChildOrderAsync(
-            string bodyJson,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(CreateWireOk("SendChildOrder", "{}"));
-
-        public Task<Call<WireCallSpec, WireResponse>> CancelChildOrderAsync(
+        public Task<Call<WireCallSpec, WireResponse>> SendAsync(
             string bodyJson,
             CancellationToken cancellationToken = default)
         {

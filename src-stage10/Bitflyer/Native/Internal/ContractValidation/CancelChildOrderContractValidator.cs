@@ -2,9 +2,9 @@ using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.MeaningValidation;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
 
-internal static class CancelChildOrderMeaningValidator
+internal static class CancelChildOrderContractValidator
 {
     public static bool TryValidate(
         CancelChildOrderResponseCandidate candidate,

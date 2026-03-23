@@ -1,11 +1,11 @@
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
+using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.MeaningValidation;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
 
-internal static class SendChildOrderMeaningValidator
+internal static class SendChildOrderContractValidator
 {
     public static bool TryValidate(
         SendChildOrderResponseCandidate candidate,

@@ -1,11 +1,11 @@
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
+using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.MeaningValidation;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
 
-internal static class GetTickerMeaningValidator
+internal static class GetTickerContractValidator
 {
     public static bool TryValidate(
         GetTickerResponseCandidate candidate,

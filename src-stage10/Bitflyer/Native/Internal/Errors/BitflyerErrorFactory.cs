@@ -1,10 +1,15 @@
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 
 internal static class BitflyerErrorFactory
 {
+    public static CallError Codec(string message) =>
+        new(
+            Kind: CallErrorKind.Codec,
+            Message: message);
+
     public static CallError Http(string message, WireResponse response) =>
         new(
             Kind: CallErrorKind.Http,

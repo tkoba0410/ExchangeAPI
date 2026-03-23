@@ -20,7 +20,7 @@ public sealed class BitflyerStage10ClientFactoryTests
             TransportConfig = new TransportConfig.ExternalTransport(transport),
         });
 
-        var call = await bundle.Public.GetTickerAsync();
+        var call = await bundle.Public.GetTickerCallAsync();
         var ok = Assert.IsType<CallResult<ExchangeApi.Transport.Wire.WireResponse>.Ok>(call.Result);
 
         Assert.Null(bundle.Private);
@@ -43,10 +43,10 @@ public sealed class BitflyerStage10ClientFactoryTests
             },
         });
 
-        var publicCall = await bundle.Public.GetTickerAsync(new ExchangeApi.Stage10.Bitflyer.Native.Public.Requests.GetTickerRequest());
+        var publicCall = await bundle.Public.GetTickerCallAsync(new ExchangeApi.Stage10.Bitflyer.Native.Public.Requests.GetTickerRequest());
         var publicOk = Assert.IsType<CallResult<ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos.GetTickerResponse>.Ok>(publicCall.Result);
 
-        var privateCall = await bundle.Private!.GetBalanceAsync(new ExchangeApi.Stage10.Bitflyer.Native.Private.Requests.GetBalanceRequest());
+        var privateCall = await bundle.Private!.GetBalanceCallAsync(new ExchangeApi.Stage10.Bitflyer.Native.Private.Requests.GetBalanceRequest());
         var privateOk = Assert.IsType<CallResult<IReadOnlyList<ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos.GetBalance.Item>>.Ok>(privateCall.Result);
 
         Assert.NotNull(bundle.Protocol.Private);
@@ -66,7 +66,7 @@ public sealed class BitflyerStage10ClientFactoryTests
             UseTickerAliasPath = true,
         });
 
-        var call = await bundle.Public.GetTickerAsync();
+        var call = await bundle.Public.GetTickerCallAsync();
         var ok = Assert.IsType<CallResult<ExchangeApi.Transport.Wire.WireResponse>.Ok>(call.Result);
 
         Assert.Equal(HttpStatusCode.OK, (HttpStatusCode)ok.Response.StatusCode);

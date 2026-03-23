@@ -1,13 +1,21 @@
-using ExchangeApi.Stage10.Bitflyer.Protocol.Public.Api;
+using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos;
+using ExchangeApi.Stage10.Bitflyer.Native.Public.Endpoints.GetTicker;
+using ExchangeApi.Stage10.Bitflyer.Native.Public.Requests;
 
 namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Api;
 
-public sealed partial class BitflyerPublicNativeApi : IBitflyerPublicNativeApi
+public sealed class BitflyerPublicNativeApi : IBitflyerPublicNativeApi
 {
-    private readonly IBitflyerPublicProtocolApi _protocol;
+    private readonly IGetTickerNativeEndpoint _getTicker;
 
-    public BitflyerPublicNativeApi(IBitflyerPublicProtocolApi protocol)
+    public BitflyerPublicNativeApi(IGetTickerNativeEndpoint getTicker)
     {
-        _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
+        _getTicker = getTicker ?? throw new ArgumentNullException(nameof(getTicker));
     }
+
+    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+        GetTickerRequest request,
+        CancellationToken cancellationToken = default) =>
+        _getTicker.CallAsync(request, cancellationToken);
 }

@@ -1,10 +1,11 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Encoder;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.JsonValidation;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.MeaningValidation;
+using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.GetBalance;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Requests
@@ -32,18 +33,27 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos
     }
 }
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Api
+namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.GetBalance
 {
-    public partial interface IBitflyerPrivateNativeApi
+    public interface IGetBalanceNativeEndpoint
     {
-        Task<Call<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>> GetBalanceAsync(
+        Task<Call<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>> CallAsync(
             Requests.GetBalanceRequest request,
             CancellationToken cancellationToken = default);
     }
 
-    public sealed partial class BitflyerPrivateNativeApi
+    public sealed class GetBalanceNativeEndpoint : IGetBalanceNativeEndpoint
     {
-        public async Task<Call<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>> GetBalanceAsync(
+        private static readonly string[] RequiredProperties = ["currency_code", "amount", "available"];
+
+        private readonly IGetBalanceProtocolEndpoint _protocol;
+
+        public GetBalanceNativeEndpoint(IGetBalanceProtocolEndpoint protocol)
+        {
+            _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
+        }
+
+        public async Task<Call<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>> CallAsync(
             Requests.GetBalanceRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -54,15 +64,15 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Api
                 return NativeCallFactory.CreateError<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>(
                     request,
                     Vocabulary.EndpointIds.GetBalance,
-                    component: "PrivateApi",
+                    component: "PrivateEndpointModule",
                     scope: "Private",
                     auth: "Required",
                     error: error!,
-                    stage: "Encoder");
+                    stage: "InputValidation");
             }
 
             var protocolCall = await _protocol
-                .GetBalanceAsync(cancellationToken)
+                .SendAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             if (protocolCall.Result is CallResult<WireResponse>.Err wireError)
@@ -70,7 +80,7 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Api
                 return NativeCallFactory.CreateError<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>(
                     request,
                     Vocabulary.EndpointIds.GetBalance,
-                    component: "PrivateApi",
+                    component: "PrivateEndpointModule",
                     scope: "Private",
                     auth: "Required",
                     error: wireError.Error,
@@ -79,12 +89,25 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Api
 
             var wireResponse = ((CallResult<WireResponse>.Ok)protocolCall.Result).Response;
 
+            if (!ProtocolJsonValidator.TryValidateExpectedStatus(wireResponse, 200, out error))
+            {
+                return NativeCallFactory.CreateError<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>(
+                    request,
+                    Vocabulary.EndpointIds.GetBalance,
+                    component: "PrivateEndpointModule",
+                    scope: "Private",
+                    auth: "Required",
+                    error: error!,
+                    stage: "JsonValidation",
+                    child: protocolCall);
+            }
+
             if (!ProtocolJsonValidator.TryValidateArrayResponse(wireResponse, out var json, out error))
             {
                 return NativeCallFactory.CreateError<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>(
                     request,
                     Vocabulary.EndpointIds.GetBalance,
-                    component: "PrivateApi",
+                    component: "PrivateEndpointModule",
                     scope: "Private",
                     auth: "Required",
                     error: error!,
@@ -94,12 +117,25 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Api
 
             using (json.Document)
             {
+                if (!TryValidateRawArrayContract(json.Root, out error))
+                {
+                    return NativeCallFactory.CreateError<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>(
+                        request,
+                        Vocabulary.EndpointIds.GetBalance,
+                        component: "PrivateEndpointModule",
+                        scope: "Private",
+                        auth: "Required",
+                        error: error!,
+                        stage: "JsonValidation",
+                        child: protocolCall);
+                }
+
                 if (!GetBalanceResponseConverter.TryConvert(json.Root, out var candidates, out error))
                 {
                     return NativeCallFactory.CreateError<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>(
                         request,
                         Vocabulary.EndpointIds.GetBalance,
-                        component: "PrivateApi",
+                        component: "PrivateEndpointModule",
                         scope: "Private",
                         auth: "Required",
                         error: error!,
@@ -107,28 +143,52 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Api
                         child: protocolCall);
                 }
 
-                if (!GetBalanceMeaningValidator.TryValidate(candidates!, out var response, out error))
+                if (!GetBalanceContractValidator.TryValidate(candidates!, out var response, out error))
                 {
                     return NativeCallFactory.CreateError<Requests.GetBalanceRequest, IReadOnlyList<Dtos.GetBalance.Item>>(
                         request,
                         Vocabulary.EndpointIds.GetBalance,
-                        component: "PrivateApi",
+                        component: "PrivateEndpointModule",
                         scope: "Private",
                         auth: "Required",
                         error: error!,
-                        stage: "MeaningValidation",
+                        stage: "ContractValidation",
                         child: protocolCall);
                 }
 
                 return NativeCallFactory.CreateSuccess(
                     request,
                     Vocabulary.EndpointIds.GetBalance,
-                    component: "PrivateApi",
+                    component: "PrivateEndpointModule",
                     scope: "Private",
                     auth: "Required",
                     response: response!,
                     child: protocolCall);
             }
+        }
+
+        private static bool TryValidateRawArrayContract(JsonElement root, out CallError? error)
+        {
+            var index = 0;
+            foreach (var element in root.EnumerateArray())
+            {
+                if (element.ValueKind != JsonValueKind.Object)
+                {
+                    error = BitflyerErrorFactory.Codec(
+                        $"GetBalance response item at index {index} must be a JSON object.");
+                    return false;
+                }
+
+                if (!ProtocolJsonValidator.TryValidateRequiredProperties(element, RequiredProperties, out error))
+                {
+                    return false;
+                }
+
+                index++;
+            }
+
+            error = null;
+            return true;
         }
     }
 }

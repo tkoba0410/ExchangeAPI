@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Encoder;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Errors;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.JsonValidation;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.MeaningValidation;
+using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 using ExchangeApi.Transport.Wire;
 
 namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Requests
@@ -68,18 +68,44 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos
     }
 }
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Api
+namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Endpoints.GetTicker
 {
-    public partial interface IBitflyerPublicNativeApi
+    public interface IGetTickerNativeEndpoint
     {
-        Task<Call<Requests.GetTickerRequest, Dtos.GetTickerResponse>> GetTickerAsync(
+        Task<Call<Requests.GetTickerRequest, Dtos.GetTickerResponse>> CallAsync(
             Requests.GetTickerRequest request,
             CancellationToken cancellationToken = default);
     }
 
-    public sealed partial class BitflyerPublicNativeApi
+    public sealed class GetTickerNativeEndpoint : IGetTickerNativeEndpoint
     {
-        public async Task<Call<Requests.GetTickerRequest, Dtos.GetTickerResponse>> GetTickerAsync(
+        private static readonly string[] RequiredProperties =
+        [
+            "product_code",
+            "state",
+            "timestamp",
+            "tick_id",
+            "best_bid",
+            "best_ask",
+            "best_bid_size",
+            "best_ask_size",
+            "total_bid_depth",
+            "total_ask_depth",
+            "market_bid_size",
+            "market_ask_size",
+            "ltp",
+            "volume",
+            "volume_by_product",
+        ];
+
+        private readonly IGetTickerProtocolEndpoint _protocol;
+
+        public GetTickerNativeEndpoint(IGetTickerProtocolEndpoint protocol)
+        {
+            _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
+        }
+
+        public async Task<Call<Requests.GetTickerRequest, Dtos.GetTickerResponse>> CallAsync(
             Requests.GetTickerRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -90,15 +116,15 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Api
                 return NativeCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
                     request,
                     Vocabulary.EndpointIds.GetTicker,
-                    component: "PublicApi",
+                    component: "PublicEndpointModule",
                     scope: "Public",
                     auth: "None",
                     error: error!,
-                    stage: "Encoder");
+                    stage: "InputValidation");
             }
 
             var protocolCall = await _protocol
-                .GetTickerAsync(encodedRequest.ProductCode, cancellationToken)
+                .SendAsync(encodedRequest.ProductCode, cancellationToken)
                 .ConfigureAwait(false);
 
             if (protocolCall.Result is CallResult<WireResponse>.Err wireError)
@@ -106,7 +132,7 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Api
                 return NativeCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
                     request,
                     Vocabulary.EndpointIds.GetTicker,
-                    component: "PublicApi",
+                    component: "PublicEndpointModule",
                     scope: "Public",
                     auth: "None",
                     error: wireError.Error,
@@ -115,12 +141,25 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Api
 
             var wireResponse = ((CallResult<WireResponse>.Ok)protocolCall.Result).Response;
 
+            if (!ProtocolJsonValidator.TryValidateExpectedStatus(wireResponse, 200, out error))
+            {
+                return NativeCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
+                    request,
+                    Vocabulary.EndpointIds.GetTicker,
+                    component: "PublicEndpointModule",
+                    scope: "Public",
+                    auth: "None",
+                    error: error!,
+                    stage: "JsonValidation",
+                    child: protocolCall);
+            }
+
             if (!ProtocolJsonValidator.TryValidateObjectResponse(wireResponse, out var json, out error))
             {
                 return NativeCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
                     request,
                     Vocabulary.EndpointIds.GetTicker,
-                    component: "PublicApi",
+                    component: "PublicEndpointModule",
                     scope: "Public",
                     auth: "None",
                     error: error!,
@@ -130,12 +169,25 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Api
 
             using (json.Document)
             {
+                if (!ProtocolJsonValidator.TryValidateRequiredProperties(json.Root, RequiredProperties, out error))
+                {
+                    return NativeCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
+                        request,
+                        Vocabulary.EndpointIds.GetTicker,
+                        component: "PublicEndpointModule",
+                        scope: "Public",
+                        auth: "None",
+                        error: error!,
+                        stage: "JsonValidation",
+                        child: protocolCall);
+                }
+
                 if (!GetTickerResponseConverter.TryConvert(json.Root, out var candidate, out error))
                 {
                     return NativeCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
                         request,
                         Vocabulary.EndpointIds.GetTicker,
-                        component: "PublicApi",
+                        component: "PublicEndpointModule",
                         scope: "Public",
                         auth: "None",
                         error: error!,
@@ -143,23 +195,23 @@ namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Api
                         child: protocolCall);
                 }
 
-                if (!GetTickerMeaningValidator.TryValidate(candidate!, out var response, out error))
+                if (!GetTickerContractValidator.TryValidate(candidate!, out var response, out error))
                 {
                     return NativeCallFactory.CreateError<Requests.GetTickerRequest, Dtos.GetTickerResponse>(
                         request,
                         Vocabulary.EndpointIds.GetTicker,
-                        component: "PublicApi",
+                        component: "PublicEndpointModule",
                         scope: "Public",
                         auth: "None",
                         error: error!,
-                        stage: "MeaningValidation",
+                        stage: "ContractValidation",
                         child: protocolCall);
                 }
 
                 return NativeCallFactory.CreateSuccess(
                     request,
                     Vocabulary.EndpointIds.GetTicker,
-                    component: "PublicApi",
+                    component: "PublicEndpointModule",
                     scope: "Public",
                     auth: "None",
                     response: response!,

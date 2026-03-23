@@ -1,6 +1,6 @@
-using ExchangeApi.Stage10.Bitflyer.Native.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.GetBalance;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Requests;
-using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.GetBalance;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
@@ -9,22 +9,19 @@ namespace ExchangeApi.Tests.Stage10.Bitflyer.Native.Tests;
 public sealed class GetBalanceNativeTests
 {
     [Fact]
-    public async Task GetBalanceAsync_SuccessfullyMapsTopLevelArray()
+    public async Task GetBalanceCallAsync_SuccessfullyMapsTopLevelArray()
     {
-        var protocol = new StubPrivateProtocolApi(
-            getBalanceCall: CreateWireOk(
-                "GetBalance",
-                """
-                [
-                  { "currency_code": "JPY", "amount": 1000, "available": 900 },
-                  { "currency_code": "BTC", "amount": 0.5, "available": 0.4 }
-                ]
-                """),
-            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"),
-            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var protocol = new StubGetBalanceProtocolEndpoint(CreateWireOk(
+            "GetBalance",
+            """
+            [
+              { "currency_code": "JPY", "amount": 1000, "available": 900 },
+              { "currency_code": "BTC", "amount": 0.5, "available": 0.4 }
+            ]
+            """));
+        var endpoint = new GetBalanceNativeEndpoint(protocol);
 
-        var call = await api.GetBalanceAsync(new GetBalanceRequest());
+        var call = await endpoint.CallAsync(new GetBalanceRequest());
         var ok = Assert.IsType<CallResult<IReadOnlyList<ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos.GetBalance.Item>>.Ok>(call.Result);
 
         Assert.Collection(
@@ -44,15 +41,12 @@ public sealed class GetBalanceNativeTests
     }
 
     [Fact]
-    public async Task GetBalanceAsync_WithNonArrayJson_ReturnsCodecError()
+    public async Task GetBalanceCallAsync_WithNonArrayJson_ReturnsCodecError()
     {
-        var protocol = new StubPrivateProtocolApi(
-            getBalanceCall: CreateWireOk("GetBalance", """{ "currency_code": "JPY" }"""),
-            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"),
-            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""));
-        var api = new BitflyerPrivateNativeApi(protocol);
+        var protocol = new StubGetBalanceProtocolEndpoint(CreateWireOk("GetBalance", """{ "currency_code": "JPY" }"""));
+        var endpoint = new GetBalanceNativeEndpoint(protocol);
 
-        var call = await api.GetBalanceAsync(new GetBalanceRequest());
+        var call = await endpoint.CallAsync(new GetBalanceRequest());
         var err = Assert.IsType<CallResult<IReadOnlyList<ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos.GetBalance.Item>>.Err>(call.Result);
 
         Assert.Equal(CallErrorKind.Codec, err.Error.Kind);
@@ -67,34 +61,17 @@ public sealed class GetBalanceNativeTests
             Result: new CallResult<WireResponse>.Ok(new WireResponse(statusCode, json)),
             Meta: new CallMeta("Protocol", "Transport", endpointId));
 
-    private sealed class StubPrivateProtocolApi : IBitflyerPrivateProtocolApi
+    private sealed class StubGetBalanceProtocolEndpoint : IGetBalanceProtocolEndpoint
     {
         private readonly Call<WireCallSpec, WireResponse> _getBalanceCall;
-        private readonly Call<WireCallSpec, WireResponse> _sendChildOrderCall;
-        private readonly Call<WireCallSpec, WireResponse> _cancelChildOrderCall;
 
-        public StubPrivateProtocolApi(
-            Call<WireCallSpec, WireResponse> getBalanceCall,
-            Call<WireCallSpec, WireResponse> sendChildOrderCall,
-            Call<WireCallSpec, WireResponse> cancelChildOrderCall)
+        public StubGetBalanceProtocolEndpoint(Call<WireCallSpec, WireResponse> getBalanceCall)
         {
             _getBalanceCall = getBalanceCall;
-            _sendChildOrderCall = sendChildOrderCall;
-            _cancelChildOrderCall = cancelChildOrderCall;
         }
 
-        public Task<Call<WireCallSpec, WireResponse>> GetBalanceAsync(
+        public Task<Call<WireCallSpec, WireResponse>> SendAsync(
             CancellationToken cancellationToken = default) =>
             Task.FromResult(_getBalanceCall);
-
-        public Task<Call<WireCallSpec, WireResponse>> SendChildOrderAsync(
-            string bodyJson,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(_sendChildOrderCall);
-
-        public Task<Call<WireCallSpec, WireResponse>> CancelChildOrderAsync(
-            string bodyJson,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(_cancelChildOrderCall);
     }
 }

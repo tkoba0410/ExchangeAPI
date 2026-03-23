@@ -1,7 +1,7 @@
 using ExchangeApi.Stage10.Bitflyer.Vocabulary;
-using ExchangeApi.Stage10.Bitflyer.Native.Public.Api;
+using ExchangeApi.Stage10.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Stage10.Bitflyer.Native.Public.Requests;
-using ExchangeApi.Stage10.Bitflyer.Protocol.Public.Api;
+using ExchangeApi.Stage10.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Transport.Wire;
 
@@ -10,9 +10,9 @@ namespace ExchangeApi.Tests.Stage10.Bitflyer.Native.Tests;
 public sealed class GetTickerNativeTests
 {
     [Fact]
-    public async Task GetTickerAsync_SuccessfullyMapsResponse()
+    public async Task GetTickerCallAsync_SuccessfullyMapsResponse()
     {
-        var protocol = new StubPublicProtocolApi(CreateWireOk(
+        var protocol = new StubGetTickerProtocolEndpoint(CreateWireOk(
             "GetTicker",
             """
             {
@@ -33,9 +33,9 @@ public sealed class GetTickerNativeTests
               "volume_by_product": 300
             }
             """));
-        var api = new BitflyerPublicNativeApi(protocol);
+        var endpoint = new GetTickerNativeEndpoint(protocol);
 
-        var call = await api.GetTickerAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
+        var call = await endpoint.CallAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
         var ok = Assert.IsType<CallResult<ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos.GetTickerResponse>.Ok>(call.Result);
 
         Assert.Equal(ProductCodes.BtcJpy, ok.Response.ProductCode);
@@ -45,12 +45,12 @@ public sealed class GetTickerNativeTests
     }
 
     [Fact]
-    public async Task GetTickerAsync_WithEmptyProductCode_ReturnsSemanticErrorWithoutCallingWire()
+    public async Task GetTickerCallAsync_WithEmptyProductCode_ReturnsSemanticErrorWithoutCallingProtocol()
     {
-        var protocol = new StubPublicProtocolApi(CreateWireOk("GetTicker", "{}"));
-        var api = new BitflyerPublicNativeApi(protocol);
+        var protocol = new StubGetTickerProtocolEndpoint(CreateWireOk("GetTicker", "{}"));
+        var endpoint = new GetTickerNativeEndpoint(protocol);
 
-        var call = await api.GetTickerAsync(new GetTickerRequest { ProductCode = "" });
+        var call = await endpoint.CallAsync(new GetTickerRequest { ProductCode = "" });
         var err = Assert.IsType<CallResult<ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos.GetTickerResponse>.Err>(call.Result);
 
         Assert.Equal(CallErrorKind.Semantic, err.Error.Kind);
@@ -58,12 +58,12 @@ public sealed class GetTickerNativeTests
     }
 
     [Fact]
-    public async Task GetTickerAsync_WithHttpFailure_ReturnsHttpError()
+    public async Task GetTickerCallAsync_WithHttpFailure_ReturnsHttpError()
     {
-        var protocol = new StubPublicProtocolApi(CreateWireOk("GetTicker", "{\"status\":\"ng\"}", statusCode: 400));
-        var api = new BitflyerPublicNativeApi(protocol);
+        var protocol = new StubGetTickerProtocolEndpoint(CreateWireOk("GetTicker", "{\"status\":\"ng\"}", statusCode: 400));
+        var endpoint = new GetTickerNativeEndpoint(protocol);
 
-        var call = await api.GetTickerAsync(new GetTickerRequest());
+        var call = await endpoint.CallAsync(new GetTickerRequest());
         var err = Assert.IsType<CallResult<ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos.GetTickerResponse>.Err>(call.Result);
 
         Assert.Equal(CallErrorKind.Http, err.Error.Kind);
@@ -72,12 +72,12 @@ public sealed class GetTickerNativeTests
     }
 
     [Fact]
-    public async Task GetTickerAsync_WithInvalidJson_ReturnsCodecError()
+    public async Task GetTickerCallAsync_WithInvalidJson_ReturnsCodecError()
     {
-        var protocol = new StubPublicProtocolApi(CreateWireOk("GetTicker", "{"));
-        var api = new BitflyerPublicNativeApi(protocol);
+        var protocol = new StubGetTickerProtocolEndpoint(CreateWireOk("GetTicker", "{"));
+        var endpoint = new GetTickerNativeEndpoint(protocol);
 
-        var call = await api.GetTickerAsync(new GetTickerRequest());
+        var call = await endpoint.CallAsync(new GetTickerRequest());
         var err = Assert.IsType<CallResult<ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos.GetTickerResponse>.Err>(call.Result);
 
         Assert.Equal(CallErrorKind.Codec, err.Error.Kind);
@@ -92,18 +92,18 @@ public sealed class GetTickerNativeTests
             Result: new CallResult<WireResponse>.Ok(new WireResponse(statusCode, json)),
             Meta: new CallMeta("Protocol", "Transport", endpointId));
 
-    private sealed class StubPublicProtocolApi : IBitflyerPublicProtocolApi
+    private sealed class StubGetTickerProtocolEndpoint : IGetTickerProtocolEndpoint
     {
         private readonly Call<WireCallSpec, WireResponse> _call;
 
-        public StubPublicProtocolApi(Call<WireCallSpec, WireResponse> call)
+        public StubGetTickerProtocolEndpoint(Call<WireCallSpec, WireResponse> call)
         {
             _call = call;
         }
 
         public string? LastProductCode { get; private set; }
 
-        public Task<Call<WireCallSpec, WireResponse>> GetTickerAsync(
+        public Task<Call<WireCallSpec, WireResponse>> SendAsync(
             string? productCode = null,
             CancellationToken cancellationToken = default)
         {

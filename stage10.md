@@ -5,7 +5,7 @@
 
 ## 1. 位置づけ
 
-本書は、Stage10 の設計を既存試作や旧文書の都合から切り離して整理し直した、新しい正本候補である。  
+本書は、Stage10 の設計を既存試作や旧文書の都合から切り離して整理し直した、現行の設計正本である。  
 本書は `Facade + Endpoint Module` を前提に、今後の実装方針をまっさらな設計として定義する。
 
 本書では、以下を明確に分離する。
@@ -93,10 +93,10 @@ sequenceDiagram
     participant RT as Runtime/Transport
     participant BF as bitFlyer API
 
-    User->>NF: GetTickerAsync(request)
+    User->>NF: GetTickerCallAsync(request)
     NF->>NM: forward
-    NM->>NM: Encode / JsonValidation / Conversion / MeaningValidation
-    NM->>PF: GetTickerAsync(productCode)
+    NM->>NM: Encode / JsonValidation / Conversion / ContractValidation
+    NM->>PF: GetTickerCallAsync(productCode)
     PF->>PM: forward
     PM->>RT: Send Call<WireCallSpec, WireResponse>
     RT->>BF: HTTP GET /v1/getticker
@@ -153,7 +153,7 @@ src-stage10/Bitflyer/
 - request DTO
 - response DTO
 - JSON decode
-- meaning validation
+- ContractValidation
 - automatic retry
 - automatic rate limiting
 - 取引所横断抽象化
@@ -178,7 +178,7 @@ src-stage10/Bitflyer/
 - request validation
 - request encode
 - `Protocol` 呼び出し
-- response の `JsonValidation -> Conversion -> MeaningValidation`
+- response の `JsonValidation -> Conversion -> ContractValidation`
 - `Call<TRequest, TResponse>` の組み立て
 
 責務に含めないもの:
@@ -259,6 +259,11 @@ Stage10 では実装対象外とする。
 - `Native` facade は `Task<Call<TRequest, TResponse>>` を返す
 - `Call` を返さない ergonomic wrapper は Stage10 の必須要件に含めない
 - ergonomic wrapper を将来追加する場合でも、`Call` を返す主 API を置き換えてはならない
+- facade の命名例:
+  - `GetTickerCallAsync(...)`
+  - `GetBalanceCallAsync(...)`
+  - `SendChildOrderCallAsync(...)`
+  - `CancelChildOrderCallAsync(...)`
 
 ### 4.3 Public / Private
 
@@ -273,7 +278,7 @@ Stage10 では実装対象外とする。
 - `Protocol` endpoint module の entry method 名は `SendAsync(...)` を基本とする
 - `Native` endpoint module の entry method 名は `CallAsync(...)` を基本とする
 - facade は module を受け取り、薄い forward のみを行う
-- method / path / query / body / request encode / response decode / meaning validation は endpoint module が所有する
+- method / path / query / body / request encode / response decode / ContractValidation は endpoint module が所有する
 - endpoint module は sibling endpoint の業務判断を持たない
 - endpoint 固有 DTO と endpoint 固有 helper は同じ endpoint フォルダに置いてよい
 - shared helper へ切り出してよいのは、複数 endpoint で再利用され、かつ endpoint identity に依存しないものに限る
@@ -291,19 +296,31 @@ public interface INativeEndpoint<in TRequest, TResponse>
 }
 ```
 
+補足:
+
+- `Protocol` endpoint に共通の `IProtocolEndpoint` は定義しない
+- `Protocol` endpoint は endpoint ごとの interface を持つ
+- `Protocol` endpoint は transport-ready scalar / primitive 引数を受けてよい
+- `Native` endpoint は request DTO を受ける
+- 例:
+
 ```csharp
-public interface IProtocolEndpoint
+public interface IGetTickerProtocolEndpoint
 {
     Task<Call<WireCallSpec, WireResponse>> SendAsync(
+        string? productCode,
         CancellationToken cancellationToken = default);
 }
 ```
 
-補足:
-
-- `Protocol` endpoint は transport-ready scalar / primitive 引数を受けてよい
-- `Native` endpoint は request DTO を受ける
-- 実装都合で具体 interface を endpoint ごとに定義してよいが、契約の意味は上記に従う
+```csharp
+public interface ISendChildOrderProtocolEndpoint
+{
+    Task<Call<WireCallSpec, WireResponse>> SendAsync(
+        string bodyJson,
+        CancellationToken cancellationToken = default);
+}
+```
 
 ## 5. Call と観測語彙
 
@@ -322,6 +339,16 @@ public interface IProtocolEndpoint
 
 追加原則:
 
+- `Request` は常に非 `null`
+- `Meta` は常に非 `null`
+- success:
+  - `IsSuccess = true`
+  - `Response != null`
+  - `Error = null`
+- failure:
+  - `IsSuccess = false`
+  - `Response = null`
+  - `Error != null`
 - `Native` call は対応する `Protocol` call を child call として保持する
 - `Protocol` call を持てない `Native` success / failure を作らない
 - facade は `Call` を再構築せず、endpoint module が返した `Call` をそのまま返す
@@ -378,7 +405,7 @@ public interface IProtocolEndpoint
 
 - `Protocol` は status / headers / raw JSON text を返す
 - `Native` は raw JSON を native contract へ落とす
-- response pipeline は `JsonValidation -> Conversion -> MeaningValidation`
+- response pipeline は `JsonValidation -> Conversion -> ContractValidation`
 - 中間 JSON object は公開しない
 
 ### 6.3 Error 契約
@@ -409,10 +436,11 @@ public interface IProtocolEndpoint
 追加原則:
 
 - `Protocol` は `Transport` を新規に生成してよい
+- `Protocol` は HTTP response を受け取った時点で `WireResponse` を返し、status code を `Http` へ変換しない
 - `Protocol` は `Semantic` を新規に生成しない
 - `Protocol` は `Codec` / `Mapping` を新規に生成しない
 - `Native` の `Conversion` で起きる field-level decode failure は `Codec` とする
-- `Native` の `MeaningValidation` で起きる rule violation は `Semantic` とする
+- `Native` の `ContractValidation` で起きる API contract rule violation は `Semantic` とする
 - `Native` は transport failure を `Http` へ畳み込まない
 
 ### 6.4 API Contract Rule と Business Rule
@@ -425,6 +453,16 @@ public interface IProtocolEndpoint
   - omission rule
   - expected status
 - 取引戦略、資産判断、執行判断のような business rule は対象外とする
+
+### 6.5 Validation Stage 語彙
+
+- `JsonValidation`
+  - parse、top-level shape、required raw field の存在確認を担う
+- `Conversion`
+  - raw JSON value を native value / candidate へ落とす
+- `ContractValidation`
+  - native candidate が API contract として成立するかを検証する
+- `MeaningValidation` という語は Stage10 の正本語彙としては使わない
 
 ## 7. Native Contract 方針
 
@@ -525,7 +563,7 @@ src-stage10/Bitflyer/Native/
 ルール:
 
 - endpoint 固有 encode / decode / validation は endpoint フォルダへ寄せてよい
-- `Encoder` / `JsonValidation` / `Conversion` / `MeaningValidation` / `Errors` は論理責務名であり、中央 top-level フォルダ固定を要求しない
+- `Encoder` / `JsonValidation` / `Conversion` / `ContractValidation` / `Errors` は論理責務名であり、中央 top-level フォルダ固定を要求しない
 - 複数 endpoint で再利用されるものだけ `Internal/Shared/` に残す
 
 ### 8.3 Composition
@@ -569,7 +607,8 @@ Stage10 の規約は文書だけで終わらせず、arch test で機械検証�
 - facade から runtime / signer / transport への直接参照禁止
 - endpoint module から sibling endpoint module への直接参照禁止
 - concrete endpoint 実装型を知ってよい場所を `Composition` に限定する
-- 公開面に `WireResponse`、`JsonElement`、raw diagnostics 型を露出しないこと
+- `Native` の公開面に `WireResponse`、`JsonElement`、raw diagnostics 型を露出しないこと
+- `Protocol` の公開面は契約上 `WireResponse` を返してよいが、`JsonElement` や raw diagnostics 型を露出しないこと
 
 配置:
 
@@ -650,6 +689,9 @@ matrix が担わないもの:
 - endpoint module 実装は matrix metadata に従う
 - matrix へない metadata をコード側で暗黙導入しない
 - metadata を増やす場合は `stage10.md` と matrix を同時更新する
+- `ExposeInProtocol = Yes` の row では `ExpectedStatus` / `ResponseShape` / `AuthType` に `TBD` を残さない
+- `ExposeInNative = Yes` の row では `ExpectedStatus` / `ResponseShape` / `AuthType` / `OptionalOmissionRule` に `TBD` を残さない
+- `TBD` は `ExposeInProtocol != Yes` かつ `ExposeInNative != Yes` の row にのみ許容する
 
 ### 9.3 Compatibility / Versioning
 
@@ -695,11 +737,12 @@ Stage10 で優先する endpoint:
 
 - `Protocol` endpoint module test
   - method / path / query / body / expected canonical request を検証する
-  - transport failure と expected status を検証する
+  - transport failure と raw status の保持を検証する
 - `Native` endpoint module test
   - request semantic rule
   - omission rule
   - response pipeline
+  - expected status 判定
   - error kind 分類
   - nested `Protocol` call の保持
   を検証する
@@ -735,7 +778,7 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 - 現在の file 配置
 - `partial` 前提の facade 実装
 - facade に endpoint 実装を直接生やす構成
-- `Native/Internal/Encoder` / `Conversion` / `MeaningValidation` の中央集約構成
+- `Native/Internal/Encoder` / `Conversion` / 旧 `MeaningValidation` 相当の中央集約構成
 
 ### 11.2 流用してよいもの
 
@@ -788,9 +831,13 @@ Codex は以下の順で実装する。
 - `Call` の最低要件と nested `Protocol` call が定義されている
 - error kind の使い分けが固定されている
 - `Transport` / `Http` / `Codec` / `Semantic` / `Mapping` の境界が定義されている
+- `Protocol` endpoint に共通 interface を置かず、endpoint-specific interface を使う方針が定義されている
+- `Call` の success / failure 不変条件が定義されている
 - `Native` が API contract rule までを扱い、business rule を持たないことが定義されている
+- `ContractValidation` を正本語彙とし、`MeaningValidation` を使わないことが定義されている
 - test の役割分担が固定されている
 - endpoint metadata の必須列が定義されている
+- 公開対象 row に `TBD` を残さない規則が定義されている
 - compatibility / versioning 方針が定義されている
 - write safety 規約が定義されている
 - `Native` が bitFlyer-native contract として定義されている

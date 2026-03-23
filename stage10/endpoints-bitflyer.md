@@ -47,13 +47,19 @@ Stage10 では本書を endpoint 運用正本とし、既存 inventory は impor
   - `TBD`: 後段で確定する
   - 条件付き omission がある場合は簡潔に記述する
 
+`TBD` の許容条件:
+
+- `ExposeInProtocol = Yes` または `ExposeInNative = Yes` の row に、`ExpectedStatus` / `ResponseShape` / `AuthType` の `TBD` を残さない
+- `ExposeInNative = Yes` の row に、`OptionalOmissionRule` の `TBD` を残さない
+- `TBD` は `ExposeInProtocol != Yes` かつ `ExposeInNative != Yes` の row にのみ許容する
+
 ## Facade + Endpoint Module Rule
 
 - `ExposeInProtocol = Yes`
-  - facade に endpoint-level method を公開する
+  - facade に `*CallAsync(...)` の endpoint-level method を公開する
   - 対応する独立 module class を `Protocol/Public|Private/Endpoints/<EndpointName>/` 配下へ置く
 - `ExposeInNative = Yes`
-  - facade に native call method を公開する
+  - facade に `*CallAsync(...)` の native call method を公開する
   - 対応する独立 module class を `Native/Public|Private/Endpoints/<EndpointName>/` 配下へ置く
   - request DTO と response DTO は同 endpoint フォルダへ寄せてよい
 - matrix は「公開面に出すか」を管理する

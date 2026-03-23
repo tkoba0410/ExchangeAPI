@@ -20,7 +20,8 @@ public sealed class GetBalanceNormalizedTests
                   { "currency_code": "BTC", "amount": 0.5, "available": 0.4 }
                 ]
                 """),
-            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
+            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"),
+            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""));
         var api = new BitflyerPrivateNormalizedApi(wire);
 
         var call = await api.GetBalanceAsync(new GetBalanceRequest());
@@ -47,7 +48,8 @@ public sealed class GetBalanceNormalizedTests
     {
         var wire = new StubPrivateWireApi(
             getBalanceCall: CreateWireOk("GetBalance", """{ "currency_code": "JPY" }"""),
-            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
+            sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"),
+            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""));
         var api = new BitflyerPrivateNormalizedApi(wire);
 
         var call = await api.GetBalanceAsync(new GetBalanceRequest());
@@ -69,13 +71,16 @@ public sealed class GetBalanceNormalizedTests
     {
         private readonly Call<WireCallSpec, WireResponse> _getBalanceCall;
         private readonly Call<WireCallSpec, WireResponse> _sendChildOrderCall;
+        private readonly Call<WireCallSpec, WireResponse> _cancelChildOrderCall;
 
         public StubPrivateWireApi(
             Call<WireCallSpec, WireResponse> getBalanceCall,
-            Call<WireCallSpec, WireResponse> sendChildOrderCall)
+            Call<WireCallSpec, WireResponse> sendChildOrderCall,
+            Call<WireCallSpec, WireResponse> cancelChildOrderCall)
         {
             _getBalanceCall = getBalanceCall;
             _sendChildOrderCall = sendChildOrderCall;
+            _cancelChildOrderCall = cancelChildOrderCall;
         }
 
         public Task<Call<WireCallSpec, WireResponse>> GetBalanceAsync(
@@ -86,5 +91,10 @@ public sealed class GetBalanceNormalizedTests
             string bodyJson,
             CancellationToken cancellationToken = default) =>
             Task.FromResult(_sendChildOrderCall);
+
+        public Task<Call<WireCallSpec, WireResponse>> CancelChildOrderAsync(
+            string bodyJson,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(_cancelChildOrderCall);
     }
 }

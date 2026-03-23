@@ -45,7 +45,7 @@ public sealed class DtoSerializationTests
     [Fact]
     public void PrivateDtos_SerializeWithSnakeCaseAndOmitNullOptionals()
     {
-        var requestJson = JsonSerializer.Serialize(new SendChildOrderRequest
+        var sendRequestJson = JsonSerializer.Serialize(new SendChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderType = "LIMIT",
@@ -54,6 +54,11 @@ public sealed class DtoSerializationTests
             Price = 100m,
             MinuteToExpire = null,
             TimeInForce = null,
+        });
+        var cancelRequestJson = JsonSerializer.Serialize(new CancelChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderAcceptanceId = "JRF20240101-000000-000001",
         });
         var balanceJson = JsonSerializer.Serialize(new GetBalance.Item
         {
@@ -66,11 +71,14 @@ public sealed class DtoSerializationTests
             ChildOrderAcceptanceId = "JRF20240101-000000-000001",
         });
 
-        Assert.Contains($"\"product_code\":\"{ProductCodes.BtcJpy}\"", requestJson);
-        Assert.Contains("\"child_order_type\":\"LIMIT\"", requestJson);
-        Assert.Contains("\"price\":100", requestJson);
-        Assert.DoesNotContain("minute_to_expire", requestJson);
-        Assert.DoesNotContain("time_in_force", requestJson);
+        Assert.Contains($"\"product_code\":\"{ProductCodes.BtcJpy}\"", sendRequestJson);
+        Assert.Contains("\"child_order_type\":\"LIMIT\"", sendRequestJson);
+        Assert.Contains("\"price\":100", sendRequestJson);
+        Assert.DoesNotContain("minute_to_expire", sendRequestJson);
+        Assert.DoesNotContain("time_in_force", sendRequestJson);
+        Assert.Contains($"\"product_code\":\"{ProductCodes.BtcJpy}\"", cancelRequestJson);
+        Assert.Contains("\"child_order_acceptance_id\":\"JRF20240101-000000-000001\"", cancelRequestJson);
+        Assert.DoesNotContain("child_order_id", cancelRequestJson);
         Assert.Contains("\"currency_code\":\"JPY\"", balanceJson);
         Assert.Contains("\"child_order_acceptance_id\":\"JRF20240101-000000-000001\"", responseJson);
     }

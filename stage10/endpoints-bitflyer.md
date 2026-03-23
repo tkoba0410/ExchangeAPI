@@ -45,7 +45,7 @@ inventory が事実一覧であるのに対し、本書は Stage10 第1段階の
 | GetWithdrawals | GET | /v1/me/getwithdrawals | private | Later | Later | Later | Transitional | Transitional |
 | SendChildOrder | POST | /v1/me/sendchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional |
 | SendParentOrder | POST | /v1/me/sendparentorder | private | Later | Later | Later | Transitional | Transitional |
-| CancelChildOrder | POST | /v1/me/cancelchildorder | private | Later | Later | Later | Transitional | Transitional |
+| CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Later | Fixed | Fixed |
 | CancelParentOrder | POST | /v1/me/cancelparentorder | private | Later | Later | Later | Transitional | Transitional |
 | CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Later | Later | Later | Transitional | Transitional |
 | GetChildOrders | GET | /v1/me/getchildorders | private | Later | Later | Later | Transitional | Transitional |
@@ -59,7 +59,7 @@ inventory が事実一覧であるのに対し、本書は Stage10 第1段階の
 
 ## Initial Rule
 
-- Stage10 第1段階では `GetTicker`、`GetBalance`、`SendChildOrder` だけを `Yes` とする
+- Stage10 第1段階では `GetTicker`、`GetBalance`、`SendChildOrder` を先行し、その後 `CancelChildOrder` を追加実装対象に含める
 - `GetTicker` と `GetBalance` は read path のため `Phase1-Read` とする
 - `SendChildOrder` は write path のため `Phase2-Write` とする
 - 初版では DTO 固定前のため、全 endpoint の `RequestDtoStatus` / `ResponseDtoStatus` は `Transitional` から開始する

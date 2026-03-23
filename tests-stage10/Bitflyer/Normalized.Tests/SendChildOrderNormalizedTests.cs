@@ -14,6 +14,7 @@ public sealed class SendChildOrderNormalizedTests
     {
         var wire = new StubPrivateWireApi(
             getBalanceCall: CreateWireOk("GetBalance", "[]"),
+            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
             sendChildOrderCall: CreateWireOk(
                 "SendChildOrder",
                 """{ "child_order_acceptance_id": "JRF20240101-000000-000001" }"""));
@@ -42,6 +43,7 @@ public sealed class SendChildOrderNormalizedTests
     {
         var wire = new StubPrivateWireApi(
             getBalanceCall: CreateWireOk("GetBalance", "[]"),
+            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
             sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
         var api = new BitflyerPrivateNormalizedApi(wire);
 
@@ -63,6 +65,7 @@ public sealed class SendChildOrderNormalizedTests
     {
         var wire = new StubPrivateWireApi(
             getBalanceCall: CreateWireOk("GetBalance", "[]"),
+            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
             sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
         var api = new BitflyerPrivateNormalizedApi(wire);
 
@@ -84,6 +87,7 @@ public sealed class SendChildOrderNormalizedTests
     {
         var wire = new StubPrivateWireApi(
             getBalanceCall: CreateWireOk("GetBalance", "[]"),
+            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
             sendChildOrderCall: CreateWireOk("SendChildOrder", "{}"));
         var api = new BitflyerPrivateNormalizedApi(wire);
 
@@ -108,6 +112,7 @@ public sealed class SendChildOrderNormalizedTests
     {
         var wire = new StubPrivateWireApi(
             getBalanceCall: CreateWireOk("GetBalance", "[]"),
+            cancelChildOrderCall: CreateWireOk("CancelChildOrder", ""),
             sendChildOrderCall: CreateWireOk(
                 "SendChildOrder",
                 """{ "child_order_acceptance_id": "JRF20240101-000000-000001" }""",
@@ -141,12 +146,15 @@ public sealed class SendChildOrderNormalizedTests
     {
         private readonly Call<WireCallSpec, WireResponse> _getBalanceCall;
         private readonly Call<WireCallSpec, WireResponse> _sendChildOrderCall;
+        private readonly Call<WireCallSpec, WireResponse> _cancelChildOrderCall;
 
         public StubPrivateWireApi(
             Call<WireCallSpec, WireResponse> getBalanceCall,
+            Call<WireCallSpec, WireResponse> cancelChildOrderCall,
             Call<WireCallSpec, WireResponse> sendChildOrderCall)
         {
             _getBalanceCall = getBalanceCall;
+            _cancelChildOrderCall = cancelChildOrderCall;
             _sendChildOrderCall = sendChildOrderCall;
         }
 
@@ -163,5 +171,10 @@ public sealed class SendChildOrderNormalizedTests
             LastBodyJson = bodyJson;
             return Task.FromResult(_sendChildOrderCall);
         }
+
+        public Task<Call<WireCallSpec, WireResponse>> CancelChildOrderAsync(
+            string bodyJson,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(_cancelChildOrderCall);
     }
 }

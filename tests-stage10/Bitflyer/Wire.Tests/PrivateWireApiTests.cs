@@ -39,6 +39,23 @@ public sealed class PrivateWireApiTests
         Assert.Null(call.Request.Headers);
     }
 
+    [Fact]
+    public async Task CancelChildOrderAsync_BuildsCanonicalRequest()
+    {
+        const string bodyJson = "{\"product_code\":\"BTC_JPY\",\"child_order_acceptance_id\":\"JRF-1\"}";
+        var transport = new CaptureWireTransport();
+        var api = new BitflyerPrivateWireApi(transport);
+
+        var call = await api.CancelChildOrderAsync(bodyJson);
+
+        Assert.Equal("POST", call.Request.Method);
+        Assert.Equal("/v1/me/cancelchildorder", call.Request.Path);
+        Assert.Equal("CancelChildOrder", call.Request.EndpointId);
+        Assert.Null(call.Request.Query);
+        Assert.Equal(bodyJson, call.Request.BodyJson);
+        Assert.Null(call.Request.Headers);
+    }
+
     private sealed class CaptureWireTransport : IWireTransport
     {
         public Task<Call<WireCallSpec, WireResponse>> SendAsync(

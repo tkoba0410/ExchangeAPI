@@ -6,4 +6,5 @@ internal static class WirePaths
     public const string GetTickerAlias = "/v1/ticker";
     public const string GetBalance = "/v1/me/getbalance";
     public const string SendChildOrder = "/v1/me/sendchildorder";
+    public const string CancelChildOrder = "/v1/me/cancelchildorder";
 }

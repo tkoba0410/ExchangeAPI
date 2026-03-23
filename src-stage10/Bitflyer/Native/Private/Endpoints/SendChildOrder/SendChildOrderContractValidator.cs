@@ -1,9 +1,8 @@
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 
 internal static class SendChildOrderContractValidator
 {

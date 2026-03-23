@@ -1,9 +1,8 @@
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Stage10.Bitflyer.Native.Public.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Endpoints.GetTicker;
 
 internal static class GetTickerContractValidator
 {

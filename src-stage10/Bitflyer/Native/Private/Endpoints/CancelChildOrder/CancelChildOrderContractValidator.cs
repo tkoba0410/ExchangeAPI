@@ -1,8 +1,7 @@
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 
 internal static class CancelChildOrderContractValidator
 {

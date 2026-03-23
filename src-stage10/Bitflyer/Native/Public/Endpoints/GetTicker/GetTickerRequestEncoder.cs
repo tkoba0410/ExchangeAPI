@@ -2,7 +2,7 @@ using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Stage10.Bitflyer.Native.Public.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Encoder;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Endpoints.GetTicker;
 
 internal static class GetTickerRequestEncoder
 {

@@ -85,10 +85,69 @@ public sealed class Stage10LiveParityTests
         Assert.Empty(responseByCurrency);
     }
 
-    [Fact(Skip = "Protocol-vs-Native live parity for SendChildOrder would place two real orders. Keep body/DTO validation in unit tests and run post live manually.")]
+    [BitflyerStage10LiveWriteFact]
     [Trait("Category", "Live")]
     [Trait("Scope", "Private")]
-    [Trait("Layer", "Parity")]
-    public Task SendChildOrder_ProtocolAndNative_Parity_IsNotSafeOnLive() =>
-        Task.CompletedTask;
+    [Trait("Layer", "Lifecycle")]
+    public async Task SendChildOrder_ThenCancelChildOrder_CompletesLifecycleWithoutCrossingBook()
+    {
+        using var bundle = BitflyerStage10ClientFactory.CreateNativeClient(new BitflyerStage10ClientOptions
+        {
+            BaseUri = BitflyerStage10LiveTestSettings.ResolveBaseUri(),
+            Credentials = BitflyerStage10LiveTestSettings.GetCredentials(),
+        });
+
+        Assert.NotNull(bundle.Private);
+
+        var ticker = BitflyerStage10LiveAssert.RequireOk(
+            await bundle.Public.GetTickerCallAsync(
+                new GetTickerRequest { ProductCode = BitflyerStage10LiveTestSettings.DefaultProductCode }));
+
+        var safePrice = ComputeSafeBuyPrice(ticker.Ltp, ticker.BestAsk);
+        var request = new SendChildOrderRequest
+        {
+            ProductCode = BitflyerStage10LiveTestSettings.DefaultProductCode,
+            ChildOrderType = "LIMIT",
+            Side = "BUY",
+            Price = safePrice,
+            Size = BitflyerStage10LiveTestSettings.ResolveSafeWriteSize(),
+            MinuteToExpire = 1,
+        };
+
+        string? acceptanceId = null;
+        try
+        {
+            var sendCall = await bundle.Private!.SendChildOrderCallAsync(request);
+            var sendResponse = BitflyerStage10LiveAssert.RequireOk(sendCall);
+            var responseJson = JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(sendResponse));
+            acceptanceId = BitflyerStage10LiveAssert.ParseAcceptanceId(responseJson.RootElement);
+            Assert.False(string.IsNullOrWhiteSpace(acceptanceId));
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
+        }
+        finally
+        {
+            if (!string.IsNullOrWhiteSpace(acceptanceId))
+            {
+                await BitflyerStage10LiveAssert.CancelChildOrderWithRetryAsync(
+                    bundle.Private!,
+                    BitflyerStage10LiveTestSettings.DefaultProductCode,
+                    acceptanceId);
+            }
+        }
+    }
+
+    private static decimal ComputeSafeBuyPrice(decimal ltp, decimal bestAsk)
+    {
+        var lowerBand = decimal.Floor(ltp * 0.5m);
+        var safePrice = lowerBand >= 1m ? lowerBand : 1m;
+
+        if (safePrice >= bestAsk)
+        {
+            throw new Xunit.Sdk.XunitException(
+                $"Refusing to place a live order because computed safe price {safePrice} would cross or touch best ask {bestAsk}. ltp={ltp}");
+        }
+
+        return safePrice;
+    }
 }

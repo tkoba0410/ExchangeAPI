@@ -1,7 +1,7 @@
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Requests;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Encoder;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.GetBalance;
 
 internal static class GetBalanceRequestEncoder
 {

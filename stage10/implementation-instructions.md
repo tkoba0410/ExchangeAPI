@@ -97,7 +97,7 @@ src-stage10/Bitflyer/
 
 - facade へ endpoint 実装を直接書くこと
 - `partial` 前提で facade を肥大化させること
-- `Native/Internal/Encoder` / `Conversion` / `MeaningValidation` の中央集約構成を正本として維持すること
+- endpoint 固有の encoder / converter / validator を `Native/Internal/*` の中央集約構成へ戻すこと
 - `Protocol` から `Native` へ依存すること
 - `Native` から shared transport runtime へ直接依存すること
 

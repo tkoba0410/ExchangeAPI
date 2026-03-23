@@ -8,6 +8,7 @@ namespace ExchangeApi.Tests.Stage10.Bitflyer.LiveTests.Infrastructure;
 internal static class BitflyerStage10LiveTestSettings
 {
     public const string LiveEnabledEnvironmentVariable = "BITFLYER_STAGE10_LIVE";
+    public const string WriteEnabledEnvironmentVariable = "BITFLYER_STAGE10_LIVE_ALLOW_WRITE";
     public const string ApiBaseUriEnvironmentVariable = "BITFLYER_API_BASE_URI";
     public const string ApiKeyEnvironmentVariable = "BITFLYER_API_KEY";
     public const string ApiSecretEnvironmentVariable = "BITFLYER_API_SECRET";
@@ -15,6 +16,7 @@ internal static class BitflyerStage10LiveTestSettings
     public const string CredentialFilePathEnvironmentVariable = "CREDENTIAL_FILE_PATH";
     public const string AgeSecretKeyPathEnvironmentVariable = "AGE_SECRET_KEY_PATH";
     public const string DefaultProductCode = ProductCodes.Default;
+    public const decimal DefaultWriteSize = 0.001m;
 
     private static readonly string DefaultCredentialFilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -46,6 +48,19 @@ internal static class BitflyerStage10LiveTestSettings
         return HasAuthenticatedCredentialSource()
             ? null
             : $"Set {ApiKeyEnvironmentVariable}/{ApiSecretEnvironmentVariable}, or provide {CredentialFilePathEnvironmentVariable}/{AgeSecretKeyPathEnvironmentVariable}, to enable authenticated Stage10 live tests.";
+    }
+
+    public static string? GetWriteSkipReason()
+    {
+        var privateSkipReason = GetPrivateSkipReason();
+        if (privateSkipReason is not null)
+        {
+            return privateSkipReason;
+        }
+
+        return IsTruthy(Environment.GetEnvironmentVariable(WriteEnabledEnvironmentVariable))
+            ? null
+            : $"Set {WriteEnabledEnvironmentVariable}=1 to enable Stage10 bitFlyer write live tests.";
     }
 
     public static Uri? ResolveBaseUri()
@@ -87,6 +102,8 @@ internal static class BitflyerStage10LiveTestSettings
             ApiSecret = credentials.ApiSecret,
         };
     }
+
+    public static decimal ResolveSafeWriteSize() => DefaultWriteSize;
 
     private static bool IsTruthy(string? value) =>
         value is not null &&

@@ -2,7 +2,7 @@ using System.Text.Json;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 
 internal static class CancelChildOrderResponseConverter
 {

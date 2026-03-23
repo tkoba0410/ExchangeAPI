@@ -1,9 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ExchangeApi.Primitives.CallCommon;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Encoder;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Stage10.Bitflyer.Protocol.Private.Endpoints.GetBalance;
 using ExchangeApi.Transport.Wire;

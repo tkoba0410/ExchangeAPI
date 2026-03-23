@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Text.Json;
 using ExchangeApi.Primitives.CallCommon;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Api;
+using ExchangeApi.Stage10.Bitflyer.Native.Private.Requests;
 using ExchangeApi.Transport.Wire;
 using Xunit.Sdk;
 
@@ -51,6 +53,56 @@ internal static class BitflyerStage10LiveAssert
         }
 
         throw new XunitException($"Timestamp '{value}' was not a valid ISO-8601 value.");
+    }
+
+    public static string ParseAcceptanceId(JsonElement root)
+    {
+        if (!root.TryGetProperty("child_order_acceptance_id", out var property))
+        {
+            throw new XunitException("Response JSON did not contain child_order_acceptance_id.");
+        }
+
+        var value = property.GetString();
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new XunitException("child_order_acceptance_id was empty.");
+        }
+
+        return value;
+    }
+
+    public static async Task CancelChildOrderWithRetryAsync(
+        IBitflyerPrivateNativeApi api,
+        string productCode,
+        string acceptanceId,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(api);
+        ArgumentException.ThrowIfNullOrWhiteSpace(productCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(acceptanceId);
+
+        var lastError = string.Empty;
+        for (var attempt = 1; attempt <= 5; attempt++)
+        {
+            var call = await api.CancelChildOrderCallAsync(
+                new CancelChildOrderRequest
+                {
+                    ProductCode = productCode,
+                    ChildOrderAcceptanceId = acceptanceId,
+                },
+                cancellationToken).ConfigureAwait(false);
+
+            if (call.Result is CallResult<ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos.CancelChildOrderResponse>.Ok)
+            {
+                return;
+            }
+
+            var err = (CallResult<ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos.CancelChildOrderResponse>.Err)call.Result;
+            lastError = $"kind={err.Error.Kind}, http={err.Error.HttpStatus}, message={err.Error.Message}, body={Truncate(err.Error.BodySnippet)}";
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
+        }
+
+        throw new XunitException($"Failed to cancel child order after retry. acceptanceId={acceptanceId}, {lastError}");
     }
 
     private static string Truncate(string? value)

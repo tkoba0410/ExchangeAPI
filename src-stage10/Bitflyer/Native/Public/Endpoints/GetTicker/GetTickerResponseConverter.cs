@@ -2,7 +2,7 @@ using System.Text.Json;
 using ExchangeApi.Primitives.CallCommon;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Public.Endpoints.GetTicker;
 
 internal static class GetTickerResponseConverter
 {

@@ -15,3 +15,11 @@ internal sealed class BitflyerStage10LivePrivateFactAttribute : FactAttribute
         Skip = BitflyerStage10LiveTestSettings.GetPrivateSkipReason();
     }
 }
+
+internal sealed class BitflyerStage10LiveWriteFactAttribute : FactAttribute
+{
+    public BitflyerStage10LiveWriteFactAttribute()
+    {
+        Skip = BitflyerStage10LiveTestSettings.GetWriteSkipReason();
+    }
+}

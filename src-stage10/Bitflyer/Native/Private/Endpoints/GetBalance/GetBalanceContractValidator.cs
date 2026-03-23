@@ -1,20 +1,19 @@
-using ExchangeApi.Stage10.Bitflyer.Native.Internal.Conversion;
 using ExchangeApi.Stage10.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Stage10.Bitflyer.Native.Private.Dtos;
 using ExchangeApi.Primitives.CallCommon;
 
-namespace ExchangeApi.Stage10.Bitflyer.Native.Internal.ContractValidation;
+namespace ExchangeApi.Stage10.Bitflyer.Native.Private.Endpoints.GetBalance;
 
 internal static class GetBalanceContractValidator
 {
     public static bool TryValidate(
         IReadOnlyList<GetBalanceItemCandidate> candidates,
-        out IReadOnlyList<GetBalance.Item>? response,
+        out IReadOnlyList<Dtos.GetBalance.Item>? response,
         out CallError? error)
     {
         ArgumentNullException.ThrowIfNull(candidates);
 
-        var items = new GetBalance.Item[candidates.Count];
+        var items = new Dtos.GetBalance.Item[candidates.Count];
         for (var index = 0; index < candidates.Count; index++)
         {
             var candidate = candidates[index];
@@ -28,7 +27,7 @@ internal static class GetBalanceContractValidator
                 return false;
             }
 
-            items[index] = new GetBalance.Item
+            items[index] = new Dtos.GetBalance.Item
             {
                 CurrencyCode = candidate.CurrencyCode,
                 Amount = candidate.Amount.Value,

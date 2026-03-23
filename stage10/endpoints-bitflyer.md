@@ -24,6 +24,7 @@ Stage10 では本書を endpoint 運用正本とし、既存 inventory は impor
 - `ExpectedStatus`
   - `200`: HTTP 200 を成功とする
   - `TBD`: 後段で確定する
+  - `Native` が評価し、`Protocol` は raw status を保持する
 - `ResponseShape`
   - `Object`: top-level object
   - `Array`: top-level array
@@ -32,9 +33,10 @@ Stage10 では本書を endpoint 運用正本とし、既存 inventory は impor
 - `WritesState`
   - `Yes`: venue state を変更する
   - `No`: read-only
-- `NeedsCleanup`
-  - `Yes`: live test 後に cleanup が必要
-  - `No`: cleanup 不要
+- `CleanupPolicy`
+  - `None`: cleanup 不要
+  - `Required`: live test 後に cleanup を必須とする
+  - `NotSupported`: Stage10 では write live test 対象にしない
 - `AliasPath`
   - path alias がある場合はその path を書く
   - なければ `-`
@@ -69,41 +71,41 @@ Stage10 では本書を endpoint 運用正本とし、既存 inventory は impor
 
 ## Matrix
 
-| EndpointId | Method | Path | Scope | ExposeInProtocol | ExposeInNative | LiveTestPhase | RequestDtoStatus | ResponseDtoStatus | ExpectedStatus | ResponseShape | WritesState | NeedsCleanup | AliasPath | AuthType | OptionalOmissionRule |
+| EndpointId | Method | Path | Scope | ExposeInProtocol | ExposeInNative | LiveTestPhase | RequestDtoStatus | ResponseDtoStatus | ExpectedStatus | ResponseShape | WritesState | CleanupPolicy | AliasPath | AuthType | OptionalOmissionRule |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| GetMarkets | GET | /v1/getmarkets | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | None | TBD |
-| GetBoard | GET | /v1/getboard | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | None | TBD |
-| GetTicker | GET | /v1/getticker | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | No | /v1/ticker | None | product_code = null は query omitted |
-| GetExecutionsPublic | GET | /v1/getexecutions | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | None | TBD |
-| GetBoardState | GET | /v1/getboardstate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | None | TBD |
-| GetHealth | GET | /v1/gethealth | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | None | TBD |
-| GetFundingRate | GET | /v1/getfundingrate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | None | TBD |
-| GetCorporateLeverage | GET | /v1/getcorporateleverage | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | None | TBD |
-| GetChats | GET | /v1/getchats | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | None | TBD |
-| GetPermissions | GET | /v1/me/getpermissions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetBalance | GET | /v1/me/getbalance | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | No | - | KeySecret | - |
-| GetCollateral | GET | /v1/me/getcollateral | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetCollateralAccounts | GET | /v1/me/getcollateralaccounts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetAddresses | GET | /v1/me/getaddresses | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetCoinIns | GET | /v1/me/getcoinins | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetCoinOuts | GET | /v1/me/getcoinouts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetBankAccounts | GET | /v1/me/getbankaccounts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetDeposits | GET | /v1/me/getdeposits | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| Withdraw | POST | /v1/me/withdraw | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | TBD | - | KeySecret | TBD |
-| GetWithdrawals | GET | /v1/me/getwithdrawals | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| SendChildOrder | POST | /v1/me/sendchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional | 200 | Object | Yes | Yes | - | KeySecret | minute_to_expire/time_in_force = null omitted, price is conditional |
-| SendParentOrder | POST | /v1/me/sendparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | TBD | - | KeySecret | TBD |
-| CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | No | - | KeySecret | exactly one of child_order_id or child_order_acceptance_id |
-| CancelParentOrder | POST | /v1/me/cancelparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | TBD | - | KeySecret | TBD |
-| CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | TBD | - | KeySecret | TBD |
-| GetChildOrders | GET | /v1/me/getchildorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetParentOrders | GET | /v1/me/getparentorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetParentOrder | GET | /v1/me/getparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetExecutionsPrivate | GET | /v1/me/getexecutions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetBalanceHistory | GET | /v1/me/getbalancehistory | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetPositions | GET | /v1/me/getpositions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetCollateralHistory | GET | /v1/me/getcollateralhistory | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
-| GetTradingCommission | GET | /v1/me/gettradingcommission | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | No | - | KeySecret | TBD |
+| GetMarkets | GET | /v1/getmarkets | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetBoard | GET | /v1/getboard | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetTicker | GET | /v1/getticker | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | /v1/ticker | None | product_code = null は query omitted |
+| GetExecutionsPublic | GET | /v1/getexecutions | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetBoardState | GET | /v1/getboardstate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetHealth | GET | /v1/gethealth | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetFundingRate | GET | /v1/getfundingrate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetCorporateLeverage | GET | /v1/getcorporateleverage | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetChats | GET | /v1/getchats | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetPermissions | GET | /v1/me/getpermissions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetBalance | GET | /v1/me/getbalance | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
+| GetCollateral | GET | /v1/me/getcollateral | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetCollateralAccounts | GET | /v1/me/getcollateralaccounts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetAddresses | GET | /v1/me/getaddresses | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetCoinIns | GET | /v1/me/getcoinins | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetCoinOuts | GET | /v1/me/getcoinouts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetBankAccounts | GET | /v1/me/getbankaccounts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetDeposits | GET | /v1/me/getdeposits | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| Withdraw | POST | /v1/me/withdraw | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | NotSupported | - | KeySecret | TBD |
+| GetWithdrawals | GET | /v1/me/getwithdrawals | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| SendChildOrder | POST | /v1/me/sendchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional | 200 | Object | Yes | Required | - | KeySecret | minute_to_expire/time_in_force = null omitted, price is conditional |
+| SendParentOrder | POST | /v1/me/sendparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | Required | - | KeySecret | TBD |
+| CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of child_order_id or child_order_acceptance_id |
+| CancelParentOrder | POST | /v1/me/cancelparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | None | - | KeySecret | TBD |
+| CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | None | - | KeySecret | TBD |
+| GetChildOrders | GET | /v1/me/getchildorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetParentOrders | GET | /v1/me/getparentorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetParentOrder | GET | /v1/me/getparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetExecutionsPrivate | GET | /v1/me/getexecutions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetBalanceHistory | GET | /v1/me/getbalancehistory | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetPositions | GET | /v1/me/getpositions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetCollateralHistory | GET | /v1/me/getcollateralhistory | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetTradingCommission | GET | /v1/me/gettradingcommission | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 
 ## Initial Rule
 

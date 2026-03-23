@@ -95,7 +95,7 @@ sequenceDiagram
 
     User->>NF: GetTickerCallAsync(request)
     NF->>NM: forward
-    NM->>NM: Encode / JsonValidation / Conversion / ContractValidation
+    NM->>NM: InputValidation / Encode
     NM->>PF: GetTickerCallAsync(productCode)
     PF->>PM: forward
     PM->>RT: Send Call<WireCallSpec, WireResponse>
@@ -104,6 +104,7 @@ sequenceDiagram
     RT-->>PM: WireResponse
     PM-->>PF: Call<WireCallSpec, WireResponse>
     PF-->>NM: protocol call
+    NM->>NM: JsonValidation / Conversion / ContractValidation
     NM-->>NF: Call<GetTickerRequest, GetTickerResponse>
     NF-->>User: native call
 ```
@@ -278,7 +279,8 @@ Stage10 では実装対象外とする。
 - `Protocol` endpoint module の entry method 名は `SendAsync(...)` を基本とする
 - `Native` endpoint module の entry method 名は `CallAsync(...)` を基本とする
 - facade は module を受け取り、薄い forward のみを行う
-- method / path / query / body / request encode / response decode / ContractValidation は endpoint module が所有する
+- `Protocol` endpoint module は method / path / query / body / canonical request / send / raw status の保持を所有する
+- `Native` endpoint module は request validation / request encode / protocol call / response decode / ContractValidation / native call 組み立てを所有する
 - endpoint module は sibling endpoint の業務判断を持たない
 - endpoint 固有 DTO と endpoint 固有 helper は同じ endpoint フォルダに置いてよい
 - shared helper へ切り出してよいのは、複数 endpoint で再利用され、かつ endpoint identity に依存しないものに限る
@@ -428,7 +430,7 @@ public interface ISendChildOrderProtocolEndpoint
 - `Semantic`
   - request DTO の必須項目欠落
   - request DTO の組み合わせ不正
-  - raw shape は読めるが、business rule として不正
+  - raw shape は読めるが、API contract rule として不正
 - `Mapping`
   - 鏡像 contract を超える明示的 mapping でのみ使う
   - Stage10 の初期 `Native` endpoint では原則として使わない
@@ -662,7 +664,7 @@ matrix が担わないもの:
 - `ExpectedStatus`
 - `ResponseShape`
 - `WritesState`
-- `NeedsCleanup`
+- `CleanupPolicy`
 - `AliasPath`
 - `AuthType`
 - `OptionalOmissionRule`
@@ -671,12 +673,13 @@ matrix が担わないもの:
 
 - `ExpectedStatus`
   - endpoint が成功と見なす status code を定義する
+  - `Native` endpoint module が評価し、`Protocol` は raw status を保持する
 - `ResponseShape`
   - `Object` / `Array` / `EmptyOrObject` など、top-level shape を定義する
 - `WritesState`
   - venue state を変更する endpoint かどうかを示す
-- `NeedsCleanup`
-  - write live test 後に cleanup が必要かを示す
+- `CleanupPolicy`
+  - `None` / `Required` / `NotSupported` で write live test 時の cleanup 方針を示す
 - `AliasPath`
   - canonical path 以外に `Protocol` が内部互換として許容する path を示す
 - `AuthType`
@@ -764,7 +767,8 @@ state を変更する endpoint の live 実行には、以下を必須とする�
   - `BITFLYER_STAGE10_LIVE=1`
   - `BITFLYER_STAGE10_ALLOW_WRITE=1`
 - 専用または影響を限定できる account を使う
-- matrix 上 `NeedsCleanup = Yes` の endpoint は cleanup 手順を同じ test に含める
+- matrix 上 `CleanupPolicy = Required` の endpoint は cleanup 手順を同じ test に含める
+- matrix 上 `CleanupPolicy = NotSupported` の endpoint は Stage10 の write live test 対象に含めない
 - write test は最小数量、最小影響の request を使う
 - `SendChildOrder` のような endpoint は `Protocol` と `Native` の parity 実行で二重送信しない
 - cleanup 用 endpoint がある場合は acceptance id / order id を保持し、後続 cleanup を必ず試みる

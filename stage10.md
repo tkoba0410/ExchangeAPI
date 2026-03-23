@@ -782,7 +782,7 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 - 現在の file 配置
 - `partial` 前提の facade 実装
 - facade に endpoint 実装を直接生やす構成
-- `Native/Internal/Encoder` / `Conversion` / 旧 `MeaningValidation` 相当の中央集約構成
+- `Native` の validation 実装を中央集約フォルダ構成の正本として扱うこと
 
 ### 11.2 流用してよいもの
 
@@ -810,7 +810,7 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 7. module 集約 object を導入して facade constructor を整理する
 8. `Composition` を更新する
 9. test を facade / endpoint module / composition に役割分離する
-10. 旧 `partial` 構成と不要 helper を整理する
+10. `partial` 依存構成と不要 helper を整理する
 
 ### 12.1 Codex 実装戦略
 
@@ -838,7 +838,7 @@ Codex は以下の順で実装する。
 - `Protocol` endpoint に共通 interface を置かず、endpoint-specific interface を使う方針が定義されている
 - `Call` の success / failure 不変条件が定義されている
 - `Native` が API contract rule までを扱い、business rule を持たないことが定義されている
-- `ContractValidation` を正本語彙とし、`MeaningValidation` を使わないことが定義されている
+- validation stage 語彙が本書に従っている
 - test の役割分担が固定されている
 - endpoint metadata の必須列が定義されている
 - 公開対象 row に `TBD` を残さない規則が定義されている

@@ -1,1 +1,35 @@
-<Solution />
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Exchanges/" />
+  <Folder Name="/src/Exchanges/Bitflyer/" />
+  <Folder Name="/src/Exchanges/Bitflyer/Composition/">
+    <Project Path="src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj" />
+  </Folder>
+  <Folder Name="/src/Exchanges/Bitflyer/Native/">
+    <Project Path="src/Exchanges/Bitflyer/Native/ExchangeApi.Exchanges.Bitflyer.Native.csproj" />
+  </Folder>
+  <Folder Name="/src/Exchanges/Bitflyer/Protocol/">
+    <Project Path="src/Exchanges/Bitflyer/Protocol/ExchangeApi.Exchanges.Bitflyer.Protocol.csproj" />
+  </Folder>
+  <Folder Name="/src/Exchanges/Bitflyer/Vocabulary/">
+    <Project Path="src/Exchanges/Bitflyer/Vocabulary/ExchangeApi.Exchanges.Bitflyer.Vocabulary.csproj" />
+  </Folder>
+  <Folder Name="/src/Primitives/">
+    <Project Path="src/Primitives/ExchangeApi.Primitives.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Exchanges/" />
+  <Folder Name="/tests/Exchanges/Bitflyer/" />
+  <Folder Name="/tests/Exchanges/Bitflyer/Composition.Tests/">
+    <Project Path="tests/Exchanges/Bitflyer/Composition.Tests/ExchangeApi.Exchanges.Bitflyer.Composition.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Exchanges/Bitflyer/LiveTests/">
+    <Project Path="tests/Exchanges/Bitflyer/LiveTests/ExchangeApi.Exchanges.Bitflyer.LiveTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Exchanges/Bitflyer/Native.Tests/">
+    <Project Path="tests/Exchanges/Bitflyer/Native.Tests/ExchangeApi.Exchanges.Bitflyer.Native.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Exchanges/Bitflyer/Protocol.Tests/">
+    <Project Path="tests/Exchanges/Bitflyer/Protocol.Tests/ExchangeApi.Exchanges.Bitflyer.Protocol.Tests.csproj" />
+  </Folder>
+</Solution>

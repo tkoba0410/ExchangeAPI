@@ -1,0 +1,42 @@
+namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
+
+internal sealed class BitflyerPublicReadLiveFactAttribute : FactAttribute
+{
+    public BitflyerPublicReadLiveFactAttribute()
+    {
+        if (Environment.GetEnvironmentVariable("BITFLYER_STAGE10_LIVE") != "1")
+        {
+            Skip = "Set BITFLYER_STAGE10_LIVE=1 to run Stage10 public live tests.";
+        }
+    }
+}
+
+internal sealed class BitflyerPrivateReadLiveFactAttribute : FactAttribute
+{
+    public BitflyerPrivateReadLiveFactAttribute()
+    {
+        if (Environment.GetEnvironmentVariable("BITFLYER_STAGE10_LIVE") != "1")
+        {
+            Skip = "Set BITFLYER_STAGE10_LIVE=1 to run Stage10 private live tests.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("BITFLYER_API_KEY")) ||
+            string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("BITFLYER_API_SECRET")))
+        {
+            Skip = "Set BITFLYER_API_KEY and BITFLYER_API_SECRET to run Stage10 private live tests.";
+        }
+    }
+}
+
+internal sealed class BitflyerWriteLiveFactAttribute : FactAttribute
+{
+    public BitflyerWriteLiveFactAttribute()
+    {
+        if (Environment.GetEnvironmentVariable("BITFLYER_STAGE10_LIVE") != "1" ||
+            Environment.GetEnvironmentVariable("BITFLYER_STAGE10_ALLOW_WRITE") != "1")
+        {
+            Skip = "Set BITFLYER_STAGE10_LIVE=1 and BITFLYER_STAGE10_ALLOW_WRITE=1 to run Stage10 write live tests.";
+        }
+    }
+}

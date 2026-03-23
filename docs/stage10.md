@@ -14,21 +14,23 @@
 - 実装上の暫定事情
 - 既存コードからの流用可能部品
 
-既存 `src-stage10`、既存 test、既存 live test 資産は再利用してよい。  
-ただし、それらは設計判断の正本ではなく、固定した設計へ寄せるための材料として扱う。
+現在の repository は docs のみを残した blank slate とし、source / tests / solution 構成はこれから再構築する。  
+必要であれば git history から過去実装を参照してよい。  
+ただし、過去実装は設計判断の正本ではなく、本書へ寄せるための参考材料としてのみ扱う。
 
 ### 1.1 文書統治
 
 Stage10 における文書の主従は以下とする。
 
-- [`stage10.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/stage10.md)
+- [`docs/stage10.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/stage10.md)
   - 設計正本
   - 層モデル、依存規約、error 契約、test 契約、変更ポリシーを定義する
-- [`stage10/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/stage10/endpoints-bitflyer.md)
+- [`docs/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-bitflyer.md)
   - endpoint 運用正本
   - endpoint ごとの metadata と固定状況を定義する
 
-`stage10.md` と matrix を現行の文書体系とする。  
+`docs/stage10.md` と matrix を現行の文書体系とする。  
+本 repository では、この 2 文書だけを Stage10 の正本とし、削除済み inventory や補助文書を前提にしない。  
 旧 `stage10b.md` は廃止し、現行の設計判断、運用判断、実装判断の根拠に使わない。
 
 ## 2. ゴール
@@ -112,7 +114,7 @@ sequenceDiagram
 ### 物理構成イメージ
 
 ```text
-src-stage10/Bitflyer/
+src/Exchanges/Bitflyer/
   Protocol/
     Public/Api/
     Public/Endpoints/<EndpointName>/
@@ -498,7 +500,7 @@ public interface ISendChildOrderProtocolEndpoint
 ### 8.1 Protocol
 
 ```text
-src-stage10/Bitflyer/Protocol/
+src/Exchanges/Bitflyer/Protocol/
   Public/
     Api/
       IBitflyerPublicProtocolApi.cs
@@ -532,7 +534,7 @@ src-stage10/Bitflyer/Protocol/
 ### 8.2 Native
 
 ```text
-src-stage10/Bitflyer/Native/
+src/Exchanges/Bitflyer/Native/
   Public/
     Api/
       IBitflyerPublicNativeApi.cs
@@ -571,7 +573,7 @@ src-stage10/Bitflyer/Native/
 ### 8.3 Composition
 
 ```text
-src-stage10/Bitflyer/Composition/
+src/Exchanges/Bitflyer/Composition/
   Bootstrap/
   Factory/
   Options/
@@ -614,7 +616,7 @@ Stage10 の規約は文書だけで終わらせず、arch test で機械検証�
 
 配置:
 
-- `tests-stage10/Bitflyer/Architecture.Tests` を追加候補とする
+- `tests/Exchanges/Bitflyer/Architecture.Tests` を追加候補とする
 - namespace forbidden dependency
 - project reference forbidden edge
 - public surface forbidden type
@@ -623,8 +625,8 @@ Stage10 の規約は文書だけで終わらせず、arch test で機械検証�
 
 ## 9. endpoint 運用正本
 
-Stage10 の endpoint 運用正本は [`stage10/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/stage10/endpoints-bitflyer.md) とする。  
-既存 inventory は import source に留める。
+Stage10 の endpoint 運用正本は [`docs/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-bitflyer.md) とする。  
+本書は削除済み inventory や外部補助文書を前提にしない。
 
 matrix が担うもの:
 
@@ -646,11 +648,11 @@ matrix が担わないもの:
 - response field の additive 追加は、`Transitional` では保留してよい
 - `Fixed` の request / response DTO を変更する場合は、文書、matrix、test を同時更新する
 - alias path、expected status、optional omission rule を変更する場合は endpoint module test を更新する
-- exchange 仕様差分を見つけた場合、まず `stage10.md` と matrix を更新し、その後実装を寄せる
+- exchange 仕様差分を見つけた場合、まず `docs/stage10.md` と matrix を更新し、その後実装を寄せる
 
 ### 9.2 Endpoint Metadata
 
-`stage10/endpoints-bitflyer.md` の matrix は、少なくとも以下の metadata を持つ。
+`docs/endpoints-bitflyer.md` の matrix は、少なくとも以下の metadata を持つ。
 
 - `EndpointId`
 - `Method`
@@ -691,7 +693,7 @@ matrix が担わないもの:
 
 - endpoint module 実装は matrix metadata に従う
 - matrix へない metadata をコード側で暗黙導入しない
-- metadata を増やす場合は `stage10.md` と matrix を同時更新する
+- metadata を増やす場合は `docs/stage10.md` と matrix を同時更新する
 - `ExposeInProtocol = Yes` の row では `ExpectedStatus` / `ResponseShape` / `AuthType` に `TBD` を残さない
 - `ExposeInNative = Yes` の row では `ExpectedStatus` / `ResponseShape` / `AuthType` / `OptionalOmissionRule` に `TBD` を残さない
 - `TBD` は `ExposeInProtocol != Yes` かつ `ExposeInNative != Yes` の row にのみ許容する
@@ -775,11 +777,11 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 - cleanup 失敗は silent ignore しない
 - write live test は read parity test と別 phase で実行する
 
-## 11. 既存試作の扱い
+## 11. 過去実装の扱い
 
 ### 11.1 正本にしないもの
 
-- 現在の file 配置
+- git history 上の file 配置
 - `partial` 前提の facade 実装
 - facade に endpoint 実装を直接生やす構成
 - `Native` の validation 実装を中央集約フォルダ構成の正本として扱うこと
@@ -796,10 +798,34 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 
 ### 11.3 判断原則
 
-- 既存コードの場所ではなく、新しい責務境界を優先する
+- 過去コードの場所ではなく、新しい責務境界を優先する
 - 「そのまま残せるか」ではなく「新しい endpoint module へ安全に移せるか」で流用可否を判断する
 
-## 12. 実装順
+## 12. Blank-Slate Bootstrap
+
+blank slate から実装を再開する際は、以下を最初に作る。
+
+```text
+src/Exchanges/Bitflyer/
+  Protocol/
+  Native/
+  Composition/
+  Vocabulary/
+tests/Exchanges/Bitflyer/
+  Protocol.Tests/
+  Native.Tests/
+  Composition.Tests/
+  LiveTests/
+```
+
+原則:
+
+- まず `Protocol` / `Native` / `Composition` の 3 project を作る
+- 次に `Protocol.Tests` / `Native.Tests` / `Composition.Tests` を作る
+- `LiveTests` は read endpoint の parity が通ってから追加する
+- `ExchangeApi.slnx` は上記 project を追加するまで空のままでよい
+
+## 13. 実装順
 
 1. 文書を正本として固定する
 2. `Protocol` の `GetTicker` を facade + endpoint module に移す
@@ -812,7 +838,7 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 9. test を facade / endpoint module / composition に役割分離する
 10. `partial` 依存構成と不要 helper を整理する
 
-### 12.1 Codex 実装戦略
+### 13.1 Codex 実装戦略
 
 Codex は以下の順で実装する。
 
@@ -824,11 +850,11 @@ Codex は以下の順で実装する。
 6. `Composition` で配線する
 7. endpoint test / facade test / composition test を追加する
 
-## 13. DoD
+## 14. DoD
 
 - `Protocol` / `Native` の責務境界が明確
 - facade と endpoint module の役割分担が明確
-- 文書統治が定義され、`stage10.md` と matrix の主従が固定されている
+- 文書統治が定義され、`docs/stage10.md` と matrix の主従が固定されている
 - 依存規約が文書化され、破ってよい場所が `Composition` に限定されている
 - architecture enforcement の対象が明記されている
 - facade の主公開面が `*CallAsync(...)` に固定されている
@@ -846,10 +872,10 @@ Codex は以下の順で実装する。
 - write safety 規約が定義されている
 - `Native` が bitFlyer-native contract として定義されている
 - `Unified` / `McpServer` を上位層として追加できる
-- endpoint 運用正本が `stage10/endpoints-bitflyer.md` に固定されている
+- endpoint 運用正本が `docs/endpoints-bitflyer.md` に固定されている
 - 既存試作は移行材料であって設計正本ではないことが明記されている
 
-## 14. Out of Scope
+## 15. Out of Scope
 
 - 取引所横断 DTO
 - 取引所横断 capability

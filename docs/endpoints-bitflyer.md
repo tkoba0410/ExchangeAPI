@@ -1,10 +1,10 @@
 # Stage10 Endpoint Matrix — Bitflyer
 
-本書は、[endpoints-bitflyer.md](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/inventory/endpoints-bitflyer.md) を入力として作成した Stage10 用の判断表である。  
-inventory が事実一覧であるのに対し、本書は Stage10 第1段階の実装・DTO 固定・live test 導入順を管理する。
+本書は、bitFlyer の Stage10 実装に対する endpoint 運用正本である。  
+本書は Stage10 第1段階の実装対象、DTO 固定状況、live test 導入順、endpoint metadata を自己完結に管理する。
 
-Stage10 では本書を endpoint 運用正本とし、既存 inventory は import source に留める。  
-現在の Stage10 コード配置は本書の従属物であり、判断根拠にはしない。
+現在の Stage10 コード配置は本書の従属物であり、判断根拠にはしない。  
+削除済み inventory や他の補助文書を前提にせず、本書自身を endpoint 正本として扱う。
 
 ## Values
 
@@ -67,7 +67,7 @@ Stage10 では本書を endpoint 運用正本とし、既存 inventory は impor
 - matrix は「公開面に出すか」を管理する
   - shared helper の配置
   - converter / validator の細かい file 分割
-  は別途 `stage10.md` の物理構成方針に従う
+  は別途 `docs/stage10.md` の物理構成方針に従う
 
 ## Matrix
 

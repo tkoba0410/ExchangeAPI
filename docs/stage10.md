@@ -26,18 +26,22 @@ Stage10 における文書の主従は以下とする。
   - 設計正本
   - 層モデル、依存規約、error 契約、test 契約、変更ポリシーを定義する
 - [`docs/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-bitflyer.md)
-  - endpoint 運用正本
-  - endpoint ごとの metadata と固定状況を定義する
+  - bitFlyer の endpoint 運用正本
+  - bitFlyer endpoint ごとの metadata と固定状況を定義する
+- [`docs/endpoints-binance.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-binance.md)
+  - Binance の endpoint 運用正本
+  - Binance endpoint ごとの metadata と固定状況を定義する
 
-`docs/stage10.md` と matrix を現行の文書体系とする。  
-本 repository では、この 2 文書だけを Stage10 の正本とし、削除済み inventory や補助文書を前提にしない。  
+`docs/stage10.md` と venue ごとの matrix を現行の文書体系とする。  
+本 repository では、この文書体系だけを Stage10 の正本とし、削除済み inventory や補助文書を前提にしない。  
 旧 `stage10b.md` は廃止し、現行の設計判断、運用判断、実装判断の根拠に使わない。
 
 ## 2. ゴール
 
-- bitFlyer 専用の `Protocol` / `Native` client をまず完成させる
+- venue ごとの `Protocol` / `Native` client を、同一の Stage10 規約で追加できるようにする
+- まず bitFlyer を完成させ、その後に Binance のような追加 venue を同じ型で載せる
 - 公開面は `Facade`、実装単位は `Endpoint Module` とする
-- `Native` を取引所横断正規化層ではなく、bitFlyer-native contract 層として固定する
+- `Native` を取引所横断正規化層ではなく、exchange-native contract 層として固定する
 - `Unified` と `McpServer` を将来追加できるよう、層名と責務境界を先に固定する
 - 既存試作の file 配置に引っ張られず、責務境界から物理構成を決める
 
@@ -50,9 +54,9 @@ flowchart TB
     App["利用者コード"]
     Mcp["McpServer<br/>(将来)"]
     Uni["Unified<br/>(将来)"]
-    Native["Native<br/>bitFlyer-native contract"]
-    Protocol["Protocol<br/>bitFlyer execution runtime"]
-    Api["bitFlyer HTTP API"]
+    Native["Native<br/>exchange-native contract"]
+    Protocol["Protocol<br/>venue-specific execution runtime"]
+    Api["Venue HTTP API"]
 
     App --> Native
     App --> Protocol
@@ -93,7 +97,7 @@ sequenceDiagram
     participant PF as Protocol Facade
     participant PM as Protocol Endpoint Module
     participant RT as Runtime/Transport
-    participant BF as bitFlyer API
+    participant BF as Venue API
 
     User->>NF: GetTickerCallAsync(request)
     NF->>NM: forward
@@ -137,7 +141,7 @@ src/Exchanges/Bitflyer/
 
 ### 3.1 Protocol
 
-`Protocol` は bitFlyer 固有の実行基盤である。
+`Protocol` は venue 固有の実行基盤である。
 
 責務:
 
@@ -171,7 +175,7 @@ src/Exchanges/Bitflyer/
 
 ### 3.2 Native
 
-`Native` は bitFlyer-native contract 層である。  
+`Native` は exchange-native contract 層である。  
 取引所横断正規化層ではない。
 
 責務:
@@ -516,7 +520,7 @@ debug logging は `Protocol` 層にのみ許可する。
 
 ### 6.1 Request
 
-- `Native` は bitFlyer API の入力 field 集合を鏡像化した request DTO を受ける
+- `Native` は venue API の入力 field 集合を鏡像化した request DTO を受ける
 - request DTO は path / query / body の配置を表現しない
 - 配置決定は endpoint module 内の encoder が担う
 - `null` は未指定を意味し、query / body / path に出力しない
@@ -604,13 +608,13 @@ bitFlyer private endpoint の認証・署名は `Protocol` が担う。
 
 ### 7.1 基本
 
-- `Native` は bitFlyer-native contract である
-- bitFlyer API の field 集合を正本とした鏡像を原則とする
+- `Native` は exchange-native contract である
+- venue API の field 集合を正本とした鏡像を原則とする
 - PascalCase 化、型変換、nullable 化、serializer-native 化のみを許容する
 
 ### 7.2 命名
 
-- field 名の唯一の語源は bitFlyer API の request / response field 名
+- field 名の唯一の語源は venue API の request / response field 名
 - raw diagnostics 起源の property は持ち込まない
 
 ### 7.3 形状
@@ -757,7 +761,12 @@ Stage10 の規約は文書だけで終わらせず、arch test で機械検証�
 
 ## 9. endpoint 運用正本
 
-Stage10 の endpoint 運用正本は [`docs/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-bitflyer.md) とする。  
+Stage10 の endpoint 運用正本は venue ごとの matrix とする。  
+現時点の正本は以下。
+
+- [`docs/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-bitflyer.md)
+- [`docs/endpoints-binance.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-binance.md)
+
 本書は削除済み inventory や外部補助文書を前提にしない。
 
 matrix が担うもの:
@@ -784,7 +793,7 @@ matrix が担わないもの:
 
 ### 9.2 Endpoint Metadata
 
-`docs/endpoints-bitflyer.md` の matrix は、少なくとも以下の metadata を持つ。
+venue ごとの endpoint matrix は、少なくとも以下の metadata を持つ。
 
 - `EndpointId`
 - `Method`
@@ -993,11 +1002,22 @@ tests/Exchanges/Bitflyer/
   Native.Tests/
   Composition.Tests/
   LiveTests/
+
+src/Exchanges/Binance/
+  Protocol/
+  Native/
+  Composition/
+  Vocabulary/
+tests/Exchanges/Binance/
+  Protocol.Tests/
+  Native.Tests/
+  Composition.Tests/
+  LiveTests/
 ```
 
 原則:
 
-- まず `Protocol` / `Native` / `Composition` の 3 project を作る
+- venue ごとに `Protocol` / `Native` / `Composition` の 3 project を作る
 - 次に `Protocol.Tests` / `Native.Tests` / `Composition.Tests` を作る
 - `LiveTests` は read endpoint の parity が通ってから追加する
 - `ExchangeApi.slnx` は上記 project を追加するまで空のままでよい
@@ -1027,6 +1047,30 @@ tests/Exchanges/Bitflyer/Composition.Tests/ExchangeApi.Exchanges.Bitflyer.Compos
 
 tests/Exchanges/Bitflyer/LiveTests/ExchangeApi.Exchanges.Bitflyer.LiveTests.csproj
   RootNamespace: ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests
+
+src/Exchanges/Binance/Protocol/ExchangeApi.Exchanges.Binance.Protocol.csproj
+  RootNamespace: ExchangeApi.Exchanges.Binance.Protocol
+
+src/Exchanges/Binance/Native/ExchangeApi.Exchanges.Binance.Native.csproj
+  RootNamespace: ExchangeApi.Exchanges.Binance.Native
+
+src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj
+  RootNamespace: ExchangeApi.Exchanges.Binance.Composition
+
+src/Exchanges/Binance/Vocabulary/ExchangeApi.Exchanges.Binance.Vocabulary.csproj
+  RootNamespace: ExchangeApi.Exchanges.Binance.Vocabulary
+
+tests/Exchanges/Binance/Protocol.Tests/ExchangeApi.Exchanges.Binance.Protocol.Tests.csproj
+  RootNamespace: ExchangeApi.Tests.Exchanges.Binance.Protocol.Tests
+
+tests/Exchanges/Binance/Native.Tests/ExchangeApi.Exchanges.Binance.Native.Tests.csproj
+  RootNamespace: ExchangeApi.Tests.Exchanges.Binance.Native.Tests
+
+tests/Exchanges/Binance/Composition.Tests/ExchangeApi.Exchanges.Binance.Composition.Tests.csproj
+  RootNamespace: ExchangeApi.Tests.Exchanges.Binance.Composition.Tests
+
+tests/Exchanges/Binance/LiveTests/ExchangeApi.Exchanges.Binance.LiveTests.csproj
+  RootNamespace: ExchangeApi.Tests.Exchanges.Binance.LiveTests
 ```
 
 project reference の正本:
@@ -1037,6 +1081,12 @@ project reference の正本:
 - `Native.Tests` -> `Native`, `Protocol`
 - `Composition.Tests` -> `Composition`, `Protocol`, `Native`
 - `LiveTests` -> `Composition`, `Protocol`, `Native`
+
+venue-specific `Vocabulary` project を作る場合の正本:
+
+- `Protocol` -> `Vocabulary`
+- `Native` -> `Vocabulary`, `Protocol`
+- `Composition` -> `Vocabulary`, `Protocol`, `Native`
 
 ## 13. 実装順
 
@@ -1083,9 +1133,9 @@ Codex は以下の順で実装する。
 - 公開対象 row に `TBD` を残さない規則が定義されている
 - compatibility / versioning 方針が定義されている
 - write safety 規約が定義されている
-- `Native` が bitFlyer-native contract として定義されている
+- `Native` が exchange-native contract として定義されている
 - `Unified` / `McpServer` を上位層として追加できる
-- endpoint 運用正本が `docs/endpoints-bitflyer.md` に固定されている
+- endpoint 運用正本が venue ごとの `docs/endpoints-<venue>.md` に固定されている
 - 既存試作は移行材料であって設計正本ではないことが明記されている
 
 ## 15. Out of Scope
@@ -1094,4 +1144,3 @@ Codex は以下の順で実装する。
 - 取引所横断 capability
 - `Unified` の実装
 - `McpServer` の実装
-- bitFlyer 以外への同時展開

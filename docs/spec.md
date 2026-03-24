@@ -689,7 +689,22 @@ debug logging は `Protocol` 層にのみ許可する。
   - native candidate が API contract として成立するかを検証する
 - `MeaningValidation` という語は Stage10 の正本語彙としては使わない
 
-### 6.6 Private Auth / Signing 契約
+### 6.6 Scalar Contract
+
+bot 運用で重要な scalar の扱いは以下を正本とする。
+
+- 数値 parse は culture 非依存とし、invariant culture を前提とする
+- price / size / amount / commission / pnl / rate のような数量系 scalar は `decimal` を基本とする
+- count / id / status code / epoch milliseconds のような整数系 scalar は `int` または `long` を使い分ける
+- timestamp scalar は `DateTimeOffset` を基本とする
+- `Native` は venue response の scalar を暗黙に丸めたり切り捨てたりしてはならない
+- response に offset が含まれる場合、`Native` はその offset 情報を保持する
+- response に offset が含まれない場合、その解釈規則は venue API 文書または endpoint contract によって固定する
+- offset なし timestamp の解釈を endpoint contract で固定できない場合、その endpoint は `Fixed` に上げない
+- scalar parse 失敗は `Codec` とする
+- bot 判断に必要な scalar を `double` / `float` へ落とすことを `Native` の正本に含めない
+
+### 6.7 Private Auth / Signing 契約
 
 bitFlyer private endpoint の認証・署名は `Protocol` が担う。
 

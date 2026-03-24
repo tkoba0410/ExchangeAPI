@@ -13,14 +13,10 @@ internal sealed class BinanceLiveTestSettings
 
     public static BinanceLiveTestSettings Load()
     {
-        var baseUriText = Environment.GetEnvironmentVariable("BINANCE_API_BASE_URI");
-
         return new BinanceLiveTestSettings
         {
-            EnableProtocolDebugLogging = Environment.GetEnvironmentVariable("BINANCE_STAGE10_DEBUG_LOG") == "1",
-            BaseUri = string.IsNullOrWhiteSpace(baseUriText)
-                ? new Uri("https://api.binance.com")
-                : new Uri(baseUriText, UriKind.Absolute),
+            EnableProtocolDebugLogging = false,
+            BaseUri = new Uri("https://api.binance.com"),
         };
     }
 

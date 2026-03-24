@@ -2,13 +2,6 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
 
 internal sealed class BitflyerPublicReadLiveFactAttribute : FactAttribute
 {
-    public BitflyerPublicReadLiveFactAttribute()
-    {
-        if (!BitflyerCredentialResolver.HasConfiguredCredentialsSource())
-        {
-            Skip = "Set EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH and EXCHANGEAPI_AGE_IDENTITY_FILE_PATH to run Stage10 public live tests.";
-        }
-    }
 }
 
 internal sealed class BitflyerPrivateReadLiveFactAttribute : FactAttribute

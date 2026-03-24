@@ -42,7 +42,10 @@ Stage10 における文書の主従は以下とする。
 - まず bitFlyer を完成させ、その後に Binance のような追加 venue を同じ型で載せる
 - 公開面は `Facade`、実装単位は `Endpoint Module` とする
 - `Native` を取引所横断正規化層ではなく、exchange-native contract 層として固定する
+- `Unified` は「最小公約数」ではなく、「意味同一性を保証できる capability だけを公開する層」として定義する
+- `Native` と `Unified` は層としては分離しつつ、利用者公開面では sibling surface として提示できるようにする
 - `Unified` と `McpServer` を将来追加できるよう、層名と責務境界を先に固定する
+- `Cli` を現行の公開 adapter として追加でき、将来の `McpServer` と役割を混同しないようにする
 - 既存試作の file 配置に引っ張られず、責務境界から物理構成を決める
 
 ## 2.1 全体図
@@ -52,6 +55,7 @@ Stage10 における文書の主従は以下とする。
 ```mermaid
 flowchart TB
     App["利用者コード"]
+    Cli["Cli<br/>(現行 adapter)"]
     Mcp["McpServer<br/>(将来)"]
     Uni["Unified<br/>(将来)"]
     Native["Native<br/>exchange-native contract"]
@@ -59,7 +63,12 @@ flowchart TB
     Api["Venue HTTP API"]
 
     App --> Native
-    App --> Protocol
+    App --> Uni
+    App -. inspection/debug .-> Protocol
+
+    Cli --> Native
+    Cli --> Uni
+    Cli -. explicit raw/debug path .-> Protocol
 
     Mcp --> Uni
     Uni --> Native
@@ -203,13 +212,33 @@ src/Exchanges/Bitflyer/
 `Unified` は将来追加する取引所横断抽象化層である。  
 Stage10 では実装対象外とする。
 
+定義:
+
+- `Unified` は、複数 venue 間で利用者意図・前提条件・副作用・結果解釈・主要エラー分類の意味同一性を保証できる capability のみを公開する
+- 「似ている」だけでは `Unified` に載せない
+- API 単位でも返り値単位でも意味同一性を保証できないものは `Unified` でサポートしない
+- サポートしない機能や field は `Native` にのみ置く
+
 前提:
 
 - `Unified` は `Native` の上に載る
 - `Native` は `Unified` の都合で歪めない
 - 取引所横断の query / command / capability は `Unified` で初めて導入する
+- `Unified` は venue ごとの差分吸収層ではあるが、意味の曖昧化や silent degrade を許容しない
+- `Unified` で未対応の capability を `Native` へ暗黙 fallback してはならない
 
-### 3.4 McpServer
+### 3.4 Cli
+
+`Cli` は現行で追加し得る公開 adapter 層である。
+
+前提:
+
+- `Cli` は request parsing / output formatting / exit code / confirmation prompt などの adapter 事情を所有する
+- `Cli` の主経路は `Native` とし、`Protocol` は raw response や debug のための明示 opt-in 経路としてのみ扱ってよい
+- 将来 `Unified` が追加された場合、`Cli` は `Native` と `Unified` を利用者から sibling surface として見せてよい
+- `Cli` は concrete endpoint / runtime / signer / transport を直接配線しない
+
+### 3.5 McpServer
 
 `McpServer` は将来追加する公開 adapter 層である。  
 Stage10 では実装対象外とする。
@@ -219,7 +248,7 @@ Stage10 では実装対象外とする。
 - `McpServer` は `Unified` を使う
 - `McpServer` は `Protocol` や `Native` を直接正本にしない
 
-### 3.5 依存規約
+### 3.6 依存規約
 
 依存方向の正本は以下とする。
 
@@ -227,6 +256,7 @@ Stage10 では実装対象外とする。
 - `Protocol.Api` -> `Protocol.Endpoints` の module interface または module 集約 object
 - `Native.Endpoints` -> `Native.Internal.Shared` / `Vocabulary` / `Primitives` / 対応する `Protocol` endpoint interface
 - `Native.Api` -> `Native.Endpoints` の module interface または module 集約 object
+- `Cli` -> `Composition`
 - `Unified` -> `Native`
 - `McpServer` -> `Unified`
 - `Composition` -> concrete 実装を横断的に組み立ててよい唯一の場所
@@ -236,6 +266,7 @@ Stage10 では実装対象外とする。
 - facade から runtime / signer / transport へ直接触れること
 - endpoint module から sibling endpoint module を直接呼ぶこと
 - `Native` から `Protocol.Internal.Runtime` の concrete 実装へ直接触れること
+- `Cli` から concrete endpoint / runtime / signer / transport へ直接触れること
 - `McpServer` から `Protocol` / `Native` を直接正本として使うこと
 
 ## 4. 公開面
@@ -271,6 +302,14 @@ Stage10 では実装対象外とする。
   - `GetBalanceCallAsync(...)`
   - `SendChildOrderCallAsync(...)`
   - `CancelChildOrderCallAsync(...)`
+
+### 4.2.2 User-Facing Surface Rule
+
+- 層の依存方向と、利用者にどう見せるかは分けて扱う
+- `Unified` は内部では `Native` の上に載るが、利用者公開面では `Native` と sibling surface として提示してよい
+- `Cli` や将来の adapter は `native` と `unified` を parallel な入口として提示してよい
+- `Unified` 未対応の capability を、利用者に見えない形で `Native` へ自動切り替えしてはならない
+- 利用者が venue 固有機能を必要とする場合は、明示的に `Native` を選ぶ
 
 ### 4.3 Public / Private
 
@@ -1134,6 +1173,8 @@ Codex は以下の順で実装する。
 - compatibility / versioning 方針が定義されている
 - write safety 規約が定義されている
 - `Native` が exchange-native contract として定義されている
+- `Unified` の意味同一性ルールが定義されている
+- `Cli` / `Unified` / `McpServer` の公開 adapter / surface 関係が定義されている
 - `Unified` / `McpServer` を上位層として追加できる
 - endpoint 運用正本が venue ごとの `docs/endpoints-<venue>.md` に固定されている
 - 既存試作は移行材料であって設計正本ではないことが明記されている

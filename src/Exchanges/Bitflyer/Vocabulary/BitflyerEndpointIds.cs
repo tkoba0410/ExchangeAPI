@@ -2,7 +2,9 @@ namespace ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 public static class BitflyerEndpointIds
 {
+    public const string GetMarkets = "GetMarkets";
     public const string GetBoard = "GetBoard";
+    public const string GetExecutionsPublic = "GetExecutionsPublic";
     public const string GetTicker = "GetTicker";
     public const string GetBalance = "GetBalance";
     public const string GetCollateral = "GetCollateral";

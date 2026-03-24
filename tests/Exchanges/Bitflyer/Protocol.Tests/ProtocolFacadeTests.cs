@@ -11,6 +11,8 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoard;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetExecutionsPublic;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
@@ -22,16 +24,24 @@ public sealed class ProtocolFacadeTests
     [Fact]
     public async Task PublicFacade_ForwardsCalls()
     {
+        var getMarkets = TestCall();
         var getBoard = TestCall();
+        var getExecutions = TestCall();
         var getTicker = TestCall();
         var api = new BitflyerPublicProtocolApi(
+            new FakeGetMarketsProtocolEndpoint(getMarkets),
             new FakeGetBoardProtocolEndpoint(getBoard),
+            new FakeGetExecutionsPublicProtocolEndpoint(getExecutions),
             new FakeGetTickerProtocolEndpoint(getTicker));
 
+        var actualMarkets = await api.GetMarketsCallAsync();
         var actualBoard = await api.GetBoardCallAsync("BTC_JPY");
+        var actualExecutions = await api.GetExecutionsCallAsync("BTC_JPY", 10, null, null);
         var actualTicker = await api.GetTickerCallAsync("BTC_JPY");
 
+        Assert.Same(getMarkets, actualMarkets);
         Assert.Same(getBoard, actualBoard);
+        Assert.Same(getExecutions, actualExecutions);
         Assert.Same(getTicker, actualTicker);
     }
 
@@ -80,11 +90,25 @@ public sealed class ProtocolFacadeTests
             new CallMeta { Layer = CallLayers.Protocol, Component = CallComponents.PublicEndpointModule, EndpointId = "E", Scope = "Public", Auth = "None" });
     }
 
+    private sealed class FakeGetMarketsProtocolEndpoint : IGetMarketsProtocolEndpoint
+    {
+        private readonly Call<ProtocolRequest, ProtocolResponse> _call;
+        public FakeGetMarketsProtocolEndpoint(Call<ProtocolRequest, ProtocolResponse> call) => _call = call;
+        public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(CancellationToken cancellationToken = default) => Task.FromResult(_call);
+    }
+
     private sealed class FakeGetBoardProtocolEndpoint : IGetBoardProtocolEndpoint
     {
         private readonly Call<ProtocolRequest, ProtocolResponse> _call;
         public FakeGetBoardProtocolEndpoint(Call<ProtocolRequest, ProtocolResponse> call) => _call = call;
         public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string? productCode, CancellationToken cancellationToken = default) => Task.FromResult(_call);
+    }
+
+    private sealed class FakeGetExecutionsPublicProtocolEndpoint : IGetExecutionsPublicProtocolEndpoint
+    {
+        private readonly Call<ProtocolRequest, ProtocolResponse> _call;
+        public FakeGetExecutionsPublicProtocolEndpoint(Call<ProtocolRequest, ProtocolResponse> call) => _call = call;
+        public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string? productCode, int? count, long? before, long? after, CancellationToken cancellationToken = default) => Task.FromResult(_call);
     }
 
     private sealed class FakeGetTickerProtocolEndpoint : IGetTickerProtocolEndpoint

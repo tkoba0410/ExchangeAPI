@@ -285,7 +285,9 @@ Stage10 では実装対象外とする。
 - `Call` を返さない ergonomic wrapper は Stage10 の必須要件に含めない
 - ergonomic wrapper を将来追加する場合でも、`Call` を返す主 API を置き換えてはならない
 - facade の命名例:
+  - `GetMarketsCallAsync(...)`
   - `GetBoardCallAsync(...)`
+  - `GetExecutionsCallAsync(...)`
   - `GetTickerCallAsync(...)`
   - `GetBalanceCallAsync(...)`
   - `GetCollateralCallAsync(...)`
@@ -676,8 +678,12 @@ src/Exchanges/Bitflyer/Protocol/
       IBitflyerPublicProtocolApi.cs
       BitflyerPublicProtocolApi.cs
     Endpoints/
+      GetMarkets/
+        GetMarketsProtocolEndpoint.cs
       GetBoard/
         GetBoardProtocolEndpoint.cs
+      GetExecutionsPublic/
+        GetExecutionsPublicProtocolEndpoint.cs
       GetTicker/
         GetTickerProtocolEndpoint.cs
   Private/
@@ -726,11 +732,19 @@ src/Exchanges/Bitflyer/Native/
       IBitflyerPublicNativeApi.cs
       BitflyerPublicNativeApi.cs
     Endpoints/
+      GetMarkets/
+        GetMarketsNativeEndpoint.cs
+        GetMarketsRequest.cs
+        GetMarkets.cs
       GetBoard/
         GetBoardNativeEndpoint.cs
         GetBoardRequest.cs
         GetBoardResponse.cs
         GetBoardLevel.cs
+      GetExecutionsPublic/
+        GetExecutionsPublicNativeEndpoint.cs
+        GetExecutionsPublicRequest.cs
+        GetExecutionsPublic.cs
       GetTicker/
         GetTickerNativeEndpoint.cs
         GetTickerRequest.cs
@@ -945,7 +959,9 @@ venue ごとの endpoint matrix は、少なくとも以下の metadata を持�
 
 Stage10 で優先する endpoint:
 
+- `GetMarkets`
 - `GetBoard`
+- `GetExecutionsPublic`
 - `GetTicker`
 - `GetBalance`
 - `GetCollateral`
@@ -960,8 +976,12 @@ Stage10 で優先する endpoint:
 
 役割:
 
+- `GetMarkets`
+  - public top-level array response の template
 - `GetBoard`
   - public object + nested array response の template
+- `GetExecutionsPublic`
+  - public paging/filter array response の template
 - `GetTicker`
   - public read の template
 - `GetBalance`
@@ -1203,18 +1223,20 @@ venue-specific `Vocabulary` project を作る場合の正本:
 ## 13. 実装順
 
 1. 文書を正本として固定する
-2. `Protocol` / `Native` の `GetTicker` を facade + endpoint module に移す
-3. `GetBoard` を移す
-4. `GetBalance` を移す
-5. `GetCollateral` / `GetCollateralAccounts` を移す
-6. `GetChildOrders` / `GetExecutionsPrivate` / `GetCollateralHistory` を移す
-7. `GetPositions` を移す
-8. `SendChildOrder` / `CancelChildOrder` を移す
-9. `CancelAllChildOrders` を移す
-10. module 集約 object を導入して facade constructor を整理する
-11. `Composition` を更新する
-12. test を facade / endpoint module / composition に役割分離する
-13. `partial` 依存構成と不要 helper を整理する
+2. `Protocol` / `Native` の `GetMarkets` を facade + endpoint module に移す
+3. `GetTicker` を移す
+4. `GetBoard` を移す
+5. `GetExecutionsPublic` を移す
+6. `GetBalance` を移す
+7. `GetCollateral` / `GetCollateralAccounts` を移す
+8. `GetChildOrders` / `GetExecutionsPrivate` / `GetCollateralHistory` を移す
+9. `GetPositions` を移す
+10. `SendChildOrder` / `CancelChildOrder` を移す
+11. `CancelAllChildOrders` を移す
+12. module 集約 object を導入して facade constructor を整理する
+13. `Composition` を更新する
+14. test を facade / endpoint module / composition に役割分離する
+15. `partial` 依存構成と不要 helper を整理する
 
 ### 13.1 Codex 実装戦略
 

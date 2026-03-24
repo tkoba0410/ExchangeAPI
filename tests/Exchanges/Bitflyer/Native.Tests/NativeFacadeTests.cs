@@ -11,6 +11,8 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetExecutionsPublic;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Units;
@@ -22,6 +24,10 @@ public sealed class NativeFacadeTests
     [Fact]
     public async Task PublicFacade_ForwardsCalls()
     {
+        var getMarkets = CallFactory.Success(
+            new GetMarketsRequest(),
+            (IReadOnlyList<GetMarkets.Item>)[new GetMarkets.Item { ProductCode = "BTC_JPY", MarketType = "Spot" }],
+            new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PublicEndpointModule, EndpointId = "GetMarkets", Scope = "Public", Auth = "None" });
         var getBoard = CallFactory.Success(
             new GetBoardRequest { ProductCode = null },
             new GetBoardResponse
@@ -31,6 +37,19 @@ public sealed class NativeFacadeTests
                 Asks = [new GetBoardLevel { Price = 2m, Size = 1m }],
             },
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PublicEndpointModule, EndpointId = "GetBoard", Scope = "Public", Auth = "None" });
+        var getExecutions = CallFactory.Success(
+            new GetExecutionsPublicRequest { ProductCode = "BTC_JPY", Count = 10 },
+            (IReadOnlyList<GetExecutionsPublic.Item>)[new GetExecutionsPublic.Item
+            {
+                Id = 1,
+                Side = "BUY",
+                Price = 1m,
+                Size = 1m,
+                ExecDate = DateTimeOffset.UnixEpoch,
+                BuyChildOrderAcceptanceId = "JRF-BUY",
+                SellChildOrderAcceptanceId = "JRF-SELL",
+            }],
+            new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PublicEndpointModule, EndpointId = "GetExecutionsPublic", Scope = "Public", Auth = "None" });
         var expected = CallFactory.Success(
             new GetTickerRequest { ProductCode = null },
             new GetTickerResponse
@@ -53,13 +72,19 @@ public sealed class NativeFacadeTests
             },
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PublicEndpointModule, EndpointId = "GetTicker", Scope = "Public", Auth = "None" });
         var api = new BitflyerPublicNativeApi(
+            new FakeGetMarketsNativeEndpoint(getMarkets),
             new FakeGetBoardNativeEndpoint(getBoard),
+            new FakeGetExecutionsPublicNativeEndpoint(getExecutions),
             new FakeGetTickerNativeEndpoint(expected));
 
+        var actualMarkets = await api.GetMarketsCallAsync(new GetMarketsRequest());
         var actualBoard = await api.GetBoardCallAsync(new GetBoardRequest { ProductCode = null });
+        var actualExecutions = await api.GetExecutionsCallAsync(new GetExecutionsPublicRequest { ProductCode = "BTC_JPY", Count = 10 });
         var actualTicker = await api.GetTickerCallAsync(new GetTickerRequest { ProductCode = null });
 
+        Assert.Same(getMarkets, actualMarkets);
         Assert.Same(getBoard, actualBoard);
+        Assert.Same(getExecutions, actualExecutions);
         Assert.Same(expected, actualTicker);
     }
 
@@ -189,11 +214,25 @@ public sealed class NativeFacadeTests
         Assert.Same(cancelAllChildOrders, await api.CancelAllChildOrdersCallAsync(new CancelAllChildOrdersRequest { ProductCode = "BTC_JPY" }));
     }
 
+    private sealed class FakeGetMarketsNativeEndpoint : IGetMarketsNativeEndpoint
+    {
+        private readonly Call<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>> _call;
+        public FakeGetMarketsNativeEndpoint(Call<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>> call) => _call = call;
+        public Task<Call<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> CallAsync(GetMarketsRequest request, CancellationToken cancellationToken = default) => Task.FromResult(_call);
+    }
+
     private sealed class FakeGetBoardNativeEndpoint : IGetBoardNativeEndpoint
     {
         private readonly Call<GetBoardRequest, GetBoardResponse> _call;
         public FakeGetBoardNativeEndpoint(Call<GetBoardRequest, GetBoardResponse> call) => _call = call;
         public Task<Call<GetBoardRequest, GetBoardResponse>> CallAsync(GetBoardRequest request, CancellationToken cancellationToken = default) => Task.FromResult(_call);
+    }
+
+    private sealed class FakeGetExecutionsPublicNativeEndpoint : IGetExecutionsPublicNativeEndpoint
+    {
+        private readonly Call<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>> _call;
+        public FakeGetExecutionsPublicNativeEndpoint(Call<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>> call) => _call = call;
+        public Task<Call<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> CallAsync(GetExecutionsPublicRequest request, CancellationToken cancellationToken = default) => Task.FromResult(_call);
     }
 
     private sealed class FakeGetTickerNativeEndpoint : IGetTickerNativeEndpoint

@@ -73,10 +73,10 @@
 
 | EndpointId | Method | Path | Scope | ExposeInProtocol | ExposeInNative | LiveTestPhase | RequestDtoStatus | ResponseDtoStatus | ExpectedStatus | ResponseShape | WritesState | CleanupPolicy | AliasPath | AuthType | OptionalOmissionRule |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| GetMarkets | GET | /v1/getmarkets | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetMarkets | GET | /v1/getmarkets | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | /v1/markets | None | - |
 | GetBoard | GET | /v1/getboard | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | None | product_code = null は query omitted |
 | GetTicker | GET | /v1/getticker | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | /v1/ticker | None | product_code = null は query omitted |
-| GetExecutionsPublic | GET | /v1/getexecutions | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetExecutionsPublic | GET | /v1/getexecutions | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | /v1/executions | None | optional query params omitted when null; product_code omitted => BTC_JPY default |
 | GetBoardState | GET | /v1/getboardstate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
 | GetHealth | GET | /v1/gethealth | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
 | GetFundingRate | GET | /v1/getfundingrate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
@@ -109,15 +109,17 @@
 
 ## Initial Rule
 
-- 現行 Stage10 実装では `GetBoard`、`GetTicker`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetChildOrders`、`GetExecutionsPrivate`、`GetPositions`、`GetCollateralHistory`、`SendChildOrder`、`CancelChildOrder`、`CancelAllChildOrders` を library 公開面に含める
+- 現行 Stage10 実装では `GetMarkets`、`GetBoard`、`GetTicker`、`GetExecutionsPublic`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetChildOrders`、`GetExecutionsPrivate`、`GetPositions`、`GetCollateralHistory`、`SendChildOrder`、`CancelChildOrder`、`CancelAllChildOrders` を library 公開面に含める
 - read path の live test は、public は条件なし、private read は認証可能なら実行する
 - `SendChildOrder` と `CancelChildOrder` は `Phase2-Write`、`CancelAllChildOrders` は destructive 範囲が広いため live test をまだ持たない
 - DTO 固定前のため、実装済み endpoint の `RequestDtoStatus` / `ResponseDtoStatus` は引き続き `Transitional` とする
 
 ## Implementation Order
 
+- `GetMarkets` で public top-level array response の基準形を作る
 - `GetTicker` で public object response の基準形を作る
 - `GetBoard` を追加し、public object with nested array response の形を固定する
+- `GetExecutionsPublic` を追加し、public paging/filter array response の形を固定する
 - `GetBalance` を追加し、private top-level array response の基準形を作る
 - `GetCollateral` / `GetCollateralAccounts` を追加し、private object と private array の空 request read endpoint を固定する
 - `GetChildOrders` / `GetExecutionsPrivate` / `GetCollateralHistory` を追加し、paging/filter を持つ private read endpoint の形を固定する
@@ -127,7 +129,24 @@
 
 ## Current Implemented Endpoint Contracts
 
-現行実装 12 endpoint の exact contract は以下とする。
+現行実装 14 endpoint の exact contract は以下とする。
+
+### GetMarkets
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetMarketsCallAsync(CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> GetMarketsCallAsync(GetMarketsRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `GetMarketsRequest` は空 DTO
+  - JSON body なし
+- response DTO
+  - top-level array
+  - `GetMarkets.Item`
+    - `ProductCode: string`
+    - `MarketType: string`
+- `ExpectedStatus = 200`
+- `ResponseShape = Array`
 
 ### GetBoard
 
@@ -148,6 +167,34 @@
     - `Size: decimal`
 - `ExpectedStatus = 200`
 - `ResponseShape = Object`
+
+### GetExecutionsPublic
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetExecutionsCallAsync(string? productCode, int? count, long? before, long? after, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> GetExecutionsCallAsync(GetExecutionsPublicRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string?`
+  - `Count: int?`
+  - `Before: long?`
+  - `After: long?`
+- request rule
+  - `ProductCode = null` のとき query omitted で bitFlyer の既定値 `BTC_JPY`
+  - `Count`、`Before`、`After` は指定時に正数
+  - optional query は `null` のとき omitted
+- response DTO
+  - top-level array
+  - `GetExecutionsPublic.Item`
+    - `Id: long`
+    - `Side: string`
+    - `Price: decimal`
+    - `Size: decimal`
+    - `ExecDate: DateTimeOffset`
+    - `BuyChildOrderAcceptanceId: string`
+    - `SellChildOrderAcceptanceId: string`
+- `ExpectedStatus = 200`
+- `ResponseShape = Array`
 
 ### GetTicker
 

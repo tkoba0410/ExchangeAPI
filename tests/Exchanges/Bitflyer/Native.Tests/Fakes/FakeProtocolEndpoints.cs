@@ -9,11 +9,28 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoard;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetExecutionsPublic;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Fakes;
+
+internal sealed class FakeGetMarketsProtocolEndpoint : IGetMarketsProtocolEndpoint
+{
+    private readonly Func<Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetMarketsProtocolEndpoint(Func<Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler());
+    }
+}
 
 internal sealed class FakeGetBoardProtocolEndpoint : IGetBoardProtocolEndpoint
 {
@@ -27,6 +44,26 @@ internal sealed class FakeGetBoardProtocolEndpoint : IGetBoardProtocolEndpoint
     public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string? productCode, CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_handler(productCode));
+    }
+}
+
+internal sealed class FakeGetExecutionsPublicProtocolEndpoint : IGetExecutionsPublicProtocolEndpoint
+{
+    private readonly Func<string?, int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetExecutionsPublicProtocolEndpoint(Func<string?, int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+        string? productCode,
+        int? count,
+        long? before,
+        long? after,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(productCode, count, before, after));
     }
 }
 

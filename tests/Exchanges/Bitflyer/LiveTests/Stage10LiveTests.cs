@@ -11,6 +11,8 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetExecutionsPublic;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
@@ -19,6 +21,39 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests;
 
 public sealed class Stage10LiveTests
 {
+    [BitflyerPublicReadLiveFact]
+    public async Task GetMarkets_ReadParity()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+
+        var nativeCall = await client.Public.GetMarketsCallAsync(new GetMarketsRequest());
+        var protocolCall = await client.Protocol.Public.GetMarketsCallAsync();
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Array, root.ValueKind);
+        Assert.Equal(root.GetArrayLength(), native.Count);
+
+        for (var i = 0; i < native.Count; i++)
+        {
+            var protocolItem = root[i];
+            var nativeItem = native[i];
+
+            Assert.Equal(protocolItem.GetProperty("product_code").GetString(), nativeItem.ProductCode);
+            Assert.Equal(protocolItem.GetProperty("market_type").GetString(), nativeItem.MarketType);
+        }
+    }
+
     [BitflyerPublicReadLiveFact]
     public async Task GetTicker_ReadContract()
     {
@@ -88,6 +123,55 @@ public sealed class Stage10LiveTests
         Assert.True(native.Bids[0].Size >= 0);
         Assert.True(native.Asks[0].Price > 0);
         Assert.True(native.Asks[0].Size >= 0);
+    }
+
+    [BitflyerPublicReadLiveFact]
+    public async Task GetExecutions_ReadContract()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var request = new GetExecutionsPublicRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            Count = 10,
+        };
+
+        var nativeCall = await client.Public.GetExecutionsCallAsync(request);
+        var protocolCall = await client.Protocol.Public.GetExecutionsCallAsync(
+            request.ProductCode,
+            request.Count,
+            request.Before,
+            request.After);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Array, root.ValueKind);
+        Assert.NotEmpty(native);
+
+        var protocolFirst = root[0];
+        var nativeFirst = native[0];
+
+        Assert.True(protocolFirst.GetProperty("id").GetInt64() > 0);
+        Assert.Equal(JsonValueKind.String, protocolFirst.GetProperty("side").ValueKind);
+        Assert.True(protocolFirst.GetProperty("price").GetDecimal() > 0);
+        Assert.True(protocolFirst.GetProperty("size").GetDecimal() > 0);
+        Assert.False(string.IsNullOrWhiteSpace(protocolFirst.GetProperty("buy_child_order_acceptance_id").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(protocolFirst.GetProperty("sell_child_order_acceptance_id").GetString()));
+        Assert.True(nativeFirst.Id > 0);
+        Assert.False(string.IsNullOrWhiteSpace(nativeFirst.Side));
+        Assert.True(nativeFirst.Price > 0);
+        Assert.True(nativeFirst.Size > 0);
+        Assert.False(string.IsNullOrWhiteSpace(nativeFirst.BuyChildOrderAcceptanceId));
+        Assert.False(string.IsNullOrWhiteSpace(nativeFirst.SellChildOrderAcceptanceId));
     }
 
     [BitflyerPrivateReadLiveFact]

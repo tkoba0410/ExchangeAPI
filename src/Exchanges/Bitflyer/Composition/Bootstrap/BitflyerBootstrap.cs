@@ -13,6 +13,8 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetExecutionsPublic;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Runtime;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Shared;
@@ -29,6 +31,8 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoard;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetExecutionsPublic;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Composition.Bootstrap;
@@ -40,9 +44,11 @@ internal static class BitflyerBootstrap
         var normalizedOptions = options ?? new BitflyerClientOptions();
         var transport = CreateTransport(normalizedOptions);
 
+        var getMarkets = new GetMarketsProtocolEndpoint(transport);
         var getBoard = new GetBoardProtocolEndpoint(transport);
+        var getExecutionsPublic = new GetExecutionsPublicProtocolEndpoint(transport);
         var getTicker = new GetTickerProtocolEndpoint(transport, normalizedOptions.UseTickerAliasPath);
-        var publicApi = new BitflyerPublicProtocolApi(getBoard, getTicker);
+        var publicApi = new BitflyerPublicProtocolApi(getMarkets, getBoard, getExecutionsPublic, getTicker);
 
         if (normalizedOptions.Credentials is null)
         {
@@ -87,12 +93,16 @@ internal static class BitflyerBootstrap
         var normalizedOptions = options ?? new BitflyerClientOptions();
         var transport = CreateTransport(normalizedOptions);
 
+        var getMarketsProtocol = new GetMarketsProtocolEndpoint(transport);
         var getBoardProtocol = new GetBoardProtocolEndpoint(transport);
+        var getExecutionsPublicProtocol = new GetExecutionsPublicProtocolEndpoint(transport);
         var getTickerProtocol = new GetTickerProtocolEndpoint(transport, normalizedOptions.UseTickerAliasPath);
-        var publicProtocolApi = new BitflyerPublicProtocolApi(getBoardProtocol, getTickerProtocol);
+        var publicProtocolApi = new BitflyerPublicProtocolApi(getMarketsProtocol, getBoardProtocol, getExecutionsPublicProtocol, getTickerProtocol);
+        var getMarketsNative = new GetMarketsNativeEndpoint(getMarketsProtocol);
         var getBoardNative = new GetBoardNativeEndpoint(getBoardProtocol);
+        var getExecutionsPublicNative = new GetExecutionsPublicNativeEndpoint(getExecutionsPublicProtocol);
         var getTickerNative = new GetTickerNativeEndpoint(getTickerProtocol);
-        var publicApi = new BitflyerPublicNativeApi(getBoardNative, getTickerNative);
+        var publicApi = new BitflyerPublicNativeApi(getMarketsNative, getBoardNative, getExecutionsPublicNative, getTickerNative);
 
         if (normalizedOptions.Credentials is null)
         {

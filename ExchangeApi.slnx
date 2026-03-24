@@ -1,6 +1,19 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/Exchanges/" />
+  <Folder Name="/src/Exchanges/Binance/" />
+  <Folder Name="/src/Exchanges/Binance/Composition/">
+    <Project Path="src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj" />
+  </Folder>
+  <Folder Name="/src/Exchanges/Binance/Native/">
+    <Project Path="src/Exchanges/Binance/Native/ExchangeApi.Exchanges.Binance.Native.csproj" />
+  </Folder>
+  <Folder Name="/src/Exchanges/Binance/Protocol/">
+    <Project Path="src/Exchanges/Binance/Protocol/ExchangeApi.Exchanges.Binance.Protocol.csproj" />
+  </Folder>
+  <Folder Name="/src/Exchanges/Binance/Vocabulary/">
+    <Project Path="src/Exchanges/Binance/Vocabulary/ExchangeApi.Exchanges.Binance.Vocabulary.csproj" />
+  </Folder>
   <Folder Name="/src/Exchanges/Bitflyer/" />
   <Folder Name="/src/Exchanges/Bitflyer/Composition/">
     <Project Path="src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj" />
@@ -19,6 +32,19 @@
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/Exchanges/" />
+  <Folder Name="/tests/Exchanges/Binance/" />
+  <Folder Name="/tests/Exchanges/Binance/Composition.Tests/">
+    <Project Path="tests/Exchanges/Binance/Composition.Tests/ExchangeApi.Exchanges.Binance.Composition.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Exchanges/Binance/LiveTests/">
+    <Project Path="tests/Exchanges/Binance/LiveTests/ExchangeApi.Exchanges.Binance.LiveTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Exchanges/Binance/Native.Tests/">
+    <Project Path="tests/Exchanges/Binance/Native.Tests/ExchangeApi.Exchanges.Binance.Native.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Exchanges/Binance/Protocol.Tests/">
+    <Project Path="tests/Exchanges/Binance/Protocol.Tests/ExchangeApi.Exchanges.Binance.Protocol.Tests.csproj" />
+  </Folder>
   <Folder Name="/tests/Exchanges/Bitflyer/" />
   <Folder Name="/tests/Exchanges/Bitflyer/Architecture.Tests/">
     <Project Path="tests/Exchanges/Bitflyer/Architecture.Tests/ExchangeApi.Exchanges.Bitflyer.Architecture.Tests.csproj" />

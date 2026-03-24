@@ -17,8 +17,7 @@ internal sealed class BitflyerLiveTestSettings
     public static BitflyerLiveTestSettings Load()
     {
         var baseUriText = Environment.GetEnvironmentVariable("BITFLYER_API_BASE_URI");
-        var apiKey = Environment.GetEnvironmentVariable("BITFLYER_API_KEY");
-        var apiSecret = Environment.GetEnvironmentVariable("BITFLYER_API_SECRET");
+        var credentials = BitflyerCredentialResolver.Load();
 
         return new BitflyerLiveTestSettings
         {
@@ -28,13 +27,7 @@ internal sealed class BitflyerLiveTestSettings
             BaseUri = string.IsNullOrWhiteSpace(baseUriText)
                 ? new Uri("https://api.bitflyer.com")
                 : new Uri(baseUriText, UriKind.Absolute),
-            Credentials = string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(apiSecret)
-                ? null
-                : new BitflyerApiCredentials
-                {
-                    ApiKey = apiKey,
-                    ApiSecret = apiSecret,
-                },
+            Credentials = credentials,
         };
     }
 }

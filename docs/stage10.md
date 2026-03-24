@@ -935,6 +935,10 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 - 明示 opt-in
   - `BITFLYER_STAGE10_LIVE=1`
   - `BITFLYER_STAGE10_ALLOW_WRITE=1`
+- private credentials は `age` file で供給する
+  - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
+  - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
+  - 2 つの file path はどちらも環境変数で明示指定する
 - 専用または影響を限定できる account を使う
 - matrix 上 `CleanupPolicy = Required` の endpoint は cleanup 手順を同じ test に含める
 - matrix 上 `CleanupPolicy = NotSupported` の endpoint は Stage10 の write live test 対象に含めない

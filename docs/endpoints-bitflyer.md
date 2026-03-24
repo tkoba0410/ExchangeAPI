@@ -73,9 +73,9 @@
 
 | EndpointId | Method | Path | Scope | ExposeInProtocol | ExposeInNative | LiveTestPhase | RequestDtoStatus | ResponseDtoStatus | ExpectedStatus | ResponseShape | WritesState | CleanupPolicy | AliasPath | AuthType | OptionalOmissionRule |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| GetMarkets | GET | /v1/getmarkets | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | /v1/markets | None | - |
+| GetMarkets | GET | /v1/getmarkets | public | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | /v1/markets | None | - |
 | GetBoard | GET | /v1/getboard | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | None | product_code = null は query omitted |
-| GetTicker | GET | /v1/getticker | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | /v1/ticker | None | product_code = null は query omitted |
+| GetTicker | GET | /v1/getticker | public | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | /v1/ticker | None | product_code = null は query omitted |
 | GetExecutionsPublic | GET | /v1/getexecutions | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | /v1/executions | None | optional query params omitted when null; product_code omitted => BTC_JPY default |
 | GetBoardState | GET | /v1/getboardstate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
 | GetHealth | GET | /v1/gethealth | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
@@ -83,9 +83,9 @@
 | GetCorporateLeverage | GET | /v1/getcorporateleverage | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
 | GetChats | GET | /v1/getchats | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
 | GetPermissions | GET | /v1/me/getpermissions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetBalance | GET | /v1/me/getbalance | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
-| GetCollateral | GET | /v1/me/getcollateral | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | KeySecret | - |
-| GetCollateralAccounts | GET | /v1/me/getcollateralaccounts | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
+| GetBalance | GET | /v1/me/getbalance | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
+| GetCollateral | GET | /v1/me/getcollateral | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | - | KeySecret | - |
+| GetCollateralAccounts | GET | /v1/me/getcollateralaccounts | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
 | GetAddresses | GET | /v1/me/getaddresses | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 | GetCoinIns | GET | /v1/me/getcoinins | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 | GetCoinOuts | GET | /v1/me/getcoinouts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
@@ -105,14 +105,15 @@
 | GetBalanceHistory | GET | /v1/me/getbalancehistory | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 | GetPositions | GET | /v1/me/getpositions | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
 | GetCollateralHistory | GET | /v1/me/getcollateralhistory | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
-| GetTradingCommission | GET | /v1/me/gettradingcommission | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetTradingCommission | GET | /v1/me/gettradingcommission | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | - | KeySecret | product_code required |
 
 ## Initial Rule
 
-- 現行 Stage10 実装では `GetMarkets`、`GetBoard`、`GetTicker`、`GetExecutionsPublic`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetChildOrders`、`GetExecutionsPrivate`、`GetPositions`、`GetCollateralHistory`、`SendChildOrder`、`CancelChildOrder`、`CancelAllChildOrders` を library 公開面に含める
+- 現行 Stage10 実装では `GetMarkets`、`GetBoard`、`GetTicker`、`GetExecutionsPublic`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetChildOrders`、`GetExecutionsPrivate`、`GetPositions`、`GetCollateralHistory`、`GetTradingCommission`、`SendChildOrder`、`CancelChildOrder`、`CancelAllChildOrders` を library 公開面に含める
 - read path の live test は、public は条件なし、private read は認証可能なら実行する
 - `SendChildOrder` と `CancelChildOrder` は `Phase2-Write`、`CancelAllChildOrders` は destructive 範囲が広いため live test をまだ持たない
-- DTO 固定前のため、実装済み endpoint の `RequestDtoStatus` / `ResponseDtoStatus` は引き続き `Transitional` とする
+- `GetMarkets`、`GetTicker`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetTradingCommission` は first wave として `Fixed` に上げる
+- paging/filter や write を含む残りの実装済み endpoint は、引き続き `Transitional` のまま段階的に固定する
 
 ## Implementation Order
 
@@ -124,12 +125,13 @@
 - `GetCollateral` / `GetCollateralAccounts` を追加し、private object と private array の空 request read endpoint を固定する
 - `GetChildOrders` / `GetExecutionsPrivate` / `GetCollateralHistory` を追加し、paging/filter を持つ private read endpoint の形を固定する
 - `GetPositions` を追加し、required query を持つ private read endpoint の形を固定する
+- `GetTradingCommission` を追加し、required query + object response の単純 private read endpoint を固定する
 - `SendChildOrder` / `CancelChildOrder` を追加し、body encode を持つ write endpoint の形を固定する
 - `CancelAllChildOrders` を追加し、body encode + `Unit` response の destructive write endpoint を固定する
 
 ## Current Implemented Endpoint Contracts
 
-現行実装 14 endpoint の exact contract は以下とする。
+現行実装 15 endpoint の exact contract は以下とする。
 
 ### GetMarkets
 
@@ -404,6 +406,21 @@
     - `Date: DateTimeOffset`
 - `ExpectedStatus = 200`
 - `ResponseShape = Array`
+
+### GetTradingCommission
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetTradingCommissionCallAsync(string productCode, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetTradingCommissionRequest, GetTradingCommissionResponse>> GetTradingCommissionCallAsync(GetTradingCommissionRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string`
+  - `ProductCode` 必須
+  - JSON body なし
+- response DTO
+  - `CommissionRate: decimal`
+- `ExpectedStatus = 200`
+- `ResponseShape = Object`
 
 ### SendChildOrder
 

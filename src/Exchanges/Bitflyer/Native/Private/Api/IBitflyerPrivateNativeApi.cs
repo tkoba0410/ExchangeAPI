@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccou
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Units;
@@ -41,6 +42,10 @@ public interface IBitflyerPrivateNativeApi
 
     Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsCallAsync(
         GetPositionsRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<GetTradingCommissionRequest, GetTradingCommissionResponse>> GetTradingCommissionCallAsync(
+        GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Call<SendChildOrderRequest, SendChildOrderResponse>> SendChildOrderCallAsync(

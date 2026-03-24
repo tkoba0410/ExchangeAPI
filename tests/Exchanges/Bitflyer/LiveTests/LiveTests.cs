@@ -9,6 +9,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccou
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetExecutionsPublic;
@@ -485,6 +486,37 @@ public sealed class LiveTests
         }
     }
 
+    [BitflyerPrivateReadLiveFact]
+    public async Task GetTradingCommission_ReadParity()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        Assert.NotNull(client.Private);
+        Assert.NotNull(client.Protocol.Private);
+
+        var request = new GetTradingCommissionRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+        };
+
+        var nativeCall = await client.Private!.GetTradingCommissionCallAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetTradingCommissionCallAsync(request.ProductCode);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Object, root.ValueKind);
+        Assert.Equal(root.GetProperty("commission_rate").GetDecimal(), native.CommissionRate);
+    }
+
     [BitflyerWriteLiveFact]
     public async Task SendChildOrder_CancelChildOrder_WriteLifecycle()
     {
@@ -498,7 +530,7 @@ public sealed class LiveTests
         Assert.NotNull(tickerCall.Response);
 
         var ticker = tickerCall.Response!;
-        var limitPrice = Math.Max(1m, decimal.Floor(ticker.Ltp * 0.5m));
+        var limitPrice = Math.Max(1m, decimal.Floor(ticker.Ltp * 0.6m));
         var orderRequest = new SendChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,

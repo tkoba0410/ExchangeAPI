@@ -44,6 +44,10 @@ public interface IBitflyerPrivateProtocolApi
         string productCode,
         CancellationToken cancellationToken = default);
 
+    Task<Call<ProtocolRequest, ProtocolResponse>> GetTradingCommissionCallAsync(
+        string productCode,
+        CancellationToken cancellationToken = default);
+
     Task<Call<ProtocolRequest, ProtocolResponse>> SendChildOrderCallAsync(
         string bodyJson,
         CancellationToken cancellationToken = default);

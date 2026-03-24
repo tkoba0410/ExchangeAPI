@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAcc
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
@@ -22,6 +23,7 @@ public sealed class BitflyerPrivateProtocolApi : IBitflyerPrivateProtocolApi
     private readonly IGetChildOrdersProtocolEndpoint _getChildOrders;
     private readonly IGetExecutionsProtocolEndpoint _getExecutions;
     private readonly IGetPositionsProtocolEndpoint _getPositions;
+    private readonly IGetTradingCommissionProtocolEndpoint _getTradingCommission;
     private readonly ISendChildOrderProtocolEndpoint _sendChildOrder;
     private readonly ICancelChildOrderProtocolEndpoint _cancelChildOrder;
     private readonly ICancelAllChildOrdersProtocolEndpoint _cancelAllChildOrders;
@@ -34,6 +36,7 @@ public sealed class BitflyerPrivateProtocolApi : IBitflyerPrivateProtocolApi
         IGetChildOrdersProtocolEndpoint getChildOrders,
         IGetExecutionsProtocolEndpoint getExecutions,
         IGetPositionsProtocolEndpoint getPositions,
+        IGetTradingCommissionProtocolEndpoint getTradingCommission,
         ISendChildOrderProtocolEndpoint sendChildOrder,
         ICancelChildOrderProtocolEndpoint cancelChildOrder,
         ICancelAllChildOrdersProtocolEndpoint cancelAllChildOrders)
@@ -45,6 +48,7 @@ public sealed class BitflyerPrivateProtocolApi : IBitflyerPrivateProtocolApi
         _getChildOrders = getChildOrders;
         _getExecutions = getExecutions;
         _getPositions = getPositions;
+        _getTradingCommission = getTradingCommission;
         _sendChildOrder = sendChildOrder;
         _cancelChildOrder = cancelChildOrder;
         _cancelAllChildOrders = cancelAllChildOrders;
@@ -124,6 +128,13 @@ public sealed class BitflyerPrivateProtocolApi : IBitflyerPrivateProtocolApi
         CancellationToken cancellationToken = default)
     {
         return _getPositions.SendAsync(productCode, cancellationToken);
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> GetTradingCommissionCallAsync(
+        string productCode,
+        CancellationToken cancellationToken = default)
+    {
+        return _getTradingCommission.SendAsync(productCode, cancellationToken);
     }
 
     public Task<Call<ProtocolRequest, ProtocolResponse>> SendChildOrderCallAsync(

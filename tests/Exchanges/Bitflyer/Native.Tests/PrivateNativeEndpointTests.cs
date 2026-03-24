@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccou
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
@@ -195,6 +196,30 @@ public sealed class PrivateNativeEndpointTests
         var endpoint = new GetCollateralHistoryNativeEndpoint(new FakeGetCollateralHistoryProtocolEndpoint((count, before, after) => throw new InvalidOperationException()));
 
         var call = await endpoint.CallAsync(new GetCollateralHistoryRequest { Count = 0 });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
+    public async Task GetTradingCommission_MapsObject()
+    {
+        var body = """{"commission_rate":0.001}""";
+        var endpoint = new GetTradingCommissionNativeEndpoint(new FakeGetTradingCommissionProtocolEndpoint(_ => Success("GetTradingCommission", "GET", "/v1/me/gettradingcommission", body)));
+
+        var call = await endpoint.CallAsync(new GetTradingCommissionRequest { ProductCode = ProductCodes.BtcJpy });
+
+        Assert.True(call.IsSuccess);
+        Assert.NotNull(call.Response);
+        Assert.Equal(0.001m, call.Response!.CommissionRate);
+    }
+
+    [Fact]
+    public async Task GetTradingCommission_ReturnsSemantic_WhenProductCodeIsMissing()
+    {
+        var endpoint = new GetTradingCommissionNativeEndpoint(new FakeGetTradingCommissionProtocolEndpoint(_ => throw new InvalidOperationException()));
+
+        var call = await endpoint.CallAsync(new GetTradingCommissionRequest { ProductCode = "" });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);

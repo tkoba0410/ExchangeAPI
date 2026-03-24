@@ -33,6 +33,9 @@
   <Folder Name="/tests/" />
   <Folder Name="/tests/Exchanges/" />
   <Folder Name="/tests/Exchanges/Binance/" />
+  <Folder Name="/tests/Exchanges/Binance/Architecture.Tests/">
+    <Project Path="tests/Exchanges/Binance/Architecture.Tests/ExchangeApi.Exchanges.Binance.Architecture.Tests.csproj" />
+  </Folder>
   <Folder Name="/tests/Exchanges/Binance/Composition.Tests/">
     <Project Path="tests/Exchanges/Binance/Composition.Tests/ExchangeApi.Exchanges.Binance.Composition.Tests.csproj" />
   </Folder>

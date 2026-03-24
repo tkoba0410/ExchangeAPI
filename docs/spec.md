@@ -849,7 +849,7 @@ Stage10 の規約は文書だけで終わらせず、arch test で機械検証�
 
 配置:
 
-- `tests/Exchanges/Bitflyer/Architecture.Tests` を追加候補とする
+- `tests/Exchanges/<Venue>/Architecture.Tests` を追加し、venue ごとに同一規約を機械検証する
 - namespace forbidden dependency
 - project reference forbidden edge
 - public surface forbidden type
@@ -971,6 +971,7 @@ Stage10 で優先する endpoint:
 - `GetExecutionsPrivate`
 - `GetPositions`
 - `GetCollateralHistory`
+- `GetTradingCommission`
 - `SendChildOrder`
 - `CancelChildOrder`
 - `CancelAllChildOrders`
@@ -999,6 +1000,8 @@ Stage10 で優先する endpoint:
   - required query を持つ private read endpoint の template
 - `GetCollateralHistory`
   - paging only private read endpoint の template
+- `GetTradingCommission`
+  - required query + object response を持つ private read endpoint の template
 - `SendChildOrder`
   - private write と request encode の template
 - `CancelChildOrder`

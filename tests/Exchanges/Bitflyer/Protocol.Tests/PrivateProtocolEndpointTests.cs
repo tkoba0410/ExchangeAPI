@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAcc
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Protocol.Tests.Fakes;
 
@@ -147,6 +148,22 @@ public sealed class PrivateProtocolEndpointTests
         Assert.Equal("/v1/me/getpositions", transport.LastRequest!.Path);
         Assert.NotNull(transport.LastRequest.Query);
         Assert.Equal("FX_BTC_JPY", transport.LastRequest.Query!["product_code"]);
+        Assert.Null(transport.LastRequest.BodyText);
+    }
+
+    [Fact]
+    public async Task GetTradingCommission_UsesPrivateGetContract()
+    {
+        var transport = new FakeProtocolTransport();
+        var endpoint = new GetTradingCommissionProtocolEndpoint(transport);
+
+        var call = await endpoint.SendAsync("BTC_JPY");
+
+        Assert.True(call.IsSuccess);
+        Assert.Equal(ProtocolTransportAuthMode.KeySecret, transport.LastAuthMode);
+        Assert.Equal("/v1/me/gettradingcommission", transport.LastRequest!.Path);
+        Assert.NotNull(transport.LastRequest.Query);
+        Assert.Equal("BTC_JPY", transport.LastRequest.Query!["product_code"]);
         Assert.Null(transport.LastRequest.BodyText);
     }
 

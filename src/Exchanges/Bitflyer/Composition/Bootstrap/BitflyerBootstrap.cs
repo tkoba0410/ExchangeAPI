@@ -10,6 +10,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccou
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
@@ -28,6 +29,7 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAcc
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoard;
@@ -66,6 +68,7 @@ internal static class BitflyerBootstrap
         var getChildOrders = new GetChildOrdersProtocolEndpoint(transport);
         var getExecutions = new GetExecutionsProtocolEndpoint(transport);
         var getPositions = new GetPositionsProtocolEndpoint(transport);
+        var getTradingCommission = new GetTradingCommissionProtocolEndpoint(transport);
         var sendChildOrder = new SendChildOrderProtocolEndpoint(transport);
         var cancelChildOrder = new CancelChildOrderProtocolEndpoint(transport);
         var cancelAllChildOrders = new CancelAllChildOrdersProtocolEndpoint(transport);
@@ -77,6 +80,7 @@ internal static class BitflyerBootstrap
             getChildOrders,
             getExecutions,
             getPositions,
+            getTradingCommission,
             sendChildOrder,
             cancelChildOrder,
             cancelAllChildOrders);
@@ -125,6 +129,7 @@ internal static class BitflyerBootstrap
         var getChildOrdersProtocol = new GetChildOrdersProtocolEndpoint(transport);
         var getExecutionsProtocol = new GetExecutionsProtocolEndpoint(transport);
         var getPositionsProtocol = new GetPositionsProtocolEndpoint(transport);
+        var getTradingCommissionProtocol = new GetTradingCommissionProtocolEndpoint(transport);
         var sendChildOrderProtocol = new SendChildOrderProtocolEndpoint(transport);
         var cancelChildOrderProtocol = new CancelChildOrderProtocolEndpoint(transport);
         var cancelAllChildOrdersProtocol = new CancelAllChildOrdersProtocolEndpoint(transport);
@@ -137,6 +142,7 @@ internal static class BitflyerBootstrap
             getChildOrdersProtocol,
             getExecutionsProtocol,
             getPositionsProtocol,
+            getTradingCommissionProtocol,
             sendChildOrderProtocol,
             cancelChildOrderProtocol,
             cancelAllChildOrdersProtocol);
@@ -148,6 +154,7 @@ internal static class BitflyerBootstrap
         var getChildOrders = new GetChildOrdersNativeEndpoint(getChildOrdersProtocol);
         var getExecutions = new GetExecutionsNativeEndpoint(getExecutionsProtocol);
         var getPositions = new GetPositionsNativeEndpoint(getPositionsProtocol);
+        var getTradingCommission = new GetTradingCommissionNativeEndpoint(getTradingCommissionProtocol);
         var sendChildOrder = new SendChildOrderNativeEndpoint(sendChildOrderProtocol);
         var cancelChildOrder = new CancelChildOrderNativeEndpoint(cancelChildOrderProtocol);
         var cancelAllChildOrders = new CancelAllChildOrdersNativeEndpoint(cancelAllChildOrdersProtocol);
@@ -159,6 +166,7 @@ internal static class BitflyerBootstrap
             getChildOrders,
             getExecutions,
             getPositions,
+            getTradingCommission,
             sendChildOrder,
             cancelChildOrder,
             cancelAllChildOrders);

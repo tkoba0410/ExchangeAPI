@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAcc
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoard;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetExecutionsPublic;
@@ -197,6 +198,21 @@ internal sealed class FakeGetPositionsProtocolEndpoint : IGetPositionsProtocolEn
     private readonly Func<string, Call<ProtocolRequest, ProtocolResponse>> _handler;
 
     public FakeGetPositionsProtocolEndpoint(Func<string, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string productCode, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(productCode));
+    }
+}
+
+internal sealed class FakeGetTradingCommissionProtocolEndpoint : IGetTradingCommissionProtocolEndpoint
+{
+    private readonly Func<string, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetTradingCommissionProtocolEndpoint(Func<string, Call<ProtocolRequest, ProtocolResponse>> handler)
     {
         _handler = handler;
     }

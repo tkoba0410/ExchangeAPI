@@ -13,17 +13,24 @@ public sealed class LiveTests
     {
         var settings = BinanceLiveTestSettings.Load();
         var client = BinanceClientFactory.CreateNativeClient(settings.ToClientOptions());
+        const long oneHourInMilliseconds = 60L * 60L * 1000L;
+        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var currentHourStart = now - (now % oneHourInMilliseconds);
         var request = new GetKlinesRequest
         {
             Symbol = BinanceSymbols.BtcJpy,
             Interval = "1h",
             Limit = 2,
+            StartTime = currentHourStart - (2L * oneHourInMilliseconds),
+            EndTime = currentHourStart - 1L,
         };
 
         var nativeCall = await client.Public.GetKlinesCallAsync(request);
         var protocolCall = await client.Protocol.Public.GetKlinesCallAsync(
             BinanceSymbols.BtcJpy,
             "1h",
+            startTime: request.StartTime,
+            endTime: request.EndTime,
             limit: 2);
 
         Assert.True(protocolCall.IsSuccess, protocolCall.Error?.Message);

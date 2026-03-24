@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAcc
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoard;
@@ -55,6 +56,7 @@ public sealed class ProtocolFacadeTests
         var getChildOrders = TestCall();
         var getExecutions = TestCall();
         var getPositions = TestCall();
+        var getTradingCommission = TestCall();
         var sendChildOrder = TestCall();
         var cancelChildOrder = TestCall();
         var cancelAllChildOrders = TestCall();
@@ -66,6 +68,7 @@ public sealed class ProtocolFacadeTests
             new FakeGetChildOrdersProtocolEndpoint(getChildOrders),
             new FakeGetExecutionsProtocolEndpoint(getExecutions),
             new FakeGetPositionsProtocolEndpoint(getPositions),
+            new FakeGetTradingCommissionProtocolEndpoint(getTradingCommission),
             new FakeSendChildOrderProtocolEndpoint(sendChildOrder),
             new FakeCancelChildOrderProtocolEndpoint(cancelChildOrder),
             new FakeCancelAllChildOrdersProtocolEndpoint(cancelAllChildOrders));
@@ -77,6 +80,7 @@ public sealed class ProtocolFacadeTests
         Assert.Same(getChildOrders, await api.GetChildOrdersCallAsync("BTC_JPY", 10, null, null, "COMPLETED", null, null, null));
         Assert.Same(getExecutions, await api.GetExecutionsCallAsync("BTC_JPY", 10, null, null, null, null));
         Assert.Same(getPositions, await api.GetPositionsCallAsync("FX_BTC_JPY"));
+        Assert.Same(getTradingCommission, await api.GetTradingCommissionCallAsync("BTC_JPY"));
         Assert.Same(sendChildOrder, await api.SendChildOrderCallAsync("{}"));
         Assert.Same(cancelChildOrder, await api.CancelChildOrderCallAsync("{}"));
         Assert.Same(cancelAllChildOrders, await api.CancelAllChildOrdersCallAsync("{}"));
@@ -182,6 +186,13 @@ public sealed class ProtocolFacadeTests
     {
         private readonly Call<ProtocolRequest, ProtocolResponse> _call;
         public FakeGetPositionsProtocolEndpoint(Call<ProtocolRequest, ProtocolResponse> call) => _call = call;
+        public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string productCode, CancellationToken cancellationToken = default) => Task.FromResult(_call);
+    }
+
+    private sealed class FakeGetTradingCommissionProtocolEndpoint : IGetTradingCommissionProtocolEndpoint
+    {
+        private readonly Call<ProtocolRequest, ProtocolResponse> _call;
+        public FakeGetTradingCommissionProtocolEndpoint(Call<ProtocolRequest, ProtocolResponse> call) => _call = call;
         public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string productCode, CancellationToken cancellationToken = default) => Task.FromResult(_call);
     }
 

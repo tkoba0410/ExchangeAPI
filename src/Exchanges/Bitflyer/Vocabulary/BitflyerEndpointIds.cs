@@ -13,6 +13,7 @@ public static class BitflyerEndpointIds
     public const string GetExecutionsPrivate = "GetExecutionsPrivate";
     public const string GetPositions = "GetPositions";
     public const string GetCollateralHistory = "GetCollateralHistory";
+    public const string GetTradingCommission = "GetTradingCommission";
     public const string SendChildOrder = "SendChildOrder";
     public const string CancelChildOrder = "CancelChildOrder";
     public const string CancelAllChildOrders = "CancelAllChildOrders";

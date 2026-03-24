@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccou
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
@@ -177,6 +178,10 @@ public sealed class NativeFacadeTests
                 Sfd = 0m,
             }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetPositions", Scope = "Private", Auth = "KeySecret" });
+        var getTradingCommission = CallFactory.Success(
+            new GetTradingCommissionRequest { ProductCode = "BTC_JPY" },
+            new GetTradingCommissionResponse { CommissionRate = 0.001m },
+            new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetTradingCommission", Scope = "Private", Auth = "KeySecret" });
         var sendChildOrder = CallFactory.Success(
             new SendChildOrderRequest { ProductCode = "BTC_JPY", ChildOrderType = "MARKET", Side = "BUY", Size = 1m },
             new SendChildOrderResponse { ChildOrderAcceptanceId = "A" },
@@ -198,6 +203,7 @@ public sealed class NativeFacadeTests
             new FakeGetChildOrdersNativeEndpoint(getChildOrders),
             new FakeGetExecutionsNativeEndpoint(getExecutions),
             new FakeGetPositionsNativeEndpoint(getPositions),
+            new FakeGetTradingCommissionNativeEndpoint(getTradingCommission),
             new FakeSendChildOrderNativeEndpoint(sendChildOrder),
             new FakeCancelChildOrderNativeEndpoint(cancelChildOrder),
             new FakeCancelAllChildOrdersNativeEndpoint(cancelAllChildOrders));
@@ -209,6 +215,7 @@ public sealed class NativeFacadeTests
         Assert.Same(getChildOrders, await api.GetChildOrdersCallAsync(new GetChildOrdersRequest { ProductCode = "BTC_JPY", Count = 10 }));
         Assert.Same(getExecutions, await api.GetExecutionsCallAsync(new GetExecutionsRequest { ProductCode = "BTC_JPY", Count = 10 }));
         Assert.Same(getPositions, await api.GetPositionsCallAsync(new GetPositionsRequest { ProductCode = "FX_BTC_JPY" }));
+        Assert.Same(getTradingCommission, await api.GetTradingCommissionCallAsync(new GetTradingCommissionRequest { ProductCode = "BTC_JPY" }));
         Assert.Same(sendChildOrder, await api.SendChildOrderCallAsync(new SendChildOrderRequest { ProductCode = "BTC_JPY", ChildOrderType = "MARKET", Side = "BUY", Size = 1m }));
         Assert.Same(cancelChildOrder, await api.CancelChildOrderCallAsync(new CancelChildOrderRequest { ProductCode = "BTC_JPY", ChildOrderId = "X" }));
         Assert.Same(cancelAllChildOrders, await api.CancelAllChildOrdersCallAsync(new CancelAllChildOrdersRequest { ProductCode = "BTC_JPY" }));
@@ -289,6 +296,13 @@ public sealed class NativeFacadeTests
         private readonly Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>> _call;
         public FakeGetPositionsNativeEndpoint(Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>> call) => _call = call;
         public Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> CallAsync(GetPositionsRequest request, CancellationToken cancellationToken = default) => Task.FromResult(_call);
+    }
+
+    private sealed class FakeGetTradingCommissionNativeEndpoint : IGetTradingCommissionNativeEndpoint
+    {
+        private readonly Call<GetTradingCommissionRequest, GetTradingCommissionResponse> _call;
+        public FakeGetTradingCommissionNativeEndpoint(Call<GetTradingCommissionRequest, GetTradingCommissionResponse> call) => _call = call;
+        public Task<Call<GetTradingCommissionRequest, GetTradingCommissionResponse>> CallAsync(GetTradingCommissionRequest request, CancellationToken cancellationToken = default) => Task.FromResult(_call);
     }
 
     private sealed class FakeSendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint

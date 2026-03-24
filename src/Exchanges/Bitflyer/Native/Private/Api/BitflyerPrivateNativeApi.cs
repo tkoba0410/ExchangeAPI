@@ -7,6 +7,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccou
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Units;
@@ -22,6 +23,7 @@ public sealed class BitflyerPrivateNativeApi : IBitflyerPrivateNativeApi
     private readonly IGetChildOrdersNativeEndpoint _getChildOrders;
     private readonly IGetExecutionsNativeEndpoint _getExecutions;
     private readonly IGetPositionsNativeEndpoint _getPositions;
+    private readonly IGetTradingCommissionNativeEndpoint _getTradingCommission;
     private readonly ISendChildOrderNativeEndpoint _sendChildOrder;
     private readonly ICancelChildOrderNativeEndpoint _cancelChildOrder;
     private readonly ICancelAllChildOrdersNativeEndpoint _cancelAllChildOrders;
@@ -34,6 +36,7 @@ public sealed class BitflyerPrivateNativeApi : IBitflyerPrivateNativeApi
         IGetChildOrdersNativeEndpoint getChildOrders,
         IGetExecutionsNativeEndpoint getExecutions,
         IGetPositionsNativeEndpoint getPositions,
+        IGetTradingCommissionNativeEndpoint getTradingCommission,
         ISendChildOrderNativeEndpoint sendChildOrder,
         ICancelChildOrderNativeEndpoint cancelChildOrder,
         ICancelAllChildOrdersNativeEndpoint cancelAllChildOrders)
@@ -45,6 +48,7 @@ public sealed class BitflyerPrivateNativeApi : IBitflyerPrivateNativeApi
         _getChildOrders = getChildOrders;
         _getExecutions = getExecutions;
         _getPositions = getPositions;
+        _getTradingCommission = getTradingCommission;
         _sendChildOrder = sendChildOrder;
         _cancelChildOrder = cancelChildOrder;
         _cancelAllChildOrders = cancelAllChildOrders;
@@ -97,6 +101,13 @@ public sealed class BitflyerPrivateNativeApi : IBitflyerPrivateNativeApi
         CancellationToken cancellationToken = default)
     {
         return _getPositions.CallAsync(request, cancellationToken);
+    }
+
+    public Task<Call<GetTradingCommissionRequest, GetTradingCommissionResponse>> GetTradingCommissionCallAsync(
+        GetTradingCommissionRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return _getTradingCommission.CallAsync(request, cancellationToken);
     }
 
     public Task<Call<SendChildOrderRequest, SendChildOrderResponse>> SendChildOrderCallAsync(

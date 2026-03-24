@@ -15,12 +15,15 @@ public interface IGetTickerProtocolEndpoint
 
 public sealed class GetTickerProtocolEndpoint : IGetTickerProtocolEndpoint
 {
-    private const string Path = "/v1/getticker";
+    private const string CanonicalPath = "/v1/getticker";
+    private const string AliasPath = "/v1/ticker";
     private readonly IProtocolTransport _transport;
+    private readonly string _path;
 
-    public GetTickerProtocolEndpoint(IProtocolTransport transport)
+    public GetTickerProtocolEndpoint(IProtocolTransport transport, bool useAliasPath = false)
     {
         _transport = transport;
+        _path = useAliasPath ? AliasPath : CanonicalPath;
     }
 
     public async Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
@@ -31,7 +34,7 @@ public sealed class GetTickerProtocolEndpoint : IGetTickerProtocolEndpoint
         {
             EndpointId = BitflyerEndpointIds.GetTicker,
             Method = HttpMethods.Get,
-            Path = Path,
+            Path = _path,
             Query = ProtocolQueryFactory.CreateSingle("product_code", productCode),
             BodyText = null,
         };

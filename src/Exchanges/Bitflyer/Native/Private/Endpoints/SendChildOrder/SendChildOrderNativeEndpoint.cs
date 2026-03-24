@@ -96,14 +96,55 @@ public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
             return new CallError { Kind = CallErrorKinds.Semantic, Message = "ChildOrderType is required." };
         }
 
+        if (!string.Equals(request.ChildOrderType, ChildOrderTypes.Limit, StringComparison.Ordinal) &&
+            !string.Equals(request.ChildOrderType, ChildOrderTypes.Market, StringComparison.Ordinal))
+        {
+            return new CallError
+            {
+                Kind = CallErrorKinds.Semantic,
+                Message = "ChildOrderType must be LIMIT or MARKET.",
+            };
+        }
+
         if (string.IsNullOrWhiteSpace(request.Side))
         {
             return new CallError { Kind = CallErrorKinds.Semantic, Message = "Side is required." };
         }
 
+        if (!string.Equals(request.Side, OrderSides.Buy, StringComparison.Ordinal) &&
+            !string.Equals(request.Side, OrderSides.Sell, StringComparison.Ordinal))
+        {
+            return new CallError
+            {
+                Kind = CallErrorKinds.Semantic,
+                Message = "Side must be BUY or SELL.",
+            };
+        }
+
         if (request.Size <= 0)
         {
             return new CallError { Kind = CallErrorKinds.Semantic, Message = "Size must be greater than zero." };
+        }
+
+        if (request.MinuteToExpire is not null && (request.MinuteToExpire <= 0 || request.MinuteToExpire > 43200))
+        {
+            return new CallError
+            {
+                Kind = CallErrorKinds.Semantic,
+                Message = "MinuteToExpire must be between 1 and 43200.",
+            };
+        }
+
+        if (request.TimeInForce is not null &&
+            !string.Equals(request.TimeInForce, TimeInForces.Gtc, StringComparison.Ordinal) &&
+            !string.Equals(request.TimeInForce, TimeInForces.Ioc, StringComparison.Ordinal) &&
+            !string.Equals(request.TimeInForce, TimeInForces.Fok, StringComparison.Ordinal))
+        {
+            return new CallError
+            {
+                Kind = CallErrorKinds.Semantic,
+                Message = "TimeInForce must be GTC, IOC or FOK.",
+            };
         }
 
         if (string.Equals(request.ChildOrderType, ChildOrderTypes.Limit, StringComparison.Ordinal))

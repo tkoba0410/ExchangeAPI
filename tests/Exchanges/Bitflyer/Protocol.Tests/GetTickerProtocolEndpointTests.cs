@@ -61,4 +61,16 @@ public sealed class GetTickerProtocolEndpointTests
         Assert.Equal(CallErrorKinds.Transport, call.Error!.Kind);
         Assert.Equal(CallComponents.PublicEndpointModule, call.Meta.Component);
     }
+
+    [Fact]
+    public async Task SendAsync_UsesAliasPath_WhenConfigured()
+    {
+        var transport = new FakeProtocolTransport();
+        var endpoint = new GetTickerProtocolEndpoint(transport, useAliasPath: true);
+
+        await endpoint.SendAsync("BTC_JPY");
+
+        Assert.NotNull(transport.LastRequest);
+        Assert.Equal("/v1/ticker", transport.LastRequest!.Path);
+    }
 }

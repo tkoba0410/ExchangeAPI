@@ -24,7 +24,7 @@ internal static class BitflyerBootstrap
         var normalizedOptions = options ?? new BitflyerClientOptions();
         var transport = CreateTransport(normalizedOptions);
 
-        var getTicker = new GetTickerProtocolEndpoint(transport);
+        var getTicker = new GetTickerProtocolEndpoint(transport, normalizedOptions.UseTickerAliasPath);
         var publicApi = new BitflyerPublicProtocolApi(getTicker);
 
         if (normalizedOptions.Credentials is null)
@@ -53,7 +53,7 @@ internal static class BitflyerBootstrap
         var normalizedOptions = options ?? new BitflyerClientOptions();
         var transport = CreateTransport(normalizedOptions);
 
-        var getTickerProtocol = new GetTickerProtocolEndpoint(transport);
+        var getTickerProtocol = new GetTickerProtocolEndpoint(transport, normalizedOptions.UseTickerAliasPath);
         var publicProtocolApi = new BitflyerPublicProtocolApi(getTickerProtocol);
         var getTickerNative = new GetTickerNativeEndpoint(getTickerProtocol);
         var publicApi = new BitflyerPublicNativeApi(getTickerNative);

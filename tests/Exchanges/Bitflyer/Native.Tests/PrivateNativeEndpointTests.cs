@@ -68,6 +68,80 @@ public sealed class PrivateNativeEndpointTests
     }
 
     [Fact]
+    public async Task SendChildOrder_ReturnsSemantic_WhenChildOrderTypeIsInvalid()
+    {
+        var fake = new FakeSendChildOrderProtocolEndpoint(_ => throw new InvalidOperationException());
+        var endpoint = new SendChildOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderType = "STOP",
+            Side = OrderSides.Buy,
+            Size = 0.01m,
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
+    public async Task SendChildOrder_ReturnsSemantic_WhenSideIsInvalid()
+    {
+        var fake = new FakeSendChildOrderProtocolEndpoint(_ => throw new InvalidOperationException());
+        var endpoint = new SendChildOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderType = ChildOrderTypes.Market,
+            Side = "HOLD",
+            Size = 0.01m,
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
+    public async Task SendChildOrder_ReturnsSemantic_WhenMinuteToExpireExceedsMax()
+    {
+        var fake = new FakeSendChildOrderProtocolEndpoint(_ => throw new InvalidOperationException());
+        var endpoint = new SendChildOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderType = ChildOrderTypes.Market,
+            Side = OrderSides.Buy,
+            Size = 0.01m,
+            MinuteToExpire = 43201,
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
+    public async Task SendChildOrder_ReturnsSemantic_WhenTimeInForceIsInvalid()
+    {
+        var fake = new FakeSendChildOrderProtocolEndpoint(_ => throw new InvalidOperationException());
+        var endpoint = new SendChildOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderType = ChildOrderTypes.Market,
+            Side = OrderSides.Buy,
+            Size = 0.01m,
+            TimeInForce = "DAY",
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
     public async Task CancelChildOrder_ReturnsSemantic_WhenIdentifiersAreInvalid()
     {
         var fake = new FakeCancelChildOrderProtocolEndpoint(_ => throw new InvalidOperationException());

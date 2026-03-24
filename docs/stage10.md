@@ -932,13 +932,13 @@ Stage10 で優先する endpoint:
 
 state を変更する endpoint の live 実行には、以下を必須とする。
 
-- 明示 opt-in
-  - `BITFLYER_STAGE10_LIVE=1`
-  - `BITFLYER_STAGE10_ALLOW_WRITE=1`
+- read / private live test の起動条件は `age` file path env 2 つのみとする
 - private credentials は `age` file で供給する
   - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
   - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
   - 2 つの file path はどちらも環境変数で明示指定する
+- write live test の明示 opt-in は env ではなく local marker file で行う
+  - `local/bitflyer-live-write-enabled`
 - 専用または影響を限定できる account を使う
 - matrix 上 `CleanupPolicy = Required` の endpoint は cleanup 手順を同じ test に含める
 - matrix 上 `CleanupPolicy = NotSupported` の endpoint は Stage10 の write live test 対象に含めない
@@ -952,9 +952,7 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 
 live test で `Protocol` debug logging を使う場合は、以下を正本とする。
 
-- `Protocol` logging は明示 opt-in 時のみ有効化する
-- 例:
-  - `BITFLYER_STAGE10_DEBUG_LOG=1`
+- 現行 phase では live test の debug logging は env で切り替えない
 - raw log 出力先は `local/logs/bitflyer/stage10/`
 - raw log は test 実行ごとに local のみへ出力する
 - raw log 自体は repository artifact にしない

@@ -1,3 +1,5 @@
+using ExchangeApi.Tests.LiveTests.Infrastructure;
+
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
 
 internal sealed class BitflyerPublicReadLiveFactAttribute : FactAttribute
@@ -36,23 +38,6 @@ internal static class BitflyerLiveTestPolicy
 {
     public static bool HasWriteOptInMarker()
     {
-        return File.Exists(Path.Combine(RepoRoot(), "local", "bitflyer-live-write-enabled"));
-    }
-
-    private static string RepoRoot()
-    {
-        var current = new DirectoryInfo(AppContext.BaseDirectory);
-
-        while (current is not null)
-        {
-            if (File.Exists(Path.Combine(current.FullName, "ExchangeApi.slnx")))
-            {
-                return current.FullName;
-            }
-
-            current = current.Parent;
-        }
-
-        throw new InvalidOperationException("Repository root was not found.");
+        return LiveTestLocalPolicy.HasMarker("bitflyer-live-write-enabled");
     }
 }

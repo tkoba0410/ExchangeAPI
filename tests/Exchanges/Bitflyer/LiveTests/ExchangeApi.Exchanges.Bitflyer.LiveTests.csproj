@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="../../../Shared/Infrastructure/LiveTestLocalPolicy.cs" Link="Infrastructure/LiveTestLocalPolicy.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../../../src/Primitives/ExchangeApi.Primitives.csproj" />
     <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Vocabulary/ExchangeApi.Exchanges.Bitflyer.Vocabulary.csproj" />
     <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Protocol/ExchangeApi.Exchanges.Bitflyer.Protocol.csproj" />

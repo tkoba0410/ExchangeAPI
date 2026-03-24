@@ -67,7 +67,7 @@
 - matrix は「公開面に出すか」を管理する
   - shared helper の配置
   - converter / validator の細かい file 分割
-  は別途 `docs/stage10.md` の物理構成方針に従う
+  は別途 `docs/spec.md` の物理構成方針に従う
 
 ## Matrix
 

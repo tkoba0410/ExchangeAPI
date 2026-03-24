@@ -1,4 +1,4 @@
-# Stage10（設計正本）
+# Stage10 Spec（library 設計正本）
 
 最終更新: 2026-03-24  
 対象ブランチ: `stage10`
@@ -22,7 +22,7 @@
 
 Stage10 における文書の主従は以下とする。
 
-- [`docs/stage10.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/stage10.md)
+- [`docs/spec.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/spec.md)
   - 設計正本
   - 層モデル、依存規約、error 契約、test 契約、変更ポリシーを定義する
 - [`docs/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-bitflyer.md)
@@ -38,9 +38,9 @@ Stage10 における文書の主従は以下とする。
   - MCP Server adapter の設計補助文書
   - `Unified` との関係と tool 公開方針を定義する
 
-`docs/stage10.md` と venue ごとの matrix を Stage10 library の正本とする。  
+`docs/spec.md` と venue ごとの matrix を Stage10 library の正本とする。  
 `Cli` と `McpServer` は別文書とし、本書では library から見た境界だけを扱う。  
-本 repository では、library 設計の正本を `docs/stage10.md` と venue matrix に固定し、削除済み inventory や補助文書を前提にしない。  
+本 repository では、library 設計の正本を `docs/spec.md` と venue matrix に固定し、削除済み inventory や補助文書を前提にしない。  
 旧 `stage10b.md` は廃止し、現行の設計判断、運用判断、実装判断の根拠に使わない。
 
 ## 2. ゴール
@@ -815,7 +815,7 @@ matrix が担わないもの:
 - response field の additive 追加は、`Transitional` では保留してよい
 - `Fixed` の request / response DTO を変更する場合は、文書、matrix、test を同時更新する
 - alias path、expected status、optional omission rule を変更する場合は endpoint module test を更新する
-- exchange 仕様差分を見つけた場合、まず `docs/stage10.md` と matrix を更新し、その後実装を寄せる
+- exchange 仕様差分を見つけた場合、まず `docs/spec.md` と matrix を更新し、その後実装を寄せる
 
 ### 9.2 Endpoint Metadata
 
@@ -860,7 +860,7 @@ venue ごとの endpoint matrix は、少なくとも以下の metadata を持�
 
 - endpoint module 実装は matrix metadata に従う
 - matrix へない metadata をコード側で暗黙導入しない
-- metadata を増やす場合は `docs/stage10.md` と matrix を同時更新する
+- metadata を増やす場合は `docs/spec.md` と matrix を同時更新する
 - `ExposeInProtocol = Yes` の row では `ExpectedStatus` / `ResponseShape` / `AuthType` に `TBD` を残さない
 - `ExposeInNative = Yes` の row では `ExpectedStatus` / `ResponseShape` / `AuthType` / `OptionalOmissionRule` に `TBD` を残さない
 - `TBD` は `ExposeInProtocol != Yes` かつ `ExposeInNative != Yes` の row にのみ許容する
@@ -1149,7 +1149,7 @@ Codex は以下の順で実装する。
 
 - `Protocol` / `Native` の責務境界が明確
 - facade と endpoint module の役割分担が明確
-- 文書統治が定義され、`docs/stage10.md` と matrix の主従が固定されている
+- 文書統治が定義され、`docs/spec.md` と matrix の主従が固定されている
 - 依存規約が文書化され、破ってよい場所が `Composition` に限定されている
 - architecture enforcement の対象が明記されている
 - facade の主公開面が `*CallAsync(...)` に固定されている

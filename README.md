@@ -1,11 +1,12 @@
 # ExchangeAPI
 
 ExchangeAPI は、複数の暗号資産取引所 API を扱うための Stage10 実装基盤です。
-現行ブランチでは、library 本体の設計正本を `docs/stage10.md` に置き、CLI と MCP Server は別文書で扱います。
+現行ブランチでは、`stage10.md` を入口文書、`docs/spec.md` を library 本体の設計正本として扱い、CLI と MCP Server は別文書で扱います。
 
 ## Quick Links
 
-- Library design: `docs/stage10.md`
+- Stage10 goals: `stage10.md`
+- Library spec: `docs/spec.md`
 - Bitflyer endpoints: `docs/endpoints-bitflyer.md`
 - Binance endpoints: `docs/endpoints-binance.md`
 - CLI adapter: `docs/cli.md`

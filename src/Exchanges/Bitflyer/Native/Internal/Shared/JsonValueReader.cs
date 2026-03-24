@@ -82,9 +82,64 @@ internal static class JsonValueReader
         return value;
     }
 
+    internal static bool ReadRequiredBoolean(JsonElement element, string propertyName)
+    {
+        if (!element.TryGetProperty(propertyName, out var property))
+        {
+            throw new CodecException($"Missing required property '{propertyName}'.");
+        }
+
+        if (property.ValueKind is not JsonValueKind.True and not JsonValueKind.False)
+        {
+            throw new CodecException($"Property '{propertyName}' must be a boolean.");
+        }
+
+        return property.GetBoolean();
+    }
+
+    internal static string? ReadOptionalString(JsonElement element, string propertyName)
+    {
+        if (!element.TryGetProperty(propertyName, out var property) || property.ValueKind == JsonValueKind.Null)
+        {
+            return null;
+        }
+
+        if (property.ValueKind != JsonValueKind.String)
+        {
+            throw new CodecException($"Property '{propertyName}' must be a string.");
+        }
+
+        return property.GetString();
+    }
+
     internal static DateTimeOffset ReadRequiredTimestamp(JsonElement element, string propertyName)
     {
         var raw = ReadRequiredString(element, propertyName);
+        return ReadRequiredTimestamp(raw, propertyName);
+    }
+
+    internal static decimal ReadDecimal(JsonElement element, string propertyName)
+    {
+        if (element.ValueKind != JsonValueKind.Number || !element.TryGetDecimal(out var value))
+        {
+            throw new CodecException($"Property '{propertyName}' must be a decimal number.");
+        }
+
+        return value;
+    }
+
+    internal static DateTimeOffset ReadTimestamp(JsonElement element, string propertyName)
+    {
+        if (element.ValueKind != JsonValueKind.String)
+        {
+            throw new CodecException($"Property '{propertyName}' must be a timestamp.");
+        }
+
+        return ReadRequiredTimestamp(element.GetString(), propertyName);
+    }
+
+    private static DateTimeOffset ReadRequiredTimestamp(string? raw, string propertyName)
+    {
         if (DateTimeOffset.TryParse(
             raw,
             CultureInfo.InvariantCulture,

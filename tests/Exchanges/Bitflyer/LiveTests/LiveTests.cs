@@ -12,7 +12,12 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetChats;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetCorporateLeverage;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetExecutionsPublic;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetFundingRate;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetHealth;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
@@ -173,6 +178,176 @@ public sealed class LiveTests
         Assert.True(nativeFirst.Size > 0);
         Assert.False(string.IsNullOrWhiteSpace(nativeFirst.BuyChildOrderAcceptanceId));
         Assert.False(string.IsNullOrWhiteSpace(nativeFirst.SellChildOrderAcceptanceId));
+    }
+
+    [BitflyerPublicReadLiveFact]
+    public async Task GetBoardState_ReadContract()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var request = new GetBoardStateRequest { ProductCode = ProductCodes.BtcJpy };
+
+        var nativeCall = await client.Public.GetBoardStateCallAsync(request);
+        var protocolCall = await client.Protocol.Public.GetBoardStateCallAsync(request.ProductCode);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Object, root.ValueKind);
+        Assert.False(string.IsNullOrWhiteSpace(root.GetProperty("health").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(root.GetProperty("state").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(native.Health));
+        Assert.False(string.IsNullOrWhiteSpace(native.State));
+
+        if (root.TryGetProperty("data", out var protocolData) &&
+            protocolData.ValueKind == JsonValueKind.Object &&
+            protocolData.TryGetProperty("special_quotation", out var specialQuotation))
+        {
+            Assert.True(specialQuotation.GetDecimal() >= 0);
+        }
+
+        if (native.Data?.SpecialQuotation is not null)
+        {
+            Assert.True(native.Data.SpecialQuotation.Value >= 0);
+        }
+    }
+
+    [BitflyerPublicReadLiveFact]
+    public async Task GetHealth_ReadContract()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var request = new GetHealthRequest { ProductCode = ProductCodes.BtcJpy };
+
+        var nativeCall = await client.Public.GetHealthCallAsync(request);
+        var protocolCall = await client.Protocol.Public.GetHealthCallAsync(request.ProductCode);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Object, root.ValueKind);
+        Assert.False(string.IsNullOrWhiteSpace(root.GetProperty("status").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(native.Status));
+    }
+
+    [BitflyerPublicReadLiveFact]
+    public async Task GetFundingRate_ReadContract()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var request = new GetFundingRateRequest { ProductCode = ProductCodes.FxBtcJpy };
+
+        var nativeCall = await client.Public.GetFundingRateCallAsync(request);
+        var protocolCall = await client.Protocol.Public.GetFundingRateCallAsync(request.ProductCode);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Object, root.ValueKind);
+        Assert.True(root.GetProperty("current_funding_rate").ValueKind is JsonValueKind.Number);
+        Assert.Equal(JsonValueKind.String, root.GetProperty("next_funding_rate_settledate").ValueKind);
+        Assert.True(native.NextFundingRateSettleDate != default);
+    }
+
+    [BitflyerPublicReadLiveFact]
+    public async Task GetCorporateLeverage_ReadContract()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+
+        var nativeCall = await client.Public.GetCorporateLeverageCallAsync(new GetCorporateLeverageRequest());
+        var protocolCall = await client.Protocol.Public.GetCorporateLeverageCallAsync();
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Object, root.ValueKind);
+        Assert.True(root.GetProperty("current_max").GetDecimal() > 0);
+        Assert.Equal(JsonValueKind.String, root.GetProperty("current_startdate").ValueKind);
+        Assert.True(native.CurrentMax > 0);
+        Assert.True(native.CurrentStartDate != default);
+
+        if (root.TryGetProperty("next_max", out var nextMax))
+        {
+            Assert.True(nextMax.GetDecimal() > 0);
+        }
+
+        if (native.NextMax is not null)
+        {
+            Assert.True(native.NextMax.Value > 0);
+        }
+    }
+
+    [BitflyerPublicReadLiveFact]
+    public async Task GetChats_ReadContract()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+
+        var nativeCall = await client.Public.GetChatsCallAsync(new GetChatsRequest());
+        var protocolCall = await client.Protocol.Public.GetChatsCallAsync(null);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Array, root.ValueKind);
+        Assert.True(native.Count >= 0);
+
+        if (root.GetArrayLength() > 0)
+        {
+            var protocolFirst = root[0];
+            Assert.False(string.IsNullOrWhiteSpace(protocolFirst.GetProperty("nickname").GetString()));
+            Assert.False(string.IsNullOrWhiteSpace(protocolFirst.GetProperty("message").GetString()));
+            Assert.Equal(JsonValueKind.String, protocolFirst.GetProperty("date").ValueKind);
+        }
+
+        if (native.Count > 0)
+        {
+            var nativeFirst = native[0];
+            Assert.False(string.IsNullOrWhiteSpace(nativeFirst.Nickname));
+            Assert.False(string.IsNullOrWhiteSpace(nativeFirst.Message));
+            Assert.True(nativeFirst.Date != default);
+        }
     }
 
     [BitflyerPrivateReadLiveFact]

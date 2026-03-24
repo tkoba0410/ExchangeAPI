@@ -1,16 +1,34 @@
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelAllChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelParentOrder;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetAddresses;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBalance;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBalanceHistory;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBankAccounts;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateral;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralHistory;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAccounts;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCoinIns;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCoinOuts;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetDeposits;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetParentOrder;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetParentOrders;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPermissions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetTradingCommission;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetWithdrawals;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendParentOrder;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.Withdraw;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoard;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoardState;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetChats;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetCorporateLeverage;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetExecutionsPublic;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetFundingRate;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetHealth;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 using ExchangeApi.Primitives.Calls;
@@ -45,6 +63,81 @@ internal sealed class FakeGetBoardProtocolEndpoint : IGetBoardProtocolEndpoint
     public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string? productCode, CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_handler(productCode));
+    }
+}
+
+internal sealed class FakeGetBoardStateProtocolEndpoint : IGetBoardStateProtocolEndpoint
+{
+    private readonly Func<string?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetBoardStateProtocolEndpoint(Func<string?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string? productCode, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(productCode));
+    }
+}
+
+internal sealed class FakeGetHealthProtocolEndpoint : IGetHealthProtocolEndpoint
+{
+    private readonly Func<string?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetHealthProtocolEndpoint(Func<string?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string? productCode, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(productCode));
+    }
+}
+
+internal sealed class FakeGetFundingRateProtocolEndpoint : IGetFundingRateProtocolEndpoint
+{
+    private readonly Func<string, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetFundingRateProtocolEndpoint(Func<string, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string productCode, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(productCode));
+    }
+}
+
+internal sealed class FakeGetCorporateLeverageProtocolEndpoint : IGetCorporateLeverageProtocolEndpoint
+{
+    private readonly Func<Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetCorporateLeverageProtocolEndpoint(Func<Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler());
+    }
+}
+
+internal sealed class FakeGetChatsProtocolEndpoint : IGetChatsProtocolEndpoint
+{
+    private readonly Func<string?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetChatsProtocolEndpoint(Func<string?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string? fromDate, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(fromDate));
     }
 }
 
@@ -98,6 +191,21 @@ internal sealed class FakeGetBalanceProtocolEndpoint : IGetBalanceProtocolEndpoi
     }
 }
 
+internal sealed class FakeGetPermissionsProtocolEndpoint : IGetPermissionsProtocolEndpoint
+{
+    private readonly Call<ProtocolRequest, ProtocolResponse> _call;
+
+    public FakeGetPermissionsProtocolEndpoint(Call<ProtocolRequest, ProtocolResponse> call)
+    {
+        _call = call;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_call);
+    }
+}
+
 internal sealed class FakeGetCollateralProtocolEndpoint : IGetCollateralProtocolEndpoint
 {
     private readonly Call<ProtocolRequest, ProtocolResponse> _call;
@@ -128,6 +236,93 @@ internal sealed class FakeGetCollateralAccountsProtocolEndpoint : IGetCollateral
     }
 }
 
+internal sealed class FakeGetAddressesProtocolEndpoint : IGetAddressesProtocolEndpoint
+{
+    private readonly Call<ProtocolRequest, ProtocolResponse> _call;
+
+    public FakeGetAddressesProtocolEndpoint(Call<ProtocolRequest, ProtocolResponse> call)
+    {
+        _call = call;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_call);
+    }
+}
+
+internal sealed class FakeGetCoinInsProtocolEndpoint : IGetCoinInsProtocolEndpoint
+{
+    private readonly Func<int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetCoinInsProtocolEndpoint(Func<int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+        int? count,
+        long? before,
+        long? after,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(count, before, after));
+    }
+}
+
+internal sealed class FakeGetCoinOutsProtocolEndpoint : IGetCoinOutsProtocolEndpoint
+{
+    private readonly Func<int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetCoinOutsProtocolEndpoint(Func<int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+        int? count,
+        long? before,
+        long? after,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(count, before, after));
+    }
+}
+
+internal sealed class FakeGetBankAccountsProtocolEndpoint : IGetBankAccountsProtocolEndpoint
+{
+    private readonly Call<ProtocolRequest, ProtocolResponse> _call;
+
+    public FakeGetBankAccountsProtocolEndpoint(Call<ProtocolRequest, ProtocolResponse> call)
+    {
+        _call = call;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_call);
+    }
+}
+
+internal sealed class FakeGetDepositsProtocolEndpoint : IGetDepositsProtocolEndpoint
+{
+    private readonly Func<int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetDepositsProtocolEndpoint(Func<int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+        int? count,
+        long? before,
+        long? after,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(count, before, after));
+    }
+}
+
 internal sealed class FakeGetChildOrdersProtocolEndpoint : IGetChildOrdersProtocolEndpoint
 {
     private readonly Func<string?, int?, long?, long?, string?, string?, string?, string?, Call<ProtocolRequest, ProtocolResponse>> _handler;
@@ -149,6 +344,23 @@ internal sealed class FakeGetChildOrdersProtocolEndpoint : IGetChildOrdersProtoc
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_handler(productCode, count, before, after, childOrderState, childOrderId, childOrderAcceptanceId, parentOrderId));
+    }
+}
+
+internal sealed class FakeWithdrawProtocolEndpoint : IWithdrawProtocolEndpoint
+{
+    private readonly Func<string, Call<ProtocolRequest, ProtocolResponse>> _handler;
+    public string? LastBodyJson { get; private set; }
+
+    public FakeWithdrawProtocolEndpoint(Func<string, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string bodyJson, CancellationToken cancellationToken = default)
+    {
+        LastBodyJson = bodyJson;
+        return Task.FromResult(_handler(bodyJson));
     }
 }
 
@@ -174,6 +386,26 @@ internal sealed class FakeGetExecutionsProtocolEndpoint : IGetExecutionsProtocol
     }
 }
 
+internal sealed class FakeGetWithdrawalsProtocolEndpoint : IGetWithdrawalsProtocolEndpoint
+{
+    private readonly Func<int?, long?, long?, string?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetWithdrawalsProtocolEndpoint(Func<int?, long?, long?, string?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+        int? count,
+        long? before,
+        long? after,
+        string? messageId,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(count, before, after, messageId));
+    }
+}
+
 internal sealed class FakeGetCollateralHistoryProtocolEndpoint : IGetCollateralHistoryProtocolEndpoint
 {
     private readonly Func<int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> _handler;
@@ -190,6 +422,65 @@ internal sealed class FakeGetCollateralHistoryProtocolEndpoint : IGetCollateralH
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_handler(count, before, after));
+    }
+}
+
+internal sealed class FakeGetParentOrdersProtocolEndpoint : IGetParentOrdersProtocolEndpoint
+{
+    private readonly Func<string?, int?, long?, long?, string?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetParentOrdersProtocolEndpoint(Func<string?, int?, long?, long?, string?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+        string? productCode,
+        int? count,
+        long? before,
+        long? after,
+        string? parentOrderState,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(productCode, count, before, after, parentOrderState));
+    }
+}
+
+internal sealed class FakeGetParentOrderProtocolEndpoint : IGetParentOrderProtocolEndpoint
+{
+    private readonly Func<string?, string?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetParentOrderProtocolEndpoint(Func<string?, string?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+        string? parentOrderId,
+        string? parentOrderAcceptanceId,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(parentOrderId, parentOrderAcceptanceId));
+    }
+}
+
+internal sealed class FakeGetBalanceHistoryProtocolEndpoint : IGetBalanceHistoryProtocolEndpoint
+{
+    private readonly Func<string?, int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> _handler;
+
+    public FakeGetBalanceHistoryProtocolEndpoint(Func<string?, int?, long?, long?, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+        string? currencyCode,
+        int? count,
+        long? before,
+        long? after,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_handler(currencyCode, count, before, after));
     }
 }
 
@@ -223,12 +514,46 @@ internal sealed class FakeGetTradingCommissionProtocolEndpoint : IGetTradingComm
     }
 }
 
+internal sealed class FakeSendParentOrderProtocolEndpoint : ISendParentOrderProtocolEndpoint
+{
+    private readonly Func<string, Call<ProtocolRequest, ProtocolResponse>> _handler;
+    public string? LastBodyJson { get; private set; }
+
+    public FakeSendParentOrderProtocolEndpoint(Func<string, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string bodyJson, CancellationToken cancellationToken = default)
+    {
+        LastBodyJson = bodyJson;
+        return Task.FromResult(_handler(bodyJson));
+    }
+}
+
 internal sealed class FakeSendChildOrderProtocolEndpoint : ISendChildOrderProtocolEndpoint
 {
     private readonly Func<string, Call<ProtocolRequest, ProtocolResponse>> _handler;
     public string? LastBodyJson { get; private set; }
 
     public FakeSendChildOrderProtocolEndpoint(Func<string, Call<ProtocolRequest, ProtocolResponse>> handler)
+    {
+        _handler = handler;
+    }
+
+    public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(string bodyJson, CancellationToken cancellationToken = default)
+    {
+        LastBodyJson = bodyJson;
+        return Task.FromResult(_handler(bodyJson));
+    }
+}
+
+internal sealed class FakeCancelParentOrderProtocolEndpoint : ICancelParentOrderProtocolEndpoint
+{
+    private readonly Func<string, Call<ProtocolRequest, ProtocolResponse>> _handler;
+    public string? LastBodyJson { get; private set; }
+
+    public FakeCancelParentOrderProtocolEndpoint(Func<string, Call<ProtocolRequest, ProtocolResponse>> handler)
     {
         _handler = handler;
     }

@@ -12,6 +12,25 @@ public interface IBitflyerPublicProtocolApi
         string? productCode,
         CancellationToken cancellationToken = default);
 
+    Task<Call<ProtocolRequest, ProtocolResponse>> GetBoardStateCallAsync(
+        string? productCode,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<ProtocolRequest, ProtocolResponse>> GetHealthCallAsync(
+        string? productCode,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<ProtocolRequest, ProtocolResponse>> GetFundingRateCallAsync(
+        string productCode,
+        CancellationToken cancellationToken = default);
+
+    Task<Call<ProtocolRequest, ProtocolResponse>> GetCorporateLeverageCallAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<Call<ProtocolRequest, ProtocolResponse>> GetChatsCallAsync(
+        string? fromDate,
+        CancellationToken cancellationToken = default);
+
     Task<Call<ProtocolRequest, ProtocolResponse>> GetExecutionsCallAsync(
         string? productCode,
         int? count,

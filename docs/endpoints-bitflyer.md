@@ -77,39 +77,39 @@
 | GetBoard | GET | /v1/getboard | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | None | product_code = null は query omitted |
 | GetTicker | GET | /v1/getticker | public | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | /v1/ticker | None | product_code = null は query omitted |
 | GetExecutionsPublic | GET | /v1/getexecutions | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | /v1/executions | None | optional query params omitted when null; product_code omitted => BTC_JPY default |
-| GetBoardState | GET | /v1/getboardstate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
-| GetHealth | GET | /v1/gethealth | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
-| GetFundingRate | GET | /v1/getfundingrate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
-| GetCorporateLeverage | GET | /v1/getcorporateleverage | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
-| GetChats | GET | /v1/getchats | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
-| GetPermissions | GET | /v1/me/getpermissions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetBoardState | GET | /v1/getboardstate | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | None | product_code = null は query omitted |
+| GetHealth | GET | /v1/gethealth | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | None | product_code = null は query omitted |
+| GetFundingRate | GET | /v1/getfundingrate | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | None | product_code required |
+| GetCorporateLeverage | GET | /v1/getcorporateleverage | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | None | - |
+| GetChats | GET | /v1/getchats | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | None | from_date = null は query omitted |
+| GetPermissions | GET | /v1/me/getpermissions | private | Yes | Yes | Later | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
 | GetBalance | GET | /v1/me/getbalance | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
 | GetCollateral | GET | /v1/me/getcollateral | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | - | KeySecret | - |
 | GetCollateralAccounts | GET | /v1/me/getcollateralaccounts | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
-| GetAddresses | GET | /v1/me/getaddresses | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetCoinIns | GET | /v1/me/getcoinins | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetCoinOuts | GET | /v1/me/getcoinouts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetBankAccounts | GET | /v1/me/getbankaccounts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetDeposits | GET | /v1/me/getdeposits | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| Withdraw | POST | /v1/me/withdraw | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | NotSupported | - | KeySecret | TBD |
-| GetWithdrawals | GET | /v1/me/getwithdrawals | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetAddresses | GET | /v1/me/getaddresses | private | Yes | Yes | Later | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
+| GetCoinIns | GET | /v1/me/getcoinins | private | Yes | Yes | Later | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetCoinOuts | GET | /v1/me/getcoinouts | private | Yes | Yes | Later | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetBankAccounts | GET | /v1/me/getbankaccounts | private | Yes | Yes | Later | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
+| GetDeposits | GET | /v1/me/getdeposits | private | Yes | Yes | Later | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| Withdraw | POST | /v1/me/withdraw | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | Yes | NotSupported | - | KeySecret | currency_code/bank_account_id/amount/code required |
+| GetWithdrawals | GET | /v1/me/getwithdrawals | private | Yes | Yes | Later | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | SendChildOrder | POST | /v1/me/sendchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional | 200 | Object | Yes | Required | - | KeySecret | minute_to_expire/time_in_force = null omitted, price is conditional |
-| SendParentOrder | POST | /v1/me/sendparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | Required | - | KeySecret | TBD |
+| SendParentOrder | POST | /v1/me/sendparentorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | Yes | Required | - | KeySecret | order_method/minute_to_expire/time_in_force = null omitted; parameter fields are conditionally omitted |
 | CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of child_order_id or child_order_acceptance_id |
-| CancelParentOrder | POST | /v1/me/cancelparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | None | - | KeySecret | TBD |
+| CancelParentOrder | POST | /v1/me/cancelparentorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
 | CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | product_code required |
 | GetChildOrders | GET | /v1/me/getchildorders | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null; product_code omitted => BTC_JPY default |
-| GetParentOrders | GET | /v1/me/getparentorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetParentOrder | GET | /v1/me/getparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetParentOrders | GET | /v1/me/getparentorders | private | Yes | Yes | Later | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetParentOrder | GET | /v1/me/getparentorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | No | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
 | GetExecutionsPrivate | GET | /v1/me/getexecutions | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | product_code required; optional query params omitted when null |
-| GetBalanceHistory | GET | /v1/me/getbalancehistory | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetBalanceHistory | GET | /v1/me/getbalancehistory | private | Yes | Yes | Later | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | GetPositions | GET | /v1/me/getpositions | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
 | GetCollateralHistory | GET | /v1/me/getcollateralhistory | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | GetTradingCommission | GET | /v1/me/gettradingcommission | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | - | KeySecret | product_code required |
 
 ## Initial Rule
 
-- 現行 Stage10 実装では `GetMarkets`、`GetBoard`、`GetTicker`、`GetExecutionsPublic`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetChildOrders`、`GetExecutionsPrivate`、`GetPositions`、`GetCollateralHistory`、`GetTradingCommission`、`SendChildOrder`、`CancelChildOrder`、`CancelAllChildOrders` を library 公開面に含める
+- 現行 Stage10 実装では `GetMarkets`、`GetBoard`、`GetTicker`、`GetExecutionsPublic`、`GetBoardState`、`GetHealth`、`GetFundingRate`、`GetCorporateLeverage`、`GetChats`、`GetPermissions`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetAddresses`、`GetCoinIns`、`GetCoinOuts`、`GetBankAccounts`、`GetDeposits`、`Withdraw`、`GetWithdrawals`、`GetChildOrders`、`GetParentOrders`、`GetParentOrder`、`GetExecutionsPrivate`、`GetBalanceHistory`、`GetPositions`、`GetCollateralHistory`、`GetTradingCommission`、`SendChildOrder`、`SendParentOrder`、`CancelChildOrder`、`CancelParentOrder`、`CancelAllChildOrders` を library 公開面に含める
 - read path の live test は、public は条件なし、private read は認証可能なら実行する
 - `SendChildOrder` と `CancelChildOrder` は `Phase2-Write`、`CancelAllChildOrders` は destructive 範囲が広いため live test をまだ持たない
 - `GetMarkets`、`GetTicker`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetTradingCommission` は first wave として `Fixed` に上げる
@@ -131,7 +131,7 @@
 
 ## Current Implemented Endpoint Contracts
 
-現行実装 15 endpoint の exact contract は以下とする。
+実装済み endpoint の公開有無と contract metadata の正本は matrix とする。以下は first wave と代表例の exact contract を示す。
 
 ### GetMarkets
 

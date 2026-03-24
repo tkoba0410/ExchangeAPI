@@ -1130,6 +1130,10 @@ Stage10 で優先する endpoint:
   - `Protocol` raw response と `Native` DTO の parity を検証する
   - public は条件なしで実行する
   - private read は認証可能なときだけ実行する
+  - mutable な market data は、別リクエスト間の完全一致を要求しない
+  - `ticker` / `board` / recent `executions` は stable field または contract check に寄せる
+  - closed snapshot を切り出せる data だけを strict parity の対象にしてよい
+  - `klines` のような時系列 data は closed window / closed bar だけを parity 比較の対象にしてよい
 - write live test
   - private write は認証可能かつ local marker file があるときだけ実行する
   - cleanup を含む

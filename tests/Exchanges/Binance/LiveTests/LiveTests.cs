@@ -9,7 +9,7 @@ namespace ExchangeApi.Tests.Exchanges.Binance.LiveTests;
 public sealed class LiveTests
 {
     [BinancePublicReadLiveFact]
-    public async Task GetKlines_ReadParity()
+    public async Task GetKlines_ClosedWindowParity()
     {
         var settings = BinanceLiveTestSettings.Load();
         var client = BinanceClientFactory.CreateNativeClient(settings.ToClientOptions());

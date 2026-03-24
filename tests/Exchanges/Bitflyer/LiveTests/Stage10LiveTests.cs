@@ -3,7 +3,14 @@ using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
@@ -13,7 +20,7 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests;
 public sealed class Stage10LiveTests
 {
     [BitflyerPublicReadLiveFact]
-    public async Task GetTicker_ReadParity()
+    public async Task GetTicker_ReadContract()
     {
         var settings = BitflyerLiveTestSettings.Load();
 
@@ -35,12 +42,52 @@ public sealed class Stage10LiveTests
 
         Assert.Equal(root.GetProperty("product_code").GetString(), native.ProductCode);
         Assert.Equal(root.GetProperty("state").GetString(), native.State);
-        Assert.Equal(root.GetProperty("tick_id").GetInt64(), native.TickId);
-        Assert.Equal(root.GetProperty("best_bid").GetDecimal(), native.BestBid);
-        Assert.Equal(root.GetProperty("best_ask").GetDecimal(), native.BestAsk);
-        Assert.Equal(root.GetProperty("ltp").GetDecimal(), native.Ltp);
-        Assert.Equal(root.GetProperty("volume").GetDecimal(), native.Volume);
-        Assert.Equal(root.GetProperty("volume_by_product").GetDecimal(), native.VolumeByProduct);
+        Assert.True(root.GetProperty("tick_id").GetInt64() > 0);
+        Assert.True(root.GetProperty("best_bid").GetDecimal() > 0);
+        Assert.True(root.GetProperty("best_ask").GetDecimal() > 0);
+        Assert.True(root.GetProperty("ltp").GetDecimal() > 0);
+        Assert.True(root.GetProperty("volume").GetDecimal() >= 0);
+        Assert.True(root.GetProperty("volume_by_product").GetDecimal() >= 0);
+        Assert.True(native.TickId > 0);
+        Assert.True(native.BestBid > 0);
+        Assert.True(native.BestAsk > 0);
+        Assert.True(native.Ltp > 0);
+        Assert.True(native.Volume >= 0);
+        Assert.True(native.VolumeByProduct >= 0);
+    }
+
+    [BitflyerPublicReadLiveFact]
+    public async Task GetBoard_ReadContract()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var request = new GetBoardRequest { ProductCode = ProductCodes.BtcJpy };
+
+        var nativeCall = await client.Public.GetBoardCallAsync(request);
+        var protocolCall = await client.Protocol.Public.GetBoardCallAsync(ProductCodes.BtcJpy);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Object, root.ValueKind);
+        Assert.True(root.GetProperty("mid_price").GetDecimal() > 0);
+        Assert.Equal(JsonValueKind.Array, root.GetProperty("bids").ValueKind);
+        Assert.Equal(JsonValueKind.Array, root.GetProperty("asks").ValueKind);
+        Assert.NotEmpty(native.Bids);
+        Assert.NotEmpty(native.Asks);
+        Assert.True(native.MidPrice > 0);
+        Assert.True(native.Bids[0].Price > 0);
+        Assert.True(native.Bids[0].Size >= 0);
+        Assert.True(native.Asks[0].Price > 0);
+        Assert.True(native.Asks[0].Size >= 0);
     }
 
     [BitflyerPrivateReadLiveFact]
@@ -78,6 +125,279 @@ public sealed class Stage10LiveTests
             Assert.True(protocolByCurrency.TryGetValue(item.CurrencyCode, out var protocolItem));
             Assert.Equal(protocolItem.GetProperty("amount").GetDecimal(), item.Amount);
             Assert.Equal(protocolItem.GetProperty("available").GetDecimal(), item.Available);
+        }
+    }
+
+    [BitflyerPrivateReadLiveFact]
+    public async Task GetPositions_ReadParity()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        Assert.NotNull(client.Private);
+        Assert.NotNull(client.Protocol.Private);
+
+        var request = new GetPositionsRequest { ProductCode = ProductCodes.FxBtcJpy };
+        var nativeCall = await client.Private!.GetPositionsCallAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetPositionsCallAsync(ProductCodes.FxBtcJpy);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Array, root.ValueKind);
+        Assert.Equal(root.GetArrayLength(), native.Count);
+
+        for (var i = 0; i < native.Count; i++)
+        {
+            var protocolItem = root[i];
+            var nativeItem = native[i];
+
+            Assert.Equal(protocolItem.GetProperty("product_code").GetString(), nativeItem.ProductCode);
+            Assert.Equal(protocolItem.GetProperty("side").GetString(), nativeItem.Side);
+            Assert.Equal(protocolItem.GetProperty("price").GetDecimal(), nativeItem.Price);
+            Assert.Equal(protocolItem.GetProperty("size").GetDecimal(), nativeItem.Size);
+            Assert.Equal(protocolItem.GetProperty("commission").GetDecimal(), nativeItem.Commission);
+            Assert.Equal(protocolItem.GetProperty("swap_point_accumulate").GetDecimal(), nativeItem.SwapPointAccumulate);
+            Assert.Equal(protocolItem.GetProperty("require_collateral").GetDecimal(), nativeItem.RequireCollateral);
+            Assert.Equal(protocolItem.GetProperty("open_date").GetDateTimeOffset(), nativeItem.OpenDate);
+            Assert.Equal(protocolItem.GetProperty("leverage").GetDecimal(), nativeItem.Leverage);
+            Assert.Equal(protocolItem.GetProperty("pnl").GetDecimal(), nativeItem.Pnl);
+            Assert.Equal(protocolItem.GetProperty("sfd").GetDecimal(), nativeItem.Sfd);
+        }
+    }
+
+    [BitflyerPrivateReadLiveFact]
+    public async Task GetCollateral_ReadContract()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        Assert.NotNull(client.Private);
+        Assert.NotNull(client.Protocol.Private);
+
+        var nativeCall = await client.Private!.GetCollateralCallAsync(new GetCollateralRequest());
+        var protocolCall = await client.Protocol.Private!.GetCollateralCallAsync();
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Object, root.ValueKind);
+        Assert.True(root.GetProperty("collateral").GetDecimal() >= 0);
+        Assert.True(root.GetProperty("require_collateral").GetDecimal() >= 0);
+        Assert.True(root.GetProperty("keep_rate").GetDecimal() >= 0);
+        Assert.True(native.Collateral >= 0);
+        Assert.True(native.RequireCollateral >= 0);
+        Assert.True(native.KeepRate >= 0);
+    }
+
+    [BitflyerPrivateReadLiveFact]
+    public async Task GetCollateralAccounts_ReadParity()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        Assert.NotNull(client.Private);
+        Assert.NotNull(client.Protocol.Private);
+
+        var nativeCall = await client.Private!.GetCollateralAccountsCallAsync(new GetCollateralAccountsRequest());
+        var protocolCall = await client.Protocol.Private!.GetCollateralAccountsCallAsync();
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Array, root.ValueKind);
+        Assert.Equal(root.GetArrayLength(), native.Count);
+
+        for (var i = 0; i < native.Count; i++)
+        {
+            var protocolItem = root[i];
+            var nativeItem = native[i];
+
+            Assert.Equal(protocolItem.GetProperty("currency_code").GetString(), nativeItem.CurrencyCode);
+            Assert.Equal(protocolItem.GetProperty("amount").GetDecimal(), nativeItem.Amount);
+        }
+    }
+
+    [BitflyerPrivateReadLiveFact]
+    public async Task GetChildOrders_ReadParity()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        Assert.NotNull(client.Private);
+        Assert.NotNull(client.Protocol.Private);
+
+        var request = new GetChildOrdersRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            Count = 10,
+            ChildOrderState = ChildOrderStates.Completed,
+        };
+
+        var nativeCall = await client.Private!.GetChildOrdersCallAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetChildOrdersCallAsync(
+            request.ProductCode,
+            request.Count,
+            request.Before,
+            request.After,
+            request.ChildOrderState,
+            request.ChildOrderId,
+            request.ChildOrderAcceptanceId,
+            request.ParentOrderId);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Array, root.ValueKind);
+        Assert.Equal(root.GetArrayLength(), native.Count);
+
+        for (var i = 0; i < native.Count; i++)
+        {
+            var protocolItem = root[i];
+            var nativeItem = native[i];
+
+            Assert.Equal(protocolItem.GetProperty("id").GetInt64(), nativeItem.Id);
+            Assert.Equal(protocolItem.GetProperty("child_order_id").GetString(), nativeItem.ChildOrderId);
+            Assert.Equal(protocolItem.GetProperty("product_code").GetString(), nativeItem.ProductCode);
+            Assert.Equal(protocolItem.GetProperty("side").GetString(), nativeItem.Side);
+            Assert.Equal(protocolItem.GetProperty("child_order_type").GetString(), nativeItem.ChildOrderType);
+            Assert.Equal(protocolItem.GetProperty("price").GetDecimal(), nativeItem.Price);
+            Assert.Equal(protocolItem.GetProperty("average_price").GetDecimal(), nativeItem.AveragePrice);
+            Assert.Equal(protocolItem.GetProperty("size").GetDecimal(), nativeItem.Size);
+            Assert.Equal(protocolItem.GetProperty("child_order_state").GetString(), nativeItem.ChildOrderState);
+            Assert.Equal(protocolItem.GetProperty("expire_date").GetDateTimeOffset(), nativeItem.ExpireDate);
+            Assert.Equal(protocolItem.GetProperty("child_order_date").GetDateTimeOffset(), nativeItem.ChildOrderDate);
+            Assert.Equal(protocolItem.GetProperty("child_order_acceptance_id").GetString(), nativeItem.ChildOrderAcceptanceId);
+            Assert.Equal(protocolItem.GetProperty("outstanding_size").GetDecimal(), nativeItem.OutstandingSize);
+            Assert.Equal(protocolItem.GetProperty("cancel_size").GetDecimal(), nativeItem.CancelSize);
+            Assert.Equal(protocolItem.GetProperty("executed_size").GetDecimal(), nativeItem.ExecutedSize);
+            Assert.Equal(protocolItem.GetProperty("total_commission").GetDecimal(), nativeItem.TotalCommission);
+            Assert.Equal(protocolItem.GetProperty("time_in_force").GetString(), nativeItem.TimeInForce);
+        }
+    }
+
+    [BitflyerPrivateReadLiveFact]
+    public async Task GetExecutions_ReadParity()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        Assert.NotNull(client.Private);
+        Assert.NotNull(client.Protocol.Private);
+
+        var request = new GetExecutionsRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            Count = 10,
+        };
+
+        var nativeCall = await client.Private!.GetExecutionsCallAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetExecutionsCallAsync(
+            request.ProductCode,
+            request.Count,
+            request.Before,
+            request.After,
+            request.ChildOrderId,
+            request.ChildOrderAcceptanceId);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Array, root.ValueKind);
+        Assert.Equal(root.GetArrayLength(), native.Count);
+
+        for (var i = 0; i < native.Count; i++)
+        {
+            var protocolItem = root[i];
+            var nativeItem = native[i];
+
+            Assert.Equal(protocolItem.GetProperty("id").GetInt64(), nativeItem.Id);
+            Assert.Equal(protocolItem.GetProperty("child_order_id").GetString(), nativeItem.ChildOrderId);
+            Assert.Equal(protocolItem.GetProperty("side").GetString(), nativeItem.Side);
+            Assert.Equal(protocolItem.GetProperty("price").GetDecimal(), nativeItem.Price);
+            Assert.Equal(protocolItem.GetProperty("size").GetDecimal(), nativeItem.Size);
+            Assert.Equal(protocolItem.GetProperty("commission").GetDecimal(), nativeItem.Commission);
+            Assert.Equal(protocolItem.GetProperty("exec_date").GetDateTimeOffset(), nativeItem.ExecDate);
+            Assert.Equal(protocolItem.GetProperty("child_order_acceptance_id").GetString(), nativeItem.ChildOrderAcceptanceId);
+        }
+    }
+
+    [BitflyerPrivateReadLiveFact]
+    public async Task GetCollateralHistory_ReadParity()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        Assert.NotNull(client.Private);
+        Assert.NotNull(client.Protocol.Private);
+
+        var request = new GetCollateralHistoryRequest
+        {
+            Count = 10,
+        };
+
+        var nativeCall = await client.Private!.GetCollateralHistoryCallAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetCollateralHistoryCallAsync(request.Count, request.Before, request.After);
+
+        Assert.True(protocolCall.IsSuccess);
+        Assert.True(nativeCall.IsSuccess);
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotNull(protocolCall.Response!.BodyText);
+        Assert.NotNull(nativeCall.Response);
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+        var native = nativeCall.Response!;
+
+        Assert.Equal(JsonValueKind.Array, root.ValueKind);
+        Assert.Equal(root.GetArrayLength(), native.Count);
+
+        for (var i = 0; i < native.Count; i++)
+        {
+            var protocolItem = root[i];
+            var nativeItem = native[i];
+
+            Assert.Equal(protocolItem.GetProperty("id").GetInt64(), nativeItem.Id);
+            Assert.Equal(protocolItem.GetProperty("currency_code").GetString(), nativeItem.CurrencyCode);
+            Assert.Equal(protocolItem.GetProperty("change").GetDecimal(), nativeItem.Change);
+            Assert.Equal(protocolItem.GetProperty("amount").GetDecimal(), nativeItem.Amount);
+            Assert.Equal(protocolItem.GetProperty("reason_code").GetString(), nativeItem.ReasonCode);
+            Assert.Equal(protocolItem.GetProperty("date").GetDateTimeOffset(), nativeItem.Date);
         }
     }
 

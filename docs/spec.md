@@ -285,10 +285,18 @@ Stage10 では実装対象外とする。
 - `Call` を返さない ergonomic wrapper は Stage10 の必須要件に含めない
 - ergonomic wrapper を将来追加する場合でも、`Call` を返す主 API を置き換えてはならない
 - facade の命名例:
+  - `GetBoardCallAsync(...)`
   - `GetTickerCallAsync(...)`
   - `GetBalanceCallAsync(...)`
+  - `GetCollateralCallAsync(...)`
+  - `GetCollateralAccountsCallAsync(...)`
+  - `GetChildOrdersCallAsync(...)`
+  - `GetExecutionsCallAsync(...)`
+  - `GetCollateralHistoryCallAsync(...)`
+  - `GetPositionsCallAsync(...)`
   - `SendChildOrderCallAsync(...)`
   - `CancelChildOrderCallAsync(...)`
+  - `CancelAllChildOrdersCallAsync(...)`
 
 ### 4.2.2 User-Facing Surface Rule
 
@@ -668,6 +676,8 @@ src/Exchanges/Bitflyer/Protocol/
       IBitflyerPublicProtocolApi.cs
       BitflyerPublicProtocolApi.cs
     Endpoints/
+      GetBoard/
+        GetBoardProtocolEndpoint.cs
       GetTicker/
         GetTickerProtocolEndpoint.cs
   Private/
@@ -677,10 +687,24 @@ src/Exchanges/Bitflyer/Protocol/
     Endpoints/
       GetBalance/
         GetBalanceProtocolEndpoint.cs
+      GetCollateral/
+        GetCollateralProtocolEndpoint.cs
+      GetCollateralAccounts/
+        GetCollateralAccountsProtocolEndpoint.cs
+      GetCollateralHistory/
+        GetCollateralHistoryProtocolEndpoint.cs
+      GetChildOrders/
+        GetChildOrdersProtocolEndpoint.cs
+      GetExecutions/
+        GetExecutionsProtocolEndpoint.cs
+      GetPositions/
+        GetPositionsProtocolEndpoint.cs
       SendChildOrder/
         SendChildOrderProtocolEndpoint.cs
       CancelChildOrder/
         CancelChildOrderProtocolEndpoint.cs
+      CancelAllChildOrders/
+        CancelAllChildOrdersProtocolEndpoint.cs
   Internal/
     Auth/
     Runtime/
@@ -702,6 +726,11 @@ src/Exchanges/Bitflyer/Native/
       IBitflyerPublicNativeApi.cs
       BitflyerPublicNativeApi.cs
     Endpoints/
+      GetBoard/
+        GetBoardNativeEndpoint.cs
+        GetBoardRequest.cs
+        GetBoardResponse.cs
+        GetBoardLevel.cs
       GetTicker/
         GetTickerNativeEndpoint.cs
         GetTickerRequest.cs
@@ -715,6 +744,30 @@ src/Exchanges/Bitflyer/Native/
         GetBalanceNativeEndpoint.cs
         GetBalanceRequest.cs
         GetBalance.cs
+      GetCollateral/
+        GetCollateralNativeEndpoint.cs
+        GetCollateralRequest.cs
+        GetCollateralResponse.cs
+      GetCollateralAccounts/
+        GetCollateralAccountsNativeEndpoint.cs
+        GetCollateralAccountsRequest.cs
+        GetCollateralAccounts.cs
+      GetCollateralHistory/
+        GetCollateralHistoryNativeEndpoint.cs
+        GetCollateralHistoryRequest.cs
+        GetCollateralHistory.cs
+      GetChildOrders/
+        GetChildOrdersNativeEndpoint.cs
+        GetChildOrdersRequest.cs
+        GetChildOrders.cs
+      GetExecutions/
+        GetExecutionsNativeEndpoint.cs
+        GetExecutionsRequest.cs
+        GetExecutions.cs
+      GetPositions/
+        GetPositionsNativeEndpoint.cs
+        GetPositionsRequest.cs
+        GetPositions.cs
       SendChildOrder/
         SendChildOrderNativeEndpoint.cs
         SendChildOrderRequest.cs
@@ -722,6 +775,9 @@ src/Exchanges/Bitflyer/Native/
       CancelChildOrder/
         CancelChildOrderNativeEndpoint.cs
         CancelChildOrderRequest.cs
+      CancelAllChildOrders/
+        CancelAllChildOrdersNativeEndpoint.cs
+        CancelAllChildOrdersRequest.cs
   Internal/
     Shared/
 ```
@@ -889,21 +945,45 @@ venue ごとの endpoint matrix は、少なくとも以下の metadata を持�
 
 Stage10 で優先する endpoint:
 
+- `GetBoard`
 - `GetTicker`
 - `GetBalance`
+- `GetCollateral`
+- `GetCollateralAccounts`
+- `GetChildOrders`
+- `GetExecutionsPrivate`
+- `GetPositions`
+- `GetCollateralHistory`
 - `SendChildOrder`
 - `CancelChildOrder`
+- `CancelAllChildOrders`
 
 役割:
 
+- `GetBoard`
+  - public object + nested array response の template
 - `GetTicker`
   - public read の template
 - `GetBalance`
   - private read と top-level array 契約の template
+- `GetCollateral`
+  - private object response の template
+- `GetCollateralAccounts`
+  - private array response の空 request template
+- `GetChildOrders`
+  - optional query と paging/filter を持つ private read endpoint の template
+- `GetExecutionsPrivate`
+  - required query + optional paging/filter を持つ private read endpoint の template
+- `GetPositions`
+  - required query を持つ private read endpoint の template
+- `GetCollateralHistory`
+  - paging only private read endpoint の template
 - `SendChildOrder`
   - private write と request encode の template
 - `CancelChildOrder`
   - 注文 lifecycle 補助 endpoint の template
+- `CancelAllChildOrders`
+  - destructive private write + `Unit` response の template
 
 ### 10.1 Test 契約
 
@@ -1123,15 +1203,18 @@ venue-specific `Vocabulary` project を作る場合の正本:
 ## 13. 実装順
 
 1. 文書を正本として固定する
-2. `Protocol` の `GetTicker` を facade + endpoint module に移す
-3. `Native` の `GetTicker` を同じ形へ移す
+2. `Protocol` / `Native` の `GetTicker` を facade + endpoint module に移す
+3. `GetBoard` を移す
 4. `GetBalance` を移す
-5. `SendChildOrder` を移す
-6. `CancelChildOrder` を移す
-7. module 集約 object を導入して facade constructor を整理する
-8. `Composition` を更新する
-9. test を facade / endpoint module / composition に役割分離する
-10. `partial` 依存構成と不要 helper を整理する
+5. `GetCollateral` / `GetCollateralAccounts` を移す
+6. `GetChildOrders` / `GetExecutionsPrivate` / `GetCollateralHistory` を移す
+7. `GetPositions` を移す
+8. `SendChildOrder` / `CancelChildOrder` を移す
+9. `CancelAllChildOrders` を移す
+10. module 集約 object を導入して facade constructor を整理する
+11. `Composition` を更新する
+12. test を facade / endpoint module / composition に役割分離する
+13. `partial` 依存構成と不要 helper を整理する
 
 ### 13.1 Codex 実装戦略
 

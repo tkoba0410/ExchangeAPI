@@ -74,7 +74,7 @@
 | EndpointId | Method | Path | Scope | ExposeInProtocol | ExposeInNative | LiveTestPhase | RequestDtoStatus | ResponseDtoStatus | ExpectedStatus | ResponseShape | WritesState | CleanupPolicy | AliasPath | AuthType | OptionalOmissionRule |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | GetMarkets | GET | /v1/getmarkets | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
-| GetBoard | GET | /v1/getboard | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
+| GetBoard | GET | /v1/getboard | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | None | product_code = null は query omitted |
 | GetTicker | GET | /v1/getticker | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | /v1/ticker | None | product_code = null は query omitted |
 | GetExecutionsPublic | GET | /v1/getexecutions | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
 | GetBoardState | GET | /v1/getboardstate | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
@@ -84,8 +84,8 @@
 | GetChats | GET | /v1/getchats | public | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | None | TBD |
 | GetPermissions | GET | /v1/me/getpermissions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 | GetBalance | GET | /v1/me/getbalance | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
-| GetCollateral | GET | /v1/me/getcollateral | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetCollateralAccounts | GET | /v1/me/getcollateralaccounts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetCollateral | GET | /v1/me/getcollateral | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Object | No | None | - | KeySecret | - |
+| GetCollateralAccounts | GET | /v1/me/getcollateralaccounts | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
 | GetAddresses | GET | /v1/me/getaddresses | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 | GetCoinIns | GET | /v1/me/getcoinins | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 | GetCoinOuts | GET | /v1/me/getcoinouts | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
@@ -97,34 +97,57 @@
 | SendParentOrder | POST | /v1/me/sendparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | Required | - | KeySecret | TBD |
 | CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of child_order_id or child_order_acceptance_id |
 | CancelParentOrder | POST | /v1/me/cancelparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | None | - | KeySecret | TBD |
-| CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | None | - | KeySecret | TBD |
-| GetChildOrders | GET | /v1/me/getchildorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | product_code required |
+| GetChildOrders | GET | /v1/me/getchildorders | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null; product_code omitted => BTC_JPY default |
 | GetParentOrders | GET | /v1/me/getparentorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 | GetParentOrder | GET | /v1/me/getparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetExecutionsPrivate | GET | /v1/me/getexecutions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetExecutionsPrivate | GET | /v1/me/getexecutions | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | product_code required; optional query params omitted when null |
 | GetBalanceHistory | GET | /v1/me/getbalancehistory | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetPositions | GET | /v1/me/getpositions | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
-| GetCollateralHistory | GET | /v1/me/getcollateralhistory | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
+| GetPositions | GET | /v1/me/getpositions | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
+| GetCollateralHistory | GET | /v1/me/getcollateralhistory | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | GetTradingCommission | GET | /v1/me/gettradingcommission | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 
 ## Initial Rule
 
-- Stage10 第1段階では `GetTicker`、`GetBalance`、`SendChildOrder` を先行し、その後 `CancelChildOrder` を追加実装対象に含める
-- `GetTicker` と `GetBalance` は read path のため `Phase1-Read` とする
-- `SendChildOrder` は write path のため `Phase2-Write` とする
-- 初版では DTO 固定前のため、全 endpoint の `RequestDtoStatus` / `ResponseDtoStatus` は `Transitional` から開始する
+- 現行 Stage10 実装では `GetBoard`、`GetTicker`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetChildOrders`、`GetExecutionsPrivate`、`GetPositions`、`GetCollateralHistory`、`SendChildOrder`、`CancelChildOrder`、`CancelAllChildOrders` を library 公開面に含める
+- read path の live test は、public は条件なし、private read は認証可能なら実行する
+- `SendChildOrder` と `CancelChildOrder` は `Phase2-Write`、`CancelAllChildOrders` は destructive 範囲が広いため live test をまだ持たない
+- DTO 固定前のため、実装済み endpoint の `RequestDtoStatus` / `ResponseDtoStatus` は引き続き `Transitional` とする
 
 ## Implementation Order
 
-- まず `GetTicker` を `Protocol` / `Native` 両方の template endpoint として新構成へ移す
-- 次に `GetBalance` を同じ形で移し、top-level array 契約の扱いを固定する
-- その後 `SendChildOrder` を移し、request encode が強い write endpoint の形を固定する
-- `CancelChildOrder` は注文 lifecycle 補助 endpoint としてその後に追従させる
-- `Composition` の wiring 変更は、少なくとも `GetTicker` と `GetBalance` の module 形が固まった後に行う
+- `GetTicker` で public object response の基準形を作る
+- `GetBoard` を追加し、public object with nested array response の形を固定する
+- `GetBalance` を追加し、private top-level array response の基準形を作る
+- `GetCollateral` / `GetCollateralAccounts` を追加し、private object と private array の空 request read endpoint を固定する
+- `GetChildOrders` / `GetExecutionsPrivate` / `GetCollateralHistory` を追加し、paging/filter を持つ private read endpoint の形を固定する
+- `GetPositions` を追加し、required query を持つ private read endpoint の形を固定する
+- `SendChildOrder` / `CancelChildOrder` を追加し、body encode を持つ write endpoint の形を固定する
+- `CancelAllChildOrders` を追加し、body encode + `Unit` response の destructive write endpoint を固定する
 
-## Initial Endpoint Contracts
+## Current Implemented Endpoint Contracts
 
-初期 4 endpoint の exact contract は以下とする。
+現行実装 12 endpoint の exact contract は以下とする。
+
+### GetBoard
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetBoardCallAsync(string? productCode, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(GetBoardRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string?`
+  - JSON body なし
+  - `ProductCode = null` のとき query omitted
+- response DTO
+  - `MidPrice: decimal`
+  - `Bids: IReadOnlyList<GetBoardLevel>`
+  - `Asks: IReadOnlyList<GetBoardLevel>`
+  - `GetBoardLevel`
+    - `Price: decimal`
+    - `Size: decimal`
+- `ExpectedStatus = 200`
+- `ResponseShape = Object`
 
 ### GetTicker
 
@@ -173,6 +196,168 @@
 - `ExpectedStatus = 200`
 - `ResponseShape = Array`
 
+### GetCollateral
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetCollateralCallAsync(CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(GetCollateralRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `GetCollateralRequest` は空 DTO
+  - JSON body なし
+- response DTO
+  - `Collateral: decimal`
+  - `OpenPositionPnl: decimal`
+  - `RequireCollateral: decimal`
+  - `KeepRate: decimal`
+  - `MarginCallAmount: decimal?`
+  - `MarginCallDueDate: DateTimeOffset?`
+- `ExpectedStatus = 200`
+- `ResponseShape = Object`
+
+### GetCollateralAccounts
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetCollateralAccountsCallAsync(CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetCollateralAccountsRequest, IReadOnlyList<GetCollateralAccounts.Item>>> GetCollateralAccountsCallAsync(GetCollateralAccountsRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `GetCollateralAccountsRequest` は空 DTO
+  - JSON body なし
+- response DTO
+  - top-level array
+  - `GetCollateralAccounts.Item`
+    - `CurrencyCode: string`
+    - `Amount: decimal`
+- `ExpectedStatus = 200`
+- `ResponseShape = Array`
+
+### GetChildOrders
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetChildOrdersCallAsync(string? productCode, int? count, long? before, long? after, string? childOrderState, string? childOrderId, string? childOrderAcceptanceId, string? parentOrderId, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetChildOrdersCallAsync(GetChildOrdersRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string?`
+  - `Count: int?`
+  - `Before: long?`
+  - `After: long?`
+  - `ChildOrderState: string?`
+  - `ChildOrderId: string?`
+  - `ChildOrderAcceptanceId: string?`
+  - `ParentOrderId: string?`
+- request rule
+  - `ProductCode = null` のとき query omitted で bitFlyer の既定値 `BTC_JPY`
+  - `Count`、`Before`、`After` は指定時に正数
+  - `ChildOrderState` は `ACTIVE` / `COMPLETED` / `CANCELED` / `EXPIRED` / `REJECTED` のいずれか
+  - それ以外の optional query は `null` のとき omitted
+- response DTO
+  - top-level array
+  - `GetChildOrders.Item`
+    - `Id: long`
+    - `ChildOrderId: string`
+    - `ProductCode: string`
+    - `Side: string`
+    - `ChildOrderType: string`
+    - `Price: decimal`
+    - `AveragePrice: decimal`
+    - `Size: decimal`
+    - `ChildOrderState: string`
+    - `ExpireDate: DateTimeOffset`
+    - `ChildOrderDate: DateTimeOffset`
+    - `ChildOrderAcceptanceId: string`
+    - `OutstandingSize: decimal`
+    - `CancelSize: decimal`
+    - `ExecutedSize: decimal`
+    - `TotalCommission: decimal`
+    - `TimeInForce: string`
+- `ExpectedStatus = 200`
+- `ResponseShape = Array`
+
+### GetExecutionsPrivate
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetExecutionsCallAsync(string productCode, int? count, long? before, long? after, string? childOrderId, string? childOrderAcceptanceId, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetExecutionsRequest, IReadOnlyList<GetExecutions.Item>>> GetExecutionsCallAsync(GetExecutionsRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string`
+  - `Count: int?`
+  - `Before: long?`
+  - `After: long?`
+  - `ChildOrderId: string?`
+  - `ChildOrderAcceptanceId: string?`
+- request rule
+  - `ProductCode` 必須
+  - `Count`、`Before`、`After` は指定時に正数
+  - optional query は `null` のとき omitted
+- response DTO
+  - top-level array
+  - `GetExecutions.Item`
+    - `Id: long`
+    - `ChildOrderId: string`
+    - `Side: string`
+    - `Price: decimal`
+    - `Size: decimal`
+    - `Commission: decimal`
+    - `ExecDate: DateTimeOffset`
+    - `ChildOrderAcceptanceId: string`
+- `ExpectedStatus = 200`
+- `ResponseShape = Array`
+
+### GetPositions
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetPositionsCallAsync(string productCode, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsCallAsync(GetPositionsRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string`
+  - `FX_BTC_JPY` のみ許容する
+  - JSON body なし
+- response DTO
+  - top-level array
+  - `GetPositions.Item`
+    - `ProductCode: string`
+    - `Side: string`
+    - `Price: decimal`
+    - `Size: decimal`
+    - `Commission: decimal`
+    - `SwapPointAccumulate: decimal`
+    - `RequireCollateral: decimal`
+    - `OpenDate: DateTimeOffset`
+    - `Leverage: decimal`
+    - `Pnl: decimal`
+    - `Sfd: decimal`
+- `ExpectedStatus = 200`
+- `ResponseShape = Array`
+
+### GetCollateralHistory
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetCollateralHistoryCallAsync(int? count, long? before, long? after, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetCollateralHistoryRequest, IReadOnlyList<GetCollateralHistory.Item>>> GetCollateralHistoryCallAsync(GetCollateralHistoryRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `Count: int?`
+  - `Before: long?`
+  - `After: long?`
+- request rule
+  - `Count`、`Before`、`After` は指定時に正数
+  - `null` のとき omitted
+- response DTO
+  - top-level array
+  - `GetCollateralHistory.Item`
+    - `Id: long`
+    - `CurrencyCode: string`
+    - `Change: decimal`
+    - `Amount: decimal`
+    - `ReasonCode: string`
+    - `Date: DateTimeOffset`
+- `ExpectedStatus = 200`
+- `ResponseShape = Array`
+
 ### SendChildOrder
 
 - `Protocol` facade
@@ -212,5 +397,21 @@
 - response DTO
   - `Unit`
   - empty body または `{}` を成功扱いにしてよい
+- `ExpectedStatus = 200`
+- `ResponseShape = EmptyOrObject`
+
+### CancelAllChildOrders
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> CancelAllChildOrdersCallAsync(string bodyJson, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<CancelAllChildOrdersRequest, Unit>> CancelAllChildOrdersCallAsync(CancelAllChildOrdersRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string`
+- request rule
+  - `ProductCode` 必須
+- response DTO
+  - `Unit`
+  - response body は decode しない
 - `ExpectedStatus = 200`
 - `ResponseShape = EmptyOrObject`

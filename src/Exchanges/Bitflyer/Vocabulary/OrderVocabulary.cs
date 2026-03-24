@@ -18,3 +18,12 @@ public static class TimeInForces
     public const string Ioc = "IOC";
     public const string Fok = "FOK";
 }
+
+public static class ChildOrderStates
+{
+    public const string Active = "ACTIVE";
+    public const string Completed = "COMPLETED";
+    public const string Canceled = "CANCELED";
+    public const string Expired = "EXPIRED";
+    public const string Rejected = "REJECTED";
+}

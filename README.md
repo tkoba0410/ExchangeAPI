@@ -103,7 +103,7 @@ else
 ## Current State
 
 - 実装済みの公開面は `Protocol` / `Native` の一部 endpoint
-- bitFlyer は `GetTicker`, `GetBalance`, `SendChildOrder`, `CancelChildOrder`
+- bitFlyer は `GetBoard`, `GetTicker`, `GetBalance`, `GetCollateral`, `GetCollateralAccounts`, `GetChildOrders`, `GetExecutionsPrivate`, `GetPositions`, `GetCollateralHistory`, `SendChildOrder`, `CancelChildOrder`, `CancelAllChildOrders`
 - Binance は `GetKlines`
 - 現行 phase では library を優先し、`Unified`, CLI, MCP Server は将来検討とする
 

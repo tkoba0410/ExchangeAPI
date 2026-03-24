@@ -88,7 +88,7 @@ internal static class JsonValueReader
         if (DateTimeOffset.TryParse(
             raw,
             CultureInfo.InvariantCulture,
-            DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+            DateTimeStyles.None,
             out var value))
         {
             return value;

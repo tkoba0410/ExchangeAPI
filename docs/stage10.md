@@ -1,6 +1,6 @@
 # Stage10（設計正本）
 
-最終更新: 2026-03-23  
+最終更新: 2026-03-24  
 対象ブランチ: `stage10`
 
 ## 1. 位置づけ
@@ -31,9 +31,16 @@ Stage10 における文書の主従は以下とする。
 - [`docs/endpoints-binance.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-binance.md)
   - Binance の endpoint 運用正本
   - Binance endpoint ごとの metadata と固定状況を定義する
+- [`docs/cli.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/cli.md)
+  - CLI adapter の設計補助文書
+  - library surface の利用方針と CLI 固有契約を定義する
+- [`docs/mcp-server.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/mcp-server.md)
+  - MCP Server adapter の設計補助文書
+  - `Unified` との関係と tool 公開方針を定義する
 
-`docs/stage10.md` と venue ごとの matrix を現行の文書体系とする。  
-本 repository では、この文書体系だけを Stage10 の正本とし、削除済み inventory や補助文書を前提にしない。  
+`docs/stage10.md` と venue ごとの matrix を Stage10 library の正本とする。  
+`Cli` と `McpServer` は別文書とし、本書では library から見た境界だけを扱う。  
+本 repository では、library 設計の正本を `docs/stage10.md` と venue matrix に固定し、削除済み inventory や補助文書を前提にしない。  
 旧 `stage10b.md` は廃止し、現行の設計判断、運用判断、実装判断の根拠に使わない。
 
 ## 2. ゴール
@@ -44,8 +51,8 @@ Stage10 における文書の主従は以下とする。
 - `Native` を取引所横断正規化層ではなく、exchange-native contract 層として固定する
 - `Unified` は「最小公約数」ではなく、「意味同一性を保証できる capability だけを公開する層」として定義する
 - `Native` と `Unified` は層としては分離しつつ、利用者公開面では sibling surface として提示できるようにする
-- `Unified` と `McpServer` を将来追加できるよう、層名と責務境界を先に固定する
-- `Cli` を現行の公開 adapter として追加でき、将来の `McpServer` と役割を混同しないようにする
+- `Unified` を将来追加できるよう、層名と責務境界を先に固定する
+- 外部 adapter (`Cli` / `McpServer`) を library 正本と分離した文書体系で追加できるようにする
 - 既存試作の file 配置に引っ張られず、責務境界から物理構成を決める
 
 ## 2.1 全体図
@@ -54,9 +61,7 @@ Stage10 における文書の主従は以下とする。
 
 ```mermaid
 flowchart TB
-    App["利用者コード"]
-    Cli["Cli<br/>(現行 adapter)"]
-    Mcp["McpServer<br/>(将来)"]
+    App["Library Consumer"]
     Uni["Unified<br/>(将来)"]
     Native["Native<br/>exchange-native contract"]
     Protocol["Protocol<br/>venue-specific execution runtime"]
@@ -65,12 +70,6 @@ flowchart TB
     App --> Native
     App --> Uni
     App -. inspection/debug .-> Protocol
-
-    Cli --> Native
-    Cli --> Uni
-    Cli -. explicit raw/debug path .-> Protocol
-
-    Mcp --> Uni
     Uni --> Native
     Native --> Protocol
     Protocol --> Api
@@ -227,28 +226,19 @@ Stage10 では実装対象外とする。
 - `Unified` は venue ごとの差分吸収層ではあるが、意味の曖昧化や silent degrade を許容しない
 - `Unified` で未対応の capability を `Native` へ暗黙 fallback してはならない
 
-### 3.4 Cli
+### 3.4 External Adapters
 
-`Cli` は現行で追加し得る公開 adapter 層である。
-
-前提:
-
-- `Cli` は request parsing / output formatting / exit code / confirmation prompt などの adapter 事情を所有する
-- `Cli` の主経路は `Native` とし、`Protocol` は raw response や debug のための明示 opt-in 経路としてのみ扱ってよい
-- 将来 `Unified` が追加された場合、`Cli` は `Native` と `Unified` を利用者から sibling surface として見せてよい
-- `Cli` は concrete endpoint / runtime / signer / transport を直接配線しない
-
-### 3.5 McpServer
-
-`McpServer` は将来追加する公開 adapter 層である。  
-Stage10 では実装対象外とする。
+`Cli` と `McpServer` は本書の主正本対象ではない。  
+それぞれの設計は別文書で定義する。
 
 前提:
 
-- `McpServer` は `Unified` を使う
-- `McpServer` は `Protocol` や `Native` を直接正本にしない
+- library は adapter-specific 事情を所有しない
+- external adapter は library の public surface または `Composition` を経由して library を利用する
+- CLI の正本は [`docs/cli.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/cli.md) に置く
+- MCP Server の正本は [`docs/mcp-server.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/mcp-server.md) に置く
 
-### 3.6 依存規約
+### 3.5 依存規約
 
 依存方向の正本は以下とする。
 
@@ -256,9 +246,7 @@ Stage10 では実装対象外とする。
 - `Protocol.Api` -> `Protocol.Endpoints` の module interface または module 集約 object
 - `Native.Endpoints` -> `Native.Internal.Shared` / `Vocabulary` / `Primitives` / 対応する `Protocol` endpoint interface
 - `Native.Api` -> `Native.Endpoints` の module interface または module 集約 object
-- `Cli` -> `Composition`
 - `Unified` -> `Native`
-- `McpServer` -> `Unified`
 - `Composition` -> concrete 実装を横断的に組み立ててよい唯一の場所
 
 禁止事項:
@@ -266,8 +254,7 @@ Stage10 では実装対象外とする。
 - facade から runtime / signer / transport へ直接触れること
 - endpoint module から sibling endpoint module を直接呼ぶこと
 - `Native` から `Protocol.Internal.Runtime` の concrete 実装へ直接触れること
-- `Cli` から concrete endpoint / runtime / signer / transport へ直接触れること
-- `McpServer` から `Protocol` / `Native` を直接正本として使うこと
+- external adapter から concrete endpoint / runtime / signer / transport へ直接触れること
 
 ## 4. 公開面
 
@@ -307,7 +294,7 @@ Stage10 では実装対象外とする。
 
 - 層の依存方向と、利用者にどう見せるかは分けて扱う
 - `Unified` は内部では `Native` の上に載るが、利用者公開面では `Native` と sibling surface として提示してよい
-- `Cli` や将来の adapter は `native` と `unified` を parallel な入口として提示してよい
+- external adapter は `native` と `unified` を parallel な入口として提示してよい
 - `Unified` 未対応の capability を、利用者に見えない形で `Native` へ自動切り替えしてはならない
 - 利用者が venue 固有機能を必要とする場合は、明示的に `Native` を選ぶ
 
@@ -1174,8 +1161,8 @@ Codex は以下の順で実装する。
 - write safety 規約が定義されている
 - `Native` が exchange-native contract として定義されている
 - `Unified` の意味同一性ルールが定義されている
-- `Cli` / `Unified` / `McpServer` の公開 adapter / surface 関係が定義されている
-- `Unified` / `McpServer` を上位層として追加できる
+- library と external adapter の境界が定義されている
+- `Unified` を上位層として追加できる
 - endpoint 運用正本が venue ごとの `docs/endpoints-<venue>.md` に固定されている
 - 既存試作は移行材料であって設計正本ではないことが明記されている
 

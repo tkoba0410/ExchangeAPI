@@ -277,7 +277,43 @@ Stage10 では実装対象外とする。
   - 認証付きなら `Native.Private` も持つ
   - 内部で利用する `Protocol` へアクセスできる
 
-### 4.2.1 Facade Method Contract
+### 4.2.1 Client Lifetime / HttpClient Ownership
+
+- client bundle は short-lived per-call object ではなく、reuse 前提の long-lived object として扱う
+- 現行の `CreateProtocolClient(...)` / `CreateNativeClient(...)` は internal-owned mode とみなし、transport 実装に必要な `HttpClient` を library 内で生成してよい
+- `HttpClient` を受け取る overload を将来追加する場合、それは external-owned mode とする
+- ownership は必ず二値で定義する
+  - internal-owned mode: library が transport 資源を所有する
+  - external-owned mode: caller が `HttpClient` を所有する
+- external-owned mode では library は caller 提供の `HttpClient` を dispose してはならない
+- external-owned mode では library は caller 提供の `HttpClient` の mutable state を変更してはならない
+  - `Timeout`
+  - `BaseAddress`
+  - `DefaultRequestHeaders`
+- `HttpClient` は option object に入れない
+- option object は値設定のみを持つ構成 object とし、資源所有 object を混在させない
+- `BaseUri` は ExchangeAPI 側の venue root 設定として持ち続ける
+- external-owned mode を将来追加する場合でも、request URI 解決の正本は ExchangeAPI 側の `BaseUri + path/query` とする
+- explicit な dispose surface を追加する場合、それは additive change として導入する
+- dispose surface が追加されるまでは、internal-owned mode の bundle は process または test scope で reuse する前提とする
+
+### 4.2.2 Transport Option Contract
+
+- transport option は ExchangeAPI の実行契約であり、caller 提供 `HttpClient` の mutable state に依存してはならない
+- 現行の stable option は `BaseUri` / credentials / protocol debug logging に限定する
+- timeout は将来 additive に追加してよい transport option とする
+- timeout option 名の正本は `RequestTimeout` とする
+- `RequestTimeout` は per-request の上限時間を意味する
+- `RequestTimeout` を実装する場合、`HttpClient.Timeout` を正本にしてはならない
+- `RequestTimeout` は linked `CancellationTokenSource` によって request ごとに適用する
+- caller から渡された `CancellationToken` は常に transport まで伝播させる
+- effective cancellation は caller cancellation と `RequestTimeout` の早い方とする
+- timeout による失敗は `Transport` とする
+- caller cancellation による失敗も `Transport` とする
+- Stage10 では retry / backoff / circuit breaker を transport option の正本に含めない
+- proxy / handler chain / resilience pipeline は Stage10 の必須正本に含めない
+
+### 4.2.3 Facade Method Contract
 
 - facade の主公開面は `*CallAsync(...)` とする
 - `Protocol` facade は `Task<Call<ProtocolRequest, ProtocolResponse>>` を返す
@@ -300,7 +336,7 @@ Stage10 では実装対象外とする。
   - `CancelChildOrderCallAsync(...)`
   - `CancelAllChildOrdersCallAsync(...)`
 
-### 4.2.2 User-Facing Surface Rule
+### 4.2.4 User-Facing Surface Rule
 
 - 層の依存方向と、利用者にどう見せるかは分けて扱う
 - `Unified` は内部では `Native` の上に載るが、利用者公開面では `Native` と sibling surface として提示してよい
@@ -512,9 +548,24 @@ public sealed class Call<TRequest, TResponse>
 
 - `CallMeta` には少なくとも `Layer` / `Component` / `EndpointId` / `Scope` / `Auth` を持たせる
 - `Native` から `Protocol` を呼ぶ場合、child call を必ず保持する
+- `CallMeta` は構造観測の置き場所であり、free-form diagnostics bag にしてはならない
+- `CallMeta` に raw error body, parsed venue error object, arbitrary dictionary を重ねてはならない
 - request header は記録しない
 - API key / secret / 認証 header / 署名値は metadata や diagnostics に露出しない
 - request body に秘匿値が含まれる endpoint でも、秘匿値そのものは diagnostics の正本にしない
+
+### 5.3.1 Error Observation Contract
+
+- venue error body の raw text の正本は `ProtocolResponse.BodyText` とする
+- non-success status の response body を `CallMeta` へ複製してはならない
+- `CallError.Kind` と `CallError.Message` は最小の失敗公開面として維持する
+- venue 固有 error code / error message を将来公開する場合、置き場所は `CallMeta` ではなく `CallError` 側の狭い optional field とする
+- 将来追加してよい error detail field は以下のような narrow field に限定する
+  - `HttpStatusCode`
+  - `VenueErrorCode`
+  - `VenueErrorMessage`
+- raw JSON object / loosely typed dictionary / venue 固有 envelope 全体を `CallError` の公開面にしてはならない
+- error detail は観測用 detail であり、`CallError.Kind` の判定結果を上書きしてはならない
 
 ### 5.4 Protocol Debug Logging
 
@@ -604,6 +655,18 @@ debug logging は `Protocol` 層にのみ許可する。
 - `Native` の `Conversion` で起きる field-level decode failure は `Codec` とする
 - `Native` の `ContractValidation` で起きる API contract rule violation は `Semantic` とする
 - `Native` は transport failure を `Http` へ畳み込まない
+
+### 6.3.1 Venue Error Body と `Http` / `Semantic` の境界
+
+- non-success status は body 内容にかかわらず `Http` とする
+- expected status 不一致も body 内容にかかわらず `Http` とする
+- `Protocol` は venue error body を読んでも `Http` を `Semantic` へ変換しない
+- `Native` は non-success status の venue error body を読んでも `Http` を `Semantic` へ変換しない
+- non-success status の venue error body を将来 decode する場合でも、その用途は観測 detail の抽出に限定する
+- success status で response body が success contract に一致しない場合は、失敗種別は decode stage に従って決める
+  - shape / required raw field / scalar parse の失敗は `Codec`
+  - raw shape は読めるが contract rule violation で失敗する場合は `Semantic`
+- Stage10 は venue 固有 business error taxonomy を `CallError.Kind` に持ち込まない
 
 ### 6.4 API Contract Rule と Business Rule
 

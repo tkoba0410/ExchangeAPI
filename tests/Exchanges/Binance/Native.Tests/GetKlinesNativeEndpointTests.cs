@@ -37,6 +37,20 @@ public sealed class GetKlinesNativeEndpointTests
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
     }
 
+    [Theory]
+    [InlineData("0")]
+    [InlineData("8")]
+    [InlineData("4")]
+    [InlineData("-1:00")]
+    [InlineData("05:45")]
+    public async Task CallAsync_AcceptsOfficiallyDocumentedTimeZoneExamples(string timeZone)
+    {
+        var endpoint = new GetKlinesNativeEndpoint(new FakeGetKlinesProtocolEndpoint((_, _, _, _, _, _) => SuccessProtocolCall(200, "[]")));
+        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h", TimeZone = timeZone });
+
+        Assert.True(call.IsSuccess);
+    }
+
     [Fact]
     public async Task CallAsync_ReturnsSemantic_WhenStartTimeExceedsEndTime()
     {

@@ -109,7 +109,8 @@
   - `StartTime` と `EndTime` が両方ある場合は `StartTime <= EndTime`
   - `TimeZone = null` のとき query omitted
   - `TimeZone` がある場合は
-    - `H`, `HH`, `+H`, `-H`, `HH:MM`, `+HH:MM`, `-HH:MM` の形を許可
+    - hour-only または hour-minute offset 文字列を許可する
+    - 例: `0`, `8`, `4`, `-1:00`, `05:45`
     - 範囲は `-12:00` から `+14:00` inclusive
   - `StartTime` と `EndTime` は常に UTC として解釈する
 - response DTO

@@ -39,7 +39,7 @@ MCP Server は以下を所有しない。
 
 ## 5. 現行 phase
 
-- 現行 phase では MCP Server 実装は未着手でよい
+- 現行 phase では MCP Server 実装は行わず、library の設計と実装を優先する
 - `Unified` 未実装の間、本書は将来方針だけを保持する
 
 ## 6. 未固定事項

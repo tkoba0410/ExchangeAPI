@@ -95,7 +95,7 @@
 | GetWithdrawals | GET | /v1/me/getwithdrawals | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |
 | SendChildOrder | POST | /v1/me/sendchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional | 200 | Object | Yes | Required | - | KeySecret | minute_to_expire/time_in_force = null omitted, price is conditional |
 | SendParentOrder | POST | /v1/me/sendparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | Required | - | KeySecret | TBD |
-| CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of child_order_id or child_order_acceptance_id |
+| CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of child_order_id or child_order_acceptance_id |
 | CancelParentOrder | POST | /v1/me/cancelparentorder | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | None | - | KeySecret | TBD |
 | CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | Yes | None | - | KeySecret | TBD |
 | GetChildOrders | GET | /v1/me/getchildorders | private | Later | Later | Later | Transitional | Transitional | TBD | TBD | No | None | - | KeySecret | TBD |

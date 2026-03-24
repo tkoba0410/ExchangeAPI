@@ -104,7 +104,7 @@ else
 - 実装済みの公開面は `Protocol` / `Native` の一部 endpoint
 - bitFlyer は `GetTicker`, `GetBalance`, `SendChildOrder`, `CancelChildOrder`
 - Binance は `GetKlines`
-- `Unified`, CLI, MCP Server は文書先行で、実装はこれから追加する
+- 現行 phase では library を優先し、`Unified`, CLI, MCP Server は将来検討とする
 
 ## Development
 

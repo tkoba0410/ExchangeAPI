@@ -45,9 +45,10 @@ CLI は以下を所有しない。
 
 ## 5. 現行 phase
 
-- 現行 phase では CLI 実装を先行してよい
-- `Unified` 未実装の間、CLI は `native` と optional な `protocol` debug path だけを expose してよい
-- command tree、global option、output format、exit code の具体値は別途固定する
+- 現行 phase では CLI 実装は行わず、library の設計と実装を優先する
+- 本書は将来の CLI 実装に向けた補助文書として保持する
+- `Unified` 未実装の間に CLI を着手する場合でも、`native` と optional な `protocol` debug path から始める
+- command tree、global option、output format、exit code の具体値は library 側の surface が固まった後で固定する
 
 ## 6. 未固定事項
 

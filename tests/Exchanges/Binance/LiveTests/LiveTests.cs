@@ -6,7 +6,7 @@ using ExchangeApi.Tests.Exchanges.Binance.LiveTests.Infrastructure;
 
 namespace ExchangeApi.Tests.Exchanges.Binance.LiveTests;
 
-public sealed class Stage10LiveTests
+public sealed class LiveTests
 {
     [BinancePublicReadLiveFact]
     public async Task GetKlines_ReadParity()

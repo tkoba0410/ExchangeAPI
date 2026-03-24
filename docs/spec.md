@@ -528,6 +528,7 @@ debug logging は `Protocol` 層にのみ許可する。
 - API key / secret / 認証 header / 署名値は logging しない
 - logging は通常時 no-op を既定とする
 - live test または明示 opt-in 実行時のみ有効化してよい
+- live test で有効にする raw debug log は `local/` 配下へ保存する
 
 記録してよい項目:
 
@@ -549,7 +550,7 @@ debug logging は `Protocol` 層にのみ許可する。
 
 出力先:
 
-- raw debug log は `local/logs/bitflyer/stage10/` 配下にのみ出力する
+- raw debug log は `local/logs/<venue>/protocol/` 配下にのみ出力する
 - raw debug log は `.gitignore` 対象とし、repository に commit / push しない
 
 ## 6. Request / Response 境界
@@ -1057,7 +1058,7 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 live test で `Protocol` debug logging を使う場合は、以下を正本とする。
 
 - 現行 phase では live test の debug logging は env で切り替えない
-- raw log 出力先は `local/logs/bitflyer/stage10/`
+- live test の raw log 出力先は `local/logs/<venue>/live-tests/`
 - raw log は test 実行ごとに local のみへ出力する
 - raw log 自体は repository artifact にしない
 

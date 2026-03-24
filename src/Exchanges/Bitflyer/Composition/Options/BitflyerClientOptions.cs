@@ -6,5 +6,5 @@ public sealed class BitflyerClientOptions
     public BitflyerApiCredentials? Credentials { get; init; }
     public bool UseTickerAliasPath { get; init; }
     public bool EnableProtocolDebugLogging { get; init; }
-    public string ProtocolDebugLogDirectory { get; init; } = Path.Combine("local", "logs", "bitflyer", "stage10");
+    public string ProtocolDebugLogDirectory { get; init; } = Path.Combine("local", "logs", "bitflyer", "protocol");
 }

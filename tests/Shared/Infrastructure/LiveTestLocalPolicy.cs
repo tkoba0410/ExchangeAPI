@@ -4,7 +4,12 @@ internal static class LiveTestLocalPolicy
 {
     public static bool HasMarker(string markerFileName)
     {
-        return File.Exists(Path.Combine(RepoRoot(), "local", markerFileName));
+        return File.Exists(LocalPath(markerFileName));
+    }
+
+    public static string LocalPath(params string[] relativeSegments)
+    {
+        return Path.Combine([RepoRoot(), "local", .. relativeSegments]);
     }
 
     private static string RepoRoot()

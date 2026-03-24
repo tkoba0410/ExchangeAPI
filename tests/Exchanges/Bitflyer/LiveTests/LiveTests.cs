@@ -19,7 +19,7 @@ using ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests;
 
-public sealed class Stage10LiveTests
+public sealed class LiveTests
 {
     [BitflyerPublicReadLiveFact]
     public async Task GetMarkets_ReadParity()
@@ -543,7 +543,7 @@ public sealed class Stage10LiveTests
             BaseUri = settings.BaseUri,
             Credentials = settings.Credentials,
             EnableProtocolDebugLogging = settings.EnableProtocolDebugLogging,
-            ProtocolDebugLogDirectory = Path.Combine("local", "logs", "bitflyer", "stage10", "live-tests"),
+            ProtocolDebugLogDirectory = settings.ProtocolDebugLogDirectory,
         };
     }
 }

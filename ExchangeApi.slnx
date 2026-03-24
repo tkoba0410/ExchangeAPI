@@ -20,6 +20,9 @@
   <Folder Name="/tests/" />
   <Folder Name="/tests/Exchanges/" />
   <Folder Name="/tests/Exchanges/Bitflyer/" />
+  <Folder Name="/tests/Exchanges/Bitflyer/Architecture.Tests/">
+    <Project Path="tests/Exchanges/Bitflyer/Architecture.Tests/ExchangeApi.Exchanges.Bitflyer.Architecture.Tests.csproj" />
+  </Folder>
   <Folder Name="/tests/Exchanges/Bitflyer/Composition.Tests/">
     <Project Path="tests/Exchanges/Bitflyer/Composition.Tests/ExchangeApi.Exchanges.Bitflyer.Composition.Tests.csproj" />
   </Folder>

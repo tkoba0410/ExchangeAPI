@@ -37,6 +37,13 @@ internal sealed class BitflyerWriteLiveFactAttribute : FactAttribute
             Environment.GetEnvironmentVariable("BITFLYER_STAGE10_ALLOW_WRITE") != "1")
         {
             Skip = "Set BITFLYER_STAGE10_LIVE=1 and BITFLYER_STAGE10_ALLOW_WRITE=1 to run Stage10 write live tests.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("BITFLYER_API_KEY")) ||
+            string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("BITFLYER_API_SECRET")))
+        {
+            Skip = "Set BITFLYER_API_KEY and BITFLYER_API_SECRET to run Stage10 write live tests.";
         }
     }
 }

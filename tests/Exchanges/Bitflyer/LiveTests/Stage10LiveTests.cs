@@ -1,7 +1,9 @@
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
@@ -80,8 +82,54 @@ public sealed class Stage10LiveTests
     }
 
     [BitflyerWriteLiveFact]
-    public void SendChildOrder_CancelChildOrder_WriteSkeleton()
+    public async Task SendChildOrder_CancelChildOrder_WriteLifecycle()
     {
+        var settings = BitflyerLiveTestSettings.Load();
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+
+        Assert.NotNull(client.Private);
+
+        var tickerCall = await client.Public.GetTickerCallAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
+        Assert.True(tickerCall.IsSuccess);
+        Assert.NotNull(tickerCall.Response);
+
+        var ticker = tickerCall.Response!;
+        var limitPrice = Math.Max(1m, decimal.Floor(ticker.Ltp * 0.5m));
+        var orderRequest = new SendChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderType = ChildOrderTypes.Limit,
+            Side = OrderSides.Buy,
+            Price = limitPrice,
+            Size = 0.001m,
+            MinuteToExpire = 1,
+            TimeInForce = TimeInForces.Gtc,
+        };
+
+        string? acceptanceId = null;
+
+        try
+        {
+            var sendCall = await client.Private!.SendChildOrderCallAsync(orderRequest);
+            Assert.True(sendCall.IsSuccess, sendCall.Error?.Message);
+            Assert.NotNull(sendCall.Response);
+            Assert.False(string.IsNullOrWhiteSpace(sendCall.Response!.ChildOrderAcceptanceId));
+
+            acceptanceId = sendCall.Response.ChildOrderAcceptanceId;
+        }
+        finally
+        {
+            if (!string.IsNullOrWhiteSpace(acceptanceId))
+            {
+                var cancelCall = await client.Private!.CancelChildOrderCallAsync(new CancelChildOrderRequest
+                {
+                    ProductCode = ProductCodes.BtcJpy,
+                    ChildOrderAcceptanceId = acceptanceId,
+                });
+
+                Assert.True(cancelCall.IsSuccess, cancelCall.Error?.Message);
+            }
+        }
     }
 
     private static BitflyerClientOptions CreateOptions(BitflyerLiveTestSettings settings)

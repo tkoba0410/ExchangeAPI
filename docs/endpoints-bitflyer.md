@@ -123,50 +123,55 @@
 - `Phase1-Read` に含めた read endpoint は third wave までで `Fixed` に上げ切る
 - `Later` の read と write を含む残りの実装済み endpoint は、引き続き `Transitional` のまま段階的に固定する
 
-## Timestamp Fields
+## 時刻フィールド一覧
 
 bitFlyer の timestamp field は offset なし文字列が多く、API 文書上も timezone 記述が揃っていない。  
 そのため、timestamp については `仕様書の状態` と `実装の状態` を分けて管理する。
 
-- `SpecStatus`
+Stage10 の working hypothesis:
+
+- bitFlyer は内部時刻を概ね UTC 基準で管理していると仮定する
+- 口座変動履歴の `trade_date` は日本向け確認用の JST 例外とみなす
+- timezone undocumented な no-offset timestamp は、反証が出るまで UTC と仮定して decode 境界で UTC 正規化する
+
+- `仕様状態`
   - `UTC documented`: bitFlyer API 文書に UTC と明記あり
   - `JST documented`: bitFlyer API 文書に JST と明記あり
   - `Timezone undocumented`: bitFlyer API 文書に timezone 明記なし
-- `ImplementationStatus`
+- `実装状態`
   - `Generic parse, not normalized`: `DateTimeOffset.TryParse(..., DateTimeStyles.None, ...)` に依存し、timezone 解釈を固定していない
   - `JST->UTC normalized`: offset なし値を JST として解釈し、内部正本では UTC に正規化済み
   - `Documented UTC normalized`: UTC documented field を UTC として明示解釈し、内部正本では UTC に正規化済み
-- `VerificationStatus`
+  - `Hypothesized UTC normalized`: timezone undocumented field を UTC working hypothesis で解釈し、内部正本では UTC に正規化済み
+- `確認状態`
   - `Documented`: bitFlyer API 文書に timezone 記述がある
   - `Observed`: live test / live log で実値観測あり
   - `Documented + Observed`: 文書記述と live 観測の両方あり
   - `Unverified`: 文書記述も live 観測も正本に未反映
 
-Current timestamp field inventory:
-
-| Endpoint | Field | SpecStatus | ImplementationStatus | VerificationStatus | Notes |
+| Endpoint | Field | 仕様状態 | 実装状態 | 確認状態 | 備考 |
 | --- | --- | --- | --- | --- | --- |
 | GetTicker | `timestamp` | UTC documented | Documented UTC normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
 | GetFundingRate | `next_funding_rate_settledate` | UTC documented | Documented UTC normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
 | GetBalanceHistory | `event_date` | UTC documented | Documented UTC normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
 | GetBalanceHistory | `trade_date` | JST documented | JST->UTC normalized | Documented + Observed | API 文書に「JST（日本標準時, UTC+9）」明記あり |
-| GetExecutionsPublic | `exec_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetExecutionsPrivate | `exec_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetCorporateLeverage | `current_startdate` | Timezone undocumented | Generic parse, not normalized | Unverified | response 例のみで timezone 記述なし |
-| GetCorporateLeverage | `next_startdate` | Timezone undocumented | Generic parse, not normalized | Unverified | response 例のみで timezone 記述なし |
-| GetChats | `date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetCollateral | `margin_call_due_date` | Timezone undocumented | Generic parse, not normalized | Observed | endpoint 専用 optional timestamp parser を使う |
-| GetCoinIns | `event_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetCoinOuts | `event_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetDeposits | `event_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetWithdrawals | `event_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetChildOrders | `expire_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetChildOrders | `child_order_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetParentOrders | `expire_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetParentOrders | `parent_order_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetParentOrder | `expire_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetPositions | `open_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
-| GetCollateralHistory | `date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetExecutionsPublic | `exec_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetExecutionsPrivate | `exec_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetCorporateLeverage | `current_startdate` | Timezone undocumented | Hypothesized UTC normalized | Unverified | response 例のみで timezone 記述なし |
+| GetCorporateLeverage | `next_startdate` | Timezone undocumented | Hypothesized UTC normalized | Unverified | response 例のみで timezone 記述なし |
+| GetChats | `date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetCollateral | `margin_call_due_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | endpoint 専用 optional timestamp parser を使わず shared UTC 仮説 parser を使う |
+| GetCoinIns | `event_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetCoinOuts | `event_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetDeposits | `event_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetWithdrawals | `event_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetChildOrders | `expire_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetChildOrders | `child_order_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetParentOrders | `expire_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetParentOrders | `parent_order_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetParentOrder | `expire_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetPositions | `open_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetCollateralHistory | `date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
 
 ## Implementation Order
 

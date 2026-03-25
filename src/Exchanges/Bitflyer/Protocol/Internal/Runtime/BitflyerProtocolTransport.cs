@@ -77,6 +77,7 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
                 BodyText = responseBody,
             };
 
+            var nowUtc = DateTimeOffset.UtcNow;
             await _debugLogger.LogAsync(new ProtocolDebugLogEntry
             {
                 EndpointId = request.EndpointId,
@@ -86,7 +87,8 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
                 BodyText = request.BodyText,
                 StatusCode = protocolResponse.StatusCode,
                 ResponseBodyText = protocolResponse.BodyText,
-                TimestampUtc = DateTimeOffset.UtcNow,
+                TimestampUtc = nowUtc,
+                TimestampJst = nowUtc.ToOffset(TimeSpan.FromHours(9)),
             }, cancellationToken);
 
             return new ProtocolTransportResult
@@ -97,6 +99,7 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or OperationCanceledException)
         {
+            var nowUtc = DateTimeOffset.UtcNow;
             await _debugLogger.LogAsync(new ProtocolDebugLogEntry
             {
                 EndpointId = request.EndpointId,
@@ -106,7 +109,8 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
                 BodyText = request.BodyText,
                 StatusCode = null,
                 ResponseBodyText = null,
-                TimestampUtc = DateTimeOffset.UtcNow,
+                TimestampUtc = nowUtc,
+                TimestampJst = nowUtc.ToOffset(TimeSpan.FromHours(9)),
                 ErrorMessage = ex.Message,
             }, cancellationToken);
 

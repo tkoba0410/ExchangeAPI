@@ -719,12 +719,17 @@ bot 運用で重要な scalar の扱いは以下を正本とする。
 - price / size / amount / commission / pnl / rate のような数量系 scalar は `decimal` を基本とする
 - count / id / status code / epoch milliseconds のような整数系 scalar は `int` または `long` を使い分ける
 - timestamp scalar は `DateTimeOffset` を基本とする
+- `Native` の公開 contract は timestamp を JST や UTC へ単純正規化せず、`DateTimeOffset` の瞬間として表現する
 - `Native` は venue response の scalar を暗黙に丸めたり切り捨てたりしてはならない
 - response に offset が含まれる場合、`Native` はその offset 情報を保持する
 - response に offset が含まれない場合、その解釈規則は venue API 文書または endpoint contract によって固定する
 - offset なし timestamp の解釈を endpoint contract で固定できない場合、その endpoint は `Fixed` に上げない
 - scalar parse 失敗は `Codec` とする
 - bot 判断に必要な scalar を `double` / `float` へ落とすことを `Native` の正本に含めない
+- human-facing な確認表示は `Native` contract の責務外とし、表示が必要な場合は JST (`+09:00`) with offset を優先する
+- zone 付き表示の例は `2026-03-25T14:32:19.033+09:00` とする
+- 表示都合の timezone 変換 helper は `Primitives` extension として追加してよい
+  - `ToUtc()`, `ToUtcString()`, `ToJst()`, `ToJstString()`
 
 ### 6.7 Private Auth / Signing 契約
 
@@ -1175,10 +1180,20 @@ state を変更する endpoint の live 実行には、以下を必須とする�
 
 live test で `Protocol` debug logging を使う場合は、以下を正本とする。
 
+Current normative:
+
 - 現行 phase では live test の debug logging は env で切り替えない
 - live test の raw log 出力先は `local/logs/<venue>/live-tests/`
 - raw log は test 実行ごとに local のみへ出力する
 - raw log 自体は repository artifact にしない
+- raw log の canonical timestamp は UTC とする
+- raw log は確認性向上のため `TimestampJst` を併記する
+- `TimestampJst` は `+09:00` offset 付きの日本時間とする
+
+Reserved additive extension:
+
+- file name や artifact 表示を JST 優先にしてよい
+- ただし UTC の canonical timestamp を削除しない
 
 ### 10.4 Artifact Generation Policy
 

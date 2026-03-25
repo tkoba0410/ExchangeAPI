@@ -123,6 +123,51 @@
 - `Phase1-Read` に含めた read endpoint は third wave までで `Fixed` に上げ切る
 - `Later` の read と write を含む残りの実装済み endpoint は、引き続き `Transitional` のまま段階的に固定する
 
+## Timestamp Fields
+
+bitFlyer の timestamp field は offset なし文字列が多く、API 文書上も timezone 記述が揃っていない。  
+そのため、timestamp については `仕様書の状態` と `実装の状態` を分けて管理する。
+
+- `SpecStatus`
+  - `UTC documented`: bitFlyer API 文書に UTC と明記あり
+  - `JST documented`: bitFlyer API 文書に JST と明記あり
+  - `Timezone undocumented`: bitFlyer API 文書に timezone 明記なし
+- `ImplementationStatus`
+  - `Generic parse, not normalized`: `DateTimeOffset.TryParse(..., DateTimeStyles.None, ...)` に依存し、timezone 解釈を固定していない
+  - `JST->UTC normalized`: offset なし値を JST として解釈し、内部正本では UTC に正規化済み
+  - `Documented UTC normalized`: UTC documented field を UTC として明示解釈し、内部正本では UTC に正規化済み
+- `VerificationStatus`
+  - `Documented`: bitFlyer API 文書に timezone 記述がある
+  - `Observed`: live test / live log で実値観測あり
+  - `Documented + Observed`: 文書記述と live 観測の両方あり
+  - `Unverified`: 文書記述も live 観測も正本に未反映
+
+Current timestamp field inventory:
+
+| Endpoint | Field | SpecStatus | ImplementationStatus | VerificationStatus | Notes |
+| --- | --- | --- | --- | --- | --- |
+| GetTicker | `timestamp` | UTC documented | Generic parse, not normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
+| GetFundingRate | `next_funding_rate_settledate` | UTC documented | Generic parse, not normalized | Documented | API 文書に「UTC（協定世界時）」明記あり |
+| GetBalanceHistory | `event_date` | UTC documented | Generic parse, not normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
+| GetBalanceHistory | `trade_date` | JST documented | Generic parse, not normalized | Documented + Observed | API 文書に「JST（日本標準時, UTC+9）」明記あり |
+| GetExecutionsPublic | `exec_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetExecutionsPrivate | `exec_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetCorporateLeverage | `current_startdate` | Timezone undocumented | Generic parse, not normalized | Unverified | response 例のみで timezone 記述なし |
+| GetCorporateLeverage | `next_startdate` | Timezone undocumented | Generic parse, not normalized | Unverified | response 例のみで timezone 記述なし |
+| GetChats | `date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetCollateral | `margin_call_due_date` | Timezone undocumented | Generic parse, not normalized | Observed | endpoint 専用 optional timestamp parser を使う |
+| GetCoinIns | `event_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetCoinOuts | `event_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetDeposits | `event_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetWithdrawals | `event_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetChildOrders | `expire_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetChildOrders | `child_order_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetParentOrders | `expire_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetParentOrders | `parent_order_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetParentOrder | `expire_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetPositions | `open_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+| GetCollateralHistory | `date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
+
 ## Implementation Order
 
 - `GetMarkets` で public top-level array response の基準形を作る

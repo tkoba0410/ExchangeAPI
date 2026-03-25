@@ -31,6 +31,9 @@
     <Project Path="src/Primitives/ExchangeApi.Primitives.csproj" />
   </Folder>
   <Folder Name="/tests/" />
+  <Folder Name="/tests/Primitives.Tests/">
+    <Project Path="tests/Primitives.Tests/ExchangeApi.Primitives.Tests.csproj" />
+  </Folder>
   <Folder Name="/tests/Exchanges/" />
   <Folder Name="/tests/Exchanges/Binance/" />
   <Folder Name="/tests/Exchanges/Binance/Architecture.Tests/">

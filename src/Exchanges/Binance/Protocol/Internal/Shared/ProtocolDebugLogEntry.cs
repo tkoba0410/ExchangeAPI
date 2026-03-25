@@ -10,5 +10,6 @@ public sealed class ProtocolDebugLogEntry
     public int? StatusCode { get; init; }
     public string? ResponseBodyText { get; init; }
     public required DateTimeOffset TimestampUtc { get; init; }
+    public required DateTimeOffset TimestampJst { get; init; }
     public string? ErrorMessage { get; init; }
 }

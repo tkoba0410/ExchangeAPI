@@ -70,13 +70,13 @@
 
 | EndpointId | Method | Path | Scope | ExposeInProtocol | ExposeInNative | LiveTestPhase | RequestDtoStatus | ResponseDtoStatus | ExpectedStatus | ResponseShape | WritesState | CleanupPolicy | AliasPath | AuthType | OptionalOmissionRule |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| GetKlines | GET | /api/v3/klines | public | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | ArrayOfArrays | No | None | - | None | startTime/endTime/timeZone/limit = null は query omitted |
+| GetKlines | GET | /api/v3/klines | public | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | ArrayOfArrays | No | None | - | None | startTime/endTime/timeZone/limit = null は query omitted |
 
 ## Initial Rule
 
 - Stage10 の Binance 初期 slice では `GetKlines` だけを扱う
 - public read endpoint の template として `Phase1-Read` に置く
-- 初版では DTO 固定前のため、`RequestDtoStatus` / `ResponseDtoStatus` は `Transitional` から開始する
+- `GetKlines` は Binance 初期 slice の read contract として `Fixed` に上げる
 
 ## Initial Endpoint Contract
 

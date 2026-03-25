@@ -175,13 +175,13 @@ public sealed class AdditionalPrivateProtocolEndpointTests
         var transport = new FakeProtocolTransport();
         var endpoint = new GetParentOrderProtocolEndpoint(transport);
 
-        var call = await endpoint.SendAsync("JPO1", "JPA1");
+        var call = await endpoint.SendAsync(null, "JPA1");
 
         Assert.True(call.IsSuccess);
         Assert.Equal(ProtocolTransportAuthMode.KeySecret, transport.LastAuthMode);
         Assert.Equal("/v1/me/getparentorder", transport.LastRequest!.Path);
         Assert.NotNull(transport.LastRequest.Query);
-        Assert.Equal("JPO1", transport.LastRequest.Query!["parent_order_id"]);
+        Assert.False(transport.LastRequest.Query!.ContainsKey("parent_order_id"));
         Assert.Equal("JPA1", transport.LastRequest.Query["parent_order_acceptance_id"]);
         Assert.Null(transport.LastRequest.BodyText);
     }

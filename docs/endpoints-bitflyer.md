@@ -94,13 +94,13 @@
 | Withdraw | POST | /v1/me/withdraw | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | Yes | NotSupported | - | KeySecret | currency_code/bank_account_id/amount/code required |
 | GetWithdrawals | GET | /v1/me/getwithdrawals | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | SendChildOrder | POST | /v1/me/sendchildorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | Object | Yes | Required | - | KeySecret | minute_to_expire/time_in_force = null omitted, price is conditional |
-| SendParentOrder | POST | /v1/me/sendparentorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | Yes | Required | - | KeySecret | order_method/minute_to_expire/time_in_force = null omitted; parameter fields are conditionally omitted |
+| SendParentOrder | POST | /v1/me/sendparentorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | Object | Yes | Required | - | KeySecret | order_method/minute_to_expire/time_in_force = null omitted; parameter fields are conditionally omitted |
 | CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of child_order_id or child_order_acceptance_id |
-| CancelParentOrder | POST | /v1/me/cancelparentorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
+| CancelParentOrder | POST | /v1/me/cancelparentorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
 | CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | product_code required |
 | GetChildOrders | GET | /v1/me/getchildorders | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null; product_code omitted => BTC_JPY default |
 | GetParentOrders | GET | /v1/me/getparentorders | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
-| GetParentOrder | GET | /v1/me/getparentorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | No | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
+| GetParentOrder | GET | /v1/me/getparentorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | Object | No | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
 | GetExecutionsPrivate | GET | /v1/me/getexecutions | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | product_code required; optional query params omitted when null |
 | GetBalanceHistory | GET | /v1/me/getbalancehistory | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | GetPositions | GET | /v1/me/getpositions | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
@@ -116,6 +116,7 @@
 - `GetBoard`、`GetExecutionsPublic`、`GetBoardState`、`GetHealth`、`GetFundingRate`、`GetCorporateLeverage`、`GetChats`、`GetAddresses`、`GetBankAccounts` は second wave として `Fixed` に上げる
 - `GetPermissions`、`GetCoinIns`、`GetCoinOuts`、`GetDeposits`、`GetWithdrawals`、`GetChildOrders`、`GetParentOrders`、`GetExecutionsPrivate`、`GetBalanceHistory`、`GetPositions`、`GetCollateralHistory` は third wave として `Fixed` に上げる
 - `SendChildOrder` と `CancelChildOrder` は non-fill lifecycle を前提に fourth wave として `Fixed` に上げる
+- `SendParentOrder`、`GetParentOrder`、`CancelParentOrder` は parent non-fill lifecycle を前提に fifth wave として `Fixed` に上げる
 - `Phase1-Read` に含めた read endpoint は third wave までで `Fixed` に上げ切る
 - `Later` の read と write を含む残りの実装済み endpoint は、引き続き `Transitional` のまま段階的に固定する
 
@@ -462,6 +463,88 @@
   - `ChildOrderAcceptanceId: string?`
 - request rule
   - `ChildOrderId` と `ChildOrderAcceptanceId` は exactly one
+- response DTO
+  - `Unit`
+  - empty body または `{}` を成功扱いにしてよい
+- `ExpectedStatus = 200`
+- `ResponseShape = EmptyOrObject`
+
+### SendParentOrder
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> SendParentOrderCallAsync(string bodyJson, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<SendParentOrderRequest, SendParentOrderResponse>> SendParentOrderCallAsync(SendParentOrderRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `OrderMethod: string?`
+  - `MinuteToExpire: int?`
+  - `TimeInForce: string?`
+  - `Parameters: IReadOnlyList<SendParentOrderParameter>`
+  - `SendParentOrderParameter`
+    - `ProductCode: string`
+    - `ConditionType: string`
+    - `Side: string`
+    - `Price: decimal?`
+    - `Size: decimal`
+    - `TriggerPrice: decimal?`
+    - `Offset: long?`
+- request rule
+  - `OrderMethod = null` のとき `SIMPLE` として扱う
+  - `MinuteToExpire = null` のとき body omitted
+  - `TimeInForce = null` のとき body omitted
+  - `Parameters` は method に対応する件数を満たす
+  - `LIMIT` は `Price` 必須
+  - `MARKET` は `Price` / `TriggerPrice` / `Offset` omitted
+  - `STOP` は `TriggerPrice` 必須
+  - `STOP_LIMIT` は `Price` と `TriggerPrice` 必須
+  - `TRAIL` は `Offset` 必須
+- response DTO
+  - `ParentOrderAcceptanceId: string`
+- `ExpectedStatus = 200`
+- `ResponseShape = Object`
+
+### GetParentOrder
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetParentOrderCallAsync(string? parentOrderId, string? parentOrderAcceptanceId, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetParentOrderRequest, GetParentOrderResponse>> GetParentOrderCallAsync(GetParentOrderRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ParentOrderId: string?`
+  - `ParentOrderAcceptanceId: string?`
+- request rule
+  - `ParentOrderId` と `ParentOrderAcceptanceId` は exactly one
+- response DTO
+  - `Id: long`
+  - `ParentOrderId: string`
+  - `OrderMethod: string`
+  - `ExpireDate: DateTimeOffset`
+  - `TimeInForce: string`
+  - `Parameters: IReadOnlyList<GetParentOrderParameter>`
+  - `ParentOrderAcceptanceId: string`
+  - `GetParentOrderParameter`
+    - `ProductCode: string`
+    - `ConditionType: string`
+    - `Side: string`
+    - `Price: decimal`
+    - `Size: decimal`
+    - `TriggerPrice: decimal`
+    - `Offset: decimal`
+- `ExpectedStatus = 200`
+- `ResponseShape = Object`
+
+### CancelParentOrder
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> CancelParentOrderCallAsync(string bodyJson, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<CancelParentOrderRequest, Unit>> CancelParentOrderCallAsync(CancelParentOrderRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string`
+  - `ParentOrderId: string?`
+  - `ParentOrderAcceptanceId: string?`
+- request rule
+  - `ParentOrderId` と `ParentOrderAcceptanceId` は exactly one
 - response DTO
   - `Unit`
   - empty body または `{}` を成功扱いにしてよい

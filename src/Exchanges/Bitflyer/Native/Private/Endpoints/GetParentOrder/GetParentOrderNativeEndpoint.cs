@@ -88,7 +88,7 @@ public sealed class GetParentOrderNativeEndpoint : IGetParentOrderNativeEndpoint
                     Price = JsonValueReader.ReadRequiredDecimal(parameter, "price"),
                     Size = JsonValueReader.ReadRequiredDecimal(parameter, "size"),
                     TriggerPrice = JsonValueReader.ReadRequiredDecimal(parameter, "trigger_price"),
-                    Offset = JsonValueReader.ReadRequiredLong(parameter, "offset"),
+                    Offset = JsonValueReader.ReadRequiredDecimal(parameter, "offset"),
                 });
             }
 

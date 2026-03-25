@@ -19,5 +19,5 @@ public sealed class GetParentOrderParameter
     public required decimal Price { get; init; }
     public required decimal Size { get; init; }
     public required decimal TriggerPrice { get; init; }
-    public required long Offset { get; init; }
+    public required decimal Offset { get; init; }
 }

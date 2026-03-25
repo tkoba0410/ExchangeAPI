@@ -248,6 +248,8 @@ public sealed class AdditionalPrivateNativeEndpointTests
         Assert.Equal("JPO1", call.Response!.ParentOrderId);
         Assert.Single(call.Response.Parameters);
         Assert.Equal("LIMIT", call.Response.Parameters[0].ConditionType);
+        Assert.Equal(0m, call.Response.Parameters[0].TriggerPrice);
+        Assert.Equal(0m, call.Response.Parameters[0].Offset);
     }
 
     [Fact]
@@ -257,6 +259,22 @@ public sealed class AdditionalPrivateNativeEndpointTests
             new FakeGetParentOrderProtocolEndpoint((parentOrderId, parentOrderAcceptanceId) => throw new InvalidOperationException()));
 
         var call = await endpoint.CallAsync(new GetParentOrderRequest());
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
+    public async Task GetParentOrder_ReturnsSemantic_WhenBothIdentifiersAreProvided()
+    {
+        var endpoint = new GetParentOrderNativeEndpoint(
+            new FakeGetParentOrderProtocolEndpoint((parentOrderId, parentOrderAcceptanceId) => throw new InvalidOperationException()));
+
+        var call = await endpoint.CallAsync(new GetParentOrderRequest
+        {
+            ParentOrderId = "JPO1",
+            ParentOrderAcceptanceId = "JPA1",
+        });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
@@ -360,6 +378,57 @@ public sealed class AdditionalPrivateNativeEndpointTests
     }
 
     [Fact]
+    public async Task SendParentOrder_ReturnsSemantic_WhenLimitParameterOmitsPrice()
+    {
+        var fake = new FakeSendParentOrderProtocolEndpoint(_ => throw new InvalidOperationException());
+        var endpoint = new SendParentOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new SendParentOrderRequest
+        {
+            OrderMethod = ParentOrderMethods.Simple,
+            Parameters =
+            [
+                new SendParentOrderParameter
+                {
+                    ProductCode = ProductCodes.BtcJpy,
+                    ConditionType = ParentOrderConditionTypes.Limit,
+                    Side = OrderSides.Buy,
+                    Size = 0.1m,
+                },
+            ],
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
+    public async Task SendParentOrder_ReturnsSemantic_WhenMarketParameterIncludesPrice()
+    {
+        var fake = new FakeSendParentOrderProtocolEndpoint(_ => throw new InvalidOperationException());
+        var endpoint = new SendParentOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new SendParentOrderRequest
+        {
+            OrderMethod = ParentOrderMethods.Simple,
+            Parameters =
+            [
+                new SendParentOrderParameter
+                {
+                    ProductCode = ProductCodes.BtcJpy,
+                    ConditionType = ParentOrderConditionTypes.Market,
+                    Side = OrderSides.Buy,
+                    Price = 30000m,
+                    Size = 0.1m,
+                },
+            ],
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
     public async Task CancelParentOrder_AllowsEmptyBodyResponse()
     {
         var fake = new FakeCancelParentOrderProtocolEndpoint(_ => Success("CancelParentOrder", "POST", "/v1/me/cancelparentorder", string.Empty));
@@ -376,6 +445,24 @@ public sealed class AdditionalPrivateNativeEndpointTests
     }
 
     [Fact]
+    public async Task CancelParentOrder_OmitsUnusedIdentifier()
+    {
+        var fake = new FakeCancelParentOrderProtocolEndpoint(_ => Success("CancelParentOrder", "POST", "/v1/me/cancelparentorder", string.Empty));
+        var endpoint = new CancelParentOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new CancelParentOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ParentOrderAcceptanceId = "JPA1",
+        });
+
+        Assert.True(call.IsSuccess);
+        Assert.NotNull(fake.LastBodyJson);
+        Assert.Contains("\"parent_order_acceptance_id\":\"JPA1\"", fake.LastBodyJson!, StringComparison.Ordinal);
+        Assert.DoesNotContain("parent_order_id", fake.LastBodyJson!, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task CancelParentOrder_ReturnsSemantic_WhenIdentifiersAreInvalid()
     {
         var fake = new FakeCancelParentOrderProtocolEndpoint(_ => throw new InvalidOperationException());
@@ -384,6 +471,23 @@ public sealed class AdditionalPrivateNativeEndpointTests
         var call = await endpoint.CallAsync(new CancelParentOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
+    public async Task CancelParentOrder_ReturnsSemantic_WhenBothIdentifiersAreProvided()
+    {
+        var fake = new FakeCancelParentOrderProtocolEndpoint(_ => throw new InvalidOperationException());
+        var endpoint = new CancelParentOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new CancelParentOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ParentOrderId = "JPO1",
+            ParentOrderAcceptanceId = "JPA1",
         });
 
         Assert.False(call.IsSuccess);

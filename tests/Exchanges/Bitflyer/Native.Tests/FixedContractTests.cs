@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalanceHistory;
@@ -14,10 +15,12 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinIns;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinOuts;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetDeposits;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPermissions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetWithdrawals;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
@@ -315,6 +318,63 @@ public sealed class FixedContractTests
             typeof(IBitflyerPrivateNativeApi),
             nameof(IBitflyerPrivateNativeApi.CancelChildOrderCallAsync),
             typeof(CancelChildOrderRequest),
+            typeof(Unit));
+
+        AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.OrderMethod), typeof(string), "order_method");
+        AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.MinuteToExpire), typeof(int?), "minute_to_expire");
+        AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.TimeInForce), typeof(string), "time_in_force");
+        AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.Parameters), typeof(IReadOnlyList<SendParentOrderParameter>), "parameters");
+        AssertJsonIgnoreWhenWritingNull(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.OrderMethod));
+        AssertJsonIgnoreWhenWritingNull(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.MinuteToExpire));
+        AssertJsonIgnoreWhenWritingNull(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.TimeInForce));
+        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.ProductCode), typeof(string), "product_code");
+        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.ConditionType), typeof(string), "condition_type");
+        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Price), typeof(decimal?), "price");
+        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Size), typeof(decimal), "size");
+        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.TriggerPrice), typeof(decimal?), "trigger_price");
+        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Offset), typeof(long?), "offset");
+        AssertJsonIgnoreWhenWritingNull(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Price));
+        AssertJsonIgnoreWhenWritingNull(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.TriggerPrice));
+        AssertJsonIgnoreWhenWritingNull(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Offset));
+        AssertProperty(typeof(SendParentOrderResponse), nameof(SendParentOrderResponse.ParentOrderAcceptanceId), typeof(string));
+        AssertCallMethod(
+            typeof(IBitflyerPrivateNativeApi),
+            nameof(IBitflyerPrivateNativeApi.SendParentOrderCallAsync),
+            typeof(SendParentOrderRequest),
+            typeof(SendParentOrderResponse));
+
+        AssertProperty(typeof(GetParentOrderRequest), nameof(GetParentOrderRequest.ParentOrderId), typeof(string));
+        AssertProperty(typeof(GetParentOrderRequest), nameof(GetParentOrderRequest.ParentOrderAcceptanceId), typeof(string));
+        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.Id), typeof(long));
+        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.ParentOrderId), typeof(string));
+        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.OrderMethod), typeof(string));
+        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.ExpireDate), typeof(DateTimeOffset));
+        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.TimeInForce), typeof(string));
+        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.Parameters), typeof(IReadOnlyList<GetParentOrderParameter>));
+        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.ParentOrderAcceptanceId), typeof(string));
+        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.ProductCode), typeof(string));
+        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.ConditionType), typeof(string));
+        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.Side), typeof(string));
+        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.Price), typeof(decimal));
+        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.Size), typeof(decimal));
+        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.TriggerPrice), typeof(decimal));
+        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.Offset), typeof(decimal));
+        AssertCallMethod(
+            typeof(IBitflyerPrivateNativeApi),
+            nameof(IBitflyerPrivateNativeApi.GetParentOrderCallAsync),
+            typeof(GetParentOrderRequest),
+            typeof(GetParentOrderResponse));
+
+        AssertJsonProperty(typeof(CancelParentOrderRequest), nameof(CancelParentOrderRequest.ProductCode), typeof(string), "product_code");
+        AssertJsonProperty(typeof(CancelParentOrderRequest), nameof(CancelParentOrderRequest.ParentOrderId), typeof(string), "parent_order_id");
+        AssertJsonProperty(typeof(CancelParentOrderRequest), nameof(CancelParentOrderRequest.ParentOrderAcceptanceId), typeof(string), "parent_order_acceptance_id");
+        AssertJsonIgnoreWhenWritingNull(typeof(CancelParentOrderRequest), nameof(CancelParentOrderRequest.ParentOrderId));
+        AssertJsonIgnoreWhenWritingNull(typeof(CancelParentOrderRequest), nameof(CancelParentOrderRequest.ParentOrderAcceptanceId));
+        AssertCallMethod(
+            typeof(IBitflyerPrivateNativeApi),
+            nameof(IBitflyerPrivateNativeApi.CancelParentOrderCallAsync),
+            typeof(CancelParentOrderRequest),
             typeof(Unit));
     }
 

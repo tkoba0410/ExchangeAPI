@@ -2,6 +2,7 @@ using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalanceHistory;
@@ -14,12 +15,14 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinIns;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinOuts;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetDeposits;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPermissions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetWithdrawals;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetChats;
@@ -30,6 +33,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetHealth;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
+using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests;
@@ -1079,6 +1083,112 @@ public sealed class LiveTests
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.ParentOrderId));
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.ProductCode));
             Assert.True(nativeFirst.ParentOrderDate != default);
+        }
+    }
+
+    [BitflyerWriteLiveFact]
+    public async Task SendParentOrder_GetParentOrder_CancelParentOrder_WriteLifecycle()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+
+        Assert.NotNull(client.Private);
+
+        var tickerCall = await client.Public.GetTickerCallAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
+        Assert.True(tickerCall.IsSuccess);
+        Assert.NotNull(tickerCall.Response);
+
+        var ticker = tickerCall.Response!;
+        var limitPrice = Math.Max(1m, decimal.Floor(ticker.Ltp * 0.6m));
+        var exitPrice = decimal.Ceiling(ticker.Ltp * 1.4m);
+        var orderRequest = new SendParentOrderRequest
+        {
+            OrderMethod = ParentOrderMethods.Ifd,
+            MinuteToExpire = 1,
+            TimeInForce = TimeInForces.Gtc,
+            Parameters =
+            [
+                new SendParentOrderParameter
+                {
+                    ProductCode = ProductCodes.BtcJpy,
+                    ConditionType = ParentOrderConditionTypes.Limit,
+                    Side = OrderSides.Buy,
+                    Price = limitPrice,
+                    Size = 0.001m,
+                },
+                new SendParentOrderParameter
+                {
+                    ProductCode = ProductCodes.BtcJpy,
+                    ConditionType = ParentOrderConditionTypes.Limit,
+                    Side = OrderSides.Sell,
+                    Price = exitPrice,
+                    Size = 0.001m,
+                },
+            ],
+        };
+
+        string? acceptanceId = null;
+
+        try
+        {
+            var sendCall = await client.Private!.SendParentOrderCallAsync(orderRequest);
+            Assert.True(sendCall.IsSuccess, sendCall.Error?.Message);
+            Assert.NotNull(sendCall.Response);
+            Assert.False(string.IsNullOrWhiteSpace(sendCall.Response!.ParentOrderAcceptanceId));
+
+            acceptanceId = sendCall.Response.ParentOrderAcceptanceId;
+
+            Call<GetParentOrderRequest, GetParentOrderResponse>? getCall = null;
+            for (var attempt = 0; attempt < 5; attempt++)
+            {
+                getCall = await client.Private.GetParentOrderCallAsync(new GetParentOrderRequest
+                {
+                    ParentOrderAcceptanceId = acceptanceId,
+                });
+
+                if (getCall.IsSuccess && getCall.Response is not null)
+                {
+                    break;
+                }
+
+                await Task.Delay(250);
+            }
+
+            Assert.NotNull(getCall);
+            Assert.True(getCall!.IsSuccess, getCall.Error?.Message);
+            Assert.NotNull(getCall.Response);
+
+            var parentOrder = getCall.Response!;
+            Assert.Equal(acceptanceId, parentOrder.ParentOrderAcceptanceId);
+            Assert.Equal(ParentOrderMethods.Ifd, parentOrder.OrderMethod);
+            Assert.Equal(2, parentOrder.Parameters.Count);
+            Assert.Equal(ProductCodes.BtcJpy, parentOrder.Parameters[0].ProductCode);
+            Assert.Equal(ParentOrderConditionTypes.Limit, parentOrder.Parameters[0].ConditionType);
+            Assert.Equal(OrderSides.Buy, parentOrder.Parameters[0].Side);
+            Assert.Equal(limitPrice, parentOrder.Parameters[0].Price);
+            Assert.Equal(0.001m, parentOrder.Parameters[0].Size);
+            Assert.Equal(0m, parentOrder.Parameters[0].TriggerPrice);
+            Assert.Equal(0m, parentOrder.Parameters[0].Offset);
+            Assert.Equal(ProductCodes.BtcJpy, parentOrder.Parameters[1].ProductCode);
+            Assert.Equal(ParentOrderConditionTypes.Limit, parentOrder.Parameters[1].ConditionType);
+            Assert.Equal(OrderSides.Sell, parentOrder.Parameters[1].Side);
+            Assert.Equal(exitPrice, parentOrder.Parameters[1].Price);
+            Assert.Equal(0.001m, parentOrder.Parameters[1].Size);
+            Assert.Equal(0m, parentOrder.Parameters[1].TriggerPrice);
+            Assert.Equal(0m, parentOrder.Parameters[1].Offset);
+        }
+        finally
+        {
+            if (!string.IsNullOrWhiteSpace(acceptanceId))
+            {
+                var cancelCall = await client.Private!.CancelParentOrderCallAsync(new CancelParentOrderRequest
+                {
+                    ProductCode = ProductCodes.BtcJpy,
+                    ParentOrderAcceptanceId = acceptanceId,
+                });
+
+                Assert.True(cancelCall.IsSuccess, cancelCall.Error?.Message);
+            }
         }
     }
 

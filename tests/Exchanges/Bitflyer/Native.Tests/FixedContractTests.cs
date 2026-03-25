@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalanceHistory;
@@ -16,6 +17,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPermissions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetWithdrawals;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
@@ -28,6 +30,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetHealth;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Units;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests;
 
@@ -285,6 +288,34 @@ public sealed class FixedContractTests
 
         AssertJsonProperty(typeof(GetTradingCommissionRequest), nameof(GetTradingCommissionRequest.ProductCode), typeof(string), "product_code");
         AssertJsonProperty(typeof(GetTradingCommissionResponse), nameof(GetTradingCommissionResponse.CommissionRate), typeof(decimal), "commission_rate");
+
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.ProductCode), typeof(string), "product_code");
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.ChildOrderType), typeof(string), "child_order_type");
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.Price), typeof(decimal?), "price");
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.Size), typeof(decimal), "size");
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.MinuteToExpire), typeof(int?), "minute_to_expire");
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.TimeInForce), typeof(string), "time_in_force");
+        AssertJsonIgnoreWhenWritingNull(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.Price));
+        AssertJsonIgnoreWhenWritingNull(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.MinuteToExpire));
+        AssertJsonIgnoreWhenWritingNull(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.TimeInForce));
+        AssertJsonProperty(typeof(SendChildOrderResponse), nameof(SendChildOrderResponse.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
+        AssertCallMethod(
+            typeof(IBitflyerPrivateNativeApi),
+            nameof(IBitflyerPrivateNativeApi.SendChildOrderCallAsync),
+            typeof(SendChildOrderRequest),
+            typeof(SendChildOrderResponse));
+
+        AssertJsonProperty(typeof(CancelChildOrderRequest), nameof(CancelChildOrderRequest.ProductCode), typeof(string), "product_code");
+        AssertJsonProperty(typeof(CancelChildOrderRequest), nameof(CancelChildOrderRequest.ChildOrderId), typeof(string), "child_order_id");
+        AssertJsonProperty(typeof(CancelChildOrderRequest), nameof(CancelChildOrderRequest.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
+        AssertJsonIgnoreWhenWritingNull(typeof(CancelChildOrderRequest), nameof(CancelChildOrderRequest.ChildOrderId));
+        AssertJsonIgnoreWhenWritingNull(typeof(CancelChildOrderRequest), nameof(CancelChildOrderRequest.ChildOrderAcceptanceId));
+        AssertCallMethod(
+            typeof(IBitflyerPrivateNativeApi),
+            nameof(IBitflyerPrivateNativeApi.CancelChildOrderCallAsync),
+            typeof(CancelChildOrderRequest),
+            typeof(Unit));
     }
 
     private static void AssertJsonProperty(Type type, string propertyName, Type propertyType, string jsonPropertyName)

@@ -270,6 +270,49 @@ public sealed class PrivateNativeEndpointTests
     }
 
     [Fact]
+    public async Task SendChildOrder_ReturnsSemantic_WhenMarketPriceIsProvided()
+    {
+        var fake = new FakeSendChildOrderProtocolEndpoint(_ => throw new InvalidOperationException());
+        var endpoint = new SendChildOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderType = ChildOrderTypes.Market,
+            Side = OrderSides.Buy,
+            Size = 0.01m,
+            Price = 100m,
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
+    public async Task SendChildOrder_EncodesPrice_ForLimitRequest()
+    {
+        var fake = new FakeSendChildOrderProtocolEndpoint(_ => Success("SendChildOrder", "POST", "/v1/me/sendchildorder", """{"child_order_acceptance_id":"JRF123"}"""));
+        var endpoint = new SendChildOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new SendChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderType = ChildOrderTypes.Limit,
+            Side = OrderSides.Buy,
+            Price = 5000000m,
+            Size = 0.01m,
+            MinuteToExpire = 1,
+            TimeInForce = TimeInForces.Gtc,
+        });
+
+        Assert.True(call.IsSuccess);
+        Assert.NotNull(fake.LastBodyJson);
+        Assert.Contains("\"price\":5000000", fake.LastBodyJson!, StringComparison.Ordinal);
+        Assert.Contains("\"minute_to_expire\":1", fake.LastBodyJson!, StringComparison.Ordinal);
+        Assert.Contains("\"time_in_force\":\"GTC\"", fake.LastBodyJson!, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task SendChildOrder_ReturnsSemantic_WhenChildOrderTypeIsInvalid()
     {
         var fake = new FakeSendChildOrderProtocolEndpoint(_ => throw new InvalidOperationException());
@@ -361,6 +404,23 @@ public sealed class PrivateNativeEndpointTests
     }
 
     [Fact]
+    public async Task CancelChildOrder_ReturnsSemantic_WhenBothIdentifiersAreProvided()
+    {
+        var fake = new FakeCancelChildOrderProtocolEndpoint(_ => throw new InvalidOperationException());
+        var endpoint = new CancelChildOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new CancelChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderId = "JOR123",
+            ChildOrderAcceptanceId = "JRF123",
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+    }
+
+    [Fact]
     public async Task CancelChildOrder_AllowsEmptyBodyResponse()
     {
         var fake = new FakeCancelChildOrderProtocolEndpoint(_ => Success("CancelChildOrder", "POST", "/v1/me/cancelchildorder", string.Empty));
@@ -373,6 +433,39 @@ public sealed class PrivateNativeEndpointTests
         });
 
         Assert.True(call.IsSuccess);
+    }
+
+    [Fact]
+    public async Task CancelChildOrder_AllowsObjectBodyResponse()
+    {
+        var fake = new FakeCancelChildOrderProtocolEndpoint(_ => Success("CancelChildOrder", "POST", "/v1/me/cancelchildorder", "{}"));
+        var endpoint = new CancelChildOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new CancelChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderAcceptanceId = "JRF123",
+        });
+
+        Assert.True(call.IsSuccess);
+    }
+
+    [Fact]
+    public async Task CancelChildOrder_OmitsUnusedIdentifier()
+    {
+        var fake = new FakeCancelChildOrderProtocolEndpoint(_ => Success("CancelChildOrder", "POST", "/v1/me/cancelchildorder", string.Empty));
+        var endpoint = new CancelChildOrderNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new CancelChildOrderRequest
+        {
+            ProductCode = ProductCodes.BtcJpy,
+            ChildOrderAcceptanceId = "JRF123",
+        });
+
+        Assert.True(call.IsSuccess);
+        Assert.NotNull(fake.LastBodyJson);
+        Assert.Contains("\"child_order_acceptance_id\":\"JRF123\"", fake.LastBodyJson!, StringComparison.Ordinal);
+        Assert.DoesNotContain("child_order_id", fake.LastBodyJson!, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

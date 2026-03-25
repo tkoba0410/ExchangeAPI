@@ -1,11 +1,23 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalanceHistory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBankAccounts;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinIns;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinOuts;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetDeposits;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrders;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPermissions;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetWithdrawals;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetChats;
@@ -15,6 +27,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetFundingRate;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetHealth;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
+using ExchangeApi.Primitives.Calls;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests;
 
@@ -112,6 +125,164 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetBankAccounts.Item), nameof(GetBankAccounts.Item.AccountNumber), typeof(string));
         AssertProperty(typeof(GetBankAccounts.Item), nameof(GetBankAccounts.Item.AccountName), typeof(string));
 
+        AssertEmptyRequest(typeof(GetPermissionsRequest));
+        AssertCallMethod(
+            typeof(IBitflyerPrivateNativeApi),
+            nameof(IBitflyerPrivateNativeApi.GetPermissionsCallAsync),
+            typeof(GetPermissionsRequest),
+            typeof(IReadOnlyList<string>));
+
+        AssertProperty(typeof(GetCoinInsRequest), nameof(GetCoinInsRequest.Count), typeof(int?));
+        AssertProperty(typeof(GetCoinInsRequest), nameof(GetCoinInsRequest.Before), typeof(long?));
+        AssertProperty(typeof(GetCoinInsRequest), nameof(GetCoinInsRequest.After), typeof(long?));
+        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.Id), typeof(long));
+        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.OrderId), typeof(string));
+        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.CurrencyCode), typeof(string));
+        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.Amount), typeof(decimal));
+        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.Address), typeof(string));
+        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.TxHash), typeof(string));
+        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.Status), typeof(string));
+        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.EventDate), typeof(DateTimeOffset));
+
+        AssertProperty(typeof(GetCoinOutsRequest), nameof(GetCoinOutsRequest.Count), typeof(int?));
+        AssertProperty(typeof(GetCoinOutsRequest), nameof(GetCoinOutsRequest.Before), typeof(long?));
+        AssertProperty(typeof(GetCoinOutsRequest), nameof(GetCoinOutsRequest.After), typeof(long?));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.Id), typeof(long));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.OrderId), typeof(string));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.CurrencyCode), typeof(string));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.Amount), typeof(decimal));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.Address), typeof(string));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.TxHash), typeof(string));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.Fee), typeof(decimal));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.AdditionalFee), typeof(decimal));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.Status), typeof(string));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.EventDate), typeof(DateTimeOffset));
+
+        AssertProperty(typeof(GetDepositsRequest), nameof(GetDepositsRequest.Count), typeof(int?));
+        AssertProperty(typeof(GetDepositsRequest), nameof(GetDepositsRequest.Before), typeof(long?));
+        AssertProperty(typeof(GetDepositsRequest), nameof(GetDepositsRequest.After), typeof(long?));
+        AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.Id), typeof(long));
+        AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.OrderId), typeof(string));
+        AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.CurrencyCode), typeof(string));
+        AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.Amount), typeof(decimal));
+        AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.Status), typeof(string));
+        AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.EventDate), typeof(DateTimeOffset));
+
+        AssertProperty(typeof(GetWithdrawalsRequest), nameof(GetWithdrawalsRequest.Count), typeof(int?));
+        AssertProperty(typeof(GetWithdrawalsRequest), nameof(GetWithdrawalsRequest.Before), typeof(long?));
+        AssertProperty(typeof(GetWithdrawalsRequest), nameof(GetWithdrawalsRequest.After), typeof(long?));
+        AssertProperty(typeof(GetWithdrawalsRequest), nameof(GetWithdrawalsRequest.MessageId), typeof(string));
+        AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.Id), typeof(long));
+        AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.OrderId), typeof(string));
+        AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.CurrencyCode), typeof(string));
+        AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.Amount), typeof(decimal));
+        AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.Status), typeof(string));
+        AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.EventDate), typeof(DateTimeOffset));
+
+        AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.ProductCode), typeof(string));
+        AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.Count), typeof(int?));
+        AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.Before), typeof(long?));
+        AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.After), typeof(long?));
+        AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.ParentOrderState), typeof(string));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Id), typeof(long));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderId), typeof(string));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ProductCode), typeof(string));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Side), typeof(string));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderType), typeof(string));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Price), typeof(decimal));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.AveragePrice), typeof(decimal));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Size), typeof(decimal));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderState), typeof(string));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ExpireDate), typeof(DateTimeOffset));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderDate), typeof(DateTimeOffset));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderAcceptanceId), typeof(string));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.OutstandingSize), typeof(decimal));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.CancelSize), typeof(decimal));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ExecutedSize), typeof(decimal));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.TotalCommission), typeof(decimal));
+
+        AssertProperty(typeof(GetBalanceHistoryRequest), nameof(GetBalanceHistoryRequest.CurrencyCode), typeof(string));
+        AssertProperty(typeof(GetBalanceHistoryRequest), nameof(GetBalanceHistoryRequest.Count), typeof(int?));
+        AssertProperty(typeof(GetBalanceHistoryRequest), nameof(GetBalanceHistoryRequest.Before), typeof(long?));
+        AssertProperty(typeof(GetBalanceHistoryRequest), nameof(GetBalanceHistoryRequest.After), typeof(long?));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.Id), typeof(long));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.TradeDate), typeof(DateTimeOffset));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.EventDate), typeof(DateTimeOffset));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.ProductCode), typeof(string));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.CurrencyCode), typeof(string));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.TradeType), typeof(string));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.Price), typeof(decimal));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.Amount), typeof(decimal));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.Quantity), typeof(decimal));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.Commission), typeof(decimal));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.Balance), typeof(decimal));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.OrderId), typeof(string));
+
+        AssertProperty(typeof(GetPositionsRequest), nameof(GetPositionsRequest.ProductCode), typeof(string));
+        AssertJsonProperty(typeof(GetPositionsRequest), nameof(GetPositionsRequest.ProductCode), typeof(string), "product_code");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.ProductCode), typeof(string), "product_code");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Price), typeof(decimal), "price");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Size), typeof(decimal), "size");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Commission), typeof(decimal), "commission");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.SwapPointAccumulate), typeof(decimal), "swap_point_accumulate");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.RequireCollateral), typeof(decimal), "require_collateral");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.OpenDate), typeof(DateTimeOffset), "open_date");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Leverage), typeof(decimal), "leverage");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Pnl), typeof(decimal), "pnl");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Sfd), typeof(decimal), "sfd");
+
+        AssertJsonProperty(typeof(GetCollateralHistoryRequest), nameof(GetCollateralHistoryRequest.Count), typeof(int?), "count");
+        AssertJsonProperty(typeof(GetCollateralHistoryRequest), nameof(GetCollateralHistoryRequest.Before), typeof(long?), "before");
+        AssertJsonProperty(typeof(GetCollateralHistoryRequest), nameof(GetCollateralHistoryRequest.After), typeof(long?), "after");
+        AssertJsonProperty(typeof(GetCollateralHistory.Item), nameof(GetCollateralHistory.Item.Id), typeof(long), "id");
+        AssertJsonProperty(typeof(GetCollateralHistory.Item), nameof(GetCollateralHistory.Item.CurrencyCode), typeof(string), "currency_code");
+        AssertJsonProperty(typeof(GetCollateralHistory.Item), nameof(GetCollateralHistory.Item.Change), typeof(decimal), "change");
+        AssertJsonProperty(typeof(GetCollateralHistory.Item), nameof(GetCollateralHistory.Item.Amount), typeof(decimal), "amount");
+        AssertJsonProperty(typeof(GetCollateralHistory.Item), nameof(GetCollateralHistory.Item.ReasonCode), typeof(string), "reason_code");
+        AssertJsonProperty(typeof(GetCollateralHistory.Item), nameof(GetCollateralHistory.Item.Date), typeof(DateTimeOffset), "date");
+
+        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ProductCode), typeof(string), "product_code");
+        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.Count), typeof(int?), "count");
+        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.Before), typeof(long?), "before");
+        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.After), typeof(long?), "after");
+        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ChildOrderState), typeof(string), "child_order_state");
+        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ChildOrderId), typeof(string), "child_order_id");
+        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
+        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ParentOrderId), typeof(string), "parent_order_id");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.Id), typeof(long), "id");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderId), typeof(string), "child_order_id");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ProductCode), typeof(string), "product_code");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderType), typeof(string), "child_order_type");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.Price), typeof(decimal), "price");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.AveragePrice), typeof(decimal), "average_price");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.Size), typeof(decimal), "size");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderState), typeof(string), "child_order_state");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ExpireDate), typeof(DateTimeOffset), "expire_date");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderDate), typeof(DateTimeOffset), "child_order_date");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.OutstandingSize), typeof(decimal), "outstanding_size");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.CancelSize), typeof(decimal), "cancel_size");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ExecutedSize), typeof(decimal), "executed_size");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.TotalCommission), typeof(decimal), "total_commission");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.TimeInForce), typeof(string), "time_in_force");
+
+        AssertJsonProperty(typeof(GetExecutionsRequest), nameof(GetExecutionsRequest.ProductCode), typeof(string), "product_code");
+        AssertJsonProperty(typeof(GetExecutionsRequest), nameof(GetExecutionsRequest.Count), typeof(int?), "count");
+        AssertJsonProperty(typeof(GetExecutionsRequest), nameof(GetExecutionsRequest.Before), typeof(long?), "before");
+        AssertJsonProperty(typeof(GetExecutionsRequest), nameof(GetExecutionsRequest.After), typeof(long?), "after");
+        AssertJsonProperty(typeof(GetExecutionsRequest), nameof(GetExecutionsRequest.ChildOrderId), typeof(string), "child_order_id");
+        AssertJsonProperty(typeof(GetExecutionsRequest), nameof(GetExecutionsRequest.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
+        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Id), typeof(long), "id");
+        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.ChildOrderId), typeof(string), "child_order_id");
+        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Price), typeof(decimal), "price");
+        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Size), typeof(decimal), "size");
+        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Commission), typeof(decimal), "commission");
+        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.ExecDate), typeof(DateTimeOffset), "exec_date");
+        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
+
         AssertJsonProperty(typeof(GetTradingCommissionRequest), nameof(GetTradingCommissionRequest.ProductCode), typeof(string), "product_code");
         AssertJsonProperty(typeof(GetTradingCommissionResponse), nameof(GetTradingCommissionResponse.CommissionRate), typeof(decimal), "commission_rate");
     }
@@ -142,5 +313,26 @@ public sealed class FixedContractTests
         var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
         Assert.NotNull(property);
         Assert.Equal(propertyType, property!.PropertyType);
+    }
+
+    private static void AssertEmptyRequest(Type type)
+    {
+        var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        Assert.Empty(properties);
+    }
+
+    private static void AssertCallMethod(Type type, string methodName, Type requestType, Type responseType)
+    {
+        var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
+        Assert.NotNull(method);
+
+        var parameters = method!.GetParameters();
+        Assert.Equal(2, parameters.Length);
+        Assert.Equal(requestType, parameters[0].ParameterType);
+        Assert.Equal(typeof(CancellationToken), parameters[1].ParameterType);
+
+        var expectedCallType = typeof(Call<,>).MakeGenericType(requestType, responseType);
+        var expectedReturnType = typeof(Task<>).MakeGenericType(expectedCallType);
+        Assert.Equal(expectedReturnType, method.ReturnType);
     }
 }

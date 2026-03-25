@@ -82,29 +82,29 @@
 | GetFundingRate | GET | /v1/getfundingrate | public | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | - | None | product_code required |
 | GetCorporateLeverage | GET | /v1/getcorporateleverage | public | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | - | None | - |
 | GetChats | GET | /v1/getchats | public | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | None | from_date = null は query omitted |
-| GetPermissions | GET | /v1/me/getpermissions | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
+| GetPermissions | GET | /v1/me/getpermissions | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
 | GetBalance | GET | /v1/me/getbalance | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
 | GetCollateral | GET | /v1/me/getcollateral | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | - | KeySecret | - |
 | GetCollateralAccounts | GET | /v1/me/getcollateralaccounts | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
 | GetAddresses | GET | /v1/me/getaddresses | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
-| GetCoinIns | GET | /v1/me/getcoinins | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
-| GetCoinOuts | GET | /v1/me/getcoinouts | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetCoinIns | GET | /v1/me/getcoinins | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetCoinOuts | GET | /v1/me/getcoinouts | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | GetBankAccounts | GET | /v1/me/getbankaccounts | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
-| GetDeposits | GET | /v1/me/getdeposits | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetDeposits | GET | /v1/me/getdeposits | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | Withdraw | POST | /v1/me/withdraw | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | Yes | NotSupported | - | KeySecret | currency_code/bank_account_id/amount/code required |
-| GetWithdrawals | GET | /v1/me/getwithdrawals | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetWithdrawals | GET | /v1/me/getwithdrawals | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | SendChildOrder | POST | /v1/me/sendchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional | 200 | Object | Yes | Required | - | KeySecret | minute_to_expire/time_in_force = null omitted, price is conditional |
 | SendParentOrder | POST | /v1/me/sendparentorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | Yes | Required | - | KeySecret | order_method/minute_to_expire/time_in_force = null omitted; parameter fields are conditionally omitted |
 | CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Phase2-Write | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of child_order_id or child_order_acceptance_id |
 | CancelParentOrder | POST | /v1/me/cancelparentorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
 | CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | product_code required |
-| GetChildOrders | GET | /v1/me/getchildorders | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null; product_code omitted => BTC_JPY default |
-| GetParentOrders | GET | /v1/me/getparentorders | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetChildOrders | GET | /v1/me/getchildorders | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null; product_code omitted => BTC_JPY default |
+| GetParentOrders | GET | /v1/me/getparentorders | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | GetParentOrder | GET | /v1/me/getparentorder | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | No | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
-| GetExecutionsPrivate | GET | /v1/me/getexecutions | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | product_code required; optional query params omitted when null |
-| GetBalanceHistory | GET | /v1/me/getbalancehistory | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
-| GetPositions | GET | /v1/me/getpositions | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | - |
-| GetCollateralHistory | GET | /v1/me/getcollateralhistory | private | Yes | Yes | Phase1-Read | Transitional | Transitional | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetExecutionsPrivate | GET | /v1/me/getexecutions | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | product_code required; optional query params omitted when null |
+| GetBalanceHistory | GET | /v1/me/getbalancehistory | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
+| GetPositions | GET | /v1/me/getpositions | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
+| GetCollateralHistory | GET | /v1/me/getcollateralhistory | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | GetTradingCommission | GET | /v1/me/gettradingcommission | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Object | No | None | - | KeySecret | product_code required |
 
 ## Initial Rule
@@ -114,7 +114,9 @@
 - `SendChildOrder` と `CancelChildOrder` は `Phase2-Write`、`CancelAllChildOrders` は destructive 範囲が広いため live test をまだ持たない
 - `GetMarkets`、`GetTicker`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetTradingCommission` は first wave として `Fixed` に上げる
 - `GetBoard`、`GetExecutionsPublic`、`GetBoardState`、`GetHealth`、`GetFundingRate`、`GetCorporateLeverage`、`GetChats`、`GetAddresses`、`GetBankAccounts` は second wave として `Fixed` に上げる
-- paging/filter が強い read と write を含む残りの実装済み endpoint は、引き続き `Transitional` のまま段階的に固定する
+- `GetPermissions`、`GetCoinIns`、`GetCoinOuts`、`GetDeposits`、`GetWithdrawals`、`GetChildOrders`、`GetParentOrders`、`GetExecutionsPrivate`、`GetBalanceHistory`、`GetPositions`、`GetCollateralHistory` は third wave として `Fixed` に上げる
+- `Phase1-Read` に含めた read endpoint は third wave までで `Fixed` に上げ切る
+- `Later` の read と write を含む残りの実装済み endpoint は、引き続き `Transitional` のまま段階的に固定する
 
 ## Implementation Order
 

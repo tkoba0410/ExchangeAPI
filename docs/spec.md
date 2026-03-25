@@ -719,7 +719,8 @@ bot 運用で重要な scalar の扱いは以下を正本とする。
 - price / size / amount / commission / pnl / rate のような数量系 scalar は `decimal` を基本とする
 - count / id / status code / epoch milliseconds のような整数系 scalar は `int` または `long` を使い分ける
 - timestamp scalar は `DateTimeOffset` を基本とする
-- `Native` の公開 contract は timestamp を JST や UTC へ単純正規化せず、`DateTimeOffset` の瞬間として表現する
+- `Native` の公開 contract は timestamp を `DateTimeOffset` の瞬間として表現する
+- response timezone の解釈規則を endpoint contract で固定できる場合、`Native` は decode 境界で UTC 正規化してよい
 - `Native` は venue response の scalar を暗黙に丸めたり切り捨てたりしてはならない
 - response に offset が含まれる場合、`Native` はその offset 情報を保持する
 - response に offset が含まれない場合、その解釈規則は venue API 文書または endpoint contract によって固定する

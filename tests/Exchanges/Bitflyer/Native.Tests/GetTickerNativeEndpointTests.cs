@@ -57,6 +57,7 @@ public sealed class GetTickerNativeEndpointTests
         Assert.True(call.IsSuccess);
         Assert.Equal("BTC_JPY", call.Response!.ProductCode);
         Assert.Equal(31690m, call.Response.Ltp);
+        Assert.Equal(new DateTimeOffset(2015, 7, 8, 2, 50, 59, 970, TimeSpan.Zero), call.Response.Timestamp);
         Assert.NotNull(call.Meta.Children);
     }
 

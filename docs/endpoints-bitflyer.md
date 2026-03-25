@@ -146,10 +146,10 @@ Current timestamp field inventory:
 
 | Endpoint | Field | SpecStatus | ImplementationStatus | VerificationStatus | Notes |
 | --- | --- | --- | --- | --- | --- |
-| GetTicker | `timestamp` | UTC documented | Generic parse, not normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
-| GetFundingRate | `next_funding_rate_settledate` | UTC documented | Generic parse, not normalized | Documented | API 文書に「UTC（協定世界時）」明記あり |
-| GetBalanceHistory | `event_date` | UTC documented | Generic parse, not normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
-| GetBalanceHistory | `trade_date` | JST documented | Generic parse, not normalized | Documented + Observed | API 文書に「JST（日本標準時, UTC+9）」明記あり |
+| GetTicker | `timestamp` | UTC documented | Documented UTC normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
+| GetFundingRate | `next_funding_rate_settledate` | UTC documented | Documented UTC normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
+| GetBalanceHistory | `event_date` | UTC documented | Documented UTC normalized | Documented + Observed | API 文書に「UTC（協定世界時）」明記あり |
+| GetBalanceHistory | `trade_date` | JST documented | JST->UTC normalized | Documented + Observed | API 文書に「JST（日本標準時, UTC+9）」明記あり |
 | GetExecutionsPublic | `exec_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
 | GetExecutionsPrivate | `exec_date` | Timezone undocumented | Generic parse, not normalized | Observed | response 例のみで timezone 記述なし |
 | GetCorporateLeverage | `current_startdate` | Timezone undocumented | Generic parse, not normalized | Unverified | response 例のみで timezone 記述なし |

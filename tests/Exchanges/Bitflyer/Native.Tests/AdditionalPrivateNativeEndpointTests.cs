@@ -295,6 +295,8 @@ public sealed class AdditionalPrivateNativeEndpointTests
         Assert.Single(call.Response!);
         Assert.Equal("JPY", call.Response![0].CurrencyCode);
         Assert.Equal("ORD1", call.Response[0].OrderId);
+        Assert.Equal(new DateTimeOffset(2024, 1, 1, 18, 4, 5, 678, TimeSpan.Zero), call.Response[0].TradeDate);
+        Assert.Equal(new DateTimeOffset(2024, 1, 2, 3, 4, 5, 678, TimeSpan.Zero), call.Response[0].EventDate);
     }
 
     [Fact]

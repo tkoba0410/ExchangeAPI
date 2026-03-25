@@ -79,8 +79,8 @@ public sealed class GetBalanceHistoryNativeEndpoint : IGetBalanceHistoryNativeEn
                 items.Add(new GetBalanceHistory.Item
                 {
                     Id = JsonValueReader.ReadRequiredLong(item, "id"),
-                    TradeDate = JsonValueReader.ReadRequiredTimestamp(item, "trade_date"),
-                    EventDate = JsonValueReader.ReadRequiredTimestamp(item, "event_date"),
+                    TradeDate = JsonValueReader.ReadRequiredJstTimestamp(item, "trade_date"),
+                    EventDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "event_date"),
                     ProductCode = JsonValueReader.ReadOptionalString(item, "product_code"),
                     CurrencyCode = JsonValueReader.ReadRequiredString(item, "currency_code"),
                     TradeType = JsonValueReader.ReadRequiredString(item, "trade_type"),

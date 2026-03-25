@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Globalization;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelAllChildOrders;
@@ -99,6 +100,7 @@ public sealed class LiveTests
 
         Assert.Equal(root.GetProperty("product_code").GetString(), native.ProductCode);
         Assert.Equal(root.GetProperty("state").GetString(), native.State);
+        Assert.Equal(ParseUtcNoOffsetTimestamp(root.GetProperty("timestamp").GetString()!), native.Timestamp);
         Assert.True(root.GetProperty("tick_id").GetInt64() > 0);
         Assert.True(root.GetProperty("best_bid").GetDecimal() > 0);
         Assert.True(root.GetProperty("best_ask").GetDecimal() > 0);
@@ -286,7 +288,7 @@ public sealed class LiveTests
         Assert.Equal(JsonValueKind.Object, root.ValueKind);
         Assert.True(root.GetProperty("current_funding_rate").ValueKind is JsonValueKind.Number);
         Assert.Equal(JsonValueKind.String, root.GetProperty("next_funding_rate_settledate").ValueKind);
-        Assert.True(native.NextFundingRateSettleDate != default);
+        Assert.Equal(ParseUtcNoOffsetTimestamp(root.GetProperty("next_funding_rate_settledate").GetString()!), native.NextFundingRateSettleDate);
     }
 
     [BitflyerPublicReadLiveFact]
@@ -1074,11 +1076,12 @@ public sealed class LiveTests
 
         if (native.Count > 0)
         {
+            var protocolFirst = root[0];
             var nativeFirst = native[0];
             Assert.True(nativeFirst.Id > 0);
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.CurrencyCode));
-            Assert.True(nativeFirst.TradeDate != default);
-            Assert.True(nativeFirst.EventDate != default);
+            Assert.Equal(ParseJstNoOffsetTimestamp(protocolFirst.GetProperty("trade_date").GetString()!), nativeFirst.TradeDate);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolFirst.GetProperty("event_date").GetString()!), nativeFirst.EventDate);
         }
     }
 
@@ -1416,5 +1419,18 @@ public sealed class LiveTests
         Assert.True(activeOrdersCall.IsSuccess, activeOrdersCall.Error?.Message);
         Assert.NotNull(activeOrdersCall.Response);
         return activeOrdersCall.Response!;
+    }
+
+    private static DateTimeOffset ParseUtcNoOffsetTimestamp(string raw)
+    {
+        var parsed = DateTime.Parse(raw, CultureInfo.InvariantCulture, DateTimeStyles.None);
+        return new DateTimeOffset(DateTime.SpecifyKind(parsed, DateTimeKind.Unspecified), TimeSpan.Zero);
+    }
+
+    private static DateTimeOffset ParseJstNoOffsetTimestamp(string raw)
+    {
+        var parsed = DateTime.Parse(raw, CultureInfo.InvariantCulture, DateTimeStyles.None);
+        return new DateTimeOffset(DateTime.SpecifyKind(parsed, DateTimeKind.Unspecified), TimeSpan.FromHours(9))
+            .ToOffset(TimeSpan.Zero);
     }
 }

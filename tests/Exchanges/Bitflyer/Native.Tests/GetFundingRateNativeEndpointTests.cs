@@ -21,13 +21,24 @@ public sealed class GetFundingRateNativeEndpointTests
     [Fact]
     public async Task CallAsync_MapsSuccessfulResponse()
     {
-        var endpoint = new GetFundingRateNativeEndpoint(new FakeGetFundingRateProtocolEndpoint(_ => SuccessProtocolCall("""{"current_funding_rate":0.001,"next_funding_rate_settledate":"2026-03-26T06:00:00+00:00"}""")));
+        var endpoint = new GetFundingRateNativeEndpoint(new FakeGetFundingRateProtocolEndpoint(_ => SuccessProtocolCall("""{"current_funding_rate":0.001,"next_funding_rate_settledate":"2026-03-26T06:00:00"}""")));
 
         var call = await endpoint.CallAsync(new GetFundingRateRequest { ProductCode = "FX_BTC_JPY" });
 
         Assert.True(call.IsSuccess);
         Assert.Equal(0.001m, call.Response!.CurrentFundingRate);
         Assert.Equal(new DateTimeOffset(2026, 3, 26, 6, 0, 0, TimeSpan.Zero), call.Response.NextFundingRateSettleDate);
+    }
+
+    [Fact]
+    public async Task CallAsync_NormalizesExplicitOffsetToUtc()
+    {
+        var endpoint = new GetFundingRateNativeEndpoint(new FakeGetFundingRateProtocolEndpoint(_ => SuccessProtocolCall("""{"current_funding_rate":0.001,"next_funding_rate_settledate":"2026-03-26T15:00:00+09:00"}""")));
+
+        var call = await endpoint.CallAsync(new GetFundingRateRequest { ProductCode = "FX_BTC_JPY" });
+
+        Assert.True(call.IsSuccess);
+        Assert.Equal(new DateTimeOffset(2026, 3, 26, 6, 0, 0, TimeSpan.Zero), call.Response!.NextFundingRateSettleDate);
     }
 
     private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)

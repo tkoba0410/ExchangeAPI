@@ -65,7 +65,7 @@ public sealed class GetFundingRateNativeEndpoint : IGetFundingRateNativeEndpoint
             var response = new GetFundingRateResponse
             {
                 CurrentFundingRate = JsonValueReader.ReadRequiredDecimal(root, "current_funding_rate"),
-                NextFundingRateSettleDate = JsonValueReader.ReadRequiredTimestamp(root, "next_funding_rate_settledate"),
+                NextFundingRateSettleDate = JsonValueReader.ReadRequiredUtcTimestamp(root, "next_funding_rate_settledate"),
             };
 
             return NativeCallFactory.Success(request, response, protocolCall, "Public");

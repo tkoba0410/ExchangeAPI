@@ -54,9 +54,9 @@ public sealed class GetCorporateLeverageNativeEndpoint : IGetCorporateLeverageNa
             var response = new GetCorporateLeverageResponse
             {
                 CurrentMax = JsonValueReader.ReadRequiredDecimal(root, "current_max"),
-                CurrentStartDate = JsonValueReader.ReadRequiredTimestamp(root, "current_startdate"),
+                CurrentStartDate = JsonValueReader.ReadRequiredUtcTimestamp(root, "current_startdate"),
                 NextMax = root.TryGetProperty("next_max", out var nextMax) ? JsonValueReader.ReadDecimal(nextMax, "next_max") : null,
-                NextStartDate = root.TryGetProperty("next_startdate", out var nextStartDate) ? JsonValueReader.ReadTimestamp(nextStartDate, "next_startdate") : null,
+                NextStartDate = JsonValueReader.ReadOptionalUtcTimestamp(root, "next_startdate"),
             };
 
             return NativeCallFactory.Success(request, response, protocolCall, "Public");

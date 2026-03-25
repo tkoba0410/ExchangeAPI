@@ -80,7 +80,7 @@ public sealed class GetCoinInsNativeEndpoint : IGetCoinInsNativeEndpoint
                     Address = JsonValueReader.ReadRequiredString(item, "address"),
                     TxHash = JsonValueReader.ReadRequiredString(item, "tx_hash"),
                     Status = JsonValueReader.ReadRequiredString(item, "status"),
-                    EventDate = JsonValueReader.ReadRequiredTimestamp(item, "event_date"),
+                    EventDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "event_date"),
                 });
             }
 

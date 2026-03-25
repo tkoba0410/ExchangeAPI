@@ -97,7 +97,7 @@ public sealed class GetParentOrderNativeEndpoint : IGetParentOrderNativeEndpoint
                 Id = JsonValueReader.ReadRequiredLong(root, "id"),
                 ParentOrderId = JsonValueReader.ReadRequiredString(root, "parent_order_id"),
                 OrderMethod = JsonValueReader.ReadRequiredString(root, "order_method"),
-                ExpireDate = JsonValueReader.ReadRequiredTimestamp(root, "expire_date"),
+                ExpireDate = JsonValueReader.ReadRequiredUtcTimestamp(root, "expire_date"),
                 TimeInForce = JsonValueReader.ReadRequiredString(root, "time_in_force"),
                 Parameters = parameters,
                 ParentOrderAcceptanceId = JsonValueReader.ReadRequiredString(root, "parent_order_acceptance_id"),

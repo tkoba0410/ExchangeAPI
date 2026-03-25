@@ -47,6 +47,7 @@ public sealed class PrivateNativeEndpointTests
         Assert.Equal(-715m, call.Response.OpenPositionPnl);
         Assert.Equal(1000000m, call.Response.MarginCallAmount);
         Assert.NotNull(call.Response.MarginCallDueDate);
+        Assert.Equal(new DateTimeOffset(2021, 9, 1, 8, 0, 0, TimeSpan.Zero), call.Response.MarginCallDueDate);
     }
 
     [Fact]
@@ -79,6 +80,7 @@ public sealed class PrivateNativeEndpointTests
         Assert.Equal("BUY", call.Response[0].Side);
         Assert.Equal(36000m, call.Response[0].Price);
         Assert.Equal(-0.5m, call.Response[0].Sfd);
+        Assert.Equal(new DateTimeOffset(2015, 11, 3, 10, 4, 45, 11, TimeSpan.Zero), call.Response[0].OpenDate);
     }
 
     [Fact]
@@ -108,6 +110,8 @@ public sealed class PrivateNativeEndpointTests
         Assert.Equal("JOR20150707-084555-022523", call.Response[0].ChildOrderId);
         Assert.Equal("COMPLETED", call.Response[0].ChildOrderState);
         Assert.Equal(0.1m, call.Response[0].ExecutedSize);
+        Assert.Equal(new DateTimeOffset(2015, 7, 14, 7, 25, 52, TimeSpan.Zero), call.Response[0].ExpireDate);
+        Assert.Equal(new DateTimeOffset(2015, 7, 7, 8, 45, 53, TimeSpan.Zero), call.Response[0].ChildOrderDate);
     }
 
     [Fact]
@@ -148,6 +152,7 @@ public sealed class PrivateNativeEndpointTests
         Assert.Equal("JOR20150707-060559-021935", call.Response[0].ChildOrderId);
         Assert.Equal("BUY", call.Response[0].Side);
         Assert.Equal(33470m, call.Response[0].Price);
+        Assert.Equal(new DateTimeOffset(2015, 7, 7, 9, 57, 40, 397, TimeSpan.Zero), call.Response[0].ExecDate);
     }
 
     [Fact]
@@ -188,6 +193,7 @@ public sealed class PrivateNativeEndpointTests
         Assert.Equal("JPY", call.Response[0].CurrencyCode);
         Assert.Equal(-6m, call.Response[0].Change);
         Assert.Equal("CLEARING_COLL", call.Response[0].ReasonCode);
+        Assert.Equal(new DateTimeOffset(2017, 5, 18, 2, 37, 41, 327, TimeSpan.Zero), call.Response[0].Date);
     }
 
     [Fact]

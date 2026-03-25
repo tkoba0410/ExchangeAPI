@@ -315,7 +315,7 @@ public sealed class LiveTests
         Assert.True(root.GetProperty("current_max").GetDecimal() > 0);
         Assert.Equal(JsonValueKind.String, root.GetProperty("current_startdate").ValueKind);
         Assert.True(native.CurrentMax > 0);
-        Assert.True(native.CurrentStartDate != default);
+        Assert.Equal(ParseUtcNoOffsetTimestamp(root.GetProperty("current_startdate").GetString()!), native.CurrentStartDate);
 
         if (root.TryGetProperty("next_max", out var nextMax))
         {
@@ -325,6 +325,11 @@ public sealed class LiveTests
         if (native.NextMax is not null)
         {
             Assert.True(native.NextMax.Value > 0);
+        }
+
+        if (root.TryGetProperty("next_startdate", out var nextStartDate) && native.NextStartDate is not null)
+        {
+            Assert.Equal(ParseUtcNoOffsetTimestamp(nextStartDate.GetString()!), native.NextStartDate.Value);
         }
     }
 
@@ -357,6 +362,7 @@ public sealed class LiveTests
             Assert.False(string.IsNullOrWhiteSpace(protocolFirst.GetProperty("nickname").GetString()));
             Assert.False(string.IsNullOrWhiteSpace(protocolFirst.GetProperty("message").GetString()));
             Assert.Equal(JsonValueKind.String, protocolFirst.GetProperty("date").ValueKind);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolFirst.GetProperty("date").GetString()!), native[0].Date);
         }
 
         if (native.Count > 0)
@@ -444,7 +450,7 @@ public sealed class LiveTests
             Assert.Equal(protocolItem.GetProperty("commission").GetDecimal(), nativeItem.Commission);
             Assert.Equal(protocolItem.GetProperty("swap_point_accumulate").GetDecimal(), nativeItem.SwapPointAccumulate);
             Assert.Equal(protocolItem.GetProperty("require_collateral").GetDecimal(), nativeItem.RequireCollateral);
-            Assert.Equal(protocolItem.GetProperty("open_date").GetDateTimeOffset(), nativeItem.OpenDate);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolItem.GetProperty("open_date").GetString()!), nativeItem.OpenDate);
             Assert.Equal(protocolItem.GetProperty("leverage").GetDecimal(), nativeItem.Leverage);
             Assert.Equal(protocolItem.GetProperty("pnl").GetDecimal(), nativeItem.Pnl);
             Assert.Equal(protocolItem.GetProperty("sfd").GetDecimal(), nativeItem.Sfd);
@@ -480,6 +486,13 @@ public sealed class LiveTests
         Assert.True(native.Collateral >= 0);
         Assert.True(native.RequireCollateral >= 0);
         Assert.True(native.KeepRate >= 0);
+
+        if (root.TryGetProperty("margin_call_due_date", out var marginCallDueDate)
+            && marginCallDueDate.ValueKind == JsonValueKind.String
+            && native.MarginCallDueDate is not null)
+        {
+            Assert.Equal(ParseUtcNoOffsetTimestamp(marginCallDueDate.GetString()!), native.MarginCallDueDate.Value);
+        }
     }
 
     [BitflyerPrivateReadLiveFact]
@@ -571,8 +584,8 @@ public sealed class LiveTests
             Assert.Equal(protocolItem.GetProperty("average_price").GetDecimal(), nativeItem.AveragePrice);
             Assert.Equal(protocolItem.GetProperty("size").GetDecimal(), nativeItem.Size);
             Assert.Equal(protocolItem.GetProperty("child_order_state").GetString(), nativeItem.ChildOrderState);
-            Assert.Equal(protocolItem.GetProperty("expire_date").GetDateTimeOffset(), nativeItem.ExpireDate);
-            Assert.Equal(protocolItem.GetProperty("child_order_date").GetDateTimeOffset(), nativeItem.ChildOrderDate);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolItem.GetProperty("expire_date").GetString()!), nativeItem.ExpireDate);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolItem.GetProperty("child_order_date").GetString()!), nativeItem.ChildOrderDate);
             Assert.Equal(protocolItem.GetProperty("child_order_acceptance_id").GetString(), nativeItem.ChildOrderAcceptanceId);
             Assert.Equal(protocolItem.GetProperty("outstanding_size").GetDecimal(), nativeItem.OutstandingSize);
             Assert.Equal(protocolItem.GetProperty("cancel_size").GetDecimal(), nativeItem.CancelSize);
@@ -630,7 +643,7 @@ public sealed class LiveTests
             Assert.Equal(protocolItem.GetProperty("price").GetDecimal(), nativeItem.Price);
             Assert.Equal(protocolItem.GetProperty("size").GetDecimal(), nativeItem.Size);
             Assert.Equal(protocolItem.GetProperty("commission").GetDecimal(), nativeItem.Commission);
-            Assert.Equal(protocolItem.GetProperty("exec_date").GetDateTimeOffset(), nativeItem.ExecDate);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolItem.GetProperty("exec_date").GetString()!), nativeItem.ExecDate);
             Assert.Equal(protocolItem.GetProperty("child_order_acceptance_id").GetString(), nativeItem.ChildOrderAcceptanceId);
         }
     }
@@ -675,7 +688,7 @@ public sealed class LiveTests
             Assert.Equal(protocolItem.GetProperty("change").GetDecimal(), nativeItem.Change);
             Assert.Equal(protocolItem.GetProperty("amount").GetDecimal(), nativeItem.Amount);
             Assert.Equal(protocolItem.GetProperty("reason_code").GetString(), nativeItem.ReasonCode);
-            Assert.Equal(protocolItem.GetProperty("date").GetDateTimeOffset(), nativeItem.Date);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolItem.GetProperty("date").GetString()!), nativeItem.Date);
         }
     }
 
@@ -904,11 +917,12 @@ public sealed class LiveTests
 
         if (native.Count > 0)
         {
+            var protocolFirst = root[0];
             var nativeFirst = native[0];
             Assert.True(nativeFirst.Id > 0);
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.CurrencyCode));
             Assert.True(nativeFirst.Amount > 0);
-            Assert.True(nativeFirst.EventDate != default);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolFirst.GetProperty("event_date").GetString()!), nativeFirst.EventDate);
         }
     }
 
@@ -947,11 +961,13 @@ public sealed class LiveTests
 
         if (native.Count > 0)
         {
+            var protocolFirst = root[0];
             var nativeFirst = native[0];
             Assert.True(nativeFirst.Id > 0);
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.CurrencyCode));
             Assert.True(nativeFirst.Amount > 0);
             Assert.True(nativeFirst.Fee >= 0);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolFirst.GetProperty("event_date").GetString()!), nativeFirst.EventDate);
         }
     }
 
@@ -990,11 +1006,12 @@ public sealed class LiveTests
 
         if (native.Count > 0)
         {
+            var protocolFirst = root[0];
             var nativeFirst = native[0];
             Assert.True(nativeFirst.Id > 0);
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.CurrencyCode));
             Assert.True(nativeFirst.Amount > 0);
-            Assert.True(nativeFirst.EventDate != default);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolFirst.GetProperty("event_date").GetString()!), nativeFirst.EventDate);
         }
     }
 
@@ -1033,11 +1050,12 @@ public sealed class LiveTests
 
         if (native.Count > 0)
         {
+            var protocolFirst = root[0];
             var nativeFirst = native[0];
             Assert.True(nativeFirst.Id > 0);
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.CurrencyCode));
             Assert.True(nativeFirst.Amount > 0);
-            Assert.True(nativeFirst.EventDate != default);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolFirst.GetProperty("event_date").GetString()!), nativeFirst.EventDate);
         }
     }
 
@@ -1125,11 +1143,12 @@ public sealed class LiveTests
 
         if (native.Count > 0)
         {
+            var protocolFirst = root[0];
             var nativeFirst = native[0];
             Assert.True(nativeFirst.Id > 0);
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.ParentOrderId));
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.ProductCode));
-            Assert.True(nativeFirst.ParentOrderDate != default);
+            Assert.Equal(ParseUtcNoOffsetTimestamp(protocolFirst.GetProperty("parent_order_date").GetString()!), nativeFirst.ParentOrderDate);
         }
     }
 

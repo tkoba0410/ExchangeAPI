@@ -75,7 +75,7 @@ public sealed class GetChatsNativeEndpoint : IGetChatsNativeEndpoint
                 {
                     Nickname = JsonValueReader.ReadRequiredString(item, "nickname"),
                     Message = JsonValueReader.ReadRequiredString(item, "message"),
-                    Date = JsonValueReader.ReadRequiredTimestamp(item, "date"),
+                    Date = JsonValueReader.ReadRequiredUtcTimestamp(item, "date"),
                 });
             }
 

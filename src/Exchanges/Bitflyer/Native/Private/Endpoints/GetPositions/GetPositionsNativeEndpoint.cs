@@ -81,7 +81,7 @@ public sealed class GetPositionsNativeEndpoint : IGetPositionsNativeEndpoint
                     Commission = JsonValueReader.ReadRequiredDecimal(item, "commission"),
                     SwapPointAccumulate = JsonValueReader.ReadRequiredDecimal(item, "swap_point_accumulate"),
                     RequireCollateral = JsonValueReader.ReadRequiredDecimal(item, "require_collateral"),
-                    OpenDate = JsonValueReader.ReadRequiredTimestamp(item, "open_date"),
+                    OpenDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "open_date"),
                     Leverage = JsonValueReader.ReadRequiredDecimal(item, "leverage"),
                     Pnl = JsonValueReader.ReadRequiredDecimal(item, "pnl"),
                     Sfd = JsonValueReader.ReadRequiredDecimal(item, "sfd"),

@@ -157,8 +157,8 @@ Stage10 の working hypothesis:
 | GetBalanceHistory | `trade_date` | JST documented | JST->UTC normalized | Documented + Observed | API 文書に「JST（日本標準時, UTC+9）」明記あり |
 | GetExecutionsPublic | `exec_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
 | GetExecutionsPrivate | `exec_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
-| GetCorporateLeverage | `current_startdate` | Timezone undocumented | Hypothesized UTC normalized | Unverified | response 例のみで timezone 記述なし |
-| GetCorporateLeverage | `next_startdate` | Timezone undocumented | Hypothesized UTC normalized | Unverified | response 例のみで timezone 記述なし |
+| GetCorporateLeverage | `current_startdate` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
+| GetCorporateLeverage | `next_startdate` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
 | GetChats | `date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |
 | GetCollateral | `margin_call_due_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | endpoint 専用 optional timestamp parser を使わず shared UTC 仮説 parser を使う |
 | GetCoinIns | `event_date` | Timezone undocumented | Hypothesized UTC normalized | Observed | response 例のみで timezone 記述なし |

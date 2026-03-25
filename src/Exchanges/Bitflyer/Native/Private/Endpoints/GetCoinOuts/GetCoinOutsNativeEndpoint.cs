@@ -82,7 +82,7 @@ public sealed class GetCoinOutsNativeEndpoint : IGetCoinOutsNativeEndpoint
                     Fee = JsonValueReader.ReadRequiredDecimal(item, "fee"),
                     AdditionalFee = JsonValueReader.ReadRequiredDecimal(item, "additional_fee"),
                     Status = JsonValueReader.ReadRequiredString(item, "status"),
-                    EventDate = JsonValueReader.ReadRequiredTimestamp(item, "event_date"),
+                    EventDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "event_date"),
                 });
             }
 

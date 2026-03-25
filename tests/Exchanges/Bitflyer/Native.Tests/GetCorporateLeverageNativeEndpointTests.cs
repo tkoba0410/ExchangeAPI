@@ -17,6 +17,8 @@ public sealed class GetCorporateLeverageNativeEndpointTests
         Assert.True(call.IsSuccess);
         Assert.Equal(2m, call.Response!.CurrentMax);
         Assert.Equal(4m, call.Response.NextMax);
+        Assert.Equal(new DateTimeOffset(2026, 3, 25, 0, 0, 0, TimeSpan.Zero), call.Response.CurrentStartDate);
+        Assert.Equal(new DateTimeOffset(2026, 3, 26, 0, 0, 0, TimeSpan.Zero), call.Response.NextStartDate);
     }
 
     [Fact]

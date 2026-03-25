@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateral;
@@ -60,7 +59,7 @@ public sealed class GetCollateralNativeEndpoint : IGetCollateralNativeEndpoint
                 RequireCollateral = JsonValueReader.ReadRequiredDecimal(root, "require_collateral"),
                 KeepRate = JsonValueReader.ReadRequiredDecimal(root, "keep_rate"),
                 MarginCallAmount = ReadOptionalDecimal(root, "margin_call_amount"),
-                MarginCallDueDate = ReadOptionalTimestamp(root, "margin_call_due_date"),
+                MarginCallDueDate = JsonValueReader.ReadOptionalUtcTimestamp(root, "margin_call_due_date"),
             };
 
             return NativeCallFactory.Success(request, response, protocolCall, "Private");
@@ -90,31 +89,5 @@ public sealed class GetCollateralNativeEndpoint : IGetCollateralNativeEndpoint
         }
 
         return value;
-    }
-
-    private static DateTimeOffset? ReadOptionalTimestamp(JsonElement element, string propertyName)
-    {
-        if (!element.TryGetProperty(propertyName, out var property) || property.ValueKind == JsonValueKind.Null)
-        {
-            return null;
-        }
-
-        if (property.ValueKind != JsonValueKind.String)
-        {
-            throw new CodecException($"Property '{propertyName}' must be a timestamp string.");
-        }
-
-        var raw = property.GetString();
-        if (string.IsNullOrWhiteSpace(raw))
-        {
-            return null;
-        }
-
-        if (DateTimeOffset.TryParse(raw, CultureInfo.InvariantCulture, DateTimeStyles.None, out var value))
-        {
-            return value;
-        }
-
-        throw new CodecException($"Property '{propertyName}' must be a timestamp.");
     }
 }

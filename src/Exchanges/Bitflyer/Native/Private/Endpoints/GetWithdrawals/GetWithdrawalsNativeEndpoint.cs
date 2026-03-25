@@ -83,7 +83,7 @@ public sealed class GetWithdrawalsNativeEndpoint : IGetWithdrawalsNativeEndpoint
                     CurrencyCode = JsonValueReader.ReadRequiredString(item, "currency_code"),
                     Amount = JsonValueReader.ReadRequiredDecimal(item, "amount"),
                     Status = JsonValueReader.ReadRequiredString(item, "status"),
-                    EventDate = JsonValueReader.ReadRequiredTimestamp(item, "event_date"),
+                    EventDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "event_date"),
                 });
             }
 

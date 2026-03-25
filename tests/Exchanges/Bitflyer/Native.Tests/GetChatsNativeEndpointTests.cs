@@ -35,6 +35,7 @@ public sealed class GetChatsNativeEndpointTests
         Assert.Single(call.Response!);
         Assert.Equal("alice", call.Response![0].Nickname);
         Assert.Equal("hello", call.Response[0].Message);
+        Assert.Equal(new DateTimeOffset(2015, 7, 8, 2, 50, 59, 970, TimeSpan.Zero), call.Response[0].Date);
     }
 
     private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)

@@ -79,7 +79,7 @@ public sealed class GetCollateralHistoryNativeEndpoint : IGetCollateralHistoryNa
                     Change = JsonValueReader.ReadRequiredDecimal(item, "change"),
                     Amount = JsonValueReader.ReadRequiredDecimal(item, "amount"),
                     ReasonCode = JsonValueReader.ReadRequiredString(item, "reason_code"),
-                    Date = JsonValueReader.ReadRequiredTimestamp(item, "date"),
+                    Date = JsonValueReader.ReadRequiredUtcTimestamp(item, "date"),
                 });
             }
 

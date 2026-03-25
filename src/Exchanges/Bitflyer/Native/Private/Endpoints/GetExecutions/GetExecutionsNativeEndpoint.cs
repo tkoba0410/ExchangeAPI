@@ -88,7 +88,7 @@ public sealed class GetExecutionsNativeEndpoint : IGetExecutionsNativeEndpoint
                     Price = JsonValueReader.ReadRequiredDecimal(item, "price"),
                     Size = JsonValueReader.ReadRequiredDecimal(item, "size"),
                     Commission = JsonValueReader.ReadRequiredDecimal(item, "commission"),
-                    ExecDate = JsonValueReader.ReadRequiredTimestamp(item, "exec_date"),
+                    ExecDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "exec_date"),
                     ChildOrderAcceptanceId = JsonValueReader.ReadRequiredString(item, "child_order_acceptance_id"),
                 });
             }

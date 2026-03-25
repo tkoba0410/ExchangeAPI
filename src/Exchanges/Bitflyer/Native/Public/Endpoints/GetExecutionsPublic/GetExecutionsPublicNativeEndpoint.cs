@@ -84,7 +84,7 @@ public sealed class GetExecutionsPublicNativeEndpoint : IGetExecutionsPublicNati
                     Side = JsonValueReader.ReadRequiredString(item, "side"),
                     Price = JsonValueReader.ReadRequiredDecimal(item, "price"),
                     Size = JsonValueReader.ReadRequiredDecimal(item, "size"),
-                    ExecDate = JsonValueReader.ReadRequiredTimestamp(item, "exec_date"),
+                    ExecDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "exec_date"),
                     BuyChildOrderAcceptanceId = JsonValueReader.ReadRequiredString(item, "buy_child_order_acceptance_id"),
                     SellChildOrderAcceptanceId = JsonValueReader.ReadRequiredString(item, "sell_child_order_acceptance_id"),
                 });

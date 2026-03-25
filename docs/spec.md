@@ -724,6 +724,7 @@ bot 運用で重要な scalar の扱いは以下を正本とする。
 - `Native` は venue response の scalar を暗黙に丸めたり切り捨てたりしてはならない
 - response に offset が含まれる場合、`Native` はその offset 情報を保持する
 - response に offset が含まれない場合、その解釈規則は venue API 文書または endpoint contract によって固定する
+- venue API 文書に timezone 記述がなくても、library が deterministic decode を優先して working hypothesis を採る場合は、その仮説を venue matrix に明示する
 - offset なし timestamp の解釈を endpoint contract で固定できない場合、その endpoint は `Fixed` に上げない
 - scalar parse 失敗は `Codec` とする
 - bot 判断に必要な scalar を `double` / `float` へ落とすことを `Native` の正本に含めない

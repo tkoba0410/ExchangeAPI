@@ -22,6 +22,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPermissions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetWithdrawals;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.Withdraw;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
@@ -35,6 +36,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Protocol;
 using ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests;
@@ -822,6 +824,47 @@ public sealed class LiveTests
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.BankName));
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.AccountNumber));
         }
+    }
+
+    [BitflyerWithdrawNegativeLiveFact]
+    public async Task Withdraw_NegativeLiveContract()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+
+        Assert.NotNull(client.Private);
+
+        var bankAccountsCall = await client.Private!.GetBankAccountsCallAsync(new GetBankAccountsRequest());
+        Assert.True(bankAccountsCall.IsSuccess, bankAccountsCall.Error?.Message);
+        Assert.NotNull(bankAccountsCall.Response);
+
+        var verifiedBankAccounts = bankAccountsCall.Response!.Where(account => account.IsVerified).ToArray();
+        Assert.NotEmpty(verifiedBankAccounts);
+        var bankAccount = verifiedBankAccounts[0];
+
+        var withdrawCall = await client.Private.WithdrawCallAsync(new WithdrawRequest
+        {
+            CurrencyCode = "JPY",
+            BankAccountId = bankAccount.Id,
+            Amount = 12000m,
+            Code = "999999",
+        });
+
+        Assert.False(withdrawCall.IsSuccess);
+        Assert.NotNull(withdrawCall.Error);
+        Assert.Equal(CallErrorKinds.Http, withdrawCall.Error!.Kind);
+
+        var protocolCall = Assert.IsType<Call<ProtocolRequest, ProtocolResponse>>(Assert.Single(withdrawCall.Meta.Children!));
+        Assert.NotNull(protocolCall.Response);
+        Assert.NotEqual(200, protocolCall.Response!.StatusCode);
+        Assert.False(string.IsNullOrWhiteSpace(protocolCall.Response.BodyText));
+
+        using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
+        var root = document.RootElement;
+
+        Assert.True(root.GetProperty("status").GetInt64() < 0);
+        Assert.False(root.TryGetProperty("message_id", out _));
+        Assert.False(string.IsNullOrWhiteSpace(root.GetProperty("error_message").GetString()));
     }
 
     [BitflyerPrivateReadLiveFact]

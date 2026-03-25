@@ -1153,11 +1153,18 @@ state を変更する endpoint の live 実行には、以下を必須とする�
   - `local/bitflyer-live-write-enabled`
 - destructive 範囲が広い write live test は dedicated local marker を別に要求する
   - `CancelAllChildOrders`: `local/bitflyer-live-cancel-all-enabled`
+- cleanup 不可の write endpoint を negative live contract で確認する場合も dedicated local marker を要求する
+  - `Withdraw`: `local/bitflyer-live-withdraw-negative-enabled`
 - 専用または影響を限定できる account を使う
 - destructive 範囲が広い write live test は preflight safety check を持つ
   - `CancelAllChildOrders` は対象 product を固定し、`ACTIVE` child orders が empty の場合のみ実行する
 - matrix 上 `CleanupPolicy = Required` の endpoint は cleanup 手順を同じ test に含める
 - matrix 上 `CleanupPolicy = NotSupported` の endpoint は Stage10 の write live test 対象に含めない
+- ただし cleanup 不可でも、negative status で資産移動が発生しないことが仕様で保証される場合に限り、negative live contract を別扱いで持ってよい
+  - `Withdraw` は wrong-code による negative status を確認対象にできる
+  - この場合も native classification は current normative に従う
+    - non-success HTTP status は `Http`
+    - negative status の観測は child `Protocol` call の body で行う
 - write test は最小数量、最小影響の request を使う
 - `SendChildOrder` のような endpoint は `Protocol` と `Native` の parity 実行で二重送信しない
 - cleanup 用 endpoint がある場合は acceptance id / order id を保持し、後続 cleanup を必ず試みる

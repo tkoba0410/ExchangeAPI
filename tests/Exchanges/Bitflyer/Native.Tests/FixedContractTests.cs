@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelAllChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
@@ -375,6 +376,13 @@ public sealed class FixedContractTests
             typeof(IBitflyerPrivateNativeApi),
             nameof(IBitflyerPrivateNativeApi.CancelParentOrderCallAsync),
             typeof(CancelParentOrderRequest),
+            typeof(Unit));
+
+        AssertJsonProperty(typeof(CancelAllChildOrdersRequest), nameof(CancelAllChildOrdersRequest.ProductCode), typeof(string), "product_code");
+        AssertCallMethod(
+            typeof(IBitflyerPrivateNativeApi),
+            nameof(IBitflyerPrivateNativeApi.CancelAllChildOrdersCallAsync),
+            typeof(CancelAllChildOrdersRequest),
             typeof(Unit));
     }
 

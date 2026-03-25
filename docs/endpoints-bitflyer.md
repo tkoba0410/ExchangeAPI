@@ -97,7 +97,7 @@
 | SendParentOrder | POST | /v1/me/sendparentorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | Object | Yes | Required | - | KeySecret | order_method/minute_to_expire/time_in_force = null omitted; parameter fields are conditionally omitted |
 | CancelChildOrder | POST | /v1/me/cancelchildorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of child_order_id or child_order_acceptance_id |
 | CancelParentOrder | POST | /v1/me/cancelparentorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | EmptyOrObject | Yes | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
-| CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Yes | Yes | Later | Transitional | Transitional | 200 | EmptyOrObject | Yes | None | - | KeySecret | product_code required |
+| CancelAllChildOrders | POST | /v1/me/cancelallchildorders | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | EmptyOrObject | Yes | None | - | KeySecret | product_code required |
 | GetChildOrders | GET | /v1/me/getchildorders | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null; product_code omitted => BTC_JPY default |
 | GetParentOrders | GET | /v1/me/getparentorders | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | GetParentOrder | GET | /v1/me/getparentorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | Object | No | None | - | KeySecret | exactly one of parent_order_id or parent_order_acceptance_id |
@@ -111,12 +111,13 @@
 
 - 現行 Stage10 実装では `GetMarkets`、`GetBoard`、`GetTicker`、`GetExecutionsPublic`、`GetBoardState`、`GetHealth`、`GetFundingRate`、`GetCorporateLeverage`、`GetChats`、`GetPermissions`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetAddresses`、`GetCoinIns`、`GetCoinOuts`、`GetBankAccounts`、`GetDeposits`、`Withdraw`、`GetWithdrawals`、`GetChildOrders`、`GetParentOrders`、`GetParentOrder`、`GetExecutionsPrivate`、`GetBalanceHistory`、`GetPositions`、`GetCollateralHistory`、`GetTradingCommission`、`SendChildOrder`、`SendParentOrder`、`CancelChildOrder`、`CancelParentOrder`、`CancelAllChildOrders` を library 公開面に含める
 - read path の live test は、public は条件なし、private read は認証可能なら実行する
-- `SendChildOrder` と `CancelChildOrder` は `Phase2-Write`、`CancelAllChildOrders` は destructive 範囲が広いため live test をまだ持たない
+- `SendChildOrder` と `CancelChildOrder` は `Phase2-Write`、`CancelAllChildOrders` は dedicated marker と `BTC_JPY` preflight empty check を持つ `Phase2-Write` とする
 - `GetMarkets`、`GetTicker`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetTradingCommission` は first wave として `Fixed` に上げる
 - `GetBoard`、`GetExecutionsPublic`、`GetBoardState`、`GetHealth`、`GetFundingRate`、`GetCorporateLeverage`、`GetChats`、`GetAddresses`、`GetBankAccounts` は second wave として `Fixed` に上げる
 - `GetPermissions`、`GetCoinIns`、`GetCoinOuts`、`GetDeposits`、`GetWithdrawals`、`GetChildOrders`、`GetParentOrders`、`GetExecutionsPrivate`、`GetBalanceHistory`、`GetPositions`、`GetCollateralHistory` は third wave として `Fixed` に上げる
 - `SendChildOrder` と `CancelChildOrder` は non-fill lifecycle を前提に fourth wave として `Fixed` に上げる
 - `SendParentOrder`、`GetParentOrder`、`CancelParentOrder` は parent non-fill lifecycle を前提に fifth wave として `Fixed` に上げる
+- `CancelAllChildOrders` は `BTC_JPY` 専用 safety gate と preflight を前提に sixth wave として `Fixed` に上げる
 - `Phase1-Read` に含めた read endpoint は third wave までで `Fixed` に上げ切る
 - `Later` の read と write を含む残りの実装済み endpoint は、引き続き `Transitional` のまま段階的に固定する
 
@@ -566,3 +567,8 @@
   - response body は decode しない
 - `ExpectedStatus = 200`
 - `ResponseShape = EmptyOrObject`
+- write live test rule
+  - dedicated marker `local/bitflyer-live-cancel-all-enabled` を要求する
+  - `BTC_JPY` に固定して実行する
+  - 実行前に `GetChildOrders(product_code=BTC_JPY, child_order_state=ACTIVE)` が empty であることを要求する
+  - test が作成した deep limit child orders だけを `CancelAllChildOrders(BTC_JPY)` の対象とし、残留時は individual cancel cleanup を試みる

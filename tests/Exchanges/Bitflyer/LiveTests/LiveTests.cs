@@ -1,6 +1,7 @@
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelAllChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
@@ -1243,6 +1244,111 @@ public sealed class LiveTests
         }
     }
 
+    [BitflyerCancelAllWriteLiveFact]
+    public async Task SendChildOrders_CancelAllChildOrders_WriteLifecycle()
+    {
+        var settings = BitflyerLiveTestSettings.Load();
+        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+
+        Assert.NotNull(client.Private);
+
+        var activeBefore = await GetActiveChildOrdersAsync(client, ProductCodes.BtcJpy);
+        if (activeBefore.Count > 0)
+        {
+            throw new InvalidOperationException("BTC_JPY active child orders must be empty before running CancelAllChildOrders live test.");
+        }
+
+        var tickerCall = await client.Public.GetTickerCallAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
+        Assert.True(tickerCall.IsSuccess);
+        Assert.NotNull(tickerCall.Response);
+
+        var ticker = tickerCall.Response!;
+        var buyPrice = Math.Max(1m, decimal.Floor(ticker.Ltp * 0.60m));
+        var sellPrice = decimal.Ceiling(ticker.Ltp * 1.40m);
+        var createdAcceptanceIds = new List<string>();
+
+        try
+        {
+            foreach (var (side, price) in new[]
+            {
+                (OrderSides.Buy, buyPrice),
+                (OrderSides.Sell, sellPrice),
+            })
+            {
+                var sendCall = await client.Private!.SendChildOrderCallAsync(new SendChildOrderRequest
+                {
+                    ProductCode = ProductCodes.BtcJpy,
+                    ChildOrderType = ChildOrderTypes.Limit,
+                    Side = side,
+                    Price = price,
+                    Size = 0.001m,
+                    MinuteToExpire = 1,
+                    TimeInForce = TimeInForces.Gtc,
+                });
+
+                Assert.True(sendCall.IsSuccess, sendCall.Error?.Message);
+                Assert.NotNull(sendCall.Response);
+                Assert.False(string.IsNullOrWhiteSpace(sendCall.Response!.ChildOrderAcceptanceId));
+                createdAcceptanceIds.Add(sendCall.Response.ChildOrderAcceptanceId);
+            }
+
+            IReadOnlyList<GetChildOrders.Item>? activeOrders = null;
+            for (var attempt = 0; attempt < 10; attempt++)
+            {
+                activeOrders = await GetActiveChildOrdersAsync(client, ProductCodes.BtcJpy);
+                if (createdAcceptanceIds.All(id =>
+                        activeOrders.Any(order => string.Equals(order.ChildOrderAcceptanceId, id, StringComparison.Ordinal))))
+                {
+                    break;
+                }
+
+                await Task.Delay(250);
+            }
+
+            Assert.NotNull(activeOrders);
+            Assert.All(createdAcceptanceIds, id =>
+                Assert.Contains(activeOrders!, order => string.Equals(order.ChildOrderAcceptanceId, id, StringComparison.Ordinal)));
+
+            var cancelAllCall = await client.Private!.CancelAllChildOrdersCallAsync(new CancelAllChildOrdersRequest
+            {
+                ProductCode = ProductCodes.BtcJpy,
+            });
+
+            Assert.True(cancelAllCall.IsSuccess, cancelAllCall.Error?.Message);
+
+            for (var attempt = 0; attempt < 10; attempt++)
+            {
+                activeOrders = await GetActiveChildOrdersAsync(client, ProductCodes.BtcJpy);
+                if (createdAcceptanceIds.All(id =>
+                        activeOrders.All(order => !string.Equals(order.ChildOrderAcceptanceId, id, StringComparison.Ordinal))))
+                {
+                    break;
+                }
+
+                await Task.Delay(250);
+            }
+
+            Assert.NotNull(activeOrders);
+            Assert.All(createdAcceptanceIds, id =>
+                Assert.DoesNotContain(activeOrders!, order => string.Equals(order.ChildOrderAcceptanceId, id, StringComparison.Ordinal)));
+        }
+        finally
+        {
+            var remainingActiveOrders = await GetActiveChildOrdersAsync(client, ProductCodes.BtcJpy);
+            foreach (var acceptanceId in createdAcceptanceIds.Where(id =>
+                         remainingActiveOrders.Any(order => string.Equals(order.ChildOrderAcceptanceId, id, StringComparison.Ordinal))))
+            {
+                var cancelCall = await client.Private!.CancelChildOrderCallAsync(new CancelChildOrderRequest
+                {
+                    ProductCode = ProductCodes.BtcJpy,
+                    ChildOrderAcceptanceId = acceptanceId,
+                });
+
+                Assert.True(cancelCall.IsSuccess, cancelCall.Error?.Message);
+            }
+        }
+    }
+
     private static BitflyerClientOptions CreateOptions(BitflyerLiveTestSettings settings)
     {
         return new BitflyerClientOptions
@@ -1252,5 +1358,20 @@ public sealed class LiveTests
             EnableProtocolDebugLogging = settings.EnableProtocolDebugLogging,
             ProtocolDebugLogDirectory = settings.ProtocolDebugLogDirectory,
         };
+    }
+
+    private static async Task<IReadOnlyList<GetChildOrders.Item>> GetActiveChildOrdersAsync(
+        BitflyerNativeBundle client,
+        string productCode)
+    {
+        var activeOrdersCall = await client.Private!.GetChildOrdersCallAsync(new GetChildOrdersRequest
+        {
+            ProductCode = productCode,
+            ChildOrderState = ChildOrderStates.Active,
+        });
+
+        Assert.True(activeOrdersCall.IsSuccess, activeOrdersCall.Error?.Message);
+        Assert.NotNull(activeOrdersCall.Response);
+        return activeOrdersCall.Response!;
     }
 }

@@ -34,10 +34,38 @@ internal sealed class BitflyerWriteLiveFactAttribute : FactAttribute
     }
 }
 
+internal sealed class BitflyerCancelAllWriteLiveFactAttribute : FactAttribute
+{
+    public BitflyerCancelAllWriteLiveFactAttribute()
+    {
+        if (!BitflyerCredentialResolver.HasConfiguredCredentialsSource())
+        {
+            Skip = "Set EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH and EXCHANGEAPI_AGE_IDENTITY_FILE_PATH to run write live tests.";
+            return;
+        }
+
+        if (!BitflyerLiveTestPolicy.HasWriteOptInMarker())
+        {
+            Skip = "Create local/bitflyer-live-write-enabled to run write live tests.";
+            return;
+        }
+
+        if (!BitflyerLiveTestPolicy.HasCancelAllWriteOptInMarker())
+        {
+            Skip = "Create local/bitflyer-live-cancel-all-enabled to run CancelAllChildOrders live tests.";
+        }
+    }
+}
+
 internal static class BitflyerLiveTestPolicy
 {
     public static bool HasWriteOptInMarker()
     {
         return LiveTestLocalPolicy.HasMarker("bitflyer-live-write-enabled");
+    }
+
+    public static bool HasCancelAllWriteOptInMarker()
+    {
+        return LiveTestLocalPolicy.HasMarker("bitflyer-live-cancel-all-enabled");
     }
 }

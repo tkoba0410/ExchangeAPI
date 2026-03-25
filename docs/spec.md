@@ -1151,7 +1151,11 @@ state を変更する endpoint の live 実行には、以下を必須とする�
   - 2 つの file path はどちらも環境変数で明示指定する
 - private write live test は認証解決可能であり、かつ local marker file がある場合のみ実行する
   - `local/bitflyer-live-write-enabled`
+- destructive 範囲が広い write live test は dedicated local marker を別に要求する
+  - `CancelAllChildOrders`: `local/bitflyer-live-cancel-all-enabled`
 - 専用または影響を限定できる account を使う
+- destructive 範囲が広い write live test は preflight safety check を持つ
+  - `CancelAllChildOrders` は対象 product を固定し、`ACTIVE` child orders が empty の場合のみ実行する
 - matrix 上 `CleanupPolicy = Required` の endpoint は cleanup 手順を同じ test に含める
 - matrix 上 `CleanupPolicy = NotSupported` の endpoint は Stage10 の write live test 対象に含めない
 - write test は最小数量、最小影響の request を使う

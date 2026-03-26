@@ -294,6 +294,27 @@ command-specific convenience flag:
 - generic `dry-run`
 - generic idempotency key
 
+## 11.1 再導入条件
+
+現行非スコープ項目は、対応する library / adapter 契約が先に固定された場合にのみ再導入してよい。
+
+- `normalize`
+  - native DTO と protocol raw response の対応関係を、単一 command 内で安定して表現できる差分 schema が必要
+- `parity-check`
+  - fixture corpus、期待判定、CLI と CI が共有する oracle が必要
+- `replay`
+  - deterministic な request/response log format と replay 対象境界の固定が必要
+- `table` 出力
+  - endpoint ごとの列定義と列安定性ポリシーが必要
+- 抽象 `--env`
+  - venue 共通で意味の一致する environment model が必要
+- generic `dry-run`
+  - write command に対する preview semantics を facade 層または adapter 層で一貫して定義できることが必要
+- generic idempotency key
+  - 複数 venue にまたがって意味の一致する idempotency 契約が必要
+
+上記条件が満たされない限り、CLI は Stage11 の current contract を優先し、非スコープ項目を先行導入してはならない。
+
 ## 12. 例
 
 bitFlyer native public:

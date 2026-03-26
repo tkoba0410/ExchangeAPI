@@ -361,6 +361,7 @@ Stage10 の working hypothesis:
   - それ以外の optional query は `null` のとき omitted
 - 引数一覧
 
+
 | Parameter | Location | Required | Omission | Type/Domain | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `product_code` | query | No | `null` のとき omitted | string | omitted 時は bitFlyer 側既定値 `BTC_JPY` |
@@ -371,7 +372,9 @@ Stage10 の working hypothesis:
 | `child_order_id` | query | No | `null` のとき omitted | string | entity id filter |
 | `child_order_acceptance_id` | query | No | `null` のとき omitted | string | acceptance id filter |
 | `parent_order_id` | query | No | `null` のとき omitted | string | parent linkage filter |
+
 - enum一覧
+
 
 | Field | Allowed Values | Meaning / Notes |
 | --- | --- | --- |
@@ -516,13 +519,16 @@ Stage10 の working hypothesis:
   - `Code` 必須
 - 引数一覧
 
+
 | Parameter | Location | Required | Omission | Type/Domain | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `currency_code` | body | Yes | omitted 不可 | string | 現行実装では `JPY` のみ |
 | `bank_account_id` | body | Yes | omitted 不可 | positive long | 出金先口座 id |
 | `amount` | body | Yes | omitted 不可 | positive decimal | 出金額 |
 | `code` | body | Yes | omitted 不可 | string | 二段階認証コード |
+
 - enum一覧
+
 
 | Field | Allowed Values | Meaning / Notes |
 | --- | --- | --- |
@@ -556,6 +562,7 @@ Stage10 の working hypothesis:
   - `TimeInForce = null` のとき body omitted
 - 引数一覧
 
+
 | Parameter | Location | Required | Omission | Type/Domain | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `product_code` | body | Yes | omitted 不可 | string | venue product |
@@ -565,7 +572,9 @@ Stage10 の working hypothesis:
 | `size` | body | Yes | omitted 不可 | positive decimal | order size |
 | `minute_to_expire` | body | No | `null` のとき omitted | positive int | expiration minutes |
 | `time_in_force` | body | No | `null` のとき omitted | enum | execution policy |
+
 - enum一覧
+
 
 | Field | Allowed Values | Meaning / Notes |
 | --- | --- | --- |
@@ -590,6 +599,7 @@ Stage10 の working hypothesis:
 - request rule
   - `ChildOrderId` と `ChildOrderAcceptanceId` は exactly one
 - 引数一覧
+
 
 | Parameter | Location | Required | Omission | Type/Domain | Notes |
 | --- | --- | --- | --- | --- | --- |
@@ -634,13 +644,16 @@ Stage10 の working hypothesis:
   - `TRAIL` は `Offset` 必須
 - 引数一覧
 
+
 | Parameter | Location | Required | Omission | Type/Domain | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `order_method` | body | No | `null` のとき omitted | enum | omitted 時は `SIMPLE` 扱い |
 | `minute_to_expire` | body | No | `null` のとき omitted | positive int | expiration minutes |
 | `time_in_force` | body | No | `null` のとき omitted | enum | execution policy |
 | `parameters` | body | Yes | omitted 不可 | array | `order_method` に対応する件数が必要 |
+
 - `parameters[]` 一覧
+
 
 | Parameter | Location | Required | Omission | Type/Domain | Notes |
 | --- | --- | --- | --- | --- | --- |
@@ -651,7 +664,9 @@ Stage10 の working hypothesis:
 | `size` | body.parameters[] | Yes | omitted 不可 | positive decimal | order size |
 | `trigger_price` | body.parameters[] | Conditional | `null` のとき omitted | decimal | `STOP` / `STOP_LIMIT` で必須 |
 | `offset` | body.parameters[] | Conditional | `null` のとき omitted | long | `TRAIL` で必須 |
+
 - enum一覧
+
 
 | Field | Allowed Values | Meaning / Notes |
 | --- | --- | --- |
@@ -683,6 +698,7 @@ Stage10 の working hypothesis:
   - `null` の optional query は omitted
 - 引数一覧
 
+
 | Parameter | Location | Required | Omission | Type/Domain | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `product_code` | query | No | `null` のとき omitted | string | venue product filter |
@@ -690,7 +706,9 @@ Stage10 の working hypothesis:
 | `before` | query | No | `null` のとき omitted | positive long | paging |
 | `after` | query | No | `null` のとき omitted | positive long | paging |
 | `parent_order_state` | query | No | `null` のとき omitted | enum | parent order status filter |
+
 - enum一覧
+
 
 | Field | Allowed Values | Meaning / Notes |
 | --- | --- | --- |
@@ -761,6 +779,7 @@ Stage10 の working hypothesis:
   - `ParentOrderId` と `ParentOrderAcceptanceId` は exactly one
 - 引数一覧
 
+
 | Parameter | Location | Required | Omission | Type/Domain | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `product_code` | body | Yes | omitted 不可 | string | venue product |
@@ -783,6 +802,7 @@ Stage10 の working hypothesis:
 - request rule
   - `ProductCode` 必須
 - 引数一覧
+
 
 | Parameter | Location | Required | Omission | Type/Domain | Notes |
 | --- | --- | --- | --- | --- | --- |

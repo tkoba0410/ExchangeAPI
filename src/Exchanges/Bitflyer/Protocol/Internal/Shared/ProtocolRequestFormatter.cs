@@ -6,6 +6,14 @@ namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Shared;
 
 internal static class ProtocolRequestFormatter
 {
+    internal static Uri ToRequestUri(Uri baseUri, ProtocolRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(baseUri);
+        ArgumentNullException.ThrowIfNull(request);
+
+        return new Uri(baseUri, ToPathAndQuery(request));
+    }
+
     internal static string ToPathAndQuery(ProtocolRequest request)
     {
         if (request.Query is null || request.Query.Count == 0)

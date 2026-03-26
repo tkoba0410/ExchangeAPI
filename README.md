@@ -42,7 +42,7 @@ using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
-var client = BitflyerClientFactory.CreateNativeClient();
+using var client = BitflyerClientFactory.CreateNativeClient();
 
 var call = await client.Public.GetTickerCallAsync(new GetTickerRequest
 {
@@ -81,7 +81,7 @@ using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines;
 using ExchangeApi.Exchanges.Binance.Vocabulary;
 
-var client = BinanceClientFactory.CreateNativeClient();
+using var client = BinanceClientFactory.CreateNativeClient();
 
 var call = await client.Public.GetKlinesCallAsync(new GetKlinesRequest
 {
@@ -104,12 +104,14 @@ else
 
 - `BitflyerClientOptions`
   - `BaseUri`
+  - `RequestTimeout`
   - `Credentials`
   - `UseTickerAliasPath`
   - `EnableProtocolDebugLogging`
   - `ProtocolDebugLogDirectory`
 - `BinanceClientOptions`
   - `BaseUri`
+  - `RequestTimeout`
   - `EnableProtocolDebugLogging`
   - `ProtocolDebugLogDirectory`
 
@@ -123,7 +125,7 @@ using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPermissions;
 
-var client = BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions
+using var client = BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions
 {
     Credentials = new BitflyerApiCredentials
     {
@@ -141,7 +143,7 @@ var call = await client.Private!.GetPermissionsCallAsync(new GetPermissionsReque
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
-var client = BitflyerClientFactory.CreateProtocolClient();
+using var client = BitflyerClientFactory.CreateProtocolClient();
 var call = await client.Public.GetTickerCallAsync(ProductCodes.BtcJpy);
 
 if (call.IsSuccess && call.Response is not null)
@@ -153,8 +155,14 @@ if (call.IsSuccess && call.Response is not null)
 ## Client Lifetime
 
 - `CreateProtocolClient(...)` / `CreateNativeClient(...)` が返す bundle は per-call object ではなく reuse 前提の long-lived object
-- 現行実装は `HttpClient` を library 内で生成し、明示的な dispose surface はまだ持たない
-- process または test scope で bundle を使い回し、endpoint 呼び出しごとに new しないことを推奨する
+- bundle は `IDisposable` を実装する
+- `CreateProtocolClient(options)` / `CreateNativeClient(options)` は internal-owned mode で、library が `HttpClient` を生成して所有する
+- `CreateProtocolClient(httpClient, options)` / `CreateNativeClient(httpClient, options)` は external-owned mode で、library は caller 提供 `HttpClient` を dispose しない
+- bundle は process または application scope で使い回し、不要になった時点で dispose することを推奨する
+- `RequestTimeout` は per-request timeout で、`HttpClient.Timeout` ではなく linked cancellation で適用する
+- internal-owned mode では library 生成 `HttpClient.Timeout` を `Timeout.InfiniteTimeSpan` に固定する
+- external-owned mode では library は caller 提供 `HttpClient` の `Timeout` / `BaseAddress` / `DefaultRequestHeaders` を変更しない
+- caller が external-owned `HttpClient.Timeout` を短く設定している場合、それが `RequestTimeout` より先に失敗することがある
 
 ## Current State
 

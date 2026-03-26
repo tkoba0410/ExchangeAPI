@@ -10,8 +10,18 @@ public static class BinanceClientFactory
         return BinanceBootstrap.CreateProtocolBundle(options);
     }
 
+    public static BinanceProtocolBundle CreateProtocolClient(HttpClient httpClient, BinanceClientOptions? options = null)
+    {
+        return BinanceBootstrap.CreateProtocolBundle(httpClient, options);
+    }
+
     public static BinanceNativeBundle CreateNativeClient(BinanceClientOptions? options = null)
     {
         return BinanceBootstrap.CreateNativeBundle(options);
+    }
+
+    public static BinanceNativeBundle CreateNativeClient(HttpClient httpClient, BinanceClientOptions? options = null)
+    {
+        return BinanceBootstrap.CreateNativeBundle(httpClient, options);
     }
 }

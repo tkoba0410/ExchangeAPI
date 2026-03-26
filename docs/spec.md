@@ -269,10 +269,14 @@ Stage10 では実装対象外とする。
 
 - `CreateProtocolClient(...)`
   - `ProtocolBundle` を返す
+  - `HttpClient` を受け取らない overload は internal-owned mode とする
+  - `HttpClient` を受け取る overload は external-owned mode とする
   - `Public` を必須で持つ
   - 認証付きなら `Private` も持つ
 - `CreateNativeClient(...)`
   - `NativeBundle` を返す
+  - `HttpClient` を受け取らない overload は internal-owned mode とする
+  - `HttpClient` を受け取る overload は external-owned mode とする
   - `Native.Public` を必須で持つ
   - 認証付きなら `Native.Private` も持つ
   - 内部で利用する `Protocol` へアクセスできる
@@ -282,48 +286,45 @@ Stage10 では実装対象外とする。
 Current normative:
 
 - client bundle は short-lived per-call object ではなく、reuse 前提の long-lived object として扱う
-- 現行の `CreateProtocolClient(...)` / `CreateNativeClient(...)` は internal-owned mode とし、transport 実装に必要な `HttpClient` を library 内で生成する
-- `HttpClient` は option object に入れない
-- option object は値設定のみを持つ構成 object とし、資源所有 object を混在させない
-- `BaseUri` は ExchangeAPI 側の venue root 設定として持ち続ける
-- 現行公開面には explicit な dispose surface はまだ存在しない
-- dispose surface が追加されるまでは、internal-owned mode の bundle は process または test scope で reuse する前提とする
-
-Reserved additive extension:
-
-- `HttpClient` を受け取る overload を将来追加してよい
-- overload を追加する場合、それは external-owned mode とする
+- `CreateProtocolClient(options)` / `CreateNativeClient(options)` は internal-owned mode とし、transport 実装に必要な `HttpClient` を library 内で生成する
+- `CreateProtocolClient(HttpClient, options)` / `CreateNativeClient(HttpClient, options)` は external-owned mode とする
 - ownership は必ず二値で定義する
   - internal-owned mode: library が transport 資源を所有する
   - external-owned mode: caller が `HttpClient` を所有する
+- bundle は explicit な dispose surface として `IDisposable` を持ってよい
+- internal-owned mode では bundle を dispose した時点ではなく、最後の shared lifetime lease が解放された時点で owned transport 資源を dispose する
 - external-owned mode では library は caller 提供の `HttpClient` を dispose してはならない
 - external-owned mode では library は caller 提供の `HttpClient` の mutable state を変更してはならない
   - `Timeout`
   - `BaseAddress`
   - `DefaultRequestHeaders`
-- external-owned mode を将来追加する場合でも、request URI 解決の正本は ExchangeAPI 側の `BaseUri + path/query` とする
-- explicit な dispose surface は additive change としてのみ導入してよい
+- `NativeBundle` と、その内部から参照できる `ProtocolBundle` は同じ transport 資源を共有してよい
+- shared bundle lifetime の dispose は idempotent でなければならない
+- use-after-dispose の動作は正本に含めない
+- `HttpClient` は option object に入れない
+- option object は値設定のみを持つ構成 object とし、資源所有 object を混在させない
+- `BaseUri` は ExchangeAPI 側の venue root 設定として持ち続ける
 
 ### 4.2.2 Transport Option Contract
 
 Current normative:
 
-- transport option は ExchangeAPI の実行契約であり、caller 提供 `HttpClient` の mutable state に依存してはならない
-- 現行の stable option は `BaseUri` / credentials / protocol debug logging に限定する
+- transport option は ExchangeAPI の実行契約であり、caller 提供 `HttpClient` の mutable state を contract source にしてはならない
+- stable option は `BaseUri` / `RequestTimeout` / credentials / protocol debug logging とする
 - caller から渡された `CancellationToken` は transport まで伝播させる
 - caller cancellation による失敗は `Transport` とする
-- Stage10 では retry / backoff / circuit breaker を transport option の正本に含めない
-- proxy / handler chain / resilience pipeline は Stage10 の必須正本に含めない
-
-Reserved additive extension:
-
-- timeout は将来 additive に追加してよい transport option とする
-- timeout option 名の正本は `RequestTimeout` とする
+- `RequestTimeout` の option 名の正本は `RequestTimeout` とする
 - `RequestTimeout` は per-request の上限時間を意味する
-- `RequestTimeout` を実装する場合、`HttpClient.Timeout` を正本にしてはならない
 - `RequestTimeout` は linked `CancellationTokenSource` によって request ごとに適用する
 - effective cancellation は caller cancellation と `RequestTimeout` の早い方とする
 - timeout による失敗は `Transport` とする
+- `RequestTimeout` の正本は ExchangeAPI 側 option であり、`HttpClient.Timeout` を正本にしてはならない
+- internal-owned mode では library 生成 `HttpClient` の `Timeout` を `Timeout.InfiniteTimeSpan` に設定してよい
+- external-owned mode では library は caller 提供 `HttpClient` の `Timeout` / `BaseAddress` / `DefaultRequestHeaders` を読んだり変更したりしてはならない
+- request URI 解決の正本は ExchangeAPI 側の `BaseUri + path/query` とする
+- caller が external-owned `HttpClient.Timeout` を `RequestTimeout` より短く設定した結果、request が先に失敗する場合、その差異は caller-owned environment の責務とする
+- Stage10 では retry / backoff / circuit breaker を transport option の正本に含めない
+- proxy / handler chain / resilience pipeline は Stage10 の必須正本に含めない
 
 ### 4.2.3 Facade Method Contract
 

@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Composition.Internal.Runtime;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
@@ -79,8 +80,25 @@ internal static class BitflyerBootstrap
 {
     internal static BitflyerProtocolBundle CreateProtocolBundle(BitflyerClientOptions? options)
     {
-        var normalizedOptions = options ?? new BitflyerClientOptions();
-        var transport = CreateTransport(normalizedOptions);
+        var normalizedOptions = ValidateOptions(options ?? new BitflyerClientOptions());
+        var runtime = CreateInternalTransportRuntime(normalizedOptions);
+
+        return CreateProtocolBundle(runtime, normalizedOptions);
+    }
+
+    internal static BitflyerProtocolBundle CreateProtocolBundle(HttpClient httpClient, BitflyerClientOptions? options)
+    {
+        ArgumentNullException.ThrowIfNull(httpClient);
+
+        var normalizedOptions = ValidateOptions(options ?? new BitflyerClientOptions());
+        var runtime = CreateExternalTransportRuntime(httpClient, normalizedOptions);
+
+        return CreateProtocolBundle(runtime, normalizedOptions);
+    }
+
+    private static BitflyerProtocolBundle CreateProtocolBundle(TransportRuntime runtime, BitflyerClientOptions normalizedOptions)
+    {
+        var transport = runtime.Transport;
 
         var getMarkets = new GetMarketsProtocolEndpoint(transport);
         var getBoard = new GetBoardProtocolEndpoint(transport);
@@ -108,6 +126,7 @@ internal static class BitflyerBootstrap
             {
                 Public = publicApi,
                 Private = null,
+                LifetimeLease = runtime.Lifetime.AcquireLease(),
             };
         }
 
@@ -165,13 +184,31 @@ internal static class BitflyerBootstrap
         {
             Public = publicApi,
             Private = privateApi,
+            LifetimeLease = runtime.Lifetime.AcquireLease(),
         };
     }
 
     internal static BitflyerNativeBundle CreateNativeBundle(BitflyerClientOptions? options)
     {
-        var normalizedOptions = options ?? new BitflyerClientOptions();
-        var transport = CreateTransport(normalizedOptions);
+        var normalizedOptions = ValidateOptions(options ?? new BitflyerClientOptions());
+        var runtime = CreateInternalTransportRuntime(normalizedOptions);
+
+        return CreateNativeBundle(runtime, normalizedOptions);
+    }
+
+    internal static BitflyerNativeBundle CreateNativeBundle(HttpClient httpClient, BitflyerClientOptions? options)
+    {
+        ArgumentNullException.ThrowIfNull(httpClient);
+
+        var normalizedOptions = ValidateOptions(options ?? new BitflyerClientOptions());
+        var runtime = CreateExternalTransportRuntime(httpClient, normalizedOptions);
+
+        return CreateNativeBundle(runtime, normalizedOptions);
+    }
+
+    private static BitflyerNativeBundle CreateNativeBundle(TransportRuntime runtime, BitflyerClientOptions normalizedOptions)
+    {
+        var transport = runtime.Transport;
 
         var getMarketsProtocol = new GetMarketsProtocolEndpoint(transport);
         var getBoardProtocol = new GetBoardProtocolEndpoint(transport);
@@ -214,15 +251,19 @@ internal static class BitflyerBootstrap
 
         if (normalizedOptions.Credentials is null)
         {
+            var protocolBundle = new BitflyerProtocolBundle
+            {
+                Public = publicProtocolApi,
+                Private = null,
+                LifetimeLease = runtime.Lifetime.AcquireLease(),
+            };
+
             return new BitflyerNativeBundle
             {
                 Public = publicApi,
                 Private = null,
-                Protocol = new BitflyerProtocolBundle
-                {
-                    Public = publicProtocolApi,
-                    Private = null,
-                },
+                Protocol = protocolBundle,
+                LifetimeLease = runtime.Lifetime.AcquireLease(),
             };
         }
 
@@ -327,33 +368,79 @@ internal static class BitflyerBootstrap
             cancelAllChildOrders,
             cancelParentOrder);
 
+        var nestedProtocolBundle = new BitflyerProtocolBundle
+        {
+            Public = publicProtocolApi,
+            Private = privateProtocolApi,
+            LifetimeLease = runtime.Lifetime.AcquireLease(),
+        };
+
         return new BitflyerNativeBundle
         {
             Public = publicApi,
             Private = privateApi,
-            Protocol = new BitflyerProtocolBundle
-            {
-                Public = publicProtocolApi,
-                Private = privateProtocolApi,
-            },
+            Protocol = nestedProtocolBundle,
+            LifetimeLease = runtime.Lifetime.AcquireLease(),
         };
     }
 
-    private static IProtocolTransport CreateTransport(BitflyerClientOptions normalizedOptions)
+    private static BitflyerClientOptions ValidateOptions(BitflyerClientOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+
+        if (!options.BaseUri.IsAbsoluteUri)
+        {
+            throw new ArgumentException("BaseUri must be absolute.", nameof(options));
+        }
+
+        if (options.RequestTimeout is not null && options.RequestTimeout <= TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(BitflyerClientOptions.RequestTimeout), "RequestTimeout must be greater than zero.");
+        }
+
+        return options;
+    }
+
+    private static TransportRuntime CreateInternalTransportRuntime(BitflyerClientOptions options)
     {
         var httpClient = new HttpClient
         {
-            BaseAddress = normalizedOptions.BaseUri,
+            Timeout = Timeout.InfiniteTimeSpan,
         };
 
-        IProtocolDebugLogger debugLogger = normalizedOptions.EnableProtocolDebugLogging
-            ? new FileProtocolDebugLogger(normalizedOptions.ProtocolDebugLogDirectory)
+        return CreateTransportRuntime(httpClient, options, SharedBundleLifetime.CreateOwned(httpClient));
+    }
+
+    private static TransportRuntime CreateExternalTransportRuntime(HttpClient httpClient, BitflyerClientOptions options)
+    {
+        return CreateTransportRuntime(httpClient, options, SharedBundleLifetime.CreateExternal());
+    }
+
+    private static TransportRuntime CreateTransportRuntime(
+        HttpClient httpClient,
+        BitflyerClientOptions options,
+        SharedBundleLifetime lifetime)
+    {
+        IProtocolDebugLogger debugLogger = options.EnableProtocolDebugLogging
+            ? new FileProtocolDebugLogger(options.ProtocolDebugLogDirectory)
             : new NoOpProtocolDebugLogger();
 
-        return new BitflyerProtocolTransport(
-            httpClient,
-            debugLogger,
-            normalizedOptions.Credentials?.ApiKey,
-            normalizedOptions.Credentials?.ApiSecret);
+        return new TransportRuntime
+        {
+            Transport = new BitflyerProtocolTransport(
+                httpClient,
+                options.BaseUri,
+                debugLogger,
+                options.Credentials?.ApiKey,
+                options.Credentials?.ApiSecret,
+                options.RequestTimeout),
+            Lifetime = lifetime,
+        };
+    }
+
+    private sealed class TransportRuntime
+    {
+        public required IProtocolTransport Transport { get; init; }
+        public required SharedBundleLifetime Lifetime { get; init; }
     }
 }

@@ -80,5 +80,8 @@ Thumbs.db
 # OS依存
 .DS_Store
 
-# local-only docs
-local/
+# local-only docs and feeds
+local/*
+!local/nuget/
+local/nuget/*
+!local/nuget/.gitkeep

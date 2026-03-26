@@ -9,6 +9,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための Stage10 
 - Library spec: [`docs/spec.md`](docs/spec.md)
 - Bitflyer endpoints: [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md)
 - Binance endpoints: [`docs/endpoints-binance.md`](docs/endpoints-binance.md)
+- Local NuGet consumer guide: [`docs/local-nuget-consumer.md`](docs/local-nuget-consumer.md)
 - CLI adapter: [`docs/cli.md`](docs/cli.md)
 - MCP Server adapter: [`docs/mcp-server.md`](docs/mcp-server.md)
 
@@ -23,10 +24,19 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための Stage10 
 ## Distribution
 
 - 現段階の正規導線は source checkout + `ProjectReference`
-- NuGet package は現 phase では提供しない
+- 公開 feed 向けの NuGet package は現 phase では提供しない
 - venue ごとの entry point には `Composition` project を参照する
   - bitFlyer: `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
   - Binance: `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
+
+## Local NuGet Feed
+
+- repo root の `NuGet.config` は local feed `local/nuget` を package source として追加する
+- local feed へ pack するには `bash scripts/pack-local-nuget.sh` を使う
+- package version を変えたい場合は第 1 引数で渡す
+  - 例: `bash scripts/pack-local-nuget.sh 0.1.0-local.1`
+- この feed は repo 内ローカル用途であり、生成された `.nupkg` は git 管理しない
+- 別 repo から consume する手順は `docs/local-nuget-consumer.md` を参照する
 
 ## Surface Overview
 

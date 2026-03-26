@@ -359,6 +359,23 @@ Stage10 の working hypothesis:
   - `Count`、`Before`、`After` は指定時に正数
   - `ChildOrderState` は `ACTIVE` / `COMPLETED` / `CANCELED` / `EXPIRED` / `REJECTED` のいずれか
   - それ以外の optional query は `null` のとき omitted
+- 引数一覧
+
+| Parameter | Location | Required | Omission | Type/Domain | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `product_code` | query | No | `null` のとき omitted | string | omitted 時は bitFlyer 側既定値 `BTC_JPY` |
+| `count` | query | No | `null` のとき omitted | positive int | paging |
+| `before` | query | No | `null` のとき omitted | positive long | paging |
+| `after` | query | No | `null` のとき omitted | positive long | paging |
+| `child_order_state` | query | No | `null` のとき omitted | enum | child order status filter |
+| `child_order_id` | query | No | `null` のとき omitted | string | entity id filter |
+| `child_order_acceptance_id` | query | No | `null` のとき omitted | string | acceptance id filter |
+| `parent_order_id` | query | No | `null` のとき omitted | string | parent linkage filter |
+- enum一覧
+
+| Field | Allowed Values | Meaning / Notes |
+| --- | --- | --- |
+| `child_order_state` | `ACTIVE`, `COMPLETED`, `CANCELED`, `EXPIRED`, `REJECTED` | filter domain |
 - response DTO
   - top-level array
   - `GetChildOrders.Item`
@@ -480,6 +497,44 @@ Stage10 の working hypothesis:
 - `ExpectedStatus = 200`
 - `ResponseShape = Object`
 
+### Withdraw
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> WithdrawCallAsync(string bodyJson, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<WithdrawRequest, WithdrawResponse>> WithdrawCallAsync(WithdrawRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `CurrencyCode: string`
+  - `BankAccountId: long`
+  - `Amount: decimal`
+  - `Code: string`
+- request rule
+  - `CurrencyCode` 必須
+  - `CurrencyCode` は現行実装では `JPY` のみ許容
+  - `BankAccountId` は正数
+  - `Amount` は正数
+  - `Code` 必須
+- 引数一覧
+
+| Parameter | Location | Required | Omission | Type/Domain | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `currency_code` | body | Yes | omitted 不可 | string | 現行実装では `JPY` のみ |
+| `bank_account_id` | body | Yes | omitted 不可 | positive long | 出金先口座 id |
+| `amount` | body | Yes | omitted 不可 | positive decimal | 出金額 |
+| `code` | body | Yes | omitted 不可 | string | 二段階認証コード |
+- enum一覧
+
+| Field | Allowed Values | Meaning / Notes |
+| --- | --- | --- |
+| `currency_code` | `JPY` | 現行実装の許容値 |
+- response DTO
+  - `MessageId: string`
+- response note
+  - `200` かつ `message_id` があれば成功
+  - `200` かつ負の `status` を持つ error body は `Semantic`
+- `ExpectedStatus = 200`
+- `ResponseShape = Object`
+
 ### SendChildOrder
 
 - `Protocol` facade
@@ -499,6 +554,24 @@ Stage10 の working hypothesis:
   - `ChildOrderType = MARKET` のとき `Price` omitted
   - `MinuteToExpire = null` のとき body omitted
   - `TimeInForce = null` のとき body omitted
+- 引数一覧
+
+| Parameter | Location | Required | Omission | Type/Domain | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `product_code` | body | Yes | omitted 不可 | string | venue product |
+| `child_order_type` | body | Yes | omitted 不可 | enum | `LIMIT` / `MARKET` |
+| `side` | body | Yes | omitted 不可 | enum | `BUY` / `SELL` |
+| `price` | body | Conditional | `null` のとき omitted | decimal | `LIMIT` では必須、`MARKET` では omitted |
+| `size` | body | Yes | omitted 不可 | positive decimal | order size |
+| `minute_to_expire` | body | No | `null` のとき omitted | positive int | expiration minutes |
+| `time_in_force` | body | No | `null` のとき omitted | enum | execution policy |
+- enum一覧
+
+| Field | Allowed Values | Meaning / Notes |
+| --- | --- | --- |
+| `child_order_type` | `LIMIT`, `MARKET` | child order type |
+| `side` | `BUY`, `SELL` | order side |
+| `time_in_force` | `GTC`, `IOC`, `FOK` | execution policy |
 - response DTO
   - `ChildOrderAcceptanceId: string`
 - `ExpectedStatus = 200`
@@ -516,6 +589,14 @@ Stage10 の working hypothesis:
   - `ChildOrderAcceptanceId: string?`
 - request rule
   - `ChildOrderId` と `ChildOrderAcceptanceId` は exactly one
+- 引数一覧
+
+| Parameter | Location | Required | Omission | Type/Domain | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `product_code` | body | Yes | omitted 不可 | string | venue product |
+| `child_order_id` | body | Conditional | `null` のとき omitted | string | entity id |
+| `child_order_acceptance_id` | body | Conditional | `null` のとき omitted | string | acceptance id |
+
 - response DTO
   - `Unit`
   - empty body または `{}` を成功扱いにしてよい
@@ -551,10 +632,90 @@ Stage10 の working hypothesis:
   - `STOP` は `TriggerPrice` 必須
   - `STOP_LIMIT` は `Price` と `TriggerPrice` 必須
   - `TRAIL` は `Offset` 必須
+- 引数一覧
+
+| Parameter | Location | Required | Omission | Type/Domain | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `order_method` | body | No | `null` のとき omitted | enum | omitted 時は `SIMPLE` 扱い |
+| `minute_to_expire` | body | No | `null` のとき omitted | positive int | expiration minutes |
+| `time_in_force` | body | No | `null` のとき omitted | enum | execution policy |
+| `parameters` | body | Yes | omitted 不可 | array | `order_method` に対応する件数が必要 |
+- `parameters[]` 一覧
+
+| Parameter | Location | Required | Omission | Type/Domain | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `product_code` | body.parameters[] | Yes | omitted 不可 | string | venue product |
+| `condition_type` | body.parameters[] | Yes | omitted 不可 | enum | execution condition |
+| `side` | body.parameters[] | Yes | omitted 不可 | enum | `BUY` / `SELL` |
+| `price` | body.parameters[] | Conditional | `null` のとき omitted | decimal | `LIMIT` / `STOP_LIMIT` で必須 |
+| `size` | body.parameters[] | Yes | omitted 不可 | positive decimal | order size |
+| `trigger_price` | body.parameters[] | Conditional | `null` のとき omitted | decimal | `STOP` / `STOP_LIMIT` で必須 |
+| `offset` | body.parameters[] | Conditional | `null` のとき omitted | long | `TRAIL` で必須 |
+- enum一覧
+
+| Field | Allowed Values | Meaning / Notes |
+| --- | --- | --- |
+| `order_method` | `SIMPLE`, `IFD`, `OCO`, `IFDOCO` | parent order method |
+| `time_in_force` | `GTC`, `IOC`, `FOK` | execution policy |
+| `parameters[].condition_type` | `LIMIT`, `MARKET`, `STOP`, `STOP_LIMIT`, `TRAIL` | parameter condition |
+| `parameters[].side` | `BUY`, `SELL` | order side |
 - response DTO
   - `ParentOrderAcceptanceId: string`
 - `ExpectedStatus = 200`
 - `ResponseShape = Object`
+
+### GetParentOrders
+
+- `Protocol` facade
+  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetParentOrdersCallAsync(string? productCode, int? count, long? before, long? after, string? parentOrderState, CancellationToken cancellationToken = default)`
+- `Native` facade
+  - `Task<Call<GetParentOrdersRequest, IReadOnlyList<GetParentOrders.Item>>> GetParentOrdersCallAsync(GetParentOrdersRequest request, CancellationToken cancellationToken = default)`
+- request DTO
+  - `ProductCode: string?`
+  - `Count: int?`
+  - `Before: long?`
+  - `After: long?`
+  - `ParentOrderState: string?`
+- request rule
+  - `ProductCode = null` のとき query omitted
+  - `Count`、`Before`、`After` は指定時に正数
+  - `ParentOrderState` は `ACTIVE` / `COMPLETED` / `CANCELED` / `EXPIRED` / `REJECTED` のいずれか
+  - `null` の optional query は omitted
+- 引数一覧
+
+| Parameter | Location | Required | Omission | Type/Domain | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `product_code` | query | No | `null` のとき omitted | string | venue product filter |
+| `count` | query | No | `null` のとき omitted | positive int | paging |
+| `before` | query | No | `null` のとき omitted | positive long | paging |
+| `after` | query | No | `null` のとき omitted | positive long | paging |
+| `parent_order_state` | query | No | `null` のとき omitted | enum | parent order status filter |
+- enum一覧
+
+| Field | Allowed Values | Meaning / Notes |
+| --- | --- | --- |
+| `parent_order_state` | `ACTIVE`, `COMPLETED`, `CANCELED`, `EXPIRED`, `REJECTED` | filter domain |
+- response DTO
+  - top-level array
+  - `GetParentOrders.Item`
+    - `Id: long`
+    - `ParentOrderId: string`
+    - `ProductCode: string`
+    - `Side: string`
+    - `ParentOrderType: string`
+    - `Price: decimal`
+    - `AveragePrice: decimal`
+    - `Size: decimal`
+    - `ParentOrderState: string`
+    - `ExpireDate: DateTimeOffset`
+    - `ParentOrderDate: DateTimeOffset`
+    - `ParentOrderAcceptanceId: string`
+    - `OutstandingSize: decimal`
+    - `CancelSize: decimal`
+    - `ExecutedSize: decimal`
+    - `TotalCommission: decimal`
+- `ExpectedStatus = 200`
+- `ResponseShape = Array`
 
 ### GetParentOrder
 
@@ -598,6 +759,13 @@ Stage10 の working hypothesis:
   - `ParentOrderAcceptanceId: string?`
 - request rule
   - `ParentOrderId` と `ParentOrderAcceptanceId` は exactly one
+- 引数一覧
+
+| Parameter | Location | Required | Omission | Type/Domain | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `product_code` | body | Yes | omitted 不可 | string | venue product |
+| `parent_order_id` | body | Conditional | `null` のとき omitted | string | entity id |
+| `parent_order_acceptance_id` | body | Conditional | `null` のとき omitted | string | acceptance id |
 - response DTO
   - `Unit`
   - empty body または `{}` を成功扱いにしてよい
@@ -614,6 +782,11 @@ Stage10 の working hypothesis:
   - `ProductCode: string`
 - request rule
   - `ProductCode` 必須
+- 引数一覧
+
+| Parameter | Location | Required | Omission | Type/Domain | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `product_code` | body | Yes | omitted 不可 | string | venue product |
 - response DTO
   - `Unit`
   - response body は decode しない

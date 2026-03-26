@@ -1,7 +1,7 @@
 # CLI（adapter 設計補助文書）
 
-最終更新: 2026-03-24  
-対象ブランチ: `stage10`
+最終更新: 2026-03-27  
+対象ブランチ: `stage11`
 
 ## 1. 位置づけ
 
@@ -32,23 +32,25 @@ CLI は以下を所有しない。
 - 現行 phase の依存は `Cli -> Composition` を基本とする
 - CLI の主経路は `Native` とする
 - raw response や debug のために `Protocol` を明示 opt-in 経路として持ってよい
-- 将来 `Unified` が追加された場合、CLI は `Native` と `Unified` を sibling surface として提示してよい
+- `Unified` を expose する場合でも、薄い取引所横断 capability に限定する
+- CLI は `Native` / `Protocol` / optional な `Unified` を sibling surface として提示してよい
 - CLI は concrete endpoint / runtime / signer / transport を直接配線しない
 
 ## 4. 公開面
 
 - CLI は library surface を command tree に写像する adapter である
 - `native` は venue 固有機能の入口である
-- `unified` は将来の取引所横断 capability の入口である
+- `protocol` は raw/debug/inspection の明示入口である
+- `unified` は薄い取引所横断 capability の入口である
 - `Unified` 未対応の capability を CLI から見えない形で `Native` へ自動切り替えしてはならない
 - venue 固有機能が必要な場合は、利用者が明示的に `native` を選ぶ
 
 ## 5. 現行 phase
 
-- 現行 phase では CLI 実装は行わず、library の設計と実装を優先する
-- 本書は将来の CLI 実装に向けた補助文書として保持する
-- `Unified` 未実装の間に CLI を着手する場合でも、`native` と optional な `protocol` debug path から始める
-- command tree、global option、output format、exit code の具体値は library 側の surface が固まった後で固定する
+- Stage11 では CLI 実装を行う
+- 初期実装は `native` 主経路と optional な `protocol` debug path から始める
+- `Unified` を expose する場合は、状態確認、指値注文、成行注文、注文キャンセルに限定する
+- command tree、global option、output format、exit code は Stage11 で実装対象に限って固定する
 
 ## 6. 未固定事項
 

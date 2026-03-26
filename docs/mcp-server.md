@@ -1,7 +1,7 @@
 # MCP Server（adapter 設計補助文書）
 
-最終更新: 2026-03-24  
-対象ブランチ: `stage10`
+最終更新: 2026-03-27  
+対象ブランチ: `stage11`
 
 ## 1. 位置づけ
 
@@ -26,21 +26,27 @@ MCP Server は以下を所有しない。
 
 ## 3. 依存規約
 
-- MCP Server の主経路は `Unified` とする
-- MCP Server は `Protocol` や `Native` を直接正本として使わない
-- `Unified` の capability だけを tool として expose する
-- venue 固有機能をそのまま tool に出したい場合は、別途方針を固定しない限り対象外とする
+- 現行 phase の依存は `McpServer -> Composition` を基本とする
+- MCP Server の主経路は venue-specific `Native` とする
+- raw response や debug のために `Protocol` を明示 opt-in tool surface として持ってよい
+- `Unified` を expose する場合は、薄い取引所横断 capability に限定する
+- venue 固有機能は `native.<venue>.*` としてそのまま tool に出してよい
+- MCP Server は concrete endpoint / runtime / signer / transport を直接配線しない
 
 ## 4. 公開面
 
-- MCP Server は `Unified` capability を tool surface に写像する adapter である
+- MCP Server は library surface を tool surface に写像する adapter である
+- `native.<venue>.*` は venue 固有機能の主入口である
+- `protocol.<venue>.*` は raw/debug/inspection の明示入口である
+- `unified.*` は薄い取引所横断 capability の入口である
 - `Unified` 未対応の capability を MCP Server から見えない形で `Native` へ自動切り替えしてはならない
 - tool 名、tool schema、permission model の具体値は別途固定する
 
 ## 5. 現行 phase
 
-- 現行 phase では MCP Server 実装は行わず、library の設計と実装を優先する
-- `Unified` 未実装の間、本書は将来方針だけを保持する
+- Stage11 では MCP Server 実装を行う
+- 初期実装は `native` 主経路と optional な `protocol` debug tool から始める
+- `Unified` を expose する場合は、状態確認、指値注文、成行注文、注文キャンセルに限定する
 
 ## 6. 未固定事項
 

@@ -1,10 +1,11 @@
 # ExchangeAPI
 
-ExchangeAPI は、複数の暗号資産取引所 API を扱うための Stage10 実装基盤です。現行の実装範囲では、bitFlyer を主対象とし、Binance は `GetKlines` のみをサポートします。
-現行ブランチでは、`stage10.md` を入口文書、`docs/spec.md` を library 本体の設計正本として扱い、CLI と MCP Server は別文書で扱います。
+ExchangeAPI は、複数の暗号資産取引所 API を扱うための library / adapter 基盤です。現行の library 実装範囲では、bitFlyer を主対象とし、Binance は `GetKlines` のみをサポートします。
+現行ブランチでは、`stage11.md` を入口文書、`docs/spec.md` を library 本体の設計正本として扱い、CLI と MCP Server は別文書で扱います。
 
 ## Quick Links
 
+- Stage11 goals: [`stage11.md`](stage11.md)
 - Stage10 goals: [`stage10.md`](stage10.md)
 - Library spec: [`docs/spec.md`](docs/spec.md)
 - Bitflyer endpoints: [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md)
@@ -18,7 +19,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための Stage10 
 - bitFlyer が現行 Stage10 の主対象であり、最も広い実装済み surface を持つ
 - Binance は public `GetKlines` のみをサポートする
 - `Unified` は未実装
-- CLI と MCP Server は将来用の文書だけがあり、実装はまだ含まない
+- CLI と MCP Server は Stage11 の実装対象であり、現時点では branch 上で整備中
 - endpoint ごとの exact contract は `docs/endpoints-bitflyer.md` と `docs/endpoints-binance.md` を正本とする
 
 ## Distribution
@@ -216,7 +217,7 @@ if (call.IsSuccess && call.Response is not null)
 - bitFlyer は `GetMarkets`, `GetBoard`, `GetTicker`, `GetExecutionsPublic`, `GetBoardState`, `GetHealth`, `GetFundingRate`, `GetCorporateLeverage`, `GetChats`, `GetPermissions`, `GetBalance`, `GetCollateral`, `GetCollateralAccounts`, `GetAddresses`, `GetCoinIns`, `GetCoinOuts`, `GetBankAccounts`, `GetDeposits`, `Withdraw`, `GetWithdrawals`, `GetChildOrders`, `GetParentOrders`, `GetParentOrder`, `GetExecutionsPrivate`, `GetBalanceHistory`, `GetPositions`, `GetCollateralHistory`, `GetTradingCommission`, `SendChildOrder`, `SendParentOrder`, `CancelChildOrder`, `CancelParentOrder`, `CancelAllChildOrders`
 - bitFlyer の `Withdraw` は fixed contract だが、live 検証は negative contract のみを持つ
 - Binance は public `GetKlines` のみをサポートする
-- 現行 phase では library を優先し、`Unified`, CLI, MCP Server は将来検討とする
+- Stage11 では CLI / MCP Server adapter を実装対象とし、`Unified` は薄い共通 capability に限定する
 
 ## Live Tests
 

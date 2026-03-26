@@ -29,10 +29,10 @@ jobs:
           global-json-file: global.json
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore ExchangeApi.slnx
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build ExchangeApi.slnx --no-restore
 
       - name: Test
-        run: dotnet test --no-build
+        run: dotnet test ExchangeApi.slnx --no-build

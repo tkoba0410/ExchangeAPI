@@ -1,16 +1,16 @@
 # ExchangeAPI
 
-ExchangeAPI は、複数の暗号資産取引所 API を扱うための Stage10 実装基盤です。
+ExchangeAPI は、複数の暗号資産取引所 API を扱うための Stage10 実装基盤です。現行の実装範囲では、bitFlyer を主対象とし、Binance は `GetKlines` のみをサポートします。
 現行ブランチでは、`stage10.md` を入口文書、`docs/spec.md` を library 本体の設計正本として扱い、CLI と MCP Server は別文書で扱います。
 
 ## Quick Links
 
-- Stage10 goals: `stage10.md`
-- Library spec: `docs/spec.md`
-- Bitflyer endpoints: `docs/endpoints-bitflyer.md`
-- Binance endpoints: `docs/endpoints-binance.md`
-- CLI adapter: `docs/cli.md`
-- MCP Server adapter: `docs/mcp-server.md`
+- Stage10 goals: [`stage10.md`](stage10.md)
+- Library spec: [`docs/spec.md`](docs/spec.md)
+- Bitflyer endpoints: [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md)
+- Binance endpoints: [`docs/endpoints-binance.md`](docs/endpoints-binance.md)
+- CLI adapter: [`docs/cli.md`](docs/cli.md)
+- MCP Server adapter: [`docs/mcp-server.md`](docs/mcp-server.md)
 
 ## Surface Overview
 
@@ -169,13 +169,17 @@ if (call.IsSuccess && call.Response is not null)
 - 実装済みの公開面は `Protocol` / `Native` の一部 endpoint
 - bitFlyer は `GetMarkets`, `GetBoard`, `GetTicker`, `GetExecutionsPublic`, `GetBoardState`, `GetHealth`, `GetFundingRate`, `GetCorporateLeverage`, `GetChats`, `GetPermissions`, `GetBalance`, `GetCollateral`, `GetCollateralAccounts`, `GetAddresses`, `GetCoinIns`, `GetCoinOuts`, `GetBankAccounts`, `GetDeposits`, `Withdraw`, `GetWithdrawals`, `GetChildOrders`, `GetParentOrders`, `GetParentOrder`, `GetExecutionsPrivate`, `GetBalanceHistory`, `GetPositions`, `GetCollateralHistory`, `GetTradingCommission`, `SendChildOrder`, `SendParentOrder`, `CancelChildOrder`, `CancelParentOrder`, `CancelAllChildOrders`
 - bitFlyer の `Withdraw` は fixed contract だが、live 検証は negative contract のみを持つ
-- Binance は `GetKlines`
+- Binance は public `GetKlines` のみをサポートする
 - 現行 phase では library を優先し、`Unified`, CLI, MCP Server は将来検討とする
 
 ## Live Tests
 
-- `dotnet test ExchangeApi.slnx` で live test project も起動する
-- public live test はそのまま実行される
+- 標準の `dotnet test ExchangeApi.slnx` には live test project を含めない
+- live test は `dotnet test ExchangeApi.LiveTests.slnx` で明示実行する
+- すべての live test は既定で skip され、次のいずれかで opt-in する
+  - `EXCHANGEAPI_RUN_LIVE_TESTS=1`
+  - `touch local/live-enabled`
+- public live test も opt-in がない限り実行しない
 - bitFlyer private/write live test は `age` で復号する credentials source を前提にする
   - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
   - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
@@ -192,4 +196,5 @@ if (call.IsSuccess && call.Response is not null)
 ```bash
 dotnet build ExchangeApi.slnx
 dotnet test ExchangeApi.slnx --no-build
+dotnet test ExchangeApi.LiveTests.slnx --no-build
 ```

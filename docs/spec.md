@@ -22,19 +22,19 @@
 
 Stage10 における文書の主従は以下とする。
 
-- [`docs/spec.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/spec.md)
+- [`docs/spec.md`](./spec.md)
   - 設計正本
   - 層モデル、依存規約、error 契約、test 契約、変更ポリシーを定義する
-- [`docs/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-bitflyer.md)
+- [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md)
   - bitFlyer の endpoint 運用正本
   - bitFlyer endpoint ごとの metadata と固定状況を定義する
-- [`docs/endpoints-binance.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-binance.md)
+- [`docs/endpoints-binance.md`](./endpoints-binance.md)
   - Binance の endpoint 運用正本
   - Binance endpoint ごとの metadata と固定状況を定義する
-- [`docs/cli.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/cli.md)
+- [`docs/cli.md`](./cli.md)
   - CLI adapter の設計補助文書
   - library surface の利用方針と CLI 固有契約を定義する
-- [`docs/mcp-server.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/mcp-server.md)
+- [`docs/mcp-server.md`](./mcp-server.md)
   - MCP Server adapter の設計補助文書
   - `Unified` との関係と tool 公開方針を定義する
 
@@ -235,8 +235,8 @@ Stage10 では実装対象外とする。
 
 - library は adapter-specific 事情を所有しない
 - external adapter は library の public surface または `Composition` を経由して library を利用する
-- CLI の正本は [`docs/cli.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/cli.md) に置く
-- MCP Server の正本は [`docs/mcp-server.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/mcp-server.md) に置く
+- CLI の正本は [`docs/cli.md`](./cli.md) に置く
+- MCP Server の正本は [`docs/mcp-server.md`](./mcp-server.md) に置く
 
 ### 3.5 依存規約
 
@@ -969,8 +969,8 @@ Stage10 の規約は文書だけで終わらせず、arch test で機械検証�
 Stage10 の endpoint 運用正本は venue ごとの matrix とする。  
 現時点の正本は以下。
 
-- [`docs/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-bitflyer.md)
-- [`docs/endpoints-binance.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-binance.md)
+- [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md)
+- [`docs/endpoints-binance.md`](./endpoints-binance.md)
 
 本書は削除済み inventory や外部補助文書を前提にしない。
 

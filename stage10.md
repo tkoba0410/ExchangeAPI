@@ -6,7 +6,7 @@
 ## 1. 位置づけ
 
 本書は、Stage10 の背景、ゴール、非ゴール、設計原則だけを示す goal document である。  
-library の詳細仕様は [`docs/spec.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/spec.md) を正本とする。
+library の詳細仕様は [`docs/spec.md`](docs/spec.md) を正本とする。
 
 Stage10 は、既存試作や旧文書の都合から切り離して、`Facade + Endpoint Module` を前提に ExchangeAPI library を再構築する作業である。  
 現行ブランチには source / tests / solution 構成が含まれてよいが、設計判断の正本は文書に置く。
@@ -37,14 +37,14 @@ Stage10 は、既存試作や旧文書の都合から切り離して、`Facade +
 
 ## 5. 参照先
 
-- [`docs/spec.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/spec.md)
+- [`docs/spec.md`](docs/spec.md)
   - Stage10 library の設計正本
   - 層モデル、依存規約、公開面、Call/Error 契約、test 契約、変更ポリシーを定義する
-- [`docs/endpoints-bitflyer.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-bitflyer.md)
+- [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md)
   - bitFlyer endpoint の運用正本
-- [`docs/endpoints-binance.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/endpoints-binance.md)
+- [`docs/endpoints-binance.md`](docs/endpoints-binance.md)
   - Binance endpoint の運用正本
-- [`docs/cli.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/cli.md)
+- [`docs/cli.md`](docs/cli.md)
   - CLI adapter の設計補助文書
-- [`docs/mcp-server.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/mcp-server.md)
+- [`docs/mcp-server.md`](docs/mcp-server.md)
   - MCP Server adapter の設計補助文書

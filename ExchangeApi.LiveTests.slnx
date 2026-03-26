@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Exchanges/" />
+  <Folder Name="/tests/Exchanges/Binance/" />
+  <Folder Name="/tests/Exchanges/Binance/LiveTests/">
+    <Project Path="tests/Exchanges/Binance/LiveTests/ExchangeApi.Exchanges.Binance.LiveTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Exchanges/Bitflyer/" />
+  <Folder Name="/tests/Exchanges/Bitflyer/LiveTests/">
+    <Project Path="tests/Exchanges/Bitflyer/LiveTests/ExchangeApi.Exchanges.Bitflyer.LiveTests.csproj" />
+  </Folder>
+</Solution>

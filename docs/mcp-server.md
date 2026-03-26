@@ -6,7 +6,7 @@
 ## 1. 位置づけ
 
 本書は、ExchangeAPI library の上に載る MCP Server adapter の設計補助文書である。  
-library の設計正本は [`docs/spec.md`](/home/tkoba/dev/tkoba0410/ExchangeAPI/docs/spec.md) に置き、  
+library の設計正本は [`docs/spec.md`](./spec.md) に置き、  
 本書では MCP Server 固有の責務、依存、tool 公開方針を扱う。
 
 ## 2. 責務

@@ -110,7 +110,8 @@
 ## Initial Rule
 
 - 現行 Stage10 実装では `GetMarkets`、`GetBoard`、`GetTicker`、`GetExecutionsPublic`、`GetBoardState`、`GetHealth`、`GetFundingRate`、`GetCorporateLeverage`、`GetChats`、`GetPermissions`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetAddresses`、`GetCoinIns`、`GetCoinOuts`、`GetBankAccounts`、`GetDeposits`、`Withdraw`、`GetWithdrawals`、`GetChildOrders`、`GetParentOrders`、`GetParentOrder`、`GetExecutionsPrivate`、`GetBalanceHistory`、`GetPositions`、`GetCollateralHistory`、`GetTradingCommission`、`SendChildOrder`、`SendParentOrder`、`CancelChildOrder`、`CancelParentOrder`、`CancelAllChildOrders` を library 公開面に含める
-- read path の live test は、public は条件なし、private read は認証可能なら実行する
+- live test の repo 共通 opt-in ルールは `docs/spec.md` の Test 契約を正本とする
+- bitFlyer private read live test は credentials source を解決できる場合にのみ実行する
 - `SendChildOrder` と `CancelChildOrder` は `Phase2-Write`、`CancelAllChildOrders` は dedicated marker と `BTC_JPY` preflight empty check を持つ `Phase2-Write` とする
 - `GetMarkets`、`GetTicker`、`GetBalance`、`GetCollateral`、`GetCollateralAccounts`、`GetTradingCommission` は first wave として `Fixed` に上げる
 - `GetBoard`、`GetExecutionsPublic`、`GetBoardState`、`GetHealth`、`GetFundingRate`、`GetCorporateLeverage`、`GetChats`、`GetAddresses`、`GetBankAccounts` は second wave として `Fixed` に上げる

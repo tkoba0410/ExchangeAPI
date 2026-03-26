@@ -1136,28 +1136,33 @@ Stage10 で優先する endpoint:
   - bundle 構成と optional `Private` の有無だけを検証する
 - read live test
   - `Protocol` raw response と `Native` DTO の parity を検証する
-  - public は条件なしで実行する
-  - private read は認証可能なときだけ実行する
+  - `LiveTests` 配下の test は global opt-in があるときだけ実行する
+  - global opt-in は `EXCHANGEAPI_RUN_LIVE_TESTS=1` または `local/live-enabled` とする
+  - public read は global opt-in だけを要求する
+  - private read は global opt-in に加えて venue 固有の credentials 条件を要求する
   - mutable な market data は、別リクエスト間の完全一致を要求しない
   - `ticker` / `board` / recent `executions` は stable field または contract check に寄せる
   - closed snapshot を切り出せる data だけを strict parity の対象にしてよい
   - `klines` のような時系列 data は closed window / closed bar だけを parity 比較の対象にしてよい
 - write live test
-  - private write は認証可能かつ local marker file があるときだけ実行する
+  - private write は global opt-in、venue 固有の credentials 条件、local marker file があるときだけ実行する
   - cleanup を含む
   - 同一 endpoint を `Protocol` と `Native` の parity で二重送信しない
 
-### 10.2 Write Safety
+### 10.2 Live Test Opt-In and Write Safety
 
-state を変更する endpoint の live 実行には、以下を必須とする。
+live test の実行条件と、state を変更する endpoint の safety 要件は以下を正本とする。
 
-- public live test は常時実行対象とする
-- private read live test は認証解決可能な場合のみ実行する
+- `LiveTests` 配下の全 test は global opt-in がある場合のみ実行する
+  - `EXCHANGEAPI_RUN_LIVE_TESTS=1`
+  - `local/live-enabled`
+- public read live test は global opt-in だけを要求する
+- private read live test は global opt-in と認証解決可能条件を要求する
 - private credentials は `age` file で供給する
   - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
   - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
   - 2 つの file path はどちらも環境変数で明示指定する
-- private write live test は認証解決可能であり、かつ local marker file がある場合のみ実行する
+- private write live test は global opt-in、認証解決可能条件、local marker file がある場合のみ実行する
   - `local/bitflyer-live-write-enabled`
 - destructive 範囲が広い write live test は dedicated local marker を別に要求する
   - `CancelAllChildOrders`: `local/bitflyer-live-cancel-all-enabled`

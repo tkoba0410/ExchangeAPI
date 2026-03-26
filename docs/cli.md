@@ -123,6 +123,26 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - body は exchange へ送る JSON text をそのまま受け取る
 - `protocol` command は native DTO decode や contract validation を行わない
 
+### 5.3 人間向け入力補助
+
+機械向け正本は JSON input のままとし、CLI はその上に lossless な人間向け利便層を追加してよい。
+
+- common scalar field が中心の command には endpoint-specific な convenience flag を追加してよい
+- convenience flag は canonical な request / query / body に一意に変換できなければならない
+- nested object、array、conditional omission が多い複雑 command では canonical JSON input を主経路とする
+- 同一 command で canonical JSON input と convenience flag を併用してはならない
+- CLI は以下の template 補助を持ってよい
+  - `--request-template`
+  - `--query-template`
+  - `--body-template`
+- template 補助は canonical な JSON 雛形を stdout に出し、facade call を行わず exit code `0` で終了する
+
+例:
+
+- `get-ticker --product-code BTC_JPY`
+- `get-klines --symbol BTCJPY --interval 1h --limit 2`
+- `cancel-all-child-orders --product-code BTC_JPY --yes`
+
 ## 6. 出力契約
 
 ### 6.1 基本原則
@@ -146,6 +166,16 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - raw response を見たい場合は `protocol` を使う
 - 現行 phase では `--raw` / `--normalized` の二重出力は固定しない
 - raw / normalized の切り替えは surface 選択で表現する
+
+### 6.4 人間向け表示補助
+
+- `--pretty` を持ってよい
+- `--pretty` は stdout の JSON を整形するだけで、データ内容を変えてはならない
+- `--summary` を持ってよい
+- `--summary` は人間向け要約を stderr にのみ出してよい
+- `--summary` は stdout の JSON 出力契約を変えてはならない
+- `--summary` の最小内容は command identity と success / failure 判定とする
+- `--verbose` 指定時は `--summary` の詳細版として追加診断を stderr に出してよい
 
 ## 7. 認証と設定
 
@@ -172,11 +202,23 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 CLI 固有:
 
 - `--verbose`
+- `--pretty`
+- `--summary`
 - `--yes`
+- `--request-template`
+- `--query-template`
+- `--body-template`
 
 bitFlyer 固有 option:
 
 - `--use-ticker-alias-path`
+
+command-specific convenience flag:
+
+- 例: `--product-code`
+- 例: `--symbol`
+- 例: `--interval`
+- 例: `--limit`
 
 ### 7.3 優先順位
 
@@ -187,8 +229,11 @@ bitFlyer 固有 option:
 
 - write command の判定は endpoint matrix の `WritesState = Yes` を正本とする
 - write command は `--yes` なしに non-interactive 実行してはならない
-- interactive 実行では確認 prompt を出してよい
+- interactive 実行では確認 prompt を出さなければならない
+- interactive 判定は少なくとも stdin と stderr が TTY であることを条件としてよい
+- 確認 prompt では command identity と送信対象 request の要約を表示しなければならない
 - 利用者が確認を拒否した場合、facade call を行ってはならない
+- 利用者が確認を拒否した場合は exit code `2` で終了する
 - 現行 phase では generic `dry-run` 契約を持たない
 - 現行 phase では generic `client-order-key` 契約を持たない
 - ログや error message に secret を出してはならない
@@ -207,11 +252,34 @@ bitFlyer 固有 option:
 - `facade call failure` は `Call.IsSuccess = false` を意味する
 - `--verbose` 指定時は stderr に `CallError.Kind` と endpoint 情報を追加してよい
 
+### 9.1 stderr 契約
+
+- failure 時の stderr 1 行目は短い人間可読 summary でなければならない
+- summary は原因分類が分かる粒度を持たなければならない
+  - 例: missing credential
+  - 例: invalid argument
+  - 例: protocol transport failure
+  - 例: native codec failure
+- 設定エラーでは不足している環境変数名または invalid option 名を示さなければならない
+- request validation error では invalid field 名を示さなければならない
+- `--verbose` 指定時は以下を追加してよい
+  - `CallError.Kind`
+  - endpoint id
+  - protocol path
+  - protocol status code
+- secret は常に redact しなければならない
+
 ## 10. Help
 
 - help は階層的でなければならない
 - 各階層で usage 例を少なくとも 1 つ示す
 - write command の help では `--yes` 要件を明示する
+- command help は以下を含まなければならない
+  - 認証要否
+  - canonical JSON input 例
+  - 提供する convenience flag 一覧
+  - write safety の有無
+- help から `--request-template` / `--query-template` / `--body-template` の存在が分かるようにしなければならない
 
 ## 11. 現行非スコープ
 
@@ -232,6 +300,14 @@ bitFlyer native public:
 
 ```bash
 exchangeapi bitflyer native public get-ticker \
+  --product-code BTC_JPY \
+  --pretty
+```
+
+bitFlyer native public canonical JSON:
+
+```bash
+exchangeapi bitflyer native public get-ticker \
   --request-json '{"product_code":"BTC_JPY"}'
 ```
 
@@ -246,6 +322,16 @@ Binance native public:
 
 ```bash
 exchangeapi binance native public get-klines \
+  --symbol BTCJPY \
+  --interval 1h \
+  --limit 2 \
+  --pretty
+```
+
+Binance native public canonical JSON:
+
+```bash
+exchangeapi binance native public get-klines \
   --request-json '{"Symbol":"BTCJPY","Interval":"1h","Limit":2}'
 ```
 
@@ -253,6 +339,13 @@ bitFlyer private write:
 
 ```bash
 exchangeapi bitflyer native private cancel-all-child-orders \
-  --request-json '{"product_code":"BTC_JPY"}' \
+  --product-code BTC_JPY \
   --yes
+```
+
+bitFlyer template:
+
+```bash
+exchangeapi bitflyer native private send-child-order \
+  --request-template
 ```

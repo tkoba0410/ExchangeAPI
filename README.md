@@ -12,17 +12,53 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための Stage10 
 - CLI adapter: [`docs/cli.md`](docs/cli.md)
 - MCP Server adapter: [`docs/mcp-server.md`](docs/mcp-server.md)
 
+## Support Boundary
+
+- bitFlyer が現行 Stage10 の主対象であり、最も広い実装済み surface を持つ
+- Binance は public `GetKlines` のみをサポートする
+- `Unified` は未実装
+- CLI と MCP Server は将来用の文書だけがあり、実装はまだ含まない
+- endpoint ごとの exact contract は `docs/endpoints-bitflyer.md` と `docs/endpoints-binance.md` を正本とする
+
+## Distribution
+
+- 現段階の正規導線は source checkout + `ProjectReference`
+- NuGet package は現 phase では提供しない
+- venue ごとの entry point には `Composition` project を参照する
+  - bitFlyer: `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
+  - Binance: `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
+
 ## Surface Overview
 
 - `Protocol`
   - venue-specific execution runtime
   - raw request / response を扱う
+  - debug / inspection 向けの lower-level surface
 - `Native`
   - exchange-native contract
   - request / response DTO、validation、decode を扱う
+  - application code が通常使う main surface
 - `Unified`
   - 将来追加予定の取引所横断層
   - 現時点では未実装
+
+通常は `Native` を使い、status code・raw body・header を直接見たいときだけ `Protocol` を使う。
+
+## Call Contract
+
+- facade の主 API は `*CallAsync(...)`
+- `Native` facade は `Task<Call<TRequest, TResponse>>` を返す
+- `Protocol` facade は `Task<Call<ProtocolRequest, ProtocolResponse>>` を返す
+- success は `IsSuccess = true`, `Response != null`, `Error = null`
+- failure は `IsSuccess = false`, `Response = null`, `Error != null`
+- `CallError.Kind` は `Transport`, `Http`, `Codec`, `Semantic`, `Mapping` の 5 種を使う
+  - `Transport`: DNS / socket / TLS / timeout / cancellation など、HTTP response を受け取る前の失敗
+  - `Http`: `Native` が expected status と実 status の不一致を判定した失敗
+  - `Codec`: JSON parse、shape、required field、scalar parse の失敗
+  - `Semantic`: request 不正、または raw shape は読めるが API contract rule として不正
+  - `Mapping`: 明示的 mapping 導入時の reserved kind
+- `Protocol` は HTTP response を受け取った時点で `ProtocolResponse` を返し、non-success status を自動で `Http` failure に変換しない
+- `Native` は対応する `Protocol` call を child call として保持しつつ、status / decode / contract rule を評価する
 
 ## Quickstart
 

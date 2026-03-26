@@ -175,6 +175,97 @@ public sealed class AdditionalPrivateNativeEndpointTests
     }
 
     [Fact]
+    public async Task Withdraw_ReturnsHttp_WhenVenueReturnsNonSuccessStatus()
+    {
+        var fake = new FakeWithdrawProtocolEndpoint(_ => ProtocolCall("Withdraw", "POST", "/v1/me/withdraw", 400, """{"status":-700,"error_message":"Invalid code."}"""));
+        var endpoint = new WithdrawNativeEndpoint(fake);
+
+        var call = await endpoint.CallAsync(new WithdrawRequest
+        {
+            CurrencyCode = "JPY",
+            BankAccountId = 1,
+            Amount = 1000m,
+            Code = "123456",
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Http, call.Error!.Kind);
+        Assert.Equal("Expected status 200 but got 400.", call.Error.Message);
+    }
+
+    [Fact]
+    public async Task Withdraw_ReturnsSemantic_WhenCurrencyCodeIsNotJpy()
+    {
+        var endpoint = new WithdrawNativeEndpoint(new FakeWithdrawProtocolEndpoint(_ => throw new InvalidOperationException()));
+
+        var call = await endpoint.CallAsync(new WithdrawRequest
+        {
+            CurrencyCode = "BTC",
+            BankAccountId = 1,
+            Amount = 1000m,
+            Code = "123456",
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+        Assert.Equal("CurrencyCode must be JPY.", call.Error.Message);
+    }
+
+    [Fact]
+    public async Task Withdraw_ReturnsSemantic_WhenBankAccountIdIsNotPositive()
+    {
+        var endpoint = new WithdrawNativeEndpoint(new FakeWithdrawProtocolEndpoint(_ => throw new InvalidOperationException()));
+
+        var call = await endpoint.CallAsync(new WithdrawRequest
+        {
+            CurrencyCode = "JPY",
+            BankAccountId = 0,
+            Amount = 1000m,
+            Code = "123456",
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+        Assert.Equal("BankAccountId must be greater than zero.", call.Error.Message);
+    }
+
+    [Fact]
+    public async Task Withdraw_ReturnsSemantic_WhenAmountIsNotPositive()
+    {
+        var endpoint = new WithdrawNativeEndpoint(new FakeWithdrawProtocolEndpoint(_ => throw new InvalidOperationException()));
+
+        var call = await endpoint.CallAsync(new WithdrawRequest
+        {
+            CurrencyCode = "JPY",
+            BankAccountId = 1,
+            Amount = 0m,
+            Code = "123456",
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+        Assert.Equal("Amount must be greater than zero.", call.Error.Message);
+    }
+
+    [Fact]
+    public async Task Withdraw_ReturnsSemantic_WhenCodeIsBlank()
+    {
+        var endpoint = new WithdrawNativeEndpoint(new FakeWithdrawProtocolEndpoint(_ => throw new InvalidOperationException()));
+
+        var call = await endpoint.CallAsync(new WithdrawRequest
+        {
+            CurrencyCode = "JPY",
+            BankAccountId = 1,
+            Amount = 1000m,
+            Code = " ",
+        });
+
+        Assert.False(call.IsSuccess);
+        Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
+        Assert.Equal("Code is required.", call.Error.Message);
+    }
+
+    [Fact]
     public async Task GetWithdrawals_MapsTopLevelArray()
     {
         var body = """
@@ -498,9 +589,14 @@ public sealed class AdditionalPrivateNativeEndpointTests
 
     private static Call<ProtocolRequest, ProtocolResponse> Success(string endpointId, string method, string path, string bodyText)
     {
+        return ProtocolCall(endpointId, method, path, 200, bodyText);
+    }
+
+    private static Call<ProtocolRequest, ProtocolResponse> ProtocolCall(string endpointId, string method, string path, int statusCode, string bodyText)
+    {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = endpointId, Method = method, Path = path, Query = null, BodyText = null },
-            new ProtocolResponse { StatusCode = 200, Headers = new Dictionary<string, string[]>(), BodyText = bodyText },
+            new ProtocolResponse { StatusCode = statusCode, Headers = new Dictionary<string, string[]>(), BodyText = bodyText },
             new CallMeta { Layer = CallLayers.Protocol, Component = CallComponents.PrivateEndpointModule, EndpointId = endpointId, Scope = "Private", Auth = "KeySecret" });
     }
 }

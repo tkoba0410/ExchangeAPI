@@ -91,7 +91,7 @@
 | GetCoinOuts | GET | /v1/me/getcoinouts | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | GetBankAccounts | GET | /v1/me/getbankaccounts | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | - |
 | GetDeposits | GET | /v1/me/getdeposits | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
-| Withdraw | POST | /v1/me/withdraw | private | Yes | Yes | Later | Transitional | Transitional | 200 | Object | Yes | NotSupported | - | KeySecret | currency_code/bank_account_id/amount/code required |
+| Withdraw | POST | /v1/me/withdraw | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | Object | Yes | NotSupported | - | KeySecret | currency_code/bank_account_id/amount/code required |
 | GetWithdrawals | GET | /v1/me/getwithdrawals | private | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | Array | No | None | - | KeySecret | optional query params omitted when null |
 | SendChildOrder | POST | /v1/me/sendchildorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | Object | Yes | Required | - | KeySecret | minute_to_expire/time_in_force = null omitted, price is conditional |
 | SendParentOrder | POST | /v1/me/sendparentorder | private | Yes | Yes | Phase2-Write | Fixed | Fixed | 200 | Object | Yes | Required | - | KeySecret | order_method/minute_to_expire/time_in_force = null omitted; parameter fields are conditionally omitted |
@@ -118,8 +118,9 @@
 - `SendChildOrder` と `CancelChildOrder` は non-fill lifecycle を前提に fourth wave として `Fixed` に上げる
 - `SendParentOrder`、`GetParentOrder`、`CancelParentOrder` は parent non-fill lifecycle を前提に fifth wave として `Fixed` に上げる
 - `CancelAllChildOrders` は `BTC_JPY` 専用 safety gate と preflight を前提に sixth wave として `Fixed` に上げる
-- `Withdraw` は cleanup 不可のため `Fixed` に上げず、wrong-code による negative live contract のみを許容する
-  - current normative では non-success HTTP status を `Http` と扱うため、negative status は child protocol body で確認する
+- `Withdraw` は cleanup 不可のため success live write target には含めないが、dedicated negative live contract を前提に seventh wave として `Fixed` に上げる
+  - success contract は `200 + message_id`
+  - wrong-code negative live contract では non-success HTTP status と child protocol body の負の `status` を確認する
 - `Phase1-Read` に含めた read endpoint は third wave までで `Fixed` に上げ切る
 - `Later` の read と write を含む残りの実装済み endpoint は、引き続き `Transitional` のまま段階的に固定する
 
@@ -537,9 +538,15 @@ Stage10 の working hypothesis:
   - `MessageId: string`
 - response note
   - `200` かつ `message_id` があれば成功
-  - `200` かつ負の `status` を持つ error body は `Semantic`
+  - wrong-code negative live contract では non-success HTTP status と負の `status` error body を観測対象にする
+  - current normative では non-success HTTP status は `Http`
+  - `200` かつ負の `status` を持つ error body は defensive fallback として `Semantic`
 - `ExpectedStatus = 200`
 - `ResponseShape = Object`
+- write live test rule
+  - dedicated marker `local/bitflyer-live-withdraw-negative-enabled` を要求する
+  - verified bank account を 1 つ選び、wrong 2FA code で negative contract だけを確認する
+  - successful withdraw は live test しない
 
 ### SendChildOrder
 

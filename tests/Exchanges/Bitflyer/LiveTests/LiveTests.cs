@@ -97,10 +97,12 @@ public sealed class LiveTests
         using var document = JsonDocument.Parse(protocolCall.Response.BodyText);
         var root = document.RootElement;
         var native = nativeCall.Response!;
+        var protocolTimestamp = ParseUtcNoOffsetTimestamp(root.GetProperty("timestamp").GetString()!);
 
         Assert.Equal(root.GetProperty("product_code").GetString(), native.ProductCode);
         Assert.Equal(root.GetProperty("state").GetString(), native.State);
-        Assert.Equal(ParseUtcNoOffsetTimestamp(root.GetProperty("timestamp").GetString()!), native.Timestamp);
+        Assert.Equal(TimeSpan.Zero, protocolTimestamp.Offset);
+        Assert.Equal(TimeSpan.Zero, native.Timestamp.Offset);
         Assert.True(root.GetProperty("tick_id").GetInt64() > 0);
         Assert.True(root.GetProperty("best_bid").GetDecimal() > 0);
         Assert.True(root.GetProperty("best_ask").GetDecimal() > 0);

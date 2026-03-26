@@ -11,3 +11,9 @@ export EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH="/path/to/credentials.enc.
 #
 # Enable write live tests explicitly by creating this local marker file:
 #   touch local/bitflyer-live-write-enabled
+#
+# Enable CancelAllChildOrders live tests explicitly:
+#   touch local/bitflyer-live-cancel-all-enabled
+#
+# Enable Withdraw negative live tests explicitly:
+#   touch local/bitflyer-live-withdraw-negative-enabled

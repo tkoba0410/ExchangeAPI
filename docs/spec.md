@@ -1172,6 +1172,8 @@ state を変更する endpoint の live 実行には、以下を必須とする�
   - この場合も native classification は current normative に従う
     - non-success HTTP status は `Http`
     - negative status の観測は child `Protocol` call の body で行う
+- cleanup 不可 endpoint でも、request / response contract、unit test、役割分離済み test、dedicated negative live contract が揃っていれば `Fixed` に上げてよい
+  - `Withdraw` は `200 + message_id` の success contract と wrong-code negative live contract の両方を固定対象にしてよい
 - write test は最小数量、最小影響の request を使う
 - `SendChildOrder` のような endpoint は `Protocol` と `Native` の parity 実行で二重送信しない
 - cleanup 用 endpoint がある場合は acceptance id / order id を保持し、後続 cleanup を必ず試みる

@@ -100,12 +100,84 @@ else
 }
 ```
 
+## Configuration
+
+- `BitflyerClientOptions`
+  - `BaseUri`
+  - `Credentials`
+  - `UseTickerAliasPath`
+  - `EnableProtocolDebugLogging`
+  - `ProtocolDebugLogDirectory`
+- `BinanceClientOptions`
+  - `BaseUri`
+  - `EnableProtocolDebugLogging`
+  - `ProtocolDebugLogDirectory`
+
+bitFlyer の private surface は `Credentials` を渡したときだけ有効になる。
+credentials なしの bundle では `Private` は `null` になる。
+
+### bitFlyer Private Permissions (`Native`)
+
+```csharp
+using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPermissions;
+
+var client = BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions
+{
+    Credentials = new BitflyerApiCredentials
+    {
+        ApiKey = Environment.GetEnvironmentVariable("BITFLYER_API_KEY")!,
+        ApiSecret = Environment.GetEnvironmentVariable("BITFLYER_API_SECRET")!,
+    },
+});
+
+var call = await client.Private!.GetPermissionsCallAsync(new GetPermissionsRequest());
+```
+
+### bitFlyer Public Ticker (`Protocol`)
+
+```csharp
+using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
+
+var client = BitflyerClientFactory.CreateProtocolClient();
+var call = await client.Public.GetTickerCallAsync(ProductCodes.BtcJpy);
+
+if (call.IsSuccess && call.Response is not null)
+{
+    Console.WriteLine(call.Response.BodyText);
+}
+```
+
+## Client Lifetime
+
+- `CreateProtocolClient(...)` / `CreateNativeClient(...)` が返す bundle は per-call object ではなく reuse 前提の long-lived object
+- 現行実装は `HttpClient` を library 内で生成し、明示的な dispose surface はまだ持たない
+- process または test scope で bundle を使い回し、endpoint 呼び出しごとに new しないことを推奨する
+
 ## Current State
 
 - 実装済みの公開面は `Protocol` / `Native` の一部 endpoint
 - bitFlyer は `GetMarkets`, `GetBoard`, `GetTicker`, `GetExecutionsPublic`, `GetBoardState`, `GetHealth`, `GetFundingRate`, `GetCorporateLeverage`, `GetChats`, `GetPermissions`, `GetBalance`, `GetCollateral`, `GetCollateralAccounts`, `GetAddresses`, `GetCoinIns`, `GetCoinOuts`, `GetBankAccounts`, `GetDeposits`, `Withdraw`, `GetWithdrawals`, `GetChildOrders`, `GetParentOrders`, `GetParentOrder`, `GetExecutionsPrivate`, `GetBalanceHistory`, `GetPositions`, `GetCollateralHistory`, `GetTradingCommission`, `SendChildOrder`, `SendParentOrder`, `CancelChildOrder`, `CancelParentOrder`, `CancelAllChildOrders`
+- bitFlyer の `Withdraw` は fixed contract だが、live 検証は negative contract のみを持つ
 - Binance は `GetKlines`
 - 現行 phase では library を優先し、`Unified`, CLI, MCP Server は将来検討とする
+
+## Live Tests
+
+- `dotnet test ExchangeApi.slnx` で live test project も起動する
+- public live test はそのまま実行される
+- bitFlyer private/write live test は `age` で復号する credentials source を前提にする
+  - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
+  - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
+- 例: `source scripts/bitflyer-live-age-env.example.sh`
+- write opt-in marker
+  - `touch local/bitflyer-live-write-enabled`
+- `CancelAllChildOrders` 専用 marker
+  - `touch local/bitflyer-live-cancel-all-enabled`
+- `Withdraw` negative live contract 専用 marker
+  - `touch local/bitflyer-live-withdraw-negative-enabled`
 
 ## Development
 

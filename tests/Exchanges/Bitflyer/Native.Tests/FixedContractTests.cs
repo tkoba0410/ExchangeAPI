@@ -24,6 +24,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetWithdrawals;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.Withdraw;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetChats;
@@ -174,6 +175,17 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.Amount), typeof(decimal));
         AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.Status), typeof(string));
         AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.EventDate), typeof(DateTimeOffset));
+
+        AssertJsonProperty(typeof(WithdrawRequest), nameof(WithdrawRequest.CurrencyCode), typeof(string), "currency_code");
+        AssertJsonProperty(typeof(WithdrawRequest), nameof(WithdrawRequest.BankAccountId), typeof(long), "bank_account_id");
+        AssertJsonProperty(typeof(WithdrawRequest), nameof(WithdrawRequest.Amount), typeof(decimal), "amount");
+        AssertJsonProperty(typeof(WithdrawRequest), nameof(WithdrawRequest.Code), typeof(string), "code");
+        AssertProperty(typeof(WithdrawResponse), nameof(WithdrawResponse.MessageId), typeof(string));
+        AssertCallMethod(
+            typeof(IBitflyerPrivateNativeApi),
+            nameof(IBitflyerPrivateNativeApi.WithdrawCallAsync),
+            typeof(WithdrawRequest),
+            typeof(WithdrawResponse));
 
         AssertProperty(typeof(GetWithdrawalsRequest), nameof(GetWithdrawalsRequest.Count), typeof(int?));
         AssertProperty(typeof(GetWithdrawalsRequest), nameof(GetWithdrawalsRequest.Before), typeof(long?));

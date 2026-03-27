@@ -167,12 +167,12 @@ dotnet build src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj
 public read を試す:
 
 ```bash
-dotnet src/Adapters/Cli/bin/Debug/net10.0/ExchangeApi.Adapters.Cli.dll \
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
   bitflyer native public get-ticker \
   --product-code BTC_JPY \
   --summary --pretty
 
-dotnet src/Adapters/Cli/bin/Debug/net10.0/ExchangeApi.Adapters.Cli.dll \
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
   binance native public get-klines \
   --symbol BTCJPY \
   --interval 1h \
@@ -186,7 +186,7 @@ bitFlyer private write は環境変数が必要:
 export BITFLYER_API_KEY=...
 export BITFLYER_API_SECRET=...
 
-dotnet src/Adapters/Cli/bin/Debug/net10.0/ExchangeApi.Adapters.Cli.dll \
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
   bitflyer native private cancel-all-child-orders \
   --product-code BTC_JPY \
   --yes
@@ -196,6 +196,7 @@ dotnet src/Adapters/Cli/bin/Debug/net10.0/ExchangeApi.Adapters.Cli.dll \
 
 - 連続で手動確認するときは `dotnet run` より `dotnet build` 後の DLL 実行を推奨する
 - `cancel-all-child-orders` は write command なので、実行時は state を変更する
+- wizard と shell は helper であり、実行可能 command set は上記 3 command に限られる
 
 `dotnet` 不要の local publish を作る場合:
 
@@ -206,13 +207,13 @@ bash scripts/publish-cli-local.sh
 既定では `linux-x64` 向け self-contained single-file を次へ出力する。
 
 ```text
-local/publish/cli/linux-x64/ExchangeApi.Adapters.Cli
+local/publish/cli/linux-x64/exchangeapi
 ```
 
 publish 後はそのまま実行できる:
 
 ```bash
-./local/publish/cli/linux-x64/ExchangeApi.Adapters.Cli \
+./local/publish/cli/linux-x64/exchangeapi \
   bitflyer native public get-ticker \
   --product-code BTC_JPY \
   --summary --pretty
@@ -221,8 +222,8 @@ publish 後はそのまま実行できる:
 限定的な対話 helper:
 
 ```bash
-./local/publish/cli/linux-x64/ExchangeApi.Adapters.Cli wizard bitflyer native public get-ticker
-./local/publish/cli/linux-x64/ExchangeApi.Adapters.Cli shell
+./local/publish/cli/linux-x64/exchangeapi wizard bitflyer native public get-ticker
+./local/publish/cli/linux-x64/exchangeapi shell
 ```
 
 RID を変える場合:

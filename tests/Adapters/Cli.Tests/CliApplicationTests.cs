@@ -229,6 +229,51 @@ public sealed class CliApplicationTests
         Assert.Contains("\"Message\": \"ok\"", console.StdOut);
     }
 
+    [Fact]
+    public async Task ShellRunFailure_PrintsExitCodeAndPreservesFailureMeaning()
+    {
+        var console = new FakeConsole();
+        console.EnqueueInputLine("use venue fake");
+        console.EnqueueInputLine("use surface native");
+        console.EnqueueInputLine("use scope public");
+        console.EnqueueInputLine("run echo --unknown");
+        console.EnqueueInputLine("show");
+        console.EnqueueInputLine("quit");
+
+        var app = new CliApplication(
+            commands:
+            [
+                new CommandDescriptor
+                {
+                    Path = new CommandPath("fake", "native", "public", "echo"),
+                    EndpointId = "Echo",
+                    Summary = "fake command",
+                    AuthenticationRequirement = "none",
+                    CanonicalJsonExample = "exchangeapi fake native public echo",
+                    TemplateJson = "{}",
+                    ConvenienceFlags = [],
+                    UsageExamples = ["exchangeapi fake native public echo --summary"],
+                    IsWrite = false,
+                    BindRequestAsync = static (_, _, _) => Task.FromResult(RequestBindingResult.Success(new object())),
+                    DescribeRequest = static _ => "none",
+                    ExecuteAsync = static (_, _, _, _) => Task.FromResult(
+                        ExecutionOutcome.Success(
+                            "fake native public echo: success",
+                            new EchoResponse { Message = "ok" })),
+                },
+            ],
+            console: console,
+            environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(["shell"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Contains("invalid option", console.StdErr);
+        Assert.Contains("unknown option: --unknown", console.StdErr);
+        Assert.Contains("shell failed: fake native public echo exit=2", console.StdErr);
+        Assert.Contains("last-exit-code=2", console.StdErr);
+    }
+
     private sealed class EchoResponse
     {
         public required string Message { get; init; }

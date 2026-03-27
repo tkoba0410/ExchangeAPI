@@ -167,7 +167,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - `GetExecutionsPublic` -> `get-executions-public`
 - `CancelAllChildOrders` -> `cancel-all-child-orders`
 
-### 4.4 現行公開範囲
+### 4.4 library 側の公開射程
 
 - bitFlyer
   - `native public`
@@ -178,7 +178,20 @@ exchangeapi <venue> <surface> <scope> <command> [options]
   - `native public`
   - `protocol public`
 
-現行 command inventory の正本は endpoint matrix とし、本書で重複列挙しない。
+本項は library 側で CLI が将来写像しうる surface range を示す。  
+現行 binary が実際に expose する command set と同義ではない。
+
+### 4.5 現行実装済み slice
+
+- 現行 branch の実行可能 command set の正本は command descriptor registry とする
+  - `src/Adapters/Cli/Commands/CommandCatalog.cs`
+- 現在実装済みの canonical command は以下の 3 本に限定する
+  - `bitflyer native public get-ticker`
+  - `binance native public get-klines`
+  - `bitflyer native private cancel-all-child-orders`
+- wizard は上記 3 command にだけ対応する
+- shell は上記 registry に登録された command にだけ委譲できる
+- endpoint matrix は設計上の inventory 正本だが、現行 phase では CLI runtime が matrix 全件を expose しているとはみなさない
 
 ## 5. 入力契約
 
@@ -343,7 +356,9 @@ command-specific convenience flag:
 
 ### 7.3 優先順位
 
-- CLI option > environment variable
+- `BITFLYER_API_KEY` と `BITFLYER_API_SECRET` は current phase では environment variable からのみ解決する
+- `--base-uri`、`--timeout-ms`、`--enable-protocol-debug-log`、`--protocol-debug-log-dir`、`--use-ticker-alias-path` は current phase では CLI option からのみ解決する
+- current phase では上記以外の generic precedence ルールを固定しない
 - 現行 phase では config file 契約を固定しない
 
 ## 8. 安全制約

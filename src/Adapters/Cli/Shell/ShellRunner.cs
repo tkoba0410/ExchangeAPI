@@ -246,8 +246,16 @@ public static class ShellRunner
         };
         canonicalArgs.AddRange(optionTokens);
 
-        await executeCanonicalAsync(canonicalArgs, cancellationToken);
-        console.WriteErrorLine($"shell executed: {path.Identity}");
+        var exitCode = await executeCanonicalAsync(canonicalArgs, cancellationToken);
+        state.SetLastExitCode(exitCode);
+
+        if (exitCode == CliExitCode.Success)
+        {
+            console.WriteErrorLine($"shell executed: {path.Identity}");
+            return;
+        }
+
+        console.WriteErrorLine($"shell failed: {path.Identity} exit={exitCode}");
     }
 
     private static bool HasExplicitPath(IReadOnlyList<string> tokens)

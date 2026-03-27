@@ -20,4 +20,4 @@ dotnet publish "${repo_root}/src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj" \
   -p:IncludeNativeLibrariesForSelfExtract=true \
   --output "${output_dir}"
 
-echo "published: ${output_dir}/ExchangeApi.Adapters.Cli"
+echo "published: ${output_dir}/exchangeapi"

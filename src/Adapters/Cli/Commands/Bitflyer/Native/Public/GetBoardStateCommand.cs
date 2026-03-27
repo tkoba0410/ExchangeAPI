@@ -1,0 +1,85 @@
+using ExchangeApi.Adapters.Cli.Binding;
+using ExchangeApi.Adapters.Cli.Configuration;
+using ExchangeApi.Adapters.Cli.Infrastructure;
+using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
+
+namespace ExchangeApi.Adapters.Cli.Commands.Bitflyer.Native.Public;
+
+public static class GetBoardStateCommand
+{
+    public static CommandDescriptor Create()
+    {
+        return new CommandDescriptor
+        {
+            Path = new CommandPath("bitflyer", "native", "public", "get-board-state"),
+            EndpointId = "GetBoardState",
+            Summary = "bitFlyer native public board state",
+            AuthenticationRequirement = "none",
+            CanonicalJsonExample = """exchangeapi bitflyer native public get-board-state --request-json '{"ProductCode":"BTC_JPY"}'""",
+            TemplateJson = """{"ProductCode":null}""",
+            ConvenienceFlags = ["--product-code <value>"],
+            UsageExamples =
+            [
+                "exchangeapi bitflyer native public get-board-state --product-code BTC_JPY",
+                """exchangeapi bitflyer native public get-board-state --request-json '{"ProductCode":"BTC_JPY"}'""",
+                "exchangeapi bitflyer native public get-board-state --request-template",
+            ],
+            IsWrite = false,
+            BindRequestAsync = BindRequestAsync,
+            DescribeRequest = static request =>
+            {
+                var typed = (GetBoardStateRequest)request;
+                return typed.ProductCode is null ? "ProductCode=<omitted>" : $"ProductCode={typed.ProductCode}";
+            },
+            ExecuteAsync = ExecuteAsync,
+        };
+    }
+
+    private static async Task<RequestBindingResult> BindRequestAsync(
+        InvocationOptions options,
+        IConsole console,
+        CancellationToken cancellationToken)
+    {
+        var hasConvenience = options.Contains("product-code");
+        var jsonInput = await JsonInputReader.ReadTextAsync(options, "request-json", "request-file", console, cancellationToken);
+        if (jsonInput.Failure is not null)
+        {
+            return jsonInput.Failure;
+        }
+
+        if (jsonInput.HasValue && hasConvenience)
+        {
+            return RequestBindingResult.Failure(
+                "invalid argument",
+                "--request-json/--request-file and convenience flags cannot be used together");
+        }
+
+        if (jsonInput.HasValue)
+        {
+            return JsonInputReader.Deserialize<GetBoardStateRequest>(jsonInput.Content!);
+        }
+
+        return RequestBindingResult.Success(new GetBoardStateRequest
+        {
+            ProductCode = options.GetValue("product-code"),
+        });
+    }
+
+    private static async Task<ExecutionOutcome> ExecuteAsync(
+        InvocationOptions options,
+        object request,
+        IEnvironment environment,
+        CancellationToken cancellationToken)
+    {
+        var created = BitflyerOptionsFactory.Create(options, environment, requiresCredentials: false);
+        if (created.Failure is not null)
+        {
+            return created.Failure;
+        }
+
+        using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
+        var call = await bundle.Public.GetBoardStateCallAsync((GetBoardStateRequest)request, cancellationToken);
+        return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "public", "get-board-state"), call);
+    }
+}

@@ -1,3 +1,4 @@
+using ExchangeApi.Adapters.Cli.Commands;
 using ExchangeApi.Adapters.Cli.Infrastructure;
 
 namespace ExchangeApi.Adapters.Cli.Tests;
@@ -30,6 +31,90 @@ public sealed class CliApplicationTests
         Assert.Equal(CliExitCode.Success, exitCode);
         Assert.Equal("""{"product_code":null}""", console.StdOut);
         Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetMarketsTemplate_PrintsEmptyCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "public", "get-markets", "--request-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetBoardStateTemplate_PrintsPascalCaseCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "public", "get-board-state", "--request-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"ProductCode":null}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetChatsTemplate_PrintsPascalCaseCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "public", "get-chats", "--request-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"FromDate":null}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetExecutionsPublicTemplate_PrintsSnakeCaseCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "public", "get-executions-public", "--request-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"product_code":null,"count":null,"before":null,"after":null}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetFundingRateWithoutProductCode_FailsInputValidation()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "public", "get-funding-rate"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("invalid field: ProductCode", console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetExecutionsPublicRejectsInvalidCountValue()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "public", "get-executions-public", "--count", "abc"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("invalid field: count", console.StdErr);
     }
 
     [Fact]
@@ -135,6 +220,31 @@ public sealed class CliApplicationTests
         Assert.Equal(CliExitCode.Success, exitCode);
         Assert.Contains("exchangeapi wizard <venue> <surface> <scope> <command>", console.StdOut);
         Assert.Contains("bitflyer native public get-ticker", console.StdOut);
+    }
+
+    [Fact]
+    public void CommandCatalog_CurrentSlice_IsExpected()
+    {
+        var identities = CommandCatalog.All
+            .Select(static x => x.Path.Identity)
+            .OrderBy(static x => x, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(
+            [
+                "binance native public get-klines",
+                "bitflyer native private cancel-all-child-orders",
+                "bitflyer native public get-board",
+                "bitflyer native public get-board-state",
+                "bitflyer native public get-chats",
+                "bitflyer native public get-corporate-leverage",
+                "bitflyer native public get-executions-public",
+                "bitflyer native public get-funding-rate",
+                "bitflyer native public get-health",
+                "bitflyer native public get-markets",
+                "bitflyer native public get-ticker",
+            ],
+            identities);
     }
 
     [Fact]

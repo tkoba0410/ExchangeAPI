@@ -9,6 +9,14 @@ public static class CommandCatalog
 {
     public static IReadOnlyList<CommandDescriptor> All { get; } =
     [
+        GetMarketsCommand.Create(),
+        GetBoardCommand.Create(),
+        GetBoardStateCommand.Create(),
+        GetHealthCommand.Create(),
+        GetFundingRateCommand.Create(),
+        GetCorporateLeverageCommand.Create(),
+        GetChatsCommand.Create(),
+        GetExecutionsPublicCommand.Create(),
         GetTickerCommand.Create(),
         GetKlinesCommand.Create(),
         CancelAllChildOrdersCommand.Create(),

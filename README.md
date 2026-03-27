@@ -152,8 +152,16 @@ else
 
 ### 3) CLI Adapter (`Stage11` 初期 slice)
 
-現時点の CLI 実装範囲は次の 3 command。
+現時点の CLI 実装範囲は次の 11 command。
 
+- `bitflyer native public get-markets`
+- `bitflyer native public get-board`
+- `bitflyer native public get-board-state`
+- `bitflyer native public get-chats`
+- `bitflyer native public get-corporate-leverage`
+- `bitflyer native public get-executions-public`
+- `bitflyer native public get-funding-rate`
+- `bitflyer native public get-health`
 - `bitflyer native public get-ticker`
 - `binance native public get-klines`
 - `bitflyer native private cancel-all-child-orders`
@@ -167,6 +175,44 @@ dotnet build src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj
 public read を試す:
 
 ```bash
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native public get-markets \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native public get-board \
+  --product-code BTC_JPY \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native public get-board-state \
+  --product-code BTC_JPY \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native public get-chats \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native public get-corporate-leverage \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native public get-executions-public \
+  --product-code BTC_JPY \
+  --count 10 \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native public get-funding-rate \
+  --product-code FX_BTC_JPY \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native public get-health \
+  --product-code BTC_JPY \
+  --summary --pretty
+
 dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
   bitflyer native public get-ticker \
   --product-code BTC_JPY \
@@ -196,7 +242,8 @@ dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
 
 - 連続で手動確認するときは `dotnet run` より `dotnet build` 後の DLL 実行を推奨する
 - `cancel-all-child-orders` は write command なので、実行時は state を変更する
-- wizard と shell は helper であり、実行可能 command set は上記 3 command に限られる
+- wizard は現時点では `get-ticker`、`get-klines`、`cancel-all-child-orders` にだけ対応する
+- shell は helper であり、registry に登録された上記 command set に委譲する
 
 `dotnet` 不要の local publish を作る場合:
 

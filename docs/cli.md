@@ -185,11 +185,19 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 
 - 現行 branch の実行可能 command set の正本は command descriptor registry とする
   - `src/Adapters/Cli/Commands/CommandCatalog.cs`
-- 現在実装済みの canonical command は以下の 3 本に限定する
+- 現在実装済みの canonical command は以下の 11 本に限定する
+  - `bitflyer native public get-markets`
+  - `bitflyer native public get-board`
+  - `bitflyer native public get-board-state`
+  - `bitflyer native public get-chats`
+  - `bitflyer native public get-corporate-leverage`
+  - `bitflyer native public get-executions-public`
+  - `bitflyer native public get-funding-rate`
+  - `bitflyer native public get-health`
   - `bitflyer native public get-ticker`
   - `binance native public get-klines`
   - `bitflyer native private cancel-all-child-orders`
-- wizard は上記 3 command にだけ対応する
+- wizard は `get-ticker`、`get-klines`、`cancel-all-child-orders` にだけ対応する
 - shell は上記 registry に登録された command にだけ委譲できる
 - endpoint matrix は設計上の inventory 正本だが、現行 phase では CLI runtime が matrix 全件を expose しているとはみなさない
 

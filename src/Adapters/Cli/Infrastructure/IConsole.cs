@@ -8,5 +8,6 @@ public interface IConsole
     Task<string?> ReadLineAsync(CancellationToken cancellationToken);
     void WriteOut(string value);
     void WriteOutLine(string value);
+    void WriteError(string value);
     void WriteErrorLine(string value);
 }

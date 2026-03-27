@@ -3,6 +3,8 @@ using ExchangeApi.Adapters.Cli.Commands;
 using ExchangeApi.Adapters.Cli.Formatting;
 using ExchangeApi.Adapters.Cli.Help;
 using ExchangeApi.Adapters.Cli.Safety;
+using ExchangeApi.Adapters.Cli.Shell;
+using ExchangeApi.Adapters.Cli.Wizard;
 
 namespace ExchangeApi.Adapters.Cli.Infrastructure;
 
@@ -36,108 +38,24 @@ public sealed class CliApplication
     {
         try
         {
-            var parseResult = InvocationParser.Parse(args);
-            if (!parseResult.IsSuccess)
+            var shellResult = await ShellRunner.TryRunAsync(
+                args,
+                _commands,
+                _console,
+                RunCanonicalAsync,
+                cancellationToken);
+            if (shellResult.Handled)
             {
-                StderrWriter.WriteFailure(
-                    _console,
-                    ExecutionOutcome.InputError(parseResult.ErrorSummary ?? "invalid argument", parseResult.ErrorDetail),
-                    verbose: false);
-                return CliExitCode.ArgumentConfigOrSafetyError;
+                return shellResult.ExitCode;
             }
 
-            if (parseResult.ShowHelp)
+            var wizardResult = await WizardRunner.TryRunAsync(args, _commands, _console, cancellationToken);
+            if (wizardResult.Handled)
             {
-                var helpOutcome = HelpRenderer.Render(_console, _commands, parseResult.PathTokens);
-                if (helpOutcome.ExitCode != CliExitCode.Success)
-                {
-                    StderrWriter.WriteFailure(_console, helpOutcome, verbose: false);
-                    return helpOutcome.ExitCode;
-                }
-
-                return CliExitCode.Success;
+                return wizardResult.ExitCode;
             }
 
-            var path = new CommandPath(
-                parseResult.PathTokens[0],
-                parseResult.PathTokens[1],
-                parseResult.PathTokens[2],
-                parseResult.PathTokens[3]);
-
-            var descriptor = _commands.FirstOrDefault(x => x.Path == path);
-            if (descriptor is null)
-            {
-                StderrWriter.WriteFailure(
-                    _console,
-                    ExecutionOutcome.InputError("invalid argument", $"unknown command: {path.Identity}"),
-                    verbose: false);
-                return CliExitCode.ArgumentConfigOrSafetyError;
-            }
-
-            var options = parseResult.Options;
-            var templateOutcome = TryHandleTemplate(descriptor, options);
-            if (templateOutcome.Handled)
-            {
-                if (templateOutcome.Outcome!.ExitCode != CliExitCode.Success)
-                {
-                    StderrWriter.WriteFailure(_console, templateOutcome.Outcome, verbose: options.HasFlag("verbose"));
-                    return templateOutcome.Outcome.ExitCode;
-                }
-
-                JsonOutputWriter.Write(_console, templateOutcome.TemplateDocument, pretty: options.HasFlag("pretty"));
-                return CliExitCode.Success;
-            }
-
-            var requestBinding = await descriptor.BindRequestAsync(options, _console, cancellationToken);
-            if (!requestBinding.IsSuccess)
-            {
-                StderrWriter.WriteFailure(
-                    _console,
-                    ExecutionOutcome.InputError(requestBinding.ErrorSummary ?? "invalid argument", requestBinding.ErrorDetail),
-                    verbose: options.HasFlag("verbose"));
-                return CliExitCode.ArgumentConfigOrSafetyError;
-            }
-
-            if (descriptor.IsWrite && !options.HasFlag("yes"))
-            {
-                if (!ConfirmationPrompt.IsInteractive(_console))
-                {
-                    StderrWriter.WriteFailure(
-                        _console,
-                        ExecutionOutcome.InputError("safety error", "--yes is required for non-interactive write execution"),
-                        verbose: options.HasFlag("verbose"));
-                    return CliExitCode.ArgumentConfigOrSafetyError;
-                }
-
-                var confirmed = await ConfirmationPrompt.ConfirmAsync(
-                    _console,
-                    descriptor,
-                    requestBinding.Request!,
-                    cancellationToken);
-                if (!confirmed)
-                {
-                    StderrWriter.WriteFailure(
-                        _console,
-                        ExecutionOutcome.InputError($"{descriptor.Path.Identity}: confirmation declined"),
-                        verbose: options.HasFlag("verbose"));
-                    return CliExitCode.ArgumentConfigOrSafetyError;
-                }
-            }
-
-            var outcome = await descriptor.ExecuteAsync(options, requestBinding.Request!, _environment, cancellationToken);
-            if (outcome.ExitCode != CliExitCode.Success)
-            {
-                StderrWriter.WriteFailure(_console, outcome, verbose: options.HasFlag("verbose"));
-                return outcome.ExitCode;
-            }
-
-            JsonOutputWriter.Write(_console, outcome.Response, pretty: options.HasFlag("pretty"));
-            if (options.HasFlag("summary"))
-            {
-                StderrWriter.WriteSuccessSummary(_console, outcome.Summary);
-            }
-
-            return CliExitCode.Success;
+            return await RunCanonicalAsync(args, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -147,6 +65,112 @@ public sealed class CliApplication
                 verbose: true);
             return CliExitCode.UnexpectedInternalError;
         }
+    }
+
+    private async Task<int> RunCanonicalAsync(IReadOnlyList<string> args, CancellationToken cancellationToken)
+    {
+        var parseResult = InvocationParser.Parse(args.ToArray());
+        if (!parseResult.IsSuccess)
+        {
+            StderrWriter.WriteFailure(
+                _console,
+                ExecutionOutcome.InputError(parseResult.ErrorSummary ?? "invalid argument", parseResult.ErrorDetail),
+                verbose: false);
+            return CliExitCode.ArgumentConfigOrSafetyError;
+        }
+
+        if (parseResult.ShowHelp)
+        {
+            var helpOutcome = HelpRenderer.Render(_console, _commands, parseResult.PathTokens);
+            if (helpOutcome.ExitCode != CliExitCode.Success)
+            {
+                StderrWriter.WriteFailure(_console, helpOutcome, verbose: false);
+                return helpOutcome.ExitCode;
+            }
+
+            return CliExitCode.Success;
+        }
+
+        var path = new CommandPath(
+            parseResult.PathTokens[0],
+            parseResult.PathTokens[1],
+            parseResult.PathTokens[2],
+            parseResult.PathTokens[3]);
+
+        var descriptor = _commands.FirstOrDefault(x => x.Path == path);
+        if (descriptor is null)
+        {
+            StderrWriter.WriteFailure(
+                _console,
+                ExecutionOutcome.InputError("invalid argument", $"unknown command: {path.Identity}"),
+                verbose: false);
+            return CliExitCode.ArgumentConfigOrSafetyError;
+        }
+
+        var options = parseResult.Options;
+        var templateOutcome = TryHandleTemplate(descriptor, options);
+        if (templateOutcome.Handled)
+        {
+            if (templateOutcome.Outcome!.ExitCode != CliExitCode.Success)
+            {
+                StderrWriter.WriteFailure(_console, templateOutcome.Outcome, verbose: options.HasFlag("verbose"));
+                return templateOutcome.Outcome.ExitCode;
+            }
+
+            JsonOutputWriter.Write(_console, templateOutcome.TemplateDocument, pretty: options.HasFlag("pretty"));
+            return CliExitCode.Success;
+        }
+
+        var requestBinding = await descriptor.BindRequestAsync(options, _console, cancellationToken);
+        if (!requestBinding.IsSuccess)
+        {
+            StderrWriter.WriteFailure(
+                _console,
+                ExecutionOutcome.InputError(requestBinding.ErrorSummary ?? "invalid argument", requestBinding.ErrorDetail),
+                verbose: options.HasFlag("verbose"));
+            return CliExitCode.ArgumentConfigOrSafetyError;
+        }
+
+        if (descriptor.IsWrite && !options.HasFlag("yes"))
+        {
+            if (!ConfirmationPrompt.IsInteractive(_console))
+            {
+                StderrWriter.WriteFailure(
+                    _console,
+                    ExecutionOutcome.InputError("safety error", "--yes is required for non-interactive write execution"),
+                    verbose: options.HasFlag("verbose"));
+                return CliExitCode.ArgumentConfigOrSafetyError;
+            }
+
+            var confirmed = await ConfirmationPrompt.ConfirmAsync(
+                _console,
+                descriptor,
+                requestBinding.Request!,
+                cancellationToken);
+            if (!confirmed)
+            {
+                StderrWriter.WriteFailure(
+                    _console,
+                    ExecutionOutcome.InputError($"{descriptor.Path.Identity}: confirmation declined"),
+                    verbose: options.HasFlag("verbose"));
+                return CliExitCode.ArgumentConfigOrSafetyError;
+            }
+        }
+
+        var outcome = await descriptor.ExecuteAsync(options, requestBinding.Request!, _environment, cancellationToken);
+        if (outcome.ExitCode != CliExitCode.Success)
+        {
+            StderrWriter.WriteFailure(_console, outcome, verbose: options.HasFlag("verbose"));
+            return outcome.ExitCode;
+        }
+
+        JsonOutputWriter.Write(_console, outcome.Response, pretty: options.HasFlag("pretty"));
+        if (options.HasFlag("summary"))
+        {
+            StderrWriter.WriteSuccessSummary(_console, outcome.Summary);
+        }
+
+        return CliExitCode.Success;
     }
 
     private static TemplateOutcome TryHandleTemplate(CommandDescriptor descriptor, InvocationOptions options)

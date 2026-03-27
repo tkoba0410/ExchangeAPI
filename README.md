@@ -150,6 +150,87 @@ else
 }
 ```
 
+### 3) CLI Adapter (`Stage11` 初期 slice)
+
+現時点の CLI 実装範囲は次の 3 command。
+
+- `bitflyer native public get-ticker`
+- `binance native public get-klines`
+- `bitflyer native private cancel-all-child-orders`
+
+`dotnet` を使って試す場合は build:
+
+```bash
+dotnet build src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj
+```
+
+public read を試す:
+
+```bash
+dotnet src/Adapters/Cli/bin/Debug/net10.0/ExchangeApi.Adapters.Cli.dll \
+  bitflyer native public get-ticker \
+  --product-code BTC_JPY \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/ExchangeApi.Adapters.Cli.dll \
+  binance native public get-klines \
+  --symbol BTCJPY \
+  --interval 1h \
+  --limit 2 \
+  --summary --pretty
+```
+
+bitFlyer private write は環境変数が必要:
+
+```bash
+export BITFLYER_API_KEY=...
+export BITFLYER_API_SECRET=...
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/ExchangeApi.Adapters.Cli.dll \
+  bitflyer native private cancel-all-child-orders \
+  --product-code BTC_JPY \
+  --yes
+```
+
+補足:
+
+- 連続で手動確認するときは `dotnet run` より `dotnet build` 後の DLL 実行を推奨する
+- `cancel-all-child-orders` は write command なので、実行時は state を変更する
+
+`dotnet` 不要の local publish を作る場合:
+
+```bash
+bash scripts/publish-cli-local.sh
+```
+
+既定では `linux-x64` 向け self-contained single-file を次へ出力する。
+
+```text
+local/publish/cli/linux-x64/ExchangeApi.Adapters.Cli
+```
+
+publish 後はそのまま実行できる:
+
+```bash
+./local/publish/cli/linux-x64/ExchangeApi.Adapters.Cli \
+  bitflyer native public get-ticker \
+  --product-code BTC_JPY \
+  --summary --pretty
+```
+
+限定的な対話 helper:
+
+```bash
+./local/publish/cli/linux-x64/ExchangeApi.Adapters.Cli wizard bitflyer native public get-ticker
+./local/publish/cli/linux-x64/ExchangeApi.Adapters.Cli shell
+```
+
+RID を変える場合:
+
+```bash
+bash scripts/publish-cli-local.sh linux-arm64
+```
+
 ## Configuration
 
 - `BitflyerClientOptions`

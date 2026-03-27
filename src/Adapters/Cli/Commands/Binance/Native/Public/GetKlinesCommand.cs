@@ -1,6 +1,7 @@
 using ExchangeApi.Adapters.Cli.Binding;
 using ExchangeApi.Adapters.Cli.Configuration;
 using ExchangeApi.Adapters.Cli.Infrastructure;
+using ExchangeApi.Adapters.Cli.Wizard;
 using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines;
 
@@ -34,6 +35,53 @@ public static class GetKlinesCommand
                 "exchangeapi binance native public get-klines --request-template",
             ],
             IsWrite = false,
+            Wizard = new WizardDefinition
+            {
+                Summary = "Collects the common klines inputs and prints an equivalent canonical request-json command.",
+                Fields =
+                [
+                    new WizardField
+                    {
+                        OptionName = "symbol",
+                        Prompt = "Symbol",
+                        Required = true,
+                    },
+                    new WizardField
+                    {
+                        OptionName = "interval",
+                        Prompt = "Interval",
+                        Required = true,
+                    },
+                    new WizardField
+                    {
+                        OptionName = "limit",
+                        Prompt = "Limit",
+                        Required = false,
+                        Hint = "leave blank to omit",
+                    },
+                    new WizardField
+                    {
+                        OptionName = "start-time",
+                        Prompt = "StartTime",
+                        Required = false,
+                        Hint = "leave blank to omit",
+                    },
+                    new WizardField
+                    {
+                        OptionName = "end-time",
+                        Prompt = "EndTime",
+                        Required = false,
+                        Hint = "leave blank to omit",
+                    },
+                    new WizardField
+                    {
+                        OptionName = "time-zone",
+                        Prompt = "TimeZone",
+                        Required = false,
+                        Hint = "leave blank to omit",
+                    },
+                ],
+            },
             BindRequestAsync = BindRequestAsync,
             DescribeRequest = static request =>
             {

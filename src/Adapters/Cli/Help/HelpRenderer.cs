@@ -37,9 +37,12 @@ public static class HelpRenderer
     {
         console.WriteOutLine("Usage:");
         console.WriteOutLine("  exchangeapi <venue> <surface> <scope> <command> [options]");
+        console.WriteOutLine("  exchangeapi wizard <venue> <surface> <scope> <command>");
         console.WriteOutLine(string.Empty);
         console.WriteOutLine("Examples:");
         console.WriteOutLine("  exchangeapi bitflyer native public get-ticker --product-code BTC_JPY");
+        console.WriteOutLine("  exchangeapi wizard bitflyer native public get-ticker");
+        console.WriteOutLine("  exchangeapi shell");
         console.WriteOutLine("  exchangeapi bitflyer native private cancel-all-child-orders --product-code BTC_JPY --yes");
         console.WriteOutLine(string.Empty);
         console.WriteOutLine("Available venues:");
@@ -47,6 +50,10 @@ public static class HelpRenderer
         {
             console.WriteOutLine($"  {venue}");
         }
+        console.WriteOutLine(string.Empty);
+        console.WriteOutLine("Other interfaces:");
+        console.WriteOutLine("  wizard");
+        console.WriteOutLine("  shell");
     }
 
     private static ExecutionOutcome RenderVenue(IConsole console, IReadOnlyList<CommandDescriptor> commands, string venue)

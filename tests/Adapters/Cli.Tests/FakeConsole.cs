@@ -40,6 +40,11 @@ internal sealed class FakeConsole : IConsole
         _stdout.AppendLine(value);
     }
 
+    public void WriteError(string value)
+    {
+        _stderr.Append(value);
+    }
+
     public void WriteErrorLine(string value)
     {
         _stderr.AppendLine(value);

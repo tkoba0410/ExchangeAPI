@@ -1,6 +1,7 @@
 using ExchangeApi.Adapters.Cli.Binding;
 using ExchangeApi.Adapters.Cli.Configuration;
 using ExchangeApi.Adapters.Cli.Infrastructure;
+using ExchangeApi.Adapters.Cli.Wizard;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 
@@ -26,6 +27,20 @@ public static class GetTickerCommand
                 "exchangeapi bitflyer native public get-ticker --request-template",
             ],
             IsWrite = false,
+            Wizard = new WizardDefinition
+            {
+                Summary = "Collects a product code and prints an equivalent canonical request-json command.",
+                Fields =
+                [
+                    new WizardField
+                    {
+                        OptionName = "product-code",
+                        Prompt = "product_code",
+                        Required = false,
+                        Hint = "leave blank to omit",
+                    },
+                ],
+            },
             BindRequestAsync = BindRequestAsync,
             DescribeRequest = static request =>
             {

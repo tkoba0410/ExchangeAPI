@@ -124,6 +124,111 @@ public sealed class CliApplicationTests
         Assert.Contains("fake native public echo: success", console.StdErr);
     }
 
+    [Fact]
+    public async Task WizardRootHelp_PrintsSupportedCommands()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(["wizard"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Contains("exchangeapi wizard <venue> <surface> <scope> <command>", console.StdOut);
+        Assert.Contains("bitflyer native public get-ticker", console.StdOut);
+    }
+
+    [Fact]
+    public async Task WizardGetTicker_PrintsCanonicalRequestJsonCommand()
+    {
+        var console = new FakeConsole();
+        console.EnqueueInputLine("BTC_JPY");
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(["wizard", "bitflyer", "native", "public", "get-ticker"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal(
+            """exchangeapi bitflyer native public get-ticker --request-json '{"product_code":"BTC_JPY"}'""" + Environment.NewLine,
+            console.StdOut);
+        Assert.Contains("Wizard: bitflyer native public get-ticker", console.StdErr);
+    }
+
+    [Fact]
+    public async Task WizardCancelAllChildOrders_PrintsSafetyNote()
+    {
+        var console = new FakeConsole();
+        console.EnqueueInputLine("BTC_JPY");
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(["wizard", "bitflyer", "native", "private", "cancel-all-child-orders"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal(
+            """exchangeapi bitflyer native private cancel-all-child-orders --request-json '{"product_code":"BTC_JPY"}'""" + Environment.NewLine,
+            console.StdOut);
+        Assert.Contains("write command note", console.StdErr);
+    }
+
+    [Fact]
+    public async Task ShellHelp_PrintsSupportedBuiltIns()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(["shell", "--help"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Contains("exchangeapi shell", console.StdErr);
+        Assert.Contains("use venue <value>", console.StdErr);
+        Assert.Contains("run <command> [options]", console.StdErr);
+    }
+
+    [Fact]
+    public async Task ShellRunWithDefaults_DelegatesToCanonicalCommand()
+    {
+        var console = new FakeConsole();
+        console.EnqueueInputLine("use venue fake");
+        console.EnqueueInputLine("use surface native");
+        console.EnqueueInputLine("use scope public");
+        console.EnqueueInputLine("show");
+        console.EnqueueInputLine("run echo --summary --pretty");
+        console.EnqueueInputLine("quit");
+
+        var app = new CliApplication(
+            commands:
+            [
+                new CommandDescriptor
+                {
+                    Path = new CommandPath("fake", "native", "public", "echo"),
+                    EndpointId = "Echo",
+                    Summary = "fake command",
+                    AuthenticationRequirement = "none",
+                    CanonicalJsonExample = "exchangeapi fake native public echo",
+                    TemplateJson = "{}",
+                    ConvenienceFlags = [],
+                    UsageExamples = ["exchangeapi fake native public echo --summary"],
+                    IsWrite = false,
+                    BindRequestAsync = static (_, _, _) => Task.FromResult(RequestBindingResult.Success(new object())),
+                    DescribeRequest = static _ => "none",
+                    ExecuteAsync = static (_, _, _, _) => Task.FromResult(
+                        ExecutionOutcome.Success(
+                            "fake native public echo: success",
+                            new EchoResponse { Message = "ok" })),
+                },
+            ],
+            console: console,
+            environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(["shell"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Contains("Shell helper started.", console.StdErr);
+        Assert.Contains("venue=fake surface=native scope=public", console.StdErr);
+        Assert.Contains("shell executed: fake native public echo", console.StdErr);
+        Assert.Contains("fake native public echo: success", console.StdErr);
+        Assert.Contains("\"Message\": \"ok\"", console.StdOut);
+    }
+
     private sealed class EchoResponse
     {
         public required string Message { get; init; }

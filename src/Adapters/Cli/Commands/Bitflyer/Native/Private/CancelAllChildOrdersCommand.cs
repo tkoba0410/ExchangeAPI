@@ -1,6 +1,7 @@
 using ExchangeApi.Adapters.Cli.Binding;
 using ExchangeApi.Adapters.Cli.Configuration;
 using ExchangeApi.Adapters.Cli.Infrastructure;
+using ExchangeApi.Adapters.Cli.Wizard;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelAllChildOrders;
 
@@ -26,6 +27,20 @@ public static class CancelAllChildOrdersCommand
                 "exchangeapi bitflyer native private cancel-all-child-orders --request-template",
             ],
             IsWrite = true,
+            Wizard = new WizardDefinition
+            {
+                Summary = "Collects product_code and prints an equivalent canonical request-json command.",
+                Fields =
+                [
+                    new WizardField
+                    {
+                        OptionName = "product-code",
+                        Prompt = "product_code",
+                        Required = true,
+                    },
+                ],
+                CompletionNote = "write command note: copied command will still require interactive confirmation unless you append --yes",
+            },
             BindRequestAsync = BindRequestAsync,
             DescribeRequest = static request =>
             {

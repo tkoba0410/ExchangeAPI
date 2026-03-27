@@ -1,5 +1,9 @@
 <Solution>
   <Folder Name="/src/" />
+  <Folder Name="/src/Adapters/" />
+  <Folder Name="/src/Adapters/Cli/">
+    <Project Path="src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj" />
+  </Folder>
   <Folder Name="/src/Exchanges/" />
   <Folder Name="/src/Exchanges/Binance/" />
   <Folder Name="/src/Exchanges/Binance/Composition/">
@@ -31,6 +35,10 @@
     <Project Path="src/Primitives/ExchangeApi.Primitives.csproj" />
   </Folder>
   <Folder Name="/tests/" />
+  <Folder Name="/tests/Adapters/" />
+  <Folder Name="/tests/Adapters/Cli.Tests/">
+    <Project Path="tests/Adapters/Cli.Tests/ExchangeApi.Adapters.Cli.Tests.csproj" />
+  </Folder>
   <Folder Name="/tests/Primitives.Tests/">
     <Project Path="tests/Primitives.Tests/ExchangeApi.Primitives.Tests.csproj" />
   </Folder>

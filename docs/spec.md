@@ -238,6 +238,13 @@ Stage10 では実装対象外とする。
 - CLI の正本は [`docs/cli.md`](./cli.md) に置く
 - MCP Server の正本は [`docs/mcp-server.md`](./mcp-server.md) に置く
 
+推奨物理配置:
+
+- external adapter project は `src/Adapters/<AdapterName>/` 配下に置く
+- external adapter test project は `tests/Adapters/<AdapterName>.Tests/` 配下に置く
+- external adapter は複数 venue を束ねる上位 adapter であるため、`src/Exchanges/<Venue>/` 配下に置いてはならない
+- Stage11 の初期 adapter 名は `Cli` と `McpServer` とする
+
 ### 3.5 依存規約
 
 依存方向の正本は以下とする。

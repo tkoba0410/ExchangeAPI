@@ -48,6 +48,48 @@ CLI -> Composition -> Native | Protocol
 - `native` と `protocol` は明示選択であり、CLI が暗黙に切り替えてはならない
 - `Unified` は未実装のため、現行 CLI 仕様には含めない
 
+### 3.1 物理配置
+
+- CLI project は `src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj` に置く
+- CLI test project は `tests/Adapters/Cli.Tests/ExchangeApi.Adapters.Cli.Tests.csproj` に置く
+- CLI は external adapter であり、`src/Exchanges/<Venue>/` 配下に置いてはならない
+- CLI の direct project reference は venue ごとの `Composition` project に限定する
+  - `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
+  - `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
+- CLI から `Native` / `Protocol` / `Vocabulary` project を直接参照してはならない
+
+推奨フォルダ構成:
+
+```text
+src/Adapters/Cli/
+  ExchangeApi.Adapters.Cli.csproj
+  Program.cs
+  Commands/
+    Bitflyer/
+      Native/
+        Public/
+        Private/
+      Protocol/
+        Public/
+        Private/
+    Binance/
+      Native/
+        Public/
+      Protocol/
+        Public/
+  Binding/
+  Configuration/
+  Formatting/
+  Help/
+  Safety/
+  Infrastructure/
+```
+
+補足:
+
+- `Commands/` は command tree の物理写像として扱う
+- venue 横断で重複が固まるまでは、追加の common project を先行導入しない
+
 ## 4. コマンドモデル
 
 ### 4.1 基本形

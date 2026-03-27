@@ -29,6 +29,9 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - venue ごとの entry point には `Composition` project を参照する
   - bitFlyer: `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
   - Binance: `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
+- Stage11 adapter の推奨配置は `src/Adapters/` 配下とする
+  - CLI: `src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj`
+  - MCP Server: `src/Adapters/McpServer/ExchangeApi.Adapters.McpServer.csproj`
 
 ## Local NuGet Feed
 

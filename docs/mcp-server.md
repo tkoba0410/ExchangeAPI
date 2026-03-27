@@ -33,6 +33,40 @@ MCP Server は以下を所有しない。
 - venue 固有機能は `native.<venue>.*` としてそのまま tool に出してよい
 - MCP Server は concrete endpoint / runtime / signer / transport を直接配線しない
 
+### 3.1 物理配置
+
+- MCP Server project は `src/Adapters/McpServer/ExchangeApi.Adapters.McpServer.csproj` に置く
+- MCP Server test project は `tests/Adapters/McpServer.Tests/ExchangeApi.Adapters.McpServer.Tests.csproj` に置く
+- MCP Server は external adapter であり、`src/Exchanges/<Venue>/` 配下に置いてはならない
+- MCP Server の direct project reference は venue ごとの `Composition` project に限定する
+  - `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
+  - `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
+- MCP Server から `Native` / `Protocol` / `Vocabulary` project を直接参照してはならない
+
+推奨フォルダ構成:
+
+```text
+src/Adapters/McpServer/
+  ExchangeApi.Adapters.McpServer.csproj
+  Program.cs
+  Tools/
+    Native/
+      Bitflyer/
+      Binance/
+    Protocol/
+      Bitflyer/
+      Binance/
+  Schema/
+  Permissions/
+  Observability/
+  Infrastructure/
+```
+
+補足:
+
+- `Tools/Native/<Venue>/` と `Tools/Protocol/<Venue>/` は tool surface の物理写像として扱う
+- venue 横断で重複が固まるまでは、追加の common project を先行導入しない
+
 ## 4. 公開面
 
 - MCP Server は library surface を tool surface に写像する adapter である

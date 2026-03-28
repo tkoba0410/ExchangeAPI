@@ -1,6 +1,13 @@
 using System.Text.Json;
+using System.Text;
 using ExchangeApi.Adapters.Cli.Commands;
 using ExchangeApi.Adapters.Cli.Infrastructure;
+using ExchangeApi.Exchanges.Binance.Native.Public.Api;
+using ExchangeApi.Exchanges.Binance.Protocol.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Api;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Api;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
 
@@ -61,6 +68,104 @@ public sealed class CliApplicationTests
 
         Assert.Equal(CliExitCode.Success, exitCode);
         Assert.Equal("""{}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetTradingCommissionTemplate_PrintsCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "get-trading-commission", "--request-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"product_code":""}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetBalanceHistoryTemplate_PrintsCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "get-balance-history", "--request-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"currency_code":null,"count":null,"before":null,"after":null}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetParentOrderTemplate_PrintsCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "get-parent-order", "--request-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"parent_order_id":null,"parent_order_acceptance_id":null}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task SendParentOrderTemplate_PrintsCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "send-parent-order", "--request-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"order_method":"SIMPLE","minute_to_expire":null,"time_in_force":null,"parameters":[{"product_code":"","condition_type":"","side":"","price":null,"size":0,"trigger_price":null,"offset":null}]}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetExecutionsPrivateProtocolTemplate_PrintsCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "private", "get-executions-private", "--query-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"product_code":null,"count":null,"before":null,"after":null,"child_order_id":null,"child_order_acceptance_id":null}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetParentOrderProtocolTemplate_PrintsCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "private", "get-parent-order", "--query-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"parent_order_id":null,"parent_order_acceptance_id":null}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetFundingRateProtocolTemplate_PrintsCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "public", "get-funding-rate", "--query-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"product_code":null}""", console.StdOut);
         Assert.Equal(string.Empty, console.StdErr);
     }
 
@@ -149,6 +254,20 @@ public sealed class CliApplicationTests
     }
 
     [Fact]
+    public async Task GetPositionsWithoutProductCode_FailsInputValidation()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "get-positions"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("invalid field: product_code", console.StdErr);
+    }
+
+    [Fact]
     public async Task GetExecutionsPublicRejectsInvalidCountValue()
     {
         var console = new FakeConsole();
@@ -160,6 +279,104 @@ public sealed class CliApplicationTests
         Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
         Assert.Contains("invalid argument", console.StdErr);
         Assert.Contains("invalid field: count", console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetExecutionsPrivateRejectsInvalidCountValue()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "get-executions-private", "--product-code", "BTC_JPY", "--count", "abc"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("invalid field: count", console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetWithdrawalsRejectsInvalidBeforeValue()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "get-withdrawals", "--before", "abc"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("invalid field: before", console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetCoinInsRejectsInvalidCountValue()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "get-coin-ins", "--count", "abc"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("invalid field: count", console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetParentOrderRequiresExactlyOneIdentifier()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "get-parent-order"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("exactly one of parent_order_id or parent_order_acceptance_id must be specified", console.StdErr);
+    }
+
+    [Fact]
+    public async Task CancelChildOrderRequiresExactlyOneIdentifier()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "cancel-child-order", "--product-code", "BTC_JPY"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("exactly one of child_order_id or child_order_acceptance_id must be specified", console.StdErr);
+    }
+
+    [Fact]
+    public async Task WithdrawRejectsInvalidBankAccountId()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "withdraw", "--currency-code", "JPY", "--bank-account-id", "abc", "--amount", "1000", "--code", "123456"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("invalid field: bank_account_id", console.StdErr);
+    }
+
+    [Fact]
+    public async Task SendParentOrderRequiresJsonInputInCurrentPhase()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "send-parent-order"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("send-parent-order requires --request-json or --request-file in the current phase", console.StdErr);
     }
 
     [Fact]
@@ -240,6 +457,22 @@ public sealed class CliApplicationTests
     }
 
     [Fact]
+    public async Task BitflyerPrivateProtocolHelp_PrintsQueryFieldSchema()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "private", "get-child-orders", "--help"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Contains("Query fields:", console.StdOut);
+        Assert.Contains("product_code <string> optional", console.StdOut);
+        Assert.Contains("child_order_state <string> optional", console.StdOut);
+        Assert.Contains("parent_order_id <string> optional", console.StdOut);
+    }
+
+    [Fact]
     public async Task RejectsMixedCanonicalJsonAndConvenienceFlags()
     {
         var console = new FakeConsole();
@@ -291,6 +524,34 @@ public sealed class CliApplicationTests
         Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
         Assert.Contains("missing credential", console.StdErr);
         Assert.Contains("BITFLYER_API_KEY", console.StdErr);
+    }
+
+    [Fact]
+    public async Task PrivateProtocolCommand_RequiresCredentials()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "private", "get-permissions", "--query-json", "{}"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("missing credential", console.StdErr);
+        Assert.Contains("BITFLYER_API_KEY", console.StdErr);
+    }
+
+    [Fact]
+    public async Task ParentOrderProtocolRequiresExactlyOneIdentifier()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "private", "get-parent-order", "--query-json", "{}"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("exactly one of parent_order_id or parent_order_acceptance_id must be specified", console.StdErr);
     }
 
     [Fact]
@@ -357,12 +618,29 @@ public sealed class CliApplicationTests
                 "binance native public get-klines",
                 "binance protocol public get-klines",
                 "bitflyer native private cancel-all-child-orders",
+                "bitflyer native private cancel-child-order",
+                "bitflyer native private cancel-parent-order",
                 "bitflyer native private get-addresses",
                 "bitflyer native private get-balance",
+                "bitflyer native private get-balance-history",
                 "bitflyer native private get-bank-accounts",
+                "bitflyer native private get-child-orders",
+                "bitflyer native private get-coin-ins",
+                "bitflyer native private get-coin-outs",
                 "bitflyer native private get-collateral",
                 "bitflyer native private get-collateral-accounts",
+                "bitflyer native private get-collateral-history",
+                "bitflyer native private get-deposits",
+                "bitflyer native private get-executions-private",
+                "bitflyer native private get-parent-order",
+                "bitflyer native private get-parent-orders",
                 "bitflyer native private get-permissions",
+                "bitflyer native private get-positions",
+                "bitflyer native private get-trading-commission",
+                "bitflyer native private get-withdrawals",
+                "bitflyer native private send-child-order",
+                "bitflyer native private send-parent-order",
+                "bitflyer native private withdraw",
                 "bitflyer native public get-board",
                 "bitflyer native public get-board-state",
                 "bitflyer native public get-chats",
@@ -372,7 +650,31 @@ public sealed class CliApplicationTests
                 "bitflyer native public get-health",
                 "bitflyer native public get-markets",
                 "bitflyer native public get-ticker",
+                "bitflyer protocol private get-addresses",
+                "bitflyer protocol private get-balance",
+                "bitflyer protocol private get-balance-history",
+                "bitflyer protocol private get-bank-accounts",
+                "bitflyer protocol private get-child-orders",
+                "bitflyer protocol private get-coin-ins",
+                "bitflyer protocol private get-coin-outs",
+                "bitflyer protocol private get-collateral",
+                "bitflyer protocol private get-collateral-accounts",
+                "bitflyer protocol private get-collateral-history",
+                "bitflyer protocol private get-deposits",
+                "bitflyer protocol private get-executions-private",
+                "bitflyer protocol private get-parent-order",
+                "bitflyer protocol private get-parent-orders",
+                "bitflyer protocol private get-permissions",
+                "bitflyer protocol private get-positions",
+                "bitflyer protocol private get-trading-commission",
+                "bitflyer protocol private get-withdrawals",
+                "bitflyer protocol public get-board",
+                "bitflyer protocol public get-board-state",
+                "bitflyer protocol public get-chats",
+                "bitflyer protocol public get-corporate-leverage",
                 "bitflyer protocol public get-executions-public",
+                "bitflyer protocol public get-funding-rate",
+                "bitflyer protocol public get-health",
                 "bitflyer protocol public get-markets",
                 "bitflyer protocol public get-ticker",
             ],
@@ -394,6 +696,7 @@ public sealed class CliApplicationTests
                 ("binance", "protocol", "public"),
                 ("bitflyer", "native", "private"),
                 ("bitflyer", "native", "public"),
+                ("bitflyer", "protocol", "private"),
                 ("bitflyer", "protocol", "public"),
             ],
             grouped.Keys.OrderBy(static x => x, Comparer<(string, string, string)>.Default).ToArray());
@@ -413,12 +716,29 @@ public sealed class CliApplicationTests
         Assert.Equal(
             [
                 "cancel-all-child-orders",
+                "cancel-child-order",
+                "cancel-parent-order",
                 "get-addresses",
                 "get-balance",
+                "get-balance-history",
                 "get-bank-accounts",
+                "get-child-orders",
+                "get-coin-ins",
+                "get-coin-outs",
                 "get-collateral",
                 "get-collateral-accounts",
+                "get-collateral-history",
+                "get-deposits",
+                "get-executions-private",
+                "get-parent-order",
+                "get-parent-orders",
                 "get-permissions",
+                "get-positions",
+                "get-trading-commission",
+                "get-withdrawals",
+                "send-child-order",
+                "send-parent-order",
+                "withdraw",
             ],
             grouped[("bitflyer", "native", "private")]);
 
@@ -438,7 +758,36 @@ public sealed class CliApplicationTests
 
         Assert.Equal(
             [
+                "get-addresses",
+                "get-balance",
+                "get-balance-history",
+                "get-bank-accounts",
+                "get-child-orders",
+                "get-coin-ins",
+                "get-coin-outs",
+                "get-collateral",
+                "get-collateral-accounts",
+                "get-collateral-history",
+                "get-deposits",
+                "get-executions-private",
+                "get-parent-order",
+                "get-parent-orders",
+                "get-permissions",
+                "get-positions",
+                "get-trading-commission",
+                "get-withdrawals",
+            ],
+            grouped[("bitflyer", "protocol", "private")]);
+
+        Assert.Equal(
+            [
+                "get-board",
+                "get-board-state",
+                "get-chats",
+                "get-corporate-leverage",
                 "get-executions-public",
+                "get-funding-rate",
+                "get-health",
                 "get-markets",
                 "get-ticker",
             ],
@@ -461,6 +810,61 @@ public sealed class CliApplicationTests
                 "bitflyer native public get-ticker",
             ],
             wizardIdentities);
+    }
+
+    [Fact]
+    public void BitflyerNativePublic_CommandCoverage_MatchesInterfaceSurface()
+    {
+        AssertInterfaceMethodsCovered<IBitflyerPublicNativeApi>(
+            "bitflyer",
+            "native",
+            "public");
+    }
+
+    [Fact]
+    public void BitflyerNativePrivate_CommandCoverage_MatchesInterfaceSurface()
+    {
+        AssertInterfaceMethodsCovered<IBitflyerPrivateNativeApi>(
+            "bitflyer",
+            "native",
+            "private");
+    }
+
+    [Fact]
+    public void BitflyerProtocolPublic_CommandCoverage_MatchesInterfaceSurface()
+    {
+        AssertInterfaceMethodsCovered<IBitflyerPublicProtocolApi>(
+            "bitflyer",
+            "protocol",
+            "public");
+    }
+
+    [Fact]
+    public void BitflyerProtocolPrivate_CommandCoverage_MatchesCurrentPhaseReadSurface()
+    {
+        AssertInterfaceMethodsCovered<IBitflyerPrivateProtocolApi>(
+            "bitflyer",
+            "protocol",
+            "private",
+            static method => method.GetParameters().All(static p => !string.Equals(p.Name, "bodyJson", StringComparison.Ordinal)));
+    }
+
+    [Fact]
+    public void BinanceNativePublic_CommandCoverage_MatchesInterfaceSurface()
+    {
+        AssertInterfaceMethodsCovered<IBinancePublicNativeApi>(
+            "binance",
+            "native",
+            "public");
+    }
+
+    [Fact]
+    public void BinanceProtocolPublic_CommandCoverage_MatchesInterfaceSurface()
+    {
+        AssertInterfaceMethodsCovered<IBinancePublicProtocolApi>(
+            "binance",
+            "protocol",
+            "public");
     }
 
     [Fact]
@@ -714,5 +1118,65 @@ public sealed class CliApplicationTests
     private sealed class EchoResponse
     {
         public required string Message { get; init; }
+    }
+
+    private static void AssertInterfaceMethodsCovered<TInterface>(
+        string venue,
+        string surface,
+        string scope,
+        Func<System.Reflection.MethodInfo, bool>? include = null)
+    {
+        include ??= static _ => true;
+
+        var expected = typeof(TInterface)
+            .GetMethods()
+            .Where(include)
+            .Select(method => ToCommandName(method.Name, scope))
+            .OrderBy(static x => x, StringComparer.Ordinal)
+            .ToArray();
+
+        var actual = CommandCatalog.All
+            .Where(x =>
+                string.Equals(x.Path.Venue, venue, StringComparison.Ordinal) &&
+                string.Equals(x.Path.Surface, surface, StringComparison.Ordinal) &&
+                string.Equals(x.Path.Scope, scope, StringComparison.Ordinal))
+            .Select(static x => x.Path.Command)
+            .OrderBy(static x => x, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(expected, actual);
+    }
+
+    private static string ToCommandName(string methodName, string scope)
+    {
+        var stem = methodName.EndsWith("CallAsync", StringComparison.Ordinal)
+            ? methodName[..^"CallAsync".Length]
+            : methodName;
+
+        if (string.Equals(stem, "GetExecutions", StringComparison.Ordinal))
+        {
+            return string.Equals(scope, "public", StringComparison.Ordinal)
+                ? "get-executions-public"
+                : "get-executions-private";
+        }
+
+        return ToKebabCase(stem);
+    }
+
+    private static string ToKebabCase(string text)
+    {
+        var builder = new StringBuilder(text.Length + 8);
+        for (var index = 0; index < text.Length; index++)
+        {
+            var character = text[index];
+            if (char.IsUpper(character) && index > 0)
+            {
+                builder.Append('-');
+            }
+
+            builder.Append(char.ToLowerInvariant(character));
+        }
+
+        return builder.ToString();
     }
 }

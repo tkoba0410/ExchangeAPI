@@ -159,18 +159,22 @@ else
 現在の slice は概ね次の範囲:
 
 - bitFlyer `native public`
-  - market / board / board-state / chats / corporate-leverage / executions / funding-rate / health / ticker の read
+  - current library の public native read surface をすべて expose
 - bitFlyer `native private`
-  - permissions / addresses / balance / bank-accounts / collateral / collateral-accounts の read
-  - `cancel-all-child-orders` の write
+  - current library の private native surface をすべて expose
 - bitFlyer `protocol public`
-  - query-only の `get-markets`
-  - query-only の `get-ticker`
-  - query-only の `get-executions-public`
+  - current phase では query-only
+  - current library の public protocol read surface をすべて expose
+- bitFlyer `protocol private`
+  - current phase では query-only
+  - current library の private protocol read surface をすべて expose
 - Binance `native public`
-  - `get-klines`
+  - current library の public native surface をすべて expose
 - Binance `protocol public`
-  - query-only の `get-klines`
+  - current library の public protocol surface をすべて expose
+
+current phase の parity は CLI test で固定しており、library API interface との差分を監視します。  
+例外は `protocol` の `bodyJson` 系 method で、これは current phase 非スコープです。
 
 `dotnet` を使って試す場合は build:
 

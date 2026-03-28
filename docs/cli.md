@@ -189,18 +189,19 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - current slice の具体的な command identity は runtime registry と test で固定する
 - 現在の slice は次の範囲に限定する
   - bitFlyer `native public`
-    - market / board / board-state / chats / corporate-leverage / executions / funding-rate / health / ticker の read
+    - current library の public native read surface をすべて expose する
   - bitFlyer `native private`
-    - permissions / addresses / balance / bank-accounts / collateral / collateral-accounts の read
-    - `cancel-all-child-orders` の write
+    - current library の private native surface をすべて expose する
   - bitFlyer `protocol public`
-    - query-only の `get-markets`
-    - query-only の `get-ticker`
-    - query-only の `get-executions-public`
+    - current phase では query-only
+    - current library の public protocol read surface をすべて expose する
+  - bitFlyer `protocol private`
+    - current phase では query-only
+    - current library の private protocol read surface をすべて expose する
   - Binance `native public`
-    - `get-klines`
+    - current library の public native surface をすべて expose する
   - Binance `protocol public`
-    - query-only の `get-klines`
+    - current library の public protocol surface をすべて expose する
 - wizard は `get-ticker`、`get-klines`、`cancel-all-child-orders` にだけ対応する
 - shell は上記 registry に登録された command にだけ委譲できる
 - endpoint matrix は設計上の inventory 正本だが、現行 phase では CLI runtime が matrix 全件を expose しているとはみなさない
@@ -212,6 +213,8 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - help、wizard、shell は current slice を独自に保持せず、runtime registry から導出しなければならない
 - 本仕様書と README は current slice の完全列挙を正本として再保持してはならない
 - README の command 例は参考情報であり、実行可能 inventory の判定には使ってはならない
+- current phase の current slice parity は library API interface に対する test で固定する
+  - ただし `protocol` の `bodyJson` 系 method は current phase 非スコープなので parity 対象から除外する
 - current slice を広げる場合は、文書上も次の 2 点を明示しなければならない
   - どの surface / scope / endpoint family が追加されたか
   - formal interface なのか helper tier なのか

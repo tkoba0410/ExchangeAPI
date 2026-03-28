@@ -194,13 +194,13 @@ exchangeapi <venue> <surface> <scope> <command> [options]
     - permissions / addresses / balance / bank-accounts / collateral / collateral-accounts の read
     - `cancel-all-child-orders` の write
   - bitFlyer `protocol public`
-    - `get-markets`
-    - `get-ticker`
-    - `get-executions-public`
+    - query-only の `get-markets`
+    - query-only の `get-ticker`
+    - query-only の `get-executions-public`
   - Binance `native public`
     - `get-klines`
   - Binance `protocol public`
-    - `get-klines`
+    - query-only の `get-klines`
 - wizard は `get-ticker`、`get-klines`、`cancel-all-child-orders` にだけ対応する
 - shell は上記 registry に登録された command にだけ委譲できる
 - endpoint matrix は設計上の inventory 正本だが、現行 phase では CLI runtime が matrix 全件を expose しているとはみなさない
@@ -235,16 +235,15 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 ### 5.2 `protocol`
 
 - `protocol` command は raw request を扱う
+- current phase の protocol current slice は query-only command に限定する
 - query-only endpoint は以下のいずれかで query object を受け取る
   - `--query-json <json>`
   - `--query-file <path>`
-- body を持つ endpoint は以下のいずれかで body text を受け取る
-  - `--body-json <json>`
-  - `--body-file <path>`
-- `--query-file -` と `--body-file -` は stdin を意味する
+- `--query-file -` は stdin を意味する
 - query object の key は exchange API の query parameter 名に合わせる
-- body は exchange へ送る JSON text をそのまま受け取る
+- current phase の query key と primitive kind は command descriptor metadata で固定し、CLI はその metadata に基づいて invalid field / invalid type を判定しなければならない
 - `protocol` command は native DTO decode や contract validation を行わない
+- body を持つ protocol endpoint と `--body-json` / `--body-file` / `--body-template` は Stage11 current phase の CLI 契約に含めない
 
 ### 5.3 人間向け入力補助
 
@@ -258,8 +257,8 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - CLI は以下の template 補助を持ってよい
   - `--request-template`
   - `--query-template`
-  - `--body-template`
 - template 補助は canonical な JSON 雛形を stdout に出し、facade call を行わず exit code `0` で終了する
+- `protocol` query command の template は command descriptor metadata から導出できる形にしてよい
 
 例:
 
@@ -340,6 +339,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - `--summary` は人間向け要約を stderr にのみ出してよい
 - `--summary` は stdout の JSON 出力契約を変えてはならない
 - `--summary` の最小内容は command identity と success / failure 判定とする
+- `protocol` command の success summary は current phase では `status=<code>` を含めなければならない
 - `--verbose` 指定時は `--summary` の詳細版として追加診断を stderr に出してよい
 
 ### 6.5 wizard と shell
@@ -378,7 +378,6 @@ CLI 固有:
 - `--yes`
 - `--request-template`
 - `--query-template`
-- `--body-template`
 
 bitFlyer 固有 option:
 
@@ -460,7 +459,11 @@ command-specific convenience flag:
   - `Response.BodyText` は raw string である
   - HTTP status 判定は `Response.StatusCode` を見る必要がある
   - non-success status だけでは exit code `3` にならない
-- help から `--request-template` / `--query-template` / `--body-template` の存在が分かるようにしなければならない
+- `protocol` query command の help は、command descriptor metadata に基づく query field 一覧を示してよい
+  - raw query key
+  - primitive kind
+  - required / optional
+- help から `--request-template` / `--query-template` の存在が分かるようにしなければならない
 
 ## 11. 現行非スコープ
 
@@ -474,6 +477,7 @@ command-specific convenience flag:
 - `production|sandbox` の抽象 `--env`
 - generic `dry-run`
 - generic idempotency key
+- protocol body command と `--body-json` / `--body-file` / `--body-template`
 - full-screen TUI
 
 ## 11.1 再導入条件

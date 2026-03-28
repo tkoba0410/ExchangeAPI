@@ -164,13 +164,13 @@ else
   - permissions / addresses / balance / bank-accounts / collateral / collateral-accounts の read
   - `cancel-all-child-orders` の write
 - bitFlyer `protocol public`
-  - `get-markets`
-  - `get-ticker`
-  - `get-executions-public`
+  - query-only の `get-markets`
+  - query-only の `get-ticker`
+  - query-only の `get-executions-public`
 - Binance `native public`
   - `get-klines`
 - Binance `protocol public`
-  - `get-klines`
+  - query-only の `get-klines`
 
 `dotnet` を使って試す場合は build:
 

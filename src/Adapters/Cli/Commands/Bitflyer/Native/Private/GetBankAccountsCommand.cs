@@ -16,9 +16,8 @@ public static class GetBankAccountsCommand
             EndpointId = "GetBankAccounts",
             Summary = "bitFlyer native private bank accounts",
             AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
-            InputMode = CommandInputMode.NativeRequest,
+            InputContract = CommandInputContract.NativeRequest("""{}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-bank-accounts --request-json '{}'""",
-            TemplateJson = """{}""",
             CommandOptions = [],
             UsageExamples =
             [

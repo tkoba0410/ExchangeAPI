@@ -73,8 +73,9 @@ public sealed class ExecutionOutcome
     {
         if (call.IsSuccess && call.Response is not null)
         {
+            var summary = $"{path.Identity}: success (status={call.Response.StatusCode})";
             return Success(
-                $"{path.Identity}: success",
+                summary,
                 new ProtocolCallEnvelope
                 {
                     Request = call.Request,

@@ -13,23 +13,6 @@ public static class CliOptionCatalog
         CliOptionSpec.Value("protocol-debug-log-dir", "path"),
     ];
 
-    private static readonly CliOptionSpec[] NativeInputOptions =
-    [
-        CliOptionSpec.Value("request-json", "json"),
-        CliOptionSpec.Value("request-file", "path"),
-        CliOptionSpec.Flag("request-template"),
-    ];
-
-    private static readonly CliOptionSpec[] ProtocolInputOptions =
-    [
-        CliOptionSpec.Value("query-json", "json"),
-        CliOptionSpec.Value("query-file", "path"),
-        CliOptionSpec.Value("body-json", "json"),
-        CliOptionSpec.Value("body-file", "path"),
-        CliOptionSpec.Flag("query-template"),
-        CliOptionSpec.Flag("body-template"),
-    ];
-
     private static readonly CliOptionSpec[] WriteSafetyOptions =
     [
         CliOptionSpec.Flag("yes"),
@@ -44,13 +27,12 @@ public static class CliOptionCatalog
     {
         var dictionary = new Dictionary<string, CliOptionSpec>(StringComparer.Ordinal);
         Add(dictionary, CommonOptions);
-        Add(dictionary, NativeInputOptions);
-        Add(dictionary, ProtocolInputOptions);
         Add(dictionary, WriteSafetyOptions);
         Add(dictionary, BitflyerSpecificOptions);
 
         foreach (var command in commands)
         {
+            Add(dictionary, command.InputContract.SupportedOptions);
             Add(dictionary, command.CommandOptions);
         }
 
@@ -62,7 +44,7 @@ public static class CliOptionCatalog
         var allowedNames = new HashSet<string>(StringComparer.Ordinal);
         Add(allowedNames, CommonOptions);
         Add(allowedNames, descriptor.CommandOptions);
-        Add(allowedNames, GetInputOptions(descriptor.InputMode));
+        Add(allowedNames, descriptor.InputContract.SupportedOptions);
 
         if (descriptor.IsWrite)
         {
@@ -85,21 +67,6 @@ public static class CliOptionCatalog
         }
 
         return null;
-    }
-
-    public static IReadOnlyList<CliOptionSpec> GetInputOptions(CommandInputMode inputMode)
-    {
-        return inputMode switch
-        {
-            CommandInputMode.NativeRequest => NativeInputOptions,
-            CommandInputMode.ProtocolQuery => ProtocolInputOptions
-                .Where(static option => option.Name is "query-json" or "query-file" or "query-template")
-                .ToArray(),
-            CommandInputMode.ProtocolBody => ProtocolInputOptions
-                .Where(static option => option.Name is "body-json" or "body-file" or "body-template")
-                .ToArray(),
-            _ => [],
-        };
     }
 
     private static void Add(IDictionary<string, CliOptionSpec> destination, IEnumerable<CliOptionSpec> source)

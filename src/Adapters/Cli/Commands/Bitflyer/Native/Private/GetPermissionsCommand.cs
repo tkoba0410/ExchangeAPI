@@ -16,9 +16,8 @@ public static class GetPermissionsCommand
             EndpointId = "GetPermissions",
             Summary = "bitFlyer native private permissions",
             AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
-            InputMode = CommandInputMode.NativeRequest,
+            InputContract = CommandInputContract.NativeRequest("""{}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-permissions --request-json '{}'""",
-            TemplateJson = """{}""",
             CommandOptions = [],
             UsageExamples =
             [

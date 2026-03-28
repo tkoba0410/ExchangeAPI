@@ -184,70 +184,18 @@ public sealed class CliApplication
 
     private static TemplateOutcome TryHandleTemplate(CommandDescriptor descriptor, InvocationOptions options)
     {
-        var requestTemplate = options.HasFlag("request-template");
-        var queryTemplate = options.HasFlag("query-template");
-        var bodyTemplate = options.HasFlag("body-template");
-        var count = (requestTemplate ? 1 : 0) + (queryTemplate ? 1 : 0) + (bodyTemplate ? 1 : 0);
-
-        if (count == 0)
+        if (!options.HasFlag(descriptor.InputContract.TemplateOptionName))
         {
             return TemplateOutcome.NotHandled();
         }
 
-        if (count > 1)
-        {
-            return TemplateOutcome.HandledWith(ExecutionOutcome.InputError("invalid argument", "template options cannot be combined"));
-        }
-
-        var requestedTemplateOption = requestTemplate
-            ? "request-template"
-            : queryTemplate
-                ? "query-template"
-                : "body-template";
-        var supportedTemplateOption = GetTemplateOptionName(descriptor.InputMode);
-        if (!string.Equals(requestedTemplateOption, supportedTemplateOption, StringComparison.Ordinal))
-        {
-            return TemplateOutcome.HandledWith(
-                ExecutionOutcome.InputError(
-                    "invalid argument",
-                    $"{descriptor.Path.Identity} only supports --{supportedTemplateOption}"));
-        }
-
-        var mixedInput = HasMixedInput(descriptor, options);
-        if (mixedInput)
+        if (descriptor.InputContract.HasCanonicalInput(options)
+            || descriptor.CommandOptions.Any(option => options.Contains(option.Name)))
         {
             return TemplateOutcome.HandledWith(ExecutionOutcome.InputError("invalid argument", "template option cannot be combined with canonical input"));
         }
 
-        return TemplateOutcome.HandledWithSuccess(descriptor.TemplateJson);
-    }
-
-    private static string GetTemplateOptionName(CommandInputMode inputMode)
-    {
-        return inputMode switch
-        {
-            CommandInputMode.NativeRequest => "request-template",
-            CommandInputMode.ProtocolQuery => "query-template",
-            CommandInputMode.ProtocolBody => "body-template",
-            _ => "request-template",
-        };
-    }
-
-    private static bool HasMixedInput(CommandDescriptor descriptor, InvocationOptions options)
-    {
-        return descriptor.InputMode switch
-        {
-            CommandInputMode.NativeRequest => options.Contains("request-json")
-                || options.Contains("request-file")
-                || descriptor.CommandOptions.Any(option => options.Contains(option.Name)),
-            CommandInputMode.ProtocolQuery => options.Contains("query-json")
-                || options.Contains("query-file")
-                || descriptor.CommandOptions.Any(option => options.Contains(option.Name)),
-            CommandInputMode.ProtocolBody => options.Contains("body-json")
-                || options.Contains("body-file")
-                || descriptor.CommandOptions.Any(option => options.Contains(option.Name)),
-            _ => false,
-        };
+        return TemplateOutcome.HandledWithSuccess(descriptor.InputContract.BuildTemplateJson());
     }
 
     private sealed class TemplateOutcome

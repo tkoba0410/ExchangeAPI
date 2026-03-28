@@ -7,17 +7,22 @@ namespace ExchangeApi.Adapters.Cli.Commands.Bitflyer.Protocol.Public;
 
 public static class GetTickerProtocolCommand
 {
+    private static readonly CommandPath Path = new("bitflyer", "protocol", "public", "get-ticker");
+    private static readonly ProtocolQuerySchema QuerySchema = new(
+    [
+        ProtocolQueryFieldSpec.String("product_code"),
+    ]);
+
     public static CommandDescriptor Create()
     {
         return new CommandDescriptor
         {
-            Path = new CommandPath("bitflyer", "protocol", "public", "get-ticker"),
+            Path = Path,
             EndpointId = "GetTicker",
             Summary = "bitFlyer protocol public ticker",
             AuthenticationRequirement = "none",
-            InputMode = CommandInputMode.ProtocolQuery,
+            InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = """exchangeapi bitflyer protocol public get-ticker --query-json '{"product_code":"BTC_JPY"}'""",
-            TemplateJson = """{"product_code":null}""",
             CommandOptions = [],
             UsageExamples =
             [
@@ -25,48 +30,11 @@ public static class GetTickerProtocolCommand
                 "exchangeapi bitflyer protocol public get-ticker --query-template",
             ],
             IsWrite = false,
-            BindRequestAsync = BindRequestAsync,
-            DescribeRequest = static request =>
-            {
-                var typed = (GetTickerProtocolCliRequest)request;
-                return typed.ProductCode is null ? "query.product_code=<omitted>" : $"query.product_code={typed.ProductCode}";
-            },
+            BindRequestAsync = static (options, console, cancellationToken) =>
+                ProtocolQueryBinder.BindAsync(options, console, QuerySchema, cancellationToken),
+            DescribeRequest = static request => ((ProtocolQueryValues)request).Describe(),
             ExecuteAsync = ExecuteAsync,
         };
-    }
-
-    private static async Task<RequestBindingResult> BindRequestAsync(
-        InvocationOptions options,
-        IConsole console,
-        CancellationToken cancellationToken)
-    {
-        var queryInput = await ProtocolQueryBinder.ReadQueryAsync(options, console, cancellationToken);
-        if (queryInput.Failure is not null)
-        {
-            return queryInput.Failure;
-        }
-
-        if (!queryInput.HasValue)
-        {
-            return RequestBindingResult.Success(new GetTickerProtocolCliRequest());
-        }
-
-        var failure = ProtocolQueryBinder.ValidateAllowedKeys(queryInput.Query!, "product_code");
-        if (failure is not null)
-        {
-            return failure;
-        }
-
-        failure = ProtocolQueryBinder.TryGetOptionalString(queryInput.Query!, "product_code", out var productCode);
-        if (failure is not null)
-        {
-            return failure;
-        }
-
-        return RequestBindingResult.Success(new GetTickerProtocolCliRequest
-        {
-            ProductCode = productCode,
-        });
     }
 
     private static async Task<ExecutionOutcome> ExecuteAsync(
@@ -81,15 +49,10 @@ public static class GetTickerProtocolCommand
             return created.Failure;
         }
 
-        var typed = (GetTickerProtocolCliRequest)request;
+        var typed = (ProtocolQueryValues)request;
 
         using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
-        var call = await bundle.Public.GetTickerCallAsync(typed.ProductCode, cancellationToken);
-        return ExecutionOutcome.FromProtocolCall(new CommandPath("bitflyer", "protocol", "public", "get-ticker"), call);
-    }
-
-    private sealed class GetTickerProtocolCliRequest
-    {
-        public string? ProductCode { get; init; }
+        var call = await bundle.Public.GetTickerCallAsync(typed.GetString("product_code"), cancellationToken);
+        return ExecutionOutcome.FromProtocolCall(Path, call);
     }
 }

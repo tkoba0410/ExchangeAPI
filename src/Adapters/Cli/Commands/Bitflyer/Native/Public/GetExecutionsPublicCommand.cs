@@ -16,9 +16,8 @@ public static class GetExecutionsPublicCommand
             EndpointId = "GetExecutionsPublic",
             Summary = "bitFlyer native public executions",
             AuthenticationRequirement = "none",
-            InputMode = CommandInputMode.NativeRequest,
+            InputContract = CommandInputContract.NativeRequest("""{"product_code":null,"count":null,"before":null,"after":null}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native public get-executions-public --request-json '{"product_code":"BTC_JPY","count":10,"before":null,"after":null}'""",
-            TemplateJson = """{"product_code":null,"count":null,"before":null,"after":null}""",
             CommandOptions =
             [
                 CliOptionSpec.Value("product-code"),

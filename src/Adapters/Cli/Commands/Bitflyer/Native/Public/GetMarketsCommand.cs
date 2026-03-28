@@ -16,9 +16,8 @@ public static class GetMarketsCommand
             EndpointId = "GetMarkets",
             Summary = "bitFlyer native public markets",
             AuthenticationRequirement = "none",
-            InputMode = CommandInputMode.NativeRequest,
+            InputContract = CommandInputContract.NativeRequest("""{}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native public get-markets --request-json '{}'""",
-            TemplateJson = """{}""",
             CommandOptions = [],
             UsageExamples =
             [

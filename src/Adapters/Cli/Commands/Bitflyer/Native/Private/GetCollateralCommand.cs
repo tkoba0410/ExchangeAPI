@@ -16,9 +16,8 @@ public static class GetCollateralCommand
             EndpointId = "GetCollateral",
             Summary = "bitFlyer native private collateral",
             AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
-            InputMode = CommandInputMode.NativeRequest,
+            InputContract = CommandInputContract.NativeRequest("""{}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-collateral --request-json '{}'""",
-            TemplateJson = """{}""",
             CommandOptions = [],
             UsageExamples =
             [

@@ -16,9 +16,8 @@ public static class GetChatsCommand
             EndpointId = "GetChats",
             Summary = "bitFlyer native public chats",
             AuthenticationRequirement = "none",
-            InputMode = CommandInputMode.NativeRequest,
+            InputContract = CommandInputContract.NativeRequest("""{"FromDate":null}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native public get-chats --request-json '{"FromDate":"2024-01-01T00:00:00Z"}'""",
-            TemplateJson = """{"FromDate":null}""",
             CommandOptions = [CliOptionSpec.Value("from-date")],
             UsageExamples =
             [

@@ -152,7 +152,7 @@ public static class HelpRenderer
 
         console.WriteOutLine(string.Empty);
         console.WriteOutLine("Template:");
-        console.WriteOutLine($"  --{GetTemplateOptionName(descriptor.InputMode)}");
+        console.WriteOutLine($"  --{descriptor.InputContract.TemplateOptionName}");
         console.WriteOutLine(string.Empty);
 
         if (string.Equals(path.Surface, "protocol", StringComparison.Ordinal))
@@ -163,6 +163,18 @@ public static class HelpRenderer
             console.WriteOutLine("  inspect HTTP status via Response.StatusCode");
             console.WriteOutLine("  non-success HTTP status alone does not cause exit code 3");
             console.WriteOutLine(string.Empty);
+
+            var helpFields = descriptor.InputContract.DescribeHelpFields();
+            if (helpFields.Count > 0)
+            {
+                console.WriteOutLine("Query fields:");
+                foreach (var field in helpFields)
+                {
+                    console.WriteOutLine($"  {field}");
+                }
+
+                console.WriteOutLine(string.Empty);
+            }
         }
 
         console.WriteOutLine("Examples:");
@@ -172,16 +184,5 @@ public static class HelpRenderer
         }
 
         return ExecutionOutcome.Success("help rendered", null);
-    }
-
-    private static string GetTemplateOptionName(CommandInputMode inputMode)
-    {
-        return inputMode switch
-        {
-            CommandInputMode.NativeRequest => "request-template",
-            CommandInputMode.ProtocolQuery => "query-template",
-            CommandInputMode.ProtocolBody => "body-template",
-            _ => "request-template",
-        };
     }
 }

@@ -17,9 +17,8 @@ public static class GetKlinesCommand
             EndpointId = "GetKlines",
             Summary = "Binance native public klines",
             AuthenticationRequirement = "none",
-            InputMode = CommandInputMode.NativeRequest,
+            InputContract = CommandInputContract.NativeRequest("""{"Symbol":"","Interval":"","StartTime":null,"EndTime":null,"TimeZone":null,"Limit":null}"""),
             CanonicalJsonExample = """exchangeapi binance native public get-klines --request-json '{"Symbol":"BTCJPY","Interval":"1h","Limit":2}'""",
-            TemplateJson = """{"Symbol":"","Interval":"","StartTime":null,"EndTime":null,"TimeZone":null,"Limit":null}""",
             CommandOptions =
             [
                 CliOptionSpec.Value("symbol"),

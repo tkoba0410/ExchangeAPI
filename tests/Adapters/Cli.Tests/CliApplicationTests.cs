@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ExchangeApi.Adapters.Cli.Commands;
 using ExchangeApi.Adapters.Cli.Infrastructure;
 using ExchangeApi.Primitives.Calls;
@@ -74,6 +75,20 @@ public sealed class CliApplicationTests
 
         Assert.Equal(CliExitCode.Success, exitCode);
         Assert.Equal("""{"product_code":null}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetExecutionsPublicProtocolTemplate_PrintsCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "public", "get-executions-public", "--query-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"product_code":null,"count":null,"before":null,"after":null}""", console.StdOut);
         Assert.Equal(string.Empty, console.StdErr);
     }
 
@@ -162,7 +177,7 @@ public sealed class CliApplicationTests
     }
 
     [Fact]
-    public async Task RejectsProtocolBodyOptionOnQueryCommand()
+    public async Task RejectsProtocolBodyOptionInCurrentPhase()
     {
         var console = new FakeConsole();
         var app = new CliApplication(console: console, environment: new FakeEnvironment());
@@ -172,7 +187,21 @@ public sealed class CliApplicationTests
 
         Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
         Assert.Contains("invalid option", console.StdErr);
-        Assert.Contains("unsupported option for bitflyer protocol public get-ticker: --body-json", console.StdErr);
+        Assert.Contains("unknown option: --body-json", console.StdErr);
+    }
+
+    [Fact]
+    public async Task BinanceProtocolKlines_RequiresSymbolAndInterval()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["binance", "protocol", "public", "get-klines", "--query-json", """{"interval":"1h"}"""]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid argument", console.StdErr);
+        Assert.Contains("invalid field: symbol", console.StdErr);
     }
 
     [Fact]
@@ -190,6 +219,24 @@ public sealed class CliApplicationTests
         Assert.Contains("Response.BodyText: raw string", console.StdOut);
         Assert.Contains("inspect HTTP status via Response.StatusCode", console.StdOut);
         Assert.Contains("non-success HTTP status alone does not cause exit code 3", console.StdOut);
+        Assert.Contains("Query fields:", console.StdOut);
+        Assert.Contains("product_code <string> optional", console.StdOut);
+    }
+
+    [Fact]
+    public async Task BinanceProtocolHelp_PrintsQueryFieldSchema()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["binance", "protocol", "public", "get-klines", "--help"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Contains("Query fields:", console.StdOut);
+        Assert.Contains("symbol <string> required", console.StdOut);
+        Assert.Contains("interval <string> required", console.StdOut);
+        Assert.Contains("limit <int> optional", console.StdOut);
     }
 
     [Fact]
@@ -259,9 +306,8 @@ public sealed class CliApplicationTests
                     EndpointId = "Echo",
                     Summary = "fake command",
                     AuthenticationRequirement = "none",
-                    InputMode = CommandInputMode.NativeRequest,
+                    InputContract = CommandInputContract.NativeRequest("{}"),
                     CanonicalJsonExample = "exchangeapi fake native public echo",
-                    TemplateJson = "{}",
                     CommandOptions = [],
                     UsageExamples = ["exchangeapi fake native public echo --summary"],
                     IsWrite = false,
@@ -454,10 +500,78 @@ public sealed class CliApplicationTests
             call);
 
         Assert.Equal(CliExitCode.Success, outcome.ExitCode);
+        Assert.Equal("bitflyer protocol public get-ticker: success (status=200)", outcome.Summary);
         var envelope = Assert.IsType<ProtocolCallEnvelope>(outcome.Response);
         Assert.Equal("/v1/getticker", envelope.Request.Path);
         Assert.Equal(200, envelope.Response.StatusCode);
         Assert.Equal("GetTicker", envelope.Meta.EndpointId);
+    }
+
+    [Fact]
+    public async Task InjectedProtocolCommand_SummaryIncludesStatusCode()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(
+            commands:
+            [
+                new CommandDescriptor
+                {
+                    Path = new CommandPath("fake", "protocol", "public", "echo"),
+                    EndpointId = "Echo",
+                    Summary = "fake protocol command",
+                    AuthenticationRequirement = "none",
+                    InputContract = CommandInputContract.ProtocolQuery(new ProtocolQuerySchema([])),
+                    CanonicalJsonExample = "exchangeapi fake protocol public echo --query-json '{}'",
+                    CommandOptions = [],
+                    UsageExamples = ["exchangeapi fake protocol public echo --summary"],
+                    IsWrite = false,
+                    BindRequestAsync = static (_, _, _) => Task.FromResult(
+                        RequestBindingResult.Success(
+                            new ProtocolQueryValues(
+                                new ProtocolQuerySchema([]),
+                                new Dictionary<string, JsonElement>(StringComparer.Ordinal),
+                                new Dictionary<string, object?>(StringComparer.Ordinal)))),
+                    DescribeRequest = static _ => "query=<none>",
+                    ExecuteAsync = static (_, _, _, _) => Task.FromResult(
+                        ExecutionOutcome.FromProtocolCall(
+                            new CommandPath("fake", "protocol", "public", "echo"),
+                            new Call<ProtocolRequest, ProtocolResponse>
+                            {
+                                Request = new ProtocolRequest
+                                {
+                                    EndpointId = "Echo",
+                                    Method = "GET",
+                                    Path = "/echo",
+                                    Query = new Dictionary<string, string>(),
+                                    BodyText = null,
+                                },
+                                Response = new ProtocolResponse
+                                {
+                                    StatusCode = 404,
+                                    Headers = new Dictionary<string, string[]>(),
+                                    BodyText = "{}",
+                                },
+                                IsSuccess = true,
+                                Error = null,
+                                Meta = new CallMeta
+                                {
+                                    Layer = CallLayers.Protocol,
+                                    Component = CallComponents.PublicEndpointModule,
+                                    EndpointId = "Echo",
+                                    Scope = "Public",
+                                    Auth = "None",
+                                    Children = null,
+                                },
+                            })),
+                },
+            ],
+            console: console,
+            environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(["fake", "protocol", "public", "echo", "--summary"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Contains("fake protocol public echo: success (status=404)", console.StdErr);
     }
 
     [Fact]
@@ -526,9 +640,8 @@ public sealed class CliApplicationTests
                     EndpointId = "Echo",
                     Summary = "fake command",
                     AuthenticationRequirement = "none",
-                    InputMode = CommandInputMode.NativeRequest,
+                    InputContract = CommandInputContract.NativeRequest("{}"),
                     CanonicalJsonExample = "exchangeapi fake native public echo",
-                    TemplateJson = "{}",
                     CommandOptions = [],
                     UsageExamples = ["exchangeapi fake native public echo --summary"],
                     IsWrite = false,
@@ -573,9 +686,8 @@ public sealed class CliApplicationTests
                     EndpointId = "Echo",
                     Summary = "fake command",
                     AuthenticationRequirement = "none",
-                    InputMode = CommandInputMode.NativeRequest,
+                    InputContract = CommandInputContract.NativeRequest("{}"),
                     CanonicalJsonExample = "exchangeapi fake native public echo",
-                    TemplateJson = "{}",
                     CommandOptions = [],
                     UsageExamples = ["exchangeapi fake native public echo --summary"],
                     IsWrite = false,

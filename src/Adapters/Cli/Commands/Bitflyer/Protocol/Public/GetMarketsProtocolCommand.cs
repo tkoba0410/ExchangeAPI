@@ -7,17 +7,19 @@ namespace ExchangeApi.Adapters.Cli.Commands.Bitflyer.Protocol.Public;
 
 public static class GetMarketsProtocolCommand
 {
+    private static readonly CommandPath Path = new("bitflyer", "protocol", "public", "get-markets");
+    private static readonly ProtocolQuerySchema QuerySchema = new([]);
+
     public static CommandDescriptor Create()
     {
         return new CommandDescriptor
         {
-            Path = new CommandPath("bitflyer", "protocol", "public", "get-markets"),
+            Path = Path,
             EndpointId = "GetMarkets",
             Summary = "bitFlyer protocol public markets",
             AuthenticationRequirement = "none",
-            InputMode = CommandInputMode.ProtocolQuery,
+            InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = """exchangeapi bitflyer protocol public get-markets --query-json '{}'""",
-            TemplateJson = """{}""",
             CommandOptions = [],
             UsageExamples =
             [
@@ -25,33 +27,11 @@ public static class GetMarketsProtocolCommand
                 "exchangeapi bitflyer protocol public get-markets --query-template",
             ],
             IsWrite = false,
-            BindRequestAsync = BindRequestAsync,
-            DescribeRequest = static _ => "query=<none>",
+            BindRequestAsync = static (options, console, cancellationToken) =>
+                ProtocolQueryBinder.BindAsync(options, console, QuerySchema, cancellationToken),
+            DescribeRequest = static request => ((ProtocolQueryValues)request).Describe(),
             ExecuteAsync = ExecuteAsync,
         };
-    }
-
-    private static async Task<RequestBindingResult> BindRequestAsync(
-        InvocationOptions options,
-        IConsole console,
-        CancellationToken cancellationToken)
-    {
-        var queryInput = await ProtocolQueryBinder.ReadQueryAsync(options, console, cancellationToken);
-        if (queryInput.Failure is not null)
-        {
-            return queryInput.Failure;
-        }
-
-        if (queryInput.HasValue)
-        {
-            var failure = ProtocolQueryBinder.ValidateAllowedKeys(queryInput.Query!);
-            if (failure is not null)
-            {
-                return failure;
-            }
-        }
-
-        return RequestBindingResult.Success(new GetMarketsProtocolCliRequest());
     }
 
     private static async Task<ExecutionOutcome> ExecuteAsync(
@@ -68,10 +48,6 @@ public static class GetMarketsProtocolCommand
 
         using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
         var call = await bundle.Public.GetMarketsCallAsync(cancellationToken);
-        return ExecutionOutcome.FromProtocolCall(new CommandPath("bitflyer", "protocol", "public", "get-markets"), call);
-    }
-
-    private sealed class GetMarketsProtocolCliRequest
-    {
+        return ExecutionOutcome.FromProtocolCall(Path, call);
     }
 }

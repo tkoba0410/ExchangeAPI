@@ -16,9 +16,8 @@ public static class GetCorporateLeverageCommand
             EndpointId = "GetCorporateLeverage",
             Summary = "bitFlyer native public corporate leverage",
             AuthenticationRequirement = "none",
-            InputMode = CommandInputMode.NativeRequest,
+            InputContract = CommandInputContract.NativeRequest("""{}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native public get-corporate-leverage --request-json '{}'""",
-            TemplateJson = """{}""",
             CommandOptions = [],
             UsageExamples =
             [

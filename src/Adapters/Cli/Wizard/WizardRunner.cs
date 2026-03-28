@@ -70,7 +70,6 @@ public static class WizardRunner
         {
             WizardCanonicalInputKind.RequestJson => "--request-json",
             WizardCanonicalInputKind.QueryJson => "--query-json",
-            WizardCanonicalInputKind.BodyJson => "--body-json",
             _ => "--request-json",
         };
 

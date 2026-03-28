@@ -4,7 +4,6 @@ public enum WizardCanonicalInputKind
 {
     RequestJson,
     QueryJson,
-    BodyJson,
 }
 
 public sealed class WizardDefinition

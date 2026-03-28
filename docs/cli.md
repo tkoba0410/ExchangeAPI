@@ -273,6 +273,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - wizard は canonical CLI と等価な request を生成しなければならない
 - wizard が command line を提示する場合、canonical input option を使ってよい
   - 例: `--request-json`
+  - current phase の wizard は `--request-json` または `--query-json` だけを生成してよく、`--body-json` を生成してはならない
 - wizard は convenience flag のみで安定して表現できる単純 command から導入する
 - 複雑 command、nested object、array、conditional omission が多い command は canonical CLI を優先し、wizard 導入を急がない
 

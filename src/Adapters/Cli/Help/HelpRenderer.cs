@@ -141,18 +141,18 @@ public static class HelpRenderer
         console.WriteOutLine($"Authentication: {descriptor.AuthenticationRequirement}");
         console.WriteOutLine($"Write safety: {(descriptor.IsWrite ? "--yes required or interactive confirmation" : "read-only")}");
         console.WriteOutLine(string.Empty);
-        console.WriteOutLine("Canonical JSON input example:");
+        console.WriteOutLine("Canonical input example:");
         console.WriteOutLine($"  {descriptor.CanonicalJsonExample}");
         console.WriteOutLine(string.Empty);
         console.WriteOutLine("Convenience flags:");
-        foreach (var flag in descriptor.ConvenienceFlags)
+        foreach (var flag in descriptor.CommandOptions.Select(static x => x.DisplayText))
         {
             console.WriteOutLine($"  {flag}");
         }
 
         console.WriteOutLine(string.Empty);
         console.WriteOutLine("Template:");
-        console.WriteOutLine("  --request-template");
+        console.WriteOutLine($"  --{GetTemplateOptionName(descriptor.InputMode)}");
         console.WriteOutLine(string.Empty);
         console.WriteOutLine("Examples:");
         foreach (var usageExample in descriptor.UsageExamples)
@@ -161,5 +161,16 @@ public static class HelpRenderer
         }
 
         return ExecutionOutcome.Success("help rendered", null);
+    }
+
+    private static string GetTemplateOptionName(CommandInputMode inputMode)
+    {
+        return inputMode switch
+        {
+            CommandInputMode.NativeRequest => "request-template",
+            CommandInputMode.ProtocolQuery => "query-template",
+            CommandInputMode.ProtocolBody => "body-template",
+            _ => "request-template",
+        };
     }
 }

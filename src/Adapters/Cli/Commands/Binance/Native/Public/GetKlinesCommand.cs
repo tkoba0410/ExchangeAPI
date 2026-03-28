@@ -17,16 +17,17 @@ public static class GetKlinesCommand
             EndpointId = "GetKlines",
             Summary = "Binance native public klines",
             AuthenticationRequirement = "none",
+            InputMode = CommandInputMode.NativeRequest,
             CanonicalJsonExample = """exchangeapi binance native public get-klines --request-json '{"Symbol":"BTCJPY","Interval":"1h","Limit":2}'""",
             TemplateJson = """{"Symbol":"","Interval":"","StartTime":null,"EndTime":null,"TimeZone":null,"Limit":null}""",
-            ConvenienceFlags =
+            CommandOptions =
             [
-                "--symbol <value>",
-                "--interval <value>",
-                "--limit <int>",
-                "--start-time <long>",
-                "--end-time <long>",
-                "--time-zone <value>",
+                CliOptionSpec.Value("symbol"),
+                CliOptionSpec.Value("interval"),
+                CliOptionSpec.Value("limit", "int"),
+                CliOptionSpec.Value("start-time", "long"),
+                CliOptionSpec.Value("end-time", "long"),
+                CliOptionSpec.Value("time-zone"),
             ],
             UsageExamples =
             [

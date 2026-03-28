@@ -16,9 +16,10 @@ public static class GetBoardStateCommand
             EndpointId = "GetBoardState",
             Summary = "bitFlyer native public board state",
             AuthenticationRequirement = "none",
+            InputMode = CommandInputMode.NativeRequest,
             CanonicalJsonExample = """exchangeapi bitflyer native public get-board-state --request-json '{"ProductCode":"BTC_JPY"}'""",
             TemplateJson = """{"ProductCode":null}""",
-            ConvenienceFlags = ["--product-code <value>"],
+            CommandOptions = [CliOptionSpec.Value("product-code")],
             UsageExamples =
             [
                 "exchangeapi bitflyer native public get-board-state --product-code BTC_JPY",

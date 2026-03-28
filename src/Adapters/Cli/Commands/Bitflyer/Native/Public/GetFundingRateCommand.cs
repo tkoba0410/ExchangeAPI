@@ -16,9 +16,10 @@ public static class GetFundingRateCommand
             EndpointId = "GetFundingRate",
             Summary = "bitFlyer native public funding rate",
             AuthenticationRequirement = "none",
+            InputMode = CommandInputMode.NativeRequest,
             CanonicalJsonExample = """exchangeapi bitflyer native public get-funding-rate --request-json '{"ProductCode":"FX_BTC_JPY"}'""",
             TemplateJson = """{"ProductCode":null}""",
-            ConvenienceFlags = ["--product-code <value>"],
+            CommandOptions = [CliOptionSpec.Value("product-code")],
             UsageExamples =
             [
                 "exchangeapi bitflyer native public get-funding-rate --product-code FX_BTC_JPY",

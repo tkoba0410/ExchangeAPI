@@ -17,9 +17,10 @@ public static class CancelAllChildOrdersCommand
             EndpointId = "CancelAllChildOrders",
             Summary = "bitFlyer native private cancel all child orders",
             AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            InputMode = CommandInputMode.NativeRequest,
             CanonicalJsonExample = """exchangeapi bitflyer native private cancel-all-child-orders --request-json '{"product_code":"BTC_JPY"}' --yes""",
             TemplateJson = """{"product_code":""}""",
-            ConvenienceFlags = ["--product-code <value>"],
+            CommandOptions = [CliOptionSpec.Value("product-code")],
             UsageExamples =
             [
                 "exchangeapi bitflyer native private cancel-all-child-orders --product-code BTC_JPY --yes",

@@ -152,8 +152,15 @@ else
 
 ### 3) CLI Adapter (`Stage11` 初期 slice)
 
-現時点の CLI 実装範囲は次の 11 command。
+現時点の CLI 実装範囲は次の 21 command。
 
+- `bitflyer native private get-addresses`
+- `bitflyer native private get-bank-accounts`
+- `bitflyer native private get-permissions`
+- `bitflyer native private get-balance`
+- `bitflyer native private get-collateral`
+- `bitflyer native private get-collateral-accounts`
+- `bitflyer native private cancel-all-child-orders`
 - `bitflyer native public get-markets`
 - `bitflyer native public get-board`
 - `bitflyer native public get-board-state`
@@ -163,8 +170,11 @@ else
 - `bitflyer native public get-funding-rate`
 - `bitflyer native public get-health`
 - `bitflyer native public get-ticker`
+- `bitflyer protocol public get-markets`
+- `bitflyer protocol public get-ticker`
+- `bitflyer protocol public get-executions-public`
 - `binance native public get-klines`
-- `bitflyer native private cancel-all-child-orders`
+- `binance protocol public get-klines`
 
 `dotnet` を使って試す場合は build:
 
@@ -224,6 +234,16 @@ dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
   --interval 1h \
   --limit 2 \
   --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer protocol public get-ticker \
+  --query-json '{"product_code":"BTC_JPY"}' \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  binance protocol public get-klines \
+  --query-json '{"symbol":"BTCJPY","interval":"1h","limit":2}' \
+  --summary --pretty
 ```
 
 bitFlyer private write は環境変数が必要:
@@ -231,6 +251,14 @@ bitFlyer private write は環境変数が必要:
 ```bash
 export BITFLYER_API_KEY=...
 export BITFLYER_API_SECRET=...
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native private get-permissions \
+  --summary --pretty
+
+dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
+  bitflyer native private get-balance \
+  --summary --pretty
 
 dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
   bitflyer native private cancel-all-child-orders \
@@ -244,6 +272,7 @@ dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
 - `cancel-all-child-orders` は write command なので、実行時は state を変更する
 - wizard は現時点では `get-ticker`、`get-klines`、`cancel-all-child-orders` にだけ対応する
 - shell は helper であり、registry に登録された上記 command set に委譲する
+- protocol CLI の stdout は `Request/Response/Meta` envelope を返す
 
 `dotnet` 不要の local publish を作る場合:
 

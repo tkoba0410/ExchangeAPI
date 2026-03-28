@@ -11,6 +11,7 @@ namespace ExchangeApi.Adapters.Cli.Infrastructure;
 public sealed class CliApplication
 {
     private readonly IReadOnlyList<CommandDescriptor> _commands;
+    private readonly IReadOnlyDictionary<string, CliOptionSpec> _allKnownOptions;
     private readonly IConsole _console;
     private readonly IEnvironment _environment;
 
@@ -20,6 +21,7 @@ public sealed class CliApplication
         IEnvironment? environment = null)
     {
         _commands = commands ?? CommandCatalog.All;
+        _allKnownOptions = CliOptionCatalog.BuildAllKnown(_commands);
         _console = console ?? new SystemConsole();
         _environment = environment ?? new ProcessEnvironment();
     }
@@ -69,7 +71,7 @@ public sealed class CliApplication
 
     private async Task<int> RunCanonicalAsync(IReadOnlyList<string> args, CancellationToken cancellationToken)
     {
-        var parseResult = InvocationParser.Parse(args.ToArray());
+        var parseResult = InvocationParser.Parse(args.ToArray(), _allKnownOptions);
         if (!parseResult.IsSuccess)
         {
             StderrWriter.WriteFailure(
@@ -108,6 +110,13 @@ public sealed class CliApplication
         }
 
         var options = parseResult.Options;
+        var optionValidationFailure = CliOptionCatalog.ValidateForCommand(descriptor, options);
+        if (optionValidationFailure is not null)
+        {
+            StderrWriter.WriteFailure(_console, optionValidationFailure, verbose: options.HasFlag("verbose"));
+            return optionValidationFailure.ExitCode;
+        }
+
         var templateOutcome = TryHandleTemplate(descriptor, options);
         if (templateOutcome.Handled)
         {
@@ -190,20 +199,55 @@ public sealed class CliApplication
             return TemplateOutcome.HandledWith(ExecutionOutcome.InputError("invalid argument", "template options cannot be combined"));
         }
 
-        if (!requestTemplate)
+        var requestedTemplateOption = requestTemplate
+            ? "request-template"
+            : queryTemplate
+                ? "query-template"
+                : "body-template";
+        var supportedTemplateOption = GetTemplateOptionName(descriptor.InputMode);
+        if (!string.Equals(requestedTemplateOption, supportedTemplateOption, StringComparison.Ordinal))
         {
-            return TemplateOutcome.HandledWith(ExecutionOutcome.InputError("invalid argument", "native commands only support --request-template"));
+            return TemplateOutcome.HandledWith(
+                ExecutionOutcome.InputError(
+                    "invalid argument",
+                    $"{descriptor.Path.Identity} only supports --{supportedTemplateOption}"));
         }
 
-        var mixedInput = options.Contains("request-json")
-            || options.Contains("request-file")
-            || descriptor.ConvenienceFlags.Any(flag => options.Contains(flag[2..].Split(' ', 2)[0]));
+        var mixedInput = HasMixedInput(descriptor, options);
         if (mixedInput)
         {
-            return TemplateOutcome.HandledWith(ExecutionOutcome.InputError("invalid argument", "template option cannot be combined with request input"));
+            return TemplateOutcome.HandledWith(ExecutionOutcome.InputError("invalid argument", "template option cannot be combined with canonical input"));
         }
 
         return TemplateOutcome.HandledWithSuccess(descriptor.TemplateJson);
+    }
+
+    private static string GetTemplateOptionName(CommandInputMode inputMode)
+    {
+        return inputMode switch
+        {
+            CommandInputMode.NativeRequest => "request-template",
+            CommandInputMode.ProtocolQuery => "query-template",
+            CommandInputMode.ProtocolBody => "body-template",
+            _ => "request-template",
+        };
+    }
+
+    private static bool HasMixedInput(CommandDescriptor descriptor, InvocationOptions options)
+    {
+        return descriptor.InputMode switch
+        {
+            CommandInputMode.NativeRequest => options.Contains("request-json")
+                || options.Contains("request-file")
+                || descriptor.CommandOptions.Any(option => options.Contains(option.Name)),
+            CommandInputMode.ProtocolQuery => options.Contains("query-json")
+                || options.Contains("query-file")
+                || descriptor.CommandOptions.Any(option => options.Contains(option.Name)),
+            CommandInputMode.ProtocolBody => options.Contains("body-json")
+                || options.Contains("body-file")
+                || descriptor.CommandOptions.Any(option => options.Contains(option.Name)),
+            _ => false,
+        };
     }
 
     private sealed class TemplateOutcome

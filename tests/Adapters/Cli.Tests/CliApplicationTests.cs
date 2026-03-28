@@ -1,5 +1,7 @@
 using ExchangeApi.Adapters.Cli.Commands;
 using ExchangeApi.Adapters.Cli.Infrastructure;
+using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Adapters.Cli.Tests;
 
@@ -44,6 +46,34 @@ public sealed class CliApplicationTests
 
         Assert.Equal(CliExitCode.Success, exitCode);
         Assert.Equal("""{}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetAddressesTemplate_PrintsEmptyCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "private", "get-addresses", "--request-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{}""", console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
+    }
+
+    [Fact]
+    public async Task GetTickerProtocolTemplate_PrintsCanonicalTemplate()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "public", "get-ticker", "--query-template"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Equal("""{"product_code":null}""", console.StdOut);
         Assert.Equal(string.Empty, console.StdErr);
     }
 
@@ -118,6 +148,34 @@ public sealed class CliApplicationTests
     }
 
     [Fact]
+    public async Task RejectsCommandInapplicableOption()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "native", "public", "get-board", "--count", "10"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid option", console.StdErr);
+        Assert.Contains("unsupported option for bitflyer native public get-board: --count", console.StdErr);
+    }
+
+    [Fact]
+    public async Task RejectsProtocolBodyOptionOnQueryCommand()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "public", "get-ticker", "--body-json", "{}"]);
+
+        Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
+        Assert.Contains("invalid option", console.StdErr);
+        Assert.Contains("unsupported option for bitflyer protocol public get-ticker: --body-json", console.StdErr);
+    }
+
+    [Fact]
     public async Task RejectsMixedCanonicalJsonAndConvenienceFlags()
     {
         var console = new FakeConsole();
@@ -184,9 +242,10 @@ public sealed class CliApplicationTests
                     EndpointId = "Echo",
                     Summary = "fake command",
                     AuthenticationRequirement = "none",
+                    InputMode = CommandInputMode.NativeRequest,
                     CanonicalJsonExample = "exchangeapi fake native public echo",
                     TemplateJson = "{}",
-                    ConvenienceFlags = [],
+                    CommandOptions = [],
                     UsageExamples = ["exchangeapi fake native public echo --summary"],
                     IsWrite = false,
                     BindRequestAsync = static (_, _, _) => Task.FromResult(RequestBindingResult.Success(new object())),
@@ -233,7 +292,14 @@ public sealed class CliApplicationTests
         Assert.Equal(
             [
                 "binance native public get-klines",
+                "binance protocol public get-klines",
                 "bitflyer native private cancel-all-child-orders",
+                "bitflyer native private get-addresses",
+                "bitflyer native private get-balance",
+                "bitflyer native private get-bank-accounts",
+                "bitflyer native private get-collateral",
+                "bitflyer native private get-collateral-accounts",
+                "bitflyer native private get-permissions",
                 "bitflyer native public get-board",
                 "bitflyer native public get-board-state",
                 "bitflyer native public get-chats",
@@ -243,8 +309,54 @@ public sealed class CliApplicationTests
                 "bitflyer native public get-health",
                 "bitflyer native public get-markets",
                 "bitflyer native public get-ticker",
+                "bitflyer protocol public get-executions-public",
+                "bitflyer protocol public get-markets",
+                "bitflyer protocol public get-ticker",
             ],
             identities);
+    }
+
+    [Fact]
+    public void ProtocolExecutionOutcome_WrapsRequestResponseAndMeta()
+    {
+        var call = new Call<ProtocolRequest, ProtocolResponse>
+        {
+            Request = new ProtocolRequest
+            {
+                EndpointId = "GetTicker",
+                Method = "GET",
+                Path = "/v1/getticker",
+                Query = new Dictionary<string, string> { ["product_code"] = "BTC_JPY" },
+                BodyText = null,
+            },
+            Response = new ProtocolResponse
+            {
+                StatusCode = 200,
+                Headers = new Dictionary<string, string[]> { ["content-type"] = ["application/json"] },
+                BodyText = """{"product_code":"BTC_JPY"}""",
+            },
+            IsSuccess = true,
+            Error = null,
+            Meta = new CallMeta
+            {
+                Layer = CallLayers.Protocol,
+                Component = CallComponents.PublicEndpointModule,
+                EndpointId = "GetTicker",
+                Scope = "Public",
+                Auth = "None",
+                Children = null,
+            },
+        };
+
+        var outcome = ExecutionOutcome.FromProtocolCall(
+            new CommandPath("bitflyer", "protocol", "public", "get-ticker"),
+            call);
+
+        Assert.Equal(CliExitCode.Success, outcome.ExitCode);
+        var envelope = Assert.IsType<ProtocolCallEnvelope>(outcome.Response);
+        Assert.Equal("/v1/getticker", envelope.Request.Path);
+        Assert.Equal(200, envelope.Response.StatusCode);
+        Assert.Equal("GetTicker", envelope.Meta.EndpointId);
     }
 
     [Fact]
@@ -313,9 +425,10 @@ public sealed class CliApplicationTests
                     EndpointId = "Echo",
                     Summary = "fake command",
                     AuthenticationRequirement = "none",
+                    InputMode = CommandInputMode.NativeRequest,
                     CanonicalJsonExample = "exchangeapi fake native public echo",
                     TemplateJson = "{}",
-                    ConvenienceFlags = [],
+                    CommandOptions = [],
                     UsageExamples = ["exchangeapi fake native public echo --summary"],
                     IsWrite = false,
                     BindRequestAsync = static (_, _, _) => Task.FromResult(RequestBindingResult.Success(new object())),
@@ -359,9 +472,10 @@ public sealed class CliApplicationTests
                     EndpointId = "Echo",
                     Summary = "fake command",
                     AuthenticationRequirement = "none",
+                    InputMode = CommandInputMode.NativeRequest,
                     CanonicalJsonExample = "exchangeapi fake native public echo",
                     TemplateJson = "{}",
-                    ConvenienceFlags = [],
+                    CommandOptions = [],
                     UsageExamples = ["exchangeapi fake native public echo --summary"],
                     IsWrite = false,
                     BindRequestAsync = static (_, _, _) => Task.FromResult(RequestBindingResult.Success(new object())),

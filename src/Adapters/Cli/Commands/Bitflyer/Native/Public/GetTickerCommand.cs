@@ -17,9 +17,10 @@ public static class GetTickerCommand
             EndpointId = "GetTicker",
             Summary = "bitFlyer native public ticker",
             AuthenticationRequirement = "none",
+            InputMode = CommandInputMode.NativeRequest,
             CanonicalJsonExample = """exchangeapi bitflyer native public get-ticker --request-json '{"product_code":"BTC_JPY"}'""",
             TemplateJson = """{"product_code":null}""",
-            ConvenienceFlags = ["--product-code <value>"],
+            CommandOptions = [CliOptionSpec.Value("product-code")],
             UsageExamples =
             [
                 "exchangeapi bitflyer native public get-ticker --product-code BTC_JPY",

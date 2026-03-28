@@ -16,14 +16,15 @@ public static class GetExecutionsPublicCommand
             EndpointId = "GetExecutionsPublic",
             Summary = "bitFlyer native public executions",
             AuthenticationRequirement = "none",
+            InputMode = CommandInputMode.NativeRequest,
             CanonicalJsonExample = """exchangeapi bitflyer native public get-executions-public --request-json '{"product_code":"BTC_JPY","count":10,"before":null,"after":null}'""",
             TemplateJson = """{"product_code":null,"count":null,"before":null,"after":null}""",
-            ConvenienceFlags =
+            CommandOptions =
             [
-                "--product-code <value>",
-                "--count <int>",
-                "--before <long>",
-                "--after <long>",
+                CliOptionSpec.Value("product-code"),
+                CliOptionSpec.Value("count", "int"),
+                CliOptionSpec.Value("before", "long"),
+                CliOptionSpec.Value("after", "long"),
             ],
             UsageExamples =
             [

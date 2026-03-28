@@ -16,9 +16,10 @@ public static class GetHealthCommand
             EndpointId = "GetHealth",
             Summary = "bitFlyer native public health",
             AuthenticationRequirement = "none",
+            InputMode = CommandInputMode.NativeRequest,
             CanonicalJsonExample = """exchangeapi bitflyer native public get-health --request-json '{"ProductCode":"BTC_JPY"}'""",
             TemplateJson = """{"ProductCode":null}""",
-            ConvenienceFlags = ["--product-code <value>"],
+            CommandOptions = [CliOptionSpec.Value("product-code")],
             UsageExamples =
             [
                 "exchangeapi bitflyer native public get-health --product-code BTC_JPY",

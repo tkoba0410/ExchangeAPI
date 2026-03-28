@@ -4,45 +4,9 @@ namespace ExchangeApi.Adapters.Cli.Binding;
 
 public static class InvocationParser
 {
-    private static readonly HashSet<string> ValueOptions = new(StringComparer.Ordinal)
-    {
-        "request-json",
-        "request-file",
-        "query-json",
-        "query-file",
-        "body-json",
-        "body-file",
-        "base-uri",
-        "timeout-ms",
-        "protocol-debug-log-dir",
-        "product-code",
-        "from-date",
-        "count",
-        "before",
-        "after",
-        "symbol",
-        "interval",
-        "limit",
-        "start-time",
-        "end-time",
-        "time-zone",
-    };
-
-    private static readonly HashSet<string> FlagOptions = new(StringComparer.Ordinal)
-    {
-        "help",
-        "pretty",
-        "summary",
-        "verbose",
-        "yes",
-        "request-template",
-        "query-template",
-        "body-template",
-        "enable-protocol-debug-log",
-        "use-ticker-alias-path",
-    };
-
-    public static InvocationParseResult Parse(string[] args)
+    public static InvocationParseResult Parse(
+        string[] args,
+        IReadOnlyDictionary<string, CliOptionSpec> allowedOptions)
     {
         if (args.Length == 0)
         {
@@ -79,7 +43,7 @@ public static class InvocationParser
                 parsingOptions = true;
                 var optionName = arg[2..];
 
-                if (!ValueOptions.Contains(optionName) && !FlagOptions.Contains(optionName))
+                if (!allowedOptions.TryGetValue(optionName, out var option))
                 {
                     return Failure("invalid option", $"unknown option: --{optionName}");
                 }
@@ -89,7 +53,7 @@ public static class InvocationParser
                     return Failure("invalid option", $"duplicate option: --{optionName}");
                 }
 
-                if (ValueOptions.Contains(optionName))
+                if (option.Kind == CliOptionKind.Value)
                 {
                     if (i + 1 >= args.Length)
                     {

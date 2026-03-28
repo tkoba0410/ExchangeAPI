@@ -69,6 +69,39 @@ public sealed class ExecutionOutcome
         };
     }
 
+    public static ExecutionOutcome FromProtocolCall(CommandPath path, Call<ProtocolRequest, ProtocolResponse> call)
+    {
+        if (call.IsSuccess && call.Response is not null)
+        {
+            return Success(
+                $"{path.Identity}: success",
+                new ProtocolCallEnvelope
+                {
+                    Request = call.Request,
+                    Response = call.Response,
+                    Meta = new ProtocolCallEnvelopeMeta
+                    {
+                        Layer = call.Meta.Layer,
+                        Component = call.Meta.Component,
+                        EndpointId = call.Meta.EndpointId,
+                        Scope = call.Meta.Scope,
+                        Auth = call.Meta.Auth,
+                    },
+                });
+        }
+
+        return new ExecutionOutcome
+        {
+            ExitCode = CliExitCode.FacadeCallFailure,
+            Summary = $"{path.Identity}: {ClassifyCallFailure(call.Error?.Kind)}",
+            Detail = call.Error?.Message,
+            ErrorKind = call.Error?.Kind,
+            EndpointId = call.Meta.EndpointId,
+            ProtocolPath = call.Request.Path,
+            ProtocolStatusCode = call.Response?.StatusCode,
+        };
+    }
+
     private static string ClassifyCallFailure(string? errorKind)
     {
         return errorKind switch

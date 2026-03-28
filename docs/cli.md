@@ -185,7 +185,14 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 
 - 現行 branch の実行可能 command set の正本は command descriptor registry とする
   - `src/Adapters/Cli/Commands/CommandCatalog.cs`
-- 現在実装済みの canonical command は以下の 11 本に限定する
+- 現在実装済みの canonical command は以下の 21 本に限定する
+  - `bitflyer native private get-addresses`
+  - `bitflyer native private get-bank-accounts`
+  - `bitflyer native private get-permissions`
+  - `bitflyer native private get-balance`
+  - `bitflyer native private get-collateral`
+  - `bitflyer native private get-collateral-accounts`
+  - `bitflyer native private cancel-all-child-orders`
   - `bitflyer native public get-markets`
   - `bitflyer native public get-board`
   - `bitflyer native public get-board-state`
@@ -195,8 +202,11 @@ exchangeapi <venue> <surface> <scope> <command> [options]
   - `bitflyer native public get-funding-rate`
   - `bitflyer native public get-health`
   - `bitflyer native public get-ticker`
+  - `bitflyer protocol public get-markets`
+  - `bitflyer protocol public get-ticker`
+  - `bitflyer protocol public get-executions-public`
   - `binance native public get-klines`
-  - `bitflyer native private cancel-all-child-orders`
+  - `binance protocol public get-klines`
 - wizard は `get-ticker`、`get-klines`、`cancel-all-child-orders` にだけ対応する
 - shell は上記 registry に登録された command にだけ委譲できる
 - endpoint matrix は設計上の inventory 正本だが、現行 phase では CLI runtime が matrix 全件を expose しているとはみなさない
@@ -239,6 +249,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - convenience flag は canonical な request / query / body に一意に変換できなければならない
 - nested object、array、conditional omission が多い複雑 command では canonical JSON input を主経路とする
 - 同一 command で canonical JSON input と convenience flag を併用してはならない
+- command-specific convenience flag はその command に対してのみ有効とし、他 command では invalid option とする
 - CLI は以下の template 補助を持ってよい
   - `--request-template`
   - `--query-template`
@@ -291,10 +302,20 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 ### 6.2 成功時
 
 - `native` command は native `Response` を JSON で出力する
-- `protocol` command は `ProtocolResponse` を JSON で出力する
+- `protocol` command は CLI-specific envelope を JSON で出力する
+  - `Request`: `ProtocolRequest`
+  - `Response`: `ProtocolResponse`
+  - `Meta`: protocol call に対応する stable meta
 - JSON は単一 document とし、pipe 処理可能でなければならない
 - decimal / int / bool を string 化してはならない
-- `ProtocolResponse.BodyText` は raw text を保持する string として出力する
+- `Response.BodyText` は raw text を保持する string として出力する
+- protocol envelope の `Meta` は少なくとも以下を含む
+  - `Layer`
+  - `Component`
+  - `EndpointId`
+  - `Scope`
+  - `Auth`
+- protocol envelope は request / response inspection のための stable schema とし、library の `Call<TRequest,TResponse>` をそのまま serialize してはならない
 
 ### 6.3 `native` と `protocol` の意味
 
@@ -421,7 +442,7 @@ command-specific convenience flag:
 - write command の help では `--yes` 要件を明示する
 - command help は以下を含まなければならない
   - 認証要否
-  - canonical JSON input 例
+  - canonical input 例
   - 提供する convenience flag 一覧
   - write safety の有無
 - help から `--request-template` / `--query-template` / `--body-template` の存在が分かるようにしなければならない
@@ -483,6 +504,13 @@ bitFlyer protocol public:
 ```bash
 exchangeapi bitflyer protocol public get-ticker \
   --query-json '{"product_code":"BTC_JPY"}'
+```
+
+Binance protocol public:
+
+```bash
+exchangeapi binance protocol public get-klines \
+  --query-json '{"symbol":"BTCJPY","interval":"1h","limit":2}'
 ```
 
 Binance native public:

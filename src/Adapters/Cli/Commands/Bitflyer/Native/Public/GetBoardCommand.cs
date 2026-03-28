@@ -16,9 +16,10 @@ public static class GetBoardCommand
             EndpointId = "GetBoard",
             Summary = "bitFlyer native public order book",
             AuthenticationRequirement = "none",
+            InputMode = CommandInputMode.NativeRequest,
             CanonicalJsonExample = """exchangeapi bitflyer native public get-board --request-json '{"product_code":"BTC_JPY"}'""",
             TemplateJson = """{"product_code":null}""",
-            ConvenienceFlags = ["--product-code <value>"],
+            CommandOptions = [CliOptionSpec.Value("product-code")],
             UsageExamples =
             [
                 "exchangeapi bitflyer native public get-board --product-code BTC_JPY",

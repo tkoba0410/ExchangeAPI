@@ -2,29 +2,29 @@ using ExchangeApi.Adapters.Cli.Binding;
 using ExchangeApi.Adapters.Cli.Configuration;
 using ExchangeApi.Adapters.Cli.Infrastructure;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
-using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
 
-namespace ExchangeApi.Adapters.Cli.Commands.Bitflyer.Native.Public;
+namespace ExchangeApi.Adapters.Cli.Commands.Bitflyer.Native.Private;
 
-public static class GetMarketsCommand
+public static class GetAddressesCommand
 {
     public static CommandDescriptor Create()
     {
         return new CommandDescriptor
         {
-            Path = new CommandPath("bitflyer", "native", "public", "get-markets"),
-            EndpointId = "GetMarkets",
-            Summary = "bitFlyer native public markets",
-            AuthenticationRequirement = "none",
+            Path = new CommandPath("bitflyer", "native", "private", "get-addresses"),
+            EndpointId = "GetAddresses",
+            Summary = "bitFlyer native private deposit addresses",
+            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
             InputMode = CommandInputMode.NativeRequest,
-            CanonicalJsonExample = """exchangeapi bitflyer native public get-markets --request-json '{}'""",
+            CanonicalJsonExample = """exchangeapi bitflyer native private get-addresses --request-json '{}'""",
             TemplateJson = """{}""",
             CommandOptions = [],
             UsageExamples =
             [
-                "exchangeapi bitflyer native public get-markets",
-                """exchangeapi bitflyer native public get-markets --request-json '{}'""",
-                "exchangeapi bitflyer native public get-markets --request-template",
+                "exchangeapi bitflyer native private get-addresses",
+                """exchangeapi bitflyer native private get-addresses --request-json '{}'""",
+                "exchangeapi bitflyer native private get-addresses --request-template",
             ],
             IsWrite = false,
             BindRequestAsync = BindRequestAsync,
@@ -46,10 +46,10 @@ public static class GetMarketsCommand
 
         if (jsonInput.HasValue)
         {
-            return JsonInputReader.Deserialize<GetMarketsRequest>(jsonInput.Content!);
+            return JsonInputReader.Deserialize<GetAddressesRequest>(jsonInput.Content!);
         }
 
-        return RequestBindingResult.Success(new GetMarketsRequest());
+        return RequestBindingResult.Success(new GetAddressesRequest());
     }
 
     private static async Task<ExecutionOutcome> ExecuteAsync(
@@ -58,14 +58,21 @@ public static class GetMarketsCommand
         IEnvironment environment,
         CancellationToken cancellationToken)
     {
-        var created = BitflyerOptionsFactory.Create(options, environment, requiresCredentials: false);
+        var created = BitflyerOptionsFactory.Create(options, environment, requiresCredentials: true);
         if (created.Failure is not null)
         {
             return created.Failure;
         }
 
         using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
-        var call = await bundle.Public.GetMarketsCallAsync((GetMarketsRequest)request, cancellationToken);
-        return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "public", "get-markets"), call);
+        if (bundle.Private is null)
+        {
+            return ExecutionOutcome.InputError(
+                "missing credential",
+                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+        }
+
+        var call = await bundle.Private.GetAddressesCallAsync((GetAddressesRequest)request, cancellationToken);
+        return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "private", "get-addresses"), call);
     }
 }

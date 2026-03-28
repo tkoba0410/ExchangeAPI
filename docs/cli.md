@@ -185,31 +185,36 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 
 - 現行 branch の実行可能 command set の正本は command descriptor registry とする
   - `src/Adapters/Cli/Commands/CommandCatalog.cs`
-- 現在実装済みの canonical command は以下の 21 本に限定する
-  - `bitflyer native private get-addresses`
-  - `bitflyer native private get-bank-accounts`
-  - `bitflyer native private get-permissions`
-  - `bitflyer native private get-balance`
-  - `bitflyer native private get-collateral`
-  - `bitflyer native private get-collateral-accounts`
-  - `bitflyer native private cancel-all-child-orders`
-  - `bitflyer native public get-markets`
-  - `bitflyer native public get-board`
-  - `bitflyer native public get-board-state`
-  - `bitflyer native public get-chats`
-  - `bitflyer native public get-corporate-leverage`
-  - `bitflyer native public get-executions-public`
-  - `bitflyer native public get-funding-rate`
-  - `bitflyer native public get-health`
-  - `bitflyer native public get-ticker`
-  - `bitflyer protocol public get-markets`
-  - `bitflyer protocol public get-ticker`
-  - `bitflyer protocol public get-executions-public`
-  - `binance native public get-klines`
-  - `binance protocol public get-klines`
+- 本仕様書は current slice の全 command identity を重複列挙によって正本化しない
+- current slice の具体的な command identity は runtime registry と test で固定する
+- 現在の slice は次の範囲に限定する
+  - bitFlyer `native public`
+    - market / board / board-state / chats / corporate-leverage / executions / funding-rate / health / ticker の read
+  - bitFlyer `native private`
+    - permissions / addresses / balance / bank-accounts / collateral / collateral-accounts の read
+    - `cancel-all-child-orders` の write
+  - bitFlyer `protocol public`
+    - `get-markets`
+    - `get-ticker`
+    - `get-executions-public`
+  - Binance `native public`
+    - `get-klines`
+  - Binance `protocol public`
+    - `get-klines`
 - wizard は `get-ticker`、`get-klines`、`cancel-all-child-orders` にだけ対応する
 - shell は上記 registry に登録された command にだけ委譲できる
 - endpoint matrix は設計上の inventory 正本だが、現行 phase では CLI runtime が matrix 全件を expose しているとはみなさない
+
+### 4.6 現行 slice の更新規約
+
+- current slice の executable truth は常に runtime registry とする
+- current slice を変更する patch は、少なくとも runtime registry と current slice を固定する test を同時に更新しなければならない
+- help、wizard、shell は current slice を独自に保持せず、runtime registry から導出しなければならない
+- 本仕様書と README は current slice の完全列挙を正本として再保持してはならない
+- README の command 例は参考情報であり、実行可能 inventory の判定には使ってはならない
+- current slice を広げる場合は、文書上も次の 2 点を明示しなければならない
+  - どの surface / scope / endpoint family が追加されたか
+  - formal interface なのか helper tier なのか
 
 ## 5. 入力契約
 
@@ -316,6 +321,9 @@ exchangeapi <venue> <surface> <scope> <command> [options]
   - `Scope`
   - `Auth`
 - protocol envelope は request / response inspection のための stable schema とし、library の `Call<TRequest,TResponse>` をそのまま serialize してはならない
+- `protocol` command の success は raw response inspection の成功を意味し、HTTP status の成功を意味しない
+- `protocol` facade が `ProtocolResponse` を返した場合、`Response.StatusCode` が non-success でも CLI は envelope を stdout に出し exit code `0` を返してよい
+- HTTP status に基づく判定が必要な automation は `Response.StatusCode` を明示的に検査しなければならない
 
 ### 6.3 `native` と `protocol` の意味
 
@@ -416,6 +424,8 @@ command-specific convenience flag:
 
 - `facade call failure` は `Call.IsSuccess = false` を意味する
 - `--verbose` 指定時は stderr に `CallError.Kind` と endpoint 情報を追加してよい
+- `protocol` command では HTTP response を受け取れた場合、non-success status だけでは exit code `3` にしない
+- `protocol` command の exit code `3` は transport failure、binding failure、または `ProtocolResponse` を返せなかった facade failure に対して使う
 
 ### 9.1 stderr 契約
 
@@ -445,6 +455,11 @@ command-specific convenience flag:
   - canonical input 例
   - 提供する convenience flag 一覧
   - write safety の有無
+- `protocol` command の help は、少なくとも以下を明示しなければならない
+  - stdout は `Request/Response/Meta` envelope である
+  - `Response.BodyText` は raw string である
+  - HTTP status 判定は `Response.StatusCode` を見る必要がある
+  - non-success status だけでは exit code `3` にならない
 - help から `--request-template` / `--query-template` / `--body-template` の存在が分かるようにしなければならない
 
 ## 11. 現行非スコープ

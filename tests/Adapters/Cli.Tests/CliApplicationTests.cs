@@ -176,6 +176,23 @@ public sealed class CliApplicationTests
     }
 
     [Fact]
+    public async Task ProtocolCommandHelp_ExplainsEnvelopeAndStatusSemantics()
+    {
+        var console = new FakeConsole();
+        var app = new CliApplication(console: console, environment: new FakeEnvironment());
+
+        var exitCode = await app.RunAsync(
+            ["bitflyer", "protocol", "public", "get-ticker", "--help"]);
+
+        Assert.Equal(CliExitCode.Success, exitCode);
+        Assert.Contains("Protocol semantics:", console.StdOut);
+        Assert.Contains("stdout schema: Request / Response / Meta", console.StdOut);
+        Assert.Contains("Response.BodyText: raw string", console.StdOut);
+        Assert.Contains("inspect HTTP status via Response.StatusCode", console.StdOut);
+        Assert.Contains("non-success HTTP status alone does not cause exit code 3", console.StdOut);
+    }
+
+    [Fact]
     public async Task RejectsMixedCanonicalJsonAndConvenienceFlags()
     {
         var console = new FakeConsole();
@@ -314,6 +331,90 @@ public sealed class CliApplicationTests
                 "bitflyer protocol public get-ticker",
             ],
             identities);
+    }
+
+    [Fact]
+    public void CommandCatalog_CurrentSlice_MatchesDocumentedFamilies()
+    {
+        var grouped = CommandCatalog.All
+            .GroupBy(static x => (x.Path.Venue, x.Path.Surface, x.Path.Scope))
+            .ToDictionary(
+                static x => x.Key,
+                static x => x.Select(static y => y.Path.Command).OrderBy(static y => y, StringComparer.Ordinal).ToArray());
+
+        Assert.Equal(
+            [
+                ("binance", "native", "public"),
+                ("binance", "protocol", "public"),
+                ("bitflyer", "native", "private"),
+                ("bitflyer", "native", "public"),
+                ("bitflyer", "protocol", "public"),
+            ],
+            grouped.Keys.OrderBy(static x => x, Comparer<(string, string, string)>.Default).ToArray());
+
+        Assert.Equal(
+            [
+                "get-klines",
+            ],
+            grouped[("binance", "native", "public")]);
+
+        Assert.Equal(
+            [
+                "get-klines",
+            ],
+            grouped[("binance", "protocol", "public")]);
+
+        Assert.Equal(
+            [
+                "cancel-all-child-orders",
+                "get-addresses",
+                "get-balance",
+                "get-bank-accounts",
+                "get-collateral",
+                "get-collateral-accounts",
+                "get-permissions",
+            ],
+            grouped[("bitflyer", "native", "private")]);
+
+        Assert.Equal(
+            [
+                "get-board",
+                "get-board-state",
+                "get-chats",
+                "get-corporate-leverage",
+                "get-executions-public",
+                "get-funding-rate",
+                "get-health",
+                "get-markets",
+                "get-ticker",
+            ],
+            grouped[("bitflyer", "native", "public")]);
+
+        Assert.Equal(
+            [
+                "get-executions-public",
+                "get-markets",
+                "get-ticker",
+            ],
+            grouped[("bitflyer", "protocol", "public")]);
+    }
+
+    [Fact]
+    public void CommandCatalog_WizardCoverage_IsDocumentedSubset()
+    {
+        var wizardIdentities = CommandCatalog.All
+            .Where(static x => x.Wizard is not null)
+            .Select(static x => x.Path.Identity)
+            .OrderBy(static x => x, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(
+            [
+                "binance native public get-klines",
+                "bitflyer native private cancel-all-child-orders",
+                "bitflyer native public get-ticker",
+            ],
+            wizardIdentities);
     }
 
     [Fact]

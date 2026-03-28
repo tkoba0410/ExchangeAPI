@@ -154,6 +154,17 @@ public static class HelpRenderer
         console.WriteOutLine("Template:");
         console.WriteOutLine($"  --{GetTemplateOptionName(descriptor.InputMode)}");
         console.WriteOutLine(string.Empty);
+
+        if (string.Equals(path.Surface, "protocol", StringComparison.Ordinal))
+        {
+            console.WriteOutLine("Protocol semantics:");
+            console.WriteOutLine("  stdout schema: Request / Response / Meta");
+            console.WriteOutLine("  Response.BodyText: raw string");
+            console.WriteOutLine("  inspect HTTP status via Response.StatusCode");
+            console.WriteOutLine("  non-success HTTP status alone does not cause exit code 3");
+            console.WriteOutLine(string.Empty);
+        }
+
         console.WriteOutLine("Examples:");
         foreach (var usageExample in descriptor.UsageExamples)
         {

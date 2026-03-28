@@ -152,29 +152,25 @@ else
 
 ### 3) CLI Adapter (`Stage11` 初期 slice)
 
-現時点の CLI 実装範囲は次の 21 command。
+現時点の CLI 実装範囲の正本は command registry:
 
-- `bitflyer native private get-addresses`
-- `bitflyer native private get-bank-accounts`
-- `bitflyer native private get-permissions`
-- `bitflyer native private get-balance`
-- `bitflyer native private get-collateral`
-- `bitflyer native private get-collateral-accounts`
-- `bitflyer native private cancel-all-child-orders`
-- `bitflyer native public get-markets`
-- `bitflyer native public get-board`
-- `bitflyer native public get-board-state`
-- `bitflyer native public get-chats`
-- `bitflyer native public get-corporate-leverage`
-- `bitflyer native public get-executions-public`
-- `bitflyer native public get-funding-rate`
-- `bitflyer native public get-health`
-- `bitflyer native public get-ticker`
-- `bitflyer protocol public get-markets`
-- `bitflyer protocol public get-ticker`
-- `bitflyer protocol public get-executions-public`
-- `binance native public get-klines`
-- `binance protocol public get-klines`
+- `src/Adapters/Cli/Commands/CommandCatalog.cs`
+
+現在の slice は概ね次の範囲:
+
+- bitFlyer `native public`
+  - market / board / board-state / chats / corporate-leverage / executions / funding-rate / health / ticker の read
+- bitFlyer `native private`
+  - permissions / addresses / balance / bank-accounts / collateral / collateral-accounts の read
+  - `cancel-all-child-orders` の write
+- bitFlyer `protocol public`
+  - `get-markets`
+  - `get-ticker`
+  - `get-executions-public`
+- Binance `native public`
+  - `get-klines`
+- Binance `protocol public`
+  - `get-klines`
 
 `dotnet` を使って試す場合は build:
 
@@ -273,6 +269,9 @@ dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
 - wizard は現時点では `get-ticker`、`get-klines`、`cancel-all-child-orders` にだけ対応する
 - shell は helper であり、registry に登録された上記 command set に委譲する
 - protocol CLI の stdout は `Request/Response/Meta` envelope を返す
+- protocol CLI の `Response.BodyText` は raw string のまま保持される
+- protocol CLI は HTTP response を受け取れた場合、`Response.StatusCode` が non-success でも exit code `0` を返しうる
+- protocol CLI を automation で使う場合、HTTP status 判定は `Response.StatusCode` を明示的に検査する
 
 `dotnet` 不要の local publish を作る場合:
 

@@ -234,6 +234,8 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - JSON field 名は DTO の serialization contract に従う
   - `JsonPropertyName` がある場合はその名前
   - ない場合は DTO property 名
+- current phase の library contract では、`native` response DTO の全 property に API response JSON field 名の `JsonPropertyName` を明示する方針を採る
+- したがって `native` command の stdout field 名は、対応する API response JSON field 名に一致することを期待してよい
 
 ### 5.2 `protocol`
 

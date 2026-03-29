@@ -6,6 +6,7 @@
 ## 1. 位置づけ
 
 本書は、Stage10 の設計を既存試作や旧文書の都合から切り離して整理し直した、現行の設計正本である。  
+Stage10 は core library foundation を定義し、Stage11 はその上に CLI / MCP Server などの adapter 層を導入する。  
 本書は `Facade + Endpoint Module` を前提に、今後の実装方針をまっさらな設計として定義する。
 
 本書では、以下を明確に分離する。
@@ -767,6 +768,9 @@ bitFlyer private endpoint の認証・署名は `Protocol` が担う。
 ### 7.2 命名
 
 - field 名の唯一の語源は venue API の request / response field 名
+- `Native` response DTO の全 property は、対応する API response JSON field 名を `JsonPropertyName` で明示しなければならない
+- `JsonPropertyName` に指定する名前は、API response JSON に現れる field 名と一致しなければならない
+- response field の required / optional 判定は `JsonPropertyName` の有無ではなく、endpoint contract に従って別に固定する
 - raw diagnostics 起源の property は持ち込まない
 
 ### 7.3 形状

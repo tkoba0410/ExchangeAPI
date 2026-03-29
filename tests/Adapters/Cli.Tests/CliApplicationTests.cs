@@ -16,6 +16,49 @@ namespace ExchangeApi.Adapters.Cli.Tests;
 public sealed class CliApplicationTests
 {
     [Fact]
+    public void GetBoardStateResponse_SerializesUsingApiFieldNames()
+    {
+        var value = new ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState.GetBoardStateResponse
+        {
+            Health = "NORMAL",
+            State = "RUNNING",
+            Data = new ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState.GetBoardStateData
+            {
+                SpecialQuotation = 123.45m,
+            },
+        };
+
+        var json = JsonSerializer.Serialize(value);
+
+        Assert.Equal("""{"health":"NORMAL","state":"RUNNING","data":{"special_quotation":123.45}}""", json);
+    }
+
+    [Fact]
+    public void BinanceGetKlinesItem_SerializesUsingDocumentedFieldNames()
+    {
+        var value = new ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines.GetKlines.Item
+        {
+            OpenTime = 1,
+            OpenPrice = 2.3m,
+            HighPrice = 3.4m,
+            LowPrice = 1.2m,
+            ClosePrice = 2.5m,
+            Volume = 10.1m,
+            CloseTime = 2,
+            QuoteAssetVolume = 20.2m,
+            NumberOfTrades = 7,
+            TakerBuyBaseAssetVolume = 4.5m,
+            TakerBuyQuoteAssetVolume = 6.7m,
+        };
+
+        var json = JsonSerializer.Serialize(value);
+
+        Assert.Equal(
+            """{"open_time":1,"open_price":2.3,"high_price":3.4,"low_price":1.2,"close_price":2.5,"volume":10.1,"close_time":2,"quote_asset_volume":20.2,"number_of_trades":7,"taker_buy_base_asset_volume":4.5,"taker_buy_quote_asset_volume":6.7}""",
+            json);
+    }
+
+    [Fact]
     public async Task NoArgs_PrintsRootHelp()
     {
         var console = new FakeConsole();

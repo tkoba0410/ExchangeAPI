@@ -66,7 +66,7 @@ public sealed class GetTickerNativeEndpoint : IGetTickerNativeEndpoint
             var response = new GetTickerResponse
             {
                 ProductCode = JsonValueReader.ReadRequiredString(root, "product_code"),
-                State = JsonValueReader.ReadRequiredString(root, "state"),
+                State = JsonValueReader.ReadRequiredEnum<BitflyerTradingState>(root, "state"),
                 Timestamp = JsonValueReader.ReadRequiredUtcTimestamp(root, "timestamp"),
                 TickId = JsonValueReader.ReadRequiredLong(root, "tick_id"),
                 BestBid = JsonValueReader.ReadRequiredDecimal(root, "best_bid"),

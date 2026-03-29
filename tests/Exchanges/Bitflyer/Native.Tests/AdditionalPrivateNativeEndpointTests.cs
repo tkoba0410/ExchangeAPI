@@ -44,7 +44,7 @@ public sealed class AdditionalPrivateNativeEndpointTests
 
         Assert.True(call.IsSuccess);
         Assert.Single(call.Response!);
-        Assert.Equal("NORMAL", call.Response![0].Type);
+        Assert.Equal(AddressTypes.Normal, call.Response![0].Type);
         Assert.Equal("BTC", call.Response[0].CurrencyCode);
         Assert.Equal("1abc", call.Response[0].Address);
     }
@@ -308,7 +308,7 @@ public sealed class AdditionalPrivateNativeEndpointTests
         Assert.True(call.IsSuccess);
         Assert.Single(call.Response!);
         Assert.Equal("JPO1", call.Response![0].ParentOrderId);
-        Assert.Equal("COMPLETED", call.Response[0].ParentOrderState);
+        Assert.Equal(ChildOrderStates.Completed, call.Response[0].ParentOrderState);
     }
 
     [Fact]
@@ -317,7 +317,7 @@ public sealed class AdditionalPrivateNativeEndpointTests
         var endpoint = new GetParentOrdersNativeEndpoint(
             new FakeGetParentOrdersProtocolEndpoint((productCode, count, before, after, parentOrderState) => throw new InvalidOperationException()));
 
-        var call = await endpoint.CallAsync(new GetParentOrdersRequest { ParentOrderState = "QUEUED" });
+        var call = await endpoint.CallAsync(new GetParentOrdersRequest { ParentOrderState = (BitflyerOrderState)999 });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
@@ -338,7 +338,7 @@ public sealed class AdditionalPrivateNativeEndpointTests
         Assert.NotNull(call.Response);
         Assert.Equal("JPO1", call.Response!.ParentOrderId);
         Assert.Single(call.Response.Parameters);
-        Assert.Equal("LIMIT", call.Response.Parameters[0].ConditionType);
+        Assert.Equal(ParentOrderConditionTypes.Limit, call.Response.Parameters[0].ConditionType);
         Assert.Equal(0m, call.Response.Parameters[0].TriggerPrice);
         Assert.Equal(0m, call.Response.Parameters[0].Offset);
     }

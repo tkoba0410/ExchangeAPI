@@ -61,7 +61,7 @@ public sealed class GetAddressesNativeEndpoint : IGetAddressesNativeEndpoint
 
                 items.Add(new GetAddresses.Item
                 {
-                    Type = JsonValueReader.ReadRequiredString(item, "type"),
+                    Type = JsonValueReader.ReadRequiredEnum<BitflyerAddressType>(item, "type"),
                     CurrencyCode = JsonValueReader.ReadRequiredString(item, "currency_code"),
                     Address = JsonValueReader.ReadRequiredString(item, "address"),
                 });

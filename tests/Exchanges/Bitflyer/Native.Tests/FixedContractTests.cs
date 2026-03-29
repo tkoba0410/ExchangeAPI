@@ -34,6 +34,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetFundingRate;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetHealth;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Units;
 
@@ -45,7 +46,7 @@ public sealed class FixedContractTests
     public void Fixed_Request_And_Response_Dtos_KeepKnown_JsonPropertyNames()
     {
         AssertJsonProperty(typeof(GetMarkets.Item), nameof(GetMarkets.Item.ProductCode), typeof(string), "product_code");
-        AssertJsonProperty(typeof(GetMarkets.Item), nameof(GetMarkets.Item.MarketType), typeof(string), "market_type");
+        AssertJsonProperty(typeof(GetMarkets.Item), nameof(GetMarkets.Item.MarketType), typeof(BitflyerMarketType), "market_type");
 
         AssertJsonProperty(typeof(GetBoardRequest), nameof(GetBoardRequest.ProductCode), typeof(string), "product_code");
         AssertProperty(typeof(GetBoardResponse), nameof(GetBoardResponse.MidPrice), typeof(decimal));
@@ -59,7 +60,7 @@ public sealed class FixedContractTests
         AssertJsonProperty(typeof(GetExecutionsPublicRequest), nameof(GetExecutionsPublicRequest.Before), typeof(long?), "before");
         AssertJsonProperty(typeof(GetExecutionsPublicRequest), nameof(GetExecutionsPublicRequest.After), typeof(long?), "after");
         AssertJsonProperty(typeof(GetExecutionsPublic.Item), nameof(GetExecutionsPublic.Item.Id), typeof(long), "id");
-        AssertJsonProperty(typeof(GetExecutionsPublic.Item), nameof(GetExecutionsPublic.Item.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(GetExecutionsPublic.Item), nameof(GetExecutionsPublic.Item.Side), typeof(BitflyerOrderSide), "side");
         AssertJsonProperty(typeof(GetExecutionsPublic.Item), nameof(GetExecutionsPublic.Item.Price), typeof(decimal), "price");
         AssertJsonProperty(typeof(GetExecutionsPublic.Item), nameof(GetExecutionsPublic.Item.Size), typeof(decimal), "size");
         AssertJsonProperty(typeof(GetExecutionsPublic.Item), nameof(GetExecutionsPublic.Item.ExecDate), typeof(DateTimeOffset), "exec_date");
@@ -69,7 +70,7 @@ public sealed class FixedContractTests
         AssertJsonProperty(typeof(GetTickerRequest), nameof(GetTickerRequest.ProductCode), typeof(string), "product_code");
         AssertJsonIgnoreWhenWritingNull(typeof(GetTickerRequest), nameof(GetTickerRequest.ProductCode));
         AssertJsonProperty(typeof(GetTickerResponse), nameof(GetTickerResponse.ProductCode), typeof(string), "product_code");
-        AssertJsonProperty(typeof(GetTickerResponse), nameof(GetTickerResponse.State), typeof(string), "state");
+        AssertJsonProperty(typeof(GetTickerResponse), nameof(GetTickerResponse.State), typeof(BitflyerTradingState), "state");
         AssertJsonProperty(typeof(GetTickerResponse), nameof(GetTickerResponse.Timestamp), typeof(DateTimeOffset), "timestamp");
         AssertJsonProperty(typeof(GetTickerResponse), nameof(GetTickerResponse.TickId), typeof(long), "tick_id");
         AssertJsonProperty(typeof(GetTickerResponse), nameof(GetTickerResponse.BestBid), typeof(decimal), "best_bid");
@@ -99,13 +100,13 @@ public sealed class FixedContractTests
         AssertJsonProperty(typeof(GetCollateralAccounts.Item), nameof(GetCollateralAccounts.Item.Amount), typeof(decimal), "amount");
 
         AssertProperty(typeof(GetBoardStateRequest), nameof(GetBoardStateRequest.ProductCode), typeof(string));
-        AssertProperty(typeof(GetBoardStateResponse), nameof(GetBoardStateResponse.Health), typeof(string));
-        AssertProperty(typeof(GetBoardStateResponse), nameof(GetBoardStateResponse.State), typeof(string));
+        AssertProperty(typeof(GetBoardStateResponse), nameof(GetBoardStateResponse.Health), typeof(BitflyerHealthStatus));
+        AssertProperty(typeof(GetBoardStateResponse), nameof(GetBoardStateResponse.State), typeof(BitflyerTradingState));
         AssertProperty(typeof(GetBoardStateResponse), nameof(GetBoardStateResponse.Data), typeof(GetBoardStateData));
         AssertProperty(typeof(GetBoardStateData), nameof(GetBoardStateData.SpecialQuotation), typeof(decimal?));
 
         AssertProperty(typeof(GetHealthRequest), nameof(GetHealthRequest.ProductCode), typeof(string));
-        AssertProperty(typeof(GetHealthResponse), nameof(GetHealthResponse.Status), typeof(string));
+        AssertProperty(typeof(GetHealthResponse), nameof(GetHealthResponse.Status), typeof(BitflyerHealthStatus));
 
         AssertProperty(typeof(GetFundingRateRequest), nameof(GetFundingRateRequest.ProductCode), typeof(string));
         AssertProperty(typeof(GetFundingRateResponse), nameof(GetFundingRateResponse.CurrentFundingRate), typeof(decimal));
@@ -121,7 +122,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetChats.Item), nameof(GetChats.Item.Message), typeof(string));
         AssertProperty(typeof(GetChats.Item), nameof(GetChats.Item.Date), typeof(DateTimeOffset));
 
-        AssertProperty(typeof(GetAddresses.Item), nameof(GetAddresses.Item.Type), typeof(string));
+        AssertProperty(typeof(GetAddresses.Item), nameof(GetAddresses.Item.Type), typeof(BitflyerAddressType));
         AssertProperty(typeof(GetAddresses.Item), nameof(GetAddresses.Item.CurrencyCode), typeof(string));
         AssertProperty(typeof(GetAddresses.Item), nameof(GetAddresses.Item.Address), typeof(string));
 
@@ -149,7 +150,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.Amount), typeof(decimal));
         AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.Address), typeof(string));
         AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.TxHash), typeof(string));
-        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.Status), typeof(string));
+        AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.Status), typeof(BitflyerTransferStatus));
         AssertProperty(typeof(GetCoinIns.Item), nameof(GetCoinIns.Item.EventDate), typeof(DateTimeOffset));
 
         AssertProperty(typeof(GetCoinOutsRequest), nameof(GetCoinOutsRequest.Count), typeof(int?));
@@ -163,7 +164,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.TxHash), typeof(string));
         AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.Fee), typeof(decimal));
         AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.AdditionalFee), typeof(decimal));
-        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.Status), typeof(string));
+        AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.Status), typeof(BitflyerTransferStatus));
         AssertProperty(typeof(GetCoinOuts.Item), nameof(GetCoinOuts.Item.EventDate), typeof(DateTimeOffset));
 
         AssertProperty(typeof(GetDepositsRequest), nameof(GetDepositsRequest.Count), typeof(int?));
@@ -173,7 +174,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.OrderId), typeof(string));
         AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.CurrencyCode), typeof(string));
         AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.Amount), typeof(decimal));
-        AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.Status), typeof(string));
+        AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.Status), typeof(BitflyerTransferStatus));
         AssertProperty(typeof(GetDeposits.Item), nameof(GetDeposits.Item.EventDate), typeof(DateTimeOffset));
 
         AssertJsonProperty(typeof(WithdrawRequest), nameof(WithdrawRequest.CurrencyCode), typeof(string), "currency_code");
@@ -195,23 +196,23 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.OrderId), typeof(string));
         AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.CurrencyCode), typeof(string));
         AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.Amount), typeof(decimal));
-        AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.Status), typeof(string));
+        AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.Status), typeof(BitflyerTransferStatus));
         AssertProperty(typeof(GetWithdrawals.Item), nameof(GetWithdrawals.Item.EventDate), typeof(DateTimeOffset));
 
         AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.ProductCode), typeof(string));
         AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.Count), typeof(int?));
         AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.Before), typeof(long?));
         AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.After), typeof(long?));
-        AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.ParentOrderState), typeof(string));
+        AssertProperty(typeof(GetParentOrdersRequest), nameof(GetParentOrdersRequest.ParentOrderState), typeof(BitflyerOrderState?));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Id), typeof(long));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderId), typeof(string));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ProductCode), typeof(string));
-        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Side), typeof(string));
-        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderType), typeof(string));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Side), typeof(BitflyerOrderSide));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderType), typeof(BitflyerParentOrderType));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Price), typeof(decimal));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.AveragePrice), typeof(decimal));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Size), typeof(decimal));
-        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderState), typeof(string));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderState), typeof(BitflyerOrderState));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ExpireDate), typeof(DateTimeOffset));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderDate), typeof(DateTimeOffset));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderAcceptanceId), typeof(string));
@@ -229,7 +230,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.EventDate), typeof(DateTimeOffset));
         AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.ProductCode), typeof(string));
         AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.CurrencyCode), typeof(string));
-        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.TradeType), typeof(string));
+        AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.TradeType), typeof(BitflyerTradeType));
         AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.Price), typeof(decimal));
         AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.Amount), typeof(decimal));
         AssertProperty(typeof(GetBalanceHistory.Item), nameof(GetBalanceHistory.Item.Quantity), typeof(decimal));
@@ -240,7 +241,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetPositionsRequest), nameof(GetPositionsRequest.ProductCode), typeof(string));
         AssertJsonProperty(typeof(GetPositionsRequest), nameof(GetPositionsRequest.ProductCode), typeof(string), "product_code");
         AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.ProductCode), typeof(string), "product_code");
-        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Side), typeof(BitflyerOrderSide), "side");
         AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Price), typeof(decimal), "price");
         AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Size), typeof(decimal), "size");
         AssertJsonProperty(typeof(GetPositions.Item), nameof(GetPositions.Item.Commission), typeof(decimal), "commission");
@@ -265,19 +266,19 @@ public sealed class FixedContractTests
         AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.Count), typeof(int?), "count");
         AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.Before), typeof(long?), "before");
         AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.After), typeof(long?), "after");
-        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ChildOrderState), typeof(string), "child_order_state");
+        AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ChildOrderState), typeof(BitflyerOrderState?), "child_order_state");
         AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ChildOrderId), typeof(string), "child_order_id");
         AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
         AssertJsonProperty(typeof(GetChildOrdersRequest), nameof(GetChildOrdersRequest.ParentOrderId), typeof(string), "parent_order_id");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.Id), typeof(long), "id");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderId), typeof(string), "child_order_id");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ProductCode), typeof(string), "product_code");
-        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.Side), typeof(string), "side");
-        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderType), typeof(string), "child_order_type");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.Side), typeof(BitflyerOrderSide), "side");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderType), typeof(BitflyerChildOrderType), "child_order_type");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.Price), typeof(decimal), "price");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.AveragePrice), typeof(decimal), "average_price");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.Size), typeof(decimal), "size");
-        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderState), typeof(string), "child_order_state");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderState), typeof(BitflyerOrderState), "child_order_state");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ExpireDate), typeof(DateTimeOffset), "expire_date");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderDate), typeof(DateTimeOffset), "child_order_date");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
@@ -285,7 +286,7 @@ public sealed class FixedContractTests
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.CancelSize), typeof(decimal), "cancel_size");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.ExecutedSize), typeof(decimal), "executed_size");
         AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.TotalCommission), typeof(decimal), "total_commission");
-        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.TimeInForce), typeof(string), "time_in_force");
+        AssertJsonProperty(typeof(GetChildOrders.Item), nameof(GetChildOrders.Item.TimeInForce), typeof(BitflyerTimeInForce), "time_in_force");
 
         AssertJsonProperty(typeof(GetExecutionsRequest), nameof(GetExecutionsRequest.ProductCode), typeof(string), "product_code");
         AssertJsonProperty(typeof(GetExecutionsRequest), nameof(GetExecutionsRequest.Count), typeof(int?), "count");
@@ -295,7 +296,7 @@ public sealed class FixedContractTests
         AssertJsonProperty(typeof(GetExecutionsRequest), nameof(GetExecutionsRequest.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
         AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Id), typeof(long), "id");
         AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.ChildOrderId), typeof(string), "child_order_id");
-        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Side), typeof(BitflyerOrderSide), "side");
         AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Price), typeof(decimal), "price");
         AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Size), typeof(decimal), "size");
         AssertJsonProperty(typeof(GetExecutions.Item), nameof(GetExecutions.Item.Commission), typeof(decimal), "commission");
@@ -306,12 +307,12 @@ public sealed class FixedContractTests
         AssertJsonProperty(typeof(GetTradingCommissionResponse), nameof(GetTradingCommissionResponse.CommissionRate), typeof(decimal), "commission_rate");
 
         AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.ProductCode), typeof(string), "product_code");
-        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.ChildOrderType), typeof(string), "child_order_type");
-        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.ChildOrderType), typeof(BitflyerChildOrderType), "child_order_type");
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.Side), typeof(BitflyerOrderSide), "side");
         AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.Price), typeof(decimal?), "price");
         AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.Size), typeof(decimal), "size");
         AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.MinuteToExpire), typeof(int?), "minute_to_expire");
-        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.TimeInForce), typeof(string), "time_in_force");
+        AssertJsonProperty(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.TimeInForce), typeof(BitflyerTimeInForce?), "time_in_force");
         AssertJsonIgnoreWhenWritingNull(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.Price));
         AssertJsonIgnoreWhenWritingNull(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.MinuteToExpire));
         AssertJsonIgnoreWhenWritingNull(typeof(SendChildOrderRequest), nameof(SendChildOrderRequest.TimeInForce));
@@ -333,16 +334,16 @@ public sealed class FixedContractTests
             typeof(CancelChildOrderRequest),
             typeof(Unit));
 
-        AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.OrderMethod), typeof(string), "order_method");
+        AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.OrderMethod), typeof(BitflyerOrderMethod?), "order_method");
         AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.MinuteToExpire), typeof(int?), "minute_to_expire");
-        AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.TimeInForce), typeof(string), "time_in_force");
+        AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.TimeInForce), typeof(BitflyerTimeInForce?), "time_in_force");
         AssertJsonProperty(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.Parameters), typeof(IReadOnlyList<SendParentOrderParameter>), "parameters");
         AssertJsonIgnoreWhenWritingNull(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.OrderMethod));
         AssertJsonIgnoreWhenWritingNull(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.MinuteToExpire));
         AssertJsonIgnoreWhenWritingNull(typeof(SendParentOrderRequest), nameof(SendParentOrderRequest.TimeInForce));
         AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.ProductCode), typeof(string), "product_code");
-        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.ConditionType), typeof(string), "condition_type");
-        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Side), typeof(string), "side");
+        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.ConditionType), typeof(BitflyerConditionType), "condition_type");
+        AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Side), typeof(BitflyerOrderSide), "side");
         AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Price), typeof(decimal?), "price");
         AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.Size), typeof(decimal), "size");
         AssertJsonProperty(typeof(SendParentOrderParameter), nameof(SendParentOrderParameter.TriggerPrice), typeof(decimal?), "trigger_price");
@@ -361,14 +362,14 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetParentOrderRequest), nameof(GetParentOrderRequest.ParentOrderAcceptanceId), typeof(string));
         AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.Id), typeof(long));
         AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.ParentOrderId), typeof(string));
-        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.OrderMethod), typeof(string));
+        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.OrderMethod), typeof(BitflyerOrderMethod));
         AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.ExpireDate), typeof(DateTimeOffset));
-        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.TimeInForce), typeof(string));
+        AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.TimeInForce), typeof(BitflyerTimeInForce));
         AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.Parameters), typeof(IReadOnlyList<GetParentOrderParameter>));
         AssertProperty(typeof(GetParentOrderResponse), nameof(GetParentOrderResponse.ParentOrderAcceptanceId), typeof(string));
         AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.ProductCode), typeof(string));
-        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.ConditionType), typeof(string));
-        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.Side), typeof(string));
+        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.ConditionType), typeof(BitflyerConditionType));
+        AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.Side), typeof(BitflyerOrderSide));
         AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.Price), typeof(decimal));
         AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.Size), typeof(decimal));
         AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.TriggerPrice), typeof(decimal));

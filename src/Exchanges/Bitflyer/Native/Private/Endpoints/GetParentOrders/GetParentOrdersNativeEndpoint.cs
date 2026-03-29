@@ -42,7 +42,7 @@ public sealed class GetParentOrdersNativeEndpoint : IGetParentOrdersNativeEndpoi
             request.Count,
             request.Before,
             request.After,
-            request.ParentOrderState,
+            request.ParentOrderState is { } parentOrderState ? ApiStringEnum<BitflyerOrderState>.Format(parentOrderState) : null,
             cancellationToken);
         if (!protocolCall.IsSuccess)
         {
@@ -82,12 +82,12 @@ public sealed class GetParentOrdersNativeEndpoint : IGetParentOrdersNativeEndpoi
                     Id = JsonValueReader.ReadRequiredLong(item, "id"),
                     ParentOrderId = JsonValueReader.ReadRequiredString(item, "parent_order_id"),
                     ProductCode = JsonValueReader.ReadRequiredString(item, "product_code"),
-                    Side = JsonValueReader.ReadRequiredString(item, "side"),
-                    ParentOrderType = JsonValueReader.ReadRequiredString(item, "parent_order_type"),
+                    Side = JsonValueReader.ReadRequiredEnum<BitflyerOrderSide>(item, "side"),
+                    ParentOrderType = JsonValueReader.ReadRequiredEnum<BitflyerParentOrderType>(item, "parent_order_type"),
                     Price = JsonValueReader.ReadRequiredDecimal(item, "price"),
                     AveragePrice = JsonValueReader.ReadRequiredDecimal(item, "average_price"),
                     Size = JsonValueReader.ReadRequiredDecimal(item, "size"),
-                    ParentOrderState = JsonValueReader.ReadRequiredString(item, "parent_order_state"),
+                    ParentOrderState = JsonValueReader.ReadRequiredEnum<BitflyerOrderState>(item, "parent_order_state"),
                     ExpireDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "expire_date"),
                     ParentOrderDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "parent_order_date"),
                     ParentOrderAcceptanceId = JsonValueReader.ReadRequiredString(item, "parent_order_acceptance_id"),
@@ -134,12 +134,8 @@ public sealed class GetParentOrdersNativeEndpoint : IGetParentOrdersNativeEndpoi
             return new CallError { Kind = CallErrorKinds.Semantic, Message = "After must be greater than zero." };
         }
 
-        if (!string.IsNullOrWhiteSpace(request.ParentOrderState) &&
-            !string.Equals(request.ParentOrderState, ParentOrderStates.Active, StringComparison.Ordinal) &&
-            !string.Equals(request.ParentOrderState, ParentOrderStates.Completed, StringComparison.Ordinal) &&
-            !string.Equals(request.ParentOrderState, ParentOrderStates.Canceled, StringComparison.Ordinal) &&
-            !string.Equals(request.ParentOrderState, ParentOrderStates.Expired, StringComparison.Ordinal) &&
-            !string.Equals(request.ParentOrderState, ParentOrderStates.Rejected, StringComparison.Ordinal))
+        if (request.ParentOrderState is not null &&
+            !ApiStringEnum<BitflyerOrderState>.IsDefined(request.ParentOrderState.Value))
         {
             return new CallError
             {

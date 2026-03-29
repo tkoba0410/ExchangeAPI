@@ -77,7 +77,7 @@ public sealed class PrivateNativeEndpointTests
         Assert.True(call.IsSuccess);
         Assert.Single(call.Response!);
         Assert.Equal(ProductCodes.FxBtcJpy, call.Response![0].ProductCode);
-        Assert.Equal("BUY", call.Response[0].Side);
+        Assert.Equal(OrderSides.Buy, call.Response[0].Side);
         Assert.Equal(36000m, call.Response[0].Price);
         Assert.Equal(-0.5m, call.Response[0].Sfd);
         Assert.Equal(new DateTimeOffset(2015, 11, 3, 10, 4, 45, 11, TimeSpan.Zero), call.Response[0].OpenDate);
@@ -108,7 +108,7 @@ public sealed class PrivateNativeEndpointTests
         Assert.Single(call.Response!);
         Assert.Equal(138398L, call.Response![0].Id);
         Assert.Equal("JOR20150707-084555-022523", call.Response[0].ChildOrderId);
-        Assert.Equal("COMPLETED", call.Response[0].ChildOrderState);
+        Assert.Equal(ChildOrderStates.Completed, call.Response[0].ChildOrderState);
         Assert.Equal(0.1m, call.Response[0].ExecutedSize);
         Assert.Equal(new DateTimeOffset(2015, 7, 14, 7, 25, 52, TimeSpan.Zero), call.Response[0].ExpireDate);
         Assert.Equal(new DateTimeOffset(2015, 7, 7, 8, 45, 53, TimeSpan.Zero), call.Response[0].ChildOrderDate);
@@ -130,7 +130,7 @@ public sealed class PrivateNativeEndpointTests
     {
         var endpoint = new GetChildOrdersNativeEndpoint(new FakeGetChildOrdersProtocolEndpoint((productCode, count, before, after, childOrderState, childOrderId, childOrderAcceptanceId, parentOrderId) => throw new InvalidOperationException()));
 
-        var call = await endpoint.CallAsync(new GetChildOrdersRequest { ChildOrderState = "PENDING" });
+        var call = await endpoint.CallAsync(new GetChildOrdersRequest { ChildOrderState = (BitflyerOrderState)999 });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
@@ -150,7 +150,7 @@ public sealed class PrivateNativeEndpointTests
         Assert.Single(call.Response!);
         Assert.Equal(37233L, call.Response![0].Id);
         Assert.Equal("JOR20150707-060559-021935", call.Response[0].ChildOrderId);
-        Assert.Equal("BUY", call.Response[0].Side);
+        Assert.Equal(OrderSides.Buy, call.Response[0].Side);
         Assert.Equal(33470m, call.Response[0].Price);
         Assert.Equal(new DateTimeOffset(2015, 7, 7, 9, 57, 40, 397, TimeSpan.Zero), call.Response[0].ExecDate);
     }
@@ -327,7 +327,7 @@ public sealed class PrivateNativeEndpointTests
         var call = await endpoint.CallAsync(new SendChildOrderRequest
         {
             ProductCode = ProductCodes.BtcJpy,
-            ChildOrderType = "STOP",
+            ChildOrderType = (BitflyerChildOrderType)999,
             Side = OrderSides.Buy,
             Size = 0.01m,
         });
@@ -346,7 +346,7 @@ public sealed class PrivateNativeEndpointTests
         {
             ProductCode = ProductCodes.BtcJpy,
             ChildOrderType = ChildOrderTypes.Market,
-            Side = "HOLD",
+            Side = (BitflyerOrderSide)999,
             Size = 0.01m,
         });
 
@@ -385,7 +385,7 @@ public sealed class PrivateNativeEndpointTests
             ChildOrderType = ChildOrderTypes.Market,
             Side = OrderSides.Buy,
             Size = 0.01m,
-            TimeInForce = "DAY",
+            TimeInForce = (BitflyerTimeInForce)999,
         });
 
         Assert.False(call.IsSuccess);

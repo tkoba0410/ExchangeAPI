@@ -77,7 +77,7 @@ public sealed class GetDepositsNativeEndpoint : IGetDepositsNativeEndpoint
                     OrderId = JsonValueReader.ReadRequiredString(item, "order_id"),
                     CurrencyCode = JsonValueReader.ReadRequiredString(item, "currency_code"),
                     Amount = JsonValueReader.ReadRequiredDecimal(item, "amount"),
-                    Status = JsonValueReader.ReadRequiredString(item, "status"),
+                    Status = JsonValueReader.ReadRequiredEnum<BitflyerTransferStatus>(item, "status"),
                     EventDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "event_date"),
                 });
             }

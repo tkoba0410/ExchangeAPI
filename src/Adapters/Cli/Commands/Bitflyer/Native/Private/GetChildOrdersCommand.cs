@@ -3,6 +3,7 @@ using ExchangeApi.Adapters.Cli.Configuration;
 using ExchangeApi.Adapters.Cli.Infrastructure;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Adapters.Cli.Commands.Bitflyer.Native.Private;
 
@@ -40,7 +41,10 @@ public static class GetChildOrdersCommand
             DescribeRequest = static request =>
             {
                 var typed = (GetChildOrdersRequest)request;
-                return $"product_code={(typed.ProductCode ?? "<omitted>")}, count={(typed.Count?.ToString() ?? "<omitted>")}, child_order_state={(typed.ChildOrderState ?? "<omitted>")}";
+                var childOrderState = typed.ChildOrderState is { } value
+                    ? ApiStringEnum<BitflyerOrderState>.Format(value)
+                    : "<omitted>";
+                return $"product_code={(typed.ProductCode ?? "<omitted>")}, count={(typed.Count?.ToString() ?? "<omitted>")}, child_order_state={childOrderState}";
             },
             ExecuteAsync = ExecuteAsync,
         };
@@ -93,13 +97,24 @@ public static class GetChildOrdersCommand
             return RequestBindingResult.Failure("invalid argument", afterError);
         }
 
+        if (!OptionValueBinder.TryGetOptionalParsed(
+                options,
+                "child-order-state",
+                "child_order_state",
+                ApiStringEnum<BitflyerOrderState>.TryParse,
+                out BitflyerOrderState? childOrderState,
+                out var childOrderStateError))
+        {
+            return RequestBindingResult.Failure("invalid argument", childOrderStateError);
+        }
+
         return RequestBindingResult.Success(new GetChildOrdersRequest
         {
             ProductCode = options.GetValue("product-code"),
             Count = count,
             Before = before,
             After = after,
-            ChildOrderState = options.GetValue("child-order-state"),
+            ChildOrderState = childOrderState,
             ChildOrderId = options.GetValue("child-order-id"),
             ChildOrderAcceptanceId = options.GetValue("child-order-acceptance-id"),
             ParentOrderId = options.GetValue("parent-order-id"),

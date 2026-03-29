@@ -771,6 +771,12 @@ bitFlyer private endpoint の認証・署名は `Protocol` が担う。
 - `Native` response DTO の全 property は、対応する API response JSON field 名を `JsonPropertyName` で明示しなければならない
 - `JsonPropertyName` に指定する名前は、API response JSON に現れる field 名と一致しなければならない
 - response field の required / optional 判定は `JsonPropertyName` の有無ではなく、endpoint contract に従って別に固定する
+- venue API の closed-set string vocabulary は、current phase では venue-local enum へ昇格させる
+- enum 化しても wire JSON の値は API string value を維持しなければならない
+- enum は cross-venue 共通化せず、対応する `Vocabulary` project に venue-local 型として置く
+- current phase の bitFlyer `Native` では、少なくとも `Side`, `TimeInForce`, `ChildOrderType`, `ConditionType`, `OrderMethod`, `ChildOrderState`, `ParentOrderState`, `HealthStatus`, `TradingState`, `TransferStatus`, `MarketType`, `TradeType`, `AddressType`, `ParentOrderType` を enum 化対象とする
+- `AccountType` と `ReasonCode` は current phase では string のまま維持する
+- docs 上の値集合が弱い field は `Unknown` member を持ってよいが、docs で閉集合が確認できる field は raw string 受理へ戻さない
 - raw diagnostics 起源の property は持ち込まない
 
 ### 7.3 形状

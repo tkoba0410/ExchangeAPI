@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetExecutionsPublic;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Fakes;
@@ -40,7 +41,7 @@ public sealed class GetExecutionsPublicNativeEndpointTests
         Assert.True(call.IsSuccess);
         Assert.Single(call.Response!);
         Assert.Equal(39287L, call.Response![0].Id);
-        Assert.Equal("BUY", call.Response[0].Side);
+        Assert.Equal(OrderSides.Buy, call.Response[0].Side);
         Assert.Equal("JRF20150708-024334-060234", call.Response[0].SellChildOrderAcceptanceId);
         Assert.Equal(new DateTimeOffset(2015, 7, 8, 2, 43, 34, 823, TimeSpan.Zero), call.Response[0].ExecDate);
     }

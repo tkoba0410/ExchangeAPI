@@ -64,7 +64,7 @@ public sealed class GetHealthNativeEndpoint : IGetHealthNativeEndpoint
             var root = JsonValueReader.EnsureObject(protocolCall.Response.BodyText);
             var response = new GetHealthResponse
             {
-                Status = JsonValueReader.ReadRequiredString(root, "status"),
+                Status = JsonValueReader.ReadRequiredEnum<BitflyerHealthStatus>(root, "status"),
             };
 
             return NativeCallFactory.Success(request, response, protocolCall, "Public");

@@ -75,7 +75,7 @@ public sealed class GetPositionsNativeEndpoint : IGetPositionsNativeEndpoint
                 items.Add(new GetPositions.Item
                 {
                     ProductCode = JsonValueReader.ReadRequiredString(item, "product_code"),
-                    Side = JsonValueReader.ReadRequiredString(item, "side"),
+                    Side = JsonValueReader.ReadRequiredEnum<BitflyerOrderSide>(item, "side"),
                     Price = JsonValueReader.ReadRequiredDecimal(item, "price"),
                     Size = JsonValueReader.ReadRequiredDecimal(item, "size"),
                     Commission = JsonValueReader.ReadRequiredDecimal(item, "commission"),

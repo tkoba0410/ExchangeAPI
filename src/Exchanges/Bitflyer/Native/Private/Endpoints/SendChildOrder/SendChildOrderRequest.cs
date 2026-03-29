@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 
@@ -8,10 +9,10 @@ public sealed class SendChildOrderRequest
     public required string ProductCode { get; init; }
 
     [JsonPropertyName("child_order_type")]
-    public required string ChildOrderType { get; init; }
+    public required BitflyerChildOrderType ChildOrderType { get; init; }
 
     [JsonPropertyName("side")]
-    public required string Side { get; init; }
+    public required BitflyerOrderSide Side { get; init; }
 
     [JsonPropertyName("price")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -26,5 +27,5 @@ public sealed class SendChildOrderRequest
 
     [JsonPropertyName("time_in_force")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? TimeInForce { get; init; }
+    public BitflyerTimeInForce? TimeInForce { get; init; }
 }

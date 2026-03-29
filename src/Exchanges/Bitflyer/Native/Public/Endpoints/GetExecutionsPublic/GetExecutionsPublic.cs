@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetExecutionsPublic;
 
@@ -10,7 +11,7 @@ public static class GetExecutionsPublic
         public required long Id { get; init; }
 
         [JsonPropertyName("side")]
-        public required string Side { get; init; }
+        public required BitflyerOrderSide Side { get; init; }
 
         [JsonPropertyName("price")]
         public required decimal Price { get; init; }

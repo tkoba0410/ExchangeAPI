@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinIns;
 
@@ -19,7 +20,7 @@ public static class GetCoinIns
         [JsonPropertyName("tx_hash")]
         public required string TxHash { get; init; }
         [JsonPropertyName("status")]
-        public required string Status { get; init; }
+        public required BitflyerTransferStatus Status { get; init; }
         [JsonPropertyName("event_date")]
         public required DateTimeOffset EventDate { get; init; }
     }

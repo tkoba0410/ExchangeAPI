@@ -3,6 +3,7 @@ using ExchangeApi.Adapters.Cli.Configuration;
 using ExchangeApi.Adapters.Cli.Infrastructure;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Adapters.Cli.Commands.Bitflyer.Native.Private;
 
@@ -30,7 +31,10 @@ public static class SendParentOrderCommand
             DescribeRequest = static request =>
             {
                 var typed = (SendParentOrderRequest)request;
-                return $"order_method={(typed.OrderMethod ?? "SIMPLE")}, parameters={typed.Parameters.Count}";
+                var orderMethod = typed.OrderMethod is { } value
+                    ? ApiStringEnum<BitflyerOrderMethod>.Format(value)
+                    : ApiStringEnum<BitflyerOrderMethod>.Format(ParentOrderMethods.Simple);
+                return $"order_method={orderMethod}, parameters={typed.Parameters.Count}";
             },
             ExecuteAsync = ExecuteAsync,
         };

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 
@@ -112,6 +113,18 @@ internal static class JsonValueReader
         }
 
         return property.GetString();
+    }
+
+    internal static TEnum ReadRequiredEnum<TEnum>(JsonElement element, string propertyName) where TEnum : struct, Enum
+    {
+        var raw = ReadRequiredString(element, propertyName);
+        if (ApiStringEnum<TEnum>.TryParseOrUnknown(raw, out var value))
+        {
+            return value;
+        }
+
+        throw new CodecException(
+            $"Property '{propertyName}' must be one of: {ApiStringEnum<TEnum>.DescribeAllowedValues()}.");
     }
 
     internal static DateTimeOffset ReadRequiredTimestamp(JsonElement element, string propertyName)

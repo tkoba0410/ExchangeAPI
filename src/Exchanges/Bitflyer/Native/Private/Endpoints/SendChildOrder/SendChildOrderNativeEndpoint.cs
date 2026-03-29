@@ -91,13 +91,7 @@ public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
             return new CallError { Kind = CallErrorKinds.Semantic, Message = "ProductCode is required." };
         }
 
-        if (string.IsNullOrWhiteSpace(request.ChildOrderType))
-        {
-            return new CallError { Kind = CallErrorKinds.Semantic, Message = "ChildOrderType is required." };
-        }
-
-        if (!string.Equals(request.ChildOrderType, ChildOrderTypes.Limit, StringComparison.Ordinal) &&
-            !string.Equals(request.ChildOrderType, ChildOrderTypes.Market, StringComparison.Ordinal))
+        if (!ApiStringEnum<BitflyerChildOrderType>.IsDefined(request.ChildOrderType))
         {
             return new CallError
             {
@@ -106,13 +100,7 @@ public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
             };
         }
 
-        if (string.IsNullOrWhiteSpace(request.Side))
-        {
-            return new CallError { Kind = CallErrorKinds.Semantic, Message = "Side is required." };
-        }
-
-        if (!string.Equals(request.Side, OrderSides.Buy, StringComparison.Ordinal) &&
-            !string.Equals(request.Side, OrderSides.Sell, StringComparison.Ordinal))
+        if (!ApiStringEnum<BitflyerOrderSide>.IsDefined(request.Side))
         {
             return new CallError
             {
@@ -136,9 +124,7 @@ public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
         }
 
         if (request.TimeInForce is not null &&
-            !string.Equals(request.TimeInForce, TimeInForces.Gtc, StringComparison.Ordinal) &&
-            !string.Equals(request.TimeInForce, TimeInForces.Ioc, StringComparison.Ordinal) &&
-            !string.Equals(request.TimeInForce, TimeInForces.Fok, StringComparison.Ordinal))
+            !ApiStringEnum<BitflyerTimeInForce>.IsDefined(request.TimeInForce.Value))
         {
             return new CallError
             {
@@ -147,7 +133,7 @@ public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
             };
         }
 
-        if (string.Equals(request.ChildOrderType, ChildOrderTypes.Limit, StringComparison.Ordinal))
+        if (request.ChildOrderType == ChildOrderTypes.Limit)
         {
             if (request.Price is null)
             {
@@ -160,7 +146,7 @@ public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
             }
         }
 
-        if (string.Equals(request.ChildOrderType, ChildOrderTypes.Market, StringComparison.Ordinal) && request.Price is not null)
+        if (request.ChildOrderType == ChildOrderTypes.Market && request.Price is not null)
         {
             return new CallError { Kind = CallErrorKinds.Semantic, Message = "Price must be omitted for MARKET orders." };
         }
@@ -171,7 +157,7 @@ public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
     private static string BuildBody(SendChildOrderRequest request)
     {
         var normalizedRequest = request;
-        if (string.Equals(request.ChildOrderType, ChildOrderTypes.Market, StringComparison.Ordinal))
+        if (request.ChildOrderType == ChildOrderTypes.Market)
         {
             normalizedRequest = new SendChildOrderRequest
             {

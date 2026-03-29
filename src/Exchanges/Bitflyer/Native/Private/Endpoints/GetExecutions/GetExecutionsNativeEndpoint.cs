@@ -84,7 +84,7 @@ public sealed class GetExecutionsNativeEndpoint : IGetExecutionsNativeEndpoint
                 {
                     Id = JsonValueReader.ReadRequiredLong(item, "id"),
                     ChildOrderId = JsonValueReader.ReadRequiredString(item, "child_order_id"),
-                    Side = JsonValueReader.ReadRequiredString(item, "side"),
+                    Side = JsonValueReader.ReadRequiredEnum<BitflyerOrderSide>(item, "side"),
                     Price = JsonValueReader.ReadRequiredDecimal(item, "price"),
                     Size = JsonValueReader.ReadRequiredDecimal(item, "size"),
                     Commission = JsonValueReader.ReadRequiredDecimal(item, "commission"),

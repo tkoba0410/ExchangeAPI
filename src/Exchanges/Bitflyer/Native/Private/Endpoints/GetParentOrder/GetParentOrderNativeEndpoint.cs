@@ -83,8 +83,8 @@ public sealed class GetParentOrderNativeEndpoint : IGetParentOrderNativeEndpoint
                 parameters.Add(new GetParentOrderParameter
                 {
                     ProductCode = JsonValueReader.ReadRequiredString(parameter, "product_code"),
-                    ConditionType = JsonValueReader.ReadRequiredString(parameter, "condition_type"),
-                    Side = JsonValueReader.ReadRequiredString(parameter, "side"),
+                    ConditionType = JsonValueReader.ReadRequiredEnum<BitflyerConditionType>(parameter, "condition_type"),
+                    Side = JsonValueReader.ReadRequiredEnum<BitflyerOrderSide>(parameter, "side"),
                     Price = JsonValueReader.ReadRequiredDecimal(parameter, "price"),
                     Size = JsonValueReader.ReadRequiredDecimal(parameter, "size"),
                     TriggerPrice = JsonValueReader.ReadRequiredDecimal(parameter, "trigger_price"),
@@ -96,9 +96,9 @@ public sealed class GetParentOrderNativeEndpoint : IGetParentOrderNativeEndpoint
             {
                 Id = JsonValueReader.ReadRequiredLong(root, "id"),
                 ParentOrderId = JsonValueReader.ReadRequiredString(root, "parent_order_id"),
-                OrderMethod = JsonValueReader.ReadRequiredString(root, "order_method"),
+                OrderMethod = JsonValueReader.ReadRequiredEnum<BitflyerOrderMethod>(root, "order_method"),
                 ExpireDate = JsonValueReader.ReadRequiredUtcTimestamp(root, "expire_date"),
-                TimeInForce = JsonValueReader.ReadRequiredString(root, "time_in_force"),
+                TimeInForce = JsonValueReader.ReadRequiredEnum<BitflyerTimeInForce>(root, "time_in_force"),
                 Parameters = parameters,
                 ParentOrderAcceptanceId = JsonValueReader.ReadRequiredString(root, "parent_order_acceptance_id"),
             };

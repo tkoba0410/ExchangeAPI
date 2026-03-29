@@ -81,7 +81,7 @@ public sealed class GetCoinOutsNativeEndpoint : IGetCoinOutsNativeEndpoint
                     TxHash = JsonValueReader.ReadRequiredString(item, "tx_hash"),
                     Fee = JsonValueReader.ReadRequiredDecimal(item, "fee"),
                     AdditionalFee = JsonValueReader.ReadRequiredDecimal(item, "additional_fee"),
-                    Status = JsonValueReader.ReadRequiredString(item, "status"),
+                    Status = JsonValueReader.ReadRequiredEnum<BitflyerTransferStatus>(item, "status"),
                     EventDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "event_date"),
                 });
             }

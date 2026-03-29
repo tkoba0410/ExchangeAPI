@@ -8,6 +8,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Api;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
 
@@ -20,8 +21,8 @@ public sealed class CliApplicationTests
     {
         var value = new ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState.GetBoardStateResponse
         {
-            Health = "NORMAL",
-            State = "RUNNING",
+            Health = HealthStatuses.Normal,
+            State = TradingStates.Running,
             Data = new ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState.GetBoardStateData
             {
                 SpecialQuotation = 123.45m,

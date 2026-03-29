@@ -33,6 +33,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetFundingRate;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetHealth;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Units;
 
@@ -45,7 +46,7 @@ public sealed class NativeFacadeTests
     {
         var getMarkets = CallFactory.Success(
             new GetMarketsRequest(),
-            (IReadOnlyList<GetMarkets.Item>)[new GetMarkets.Item { ProductCode = "BTC_JPY", MarketType = "Spot" }],
+            (IReadOnlyList<GetMarkets.Item>)[new GetMarkets.Item { ProductCode = "BTC_JPY", MarketType = MarketTypes.Spot }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PublicEndpointModule, EndpointId = "GetMarkets", Scope = "Public", Auth = "None" });
         var getBoard = CallFactory.Success(
             new GetBoardRequest { ProductCode = null },
@@ -60,14 +61,14 @@ public sealed class NativeFacadeTests
             new GetBoardStateRequest { ProductCode = "BTC_JPY" },
             new GetBoardStateResponse
             {
-                Health = "NORMAL",
-                State = "RUNNING",
+                Health = HealthStatuses.Normal,
+                State = TradingStates.Running,
                 Data = new GetBoardStateData { SpecialQuotation = 1m },
             },
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PublicEndpointModule, EndpointId = "GetBoardState", Scope = "Public", Auth = "None" });
         var getHealth = CallFactory.Success(
             new GetHealthRequest { ProductCode = "BTC_JPY" },
-            new GetHealthResponse { Status = "NORMAL" },
+            new GetHealthResponse { Status = HealthStatuses.Normal },
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PublicEndpointModule, EndpointId = "GetHealth", Scope = "Public", Auth = "None" });
         var getFundingRate = CallFactory.Success(
             new GetFundingRateRequest { ProductCode = "FX_BTC_JPY" },
@@ -101,7 +102,7 @@ public sealed class NativeFacadeTests
             (IReadOnlyList<GetExecutionsPublic.Item>)[new GetExecutionsPublic.Item
             {
                 Id = 1,
-                Side = "BUY",
+                Side = OrderSides.Buy,
                 Price = 1m,
                 Size = 1m,
                 ExecDate = DateTimeOffset.UnixEpoch,
@@ -114,7 +115,7 @@ public sealed class NativeFacadeTests
             new GetTickerResponse
             {
                 ProductCode = "BTC_JPY",
-                State = "RUNNING",
+                State = TradingStates.Running,
                 Timestamp = DateTimeOffset.UtcNow,
                 TickId = 1,
                 BestBid = 1,
@@ -171,15 +172,15 @@ public sealed class NativeFacadeTests
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetPermissions", Scope = "Private", Auth = "KeySecret" });
         var getAddresses = CallFactory.Success(
             new GetAddressesRequest(),
-            (IReadOnlyList<GetAddresses.Item>)[new GetAddresses.Item { Type = "NORMAL", CurrencyCode = "BTC", Address = "addr" }],
+            (IReadOnlyList<GetAddresses.Item>)[new GetAddresses.Item { Type = AddressTypes.Normal, CurrencyCode = "BTC", Address = "addr" }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetAddresses", Scope = "Private", Auth = "KeySecret" });
         var getCoinIns = CallFactory.Success(
             new GetCoinInsRequest { Count = 10 },
-            (IReadOnlyList<GetCoinIns.Item>)[new GetCoinIns.Item { Id = 1, OrderId = "CDP1", CurrencyCode = "BTC", Amount = 1m, Address = "addr", TxHash = "hash", Status = "COMPLETED", EventDate = DateTimeOffset.UnixEpoch }],
+            (IReadOnlyList<GetCoinIns.Item>)[new GetCoinIns.Item { Id = 1, OrderId = "CDP1", CurrencyCode = "BTC", Amount = 1m, Address = "addr", TxHash = "hash", Status = TransferStatuses.Completed, EventDate = DateTimeOffset.UnixEpoch }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetCoinIns", Scope = "Private", Auth = "KeySecret" });
         var getCoinOuts = CallFactory.Success(
             new GetCoinOutsRequest { Count = 10 },
-            (IReadOnlyList<GetCoinOuts.Item>)[new GetCoinOuts.Item { Id = 1, OrderId = "CWD1", CurrencyCode = "BTC", Amount = 1m, Address = "addr", TxHash = "hash", Fee = 0.1m, AdditionalFee = 0.01m, Status = "COMPLETED", EventDate = DateTimeOffset.UnixEpoch }],
+            (IReadOnlyList<GetCoinOuts.Item>)[new GetCoinOuts.Item { Id = 1, OrderId = "CWD1", CurrencyCode = "BTC", Amount = 1m, Address = "addr", TxHash = "hash", Fee = 0.1m, AdditionalFee = 0.01m, Status = TransferStatuses.Completed, EventDate = DateTimeOffset.UnixEpoch }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetCoinOuts", Scope = "Private", Auth = "KeySecret" });
         var getBankAccounts = CallFactory.Success(
             new GetBankAccountsRequest(),
@@ -187,7 +188,7 @@ public sealed class NativeFacadeTests
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetBankAccounts", Scope = "Private", Auth = "KeySecret" });
         var getDeposits = CallFactory.Success(
             new GetDepositsRequest { Count = 10 },
-            (IReadOnlyList<GetDeposits.Item>)[new GetDeposits.Item { Id = 1, OrderId = "MDP1", CurrencyCode = "JPY", Amount = 10m, Status = "COMPLETED", EventDate = DateTimeOffset.UnixEpoch }],
+            (IReadOnlyList<GetDeposits.Item>)[new GetDeposits.Item { Id = 1, OrderId = "MDP1", CurrencyCode = "JPY", Amount = 10m, Status = TransferStatuses.Completed, EventDate = DateTimeOffset.UnixEpoch }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetDeposits", Scope = "Private", Auth = "KeySecret" });
         var withdraw = CallFactory.Success(
             new WithdrawRequest { CurrencyCode = "JPY", BankAccountId = 1, Amount = 10m, Code = "123456" },
@@ -195,7 +196,7 @@ public sealed class NativeFacadeTests
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "Withdraw", Scope = "Private", Auth = "KeySecret" });
         var getWithdrawals = CallFactory.Success(
             new GetWithdrawalsRequest { Count = 10, MessageId = "MID1" },
-            (IReadOnlyList<GetWithdrawals.Item>)[new GetWithdrawals.Item { Id = 1, OrderId = "MWD1", CurrencyCode = "JPY", Amount = 10m, Status = "COMPLETED", EventDate = DateTimeOffset.UnixEpoch }],
+            (IReadOnlyList<GetWithdrawals.Item>)[new GetWithdrawals.Item { Id = 1, OrderId = "MWD1", CurrencyCode = "JPY", Amount = 10m, Status = TransferStatuses.Completed, EventDate = DateTimeOffset.UnixEpoch }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetWithdrawals", Scope = "Private", Auth = "KeySecret" });
         var getBalance = CallFactory.Success(
             new GetBalanceRequest(),
@@ -203,11 +204,11 @@ public sealed class NativeFacadeTests
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetBalance", Scope = "Private", Auth = "KeySecret" });
         var getParentOrders = CallFactory.Success(
             new GetParentOrdersRequest { ProductCode = "BTC_JPY", Count = 10 },
-            (IReadOnlyList<GetParentOrders.Item>)[new GetParentOrders.Item { Id = 1, ParentOrderId = "JCO1", ProductCode = "BTC_JPY", Side = "BUY", ParentOrderType = "SIMPLE", Price = 1m, AveragePrice = 1m, Size = 1m, ParentOrderState = "ACTIVE", ExpireDate = DateTimeOffset.UnixEpoch, ParentOrderDate = DateTimeOffset.UnixEpoch, ParentOrderAcceptanceId = "JRF1", OutstandingSize = 1m, CancelSize = 0m, ExecutedSize = 0m, TotalCommission = 0m }],
+            (IReadOnlyList<GetParentOrders.Item>)[new GetParentOrders.Item { Id = 1, ParentOrderId = "JCO1", ProductCode = "BTC_JPY", Side = OrderSides.Buy, ParentOrderType = ParentOrderTypes.Unknown, Price = 1m, AveragePrice = 1m, Size = 1m, ParentOrderState = ParentOrderStates.Active, ExpireDate = DateTimeOffset.UnixEpoch, ParentOrderDate = DateTimeOffset.UnixEpoch, ParentOrderAcceptanceId = "JRF1", OutstandingSize = 1m, CancelSize = 0m, ExecutedSize = 0m, TotalCommission = 0m }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetParentOrders", Scope = "Private", Auth = "KeySecret" });
         var getParentOrder = CallFactory.Success(
             new GetParentOrderRequest { ParentOrderId = "JCO1" },
-            new GetParentOrderResponse { Id = 1, ParentOrderId = "JCO1", OrderMethod = "SIMPLE", ExpireDate = DateTimeOffset.UnixEpoch, TimeInForce = "GTC", Parameters = [new GetParentOrderParameter { ProductCode = "BTC_JPY", ConditionType = "LIMIT", Side = "BUY", Price = 1m, Size = 1m, TriggerPrice = 0m, Offset = 0 }], ParentOrderAcceptanceId = "JRF1" },
+            new GetParentOrderResponse { Id = 1, ParentOrderId = "JCO1", OrderMethod = ParentOrderMethods.Simple, ExpireDate = DateTimeOffset.UnixEpoch, TimeInForce = TimeInForces.Gtc, Parameters = [new GetParentOrderParameter { ProductCode = "BTC_JPY", ConditionType = ParentOrderConditionTypes.Limit, Side = OrderSides.Buy, Price = 1m, Size = 1m, TriggerPrice = 0m, Offset = 0 }], ParentOrderAcceptanceId = "JRF1" },
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetParentOrder", Scope = "Private", Auth = "KeySecret" });
         var getCollateral = CallFactory.Success(
             new GetCollateralRequest(),
@@ -244,12 +245,12 @@ public sealed class NativeFacadeTests
                 Id = 1,
                 ChildOrderId = "JOR1",
                 ProductCode = "BTC_JPY",
-                Side = "BUY",
-                ChildOrderType = "LIMIT",
+                Side = OrderSides.Buy,
+                ChildOrderType = ChildOrderTypes.Limit,
                 Price = 1m,
                 AveragePrice = 1m,
                 Size = 1m,
-                ChildOrderState = "COMPLETED",
+                ChildOrderState = ChildOrderStates.Completed,
                 ExpireDate = DateTimeOffset.UnixEpoch,
                 ChildOrderDate = DateTimeOffset.UnixEpoch,
                 ChildOrderAcceptanceId = "JRF1",
@@ -257,7 +258,7 @@ public sealed class NativeFacadeTests
                 CancelSize = 0m,
                 ExecutedSize = 1m,
                 TotalCommission = 0m,
-                TimeInForce = "GTC",
+                TimeInForce = TimeInForces.Gtc,
             }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetChildOrders", Scope = "Private", Auth = "KeySecret" });
         var getExecutions = CallFactory.Success(
@@ -266,7 +267,7 @@ public sealed class NativeFacadeTests
             {
                 Id = 1,
                 ChildOrderId = "JOR1",
-                Side = "BUY",
+                Side = OrderSides.Buy,
                 Price = 1m,
                 Size = 1m,
                 Commission = 0m,
@@ -276,14 +277,14 @@ public sealed class NativeFacadeTests
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetExecutionsPrivate", Scope = "Private", Auth = "KeySecret" });
         var getBalanceHistory = CallFactory.Success(
             new GetBalanceHistoryRequest { CurrencyCode = "JPY", Count = 10 },
-            (IReadOnlyList<GetBalanceHistory.Item>)[new GetBalanceHistory.Item { Id = 1, TradeDate = DateTimeOffset.UnixEpoch, EventDate = DateTimeOffset.UnixEpoch, ProductCode = null, CurrencyCode = "JPY", TradeType = "DEPOSIT", Price = 0m, Amount = 10m, Quantity = 0m, Commission = 0m, Balance = 10m, OrderId = "ORDER1" }],
+            (IReadOnlyList<GetBalanceHistory.Item>)[new GetBalanceHistory.Item { Id = 1, TradeDate = DateTimeOffset.UnixEpoch, EventDate = DateTimeOffset.UnixEpoch, ProductCode = null, CurrencyCode = "JPY", TradeType = TradeTypes.Deposit, Price = 0m, Amount = 10m, Quantity = 0m, Commission = 0m, Balance = 10m, OrderId = "ORDER1" }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetBalanceHistory", Scope = "Private", Auth = "KeySecret" });
         var getPositions = CallFactory.Success(
             new GetPositionsRequest { ProductCode = "FX_BTC_JPY" },
             (IReadOnlyList<GetPositions.Item>)[new GetPositions.Item
             {
                 ProductCode = "FX_BTC_JPY",
-                Side = "BUY",
+                Side = OrderSides.Buy,
                 Price = 1m,
                 Size = 1m,
                 Commission = 0m,
@@ -300,11 +301,11 @@ public sealed class NativeFacadeTests
             new GetTradingCommissionResponse { CommissionRate = 0.001m },
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetTradingCommission", Scope = "Private", Auth = "KeySecret" });
         var sendChildOrder = CallFactory.Success(
-            new SendChildOrderRequest { ProductCode = "BTC_JPY", ChildOrderType = "MARKET", Side = "BUY", Size = 1m },
+            new SendChildOrderRequest { ProductCode = "BTC_JPY", ChildOrderType = ChildOrderTypes.Market, Side = OrderSides.Buy, Size = 1m },
             new SendChildOrderResponse { ChildOrderAcceptanceId = "A" },
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "SendChildOrder", Scope = "Private", Auth = "KeySecret" });
         var sendParentOrder = CallFactory.Success(
-            new SendParentOrderRequest { Parameters = [new SendParentOrderParameter { ProductCode = "BTC_JPY", ConditionType = "LIMIT", Side = "BUY", Price = 1m, Size = 1m }] },
+            new SendParentOrderRequest { Parameters = [new SendParentOrderParameter { ProductCode = "BTC_JPY", ConditionType = ParentOrderConditionTypes.Limit, Side = OrderSides.Buy, Price = 1m, Size = 1m }] },
             new SendParentOrderResponse { ParentOrderAcceptanceId = "A" },
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "SendParentOrder", Scope = "Private", Auth = "KeySecret" });
         var cancelChildOrder = CallFactory.Success(
@@ -365,8 +366,8 @@ public sealed class NativeFacadeTests
         Assert.Same(getBalanceHistory, await api.GetBalanceHistoryCallAsync(new GetBalanceHistoryRequest { CurrencyCode = "JPY", Count = 10 }));
         Assert.Same(getPositions, await api.GetPositionsCallAsync(new GetPositionsRequest { ProductCode = "FX_BTC_JPY" }));
         Assert.Same(getTradingCommission, await api.GetTradingCommissionCallAsync(new GetTradingCommissionRequest { ProductCode = "BTC_JPY" }));
-        Assert.Same(sendChildOrder, await api.SendChildOrderCallAsync(new SendChildOrderRequest { ProductCode = "BTC_JPY", ChildOrderType = "MARKET", Side = "BUY", Size = 1m }));
-        Assert.Same(sendParentOrder, await api.SendParentOrderCallAsync(new SendParentOrderRequest { Parameters = [new SendParentOrderParameter { ProductCode = "BTC_JPY", ConditionType = "LIMIT", Side = "BUY", Price = 1m, Size = 1m }] }));
+        Assert.Same(sendChildOrder, await api.SendChildOrderCallAsync(new SendChildOrderRequest { ProductCode = "BTC_JPY", ChildOrderType = ChildOrderTypes.Market, Side = OrderSides.Buy, Size = 1m }));
+        Assert.Same(sendParentOrder, await api.SendParentOrderCallAsync(new SendParentOrderRequest { Parameters = [new SendParentOrderParameter { ProductCode = "BTC_JPY", ConditionType = ParentOrderConditionTypes.Limit, Side = OrderSides.Buy, Price = 1m, Size = 1m }] }));
         Assert.Same(cancelChildOrder, await api.CancelChildOrderCallAsync(new CancelChildOrderRequest { ProductCode = "BTC_JPY", ChildOrderId = "X" }));
         Assert.Same(cancelAllChildOrders, await api.CancelAllChildOrdersCallAsync(new CancelAllChildOrdersRequest { ProductCode = "BTC_JPY" }));
         Assert.Same(cancelParentOrder, await api.CancelParentOrderCallAsync(new CancelParentOrderRequest { ProductCode = "BTC_JPY", ParentOrderId = "JCO1" }));

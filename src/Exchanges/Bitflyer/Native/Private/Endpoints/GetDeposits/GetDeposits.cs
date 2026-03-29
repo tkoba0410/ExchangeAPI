@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetDeposits;
 
@@ -15,7 +16,7 @@ public static class GetDeposits
         [JsonPropertyName("amount")]
         public required decimal Amount { get; init; }
         [JsonPropertyName("status")]
-        public required string Status { get; init; }
+        public required BitflyerTransferStatus Status { get; init; }
         [JsonPropertyName("event_date")]
         public required DateTimeOffset EventDate { get; init; }
     }

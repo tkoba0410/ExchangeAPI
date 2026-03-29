@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 
@@ -16,10 +17,10 @@ public static class GetChildOrders
         public required string ProductCode { get; init; }
 
         [JsonPropertyName("side")]
-        public required string Side { get; init; }
+        public required BitflyerOrderSide Side { get; init; }
 
         [JsonPropertyName("child_order_type")]
-        public required string ChildOrderType { get; init; }
+        public required BitflyerChildOrderType ChildOrderType { get; init; }
 
         [JsonPropertyName("price")]
         public required decimal Price { get; init; }
@@ -31,7 +32,7 @@ public static class GetChildOrders
         public required decimal Size { get; init; }
 
         [JsonPropertyName("child_order_state")]
-        public required string ChildOrderState { get; init; }
+        public required BitflyerOrderState ChildOrderState { get; init; }
 
         [JsonPropertyName("expire_date")]
         public required DateTimeOffset ExpireDate { get; init; }
@@ -55,6 +56,6 @@ public static class GetChildOrders
         public required decimal TotalCommission { get; init; }
 
         [JsonPropertyName("time_in_force")]
-        public required string TimeInForce { get; init; }
+        public required BitflyerTimeInForce TimeInForce { get; init; }
     }
 }

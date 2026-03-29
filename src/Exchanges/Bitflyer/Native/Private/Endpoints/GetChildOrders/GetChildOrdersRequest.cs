@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 
@@ -17,7 +18,7 @@ public sealed class GetChildOrdersRequest
     public long? After { get; init; }
 
     [JsonPropertyName("child_order_state")]
-    public string? ChildOrderState { get; init; }
+    public BitflyerOrderState? ChildOrderState { get; init; }
 
     [JsonPropertyName("child_order_id")]
     public string? ChildOrderId { get; init; }

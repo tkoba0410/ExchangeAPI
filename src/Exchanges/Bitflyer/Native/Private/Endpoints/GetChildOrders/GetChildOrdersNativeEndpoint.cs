@@ -42,7 +42,7 @@ public sealed class GetChildOrdersNativeEndpoint : IGetChildOrdersNativeEndpoint
             request.Count,
             request.Before,
             request.After,
-            request.ChildOrderState,
+            request.ChildOrderState is { } childOrderState ? ApiStringEnum<BitflyerOrderState>.Format(childOrderState) : null,
             request.ChildOrderId,
             request.ChildOrderAcceptanceId,
             request.ParentOrderId,
@@ -87,12 +87,12 @@ public sealed class GetChildOrdersNativeEndpoint : IGetChildOrdersNativeEndpoint
                     Id = JsonValueReader.ReadRequiredLong(item, "id"),
                     ChildOrderId = JsonValueReader.ReadRequiredString(item, "child_order_id"),
                     ProductCode = JsonValueReader.ReadRequiredString(item, "product_code"),
-                    Side = JsonValueReader.ReadRequiredString(item, "side"),
-                    ChildOrderType = JsonValueReader.ReadRequiredString(item, "child_order_type"),
+                    Side = JsonValueReader.ReadRequiredEnum<BitflyerOrderSide>(item, "side"),
+                    ChildOrderType = JsonValueReader.ReadRequiredEnum<BitflyerChildOrderType>(item, "child_order_type"),
                     Price = JsonValueReader.ReadRequiredDecimal(item, "price"),
                     AveragePrice = JsonValueReader.ReadRequiredDecimal(item, "average_price"),
                     Size = JsonValueReader.ReadRequiredDecimal(item, "size"),
-                    ChildOrderState = JsonValueReader.ReadRequiredString(item, "child_order_state"),
+                    ChildOrderState = JsonValueReader.ReadRequiredEnum<BitflyerOrderState>(item, "child_order_state"),
                     ExpireDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "expire_date"),
                     ChildOrderDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "child_order_date"),
                     ChildOrderAcceptanceId = JsonValueReader.ReadRequiredString(item, "child_order_acceptance_id"),
@@ -100,7 +100,7 @@ public sealed class GetChildOrdersNativeEndpoint : IGetChildOrdersNativeEndpoint
                     CancelSize = JsonValueReader.ReadRequiredDecimal(item, "cancel_size"),
                     ExecutedSize = JsonValueReader.ReadRequiredDecimal(item, "executed_size"),
                     TotalCommission = JsonValueReader.ReadRequiredDecimal(item, "total_commission"),
-                    TimeInForce = JsonValueReader.ReadRequiredString(item, "time_in_force"),
+                    TimeInForce = JsonValueReader.ReadRequiredEnum<BitflyerTimeInForce>(item, "time_in_force"),
                 });
             }
 
@@ -135,12 +135,8 @@ public sealed class GetChildOrdersNativeEndpoint : IGetChildOrdersNativeEndpoint
             return new CallError { Kind = CallErrorKinds.Semantic, Message = "After must be greater than zero." };
         }
 
-        if (!string.IsNullOrWhiteSpace(request.ChildOrderState) &&
-            !string.Equals(request.ChildOrderState, ChildOrderStates.Active, StringComparison.Ordinal) &&
-            !string.Equals(request.ChildOrderState, ChildOrderStates.Completed, StringComparison.Ordinal) &&
-            !string.Equals(request.ChildOrderState, ChildOrderStates.Canceled, StringComparison.Ordinal) &&
-            !string.Equals(request.ChildOrderState, ChildOrderStates.Expired, StringComparison.Ordinal) &&
-            !string.Equals(request.ChildOrderState, ChildOrderStates.Rejected, StringComparison.Ordinal))
+        if (request.ChildOrderState is not null &&
+            !ApiStringEnum<BitflyerOrderState>.IsDefined(request.ChildOrderState.Value))
         {
             return new CallError
             {

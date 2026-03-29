@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrder;
 
@@ -9,11 +10,11 @@ public sealed class GetParentOrderResponse
     [JsonPropertyName("parent_order_id")]
     public required string ParentOrderId { get; init; }
     [JsonPropertyName("order_method")]
-    public required string OrderMethod { get; init; }
+    public required BitflyerOrderMethod OrderMethod { get; init; }
     [JsonPropertyName("expire_date")]
     public required DateTimeOffset ExpireDate { get; init; }
     [JsonPropertyName("time_in_force")]
-    public required string TimeInForce { get; init; }
+    public required BitflyerTimeInForce TimeInForce { get; init; }
     [JsonPropertyName("parameters")]
     public required IReadOnlyList<GetParentOrderParameter> Parameters { get; init; }
     [JsonPropertyName("parent_order_acceptance_id")]
@@ -25,9 +26,9 @@ public sealed class GetParentOrderParameter
     [JsonPropertyName("product_code")]
     public required string ProductCode { get; init; }
     [JsonPropertyName("condition_type")]
-    public required string ConditionType { get; init; }
+    public required BitflyerConditionType ConditionType { get; init; }
     [JsonPropertyName("side")]
-    public required string Side { get; init; }
+    public required BitflyerOrderSide Side { get; init; }
     [JsonPropertyName("price")]
     public required decimal Price { get; init; }
     [JsonPropertyName("size")]

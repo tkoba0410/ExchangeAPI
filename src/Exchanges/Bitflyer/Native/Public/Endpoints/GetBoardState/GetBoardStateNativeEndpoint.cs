@@ -80,8 +80,8 @@ public sealed class GetBoardStateNativeEndpoint : IGetBoardStateNativeEndpoint
 
             var response = new GetBoardStateResponse
             {
-                Health = JsonValueReader.ReadRequiredString(root, "health"),
-                State = JsonValueReader.ReadRequiredString(root, "state"),
+                Health = JsonValueReader.ReadRequiredEnum<BitflyerHealthStatus>(root, "health"),
+                State = JsonValueReader.ReadRequiredEnum<BitflyerTradingState>(root, "state"),
                 Data = data,
             };
 

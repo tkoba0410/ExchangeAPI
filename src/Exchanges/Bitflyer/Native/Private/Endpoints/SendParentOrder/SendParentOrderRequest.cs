@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
 
@@ -6,7 +7,7 @@ public sealed class SendParentOrderRequest
 {
     [JsonPropertyName("order_method")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? OrderMethod { get; init; }
+    public BitflyerOrderMethod? OrderMethod { get; init; }
 
     [JsonPropertyName("minute_to_expire")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -14,7 +15,7 @@ public sealed class SendParentOrderRequest
 
     [JsonPropertyName("time_in_force")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? TimeInForce { get; init; }
+    public BitflyerTimeInForce? TimeInForce { get; init; }
 
     [JsonPropertyName("parameters")]
     public required IReadOnlyList<SendParentOrderParameter> Parameters { get; init; }
@@ -26,10 +27,10 @@ public sealed class SendParentOrderParameter
     public required string ProductCode { get; init; }
 
     [JsonPropertyName("condition_type")]
-    public required string ConditionType { get; init; }
+    public required BitflyerConditionType ConditionType { get; init; }
 
     [JsonPropertyName("side")]
-    public required string Side { get; init; }
+    public required BitflyerOrderSide Side { get; init; }
 
     [JsonPropertyName("price")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

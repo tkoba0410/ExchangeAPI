@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetHealth;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Fakes;
@@ -26,7 +27,7 @@ public sealed class GetHealthNativeEndpointTests
         var call = await endpoint.CallAsync(new GetHealthRequest());
 
         Assert.True(call.IsSuccess);
-        Assert.Equal("NORMAL", call.Response!.Status);
+        Assert.Equal(HealthStatuses.Normal, call.Response!.Status);
     }
 
     private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)

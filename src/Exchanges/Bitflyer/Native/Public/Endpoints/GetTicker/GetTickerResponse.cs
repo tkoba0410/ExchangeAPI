@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 
@@ -8,7 +9,7 @@ public sealed class GetTickerResponse
     public required string ProductCode { get; init; }
 
     [JsonPropertyName("state")]
-    public required string State { get; init; }
+    public required BitflyerTradingState State { get; init; }
 
     [JsonPropertyName("timestamp")]
     public required DateTimeOffset Timestamp { get; init; }

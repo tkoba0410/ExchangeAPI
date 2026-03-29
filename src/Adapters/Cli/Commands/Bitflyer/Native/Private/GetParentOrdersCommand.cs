@@ -3,6 +3,7 @@ using ExchangeApi.Adapters.Cli.Configuration;
 using ExchangeApi.Adapters.Cli.Infrastructure;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrders;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Adapters.Cli.Commands.Bitflyer.Native.Private;
 
@@ -37,7 +38,10 @@ public static class GetParentOrdersCommand
             DescribeRequest = static request =>
             {
                 var typed = (GetParentOrdersRequest)request;
-                return $"product_code={(typed.ProductCode ?? "<omitted>")}, count={(typed.Count?.ToString() ?? "<omitted>")}, parent_order_state={(typed.ParentOrderState ?? "<omitted>")}";
+                var parentOrderState = typed.ParentOrderState is { } value
+                    ? ApiStringEnum<BitflyerOrderState>.Format(value)
+                    : "<omitted>";
+                return $"product_code={(typed.ProductCode ?? "<omitted>")}, count={(typed.Count?.ToString() ?? "<omitted>")}, parent_order_state={parentOrderState}";
             },
             ExecuteAsync = ExecuteAsync,
         };
@@ -87,13 +91,24 @@ public static class GetParentOrdersCommand
             return RequestBindingResult.Failure("invalid argument", afterError);
         }
 
+        if (!OptionValueBinder.TryGetOptionalParsed(
+                options,
+                "parent-order-state",
+                "parent_order_state",
+                ApiStringEnum<BitflyerOrderState>.TryParse,
+                out BitflyerOrderState? parentOrderState,
+                out var parentOrderStateError))
+        {
+            return RequestBindingResult.Failure("invalid argument", parentOrderStateError);
+        }
+
         return RequestBindingResult.Success(new GetParentOrdersRequest
         {
             ProductCode = options.GetValue("product-code"),
             Count = count,
             Before = before,
             After = after,
-            ParentOrderState = options.GetValue("parent-order-state"),
+            ParentOrderState = parentOrderState,
         });
     }
 

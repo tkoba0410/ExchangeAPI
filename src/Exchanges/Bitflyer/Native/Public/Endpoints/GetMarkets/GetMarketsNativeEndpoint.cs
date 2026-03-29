@@ -64,7 +64,7 @@ public sealed class GetMarketsNativeEndpoint : IGetMarketsNativeEndpoint
                 items.Add(new GetMarkets.Item
                 {
                     ProductCode = JsonValueReader.ReadRequiredString(item, "product_code"),
-                    MarketType = JsonValueReader.ReadRequiredString(item, "market_type"),
+                    MarketType = JsonValueReader.ReadRequiredEnum<BitflyerMarketType>(item, "market_type"),
                 });
             }
 

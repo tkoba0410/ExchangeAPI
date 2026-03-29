@@ -81,7 +81,7 @@ public sealed class GetExecutionsPublicNativeEndpoint : IGetExecutionsPublicNati
                 items.Add(new GetExecutionsPublic.Item
                 {
                     Id = JsonValueReader.ReadRequiredLong(item, "id"),
-                    Side = JsonValueReader.ReadRequiredString(item, "side"),
+                    Side = JsonValueReader.ReadRequiredEnum<BitflyerOrderSide>(item, "side"),
                     Price = JsonValueReader.ReadRequiredDecimal(item, "price"),
                     Size = JsonValueReader.ReadRequiredDecimal(item, "size"),
                     ExecDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "exec_date"),

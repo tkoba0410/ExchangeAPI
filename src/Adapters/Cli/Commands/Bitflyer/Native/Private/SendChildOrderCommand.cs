@@ -3,6 +3,7 @@ using ExchangeApi.Adapters.Cli.Configuration;
 using ExchangeApi.Adapters.Cli.Infrastructure;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Adapters.Cli.Commands.Bitflyer.Native.Private;
 
@@ -39,7 +40,7 @@ public static class SendChildOrderCommand
             DescribeRequest = static request =>
             {
                 var typed = (SendChildOrderRequest)request;
-                return $"product_code={typed.ProductCode}, child_order_type={typed.ChildOrderType}, side={typed.Side}, size={typed.Size}";
+                return $"product_code={typed.ProductCode}, child_order_type={ApiStringEnum<BitflyerChildOrderType>.Format(typed.ChildOrderType)}, side={ApiStringEnum<BitflyerOrderSide>.Format(typed.Side)}, size={typed.Size}";
             },
             ExecuteAsync = ExecuteAsync,
         };
@@ -81,12 +82,24 @@ public static class SendChildOrderCommand
             return RequestBindingResult.Failure("invalid argument", productCodeError);
         }
 
-        if (!OptionValueBinder.TryGetRequiredString(options, "child-order-type", "child_order_type", out var childOrderType, out var childOrderTypeError))
+        if (!OptionValueBinder.TryGetRequiredParsed(
+                options,
+                "child-order-type",
+                "child_order_type",
+                ApiStringEnum<BitflyerChildOrderType>.TryParse,
+                out BitflyerChildOrderType childOrderType,
+                out var childOrderTypeError))
         {
             return RequestBindingResult.Failure("invalid argument", childOrderTypeError);
         }
 
-        if (!OptionValueBinder.TryGetRequiredString(options, "side", "side", out var side, out var sideError))
+        if (!OptionValueBinder.TryGetRequiredParsed(
+                options,
+                "side",
+                "side",
+                ApiStringEnum<BitflyerOrderSide>.TryParse,
+                out BitflyerOrderSide side,
+                out var sideError))
         {
             return RequestBindingResult.Failure("invalid argument", sideError);
         }
@@ -106,6 +119,17 @@ public static class SendChildOrderCommand
             return RequestBindingResult.Failure("invalid argument", minuteToExpireError);
         }
 
+        if (!OptionValueBinder.TryGetOptionalParsed(
+                options,
+                "time-in-force",
+                "time_in_force",
+                ApiStringEnum<BitflyerTimeInForce>.TryParse,
+                out BitflyerTimeInForce? timeInForce,
+                out var timeInForceError))
+        {
+            return RequestBindingResult.Failure("invalid argument", timeInForceError);
+        }
+
         return RequestBindingResult.Success(new SendChildOrderRequest
         {
             ProductCode = productCode,
@@ -114,7 +138,7 @@ public static class SendChildOrderCommand
             Price = price,
             Size = size,
             MinuteToExpire = minuteToExpire,
-            TimeInForce = options.GetValue("time-in-force"),
+            TimeInForce = timeInForce,
         });
     }
 

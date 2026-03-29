@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Fakes;
@@ -34,7 +35,7 @@ public sealed class GetMarketsNativeEndpointTests
         Assert.True(call.IsSuccess);
         Assert.Equal(2, call.Response!.Count);
         Assert.Equal("BTC_JPY", call.Response![0].ProductCode);
-        Assert.Equal("FX", call.Response[1].MarketType);
+        Assert.Equal(MarketTypes.Fx, call.Response[1].MarketType);
     }
 
     [Fact]

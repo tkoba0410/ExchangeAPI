@@ -83,7 +83,7 @@ public sealed class GetBalanceHistoryNativeEndpoint : IGetBalanceHistoryNativeEn
                     EventDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "event_date"),
                     ProductCode = JsonValueReader.ReadOptionalString(item, "product_code"),
                     CurrencyCode = JsonValueReader.ReadRequiredString(item, "currency_code"),
-                    TradeType = JsonValueReader.ReadRequiredString(item, "trade_type"),
+                    TradeType = JsonValueReader.ReadRequiredEnum<BitflyerTradeType>(item, "trade_type"),
                     Price = JsonValueReader.ReadRequiredDecimal(item, "price"),
                     Amount = JsonValueReader.ReadRequiredDecimal(item, "amount"),
                     Quantity = JsonValueReader.ReadRequiredDecimal(item, "quantity"),

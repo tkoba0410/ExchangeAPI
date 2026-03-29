@@ -87,10 +87,7 @@ public sealed class SendParentOrderNativeEndpoint : ISendParentOrderNativeEndpoi
     {
         var orderMethod = request.OrderMethod ?? ParentOrderMethods.Simple;
 
-        if (!string.Equals(orderMethod, ParentOrderMethods.Simple, StringComparison.Ordinal) &&
-            !string.Equals(orderMethod, ParentOrderMethods.Ifd, StringComparison.Ordinal) &&
-            !string.Equals(orderMethod, ParentOrderMethods.Oco, StringComparison.Ordinal) &&
-            !string.Equals(orderMethod, ParentOrderMethods.IfdOco, StringComparison.Ordinal))
+        if (!ApiStringEnum<BitflyerOrderMethod>.IsDefined(orderMethod))
         {
             return new CallError
             {
@@ -109,9 +106,7 @@ public sealed class SendParentOrderNativeEndpoint : ISendParentOrderNativeEndpoi
         }
 
         if (request.TimeInForce is not null &&
-            !string.Equals(request.TimeInForce, TimeInForces.Gtc, StringComparison.Ordinal) &&
-            !string.Equals(request.TimeInForce, TimeInForces.Ioc, StringComparison.Ordinal) &&
-            !string.Equals(request.TimeInForce, TimeInForces.Fok, StringComparison.Ordinal))
+            !ApiStringEnum<BitflyerTimeInForce>.IsDefined(request.TimeInForce.Value))
         {
             return new CallError
             {
@@ -162,16 +157,7 @@ public sealed class SendParentOrderNativeEndpoint : ISendParentOrderNativeEndpoi
             return new CallError { Kind = CallErrorKinds.Semantic, Message = "Parameter.ProductCode is required." };
         }
 
-        if (string.IsNullOrWhiteSpace(parameter.ConditionType))
-        {
-            return new CallError { Kind = CallErrorKinds.Semantic, Message = "Parameter.ConditionType is required." };
-        }
-
-        if (!string.Equals(parameter.ConditionType, ParentOrderConditionTypes.Limit, StringComparison.Ordinal) &&
-            !string.Equals(parameter.ConditionType, ParentOrderConditionTypes.Market, StringComparison.Ordinal) &&
-            !string.Equals(parameter.ConditionType, ParentOrderConditionTypes.Stop, StringComparison.Ordinal) &&
-            !string.Equals(parameter.ConditionType, ParentOrderConditionTypes.StopLimit, StringComparison.Ordinal) &&
-            !string.Equals(parameter.ConditionType, ParentOrderConditionTypes.Trail, StringComparison.Ordinal))
+        if (!ApiStringEnum<BitflyerConditionType>.IsDefined(parameter.ConditionType))
         {
             return new CallError
             {
@@ -180,9 +166,7 @@ public sealed class SendParentOrderNativeEndpoint : ISendParentOrderNativeEndpoi
             };
         }
 
-        if (string.IsNullOrWhiteSpace(parameter.Side) ||
-            (!string.Equals(parameter.Side, OrderSides.Buy, StringComparison.Ordinal) &&
-             !string.Equals(parameter.Side, OrderSides.Sell, StringComparison.Ordinal)))
+        if (!ApiStringEnum<BitflyerOrderSide>.IsDefined(parameter.Side))
         {
             return new CallError { Kind = CallErrorKinds.Semantic, Message = "Parameter.Side must be BUY or SELL." };
         }

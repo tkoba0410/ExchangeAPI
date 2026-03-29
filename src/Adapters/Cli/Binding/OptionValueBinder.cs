@@ -5,6 +5,8 @@ namespace ExchangeApi.Adapters.Cli.Binding;
 
 public static class OptionValueBinder
 {
+    public delegate bool TryParseValue<T>(string text, out T value);
+
     public static bool TryGetRequiredString(
         InvocationOptions options,
         string optionName,
@@ -68,6 +70,55 @@ public static class OptionValueBinder
         }
 
         if (long.TryParse(text, out var parsed))
+        {
+            value = parsed;
+            error = null;
+            return true;
+        }
+
+        value = null;
+        error = $"invalid field: {fieldName}";
+        return false;
+    }
+
+    public static bool TryGetRequiredParsed<T>(
+        InvocationOptions options,
+        string optionName,
+        string fieldName,
+        TryParseValue<T> tryParse,
+        out T value,
+        out string? error)
+    {
+        var text = options.GetValue(optionName);
+        if (!string.IsNullOrWhiteSpace(text) && tryParse(text, out var parsed))
+        {
+            value = parsed;
+            error = null;
+            return true;
+        }
+
+        value = default!;
+        error = $"invalid field: {fieldName}";
+        return false;
+    }
+
+    public static bool TryGetOptionalParsed<T>(
+        InvocationOptions options,
+        string optionName,
+        string fieldName,
+        TryParseValue<T> tryParse,
+        out T? value,
+        out string? error) where T : struct
+    {
+        var text = options.GetValue(optionName);
+        if (text is null)
+        {
+            value = null;
+            error = null;
+            return true;
+        }
+
+        if (tryParse(text, out var parsed))
         {
             value = parsed;
             error = null;

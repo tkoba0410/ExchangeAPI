@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Fakes;
@@ -26,8 +27,8 @@ public sealed class GetBoardStateNativeEndpointTests
         var call = await endpoint.CallAsync(new GetBoardStateRequest { ProductCode = "BTC_JPY" });
 
         Assert.True(call.IsSuccess);
-        Assert.Equal("NORMAL", call.Response!.Health);
-        Assert.Equal("RUNNING", call.Response.State);
+        Assert.Equal(HealthStatuses.Normal, call.Response!.Health);
+        Assert.Equal(TradingStates.Running, call.Response.State);
         Assert.Equal(123m, call.Response.Data!.SpecialQuotation);
     }
 

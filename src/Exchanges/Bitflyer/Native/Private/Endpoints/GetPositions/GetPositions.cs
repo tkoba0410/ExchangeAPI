@@ -29,6 +29,7 @@ public static class GetPositions
         public required decimal RequireCollateral { get; init; }
 
         [JsonPropertyName("open_date")]
+        [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
         public required DateTimeOffset OpenDate { get; init; }
 
         [JsonPropertyName("leverage")]

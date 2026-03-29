@@ -399,6 +399,25 @@ public sealed class FixedContractTests
             typeof(Unit));
     }
 
+    [Fact]
+    public void Fixed_Native_Timestamp_Properties_Use_Expected_JsonConverters()
+    {
+        var nativeTypes = typeof(GetTickerResponse).Assembly
+            .GetTypes()
+            .Where(type => type.Namespace?.StartsWith("ExchangeApi.Exchanges.Bitflyer.Native.", StringComparison.Ordinal) == true);
+
+        foreach (var property in nativeTypes
+                     .SelectMany(type => type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                     .Where(property => property.PropertyType == typeof(DateTimeOffset) || property.PropertyType == typeof(DateTimeOffset?)))
+        {
+            var attribute = property.GetCustomAttribute<JsonConverterAttribute>();
+            Assert.NotNull(attribute);
+
+            var expectedConverterType = ResolveExpectedTimestampConverter(property);
+            Assert.Equal(expectedConverterType, attribute!.ConverterType);
+        }
+    }
+
     private static void AssertJsonProperty(Type type, string propertyName, Type propertyType, string jsonPropertyName)
     {
         var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
@@ -446,5 +465,23 @@ public sealed class FixedContractTests
         var expectedCallType = typeof(Call<,>).MakeGenericType(requestType, responseType);
         var expectedReturnType = typeof(Task<>).MakeGenericType(expectedCallType);
         Assert.Equal(expectedReturnType, method.ReturnType);
+    }
+
+    private static Type ResolveExpectedTimestampConverter(PropertyInfo property)
+    {
+        var isNullable = property.PropertyType == typeof(DateTimeOffset?);
+        var isJst = property.DeclaringType == typeof(GetBalanceHistory.Item)
+            && property.Name == nameof(GetBalanceHistory.Item.TradeDate);
+
+        if (isJst)
+        {
+            return isNullable
+                ? typeof(BitflyerNullableJstTimestampJsonConverter)
+                : typeof(BitflyerJstTimestampJsonConverter);
+        }
+
+        return isNullable
+            ? typeof(BitflyerNullableUtcTimestampJsonConverter)
+            : typeof(BitflyerUtcTimestampJsonConverter);
     }
 }

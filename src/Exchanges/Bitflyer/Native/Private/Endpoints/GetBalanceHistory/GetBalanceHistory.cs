@@ -10,8 +10,10 @@ public static class GetBalanceHistory
         [JsonPropertyName("id")]
         public required long Id { get; init; }
         [JsonPropertyName("trade_date")]
+        [JsonConverter(typeof(BitflyerJstTimestampJsonConverter))]
         public required DateTimeOffset TradeDate { get; init; }
         [JsonPropertyName("event_date")]
+        [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
         public required DateTimeOffset EventDate { get; init; }
         [JsonPropertyName("product_code")]
         public string? ProductCode { get; init; }

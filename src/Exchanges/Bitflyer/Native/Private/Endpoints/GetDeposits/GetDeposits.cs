@@ -18,6 +18,7 @@ public static class GetDeposits
         [JsonPropertyName("status")]
         public required BitflyerTransferStatus Status { get; init; }
         [JsonPropertyName("event_date")]
+        [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
         public required DateTimeOffset EventDate { get; init; }
     }
 }

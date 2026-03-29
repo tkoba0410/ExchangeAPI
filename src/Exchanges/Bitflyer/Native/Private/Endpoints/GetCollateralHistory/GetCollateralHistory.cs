@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
 
@@ -22,6 +23,7 @@ public static class GetCollateralHistory
         public required string ReasonCode { get; init; }
 
         [JsonPropertyName("date")]
+        [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
         public required DateTimeOffset Date { get; init; }
     }
 }

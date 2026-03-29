@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
@@ -209,11 +208,7 @@ internal static class JsonValueReader
 
     private static DateTimeOffset ReadRequiredTimestamp(string? raw, string propertyName)
     {
-        if (DateTimeOffset.TryParse(
-            raw,
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.None,
-            out var value))
+        if (BitflyerTimestampJson.TryParseRaw(raw, out var value))
         {
             return value;
         }
@@ -223,51 +218,15 @@ internal static class JsonValueReader
 
     private static DateTimeOffset ReadRequiredTimestampWithAssumedOffset(string? raw, string propertyName, TimeSpan assumedOffset)
     {
-        if (string.IsNullOrWhiteSpace(raw))
-        {
-            throw new CodecException($"Property '{propertyName}' must be a timestamp.");
-        }
+        var success = assumedOffset == TimeSpan.Zero
+            ? BitflyerTimestampJson.TryParseUtc(raw, out var value)
+            : BitflyerTimestampJson.TryParseJst(raw, out value);
 
-        if (HasExplicitOffset(raw))
+        if (success)
         {
-            if (DateTimeOffset.TryParse(
-                raw,
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None,
-                out var explicitValue))
-            {
-                return explicitValue.ToOffset(TimeSpan.Zero);
-            }
-
-            throw new CodecException($"Property '{propertyName}' must be a timestamp.");
-        }
-
-        if (DateTime.TryParse(
-            raw,
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.None,
-            out var localValue))
-        {
-            var unspecified = DateTime.SpecifyKind(localValue, DateTimeKind.Unspecified);
-            return new DateTimeOffset(unspecified, assumedOffset).ToOffset(TimeSpan.Zero);
+            return value;
         }
 
         throw new CodecException($"Property '{propertyName}' must be a timestamp.");
-    }
-
-    private static bool HasExplicitOffset(string raw)
-    {
-        if (raw.EndsWith("Z", StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
-        return raw.Length >= 6
-            && (raw[^6] == '+' || raw[^6] == '-')
-            && char.IsDigit(raw[^5])
-            && char.IsDigit(raw[^4])
-            && raw[^3] == ':'
-            && char.IsDigit(raw[^2])
-            && char.IsDigit(raw[^1]);
     }
 }

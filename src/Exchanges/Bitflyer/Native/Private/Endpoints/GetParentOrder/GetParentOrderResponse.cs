@@ -12,6 +12,7 @@ public sealed class GetParentOrderResponse
     [JsonPropertyName("order_method")]
     public required BitflyerOrderMethod OrderMethod { get; init; }
     [JsonPropertyName("expire_date")]
+    [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
     public required DateTimeOffset ExpireDate { get; init; }
     [JsonPropertyName("time_in_force")]
     public required BitflyerTimeInForce TimeInForce { get; init; }

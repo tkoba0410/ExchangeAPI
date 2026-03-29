@@ -26,6 +26,7 @@ public static class GetExecutions
         public required decimal Commission { get; init; }
 
         [JsonPropertyName("exec_date")]
+        [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
         public required DateTimeOffset ExecDate { get; init; }
 
         [JsonPropertyName("child_order_acceptance_id")]

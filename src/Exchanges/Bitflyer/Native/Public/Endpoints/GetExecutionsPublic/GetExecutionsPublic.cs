@@ -20,6 +20,7 @@ public static class GetExecutionsPublic
         public required decimal Size { get; init; }
 
         [JsonPropertyName("exec_date")]
+        [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
         public required DateTimeOffset ExecDate { get; init; }
 
         [JsonPropertyName("buy_child_order_acceptance_id")]

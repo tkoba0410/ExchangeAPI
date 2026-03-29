@@ -779,13 +779,23 @@ bitFlyer private endpoint の認証・署名は `Protocol` が担う。
 - docs 上の値集合が弱い field は `Unknown` member を持ってよいが、docs で閉集合が確認できる field は raw string 受理へ戻さない
 - raw diagnostics 起源の property は持ち込まない
 
-### 7.3 形状
+### 7.3 JSON 処理責務
+
+- `JsonPropertyName` は field naming の正本とし、request / response field 名の固定にのみ使う
+- `JsonConverter` は venue-local enum、再利用できる scalar、または小さい value conversion に対して使ってよい
+- enum property は `JsonConverter` により API string value を serialize / deserialize しなければならない
+- `JsonConverter` を endpoint DTO 全体の mapping 正本として使ってはならない
+- `JsonConverter` を object / array shape 判定、required / optional 判定、semantic validation、query parameter 生成の正本にしてはならない
+- `Native` response の shape decode と contract validation は endpoint module が担い、必要に応じて `JsonDocument` / `JsonElement` と internal helper を使ってよい
+- `Native` request body は DTO を `JsonSerializer.Serialize(dto)` の既定設定で送れる形を基本とし、query request は endpoint module が query parameter を組み立てる
+
+### 7.4 形状
 
 - property-based immutable type を基本とする
 - primary-constructor record は固定対象で採らない
 - `JsonSerializer.Serialize(dto)` が既定設定で通る形を必須とする
 
-### 7.4 非サポート
+### 7.5 非サポート
 
 - `RawJson`
 - `RawSnapshot`

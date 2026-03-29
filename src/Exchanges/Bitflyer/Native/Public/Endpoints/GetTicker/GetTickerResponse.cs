@@ -12,6 +12,7 @@ public sealed class GetTickerResponse
     public required BitflyerTradingState State { get; init; }
 
     [JsonPropertyName("timestamp")]
+    [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
     public required DateTimeOffset Timestamp { get; init; }
 
     [JsonPropertyName("tick_id")]

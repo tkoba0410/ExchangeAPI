@@ -26,8 +26,10 @@ public static class GetParentOrders
         [JsonPropertyName("parent_order_state")]
         public required BitflyerOrderState ParentOrderState { get; init; }
         [JsonPropertyName("expire_date")]
+        [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
         public required DateTimeOffset ExpireDate { get; init; }
         [JsonPropertyName("parent_order_date")]
+        [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
         public required DateTimeOffset ParentOrderDate { get; init; }
         [JsonPropertyName("parent_order_acceptance_id")]
         public required string ParentOrderAcceptanceId { get; init; }

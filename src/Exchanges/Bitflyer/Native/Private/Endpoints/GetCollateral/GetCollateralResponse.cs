@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
 
@@ -20,5 +21,6 @@ public sealed class GetCollateralResponse
     public decimal? MarginCallAmount { get; init; }
 
     [JsonPropertyName("margin_call_due_date")]
+    [JsonConverter(typeof(BitflyerNullableUtcTimestampJsonConverter))]
     public DateTimeOffset? MarginCallDueDate { get; init; }
 }

@@ -246,7 +246,7 @@ dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
   --summary --pretty
 ```
 
-bitFlyer private write は環境変数が必要:
+bitFlyer private write は直接環境変数、または age-backed credentials source が必要:
 
 ```bash
 export BITFLYER_API_KEY=...
@@ -264,6 +264,13 @@ dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
   bitflyer native private cancel-all-child-orders \
   --product-code BTC_JPY \
   --yes
+```
+
+または:
+
+```bash
+export EXCHANGEAPI_AGE_IDENTITY_FILE_PATH="$HOME/.config/exchangeapi/keys/age.key"
+export EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH="$HOME/.config/exchangeapi/secrets/credentials.enc.json"
 ```
 
 補足:

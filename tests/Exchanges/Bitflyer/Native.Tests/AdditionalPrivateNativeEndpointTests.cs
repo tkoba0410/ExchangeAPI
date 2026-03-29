@@ -298,7 +298,7 @@ public sealed class AdditionalPrivateNativeEndpointTests
     public async Task GetParentOrders_MapsTopLevelArray()
     {
         var body = """
-            [{"id":1,"parent_order_id":"JPO1","product_code":"BTC_JPY","side":"BUY","parent_order_type":"SIMPLE","price":30000,"average_price":30000,"size":0.1,"parent_order_state":"COMPLETED","expire_date":"2024-01-02T03:04:05.678","parent_order_date":"2024-01-02T03:04:05.678","parent_order_acceptance_id":"JPA1","outstanding_size":0,"cancel_size":0,"executed_size":0.1,"total_commission":0}]
+            [{"id":1,"parent_order_id":"JPO1","product_code":"BTC_JPY","side":"BUYSELL","parent_order_type":"SIMPLE","price":30000,"average_price":30000,"size":0.1,"parent_order_state":"COMPLETED","expire_date":"2024-01-02T03:04:05.678","parent_order_date":"2024-01-02T03:04:05.678","parent_order_acceptance_id":"JPA1","outstanding_size":0,"cancel_size":0,"executed_size":0.1,"total_commission":0}]
             """;
         var endpoint = new GetParentOrdersNativeEndpoint(
             new FakeGetParentOrdersProtocolEndpoint((productCode, count, before, after, parentOrderState) => Success("GetParentOrders", "GET", "/v1/me/getparentorders", body)));
@@ -308,6 +308,7 @@ public sealed class AdditionalPrivateNativeEndpointTests
         Assert.True(call.IsSuccess);
         Assert.Single(call.Response!);
         Assert.Equal("JPO1", call.Response![0].ParentOrderId);
+        Assert.Equal(ParentOrderSides.BuySell, call.Response[0].Side);
         Assert.Equal(ChildOrderStates.Completed, call.Response[0].ParentOrderState);
     }
 

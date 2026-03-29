@@ -73,7 +73,7 @@ public sealed class LiveTests
             var nativeItem = native[i];
 
             Assert.Equal(protocolItem.GetProperty("product_code").GetString(), nativeItem.ProductCode);
-            Assert.Equal(protocolItem.GetProperty("market_type").GetString(), nativeItem.MarketType);
+            Assert.Equal(protocolItem.GetProperty("market_type").GetString(), ApiStringEnum<BitflyerMarketType>.Format(nativeItem.MarketType));
         }
     }
 
@@ -100,7 +100,7 @@ public sealed class LiveTests
         var protocolTimestamp = ParseUtcNoOffsetTimestamp(root.GetProperty("timestamp").GetString()!);
 
         Assert.Equal(root.GetProperty("product_code").GetString(), native.ProductCode);
-        Assert.Equal(root.GetProperty("state").GetString(), native.State);
+        Assert.Equal(root.GetProperty("state").GetString(), ApiStringEnum<BitflyerTradingState>.Format(native.State));
         Assert.Equal(TimeSpan.Zero, protocolTimestamp.Offset);
         Assert.Equal(TimeSpan.Zero, native.Timestamp.Offset);
         Assert.True(root.GetProperty("tick_id").GetInt64() > 0);
@@ -193,7 +193,7 @@ public sealed class LiveTests
         Assert.False(string.IsNullOrWhiteSpace(protocolFirst.GetProperty("buy_child_order_acceptance_id").GetString()));
         Assert.False(string.IsNullOrWhiteSpace(protocolFirst.GetProperty("sell_child_order_acceptance_id").GetString()));
         Assert.True(nativeFirst.Id > 0);
-        Assert.False(string.IsNullOrWhiteSpace(nativeFirst.Side));
+        Assert.False(string.IsNullOrWhiteSpace(ApiStringEnum<BitflyerOrderSide>.Format(nativeFirst.Side)));
         Assert.True(nativeFirst.Price > 0);
         Assert.True(nativeFirst.Size > 0);
         Assert.False(string.IsNullOrWhiteSpace(nativeFirst.BuyChildOrderAcceptanceId));
@@ -224,8 +224,8 @@ public sealed class LiveTests
         Assert.Equal(JsonValueKind.Object, root.ValueKind);
         Assert.False(string.IsNullOrWhiteSpace(root.GetProperty("health").GetString()));
         Assert.False(string.IsNullOrWhiteSpace(root.GetProperty("state").GetString()));
-        Assert.False(string.IsNullOrWhiteSpace(native.Health));
-        Assert.False(string.IsNullOrWhiteSpace(native.State));
+        Assert.False(string.IsNullOrWhiteSpace(ApiStringEnum<BitflyerHealthStatus>.Format(native.Health)));
+        Assert.False(string.IsNullOrWhiteSpace(ApiStringEnum<BitflyerTradingState>.Format(native.State)));
 
         if (root.TryGetProperty("data", out var protocolData) &&
             protocolData.ValueKind == JsonValueKind.Object &&
@@ -263,7 +263,7 @@ public sealed class LiveTests
 
         Assert.Equal(JsonValueKind.Object, root.ValueKind);
         Assert.False(string.IsNullOrWhiteSpace(root.GetProperty("status").GetString()));
-        Assert.False(string.IsNullOrWhiteSpace(native.Status));
+        Assert.False(string.IsNullOrWhiteSpace(ApiStringEnum<BitflyerHealthStatus>.Format(native.Status)));
     }
 
     [BitflyerPublicReadLiveFact]
@@ -446,7 +446,7 @@ public sealed class LiveTests
             var nativeItem = native[i];
 
             Assert.Equal(protocolItem.GetProperty("product_code").GetString(), nativeItem.ProductCode);
-            Assert.Equal(protocolItem.GetProperty("side").GetString(), nativeItem.Side);
+            Assert.Equal(protocolItem.GetProperty("side").GetString(), ApiStringEnum<BitflyerOrderSide>.Format(nativeItem.Side));
             Assert.Equal(protocolItem.GetProperty("price").GetDecimal(), nativeItem.Price);
             Assert.Equal(protocolItem.GetProperty("size").GetDecimal(), nativeItem.Size);
             Assert.Equal(protocolItem.GetProperty("commission").GetDecimal(), nativeItem.Commission);
@@ -554,7 +554,7 @@ public sealed class LiveTests
             request.Count,
             request.Before,
             request.After,
-            request.ChildOrderState,
+            request.ChildOrderState is { } childOrderState ? ApiStringEnum<BitflyerOrderState>.Format(childOrderState) : null,
             request.ChildOrderId,
             request.ChildOrderAcceptanceId,
             request.ParentOrderId);
@@ -580,12 +580,12 @@ public sealed class LiveTests
             Assert.Equal(protocolItem.GetProperty("id").GetInt64(), nativeItem.Id);
             Assert.Equal(protocolItem.GetProperty("child_order_id").GetString(), nativeItem.ChildOrderId);
             Assert.Equal(protocolItem.GetProperty("product_code").GetString(), nativeItem.ProductCode);
-            Assert.Equal(protocolItem.GetProperty("side").GetString(), nativeItem.Side);
-            Assert.Equal(protocolItem.GetProperty("child_order_type").GetString(), nativeItem.ChildOrderType);
+            Assert.Equal(protocolItem.GetProperty("side").GetString(), ApiStringEnum<BitflyerOrderSide>.Format(nativeItem.Side));
+            Assert.Equal(protocolItem.GetProperty("child_order_type").GetString(), ApiStringEnum<BitflyerChildOrderType>.Format(nativeItem.ChildOrderType));
             Assert.Equal(protocolItem.GetProperty("price").GetDecimal(), nativeItem.Price);
             Assert.Equal(protocolItem.GetProperty("average_price").GetDecimal(), nativeItem.AveragePrice);
             Assert.Equal(protocolItem.GetProperty("size").GetDecimal(), nativeItem.Size);
-            Assert.Equal(protocolItem.GetProperty("child_order_state").GetString(), nativeItem.ChildOrderState);
+            Assert.Equal(protocolItem.GetProperty("child_order_state").GetString(), ApiStringEnum<BitflyerOrderState>.Format(nativeItem.ChildOrderState));
             Assert.Equal(ParseUtcNoOffsetTimestamp(protocolItem.GetProperty("expire_date").GetString()!), nativeItem.ExpireDate);
             Assert.Equal(ParseUtcNoOffsetTimestamp(protocolItem.GetProperty("child_order_date").GetString()!), nativeItem.ChildOrderDate);
             Assert.Equal(protocolItem.GetProperty("child_order_acceptance_id").GetString(), nativeItem.ChildOrderAcceptanceId);
@@ -593,7 +593,7 @@ public sealed class LiveTests
             Assert.Equal(protocolItem.GetProperty("cancel_size").GetDecimal(), nativeItem.CancelSize);
             Assert.Equal(protocolItem.GetProperty("executed_size").GetDecimal(), nativeItem.ExecutedSize);
             Assert.Equal(protocolItem.GetProperty("total_commission").GetDecimal(), nativeItem.TotalCommission);
-            Assert.Equal(protocolItem.GetProperty("time_in_force").GetString(), nativeItem.TimeInForce);
+            Assert.Equal(protocolItem.GetProperty("time_in_force").GetString(), ApiStringEnum<BitflyerTimeInForce>.Format(nativeItem.TimeInForce));
         }
     }
 
@@ -641,7 +641,7 @@ public sealed class LiveTests
 
             Assert.Equal(protocolItem.GetProperty("id").GetInt64(), nativeItem.Id);
             Assert.Equal(protocolItem.GetProperty("child_order_id").GetString(), nativeItem.ChildOrderId);
-            Assert.Equal(protocolItem.GetProperty("side").GetString(), nativeItem.Side);
+            Assert.Equal(protocolItem.GetProperty("side").GetString(), ApiStringEnum<BitflyerOrderSide>.Format(nativeItem.Side));
             Assert.Equal(protocolItem.GetProperty("price").GetDecimal(), nativeItem.Price);
             Assert.Equal(protocolItem.GetProperty("size").GetDecimal(), nativeItem.Size);
             Assert.Equal(protocolItem.GetProperty("commission").GetDecimal(), nativeItem.Commission);
@@ -796,7 +796,7 @@ public sealed class LiveTests
         if (native.Count > 0)
         {
             var nativeFirst = native[0];
-            Assert.False(string.IsNullOrWhiteSpace(nativeFirst.Type));
+            Assert.False(string.IsNullOrWhiteSpace(ApiStringEnum<BitflyerAddressType>.Format(nativeFirst.Type)));
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.CurrencyCode));
             Assert.False(string.IsNullOrWhiteSpace(nativeFirst.Address));
         }
@@ -1121,7 +1121,7 @@ public sealed class LiveTests
             request.Count,
             request.Before,
             request.After,
-            request.ParentOrderState);
+            request.ParentOrderState is { } parentOrderState ? ApiStringEnum<BitflyerOrderState>.Format(parentOrderState) : null);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);

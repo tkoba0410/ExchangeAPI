@@ -204,7 +204,7 @@ public sealed class NativeFacadeTests
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetBalance", Scope = "Private", Auth = "KeySecret" });
         var getParentOrders = CallFactory.Success(
             new GetParentOrdersRequest { ProductCode = "BTC_JPY", Count = 10 },
-            (IReadOnlyList<GetParentOrders.Item>)[new GetParentOrders.Item { Id = 1, ParentOrderId = "JCO1", ProductCode = "BTC_JPY", Side = OrderSides.Buy, ParentOrderType = ParentOrderTypes.Unknown, Price = 1m, AveragePrice = 1m, Size = 1m, ParentOrderState = ParentOrderStates.Active, ExpireDate = DateTimeOffset.UnixEpoch, ParentOrderDate = DateTimeOffset.UnixEpoch, ParentOrderAcceptanceId = "JRF1", OutstandingSize = 1m, CancelSize = 0m, ExecutedSize = 0m, TotalCommission = 0m }],
+            (IReadOnlyList<GetParentOrders.Item>)[new GetParentOrders.Item { Id = 1, ParentOrderId = "JCO1", ProductCode = "BTC_JPY", Side = ParentOrderSides.Buy, ParentOrderType = ParentOrderTypes.Unknown, Price = 1m, AveragePrice = 1m, Size = 1m, ParentOrderState = ParentOrderStates.Active, ExpireDate = DateTimeOffset.UnixEpoch, ParentOrderDate = DateTimeOffset.UnixEpoch, ParentOrderAcceptanceId = "JRF1", OutstandingSize = 1m, CancelSize = 0m, ExecutedSize = 0m, TotalCommission = 0m }],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PrivateEndpointModule, EndpointId = "GetParentOrders", Scope = "Private", Auth = "KeySecret" });
         var getParentOrder = CallFactory.Success(
             new GetParentOrderRequest { ParentOrderId = "JCO1" },

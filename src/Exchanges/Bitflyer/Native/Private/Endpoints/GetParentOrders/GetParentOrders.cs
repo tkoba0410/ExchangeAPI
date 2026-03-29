@@ -14,7 +14,7 @@ public static class GetParentOrders
         [JsonPropertyName("product_code")]
         public required string ProductCode { get; init; }
         [JsonPropertyName("side")]
-        public required BitflyerOrderSide Side { get; init; }
+        public required BitflyerParentOrderSide Side { get; init; }
         [JsonPropertyName("parent_order_type")]
         public required BitflyerParentOrderType ParentOrderType { get; init; }
         [JsonPropertyName("price")]

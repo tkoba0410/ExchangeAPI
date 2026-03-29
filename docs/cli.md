@@ -360,9 +360,12 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 ### 7.1 認証
 
 - API key / secret を CLI 引数で受け取ってはならない
-- 現行 phase で固定する credentials input は環境変数のみとする
+- 現行 phase で固定する credentials input は environment-backed source に限定する
   - `BITFLYER_API_KEY`
   - `BITFLYER_API_SECRET`
+- 追加の age-backed source として次を許可する
+  - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
+  - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
 - bitFlyer private command は credentials を解決できない場合、facade call 前に失敗させる
 - Binance は現行公開範囲に private surface を持たない
 
@@ -399,7 +402,8 @@ command-specific convenience flag:
 
 ### 7.3 優先順位
 
-- `BITFLYER_API_KEY` と `BITFLYER_API_SECRET` は current phase では environment variable からのみ解決する
+- `BITFLYER_API_KEY` と `BITFLYER_API_SECRET` が両方ある場合はそれを優先して使う
+- 上記が揃わない場合に限り、`EXCHANGEAPI_AGE_IDENTITY_FILE_PATH` と `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH` を使った age-backed source を解決してよい
 - `--base-uri`、`--timeout-ms`、`--enable-protocol-debug-log`、`--protocol-debug-log-dir`、`--use-ticker-alias-path` は current phase では CLI option からのみ解決する
 - current phase では上記以外の generic precedence ルールを固定しない
 - 現行 phase では config file 契約を固定しない

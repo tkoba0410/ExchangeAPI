@@ -82,7 +82,7 @@ public sealed class GetParentOrdersNativeEndpoint : IGetParentOrdersNativeEndpoi
                     Id = JsonValueReader.ReadRequiredLong(item, "id"),
                     ParentOrderId = JsonValueReader.ReadRequiredString(item, "parent_order_id"),
                     ProductCode = JsonValueReader.ReadRequiredString(item, "product_code"),
-                    Side = JsonValueReader.ReadRequiredEnum<BitflyerOrderSide>(item, "side"),
+                    Side = JsonValueReader.ReadRequiredEnum<BitflyerParentOrderSide>(item, "side"),
                     ParentOrderType = JsonValueReader.ReadRequiredEnum<BitflyerParentOrderType>(item, "parent_order_type"),
                     Price = JsonValueReader.ReadRequiredDecimal(item, "price"),
                     AveragePrice = JsonValueReader.ReadRequiredDecimal(item, "average_price"),

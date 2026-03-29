@@ -16,24 +16,21 @@ public static class BitflyerOptionsFactory
             return (null, common.Failure);
         }
 
-        var apiKey = environment.GetEnvironmentVariable("BITFLYER_API_KEY");
-        var apiSecret = environment.GetEnvironmentVariable("BITFLYER_API_SECRET");
-        BitflyerApiCredentials? credentials = null;
-
-        if (!string.IsNullOrWhiteSpace(apiKey) && !string.IsNullOrWhiteSpace(apiSecret))
+        var credentialResolution = BitflyerCredentialResolver.Resolve(environment);
+        if (credentialResolution.HasFailure)
         {
-            credentials = new BitflyerApiCredentials
-            {
-                ApiKey = apiKey,
-                ApiSecret = apiSecret,
-            };
+            return (null, ExecutionOutcome.InputError(
+                "invalid credential source",
+                credentialResolution.ErrorMessage!));
         }
+
+        var credentials = credentialResolution.Credentials;
 
         if (requiresCredentials && credentials is null)
         {
             return (null, ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set"));
+                BitflyerCredentialResolver.BuildMissingCredentialMessage()));
         }
 
         return (new BitflyerClientOptions

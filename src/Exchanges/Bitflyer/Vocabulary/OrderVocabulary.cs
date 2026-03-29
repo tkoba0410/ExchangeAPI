@@ -20,6 +20,17 @@ public enum BitflyerOrderSide
     Sell = 2,
 }
 
+[JsonConverter(typeof(ApiStringEnumJsonConverter<BitflyerParentOrderSide>))]
+public enum BitflyerParentOrderSide
+{
+    [ApiStringEnumValue("BUY")]
+    Buy = 1,
+    [ApiStringEnumValue("SELL")]
+    Sell = 2,
+    [ApiStringEnumValue("BUYSELL")]
+    BuySell = 3,
+}
+
 [JsonConverter(typeof(ApiStringEnumJsonConverter<BitflyerTimeInForce>))]
 public enum BitflyerTimeInForce
 {
@@ -84,6 +95,13 @@ public static class OrderSides
 {
     public const BitflyerOrderSide Buy = BitflyerOrderSide.Buy;
     public const BitflyerOrderSide Sell = BitflyerOrderSide.Sell;
+}
+
+public static class ParentOrderSides
+{
+    public const BitflyerParentOrderSide Buy = BitflyerParentOrderSide.Buy;
+    public const BitflyerParentOrderSide Sell = BitflyerParentOrderSide.Sell;
+    public const BitflyerParentOrderSide BuySell = BitflyerParentOrderSide.BuySell;
 }
 
 public static class TimeInForces

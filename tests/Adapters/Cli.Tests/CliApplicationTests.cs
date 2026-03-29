@@ -568,6 +568,7 @@ public sealed class CliApplicationTests
         Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
         Assert.Contains("missing credential", console.StdErr);
         Assert.Contains("BITFLYER_API_KEY", console.StdErr);
+        Assert.Contains("EXCHANGEAPI_AGE_IDENTITY_FILE_PATH", console.StdErr);
     }
 
     [Fact]
@@ -582,6 +583,7 @@ public sealed class CliApplicationTests
         Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
         Assert.Contains("missing credential", console.StdErr);
         Assert.Contains("BITFLYER_API_KEY", console.StdErr);
+        Assert.Contains("EXCHANGEAPI_AGE_IDENTITY_FILE_PATH", console.StdErr);
     }
 
     [Fact]

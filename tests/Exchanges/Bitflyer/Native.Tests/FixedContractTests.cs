@@ -207,7 +207,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Id), typeof(long));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderId), typeof(string));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ProductCode), typeof(string));
-        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Side), typeof(BitflyerOrderSide));
+        AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Side), typeof(BitflyerParentOrderSide));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.ParentOrderType), typeof(BitflyerParentOrderType));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.Price), typeof(decimal));
         AssertProperty(typeof(GetParentOrders.Item), nameof(GetParentOrders.Item.AveragePrice), typeof(decimal));

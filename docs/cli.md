@@ -234,6 +234,8 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - JSON field 名は DTO の serialization contract に従う
   - `JsonPropertyName` がある場合はその名前
   - ない場合は DTO property 名
+- `native` request JSON の field naming 正本は request DTO の serialization contract だけとする
+- CLI command descriptor、help、template、usage example は `native` request JSON に対して DTO 契約と異なる別名を hand-write してはならない
 - current phase の library contract では、`native` response DTO の全 property に API response JSON field 名の `JsonPropertyName` を明示する方針を採る
 - `native` DTO の property が enum で表現される場合も、request / response JSON の値は API が定義する string literal を使う
 - CLI は DTO の `JsonPropertyName` / `JsonConverter` をそのまま使い、CLI 独自の JSON naming policy や value rewriting を定義しない
@@ -265,6 +267,8 @@ exchangeapi <venue> <surface> <scope> <command> [options]
   - `--request-template`
   - `--query-template`
 - template 補助は canonical な JSON 雛形を stdout に出し、facade call を行わず exit code `0` で終了する
+- `native` request template は request DTO の serialization contract から導出しなければならない
+- `native` の usage example に `--request-json` を載せる場合、その field 名は request DTO の serialization contract と一致しなければならない
 - `protocol` query command の template は command descriptor metadata から導出できる形にしてよい
 
 例:
@@ -570,7 +574,7 @@ Binance native public canonical JSON:
 
 ```bash
 exchangeapi binance native public get-klines \
-  --request-json '{"Symbol":"BTCJPY","Interval":"1h","Limit":2}'
+  --request-json '{"symbol":"BTCJPY","interval":"1h","limit":2}'
 ```
 
 bitFlyer private write:

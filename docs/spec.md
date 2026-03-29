@@ -791,6 +791,7 @@ bitFlyer private endpoint の認証・署名は `Protocol` が担う。
 - `JsonConverter` を object / array shape 判定、required / optional 判定、semantic validation、query parameter 生成の正本にしてはならない
 - `Native` response の shape decode と contract validation は endpoint module が担い、必要に応じて `JsonDocument` / `JsonElement` と internal helper を使ってよい
 - `Native` request body は DTO を `JsonSerializer.Serialize(dto)` の既定設定で送れる形を基本とし、query request は endpoint module が query parameter を組み立てる
+- `Native` request JSON の field naming 正本は request DTO の serialization contract だけとし、adapter 側の template / help / example が別の request JSON 名を hand-write してはならない
 
 ### 7.4 形状
 

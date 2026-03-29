@@ -25,7 +25,7 @@ public static class GetExecutionsPrivateProtocolCommand
             Path = Path,
             EndpointId = "GetExecutionsPrivate",
             Summary = "bitFlyer protocol private executions",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = """exchangeapi bitflyer protocol private get-executions-private --query-json '{"product_code":"BTC_JPY","count":10}'""",
             CommandOptions = [],
@@ -59,7 +59,7 @@ public static class GetExecutionsPrivateProtocolCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var typed = (ProtocolQueryValues)request;

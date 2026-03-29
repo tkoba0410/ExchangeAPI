@@ -16,7 +16,7 @@ public static class GetChildOrdersCommand
             Path = new CommandPath("bitflyer", "native", "private", "get-child-orders"),
             EndpointId = "GetChildOrders",
             Summary = "bitFlyer native private child orders",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{"product_code":null,"count":null,"before":null,"after":null,"child_order_state":null,"child_order_id":null,"child_order_acceptance_id":null,"parent_order_id":null}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-child-orders --request-json '{"product_code":"BTC_JPY","count":10,"child_order_state":"ACTIVE"}'""",
             CommandOptions =
@@ -138,7 +138,7 @@ public static class GetChildOrdersCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetChildOrdersCallAsync((GetChildOrdersRequest)request, cancellationToken);

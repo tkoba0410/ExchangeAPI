@@ -15,7 +15,7 @@ public static class GetParentOrderCommand
             Path = new CommandPath("bitflyer", "native", "private", "get-parent-order"),
             EndpointId = "GetParentOrder",
             Summary = "bitFlyer native private parent order",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{"parent_order_id":null,"parent_order_acceptance_id":null}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-parent-order --request-json '{"parent_order_acceptance_id":"JRF20200101-000000-000000"}'""",
             CommandOptions =
@@ -101,7 +101,7 @@ public static class GetParentOrderCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetParentOrderCallAsync((GetParentOrderRequest)request, cancellationToken);

@@ -15,7 +15,7 @@ public static class WithdrawCommand
             Path = new CommandPath("bitflyer", "native", "private", "withdraw"),
             EndpointId = "Withdraw",
             Summary = "bitFlyer native private withdraw",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{"currency_code":"JPY","bank_account_id":0,"amount":0,"code":""}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private withdraw --request-json '{"currency_code":"JPY","bank_account_id":12345,"amount":10000,"code":"123456"}' --yes""",
             CommandOptions =
@@ -116,7 +116,7 @@ public static class WithdrawCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.WithdrawCallAsync((WithdrawRequest)request, cancellationToken);

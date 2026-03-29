@@ -15,7 +15,7 @@ public static class GetTradingCommissionCommand
             Path = new CommandPath("bitflyer", "native", "private", "get-trading-commission"),
             EndpointId = "GetTradingCommission",
             Summary = "bitFlyer native private trading commission",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{"product_code":""}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-trading-commission --request-json '{"product_code":"BTC_JPY"}'""",
             CommandOptions = [CliOptionSpec.Value("product-code")],
@@ -88,7 +88,7 @@ public static class GetTradingCommissionCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetTradingCommissionCallAsync((GetTradingCommissionRequest)request, cancellationToken);

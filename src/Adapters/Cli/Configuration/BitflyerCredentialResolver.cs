@@ -6,10 +6,10 @@ namespace ExchangeApi.Adapters.Cli.Configuration;
 
 public static class BitflyerCredentialResolver
 {
-    public const string ApiKeyEnvName = "BITFLYER_API_KEY";
-    public const string ApiSecretEnvName = "BITFLYER_API_SECRET";
     public const string AgeIdentityFileEnvName = "EXCHANGEAPI_AGE_IDENTITY_FILE_PATH";
     public const string CredentialsAgeFileEnvName = "EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH";
+    public const string AuthenticationRequirementText =
+        $"{AgeIdentityFileEnvName} / {CredentialsAgeFileEnvName}";
 
     public static BitflyerCredentialResolution Resolve(IEnvironment environment)
     {
@@ -18,17 +18,6 @@ public static class BitflyerCredentialResolver
 
     public static BitflyerCredentialResolution Resolve(IEnvironment environment, IAgeCredentialDecryptor decryptor)
     {
-        var apiKey = environment.GetEnvironmentVariable(ApiKeyEnvName);
-        var apiSecret = environment.GetEnvironmentVariable(ApiSecretEnvName);
-        if (!string.IsNullOrWhiteSpace(apiKey) && !string.IsNullOrWhiteSpace(apiSecret))
-        {
-            return BitflyerCredentialResolution.Success(new BitflyerApiCredentials
-            {
-                ApiKey = apiKey,
-                ApiSecret = apiSecret,
-            });
-        }
-
         var identityFilePath = environment.GetEnvironmentVariable(AgeIdentityFileEnvName);
         var credentialsFilePath = environment.GetEnvironmentVariable(CredentialsAgeFileEnvName);
         var hasIdentity = !string.IsNullOrWhiteSpace(identityFilePath);
@@ -76,8 +65,7 @@ public static class BitflyerCredentialResolver
 
     public static string BuildMissingCredentialMessage()
     {
-        return
-            $"{ApiKeyEnvName} and {ApiSecretEnvName} must be set, or configure {AgeIdentityFileEnvName} and {CredentialsAgeFileEnvName}.";
+        return $"Configure {AgeIdentityFileEnvName} and {CredentialsAgeFileEnvName}.";
     }
 
     private static BitflyerApiCredentials ParseCredentials(string decryptedJson)

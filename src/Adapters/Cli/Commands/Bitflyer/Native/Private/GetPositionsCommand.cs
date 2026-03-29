@@ -15,7 +15,7 @@ public static class GetPositionsCommand
             Path = new CommandPath("bitflyer", "native", "private", "get-positions"),
             EndpointId = "GetPositions",
             Summary = "bitFlyer native private positions",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{"product_code":""}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-positions --request-json '{"product_code":"FX_BTC_JPY"}'""",
             CommandOptions = [CliOptionSpec.Value("product-code")],
@@ -88,7 +88,7 @@ public static class GetPositionsCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetPositionsCallAsync((GetPositionsRequest)request, cancellationToken);

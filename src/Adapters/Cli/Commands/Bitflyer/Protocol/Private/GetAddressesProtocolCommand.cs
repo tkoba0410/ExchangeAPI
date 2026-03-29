@@ -17,7 +17,7 @@ public static class GetAddressesProtocolCommand
             Path = Path,
             EndpointId = "GetAddresses",
             Summary = "bitFlyer protocol private addresses",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = "exchangeapi bitflyer protocol private get-addresses --query-json '{}'",
             CommandOptions = [],
@@ -51,7 +51,7 @@ public static class GetAddressesProtocolCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetAddressesCallAsync(cancellationToken);

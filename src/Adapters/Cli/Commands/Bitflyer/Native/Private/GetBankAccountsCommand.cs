@@ -15,7 +15,7 @@ public static class GetBankAccountsCommand
             Path = new CommandPath("bitflyer", "native", "private", "get-bank-accounts"),
             EndpointId = "GetBankAccounts",
             Summary = "bitFlyer native private bank accounts",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-bank-accounts --request-json '{}'""",
             CommandOptions = [],
@@ -68,7 +68,7 @@ public static class GetBankAccountsCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetBankAccountsCallAsync((GetBankAccountsRequest)request, cancellationToken);

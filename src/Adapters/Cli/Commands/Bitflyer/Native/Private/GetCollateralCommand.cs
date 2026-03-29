@@ -15,7 +15,7 @@ public static class GetCollateralCommand
             Path = new CommandPath("bitflyer", "native", "private", "get-collateral"),
             EndpointId = "GetCollateral",
             Summary = "bitFlyer native private collateral",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-collateral --request-json '{}'""",
             CommandOptions = [],
@@ -68,7 +68,7 @@ public static class GetCollateralCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetCollateralCallAsync((GetCollateralRequest)request, cancellationToken);

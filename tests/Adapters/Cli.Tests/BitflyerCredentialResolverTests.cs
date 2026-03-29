@@ -5,22 +5,14 @@ namespace ExchangeApi.Adapters.Cli.Tests;
 public sealed class BitflyerCredentialResolverTests
 {
     [Fact]
-    public void Resolve_UsesDirectEnvironmentCredentials_First()
+    public void Resolve_ReturnsNoneWhenAgeBackedSourceIsNotConfigured()
     {
-        var environment = new FakeEnvironment(new Dictionary<string, string?>
-        {
-            [BitflyerCredentialResolver.ApiKeyEnvName] = "env-key",
-            [BitflyerCredentialResolver.ApiSecretEnvName] = "env-secret",
-            [BitflyerCredentialResolver.AgeIdentityFileEnvName] = "/tmp/unused-age.key",
-            [BitflyerCredentialResolver.CredentialsAgeFileEnvName] = "/tmp/unused-credentials.enc.json",
-        });
+        var environment = new FakeEnvironment();
 
         var result = BitflyerCredentialResolver.Resolve(environment, new FakeAgeCredentialDecryptor(false, ""));
 
         Assert.False(result.HasFailure);
-        Assert.NotNull(result.Credentials);
-        Assert.Equal("env-key", result.Credentials!.ApiKey);
-        Assert.Equal("env-secret", result.Credentials.ApiSecret);
+        Assert.Null(result.Credentials);
     }
 
     [Fact]

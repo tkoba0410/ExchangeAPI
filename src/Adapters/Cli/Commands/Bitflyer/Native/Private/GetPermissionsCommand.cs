@@ -15,7 +15,7 @@ public static class GetPermissionsCommand
             Path = new CommandPath("bitflyer", "native", "private", "get-permissions"),
             EndpointId = "GetPermissions",
             Summary = "bitFlyer native private permissions",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private get-permissions --request-json '{}'""",
             CommandOptions = [],
@@ -68,7 +68,7 @@ public static class GetPermissionsCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetPermissionsCallAsync((GetPermissionsRequest)request, cancellationToken);

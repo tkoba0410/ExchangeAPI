@@ -20,7 +20,7 @@ public static class GetPositionsProtocolCommand
             Path = Path,
             EndpointId = "GetPositions",
             Summary = "bitFlyer protocol private positions",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = """exchangeapi bitflyer protocol private get-positions --query-json '{"product_code":"BTC_JPY"}'""",
             CommandOptions = [],
@@ -54,7 +54,7 @@ public static class GetPositionsProtocolCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var typed = (ProtocolQueryValues)request;

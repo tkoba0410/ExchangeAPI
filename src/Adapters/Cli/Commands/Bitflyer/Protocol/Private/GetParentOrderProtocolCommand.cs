@@ -21,7 +21,7 @@ public static class GetParentOrderProtocolCommand
             Path = Path,
             EndpointId = "GetParentOrder",
             Summary = "bitFlyer protocol private parent order",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = """exchangeapi bitflyer protocol private get-parent-order --query-json '{"parent_order_acceptance_id":"JRF20200101-000000-000000"}'""",
             CommandOptions = [],
@@ -78,7 +78,7 @@ public static class GetParentOrderProtocolCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var typed = (ProtocolQueryValues)request;

@@ -15,7 +15,7 @@ public static class CancelParentOrderCommand
             Path = new CommandPath("bitflyer", "native", "private", "cancel-parent-order"),
             EndpointId = "CancelParentOrder",
             Summary = "bitFlyer native private cancel parent order",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{"product_code":"","parent_order_id":null,"parent_order_acceptance_id":null}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private cancel-parent-order --request-json '{"product_code":"BTC_JPY","parent_order_acceptance_id":"JRF20200101-000000-000000"}' --yes""",
             CommandOptions =
@@ -109,7 +109,7 @@ public static class CancelParentOrderCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.CancelParentOrderCallAsync((CancelParentOrderRequest)request, cancellationToken);

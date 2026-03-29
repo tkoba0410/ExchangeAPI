@@ -20,7 +20,7 @@ public static class GetTradingCommissionProtocolCommand
             Path = Path,
             EndpointId = "GetTradingCommission",
             Summary = "bitFlyer protocol private trading commission",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = """exchangeapi bitflyer protocol private get-trading-commission --query-json '{"product_code":"BTC_JPY"}'""",
             CommandOptions = [],
@@ -54,7 +54,7 @@ public static class GetTradingCommissionProtocolCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var typed = (ProtocolQueryValues)request;

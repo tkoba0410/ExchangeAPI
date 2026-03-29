@@ -17,7 +17,7 @@ public static class GetCollateralAccountsProtocolCommand
             Path = Path,
             EndpointId = "GetCollateralAccounts",
             Summary = "bitFlyer protocol private collateral accounts",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = "exchangeapi bitflyer protocol private get-collateral-accounts --query-json '{}'",
             CommandOptions = [],
@@ -51,7 +51,7 @@ public static class GetCollateralAccountsProtocolCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetCollateralAccountsCallAsync(cancellationToken);

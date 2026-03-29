@@ -22,7 +22,7 @@ public static class GetCoinOutsProtocolCommand
             Path = Path,
             EndpointId = "GetCoinOuts",
             Summary = "bitFlyer protocol private coin outs",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = """exchangeapi bitflyer protocol private get-coin-outs --query-json '{"count":10}'""",
             CommandOptions = [],
@@ -56,7 +56,7 @@ public static class GetCoinOutsProtocolCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var typed = (ProtocolQueryValues)request;

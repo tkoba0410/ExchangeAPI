@@ -23,7 +23,7 @@ public static class GetBalanceHistoryProtocolCommand
             Path = Path,
             EndpointId = "GetBalanceHistory",
             Summary = "bitFlyer protocol private balance history",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = """exchangeapi bitflyer protocol private get-balance-history --query-json '{"currency_code":"JPY","count":10}'""",
             CommandOptions = [],
@@ -57,7 +57,7 @@ public static class GetBalanceHistoryProtocolCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var typed = (ProtocolQueryValues)request;

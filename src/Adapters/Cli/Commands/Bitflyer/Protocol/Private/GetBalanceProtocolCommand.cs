@@ -17,7 +17,7 @@ public static class GetBalanceProtocolCommand
             Path = Path,
             EndpointId = "GetBalance",
             Summary = "bitFlyer protocol private balance",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.ProtocolQuery(QuerySchema),
             CanonicalJsonExample = "exchangeapi bitflyer protocol private get-balance --query-json '{}'",
             CommandOptions = [],
@@ -51,7 +51,7 @@ public static class GetBalanceProtocolCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.GetBalanceCallAsync(cancellationToken);

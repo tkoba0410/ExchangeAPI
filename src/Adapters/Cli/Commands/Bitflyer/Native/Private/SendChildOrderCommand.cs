@@ -16,7 +16,7 @@ public static class SendChildOrderCommand
             Path = new CommandPath("bitflyer", "native", "private", "send-child-order"),
             EndpointId = "SendChildOrder",
             Summary = "bitFlyer native private send child order",
-            AuthenticationRequirement = "BITFLYER_API_KEY / BITFLYER_API_SECRET",
+            AuthenticationRequirement = BitflyerCredentialResolver.AuthenticationRequirementText,
             InputContract = CommandInputContract.NativeRequest("""{"product_code":"","child_order_type":"","side":"","price":null,"size":0,"minute_to_expire":null,"time_in_force":null}"""),
             CanonicalJsonExample = """exchangeapi bitflyer native private send-child-order --request-json '{"product_code":"BTC_JPY","child_order_type":"LIMIT","side":"BUY","price":1000000,"size":0.01,"minute_to_expire":43200,"time_in_force":"GTC"}' --yes""",
             CommandOptions =
@@ -159,7 +159,7 @@ public static class SendChildOrderCommand
         {
             return ExecutionOutcome.InputError(
                 "missing credential",
-                "BITFLYER_API_KEY and BITFLYER_API_SECRET must be set");
+                BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
         var call = await bundle.Private.SendChildOrderCallAsync((SendChildOrderRequest)request, cancellationToken);

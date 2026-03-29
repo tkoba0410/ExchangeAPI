@@ -38,10 +38,7 @@ public sealed class CancelAllChildOrdersNativeEndpoint : ICancelAllChildOrdersNa
                 auth: "KeySecret");
         }
 
-        var bodyJson = JsonSerializer.Serialize(new Dictionary<string, string>
-        {
-            ["product_code"] = request.ProductCode,
-        });
+        var bodyJson = JsonSerializer.Serialize(request);
 
         var protocolCall = await _protocolEndpoint.SendAsync(bodyJson, cancellationToken);
         if (!protocolCall.IsSuccess)

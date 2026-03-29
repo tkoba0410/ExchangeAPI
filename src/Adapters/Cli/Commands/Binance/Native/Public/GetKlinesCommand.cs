@@ -4,6 +4,7 @@ using ExchangeApi.Adapters.Cli.Infrastructure;
 using ExchangeApi.Adapters.Cli.Wizard;
 using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines;
+using ExchangeApi.Exchanges.Binance.Vocabulary;
 
 namespace ExchangeApi.Adapters.Cli.Commands.Binance.Native.Public;
 
@@ -86,7 +87,7 @@ public static class GetKlinesCommand
             DescribeRequest = static request =>
             {
                 var typed = (GetKlinesRequest)request;
-                return $"Symbol={typed.Symbol}, Interval={typed.Interval}, Limit={(typed.Limit?.ToString() ?? "<omitted>")}";
+                return $"Symbol={typed.Symbol}, Interval={BinanceApiStringEnum<BinanceInterval>.Format(typed.Interval)}, Limit={(typed.Limit?.ToString() ?? "<omitted>")}";
             },
             ExecuteAsync = ExecuteAsync,
         };
@@ -128,10 +129,15 @@ public static class GetKlinesCommand
             return RequestBindingResult.Failure("invalid argument", "invalid field: Symbol");
         }
 
-        var interval = options.GetValue("interval");
-        if (string.IsNullOrWhiteSpace(interval))
+        if (!OptionValueBinder.TryGetRequiredParsed(
+                options,
+                "interval",
+                "Interval",
+                BinanceApiStringEnum<BinanceInterval>.TryParse,
+                out BinanceInterval interval,
+                out var intervalError))
         {
-            return RequestBindingResult.Failure("invalid argument", "invalid field: Interval");
+            return RequestBindingResult.Failure("invalid argument", intervalError);
         }
 
         if (!TryParseLongOption(options, "start-time", out var startTime, out var startError))

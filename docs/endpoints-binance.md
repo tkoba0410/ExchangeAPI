@@ -84,6 +84,7 @@
 
 - vocabulary
   - `BinanceSymbols.BtcJpy = "BTCJPY"` を唯一の初期定数として用意してよい
+  - `BinanceIntervals.Hour1h = BinanceInterval.Hour1h` のような known interval 定数を用意してよい
   - request DTO の `Symbol` 自体は `string` のまま持つ
 - `Protocol` facade
   - `Task<Call<ProtocolRequest, ProtocolResponse>> GetKlinesCallAsync(string symbol, string interval, long? startTime = null, long? endTime = null, string? timeZone = null, int? limit = null, CancellationToken cancellationToken = default)`
@@ -91,14 +92,15 @@
   - `Task<Call<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> GetKlinesCallAsync(GetKlinesRequest request, CancellationToken cancellationToken = default)`
 - request DTO
   - `Symbol: string`
-  - `Interval: string`
+  - `Interval: BinanceInterval`
   - `StartTime: long?`
   - `EndTime: long?`
   - `TimeZone: string?`
   - `Limit: int?`
 - request rule
   - `Symbol` 必須、blank 不可
-  - `Interval` 必須、case-sensitive
+  - `Interval` 必須
+  - wire JSON / query string 上の `interval` value は case-sensitive
     - `1s`
     - `1m`, `3m`, `5m`, `15m`, `30m`
     - `1h`, `2h`, `4h`, `6h`, `8h`, `12h`

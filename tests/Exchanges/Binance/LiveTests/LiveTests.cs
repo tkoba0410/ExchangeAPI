@@ -19,7 +19,7 @@ public sealed class LiveTests
         var request = new GetKlinesRequest
         {
             Symbol = BinanceSymbols.BtcJpy,
-            Interval = "1h",
+            Interval = BinanceIntervals.Hour1h,
             Limit = 2,
             StartTime = currentHourStart - (2L * oneHourInMilliseconds),
             EndTime = currentHourStart - 1L,
@@ -28,7 +28,7 @@ public sealed class LiveTests
         var nativeCall = await client.Public.GetKlinesCallAsync(request);
         var protocolCall = await client.Protocol.Public.GetKlinesCallAsync(
             BinanceSymbols.BtcJpy,
-            "1h",
+            BinanceApiStringEnum<BinanceInterval>.Format(BinanceIntervals.Hour1h),
             startTime: request.StartTime,
             endTime: request.EndTime,
             limit: 2);

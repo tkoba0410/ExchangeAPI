@@ -1,5 +1,6 @@
 using ExchangeApi.Exchanges.Binance.Native.Public.Api;
 using ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines;
+using ExchangeApi.Exchanges.Binance.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 
 namespace ExchangeApi.Tests.Exchanges.Binance.Native.Tests;
@@ -10,13 +11,13 @@ public sealed class NativeFacadeTests
     public async Task PublicFacade_ForwardsCall()
     {
         var expected = CallFactory.Success(
-            new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h" },
+            new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h },
             (IReadOnlyList<GetKlines.Item>)[],
             new CallMeta { Layer = CallLayers.Native, Component = CallComponents.PublicEndpointModule, EndpointId = "GetKlines", Scope = "Public", Auth = "None" });
 
         var api = new BinancePublicNativeApi(new FakeGetKlinesNativeEndpoint(expected));
 
-        var actual = await api.GetKlinesCallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h" });
+        var actual = await api.GetKlinesCallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h });
 
         Assert.Same(expected, actual);
     }

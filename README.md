@@ -136,7 +136,7 @@ using var client = BinanceClientFactory.CreateNativeClient();
 var call = await client.Public.GetKlinesCallAsync(new GetKlinesRequest
 {
     Symbol = BinanceSymbols.BtcJpy,
-    Interval = "1h",
+    Interval = BinanceIntervals.Hour1h,
     Limit = 2,
 });
 

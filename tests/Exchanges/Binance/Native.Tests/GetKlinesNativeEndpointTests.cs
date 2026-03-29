@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines;
+using ExchangeApi.Exchanges.Binance.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 using ExchangeApi.Primitives.Protocol;
 using ExchangeApi.Tests.Exchanges.Binance.Native.Tests.Fakes;
@@ -11,7 +12,7 @@ public sealed class GetKlinesNativeEndpointTests
     public async Task CallAsync_ReturnsSemantic_WhenIntervalIsInvalid()
     {
         var endpoint = new GetKlinesNativeEndpoint(new FakeGetKlinesProtocolEndpoint((_, _, _, _, _, _) => throw new InvalidOperationException()));
-        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "bad" });
+        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = default });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
@@ -21,7 +22,7 @@ public sealed class GetKlinesNativeEndpointTests
     public async Task CallAsync_ReturnsSemantic_WhenLimitIsOutOfRange()
     {
         var endpoint = new GetKlinesNativeEndpoint(new FakeGetKlinesProtocolEndpoint((_, _, _, _, _, _) => throw new InvalidOperationException()));
-        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h", Limit = 1001 });
+        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h, Limit = 1001 });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
@@ -31,7 +32,7 @@ public sealed class GetKlinesNativeEndpointTests
     public async Task CallAsync_ReturnsSemantic_WhenTimeZoneIsInvalid()
     {
         var endpoint = new GetKlinesNativeEndpoint(new FakeGetKlinesProtocolEndpoint((_, _, _, _, _, _) => throw new InvalidOperationException()));
-        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h", TimeZone = "15:00" });
+        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h, TimeZone = "15:00" });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
@@ -46,7 +47,7 @@ public sealed class GetKlinesNativeEndpointTests
     public async Task CallAsync_AcceptsOfficiallyDocumentedTimeZoneExamples(string timeZone)
     {
         var endpoint = new GetKlinesNativeEndpoint(new FakeGetKlinesProtocolEndpoint((_, _, _, _, _, _) => SuccessProtocolCall(200, "[]")));
-        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h", TimeZone = timeZone });
+        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h, TimeZone = timeZone });
 
         Assert.True(call.IsSuccess);
     }
@@ -55,7 +56,7 @@ public sealed class GetKlinesNativeEndpointTests
     public async Task CallAsync_ReturnsSemantic_WhenStartTimeExceedsEndTime()
     {
         var endpoint = new GetKlinesNativeEndpoint(new FakeGetKlinesProtocolEndpoint((_, _, _, _, _, _) => throw new InvalidOperationException()));
-        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h", StartTime = 2, EndTime = 1 });
+        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h, StartTime = 2, EndTime = 1 });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
@@ -65,7 +66,7 @@ public sealed class GetKlinesNativeEndpointTests
     public async Task CallAsync_ReturnsHttp_WhenStatusIsNotExpected()
     {
         var endpoint = new GetKlinesNativeEndpoint(new FakeGetKlinesProtocolEndpoint((_, _, _, _, _, _) => SuccessProtocolCall(429, "[]")));
-        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h" });
+        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Http, call.Error!.Kind);
@@ -95,7 +96,7 @@ public sealed class GetKlinesNativeEndpointTests
         """;
 
         var endpoint = new GetKlinesNativeEndpoint(new FakeGetKlinesProtocolEndpoint((_, _, _, _, _, _) => SuccessProtocolCall(200, body)));
-        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h", Limit = 1 });
+        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h, Limit = 1 });
 
         Assert.True(call.IsSuccess);
         var item = Assert.Single(call.Response!);
@@ -114,7 +115,7 @@ public sealed class GetKlinesNativeEndpointTests
         """;
 
         var endpoint = new GetKlinesNativeEndpoint(new FakeGetKlinesProtocolEndpoint((_, _, _, _, _, _) => SuccessProtocolCall(200, body)));
-        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = "1h" });
+        var call = await endpoint.CallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h });
 
         Assert.False(call.IsSuccess);
         Assert.Equal(CallErrorKinds.Codec, call.Error!.Kind);

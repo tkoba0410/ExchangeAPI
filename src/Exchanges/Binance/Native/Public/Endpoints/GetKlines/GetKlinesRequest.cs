@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Binance.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines;
 
@@ -7,7 +8,7 @@ public sealed class GetKlinesRequest
     [JsonPropertyName("symbol")]
     public required string Symbol { get; init; }
     [JsonPropertyName("interval")]
-    public required string Interval { get; init; }
+    public required BinanceInterval Interval { get; init; }
     [JsonPropertyName("startTime")]
     public long? StartTime { get; init; }
     [JsonPropertyName("endTime")]

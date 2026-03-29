@@ -14,16 +14,6 @@ public interface IGetKlinesNativeEndpoint
 
 public sealed class GetKlinesNativeEndpoint : IGetKlinesNativeEndpoint
 {
-    private static readonly HashSet<string> SupportedIntervals =
-    [
-        "1s",
-        "1m", "3m", "5m", "15m", "30m",
-        "1h", "2h", "4h", "6h", "8h", "12h",
-        "1d", "3d",
-        "1w",
-        "1M",
-    ];
-
     private readonly IGetKlinesProtocolEndpoint _protocolEndpoint;
 
     public GetKlinesNativeEndpoint(IGetKlinesProtocolEndpoint protocolEndpoint)
@@ -47,7 +37,7 @@ public sealed class GetKlinesNativeEndpoint : IGetKlinesNativeEndpoint
 
         var protocolCall = await _protocolEndpoint.SendAsync(
             request.Symbol,
-            request.Interval,
+            BinanceApiStringEnum<BinanceInterval>.Format(request.Interval),
             request.StartTime,
             request.EndTime,
             request.TimeZone,
@@ -123,12 +113,7 @@ public sealed class GetKlinesNativeEndpoint : IGetKlinesNativeEndpoint
             return Semantic("Symbol must not be blank.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Interval))
-        {
-            return Semantic("Interval must not be blank.");
-        }
-
-        if (!SupportedIntervals.Contains(request.Interval))
+        if (!BinanceApiStringEnum<BinanceInterval>.IsDefined(request.Interval))
         {
             return Semantic("Interval is not supported.");
         }

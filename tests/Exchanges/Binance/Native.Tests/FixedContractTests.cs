@@ -1,6 +1,8 @@
 using System.Reflection;
+using System.Text.Json;
 using ExchangeApi.Exchanges.Binance.Native.Public.Api;
 using ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines;
+using ExchangeApi.Exchanges.Binance.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 
 namespace ExchangeApi.Tests.Exchanges.Binance.Native.Tests;
@@ -11,7 +13,7 @@ public sealed class FixedContractTests
     public void Fixed_Request_And_Response_Dtos_KeepKnown_Shape()
     {
         AssertProperty(typeof(GetKlinesRequest), nameof(GetKlinesRequest.Symbol), typeof(string));
-        AssertProperty(typeof(GetKlinesRequest), nameof(GetKlinesRequest.Interval), typeof(string));
+        AssertProperty(typeof(GetKlinesRequest), nameof(GetKlinesRequest.Interval), typeof(BinanceInterval));
         AssertProperty(typeof(GetKlinesRequest), nameof(GetKlinesRequest.StartTime), typeof(long?));
         AssertProperty(typeof(GetKlinesRequest), nameof(GetKlinesRequest.EndTime), typeof(long?));
         AssertProperty(typeof(GetKlinesRequest), nameof(GetKlinesRequest.TimeZone), typeof(string));
@@ -34,6 +36,24 @@ public sealed class FixedContractTests
             nameof(IBinancePublicNativeApi.GetKlinesCallAsync),
             typeof(GetKlinesRequest),
             typeof(IReadOnlyList<GetKlines.Item>));
+    }
+
+    [Fact]
+    public void GetKlinesRequest_UsesDocumentedIntervalLiterals()
+    {
+        var value = new GetKlinesRequest
+        {
+            Symbol = BinanceSymbols.BtcJpy,
+            Interval = BinanceIntervals.Hour1h,
+            Limit = 2,
+        };
+
+        var json = JsonSerializer.Serialize(value);
+        Assert.Equal("""{"symbol":"BTCJPY","interval":"1h","startTime":null,"endTime":null,"timeZone":null,"limit":2}""", json);
+
+        var deserialized = JsonSerializer.Deserialize<GetKlinesRequest>("""{"symbol":"BTCJPY","interval":"1M"}""");
+        Assert.NotNull(deserialized);
+        Assert.Equal(BinanceIntervals.Month1M, deserialized!.Interval);
     }
 
     private static void AssertProperty(Type type, string propertyName, Type propertyType)

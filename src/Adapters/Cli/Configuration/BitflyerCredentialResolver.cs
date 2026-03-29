@@ -6,6 +6,8 @@ namespace ExchangeApi.Adapters.Cli.Configuration;
 
 public static class BitflyerCredentialResolver
 {
+    public const int CanonicalVersion = 1;
+    public const string CanonicalVenue = "bitflyer";
     public const string AgeIdentityFileEnvName = "EXCHANGEAPI_AGE_IDENTITY_FILE_PATH";
     public const string CredentialsAgeFileEnvName = "EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH";
     public const string AuthenticationRequirementText =
@@ -77,9 +79,36 @@ public static class BitflyerCredentialResolver
             throw new InvalidOperationException("Decrypted credentials JSON must be an object.");
         }
 
-        var source = ResolveBitflyerSection(root);
-        var apiKey = ReadFirstString(source, "apiKey", "api_key", "ApiKey");
-        var apiSecret = ReadFirstString(source, "apiSecret", "api_secret", "ApiSecret");
+        return ParseCanonicalCredentials(root);
+    }
+
+    private static BitflyerApiCredentials ParseCanonicalCredentials(JsonElement root)
+    {
+        if (!root.TryGetProperty("version", out var versionElement) ||
+            versionElement.ValueKind != JsonValueKind.Number ||
+            !versionElement.TryGetInt32(out var version))
+        {
+            throw new InvalidOperationException("Decrypted credentials JSON must contain integer version.");
+        }
+
+        if (version != CanonicalVersion)
+        {
+            throw new InvalidOperationException($"Unsupported credentials JSON version: {version}.");
+        }
+
+        if (!root.TryGetProperty("venue", out var venueElement) || venueElement.ValueKind != JsonValueKind.String)
+        {
+            throw new InvalidOperationException("Decrypted credentials JSON must contain string venue.");
+        }
+
+        var venue = venueElement.GetString();
+        if (!string.Equals(venue, CanonicalVenue, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException($"Decrypted credentials JSON venue must be '{CanonicalVenue}'.");
+        }
+
+        var apiKey = ReadString(root, "apiKey");
+        var apiSecret = ReadString(root, "apiSecret");
         if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(apiSecret))
         {
             throw new InvalidOperationException("Decrypted credentials JSON must contain bitFlyer apiKey/apiSecret.");
@@ -92,27 +121,11 @@ public static class BitflyerCredentialResolver
         };
     }
 
-    private static JsonElement ResolveBitflyerSection(JsonElement root)
+    private static string? ReadString(JsonElement source, string propertyName)
     {
-        foreach (var propertyName in new[] { "bitflyer/default", "bitflyer", "Bitflyer" })
+        if (source.TryGetProperty(propertyName, out var value) && value.ValueKind == JsonValueKind.String)
         {
-            if (root.TryGetProperty(propertyName, out var section) && section.ValueKind == JsonValueKind.Object)
-            {
-                return section;
-            }
-        }
-
-        return root;
-    }
-
-    private static string? ReadFirstString(JsonElement source, params string[] propertyNames)
-    {
-        foreach (var propertyName in propertyNames)
-        {
-            if (source.TryGetProperty(propertyName, out var value) && value.ValueKind == JsonValueKind.String)
-            {
-                return value.GetString();
-            }
+            return value.GetString();
         }
 
         return null;

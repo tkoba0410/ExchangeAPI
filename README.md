@@ -251,7 +251,29 @@ bitFlyer private write は age-backed credentials source が必要:
 ```bash
 export EXCHANGEAPI_AGE_IDENTITY_FILE_PATH="$HOME/.config/exchangeapi/keys/age.key"
 export EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH="$HOME/.config/exchangeapi/secrets/credentials.enc.json"
+```
 
+復号後 credentials file の canonical JSON format:
+
+```json
+{
+  "version": 1,
+  "venue": "bitflyer",
+  "apiKey": "xxxxx",
+  "apiSecret": "yyyyy",
+  "label": "main-trade",
+  "generatedAt": "2026-03-29T10:00:00+09:00",
+  "expiresAt": "2026-06-30T00:00:00+09:00",
+  "note": "main trading key"
+}
+```
+
+補足:
+
+- `version`, `venue`, `apiKey`, `apiSecret` は必須
+- `label`, `generatedAt`, `expiresAt`, `note` は optional metadata
+
+```bash
 dotnet src/Adapters/Cli/bin/Debug/net10.0/exchangeapi.dll \
   bitflyer native private get-permissions \
   --summary --pretty

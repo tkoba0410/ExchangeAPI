@@ -1192,6 +1192,9 @@ live test の実行条件と、state を変更する endpoint の safety 要件�
   - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
   - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
   - 2 つの file path はどちらも環境変数で明示指定する
+  - 復号後 JSON の canonical format は `version`, `venue`, `apiKey`, `apiSecret` を必須とする flat object である
+  - `label`, `generatedAt`, `expiresAt`, `note` は optional metadata として持ってよい
+  - account / profile / multi-key selection は current phase では file format に持ち込まず、上層で credentials file path を切り替えて解決する
 - private write live test は global opt-in、認証解決可能条件、local marker file がある場合のみ実行する
   - `local/bitflyer-live-write-enabled`
 - destructive 範囲が広い write live test は dedicated local marker を別に要求する

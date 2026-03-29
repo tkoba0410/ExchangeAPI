@@ -34,7 +34,9 @@ public sealed class BitflyerCredentialResolverTests
 
             var result = BitflyerCredentialResolver.Resolve(
                 environment,
-                new FakeAgeCredentialDecryptor(true, """{"bitflyer":{"apiKey":"age-key","apiSecret":"age-secret"}}"""));
+                new FakeAgeCredentialDecryptor(
+                    true,
+                    """{"version":1,"venue":"bitflyer","apiKey":"age-key","apiSecret":"age-secret","label":"main-trade","generatedAt":"2026-03-29T10:00:00+09:00","expiresAt":"2026-06-30T00:00:00+09:00","note":"main trading key"}"""));
 
             Assert.False(result.HasFailure);
             Assert.NotNull(result.Credentials);
@@ -60,6 +62,66 @@ public sealed class BitflyerCredentialResolverTests
         Assert.True(result.HasFailure);
         Assert.Contains(BitflyerCredentialResolver.AgeIdentityFileEnvName, result.ErrorMessage);
         Assert.Contains(BitflyerCredentialResolver.CredentialsAgeFileEnvName, result.ErrorMessage);
+    }
+
+    [Fact]
+    public void Resolve_FailsWhenCanonicalVenueDoesNotMatch()
+    {
+        var tempDirectory = Directory.CreateTempSubdirectory();
+        try
+        {
+            var identityFilePath = Path.Combine(tempDirectory.FullName, "age.key");
+            var credentialsFilePath = Path.Combine(tempDirectory.FullName, "credentials.enc.json");
+            File.WriteAllText(identityFilePath, "identity");
+            File.WriteAllText(credentialsFilePath, "ciphertext");
+
+            var environment = new FakeEnvironment(new Dictionary<string, string?>
+            {
+                [BitflyerCredentialResolver.AgeIdentityFileEnvName] = identityFilePath,
+                [BitflyerCredentialResolver.CredentialsAgeFileEnvName] = credentialsFilePath,
+            });
+
+            var result = BitflyerCredentialResolver.Resolve(
+                environment,
+                new FakeAgeCredentialDecryptor(true, """{"version":1,"venue":"binance","apiKey":"age-key","apiSecret":"age-secret"}"""));
+
+            Assert.True(result.HasFailure);
+            Assert.Contains("venue", result.ErrorMessage);
+        }
+        finally
+        {
+            tempDirectory.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Resolve_FailsWhenLegacyFormatIsUsed()
+    {
+        var tempDirectory = Directory.CreateTempSubdirectory();
+        try
+        {
+            var identityFilePath = Path.Combine(tempDirectory.FullName, "age.key");
+            var credentialsFilePath = Path.Combine(tempDirectory.FullName, "credentials.enc.json");
+            File.WriteAllText(identityFilePath, "identity");
+            File.WriteAllText(credentialsFilePath, "ciphertext");
+
+            var environment = new FakeEnvironment(new Dictionary<string, string?>
+            {
+                [BitflyerCredentialResolver.AgeIdentityFileEnvName] = identityFilePath,
+                [BitflyerCredentialResolver.CredentialsAgeFileEnvName] = credentialsFilePath,
+            });
+
+            var result = BitflyerCredentialResolver.Resolve(
+                environment,
+                new FakeAgeCredentialDecryptor(true, """{"bitflyer":{"apiKey":"legacy-key","apiSecret":"legacy-secret"}}"""));
+
+            Assert.True(result.HasFailure);
+            Assert.Contains("version", result.ErrorMessage);
+        }
+        finally
+        {
+            tempDirectory.Delete(recursive: true);
+        }
     }
 
     private sealed class FakeAgeCredentialDecryptor : IAgeCredentialDecryptor

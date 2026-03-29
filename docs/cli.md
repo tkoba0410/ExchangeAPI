@@ -364,6 +364,22 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - 現行 phase で固定する credentials input は age-backed source に限定する
   - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
   - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
+- 復号後 credentials file の canonical JSON format は次とする
+```json
+{
+  "version": 1,
+  "venue": "bitflyer",
+  "apiKey": "xxxxx",
+  "apiSecret": "yyyyy",
+  "label": "main-trade",
+  "generatedAt": "2026-03-29T10:00:00+09:00",
+  "expiresAt": "2026-06-30T00:00:00+09:00",
+  "note": "main trading key"
+}
+```
+- `version`、`venue`、`apiKey`、`apiSecret` は credentials contract の本体である
+- `label`、`generatedAt`、`expiresAt`、`note` は optional metadata として許可してよい
+- current phase の CLI は optional metadata を挙動判定には使わず、未知 field も無視してよい
 - bitFlyer private command は credentials を解決できない場合、facade call 前に失敗させる
 - Binance は現行公開範囲に private surface を持たない
 

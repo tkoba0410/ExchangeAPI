@@ -43,6 +43,25 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests;
 public sealed class FixedContractTests
 {
     [Fact]
+    public void Vocabulary_KnownStringConstants_KeepDocumentedLiteralValues()
+    {
+        Assert.Equal("BTC_JPY", ProductCodes.BtcJpy);
+        Assert.Equal("FX_BTC_JPY", ProductCodes.FxBtcJpy);
+
+        Assert.Equal("JPY", CurrencyCodes.Jpy);
+        Assert.Equal("BTC", CurrencyCodes.Btc);
+        Assert.Equal("ETH", CurrencyCodes.Eth);
+        Assert.Equal("USD", CurrencyCodes.Usd);
+
+        Assert.Equal("普通", KnownAccountTypes.Ordinary);
+
+        Assert.Equal("CLEARING_COLL", CollateralReasonCodes.ClearingCollateral);
+        Assert.Equal("EXCHANGE_COLL", CollateralReasonCodes.ExchangeCollateral);
+        Assert.Equal("POST_COLL", CollateralReasonCodes.PostCollateral);
+        Assert.Equal("CANCEL_COLL", CollateralReasonCodes.CancelCollateral);
+    }
+
+    [Fact]
     public void Fixed_Request_And_Response_Dtos_KeepKnown_JsonPropertyNames()
     {
         AssertJsonProperty(typeof(GetMarkets.Item), nameof(GetMarkets.Item.ProductCode), typeof(string), "product_code");

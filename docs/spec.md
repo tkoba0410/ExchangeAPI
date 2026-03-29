@@ -776,6 +776,9 @@ bitFlyer private endpoint の認証・署名は `Protocol` が担う。
 - enum は cross-venue 共通化せず、対応する `Vocabulary` project に venue-local 型として置く
 - current phase の bitFlyer `Native` では、少なくとも `Side`, `TimeInForce`, `ChildOrderType`, `ConditionType`, `OrderMethod`, `ChildOrderState`, `ParentOrderState`, `HealthStatus`, `TradingState`, `TransferStatus`, `MarketType`, `TradeType`, `AddressType`, `ParentOrderType` を enum 化対象とする
 - `AccountType` と `ReasonCode` は current phase では string のまま維持する
+- `ProductCode`, `CurrencyCode`, `Symbol`, `AccountType`, `ReasonCode` のように enum 化しない string vocabulary でも、known values を対応する `Vocabulary` project の `public static class` + `public const string` として持ってよい
+- 上記の known values 定数は convenience 用であり、closed set や exhaustive inventory の正本として扱ってはならない
+- endpoint contract が open set または current phase で string 維持対象の field について、validation の正本を known values 定数へ移してはならない
 - docs 上の値集合が弱い field は `Unknown` member を持ってよいが、docs で閉集合が確認できる field は raw string 受理へ戻さない
 - raw diagnostics 起源の property は持ち込まない
 

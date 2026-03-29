@@ -85,6 +85,7 @@
 - vocabulary
   - `BinanceSymbols.BtcJpy = "BTCJPY"` を唯一の初期定数として用意してよい
   - `BinanceIntervals.Hour1h = BinanceInterval.Hour1h` のような known interval 定数を用意してよい
+  - `Symbol` の known values 定数は convenience 用であり、closed set の正本として扱わない
   - request DTO の `Symbol` 自体は `string` のまま持つ
 - `Protocol` facade
   - `Task<Call<ProtocolRequest, ProtocolResponse>> GetKlinesCallAsync(string symbol, string interval, long? startTime = null, long? endTime = null, string? timeZone = null, int? limit = null, CancellationToken cancellationToken = default)`

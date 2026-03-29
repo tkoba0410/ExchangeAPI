@@ -55,6 +55,12 @@
 - `ExposeInNative = Yes` の row に、`OptionalOmissionRule` の `TBD` を残さない
 - `TBD` は `ExposeInProtocol != Yes` かつ `ExposeInNative != Yes` の row にのみ許容する
 
+## Vocabulary Notes
+
+- `ProductCode`, `CurrencyCode`, `AccountType`, `ReasonCode` のような string field について、known values を `Vocabulary` project の `public static class` + `public const string` として置いてよい
+- これらの known values は convenience 用であり、closed set や exhaustive inventory の正本として扱わない
+- enum 化対象に上がっていない string field の validation は、known values 定数ではなく endpoint contract を正本とする
+
 ## Facade + Endpoint Module Rule
 
 - `ExposeInProtocol = Yes`

@@ -64,7 +64,7 @@ public sealed class GetAccountSnapshotToolTests
                 TestCallMeta("GetPermissions")),
         });
 
-        var result = await tool.ExecuteAsync(new GetAccountSnapshotRequest());
+        var result = await tool.ExecuteAsync(CreateRequest());
 
         Assert.True(result.IsSuccess);
         Assert.Null(result.Error);
@@ -95,7 +95,7 @@ public sealed class GetAccountSnapshotToolTests
                     "/v1/me/getchildorders",
                 ]));
 
-        var result = await tool.ExecuteAsync(new GetAccountSnapshotRequest());
+        var result = await tool.ExecuteAsync(CreateRequest());
 
         Assert.True(result.IsSuccess);
         Assert.Equal(PermissionModelIds.BitflyerPrivateReadV1, result.Response!.PermissionModel);
@@ -116,7 +116,7 @@ public sealed class GetAccountSnapshotToolTests
                     },
                     TestCallMeta("GetPermissions"))));
 
-        var result = await tool.ExecuteAsync(new GetAccountSnapshotRequest());
+        var result = await tool.ExecuteAsync(CreateRequest());
 
         Assert.True(result.IsSuccess);
         Assert.Equal(PermissionModelIds.BitflyerPrivateReadV1, result.Response!.PermissionModel);
@@ -137,7 +137,7 @@ public sealed class GetAccountSnapshotToolTests
                     },
                     TestCallMeta("GetBalance"))));
 
-        var result = await tool.ExecuteAsync(new GetAccountSnapshotRequest());
+        var result = await tool.ExecuteAsync(CreateRequest());
 
         Assert.False(result.IsSuccess);
         Assert.Null(result.Response);
@@ -164,6 +164,20 @@ public sealed class GetAccountSnapshotToolTests
         var actual = BitflyerAccountReadinessMapper.Map(null);
 
         Assert.Equal("unknown", actual);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsValidationErrorWhenVenueIsUnsupported()
+    {
+        var tool = new GetAccountSnapshotTool(CreateHappyPathGateway());
+
+        var result = await tool.ExecuteAsync(CreateRequest(venue: McpVenueIds.Binance));
+
+        Assert.False(result.IsSuccess);
+        var error = Assert.IsType<ExchangeApi.Adapters.McpServer.Schema.McpToolError>(result.Error);
+        Assert.Equal("validation_error", error.ErrorCategory);
+        Assert.Equal("invalid_venue", error.ErrorCode);
+        Assert.False(error.Retryable);
     }
 
     private static FakeBitflyerAccountSnapshotGateway CreateHappyPathGateway(
@@ -199,6 +213,17 @@ public sealed class GetAccountSnapshotToolTests
                 new GetPermissionsRequest(),
                 grantedPermissions,
                 TestCallMeta("GetPermissions")),
+        };
+    }
+
+    private static GetAccountSnapshotRequest CreateRequest(
+        string venue = McpVenueIds.Bitflyer,
+        string accountContext = McpAccountContextIds.Default)
+    {
+        return new GetAccountSnapshotRequest
+        {
+            Venue = venue,
+            AccountContext = accountContext,
         };
     }
 

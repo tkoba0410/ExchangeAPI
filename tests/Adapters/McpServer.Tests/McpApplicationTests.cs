@@ -102,7 +102,7 @@ public sealed class McpApplicationTests
     {
         var console = new FakeMcpConsole(
             """{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}}}""",
-            """{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"evaluate_order","arguments":{"symbol":"BTC_JPY"}}}""");
+            """{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"evaluate_order","arguments":{"venue":"bitflyer","accountContext":"default","symbol":"BTC_JPY"}}}""");
         var app = new McpApplication(dispatcher: new FakeToolDispatcher(), console: console);
 
         var exitCode = await app.RunAsync([]);

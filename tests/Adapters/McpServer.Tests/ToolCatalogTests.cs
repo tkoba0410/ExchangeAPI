@@ -97,6 +97,16 @@ public sealed class ToolCatalogTests
     }
 
     [Fact]
+    public void PrivateToolInputSchemas_ExposeBitflyerVenueAndDefaultAccountContext()
+    {
+        using var accountDocument = JsonDocument.Parse(ToolCatalog.GetAccountSnapshot.InputSchemaJson);
+        using var evaluateDocument = JsonDocument.Parse(ToolCatalog.EvaluateOrder.InputSchemaJson);
+
+        AssertBitflyerPrivateContextShape(accountDocument.RootElement);
+        AssertBitflyerPrivateContextShape(evaluateDocument.RootElement);
+    }
+
+    [Fact]
     public void EvaluateOrder_OutputSchema_ExposesClosedWarningTaxonomy()
     {
         using var document = JsonDocument.Parse(ToolCatalog.EvaluateOrder.OutputSchemaJson!);
@@ -110,9 +120,26 @@ public sealed class ToolCatalogTests
             .ToArray();
         var checks = properties.GetProperty("checks").GetProperty("properties");
         var estimate = properties.GetProperty("estimate").GetProperty("properties");
+        var normalizedRequest = properties.GetProperty("normalizedRequest");
+        var normalizedRequired = normalizedRequest.GetProperty("required").EnumerateArray().Select(x => x.GetString()!).ToArray();
 
         Assert.Equal(EvaluateOrderWarningCodes.All, warningEnum);
         Assert.Equal("null", checks.GetProperty("feeCoverageOk").GetProperty("type")[1].GetString());
         Assert.Equal("null", estimate.GetProperty("estimatedFee").GetProperty("type")[1].GetString());
+        Assert.Contains("venue", normalizedRequired);
+        Assert.Contains("accountContext", normalizedRequired);
+        Assert.Equal("bitflyer", normalizedRequest.GetProperty("properties").GetProperty("venue").GetProperty("enum")[0].GetString());
+        Assert.Equal("default", normalizedRequest.GetProperty("properties").GetProperty("accountContext").GetProperty("enum")[0].GetString());
+    }
+
+    private static void AssertBitflyerPrivateContextShape(JsonElement root)
+    {
+        var required = root.GetProperty("required").EnumerateArray().Select(x => x.GetString()!).ToArray();
+        var properties = root.GetProperty("properties");
+
+        Assert.Contains("venue", required);
+        Assert.Contains("accountContext", required);
+        Assert.Equal("bitflyer", properties.GetProperty("venue").GetProperty("enum")[0].GetString());
+        Assert.Equal("default", properties.GetProperty("accountContext").GetProperty("enum")[0].GetString());
     }
 }

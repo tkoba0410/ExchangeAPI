@@ -18,14 +18,11 @@ public sealed class EvaluateOrderToolTests
         var tool = new EvaluateOrderTool(CreateHappyPathGateway(jpyAvailable: 5000000m, btcAvailable: 1m));
 
         var result = await tool.ExecuteAsync(
-            new EvaluateOrderRequest
-            {
-                Symbol = " btc_jpy ",
-                Side = " BUY ",
-                OrderType = " market ",
-                Size = "0.300",
-                Price = null,
-            });
+            CreateRequest(
+                symbol: " btc_jpy ",
+                side: " BUY ",
+                orderType: " market ",
+                size: "0.300"));
 
         Assert.True(result.IsSuccess);
         var response = Assert.IsType<EvaluateOrderResponse>(result.Response);
@@ -37,6 +34,8 @@ public sealed class EvaluateOrderToolTests
         Assert.True(response.Checks.BalanceOk);
         Assert.Null(response.Checks.FeeCoverageOk);
         Assert.True(response.Checks.ProjectedExposureOk);
+        Assert.Equal(McpVenueIds.Bitflyer, response.NormalizedRequest.Venue);
+        Assert.Equal(McpAccountContextIds.Default, response.NormalizedRequest.AccountContext);
         Assert.Equal("BTC_JPY", response.NormalizedRequest.Symbol);
         Assert.Equal("buy", response.NormalizedRequest.Side);
         Assert.Equal("market", response.NormalizedRequest.OrderType);
@@ -56,14 +55,11 @@ public sealed class EvaluateOrderToolTests
         var tool = new EvaluateOrderTool(CreateHappyPathGateway());
 
         var result = await tool.ExecuteAsync(
-            new EvaluateOrderRequest
-            {
-                Symbol = "FX_BTC_JPY",
-                Side = "buy",
-                OrderType = "market",
-                Size = "0.1",
-                Price = null,
-            });
+            CreateRequest(
+                symbol: "FX_BTC_JPY",
+                side: "buy",
+                orderType: "market",
+                size: "0.1"));
 
         Assert.False(result.IsSuccess);
         var error = Assert.IsType<ExchangeApi.Adapters.McpServer.Schema.McpToolError>(result.Error);
@@ -78,14 +74,12 @@ public sealed class EvaluateOrderToolTests
         var tool = new EvaluateOrderTool(CreateHappyPathGateway());
 
         var result = await tool.ExecuteAsync(
-            new EvaluateOrderRequest
-            {
-                Symbol = "BTC_JPY",
-                Side = "buy",
-                OrderType = "market",
-                Size = "0.1",
-                Price = "10000000",
-            });
+            CreateRequest(
+                symbol: "BTC_JPY",
+                side: "buy",
+                orderType: "market",
+                size: "0.1",
+                price: "10000000"));
 
         Assert.False(result.IsSuccess);
         var error = Assert.IsType<ExchangeApi.Adapters.McpServer.Schema.McpToolError>(result.Error);
@@ -99,14 +93,12 @@ public sealed class EvaluateOrderToolTests
         var tool = new EvaluateOrderTool(CreateHappyPathGateway(jpyAvailable: 100000m, btcAvailable: 1m));
 
         var result = await tool.ExecuteAsync(
-            new EvaluateOrderRequest
-            {
-                Symbol = "BTC_JPY",
-                Side = "buy",
-                OrderType = "limit",
-                Size = "0.100",
-                Price = "12345678.5",
-            });
+            CreateRequest(
+                symbol: "BTC_JPY",
+                side: "buy",
+                orderType: "limit",
+                size: "0.100",
+                price: "12345678.5"));
 
         Assert.True(result.IsSuccess);
         var response = Assert.IsType<EvaluateOrderResponse>(result.Response);
@@ -139,14 +131,11 @@ public sealed class EvaluateOrderToolTests
             });
 
         var result = await tool.ExecuteAsync(
-            new EvaluateOrderRequest
-            {
-                Symbol = "BTC_JPY",
-                Side = "sell",
-                OrderType = "market",
-                Size = "0.300",
-                Price = null,
-            });
+            CreateRequest(
+                symbol: "BTC_JPY",
+                side: "sell",
+                orderType: "market",
+                size: "0.300"));
 
         Assert.True(result.IsSuccess);
         var response = Assert.IsType<EvaluateOrderResponse>(result.Response);
@@ -167,14 +156,11 @@ public sealed class EvaluateOrderToolTests
             });
 
         var result = await tool.ExecuteAsync(
-            new EvaluateOrderRequest
-            {
-                Symbol = "BTC_JPY",
-                Side = "buy",
-                OrderType = "market",
-                Size = "0.300",
-                Price = null,
-            });
+            CreateRequest(
+                symbol: "BTC_JPY",
+                side: "buy",
+                orderType: "market",
+                size: "0.300"));
 
         Assert.True(result.IsSuccess);
         var response = Assert.IsType<EvaluateOrderResponse>(result.Response);
@@ -204,14 +190,12 @@ public sealed class EvaluateOrderToolTests
             });
 
         var result = await tool.ExecuteAsync(
-            new EvaluateOrderRequest
-            {
-                Symbol = "BTC_JPY",
-                Side = "buy",
-                OrderType = "limit",
-                Size = "0.3",
-                Price = "12346000",
-            });
+            CreateRequest(
+                symbol: "BTC_JPY",
+                side: "buy",
+                orderType: "limit",
+                size: "0.3",
+                price: "12346000"));
 
         Assert.True(result.IsSuccess);
         var response = Assert.IsType<EvaluateOrderResponse>(result.Response);
@@ -235,14 +219,11 @@ public sealed class EvaluateOrderToolTests
                     TestCallMeta("GetBalance", "Private", "ApiKey"))));
 
         var result = await tool.ExecuteAsync(
-            new EvaluateOrderRequest
-            {
-                Symbol = "BTC_JPY",
-                Side = "buy",
-                OrderType = "market",
-                Size = "0.1",
-                Price = null,
-            });
+            CreateRequest(
+                symbol: "BTC_JPY",
+                side: "buy",
+                orderType: "market",
+                size: "0.1"));
 
         Assert.False(result.IsSuccess);
         var error = Assert.IsType<ExchangeApi.Adapters.McpServer.Schema.McpToolError>(result.Error);
@@ -251,6 +232,26 @@ public sealed class EvaluateOrderToolTests
         Assert.Equal("GetBalance", error.Details["endpoint"]);
         Assert.Equal("Http", error.Details["callErrorKind"]);
         Assert.True(error.Retryable);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsValidationErrorWhenAccountContextIsUnsupported()
+    {
+        var tool = new EvaluateOrderTool(CreateHappyPathGateway());
+
+        var result = await tool.ExecuteAsync(
+            CreateRequest(
+                symbol: "BTC_JPY",
+                side: "buy",
+                orderType: "market",
+                size: "0.1",
+                accountContext: "secondary"));
+
+        Assert.False(result.IsSuccess);
+        var error = Assert.IsType<ExchangeApi.Adapters.McpServer.Schema.McpToolError>(result.Error);
+        Assert.Equal("validation_error", error.ErrorCategory);
+        Assert.Equal("invalid_account_context", error.ErrorCode);
+        Assert.False(error.Retryable);
     }
 
     private static FakeBitflyerEvaluateOrderGateway CreateHappyPathGateway(
@@ -334,6 +335,27 @@ public sealed class EvaluateOrderToolTests
             ExecutedSize = 0m,
             TotalCommission = 0m,
             TimeInForce = TimeInForces.Gtc,
+        };
+    }
+
+    private static EvaluateOrderRequest CreateRequest(
+        string symbol,
+        string side,
+        string orderType,
+        string size,
+        string? price = null,
+        string venue = McpVenueIds.Bitflyer,
+        string accountContext = McpAccountContextIds.Default)
+    {
+        return new EvaluateOrderRequest
+        {
+            Venue = venue,
+            AccountContext = accountContext,
+            Symbol = symbol,
+            Side = side,
+            OrderType = orderType,
+            Size = size,
+            Price = price,
         };
     }
 

@@ -4,6 +4,12 @@ namespace ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 
 public sealed class EvaluateOrderRequest
 {
+    [JsonPropertyName("venue")]
+    public required string Venue { get; init; }
+
+    [JsonPropertyName("accountContext")]
+    public required string AccountContext { get; init; }
+
     [JsonPropertyName("symbol")]
     public required string Symbol { get; init; }
 

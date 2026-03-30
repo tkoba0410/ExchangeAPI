@@ -93,6 +93,8 @@ public sealed class SchemaContractTests
             },
             NormalizedRequest = new EvaluateOrderRequest
             {
+                Venue = "bitflyer",
+                AccountContext = "default",
                 Symbol = "BTC_JPY",
                 Side = "buy",
                 OrderType = "market",
@@ -112,17 +114,19 @@ public sealed class SchemaContractTests
 
         var json = JsonSerializer.Serialize(value);
 
-        Assert.Equal("""{"canPlace":true,"checks":{"symbolOk":true,"marketStatusOk":true,"sizeRuleOk":true,"priceRuleOk":true,"balanceOk":true,"feeCoverageOk":null,"projectedExposureOk":true},"normalizedRequest":{"symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.300","price":null},"estimate":{"referencePrice":"12345678","estimatedNotional":"3703703.4","estimatedFee":null,"estimatedFeeSourceKind":null},"warnings":["market_order_slippage_risk"],"reasons":[]}""", json);
+        Assert.Equal("""{"canPlace":true,"checks":{"symbolOk":true,"marketStatusOk":true,"sizeRuleOk":true,"priceRuleOk":true,"balanceOk":true,"feeCoverageOk":null,"projectedExposureOk":true},"normalizedRequest":{"venue":"bitflyer","accountContext":"default","symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.300","price":null},"estimate":{"referencePrice":"12345678","estimatedNotional":"3703703.4","estimatedFee":null,"estimatedFeeSourceKind":null},"warnings":["market_order_slippage_risk"],"reasons":[]}""", json);
     }
 
     [Fact]
     public void EvaluateOrderRequest_AllowsMissingPriceForMarketOrders()
     {
-        var json = """{"symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.001"}""";
+        var json = """{"venue":"bitflyer","accountContext":"default","symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.001"}""";
 
         var value = JsonSerializer.Deserialize<EvaluateOrderRequest>(json);
 
         Assert.NotNull(value);
+        Assert.Equal("bitflyer", value.Venue);
+        Assert.Equal("default", value.AccountContext);
         Assert.Equal("BTC_JPY", value.Symbol);
         Assert.Equal("buy", value.Side);
         Assert.Equal("market", value.OrderType);

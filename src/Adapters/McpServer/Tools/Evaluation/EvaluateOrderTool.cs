@@ -140,6 +140,8 @@ public sealed class EvaluateOrderTool
             Checks = checks,
             NormalizedRequest = new EvaluateOrderRequest
             {
+                Venue = normalized.Venue,
+                AccountContext = normalized.AccountContext,
                 Symbol = normalized.Symbol,
                 Side = normalized.Side,
                 OrderType = normalized.OrderType,
@@ -162,6 +164,16 @@ public sealed class EvaluateOrderTool
 
     private static ValidationResult Validate(EvaluateOrderRequest request)
     {
+        if (!BitflyerPrivateContextValidator.TryNormalize(
+                request.Venue,
+                request.AccountContext,
+                out var normalizedVenue,
+                out var normalizedAccountContext,
+                out var contextError))
+        {
+            return ValidationResult.Fail(contextError!);
+        }
+
         var symbol = request.Symbol.Trim().ToUpperInvariant();
         if (!string.Equals(symbol, SupportedSymbol, StringComparison.Ordinal))
         {
@@ -214,7 +226,7 @@ public sealed class EvaluateOrderTool
                         details: new Dictionary<string, string?> { ["price"] = request.Price }));
             }
 
-            return ValidationResult.Ok(new NormalizedEvaluateOrderRequest(symbol, side, orderType, sizeValue, null));
+            return ValidationResult.Ok(new NormalizedEvaluateOrderRequest(normalizedVenue, normalizedAccountContext, symbol, side, orderType, sizeValue, null));
         }
 
         if (request.Price is null)
@@ -235,7 +247,7 @@ public sealed class EvaluateOrderTool
                     details: new Dictionary<string, string?> { ["price"] = request.Price }));
         }
 
-        return ValidationResult.Ok(new NormalizedEvaluateOrderRequest(symbol, side, orderType, sizeValue, priceValue));
+        return ValidationResult.Ok(new NormalizedEvaluateOrderRequest(normalizedVenue, normalizedAccountContext, symbol, side, orderType, sizeValue, priceValue));
     }
 
     private static bool TryParseRule(
@@ -507,6 +519,8 @@ public sealed class EvaluateOrderTool
     }
 
     private sealed record NormalizedEvaluateOrderRequest(
+        string Venue,
+        string AccountContext,
         string Symbol,
         string Side,
         string OrderType,

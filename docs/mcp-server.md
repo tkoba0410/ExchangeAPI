@@ -313,6 +313,7 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 - `get_klines` は Binance public client が配線されている場合のみ advertise してよい
 - current `CreateDefault` 実装では Binance public client を既定で配線するため、通常の server 起動では `get_klines` は visible tool set に含まれる
 - Binance upstream の可用性までは `tools/list` で事前判定せず、`tools/call get_klines` 時の `upstream_error` として扱う
+- v2 で multi-venue private tool を導入する場合、hidden venue を増やさず、tool input に `venue` と `accountContext` を first-class field として出す
 
 追加しない例:
 
@@ -323,9 +324,10 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 - tool input の数値は、価格、数量、金額に限り decimal string を使う
 - count や boolean は JSON number / boolean を維持する
 - timestamp は UTC の ISO 8601 string とする
-- bitFlyer v1 core tools の venue は server configuration に固定する
+- bitFlyer v1 private tools は `venue` と `accountContext` を明示 input とする
+- `get_market_snapshot` は current phase では bitFlyer v1 固定の public tool とする
 - Binance public `get_klines` は venue-explicit とし、tool input の `venue` は v1 では `binance` のみを許可する
-- 将来 multi-venue を扱う場合は、tool ごとに `venue` または等価の account context を contract で明示する
+- multi-venue を扱う tool は、hidden venue を増やさず `venue` または等価の account context を contract で明示する
 - supported symbol は tool ごとに固定する
 - v1 では、supported symbol は library の市場存在確認と MCP adapter 側の明示 rule/config の両方を満たす集合とする
 - market rule は runtime 推測で埋めてはならない
@@ -422,6 +424,34 @@ versioned data file:
 - `BinanceSymbols` の known values 定数は convenience 用であり、MCP support set の正本ではない
 - `get_klines.interval` は [`docs/endpoints-binance.md`](./endpoints-binance.md) の `GetKlines` fixed contract を正本とする
 - `get_klines` は Binance の `timeZone` parameter を v1 では公開せず、UTC 固定で扱う
+
+### 11.1.6 v2 multi-venue contract direction
+
+bitFlyer v1 private tools は最小形としてすでに `venue + accountContext` を公開している。
+
+v2 で multi-venue を扱う場合は、以下を採用する。
+
+- public tool は `venue` を first-class input とする
+- private tool は `venue` に加えて `accountContext` を first-class input とする
+- server configuration は default venue / default accountContext を与えるだけで、意味論の本体にしない
+- hidden venue / hidden account routing を増やさない
+- 責務が同じ tool は venue ごとに rename せず、generic tool 名を維持する
+- venue ごとの差分は input/output schema を `venue` 従属で表現する
+
+`accountContext` の v2 初期形:
+
+```json
+{
+  "venue": "bitflyer",
+  "accountContext": "default"
+}
+```
+
+補足:
+
+- `accountContext` は free-form text にせず、tool ごとに許可された closed set とする
+- 同じ server process が複数 venue を扱っても、contract 上は `venue` を省略しない
+- `tools/list` は capability を返すものであり、runtime routing policy の暗黙共有手段として使わない
 
 ### 11.2 `get_market_snapshot`
 
@@ -533,8 +563,16 @@ bitFlyer v1 の補足:
 入力:
 
 ```json
-{}
+{
+  "venue": "bitflyer",
+  "accountContext": "default"
+}
 ```
+
+入力制約:
+
+- `venue`: 必須。v1 では `bitflyer`
+- `accountContext`: 必須。v1 では `default`
 
 出力:
 
@@ -676,6 +714,8 @@ bitFlyer v1 の補足:
 
 ```json
 {
+  "venue": "bitflyer",
+  "accountContext": "default",
   "symbol": "BTC_JPY",
   "side": "buy",
   "orderType": "market",
@@ -686,6 +726,8 @@ bitFlyer v1 の補足:
 
 入力制約:
 
+- `venue`: 必須。v1 では `bitflyer`
+- `accountContext`: 必須。v1 では `default`
 - `symbol`: 必須
 - `side`: 必須。`buy` / `sell`
 - `orderType`: 必須。`market` / `limit`
@@ -734,6 +776,8 @@ bitFlyer v1 追加制約:
     "projectedExposureOk": true
   },
   "normalizedRequest": {
+    "venue": "bitflyer",
+    "accountContext": "default",
     "symbol": "BTC_JPY",
     "side": "buy",
     "orderType": "market",
@@ -758,6 +802,8 @@ bitFlyer v1 追加制約:
 - `canPlace`: 総合判定
 - `checks`: 個別検査結果
 - `normalizedRequest`: 正規化済み注文要求
+- `normalizedRequest.venue`: 正規化済み venue
+- `normalizedRequest.accountContext`: 正規化済み account context
 - `estimate.referencePrice`: 評価基準価格
 - `estimate.estimatedNotional`: 想定約定金額
 - `estimate.estimatedFee`: optional fee estimate
@@ -778,6 +824,7 @@ warning taxonomy:
 - `canPlace = true` でも、最終発注判断は Bot が行う
 - `evaluate_order` は単一 venue / 単一 symbol / 単一 order request に対する局所 preflight evaluator として扱う
 - `evaluate_order` は口座横断 risk engine、execution policy engine、strategy coordinator として扱わない
+- v2 で margin product を扱う場合でも、spot evaluator と margin evaluator を 1 tool に混在させない
 
 bitFlyer v1 導出:
 
@@ -810,6 +857,28 @@ bitFlyer v1 の補足:
 - v1 は `FX_BTC_JPY` を評価対象に含めない
 - v1 の `projectedExposureOk` は active child order ベースの projected exposure 判定であり、既存 spot 保有残高そのものは含めない
 - v1 は exchange-side の hidden limit、rate limit、post-only 相当条件、将来追加される venue-specific reject rule を完全再現しない
+
+v2 方向:
+
+- `evaluate_order` は spot preflight evaluator として維持する
+- `FX_BTC_JPY` を含む margin product は `evaluate_margin_order` の別 tool として導入する
+- margin evaluator は spot evaluator と別の rule 正本を持つ
+- margin evaluator の最小 rule domain は `minSize`、`sizeStep`、`priceStep` に加え、`collateralModel`、`requireCollateralModel`、`maintenanceModel`、`feeModel` を含む
+- bitFlyer margin evaluator の pinned file 名は `bitflyer-margin-rules.v1.json` を予約し、spot rule file と混在させない
+
+`evaluate_margin_order` の v2 初期 input 形:
+
+```json
+{
+  "venue": "bitflyer",
+  "accountContext": "default",
+  "symbol": "FX_BTC_JPY",
+  "side": "buy",
+  "orderType": "market",
+  "size": "0.1",
+  "price": null
+}
+```
 
 ### 11.5.1 MCP `tools/call` `_meta`
 
@@ -880,6 +949,38 @@ Binance public kline v1 追加制約:
 - `startTime` と `endTime` は strict RFC 3339 parse を行い、offset なし local time は受理しない
 - `startTime` と `endTime` は server 側で UTC に正規化する
 - `startTime` と `endTime` が両方ある場合は `startTime <= endTime`
+
+multi-venue 方向:
+
+- `get_klines` は generic tool 名を維持する
+- venue ごとに `get_<venue>_klines` を増やさない
+- multi-venue 時は `venue` を discriminator にして input schema を従属化する
+- `symbol` の closed set は `venue` ごとに独立させる
+- `interval` の closed set も `venue` ごとに独立させる
+
+`venue` 従属 schema の考え方:
+
+```json
+{
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "venue": { "const": "binance" },
+        "symbol": { "enum": ["BTCJPY", "ETHJPY", "XRPJPY", "BNBJPY", "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"] },
+        "interval": { "enum": ["1m", "5m", "15m", "1h", "4h", "1d"] }
+      },
+      "required": ["venue", "symbol", "interval"]
+    }
+  ]
+}
+```
+
+補足:
+
+- second venue を追加するまでは v1 と同じ `venue = binance` の closed set を維持する
+- second venue 追加時は new tool を増やさず、`oneOf` 分岐を追加して schema version を上げる
+- output schema も `venue` を discriminator にして同じ方針で従属化する
 
 出力:
 
@@ -1092,8 +1193,9 @@ live test:
 - live test は `BitflyerMarketRuleRegistry` baseline が drift していないことを検出できる構成にする
 - adapter live test は `tests/Adapters/McpServer.LiveTests` に置き、transport は in-memory stdio で検証する
 
-## 15. 今後詰める項目
+## 15. 実装 backlog
 
-- `evaluate_order` を `FX_BTC_JPY` まで広げるための margin rule 正本
-- multi-venue 化時の `venue` / account context 契約
-- generic `get_klines` を維持しつつ、multi-venue 時の venue ごとの closed set schema をどう表現するか
+以下は未決論点ではなく、採用済み方針の未実装項目である。
+
+- `evaluate_margin_order` を追加し、`bitflyer-margin-rules.v1.json` を正本として導入する
+- `get_klines` を v2 で `venue` discriminator の `oneOf` schema へ拡張する

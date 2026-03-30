@@ -23,7 +23,15 @@ public sealed class GetAccountSnapshotTool
         GetAccountSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        _ = request;
+        if (!BitflyerPrivateContextValidator.TryNormalize(
+                request.Venue,
+                request.AccountContext,
+                out _,
+                out _,
+                out var validationError))
+        {
+            return McpToolExecutionResult<GetAccountSnapshotResponse>.Failure(validationError!);
+        }
 
         var balanceTask = _gateway.GetBalanceCallAsync(cancellationToken);
         var collateralTask = _gateway.GetCollateralCallAsync(cancellationToken);

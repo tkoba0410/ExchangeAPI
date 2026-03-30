@@ -123,7 +123,14 @@ public sealed class LiveTests
             console => ExchangeApiMcpToolDispatcher.CreateDefault(console),
             BuildInitializeRequest(1),
             BuildToolsListRequest(2),
-            BuildToolCallRequest(3, "get_account_snapshot", new { }));
+            BuildToolCallRequest(
+                3,
+                "get_account_snapshot",
+                new
+                {
+                    venue = McpVenueIds.Bitflyer,
+                    accountContext = McpAccountContextIds.Default,
+                }));
 
         Assert.Equal(3, result.OutputLines.Count);
 
@@ -154,6 +161,8 @@ public sealed class LiveTests
                 "evaluate_order",
                 new
                 {
+                    venue = McpVenueIds.Bitflyer,
+                    accountContext = McpAccountContextIds.Default,
                     symbol = "BTC_JPY",
                     side = "buy",
                     orderType = "market",
@@ -168,6 +177,8 @@ public sealed class LiveTests
         Assert.True(evaluation.Checks.SizeRuleOk);
         Assert.True(evaluation.Checks.PriceRuleOk);
         Assert.True(evaluation.Checks.ProjectedExposureOk);
+        Assert.Equal(McpVenueIds.Bitflyer, evaluation.NormalizedRequest.Venue);
+        Assert.Equal(McpAccountContextIds.Default, evaluation.NormalizedRequest.AccountContext);
         Assert.Equal("BTC_JPY", evaluation.NormalizedRequest.Symbol);
         Assert.Equal("buy", evaluation.NormalizedRequest.Side);
         Assert.Equal("market", evaluation.NormalizedRequest.OrderType);

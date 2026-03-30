@@ -20,12 +20,7 @@ public static class ToolCatalog
         }
         """;
 
-    private const string AccountSnapshotInputSchema = """
-        {
-          "type": "object",
-          "additionalProperties": false
-        }
-        """;
+    private static readonly string AccountSnapshotInputSchema = BuildAccountSnapshotInputSchema();
 
     private static readonly string KlinesInputSchema = BuildKlinesInputSchema();
 
@@ -177,13 +172,21 @@ public static class ToolCatalog
             "normalizedRequest": {
               "type": "object",
               "properties": {
+                "venue": {
+                  "type": "string",
+                  "enum": ["bitflyer"]
+                },
+                "accountContext": {
+                  "type": "string",
+                  "enum": ["default"]
+                },
                 "symbol": { "type": "string" },
                 "side": { "type": "string" },
                 "orderType": { "type": "string" },
                 "size": { "type": "string" },
                 "price": { "type": ["string", "null"] }
               },
-              "required": ["symbol", "side", "orderType", "size", "price"],
+              "required": ["venue", "accountContext", "symbol", "side", "orderType", "size", "price"],
               "additionalProperties": false
             },
             "estimate": {
@@ -328,6 +331,32 @@ public static class ToolCatalog
             });
     }
 
+    private static string BuildAccountSnapshotInputSchema()
+    {
+        return SerializeSchema(
+            new Dictionary<string, object?>
+            {
+                ["type"] = "object",
+                ["properties"] = new Dictionary<string, object?>
+                {
+                    ["venue"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Venue identifier. v1 requires bitflyer.",
+                        ["enum"] = new[] { McpVenueIds.Bitflyer },
+                    },
+                    ["accountContext"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Account context identifier. v1 requires default.",
+                        ["enum"] = new[] { McpAccountContextIds.Default },
+                    },
+                },
+                ["required"] = new[] { "venue", "accountContext" },
+                ["additionalProperties"] = false,
+            });
+    }
+
     private static string BuildEvaluateOrderInputSchema()
     {
         return SerializeSchema(
@@ -336,6 +365,18 @@ public static class ToolCatalog
                 ["type"] = "object",
                 ["properties"] = new Dictionary<string, object?>
                 {
+                    ["venue"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Venue identifier. v1 requires bitflyer.",
+                        ["enum"] = new[] { McpVenueIds.Bitflyer },
+                    },
+                    ["accountContext"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Account context identifier. v1 requires default.",
+                        ["enum"] = new[] { McpAccountContextIds.Default },
+                    },
                     ["symbol"] = new Dictionary<string, object?>
                     {
                         ["type"] = "string",
@@ -363,7 +404,7 @@ public static class ToolCatalog
                         ["description"] = "Decimal string for limit orders, null for market orders.",
                     },
                 },
-                ["required"] = new[] { "symbol", "side", "orderType", "size" },
+                ["required"] = new[] { "venue", "accountContext", "symbol", "side", "orderType", "size" },
                 ["additionalProperties"] = false,
             });
     }
@@ -409,7 +450,7 @@ public static class ToolCatalog
     public static McpToolDefinition GetAccountSnapshot { get; } =
         new(
             Name: "get_account_snapshot",
-            Description: "Return the bot-oriented account snapshot for balances, positions, open order count, and read readiness.",
+            Description: "Return the bot-oriented bitFlyer v1 account snapshot for balances, positions, open order count, and read readiness.",
             RequestType: typeof(GetAccountSnapshotRequest),
             ResponseType: typeof(GetAccountSnapshotResponse),
             InputSchemaJson: AccountSnapshotInputSchema,
@@ -420,7 +461,7 @@ public static class ToolCatalog
     public static McpToolDefinition EvaluateOrder { get; } =
         new(
             Name: "evaluate_order",
-            Description: "Evaluate whether a supported order request can be placed mechanically under current rules and balances.",
+            Description: "Evaluate whether a supported bitFlyer v1 spot order request can be placed mechanically under current rules and balances.",
             RequestType: typeof(EvaluateOrderRequest),
             ResponseType: typeof(EvaluateOrderResponse),
             InputSchemaJson: EvaluateOrderInputSchema,

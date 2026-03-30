@@ -10,12 +10,18 @@ public static class BitflyerMarketRuleRegistry
                 MinSize: "0.001",
                 SizeStep: "0.00000001",
                 PriceStep: "1",
+                MinSizeSourceKind: MarketRuleSourceKinds.OfficialDocumented,
+                SizeStepSourceKind: MarketRuleSourceKinds.OfficialDocumented,
+                PriceStepSourceKind: MarketRuleSourceKinds.AdapterInferred,
                 SourceNote: "minSize and sizeStep are documented; priceStep is adapter-owned inference"),
             ["FX_BTC_JPY"] = new(
                 Symbol: "FX_BTC_JPY",
                 MinSize: "0.001",
                 SizeStep: "0.00000001",
                 PriceStep: "1",
+                MinSizeSourceKind: MarketRuleSourceKinds.OfficialDocumented,
+                SizeStepSourceKind: MarketRuleSourceKinds.OfficialDocumented,
+                PriceStepSourceKind: MarketRuleSourceKinds.AdapterInferred,
                 SourceNote: "minSize reflects the post-2024-10-21 CFD change; priceStep is adapter-owned inference"),
         };
 

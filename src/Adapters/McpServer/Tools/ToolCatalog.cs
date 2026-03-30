@@ -1,26 +1,17 @@
+using System.Text.Json;
+using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
+using ExchangeApi.Exchanges.Binance.Vocabulary;
 
 namespace ExchangeApi.Adapters.McpServer.Tools;
 
 public static class ToolCatalog
 {
-    private const string MarketSnapshotInputSchema = """
-        {
-          "type": "object",
-          "properties": {
-            "symbol": {
-              "type": "string",
-              "description": "Supported bitFlyer symbol."
-            }
-          },
-          "required": ["symbol"],
-          "additionalProperties": false
-        }
-        """;
+    private static readonly string MarketSnapshotInputSchema = BuildMarketSnapshotInputSchema();
 
     private const string AccountSnapshotInputSchema = """
         {
@@ -29,65 +20,9 @@ public static class ToolCatalog
         }
         """;
 
-    private const string KlinesInputSchema = """
-        {
-          "type": "object",
-          "properties": {
-            "symbol": {
-              "type": "string",
-              "description": "Supported Binance symbol."
-            },
-            "interval": {
-              "type": "string",
-              "description": "Binance kline interval literal."
-            },
-            "startTime": {
-              "type": ["string", "null"],
-              "description": "ISO 8601 string. Normalized to UTC by the server."
-            },
-            "endTime": {
-              "type": ["string", "null"],
-              "description": "ISO 8601 string. Normalized to UTC by the server."
-            },
-            "limit": {
-              "type": ["integer", "null"],
-              "description": "1..1000"
-            }
-          },
-          "required": ["symbol", "interval"],
-          "additionalProperties": false
-        }
-        """;
+    private static readonly string KlinesInputSchema = BuildKlinesInputSchema();
 
-    private const string EvaluateOrderInputSchema = """
-        {
-          "type": "object",
-          "properties": {
-            "symbol": {
-              "type": "string",
-              "description": "Supported bitFlyer symbol."
-            },
-            "side": {
-              "type": "string",
-              "enum": ["buy", "sell"]
-            },
-            "orderType": {
-              "type": "string",
-              "enum": ["market", "limit"]
-            },
-            "size": {
-              "type": "string",
-              "description": "Positive decimal string."
-            },
-            "price": {
-              "type": ["string", "null"],
-              "description": "Decimal string for limit orders, null for market orders."
-            }
-          },
-          "required": ["symbol", "side", "orderType", "size"],
-          "additionalProperties": false
-        }
-        """;
+    private static readonly string EvaluateOrderInputSchema = BuildEvaluateOrderInputSchema();
 
     private const string MarketSnapshotOutputSchema = """
         {
@@ -103,9 +38,21 @@ public static class ToolCatalog
               "properties": {
                 "minSize": { "type": "string" },
                 "sizeStep": { "type": "string" },
-                "priceStep": { "type": "string" }
+                "priceStep": { "type": "string" },
+                "minSizeSourceKind": {
+                  "type": "string",
+                  "enum": ["official_documented", "official_api_contract", "adapter_inferred", "pinned_operational"]
+                },
+                "sizeStepSourceKind": {
+                  "type": "string",
+                  "enum": ["official_documented", "official_api_contract", "adapter_inferred", "pinned_operational"]
+                },
+                "priceStepSourceKind": {
+                  "type": "string",
+                  "enum": ["official_documented", "official_api_contract", "adapter_inferred", "pinned_operational"]
+                }
               },
-              "required": ["minSize", "sizeStep", "priceStep"],
+              "required": ["minSize", "sizeStep", "priceStep", "minSizeSourceKind", "sizeStepSourceKind", "priceStepSourceKind"],
               "additionalProperties": false
             },
             "status": { "type": "string" }
@@ -175,9 +122,9 @@ public static class ToolCatalog
                 "sizeRuleOk": { "type": "boolean" },
                 "priceRuleOk": { "type": "boolean" },
                 "balanceOk": { "type": "boolean" },
-                "positionLimitOk": { "type": "boolean" }
+                "projectedExposureOk": { "type": "boolean" }
               },
-              "required": ["symbolOk", "marketStatusOk", "sizeRuleOk", "priceRuleOk", "balanceOk", "positionLimitOk"],
+              "required": ["symbolOk", "marketStatusOk", "sizeRuleOk", "priceRuleOk", "balanceOk", "projectedExposureOk"],
               "additionalProperties": false
             },
             "normalizedRequest": {
@@ -219,6 +166,10 @@ public static class ToolCatalog
         {
           "type": "object",
           "properties": {
+            "venue": {
+              "type": "string",
+              "enum": ["binance"]
+            },
             "symbol": { "type": "string" },
             "interval": { "type": "string" },
             "candles": {
@@ -243,10 +194,129 @@ public static class ToolCatalog
               }
             }
           },
-          "required": ["symbol", "interval", "candles"],
+          "required": ["venue", "symbol", "interval", "candles"],
           "additionalProperties": false
         }
         """;
+
+    private static string BuildMarketSnapshotInputSchema()
+    {
+        var symbols = BitflyerMarketRuleRegistry.Entries.Keys.OrderBy(x => x).ToArray();
+
+        return SerializeSchema(
+            new Dictionary<string, object?>
+            {
+                ["type"] = "object",
+                ["properties"] = new Dictionary<string, object?>
+                {
+                    ["symbol"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Supported bitFlyer v1 symbol.",
+                        ["enum"] = symbols,
+                    },
+                },
+                ["required"] = new[] { "symbol" },
+                ["additionalProperties"] = false,
+            });
+    }
+
+    private static string BuildKlinesInputSchema()
+    {
+        var symbols = BinanceKlineSymbolSet.Entries.OrderBy(x => x).ToArray();
+        var intervals = Enum.GetValues<BinanceInterval>()
+            .Select(BinanceApiStringEnum<BinanceInterval>.Format)
+            .ToArray();
+
+        return SerializeSchema(
+            new Dictionary<string, object?>
+            {
+                ["type"] = "object",
+                ["properties"] = new Dictionary<string, object?>
+                {
+                    ["venue"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Venue identifier. v1 requires binance.",
+                        ["enum"] = new[] { "binance" },
+                    },
+                    ["symbol"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Supported Binance v1 symbol.",
+                        ["enum"] = symbols,
+                    },
+                    ["interval"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Binance kline interval literal.",
+                        ["enum"] = intervals,
+                    },
+                    ["startTime"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = new object[] { "string", "null" },
+                        ["description"] = "ISO 8601 string. Normalized to UTC by the server.",
+                    },
+                    ["endTime"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = new object[] { "string", "null" },
+                        ["description"] = "ISO 8601 string. Normalized to UTC by the server.",
+                    },
+                    ["limit"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = new object[] { "integer", "null" },
+                        ["description"] = "1..1000",
+                    },
+                },
+                ["required"] = new[] { "venue", "symbol", "interval" },
+                ["additionalProperties"] = false,
+            });
+    }
+
+    private static string BuildEvaluateOrderInputSchema()
+    {
+        return SerializeSchema(
+            new Dictionary<string, object?>
+            {
+                ["type"] = "object",
+                ["properties"] = new Dictionary<string, object?>
+                {
+                    ["symbol"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Supported bitFlyer v1 symbol.",
+                        ["enum"] = new[] { "BTC_JPY" },
+                    },
+                    ["side"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["enum"] = new[] { "buy", "sell" },
+                    },
+                    ["orderType"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["enum"] = new[] { "market", "limit" },
+                    },
+                    ["size"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Positive decimal string.",
+                    },
+                    ["price"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = new object[] { "string", "null" },
+                        ["description"] = "Decimal string for limit orders, null for market orders.",
+                    },
+                },
+                ["required"] = new[] { "symbol", "side", "orderType", "size" },
+                ["additionalProperties"] = false,
+            });
+    }
+
+    private static string SerializeSchema(object value)
+    {
+        return JsonSerializer.Serialize(value);
+    }
 
     public static McpToolDefinition GetMarketSnapshot { get; } =
         new(

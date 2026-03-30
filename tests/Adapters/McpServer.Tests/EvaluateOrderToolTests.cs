@@ -34,7 +34,7 @@ public sealed class EvaluateOrderToolTests
         Assert.True(response.Checks.SizeRuleOk);
         Assert.True(response.Checks.PriceRuleOk);
         Assert.True(response.Checks.BalanceOk);
-        Assert.True(response.Checks.PositionLimitOk);
+        Assert.True(response.Checks.ProjectedExposureOk);
         Assert.Equal("BTC_JPY", response.NormalizedRequest.Symbol);
         Assert.Equal("buy", response.NormalizedRequest.Side);
         Assert.Equal("market", response.NormalizedRequest.OrderType);
@@ -112,7 +112,7 @@ public sealed class EvaluateOrderToolTests
         Assert.True(response.Checks.SizeRuleOk);
         Assert.False(response.Checks.PriceRuleOk);
         Assert.False(response.Checks.BalanceOk);
-        Assert.True(response.Checks.PositionLimitOk);
+        Assert.True(response.Checks.ProjectedExposureOk);
         Assert.Equal(["price_rule_violation", "insufficient_balance"], response.Reasons);
         Assert.Empty(response.Warnings);
     }
@@ -147,7 +147,7 @@ public sealed class EvaluateOrderToolTests
         var response = Assert.IsType<EvaluateOrderResponse>(result.Response);
         Assert.False(response.CanPlace);
         Assert.False(response.Checks.MarketStatusOk);
-        Assert.False(response.Checks.PositionLimitOk);
+        Assert.False(response.Checks.ProjectedExposureOk);
         Assert.Equal(["market_not_active", "exposure_limit_exceeded"], response.Reasons);
     }
 
@@ -179,7 +179,7 @@ public sealed class EvaluateOrderToolTests
         Assert.True(result.IsSuccess);
         var response = Assert.IsType<EvaluateOrderResponse>(result.Response);
         Assert.False(response.CanPlace);
-        Assert.False(response.Checks.PositionLimitOk);
+        Assert.False(response.Checks.ProjectedExposureOk);
         Assert.Equal(["exposure_limit_exceeded"], response.Reasons);
     }
 

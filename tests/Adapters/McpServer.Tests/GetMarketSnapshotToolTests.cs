@@ -65,6 +65,9 @@ public sealed class GetMarketSnapshotToolTests
         Assert.Equal("0.001", response.Rules.MinSize);
         Assert.Equal("0.00000001", response.Rules.SizeStep);
         Assert.Equal("1", response.Rules.PriceStep);
+        Assert.Equal(MarketRuleSourceKinds.OfficialDocumented, response.Rules.MinSizeSourceKind);
+        Assert.Equal(MarketRuleSourceKinds.OfficialDocumented, response.Rules.SizeStepSourceKind);
+        Assert.Equal(MarketRuleSourceKinds.AdapterInferred, response.Rules.PriceStepSourceKind);
         Assert.Equal("active", response.Status);
     }
 

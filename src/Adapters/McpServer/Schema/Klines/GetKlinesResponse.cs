@@ -4,6 +4,9 @@ namespace ExchangeApi.Adapters.McpServer.Schema.Klines;
 
 public sealed class GetKlinesResponse
 {
+    [JsonPropertyName("venue")]
+    public required string Venue { get; init; }
+
     [JsonPropertyName("symbol")]
     public required string Symbol { get; init; }
 

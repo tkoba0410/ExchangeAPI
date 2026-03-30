@@ -1,4 +1,5 @@
 using System.Text.Json;
+using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
@@ -23,13 +24,16 @@ public sealed class SchemaContractTests
                 MinSize = "0.001",
                 SizeStep = "0.00000001",
                 PriceStep = "1",
+                MinSizeSourceKind = MarketRuleSourceKinds.OfficialDocumented,
+                SizeStepSourceKind = MarketRuleSourceKinds.OfficialDocumented,
+                PriceStepSourceKind = MarketRuleSourceKinds.AdapterInferred,
             },
             Status = "active",
         };
 
         var json = JsonSerializer.Serialize(value);
 
-        Assert.Equal("""{"symbol":"BTC_JPY","bid":"12345000","ask":"12346000","last":"12345500","timestamp":"2026-03-29T10:00:00Z","rules":{"minSize":"0.001","sizeStep":"0.00000001","priceStep":"1"},"status":"active"}""", json);
+        Assert.Equal("""{"symbol":"BTC_JPY","bid":"12345000","ask":"12346000","last":"12345500","timestamp":"2026-03-29T10:00:00Z","rules":{"minSize":"0.001","sizeStep":"0.00000001","priceStep":"1","minSizeSourceKind":"official_documented","sizeStepSourceKind":"official_documented","priceStepSourceKind":"adapter_inferred"},"status":"active"}""", json);
     }
 
     [Fact]
@@ -80,7 +84,7 @@ public sealed class SchemaContractTests
                 SizeRuleOk = true,
                 PriceRuleOk = true,
                 BalanceOk = true,
-                PositionLimitOk = true,
+                ProjectedExposureOk = true,
             },
             NormalizedRequest = new EvaluateOrderRequest
             {
@@ -101,7 +105,7 @@ public sealed class SchemaContractTests
 
         var json = JsonSerializer.Serialize(value);
 
-        Assert.Equal("""{"canPlace":true,"checks":{"symbolOk":true,"marketStatusOk":true,"sizeRuleOk":true,"priceRuleOk":true,"balanceOk":true,"positionLimitOk":true},"normalizedRequest":{"symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.300","price":null},"estimate":{"referencePrice":"12345678","estimatedNotional":"3703703.4"},"warnings":["market_order_slippage_risk"],"reasons":[]}""", json);
+        Assert.Equal("""{"canPlace":true,"checks":{"symbolOk":true,"marketStatusOk":true,"sizeRuleOk":true,"priceRuleOk":true,"balanceOk":true,"projectedExposureOk":true},"normalizedRequest":{"symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.300","price":null},"estimate":{"referencePrice":"12345678","estimatedNotional":"3703703.4"},"warnings":["market_order_slippage_risk"],"reasons":[]}""", json);
     }
 
     [Fact]
@@ -124,6 +128,7 @@ public sealed class SchemaContractTests
     {
         var value = new GetKlinesResponse
         {
+            Venue = "binance",
             Symbol = "BTCUSDT",
             Interval = "1h",
             Candles =
@@ -147,6 +152,6 @@ public sealed class SchemaContractTests
 
         var json = JsonSerializer.Serialize(value);
 
-        Assert.Equal("""{"symbol":"BTCUSDT","interval":"1h","candles":[{"openTime":"2026-03-30T00:00:00Z","closeTime":"2026-03-30T00:59:59.999Z","open":"10700000","high":"10750000","low":"10680000","close":"10720000","volume":"123.45","quoteVolume":"1323000000","tradeCount":12345,"takerBuyBaseVolume":"61.72","takerBuyQuoteVolume":"662100000"}]}""", json);
+        Assert.Equal("""{"venue":"binance","symbol":"BTCUSDT","interval":"1h","candles":[{"openTime":"2026-03-30T00:00:00Z","closeTime":"2026-03-30T00:59:59.999Z","open":"10700000","high":"10750000","low":"10680000","close":"10720000","volume":"123.45","quoteVolume":"1323000000","tradeCount":12345,"takerBuyBaseVolume":"61.72","takerBuyQuoteVolume":"662100000"}]}""", json);
     }
 }

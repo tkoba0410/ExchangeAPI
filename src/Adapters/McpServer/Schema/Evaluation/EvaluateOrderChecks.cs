@@ -19,6 +19,6 @@ public sealed class EvaluateOrderChecks
     [JsonPropertyName("balanceOk")]
     public required bool BalanceOk { get; init; }
 
-    [JsonPropertyName("positionLimitOk")]
-    public required bool PositionLimitOk { get; init; }
+    [JsonPropertyName("projectedExposureOk")]
+    public required bool ProjectedExposureOk { get; init; }
 }

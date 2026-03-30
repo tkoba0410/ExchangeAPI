@@ -311,18 +311,20 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 - tool input の数値は、価格、数量、金額に限り decimal string を使う
 - count や boolean は JSON number / boolean を維持する
 - timestamp は UTC の ISO 8601 string とする
-- venue は初期 phase では server configuration に固定し、tool input には含めない
-- 将来 multi-venue を扱う場合は、tool input へ `venue` または等価の account context を追加する
+- bitFlyer v1 core tools の venue は server configuration に固定する
+- Binance public `get_klines` は venue-explicit とし、tool input の `venue` は v1 では `binance` のみを許可する
+- 将来 multi-venue を扱う場合は、tool ごとに `venue` または等価の account context を contract で明示する
 - supported symbol は tool ごとに固定する
 - v1 では、supported symbol は library の市場存在確認と MCP adapter 側の明示 rule/config の両方を満たす集合とする
 - market rule は runtime 推測で埋めてはならない
 
 ### 11.1.1 bitFlyer v1 共通導出ルール
 
-- `get_market_snapshot` と `evaluate_order` の symbol support は adapter-owned の `BitflyerMarketRuleRegistry` を正本とする
-- `BitflyerMarketRuleRegistry` は `minSize`、`sizeStep`、`priceStep` を symbol ごとに明示定義する
+- bitFlyer の公開文書と公開 API 文書を external source of truth とする
+- `get_market_snapshot` と `evaluate_order` は adapter-owned の `BitflyerMarketRuleRegistry` を pinned operational config として利用する
+- `BitflyerMarketRuleRegistry` は `minSize`、`sizeStep`、`priceStep` と各 field の source kind を symbol ごとに明示定義する
 - `BitflyerMarketRuleRegistry` に entry がない symbol は、MCP として未サポートとみなし `invalid_symbol` とする
-- `BitflyerMarketRuleRegistry` は venue 文書または運用上固定した設定値を source とする
+- `BitflyerMarketRuleRegistry` は venue 文書または運用上固定した設定値から構成される pinned config である
 - `BitflyerMarketRuleRegistry` の entry は version 管理対象とし、runtime observation から自動学習してはならない
 
 ### 11.1.2 `BitflyerMarketRuleRegistry` の source hierarchy
@@ -333,7 +335,7 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 2. 公式 API 文書の request / response contract
 3. 上記で未公開の項目に限り、adapter-owned の明示設定値
 
-bitFlyer v1 では次の source を正本とする。
+bitFlyer v1 では次の source hierarchy を使って pinned config を構成する。
 
 - `minSize`
   - 公式 FAQ `注文数量について`
@@ -358,10 +360,10 @@ bitFlyer v1 では次の source を正本とする。
 
 初期実装では、以下の registry entry を用いる。
 
-| symbol | minSize | sizeStep | priceStep | source note |
-| --- | --- | --- | --- | --- |
-| `BTC_JPY` | `"0.001"` | `"0.00000001"` | `"1"` | `minSize` と `sizeStep` は公式公開値、`priceStep` は adapter-owned 推論値 |
-| `FX_BTC_JPY` | `"0.001"` | `"0.00000001"` | `"1"` | `minSize` は 2024-10-21 以降の公式公開値、`sizeStep` は BTC 単位の公開値、`priceStep` は adapter-owned 推論値 |
+| symbol | minSize | sizeStep | priceStep | minSize source kind | sizeStep source kind | priceStep source kind | source note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `BTC_JPY` | `"0.001"` | `"0.00000001"` | `"1"` | `official_documented` | `official_documented` | `adapter_inferred` | `minSize` と `sizeStep` は公式公開値、`priceStep` は adapter-owned 推論値 |
+| `FX_BTC_JPY` | `"0.001"` | `"0.00000001"` | `"1"` | `official_documented` | `official_documented` | `adapter_inferred` | `minSize` は 2024-10-21 以降の公式公開値、`sizeStep` は BTC 単位の公開値、`priceStep` は adapter-owned 推論値 |
 
 補足:
 
@@ -432,7 +434,10 @@ bitFlyer v1 では次の source を正本とする。
   "rules": {
     "minSize": "0.001",
     "sizeStep": "0.00000001",
-    "priceStep": "1"
+    "priceStep": "1",
+    "minSizeSourceKind": "official_documented",
+    "sizeStepSourceKind": "official_documented",
+    "priceStepSourceKind": "adapter_inferred"
   },
   "status": "active"
 }
@@ -448,6 +453,9 @@ bitFlyer v1 では次の source を正本とする。
 - `rules.minSize`: 最小数量
 - `rules.sizeStep`: 数量刻み
 - `rules.priceStep`: 価格刻み
+- `rules.minSizeSourceKind`: `minSize` の source kind
+- `rules.sizeStepSourceKind`: `sizeStep` の source kind
+- `rules.priceStepSourceKind`: `priceStep` の source kind
 - `status`: 市場状態
 
 状態値:
@@ -467,7 +475,8 @@ bitFlyer v1 導出:
 
 - `bid`、`ask`、`last`、`timestamp` は `GetTicker` を正本とする
 - `status` は `GetBoardState.health` と `GetBoardState.state` の組み合わせで決定する
-- `rules.*` は `BitflyerMarketRuleRegistry` を正本とする
+- `rules.*` の返却値は `BitflyerMarketRuleRegistry` pinned operational config から取る
+- `rules.*SourceKind` は各 rule field が `official_documented`、`official_api_contract`、`adapter_inferred`、`pinned_operational` のどれに基づくかを返す
 
 bitFlyer v1 `status` mapping:
 
@@ -647,7 +656,7 @@ bitFlyer v1 追加制約:
     "sizeRuleOk": true,
     "priceRuleOk": true,
     "balanceOk": true,
-    "positionLimitOk": true
+    "projectedExposureOk": true
   },
   "normalizedRequest": {
     "symbol": "BTC_JPY",
@@ -695,14 +704,14 @@ bitFlyer v1 導出:
 - `marketStatusOk` は `get_market_snapshot.status == active` のときのみ `true`
 - `sizeRuleOk` は `BitflyerMarketRuleRegistry.minSize` と `sizeStep` に対する適合で判定する
 - `priceRuleOk` は `orderType = limit` のとき `priceStep` 適合と正値条件で判定する
-- `positionLimitOk` は adapter config の optional `MaxBaseSize` で判定し、`BTC_JPY` の同 side `ACTIVE` child order の `outstanding_size` 合計と今回 `size` の projected exposure が上限以下なら `true` とする
+- `projectedExposureOk` は adapter config の optional `MaxBaseSize` で判定し、`BTC_JPY` の同 side `ACTIVE` child order の `outstanding_size` 合計と今回 `size` の projected exposure が上限以下なら `true` とする
 - `warnings` は v1 では `market` 注文時に `market_order_slippage_risk` を返し、それ以外は空配列とする
 
 bitFlyer v1 の補足:
 
 - v1 は fee を blocking check に含めない
 - v1 は `FX_BTC_JPY` を評価対象に含めない
-- v1 の `positionLimitOk` は active child order ベースの projected exposure 判定であり、既存 spot 保有残高そのものは含めない
+- v1 の `projectedExposureOk` は active child order ベースの projected exposure 判定であり、既存 spot 保有残高そのものは含めない
 - v1 は exchange-side の hidden limit、rate limit、post-only 相当条件、将来追加される venue-specific reject rule を完全再現しない
 
 ### 11.5 `get_klines`
@@ -715,6 +724,7 @@ bitFlyer v1 の補足:
 
 ```json
 {
+  "venue": "binance",
   "symbol": "BTCUSDT",
   "interval": "1h",
   "startTime": null,
@@ -725,6 +735,7 @@ bitFlyer v1 の補足:
 
 入力制約:
 
+- `venue`: 必須。v1 では `binance`
 - `symbol`: 必須
 - `interval`: 必須。Binance の kline interval literal
 - `startTime`: 任意。ISO 8601 string または `null`
@@ -733,6 +744,7 @@ bitFlyer v1 の補足:
 
 Binance public kline v1 追加制約:
 
+- `venue` は `binance` のみ
 - `symbol` は `BinanceKlineSymbolSet` のみ
 - `interval` は [`docs/endpoints-binance.md`](./endpoints-binance.md) の `GetKlines` fixed contract に従う
 - `timeZone` は公開しない
@@ -743,6 +755,7 @@ Binance public kline v1 追加制約:
 
 ```json
 {
+  "venue": "binance",
   "symbol": "BTCUSDT",
   "interval": "1h",
   "candles": [
@@ -765,6 +778,7 @@ Binance public kline v1 追加制約:
 
 出力項目:
 
+- `venue`: 正規化済み venue
 - `symbol`: 正規化済み symbol
 - `interval`: 正規化済み interval literal
 - `candles[].openTime`: UTC open time
@@ -816,6 +830,7 @@ tool-level error は以下のカテゴリに分類する。
 - `invalid_order_type`
 - `invalid_size`
 - `invalid_price`
+- `invalid_venue`
 - `invalid_interval`
 - `invalid_limit`
 - `invalid_time_range`
@@ -854,6 +869,7 @@ MCP v1 error boundary:
   - malformed decimal string
   - `market` なのに `price != null`
   - `limit` なのに `price == null`
+  - unsupported venue
   - unsupported kline interval
   - kline `limit` out of range
   - kline `startTime > endTime`
@@ -949,4 +965,4 @@ live test:
 - observability / tracing rule
 - permission model の具体値
 - `list_markets` を追加するかどうか
-- Binance public kline tool を generic `get_klines` のまま維持するか、将来 multi-venue 時に `venue` を input に持たせるか
+- generic `get_klines` を将来 multi-venue 化するか、venue ごとに tool を分けるか

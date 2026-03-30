@@ -49,6 +49,7 @@ public sealed class GetKlinesToolTests
         var result = await tool.ExecuteAsync(
             new McpGetKlinesRequest
             {
+                Venue = " binance ",
                 Symbol = " btcusdt ",
                 Interval = "1h",
                 StartTime = null,
@@ -58,6 +59,7 @@ public sealed class GetKlinesToolTests
 
         Assert.True(result.IsSuccess);
         var response = Assert.IsType<GetKlinesResponse>(result.Response);
+        Assert.Equal("binance", response.Venue);
         Assert.Equal("BTCUSDT", response.Symbol);
         Assert.Equal("1h", response.Interval);
         var candle = Assert.Single(response.Candles);
@@ -82,6 +84,7 @@ public sealed class GetKlinesToolTests
         var result = await tool.ExecuteAsync(
             new McpGetKlinesRequest
             {
+                Venue = "binance",
                 Symbol = "SOLJPY",
                 Interval = "1h",
             });
@@ -100,6 +103,7 @@ public sealed class GetKlinesToolTests
         var result = await tool.ExecuteAsync(
             new McpGetKlinesRequest
             {
+                Venue = "binance",
                 Symbol = "BTCUSDT",
                 Interval = "10h",
             });
@@ -118,6 +122,7 @@ public sealed class GetKlinesToolTests
         var result = await tool.ExecuteAsync(
             new McpGetKlinesRequest
             {
+                Venue = "binance",
                 Symbol = "BTCUSDT",
                 Interval = "1h",
                 Limit = 1001,
@@ -137,6 +142,7 @@ public sealed class GetKlinesToolTests
         var result = await tool.ExecuteAsync(
             new McpGetKlinesRequest
             {
+                Venue = "binance",
                 Symbol = "BTCUSDT",
                 Interval = "1h",
                 StartTime = "2026-03-30T01:00:00Z",
@@ -147,6 +153,75 @@ public sealed class GetKlinesToolTests
         var error = Assert.IsType<ExchangeApi.Adapters.McpServer.Schema.McpToolError>(result.Error);
         Assert.Equal("validation_error", error.ErrorCategory);
         Assert.Equal("invalid_time_range", error.ErrorCode);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsValidationErrorWhenVenueIsUnsupported()
+    {
+        var tool = new GetKlinesTool(new FakeBinanceKlinesGateway());
+
+        var result = await tool.ExecuteAsync(
+            new McpGetKlinesRequest
+            {
+                Venue = "bitflyer",
+                Symbol = "BTCUSDT",
+                Interval = "1h",
+            });
+
+        Assert.False(result.IsSuccess);
+        var error = Assert.IsType<ExchangeApi.Adapters.McpServer.Schema.McpToolError>(result.Error);
+        Assert.Equal("validation_error", error.ErrorCategory);
+        Assert.Equal("invalid_venue", error.ErrorCode);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_NormalizesOffsetTimestampInputToUtc()
+    {
+        IReadOnlyList<GetKlines.Item> emptyItems = Array.Empty<GetKlines.Item>();
+
+        var tool = new GetKlinesTool(
+            new FakeBinanceKlinesGateway
+            {
+                KlinesCall = CallFactory.Success(
+                    new BinanceGetKlinesRequest
+                    {
+                        Symbol = "BTCUSDT",
+                        Interval = BinanceIntervals.Hour1h,
+                        StartTime = 1_743_292_800_000L,
+                        EndTime = 1_743_296_400_000L,
+                        TimeZone = null,
+                        Limit = 2,
+                    },
+                    emptyItems,
+                    TestCallMeta("GetKlines")),
+            });
+
+        var result = await tool.ExecuteAsync(
+            new McpGetKlinesRequest
+            {
+                Venue = "binance",
+                Symbol = "BTCUSDT",
+                Interval = "1h",
+                StartTime = "2025-03-30T09:00:00+09:00",
+                EndTime = "2025-03-30T19:00:00+09:00",
+                Limit = 2,
+            });
+
+        Assert.True(result.IsSuccess);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsValidationErrorWhenVenueIsMissingFromContract()
+    {
+        var json = """{"symbol":"BTCUSDT","interval":"1h"}""";
+
+        await Assert.ThrowsAsync<System.Text.Json.JsonException>(
+            async () =>
+            {
+                var request = System.Text.Json.JsonSerializer.Deserialize<McpGetKlinesRequest>(json)!;
+                var tool = new GetKlinesTool(new FakeBinanceKlinesGateway());
+                await tool.ExecuteAsync(request);
+            });
     }
 
     [Fact]
@@ -172,6 +247,7 @@ public sealed class GetKlinesToolTests
         var result = await tool.ExecuteAsync(
             new McpGetKlinesRequest
             {
+                Venue = "binance",
                 Symbol = "BTCUSDT",
                 Interval = "1h",
             });
@@ -183,6 +259,7 @@ public sealed class GetKlinesToolTests
         Assert.Equal("GetKlines", error.Details["endpoint"]);
         Assert.True(error.Retryable);
     }
+
 
     private static CallMeta TestCallMeta(string endpointId)
     {

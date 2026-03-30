@@ -119,7 +119,7 @@ public sealed class EvaluateOrderTool
             SizeRuleOk = IsSizeRuleOk(normalized.SizeValue, parsedRule.MinSize, parsedRule.SizeStep),
             PriceRuleOk = normalized.OrderType == "market" || IsPriceRuleOk(normalized.PriceValue!.Value, parsedRule.PriceStep),
             BalanceOk = IsBalanceOk(normalized, estimatedNotional, balanceCall.Response),
-            PositionLimitOk = IsPositionLimitOk(normalized, activeOrdersCall.Response),
+            ProjectedExposureOk = IsProjectedExposureOk(normalized, activeOrdersCall.Response),
         };
 
         var reasons = BuildReasons(checks);
@@ -132,7 +132,7 @@ public sealed class EvaluateOrderTool
                 && checks.SizeRuleOk
                 && checks.PriceRuleOk
                 && checks.BalanceOk
-                && checks.PositionLimitOk,
+                && checks.ProjectedExposureOk,
             Checks = checks,
             NormalizedRequest = new EvaluateOrderRequest
             {
@@ -312,7 +312,7 @@ public sealed class EvaluateOrderTool
         return availableByCurrency.GetValueOrDefault(BtcCurrencyCode, 0m) >= request.SizeValue;
     }
 
-    private bool IsPositionLimitOk(
+    private bool IsProjectedExposureOk(
         NormalizedEvaluateOrderRequest request,
         IReadOnlyList<GetChildOrders.Item> activeOrders)
     {
@@ -364,7 +364,7 @@ public sealed class EvaluateOrderTool
             reasons.Add("insufficient_balance");
         }
 
-        if (!checks.PositionLimitOk)
+        if (!checks.ProjectedExposureOk)
         {
             reasons.Add("exposure_limit_exceeded");
         }

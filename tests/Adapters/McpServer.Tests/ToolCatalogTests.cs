@@ -1,7 +1,9 @@
+using System.Text.Json;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
+using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Tools;
 
 namespace ExchangeApi.Adapters.McpServer.Tests;
@@ -42,5 +44,38 @@ public sealed class ToolCatalogTests
         var tools = ToolCatalog.PublicOnly;
 
         Assert.Equal(["get_market_snapshot", "get_klines"], tools.Select(tool => tool.Name).ToArray());
+    }
+
+    [Fact]
+    public void GetKlines_InputSchema_ExposesVenueAndClosedSets()
+    {
+        using var document = JsonDocument.Parse(ToolCatalog.GetKlines.InputSchemaJson);
+        var root = document.RootElement;
+        var required = root.GetProperty("required").EnumerateArray().Select(x => x.GetString()!).ToArray();
+
+        Assert.Equal(["venue", "symbol", "interval"], required);
+
+        var properties = root.GetProperty("properties");
+        var venues = properties.GetProperty("venue").GetProperty("enum").EnumerateArray().Select(x => x.GetString()!).ToArray();
+        var symbols = properties.GetProperty("symbol").GetProperty("enum").EnumerateArray().Select(x => x.GetString()!).ToArray();
+        var intervals = properties.GetProperty("interval").GetProperty("enum").EnumerateArray().Select(x => x.GetString()!).ToArray();
+
+        Assert.Equal(["binance"], venues);
+        Assert.Equal(BinanceKlineSymbolSet.Entries.OrderBy(x => x).ToArray(), symbols);
+        Assert.Contains("1h", intervals);
+    }
+
+    [Fact]
+    public void GetMarketSnapshot_OutputSchema_ExposesRuleSourceKinds()
+    {
+        using var document = JsonDocument.Parse(ToolCatalog.GetMarketSnapshot.OutputSchemaJson!);
+        var rules = document.RootElement.GetProperty("properties").GetProperty("rules");
+        var required = rules.GetProperty("required").EnumerateArray().Select(x => x.GetString()!).ToArray();
+        var sourceKinds = rules.GetProperty("properties").GetProperty("priceStepSourceKind").GetProperty("enum").EnumerateArray().Select(x => x.GetString()!).ToArray();
+
+        Assert.Contains("minSizeSourceKind", required);
+        Assert.Equal(
+            [MarketRuleSourceKinds.OfficialDocumented, MarketRuleSourceKinds.OfficialApiContract, MarketRuleSourceKinds.AdapterInferred, MarketRuleSourceKinds.PinnedOperational],
+            sourceKinds);
     }
 }

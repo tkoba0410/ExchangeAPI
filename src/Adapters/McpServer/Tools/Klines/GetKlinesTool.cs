@@ -11,6 +11,8 @@ namespace ExchangeApi.Adapters.McpServer.Tools.Klines;
 
 public sealed class GetKlinesTool
 {
+    private const string SupportedVenue = "binance";
+
     private readonly IBinanceKlinesGateway _gateway;
 
     public GetKlinesTool(IBinanceKlinesGateway gateway)
@@ -53,6 +55,7 @@ public sealed class GetKlinesTool
 
         var response = new GetKlinesResponse
         {
+            Venue = SupportedVenue,
             Symbol = normalized.Symbol,
             Interval = BinanceApiStringEnum<BinanceInterval>.Format(normalized.Interval),
             Candles = call.Response.Select(MapCandle).ToArray(),
@@ -63,6 +66,16 @@ public sealed class GetKlinesTool
 
     private static ValidationResult Validate(GetKlinesRequest request)
     {
+        var venue = request.Venue.Trim().ToLowerInvariant();
+        if (!string.Equals(venue, SupportedVenue, StringComparison.Ordinal))
+        {
+            return ValidationResult.Fail(
+                ValidationError(
+                    errorCode: "invalid_venue",
+                    message: "Venue must be binance.",
+                    details: new Dictionary<string, string?> { ["venue"] = request.Venue }));
+        }
+
         var symbol = request.Symbol.Trim().ToUpperInvariant();
         if (!BinanceKlineSymbolSet.Contains(symbol))
         {
@@ -117,6 +130,7 @@ public sealed class GetKlinesTool
 
         return ValidationResult.Ok(
             new NormalizedRequest(
+                venue,
                 symbol,
                 interval,
                 startTime?.ToUnixTimeMilliseconds(),
@@ -231,6 +245,7 @@ public sealed class GetKlinesTool
     }
 
     private sealed record NormalizedRequest(
+        string Venue,
         string Symbol,
         BinanceInterval Interval,
         long? StartTime,

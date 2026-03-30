@@ -48,6 +48,9 @@ public sealed class LiveTests
         Assert.Equal(rule!.MinSize, snapshot.Rules.MinSize);
         Assert.Equal(rule.SizeStep, snapshot.Rules.SizeStep);
         Assert.Equal(rule.PriceStep, snapshot.Rules.PriceStep);
+        Assert.Equal(rule.MinSizeSourceKind, snapshot.Rules.MinSizeSourceKind);
+        Assert.Equal(rule.SizeStepSourceKind, snapshot.Rules.SizeStepSourceKind);
+        Assert.Equal(rule.PriceStepSourceKind, snapshot.Rules.PriceStepSourceKind);
     }
 
     [McpServerPublicReadLiveFact]
@@ -64,6 +67,7 @@ public sealed class LiveTests
                 "get_klines",
                 new
                 {
+                    venue = "binance",
                     symbol = "BTCUSDT",
                     interval = "1h",
                     limit = 2,
@@ -75,6 +79,7 @@ public sealed class LiveTests
 
         var response = ReadStructuredContent<GetKlinesResponse>(result.OutputLines[2], out var isError);
         Assert.False(isError);
+        Assert.Equal("binance", response.Venue);
         Assert.Equal("BTCUSDT", response.Symbol);
         Assert.Equal("1h", response.Interval);
         AssertCandlesAreWellFormed(response.Candles);
@@ -93,6 +98,7 @@ public sealed class LiveTests
                 "get_klines",
                 new
                 {
+                    venue = "binance",
                     symbol = "BTCJPY",
                     interval = "1h",
                     limit = 2,
@@ -102,6 +108,7 @@ public sealed class LiveTests
 
         var response = ReadStructuredContent<GetKlinesResponse>(result.OutputLines[1], out var isError);
         Assert.False(isError);
+        Assert.Equal("binance", response.Venue);
         Assert.Equal("BTCJPY", response.Symbol);
         Assert.Equal("1h", response.Interval);
         AssertCandlesAreWellFormed(response.Candles);
@@ -156,7 +163,7 @@ public sealed class LiveTests
         Assert.True(evaluation.Checks.SymbolOk);
         Assert.True(evaluation.Checks.SizeRuleOk);
         Assert.True(evaluation.Checks.PriceRuleOk);
-        Assert.True(evaluation.Checks.PositionLimitOk);
+        Assert.True(evaluation.Checks.ProjectedExposureOk);
         Assert.Equal("BTC_JPY", evaluation.NormalizedRequest.Symbol);
         Assert.Equal("buy", evaluation.NormalizedRequest.Side);
         Assert.Equal("market", evaluation.NormalizedRequest.OrderType);

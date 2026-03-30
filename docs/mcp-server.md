@@ -253,7 +253,7 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 ## 9. 現行 phase
 
 - Stage11 の初期実装は Bot 向け read / evaluate tool から始める
-- bitFlyer v1 core tool は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order` の 3 つに固定する
+- bitFlyer v1 core tool は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order`、`evaluate_margin_order` の 4 つとする
 - 初期 venue scope は bitFlyer を正本とする
 - Binance など他 venue の account / evaluation 展開は、market rule / account / evaluation の導出元が固定できてから行う
 - ただし Binance public market data は例外とし、Kline 専用 tool を public read 拡張として先行追加してよい
@@ -264,6 +264,7 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 - `get_market_snapshot`: `BTC_JPY`、`FX_BTC_JPY`
 - `get_account_snapshot`: symbol input なし。spot balance と `FX_BTC_JPY` position を返す
 - `evaluate_order`: `BTC_JPY` の `LIMIT` / `MARKET` child order のみ
+- `evaluate_margin_order`: `FX_BTC_JPY` の `LIMIT` / `MARKET` child order のみ
 
 補足:
 
@@ -302,13 +303,14 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 3. `get_klines`
 4. `get_account_snapshot`
 5. `evaluate_order`
+6. `evaluate_margin_order`
 
 補足:
 
-- 上記 5 つが現行実装の current phase tool universe である
-- bitFlyer v1 core は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order` であり、`list_markets` は market discovery tool、`get_klines` は Binance public read extension として扱う
+- 上記 6 つが現行実装の current phase tool universe である
+- bitFlyer v1 core は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order`、`evaluate_margin_order` であり、`list_markets` は market discovery tool、`get_klines` は Binance public read extension として扱う
 - MCP `tools/list` は current process が実際に実行可能な visible tool set を返す
-- `get_account_snapshot` と `evaluate_order` は private credentials を解決できない場合、`tools/list` から advertise しない
+- `get_account_snapshot`、`evaluate_order`、`evaluate_margin_order` は private credentials を解決できない場合、`tools/list` から advertise しない
 - `list_markets` は current process の visible market capability set を返す
 - `get_klines` は Binance public client が配線されている場合のみ advertise してよい
 - current `CreateDefault` 実装では Binance public client を既定で配線するため、通常の server 起動では `get_klines` は visible tool set に含まれる
@@ -563,16 +565,8 @@ bitFlyer v1 の補足:
 入力:
 
 ```json
-{
-  "venue": "bitflyer",
-  "accountContext": "default"
-}
+{}
 ```
-
-入力制約:
-
-- `venue`: 必須。v1 では `bitflyer`
-- `accountContext`: 必須。v1 では `default`
 
 出力:
 
@@ -585,6 +579,14 @@ bitFlyer v1 の補足:
       "capabilities": [
         "get_market_snapshot",
         "evaluate_order"
+      ]
+    },
+    {
+      "venue": "bitflyer",
+      "symbol": "FX_BTC_JPY",
+      "capabilities": [
+        "get_market_snapshot",
+        "evaluate_margin_order"
       ]
     },
     {
@@ -603,7 +605,8 @@ bitFlyer v1 の補足:
 - `list_markets` は current process の visible tool set を基準に構成する
 - market-specific でない `get_account_snapshot` は `capabilities` に含めない
 - `evaluate_order` は `BTC_JPY` に対してのみ列挙する
-- private credentials が無い場合は `evaluate_order` capability を列挙しない
+- `evaluate_margin_order` は `FX_BTC_JPY` に対してのみ列挙する
+- private credentials が無い場合は `evaluate_order` と `evaluate_margin_order` capability を列挙しない
 
 ### 11.4 `get_account_snapshot`
 
@@ -614,7 +617,10 @@ bitFlyer v1 の補足:
 入力:
 
 ```json
-{}
+{
+  "venue": "bitflyer",
+  "accountContext": "default"
+}
 ```
 
 出力:
@@ -652,6 +658,11 @@ bitFlyer v1 の補足:
 - `openOrdersSummary.count`: 未約定注文件数
 - `margin.derivedAvailable`: `GetCollateral` 由来の導出余力
 - `accountReadiness`: MCP が必要 read capability を観測できているか
+
+入力制約:
+
+- `venue`: 必須。v1 では `bitflyer`
+- `accountContext`: 必須。v1 では `default`
 
 状態値:
 
@@ -858,15 +869,7 @@ bitFlyer v1 の補足:
 - v1 の `projectedExposureOk` は active child order ベースの projected exposure 判定であり、既存 spot 保有残高そのものは含めない
 - v1 は exchange-side の hidden limit、rate limit、post-only 相当条件、将来追加される venue-specific reject rule を完全再現しない
 
-v2 方向:
-
-- `evaluate_order` は spot preflight evaluator として維持する
-- `FX_BTC_JPY` を含む margin product は `evaluate_margin_order` の別 tool として導入する
-- margin evaluator は spot evaluator と別の rule 正本を持つ
-- margin evaluator の最小 rule domain は `minSize`、`sizeStep`、`priceStep` に加え、`collateralModel`、`requireCollateralModel`、`maintenanceModel`、`feeModel` を含む
-- bitFlyer margin evaluator の pinned file 名は `bitflyer-margin-rules.v1.json` を予約し、spot rule file と混在させない
-
-`evaluate_margin_order` の v2 初期 input 形:
+`evaluate_margin_order`:
 
 ```json
 {
@@ -880,7 +883,110 @@ v2 方向:
 }
 ```
 
-### 11.5.1 MCP `tools/call` `_meta`
+実装ルール:
+
+- `evaluate_order` は spot preflight evaluator として維持する
+- `evaluate_margin_order` は margin preflight evaluator として別 tool に維持する
+- margin evaluator は spot evaluator と別の rule 正本を持つ
+- bitFlyer margin evaluator の pinned file 名は `bitflyer-margin-rules.v1.json` とする
+
+### 11.5.1 `evaluate_margin_order`
+
+目的:
+
+- 指定された bitFlyer margin 注文要求が、現在の市場、証拠金、維持率、制約の下で機械的に成立可能かを評価する
+
+入力:
+
+```json
+{
+  "venue": "bitflyer",
+  "accountContext": "default",
+  "symbol": "FX_BTC_JPY",
+  "side": "buy",
+  "orderType": "market",
+  "size": "0.1",
+  "price": null
+}
+```
+
+入力制約:
+
+- `venue`: 必須。v1 では `bitflyer`
+- `accountContext`: 必須。v1 では `default`
+- `symbol`: 必須。v1 では `FX_BTC_JPY`
+- `side`: 必須。`buy` / `sell`
+- `orderType`: 必須。`market` / `limit`
+- `size`: 必須。正の decimal string
+- `price`: `limit` の場合必須、`market` の場合は省略または `null`
+
+出力:
+
+```json
+{
+  "canPlace": true,
+  "checks": {
+    "symbolOk": true,
+    "marketStatusOk": true,
+    "sizeRuleOk": true,
+    "priceRuleOk": true,
+    "collateralCoverageOk": true,
+    "feeCoverageOk": null,
+    "projectedMarginExposureOk": true,
+    "currentMaintenanceOk": true
+  },
+  "normalizedRequest": {
+    "venue": "bitflyer",
+    "accountContext": "default",
+    "symbol": "FX_BTC_JPY",
+    "side": "buy",
+    "orderType": "market",
+    "size": "0.1",
+    "price": null
+  },
+  "estimate": {
+    "referencePrice": "12345678",
+    "estimatedNotional": "1234567.8",
+    "estimatedRequiredCollateral": "493827.12",
+    "currentMaxLeverage": "2.5",
+    "currentKeepRate": "8",
+    "minimumKeepRate": "1.5",
+    "estimatedFee": null,
+    "estimatedFeeSourceKind": null
+  },
+  "warnings": [
+    "market_order_slippage_risk"
+  ],
+  "reasons": []
+}
+```
+
+bitFlyer v1 導出:
+
+- 評価対象は `FX_BTC_JPY` margin order に限定する
+- `referencePrice` は `market buy -> ask`、`market sell -> bid`、`limit -> input price` とする
+- `estimatedNotional` は `referencePrice * size` とする
+- `estimatedRequiredCollateral` は `estimatedNotional / currentMaxLeverage` とする
+- `currentMaxLeverage` は `GetCorporateLeverage.current_max` を正本とする
+- `currentKeepRate` は `GetCollateral.keep_rate` を正本とする
+- `minimumKeepRate` は `bitflyer-margin-rules.v1.json` を正本とする
+- `collateralCoverageOk` は `derivedAvailable >= estimatedRequiredCollateral` で判定する
+- `feeCoverageOk`
+  - fee estimate がない場合は `null`
+  - fee estimate がある場合は `derivedAvailable >= estimatedRequiredCollateral + estimatedFee`
+- `projectedMarginExposureOk` は adapter config の optional `MaxBaseSize` で判定し、`FX_BTC_JPY` の同 side `ACTIVE` child order の `outstanding_size`、同 side open positions の `size`、今回 `size` の projected exposure が上限以下なら `true` とする
+- `currentMaintenanceOk` は current keep rate が minimum keep rate 以上なら `true`
+- `warnings`
+  - `market` 注文時に `market_order_slippage_risk` を返す
+  - `feeCoverageOk = false` の場合は `estimated_fee_not_covered` を返す
+
+補足:
+
+- `evaluate_margin_order` は current maintenance state を評価するが、post-trade liquidation proximity を完全再現しない
+- v1 は fee を blocking check に含めない
+- v1 は exchange-side の hidden leverage rule、future maintenance rule、将来追加される venue-specific reject rule を完全再現しない
+
+### 11.5.2 MCP `tools/call` `_meta`
 
 `tools/call` の result object には payload 本体と分離した `_meta` を含める。
 
@@ -1195,7 +1301,4 @@ live test:
 
 ## 15. 実装 backlog
 
-以下は未決論点ではなく、採用済み方針の未実装項目である。
-
-- `evaluate_margin_order` を追加し、`bitflyer-margin-rules.v1.json` を正本として導入する
-- `get_klines` を v2 で `venue` discriminator の `oneOf` schema へ拡張する
+現時点で、採用済み方針の未実装項目はない。

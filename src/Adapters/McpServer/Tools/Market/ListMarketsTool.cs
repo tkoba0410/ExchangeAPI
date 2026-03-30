@@ -9,15 +9,18 @@ public sealed class ListMarketsTool
     private readonly bool _hasMarketSnapshot;
     private readonly bool _hasKlines;
     private readonly bool _hasEvaluateOrder;
+    private readonly bool _hasEvaluateMarginOrder;
 
     public ListMarketsTool(
         bool hasMarketSnapshot,
         bool hasKlines,
-        bool hasEvaluateOrder)
+        bool hasEvaluateOrder,
+        bool hasEvaluateMarginOrder)
     {
         _hasMarketSnapshot = hasMarketSnapshot;
         _hasKlines = hasKlines;
         _hasEvaluateOrder = hasEvaluateOrder;
+        _hasEvaluateMarginOrder = hasEvaluateMarginOrder;
     }
 
     public Task<McpToolExecutionResult<ListMarketsResponse>> ExecuteAsync(
@@ -37,6 +40,11 @@ public sealed class ListMarketsTool
                 if (_hasEvaluateOrder && string.Equals(symbol, "BTC_JPY", StringComparison.Ordinal))
                 {
                     capabilities.Add("evaluate_order");
+                }
+
+                if (_hasEvaluateMarginOrder && string.Equals(symbol, "FX_BTC_JPY", StringComparison.Ordinal))
+                {
+                    capabilities.Add("evaluate_margin_order");
                 }
 
                 markets.Add(

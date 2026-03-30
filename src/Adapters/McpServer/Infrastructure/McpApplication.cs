@@ -184,7 +184,7 @@ public sealed class McpApplication
                                     version = GetServerVersion(),
                                 },
                                 instructions =
-                                    "ExchangeAPI MCP server. This server is read/evaluate-only and exposes bitFlyer market/account/evaluation tools plus Binance public get_klines.",
+                                    "ExchangeAPI MCP server. This server is read/evaluate-only and exposes bitFlyer market/account/spot-margin evaluation tools plus Binance public get_klines.",
                             });
                         return;
 

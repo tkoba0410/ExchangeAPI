@@ -4,6 +4,7 @@ using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
+using ExchangeApi.Adapters.McpServer.Schema.MarginEvaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 using ExchangeApi.Exchanges.Binance.Vocabulary;
 
@@ -23,8 +24,10 @@ public static class ToolCatalog
     private static readonly string AccountSnapshotInputSchema = BuildAccountSnapshotInputSchema();
 
     private static readonly string KlinesInputSchema = BuildKlinesInputSchema();
+    private static readonly string KlinesOutputSchema = BuildKlinesOutputSchema();
 
     private static readonly string EvaluateOrderInputSchema = BuildEvaluateOrderInputSchema();
+    private static readonly string EvaluateMarginOrderInputSchema = BuildEvaluateMarginOrderInputSchema();
 
     private const string MarketSnapshotOutputSchema = """
         {
@@ -85,7 +88,7 @@ public static class ToolCatalog
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "enum": ["get_market_snapshot", "get_klines", "evaluate_order"]
+                      "enum": ["get_market_snapshot", "get_klines", "evaluate_order", "evaluate_margin_order"]
                     }
                   }
                 },
@@ -220,39 +223,77 @@ public static class ToolCatalog
         }
         """;
 
-    private const string KlinesOutputSchema = """
+    private const string EvaluateMarginOrderOutputSchema = """
         {
           "type": "object",
           "properties": {
-            "venue": {
-              "type": "string",
-              "enum": ["binance"]
+            "canPlace": { "type": "boolean" },
+            "checks": {
+              "type": "object",
+              "properties": {
+                "symbolOk": { "type": "boolean" },
+                "marketStatusOk": { "type": "boolean" },
+                "sizeRuleOk": { "type": "boolean" },
+                "priceRuleOk": { "type": "boolean" },
+                "collateralCoverageOk": { "type": "boolean" },
+                "feeCoverageOk": { "type": ["boolean", "null"] },
+                "projectedMarginExposureOk": { "type": "boolean" },
+                "currentMaintenanceOk": { "type": "boolean" }
+              },
+              "required": ["symbolOk", "marketStatusOk", "sizeRuleOk", "priceRuleOk", "collateralCoverageOk", "feeCoverageOk", "projectedMarginExposureOk", "currentMaintenanceOk"],
+              "additionalProperties": false
             },
-            "symbol": { "type": "string" },
-            "interval": { "type": "string" },
-            "candles": {
+            "normalizedRequest": {
+              "type": "object",
+              "properties": {
+                "venue": {
+                  "type": "string",
+                  "enum": ["bitflyer"]
+                },
+                "accountContext": {
+                  "type": "string",
+                  "enum": ["default"]
+                },
+                "symbol": { "type": "string" },
+                "side": { "type": "string" },
+                "orderType": { "type": "string" },
+                "size": { "type": "string" },
+                "price": { "type": ["string", "null"] }
+              },
+              "required": ["venue", "accountContext", "symbol", "side", "orderType", "size", "price"],
+              "additionalProperties": false
+            },
+            "estimate": {
+              "type": "object",
+              "properties": {
+                "referencePrice": { "type": "string" },
+                "estimatedNotional": { "type": "string" },
+                "estimatedRequiredCollateral": { "type": "string" },
+                "currentMaxLeverage": { "type": "string" },
+                "currentKeepRate": { "type": "string" },
+                "minimumKeepRate": { "type": "string" },
+                "estimatedFee": { "type": ["string", "null"] },
+                "estimatedFeeSourceKind": {
+                  "type": ["string", "null"],
+                  "enum": ["pinned_operational", null]
+                }
+              },
+              "required": ["referencePrice", "estimatedNotional", "estimatedRequiredCollateral", "currentMaxLeverage", "currentKeepRate", "minimumKeepRate", "estimatedFee", "estimatedFeeSourceKind"],
+              "additionalProperties": false
+            },
+            "warnings": {
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "openTime": { "type": "string" },
-                  "closeTime": { "type": "string" },
-                  "open": { "type": "string" },
-                  "high": { "type": "string" },
-                  "low": { "type": "string" },
-                  "close": { "type": "string" },
-                  "volume": { "type": "string" },
-                  "quoteVolume": { "type": "string" },
-                  "tradeCount": { "type": "integer" },
-                  "takerBuyBaseVolume": { "type": "string" },
-                  "takerBuyQuoteVolume": { "type": "string" }
-                },
-                "required": ["openTime", "closeTime", "open", "high", "low", "close", "volume", "quoteVolume", "tradeCount", "takerBuyBaseVolume", "takerBuyQuoteVolume"],
-                "additionalProperties": false
+                "type": "string",
+                "enum": ["estimated_fee_not_covered", "market_order_slippage_risk"]
               }
+            },
+            "reasons": {
+              "type": "array",
+              "items": { "type": "string" }
             }
           },
-          "required": ["venue", "symbol", "interval", "candles"],
+          "required": ["canPlace", "checks", "normalizedRequest", "estimate", "warnings", "reasons"],
           "additionalProperties": false
         }
         """;
@@ -289,45 +330,108 @@ public static class ToolCatalog
         return SerializeSchema(
             new Dictionary<string, object?>
             {
-                ["type"] = "object",
-                ["properties"] = new Dictionary<string, object?>
+                ["oneOf"] = new object[]
                 {
-                    ["venue"] = new Dictionary<string, object?>
+                    new Dictionary<string, object?>
                     {
-                        ["type"] = "string",
-                        ["description"] = "Venue identifier. v1 requires binance.",
-                        ["enum"] = new[] { "binance" },
-                    },
-                    ["symbol"] = new Dictionary<string, object?>
-                    {
-                        ["type"] = "string",
-                        ["description"] = "Supported Binance v1 symbol.",
-                        ["enum"] = symbols,
-                    },
-                    ["interval"] = new Dictionary<string, object?>
-                    {
-                        ["type"] = "string",
-                        ["description"] = "Binance kline interval literal.",
-                        ["enum"] = intervals,
-                    },
-                    ["startTime"] = new Dictionary<string, object?>
-                    {
-                        ["type"] = new object[] { "string", "null" },
-                        ["description"] = "RFC 3339 string with explicit Z or numeric offset. Normalized to UTC by the server.",
-                    },
-                    ["endTime"] = new Dictionary<string, object?>
-                    {
-                        ["type"] = new object[] { "string", "null" },
-                        ["description"] = "RFC 3339 string with explicit Z or numeric offset. Normalized to UTC by the server.",
-                    },
-                    ["limit"] = new Dictionary<string, object?>
-                    {
-                        ["type"] = new object[] { "integer", "null" },
-                        ["description"] = "1..1000",
-                    },
+                        ["type"] = "object",
+                        ["properties"] = new Dictionary<string, object?>
+                        {
+                            ["venue"] = new Dictionary<string, object?>
+                            {
+                                ["const"] = McpVenueIds.Binance,
+                                ["description"] = "Venue identifier. v1 requires binance.",
+                            },
+                            ["symbol"] = new Dictionary<string, object?>
+                            {
+                                ["type"] = "string",
+                                ["description"] = "Supported Binance v1 symbol.",
+                                ["enum"] = symbols,
+                            },
+                            ["interval"] = new Dictionary<string, object?>
+                            {
+                                ["type"] = "string",
+                                ["description"] = "Binance kline interval literal.",
+                                ["enum"] = intervals,
+                            },
+                            ["startTime"] = new Dictionary<string, object?>
+                            {
+                                ["type"] = new object[] { "string", "null" },
+                                ["description"] = "RFC 3339 string with explicit Z or numeric offset. Normalized to UTC by the server.",
+                            },
+                            ["endTime"] = new Dictionary<string, object?>
+                            {
+                                ["type"] = new object[] { "string", "null" },
+                                ["description"] = "RFC 3339 string with explicit Z or numeric offset. Normalized to UTC by the server.",
+                            },
+                            ["limit"] = new Dictionary<string, object?>
+                            {
+                                ["type"] = new object[] { "integer", "null" },
+                                ["description"] = "1..1000",
+                            },
+                        },
+                        ["required"] = new[] { "venue", "symbol", "interval" },
+                        ["additionalProperties"] = false,
+                    }
                 },
-                ["required"] = new[] { "venue", "symbol", "interval" },
-                ["additionalProperties"] = false,
+            });
+    }
+
+    private static string BuildKlinesOutputSchema()
+    {
+        return SerializeSchema(
+            new Dictionary<string, object?>
+            {
+                ["oneOf"] = new object[]
+                {
+                    new Dictionary<string, object?>
+                    {
+                        ["type"] = "object",
+                        ["properties"] = new Dictionary<string, object?>
+                        {
+                            ["venue"] = new Dictionary<string, object?>
+                            {
+                                ["const"] = McpVenueIds.Binance,
+                            },
+                            ["symbol"] = new Dictionary<string, object?>
+                            {
+                                ["type"] = "string",
+                                ["enum"] = BinanceKlineSymbolSet.Entries.OrderBy(x => x).ToArray(),
+                            },
+                            ["interval"] = new Dictionary<string, object?>
+                            {
+                                ["type"] = "string",
+                                ["enum"] = Enum.GetValues<BinanceInterval>().Select(BinanceApiStringEnum<BinanceInterval>.Format).ToArray(),
+                            },
+                            ["candles"] = new Dictionary<string, object?>
+                            {
+                                ["type"] = "array",
+                                ["items"] = new Dictionary<string, object?>
+                                {
+                                    ["type"] = "object",
+                                    ["properties"] = new Dictionary<string, object?>
+                                    {
+                                        ["openTime"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                        ["closeTime"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                        ["open"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                        ["high"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                        ["low"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                        ["close"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                        ["volume"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                        ["quoteVolume"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                        ["tradeCount"] = new Dictionary<string, object?> { ["type"] = "integer" },
+                                        ["takerBuyBaseVolume"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                        ["takerBuyQuoteVolume"] = new Dictionary<string, object?> { ["type"] = "string" },
+                                    },
+                                    ["required"] = new[] { "openTime", "closeTime", "open", "high", "low", "close", "volume", "quoteVolume", "tradeCount", "takerBuyBaseVolume", "takerBuyQuoteVolume" },
+                                    ["additionalProperties"] = false,
+                                },
+                            },
+                        },
+                        ["required"] = new[] { "venue", "symbol", "interval", "candles" },
+                        ["additionalProperties"] = false,
+                    }
+                },
             });
     }
 
@@ -382,6 +486,58 @@ public static class ToolCatalog
                         ["type"] = "string",
                         ["description"] = "Supported bitFlyer v1 symbol.",
                         ["enum"] = new[] { "BTC_JPY" },
+                    },
+                    ["side"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["enum"] = new[] { "buy", "sell" },
+                    },
+                    ["orderType"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["enum"] = new[] { "market", "limit" },
+                    },
+                    ["size"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Positive decimal string.",
+                    },
+                    ["price"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = new object[] { "string", "null" },
+                        ["description"] = "Decimal string for limit orders, null for market orders.",
+                    },
+                },
+                ["required"] = new[] { "venue", "accountContext", "symbol", "side", "orderType", "size" },
+                ["additionalProperties"] = false,
+            });
+    }
+
+    private static string BuildEvaluateMarginOrderInputSchema()
+    {
+        return SerializeSchema(
+            new Dictionary<string, object?>
+            {
+                ["type"] = "object",
+                ["properties"] = new Dictionary<string, object?>
+                {
+                    ["venue"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Venue identifier. v1 requires bitflyer.",
+                        ["enum"] = new[] { McpVenueIds.Bitflyer },
+                    },
+                    ["accountContext"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Account context identifier. v1 requires default.",
+                        ["enum"] = new[] { McpAccountContextIds.Default },
+                    },
+                    ["symbol"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Supported bitFlyer v1 margin symbol.",
+                        ["enum"] = new[] { "FX_BTC_JPY" },
                     },
                     ["side"] = new Dictionary<string, object?>
                     {
@@ -469,8 +625,19 @@ public static class ToolCatalog
             ReadOnlyHint: true,
             RequiresCredentials: true);
 
+    public static McpToolDefinition EvaluateMarginOrder { get; } =
+        new(
+            Name: "evaluate_margin_order",
+            Description: "Evaluate whether a supported bitFlyer v1 margin order request can be placed mechanically under current rules, collateral, and maintenance state.",
+            RequestType: typeof(EvaluateMarginOrderRequest),
+            ResponseType: typeof(EvaluateMarginOrderResponse),
+            InputSchemaJson: EvaluateMarginOrderInputSchema,
+            OutputSchemaJson: EvaluateMarginOrderOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: true);
+
     public static IReadOnlyList<McpToolDefinition> All { get; } =
-        [GetMarketSnapshot, ListMarkets, GetKlines, GetAccountSnapshot, EvaluateOrder];
+        [GetMarketSnapshot, ListMarkets, GetKlines, GetAccountSnapshot, EvaluateOrder, EvaluateMarginOrder];
 
     public static IReadOnlyList<McpToolDefinition> PublicOnly { get; } =
         All.Where(tool => !tool.RequiresCredentials).ToArray();

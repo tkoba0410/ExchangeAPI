@@ -45,10 +45,12 @@ public sealed class McpApplicationTests
 
         using var toolsList = JsonDocument.Parse(lines[1]);
         var tools = toolsList.RootElement.GetProperty("result").GetProperty("tools");
-        Assert.Equal(5, tools.GetArrayLength());
-        Assert.Equal(["get_market_snapshot", "list_markets", "get_klines", "get_account_snapshot", "evaluate_order"], tools.EnumerateArray().Select(item => item.GetProperty("name").GetString()!).ToArray());
+        Assert.Equal(6, tools.GetArrayLength());
+        Assert.Equal(["get_market_snapshot", "list_markets", "get_klines", "get_account_snapshot", "evaluate_order", "evaluate_margin_order"], tools.EnumerateArray().Select(item => item.GetProperty("name").GetString()!).ToArray());
         Assert.Equal("object", tools[0].GetProperty("inputSchema").GetProperty("type").GetString());
         Assert.Equal("object", tools[0].GetProperty("outputSchema").GetProperty("type").GetString());
+        Assert.Equal("object", tools[2].GetProperty("inputSchema").GetProperty("oneOf")[0].GetProperty("type").GetString());
+        Assert.Equal("object", tools[2].GetProperty("outputSchema").GetProperty("oneOf")[0].GetProperty("type").GetString());
         Assert.True(tools[0].GetProperty("annotations").GetProperty("readOnlyHint").GetBoolean());
     }
 
@@ -153,6 +155,7 @@ public sealed class McpApplicationTests
         Assert.Contains("get_klines", console.StdErr);
         Assert.Contains("get_account_snapshot", console.StdErr);
         Assert.Contains("evaluate_order", console.StdErr);
+        Assert.Contains("evaluate_margin_order", console.StdErr);
     }
 
     [Fact]
@@ -208,6 +211,7 @@ public sealed class McpApplicationTests
                             Retryable = false,
                         },
                         new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.evaluate_order.v1", DataVersion = "bitflyer-evaluate-order.v1", Degraded = false }),
+                    "evaluate_margin_order" => McpToolCallResult.Success(new { canPlace = true }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.evaluate_margin_order.v1", DataVersion = "bitflyer-margin-rules.v1", Degraded = false }),
                     _ => throw new InvalidOperationException($"Unexpected tool name in fake dispatcher: {name}"),
                 });
         }

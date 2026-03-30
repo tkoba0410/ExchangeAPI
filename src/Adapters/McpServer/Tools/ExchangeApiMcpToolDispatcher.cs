@@ -5,10 +5,12 @@ using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
+using ExchangeApi.Adapters.McpServer.Schema.MarginEvaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 using ExchangeApi.Adapters.McpServer.Tools.Account;
 using ExchangeApi.Adapters.McpServer.Tools.Evaluation;
 using ExchangeApi.Adapters.McpServer.Tools.Klines;
+using ExchangeApi.Adapters.McpServer.Tools.MarginEvaluation;
 using ExchangeApi.Adapters.McpServer.Tools.Market;
 using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
@@ -25,6 +27,7 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
     private readonly GetKlinesTool? _klinesTool;
     private readonly GetAccountSnapshotTool? _accountTool;
     private readonly EvaluateOrderTool? _evaluateOrderTool;
+    private readonly EvaluateMarginOrderTool? _evaluateMarginOrderTool;
     private readonly string? _privateToolUnavailableReason;
     private readonly IReadOnlyList<McpToolDefinition> _tools;
 
@@ -47,12 +50,14 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
         {
             _accountTool = new GetAccountSnapshotTool(new BitflyerNativeAccountSnapshotGateway(bitflyerBundle.Private));
             _evaluateOrderTool = new EvaluateOrderTool(new BitflyerNativeEvaluateOrderGateway(bitflyerBundle.Public, bitflyerBundle.Private));
+            _evaluateMarginOrderTool = new EvaluateMarginOrderTool(new BitflyerNativeEvaluateMarginOrderGateway(bitflyerBundle.Public, bitflyerBundle.Private));
         }
 
         _listMarketsTool = new ListMarketsTool(
             hasMarketSnapshot: true,
             hasKlines: _klinesTool is not null,
-            hasEvaluateOrder: _evaluateOrderTool is not null);
+            hasEvaluateOrder: _evaluateOrderTool is not null,
+            hasEvaluateMarginOrder: _evaluateMarginOrderTool is not null);
 
         _tools = BuildVisibleTools();
     }
@@ -141,6 +146,19 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
                 var result = await _evaluateOrderTool.ExecuteAsync(request, cancellationToken);
                 return ToToolCallResult(result, "evaluate_order");
             }
+            case "evaluate_margin_order":
+            {
+                if (_evaluateMarginOrderTool is null)
+                {
+                    return McpToolCallResult.ToolError(
+                        BuildMissingPrivateToolError(),
+                        BuildMeta("evaluate_margin_order", content: null));
+                }
+
+                var request = Deserialize<EvaluateMarginOrderRequest>(arguments);
+                var result = await _evaluateMarginOrderTool.ExecuteAsync(request, cancellationToken);
+                return ToToolCallResult(result, "evaluate_margin_order");
+            }
             default:
                 throw new InvalidOperationException($"Unknown tool: {name}");
         }
@@ -182,6 +200,7 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
                 "get_klines" => "binance-kline-support-set.v1",
                 "get_account_snapshot" => "bitflyer-private-read.v1",
                 "evaluate_order" => "bitflyer-evaluate-order.v1",
+                "evaluate_margin_order" => "bitflyer-margin-rules.v1",
                 _ => "exchangeapi.mcp.unknown.v1",
             },
             Degraded = content is GetAccountSnapshotResponse accountSnapshot
@@ -227,6 +246,11 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
         if (_evaluateOrderTool is not null)
         {
             tools.Add(ToolCatalog.EvaluateOrder);
+        }
+
+        if (_evaluateMarginOrderTool is not null)
+        {
+            tools.Add(ToolCatalog.EvaluateMarginOrder);
         }
 
         return tools;

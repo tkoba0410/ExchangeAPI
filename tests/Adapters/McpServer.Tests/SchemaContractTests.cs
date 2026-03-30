@@ -3,6 +3,7 @@ using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
+using ExchangeApi.Adapters.McpServer.Schema.MarginEvaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 
 namespace ExchangeApi.Adapters.McpServer.Tests;
@@ -115,6 +116,53 @@ public sealed class SchemaContractTests
         var json = JsonSerializer.Serialize(value);
 
         Assert.Equal("""{"canPlace":true,"checks":{"symbolOk":true,"marketStatusOk":true,"sizeRuleOk":true,"priceRuleOk":true,"balanceOk":true,"feeCoverageOk":null,"projectedExposureOk":true},"normalizedRequest":{"venue":"bitflyer","accountContext":"default","symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.300","price":null},"estimate":{"referencePrice":"12345678","estimatedNotional":"3703703.4","estimatedFee":null,"estimatedFeeSourceKind":null},"warnings":["market_order_slippage_risk"],"reasons":[]}""", json);
+    }
+
+    [Fact]
+    public void EvaluateMarginOrderResponse_SerializesUsingDocumentedFieldNames()
+    {
+        var value = new EvaluateMarginOrderResponse
+        {
+            CanPlace = true,
+            Checks = new EvaluateMarginOrderChecks
+            {
+                SymbolOk = true,
+                MarketStatusOk = true,
+                SizeRuleOk = true,
+                PriceRuleOk = true,
+                CollateralCoverageOk = true,
+                FeeCoverageOk = null,
+                ProjectedMarginExposureOk = true,
+                CurrentMaintenanceOk = true,
+            },
+            NormalizedRequest = new EvaluateMarginOrderRequest
+            {
+                Venue = "bitflyer",
+                AccountContext = "default",
+                Symbol = "FX_BTC_JPY",
+                Side = "buy",
+                OrderType = "market",
+                Size = "0.100",
+                Price = null,
+            },
+            Estimate = new EvaluateMarginOrderEstimate
+            {
+                ReferencePrice = "12345678",
+                EstimatedNotional = "1234567.8",
+                EstimatedRequiredCollateral = "493827.12",
+                CurrentMaxLeverage = "2.5",
+                CurrentKeepRate = "8",
+                MinimumKeepRate = "1.5",
+                EstimatedFee = null,
+                EstimatedFeeSourceKind = null,
+            },
+            Warnings = [EvaluateMarginOrderWarningCodes.MarketOrderSlippageRisk],
+            Reasons = [],
+        };
+
+        var json = JsonSerializer.Serialize(value);
+
+        Assert.Equal("""{"canPlace":true,"checks":{"symbolOk":true,"marketStatusOk":true,"sizeRuleOk":true,"priceRuleOk":true,"collateralCoverageOk":true,"feeCoverageOk":null,"projectedMarginExposureOk":true,"currentMaintenanceOk":true},"normalizedRequest":{"venue":"bitflyer","accountContext":"default","symbol":"FX_BTC_JPY","side":"buy","orderType":"market","size":"0.100","price":null},"estimate":{"referencePrice":"12345678","estimatedNotional":"1234567.8","estimatedRequiredCollateral":"493827.12","currentMaxLeverage":"2.5","currentKeepRate":"8","minimumKeepRate":"1.5","estimatedFee":null,"estimatedFeeSourceKind":null},"warnings":["market_order_slippage_risk"],"reasons":[]}""", json);
     }
 
     [Fact]

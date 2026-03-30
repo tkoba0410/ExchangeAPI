@@ -1,0 +1,27 @@
+using System.Text.Json.Serialization;
+
+namespace ExchangeApi.Adapters.McpServer.Schema.MarginEvaluation;
+
+public sealed class EvaluateMarginOrderRequest
+{
+    [JsonPropertyName("venue")]
+    public required string Venue { get; init; }
+
+    [JsonPropertyName("accountContext")]
+    public required string AccountContext { get; init; }
+
+    [JsonPropertyName("symbol")]
+    public required string Symbol { get; init; }
+
+    [JsonPropertyName("side")]
+    public required string Side { get; init; }
+
+    [JsonPropertyName("orderType")]
+    public required string OrderType { get; init; }
+
+    [JsonPropertyName("size")]
+    public required string Size { get; init; }
+
+    [JsonPropertyName("price")]
+    public string? Price { get; init; }
+}

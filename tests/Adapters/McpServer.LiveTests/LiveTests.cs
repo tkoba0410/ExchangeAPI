@@ -139,6 +139,7 @@ public sealed class LiveTests
         Assert.Contains("list_markets", toolNames);
         Assert.Contains("get_account_snapshot", toolNames);
         Assert.Contains("evaluate_order", toolNames);
+        Assert.Contains("evaluate_margin_order", toolNames);
 
         var snapshot = ReadStructuredContent<GetAccountSnapshotResponse>(result.OutputLines[2], out var isError);
         Assert.False(isError);

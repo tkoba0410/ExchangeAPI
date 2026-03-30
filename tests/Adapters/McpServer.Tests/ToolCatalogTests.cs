@@ -2,6 +2,7 @@ using System.Text.Json;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
+using ExchangeApi.Adapters.McpServer.Schema.MarginEvaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Tools;
@@ -15,7 +16,7 @@ public sealed class ToolCatalogTests
     {
         var tools = ToolCatalog.All;
 
-        Assert.Equal(5, tools.Count);
+        Assert.Equal(6, tools.Count);
         Assert.Equal("get_market_snapshot", tools[0].Name);
         Assert.Equal(typeof(GetMarketSnapshotRequest), tools[0].RequestType);
         Assert.Equal(typeof(GetMarketSnapshotResponse), tools[0].ResponseType);
@@ -41,6 +42,11 @@ public sealed class ToolCatalogTests
         Assert.Equal(typeof(EvaluateOrderResponse), tools[4].ResponseType);
         Assert.NotNull(tools[4].OutputSchemaJson);
         Assert.True(tools[4].RequiresCredentials);
+        Assert.Equal("evaluate_margin_order", tools[5].Name);
+        Assert.Equal(typeof(EvaluateMarginOrderRequest), tools[5].RequestType);
+        Assert.Equal(typeof(EvaluateMarginOrderResponse), tools[5].ResponseType);
+        Assert.NotNull(tools[5].OutputSchemaJson);
+        Assert.True(tools[5].RequiresCredentials);
     }
 
     [Fact]
@@ -56,16 +62,17 @@ public sealed class ToolCatalogTests
     {
         using var document = JsonDocument.Parse(ToolCatalog.GetKlines.InputSchemaJson);
         var root = document.RootElement;
-        var required = root.GetProperty("required").EnumerateArray().Select(x => x.GetString()!).ToArray();
+        var branch = root.GetProperty("oneOf")[0];
+        var required = branch.GetProperty("required").EnumerateArray().Select(x => x.GetString()!).ToArray();
 
         Assert.Equal(["venue", "symbol", "interval"], required);
 
-        var properties = root.GetProperty("properties");
-        var venues = properties.GetProperty("venue").GetProperty("enum").EnumerateArray().Select(x => x.GetString()!).ToArray();
+        var properties = branch.GetProperty("properties");
+        var venue = properties.GetProperty("venue").GetProperty("const").GetString();
         var symbols = properties.GetProperty("symbol").GetProperty("enum").EnumerateArray().Select(x => x.GetString()!).ToArray();
         var intervals = properties.GetProperty("interval").GetProperty("enum").EnumerateArray().Select(x => x.GetString()!).ToArray();
 
-        Assert.Equal(["binance"], venues);
+        Assert.Equal("binance", venue);
         Assert.Equal(BinanceKlineSymbolSet.Entries.OrderBy(x => x).ToArray(), symbols);
         Assert.Contains("1h", intervals);
     }
@@ -101,9 +108,11 @@ public sealed class ToolCatalogTests
     {
         using var accountDocument = JsonDocument.Parse(ToolCatalog.GetAccountSnapshot.InputSchemaJson);
         using var evaluateDocument = JsonDocument.Parse(ToolCatalog.EvaluateOrder.InputSchemaJson);
+        using var evaluateMarginDocument = JsonDocument.Parse(ToolCatalog.EvaluateMarginOrder.InputSchemaJson);
 
         AssertBitflyerPrivateContextShape(accountDocument.RootElement);
         AssertBitflyerPrivateContextShape(evaluateDocument.RootElement);
+        AssertBitflyerPrivateContextShape(evaluateMarginDocument.RootElement);
     }
 
     [Fact]
@@ -130,6 +139,28 @@ public sealed class ToolCatalogTests
         Assert.Contains("accountContext", normalizedRequired);
         Assert.Equal("bitflyer", normalizedRequest.GetProperty("properties").GetProperty("venue").GetProperty("enum")[0].GetString());
         Assert.Equal("default", normalizedRequest.GetProperty("properties").GetProperty("accountContext").GetProperty("enum")[0].GetString());
+    }
+
+    [Fact]
+    public void EvaluateMarginOrder_OutputSchema_ExposesClosedWarningTaxonomy()
+    {
+        using var document = JsonDocument.Parse(ToolCatalog.EvaluateMarginOrder.OutputSchemaJson!);
+        var properties = document.RootElement.GetProperty("properties");
+        var warningEnum = properties
+            .GetProperty("warnings")
+            .GetProperty("items")
+            .GetProperty("enum")
+            .EnumerateArray()
+            .Select(x => x.GetString()!)
+            .ToArray();
+        var checks = properties.GetProperty("checks").GetProperty("properties");
+        var estimate = properties.GetProperty("estimate").GetProperty("properties");
+
+        Assert.Equal(EvaluateMarginOrderWarningCodes.All, warningEnum);
+        Assert.Equal("null", checks.GetProperty("feeCoverageOk").GetProperty("type")[1].GetString());
+        Assert.Equal("null", estimate.GetProperty("estimatedFee").GetProperty("type")[1].GetString());
+        Assert.Equal("bitflyer", properties.GetProperty("normalizedRequest").GetProperty("properties").GetProperty("venue").GetProperty("enum")[0].GetString());
+        Assert.Equal("default", properties.GetProperty("normalizedRequest").GetProperty("properties").GetProperty("accountContext").GetProperty("enum")[0].GetString());
     }
 
     private static void AssertBitflyerPrivateContextShape(JsonElement root)

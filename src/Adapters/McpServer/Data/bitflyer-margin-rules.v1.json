@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "symbol": "FX_BTC_JPY",
+      "minSize": "0.001",
+      "sizeStep": "0.00000001",
+      "priceStep": "1",
+      "minSizeSourceKind": "official_documented",
+      "minSizeSourceRef": "https://bitflyer.com/pub/20241015-bitFlyerCryptoCFD-Minimum-Order-Change-en.pdf",
+      "sizeStepSourceKind": "official_documented",
+      "sizeStepSourceRef": "https://bitflyer.com/ja-jp/s/commission",
+      "priceStepSourceKind": "adapter_inferred",
+      "priceStepSourceRef": "adapter://bitflyer-jpy-price-step.v1",
+      "requireCollateralModel": "reference_price_times_size_div_corporate_leverage",
+      "requireCollateralModelSourceKind": "pinned_operational",
+      "requireCollateralModelSourceRef": "adapter://bitflyer-margin-require-collateral.v1",
+      "maintenanceModel": "current_keep_rate_floor",
+      "maintenanceModelSourceKind": "pinned_operational",
+      "maintenanceModelSourceRef": "adapter://bitflyer-margin-current-keep-rate-floor.v1",
+      "minimumKeepRate": "1.2",
+      "feeModel": "operational_percentage_fee",
+      "feeModelSourceKind": "pinned_operational",
+      "feeModelSourceRef": "adapter://bitflyer-margin-fee-model.v1",
+      "sourceNote": "minSize and sizeStep are documented; priceStep and margin evaluation models are adapter-owned operational rules"
+    }
+  ]
+}

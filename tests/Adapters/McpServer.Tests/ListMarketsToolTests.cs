@@ -11,7 +11,8 @@ public sealed class ListMarketsToolTests
         var tool = new ListMarketsTool(
             hasMarketSnapshot: true,
             hasKlines: true,
-            hasEvaluateOrder: true);
+            hasEvaluateOrder: true,
+            hasEvaluateMarginOrder: true);
 
         var result = await tool.ExecuteAsync(new ListMarketsRequest());
 
@@ -22,7 +23,7 @@ public sealed class ListMarketsToolTests
         Assert.Equal(["get_market_snapshot", "evaluate_order"], btcJpy.Capabilities);
 
         var fxBtcJpy = Assert.Single(response.Markets, x => x.Venue == "bitflyer" && x.Symbol == "FX_BTC_JPY");
-        Assert.Equal(["get_market_snapshot"], fxBtcJpy.Capabilities);
+        Assert.Equal(["get_market_snapshot", "evaluate_margin_order"], fxBtcJpy.Capabilities);
 
         var btcUsdt = Assert.Single(response.Markets, x => x.Venue == "binance" && x.Symbol == "BTCUSDT");
         Assert.Equal(["get_klines"], btcUsdt.Capabilities);
@@ -34,7 +35,8 @@ public sealed class ListMarketsToolTests
         var tool = new ListMarketsTool(
             hasMarketSnapshot: true,
             hasKlines: false,
-            hasEvaluateOrder: false);
+            hasEvaluateOrder: false,
+            hasEvaluateMarginOrder: false);
 
         var result = await tool.ExecuteAsync(new ListMarketsRequest());
 

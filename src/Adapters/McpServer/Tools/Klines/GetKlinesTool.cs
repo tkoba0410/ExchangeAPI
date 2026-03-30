@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
@@ -12,6 +13,9 @@ namespace ExchangeApi.Adapters.McpServer.Tools.Klines;
 public sealed class GetKlinesTool
 {
     private const string SupportedVenue = "binance";
+    private static readonly Regex Rfc3339TimestampPattern = new(
+        @"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,7})?(?:Z|[+-]\d{2}:\d{2})$",
+        RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
     private readonly IBinanceKlinesGateway _gateway;
 
@@ -150,16 +154,17 @@ public sealed class GetKlinesTool
             return true;
         }
 
-        if (!DateTimeOffset.TryParse(
+        if (!Rfc3339TimestampPattern.IsMatch(value) ||
+            !DateTimeOffset.TryParse(
                 value,
                 CultureInfo.InvariantCulture,
-                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                DateTimeStyles.None,
                 out var parsed))
         {
             timestamp = null;
             error = ValidationError(
                 errorCode: "invalid_time_range",
-                message: "Timestamp must be a valid ISO 8601 string.",
+                message: "Timestamp must be an RFC 3339 string with explicit Z or numeric offset.",
                 details: new Dictionary<string, string?> { ["timestamp"] = value });
             return false;
         }

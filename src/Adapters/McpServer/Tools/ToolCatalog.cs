@@ -255,12 +255,12 @@ public static class ToolCatalog
                     ["startTime"] = new Dictionary<string, object?>
                     {
                         ["type"] = new object[] { "string", "null" },
-                        ["description"] = "ISO 8601 string. Normalized to UTC by the server.",
+                        ["description"] = "RFC 3339 string with explicit Z or numeric offset. Normalized to UTC by the server.",
                     },
                     ["endTime"] = new Dictionary<string, object?>
                     {
                         ["type"] = new object[] { "string", "null" },
-                        ["description"] = "ISO 8601 string. Normalized to UTC by the server.",
+                        ["description"] = "RFC 3339 string with explicit Z or numeric offset. Normalized to UTC by the server.",
                     },
                     ["limit"] = new Dictionary<string, object?>
                     {

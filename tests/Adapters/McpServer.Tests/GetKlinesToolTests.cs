@@ -211,6 +211,27 @@ public sealed class GetKlinesToolTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_ReturnsValidationErrorWhenTimestampHasNoExplicitOffset()
+    {
+        var tool = new GetKlinesTool(new FakeBinanceKlinesGateway());
+
+        var result = await tool.ExecuteAsync(
+            new McpGetKlinesRequest
+            {
+                Venue = "binance",
+                Symbol = "BTCUSDT",
+                Interval = "1h",
+                StartTime = "2025-03-30T09:00:00",
+            });
+
+        Assert.False(result.IsSuccess);
+        var error = Assert.IsType<ExchangeApi.Adapters.McpServer.Schema.McpToolError>(result.Error);
+        Assert.Equal("validation_error", error.ErrorCategory);
+        Assert.Equal("invalid_time_range", error.ErrorCode);
+        Assert.Equal("2025-03-30T09:00:00", error.Details["timestamp"]);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsValidationErrorWhenVenueIsMissingFromContract()
     {
         var json = """{"symbol":"BTCUSDT","interval":"1h"}""";

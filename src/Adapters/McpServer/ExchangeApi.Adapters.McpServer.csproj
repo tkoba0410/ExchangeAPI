@@ -13,4 +13,8 @@
     <ProjectReference Include="../../Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Data/*.json" />
+  </ItemGroup>
+
 </Project>

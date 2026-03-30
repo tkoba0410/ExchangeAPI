@@ -215,6 +215,23 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 
 取引所側または ExchangeAPI 側で取得不能な項目は、推測や補完を行わず `null` または `unknown` として返す。
 
+### 7.9 Extension Admission Rule
+
+新しい tool は、次の条件をすべて満たす場合にのみ追加してよい。
+
+1. 新しい責務単位があり、既存 tool へ自然吸収できない
+2. Bot / LLM 実装に安定した価値があり、質問文ごとの convenience 問いではない
+3. venue 固有の一時的 shortcut ではなく、current phase の support boundary と整合する
+
+追加しない例:
+
+- `can_buy_now`
+- `can_sell_now`
+- `can_place_market_buy`
+- `can_place_limit_buy`
+
+これらは `evaluate_order` に吸収する。
+
 ## 8. 動作モードと境界
 
 ### 8.1 Production
@@ -297,13 +314,6 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 
 追加しない例:
 
-- `can_buy_now`
-- `can_sell_now`
-- `can_place_market_buy`
-- `can_place_limit_buy`
-
-これらは `evaluate_order` に吸収する。
-
 ## 11. Tool 契約
 
 ### 11.1 共通ルール
@@ -322,6 +332,7 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 
 - bitFlyer の公開文書と公開 API 文書を external source of truth とする
 - `get_market_snapshot` と `evaluate_order` は adapter-owned の `BitflyerMarketRuleRegistry` を pinned operational config として利用する
+- `BitflyerMarketRuleRegistry` の正本データは version 管理された data file とし、adapter code は loader / validator のみを持つ
 - `BitflyerMarketRuleRegistry` は `minSize`、`sizeStep`、`priceStep` と各 field の source kind を symbol ごとに明示定義する
 - `BitflyerMarketRuleRegistry` に entry がない symbol は、MCP として未サポートとみなし `invalid_symbol` とする
 - `BitflyerMarketRuleRegistry` は venue 文書または運用上固定した設定値から構成される pinned config である
@@ -346,6 +357,11 @@ bitFlyer v1 では次の source hierarchy を使って pinned config を構成�
   - bitFlyer の公開文書に明示がないため、adapter-owned の明示設定値
   - この値は公式 API 文書の JPY market の example と live market observation を材料に maintain する
   - これは公開文書からの直接引用ではなく、運用上の推論である
+
+versioned data file:
+
+- current pinned file は `src/Adapters/McpServer/Data/bitflyer-market-rules.v1.json`
+- code 側の registry は上記 file を load / validate して `Entries` を構成する
 
 参照 URL:
 
@@ -556,6 +572,7 @@ bitFlyer v1 の補足:
 - `accountReadiness` は venue 側の口座状態そのものではなく、MCP が必要 read capability を観測できているかを表す
 - `margin.derivedAvailable` を導出できない場合は `null` を返す
 - `GetPermissions` のみ取得不能な場合は、snapshot 自体は成功として返し、`accountReadiness = unknown` とする
+- v1 では `accountReadiness` と `margin.derivedAvailable` を無理に venue-neutral 化しない
 
 bitFlyer v1 導出:
 
@@ -692,6 +709,8 @@ bitFlyer v1 追加制約:
 - 残高不足や position limit 超過は、原則として `reasons` に積み、tool 自体は失敗させない
 - 入力不正、upstream 取得失敗、想定外障害のみを tool-level error とする
 - `canPlace = true` でも、最終発注判断は Bot が行う
+- `evaluate_order` は単一 venue / 単一 symbol / 単一 order request に対する局所 preflight evaluator として扱う
+- `evaluate_order` は口座横断 risk engine、execution policy engine、strategy coordinator として扱わない
 
 bitFlyer v1 導出:
 
@@ -738,8 +757,8 @@ bitFlyer v1 の補足:
 - `venue`: 必須。v1 では `binance`
 - `symbol`: 必須
 - `interval`: 必須。Binance の kline interval literal
-- `startTime`: 任意。ISO 8601 string または `null`
-- `endTime`: 任意。ISO 8601 string または `null`
+- `startTime`: 任意。explicit `Z` または numeric offset を持つ RFC 3339 string または `null`
+- `endTime`: 任意。explicit `Z` または numeric offset を持つ RFC 3339 string または `null`
 - `limit`: 任意。`1..1000`
 
 Binance public kline v1 追加制約:
@@ -748,7 +767,8 @@ Binance public kline v1 追加制約:
 - `symbol` は `BinanceKlineSymbolSet` のみ
 - `interval` は [`docs/endpoints-binance.md`](./endpoints-binance.md) の `GetKlines` fixed contract に従う
 - `timeZone` は公開しない
-- `startTime` と `endTime` は offset 付き ISO 8601 を受けてよく、server 側で UTC に正規化する
+- `startTime` と `endTime` は strict RFC 3339 parse を行い、offset なし local time は受理しない
+- `startTime` と `endTime` は server 側で UTC に正規化する
 - `startTime` と `endTime` が両方ある場合は `startTime <= endTime`
 
 出力:
@@ -796,7 +816,7 @@ Binance public kline v1 追加制約:
 実装ルール:
 
 - `candles` は open time 昇順で返す
-- `startTime` / `endTime` は tool input では ISO 8601 string を受け、UTC に正規化した上で upstream へ epoch milliseconds として変換する
+- `startTime` / `endTime` は tool input では explicit `Z` または numeric offset を持つ RFC 3339 string を受け、UTC に正規化した上で upstream へ epoch milliseconds として変換する
 - `startTime` と `endTime` を省略した場合は upstream の most recent klines を返す
 - v1 では `timeZone` は UTC 固定とし、Binance の `timeZone` parameter は使わない
 - raw tuple array は MCP response に露出せず、named field object に正規化する
@@ -957,7 +977,6 @@ live test:
 ## 15. 今後詰める項目
 
 - `BitflyerMarketRuleRegistry.priceStep` の公開 source が将来提供された場合の切替手順
-- `accountReadiness` / `margin.derivedAvailable` を multi-venue でも維持するか、より venue-neutral な schema に寄せるか
 - `evaluate_order` に fee を blocking check として含めるか
 - `evaluate_order` を `FX_BTC_JPY` まで広げるための margin rule 正本
 - warning taxonomy の固定
@@ -965,4 +984,4 @@ live test:
 - observability / tracing rule
 - permission model の具体値
 - `list_markets` を追加するかどうか
-- generic `get_klines` を将来 multi-venue 化するか、venue ごとに tool を分けるか
+- generic `get_klines` を維持しつつ、multi-venue 時の venue ごとの closed set schema をどう表現するか

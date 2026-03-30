@@ -13,6 +13,16 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - CLI adapter: [`docs/cli.md`](docs/cli.md)
 - MCP Server adapter: [`docs/mcp-server.md`](docs/mcp-server.md)
 
+## Recommended Reading Order
+
+初見で repo を追う場合は、次の順で読む。
+
+1. [`docs/spec.md`](docs/spec.md)
+2. [`stage11.md`](stage11.md)
+3. [`docs/cli.md`](docs/cli.md)
+4. [`docs/mcp-server.md`](docs/mcp-server.md)
+5. [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md) / [`docs/endpoints-binance.md`](docs/endpoints-binance.md)
+
 ## Support Boundary
 
 - bitFlyer が現行 Stage10 の主対象であり、最も広い実装済み surface を持つ

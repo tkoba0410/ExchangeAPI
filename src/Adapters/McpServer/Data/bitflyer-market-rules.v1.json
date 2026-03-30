@@ -1,0 +1,25 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "symbol": "BTC_JPY",
+      "minSize": "0.001",
+      "sizeStep": "0.00000001",
+      "priceStep": "1",
+      "minSizeSourceKind": "official_documented",
+      "sizeStepSourceKind": "official_documented",
+      "priceStepSourceKind": "adapter_inferred",
+      "sourceNote": "minSize and sizeStep are documented; priceStep is adapter-owned inference"
+    },
+    {
+      "symbol": "FX_BTC_JPY",
+      "minSize": "0.001",
+      "sizeStep": "0.00000001",
+      "priceStep": "1",
+      "minSizeSourceKind": "official_documented",
+      "sizeStepSourceKind": "official_documented",
+      "priceStepSourceKind": "adapter_inferred",
+      "sourceNote": "minSize reflects the post-2024-10-21 CFD change; priceStep is adapter-owned inference"
+    }
+  ]
+}

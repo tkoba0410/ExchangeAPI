@@ -281,13 +281,14 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 ## 10. 公開 tool 一覧
 
 1. `get_market_snapshot`
-2. `get_account_snapshot`
-3. `evaluate_order`
+2. `get_klines`
+3. `get_account_snapshot`
+4. `evaluate_order`
 
 補足:
 
-- 上記 3 つが現行実装の current phase tool universe である
-- 次 phase の public 拡張候補として `get_klines` を追加してよい
+- 上記 4 つが現行実装の current phase tool universe である
+- bitFlyer v1 core は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order` であり、`get_klines` は Binance public read extension として扱う
 - MCP `tools/list` は current process が実際に実行可能な visible tool set を返す
 - `get_account_snapshot` と `evaluate_order` は private credentials を解決できない場合、`tools/list` から advertise しない
 - `get_klines` は Binance public client が配線されている場合のみ advertise してよい
@@ -724,8 +725,8 @@ bitFlyer v1 の補足:
 
 - `symbol`: 必須
 - `interval`: 必須。Binance の kline interval literal
-- `startTime`: 任意。UTC ISO 8601 string または `null`
-- `endTime`: 任意。UTC ISO 8601 string または `null`
+- `startTime`: 任意。ISO 8601 string または `null`
+- `endTime`: 任意。ISO 8601 string または `null`
 - `limit`: 任意。`1..1000`
 
 Binance public kline v1 追加制約:
@@ -733,6 +734,7 @@ Binance public kline v1 追加制約:
 - `symbol` は `BinanceKlineSymbolSet` のみ
 - `interval` は [`docs/endpoints-binance.md`](./endpoints-binance.md) の `GetKlines` fixed contract に従う
 - `timeZone` は公開しない
+- `startTime` と `endTime` は offset 付き ISO 8601 を受けてよく、server 側で UTC に正規化する
 - `startTime` と `endTime` が両方ある場合は `startTime <= endTime`
 
 出力:
@@ -778,7 +780,7 @@ Binance public kline v1 追加制約:
 実装ルール:
 
 - `candles` は open time 昇順で返す
-- `startTime` / `endTime` は tool input では UTC ISO 8601 string、upstream には epoch milliseconds として変換する
+- `startTime` / `endTime` は tool input では ISO 8601 string を受け、UTC に正規化した上で upstream へ epoch milliseconds として変換する
 - `startTime` と `endTime` を省略した場合は upstream の most recent klines を返す
 - v1 では `timeZone` は UTC 固定とし、Binance の `timeZone` parameter は使わない
 - raw tuple array は MCP response に露出せず、named field object に正規化する

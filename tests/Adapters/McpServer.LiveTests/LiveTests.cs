@@ -77,21 +77,34 @@ public sealed class LiveTests
         Assert.False(isError);
         Assert.Equal("BTCUSDT", response.Symbol);
         Assert.Equal("1h", response.Interval);
-        Assert.True(response.Candles.Count > 0);
-        Assert.All(
-            response.Candles,
-            candle =>
-            {
-                Assert.True(DateTimeOffset.TryParse(candle.OpenTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out _));
-                Assert.True(DateTimeOffset.TryParse(candle.CloseTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out _));
-                Assert.True(decimal.Parse(candle.Open, CultureInfo.InvariantCulture) > 0m);
-                Assert.True(decimal.Parse(candle.High, CultureInfo.InvariantCulture) > 0m);
-                Assert.True(decimal.Parse(candle.Low, CultureInfo.InvariantCulture) > 0m);
-                Assert.True(decimal.Parse(candle.Close, CultureInfo.InvariantCulture) > 0m);
-                Assert.True(decimal.Parse(candle.Volume, CultureInfo.InvariantCulture) >= 0m);
-                Assert.True(decimal.Parse(candle.QuoteVolume, CultureInfo.InvariantCulture) >= 0m);
-                Assert.True(candle.TradeCount >= 0);
-            });
+        AssertCandlesAreWellFormed(response.Candles);
+    }
+
+    [McpServerPublicReadLiveFact]
+    public async Task GetKlines_ReturnsLiveBinanceJpyCandles()
+    {
+        var result = await RunAsync(
+            _ => new ExchangeApiMcpToolDispatcher(
+                BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions()),
+                BinanceClientFactory.CreateNativeClient()),
+            BuildInitializeRequest(1),
+            BuildToolCallRequest(
+                2,
+                "get_klines",
+                new
+                {
+                    symbol = "BTCJPY",
+                    interval = "1h",
+                    limit = 2,
+                }));
+
+        Assert.Equal(2, result.OutputLines.Count);
+
+        var response = ReadStructuredContent<GetKlinesResponse>(result.OutputLines[1], out var isError);
+        Assert.False(isError);
+        Assert.Equal("BTCJPY", response.Symbol);
+        Assert.Equal("1h", response.Interval);
+        AssertCandlesAreWellFormed(response.Candles);
     }
 
     [McpServerPrivateReadLiveFact]
@@ -243,6 +256,25 @@ public sealed class LiveTests
     {
         return stdout
             .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    private static void AssertCandlesAreWellFormed(IReadOnlyList<KlineCandle> candles)
+    {
+        Assert.True(candles.Count > 0);
+        Assert.All(
+            candles,
+            candle =>
+            {
+                Assert.True(DateTimeOffset.TryParse(candle.OpenTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out _));
+                Assert.True(DateTimeOffset.TryParse(candle.CloseTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out _));
+                Assert.True(decimal.Parse(candle.Open, CultureInfo.InvariantCulture) > 0m);
+                Assert.True(decimal.Parse(candle.High, CultureInfo.InvariantCulture) > 0m);
+                Assert.True(decimal.Parse(candle.Low, CultureInfo.InvariantCulture) > 0m);
+                Assert.True(decimal.Parse(candle.Close, CultureInfo.InvariantCulture) > 0m);
+                Assert.True(decimal.Parse(candle.Volume, CultureInfo.InvariantCulture) >= 0m);
+                Assert.True(decimal.Parse(candle.QuoteVolume, CultureInfo.InvariantCulture) >= 0m);
+                Assert.True(candle.TradeCount >= 0);
+            });
     }
 
     private sealed record RunResult(IReadOnlyList<string> OutputLines, string StdErr);

@@ -1,17 +1,19 @@
+using ExchangeApi.Exchanges.Binance.Vocabulary;
+
 namespace ExchangeApi.Adapters.McpServer.Mapping;
 
 public static class BinanceKlineSymbolSet
 {
     private static readonly HashSet<string> Symbols =
     [
-        "BTCJPY",
-        "ETHJPY",
-        "XRPJPY",
-        "BNBJPY",
-        "BTCUSDT",
-        "ETHUSDT",
-        "SOLUSDT",
-        "XRPUSDT",
+        BinanceSymbols.BtcJpy,
+        BinanceSymbols.EthJpy,
+        BinanceSymbols.XrpJpy,
+        BinanceSymbols.BnbJpy,
+        BinanceSymbols.BtcUsdt,
+        BinanceSymbols.EthUsdt,
+        BinanceSymbols.SolUsdt,
+        BinanceSymbols.XrpUsdt,
     ];
 
     public static IReadOnlyCollection<string> Entries => Symbols;

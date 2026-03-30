@@ -15,27 +15,32 @@ public sealed class ToolCatalogTests
     {
         var tools = ToolCatalog.All;
 
-        Assert.Equal(4, tools.Count);
+        Assert.Equal(5, tools.Count);
         Assert.Equal("get_market_snapshot", tools[0].Name);
         Assert.Equal(typeof(GetMarketSnapshotRequest), tools[0].RequestType);
         Assert.Equal(typeof(GetMarketSnapshotResponse), tools[0].ResponseType);
         Assert.NotNull(tools[0].OutputSchemaJson);
         Assert.False(tools[0].RequiresCredentials);
-        Assert.Equal("get_klines", tools[1].Name);
-        Assert.Equal(typeof(GetKlinesRequest), tools[1].RequestType);
-        Assert.Equal(typeof(GetKlinesResponse), tools[1].ResponseType);
+        Assert.Equal("list_markets", tools[1].Name);
+        Assert.Equal(typeof(ListMarketsRequest), tools[1].RequestType);
+        Assert.Equal(typeof(ListMarketsResponse), tools[1].ResponseType);
         Assert.NotNull(tools[1].OutputSchemaJson);
         Assert.False(tools[1].RequiresCredentials);
-        Assert.Equal("get_account_snapshot", tools[2].Name);
-        Assert.Equal(typeof(GetAccountSnapshotRequest), tools[2].RequestType);
-        Assert.Equal(typeof(GetAccountSnapshotResponse), tools[2].ResponseType);
+        Assert.Equal("get_klines", tools[2].Name);
+        Assert.Equal(typeof(GetKlinesRequest), tools[2].RequestType);
+        Assert.Equal(typeof(GetKlinesResponse), tools[2].ResponseType);
         Assert.NotNull(tools[2].OutputSchemaJson);
-        Assert.True(tools[2].RequiresCredentials);
-        Assert.Equal("evaluate_order", tools[3].Name);
-        Assert.Equal(typeof(EvaluateOrderRequest), tools[3].RequestType);
-        Assert.Equal(typeof(EvaluateOrderResponse), tools[3].ResponseType);
+        Assert.False(tools[2].RequiresCredentials);
+        Assert.Equal("get_account_snapshot", tools[3].Name);
+        Assert.Equal(typeof(GetAccountSnapshotRequest), tools[3].RequestType);
+        Assert.Equal(typeof(GetAccountSnapshotResponse), tools[3].ResponseType);
         Assert.NotNull(tools[3].OutputSchemaJson);
         Assert.True(tools[3].RequiresCredentials);
+        Assert.Equal("evaluate_order", tools[4].Name);
+        Assert.Equal(typeof(EvaluateOrderRequest), tools[4].RequestType);
+        Assert.Equal(typeof(EvaluateOrderResponse), tools[4].ResponseType);
+        Assert.NotNull(tools[4].OutputSchemaJson);
+        Assert.True(tools[4].RequiresCredentials);
     }
 
     [Fact]
@@ -43,7 +48,7 @@ public sealed class ToolCatalogTests
     {
         var tools = ToolCatalog.PublicOnly;
 
-        Assert.Equal(["get_market_snapshot", "get_klines"], tools.Select(tool => tool.Name).ToArray());
+        Assert.Equal(["get_market_snapshot", "list_markets", "get_klines"], tools.Select(tool => tool.Name).ToArray());
     }
 
     [Fact]
@@ -77,5 +82,30 @@ public sealed class ToolCatalogTests
         Assert.Equal(
             [MarketRuleSourceKinds.OfficialDocumented, MarketRuleSourceKinds.OfficialApiContract, MarketRuleSourceKinds.AdapterInferred, MarketRuleSourceKinds.PinnedOperational],
             sourceKinds);
+    }
+
+    [Fact]
+    public void GetAccountSnapshot_OutputSchema_ExposesPermissionModel()
+    {
+        using var document = JsonDocument.Parse(ToolCatalog.GetAccountSnapshot.OutputSchemaJson!);
+        var properties = document.RootElement.GetProperty("properties");
+
+        Assert.Equal("bitflyer_private_read_v1", properties.GetProperty("permissionModel").GetProperty("enum")[0].GetString());
+    }
+
+    [Fact]
+    public void EvaluateOrder_OutputSchema_ExposesClosedWarningTaxonomy()
+    {
+        using var document = JsonDocument.Parse(ToolCatalog.EvaluateOrder.OutputSchemaJson!);
+        var warningEnum = document.RootElement
+            .GetProperty("properties")
+            .GetProperty("warnings")
+            .GetProperty("items")
+            .GetProperty("enum")
+            .EnumerateArray()
+            .Select(x => x.GetString()!)
+            .ToArray();
+
+        Assert.Equal(EvaluateOrderWarningCodes.All, warningEnum);
     }
 }

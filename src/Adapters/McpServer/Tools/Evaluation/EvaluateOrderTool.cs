@@ -375,7 +375,7 @@ public sealed class EvaluateOrderTool
     private static IReadOnlyList<string> BuildWarnings(string orderType)
     {
         return string.Equals(orderType, "market", StringComparison.Ordinal)
-            ? ["market_order_slippage_risk"]
+            ? [EvaluateOrderWarningCodes.MarketOrderSlippageRisk]
             : Array.Empty<string>();
     }
 

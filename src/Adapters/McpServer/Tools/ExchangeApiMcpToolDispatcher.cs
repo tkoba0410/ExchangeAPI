@@ -21,6 +21,7 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
     private readonly BitflyerNativeBundle _bitflyerBundle;
     private readonly BinanceNativeBundle? _binanceBundle;
     private readonly GetMarketSnapshotTool _marketTool;
+    private readonly ListMarketsTool _listMarketsTool;
     private readonly GetKlinesTool? _klinesTool;
     private readonly GetAccountSnapshotTool? _accountTool;
     private readonly EvaluateOrderTool? _evaluateOrderTool;
@@ -47,6 +48,11 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
             _accountTool = new GetAccountSnapshotTool(new BitflyerNativeAccountSnapshotGateway(bitflyerBundle.Private));
             _evaluateOrderTool = new EvaluateOrderTool(new BitflyerNativeEvaluateOrderGateway(bitflyerBundle.Public, bitflyerBundle.Private));
         }
+
+        _listMarketsTool = new ListMarketsTool(
+            hasMarketSnapshot: true,
+            hasKlines: _klinesTool is not null,
+            hasEvaluateOrder: _evaluateOrderTool is not null);
 
         _tools = BuildVisibleTools();
     }
@@ -90,6 +96,12 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
             {
                 var request = Deserialize<GetMarketSnapshotRequest>(arguments);
                 var result = await _marketTool.ExecuteAsync(request, cancellationToken);
+                return ToToolCallResult(result);
+            }
+            case "list_markets":
+            {
+                var request = Deserialize<ListMarketsRequest>(arguments);
+                var result = await _listMarketsTool.ExecuteAsync(request, cancellationToken);
                 return ToToolCallResult(result);
             }
             case "get_klines":
@@ -176,6 +188,7 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
         var tools = new List<McpToolDefinition>
         {
             ToolCatalog.GetMarketSnapshot,
+            ToolCatalog.ListMarkets,
         };
 
         if (_klinesTool is not null)

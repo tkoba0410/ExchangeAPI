@@ -76,6 +76,7 @@ public sealed class GetAccountSnapshotTool
 
         var response = new GetAccountSnapshotResponse
         {
+            PermissionModel = PermissionModelIds.BitflyerPrivateReadV1,
             Balance = MapBalance(balanceCall.Response),
             Positions = MapPositions(positionsCall.Response),
             OpenOrdersSummary = new OpenOrdersSummary

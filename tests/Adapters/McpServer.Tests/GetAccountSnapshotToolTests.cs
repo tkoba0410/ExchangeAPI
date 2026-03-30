@@ -69,6 +69,7 @@ public sealed class GetAccountSnapshotToolTests
         Assert.True(result.IsSuccess);
         Assert.Null(result.Error);
         var response = Assert.IsType<GetAccountSnapshotResponse>(result.Response);
+        Assert.Equal(PermissionModelIds.BitflyerPrivateReadV1, response.PermissionModel);
         Assert.Equal("4800000", response.Balance["JPY"]);
         Assert.Equal("0.4", response.Balance["BTC"]);
         var position = Assert.Single(response.Positions);
@@ -97,6 +98,7 @@ public sealed class GetAccountSnapshotToolTests
         var result = await tool.ExecuteAsync(new GetAccountSnapshotRequest());
 
         Assert.True(result.IsSuccess);
+        Assert.Equal(PermissionModelIds.BitflyerPrivateReadV1, result.Response!.PermissionModel);
         Assert.Equal("restricted", result.Response!.AccountReadiness);
     }
 
@@ -117,6 +119,7 @@ public sealed class GetAccountSnapshotToolTests
         var result = await tool.ExecuteAsync(new GetAccountSnapshotRequest());
 
         Assert.True(result.IsSuccess);
+        Assert.Equal(PermissionModelIds.BitflyerPrivateReadV1, result.Response!.PermissionModel);
         Assert.Equal("unknown", result.Response!.AccountReadiness);
     }
 

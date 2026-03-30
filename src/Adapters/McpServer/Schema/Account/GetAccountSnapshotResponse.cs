@@ -4,6 +4,9 @@ namespace ExchangeApi.Adapters.McpServer.Schema.Account;
 
 public sealed class GetAccountSnapshotResponse
 {
+    [JsonPropertyName("permissionModel")]
+    public required string PermissionModel { get; init; }
+
     [JsonPropertyName("balance")]
     public required IReadOnlyDictionary<string, string> Balance { get; init; }
 

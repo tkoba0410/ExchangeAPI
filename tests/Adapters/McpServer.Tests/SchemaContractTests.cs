@@ -41,6 +41,7 @@ public sealed class SchemaContractTests
     {
         var value = new GetAccountSnapshotResponse
         {
+            PermissionModel = PermissionModelIds.BitflyerPrivateReadV1,
             Balance = new Dictionary<string, string>
             {
                 ["JPY"] = "5000000",
@@ -68,7 +69,7 @@ public sealed class SchemaContractTests
 
         var json = JsonSerializer.Serialize(value);
 
-        Assert.Equal("""{"balance":{"JPY":"5000000"},"positions":[{"symbol":"FX_BTC_JPY","side":"buy","size":"0.1","avgPrice":"12000000"}],"openOrdersSummary":{"count":0},"margin":{"derivedAvailable":"4500000"},"accountReadiness":"ready"}""", json);
+        Assert.Equal("""{"permissionModel":"bitflyer_private_read_v1","balance":{"JPY":"5000000"},"positions":[{"symbol":"FX_BTC_JPY","side":"buy","size":"0.1","avgPrice":"12000000"}],"openOrdersSummary":{"count":0},"margin":{"derivedAvailable":"4500000"},"accountReadiness":"ready"}""", json);
     }
 
     [Fact]
@@ -153,5 +154,26 @@ public sealed class SchemaContractTests
         var json = JsonSerializer.Serialize(value);
 
         Assert.Equal("""{"venue":"binance","symbol":"BTCUSDT","interval":"1h","candles":[{"openTime":"2026-03-30T00:00:00Z","closeTime":"2026-03-30T00:59:59.999Z","open":"10700000","high":"10750000","low":"10680000","close":"10720000","volume":"123.45","quoteVolume":"1323000000","tradeCount":12345,"takerBuyBaseVolume":"61.72","takerBuyQuoteVolume":"662100000"}]}""", json);
+    }
+
+    [Fact]
+    public void ListMarketsResponse_SerializesUsingDocumentedFieldNames()
+    {
+        var value = new ListMarketsResponse
+        {
+            Markets =
+            [
+                new SupportedMarketDescriptor
+                {
+                    Venue = "bitflyer",
+                    Symbol = "BTC_JPY",
+                    Capabilities = ["get_market_snapshot", "evaluate_order"],
+                },
+            ],
+        };
+
+        var json = JsonSerializer.Serialize(value);
+
+        Assert.Equal("""{"markets":[{"venue":"bitflyer","symbol":"BTC_JPY","capabilities":["get_market_snapshot","evaluate_order"]}]}""", json);
     }
 }

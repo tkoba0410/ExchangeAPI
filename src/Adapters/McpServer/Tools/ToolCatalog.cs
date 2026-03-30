@@ -13,6 +13,13 @@ public static class ToolCatalog
 {
     private static readonly string MarketSnapshotInputSchema = BuildMarketSnapshotInputSchema();
 
+    private const string ListMarketsInputSchema = """
+        {
+          "type": "object",
+          "additionalProperties": false
+        }
+        """;
+
     private const string AccountSnapshotInputSchema = """
         {
           "type": "object",
@@ -62,10 +69,46 @@ public static class ToolCatalog
         }
         """;
 
+    private const string ListMarketsOutputSchema = """
+        {
+          "type": "object",
+          "properties": {
+            "markets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "venue": {
+                    "type": "string",
+                    "enum": ["binance", "bitflyer"]
+                  },
+                  "symbol": { "type": "string" },
+                  "capabilities": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["get_market_snapshot", "get_klines", "evaluate_order"]
+                    }
+                  }
+                },
+                "required": ["venue", "symbol", "capabilities"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["markets"],
+          "additionalProperties": false
+        }
+        """;
+
     private const string AccountSnapshotOutputSchema = """
         {
           "type": "object",
           "properties": {
+            "permissionModel": {
+              "type": "string",
+              "enum": ["bitflyer_private_read_v1"]
+            },
             "balance": {
               "type": "object",
               "additionalProperties": { "type": "string" }
@@ -104,7 +147,7 @@ public static class ToolCatalog
             },
             "accountReadiness": { "type": "string" }
           },
-          "required": ["balance", "positions", "openOrdersSummary", "margin", "accountReadiness"],
+          "required": ["permissionModel", "balance", "positions", "openOrdersSummary", "margin", "accountReadiness"],
           "additionalProperties": false
         }
         """;
@@ -150,7 +193,10 @@ public static class ToolCatalog
             },
             "warnings": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string",
+                "enum": ["market_order_slippage_risk"]
+              }
             },
             "reasons": {
               "type": "array",
@@ -329,6 +375,17 @@ public static class ToolCatalog
             ReadOnlyHint: true,
             RequiresCredentials: false);
 
+    public static McpToolDefinition ListMarkets { get; } =
+        new(
+            Name: "list_markets",
+            Description: "Return the current visible market capability set grouped as venue and symbol pairs.",
+            RequestType: typeof(ListMarketsRequest),
+            ResponseType: typeof(ListMarketsResponse),
+            InputSchemaJson: ListMarketsInputSchema,
+            OutputSchemaJson: ListMarketsOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: false);
+
     public static McpToolDefinition GetKlines { get; } =
         new(
             Name: "get_klines",
@@ -363,7 +420,7 @@ public static class ToolCatalog
             RequiresCredentials: true);
 
     public static IReadOnlyList<McpToolDefinition> All { get; } =
-        [GetMarketSnapshot, GetKlines, GetAccountSnapshot, EvaluateOrder];
+        [GetMarketSnapshot, ListMarkets, GetKlines, GetAccountSnapshot, EvaluateOrder];
 
     public static IReadOnlyList<McpToolDefinition> PublicOnly { get; } =
         All.Where(tool => !tool.RequiresCredentials).ToArray();

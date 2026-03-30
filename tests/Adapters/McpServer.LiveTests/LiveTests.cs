@@ -32,6 +32,7 @@ public sealed class LiveTests
 
         var toolNames = ReadToolNames(result.OutputLines[1]);
         Assert.Contains("get_market_snapshot", toolNames);
+        Assert.Contains("list_markets", toolNames);
         Assert.Contains("get_klines", toolNames);
 
         var snapshot = ReadStructuredContent<GetMarketSnapshotResponse>(result.OutputLines[2], out var isError);
@@ -75,6 +76,7 @@ public sealed class LiveTests
 
         Assert.Equal(3, result.OutputLines.Count);
         var toolNames = ReadToolNames(result.OutputLines[1]);
+        Assert.Contains("list_markets", toolNames);
         Assert.Contains("get_klines", toolNames);
 
         var response = ReadStructuredContent<GetKlinesResponse>(result.OutputLines[2], out var isError);
@@ -127,11 +129,13 @@ public sealed class LiveTests
 
         var toolNames = ReadToolNames(result.OutputLines[1]);
         Assert.Contains("get_market_snapshot", toolNames);
+        Assert.Contains("list_markets", toolNames);
         Assert.Contains("get_account_snapshot", toolNames);
         Assert.Contains("evaluate_order", toolNames);
 
         var snapshot = ReadStructuredContent<GetAccountSnapshotResponse>(result.OutputLines[2], out var isError);
         Assert.False(isError);
+        Assert.Equal("bitflyer_private_read_v1", snapshot.PermissionModel);
         Assert.NotNull(snapshot.Balance);
         Assert.True(snapshot.OpenOrdersSummary.Count >= 0);
         Assert.True(decimal.TryParse(snapshot.Margin.DerivedAvailable, CultureInfo.InvariantCulture, out _));

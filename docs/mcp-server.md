@@ -253,11 +253,11 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 ## 9. 現行 phase
 
 - Stage11 の初期実装は Bot 向け read / evaluate tool から始める
-- 初期 tool inventory は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order` の 3 つに固定する
+- bitFlyer v1 core tool は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order` の 3 つに固定する
 - 初期 venue scope は bitFlyer を正本とする
 - Binance など他 venue の account / evaluation 展開は、market rule / account / evaluation の導出元が固定できてから行う
 - ただし Binance public market data は例外とし、Kline 専用 tool を public read 拡張として先行追加してよい
-- 拡張候補は `list_markets` のみとし、他は明確な新責務が生じるまで追加しない
+- current phase では `list_markets` を market discovery tool として追加してよい
 
 ### 9.1 bitFlyer v1 support matrix
 
@@ -298,16 +298,18 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 ## 10. 公開 tool 一覧
 
 1. `get_market_snapshot`
-2. `get_klines`
-3. `get_account_snapshot`
-4. `evaluate_order`
+2. `list_markets`
+3. `get_klines`
+4. `get_account_snapshot`
+5. `evaluate_order`
 
 補足:
 
-- 上記 4 つが現行実装の current phase tool universe である
-- bitFlyer v1 core は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order` であり、`get_klines` は Binance public read extension として扱う
+- 上記 5 つが現行実装の current phase tool universe である
+- bitFlyer v1 core は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order` であり、`list_markets` は market discovery tool、`get_klines` は Binance public read extension として扱う
 - MCP `tools/list` は current process が実際に実行可能な visible tool set を返す
 - `get_account_snapshot` と `evaluate_order` は private credentials を解決できない場合、`tools/list` から advertise しない
+- `list_markets` は current process の visible market capability set を返す
 - `get_klines` は Binance public client が配線されている場合のみ advertise してよい
 - current `CreateDefault` 実装では Binance public client を既定で配線するため、通常の server 起動では `get_klines` は visible tool set に含まれる
 - Binance upstream の可用性までは `tools/list` で事前判定せず、`tools/call get_klines` 時の `upstream_error` として扱う
@@ -513,7 +515,50 @@ bitFlyer v1 の補足:
 - v1 support set に含まれる symbol では `rules.*` を non-null とする
 - `GetBoardState` が取得できない場合は tool-level `upstream_error` とし、`GetHealth` 単独への silent fallback は行わない
 
-### 11.3 `get_account_snapshot`
+### 11.3 `list_markets`
+
+目的:
+
+- current process が実際に提供できる market-specific capability を venue / symbol 単位で列挙する
+
+入力:
+
+```json
+{}
+```
+
+出力:
+
+```json
+{
+  "markets": [
+    {
+      "venue": "bitflyer",
+      "symbol": "BTC_JPY",
+      "capabilities": [
+        "get_market_snapshot",
+        "evaluate_order"
+      ]
+    },
+    {
+      "venue": "binance",
+      "symbol": "BTCUSDT",
+      "capabilities": [
+        "get_klines"
+      ]
+    }
+  ]
+}
+```
+
+実装ルール:
+
+- `list_markets` は current process の visible tool set を基準に構成する
+- market-specific でない `get_account_snapshot` は `capabilities` に含めない
+- `evaluate_order` は `BTC_JPY` に対してのみ列挙する
+- private credentials が無い場合は `evaluate_order` capability を列挙しない
+
+### 11.4 `get_account_snapshot`
 
 目的:
 
@@ -529,6 +574,7 @@ bitFlyer v1 の補足:
 
 ```json
 {
+  "permissionModel": "bitflyer_private_read_v1",
   "balance": {
     "JPY": "5000000"
   },
@@ -552,6 +598,7 @@ bitFlyer v1 の補足:
 
 出力項目:
 
+- `permissionModel`: `accountReadiness` 判定に使う permission model identifier
 - `balance`: 通貨別残高
 - `positions`: 建玉一覧
 - `positions[].side`: `buy` / `sell`
@@ -581,6 +628,7 @@ bitFlyer v1 導出:
 - `openOrdersSummary.count` は `GetChildOrders(product_code = BTC_JPY, child_order_state = ACTIVE)` と `GetChildOrders(product_code = FX_BTC_JPY, child_order_state = ACTIVE)` の件数合計を正本とする
 - `margin.derivedAvailable` は `GetCollateral` の `collateral + open_position_pnl - require_collateral` で算出する
 - `accountReadiness` は `GetPermissions` による read capability 判定を正本とする
+- `permissionModel` は `bitflyer_private_read_v1` に固定する
 
 bitFlyer v1 `accountReadiness` mapping:
 
@@ -609,7 +657,7 @@ bitFlyer v1 の補足:
 - 取引所固有の証拠金内訳
 - 取引所固有の追加統計情報
 
-### 11.4 `evaluate_order`
+### 11.5 `evaluate_order`
 
 目的:
 
@@ -703,6 +751,11 @@ bitFlyer v1 追加制約:
 - `warnings`: 注意事項
 - `reasons`: 不可時の理由一覧
 
+warning taxonomy:
+
+- v1 で返してよい warning code は `market_order_slippage_risk` のみ
+- `warnings` は free-form text ではなく closed set として扱う
+
 実装ルール:
 
 - `canPlace = false` は tool-level error ではなく正常 response として返す
@@ -733,7 +786,7 @@ bitFlyer v1 の補足:
 - v1 の `projectedExposureOk` は active child order ベースの projected exposure 判定であり、既存 spot 保有残高そのものは含めない
 - v1 は exchange-side の hidden limit、rate limit、post-only 相当条件、将来追加される venue-specific reject rule を完全再現しない
 
-### 11.5 `get_klines`
+### 11.6 `get_klines`
 
 目的:
 
@@ -926,6 +979,7 @@ MCP v1 error boundary:
 初期完成は以下を満たした時点とする。
 
 - `get_market_snapshot` が実装されている
+- `list_markets` が current visible market capability set を返せる
 - `get_account_snapshot` が MVP 範囲で実装されている
 - `evaluate_order` が機械的成立可否の範囲で実装されている
 - 返り値が LLM / Bot に利用可能な構造化形式である
@@ -950,7 +1004,11 @@ fixture test:
   - supported symbol に対して `rules.*` が registry baseline と一致する
   - `GetBoardState.health` / `state` の代表組み合わせが `active` / `restricted` / `halted` / `unknown` に写像される
   - `GetBoardState` failure は silent fallback せず `upstream_error` になる
+- `list_markets`
+  - visible tool set に応じて venue / symbol / capabilities が変わる
+  - `get_account_snapshot` のような market-specific でない tool は `capabilities` に含めない
 - `get_account_snapshot`
+  - `permissionModel = bitflyer_private_read_v1` を返す
   - `GetBalance.available` が通貨別 map に正規化される
   - `positions` は `FX_BTC_JPY` のみを返し、spot holdings は `balance` にのみ現れる
   - `openOrdersSummary.count` は `BTC_JPY` と `FX_BTC_JPY` の `ACTIVE` child order 件数合計である
@@ -963,6 +1021,7 @@ fixture test:
   - `market buy -> ask`、`market sell -> bid`、`limit -> input price` の `referencePrice` が使われる
   - `sizeRuleOk` と `priceRuleOk` が registry baseline に対して判定される
   - `buy` は `JPY` 残高、`sell` は `BTC` 残高で `balanceOk` を判定する
+  - `warnings` は closed set として扱い、v1 では `market_order_slippage_risk` のみを返す
 
 live test:
 
@@ -979,9 +1038,6 @@ live test:
 - `BitflyerMarketRuleRegistry.priceStep` の公開 source が将来提供された場合の切替手順
 - `evaluate_order` に fee を blocking check として含めるか
 - `evaluate_order` を `FX_BTC_JPY` まで広げるための margin rule 正本
-- warning taxonomy の固定
 - multi-venue 化時の `venue` / account context 契約
 - observability / tracing rule
-- permission model の具体値
-- `list_markets` を追加するかどうか
 - generic `get_klines` を維持しつつ、multi-venue 時の venue ごとの closed set schema をどう表現するか

@@ -292,6 +292,8 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 - MCP `tools/list` は current process が実際に実行可能な visible tool set を返す
 - `get_account_snapshot` と `evaluate_order` は private credentials を解決できない場合、`tools/list` から advertise しない
 - `get_klines` は Binance public client が配線されている場合のみ advertise してよい
+- current `CreateDefault` 実装では Binance public client を既定で配線するため、通常の server 起動では `get_klines` は visible tool set に含まれる
+- Binance upstream の可用性までは `tools/list` で事前判定せず、`tools/call get_klines` 時の `upstream_error` として扱う
 
 追加しない例:
 

@@ -43,11 +43,11 @@ public static class ToolCatalog
             },
             "startTime": {
               "type": ["string", "null"],
-              "description": "UTC ISO 8601 string."
+              "description": "ISO 8601 string. Normalized to UTC by the server."
             },
             "endTime": {
               "type": ["string", "null"],
-              "description": "UTC ISO 8601 string."
+              "description": "ISO 8601 string. Normalized to UTC by the server."
             },
             "limit": {
               "type": ["integer", "null"],
@@ -262,7 +262,7 @@ public static class ToolCatalog
     public static McpToolDefinition GetKlines { get; } =
         new(
             Name: "get_klines",
-            Description: "Return Binance public OHLCV kline candles for a supported symbol and interval.",
+            Description: "Return Binance v1 public OHLCV kline candles for a supported symbol and interval.",
             RequestType: typeof(GetKlinesRequest),
             ResponseType: typeof(GetKlinesResponse),
             InputSchemaJson: KlinesInputSchema,

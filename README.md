@@ -6,7 +6,6 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 ## Quick Links
 
 - Stage11 goals: [`stage11.md`](stage11.md)
-- Stage10 goals: [`stage10.md`](stage10.md)
 - Library spec: [`docs/spec.md`](docs/spec.md)
 - Bitflyer endpoints: [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md)
 - Binance endpoints: [`docs/endpoints-binance.md`](docs/endpoints-binance.md)

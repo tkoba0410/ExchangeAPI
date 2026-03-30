@@ -58,8 +58,6 @@ Stage11 は、少なくとも以下を満たした時点で完了とみなす。
 
 ## 5. 参照先
 
-- [`stage10.md`](stage10.md)
-  - Stage10 library foundation の goal document
 - [`docs/spec.md`](docs/spec.md)
   - library 設計正本
 - [`docs/cli.md`](docs/cli.md)

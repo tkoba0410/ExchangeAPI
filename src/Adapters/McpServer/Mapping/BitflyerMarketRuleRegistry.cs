@@ -42,8 +42,11 @@ public static class BitflyerMarketRuleRegistry
                         SizeStep: item.SizeStep,
                         PriceStep: item.PriceStep,
                         MinSizeSourceKind: item.MinSizeSourceKind,
+                        MinSizeSourceRef: item.MinSizeSourceRef,
                         SizeStepSourceKind: item.SizeStepSourceKind,
+                        SizeStepSourceRef: item.SizeStepSourceRef,
                         PriceStepSourceKind: item.PriceStepSourceKind,
+                        PriceStepSourceRef: item.PriceStepSourceRef,
                         SourceNote: item.SourceNote)))
             {
                 throw new InvalidOperationException(
@@ -84,16 +87,34 @@ public static class BitflyerMarketRuleRegistry
                 $"Unsupported minSizeSourceKind '{item.MinSizeSourceKind}' for '{item.Symbol}'.");
         }
 
+        if (string.IsNullOrWhiteSpace(item.MinSizeSourceRef))
+        {
+            throw new InvalidOperationException(
+                $"minSizeSourceRef must not be empty for '{item.Symbol}'.");
+        }
+
         if (!MarketRuleSourceKinds.IsDefined(item.SizeStepSourceKind))
         {
             throw new InvalidOperationException(
                 $"Unsupported sizeStepSourceKind '{item.SizeStepSourceKind}' for '{item.Symbol}'.");
         }
 
+        if (string.IsNullOrWhiteSpace(item.SizeStepSourceRef))
+        {
+            throw new InvalidOperationException(
+                $"sizeStepSourceRef must not be empty for '{item.Symbol}'.");
+        }
+
         if (!MarketRuleSourceKinds.IsDefined(item.PriceStepSourceKind))
         {
             throw new InvalidOperationException(
                 $"Unsupported priceStepSourceKind '{item.PriceStepSourceKind}' for '{item.Symbol}'.");
+        }
+
+        if (string.IsNullOrWhiteSpace(item.PriceStepSourceRef))
+        {
+            throw new InvalidOperationException(
+                $"priceStepSourceRef must not be empty for '{item.Symbol}'.");
         }
     }
 
@@ -123,11 +144,20 @@ public static class BitflyerMarketRuleRegistry
         [JsonPropertyName("minSizeSourceKind")]
         public required string MinSizeSourceKind { get; init; }
 
+        [JsonPropertyName("minSizeSourceRef")]
+        public required string MinSizeSourceRef { get; init; }
+
         [JsonPropertyName("sizeStepSourceKind")]
         public required string SizeStepSourceKind { get; init; }
 
+        [JsonPropertyName("sizeStepSourceRef")]
+        public required string SizeStepSourceRef { get; init; }
+
         [JsonPropertyName("priceStepSourceKind")]
         public required string PriceStepSourceKind { get; init; }
+
+        [JsonPropertyName("priceStepSourceRef")]
+        public required string PriceStepSourceRef { get; init; }
 
         [JsonPropertyName("sourceNote")]
         public required string SourceNote { get; init; }

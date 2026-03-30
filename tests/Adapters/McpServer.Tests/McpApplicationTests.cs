@@ -91,6 +91,9 @@ public sealed class McpApplicationTests
         var result = toolCall.RootElement.GetProperty("result");
         Assert.False(result.GetProperty("isError").GetBoolean());
         Assert.Equal("ok", result.GetProperty("structuredContent").GetProperty("message").GetString());
+        Assert.Equal("exchangeapi.mcp.get_market_snapshot.v1", result.GetProperty("_meta").GetProperty("schemaVersion").GetString());
+        Assert.Equal("bitflyer-market-rules.v1", result.GetProperty("_meta").GetProperty("dataVersion").GetString());
+        Assert.False(result.GetProperty("_meta").GetProperty("degraded").GetBoolean());
         Assert.Equal("""{"message":"ok"}""", result.GetProperty("content")[0].GetProperty("text").GetString());
     }
 
@@ -113,6 +116,7 @@ public sealed class McpApplicationTests
         Assert.True(result.GetProperty("isError").GetBoolean());
         Assert.Equal("validation_error", result.GetProperty("structuredContent").GetProperty("errorCategory").GetString());
         Assert.Equal("invalid_request", result.GetProperty("structuredContent").GetProperty("errorCode").GetString());
+        Assert.Equal("exchangeapi.mcp.evaluate_order.v1", result.GetProperty("_meta").GetProperty("schemaVersion").GetString());
     }
 
     [Fact]
@@ -190,10 +194,10 @@ public sealed class McpApplicationTests
             return Task.FromResult(
                 name switch
                 {
-                    "get_market_snapshot" => McpToolCallResult.Success(new { message = "ok" }),
-                    "list_markets" => McpToolCallResult.Success(new { markets = 2 }),
-                    "get_klines" => McpToolCallResult.Success(new { candles = 1 }),
-                    "get_account_snapshot" => McpToolCallResult.Success(new { count = 1 }),
+                    "get_market_snapshot" => McpToolCallResult.Success(new { message = "ok" }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.get_market_snapshot.v1", DataVersion = "bitflyer-market-rules.v1", Degraded = false }),
+                    "list_markets" => McpToolCallResult.Success(new { markets = 2 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.list_markets.v1", DataVersion = "exchangeapi-visible-markets.v1", Degraded = false }),
+                    "get_klines" => McpToolCallResult.Success(new { candles = 1 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.get_klines.v1", DataVersion = "binance-kline-support-set.v1", Degraded = false }),
+                    "get_account_snapshot" => McpToolCallResult.Success(new { count = 1 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.get_account_snapshot.v1", DataVersion = "bitflyer-private-read.v1", Degraded = false }),
                     "evaluate_order" => McpToolCallResult.ToolError(
                         new McpToolError
                         {
@@ -202,7 +206,8 @@ public sealed class McpApplicationTests
                             Message = "Invalid request.",
                             Details = new Dictionary<string, string?>(),
                             Retryable = false,
-                        }),
+                        },
+                        new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.evaluate_order.v1", DataVersion = "bitflyer-evaluate-order.v1", Degraded = false }),
                     _ => throw new InvalidOperationException($"Unexpected tool name in fake dispatcher: {name}"),
                 });
         }

@@ -88,7 +88,7 @@ MCP Server は以下を所有する。
 - 必要最小限の正規化
 - warning の返却
 - session / transport ごとの公開制御
-- tool-level observability
+- tool-call-level observability via MCP result `_meta`
 
 MCP Server は以下を所有しない。
 
@@ -335,7 +335,7 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 - bitFlyer の公開文書と公開 API 文書を external source of truth とする
 - `get_market_snapshot` と `evaluate_order` は adapter-owned の `BitflyerMarketRuleRegistry` を pinned operational config として利用する
 - `BitflyerMarketRuleRegistry` の正本データは version 管理された data file とし、adapter code は loader / validator のみを持つ
-- `BitflyerMarketRuleRegistry` は `minSize`、`sizeStep`、`priceStep` と各 field の source kind を symbol ごとに明示定義する
+- `BitflyerMarketRuleRegistry` は `minSize`、`sizeStep`、`priceStep` と各 field の source kind / source ref を symbol ごとに明示定義する
 - `BitflyerMarketRuleRegistry` に entry がない symbol は、MCP として未サポートとみなし `invalid_symbol` とする
 - `BitflyerMarketRuleRegistry` は venue 文書または運用上固定した設定値から構成される pinned config である
 - `BitflyerMarketRuleRegistry` の entry は version 管理対象とし、runtime observation から自動学習してはならない
@@ -378,16 +378,17 @@ versioned data file:
 
 初期実装では、以下の registry entry を用いる。
 
-| symbol | minSize | sizeStep | priceStep | minSize source kind | sizeStep source kind | priceStep source kind | source note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `BTC_JPY` | `"0.001"` | `"0.00000001"` | `"1"` | `official_documented` | `official_documented` | `adapter_inferred` | `minSize` と `sizeStep` は公式公開値、`priceStep` は adapter-owned 推論値 |
-| `FX_BTC_JPY` | `"0.001"` | `"0.00000001"` | `"1"` | `official_documented` | `official_documented` | `adapter_inferred` | `minSize` は 2024-10-21 以降の公式公開値、`sizeStep` は BTC 単位の公開値、`priceStep` は adapter-owned 推論値 |
+| symbol | minSize | sizeStep | priceStep | minSize source kind | minSize source ref | sizeStep source kind | sizeStep source ref | priceStep source kind | priceStep source ref | source note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `BTC_JPY` | `"0.001"` | `"0.00000001"` | `"1"` | `official_documented` | `https://bitflyer.com/ja-jp/s/commission` | `official_documented` | `https://bitflyer.com/ja-jp/s/commission` | `adapter_inferred` | `adapter://bitflyer-jpy-price-step.v1` | `minSize` と `sizeStep` は公式公開値、`priceStep` は adapter-owned 推論値 |
+| `FX_BTC_JPY` | `"0.001"` | `"0.00000001"` | `"1"` | `official_documented` | `https://bitflyer.com/pub/20241015-bitFlyerCryptoCFD-Minimum-Order-Change-en.pdf` | `official_documented` | `https://bitflyer.com/ja-jp/s/commission` | `adapter_inferred` | `adapter://bitflyer-jpy-price-step.v1` | `minSize` は 2024-10-21 以降の公式公開値、`sizeStep` は BTC 単位の公開値、`priceStep` は adapter-owned 推論値 |
 
 補足:
 
 - `FX_BTC_JPY.minSize = "0.001"` は bitFlyer Crypto CFD の最小発注数量変更後の値を正本とする
 - `priceStep = "1"` は JPY market の例示価格が整数で示されていることと、運用上の観測に基づく保守的固定値である
-- bitFlyer が価格単位を公式公開した場合は、その公開値を優先し、推論値を廃止する
+- bitFlyer が価格単位を公式公開した場合は、その公開値を優先し、`priceStepSourceKind = official_documented` または `official_api_contract` へ切り替え、`adapter_inferred` を廃止する
+- 公式 source が提供された symbol では `adapter_inferred` を残さない
 
 ### 11.1.4 `BitflyerMarketRuleRegistry` 更新手順
 
@@ -398,6 +399,7 @@ versioned data file:
 3. `priceStep` 変更の必要がある場合は、公式 API 文書の example と live market observation を確認する
 4. 推論値を変更する場合は、変更理由を commit message または関連文書に残す
 5. MCP adapter test で `sizeRuleOk` / `priceRuleOk` / normalize の fixture を更新する
+6. 公式 source が提供された場合は `*SourceRef` を公式参照へ更新し、`adapter_inferred` を除去する
 
 更新禁止事項:
 
@@ -454,8 +456,11 @@ versioned data file:
     "sizeStep": "0.00000001",
     "priceStep": "1",
     "minSizeSourceKind": "official_documented",
+    "minSizeSourceRef": "https://bitflyer.com/ja-jp/s/commission",
     "sizeStepSourceKind": "official_documented",
-    "priceStepSourceKind": "adapter_inferred"
+    "sizeStepSourceRef": "https://bitflyer.com/ja-jp/s/commission",
+    "priceStepSourceKind": "adapter_inferred",
+    "priceStepSourceRef": "adapter://bitflyer-jpy-price-step.v1"
   },
   "status": "active"
 }
@@ -472,8 +477,11 @@ versioned data file:
 - `rules.sizeStep`: 数量刻み
 - `rules.priceStep`: 価格刻み
 - `rules.minSizeSourceKind`: `minSize` の source kind
+- `rules.minSizeSourceRef`: `minSize` の source ref
 - `rules.sizeStepSourceKind`: `sizeStep` の source kind
+- `rules.sizeStepSourceRef`: `sizeStep` の source ref
 - `rules.priceStepSourceKind`: `priceStep` の source kind
+- `rules.priceStepSourceRef`: `priceStep` の source ref
 - `status`: 市場状態
 
 状態値:
@@ -495,6 +503,7 @@ bitFlyer v1 導出:
 - `status` は `GetBoardState.health` と `GetBoardState.state` の組み合わせで決定する
 - `rules.*` の返却値は `BitflyerMarketRuleRegistry` pinned operational config から取る
 - `rules.*SourceKind` は各 rule field が `official_documented`、`official_api_contract`、`adapter_inferred`、`pinned_operational` のどれに基づくかを返す
+- `rules.*SourceRef` はその field の pinned source 参照を返す
 
 bitFlyer v1 `status` mapping:
 
@@ -721,6 +730,7 @@ bitFlyer v1 追加制約:
     "sizeRuleOk": true,
     "priceRuleOk": true,
     "balanceOk": true,
+    "feeCoverageOk": null,
     "projectedExposureOk": true
   },
   "normalizedRequest": {
@@ -732,7 +742,9 @@ bitFlyer v1 追加制約:
   },
   "estimate": {
     "referencePrice": "12345678",
-    "estimatedNotional": "3703703.4"
+    "estimatedNotional": "3703703.4",
+    "estimatedFee": null,
+    "estimatedFeeSourceKind": null
   },
   "warnings": [
     "market_order_slippage_risk"
@@ -748,12 +760,14 @@ bitFlyer v1 追加制約:
 - `normalizedRequest`: 正規化済み注文要求
 - `estimate.referencePrice`: 評価基準価格
 - `estimate.estimatedNotional`: 想定約定金額
+- `estimate.estimatedFee`: optional fee estimate
+- `estimate.estimatedFeeSourceKind`: fee estimate の source kind。v1 は optional `pinned_operational`
 - `warnings`: 注意事項
 - `reasons`: 不可時の理由一覧
 
 warning taxonomy:
 
-- v1 で返してよい warning code は `market_order_slippage_risk` のみ
+- v1 で返してよい warning code は `market_order_slippage_risk` と `estimated_fee_not_covered` のみ
 - `warnings` は free-form text ではなく closed set として扱う
 
 実装ルール:
@@ -770,21 +784,64 @@ bitFlyer v1 導出:
 - 評価対象は `BTC_JPY` spot order に限定する
 - `referencePrice` は `market buy -> ask`、`market sell -> bid`、`limit -> input price` とする
 - `estimatedNotional` は `referencePrice * size` とする
+- `estimatedFee`
+  - optional adapter config の fee rate がある場合のみ算出する
+  - `market` は `MarketFeeRate`、`limit` は `LimitFeeRate` を使う
+  - v1 では authoritative fee model ではなく operational estimate として扱う
 - `balanceOk`
   - `buy`: `balance["JPY"] >= estimatedNotional`
   - `sell`: `balance["BTC"] >= size`
+- `feeCoverageOk`
+  - fee estimate がない場合は `null`
+  - `buy`: `balance["JPY"] >= estimatedNotional + estimatedFee`
+  - `sell`: v1 では fee settlement model を固定しないため `null`
 - `marketStatusOk` は `get_market_snapshot.status == active` のときのみ `true`
 - `sizeRuleOk` は `BitflyerMarketRuleRegistry.minSize` と `sizeStep` に対する適合で判定する
 - `priceRuleOk` は `orderType = limit` のとき `priceStep` 適合と正値条件で判定する
 - `projectedExposureOk` は adapter config の optional `MaxBaseSize` で判定し、`BTC_JPY` の同 side `ACTIVE` child order の `outstanding_size` 合計と今回 `size` の projected exposure が上限以下なら `true` とする
-- `warnings` は v1 では `market` 注文時に `market_order_slippage_risk` を返し、それ以外は空配列とする
+- `warnings`
+  - `market` 注文時に `market_order_slippage_risk` を返す
+  - `feeCoverageOk = false` の場合は `estimated_fee_not_covered` を返す
 
 bitFlyer v1 の補足:
 
 - v1 は fee を blocking check に含めない
+- v1 は fee estimate があっても `canPlace` の blocking check に含めない
 - v1 は `FX_BTC_JPY` を評価対象に含めない
 - v1 の `projectedExposureOk` は active child order ベースの projected exposure 判定であり、既存 spot 保有残高そのものは含めない
 - v1 は exchange-side の hidden limit、rate limit、post-only 相当条件、将来追加される venue-specific reject rule を完全再現しない
+
+### 11.5.1 MCP `tools/call` `_meta`
+
+`tools/call` の result object には payload 本体と分離した `_meta` を含める。
+
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"symbol\":\"BTC_JPY\"}"
+    }
+  ],
+  "structuredContent": {
+    "symbol": "BTC_JPY"
+  },
+  "_meta": {
+    "schemaVersion": "exchangeapi.mcp.get_market_snapshot.v1",
+    "dataVersion": "bitflyer-market-rules.v1",
+    "degraded": false
+  },
+  "isError": false
+}
+```
+
+実装ルール:
+
+- `_meta` は tool payload 本体に混ぜず、MCP call result envelope に置く
+- `schemaVersion` は tool contract version を表す
+- `dataVersion` は pinned config / support set / permission model の version を表す
+- `degraded = true` は partial success で意味が弱まっている場合のみ返す
+- v1 では `get_account_snapshot` で `accountReadiness = unknown` のときのみ `degraded = true`
 
 ### 11.6 `get_klines`
 
@@ -1021,7 +1078,9 @@ fixture test:
   - `market buy -> ask`、`market sell -> bid`、`limit -> input price` の `referencePrice` が使われる
   - `sizeRuleOk` と `priceRuleOk` が registry baseline に対して判定される
   - `buy` は `JPY` 残高、`sell` は `BTC` 残高で `balanceOk` を判定する
-  - `warnings` は closed set として扱い、v1 では `market_order_slippage_risk` のみを返す
+  - `warnings` は closed set として扱い、v1 では `market_order_slippage_risk` と `estimated_fee_not_covered` のみを返す
+  - `feeCoverageOk` と `estimatedFee` は optional fee config がないとき `null` を返す
+  - `tools/call` result の `_meta` に `schemaVersion` / `dataVersion` / `degraded` が含まれる
 
 live test:
 
@@ -1035,9 +1094,6 @@ live test:
 
 ## 15. 今後詰める項目
 
-- `BitflyerMarketRuleRegistry.priceStep` の公開 source が将来提供された場合の切替手順
-- `evaluate_order` に fee を blocking check として含めるか
 - `evaluate_order` を `FX_BTC_JPY` まで広げるための margin rule 正本
 - multi-venue 化時の `venue` / account context 契約
-- observability / tracing rule
 - generic `get_klines` を維持しつつ、multi-venue 時の venue ごとの closed set schema をどう表現するか

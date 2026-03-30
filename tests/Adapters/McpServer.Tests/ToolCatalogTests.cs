@@ -79,6 +79,9 @@ public sealed class ToolCatalogTests
         var sourceKinds = rules.GetProperty("properties").GetProperty("priceStepSourceKind").GetProperty("enum").EnumerateArray().Select(x => x.GetString()!).ToArray();
 
         Assert.Contains("minSizeSourceKind", required);
+        Assert.Contains("minSizeSourceRef", required);
+        Assert.Contains("sizeStepSourceRef", required);
+        Assert.Contains("priceStepSourceRef", required);
         Assert.Equal(
             [MarketRuleSourceKinds.OfficialDocumented, MarketRuleSourceKinds.OfficialApiContract, MarketRuleSourceKinds.AdapterInferred, MarketRuleSourceKinds.PinnedOperational],
             sourceKinds);
@@ -97,15 +100,19 @@ public sealed class ToolCatalogTests
     public void EvaluateOrder_OutputSchema_ExposesClosedWarningTaxonomy()
     {
         using var document = JsonDocument.Parse(ToolCatalog.EvaluateOrder.OutputSchemaJson!);
-        var warningEnum = document.RootElement
-            .GetProperty("properties")
+        var properties = document.RootElement.GetProperty("properties");
+        var warningEnum = properties
             .GetProperty("warnings")
             .GetProperty("items")
             .GetProperty("enum")
             .EnumerateArray()
             .Select(x => x.GetString()!)
             .ToArray();
+        var checks = properties.GetProperty("checks").GetProperty("properties");
+        var estimate = properties.GetProperty("estimate").GetProperty("properties");
 
         Assert.Equal(EvaluateOrderWarningCodes.All, warningEnum);
+        Assert.Equal("null", checks.GetProperty("feeCoverageOk").GetProperty("type")[1].GetString());
+        Assert.Equal("null", estimate.GetProperty("estimatedFee").GetProperty("type")[1].GetString());
     }
 }

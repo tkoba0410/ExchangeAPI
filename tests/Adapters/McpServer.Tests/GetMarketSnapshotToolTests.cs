@@ -66,8 +66,11 @@ public sealed class GetMarketSnapshotToolTests
         Assert.Equal("0.00000001", response.Rules.SizeStep);
         Assert.Equal("1", response.Rules.PriceStep);
         Assert.Equal(MarketRuleSourceKinds.OfficialDocumented, response.Rules.MinSizeSourceKind);
+        Assert.Equal("https://bitflyer.com/ja-jp/s/commission", response.Rules.MinSizeSourceRef);
         Assert.Equal(MarketRuleSourceKinds.OfficialDocumented, response.Rules.SizeStepSourceKind);
+        Assert.Equal("https://bitflyer.com/ja-jp/s/commission", response.Rules.SizeStepSourceRef);
         Assert.Equal(MarketRuleSourceKinds.AdapterInferred, response.Rules.PriceStepSourceKind);
+        Assert.Equal("adapter://bitflyer-jpy-price-step.v1", response.Rules.PriceStepSourceRef);
         Assert.Equal("active", response.Status);
     }
 

@@ -1,4 +1,5 @@
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
+using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Tools.Evaluation;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
@@ -34,6 +35,7 @@ public sealed class EvaluateOrderToolTests
         Assert.True(response.Checks.SizeRuleOk);
         Assert.True(response.Checks.PriceRuleOk);
         Assert.True(response.Checks.BalanceOk);
+        Assert.Null(response.Checks.FeeCoverageOk);
         Assert.True(response.Checks.ProjectedExposureOk);
         Assert.Equal("BTC_JPY", response.NormalizedRequest.Symbol);
         Assert.Equal("buy", response.NormalizedRequest.Side);
@@ -42,6 +44,8 @@ public sealed class EvaluateOrderToolTests
         Assert.Null(response.NormalizedRequest.Price);
         Assert.Equal("12346000", response.Estimate.ReferencePrice);
         Assert.Equal("3703800.000", response.Estimate.EstimatedNotional);
+        Assert.Null(response.Estimate.EstimatedFee);
+        Assert.Null(response.Estimate.EstimatedFeeSourceKind);
         Assert.Equal(["market_order_slippage_risk"], response.Warnings);
         Assert.Empty(response.Reasons);
     }
@@ -112,6 +116,7 @@ public sealed class EvaluateOrderToolTests
         Assert.True(response.Checks.SizeRuleOk);
         Assert.False(response.Checks.PriceRuleOk);
         Assert.False(response.Checks.BalanceOk);
+        Assert.Null(response.Checks.FeeCoverageOk);
         Assert.True(response.Checks.ProjectedExposureOk);
         Assert.Equal(["price_rule_violation", "insufficient_balance"], response.Reasons);
         Assert.Empty(response.Warnings);
@@ -149,6 +154,38 @@ public sealed class EvaluateOrderToolTests
         Assert.False(response.Checks.MarketStatusOk);
         Assert.False(response.Checks.ProjectedExposureOk);
         Assert.Equal(["market_not_active", "exposure_limit_exceeded"], response.Reasons);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ExposesFeeEstimateAndWarningWithoutBlockingCanPlace()
+    {
+        var tool = new EvaluateOrderTool(
+            CreateHappyPathGateway(jpyAvailable: 3_705_000m, btcAvailable: 1m),
+            new EvaluateOrderOptions
+            {
+                MarketFeeRate = 0.001m,
+            });
+
+        var result = await tool.ExecuteAsync(
+            new EvaluateOrderRequest
+            {
+                Symbol = "BTC_JPY",
+                Side = "buy",
+                OrderType = "market",
+                Size = "0.300",
+                Price = null,
+            });
+
+        Assert.True(result.IsSuccess);
+        var response = Assert.IsType<EvaluateOrderResponse>(result.Response);
+        Assert.True(response.CanPlace);
+        Assert.Equal(false, response.Checks.FeeCoverageOk);
+        Assert.Equal("3703.800000", response.Estimate.EstimatedFee);
+        Assert.Equal(MarketRuleSourceKinds.PinnedOperational, response.Estimate.EstimatedFeeSourceKind);
+        Assert.Equal(
+            [EvaluateOrderWarningCodes.MarketOrderSlippageRisk, EvaluateOrderWarningCodes.EstimatedFeeNotCovered],
+            response.Warnings);
+        Assert.Empty(response.Reasons);
     }
 
     [Fact]

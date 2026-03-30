@@ -289,6 +289,7 @@ public sealed class McpApplication
                                         },
                                     },
                                     structuredContent,
+                                    _meta = toolResult.Meta,
                                     isError = toolResult.IsError,
                                 });
                         }

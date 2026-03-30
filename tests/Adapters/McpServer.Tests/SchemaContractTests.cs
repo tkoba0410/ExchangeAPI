@@ -25,15 +25,18 @@ public sealed class SchemaContractTests
                 SizeStep = "0.00000001",
                 PriceStep = "1",
                 MinSizeSourceKind = MarketRuleSourceKinds.OfficialDocumented,
+                MinSizeSourceRef = "https://bitflyer.com/ja-jp/s/commission",
                 SizeStepSourceKind = MarketRuleSourceKinds.OfficialDocumented,
+                SizeStepSourceRef = "https://bitflyer.com/ja-jp/s/commission",
                 PriceStepSourceKind = MarketRuleSourceKinds.AdapterInferred,
+                PriceStepSourceRef = "adapter://bitflyer-jpy-price-step.v1",
             },
             Status = "active",
         };
 
         var json = JsonSerializer.Serialize(value);
 
-        Assert.Equal("""{"symbol":"BTC_JPY","bid":"12345000","ask":"12346000","last":"12345500","timestamp":"2026-03-29T10:00:00Z","rules":{"minSize":"0.001","sizeStep":"0.00000001","priceStep":"1","minSizeSourceKind":"official_documented","sizeStepSourceKind":"official_documented","priceStepSourceKind":"adapter_inferred"},"status":"active"}""", json);
+        Assert.Equal("""{"symbol":"BTC_JPY","bid":"12345000","ask":"12346000","last":"12345500","timestamp":"2026-03-29T10:00:00Z","rules":{"minSize":"0.001","sizeStep":"0.00000001","priceStep":"1","minSizeSourceKind":"official_documented","minSizeSourceRef":"https://bitflyer.com/ja-jp/s/commission","sizeStepSourceKind":"official_documented","sizeStepSourceRef":"https://bitflyer.com/ja-jp/s/commission","priceStepSourceKind":"adapter_inferred","priceStepSourceRef":"adapter://bitflyer-jpy-price-step.v1"},"status":"active"}""", json);
     }
 
     [Fact]
@@ -85,6 +88,7 @@ public sealed class SchemaContractTests
                 SizeRuleOk = true,
                 PriceRuleOk = true,
                 BalanceOk = true,
+                FeeCoverageOk = null,
                 ProjectedExposureOk = true,
             },
             NormalizedRequest = new EvaluateOrderRequest
@@ -99,6 +103,8 @@ public sealed class SchemaContractTests
             {
                 ReferencePrice = "12345678",
                 EstimatedNotional = "3703703.4",
+                EstimatedFee = null,
+                EstimatedFeeSourceKind = null,
             },
             Warnings = ["market_order_slippage_risk"],
             Reasons = [],
@@ -106,7 +112,7 @@ public sealed class SchemaContractTests
 
         var json = JsonSerializer.Serialize(value);
 
-        Assert.Equal("""{"canPlace":true,"checks":{"symbolOk":true,"marketStatusOk":true,"sizeRuleOk":true,"priceRuleOk":true,"balanceOk":true,"projectedExposureOk":true},"normalizedRequest":{"symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.300","price":null},"estimate":{"referencePrice":"12345678","estimatedNotional":"3703703.4"},"warnings":["market_order_slippage_risk"],"reasons":[]}""", json);
+        Assert.Equal("""{"canPlace":true,"checks":{"symbolOk":true,"marketStatusOk":true,"sizeRuleOk":true,"priceRuleOk":true,"balanceOk":true,"feeCoverageOk":null,"projectedExposureOk":true},"normalizedRequest":{"symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.300","price":null},"estimate":{"referencePrice":"12345678","estimatedNotional":"3703703.4","estimatedFee":null,"estimatedFeeSourceKind":null},"warnings":["market_order_slippage_risk"],"reasons":[]}""", json);
     }
 
     [Fact]

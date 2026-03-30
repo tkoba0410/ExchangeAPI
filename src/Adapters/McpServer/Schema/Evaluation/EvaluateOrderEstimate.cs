@@ -9,4 +9,10 @@ public sealed class EvaluateOrderEstimate
 
     [JsonPropertyName("estimatedNotional")]
     public required string EstimatedNotional { get; init; }
+
+    [JsonPropertyName("estimatedFee")]
+    public required string? EstimatedFee { get; init; }
+
+    [JsonPropertyName("estimatedFeeSourceKind")]
+    public required string? EstimatedFeeSourceKind { get; init; }
 }

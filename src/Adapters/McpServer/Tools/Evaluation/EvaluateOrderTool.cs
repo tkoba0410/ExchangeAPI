@@ -26,6 +26,7 @@ public sealed class EvaluateOrderTool
     {
         _gateway = gateway;
         _options = options ?? new EvaluateOrderOptions();
+        ValidateOptions(_options);
     }
 
     public async Task<McpToolExecutionResult<EvaluateOrderResponse>> ExecuteAsync(
@@ -110,7 +111,9 @@ public sealed class EvaluateOrderTool
 
         var referencePrice = SelectReferencePrice(normalized, tickerCall.Response);
         var estimatedNotional = referencePrice * normalized.SizeValue;
+        var estimatedFee = EstimateFee(normalized.OrderType, estimatedNotional);
         var marketStatus = BitflyerMarketStatusMapper.Map(boardStateCall.Response.State, boardStateCall.Response.Health);
+        var feeCoverageOk = IsFeeCoverageOk(normalized, estimatedNotional, estimatedFee, balanceCall.Response);
 
         var checks = new EvaluateOrderChecks
         {
@@ -119,11 +122,12 @@ public sealed class EvaluateOrderTool
             SizeRuleOk = IsSizeRuleOk(normalized.SizeValue, parsedRule.MinSize, parsedRule.SizeStep),
             PriceRuleOk = normalized.OrderType == "market" || IsPriceRuleOk(normalized.PriceValue!.Value, parsedRule.PriceStep),
             BalanceOk = IsBalanceOk(normalized, estimatedNotional, balanceCall.Response),
+            FeeCoverageOk = feeCoverageOk,
             ProjectedExposureOk = IsProjectedExposureOk(normalized, activeOrdersCall.Response),
         };
 
         var reasons = BuildReasons(checks);
-        var warnings = BuildWarnings(normalized.OrderType);
+        var warnings = BuildWarnings(normalized.OrderType, feeCoverageOk);
 
         var response = new EvaluateOrderResponse
         {
@@ -146,6 +150,8 @@ public sealed class EvaluateOrderTool
             {
                 ReferencePrice = FormatDecimal(referencePrice),
                 EstimatedNotional = FormatDecimal(estimatedNotional),
+                EstimatedFee = estimatedFee is decimal fee ? FormatDecimal(fee) : null,
+                EstimatedFeeSourceKind = estimatedFee.HasValue ? MarketRuleSourceKinds.PinnedOperational : null,
             },
             Warnings = warnings,
             Reasons = reasons,
@@ -312,6 +318,41 @@ public sealed class EvaluateOrderTool
         return availableByCurrency.GetValueOrDefault(BtcCurrencyCode, 0m) >= request.SizeValue;
     }
 
+    private decimal? EstimateFee(string orderType, decimal estimatedNotional)
+    {
+        var feeRate = string.Equals(orderType, "market", StringComparison.Ordinal)
+            ? _options.MarketFeeRate
+            : _options.LimitFeeRate;
+
+        return feeRate.HasValue
+            ? estimatedNotional * feeRate.Value
+            : null;
+    }
+
+    private static bool? IsFeeCoverageOk(
+        NormalizedEvaluateOrderRequest request,
+        decimal estimatedNotional,
+        decimal? estimatedFee,
+        IReadOnlyList<GetBalance.Item> balances)
+    {
+        if (!estimatedFee.HasValue)
+        {
+            return null;
+        }
+
+        if (!string.Equals(request.Side, "buy", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var availableByCurrency = balances.ToDictionary(
+            item => item.CurrencyCode,
+            item => item.Available,
+            StringComparer.Ordinal);
+
+        return availableByCurrency.GetValueOrDefault(JpyCurrencyCode, 0m) >= estimatedNotional + estimatedFee.Value;
+    }
+
     private bool IsProjectedExposureOk(
         NormalizedEvaluateOrderRequest request,
         IReadOnlyList<GetChildOrders.Item> activeOrders)
@@ -372,11 +413,20 @@ public sealed class EvaluateOrderTool
         return reasons;
     }
 
-    private static IReadOnlyList<string> BuildWarnings(string orderType)
+    private static IReadOnlyList<string> BuildWarnings(string orderType, bool? feeCoverageOk)
     {
-        return string.Equals(orderType, "market", StringComparison.Ordinal)
-            ? [EvaluateOrderWarningCodes.MarketOrderSlippageRisk]
-            : Array.Empty<string>();
+        var warnings = new List<string>();
+        if (string.Equals(orderType, "market", StringComparison.Ordinal))
+        {
+            warnings.Add(EvaluateOrderWarningCodes.MarketOrderSlippageRisk);
+        }
+
+        if (feeCoverageOk == false)
+        {
+            warnings.Add(EvaluateOrderWarningCodes.EstimatedFeeNotCovered);
+        }
+
+        return warnings;
     }
 
     private static string FormatDecimal(decimal value)
@@ -435,6 +485,25 @@ public sealed class EvaluateOrderTool
             },
             Retryable = true,
         };
+    }
+
+    private static void ValidateOptions(EvaluateOrderOptions options)
+    {
+        ValidateFeeRate(options.MarketFeeRate, nameof(EvaluateOrderOptions.MarketFeeRate));
+        ValidateFeeRate(options.LimitFeeRate, nameof(EvaluateOrderOptions.LimitFeeRate));
+    }
+
+    private static void ValidateFeeRate(decimal? rate, string name)
+    {
+        if (!rate.HasValue)
+        {
+            return;
+        }
+
+        if (rate.Value < 0m || rate.Value > 1m)
+        {
+            throw new ArgumentOutOfRangeException(name, "Fee rate must be between 0 and 1.");
+        }
     }
 
     private sealed record NormalizedEvaluateOrderRequest(

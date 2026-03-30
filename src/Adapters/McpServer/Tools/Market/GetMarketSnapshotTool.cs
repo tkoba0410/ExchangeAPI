@@ -66,8 +66,11 @@ public sealed class GetMarketSnapshotTool
                 SizeStep = rule.SizeStep,
                 PriceStep = rule.PriceStep,
                 MinSizeSourceKind = rule.MinSizeSourceKind,
+                MinSizeSourceRef = rule.MinSizeSourceRef,
                 SizeStepSourceKind = rule.SizeStepSourceKind,
+                SizeStepSourceRef = rule.SizeStepSourceRef,
                 PriceStepSourceKind = rule.PriceStepSourceKind,
+                PriceStepSourceRef = rule.PriceStepSourceRef,
             },
             Status = BitflyerMarketStatusMapper.Map(boardStateCall.Response.State, boardStateCall.Response.Health),
         };

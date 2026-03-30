@@ -16,9 +16,18 @@ public sealed class MarketSnapshotRules
     [JsonPropertyName("minSizeSourceKind")]
     public required string MinSizeSourceKind { get; init; }
 
+    [JsonPropertyName("minSizeSourceRef")]
+    public required string MinSizeSourceRef { get; init; }
+
     [JsonPropertyName("sizeStepSourceKind")]
     public required string SizeStepSourceKind { get; init; }
 
+    [JsonPropertyName("sizeStepSourceRef")]
+    public required string SizeStepSourceRef { get; init; }
+
     [JsonPropertyName("priceStepSourceKind")]
     public required string PriceStepSourceKind { get; init; }
+
+    [JsonPropertyName("priceStepSourceRef")]
+    public required string PriceStepSourceRef { get; init; }
 }

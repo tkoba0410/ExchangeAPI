@@ -7,8 +7,11 @@
       "sizeStep": "0.00000001",
       "priceStep": "1",
       "minSizeSourceKind": "official_documented",
+      "minSizeSourceRef": "https://bitflyer.com/ja-jp/s/commission",
       "sizeStepSourceKind": "official_documented",
+      "sizeStepSourceRef": "https://bitflyer.com/ja-jp/s/commission",
       "priceStepSourceKind": "adapter_inferred",
+      "priceStepSourceRef": "adapter://bitflyer-jpy-price-step.v1",
       "sourceNote": "minSize and sizeStep are documented; priceStep is adapter-owned inference"
     },
     {
@@ -17,8 +20,11 @@
       "sizeStep": "0.00000001",
       "priceStep": "1",
       "minSizeSourceKind": "official_documented",
+      "minSizeSourceRef": "https://bitflyer.com/pub/20241015-bitFlyerCryptoCFD-Minimum-Order-Change-en.pdf",
       "sizeStepSourceKind": "official_documented",
+      "sizeStepSourceRef": "https://bitflyer.com/ja-jp/s/commission",
       "priceStepSourceKind": "adapter_inferred",
+      "priceStepSourceRef": "adapter://bitflyer-jpy-price-step.v1",
       "sourceNote": "minSize reflects the post-2024-10-21 CFD change; priceStep is adapter-owned inference"
     }
   ]

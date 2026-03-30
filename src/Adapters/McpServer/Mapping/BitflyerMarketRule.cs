@@ -6,6 +6,9 @@ public sealed record BitflyerMarketRule(
     string SizeStep,
     string PriceStep,
     string MinSizeSourceKind,
+    string MinSizeSourceRef,
     string SizeStepSourceKind,
+    string SizeStepSourceRef,
     string PriceStepSourceKind,
+    string PriceStepSourceRef,
     string SourceNote);

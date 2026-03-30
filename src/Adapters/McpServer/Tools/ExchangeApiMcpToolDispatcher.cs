@@ -96,13 +96,13 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
             {
                 var request = Deserialize<GetMarketSnapshotRequest>(arguments);
                 var result = await _marketTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result);
+                return ToToolCallResult(result, "get_market_snapshot");
             }
             case "list_markets":
             {
                 var request = Deserialize<ListMarketsRequest>(arguments);
                 var result = await _listMarketsTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result);
+                return ToToolCallResult(result, "list_markets");
             }
             case "get_klines":
             {
@@ -113,29 +113,33 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
 
                 var request = Deserialize<GetKlinesRequest>(arguments);
                 var result = await _klinesTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result);
+                return ToToolCallResult(result, "get_klines");
             }
             case "get_account_snapshot":
             {
                 if (_accountTool is null)
                 {
-                    return McpToolCallResult.ToolError(BuildMissingPrivateToolError());
+                    return McpToolCallResult.ToolError(
+                        BuildMissingPrivateToolError(),
+                        BuildMeta("get_account_snapshot", content: null));
                 }
 
                 var request = Deserialize<GetAccountSnapshotRequest>(arguments);
                 var result = await _accountTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result);
+                return ToToolCallResult(result, "get_account_snapshot");
             }
             case "evaluate_order":
             {
                 if (_evaluateOrderTool is null)
                 {
-                    return McpToolCallResult.ToolError(BuildMissingPrivateToolError());
+                    return McpToolCallResult.ToolError(
+                        BuildMissingPrivateToolError(),
+                        BuildMeta("evaluate_order", content: null));
                 }
 
                 var request = Deserialize<EvaluateOrderRequest>(arguments);
                 var result = await _evaluateOrderTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result);
+                return ToToolCallResult(result, "evaluate_order");
             }
             default:
                 throw new InvalidOperationException($"Unknown tool: {name}");
@@ -158,12 +162,31 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
             ?? throw new JsonException($"Failed to deserialize tool arguments as {typeof(TRequest).Name}.");
     }
 
-    private static McpToolCallResult ToToolCallResult<TResponse>(McpToolExecutionResult<TResponse> result)
+    private static McpToolCallResult ToToolCallResult<TResponse>(McpToolExecutionResult<TResponse> result, string toolName)
         where TResponse : class
     {
         return result.IsSuccess
-            ? McpToolCallResult.Success(result.Response!)
-            : McpToolCallResult.ToolError(result.Error!);
+            ? McpToolCallResult.Success(result.Response!, BuildMeta(toolName, result.Response))
+            : McpToolCallResult.ToolError(result.Error!, BuildMeta(toolName, content: null));
+    }
+
+    private static McpToolCallMeta BuildMeta(string toolName, object? content)
+    {
+        return new McpToolCallMeta
+        {
+            SchemaVersion = $"exchangeapi.mcp.{toolName}.v1",
+            DataVersion = toolName switch
+            {
+                "get_market_snapshot" => "bitflyer-market-rules.v1",
+                "list_markets" => "exchangeapi-visible-markets.v1",
+                "get_klines" => "binance-kline-support-set.v1",
+                "get_account_snapshot" => "bitflyer-private-read.v1",
+                "evaluate_order" => "bitflyer-evaluate-order.v1",
+                _ => "exchangeapi.mcp.unknown.v1",
+            },
+            Degraded = content is GetAccountSnapshotResponse accountSnapshot
+                && string.Equals(accountSnapshot.AccountReadiness, "unknown", StringComparison.Ordinal),
+        };
     }
 
     private McpToolError BuildMissingPrivateToolError()

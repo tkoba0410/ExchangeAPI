@@ -50,16 +50,19 @@ public static class ToolCatalog
                   "type": "string",
                   "enum": ["official_documented", "official_api_contract", "adapter_inferred", "pinned_operational"]
                 },
+                "minSizeSourceRef": { "type": "string" },
                 "sizeStepSourceKind": {
                   "type": "string",
                   "enum": ["official_documented", "official_api_contract", "adapter_inferred", "pinned_operational"]
                 },
+                "sizeStepSourceRef": { "type": "string" },
                 "priceStepSourceKind": {
                   "type": "string",
                   "enum": ["official_documented", "official_api_contract", "adapter_inferred", "pinned_operational"]
-                }
+                },
+                "priceStepSourceRef": { "type": "string" }
               },
-              "required": ["minSize", "sizeStep", "priceStep", "minSizeSourceKind", "sizeStepSourceKind", "priceStepSourceKind"],
+              "required": ["minSize", "sizeStep", "priceStep", "minSizeSourceKind", "minSizeSourceRef", "sizeStepSourceKind", "sizeStepSourceRef", "priceStepSourceKind", "priceStepSourceRef"],
               "additionalProperties": false
             },
             "status": { "type": "string" }
@@ -165,9 +168,10 @@ public static class ToolCatalog
                 "sizeRuleOk": { "type": "boolean" },
                 "priceRuleOk": { "type": "boolean" },
                 "balanceOk": { "type": "boolean" },
+                "feeCoverageOk": { "type": ["boolean", "null"] },
                 "projectedExposureOk": { "type": "boolean" }
               },
-              "required": ["symbolOk", "marketStatusOk", "sizeRuleOk", "priceRuleOk", "balanceOk", "projectedExposureOk"],
+              "required": ["symbolOk", "marketStatusOk", "sizeRuleOk", "priceRuleOk", "balanceOk", "feeCoverageOk", "projectedExposureOk"],
               "additionalProperties": false
             },
             "normalizedRequest": {
@@ -186,16 +190,21 @@ public static class ToolCatalog
               "type": "object",
               "properties": {
                 "referencePrice": { "type": "string" },
-                "estimatedNotional": { "type": "string" }
+                "estimatedNotional": { "type": "string" },
+                "estimatedFee": { "type": ["string", "null"] },
+                "estimatedFeeSourceKind": {
+                  "type": ["string", "null"],
+                  "enum": ["pinned_operational", null]
+                }
               },
-              "required": ["referencePrice", "estimatedNotional"],
+              "required": ["referencePrice", "estimatedNotional", "estimatedFee", "estimatedFeeSourceKind"],
               "additionalProperties": false
             },
             "warnings": {
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["market_order_slippage_risk"]
+                "enum": ["estimated_fee_not_covered", "market_order_slippage_risk"]
               }
             },
             "reasons": {

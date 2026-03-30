@@ -83,7 +83,15 @@
 ### GetKlines
 
 - vocabulary
-  - `BinanceSymbols.BtcJpy = "BTCJPY"` を唯一の初期定数として用意してよい
+  - convenience 用の known symbol 定数として以下を用意してよい
+    - `BinanceSymbols.BtcJpy = "BTCJPY"`
+    - `BinanceSymbols.EthJpy = "ETHJPY"`
+    - `BinanceSymbols.XrpJpy = "XRPJPY"`
+    - `BinanceSymbols.BnbJpy = "BNBJPY"`
+    - `BinanceSymbols.BtcUsdt = "BTCUSDT"`
+    - `BinanceSymbols.EthUsdt = "ETHUSDT"`
+    - `BinanceSymbols.SolUsdt = "SOLUSDT"`
+    - `BinanceSymbols.XrpUsdt = "XRPUSDT"`
   - `BinanceIntervals.Hour1h = BinanceInterval.Hour1h` のような known interval 定数を用意してよい
   - `Symbol` の known values 定数は convenience 用であり、closed set の正本として扱わない
   - request DTO の `Symbol` 自体は `string` のまま持つ

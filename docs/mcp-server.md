@@ -238,7 +238,8 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 - Stage11 の初期実装は Bot 向け read / evaluate tool から始める
 - 初期 tool inventory は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order` の 3 つに固定する
 - 初期 venue scope は bitFlyer を正本とする
-- Binance など他 venue の展開は、market rule / account / evaluation の導出元が固定できてから行う
+- Binance など他 venue の account / evaluation 展開は、market rule / account / evaluation の導出元が固定できてから行う
+- ただし Binance public market data は例外とし、Kline 専用 tool を public read 拡張として先行追加してよい
 - 拡張候補は `list_markets` のみとし、他は明確な新責務が生じるまで追加しない
 
 ### 9.1 bitFlyer v1 support matrix
@@ -253,6 +254,30 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 - spot 保有は `positions` ではなく `balance` に表現する
 - `evaluate_order` は margin product を初期 scope に含めない
 
+### 9.2 Binance public kline extension support matrix
+
+- `get_klines`: public read only
+- account snapshot は提供しない
+- order evaluation は提供しない
+- private credentials は不要
+
+初期 support set:
+
+- `BTCJPY`
+- `ETHJPY`
+- `XRPJPY`
+- `BNBJPY`
+- `BTCUSDT`
+- `ETHUSDT`
+- `SOLUSDT`
+- `XRPUSDT`
+
+補足:
+
+- Binance extension は Bot 向け account / evaluation tool ではなく、市場時系列の public read tool として扱う
+- 初期 phase では Binance `GetKlines` のみを MCP へ露出する
+- Binance private tool は初期 scope に含めない
+
 ## 10. 公開 tool 一覧
 
 1. `get_market_snapshot`
@@ -261,9 +286,11 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 
 補足:
 
-- 上記 3 つが current phase の tool universe である
+- 上記 3 つが現行実装の current phase tool universe である
+- 次 phase の public 拡張候補として `get_klines` を追加してよい
 - MCP `tools/list` は current process が実際に実行可能な visible tool set を返す
 - `get_account_snapshot` と `evaluate_order` は private credentials を解決できない場合、`tools/list` から advertise しない
+- `get_klines` は Binance public client が配線されている場合のみ advertise してよい
 
 追加しない例:
 
@@ -354,6 +381,22 @@ bitFlyer v1 では次の source を正本とする。
 - runtime で受け取った注文エラーを使って registry を自動更新してはならない
 - 単一観測だけで `priceStep` を変更してはならない
 - 公式 source 未確認のまま `minSize` / `sizeStep` を変更してはならない
+
+### 11.1.5 Binance public kline support set
+
+- `get_klines` の symbol support は adapter-owned の `BinanceKlineSymbolSet` を正本とする
+- `BinanceKlineSymbolSet` は初期 phase では以下の 8 symbol に固定する
+  - `BTCJPY`
+  - `ETHJPY`
+  - `XRPJPY`
+  - `BNBJPY`
+  - `BTCUSDT`
+  - `ETHUSDT`
+  - `SOLUSDT`
+  - `XRPUSDT`
+- `BinanceSymbols` の known values 定数は convenience 用であり、MCP support set の正本ではない
+- `get_klines.interval` は [`docs/endpoints-binance.md`](./endpoints-binance.md) の `GetKlines` fixed contract を正本とする
+- `get_klines` は Binance の `timeZone` parameter を v1 では公開せず、UTC 固定で扱う
 
 ### 11.2 `get_market_snapshot`
 
@@ -561,7 +604,7 @@ bitFlyer v1 の補足:
 - `side`: 必須。`buy` / `sell`
 - `orderType`: 必須。`market` / `limit`
 - `size`: 必須。正の decimal string
-- `price`: `limit` の場合必須、`market` の場合 `null`
+- `price`: `limit` の場合必須、`market` の場合は省略または `null`
 
 bitFlyer v1 追加制約:
 
@@ -656,7 +699,102 @@ bitFlyer v1 の補足:
 
 - v1 は fee を blocking check に含めない
 - v1 は `FX_BTC_JPY` を評価対象に含めない
+- v1 の `positionLimitOk` は active child order ベースの projected exposure 判定であり、既存 spot 保有残高そのものは含めない
 - v1 は exchange-side の hidden limit、rate limit、post-only 相当条件、将来追加される venue-specific reject rule を完全再現しない
+
+### 11.5 `get_klines`
+
+目的:
+
+- 売買判断または market observation に必要な OHLCV 時系列を public read で取得する
+
+入力:
+
+```json
+{
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "startTime": null,
+  "endTime": null,
+  "limit": 200
+}
+```
+
+入力制約:
+
+- `symbol`: 必須
+- `interval`: 必須。Binance の kline interval literal
+- `startTime`: 任意。UTC ISO 8601 string または `null`
+- `endTime`: 任意。UTC ISO 8601 string または `null`
+- `limit`: 任意。`1..1000`
+
+Binance public kline v1 追加制約:
+
+- `symbol` は `BinanceKlineSymbolSet` のみ
+- `interval` は [`docs/endpoints-binance.md`](./endpoints-binance.md) の `GetKlines` fixed contract に従う
+- `timeZone` は公開しない
+- `startTime` と `endTime` が両方ある場合は `startTime <= endTime`
+
+出力:
+
+```json
+{
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "candles": [
+    {
+      "openTime": "2026-03-30T00:00:00Z",
+      "closeTime": "2026-03-30T00:59:59.999Z",
+      "open": "10700000",
+      "high": "10750000",
+      "low": "10680000",
+      "close": "10720000",
+      "volume": "123.45",
+      "quoteVolume": "1323000000",
+      "tradeCount": 12345,
+      "takerBuyBaseVolume": "61.72",
+      "takerBuyQuoteVolume": "662100000"
+    }
+  ]
+}
+```
+
+出力項目:
+
+- `symbol`: 正規化済み symbol
+- `interval`: 正規化済み interval literal
+- `candles[].openTime`: UTC open time
+- `candles[].closeTime`: UTC close time
+- `candles[].open`: 始値
+- `candles[].high`: 高値
+- `candles[].low`: 安値
+- `candles[].close`: 終値
+- `candles[].volume`: base volume
+- `candles[].quoteVolume`: quote volume
+- `candles[].tradeCount`: trade count
+- `candles[].takerBuyBaseVolume`: taker buy base volume
+- `candles[].takerBuyQuoteVolume`: taker buy quote volume
+
+実装ルール:
+
+- `candles` は open time 昇順で返す
+- `startTime` / `endTime` は tool input では UTC ISO 8601 string、upstream には epoch milliseconds として変換する
+- `startTime` と `endTime` を省略した場合は upstream の most recent klines を返す
+- v1 では `timeZone` は UTC 固定とし、Binance の `timeZone` parameter は使わない
+- raw tuple array は MCP response に露出せず、named field object に正規化する
+
+Binance public kline v1 導出:
+
+- `candles` は `GetKlines` を正本とする
+- `openTime` と `closeTime` は Binance の millisecond timestamp を UTC ISO 8601 string に正規化する
+- `interval` は Binance の case-sensitive literal をそのまま返す
+
+初期実装で除外する項目:
+
+- `uiKlines`
+- venue-side timezone variant
+- symbol discovery
+- technical indicator 計算
 
 ## 12. エラー仕様
 
@@ -674,6 +812,9 @@ tool-level error は以下のカテゴリに分類する。
 - `invalid_order_type`
 - `invalid_size`
 - `invalid_price`
+- `invalid_interval`
+- `invalid_limit`
+- `invalid_time_range`
 - `market_unavailable`
 - `account_unavailable`
 - `internal_error`
@@ -709,8 +850,12 @@ MCP v1 error boundary:
   - malformed decimal string
   - `market` なのに `price != null`
   - `limit` なのに `price == null`
+  - unsupported kline interval
+  - kline `limit` out of range
+  - kline `startTime > endTime`
 - `upstream_error`
   - `GetTicker` / `GetBoardState` / `GetBalance` / `GetCollateral` / `GetChildOrders` / `GetPositions` の transport, http, codec failure
+  - `GetKlines` の transport, http, codec failure
   - `GetPermissions` failure は `get_account_snapshot` では degraded success とし、`accountReadiness = unknown` に写像する
 - `domain_error`
   - tool 契約上は support 済みの symbol に対して、required mapping/config が壊れている
@@ -747,6 +892,14 @@ MCP v1 error boundary:
 - 副作用を持たない
 - bitFlyer venue で live / fixture の両方から検証可能である
 
+### 14.2 Binance public kline extension completion
+
+- `get_klines` が public read tool として実装されている
+- `BinanceKlineSymbolSet` の support 済み symbol に対して fixture / live の両方で検証可能である
+- `timeZone` を公開せず UTC 固定でも、`GetKlines` fixed contract と矛盾しない
+- private credentials を要求しない
+- raw tuple array を MCP の named field object へ安定変換できる
+
 ### 14.1 最低検証項目
 
 MCP v1 の検証は、fixture test と live test の両方で以下を満たす。
@@ -776,6 +929,7 @@ live test:
 - live test の opt-in と local marker の扱いは [`docs/spec.md`](./spec.md) の live test 契約を正本とする
 - `get_market_snapshot` は public read live test として検証可能である
 - `get_account_snapshot` と `evaluate_order` は private read live test として検証可能である
+- `get_klines` は Binance public read live test として検証可能である
 - private live test は read-only に限定し、write side effect を持たない
 - live test は `BitflyerMarketRuleRegistry` baseline が drift していないことを検出できる構成にする
 - adapter live test は `tests/Adapters/McpServer.LiveTests` に置き、transport は in-memory stdio で検証する
@@ -791,3 +945,4 @@ live test:
 - observability / tracing rule
 - permission model の具体値
 - `list_markets` を追加するかどうか
+- Binance public kline tool を generic `get_klines` のまま維持するか、将来 multi-venue 時に `venue` を input に持たせるか

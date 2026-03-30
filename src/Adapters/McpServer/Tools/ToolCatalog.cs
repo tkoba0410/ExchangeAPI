@@ -1,6 +1,7 @@
 using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
+using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 
 namespace ExchangeApi.Adapters.McpServer.Tools;
@@ -24,6 +25,36 @@ public static class ToolCatalog
     private const string AccountSnapshotInputSchema = """
         {
           "type": "object",
+          "additionalProperties": false
+        }
+        """;
+
+    private const string KlinesInputSchema = """
+        {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "Supported Binance symbol."
+            },
+            "interval": {
+              "type": "string",
+              "description": "Binance kline interval literal."
+            },
+            "startTime": {
+              "type": ["string", "null"],
+              "description": "UTC ISO 8601 string."
+            },
+            "endTime": {
+              "type": ["string", "null"],
+              "description": "UTC ISO 8601 string."
+            },
+            "limit": {
+              "type": ["integer", "null"],
+              "description": "1..1000"
+            }
+          },
+          "required": ["symbol", "interval"],
           "additionalProperties": false
         }
         """;
@@ -184,37 +215,85 @@ public static class ToolCatalog
         }
         """;
 
-    public static IReadOnlyList<McpToolDefinition> All { get; } =
-        new McpToolDefinition[]
+    private const string KlinesOutputSchema = """
         {
-            new(
-                Name: "get_market_snapshot",
-                Description: "Return market price, market status, and fixed trading rules for a supported symbol.",
-                RequestType: typeof(GetMarketSnapshotRequest),
-                ResponseType: typeof(GetMarketSnapshotResponse),
-                InputSchemaJson: MarketSnapshotInputSchema,
-                OutputSchemaJson: MarketSnapshotOutputSchema,
-                ReadOnlyHint: true,
-                RequiresCredentials: false),
-            new(
-                Name: "get_account_snapshot",
-                Description: "Return the bot-oriented account snapshot for balances, positions, open order count, and read readiness.",
-                RequestType: typeof(GetAccountSnapshotRequest),
-                ResponseType: typeof(GetAccountSnapshotResponse),
-                InputSchemaJson: AccountSnapshotInputSchema,
-                OutputSchemaJson: AccountSnapshotOutputSchema,
-                ReadOnlyHint: true,
-                RequiresCredentials: true),
-            new(
-                Name: "evaluate_order",
-                Description: "Evaluate whether a supported order request can be placed mechanically under current rules and balances.",
-                RequestType: typeof(EvaluateOrderRequest),
-                ResponseType: typeof(EvaluateOrderResponse),
-                InputSchemaJson: EvaluateOrderInputSchema,
-                OutputSchemaJson: EvaluateOrderOutputSchema,
-                ReadOnlyHint: true,
-                RequiresCredentials: true),
-        };
+          "type": "object",
+          "properties": {
+            "symbol": { "type": "string" },
+            "interval": { "type": "string" },
+            "candles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "openTime": { "type": "string" },
+                  "closeTime": { "type": "string" },
+                  "open": { "type": "string" },
+                  "high": { "type": "string" },
+                  "low": { "type": "string" },
+                  "close": { "type": "string" },
+                  "volume": { "type": "string" },
+                  "quoteVolume": { "type": "string" },
+                  "tradeCount": { "type": "integer" },
+                  "takerBuyBaseVolume": { "type": "string" },
+                  "takerBuyQuoteVolume": { "type": "string" }
+                },
+                "required": ["openTime", "closeTime", "open", "high", "low", "close", "volume", "quoteVolume", "tradeCount", "takerBuyBaseVolume", "takerBuyQuoteVolume"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["symbol", "interval", "candles"],
+          "additionalProperties": false
+        }
+        """;
+
+    public static McpToolDefinition GetMarketSnapshot { get; } =
+        new(
+            Name: "get_market_snapshot",
+            Description: "Return market price, market status, and fixed trading rules for a supported symbol.",
+            RequestType: typeof(GetMarketSnapshotRequest),
+            ResponseType: typeof(GetMarketSnapshotResponse),
+            InputSchemaJson: MarketSnapshotInputSchema,
+            OutputSchemaJson: MarketSnapshotOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: false);
+
+    public static McpToolDefinition GetKlines { get; } =
+        new(
+            Name: "get_klines",
+            Description: "Return Binance public OHLCV kline candles for a supported symbol and interval.",
+            RequestType: typeof(GetKlinesRequest),
+            ResponseType: typeof(GetKlinesResponse),
+            InputSchemaJson: KlinesInputSchema,
+            OutputSchemaJson: KlinesOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: false);
+
+    public static McpToolDefinition GetAccountSnapshot { get; } =
+        new(
+            Name: "get_account_snapshot",
+            Description: "Return the bot-oriented account snapshot for balances, positions, open order count, and read readiness.",
+            RequestType: typeof(GetAccountSnapshotRequest),
+            ResponseType: typeof(GetAccountSnapshotResponse),
+            InputSchemaJson: AccountSnapshotInputSchema,
+            OutputSchemaJson: AccountSnapshotOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: true);
+
+    public static McpToolDefinition EvaluateOrder { get; } =
+        new(
+            Name: "evaluate_order",
+            Description: "Evaluate whether a supported order request can be placed mechanically under current rules and balances.",
+            RequestType: typeof(EvaluateOrderRequest),
+            ResponseType: typeof(EvaluateOrderResponse),
+            InputSchemaJson: EvaluateOrderInputSchema,
+            OutputSchemaJson: EvaluateOrderOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: true);
+
+    public static IReadOnlyList<McpToolDefinition> All { get; } =
+        [GetMarketSnapshot, GetKlines, GetAccountSnapshot, EvaluateOrder];
 
     public static IReadOnlyList<McpToolDefinition> PublicOnly { get; } =
         All.Where(tool => !tool.RequiresCredentials).ToArray();

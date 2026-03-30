@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj" />
+    <ProjectReference Include="../../Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj" />
   </ItemGroup>
 
 </Project>

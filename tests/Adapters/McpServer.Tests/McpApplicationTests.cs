@@ -45,8 +45,8 @@ public sealed class McpApplicationTests
 
         using var toolsList = JsonDocument.Parse(lines[1]);
         var tools = toolsList.RootElement.GetProperty("result").GetProperty("tools");
-        Assert.Equal(3, tools.GetArrayLength());
-        Assert.Equal("get_market_snapshot", tools[0].GetProperty("name").GetString());
+        Assert.Equal(4, tools.GetArrayLength());
+        Assert.Equal(["get_market_snapshot", "get_klines", "get_account_snapshot", "evaluate_order"], tools.EnumerateArray().Select(item => item.GetProperty("name").GetString()!).ToArray());
         Assert.Equal("object", tools[0].GetProperty("inputSchema").GetProperty("type").GetString());
         Assert.Equal("object", tools[0].GetProperty("outputSchema").GetProperty("type").GetString());
         Assert.True(tools[0].GetProperty("annotations").GetProperty("readOnlyHint").GetBoolean());
@@ -70,8 +70,7 @@ public sealed class McpApplicationTests
 
         using var toolsList = JsonDocument.Parse(lines[1]);
         var tools = toolsList.RootElement.GetProperty("result").GetProperty("tools");
-        var only = Assert.Single(tools.EnumerateArray());
-        Assert.Equal("get_market_snapshot", only.GetProperty("name").GetString());
+        Assert.Equal(["get_market_snapshot", "get_klines"], tools.EnumerateArray().Select(item => item.GetProperty("name").GetString()!).ToArray());
     }
 
     [Fact]
@@ -146,6 +145,7 @@ public sealed class McpApplicationTests
         Assert.Equal(McpExitCode.Success, exitCode);
         Assert.Equal(string.Empty, console.StdOut);
         Assert.Contains("get_market_snapshot", console.StdErr);
+        Assert.Contains("get_klines", console.StdErr);
         Assert.Contains("get_account_snapshot", console.StdErr);
         Assert.Contains("evaluate_order", console.StdErr);
     }
@@ -190,6 +190,7 @@ public sealed class McpApplicationTests
                 name switch
                 {
                     "get_market_snapshot" => McpToolCallResult.Success(new { message = "ok" }),
+                    "get_klines" => McpToolCallResult.Success(new { candles = 1 }),
                     "get_account_snapshot" => McpToolCallResult.Success(new { count = 1 }),
                     "evaluate_order" => McpToolCallResult.ToolError(
                         new McpToolError

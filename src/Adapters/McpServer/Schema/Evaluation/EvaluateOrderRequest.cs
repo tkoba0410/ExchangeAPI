@@ -17,5 +17,5 @@ public sealed class EvaluateOrderRequest
     public required string Size { get; init; }
 
     [JsonPropertyName("price")]
-    public required string? Price { get; init; }
+    public string? Price { get; init; }
 }

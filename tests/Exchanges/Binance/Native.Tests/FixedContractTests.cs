@@ -56,6 +56,19 @@ public sealed class FixedContractTests
         Assert.Equal(BinanceIntervals.Month1M, deserialized!.Interval);
     }
 
+    [Fact]
+    public void BinanceSymbols_ExposeDocumentedConvenienceValues()
+    {
+        Assert.Equal("BTCJPY", BinanceSymbols.BtcJpy);
+        Assert.Equal("ETHJPY", BinanceSymbols.EthJpy);
+        Assert.Equal("XRPJPY", BinanceSymbols.XrpJpy);
+        Assert.Equal("BNBJPY", BinanceSymbols.BnbJpy);
+        Assert.Equal("BTCUSDT", BinanceSymbols.BtcUsdt);
+        Assert.Equal("ETHUSDT", BinanceSymbols.EthUsdt);
+        Assert.Equal("SOLUSDT", BinanceSymbols.SolUsdt);
+        Assert.Equal("XRPUSDT", BinanceSymbols.XrpUsdt);
+    }
+
     private static void AssertProperty(Type type, string propertyName, Type propertyType)
     {
         var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);

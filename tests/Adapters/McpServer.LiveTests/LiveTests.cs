@@ -1,9 +1,11 @@
 using System.Globalization;
 using System.Text.Json;
+using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using ExchangeApi.Adapters.McpServer.Infrastructure;
 using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
+using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 using ExchangeApi.Adapters.McpServer.Tools;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
@@ -19,7 +21,8 @@ public sealed class LiveTests
     {
         var result = await RunAsync(
             _ => new ExchangeApiMcpToolDispatcher(
-                BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions())),
+                BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions()),
+                BinanceClientFactory.CreateNativeClient()),
             BuildInitializeRequest(1),
             BuildToolsListRequest(2),
             BuildToolCallRequest(3, "get_market_snapshot", new { symbol = "BTC_JPY" }));
@@ -28,8 +31,8 @@ public sealed class LiveTests
         Assert.Equal(3, result.OutputLines.Count);
 
         var toolNames = ReadToolNames(result.OutputLines[1]);
-        var only = Assert.Single(toolNames);
-        Assert.Equal("get_market_snapshot", only);
+        Assert.Contains("get_market_snapshot", toolNames);
+        Assert.Contains("get_klines", toolNames);
 
         var snapshot = ReadStructuredContent<GetMarketSnapshotResponse>(result.OutputLines[2], out var isError);
         Assert.False(isError);
@@ -45,6 +48,50 @@ public sealed class LiveTests
         Assert.Equal(rule!.MinSize, snapshot.Rules.MinSize);
         Assert.Equal(rule.SizeStep, snapshot.Rules.SizeStep);
         Assert.Equal(rule.PriceStep, snapshot.Rules.PriceStep);
+    }
+
+    [McpServerPublicReadLiveFact]
+    public async Task GetKlines_ReturnsLiveBinanceCandles()
+    {
+        var result = await RunAsync(
+            _ => new ExchangeApiMcpToolDispatcher(
+                BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions()),
+                BinanceClientFactory.CreateNativeClient()),
+            BuildInitializeRequest(1),
+            BuildToolsListRequest(2),
+            BuildToolCallRequest(
+                3,
+                "get_klines",
+                new
+                {
+                    symbol = "BTCUSDT",
+                    interval = "1h",
+                    limit = 2,
+                }));
+
+        Assert.Equal(3, result.OutputLines.Count);
+        var toolNames = ReadToolNames(result.OutputLines[1]);
+        Assert.Contains("get_klines", toolNames);
+
+        var response = ReadStructuredContent<GetKlinesResponse>(result.OutputLines[2], out var isError);
+        Assert.False(isError);
+        Assert.Equal("BTCUSDT", response.Symbol);
+        Assert.Equal("1h", response.Interval);
+        Assert.True(response.Candles.Count > 0);
+        Assert.All(
+            response.Candles,
+            candle =>
+            {
+                Assert.True(DateTimeOffset.TryParse(candle.OpenTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out _));
+                Assert.True(DateTimeOffset.TryParse(candle.CloseTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out _));
+                Assert.True(decimal.Parse(candle.Open, CultureInfo.InvariantCulture) > 0m);
+                Assert.True(decimal.Parse(candle.High, CultureInfo.InvariantCulture) > 0m);
+                Assert.True(decimal.Parse(candle.Low, CultureInfo.InvariantCulture) > 0m);
+                Assert.True(decimal.Parse(candle.Close, CultureInfo.InvariantCulture) > 0m);
+                Assert.True(decimal.Parse(candle.Volume, CultureInfo.InvariantCulture) >= 0m);
+                Assert.True(decimal.Parse(candle.QuoteVolume, CultureInfo.InvariantCulture) >= 0m);
+                Assert.True(candle.TradeCount >= 0);
+            });
     }
 
     [McpServerPrivateReadLiveFact]

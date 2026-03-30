@@ -1,6 +1,7 @@
 using System.Text.Json;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
+using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 
 namespace ExchangeApi.Adapters.McpServer.Tests;
@@ -101,5 +102,51 @@ public sealed class SchemaContractTests
         var json = JsonSerializer.Serialize(value);
 
         Assert.Equal("""{"canPlace":true,"checks":{"symbolOk":true,"marketStatusOk":true,"sizeRuleOk":true,"priceRuleOk":true,"balanceOk":true,"positionLimitOk":true},"normalizedRequest":{"symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.300","price":null},"estimate":{"referencePrice":"12345678","estimatedNotional":"3703703.4"},"warnings":["market_order_slippage_risk"],"reasons":[]}""", json);
+    }
+
+    [Fact]
+    public void EvaluateOrderRequest_AllowsMissingPriceForMarketOrders()
+    {
+        var json = """{"symbol":"BTC_JPY","side":"buy","orderType":"market","size":"0.001"}""";
+
+        var value = JsonSerializer.Deserialize<EvaluateOrderRequest>(json);
+
+        Assert.NotNull(value);
+        Assert.Equal("BTC_JPY", value.Symbol);
+        Assert.Equal("buy", value.Side);
+        Assert.Equal("market", value.OrderType);
+        Assert.Equal("0.001", value.Size);
+        Assert.Null(value.Price);
+    }
+
+    [Fact]
+    public void GetKlinesResponse_SerializesUsingDocumentedFieldNames()
+    {
+        var value = new GetKlinesResponse
+        {
+            Symbol = "BTCUSDT",
+            Interval = "1h",
+            Candles =
+            [
+                new KlineCandle
+                {
+                    OpenTime = "2026-03-30T00:00:00Z",
+                    CloseTime = "2026-03-30T00:59:59.999Z",
+                    Open = "10700000",
+                    High = "10750000",
+                    Low = "10680000",
+                    Close = "10720000",
+                    Volume = "123.45",
+                    QuoteVolume = "1323000000",
+                    TradeCount = 12345,
+                    TakerBuyBaseVolume = "61.72",
+                    TakerBuyQuoteVolume = "662100000",
+                },
+            ],
+        };
+
+        var json = JsonSerializer.Serialize(value);
+
+        Assert.Equal("""{"symbol":"BTCUSDT","interval":"1h","candles":[{"openTime":"2026-03-30T00:00:00Z","closeTime":"2026-03-30T00:59:59.999Z","open":"10700000","high":"10750000","low":"10680000","close":"10720000","volume":"123.45","quoteVolume":"1323000000","tradeCount":12345,"takerBuyBaseVolume":"61.72","takerBuyQuoteVolume":"662100000"}]}""", json);
     }
 }

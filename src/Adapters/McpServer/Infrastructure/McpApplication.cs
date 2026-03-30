@@ -184,7 +184,7 @@ public sealed class McpApplication
                                     version = GetServerVersion(),
                                 },
                                 instructions =
-                                    "ExchangeAPI bitFlyer v1 MCP server. This server is read/evaluate-only and exposes get_market_snapshot, get_account_snapshot, and evaluate_order.",
+                                    "ExchangeAPI MCP server. This server is read/evaluate-only and exposes bitFlyer market/account/evaluation tools plus Binance public get_klines.",
                             });
                         return;
 
@@ -326,7 +326,7 @@ public sealed class McpApplication
     private void WriteHelp()
     {
         _console.WriteErrorLine("exchangeapi-mcp");
-        _console.WriteErrorLine("ExchangeAPI MCP server for bitFlyer v1.");
+        _console.WriteErrorLine("ExchangeAPI MCP server for bitFlyer v1 and Binance public klines.");
         _console.WriteErrorLine("Current tools:");
 
         foreach (var tool in _toolOverrides ?? _dispatcher?.Tools ?? ToolCatalog.All)

@@ -4,10 +4,13 @@ using ExchangeApi.Adapters.McpServer.Infrastructure;
 using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
+using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 using ExchangeApi.Adapters.McpServer.Tools.Account;
 using ExchangeApi.Adapters.McpServer.Tools.Evaluation;
+using ExchangeApi.Adapters.McpServer.Tools.Klines;
 using ExchangeApi.Adapters.McpServer.Tools.Market;
+using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
 
@@ -15,30 +18,40 @@ namespace ExchangeApi.Adapters.McpServer.Tools;
 
 public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposable
 {
-    private readonly BitflyerNativeBundle _bundle;
+    private readonly BitflyerNativeBundle _bitflyerBundle;
+    private readonly BinanceNativeBundle? _binanceBundle;
     private readonly GetMarketSnapshotTool _marketTool;
+    private readonly GetKlinesTool? _klinesTool;
     private readonly GetAccountSnapshotTool? _accountTool;
     private readonly EvaluateOrderTool? _evaluateOrderTool;
     private readonly string? _privateToolUnavailableReason;
+    private readonly IReadOnlyList<McpToolDefinition> _tools;
 
     public ExchangeApiMcpToolDispatcher(
-        BitflyerNativeBundle bundle,
+        BitflyerNativeBundle bitflyerBundle,
+        BinanceNativeBundle? binanceBundle = null,
         string? privateToolUnavailableReason = null)
     {
-        _bundle = bundle;
+        _bitflyerBundle = bitflyerBundle;
+        _binanceBundle = binanceBundle;
         _privateToolUnavailableReason = privateToolUnavailableReason;
-        _marketTool = new GetMarketSnapshotTool(new BitflyerNativeMarketSnapshotGateway(bundle.Public));
+        _marketTool = new GetMarketSnapshotTool(new BitflyerNativeMarketSnapshotGateway(bitflyerBundle.Public));
 
-        if (bundle.Private is not null)
+        if (binanceBundle is not null)
         {
-            _accountTool = new GetAccountSnapshotTool(new BitflyerNativeAccountSnapshotGateway(bundle.Private));
-            _evaluateOrderTool = new EvaluateOrderTool(new BitflyerNativeEvaluateOrderGateway(bundle.Public, bundle.Private));
+            _klinesTool = new GetKlinesTool(new BinanceNativeKlinesGateway(binanceBundle.Public));
         }
+
+        if (bitflyerBundle.Private is not null)
+        {
+            _accountTool = new GetAccountSnapshotTool(new BitflyerNativeAccountSnapshotGateway(bitflyerBundle.Private));
+            _evaluateOrderTool = new EvaluateOrderTool(new BitflyerNativeEvaluateOrderGateway(bitflyerBundle.Public, bitflyerBundle.Private));
+        }
+
+        _tools = BuildVisibleTools();
     }
 
-    public IReadOnlyList<McpToolDefinition> Tools => _accountTool is not null && _evaluateOrderTool is not null
-        ? ToolCatalog.All
-        : ToolCatalog.PublicOnly;
+    public IReadOnlyList<McpToolDefinition> Tools => _tools;
 
     public static ExchangeApiMcpToolDispatcher CreateDefault(IMcpConsole console)
     {
@@ -62,7 +75,8 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
                 $"Configure {BitflyerCredentialResolver.AgeIdentityFileEnvName} and {BitflyerCredentialResolver.CredentialsAgeFileEnvName} to enable private tools.";
         }
 
-        return new ExchangeApiMcpToolDispatcher(bundle, privateToolUnavailableReason);
+        var binanceBundle = BinanceClientFactory.CreateNativeClient();
+        return new ExchangeApiMcpToolDispatcher(bundle, binanceBundle, privateToolUnavailableReason);
     }
 
     public async Task<McpToolCallResult> DispatchAsync(
@@ -76,6 +90,17 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
             {
                 var request = Deserialize<GetMarketSnapshotRequest>(arguments);
                 var result = await _marketTool.ExecuteAsync(request, cancellationToken);
+                return ToToolCallResult(result);
+            }
+            case "get_klines":
+            {
+                if (_klinesTool is null)
+                {
+                    throw new InvalidOperationException("Binance public kline tool is not configured.");
+                }
+
+                var request = Deserialize<GetKlinesRequest>(arguments);
+                var result = await _klinesTool.ExecuteAsync(request, cancellationToken);
                 return ToToolCallResult(result);
             }
             case "get_account_snapshot":
@@ -107,7 +132,8 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
 
     public void Dispose()
     {
-        _bundle.Dispose();
+        _bitflyerBundle.Dispose();
+        _binanceBundle?.Dispose();
     }
 
     private TRequest Deserialize<TRequest>(JsonElement arguments)
@@ -143,5 +169,30 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
             },
             Retryable = false,
         };
+    }
+
+    private IReadOnlyList<McpToolDefinition> BuildVisibleTools()
+    {
+        var tools = new List<McpToolDefinition>
+        {
+            ToolCatalog.GetMarketSnapshot,
+        };
+
+        if (_klinesTool is not null)
+        {
+            tools.Add(ToolCatalog.GetKlines);
+        }
+
+        if (_accountTool is not null)
+        {
+            tools.Add(ToolCatalog.GetAccountSnapshot);
+        }
+
+        if (_evaluateOrderTool is not null)
+        {
+            tools.Add(ToolCatalog.EvaluateOrder);
+        }
+
+        return tools;
     }
 }

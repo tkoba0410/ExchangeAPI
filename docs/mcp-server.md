@@ -649,7 +649,7 @@ bitFlyer v1 導出:
 - `marketStatusOk` は `get_market_snapshot.status == active` のときのみ `true`
 - `sizeRuleOk` は `BitflyerMarketRuleRegistry.minSize` と `sizeStep` に対する適合で判定する
 - `priceRuleOk` は `orderType = limit` のとき `priceStep` 適合と正値条件で判定する
-- `positionLimitOk` は adapter config の optional `MaxBaseSize` で判定し、未設定なら `true` とする
+- `positionLimitOk` は adapter config の optional `MaxBaseSize` で判定し、`BTC_JPY` の同 side `ACTIVE` child order の `outstanding_size` 合計と今回 `size` の projected exposure が上限以下なら `true` とする
 - `warnings` は v1 では `market` 注文時に `market_order_slippage_risk` を返し、それ以外は空配列とする
 
 bitFlyer v1 の補足:

@@ -1,6 +1,7 @@
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Tools.Evaluation;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
@@ -151,6 +152,38 @@ public sealed class EvaluateOrderToolTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_CountsOutstandingSameSideOrdersTowardExposureLimit()
+    {
+        var tool = new EvaluateOrderTool(
+            CreateHappyPathGateway(
+                activeOrders:
+                [
+                    ActiveOrder(OrderSides.Buy, outstandingSize: 0.6m),
+                    ActiveOrder(OrderSides.Sell, outstandingSize: 0.4m),
+                ]),
+            new EvaluateOrderOptions
+            {
+                MaxBaseSize = 0.8m,
+            });
+
+        var result = await tool.ExecuteAsync(
+            new EvaluateOrderRequest
+            {
+                Symbol = "BTC_JPY",
+                Side = "buy",
+                OrderType = "limit",
+                Size = "0.3",
+                Price = "12346000",
+            });
+
+        Assert.True(result.IsSuccess);
+        var response = Assert.IsType<EvaluateOrderResponse>(result.Response);
+        Assert.False(response.CanPlace);
+        Assert.False(response.Checks.PositionLimitOk);
+        Assert.Equal(["exposure_limit_exceeded"], response.Reasons);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsUpstreamErrorWhenBalanceFails()
     {
         var tool = new EvaluateOrderTool(
@@ -187,7 +220,8 @@ public sealed class EvaluateOrderToolTests
         decimal jpyAvailable = 5000000m,
         decimal btcAvailable = 1m,
         GetBoardStateResponse? boardState = null,
-        Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>? balanceCall = null)
+        Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>? balanceCall = null,
+        IReadOnlyList<GetChildOrders.Item>? activeOrders = null)
     {
         return new FakeBitflyerEvaluateOrderGateway
         {
@@ -229,6 +263,40 @@ public sealed class EvaluateOrderToolTests
                     new GetBalance.Item { CurrencyCode = "BTC", Amount = btcAvailable, Available = btcAvailable },
                 ],
                 TestCallMeta("GetBalance", "Private", "ApiKey")),
+            ActiveOrdersCall = CallFactory.Success(
+                new GetChildOrdersRequest
+                {
+                    ProductCode = "BTC_JPY",
+                    ChildOrderState = ChildOrderStates.Active,
+                },
+                activeOrders ?? Array.Empty<GetChildOrders.Item>(),
+                TestCallMeta("GetChildOrders", "Private", "ApiKey")),
+        };
+    }
+
+    private static GetChildOrders.Item ActiveOrder(
+        BitflyerOrderSide side,
+        decimal outstandingSize)
+    {
+        return new GetChildOrders.Item
+        {
+            Id = 1,
+            ChildOrderId = "JRF20260330-000000-000001",
+            ProductCode = "BTC_JPY",
+            Side = side,
+            ChildOrderType = ChildOrderTypes.Limit,
+            Price = 12345000m,
+            AveragePrice = 0m,
+            Size = outstandingSize,
+            ChildOrderState = ChildOrderStates.Active,
+            ExpireDate = new DateTimeOffset(2026, 03, 31, 0, 0, 0, TimeSpan.Zero),
+            ChildOrderDate = new DateTimeOffset(2026, 03, 30, 10, 0, 0, TimeSpan.Zero),
+            ChildOrderAcceptanceId = "JRF20260330-000000-000001",
+            OutstandingSize = outstandingSize,
+            CancelSize = 0m,
+            ExecutedSize = 0m,
+            TotalCommission = 0m,
+            TimeInForce = TimeInForces.Gtc,
         };
     }
 
@@ -253,6 +321,8 @@ public sealed class EvaluateOrderToolTests
 
         public required Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>> BalanceCall { get; init; }
 
+        public required Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> ActiveOrdersCall { get; init; }
+
         public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
             string symbol,
             CancellationToken cancellationToken = default)
@@ -276,6 +346,15 @@ public sealed class EvaluateOrderToolTests
         {
             _ = cancellationToken;
             return Task.FromResult(BalanceCall);
+        }
+
+        public Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+            string symbol,
+            CancellationToken cancellationToken = default)
+        {
+            _ = symbol;
+            _ = cancellationToken;
+            return Task.FromResult(ActiveOrdersCall);
         }
     }
 }

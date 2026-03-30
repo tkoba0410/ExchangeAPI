@@ -3,8 +3,10 @@ using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 
 namespace ExchangeApi.Adapters.McpServer.Tools.Evaluation;
@@ -54,8 +56,9 @@ public sealed class EvaluateOrderTool
         var tickerTask = _gateway.GetTickerCallAsync(normalized.Symbol, cancellationToken);
         var boardStateTask = _gateway.GetBoardStateCallAsync(normalized.Symbol, cancellationToken);
         var balanceTask = _gateway.GetBalanceCallAsync(cancellationToken);
+        var activeOrdersTask = _gateway.GetActiveChildOrdersCallAsync(normalized.Symbol, cancellationToken);
 
-        await Task.WhenAll(tickerTask, boardStateTask, balanceTask);
+        await Task.WhenAll(tickerTask, boardStateTask, balanceTask, activeOrdersTask);
 
         var tickerCall = await tickerTask;
         if (!tickerCall.IsSuccess || tickerCall.Response is null)
@@ -93,6 +96,18 @@ public sealed class EvaluateOrderTool
                     error: balanceCall.Error));
         }
 
+        var activeOrdersCall = await activeOrdersTask;
+        if (!activeOrdersCall.IsSuccess || activeOrdersCall.Response is null)
+        {
+            return McpToolExecutionResult<EvaluateOrderResponse>.Failure(
+                UpstreamError(
+                    errorCode: "account_unavailable",
+                    message: "Failed to load active child orders from upstream.",
+                    endpoint: "GetChildOrders",
+                    symbol: normalized.Symbol,
+                    error: activeOrdersCall.Error));
+        }
+
         var referencePrice = SelectReferencePrice(normalized, tickerCall.Response);
         var estimatedNotional = referencePrice * normalized.SizeValue;
         var marketStatus = BitflyerMarketStatusMapper.Map(boardStateCall.Response.State, boardStateCall.Response.Health);
@@ -104,7 +119,7 @@ public sealed class EvaluateOrderTool
             SizeRuleOk = IsSizeRuleOk(normalized.SizeValue, parsedRule.MinSize, parsedRule.SizeStep),
             PriceRuleOk = normalized.OrderType == "market" || IsPriceRuleOk(normalized.PriceValue!.Value, parsedRule.PriceStep),
             BalanceOk = IsBalanceOk(normalized, estimatedNotional, balanceCall.Response),
-            PositionLimitOk = IsPositionLimitOk(normalized.SizeValue),
+            PositionLimitOk = IsPositionLimitOk(normalized, activeOrdersCall.Response),
         };
 
         var reasons = BuildReasons(checks);
@@ -297,9 +312,33 @@ public sealed class EvaluateOrderTool
         return availableByCurrency.GetValueOrDefault(BtcCurrencyCode, 0m) >= request.SizeValue;
     }
 
-    private bool IsPositionLimitOk(decimal size)
+    private bool IsPositionLimitOk(
+        NormalizedEvaluateOrderRequest request,
+        IReadOnlyList<GetChildOrders.Item> activeOrders)
     {
-        return !_options.MaxBaseSize.HasValue || size <= _options.MaxBaseSize.Value;
+        if (!_options.MaxBaseSize.HasValue)
+        {
+            return true;
+        }
+
+        var outstandingExposure = activeOrders
+            .Where(item =>
+                string.Equals(item.ProductCode, request.Symbol, StringComparison.Ordinal)
+                && item.ChildOrderState == ChildOrderStates.Active
+                && IsSameSide(item.Side, request.Side))
+            .Sum(item => item.OutstandingSize);
+
+        return outstandingExposure + request.SizeValue <= _options.MaxBaseSize.Value;
+    }
+
+    private static bool IsSameSide(BitflyerOrderSide side, string normalizedSide)
+    {
+        return side switch
+        {
+            _ when string.Equals(normalizedSide, "buy", StringComparison.Ordinal) => side == OrderSides.Buy,
+            _ when string.Equals(normalizedSide, "sell", StringComparison.Ordinal) => side == OrderSides.Sell,
+            _ => false,
+        };
     }
 
     private static IReadOnlyList<string> BuildReasons(EvaluateOrderChecks checks)

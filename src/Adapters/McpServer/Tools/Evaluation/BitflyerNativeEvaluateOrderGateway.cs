@@ -1,8 +1,10 @@
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
 
 namespace ExchangeApi.Adapters.McpServer.Tools.Evaluation;
@@ -48,5 +50,18 @@ public sealed class BitflyerNativeEvaluateOrderGateway : IBitflyerEvaluateOrderG
         CancellationToken cancellationToken = default)
     {
         return _privateApi.GetBalanceCallAsync(new GetBalanceRequest(), cancellationToken);
+    }
+
+    public Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+        string symbol,
+        CancellationToken cancellationToken = default)
+    {
+        return _privateApi.GetChildOrdersCallAsync(
+            new GetChildOrdersRequest
+            {
+                ProductCode = symbol,
+                ChildOrderState = ChildOrderStates.Active,
+            },
+            cancellationToken);
     }
 }

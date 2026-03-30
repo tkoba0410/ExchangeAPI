@@ -1,15 +1,15 @@
 using System.Text;
 using ExchangeApi.Adapters.McpServer.Infrastructure;
 
-namespace ExchangeApi.Adapters.McpServer.Tests;
+namespace ExchangeApi.Tests.Adapters.McpServer.LiveTests;
 
-internal sealed class FakeMcpConsole : IMcpConsole
+internal sealed class TestMcpConsole : IMcpConsole
 {
     private readonly Queue<string> _stdin;
     private readonly StringBuilder _stdout = new();
     private readonly StringBuilder _stderr = new();
 
-    public FakeMcpConsole(params string[] inputLines)
+    public TestMcpConsole(params string[] inputLines)
     {
         _stdin = new Queue<string>(inputLines);
     }

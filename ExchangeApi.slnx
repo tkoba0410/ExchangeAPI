@@ -4,6 +4,9 @@
   <Folder Name="/src/Adapters/Cli/">
     <Project Path="src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj" />
   </Folder>
+  <Folder Name="/src/Adapters/McpServer/">
+    <Project Path="src/Adapters/McpServer/ExchangeApi.Adapters.McpServer.csproj" />
+  </Folder>
   <Folder Name="/src/Exchanges/" />
   <Folder Name="/src/Exchanges/Binance/" />
   <Folder Name="/src/Exchanges/Binance/Composition/">
@@ -38,6 +41,12 @@
   <Folder Name="/tests/Adapters/" />
   <Folder Name="/tests/Adapters/Cli.Tests/">
     <Project Path="tests/Adapters/Cli.Tests/ExchangeApi.Adapters.Cli.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Adapters/McpServer.Tests/">
+    <Project Path="tests/Adapters/McpServer.Tests/ExchangeApi.Adapters.McpServer.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Adapters/McpServer.LiveTests/">
+    <Project Path="tests/Adapters/McpServer.LiveTests/ExchangeApi.Adapters.McpServer.LiveTests.csproj" />
   </Folder>
   <Folder Name="/tests/Primitives.Tests/">
     <Project Path="tests/Primitives.Tests/ExchangeApi.Primitives.Tests.csproj" />

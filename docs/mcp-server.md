@@ -259,6 +259,12 @@ debug 系の例外運用は、本番系とは別 capability / 別経路として
 2. `get_account_snapshot`
 3. `evaluate_order`
 
+補足:
+
+- 上記 3 つが current phase の tool universe である
+- MCP `tools/list` は current process が実際に実行可能な visible tool set を返す
+- `get_account_snapshot` と `evaluate_order` は private credentials を解決できない場合、`tools/list` から advertise しない
+
 追加しない例:
 
 - `can_buy_now`
@@ -643,7 +649,8 @@ bitFlyer v1 導出:
 - `marketStatusOk` は `get_market_snapshot.status == active` のときのみ `true`
 - `sizeRuleOk` は `BitflyerMarketRuleRegistry.minSize` と `sizeStep` に対する適合で判定する
 - `priceRuleOk` は `orderType = limit` のとき `priceStep` 適合と正値条件で判定する
-- `positionLimitOk` は adapter config の optional exposure limit で判定し、未設定なら `true` とする
+- `positionLimitOk` は adapter config の optional `MaxBaseSize` で判定し、未設定なら `true` とする
+- `warnings` は v1 では `market` 注文時に `market_order_slippage_risk` を返し、それ以外は空配列とする
 
 bitFlyer v1 の補足:
 
@@ -721,8 +728,11 @@ MCP v1 error boundary:
 ## 13. ログ / 実装上の制約
 
 - transport は初期実装で `stdio` を採用する
+- stdio transport は latest MCP transport に従い、`stdin` / `stdout` で 1 行 1 JSON-RPC message を扱う
 - `stdout` は MCP message 専用とし、ログを書かない
 - ログは `stderr` または別ログ出力に限定する
+- 初期 server surface は `initialize`、`ping`、`tools/list`、`tools/call` に限定する
+- `tools/list` は各 tool の `inputSchema` と `outputSchema` を返す
 - 返り値は安定した JSON 構造を維持する
 - sensitive data をログに出してはならない
 
@@ -768,6 +778,7 @@ live test:
 - `get_account_snapshot` と `evaluate_order` は private read live test として検証可能である
 - private live test は read-only に限定し、write side effect を持たない
 - live test は `BitflyerMarketRuleRegistry` baseline が drift していないことを検出できる構成にする
+- adapter live test は `tests/Adapters/McpServer.LiveTests` に置き、transport は in-memory stdio で検証する
 
 ## 15. 今後詰める項目
 

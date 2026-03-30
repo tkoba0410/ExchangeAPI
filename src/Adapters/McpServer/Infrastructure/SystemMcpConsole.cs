@@ -2,6 +2,11 @@ namespace ExchangeApi.Adapters.McpServer.Infrastructure;
 
 public sealed class SystemMcpConsole : IMcpConsole
 {
+    public Task<string?> ReadInLineAsync(CancellationToken cancellationToken)
+    {
+        return Console.In.ReadLineAsync(cancellationToken).AsTask();
+    }
+
     public void WriteOut(string value)
     {
         Console.Out.Write(value);

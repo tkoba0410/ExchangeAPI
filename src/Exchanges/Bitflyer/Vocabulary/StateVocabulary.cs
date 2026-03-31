@@ -75,6 +75,8 @@ public enum BitflyerTradeType
     Payment = 8,
     [ApiStringEnumValue("TRANSFER")]
     Transfer = 9,
+    [ApiStringEnumValue("RECEIVE")]
+    Receive = 10,
 }
 
 [JsonConverter(typeof(ApiStringEnumJsonConverter<BitflyerAddressType>))]
@@ -152,6 +154,7 @@ public static class TradeTypes
     public const BitflyerTradeType CancelCollateral = BitflyerTradeType.CancelCollateral;
     public const BitflyerTradeType Payment = BitflyerTradeType.Payment;
     public const BitflyerTradeType Transfer = BitflyerTradeType.Transfer;
+    public const BitflyerTradeType Receive = BitflyerTradeType.Receive;
 }
 
 public static class AddressTypes

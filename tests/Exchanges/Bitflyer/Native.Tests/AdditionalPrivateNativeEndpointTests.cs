@@ -392,6 +392,22 @@ public sealed class AdditionalPrivateNativeEndpointTests
     }
 
     [Fact]
+    public async Task GetBalanceHistory_MapsReceiveTradeType()
+    {
+        var body = """
+            [{"id":1,"trade_date":"2026-03-30T16:38:10.85","event_date":"2026-03-30T07:38:10.85","product_code":"JPY","currency_code":"JPY","trade_type":"RECEIVE","price":0.0,"amount":48.0,"quantity":48.0,"commission":0.0,"balance":29725.0,"order_id":"REC20260330-073810-990383"}]
+            """;
+        var endpoint = new GetBalanceHistoryNativeEndpoint(
+            new FakeGetBalanceHistoryProtocolEndpoint((currencyCode, count, before, after) => Success("GetBalanceHistory", "GET", "/v1/me/getbalancehistory", body)));
+
+        var call = await endpoint.CallAsync(new GetBalanceHistoryRequest { Count = 10 });
+
+        Assert.True(call.IsSuccess);
+        Assert.Single(call.Response!);
+        Assert.Equal(TradeTypes.Receive, call.Response![0].TradeType);
+    }
+
+    [Fact]
     public async Task GetBalanceHistory_ReturnsSemantic_WhenCurrencyCodeIsBlank()
     {
         var endpoint = new GetBalanceHistoryNativeEndpoint(

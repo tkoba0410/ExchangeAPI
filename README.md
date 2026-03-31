@@ -1,10 +1,11 @@
 # ExchangeAPI
 
 ExchangeAPI は、複数の暗号資産取引所 API を扱うための library / adapter 基盤です。現行の library 実装範囲では、bitFlyer を主対象とし、Binance は `GetKlines` のみをサポートします。
-現行ブランチでは、`stage11.md` を入口文書、`docs/spec.md` を library 本体の設計正本として扱い、CLI と MCP Server は別文書で扱います。
+現行ブランチでは、`stage12.md` を入口文書、`docs/spec.md` を library 本体の設計正本として扱い、CLI と MCP Server は別文書で扱います。
 
 ## Quick Links
 
+- Stage12 goals: [`stage12.md`](stage12.md)
 - Stage11 goals: [`stage11.md`](stage11.md)
 - Library spec: [`docs/spec.md`](docs/spec.md)
 - Bitflyer endpoints: [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md)
@@ -22,17 +23,18 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 初見で repo を追う場合は、次の順で読む。
 
 1. [`docs/spec.md`](docs/spec.md)
-2. [`stage11.md`](stage11.md)
-3. [`docs/cli.md`](docs/cli.md)
-4. [`docs/mcp-server.md`](docs/mcp-server.md)
-5. [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md) / [`docs/endpoints-binance.md`](docs/endpoints-binance.md)
+2. [`stage12.md`](stage12.md)
+3. [`stage11.md`](stage11.md)
+4. [`docs/cli.md`](docs/cli.md)
+5. [`docs/mcp-server.md`](docs/mcp-server.md)
+6. [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md) / [`docs/endpoints-binance.md`](docs/endpoints-binance.md)
 
 ## Support Boundary
 
 - bitFlyer が現行 Stage10 の主対象であり、最も広い実装済み surface を持つ
 - Binance は public `GetKlines` のみをサポートする
 - `Unified` は未実装
-- CLI と MCP Server は Stage11 の実装対象であり、現行 branch で利用可能
+- CLI と MCP Server は Stage11 で実装済みであり、現行 branch でも利用可能
 - endpoint ごとの exact contract は `docs/endpoints-bitflyer.md` と `docs/endpoints-binance.md` を正本とする
 
 ## Distribution
@@ -42,7 +44,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - venue ごとの entry point には `Composition` project を参照する
   - bitFlyer: `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
   - Binance: `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
-- Stage11 adapter の推奨配置は `src/Adapters/` 配下とする
+- adapter の推奨配置は `src/Adapters/` 配下とする
   - CLI: `src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj`
   - MCP Server: `src/Adapters/McpServer/ExchangeApi.Adapters.McpServer.csproj`
 - 外部利用向け成果物の正式導線と生成先は `docs/distribution.md` を参照する

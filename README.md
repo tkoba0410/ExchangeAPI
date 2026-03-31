@@ -425,10 +425,12 @@ if (call.IsSuccess && call.Response is not null)
 
 - 標準の `dotnet test ExchangeApi.slnx` には live test project を含めない
 - live test は `dotnet test ExchangeApi.LiveTests.slnx` で明示実行する
+- Stage11 の完了判定は `Engineering Complete` を基準とし、live test は `Live Verified` のための opt-in 検証として扱う
 - すべての live test は既定で skip され、次のいずれかで opt-in する
   - `EXCHANGEAPI_RUN_LIVE_TESTS=1`
   - `touch local/live-enabled`
 - public live test も opt-in がない限り実行しない
+- opt-in 未実行の private live test は未確認として扱い、通常の完了条件 failure とは扱わない
 - bitFlyer private/write live test は `age` で復号する credentials source を前提にする
   - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
   - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`

@@ -43,6 +43,20 @@ Stage11 は、少なくとも以下を満たした時点で完了とみなす。
 
 `Unified` は Stage11 で検討または限定公開してよいが、未実装であっても上記完了条件を満たす限り Stage11 は完了とみなす。
 
+## 2.2 検証水準
+
+Stage11 の完了判定は、次の 2 水準に分けて扱う。
+
+- `Engineering Complete`
+  - main solution と live solution の restore / build / test 導線が repo 単体で成立する
+  - CLI / MCP Server / library の正本が整合し、通常 test が成功する
+  - live test は opt-in 未設定で skip されていてよい
+- `Live Verified`
+  - `docs/spec.md` で定義した live test opt-in 条件を満たし、対象 live test を明示実行して確認済みである
+
+Stage11 の完了条件は `Engineering Complete` を基準とする。  
+`Live Verified` は confidence を追加する検証水準であり、opt-in 未実行を failure 扱いにしない。
+
 ## 3. 非ゴール
 
 - 広い `Unified` 層の実装

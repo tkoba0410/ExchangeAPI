@@ -1292,6 +1292,8 @@ fixture test:
 live test:
 
 - live test の opt-in と local marker の扱いは [`docs/spec.md`](./spec.md) の live test 契約を正本とする
+- MCP adapter の通常完了判定は `Engineering Complete` を基準とし、private live test の opt-in 未実行は未確認として扱う
+- `Live Verified` は opt-in 条件を満たしたうえで adapter live test を明示実行して確認した状態を指す
 - `get_market_snapshot` は public read live test として検証可能である
 - `get_account_snapshot` と `evaluate_order` は private read live test として検証可能である
 - `get_klines` は Binance public read live test として検証可能である
@@ -1303,3 +1305,14 @@ live test:
 ## 15. 実装 backlog
 
 現時点で、採用済み方針の未実装項目はない。
+
+## 16. Verification Status Labels
+
+- `Engineering Complete`
+  - tool surface、schema、solution、CI、通常 test が整合している状態
+  - live test は opt-in 未実行で skip されていてよい
+- `Live Verified`
+  - [`docs/spec.md`](./spec.md) の opt-in 条件を満たし、対象 live test を明示実行して確認済みの状態
+
+MCP Server v1 の完了宣言は `Engineering Complete` を基準とする。  
+`Live Verified` は追加確認であり、未実行を失敗扱いにしない。

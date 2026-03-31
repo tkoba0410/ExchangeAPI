@@ -41,6 +41,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - Stage11 adapter の推奨配置は `src/Adapters/` 配下とする
   - CLI: `src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj`
   - MCP Server: `src/Adapters/McpServer/ExchangeApi.Adapters.McpServer.csproj`
+- 外部利用向け成果物の正式導線と生成先は `docs/distribution.md` を参照する
 
 ## Local NuGet Feed
 
@@ -50,6 +51,12 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
   - 例: `bash scripts/pack-local-nuget.sh 0.1.0-local.1`
 - この feed は repo 内ローカル用途であり、生成された `.nupkg` は git 管理しない
 - 別 repo から consume する手順は `docs/local-nuget-consumer.md` を参照する
+
+## Local Publish
+
+- CLI executable は `bash scripts/publish-cli-local.sh` で `local/publish/cli/<rid>/` に生成する
+- MCP Server executable は `bash scripts/publish-mcp-local.sh` で `local/publish/mcp/<rid>/` に生成する
+- 生成物は git 管理しない
 
 ## Surface Overview
 

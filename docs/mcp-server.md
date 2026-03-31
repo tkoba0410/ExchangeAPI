@@ -1298,6 +1298,7 @@ live test:
 - private live test は read-only に限定し、write side effect を持たない
 - live test は `BitflyerMarketRuleRegistry` baseline が drift していないことを検出できる構成にする
 - adapter live test は `tests/Adapters/McpServer.LiveTests` に置き、transport は in-memory stdio で検証する
+- adapter live test の official solution path は `ExchangeApi.LiveTests.slnx` とする
 
 ## 15. 実装 backlog
 

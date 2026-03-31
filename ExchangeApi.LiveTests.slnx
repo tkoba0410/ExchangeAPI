@@ -1,5 +1,9 @@
 <Solution>
   <Folder Name="/tests/" />
+  <Folder Name="/tests/Adapters/" />
+  <Folder Name="/tests/Adapters/McpServer.LiveTests/">
+    <Project Path="tests/Adapters/McpServer.LiveTests/ExchangeApi.Adapters.McpServer.LiveTests.csproj" />
+  </Folder>
   <Folder Name="/tests/Exchanges/" />
   <Folder Name="/tests/Exchanges/Binance/" />
   <Folder Name="/tests/Exchanges/Binance/LiveTests/">

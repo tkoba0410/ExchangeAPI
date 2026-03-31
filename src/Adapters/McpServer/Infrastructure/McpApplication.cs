@@ -67,7 +67,7 @@ public sealed class McpApplication
         }
 
         _console.WriteErrorLine($"unknown argument: {string.Join(" ", args)}");
-        _console.WriteErrorLine("Use --help to inspect the current scaffold.");
+        _console.WriteErrorLine("Use --help to inspect the current MCP tool surface.");
         return McpExitCode.ArgumentError;
     }
 

@@ -28,7 +28,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - bitFlyer が現行 Stage10 の主対象であり、最も広い実装済み surface を持つ
 - Binance は public `GetKlines` のみをサポートする
 - `Unified` は未実装
-- CLI と MCP Server は Stage11 の実装対象であり、現時点では branch 上で整備中
+- CLI と MCP Server は Stage11 の実装対象であり、現行 branch で利用可能
 - endpoint ごとの exact contract は `docs/endpoints-bitflyer.md` と `docs/endpoints-binance.md` を正本とする
 
 ## Distribution

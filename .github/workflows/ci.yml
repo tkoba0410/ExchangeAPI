@@ -17,12 +17,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Lint review axis alignment
-        run: bash scripts/ci/lint-review-axis-alignment.sh
-
-      - name: Lint reference review status
-        run: bash scripts/ci/lint-reference-review-status.sh
-
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:

@@ -2,6 +2,8 @@
 
 この文書は、別の .NET project から ExchangeAPI の local NuGet feed を使う手順を定義する。
 
+外部 consumer 向けの推奨導線は local NuGet feed とする。`ProjectReference` は repo 内開発または近接開発向けであり、外部 consumer の推奨導線ではない。
+
 ## 1. 前提
 
 - ExchangeAPI repository 側で local package を生成済みであること
@@ -63,7 +65,33 @@ dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 0.1.0-loc
 - `ExchangeApi.Exchanges.Binance.Native`
 - `ExchangeApi.Exchanges.Binance.Composition`
 
-## 4. Restore と Build
+## 4. 最小利用例
+
+consumer app の `Program.cs`:
+
+```csharp
+using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
+
+using var client = BitflyerClientFactory.CreateNativeClient();
+
+var call = await client.Public.GetTickerCallAsync(new GetTickerRequest
+{
+    ProductCode = ProductCodes.BtcJpy,
+});
+
+if (call.IsSuccess && call.Response is not null)
+{
+    Console.WriteLine($"{call.Response.ProductCode} ltp={call.Response.Ltp}");
+}
+else
+{
+    Console.WriteLine($"error kind={call.Error?.Kind} message={call.Error?.Message}");
+}
+```
+
+## 5. Restore と Build
 
 consumer repo で次を実行する。
 
@@ -72,7 +100,7 @@ dotnet restore --configfile NuGet.config
 dotnet build
 ```
 
-## 5. Version 更新ルール
+## 6. Version 更新ルール
 
 local feed へ再 pack するときは、同じ version を上書きするより version を増やすほうが安全である。
 
@@ -82,7 +110,7 @@ local feed へ再 pack するときは、同じ version を上書きするより
 bash scripts/pack-local-nuget.sh 0.1.0-local.2
 ```
 
-その後、consumer repo 側でも package version を更新する。
+その後、consumer repo 側でも package version を更新する。consumer repo は floating version ではなく、明示 version を固定する。
 
 ```bash
 dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 0.1.0-local.2
@@ -95,7 +123,7 @@ dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 0.1.0-lo
 dotnet nuget locals global-packages --clear
 ```
 
-## 6. Scope
+## 7. Scope
 
 - bitFlyer は現行 Stage10 の主対象であり、最も広い実装済み surface を持つ
 - Binance は public `GetKlines` のみをサポートする

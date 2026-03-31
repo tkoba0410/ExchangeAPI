@@ -45,7 +45,7 @@ public static class InvocationParser
 
                 if (!allowedOptions.TryGetValue(optionName, out var option))
                 {
-                    return Failure("invalid option", $"unknown option: --{optionName}");
+                    return Failure("invalid option", $"unknown option: --{optionName}. Run: exchangeapi --help");
                 }
 
                 if (!options.TryAdd(optionName, null))
@@ -57,13 +57,13 @@ public static class InvocationParser
                 {
                     if (i + 1 >= args.Length)
                     {
-                        return Failure("invalid option", $"missing value for --{optionName}");
+                        return Failure("invalid option", $"missing value for --{optionName}. Example: --{optionName} <value>");
                     }
 
                     var value = args[++i];
                     if (value.StartsWith("--", StringComparison.Ordinal))
                     {
-                        return Failure("invalid option", $"missing value for --{optionName}");
+                        return Failure("invalid option", $"missing value for --{optionName}. Example: --{optionName} <value>");
                     }
 
                     options[optionName] = value;
@@ -74,13 +74,13 @@ public static class InvocationParser
 
             if (parsingOptions)
             {
-                return Failure("invalid argument", $"unexpected positional argument: {arg}");
+                return Failure("invalid argument", $"unexpected positional argument: {arg}. Put positional tokens before options or run: exchangeapi --help");
             }
 
             pathTokens.Add(arg);
             if (pathTokens.Count > 4)
             {
-                return Failure("invalid argument", "too many command path tokens");
+                return Failure("invalid argument", "too many command path tokens. Example: exchangeapi bitflyer native public get-ticker --product-code BTC_JPY");
             }
         }
 
@@ -91,7 +91,7 @@ public static class InvocationParser
 
         if (pathTokens.Count < 4)
         {
-            return Failure("invalid argument", "missing command path");
+            return Failure("invalid argument", "missing command path. Example: exchangeapi bitflyer native public get-ticker --product-code BTC_JPY");
         }
 
         return Success(showHelp: false, pathTokens, options);

@@ -35,6 +35,8 @@ public static class HelpRenderer
 
     private static void RenderRoot(IConsole console, IReadOnlyList<CommandDescriptor> commands)
     {
+        console.WriteOutLine("ExchangeAPI CLI. Use native commands for exchange-native calls and protocol commands for raw/debug inspection.");
+        console.WriteOutLine(string.Empty);
         console.WriteOutLine("Usage:");
         console.WriteOutLine("  exchangeapi <venue> <surface> <scope> <command> [options]");
         console.WriteOutLine("  exchangeapi wizard <venue> <surface> <scope> <command>");
@@ -61,7 +63,7 @@ public static class HelpRenderer
         var matches = commands.Where(x => x.Path.Venue == venue).ToArray();
         if (matches.Length == 0)
         {
-            return ExecutionOutcome.InputError("invalid argument", $"unknown venue: {venue}");
+            return ExecutionOutcome.InputError("invalid argument", $"unknown venue: {venue}. Run: exchangeapi --help");
         }
 
         console.WriteOutLine("Usage:");
@@ -84,7 +86,7 @@ public static class HelpRenderer
         var matches = commands.Where(x => x.Path.Venue == venue && x.Path.Surface == surface).ToArray();
         if (matches.Length == 0)
         {
-            return ExecutionOutcome.InputError("invalid argument", $"unknown surface: {venue} {surface}");
+            return ExecutionOutcome.InputError("invalid argument", $"unknown surface: {venue} {surface}. Run: exchangeapi {venue} --help");
         }
 
         console.WriteOutLine("Usage:");
@@ -107,7 +109,7 @@ public static class HelpRenderer
         var matches = commands.Where(x => x.Path.Venue == venue && x.Path.Surface == surface && x.Path.Scope == scope).ToArray();
         if (matches.Length == 0)
         {
-            return ExecutionOutcome.InputError("invalid argument", $"unknown scope: {venue} {surface} {scope}");
+            return ExecutionOutcome.InputError("invalid argument", $"unknown scope: {venue} {surface} {scope}. Run: exchangeapi {venue} {surface} --help");
         }
 
         console.WriteOutLine("Usage:");
@@ -130,7 +132,7 @@ public static class HelpRenderer
         var descriptor = commands.FirstOrDefault(x => x.Path == path);
         if (descriptor is null)
         {
-            return ExecutionOutcome.InputError("invalid argument", $"unknown command: {path.Identity}");
+            return ExecutionOutcome.InputError("invalid argument", $"unknown command: {path.Identity}. Run: exchangeapi {path.Venue} {path.Surface} {path.Scope} --help");
         }
 
         console.WriteOutLine("Usage:");

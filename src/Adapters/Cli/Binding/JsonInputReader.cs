@@ -58,14 +58,14 @@ public static class JsonInputReader
             var request = JsonSerializer.Deserialize<T>(json);
             if (request is null)
             {
-                return RequestBindingResult.Failure("invalid argument", "request JSON must not be null");
+                return RequestBindingResult.Failure("invalid argument", "request JSON must not be null. Example: --request-json '{\"product_code\":\"BTC_JPY\"}'");
             }
 
             return RequestBindingResult.Success(request);
         }
         catch (JsonException ex)
         {
-            return RequestBindingResult.Failure("invalid argument", ex.Message);
+            return RequestBindingResult.Failure("invalid argument", $"invalid JSON: {ex.Message}");
         }
     }
 }

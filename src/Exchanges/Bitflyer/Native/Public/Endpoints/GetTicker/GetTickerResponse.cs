@@ -3,14 +3,23 @@ using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 
+/// <summary>
+/// Represents the current public ticker snapshot returned by bitFlyer.
+/// </summary>
 public sealed class GetTickerResponse
 {
+    /// <summary>
+    /// bitFlyer product code such as <c>BTC_JPY</c>.
+    /// </summary>
     [JsonPropertyName("product_code")]
     public required string ProductCode { get; init; }
 
     [JsonPropertyName("state")]
     public required BitflyerTradingState State { get; init; }
 
+    /// <summary>
+    /// Server timestamp for this ticker snapshot.
+    /// </summary>
     [JsonPropertyName("timestamp")]
     [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
     public required DateTimeOffset Timestamp { get; init; }
@@ -42,6 +51,9 @@ public sealed class GetTickerResponse
     [JsonPropertyName("market_ask_size")]
     public required decimal MarketAskSize { get; init; }
 
+    /// <summary>
+    /// Last traded price.
+    /// </summary>
     [JsonPropertyName("ltp")]
     public required decimal Ltp { get; init; }
 

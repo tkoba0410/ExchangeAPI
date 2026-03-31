@@ -10,6 +10,10 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - Bitflyer endpoints: [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md)
 - Binance endpoints: [`docs/endpoints-binance.md`](docs/endpoints-binance.md)
 - Local NuGet consumer guide: [`docs/local-nuget-consumer.md`](docs/local-nuget-consumer.md)
+- Library getting started: [`docs/guides/library-getting-started.md`](docs/guides/library-getting-started.md)
+- CLI getting started: [`docs/guides/cli-getting-started.md`](docs/guides/cli-getting-started.md)
+- MCP getting started: [`docs/guides/mcp-getting-started.md`](docs/guides/mcp-getting-started.md)
+- Troubleshooting: [`docs/guides/troubleshooting.md`](docs/guides/troubleshooting.md)
 - CLI adapter: [`docs/cli.md`](docs/cli.md)
 - MCP Server adapter: [`docs/mcp-server.md`](docs/mcp-server.md)
 

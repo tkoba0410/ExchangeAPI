@@ -573,7 +573,7 @@ public static class ToolCatalog
     public static McpToolDefinition GetMarketSnapshot { get; } =
         new(
             Name: "get_market_snapshot",
-            Description: "Return market price, market status, and fixed trading rules for a supported symbol.",
+            Description: "Read market price, venue status, and fixed trading rules for a supported symbol. Read-only. Does not place orders.",
             RequestType: typeof(GetMarketSnapshotRequest),
             ResponseType: typeof(GetMarketSnapshotResponse),
             InputSchemaJson: MarketSnapshotInputSchema,
@@ -584,7 +584,7 @@ public static class ToolCatalog
     public static McpToolDefinition ListMarkets { get; } =
         new(
             Name: "list_markets",
-            Description: "Return the current visible market capability set grouped as venue and symbol pairs.",
+            Description: "Read the current visible venue and symbol capability set for discovery. Read-only. Does not place orders.",
             RequestType: typeof(ListMarketsRequest),
             ResponseType: typeof(ListMarketsResponse),
             InputSchemaJson: ListMarketsInputSchema,
@@ -595,7 +595,7 @@ public static class ToolCatalog
     public static McpToolDefinition GetKlines { get; } =
         new(
             Name: "get_klines",
-            Description: "Return Binance v1 public OHLCV kline candles for a supported symbol and interval.",
+            Description: "Read Binance v1 public OHLCV kline candles for a supported symbol and interval. Read-only. Does not place orders.",
             RequestType: typeof(GetKlinesRequest),
             ResponseType: typeof(GetKlinesResponse),
             InputSchemaJson: KlinesInputSchema,
@@ -606,7 +606,7 @@ public static class ToolCatalog
     public static McpToolDefinition GetAccountSnapshot { get; } =
         new(
             Name: "get_account_snapshot",
-            Description: "Return the bot-oriented bitFlyer v1 account snapshot for balances, positions, open order count, and read readiness.",
+            Description: "Read a bot-oriented bitFlyer v1 account snapshot for balances, positions, open order count, and read readiness. Read-only. Does not place orders.",
             RequestType: typeof(GetAccountSnapshotRequest),
             ResponseType: typeof(GetAccountSnapshotResponse),
             InputSchemaJson: AccountSnapshotInputSchema,
@@ -617,7 +617,7 @@ public static class ToolCatalog
     public static McpToolDefinition EvaluateOrder { get; } =
         new(
             Name: "evaluate_order",
-            Description: "Evaluate whether a supported bitFlyer v1 spot order request can be placed mechanically under current rules and balances.",
+            Description: "Evaluate whether a supported bitFlyer v1 spot order request can be placed mechanically under current rules and balances. Evaluate-only. Does not place orders.",
             RequestType: typeof(EvaluateOrderRequest),
             ResponseType: typeof(EvaluateOrderResponse),
             InputSchemaJson: EvaluateOrderInputSchema,
@@ -628,7 +628,7 @@ public static class ToolCatalog
     public static McpToolDefinition EvaluateMarginOrder { get; } =
         new(
             Name: "evaluate_margin_order",
-            Description: "Evaluate whether a supported bitFlyer v1 margin order request can be placed mechanically under current rules, collateral, and maintenance state.",
+            Description: "Evaluate whether a supported bitFlyer v1 margin order request can be placed mechanically under current rules, collateral, and maintenance state. Evaluate-only. Does not place orders.",
             RequestType: typeof(EvaluateMarginOrderRequest),
             ResponseType: typeof(EvaluateMarginOrderResponse),
             InputSchemaJson: EvaluateMarginOrderInputSchema,

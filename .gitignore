@@ -50,6 +50,7 @@ iisexpress/
 # dotenv
 *.env
 *.env.*
+.envrc.local
 
 # VSCode
 .vscode/

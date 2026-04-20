@@ -3,6 +3,9 @@
 ExchangeAPI は、複数の暗号資産取引所 API を扱うための library / adapter 基盤です。現行の library 実装範囲では、bitFlyer を主対象とし、Binance は `GetKlines` のみをサポートします。
 現行ブランチでは、`stage12.md` を入口文書、`docs/spec.md` を library 本体の設計正本として扱い、CLI と MCP Server は別文書で扱います。
 
+現時点の公開固定点は **`v1.0.0`** とし、以後の公開系列は version 主体で扱う。
+`stage` 系の tag は履歴として残すが、現在の安定固定点としては `v1.0.0` を参照する。
+
 ## Quick Links
 
 - Stage12 goals: [`stage12.md`](stage12.md)
@@ -17,6 +20,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - Troubleshooting: [`docs/guides/troubleshooting.md`](docs/guides/troubleshooting.md)
 - CLI adapter: [`docs/cli.md`](docs/cli.md)
 - MCP Server adapter: [`docs/mcp-server.md`](docs/mcp-server.md)
+- Release note `v1.0.0`: [`docs/release-note-v1.0.0.md`](docs/release-note-v1.0.0.md)
 
 ## Recommended Reading Order
 

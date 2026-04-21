@@ -23,11 +23,18 @@ version 主体の公開系列へ移る最初の固定点である。
 ## Distribution
 - 現段階の正規導線は source checkout + `ProjectReference`
 - local NuGet feed と local publish recipe は用意されている
-- package の正式提供は、この release 作成後に別途判断する
+- library package は GitHub Packages に publish 済み
+- executable は release asset 側を正式導線とする
+
+公開済み library package:
+- `ExchangeApi.Primitives`
+- `ExchangeApi.Exchanges.Bitflyer.*`
+- `ExchangeApi.Exchanges.Binance.*`
 
 ## Verified Current State
 - solution build と test を current fixed point として確認
 - `CTradeBot` 側の `v1.0.0` 固定点は `ExchangeAPI v1.0.0` を前提にする
+- `ExchangeApi.Exchanges.Bitflyer.Composition v1.0.0` は GitHub Packages からの consumer smoke test を確認
 
 ## Notes
 - `stage` 系 tag は履歴として残す

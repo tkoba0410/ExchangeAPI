@@ -1,6 +1,7 @@
 # GitHub Packages Publish Guide
 
 この文書は、`ExchangeAPI v1.0.0` の library package を GitHub Packages へ publish する手順を固定する。
+`v1.0.0` では publish 済みであり、この文書は再現手順と次回 publish の基準を兼ねる。
 
 ## Scope
 
@@ -80,6 +81,14 @@ publish 後は GitHub Packages で package 一覧を確認する。
 - version が `1.0.0`
 - CLI / MCP executable package が publish されていない
 - `Composition` package が見える
+
+加えて、少なくとも 1 本は consumer 側で restore/build/run を確認する。
+
+`v1.0.0` では次を確認済み:
+
+- `ExchangeApi.Exchanges.Bitflyer.Composition 1.0.0`
+- restore: GitHub Packages source から成功
+- build/run: `BitflyerClientFactory` と `ProductCodes.BtcJpy` の参照成功
 
 ## Notes
 

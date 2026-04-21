@@ -40,6 +40,10 @@ bash scripts/pack-local-nuget.sh
 
 - publish guide:
   - `docs/guides/package-publish.md`
+- current published baseline:
+  - `v1.0.0`
+- current published verification:
+  - `ExchangeApi.Exchanges.Bitflyer.Composition v1.0.0` の consumer smoke test を確認済み
 
 ### CLI
 

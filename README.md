@@ -45,6 +45,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 
 - 現段階の正規導線は source checkout + `ProjectReference`
 - 公開 feed 向けの NuGet package は現 phase では提供しない
+- `v1.0.0` では library package を GitHub Packages へ publish できる形を current baseline とする
 - venue ごとの entry point には `Composition` project を参照する
   - bitFlyer: `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
   - Binance: `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
@@ -52,6 +53,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
   - CLI: `src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj`
   - MCP Server: `src/Adapters/McpServer/ExchangeApi.Adapters.McpServer.csproj`
 - 外部利用向け成果物の正式導線と生成先は `docs/distribution.md` を参照する
+- GitHub Packages への publish 手順は `docs/guides/package-publish.md` を参照する
 
 ## Local NuGet Feed
 

@@ -13,7 +13,7 @@
 ExchangeAPI repository 側では、repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 0.1.0-local.1
+bash scripts/pack-local-nuget.sh 1.0.0
 ```
 
 生成先は `local/nuget`。
@@ -44,13 +44,13 @@ path は absolute path を推奨する。
 bitFlyer を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 0.1.0-local.1
+dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 1.0.0
 ```
 
 Binance を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 0.1.0-local.1
+dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 1.0.0
 ```
 
 より狭い依存だけ欲しい場合は、個別 package を直接参照してよい。
@@ -107,13 +107,13 @@ local feed へ再 pack するときは、同じ version を上書きするより
 推奨:
 
 ```bash
-bash scripts/pack-local-nuget.sh 0.1.0-local.2
+bash scripts/pack-local-nuget.sh 1.0.1-local.1
 ```
 
 その後、consumer repo 側でも package version を更新する。consumer repo は floating version ではなく、明示 version を固定する。
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 0.1.0-local.2
+dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 1.0.1-local.1
 ```
 
 同じ version を再利用すると、consumer 側の global packages cache により古い package が使われ続けることがある。

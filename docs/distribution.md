@@ -29,6 +29,7 @@
 - formal distribution path:
   - `ProjectReference`
   - local NuGet feed
+  - GitHub Packages
 - generated output:
   - `local/nuget/`
 - generation command:
@@ -36,6 +37,9 @@
 ```bash
 bash scripts/pack-local-nuget.sh
 ```
+
+- publish guide:
+  - `docs/guides/package-publish.md`
 
 ### CLI
 
@@ -83,6 +87,8 @@ bash scripts/publish-mcp-local.sh
 
 - `README.md`
 - `docs/local-nuget-consumer.md`
+- `docs/guides/package-publish.md`
 - `scripts/pack-local-nuget.sh`
+- `scripts/push-github-packages.sh`
 - `scripts/publish-cli-local.sh`
 - `scripts/publish-mcp-local.sh`

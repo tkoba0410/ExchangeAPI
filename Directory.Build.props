@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup Condition="'$(IsPackable)' != 'false'">
+    <Authors>tkoba0410</Authors>
+    <RepositoryUrl>https://github.com/tkoba0410/ExchangeAPI</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/tkoba0410/ExchangeAPI</PackageProjectUrl>
+    <PackageTags>exchangeapi;crypto;bitflyer;binance;dotnet</PackageTags>
+    <PackageReadmeFile>package-readme.md</PackageReadmeFile>
+    <Description>ExchangeAPI library surface for bitFlyer-focused exchange integrations and limited Binance support.</Description>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsPackable)' != 'false'">
+    <None Include="$(MSBuildThisFileDirectory)docs/package-readme.md" Pack="true" PackagePath="\" Link="package-readme.md" />
+  </ItemGroup>
+</Project>

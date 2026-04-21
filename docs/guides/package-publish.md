@@ -89,6 +89,9 @@ publish 後は GitHub Packages で package 一覧を確認する。
 - `ExchangeApi.Exchanges.Bitflyer.Composition 1.0.0`
 - restore: GitHub Packages source から成功
 - build/run: `BitflyerClientFactory` と `ProductCodes.BtcJpy` の参照成功
+- `ExchangeApi.Exchanges.Binance.Composition 1.0.0`
+- restore: GitHub Packages source から成功
+- build/run: `BinanceClientFactory` と `BinanceSymbols.BtcJpy` の参照成功
 
 ## Notes
 

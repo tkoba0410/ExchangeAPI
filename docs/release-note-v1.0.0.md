@@ -35,6 +35,7 @@ version 主体の公開系列へ移る最初の固定点である。
 - solution build と test を current fixed point として確認
 - `CTradeBot` 側の `v1.0.0` 固定点は `ExchangeAPI v1.0.0` を前提にする
 - `ExchangeApi.Exchanges.Bitflyer.Composition v1.0.0` は GitHub Packages からの consumer smoke test を確認
+- `ExchangeApi.Exchanges.Binance.Composition v1.0.0` は GitHub Packages からの consumer smoke test を確認
 
 ## Notes
 - `stage` 系 tag は履歴として残す

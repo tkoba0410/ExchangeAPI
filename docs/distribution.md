@@ -44,6 +44,7 @@ bash scripts/pack-local-nuget.sh
   - `v1.0.0`
 - current published verification:
   - `ExchangeApi.Exchanges.Bitflyer.Composition v1.0.0` の consumer smoke test を確認済み
+  - `ExchangeApi.Exchanges.Binance.Composition v1.0.0` の consumer smoke test を確認済み
 
 ### CLI
 

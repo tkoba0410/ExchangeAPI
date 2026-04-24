@@ -30,7 +30,12 @@
 - endpoint matrix の facade rule と実装 surface の rename は、実装変更と同時に反映する。
 - auth provider は `IApiCredentialProvider` / `IApiCredentialSession` / `OpenSessionAsync(...)` を前提にする。
 - `ApiSecret` は公開 API に出さず、session の `Sign(payload)` で署名する。
-- `Sign(string payload)` の overload、venue 情報の渡し方、plain text provider の配置は実装時に裁定する。
+- v2 の署名 API は `Sign(string payload)` のみとし、byte sequence overload は post-v2 検討に回す。
+- provider は venue-specific class とする。
+- `PlainText` / `AgeFile` provider は `ExchangeApi.Optional.Credentials` に置く。
+- optional credentials project は `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` とする。
+- `AgeFile` provider の復号後 JSON は `version`, `venue`, `apiKey`, `apiSecret` を required とする。
+- 明示 session overload は private endpoint のみに追加し、`EndpointAsync(request, credentialSession, cancellationToken)` の順にする。
 
 ## 3. Documentation Rules
 

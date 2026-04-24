@@ -334,7 +334,7 @@ error 返却形式:
 - 想定外障害は `internal_error`
 - private credentials が未設定または解決不能な場合、private tool は `tools/list` から advertise してはならない
 - advertise 済み tool の call 時点で credential failure が発生した場合、`upstream_error` / `account_unavailable` として返す
-- credential failure の `details` には secret-safe な `credentialErrorKind`、`venue`、`provider`、`reason` を含めてよい
+- credential failure の `details` には secret-safe な `credentialErrorKind`、`venue`、`provider`、`reason` を含める
 - API key / secret / 署名値 / 認証 header は `message`、`details`、`_meta`、stderr に出してはならない
 - stderr diagnostic は operator 向け通知であり、stdout の MCP JSON-RPC stream にログを混ぜてはならない
 

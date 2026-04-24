@@ -613,7 +613,10 @@
 結論:
 
 - `v2.0.0` では auth provider の具体 shape として `IApiCredentialProvider.OpenSessionAsync(...)` 型を採用する
-- session は `GetApiKey()` と `Sign(...)` を持つ
+- session は `ApiKey` property と `Sign(string payload)` を持つ
+- v2 の署名 API は `Sign(string payload)` のみとし、byte sequence overload は post-v2 検討に回す
+- provider は venue-specific class とし、runtime venue selector を持たせない
+- `PlainText` / `AgeFile` provider は `ExchangeApi.Optional.Credentials` に置く
 - 通常利用では client 側が session を内部で開閉し、初見利用者に session を必須で意識させない
 - 高コスト provider や寿命を明示管理したい利用者には、明示 session を使う導線を残す
 
@@ -622,9 +625,9 @@
 - provider
   - `OpenSessionAsync(...)`
 - session
-  - `GetApiKey()`
-  - `Sign(timestamp, method, path, bodyText)`
-  - `Dispose()`
+  - `ApiKey`
+  - `Sign(string payload)`
+  - `DisposeAsync()`
 
 検討した代替案:
 
@@ -647,7 +650,34 @@
   - private call 実行時に client 側が内部で session を扱ってよい
 - 明示利用
   - 利用者が `OpenSessionAsync(...)` して複数 private call の間だけ再利用してよい
-  - 処理単位の終了時に `Dispose()` する
+  - 処理単位の終了時に `DisposeAsync()` する
+
+明示 session overload:
+
+```csharp
+Task<CallResult<TRequest, TResponse>> EndpointAsync(
+    TRequest request,
+    IApiCredentialSession credentialSession,
+    CancellationToken cancellationToken = default);
+```
+
+ルール:
+
+- 通常 overload は provider から session を内部で開閉する
+- 明示 session overload は caller が渡した session を dispose しない
+- 明示 session overload は private endpoint にだけ用意する
+
+optional credentials public type set:
+
+- `ExchangeVenue`
+- `IAgeCredentialFileDecryptor`
+- `AgeCliCredentialFileDecryptor`
+- `BitflyerPlainTextApiCredentialProvider`
+- `BinancePlainTextApiCredentialProvider`
+- `BitflyerAgeFileApiCredentialProvider`
+- `BinanceAgeFileApiCredentialProvider`
+- `PlainTextApiCredentialProviderFactory`
+- `AgeFileApiCredentialProviderFactory`
 
 運用メモ:
 
@@ -749,7 +779,48 @@
 - 正本反映後も、利用者移行のため release 完了までは削除しない
 - 却下理由も簡潔に残す
 
-## 5. 関連文書
+## 5. 実装チェックリスト
+
+v2 実装時は、次の順で進める。
+
+1. `Primitives`
+   - `Call<TRequest, TResponse>` を `CallResult<TRequest, TResponse>` へ rename する
+   - `CallError` に `HttpStatusCode`, `VenueErrorCode`, `VenueErrorMessage` を追加する
+   - `IApiCredentialProvider`, `IApiCredentialSession`, `ApiCredentialException`, `ApiCredentialErrorKind` を配置する
+2. `Protocol` / `Native`
+   - public facade method を `*Async(...)` へ rename する
+   - private endpoint に明示 session overload を追加する
+   - private endpoint の session overload は `EndpointAsync(request, credentialSession, cancellationToken)` の順にする
+   - raw body は `ProtocolResponse.BodyText` に残し、`CallError` detail は抽出 field のみを保持する
+3. `Composition`
+   - `CreateProtocolClientBundle(...)` / `CreateNativeClientBundle(...)` へ rename する
+   - `BitflyerClientFactory` / `BinanceClientFactory` class 名は維持する
+   - options は `ApiCredentialProvider` を受ける
+   - 通常 private call では provider から session を内部で開閉する
+4. `Optional.Credentials`
+   - `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` を追加する
+   - `ExchangeApi.Optional.Credentials` package として pack 対象に含める
+   - `ExchangeVenue`, `IAgeCredentialFileDecryptor`, `AgeCliCredentialFileDecryptor` を追加する
+   - venue-specific `PlainText` / `AgeFile` provider を追加する
+   - provider factory を追加する
+   - `AgeFile` provider は credentials JSON schema と `ApiCredentialErrorKind` を test で固定する
+5. CLI
+   - factory / facade rename に追従する
+   - credential failure を stderr と exit code `2` へ写像する
+   - verbose detail key を `credentialErrorKind`, `venue`, `provider`, `reason` に揃える
+   - `CallError` additive detail を `--verbose` に出す
+6. MCP
+   - factory / facade rename に追従する
+   - credential failure 時は private tool 非公開または `account_unavailable` details へ写像する
+   - credential failure details は `credentialErrorKind`, `venue`, `provider`, `reason` を持つ
+   - `upstream_error.details` に `callHttpStatusCode`, `callVenueErrorCode`, `callVenueErrorMessage` を optional で追加する
+7. Verification / package
+   - migration lock test を追加または更新する
+   - `ExchangeApi.Optional.Credentials` を solution と pack script 対象へ追加する
+   - local NuGet consumer smoke test を v2 API 名で更新する
+   - CLI / MCP publish script は executable artifact 方針を維持する
+
+## 6. 関連文書
 
 - [`docs/docs-architecture.md`](./docs-architecture.md)
 - [`docs/spec.md`](./spec.md)

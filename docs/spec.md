@@ -788,12 +788,33 @@ public interface IApiCredentialSession : IAsyncDisposable
 - `IApiCredentialProvider` は credential source を開き、必要なら復号し、session を返す
 - `IApiCredentialSession` は session 寿命中だけ `ApiKey` と署名機能を提供する
 - `Sign(payload)` の payload は venue ごとの canonical signing payload とする
+- v2 の署名 API は `Sign(string payload)` のみとし、byte sequence overload は持たない
+- provider は venue-specific とし、provider / session に runtime venue selector を持たせない
 - client / adapter は通常利用では session 境界を隠蔽してよい
 - 高コスト provider では、利用者が明示 session を開き、複数 private call の間だけ再利用してよい
 - session は `IAsyncDisposable` であり、dispose は完全なメモリ消去ではなく保持寿命の明示的終了を意味する
 - provider 内部の無制限 cache を正本にしない
-- `PlainTextApiCredentialProvider` は sample / test / local dev 用として用意してよいが、production 推奨ではない
+- `BitflyerPlainTextApiCredentialProvider` / `BinancePlainTextApiCredentialProvider` は sample / test / local dev 用として用意してよいが、production 推奨ではない
+- `PlainText` / `AgeFile` provider は core ではなく `ExchangeApi.Optional.Credentials` に置く
+- `ExchangeApi.Optional.Credentials` は `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` に置く
+- optional credentials package は venue `Composition` / `Protocol` / `Native` project に依存しない
 - API key / secret / 署名値は log / exception / result / evidence に露出してはならない
+
+明示 session overload:
+
+```csharp
+Task<CallResult<TRequest, TResponse>> EndpointAsync(
+    TRequest request,
+    IApiCredentialSession credentialSession,
+    CancellationToken cancellationToken = default);
+```
+
+ルール:
+
+- 通常 overload は `IApiCredentialProvider` から session を内部で開閉する
+- 明示 session overload は caller が渡した session を dispose しない
+- 明示 session overload は private endpoint にだけ用意する
+- public endpoint に credential session overload を用意してはならない
 
 credential failure 契約:
 
@@ -815,6 +836,28 @@ credential failure 契約:
 - `VenueMismatch`
 - `InvalidApiKey`
 - `InvalidApiSecret`
+
+分類境界:
+
+- `NotConfigured`: provider に必要な設定値が渡されていない
+- `SourceUnavailable`: 設定値はあるが、credential source に到達できない
+- `DecryptFailed`: credential source は読めたが復号に失敗した
+- `JsonParseFailed`: 復号後 payload を credentials JSON として parse できない
+- `MissingRequiredField`: `version`、`venue`、`apiKey`、`apiSecret` のいずれかが無い
+- `UnsupportedVersion`: `version` が v2 実装の対応範囲外
+- `VenueMismatch`: credentials JSON の `venue` が provider の venue と一致しない
+- `InvalidApiKey`: `apiKey` が empty、whitespace-only、または前後 whitespace を含む
+- `InvalidApiSecret`: `apiSecret` が empty、whitespace-only、または前後 whitespace を含む
+
+credential JSON schema:
+
+- `AgeFile` provider の復号後 JSON は flat object とする
+- required fields は `version`, `venue`, `apiKey`, `apiSecret` とする
+- optional metadata は `label`, `generatedAt`, `expiresAt`, `note` とする
+- `version` は integer `1` のみを受け付ける
+- canonical venue string は `bitflyer` / `binance` とする
+- unknown field は許容する
+- `expiresAt` は v2 では metadata であり、期限 enforcement は行わない
 
 bitFlyer private endpoint 固有の固定事項:
 

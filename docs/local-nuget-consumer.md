@@ -4,13 +4,19 @@
 
 外部 consumer 向けの推奨導線は local NuGet feed とする。`ProjectReference` は repo 内開発または近接開発向けであり、外部 consumer の推奨導線ではない。
 
+注記:
+
+- 現在の公開固定点は `v1.0.0` である
+- 本書の package version と API 例は `v2.0.0` 実装後の local consumer 導線を示す
+- `v2.0.0` 実装前に現行 package を試す場合は、version と API 名を `v1.0.0` 系に読み替える
+
 ## 1. 前提
 
 - ExchangeAPI repository 側で local package を生成済みであること
 - consumer project 側が `net10.0` を target できること
 - local feed は machine-local 用途であり、共有 feed や公開 feed の代替ではない
 
-ExchangeAPI repository 側では、repo root で次を実行する。
+`v2.0.0` 実装後、ExchangeAPI repository 側では repo root で次を実行する。
 
 ```bash
 bash scripts/pack-local-nuget.sh 2.0.0
@@ -75,6 +81,8 @@ dotnet add package ExchangeApi.Optional.Credentials --version 2.0.0
 平文 provider、age-backed provider などの storage / decrypt recipe が必要な consumer だけが参照する。
 
 ## 4. 最小利用例
+
+以下は `v2.0.0` 実装後の API 名を使う例である。
 
 consumer app の `Program.cs`:
 

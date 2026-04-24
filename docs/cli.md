@@ -413,7 +413,7 @@ CLI は private command 実行時に credential failure を検出した場合、
 - stdout には何も出してはならない
 - stderr 1 行目は短い summary とする
 - exit code は `2` とする
-- `--verbose` 指定時は secret-safe な範囲で `ApiCredentialErrorKind`、必要な環境変数名、provider 種別、venue を追加してよい
+- `--verbose` 指定時は secret-safe な範囲で `credentialErrorKind`、必要な環境変数名、`provider`、`venue`、`reason` を追加してよい
 - API key / secret / 署名値 / 認証 header は出してはならない
 - path は secret ではないが、運用環境情報になり得るため、通常 summary では出さず `--verbose` に限定する
 

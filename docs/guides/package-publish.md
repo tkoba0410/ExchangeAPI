@@ -3,6 +3,12 @@
 この文書は、ExchangeAPI の library / optional package を GitHub Packages へ publish する手順を固定する。
 `v1.0.0` では library package を publish 済みであり、この文書は再現手順と次回 publish の基準を兼ねる。
 
+注記:
+
+- 現在の公開固定点は `v1.0.0` である
+- 本書の `2.0.0` command 例は `v2.0.0` 実装後の publish 手順を示す
+- `v2.0.0` 実装前に再現確認する場合は、対象 version を現行 package version に読み替える
+
 ## Scope
 
 publish 対象は library package と optional package とする。

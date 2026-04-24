@@ -664,7 +664,8 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `evaluate_order` の機械的な不成立は、可能な限り正常 response の `canPlace = false` で表現する
 - `GetPermissions` failure は `get_account_snapshot` では degraded success とし、`accountReadiness = unknown` に写像してよい
 - credential failure は private account capability の unavailable として扱う
-- call 時点の credential failure は `upstream_error` / `account_unavailable` とし、`details.credentialErrorKind` に secret-safe な分類を入れてよい
+- call 時点の credential failure は `upstream_error` / `account_unavailable` とする
+- credential failure の details は `credentialErrorKind`、`venue`、`provider`、`reason` を持つ
 - credential failure を `_meta.degraded = true` だけで表現してはならない
 
 ## 8. Related Documents

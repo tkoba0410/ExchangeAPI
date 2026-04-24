@@ -33,7 +33,11 @@ public interface IApiCredentialSession : IAsyncDisposable
 - provider は credential source を開き、必要なら復号し、session を返す
 - session は session 寿命中だけ `ApiKey` と署名機能を提供する
 - client は `ApiKey` と `Sign(payload)` だけを使う
+- v2 の署名 API は `Sign(string payload)` のみを固定する
+- `payload` は venue ごとの canonical signing payload を UTF-8 文字列として構築したものとする
+- byte sequence を直接扱う overload は v2 では追加しない
 - storage / encryption recipe は provider 実装に閉じる
+- provider は venue-specific とし、1 provider instance は 1 venue の credential source だけを扱う
 
 ## 2. 通常利用
 
@@ -43,7 +47,7 @@ client / adapter は private call の実行時に session を開き、必要な 
 概念例:
 
 ```csharp
-var credentials = new PlainTextApiCredentialProvider(
+var credentials = new BitflyerPlainTextApiCredentialProvider(
     apiKey: "...",
     apiSecret: "...");
 
@@ -65,8 +69,15 @@ session 寿命は client / adapter が operation 単位で管理する。
 ```csharp
 await using var session = await credentials.OpenSessionAsync(cancellationToken);
 
-var balance = await client.Private.GetBalanceAsync(session, cancellationToken);
-var collateral = await client.Private.GetCollateralAsync(session, cancellationToken);
+var balance = await client.Private.GetBalanceAsync(
+    new GetBalanceRequest(),
+    session,
+    cancellationToken);
+
+var collateral = await client.Private.GetCollateralAsync(
+    new GetCollateralRequest(),
+    session,
+    cancellationToken);
 ```
 
 明示 session の基本:
@@ -76,12 +87,25 @@ var collateral = await client.Private.GetCollateralAsync(session, cancellationTo
 - client bundle 寿命まで無条件に延ばさない
 - provider 内部の無制限 cache を正本にしない
 
+明示 session overload の形:
+
+```csharp
+Task<CallResult<TRequest, TResponse>> EndpointAsync(
+    TRequest request,
+    IApiCredentialSession credentialSession,
+    CancellationToken cancellationToken = default);
+```
+
+この overload は private endpoint にだけ用意する。  
+渡された `credentialSession` の dispose は caller の責務であり、client / adapter は dispose しない。
+
 ## 4. PlainText Provider
 
 平文 provider は、sample / test / local dev 用として用意してよい。
 
 ```csharp
-public sealed class PlainTextApiCredentialProvider : IApiCredentialProvider
+public sealed class BitflyerPlainTextApiCredentialProvider : IApiCredentialProvider
+public sealed class BinancePlainTextApiCredentialProvider : IApiCredentialProvider
 ```
 
 位置づけ:
@@ -94,6 +118,17 @@ public sealed class PlainTextApiCredentialProvider : IApiCredentialProvider
 
 平文 provider を用意する理由は、API の使い方を最小構成で説明するためである。  
 安全な保存方式を提供するためではない。
+
+配置:
+
+- project: `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj`
+- package: `ExchangeApi.Optional.Credentials`
+- namespace root: `ExchangeApi.Optional.Credentials`
+- dependencies:
+  - `ExchangeApi.Primitives`
+  - venue `Composition` project には依存しない
+  - venue `Protocol` / `Native` project には依存しない
+- core auth contract が `Primitives` 以外に置かれる場合、optional package はその contract project のみに依存する
 
 ## 5. 外部 Provider
 
@@ -110,7 +145,83 @@ public sealed class PlainTextApiCredentialProvider : IApiCredentialProvider
 これらは ExchangeAPI core の正本ではない。  
 それぞれの復号、取得、cache、監査、権限管理は provider 実装または上層 application の責務である。
 
-## 6. 失敗通知
+v2 初手で同梱する optional provider:
+
+```csharp
+public sealed class BitflyerAgeFileApiCredentialProvider : IApiCredentialProvider
+public sealed class BinanceAgeFileApiCredentialProvider : IApiCredentialProvider
+```
+
+`age` provider は、復号処理そのものを `IAgeCredentialFileDecryptor` に委譲する。  
+標準実装は external `age` CLI を呼び出す `AgeCliCredentialFileDecryptor` とする。
+
+factory:
+
+```csharp
+public static class PlainTextApiCredentialProviderFactory
+public static class AgeFileApiCredentialProviderFactory
+```
+
+factory は `ExchangeVenue` を受け取り、対応する venue-specific provider を返す。  
+`ExchangeVenue` は `ExchangeApi.Optional.Credentials` に置く optional package 内 vocabulary とし、core library の共通 enum にはしない。
+
+public type set:
+
+```csharp
+public enum ExchangeVenue
+public interface IAgeCredentialFileDecryptor
+public sealed class AgeCliCredentialFileDecryptor : IAgeCredentialFileDecryptor
+public sealed class BitflyerPlainTextApiCredentialProvider : IApiCredentialProvider
+public sealed class BinancePlainTextApiCredentialProvider : IApiCredentialProvider
+public sealed class BitflyerAgeFileApiCredentialProvider : IApiCredentialProvider
+public sealed class BinanceAgeFileApiCredentialProvider : IApiCredentialProvider
+public static class PlainTextApiCredentialProviderFactory
+public static class AgeFileApiCredentialProviderFactory
+```
+
+## 6. Credential JSON Schema
+
+`AgeFile` provider が復号後に受け取る JSON は次の flat object とする。
+
+```json
+{
+  "version": 1,
+  "venue": "bitflyer",
+  "apiKey": "xxxxx",
+  "apiSecret": "yyyyy",
+  "label": "main-trade",
+  "generatedAt": "2026-03-29T10:00:00+09:00",
+  "expiresAt": "2026-06-30T00:00:00+09:00",
+  "note": "main trading key"
+}
+```
+
+required fields:
+
+- `version`
+- `venue`
+- `apiKey`
+- `apiSecret`
+
+optional metadata:
+
+- `label`
+- `generatedAt`
+- `expiresAt`
+- `note`
+
+validation:
+
+- `version` は integer `1` のみを受け付ける
+- `venue` は provider の venue と一致しなければならない
+- canonical venue string は `bitflyer` / `binance` とする
+- `apiKey` / `apiSecret` は empty、whitespace-only、前後 whitespace を invalid とする
+- unknown field は許容し、v2 実装では無視してよい
+- `generatedAt` / `expiresAt` は `DateTimeOffset` として parse 可能な文字列を推奨する
+- `expiresAt` は v2 では metadata であり、期限 enforcement は行わない
+- `label` は operator 向け metadata であり、routing、account selection、session identity に使わない
+
+## 7. 失敗通知
 
 credential provider は、credential を開けない場合に失敗理由を分類可能にする。
 
@@ -123,7 +234,7 @@ public sealed class ApiCredentialException : Exception
 }
 ```
 
-分類例:
+分類:
 
 - `NotConfigured`
 - `SourceUnavailable`
@@ -135,6 +246,18 @@ public sealed class ApiCredentialException : Exception
 - `InvalidApiKey`
 - `InvalidApiSecret`
 
+分類境界:
+
+- `NotConfigured`: provider に必要な設定値が渡されていない
+- `SourceUnavailable`: 設定値はあるが、credential source に到達できない
+- `DecryptFailed`: credential source は読めたが復号に失敗した
+- `JsonParseFailed`: 復号後 payload を credentials JSON として parse できない
+- `MissingRequiredField`: `version`、`venue`、`apiKey`、`apiSecret` のいずれかが無い
+- `UnsupportedVersion`: `version` が v2 実装の対応範囲外
+- `VenueMismatch`: credentials JSON の `venue` が provider の venue と一致しない
+- `InvalidApiKey`: `apiKey` が empty、whitespace-only、または前後 whitespace を含む
+- `InvalidApiSecret`: `apiSecret` が empty、whitespace-only、または前後 whitespace を含む
+
 通知責務:
 
 - provider は secret-safe な exception を投げる
@@ -143,21 +266,33 @@ public sealed class ApiCredentialException : Exception
 - MCP は tool 公開制御、structured error、stderr diagnostic へ写像する
 - application は UI、operator log、alert など用途に応じて写像する
 
-## 7. 禁止事項
+adapter が公開してよい detail key:
+
+- `credentialErrorKind`
+- `venue`
+- `provider`
+- `reason`
+
+`reason` は secret-safe な短文に限定する。file path は通常 summary に含めず、adapter の verbose / diagnostic 出力に限定する。
+
+## 8. 禁止事項
 
 - `ApiSecret` を public API に出さない
 - API key / secret を log に出さない
 - API key / secret を exception message に含めない
 - API key / secret を `CallResult`, `CallMeta`, `CallError` に含めない
 - API key / secret を `local/evidence/` に残さない
-- `PlainTextApiCredentialProvider` を production 推奨として扱わない
+- `BitflyerPlainTextApiCredentialProvider` / `BinancePlainTextApiCredentialProvider` を production 推奨として扱わない
 - storage / encryption 方式を ExchangeAPI core の必須正本にしない
 
-## 8. 残る実装裁定
+## 9. 実装固定事項
 
-次の詳細は、実装時に確定する。
+v2 実装では次を固定する。
 
-- `Sign(string payload)` だけでよいか、byte sequence を扱う overload を追加するか
-- provider を venue 別にするか、provider / session へ venue 情報を渡すか
-- `PlainTextApiCredentialProvider` をどの project に置くか
-- 明示 session API をどの public surface に出すか
+- `Sign(string payload)` のみを public signing API とする
+- byte sequence overload は post-v2 検討とする
+- provider は venue-specific class とする
+- `PlainText` / `AgeFile` provider は `ExchangeApi.Optional.Credentials` に置く
+- `ExchangeVenue` は optional package 内 vocabulary とする
+- 通常 private call は client / adapter が session を内部で開閉する
+- 明示 session overload は、複数 private call を同一 session で実行したい利用者向けに public surface へ出す

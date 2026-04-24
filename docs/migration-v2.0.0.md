@@ -1,6 +1,6 @@
 # ExchangeAPI v2.0.0 Migration Guide
 
-最終更新: 2026-04-23  
+最終更新: 2026-04-25  
 位置づけ: version 単位文書  
 状態: draft
 
@@ -29,10 +29,11 @@ repo 内で `v2.0.0` 実装を進める場合は、次の順を推奨する。
 
 1. library public surface rename
 2. `CallError` additive detail field 追加
-3. CLI / MCP adapter 追従
-4. human-facing timestamp display の更新
-5. migration lock test の更新
-6. 正本文書と release note の最終反映
+3. auth provider / optional credentials 実装
+4. CLI / MCP adapter 追従
+5. human-facing timestamp display の更新
+6. migration lock test の更新
+7. 正本文書と release note の最終反映
 
 ## 4. 変更カテゴリ
 
@@ -59,9 +60,15 @@ repo 内で `v2.0.0` 実装を進める場合は、次の順を推奨する。
 - private credentials の storage / encryption 方式は core 正本から外し、auth provider 契約へ責務を寄せる
 - auth provider の具体 shape は `IApiCredentialProvider.OpenSessionAsync(...)` 型を採用する
 - 通常利用では client 側が session を隠して扱い、明示管理が必要な場合だけ利用者が session を開く
+- `ApiSecret` は public API に出さず、`IApiCredentialSession.Sign(string payload)` で署名する
+- `Sign(string payload)` のみを v2 public signing API とし、byte sequence overload は持たない
+- `PlainText` / `AgeFile` provider は `ExchangeApi.Optional.Credentials` package へ移る
+- `AgeFile` provider の復号後 JSON は `version`, `venue`, `apiKey`, `apiSecret` を required とする
+- credential failure は `ApiCredentialException.Kind` で分類し、CLI / MCP が通知へ写像する
 - MCP では副作用系を除く read-only 情報を原則サポート対象にし、tool は `Core Bot Tools` と `Inspection Read Tools` に分ける
 - verification は API 契約分類とは別に、`repo/local` 配置と `safe/tolerable/dangerous` の運用分類で整理する
 - 実行結果、artifact、log、手動確認メモは `local/evidence/` に集約する
+- distribution は library / optional package を NuGet、CLI / MCP を executable artifact として扱う
 
 ### 4.2 CLI
 
@@ -75,6 +82,8 @@ repo 内で `v2.0.0` 実装を進める場合は、次の順を推奨する。
 - runtime registry と adapter test を更新し、v2 rename と verbose detail を固定する
 - CLI の human-facing な時刻表示は local with offset を優先してよい
 - CLI canonical は API key / secret の直接引数入力を引き続き許可しない
+- credential failure は stderr と exit code `2` へ写像する
+- credential failure の verbose detail key は `credentialErrorKind`, `venue`, `provider`, `reason` とする
 
 ### 4.3 MCP Server
 
@@ -85,12 +94,86 @@ repo 内で `v2.0.0` 実装を進める場合は、次の順を推奨する。
 - visible tool inventory は tool catalog を正本としつつ、shared vocabulary は CLI と整合させる
 - adapter test と live test は維持し、tool schema と upstream error detail shape を固定する
 - MCP の structured response は UTC / structured contract を維持してよい
+- credential failure は private tool 非公開、または `upstream_error` / `account_unavailable` として表現する
+- credential failure details は `credentialErrorKind`, `venue`, `provider`, `reason` を持つ
 
-## 4.4 先に確認すべき影響
+### 4.4 Optional Credentials
+
+v2 では credential storage / decrypt recipe を core library から外し、optional package に置く。
+
+追加 package:
+
+```bash
+dotnet add package ExchangeApi.Optional.Credentials --version 2.0.0
+```
+
+主な public type:
+
+- `ExchangeVenue`
+- `IAgeCredentialFileDecryptor`
+- `AgeCliCredentialFileDecryptor`
+- `BitflyerPlainTextApiCredentialProvider`
+- `BinancePlainTextApiCredentialProvider`
+- `BitflyerAgeFileApiCredentialProvider`
+- `BinanceAgeFileApiCredentialProvider`
+- `PlainTextApiCredentialProviderFactory`
+- `AgeFileApiCredentialProviderFactory`
+
+v1 系で `BitflyerApiCredentials` を直接渡していた利用者は、v2 では provider を渡す。
+
+v1 例:
+
+```csharp
+using var client = BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions
+{
+    Credentials = new BitflyerApiCredentials
+    {
+        ApiKey = "...",
+        ApiSecret = "...",
+    },
+});
+```
+
+v2 例:
+
+```csharp
+var credentials = new BitflyerPlainTextApiCredentialProvider(
+    apiKey: "...",
+    apiSecret: "...");
+
+using var client = BitflyerClientFactory.CreateNativeClientBundle(
+    new BitflyerClientOptions
+    {
+        ApiCredentialProvider = credentials,
+    });
+```
+
+高コスト provider を複数 private call で再利用したい場合は、明示 session を使う。
+
+```csharp
+await using var session = await credentials.OpenSessionAsync(cancellationToken);
+
+var balance = await client.Private.GetBalanceAsync(
+    new GetBalanceRequest(),
+    session,
+    cancellationToken);
+```
+
+明示 session overload は private endpoint にだけ追加され、引数順は `request`, `credentialSession`, `cancellationToken` とする。
+
+### 4.5 Distribution
+
+- library package と optional package は NuGet package として配布する
+- `ExchangeApi.Optional.Credentials` は v2 publish 対象に含める
+- CLI と MCP Server は NuGet package ではなく executable artifact として配布する
+- 生成物は `local/nuget/` と `local/publish/**` に置き、git 管理しない
+
+## 4.6 先に確認すべき影響
 
 - library 利用者は型名と method 名の rename 影響が最も大きい
-- CLI 利用者は command 名よりも verbose/error 表示の detail 追加を確認すればよい
-- MCP 利用者は tool 名よりも `upstream_error.details` と shared vocabulary の更新を確認すればよい
+- private endpoint 利用者は credentials 直渡しから auth provider 注入への変更を確認する
+- CLI 利用者は command 名よりも verbose/error 表示の detail 追加と credential failure 通知を確認すればよい
+- MCP 利用者は tool 名よりも `upstream_error.details`、credential failure details、shared vocabulary の更新を確認すればよい
 
 ## 5. 変更一覧
 
@@ -119,8 +202,13 @@ repo 内で `v2.0.0` 実装を進める場合は、次の順を推奨する。
 | human-facing timestamp display | UTC 基本 | local with offset 優先 | machine canonical は維持し、CLI / log 表示を更新する |
 | private credentials policy | `age` 前提の色が強い | auth provider 契約を core に置き、storage/encryption recipe は外に出す | CLI 直引数は許可しない |
 | auth provider shape | 暗黙または未固定 | `IApiCredentialProvider.OpenSessionAsync(...)` 型 | 通常利用では自動 session、必要時だけ明示 session を使う |
+| credential implementation package | core / adapter に混在 | `ExchangeApi.Optional.Credentials` | provider 実装が必要な consumer は optional package を追加する |
+| private credential injection | credentials object 直渡し | `IApiCredentialProvider` 注入 | `BitflyerPlainTextApiCredentialProvider` などへ置換する |
+| explicit credential session | なし、または未固定 | private endpoint の `EndpointAsync(request, credentialSession, cancellationToken)` | 高コスト provider で複数 private call をまとめる場合に使う |
+| credential failure notification | string message 中心 | `ApiCredentialException.Kind` を adapter が通知へ写像 | CLI は stderr/exit code 2、MCP は account_unavailable details |
 | MCP read-only surface policy | bot 向け最小 tool にかなり限定 | 副作用系を除く read-only 情報を原則サポートし、`Core Bot Tools` と `Inspection Read Tools` に分ける | 既存 aggregate tool を維持しつつ、inspection 用 read-only tool を追加する |
 | verification layout and risk model | `tests` / `LiveTests` と marker 中心 | test 本体を `tests` / `verification` に置き、evidence を `local/evidence` に集約し、`safe/tolerable/dangerous` を導入する | API 契約分類は維持しつつ、manual/live verification と evidence 管理を分離する |
+| distribution artifact shape | library package と executable が混在気味 | library / optional は NuGet、CLI / MCP は executable artifact | optional package を publish 対象に加え、CLI/MCP は release asset として扱う |
 
 ## 6. 関連文書
 
@@ -129,3 +217,5 @@ repo 内で `v2.0.0` 実装を進める場合は、次の順を推奨する。
 - [`docs/cli.md`](./cli.md)
 - [`docs/mcp-server.md`](./mcp-server.md)
 - [`docs/verification.md`](./verification.md)
+- [`docs/guides/credentials-and-auth-provider.md`](./guides/credentials-and-auth-provider.md)
+- [`docs/distribution.md`](./distribution.md)

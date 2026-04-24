@@ -1,15 +1,16 @@
 # GitHub Packages Publish Guide
 
-この文書は、`ExchangeAPI v1.0.0` の library package を GitHub Packages へ publish する手順を固定する。
-`v1.0.0` では publish 済みであり、この文書は再現手順と次回 publish の基準を兼ねる。
+この文書は、ExchangeAPI の library / optional package を GitHub Packages へ publish する手順を固定する。
+`v1.0.0` では library package を publish 済みであり、この文書は再現手順と次回 publish の基準を兼ねる。
 
 ## Scope
 
-publish 対象は library package のみ。
+publish 対象は library package と optional package とする。
 
 - `ExchangeApi.Primitives`
 - `ExchangeApi.Exchanges.Bitflyer.*`
 - `ExchangeApi.Exchanges.Binance.*`
+- `ExchangeApi.Optional.*`
 
 次は package publish 対象にしない。
 
@@ -18,12 +19,18 @@ publish 対象は library package のみ。
 
 CLI / MCP Server は executable であり、release asset 側を正式導線とする。
 
+v2 方針:
+
+- `ExchangeApi.Optional.Credentials` は NuGet publish 対象に含める
+- optional package は core library の必須依存ではない
+- `age` などの credential storage / decrypt recipe は optional package または adapter executable 側へ寄せる
+
 ## 1. Local Pack
 
 repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 1.0.0
+bash scripts/pack-local-nuget.sh 2.0.0
 ```
 
 生成先:
@@ -60,13 +67,13 @@ export GITHUB_TOKEN=...
 `dotnet nuget push` を使う。
 
 ```bash
-bash scripts/push-github-packages.sh 1.0.0
+bash scripts/push-github-packages.sh 2.0.0
 ```
 
 script を使わず個別 push したい場合は、`dotnet nuget push` を直接使ってよい。
 
 ```bash
-dotnet nuget push "local/nuget/ExchangeApi.Primitives.1.0.0.nupkg" \
+dotnet nuget push "local/nuget/ExchangeApi.Primitives.2.0.0.nupkg" \
   --source "https://nuget.pkg.github.com/tkoba0410/index.json" \
   --api-key "$GITHUB_TOKEN" \
   --skip-duplicate
@@ -78,9 +85,10 @@ publish 後は GitHub Packages で package 一覧を確認する。
 
 少なくとも次を確認する。
 
-- version が `1.0.0`
+- publish 対象 version が見える
 - CLI / MCP executable package が publish されていない
 - `Composition` package が見える
+- `v2.0.0` では `ExchangeApi.Optional.Credentials` package が見える
 
 加えて、少なくとも 1 本は consumer 側で restore/build/run を確認する。
 
@@ -97,4 +105,5 @@ publish 後は GitHub Packages で package 一覧を確認する。
 
 - local NuGet feed と GitHub Packages feed を混同しない
 - `stage` 系は履歴であり、package の current public baseline は `v1.0.0`
+- 次回 v2 publish baseline は `v2.0.0` とする
 - nuget.org 公開はこの文書の対象外

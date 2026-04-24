@@ -1,19 +1,33 @@
-# CLI（Stage11 現行仕様）
+# CLI Specification
 
-最終更新: 2026-03-27  
-対象ブランチ: `stage11`
+最終更新: 2026-04-25  
+位置づけ: CLI adapter 正本
 
 ## 1. 位置づけ
 
-本書は Stage11 における CLI adapter の現行仕様である。  
-library 本体の設計正本は [`docs/spec.md`](./spec.md) に置き、  
+本書は ExchangeAPI CLI adapter の現行契約を定義する正本である。  
+library 本体の共通正本は [`docs/spec.md`](./spec.md) に置き、  
 endpoint ごとの公開範囲と contract metadata の正本は以下に置く。
 
 - [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md)
 - [`docs/endpoints-binance.md`](./endpoints-binance.md)
 
 CLI は library surface を terminal 向けに写像する adapter であり、  
-本書では current branch で固定できる内容だけを SSOT として定義する。
+本書では CLI 固有契約だけを扱う。過去 phase の計画履歴は [`docs/archive/`](./archive/README.md) を参照する。
+
+注記:
+
+- 本文中に残る `Stage11` は履歴ラベルであり、現行契約の優先順位は stage 名ではなく文書体系ガイドに従う
+
+### 1.1 Version Notes
+
+- `v2.0.0` で検討中の CLI 変更は [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md) と [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md) を参照する
+- 現時点で採用済みの CLI 関連論点は、library 側 rename への追従、`--verbose` 時の `CallError` detail 拡張、MCP との shared vocabulary 整合である
+- private credentials については、`v2.0.0` で core 正本から `age` 固定の色を外し、auth provider 契約へ責務を寄せる
+- auth provider の具体 shape は `IApiCredentialProvider.OpenSessionAsync(...)` 型を採用するが、通常の CLI 利用では adapter 側が session を隠して扱う想定である
+- credential failure は CLI が利用者へ通知する。通知先は stderr と exit code であり、stdout の JSON 契約を汚してはならない
+- ただし現行 CLI canonical の `v1.x` 契約としては、credentials input は引き続き age-backed source を正本とする
+- command identity と CLI surface 自体は `v2.0.0` でも 1:1 に MCP tool 名へ寄せない方針である
 
 ## 2. 責務
 
@@ -115,7 +129,7 @@ CLI adapter の interface tier は以下を正本とする。
 - wizard は canonical CLI に存在しない capability を追加してはならない
 - wizard は最終的に canonical CLI と等価な request を生成しなければならない
 - wizard の human-facing prompt / prose / layout は正式な automation 契約に含めない
-- 現行 phase の最小 wizard は、selected command の scalar input を収集し、等価な canonical invocation を提示する形でよい
+- 現行 CLI 契約における最小 wizard は、selected command の scalar input を収集し、等価な canonical invocation を提示する形でよい
 
 #### Tier 3: Shell
 
@@ -124,12 +138,12 @@ CLI adapter の interface tier は以下を正本とする。
 - shell は venue / surface / scope などの process-local default を持ってよい
 - shell の実行は canonical command descriptor を再利用しなければならない
 - shell 独自の request / response 契約、独自 capability、独自 safety rule を導入してはならない
-- 現行 phase の shell helper は venue / surface / scope の default 保持と `run` 委譲に限定する
+- 現行 CLI 契約における shell helper は venue / surface / scope の default 保持と `run` 委譲に限定する
 
 #### TUI
 
 - full-screen TUI は当面導入しない
-- TUI は CLI adapter の current contract に含めない
+- TUI は CLI adapter の現行契約に含めない
 
 ## 4. コマンドモデル
 
@@ -181,22 +195,22 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 本項は library 側で CLI が将来写像しうる surface range を示す。  
 現行 binary が実際に expose する command set と同義ではない。
 
-### 4.5 現行実装済み slice
+### 4.5 Runtime Command Coverage
 
 - 現行 branch の実行可能 command set の正本は command descriptor registry とする
   - `src/Adapters/Cli/Commands/CommandCatalog.cs`
-- 本仕様書は current slice の全 command identity を重複列挙によって正本化しない
-- current slice の具体的な command identity は runtime registry と test で固定する
-- 現在の slice は次の範囲に限定する
+- 本仕様書は runtime command coverage の全 command identity を重複列挙によって正本化しない
+- 具体的な command identity は runtime registry と test で固定する
+- 現行 coverage は次の範囲に限定する
   - bitFlyer `native public`
     - current library の public native read surface をすべて expose する
   - bitFlyer `native private`
     - current library の private native surface をすべて expose する
   - bitFlyer `protocol public`
-    - current phase では query-only
+    - query-only
     - current library の public protocol read surface をすべて expose する
   - bitFlyer `protocol private`
-    - current phase では query-only
+    - query-only
     - current library の private protocol read surface をすべて expose する
   - Binance `native public`
     - current library の public native surface をすべて expose する
@@ -204,18 +218,18 @@ exchangeapi <venue> <surface> <scope> <command> [options]
     - current library の public protocol surface をすべて expose する
 - wizard は `get-ticker`、`get-klines`、`cancel-all-child-orders` にだけ対応する
 - shell は上記 registry に登録された command にだけ委譲できる
-- endpoint matrix は設計上の inventory 正本だが、現行 phase では CLI runtime が matrix 全件を expose しているとはみなさない
+- endpoint matrix は設計上の inventory 正本だが、CLI runtime が matrix 全件を expose しているとはみなさない
 
-### 4.6 現行 slice の更新規約
+### 4.6 Runtime Coverage の更新規約
 
-- current slice の executable truth は常に runtime registry とする
-- current slice を変更する patch は、少なくとも runtime registry と current slice を固定する test を同時に更新しなければならない
-- help、wizard、shell は current slice を独自に保持せず、runtime registry から導出しなければならない
-- 本仕様書と README は current slice の完全列挙を正本として再保持してはならない
+- runtime coverage の executable truth は常に runtime registry とする
+- runtime coverage を変更する patch は、少なくとも runtime registry と runtime coverage を固定する test を同時に更新しなければならない
+- help、wizard、shell は runtime coverage を独自に保持せず、runtime registry から導出しなければならない
+- 本仕様書と README は runtime coverage の完全列挙を正本として再保持してはならない
 - README の command 例は参考情報であり、実行可能 inventory の判定には使ってはならない
-- current phase の current slice parity は library API interface に対する test で固定する
-  - ただし `protocol` の `bodyJson` 系 method は current phase 非スコープなので parity 対象から除外する
-- current slice を広げる場合は、文書上も次の 2 点を明示しなければならない
+- runtime coverage parity は library API interface に対する test で固定する
+  - ただし `protocol` の `bodyJson` 系 method は現行非スコープなので parity 対象から除外する
+- runtime coverage を広げる場合は、文書上も次の 2 点を明示しなければならない
   - どの surface / scope / endpoint family が追加されたか
   - formal interface なのか helper tier なのか
 
@@ -236,7 +250,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
   - ない場合は DTO property 名
 - `native` request JSON の field naming 正本は request DTO の serialization contract だけとする
 - CLI command descriptor、help、template、usage example は `native` request JSON に対して DTO 契約と異なる別名を hand-write してはならない
-- current phase の library contract では、`native` response DTO の全 property に API response JSON field 名の `JsonPropertyName` を明示する方針を採る
+- 現行 library contract では、`native` response DTO の全 property に API response JSON field 名の `JsonPropertyName` を明示する方針を採る
 - `native` DTO の property が enum で表現される場合も、request / response JSON の値は API が定義する string literal を使う
 - CLI は DTO の `JsonPropertyName` / `JsonConverter` をそのまま使い、CLI 独自の JSON naming policy や value rewriting を定義しない
 - したがって `native` command の stdout field 名は、対応する API response JSON field 名に一致することを期待してよい
@@ -244,15 +258,15 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 ### 5.2 `protocol`
 
 - `protocol` command は raw request を扱う
-- current phase の protocol current slice は query-only command に限定する
+- 現行の protocol runtime coverage は query-only command に限定する
 - query-only endpoint は以下のいずれかで query object を受け取る
   - `--query-json <json>`
   - `--query-file <path>`
 - `--query-file -` は stdin を意味する
 - query object の key は exchange API の query parameter 名に合わせる
-- current phase の query key と primitive kind は command descriptor metadata で固定し、CLI はその metadata に基づいて invalid field / invalid type を判定しなければならない
+- 現行 CLI 契約では query key と primitive kind は command descriptor metadata で固定し、CLI はその metadata に基づいて invalid field / invalid type を判定しなければならない
 - `protocol` command は native DTO decode や contract validation を行わない
-- body を持つ protocol endpoint と `--body-json` / `--body-file` / `--body-template` は Stage11 current phase の CLI 契約に含めない
+- body を持つ protocol endpoint と `--body-json` / `--body-file` / `--body-template` は現行 CLI 契約に含めない
 
 ### 5.3 人間向け入力補助
 
@@ -284,7 +298,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - wizard は canonical CLI と等価な request を生成しなければならない
 - wizard が command line を提示する場合、canonical input option を使ってよい
   - 例: `--request-json`
-  - current phase の wizard は `--request-json` または `--query-json` だけを生成してよく、`--body-json` を生成してはならない
+  - 現行 wizard は `--request-json` または `--query-json` だけを生成してよく、`--body-json` を生成してはならない
 - wizard は convenience flag のみで安定して表現できる単純 command から導入する
 - 複雑 command、nested object、array、conditional omission が多い command は canonical CLI を優先し、wizard 導入を急がない
 
@@ -293,7 +307,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - shell の入力体験は人間向け補助であり、formal automation contract に含めない
 - shell の session default は canonical CLI の path token や option の短縮入力にのみ使ってよい
 - shell は execution 時に canonical command descriptor へ解決しなければならない
-- 現行 phase の shell built-in は以下に限定してよい
+- 現行 shell built-in は以下に限定してよい
   - `help`
   - `show`
   - `use venue <value>`
@@ -310,7 +324,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 
 ### 6.1 基本原則
 
-- 現行 phase で固定する出力形式は `json` のみとする
+- 現行 CLI 契約で固定する出力形式は `json` のみとする
 - stdout は成功時データのみを出す
 - stderr は診断メッセージのみを出す
 - stdout に説明文や装飾文字列を混ぜてはならない
@@ -340,7 +354,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 
 - 正規化済み contract を見たい場合は `native` を使う
 - raw response を見たい場合は `protocol` を使う
-- 現行 phase では `--raw` / `--normalized` の二重出力は固定しない
+- 現行 CLI 契約では `--raw` / `--normalized` の二重出力は固定しない
 - raw / normalized の切り替えは surface 選択で表現する
 
 ### 6.4 人間向け表示補助
@@ -351,8 +365,10 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 - `--summary` は人間向け要約を stderr にのみ出してよい
 - `--summary` は stdout の JSON 出力契約を変えてはならない
 - `--summary` の最小内容は command identity と success / failure 判定とする
-- `protocol` command の success summary は current phase では `status=<code>` を含めなければならない
+- `protocol` command の success summary は現行 CLI 契約では `status=<code>` を含めなければならない
 - `--verbose` 指定時は `--summary` の詳細版として追加診断を stderr に出してよい
+- human-facing な timestamp を stderr に表示する場合は、実行環境の local time with offset を優先してよい
+- 上記は人間向け表示補助に限り、stdout の canonical JSON 契約を変更しない
 
 ### 6.5 wizard と shell
 
@@ -365,7 +381,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 ### 7.1 認証
 
 - API key / secret を CLI 引数で受け取ってはならない
-- 現行 phase で固定する credentials input は age-backed source に限定する
+- 現行 CLI 契約で固定する credentials input は age-backed source に限定する
   - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
   - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
 - 復号後 credentials file の canonical JSON format は次とする
@@ -383,13 +399,36 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 ```
 - `version`、`venue`、`apiKey`、`apiSecret` は credentials contract の本体である
 - `label`、`generatedAt`、`expiresAt`、`note` は optional metadata として許可してよい
-- current phase の CLI は optional metadata を挙動判定には使わず、未知 field も無視してよい
+- 現行 CLI は optional metadata を挙動判定には使わず、未知 field も無視してよい
 - bitFlyer private command は credentials を解決できない場合、facade call 前に失敗させる
 - Binance は現行公開範囲に private surface を持たない
 
-### 7.2 option
+### 7.2 credential failure notification
 
-現行 phase で固定する option は、`Composition` 直結のものと CLI 固有のものに分ける。
+CLI は private command 実行時に credential failure を検出した場合、利用者へ通知しなければならない。
+
+ルール:
+
+- credential failure は原則として facade call 前の config / credential error として扱う
+- stdout には何も出してはならない
+- stderr 1 行目は短い summary とする
+- exit code は `2` とする
+- `--verbose` 指定時は secret-safe な範囲で `ApiCredentialErrorKind`、必要な環境変数名、provider 種別、venue を追加してよい
+- API key / secret / 署名値 / 認証 header は出してはならない
+- path は secret ではないが、運用環境情報になり得るため、通常 summary では出さず `--verbose` に限定する
+
+summary 例:
+
+```text
+missing credential
+invalid credential source
+credential decrypt failed
+credential venue mismatch
+```
+
+### 7.3 option
+
+現行 CLI 契約で固定する option は、`Composition` 直結のものと CLI 固有のものに分ける。
 
 `Composition` 直結:
 
@@ -418,12 +457,12 @@ command-specific convenience flag:
 - 例: `--interval`
 - 例: `--limit`
 
-### 7.3 優先順位
+### 7.4 優先順位
 
 - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH` と `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH` の両方がある場合に限り、age-backed source を解決してよい
-- `--base-uri`、`--timeout-ms`、`--enable-protocol-debug-log`、`--protocol-debug-log-dir`、`--use-ticker-alias-path` は current phase では CLI option からのみ解決する
-- current phase では上記以外の generic precedence ルールを固定しない
-- 現行 phase では config file 契約を固定しない
+- `--base-uri`、`--timeout-ms`、`--enable-protocol-debug-log`、`--protocol-debug-log-dir`、`--use-ticker-alias-path` は現行 CLI 契約では CLI option からのみ解決する
+- 現行 CLI 契約では上記以外の generic precedence ルールを固定しない
+- 現行 CLI 契約では config file 契約を固定しない
 
 ## 8. 安全制約
 
@@ -434,8 +473,8 @@ command-specific convenience flag:
 - 確認 prompt では command identity と送信対象 request の要約を表示しなければならない
 - 利用者が確認を拒否した場合、facade call を行ってはならない
 - 利用者が確認を拒否した場合は exit code `2` で終了する
-- 現行 phase では generic `dry-run` 契約を持たない
-- 現行 phase では generic `client-order-key` 契約を持たない
+- 現行 CLI 契約では generic `dry-run` 契約を持たない
+- 現行 CLI 契約では generic `client-order-key` 契約を持たない
 - ログや error message に secret を出してはならない
 
 ## 9. Exit Code
@@ -450,6 +489,7 @@ command-specific convenience flag:
 補足:
 
 - `facade call failure` は `Call.IsSuccess = false` を意味する
+- credential failure は原則として exit code `2` とする
 - `--verbose` 指定時は stderr に `CallError.Kind` と endpoint 情報を追加してよい
 - `protocol` command では HTTP response を受け取れた場合、non-success status だけでは exit code `3` にしない
 - `protocol` command の exit code `3` は transport failure、binding failure、または `ProtocolResponse` を返せなかった facade failure に対して使う
@@ -469,11 +509,12 @@ command-specific convenience flag:
   - endpoint id
   - protocol path
   - protocol status code
+- timestamp を追加表示する場合は local with offset を優先してよい
 - secret は常に redact しなければならない
 
 ## 10. Help
 
-- root help は canonical CLI に加えて wizard と shell の存在または current phase の扱いが分かるようにしてよい
+- root help は canonical CLI に加えて wizard と shell の存在または現行 CLI 契約での扱いが分かるようにしてよい
 - help は階層的でなければならない
 - 各階層で usage 例を少なくとも 1 つ示す
 - write command の help では `--yes` 要件を明示する
@@ -493,7 +534,7 @@ command-specific convenience flag:
   - required / optional
 - help から `--request-template` / `--query-template` の存在が分かるようにしなければならない
 
-## 11. 現行非スコープ
+## 11. Out Of Scope
 
 以下は旧草案から intent は引き継ぐが、現行 branch では仕様固定しない。
 
@@ -508,7 +549,7 @@ command-specific convenience flag:
 - protocol body command と `--body-json` / `--body-file` / `--body-template`
 - full-screen TUI
 
-## 11.1 再導入条件
+## 11.1 将来導入条件
 
 現行非スコープ項目は、対応する library / adapter 契約が先に固定された場合にのみ再導入してよい。
 
@@ -527,7 +568,7 @@ command-specific convenience flag:
 - generic idempotency key
   - 複数 venue にまたがって意味の一致する idempotency 契約が必要
 
-上記条件が満たされない限り、CLI は Stage11 の current contract を優先し、非スコープ項目を先行導入してはならない。
+上記条件が満たされない限り、CLI は現行契約を優先し、非スコープ項目を先行導入してはならない。
 
 ## 12. 例
 

@@ -7,6 +7,7 @@
 対象:
 
 - Library
+- Optional packages
 - CLI
 - MCP Server
 
@@ -18,6 +19,8 @@
 - 生成された `.nupkg` や executable は git 管理しない
 - 生成物は `local/` 配下に集約する
 - 外部利用者向けには「何をどう生成するか」を文書で固定する
+- `v2.0.0` では配布方式自体を変更しない
+- v2 の追加機能は、必要に応じて library package 群または executable に含める
 
 ## Artifact Layout
 
@@ -46,6 +49,40 @@ bash scripts/pack-local-nuget.sh
   - `ExchangeApi.Exchanges.Bitflyer.Composition v1.0.0` の consumer smoke test を確認済み
   - `ExchangeApi.Exchanges.Binance.Composition v1.0.0` の consumer smoke test を確認済み
 
+v2 方針:
+
+- `v2.0.0` でも library は NuGet package を正式導線とする
+- 通常利用者は venue ごとの `Composition` package を参照する
+- `Protocol` / `Native` / `Vocabulary` / `Primitives` は、必要に応じて個別参照できる package として維持する
+- `ProjectReference` は repo 内開発または近接開発向けであり、外部 consumer の第一導線にはしない
+
+### Optional Packages
+
+optional package は、core library の責務を薄く保つための追加 NuGet package として扱う。
+
+v2 初手の対象:
+
+- `ExchangeApi.Optional.Credentials`
+
+役割:
+
+- `PlainText` provider など sample / test / local dev 向け実装を提供する
+- `AgeFile` provider など、core から外した credential storage / decrypt recipe を提供する
+- `IApiCredentialProvider` / `IApiCredentialSession` の core 契約を実装する
+
+配布方針:
+
+- optional package は NuGet package として配布する
+- CLI / MCP executable は、必要な optional 実装を参照して publish artifact に含めてよい
+- optional package は core の必須依存にしない
+- optional package の追加により、`ExchangeApi.Exchanges.*.Composition` の最小利用者が不要な storage / decrypt 実装を強制参照しないようにする
+- optional package の生成先は library package と同じ `local/nuget/` とする
+
+実装前提:
+
+- `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` を追加したら、solution と pack script の対象に含める
+- package publish guide と local consumer guide は、実装後に `ExchangeApi.Optional.Credentials` の参照例を最終化する
+
 ### CLI
 
 - project:
@@ -73,6 +110,15 @@ bash scripts/publish-cli-local.sh
 ```bash
 bash scripts/publish-mcp-local.sh
 ```
+
+### Release Asset 方針
+
+CLI / MCP Server は NuGet package ではなく executable artifact として扱う。
+
+- local 生成先は `local/publish/<adapter>/<rid>/`
+- public release では GitHub Releases asset など、executable を直接取得できる導線を想定する
+- executable artifact の正式 name、RID matrix、checksum の有無は release 手順側で固定する
+- v2 初手では executable 配布方式の大規模変更は行わない
 
 ## Git Policy
 

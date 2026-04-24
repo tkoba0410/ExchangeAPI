@@ -1,19 +1,27 @@
-# Stage10 Endpoint Matrix — Binance
+# Binance Endpoint Matrix
 
-本書は、Binance の Stage10 実装に対する endpoint 運用正本である。  
-本書は Stage10 の Binance slice における実装対象、DTO 固定状況、live test 導入順、endpoint metadata を自己完結に管理する。
+最終更新: 2026-04-22  
+位置づけ: Binance venue ledger
 
-現在の Stage10 コード配置は本書の従属物であり、判断根拠にはしない。  
+本書は、Binance venue の endpoint metadata、公開範囲、固定状況を管理する現行正本である。  
+library 共通原則は [`docs/spec.md`](./spec.md) を参照し、本書では Binance 固有の matrix と補助台帳だけを扱う。
+
+現在のコード配置は本書の従属物であり、判断根拠にはしない。  
 削除済み inventory や他の補助文書を前提にせず、本書自身を endpoint 正本として扱う。
+
+注記:
+
+- 本文中に残る `Stage10` は履歴ラベルであり、現行の優先順位は文書体系ガイドに従う
+- 初期ルールや代表 contract 例は [`docs/archive/endpoint-history-and-examples.md`](./archive/endpoint-history-and-examples.md) に切り出して管理する
 
 ## Values
 
 - `ExposeInProtocol`
-  - `Yes`: Stage10 で `Protocol` 公開面に含める
-  - `Later`: 後段で扱う
+  - `Yes`: 現行 Binance slice の `Protocol` 公開面に含める
+  - `Later`: 現行 slice ではまだ公開しない
 - `ExposeInNative`
-  - `Yes`: Stage10 で `Native` 公開面に含める
-  - `Later`: 後段で扱う
+  - `Yes`: 現行 Binance slice の `Native` 公開面に含める
+  - `Later`: 現行 slice ではまだ公開しない
 - `LiveTestPhase`
   - `Phase1-Read`: 第1段階の read live test 対象
   - `Phase2-Write`: 第2段階の write live test 対象
@@ -36,7 +44,7 @@
 - `CleanupPolicy`
   - `None`: cleanup 不要
   - `Required`: live test 後に cleanup を必須とする
-  - `NotSupported`: Stage10 では write live test 対象にしない
+  - `NotSupported`: 現行 slice では write live test 対象にしない
 - `AliasPath`
   - path alias がある場合はその path を書く
   - なければ `-`
@@ -72,80 +80,12 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | GetKlines | GET | /api/v3/klines | public | Yes | Yes | Phase1-Read | Fixed | Fixed | 200 | ArrayOfArrays | No | None | - | None | startTime/endTime/timeZone/limit = null は query omitted |
 
-## Initial Rule
+## Current Rule
 
-- Stage10 の Binance 初期 slice では `GetKlines` だけを扱う
+- 現行 Binance slice では `GetKlines` だけを扱う
 - public read endpoint の template として `Phase1-Read` に置く
-- `GetKlines` は Binance 初期 slice の read contract として `Fixed` に上げる
+- `GetKlines` は Binance 現行 slice の read contract として `Fixed` に上げる
 
-## Initial Endpoint Contract
+## Representative Contract Notes
 
-### GetKlines
-
-- vocabulary
-  - convenience 用の known symbol 定数として以下を用意してよい
-    - `BinanceSymbols.BtcJpy = "BTCJPY"`
-    - `BinanceSymbols.EthJpy = "ETHJPY"`
-    - `BinanceSymbols.XrpJpy = "XRPJPY"`
-    - `BinanceSymbols.BnbJpy = "BNBJPY"`
-    - `BinanceSymbols.BtcUsdt = "BTCUSDT"`
-    - `BinanceSymbols.EthUsdt = "ETHUSDT"`
-    - `BinanceSymbols.SolUsdt = "SOLUSDT"`
-    - `BinanceSymbols.XrpUsdt = "XRPUSDT"`
-  - `BinanceIntervals.Hour1h = BinanceInterval.Hour1h` のような known interval 定数を用意してよい
-  - `Symbol` の known values 定数は convenience 用であり、closed set の正本として扱わない
-  - request DTO の `Symbol` 自体は `string` のまま持つ
-- `Protocol` facade
-  - `Task<Call<ProtocolRequest, ProtocolResponse>> GetKlinesCallAsync(string symbol, string interval, long? startTime = null, long? endTime = null, string? timeZone = null, int? limit = null, CancellationToken cancellationToken = default)`
-- `Native` facade
-  - `Task<Call<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> GetKlinesCallAsync(GetKlinesRequest request, CancellationToken cancellationToken = default)`
-- request DTO
-  - `Symbol: string`
-  - `Interval: BinanceInterval`
-  - `StartTime: long?`
-  - `EndTime: long?`
-  - `TimeZone: string?`
-  - `Limit: int?`
-- request rule
-  - `Symbol` 必須、blank 不可
-  - `Interval` 必須
-  - wire JSON / query string 上の `interval` value は case-sensitive
-    - `1s`
-    - `1m`, `3m`, `5m`, `15m`, `30m`
-    - `1h`, `2h`, `4h`, `6h`, `8h`, `12h`
-    - `1d`, `3d`
-    - `1w`
-    - `1M`
-  - `Limit` は `1..1000`
-  - `StartTime` と `EndTime` が両方ある場合は `StartTime <= EndTime`
-  - `TimeZone = null` のとき query omitted
-  - `TimeZone` がある場合は
-    - hour-only または hour-minute offset 文字列を許可する
-    - 例: `0`, `8`, `4`, `-1:00`, `05:45`
-    - 範囲は `-12:00` から `+14:00` inclusive
-  - `StartTime` と `EndTime` は常に UTC として解釈する
-- response DTO
-  - top-level array
-  - 各 item は tuple array
-  - `GetKlines.Item`
-    - `OpenTime: long`
-    - `OpenPrice: decimal`
-    - `HighPrice: decimal`
-    - `LowPrice: decimal`
-    - `ClosePrice: decimal`
-    - `Volume: decimal`
-    - `CloseTime: long`
-    - `QuoteAssetVolume: decimal`
-    - `NumberOfTrades: int`
-    - `TakerBuyBaseAssetVolume: decimal`
-    - `TakerBuyQuoteAssetVolume: decimal`
-  - tuple index `11` の unused field は ignore してよい
-- response rule
-  - top-level shape は `Array`
-  - 各 item の shape は `Array`
-  - 各 item は 12 要素前提
-  - tuple length 不一致、index kind 不一致、required scalar parse failure は `Codec`
-- `ExpectedStatus = 200`
-- `ResponseShape = ArrayOfArrays`
-- `AuthType = None`
-- `AliasPath = -`
+代表 contract 例、初期ルール、`GetKlines` の詳細な facade/request/response 例は [`docs/archive/endpoint-history-and-examples.md`](./archive/endpoint-history-and-examples.md) を参照する。

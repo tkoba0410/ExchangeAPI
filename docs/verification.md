@@ -242,6 +242,16 @@ API 契約の正本は endpoint matrix であり、本表は live / manual verif
 endpoint ごとの危険度、manual 実行条件、evidence 保存先は本書と `verification/` 側で管理する。  
 `LiveTests` の実行結果を後から確認したい場合は、端末出力や CI 結果そのものではなく、必要な範囲を `local/evidence/static/` または `local/evidence/verification/` に整理して残す。
 
+safe live verification をまとめて実行する場合は、次を使う。
+
+```bash
+bash scripts/run-safe-live-tests.sh
+```
+
+この script は `EXCHANGEAPI_RUN_LIVE_TESTS=1` を一時設定し、Binance live tests、bitFlyer live tests、MCP server live tests を実行する。
+credentials が未設定の場合、bitFlyer private read と MCP private read は skip される。
+write 系 live test は dedicated marker が無い限り実行されない。
+
 ## 8. MCP との関係
 
 MCP は read-only 情報取得を広く支援してよい。  

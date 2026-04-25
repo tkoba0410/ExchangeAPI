@@ -146,3 +146,4 @@ CLI / MCP Server は NuGet package ではなく executable artifact として扱
 - `scripts/smoke-local-nuget-consumer.sh`
 - `scripts/publish-cli-local.sh`
 - `scripts/publish-mcp-local.sh`
+- `scripts/run-safe-live-tests.sh`

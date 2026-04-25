@@ -6,8 +6,8 @@
 注記:
 
 - 現在の公開固定点は `v1.0.0` である
-- 本書の `2.0.0` command 例は `v2.0.0` 実装後の publish 手順を示す
-- `v2.0.0` 実装前に再現確認する場合は、対象 version を現行 package version に読み替える
+- 本書の `2.0.0` command 例は `v2.0.0` の publish 手順を示す
+- `v2.0.0` publish 前の確認では、`2.0.0-local.*` のような local package version を使う
 
 ## Scope
 

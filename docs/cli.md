@@ -21,8 +21,8 @@ CLI は library surface を terminal 向けに写像する adapter であり、
 
 ### 1.1 Version Notes
 
-- `v2.0.0` で検討中の CLI 変更は [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md) と [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md) を参照する
-- 現時点で採用済みの CLI 関連論点は、library 側 rename への追従、`--verbose` 時の `CallError` detail 拡張、MCP との shared vocabulary 整合である
+- `v2.0.0` で採用した CLI 変更は [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md) と [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md) を参照する
+- CLI 関連の主な変更は、library 側 rename への追従、`--verbose` 時の `CallError` detail 拡張、MCP との shared vocabulary 整合である
 - private credentials については、`v2.0.0` で core 正本から `age` 固定の色を外し、auth provider 契約へ責務を寄せる
 - auth provider の具体 shape は `IApiCredentialProvider.OpenSessionAsync(...)` 型を採用するが、通常の CLI 利用では adapter 側が session を隠して扱う想定である
 - credential failure は CLI が利用者へ通知する。通知先は stderr と exit code であり、stdout の JSON 契約を汚してはならない

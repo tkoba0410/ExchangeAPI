@@ -20,8 +20,8 @@ library の設計正本は [`docs/spec.md`](./spec.md) に置き、
 
 ### 1.1 Version Notes
 
-- `v2.0.0` で検討中の MCP 変更は [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md) と [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md) を参照する
-- 現時点で採用済みの MCP 関連論点は、`upstream_error.details` への additive detail key 追加と、CLI との shared vocabulary 整合である
+- `v2.0.0` で採用した MCP 変更は [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md) と [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md) を参照する
+- MCP 関連の主な変更は、`upstream_error.details` への additive detail key 追加と、CLI との shared vocabulary 整合である
 - MCP tool surface 自体は `v2.0.0` でも bot-oriented abstraction を維持し、CLI command や library endpoint の 1:1 mirror へは戻さない
 - 時刻表示については、structured response は UTC / structured contract を維持しつつ、human-facing log や CLI 表示とは役割を分ける方針である
 - private credentials については、`v2.0.0` で core 正本から特定の storage / encryption recipe を外し、auth provider 契約へ責務を寄せる

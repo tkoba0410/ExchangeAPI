@@ -7,8 +7,8 @@
 注記:
 
 - 現在の公開固定点は `v1.0.0` である
-- 本書の package version と API 例は `v2.0.0` 実装後の local consumer 導線を示す
-- `v2.0.0` 実装前に現行 package を試す場合は、version と API 名を `v1.0.0` 系に読み替える
+- 本書の package version と API 例は `v2.0.0` の local consumer 導線を示す
+- `v2.0.0` publish 前の確認では、`2.0.0-local.*` のような local package version を使う
 
 ## 1. 前提
 
@@ -16,7 +16,7 @@
 - consumer project 側が `net10.0` を target できること
 - local feed は machine-local 用途であり、共有 feed や公開 feed の代替ではない
 
-`v2.0.0` 実装後、ExchangeAPI repository 側では repo root で次を実行する。
+ExchangeAPI repository 側では repo root で次を実行する。
 
 ```bash
 bash scripts/pack-local-nuget.sh 2.0.0
@@ -82,7 +82,7 @@ dotnet add package ExchangeApi.Optional.Credentials --version 2.0.0
 
 ## 4. 最小利用例
 
-以下は `v2.0.0` 実装後の API 名を使う例である。
+以下は `v2.0.0` の API 名を使う例である。
 
 consumer app の `Program.cs`:
 

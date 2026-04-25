@@ -141,6 +141,7 @@ CLI / MCP Server は NuGet package ではなく executable artifact として扱
 - `README.md`
 - `docs/local-nuget-consumer.md`
 - `docs/guides/package-publish.md`
+- `docs/release-checklist-v2.0.0.md`
 - `scripts/pack-local-nuget.sh`
 - `scripts/push-github-packages.sh`
 - `scripts/smoke-local-nuget-consumer.sh`

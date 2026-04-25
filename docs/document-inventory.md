@@ -34,6 +34,7 @@
 - [`docs/guides/troubleshooting.md`](./guides/troubleshooting.md)
 - [`docs/distribution.md`](./distribution.md)
 - [`docs/local-nuget-consumer.md`](./local-nuget-consumer.md)
+- [`docs/release-checklist-v2.0.0.md`](./release-checklist-v2.0.0.md)
 - [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md)
 - [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md)
 - [`docs/release-notes/v2.0.0.md`](./release-notes/v2.0.0.md)

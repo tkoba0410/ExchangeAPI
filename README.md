@@ -22,8 +22,10 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - Binance endpoints: [`docs/endpoints-binance.md`](docs/endpoints-binance.md)
 - `v2.0.0` breaking changes: [`docs/breaking-changes-v2.0.0.md`](docs/breaking-changes-v2.0.0.md)
 - `v2.0.0` migration guide: [`docs/migration-v2.0.0.md`](docs/migration-v2.0.0.md)
+- `v2.0.0` release checklist: [`docs/release-checklist-v2.0.0.md`](docs/release-checklist-v2.0.0.md)
 - Credentials / auth provider guide: [`docs/guides/credentials-and-auth-provider.md`](docs/guides/credentials-and-auth-provider.md)
 - Release note `v1.0.0`: [`docs/release-notes/v1.0.0.md`](docs/release-notes/v1.0.0.md)
+- Release note `v2.0.0`: [`docs/release-notes/v2.0.0.md`](docs/release-notes/v2.0.0.md)
 - Archive guide: [`docs/archive/README.md`](docs/archive/README.md)
 
 ## Reading Order
@@ -80,6 +82,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - 外部利用向け成果物の正式導線と生成先は [`docs/distribution.md`](docs/distribution.md)
 - package publish 手順は [`docs/guides/package-publish.md`](docs/guides/package-publish.md)
 - local NuGet consumer 導線は [`docs/local-nuget-consumer.md`](docs/local-nuget-consumer.md)
+- v2 release 前確認は [`docs/release-checklist-v2.0.0.md`](docs/release-checklist-v2.0.0.md)
 - v2 の optional credentials 実装は `ExchangeApi.Optional.Credentials` package として扱う
 - CLI local publish は `bash scripts/publish-cli-local.sh`
 - MCP Server local publish は `bash scripts/publish-mcp-local.sh`

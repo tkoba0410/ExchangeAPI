@@ -175,9 +175,10 @@ ExchangeAPI Library は以下を所有する。
 - MCP Server project は `src/Adapters/McpServer/ExchangeApi.Adapters.McpServer.csproj` に置く
 - MCP Server test project は `tests/Adapters/McpServer.Tests/ExchangeApi.Adapters.McpServer.Tests.csproj` に置く
 - MCP Server は external adapter であり、`src/Exchanges/<Venue>/` 配下に置いてはならない
-- direct project reference は venue ごとの `Composition` project に限定する
+- direct project reference は venue ごとの `Composition` project と optional credentials project に限定する
   - `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
   - `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
+  - `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj`
 
 推奨フォルダ構成:
 

@@ -66,7 +66,7 @@ repo 内で `v2.0.0` 実装を進める場合は、次の順を推奨する。
 - CLI / MCP / live test の API key 読み込みは `--credential-profile <path>` または `local/credentials/credential-profile.json` に寄せ、環境変数を使わない
 - `AgeFile` provider の復号後 JSON は `version`, `venue`, `apiKey`, `apiSecret` を required とする
 - credential failure は `ApiCredentialException.Kind` で分類し、CLI / MCP が通知へ写像する
-- MCP では副作用系を除く read-only 情報を原則サポート対象にし、tool は `Core Bot Tools` と `Inspection Read Tools` に分ける
+- MCP では副作用系を除く read-only 情報を原則サポート候補にし、tool は `Core Bot Tools` と `Inspection Read Tools` に分ける
 - verification は API 契約分類とは別に、`repo/local` 配置と `safe/tolerable/dangerous` の運用分類で整理する
 - 実行結果、artifact、log、手動確認メモは `local/evidence/` に集約する
 - distribution は library / optional package を NuGet、CLI / MCP を executable artifact として扱う
@@ -219,7 +219,7 @@ var balance = await client.Private.GetBalanceAsync(
 | private credential injection | credentials object 直渡し | `IApiCredentialProvider` 注入 | `BitflyerPlainTextApiCredentialProvider` などへ置換する |
 | explicit credential session | なし、または未固定 | private endpoint の `EndpointAsync(request, credentialSession, cancellationToken)` | 高コスト provider で複数 private call をまとめる場合に使う |
 | credential failure notification | string message 中心 | `ApiCredentialException.Kind` を adapter が通知へ写像 | CLI は stderr/exit code 2、MCP は account_unavailable details |
-| MCP read-only surface policy | bot 向け最小 tool にかなり限定 | 副作用系を除く read-only 情報を原則サポートし、`Core Bot Tools` と `Inspection Read Tools` に分ける | 既存 aggregate tool を維持しつつ、inspection 用 read-only tool を追加する |
+| MCP read-only surface policy | bot 向け最小 tool にかなり限定 | 副作用系を除く read-only 情報を原則サポート候補とし、`Core Bot Tools` と `Inspection Read Tools` に分ける | 既存 aggregate tool を維持しつつ、v2.0.0 の visible tool universe は現行実装に限定する。inspection 用 read-only tool の追加は post-v2 または別裁定で行う |
 | verification layout and risk model | `tests` / `LiveTests` と marker 中心 | test 本体を `tests` / `verification` に置き、evidence を `local/evidence` に集約し、`safe/tolerable/dangerous` を導入する | API 契約分類は維持しつつ、manual/live verification と evidence 管理を分離する |
 | distribution artifact shape | library package と executable が混在気味 | library / optional は NuGet、CLI / MCP は executable artifact | optional package を publish 対象に加え、CLI/MCP は release asset として扱う |
 

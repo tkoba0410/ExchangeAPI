@@ -70,9 +70,10 @@ CLI -> Composition -> Native | Protocol
 - CLI project は `src/Adapters/Cli/ExchangeApi.Adapters.Cli.csproj` に置く
 - CLI test project は `tests/Adapters/Cli.Tests/ExchangeApi.Adapters.Cli.Tests.csproj` に置く
 - CLI は external adapter であり、`src/Exchanges/<Venue>/` 配下に置いてはならない
-- CLI の direct project reference は venue ごとの `Composition` project に限定する
+- CLI の direct project reference は venue ごとの `Composition` project と optional credentials project に限定する
   - `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
   - `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
+  - `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj`
 - CLI から `Native` / `Protocol` / `Vocabulary` project を直接参照してはならない
 
 推奨フォルダ構成:

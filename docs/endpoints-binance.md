@@ -67,10 +67,10 @@ library 共通原則は [`docs/spec.md`](./spec.md) を参照し、本書では 
 ## Facade + Endpoint Module Rule
 
 - `ExposeInProtocol = Yes`
-  - facade に `*CallAsync(...)` の endpoint-level method を公開する
+  - facade に `*Async(...)` の endpoint-level method を公開する
   - 対応する独立 module class を `Protocol/Public|Private/Endpoints/<EndpointName>/` 配下へ置く
 - `ExposeInNative = Yes`
-  - facade に `*CallAsync(...)` の native call method を公開する
+  - facade に `*Async(...)` の native call method を公開する
   - 対応する独立 module class を `Native/Public|Private/Endpoints/<EndpointName>/` 配下へ置く
   - request DTO と response DTO は同 endpoint フォルダへ寄せてよい
 

@@ -65,6 +65,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `GetCollateralAccounts`
   - 通貨別の証拠金残高は account snapshot の自然な構成要素として扱ってよい
   - 既存の `margin.derivedAvailable` だけでは不足する確認用途を補える
+  - ただし v2.0.0 の現行 `get_account_snapshot` schema にはまだ含めない
 
 #### `Inspection Read Tools` として優先追加する候補
 
@@ -260,14 +261,13 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `balance` は `GetBalance` の `available` を通貨別 map へ正規化したものを正本とする
 - `positions` は `GetPositions(product_code = FX_BTC_JPY)` を正本とする
 - `margin.derivedAvailable` は `GetCollateral` 由来の導出値とする
-- `margin.accounts` は `GetCollateralAccounts` を通貨別 map へ正規化したものを正本とする
 - `accountReadiness` は `GetPermissions` による read capability 判定を正本とする
 
 補足:
 
 - `get_account_snapshot` は bot 向け aggregate tool として、口座の現在状態を要約して返す
-- `margin.accounts` は inspection 用の full response ではなく、現在時点の通貨別 collateral 残高を確認するための要約とする
-- `GetCollateralAccounts` の full read capability は inspection tool `get_collateral_accounts` で別に提供してよい
+- `GetCollateralAccounts` 由来の通貨別 collateral 残高を `get_account_snapshot` へ吸収するか、inspection tool `get_collateral_accounts` として独立提供するかは post-v2 の裁定事項とする
+- v2.0.0 の現行 `get_account_snapshot.margin` schema は `derivedAvailable` のみを持つ
 
 ### 5.3.1 `get_collateral_accounts` (post-v2 draft)
 

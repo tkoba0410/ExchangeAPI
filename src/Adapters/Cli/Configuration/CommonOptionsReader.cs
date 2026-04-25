@@ -33,6 +33,7 @@ internal static class CommonOptionsReader
             BaseUri = baseUri,
             Timeout = timeout,
             ProtocolDebugLogDirectory = options.GetValue("protocol-debug-log-dir"),
+            CredentialProfilePath = options.GetValue("credential-profile"),
         };
     }
 
@@ -41,6 +42,7 @@ internal static class CommonOptionsReader
         public Uri? BaseUri { get; init; }
         public TimeSpan? Timeout { get; init; }
         public string? ProtocolDebugLogDirectory { get; init; }
+        public string? CredentialProfilePath { get; init; }
         public ExecutionOutcome? Failure { get; init; }
 
         public static CommonOptionsReadResult Failed(string summary, string detail)

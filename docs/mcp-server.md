@@ -26,6 +26,7 @@ library の設計正本は [`docs/spec.md`](./spec.md) に置き、
 - 時刻表示については、structured response は UTC / structured contract を維持しつつ、human-facing log や CLI 表示とは役割を分ける方針である
 - private credentials については、`v2.0.0` で core 正本から特定の storage / encryption recipe を外し、auth provider 契約へ責務を寄せる
 - auth provider の具体 shape は `IApiCredentialProvider.OpenSessionAsync(...)` 型を採用するが、MCP adapter は通常その session 境界を内部で扱う想定である
+- MCP Server の private credentials は `--credential-profile <path>` または `local/credentials/credential-profile.json` から解決し、API key 読み込みに環境変数を使わない
 - credential failure は MCP adapter が通知する。通知は `tools/list` の公開制御、`tools/call` の structured error、stderr diagnostic に分けて扱う
 
 ## 2. 目的
@@ -334,7 +335,7 @@ error 返却形式:
 - 想定外障害は `internal_error`
 - private credentials が未設定または解決不能な場合、private tool は `tools/list` から advertise してはならない
 - advertise 済み tool の call 時点で credential failure が発生した場合、`upstream_error` / `account_unavailable` として返す
-- credential failure の `details` には secret-safe な `credentialErrorKind`、`venue`、`provider`、`reason` を含める
+- credential failure の `details` には secret-safe な `credentialErrorKind`、`venue`、`provider`、`reason`、`requiredCredentialProfile` を含めてよい
 - API key / secret / 署名値 / 認証 header は `message`、`details`、`_meta`、stderr に出してはならない
 - stderr diagnostic は operator 向け通知であり、stdout の MCP JSON-RPC stream にログを混ぜてはならない
 

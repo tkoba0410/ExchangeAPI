@@ -64,9 +64,9 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
 
     public IReadOnlyList<McpToolDefinition> Tools => _tools;
 
-    public static ExchangeApiMcpToolDispatcher CreateDefault(IMcpConsole console)
+    public static ExchangeApiMcpToolDispatcher CreateDefault(IMcpConsole console, string? credentialProfilePath = null)
     {
-        var credentialResolution = BitflyerCredentialResolver.Resolve();
+        var credentialResolution = BitflyerCredentialResolver.Resolve(credentialProfilePath);
         string? privateToolUnavailableReason = null;
         if (credentialResolution.HasFailure)
         {
@@ -82,8 +82,7 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
 
         if (bundle.Private is null && privateToolUnavailableReason is null)
         {
-            privateToolUnavailableReason =
-                $"Configure {BitflyerCredentialResolver.AgeIdentityFileEnvName} and {BitflyerCredentialResolver.CredentialsAgeFileEnvName} to enable private tools.";
+            privateToolUnavailableReason = BitflyerCredentialResolver.BuildMissingCredentialMessage();
         }
 
         var binanceBundle = BinanceClientFactory.CreateNativeClientBundle();
@@ -218,8 +217,7 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
             Details = new Dictionary<string, string?>
             {
                 ["reason"] = _privateToolUnavailableReason,
-                ["requiredEnv"] =
-                    $"{BitflyerCredentialResolver.AgeIdentityFileEnvName}, {BitflyerCredentialResolver.CredentialsAgeFileEnvName}",
+                ["requiredCredentialProfile"] = BitflyerCredentialResolver.AuthenticationRequirementText,
             },
             Retryable = false,
         };

@@ -381,9 +381,24 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 ### 7.1 認証
 
 - API key / secret を CLI 引数で受け取ってはならない
-- 現行 CLI 契約で固定する credentials input は age-backed source に限定する
-  - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
-  - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
+- 現行 CLI 契約で固定する credentials input は credential profile から解決する age-backed source に限定する
+  - 明示指定: `--credential-profile <path>`
+  - 既定 path: `local/credentials/credential-profile.json`
+  - profile 内 path 省略時: `local/credentials/current/age-identity.txt` と `local/credentials/current/<venue>.age`
+- API key 読み込みに環境変数を使ってはならない
+- canonical credential profile format は次とする
+```json
+{
+  "version": 1,
+  "credentials": {
+    "bitflyer": {
+      "provider": "age-file",
+      "identityFilePath": "current/age-identity.txt",
+      "credentialsFilePath": "current/bitflyer.age"
+    }
+  }
+}
+```
 - 復号後 credentials file の canonical JSON format は次とする
 ```json
 {
@@ -413,7 +428,7 @@ CLI は private command 実行時に credential failure を検出した場合、
 - stdout には何も出してはならない
 - stderr 1 行目は短い summary とする
 - exit code は `2` とする
-- `--verbose` 指定時は secret-safe な範囲で `credentialErrorKind`、必要な環境変数名、`provider`、`venue`、`reason` を追加してよい
+- `--verbose` 指定時は secret-safe な範囲で `credentialErrorKind`、credential profile path、`provider`、`venue`、`reason` を追加してよい
 - API key / secret / 署名値 / 認証 header は出してはならない
 - path は secret ではないが、運用環境情報になり得るため、通常 summary では出さず `--verbose` に限定する
 
@@ -436,6 +451,7 @@ credential venue mismatch
 - `--timeout-ms <int>`
 - `--enable-protocol-debug-log`
 - `--protocol-debug-log-dir <path>`
+- `--credential-profile <path>`
 
 CLI 固有:
 
@@ -459,10 +475,12 @@ command-specific convenience flag:
 
 ### 7.4 優先順位
 
-- `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH` と `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH` の両方がある場合に限り、age-backed source を解決してよい
+- `--credential-profile <path>` が指定された場合、その profile だけを credentials source として解決する
+- `--credential-profile <path>` がない場合、`local/credentials/credential-profile.json` が存在するときだけ既定 profile として解決する
+- 既定 profile が存在しない場合、public command は credentials なしで続行し、private command は facade call 前に失敗する
 - `--base-uri`、`--timeout-ms`、`--enable-protocol-debug-log`、`--protocol-debug-log-dir`、`--use-ticker-alias-path` は現行 CLI 契約では CLI option からのみ解決する
 - 現行 CLI 契約では上記以外の generic precedence ルールを固定しない
-- 現行 CLI 契約では config file 契約を固定しない
+- 現行 CLI 契約では credential profile 以外の config file 契約を固定しない
 
 ## 8. 安全制約
 

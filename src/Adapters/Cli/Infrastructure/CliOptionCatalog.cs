@@ -11,6 +11,7 @@ public static class CliOptionCatalog
         CliOptionSpec.Flag("verbose"),
         CliOptionSpec.Flag("enable-protocol-debug-log"),
         CliOptionSpec.Value("protocol-debug-log-dir", "path"),
+        CliOptionSpec.Value("credential-profile", "path"),
     ];
 
     private static readonly CliOptionSpec[] WriteSafetyOptions =

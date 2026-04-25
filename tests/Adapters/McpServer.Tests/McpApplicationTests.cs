@@ -156,6 +156,20 @@ public sealed class McpApplicationTests
         Assert.Contains("get_account_snapshot", console.StdErr);
         Assert.Contains("evaluate_order", console.StdErr);
         Assert.Contains("evaluate_margin_order", console.StdErr);
+        Assert.Contains("--credential-profile", console.StdErr);
+    }
+
+    [Fact]
+    public async Task CredentialProfileArgument_StartsStdioMode()
+    {
+        var console = new FakeMcpConsole();
+        var app = new McpApplication(dispatcher: new FakeToolDispatcher(), console: console);
+
+        var exitCode = await app.RunAsync(["--credential-profile", "local/credentials/credential-profile.json"]);
+
+        Assert.Equal(McpExitCode.Success, exitCode);
+        Assert.Equal(string.Empty, console.StdOut);
+        Assert.Equal(string.Empty, console.StdErr);
     }
 
     [Fact]

@@ -154,12 +154,14 @@ public sealed class BinanceAgeFileApiCredentialProvider : IApiCredentialProvider
 
 `age` provider は、復号処理そのものを `IAgeCredentialFileDecryptor` に委譲する。  
 標準実装は external `age` CLI を呼び出す `AgeCliCredentialFileDecryptor` とする。
+CLI / MCP / live test で使う標準運用 recipe は、環境変数ではなく credential profile から `AgeFile` provider を作る。
 
 factory:
 
 ```csharp
 public static class PlainTextApiCredentialProviderFactory
 public static class AgeFileApiCredentialProviderFactory
+public static class CredentialProfileProviderFactory
 ```
 
 factory は `ExchangeVenue` を受け取り、対応する venue-specific provider を返す。  
@@ -177,9 +179,56 @@ public sealed class BitflyerAgeFileApiCredentialProvider : IApiCredentialProvide
 public sealed class BinanceAgeFileApiCredentialProvider : IApiCredentialProvider
 public static class PlainTextApiCredentialProviderFactory
 public static class AgeFileApiCredentialProviderFactory
+public sealed class CredentialProfile
+public sealed class CredentialProfileEntry
+public static class CredentialProfileDefaults
+public static class CredentialProfileLoader
+public static class CredentialProfileProviderFactory
 ```
 
-## 6. Credential JSON Schema
+## 6. Credential Profile
+
+credential profile は、どの venue の credentials をどの provider から読むかを示す local-only 設定である。
+API key / secret 本体は profile に置かない。
+
+標準配置:
+
+- `local/credentials/credential-profile.json`
+- `local/credentials/current/age-identity.txt`
+- `local/credentials/current/bitflyer.age`
+- `local/credentials/current/binance.age`
+
+canonical profile:
+
+```json
+{
+  "version": 1,
+  "credentials": {
+    "bitflyer": {
+      "provider": "age-file",
+      "identityFilePath": "current/age-identity.txt",
+      "credentialsFilePath": "current/bitflyer.age"
+    }
+  }
+}
+```
+
+`identityFilePath` と `credentialsFilePath` は profile file からの相対 path または absolute path とする。
+`current/` 配下は実ファイルではなく symlink として運用してよい。
+
+CTradeBot 互換の flat settings も読み取れる:
+
+```json
+{
+  "credentialsSource": "AgeFile",
+  "credentialsAgeFile": "./bitflyer-credentials.age",
+  "ageIdentityFile": "./age-identity.txt"
+}
+```
+
+この互換 shape は CTradeBot から ExchangeAPI optional credentials へ逆追随しやすくするための bridge であり、ExchangeAPI 側の canonical profile は `credentials` object を持つ形式とする。
+
+## 7. Credential JSON Schema
 
 `AgeFile` provider が復号後に受け取る JSON は次の flat object とする。
 
@@ -221,7 +270,7 @@ validation:
 - `expiresAt` は v2 では metadata であり、期限 enforcement は行わない
 - `label` は operator 向け metadata であり、routing、account selection、session identity に使わない
 
-## 7. 失敗通知
+## 8. 失敗通知
 
 credential provider は、credential を開けない場合に失敗理由を分類可能にする。
 
@@ -275,7 +324,7 @@ adapter が公開してよい detail key:
 
 `reason` は secret-safe な短文に限定する。file path は通常 summary に含めず、adapter の verbose / diagnostic 出力に限定する。
 
-## 8. 禁止事項
+## 9. 禁止事項
 
 - `ApiSecret` を public API に出さない
 - API key / secret を log に出さない
@@ -285,7 +334,7 @@ adapter が公開してよい detail key:
 - `BitflyerPlainTextApiCredentialProvider` / `BinancePlainTextApiCredentialProvider` を production 推奨として扱わない
 - storage / encryption 方式を ExchangeAPI core の必須正本にしない
 
-## 9. 実装固定事項
+## 10. 実装固定事項
 
 v2 実装では次を固定する。
 

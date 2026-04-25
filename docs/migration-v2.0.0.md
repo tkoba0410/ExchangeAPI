@@ -63,6 +63,7 @@ repo 内で `v2.0.0` 実装を進める場合は、次の順を推奨する。
 - `ApiSecret` は public API に出さず、`IApiCredentialSession.Sign(string payload)` で署名する
 - `Sign(string payload)` のみを v2 public signing API とし、byte sequence overload は持たない
 - `PlainText` / `AgeFile` provider は `ExchangeApi.Optional.Credentials` package へ移る
+- CLI / MCP / live test の API key 読み込みは `--credential-profile <path>` または `local/credentials/credential-profile.json` に寄せ、環境変数を使わない
 - `AgeFile` provider の復号後 JSON は `version`, `venue`, `apiKey`, `apiSecret` を required とする
 - credential failure は `ApiCredentialException.Kind` で分類し、CLI / MCP が通知へ写像する
 - MCP では副作用系を除く read-only 情報を原則サポート対象にし、tool は `Core Bot Tools` と `Inspection Read Tools` に分ける
@@ -118,6 +119,11 @@ dotnet add package ExchangeApi.Optional.Credentials --version 2.0.0
 - `BinanceAgeFileApiCredentialProvider`
 - `PlainTextApiCredentialProviderFactory`
 - `AgeFileApiCredentialProviderFactory`
+- `CredentialProfile`
+- `CredentialProfileEntry`
+- `CredentialProfileDefaults`
+- `CredentialProfileLoader`
+- `CredentialProfileProviderFactory`
 
 v1 系で `BitflyerApiCredentials` を直接渡していた利用者は、v2 では provider を渡す。
 

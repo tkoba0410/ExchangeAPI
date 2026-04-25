@@ -16,7 +16,10 @@ public static class BitflyerOptionsFactory
             return (null, common.Failure);
         }
 
-        var credentialResolution = BitflyerCredentialResolver.Resolve(environment);
+        var credentialResolution = BitflyerCredentialResolver.Resolve(
+            environment,
+            common.CredentialProfilePath,
+            ProcessAgeCredentialDecryptor.Instance);
         if (credentialResolution.HasFailure)
         {
             return (null, ExecutionOutcome.InputError(

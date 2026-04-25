@@ -55,6 +55,7 @@
 | BC-V2-022 | split | optional logging への将来切り出し | 保留 | core の責務を薄くし、CLI/MCP/live test/bot/local evidence など用途別に適した log writer を作れるようにする方向は妥当だが、v2 初手では credentials optional を優先するため | `docs/spec.md`, `docs/verification.md` | v2 初手では具体移動しない。将来 `ExchangeApi.Optional.Logging` として JSONL/file/redaction/evidence writer を検討する |
 | BC-V2-023 | contract tighten | credential failure notification | 採用 | auth provider が失敗を typed に返しても adapter が通知しなければ利用者が原因を特定できず、逆に core が通知責務を持つと用途別 UI / MCP / CLI の境界が崩れるため | `docs/spec.md`, `docs/cli.md`, `docs/mcp-server.md`, `docs/guides/credentials-and-auth-provider.md` | `ApiCredentialException.Kind` を CLI は stderr/exit code、MCP は tool 公開制御/structured error/stderr diagnostic へ写像する |
 | BC-V2-024 | split | distribution artifact shape | 採用 | core library、optional credentials、CLI executable、MCP executable の責務と配布単位を分けると、最小利用者へ不要な storage/decrypt 実装を強制せず、adapter は単体実行可能 artifact として維持できるため | `docs/distribution.md`, `docs/guides/package-publish.md`, `docs/local-nuget-consumer.md` | library / optional は NuGet package、CLI / MCP は executable release asset とし、生成物は `local/` 配下に置き git 管理しない |
+| BC-V2-025 | contract tighten | CLI/MCP/live test の API key 読み込みを credential profile 化 | 採用 | 環境変数に API credential path を分散させると CLI/MCP/test と CTradeBot の運用差が広がり、同じ機構を使っていることも読み取りづらいため | `docs/spec.md`, `docs/cli.md`, `docs/mcp-server.md`, `docs/guides/credentials-and-auth-provider.md`, `docs/verification.md` | `local/credentials/credential-profile.json` と `current/` symlink convention を標準にし、CLI/MCP は `--credential-profile <path>` を受ける。API key 読み込みに環境変数を使わない |
 
 ## 3.0 現時点の要約
 
@@ -803,14 +804,17 @@ v2 実装時は、次の順で進める。
    - `ExchangeVenue`, `IAgeCredentialFileDecryptor`, `AgeCliCredentialFileDecryptor` を追加する
    - venue-specific `PlainText` / `AgeFile` provider を追加する
    - provider factory を追加する
+   - credential profile loader / factory を追加する
    - `AgeFile` provider は credentials JSON schema と `ApiCredentialErrorKind` を test で固定する
 5. CLI
    - factory / facade rename に追従する
+   - `--credential-profile <path>` と既定 `local/credentials/credential-profile.json` を credentials source として扱う
    - credential failure を stderr と exit code `2` へ写像する
    - verbose detail key を `credentialErrorKind`, `venue`, `provider`, `reason` に揃える
    - `CallError` additive detail を `--verbose` に出す
 6. MCP
    - factory / facade rename に追従する
+   - `--credential-profile <path>` と既定 `local/credentials/credential-profile.json` を credentials source として扱う
    - credential failure 時は private tool 非公開または `account_unavailable` details へ写像する
    - credential failure details は `credentialErrorKind`, `venue`, `provider`, `reason` を持つ
    - `upstream_error.details` に `callHttpStatusCode`, `callVenueErrorCode`, `callVenueErrorMessage` を optional で追加する

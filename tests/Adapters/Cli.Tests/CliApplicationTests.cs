@@ -568,8 +568,8 @@ public sealed class CliApplicationTests
 
         Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
         Assert.Contains("missing credential", console.StdErr);
-        Assert.Contains("EXCHANGEAPI_AGE_IDENTITY_FILE_PATH", console.StdErr);
-        Assert.Contains("EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH", console.StdErr);
+        Assert.Contains("--credential-profile", console.StdErr);
+        Assert.Contains("local/credentials/credential-profile.json", console.StdErr);
     }
 
     [Fact]
@@ -583,8 +583,8 @@ public sealed class CliApplicationTests
 
         Assert.Equal(CliExitCode.ArgumentConfigOrSafetyError, exitCode);
         Assert.Contains("missing credential", console.StdErr);
-        Assert.Contains("EXCHANGEAPI_AGE_IDENTITY_FILE_PATH", console.StdErr);
-        Assert.Contains("EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH", console.StdErr);
+        Assert.Contains("--credential-profile", console.StdErr);
+        Assert.Contains("local/credentials/credential-profile.json", console.StdErr);
     }
 
     [Fact]

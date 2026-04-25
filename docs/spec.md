@@ -1257,10 +1257,10 @@ live test の実行条件と、state を変更する endpoint の safety 要件�
   - `local/live-enabled`
 - public read live test は global opt-in だけを要求する
 - private read live test は global opt-in と認証解決可能条件を要求する
-- private credentials は `age` file で供給する
-  - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
-  - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
-  - 2 つの file path はどちらも環境変数で明示指定する
+- private credentials は credential profile から `age` file provider を解決して供給する
+  - 既定 profile path は `local/credentials/credential-profile.json` とする
+  - profile 内 path 省略時は `local/credentials/current/age-identity.txt` と `local/credentials/current/<venue>.age` の symlink convention を使う
+  - CLI / MCP / live test の正本契約では API key 読み込みに環境変数を使わない
   - 復号後 JSON の canonical format は `version`, `venue`, `apiKey`, `apiSecret` を必須とする flat object である
   - `label`, `generatedAt`, `expiresAt`, `note` は optional metadata として持ってよい
   - account / profile / multi-key selection は現行 normative slice では file format に持ち込まず、上層で credentials file path を切り替えて解決する

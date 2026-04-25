@@ -1,22 +1,35 @@
-using ExchangeApi.Optional.Credentials.AgeFile;
+using ExchangeApi.Optional.Credentials;
+using ExchangeApi.Optional.Credentials.Profiles;
 using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
 
 internal static class BitflyerCredentialResolver
 {
-    private const string CredentialsAgeFileEnvName = "EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH";
-    private const string AgeIdentityFileEnvName = "EXCHANGEAPI_AGE_IDENTITY_FILE_PATH";
+    public static readonly string DefaultCredentialProfilePath = CredentialProfileDefaults.DefaultProfilePath;
 
     public static bool HasConfiguredCredentialsSource()
     {
-        var identityFilePath = Environment.GetEnvironmentVariable(AgeIdentityFileEnvName);
-        var credentialsFilePath = Environment.GetEnvironmentVariable(CredentialsAgeFileEnvName);
-        return !string.IsNullOrWhiteSpace(identityFilePath)
-            && !string.IsNullOrWhiteSpace(credentialsFilePath)
-            && File.Exists(identityFilePath)
-            && File.Exists(credentialsFilePath)
-            && TryResolveAgeExecutable(out _);
+        var profilePath = CredentialProfileDefaults.ResolveDefaultProfilePath();
+        if (!File.Exists(profilePath) || !TryResolveAgeExecutable(out var ageExecutablePath))
+        {
+            return false;
+        }
+
+        try
+        {
+            var profile = CredentialProfileLoader.Load(profilePath);
+            _ = CredentialProfileProviderFactory.Create(
+                profile,
+                ExchangeVenue.Bitflyer,
+                profilePath,
+                new ExchangeApi.Optional.Credentials.AgeFile.AgeCliCredentialFileDecryptor(ageExecutablePath));
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException or System.Text.Json.JsonException)
+        {
+            return false;
+        }
     }
 
     public static IApiCredentialProvider? Load()
@@ -24,29 +37,21 @@ internal static class BitflyerCredentialResolver
         if (!TryResolveAgeExecutable(out var ageExecutablePath))
         {
             throw new InvalidOperationException(
-                $"The 'age' executable was not found on PATH. Set {CredentialsAgeFileEnvName}/{AgeIdentityFileEnvName}, or install age.");
+                $"The 'age' executable was not found on PATH. Configure {DefaultCredentialProfilePath}, or install age.");
         }
 
-        var identityFilePath = Environment.GetEnvironmentVariable(AgeIdentityFileEnvName);
-        var credentialsFilePath = Environment.GetEnvironmentVariable(CredentialsAgeFileEnvName);
-        var hasIdentity = !string.IsNullOrWhiteSpace(identityFilePath);
-        var hasCredentialsFile = !string.IsNullOrWhiteSpace(credentialsFilePath);
-
-        if (!hasIdentity && !hasCredentialsFile)
+        var profilePath = CredentialProfileDefaults.ResolveDefaultProfilePath();
+        if (!File.Exists(profilePath))
         {
             return null;
         }
 
-        if (!hasIdentity || !hasCredentialsFile)
-        {
-            throw new InvalidOperationException(
-                $"{CredentialsAgeFileEnvName} and {AgeIdentityFileEnvName} must both be set.");
-        }
-
-        return new BitflyerAgeFileApiCredentialProvider(
-            identityFilePath!,
-            credentialsFilePath!,
-            new AgeCliCredentialFileDecryptor(ageExecutablePath));
+        var profile = CredentialProfileLoader.Load(profilePath);
+        return CredentialProfileProviderFactory.Create(
+            profile,
+            ExchangeVenue.Bitflyer,
+            profilePath,
+            new ExchangeApi.Optional.Credentials.AgeFile.AgeCliCredentialFileDecryptor(ageExecutablePath));
     }
 
     private static bool TryResolveAgeExecutable(out string executablePath)

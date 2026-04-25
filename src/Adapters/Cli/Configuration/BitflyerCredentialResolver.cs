@@ -1,5 +1,7 @@
 using ExchangeApi.Adapters.Cli.Infrastructure;
+using ExchangeApi.Optional.Credentials;
 using ExchangeApi.Optional.Credentials.AgeFile;
+using ExchangeApi.Optional.Credentials.Profiles;
 using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Adapters.Cli.Configuration;
@@ -8,44 +10,44 @@ public static class BitflyerCredentialResolver
 {
     public const int CanonicalVersion = 1;
     public const string CanonicalVenue = "bitflyer";
-    public const string AgeIdentityFileEnvName = "EXCHANGEAPI_AGE_IDENTITY_FILE_PATH";
-    public const string CredentialsAgeFileEnvName = "EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH";
-    public const string AuthenticationRequirementText =
-        $"{AgeIdentityFileEnvName} / {CredentialsAgeFileEnvName}";
+    public const string CredentialProfileOptionName = "credential-profile";
+    public static readonly string DefaultCredentialProfilePath = CredentialProfileDefaults.DefaultProfilePath;
+    public static readonly string AuthenticationRequirementText =
+        $"--{CredentialProfileOptionName} / {CredentialProfileDefaults.DefaultProfilePath}";
 
     public static BitflyerCredentialResolution Resolve(IEnvironment environment)
     {
-        return Resolve(environment, ProcessAgeCredentialDecryptor.Instance);
+        return Resolve(environment, null, ProcessAgeCredentialDecryptor.Instance);
     }
 
     public static BitflyerCredentialResolution Resolve(IEnvironment environment, IAgeCredentialDecryptor decryptor)
     {
-        var identityFilePath = environment.GetEnvironmentVariable(AgeIdentityFileEnvName);
-        var credentialsFilePath = environment.GetEnvironmentVariable(CredentialsAgeFileEnvName);
-        var hasIdentity = !string.IsNullOrWhiteSpace(identityFilePath);
-        var hasCredentialsFile = !string.IsNullOrWhiteSpace(credentialsFilePath);
+        return Resolve(environment, null, decryptor);
+    }
 
-        if (!hasIdentity && !hasCredentialsFile)
+    public static BitflyerCredentialResolution Resolve(
+        IEnvironment environment,
+        string? credentialProfilePath,
+        IAgeCredentialDecryptor decryptor)
+    {
+        var explicitProfilePath = !string.IsNullOrWhiteSpace(credentialProfilePath);
+        if (!explicitProfilePath && !environment.AllowDefaultCredentialProfileDiscovery)
         {
             return BitflyerCredentialResolution.None();
         }
 
-        if (!hasIdentity || !hasCredentialsFile)
-        {
-            return BitflyerCredentialResolution.Failure(
-                $"{AgeIdentityFileEnvName} and {CredentialsAgeFileEnvName} must both be set to use age-backed credentials.");
-        }
+        var profilePath = string.IsNullOrWhiteSpace(credentialProfilePath)
+            ? CredentialProfileDefaults.ResolveDefaultProfilePath()
+            : credentialProfilePath;
 
-        if (!File.Exists(identityFilePath!))
+        if (!File.Exists(profilePath))
         {
-            return BitflyerCredentialResolution.Failure(
-                $"{AgeIdentityFileEnvName} does not exist: {identityFilePath}");
-        }
+            if (explicitProfilePath)
+            {
+                return BitflyerCredentialResolution.Failure($"Credential profile does not exist: {profilePath}");
+            }
 
-        if (!File.Exists(credentialsFilePath!))
-        {
-            return BitflyerCredentialResolution.Failure(
-                $"{CredentialsAgeFileEnvName} does not exist: {credentialsFilePath}");
+            return BitflyerCredentialResolution.None();
         }
 
         if (!decryptor.IsAvailable())
@@ -53,16 +55,29 @@ public static class BitflyerCredentialResolver
             return BitflyerCredentialResolution.Failure("The 'age' executable was not found on PATH.");
         }
 
-        return BitflyerCredentialResolution.Success(
-            new BitflyerAgeFileApiCredentialProvider(
-                identityFilePath!,
-                credentialsFilePath!,
-                new CliAgeCredentialFileDecryptor(decryptor)));
+        if (!CredentialProfileLoader.TryLoad(profilePath, out var profile, out var errorMessage))
+        {
+            return BitflyerCredentialResolution.Failure($"Invalid credential profile: {errorMessage}");
+        }
+
+        try
+        {
+            return BitflyerCredentialResolution.Success(
+                CredentialProfileProviderFactory.Create(
+                    profile!,
+                    ExchangeVenue.Bitflyer,
+                    profilePath,
+                    new CliAgeCredentialFileDecryptor(decryptor)));
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
+        {
+            return BitflyerCredentialResolution.Failure(ex.Message);
+        }
     }
 
     public static string BuildMissingCredentialMessage()
     {
-        return $"Configure {AgeIdentityFileEnvName} and {CredentialsAgeFileEnvName}.";
+        return CredentialProfileDefaults.GetMissingCredentialMessage(ExchangeVenue.Bitflyer);
     }
 
     private sealed class CliAgeCredentialFileDecryptor : IAgeCredentialFileDecryptor

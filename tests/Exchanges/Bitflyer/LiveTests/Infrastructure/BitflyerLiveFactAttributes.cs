@@ -59,7 +59,7 @@ internal static class BitflyerLiveTestPolicy
 
         if (!BitflyerCredentialResolver.HasConfiguredCredentialsSource())
         {
-            return "Set EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH and EXCHANGEAPI_AGE_IDENTITY_FILE_PATH to run private live tests.";
+            return $"Configure {BitflyerCredentialResolver.DefaultCredentialProfilePath} to run private live tests.";
         }
 
         return null;
@@ -75,7 +75,7 @@ internal static class BitflyerLiveTestPolicy
 
         if (!BitflyerCredentialResolver.HasConfiguredCredentialsSource())
         {
-            return "Set EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH and EXCHANGEAPI_AGE_IDENTITY_FILE_PATH to run write live tests.";
+            return $"Configure {BitflyerCredentialResolver.DefaultCredentialProfilePath} to run write live tests.";
         }
 
         if (!HasWriteOptInMarker())

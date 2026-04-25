@@ -34,6 +34,8 @@
 - provider は venue-specific class とする。
 - `PlainText` / `AgeFile` provider は `ExchangeApi.Optional.Credentials` に置く。
 - optional credentials project は `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` とする。
+- CLI / MCP / live test の API key 読み込みは `--credential-profile <path>` または `local/credentials/credential-profile.json` を前提にし、環境変数を使わない。
+- credential profile は `local/credentials/current/` 配下の symlink convention を使ってよい。
 - `AgeFile` provider の復号後 JSON は `version`, `venue`, `apiKey`, `apiSecret` を required とする。
 - 明示 session overload は private endpoint のみに追加し、`EndpointAsync(request, credentialSession, cancellationToken)` の順にする。
 

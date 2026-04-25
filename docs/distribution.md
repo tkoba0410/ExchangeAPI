@@ -78,10 +78,12 @@ v2 初手の対象:
 - optional package の追加により、`ExchangeApi.Exchanges.*.Composition` の最小利用者が不要な storage / decrypt 実装を強制参照しないようにする
 - optional package の生成先は library package と同じ `local/nuget/` とする
 
-実装前提:
+実装状態:
 
-- `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` を追加したら、solution と pack script の対象に含める
-- package publish guide と local consumer guide は、実装後に `ExchangeApi.Optional.Credentials` の参照例を最終化する
+- `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` は solution に含める
+- `scripts/pack-local-nuget.sh` は solution pack により `ExchangeApi.Optional.Credentials` を生成対象に含める
+- `scripts/push-github-packages.sh` は `ExchangeApi.Optional.*.<version>.nupkg` を publish 対象に含める
+- package publish guide と local consumer guide は `ExchangeApi.Optional.Credentials` の参照例を含める
 
 ### CLI
 

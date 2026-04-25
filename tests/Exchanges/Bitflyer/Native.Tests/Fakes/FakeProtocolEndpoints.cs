@@ -32,6 +32,7 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetHealth;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Fakes;
@@ -185,8 +186,19 @@ internal sealed class FakeGetBalanceProtocolEndpoint : IGetBalanceProtocolEndpoi
         _call = call;
     }
 
+    public IApiCredentialSession? LastCredentialSession { get; private set; }
+
     public Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(CancellationToken cancellationToken = default)
     {
+        LastCredentialSession = null;
+        return Task.FromResult(_call);
+    }
+
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        LastCredentialSession = credentialSession;
         return Task.FromResult(_call);
     }
 }

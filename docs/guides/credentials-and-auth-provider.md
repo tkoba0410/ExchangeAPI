@@ -228,7 +228,48 @@ CTradeBot 互換の flat settings も読み取れる:
 
 この互換 shape は CTradeBot から ExchangeAPI optional credentials へ逆追随しやすくするための bridge であり、ExchangeAPI 側の canonical profile は `credentials` object を持つ形式とする。
 
-## 7. Credential JSON Schema
+## 7. Age Credential File 作成支援
+
+`scripts/create-age-credential-file.sh` は、ExchangeAPI が読む age 暗号化済み credentials file を作成するための local setup helper である。
+credential 管理機構、secret manager、runtime provider ではない。
+
+基本例:
+
+```bash
+bash scripts/create-age-credential-file.sh --venue bitflyer
+```
+
+既定値:
+
+- identity: `~/.config/exchangeapi/keys/age.key`
+- encrypted credentials: `local/credentials/current/<venue>.age`
+- identity symlink: `local/credentials/current/age-identity.txt`
+- credential profile: `local/credentials/credential-profile.json`
+
+script が行うこと:
+
+- `age` / `age-keygen` / `python3` の存在確認
+- age identity file が無い場合の新規作成確認
+- 既存 identity から `age-keygen -y` で recipient を取得
+- API key / API secret の非表示対話入力
+- canonical credentials JSON をメモリ上で作成
+- 平文 file を作らず `age` へ pipe して暗号化
+- encrypted credentials file、identity symlink、credential profile の作成または更新
+
+script が行わないこと:
+
+- API key / API secret を command line 引数で受け取る
+- API key / API secret を画面に表示する
+- 平文 credentials JSON file を保存する
+- 取引所 API に接続する
+- API key の有効性確認を行う
+- secret manager / keychain / 外部サービスに接続する
+- credential lifecycle を管理する
+
+script は起動時、API key / secret 入力直前、完了時に日本語で説明を表示する。
+完了時には、生成・更新した file と、それぞれに含まれる情報、注意点を表示する。
+
+## 8. Credential JSON Schema
 
 `AgeFile` provider が復号後に受け取る JSON は次の flat object とする。
 
@@ -270,7 +311,7 @@ validation:
 - `expiresAt` は v2 では metadata であり、期限 enforcement は行わない
 - `label` は operator 向け metadata であり、routing、account selection、session identity に使わない
 
-## 8. 失敗通知
+## 9. 失敗通知
 
 credential provider は、credential を開けない場合に失敗理由を分類可能にする。
 
@@ -324,7 +365,7 @@ adapter が公開してよい detail key:
 
 `reason` は secret-safe な短文に限定する。file path は通常 summary に含めず、adapter の verbose / diagnostic 出力に限定する。
 
-## 9. 禁止事項
+## 10. 禁止事項
 
 - `ApiSecret` を public API に出さない
 - API key / secret を log に出さない
@@ -334,7 +375,7 @@ adapter が公開してよい detail key:
 - `BitflyerPlainTextApiCredentialProvider` / `BinancePlainTextApiCredentialProvider` を production 推奨として扱わない
 - storage / encryption 方式を ExchangeAPI core の必須正本にしない
 
-## 10. 実装固定事項
+## 11. 実装固定事項
 
 v2 実装では次を固定する。
 

@@ -28,6 +28,15 @@ local/credentials/credential-profile.json
 `current/age-identity.txt` と `current/bitflyer.age` は、実ファイルへの symlink として置いてよい。
 CLI は `--credential-profile <path>` で別 profile を指定できる。MCP Server も `--credential-profile <path>` を受け取る。
 
+age 暗号化済み credentials file を作成するだけなら、local setup helper を使える。
+
+```bash
+bash scripts/create-age-credential-file.sh --venue bitflyer
+```
+
+この script は API key / API secret を非表示の対話入力で受け取り、平文 file を作らずに `local/credentials/current/bitflyer.age` を作成する。
+取引所 API には接続せず、API key の有効性確認も行わない。
+
 ## NuGet 解決に失敗する
 
 consumer repo の `NuGet.config` に local feed が入っているか確認する。

@@ -36,6 +36,7 @@
 - optional credentials project は `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` とする。
 - CLI / MCP / live test の API key 読み込みは `--credential-profile <path>` または `local/credentials/credential-profile.json` を前提にし、環境変数を使わない。
 - credential profile は `local/credentials/current/` 配下の symlink convention を使ってよい。
+- `scripts/create-age-credential-file.sh` は age 暗号化済み credentials file を作成する local setup helper であり、credential 管理機構として扱わない。
 - `AgeFile` provider の復号後 JSON は `version`, `venue`, `apiKey`, `apiSecret` を required とする。
 - 明示 session overload は private endpoint のみに追加し、`EndpointAsync(request, credentialSession, cancellationToken)` の順にする。
 

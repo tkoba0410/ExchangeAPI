@@ -5,7 +5,7 @@
 
 注記:
 
-- 現在の公開固定点は `v1.0.0` である
+- 現在の公開固定点は `v2.0.0` である
 - 本書の `2.0.0` command 例は `v2.0.0` の publish 手順を示す
 - `v2.0.0` publish 前の確認では、`2.0.0-local.*` のような local package version を使う
 - `v2.0.0` publish 前の最終確認では、publish/tag/release は実行せず、`2.0.0-local.final` などの local version で preflight する
@@ -120,9 +120,19 @@ publish 後は GitHub Packages で package 一覧を確認する。
 - restore: GitHub Packages source から成功
 - build/run: `BinanceClientFactory` と `BinanceSymbols.BtcJpy` の参照成功
 
+`v2.0.0` では次を確認済み:
+
+- GitHub Packages publish: `ExchangeApi.Primitives 2.0.0`
+- GitHub Packages publish: `ExchangeApi.Exchanges.Bitflyer.* 2.0.0`
+- GitHub Packages publish: `ExchangeApi.Exchanges.Binance.* 2.0.0`
+- GitHub Packages publish: `ExchangeApi.Optional.Credentials 2.0.0`
+- CLI / MCP executable package が NuGet package として publish されていないことを確認
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer.Composition 2.0.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Binance.Composition 2.0.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Optional.Credentials 2.0.0`
+
 ## Notes
 
 - local NuGet feed と GitHub Packages feed を混同しない
-- `stage` 系は履歴であり、package の current public baseline は `v1.0.0`
-- 次回 v2 publish baseline は `v2.0.0` とする
+- `stage` 系と `v1.0.0` は履歴であり、package の current public baseline は `v2.0.0`
 - nuget.org 公開はこの文書の対象外

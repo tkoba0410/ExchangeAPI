@@ -6,9 +6,9 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 この `README.md` は入口文書です。  
 文書の主従、正本、履歴の扱いは [`docs/docs-architecture.md`](docs/docs-architecture.md) を参照してください。
 
-現時点の公開固定点は **`v1.0.0`** です。  
-`v2.0.0` は release 準備中の次期 breaking release であり、release 前確認は [`docs/release-checklist-v2.0.0.md`](docs/release-checklist-v2.0.0.md) を参照します。
-`stage` 系 tag は履歴として残しますが、現在の安定固定点としては `v1.0.0` を参照します。
+現時点の公開固定点は **`v2.0.0`** です。
+`v2.0.0` の release 手順と確認結果は [`docs/release-checklist-v2.0.0.md`](docs/release-checklist-v2.0.0.md) を参照します。
+`stage` 系 tag と `v1.0.0` は履歴として残しますが、現在の安定固定点としては `v2.0.0` を参照します。
 
 ## Quick Links
 
@@ -84,7 +84,7 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - 外部利用向け成果物の正式導線と生成先は [`docs/distribution.md`](docs/distribution.md)
 - package publish 手順は [`docs/guides/package-publish.md`](docs/guides/package-publish.md)
 - local NuGet consumer 導線は [`docs/local-nuget-consumer.md`](docs/local-nuget-consumer.md)
-- v2 release 前確認は [`docs/release-checklist-v2.0.0.md`](docs/release-checklist-v2.0.0.md)
+- v2 release 確認結果は [`docs/release-checklist-v2.0.0.md`](docs/release-checklist-v2.0.0.md)
 - v2 の optional credentials 実装は `ExchangeApi.Optional.Credentials` package として扱う
 - CLI local publish は `bash scripts/publish-cli-local.sh`
 - MCP Server local publish は `bash scripts/publish-mcp-local.sh`

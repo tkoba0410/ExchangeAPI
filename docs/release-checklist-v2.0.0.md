@@ -5,6 +5,20 @@
 この文書は、`v2.0.0` を publish / release する直前に確認する作業順を固定する。  
 設計正本ではない。契約判断は `docs/spec.md`、endpoint matrix、adapter 正本を優先する。
 
+状態: `v2.0.0` released
+
+release 完了日: 2026-04-26
+
+完了済み:
+
+- release preflight: `bash scripts/run-v2-release-preflight.sh 2.0.0-local.final`
+- safe live tests: `bash scripts/run-safe-live-tests.sh`
+- GitHub Packages publish: library / optional packages `2.0.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer.Composition`, `ExchangeApi.Exchanges.Binance.Composition`, `ExchangeApi.Optional.Credentials`
+- tag: `v2.0.0`
+- GitHub Release: `ExchangeAPI v2.0.0`
+- release assets: `exchangeapi-linux-x64`, `exchangeapi-linux-x64.sha256`, `exchangeapi-mcp-linux-x64`, `exchangeapi-mcp-linux-x64.sha256`
+
 ## 1. Preflight
 
 repo root で release preflight を実行する。
@@ -85,7 +99,7 @@ asset 作成時は、生成された executable を上記 name に rename し、
 
 ## 4. Post Publish Verification
 
-この節は publish 後に実行する。release 前の最終確認では未完了でよい。
+この節は publish 後に実行する。`v2.0.0` release では実行済みである。
 
 publish 後に確認する。
 
@@ -97,7 +111,7 @@ publish 後に確認する。
 
 ## 5. Documentation
 
-release 前に確認する。
+release 前後で次を確認する。`v2.0.0` release では反映済みである。
 
 - release 前は `README.md` / `docs/distribution.md` / `docs/guides/package-publish.md` の current public baseline を `v1.0.0` のまま維持する
 - GitHub Packages publish、tag 作成、GitHub Release 作成が完了した後、`README.md` の公開固定点を `v2.0.0` へ更新する

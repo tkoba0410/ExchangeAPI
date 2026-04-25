@@ -512,7 +512,7 @@ command-specific convenience flag:
 
 補足:
 
-- `facade call failure` は `Call.IsSuccess = false` を意味する
+- `facade call failure` は `CallResult.IsSuccess = false` を意味する
 - credential failure は原則として exit code `2` とする
 - `--verbose` 指定時は stderr に `CallError.Kind` と endpoint 情報を追加してよい
 - `protocol` command では HTTP response を受け取れた場合、non-success status だけでは exit code `3` にしない
@@ -526,7 +526,7 @@ command-specific convenience flag:
   - 例: invalid argument
   - 例: protocol transport failure
   - 例: native codec failure
-- 設定エラーでは不足している環境変数名または invalid option 名を示さなければならない
+- 設定エラーでは missing credential profile、missing credential file、invalid option などの secret-safe な原因分類を示さなければならない
 - request validation error では invalid field 名を示さなければならない
 - `--verbose` 指定時は以下を追加してよい
   - `CallError.Kind`

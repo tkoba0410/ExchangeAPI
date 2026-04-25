@@ -43,6 +43,18 @@ bash scripts/pack-local-nuget.sh 2.0.0
 
 - `local/nuget/`
 
+release 前に static test、local pack、local consumer smoke、CLI/MCP executable publish をまとめて確認する場合は、次を使う。
+
+```bash
+bash scripts/run-v2-release-preflight.sh 2.0.0-local.preflight
+```
+
+safe live verification まで含める場合だけ、次のように明示 opt-in する。
+
+```bash
+EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-v2-release-preflight.sh 2.0.0-local.preflight
+```
+
 ## 2. GitHub Packages Source
 
 GitHub Packages の NuGet feed URL:

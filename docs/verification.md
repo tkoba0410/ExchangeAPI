@@ -214,7 +214,7 @@ API 契約の正本は endpoint matrix であり、本表は live / manual verif
 | GetWithdrawals | private read | safe | opt-in live read with credentials |
 | GetChildOrders | private read | safe | opt-in live read with credentials |
 | GetParentOrders | private read | safe | opt-in live read with credentials |
-| GetParentOrder | private read by id | safe | opt-in live read with credentials and known id |
+| GetParentOrder | private read by id | safe | known-id manual read; automated coverage is currently paired with parent-order write lifecycle |
 | GetExecutionsPrivate | private read | safe | opt-in live read with credentials |
 | GetBalanceHistory | private read | safe | opt-in live read with credentials |
 | GetPositions | private read | safe | opt-in live read with credentials |

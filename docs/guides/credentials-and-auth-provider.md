@@ -51,8 +51,11 @@ var credentials = new BitflyerPlainTextApiCredentialProvider(
     apiKey: "...",
     apiSecret: "...");
 
-var client = BitflyerClientFactory.CreateNativeClientBundle(
-    options with { ApiCredentialProvider = credentials });
+using var client = BitflyerClientFactory.CreateNativeClientBundle(
+    new BitflyerClientOptions
+    {
+        ApiCredentialProvider = credentials,
+    });
 
 var result = await client.Private.GetBalanceAsync(cancellationToken);
 ```
@@ -362,6 +365,7 @@ adapter が公開してよい detail key:
 - `venue`
 - `provider`
 - `reason`
+- `requiredCredentialProfile`
 
 `reason` は secret-safe な短文に限定する。file path は通常 summary に含めず、adapter の verbose / diagnostic 出力に限定する。
 

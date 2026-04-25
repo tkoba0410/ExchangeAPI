@@ -15,7 +15,7 @@ ExchangeAPI Library を別の .NET project から参照し、最小コードで 
 ExchangeAPI repo root で local package を生成する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 0.1.0-local.1
+bash scripts/pack-local-nuget.sh 2.0.0-local.1
 ```
 
 consumer repo 側では `NuGet.config` に local feed を追加する。
@@ -34,7 +34,7 @@ consumer repo 側では `NuGet.config` に local feed を追加する。
 その後、consumer project へ package を追加する。
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 0.1.0-local.1
+dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 2.0.0-local.1
 ```
 
 詳細な consumer 手順は [`../local-nuget-consumer.md`](../local-nuget-consumer.md) を参照する。

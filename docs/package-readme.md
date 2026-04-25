@@ -20,4 +20,5 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための .NET lib
 ## Distribution Note
 
 - CLI と MCP Server は executable であり、package ではなく release asset 側を正式導線とします
+- credential provider 実装が必要な場合は `ExchangeApi.Optional.Credentials` を追加参照します
 - consumer guidance の詳細は repository の `README.md` と `docs/local-nuget-consumer.md` を参照してください

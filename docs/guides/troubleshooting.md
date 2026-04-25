@@ -48,7 +48,7 @@ consumer repo の `NuGet.config` に local feed が入っているか確認す�
 local package を作り直したのに古い package が使われる場合は、version を増やす。
 
 ```bash
-bash scripts/pack-local-nuget.sh 0.1.0-local.2
+bash scripts/pack-local-nuget.sh 2.0.0-local.2
 ```
 
 同じ version を再利用した場合は cache を消す。

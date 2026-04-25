@@ -6,11 +6,11 @@ namespace ExchangeApi.Adapters.McpServer.Tools.Market;
 
 public interface IBitflyerMarketSnapshotGateway
 {
-    Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+    Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 }

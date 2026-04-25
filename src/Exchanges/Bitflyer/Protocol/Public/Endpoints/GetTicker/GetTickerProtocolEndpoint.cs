@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetTicker;
 
 public interface IGetTickerProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         CancellationToken cancellationToken = default);
 }
@@ -26,7 +26,7 @@ public sealed class GetTickerProtocolEndpoint : IGetTickerProtocolEndpoint
         _path = useAliasPath ? AliasPath : CanonicalPath;
     }
 
-    public async Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    public async Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         CancellationToken cancellationToken = default)
     {

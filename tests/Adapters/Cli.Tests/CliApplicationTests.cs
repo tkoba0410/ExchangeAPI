@@ -1,5 +1,5 @@
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
 using ExchangeApi.Adapters.Cli.Commands;
 using ExchangeApi.Adapters.Cli.Infrastructure;
 using ExchangeApi.Exchanges.Binance.Native.Public.Api;
@@ -10,6 +10,7 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Api;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Adapters.Cli.Tests;
@@ -916,7 +917,7 @@ public sealed class CliApplicationTests
     [Fact]
     public void ProtocolExecutionOutcome_WrapsRequestResponseAndMeta()
     {
-        var call = new Call<ProtocolRequest, ProtocolResponse>
+        var call = new CallResult<ProtocolRequest, ProtocolResponse>
         {
             Request = new ProtocolRequest
             {
@@ -985,7 +986,7 @@ public sealed class CliApplicationTests
                     ExecuteAsync = static (_, _, _, _) => Task.FromResult(
                         ExecutionOutcome.FromProtocolCall(
                             new CommandPath("fake", "protocol", "public", "echo"),
-                            new Call<ProtocolRequest, ProtocolResponse>
+                            new CallResult<ProtocolRequest, ProtocolResponse>
                             {
                                 Request = new ProtocolRequest
                                 {
@@ -1177,6 +1178,7 @@ public sealed class CliApplicationTests
         var expected = typeof(TInterface)
             .GetMethods()
             .Where(include)
+            .Where(static method => method.GetParameters().All(static parameter => parameter.ParameterType != typeof(IApiCredentialSession)))
             .Select(method => ToCommandName(method.Name, scope))
             .OrderBy(static x => x, StringComparer.Ordinal)
             .ToArray();
@@ -1197,7 +1199,9 @@ public sealed class CliApplicationTests
     {
         var stem = methodName.EndsWith("CallAsync", StringComparison.Ordinal)
             ? methodName[..^"CallAsync".Length]
-            : methodName;
+            : methodName.EndsWith("Async", StringComparison.Ordinal)
+                ? methodName[..^"Async".Length]
+                : methodName;
 
         if (string.Equals(stem, "GetExecutions", StringComparison.Ordinal))
         {

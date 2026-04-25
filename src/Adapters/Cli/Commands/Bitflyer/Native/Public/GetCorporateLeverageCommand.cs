@@ -63,8 +63,8 @@ public static class GetCorporateLeverageCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
-        var call = await bundle.Public.GetCorporateLeverageCallAsync((GetCorporateLeverageRequest)request, cancellationToken);
+        using var bundle = BitflyerClientFactory.CreateNativeClientBundle(created.Options);
+        var call = await bundle.Public.GetCorporateLeverageAsync((GetCorporateLeverageRequest)request, cancellationToken);
         return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "public", "get-corporate-leverage"), call);
     }
 }

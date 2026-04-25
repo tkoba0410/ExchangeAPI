@@ -66,7 +66,7 @@ public sealed class GetBoardNativeEndpointTests
         Assert.Equal(CallErrorKinds.Codec, call.Error!.Kind);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetBoard", Method = "GET", Path = "/v1/getboard", Query = null, BodyText = null },
@@ -74,7 +74,7 @@ public sealed class GetBoardNativeEndpointTests
             new CallMeta { Layer = CallLayers.Protocol, Component = CallComponents.PublicEndpointModule, EndpointId = "GetBoard", Scope = "Public", Auth = "None" });
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> FailureProtocolCall(int statusCode, string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> FailureProtocolCall(int statusCode, string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetBoard", Method = "GET", Path = "/v1/getboard", Query = null, BodyText = null },

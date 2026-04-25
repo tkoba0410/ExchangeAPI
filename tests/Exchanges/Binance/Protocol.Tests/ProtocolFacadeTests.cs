@@ -13,12 +13,12 @@ public sealed class ProtocolFacadeTests
         var expected = TestCall();
         var api = new BinancePublicProtocolApi(new FakeGetKlinesProtocolEndpoint(expected));
 
-        var actual = await api.GetKlinesCallAsync("BTCJPY", "1h");
+        var actual = await api.GetKlinesAsync("BTCJPY", "1h");
 
         Assert.Same(expected, actual);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> TestCall()
+    private static CallResult<ProtocolRequest, ProtocolResponse> TestCall()
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "E", Method = "GET", Path = "/", Query = null, BodyText = null },
@@ -28,14 +28,14 @@ public sealed class ProtocolFacadeTests
 
     private sealed class FakeGetKlinesProtocolEndpoint : IGetKlinesProtocolEndpoint
     {
-        private readonly Call<ProtocolRequest, ProtocolResponse> _call;
+        private readonly CallResult<ProtocolRequest, ProtocolResponse> _call;
 
-        public FakeGetKlinesProtocolEndpoint(Call<ProtocolRequest, ProtocolResponse> call)
+        public FakeGetKlinesProtocolEndpoint(CallResult<ProtocolRequest, ProtocolResponse> call)
         {
             _call = call;
         }
 
-        public Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+        public Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
             string symbol,
             string interval,
             long? startTime = null,

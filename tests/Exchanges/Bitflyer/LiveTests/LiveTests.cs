@@ -49,10 +49,10 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
 
-        var nativeCall = await client.Public.GetMarketsCallAsync(new GetMarketsRequest());
-        var protocolCall = await client.Protocol.Public.GetMarketsCallAsync();
+        var nativeCall = await client.Public.GetMarketsAsync(new GetMarketsRequest());
+        var protocolCall = await client.Protocol.Public.GetMarketsAsync();
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -82,11 +82,11 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         var request = new GetTickerRequest { ProductCode = ProductCodes.BtcJpy };
 
-        var nativeCall = await client.Public.GetTickerCallAsync(request);
-        var protocolCall = await client.Protocol.Public.GetTickerCallAsync(ProductCodes.BtcJpy);
+        var nativeCall = await client.Public.GetTickerAsync(request);
+        var protocolCall = await client.Protocol.Public.GetTickerAsync(ProductCodes.BtcJpy);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -122,11 +122,11 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         var request = new GetBoardRequest { ProductCode = ProductCodes.BtcJpy };
 
-        var nativeCall = await client.Public.GetBoardCallAsync(request);
-        var protocolCall = await client.Protocol.Public.GetBoardCallAsync(ProductCodes.BtcJpy);
+        var nativeCall = await client.Public.GetBoardAsync(request);
+        var protocolCall = await client.Protocol.Public.GetBoardAsync(ProductCodes.BtcJpy);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -156,15 +156,15 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         var request = new GetExecutionsPublicRequest
         {
             ProductCode = ProductCodes.BtcJpy,
             Count = 10,
         };
 
-        var nativeCall = await client.Public.GetExecutionsCallAsync(request);
-        var protocolCall = await client.Protocol.Public.GetExecutionsCallAsync(
+        var nativeCall = await client.Public.GetExecutionsAsync(request);
+        var protocolCall = await client.Protocol.Public.GetExecutionsAsync(
             request.ProductCode,
             request.Count,
             request.Before,
@@ -205,11 +205,11 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         var request = new GetBoardStateRequest { ProductCode = ProductCodes.BtcJpy };
 
-        var nativeCall = await client.Public.GetBoardStateCallAsync(request);
-        var protocolCall = await client.Protocol.Public.GetBoardStateCallAsync(request.ProductCode);
+        var nativeCall = await client.Public.GetBoardStateAsync(request);
+        var protocolCall = await client.Protocol.Public.GetBoardStateAsync(request.ProductCode);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -245,11 +245,11 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         var request = new GetHealthRequest { ProductCode = ProductCodes.BtcJpy };
 
-        var nativeCall = await client.Public.GetHealthCallAsync(request);
-        var protocolCall = await client.Protocol.Public.GetHealthCallAsync(request.ProductCode);
+        var nativeCall = await client.Public.GetHealthAsync(request);
+        var protocolCall = await client.Protocol.Public.GetHealthAsync(request.ProductCode);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -271,11 +271,11 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         var request = new GetFundingRateRequest { ProductCode = ProductCodes.FxBtcJpy };
 
-        var nativeCall = await client.Public.GetFundingRateCallAsync(request);
-        var protocolCall = await client.Protocol.Public.GetFundingRateCallAsync(request.ProductCode);
+        var nativeCall = await client.Public.GetFundingRateAsync(request);
+        var protocolCall = await client.Protocol.Public.GetFundingRateAsync(request.ProductCode);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -298,10 +298,10 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
 
-        var nativeCall = await client.Public.GetCorporateLeverageCallAsync(new GetCorporateLeverageRequest());
-        var protocolCall = await client.Protocol.Public.GetCorporateLeverageCallAsync();
+        var nativeCall = await client.Public.GetCorporateLeverageAsync(new GetCorporateLeverageRequest());
+        var protocolCall = await client.Protocol.Public.GetCorporateLeverageAsync();
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -340,10 +340,10 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
 
-        var nativeCall = await client.Public.GetChatsCallAsync(new GetChatsRequest());
-        var protocolCall = await client.Protocol.Public.GetChatsCallAsync(null);
+        var nativeCall = await client.Public.GetChatsAsync(new GetChatsRequest());
+        var protocolCall = await client.Protocol.Public.GetChatsAsync(null);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -381,12 +381,12 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
-        var nativeCall = await client.Private!.GetBalanceCallAsync(new GetBalanceRequest());
-        var protocolCall = await client.Protocol.Private!.GetBalanceCallAsync();
+        var nativeCall = await client.Private!.GetBalanceAsync(new GetBalanceRequest());
+        var protocolCall = await client.Protocol.Private!.GetBalanceAsync();
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -419,13 +419,13 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
         var request = new GetPositionsRequest { ProductCode = ProductCodes.FxBtcJpy };
-        var nativeCall = await client.Private!.GetPositionsCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetPositionsCallAsync(ProductCodes.FxBtcJpy);
+        var nativeCall = await client.Private!.GetPositionsAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetPositionsAsync(ProductCodes.FxBtcJpy);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -464,12 +464,12 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
-        var nativeCall = await client.Private!.GetCollateralCallAsync(new GetCollateralRequest());
-        var protocolCall = await client.Protocol.Private!.GetCollateralCallAsync();
+        var nativeCall = await client.Private!.GetCollateralAsync(new GetCollateralRequest());
+        var protocolCall = await client.Protocol.Private!.GetCollateralAsync();
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -502,12 +502,12 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
-        var nativeCall = await client.Private!.GetCollateralAccountsCallAsync(new GetCollateralAccountsRequest());
-        var protocolCall = await client.Protocol.Private!.GetCollateralAccountsCallAsync();
+        var nativeCall = await client.Private!.GetCollateralAccountsAsync(new GetCollateralAccountsRequest());
+        var protocolCall = await client.Protocol.Private!.GetCollateralAccountsAsync();
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -537,7 +537,7 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
@@ -548,8 +548,8 @@ public sealed class LiveTests
             ChildOrderState = ChildOrderStates.Completed,
         };
 
-        var nativeCall = await client.Private!.GetChildOrdersCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetChildOrdersCallAsync(
+        var nativeCall = await client.Private!.GetChildOrdersAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetChildOrdersAsync(
             request.ProductCode,
             request.Count,
             request.Before,
@@ -602,7 +602,7 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
@@ -612,8 +612,8 @@ public sealed class LiveTests
             Count = 10,
         };
 
-        var nativeCall = await client.Private!.GetExecutionsCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetExecutionsCallAsync(
+        var nativeCall = await client.Private!.GetExecutionsAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetExecutionsAsync(
             request.ProductCode,
             request.Count,
             request.Before,
@@ -655,7 +655,7 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
@@ -664,8 +664,8 @@ public sealed class LiveTests
             Count = 10,
         };
 
-        var nativeCall = await client.Private!.GetCollateralHistoryCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetCollateralHistoryCallAsync(request.Count, request.Before, request.After);
+        var nativeCall = await client.Private!.GetCollateralHistoryAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetCollateralHistoryAsync(request.Count, request.Before, request.After);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -699,7 +699,7 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
@@ -708,8 +708,8 @@ public sealed class LiveTests
             ProductCode = ProductCodes.BtcJpy,
         };
 
-        var nativeCall = await client.Private!.GetTradingCommissionCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetTradingCommissionCallAsync(request.ProductCode);
+        var nativeCall = await client.Private!.GetTradingCommissionAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetTradingCommissionAsync(request.ProductCode);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -730,12 +730,12 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
-        var nativeCall = await client.Private!.GetPermissionsCallAsync(new GetPermissionsRequest());
-        var protocolCall = await client.Protocol.Private!.GetPermissionsCallAsync();
+        var nativeCall = await client.Private!.GetPermissionsAsync(new GetPermissionsRequest());
+        var protocolCall = await client.Protocol.Private!.GetPermissionsAsync();
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -767,12 +767,12 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
-        var nativeCall = await client.Private!.GetAddressesCallAsync(new GetAddressesRequest());
-        var protocolCall = await client.Protocol.Private!.GetAddressesCallAsync();
+        var nativeCall = await client.Private!.GetAddressesAsync(new GetAddressesRequest());
+        var protocolCall = await client.Protocol.Private!.GetAddressesAsync();
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -807,12 +807,12 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
-        var nativeCall = await client.Private!.GetBankAccountsCallAsync(new GetBankAccountsRequest());
-        var protocolCall = await client.Protocol.Private!.GetBankAccountsCallAsync();
+        var nativeCall = await client.Private!.GetBankAccountsAsync(new GetBankAccountsRequest());
+        var protocolCall = await client.Protocol.Private!.GetBankAccountsAsync();
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -847,11 +847,11 @@ public sealed class LiveTests
     public async Task Withdraw_NegativeLiveContract()
     {
         var settings = BitflyerLiveTestSettings.Load();
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
 
         Assert.NotNull(client.Private);
 
-        var bankAccountsCall = await client.Private!.GetBankAccountsCallAsync(new GetBankAccountsRequest());
+        var bankAccountsCall = await client.Private!.GetBankAccountsAsync(new GetBankAccountsRequest());
         Assert.True(bankAccountsCall.IsSuccess, bankAccountsCall.Error?.Message);
         Assert.NotNull(bankAccountsCall.Response);
 
@@ -859,7 +859,7 @@ public sealed class LiveTests
         Assert.NotEmpty(verifiedBankAccounts);
         var bankAccount = verifiedBankAccounts[0];
 
-        var withdrawCall = await client.Private.WithdrawCallAsync(new WithdrawRequest
+        var withdrawCall = await client.Private.WithdrawAsync(new WithdrawRequest
         {
             CurrencyCode = "JPY",
             BankAccountId = bankAccount.Id,
@@ -871,7 +871,7 @@ public sealed class LiveTests
         Assert.NotNull(withdrawCall.Error);
         Assert.Equal(CallErrorKinds.Http, withdrawCall.Error!.Kind);
 
-        var protocolCall = Assert.IsType<Call<ProtocolRequest, ProtocolResponse>>(Assert.Single(withdrawCall.Meta.Children!));
+        var protocolCall = Assert.IsType<CallResult<ProtocolRequest, ProtocolResponse>>(Assert.Single(withdrawCall.Meta.Children!));
         Assert.NotNull(protocolCall.Response);
         Assert.NotEqual(200, protocolCall.Response!.StatusCode);
         Assert.False(string.IsNullOrWhiteSpace(protocolCall.Response.BodyText));
@@ -889,13 +889,13 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
         var request = new GetCoinInsRequest { Count = 10 };
-        var nativeCall = await client.Private!.GetCoinInsCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetCoinInsCallAsync(request.Count, request.Before, request.After);
+        var nativeCall = await client.Private!.GetCoinInsAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetCoinInsAsync(request.Count, request.Before, request.After);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -933,13 +933,13 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
         var request = new GetCoinOutsRequest { Count = 10 };
-        var nativeCall = await client.Private!.GetCoinOutsCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetCoinOutsCallAsync(request.Count, request.Before, request.After);
+        var nativeCall = await client.Private!.GetCoinOutsAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetCoinOutsAsync(request.Count, request.Before, request.After);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -978,13 +978,13 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
         var request = new GetDepositsRequest { Count = 10 };
-        var nativeCall = await client.Private!.GetDepositsCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetDepositsCallAsync(request.Count, request.Before, request.After);
+        var nativeCall = await client.Private!.GetDepositsAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetDepositsAsync(request.Count, request.Before, request.After);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -1022,13 +1022,13 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
         var request = new GetWithdrawalsRequest { Count = 10 };
-        var nativeCall = await client.Private!.GetWithdrawalsCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetWithdrawalsCallAsync(request.Count, request.Before, request.After, request.MessageId);
+        var nativeCall = await client.Private!.GetWithdrawalsAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetWithdrawalsAsync(request.Count, request.Before, request.After, request.MessageId);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -1066,13 +1066,13 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
         var request = new GetBalanceHistoryRequest { Count = 10 };
-        var nativeCall = await client.Private!.GetBalanceHistoryCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetBalanceHistoryCallAsync(request.CurrencyCode, request.Count, request.Before, request.After);
+        var nativeCall = await client.Private!.GetBalanceHistoryAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetBalanceHistoryAsync(request.CurrencyCode, request.Count, request.Before, request.After);
 
         Assert.True(protocolCall.IsSuccess);
         Assert.True(nativeCall.IsSuccess);
@@ -1110,13 +1110,13 @@ public sealed class LiveTests
     {
         var settings = BitflyerLiveTestSettings.Load();
 
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
         Assert.NotNull(client.Private);
         Assert.NotNull(client.Protocol.Private);
 
         var request = new GetParentOrdersRequest { ProductCode = ProductCodes.BtcJpy, Count = 10 };
-        var nativeCall = await client.Private!.GetParentOrdersCallAsync(request);
-        var protocolCall = await client.Protocol.Private!.GetParentOrdersCallAsync(
+        var nativeCall = await client.Private!.GetParentOrdersAsync(request);
+        var protocolCall = await client.Protocol.Private!.GetParentOrdersAsync(
             request.ProductCode,
             request.Count,
             request.Before,
@@ -1158,11 +1158,11 @@ public sealed class LiveTests
     public async Task SendParentOrder_GetParentOrder_CancelParentOrder_WriteLifecycle()
     {
         var settings = BitflyerLiveTestSettings.Load();
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
 
         Assert.NotNull(client.Private);
 
-        var tickerCall = await client.Public.GetTickerCallAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
+        var tickerCall = await client.Public.GetTickerAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
         Assert.True(tickerCall.IsSuccess);
         Assert.NotNull(tickerCall.Response);
 
@@ -1199,17 +1199,17 @@ public sealed class LiveTests
 
         try
         {
-            var sendCall = await client.Private!.SendParentOrderCallAsync(orderRequest);
+            var sendCall = await client.Private!.SendParentOrderAsync(orderRequest);
             Assert.True(sendCall.IsSuccess, sendCall.Error?.Message);
             Assert.NotNull(sendCall.Response);
             Assert.False(string.IsNullOrWhiteSpace(sendCall.Response!.ParentOrderAcceptanceId));
 
             acceptanceId = sendCall.Response.ParentOrderAcceptanceId;
 
-            Call<GetParentOrderRequest, GetParentOrderResponse>? getCall = null;
+            CallResult<GetParentOrderRequest, GetParentOrderResponse>? getCall = null;
             for (var attempt = 0; attempt < 5; attempt++)
             {
-                getCall = await client.Private.GetParentOrderCallAsync(new GetParentOrderRequest
+                getCall = await client.Private.GetParentOrderAsync(new GetParentOrderRequest
                 {
                     ParentOrderAcceptanceId = acceptanceId,
                 });
@@ -1249,7 +1249,7 @@ public sealed class LiveTests
         {
             if (!string.IsNullOrWhiteSpace(acceptanceId))
             {
-                var cancelCall = await client.Private!.CancelParentOrderCallAsync(new CancelParentOrderRequest
+                var cancelCall = await client.Private!.CancelParentOrderAsync(new CancelParentOrderRequest
                 {
                     ProductCode = ProductCodes.BtcJpy,
                     ParentOrderAcceptanceId = acceptanceId,
@@ -1264,11 +1264,11 @@ public sealed class LiveTests
     public async Task SendChildOrder_CancelChildOrder_WriteLifecycle()
     {
         var settings = BitflyerLiveTestSettings.Load();
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
 
         Assert.NotNull(client.Private);
 
-        var tickerCall = await client.Public.GetTickerCallAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
+        var tickerCall = await client.Public.GetTickerAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
         Assert.True(tickerCall.IsSuccess);
         Assert.NotNull(tickerCall.Response);
 
@@ -1289,7 +1289,7 @@ public sealed class LiveTests
 
         try
         {
-            var sendCall = await client.Private!.SendChildOrderCallAsync(orderRequest);
+            var sendCall = await client.Private!.SendChildOrderAsync(orderRequest);
             Assert.True(sendCall.IsSuccess, sendCall.Error?.Message);
             Assert.NotNull(sendCall.Response);
             Assert.False(string.IsNullOrWhiteSpace(sendCall.Response!.ChildOrderAcceptanceId));
@@ -1300,7 +1300,7 @@ public sealed class LiveTests
         {
             if (!string.IsNullOrWhiteSpace(acceptanceId))
             {
-                var cancelCall = await client.Private!.CancelChildOrderCallAsync(new CancelChildOrderRequest
+                var cancelCall = await client.Private!.CancelChildOrderAsync(new CancelChildOrderRequest
                 {
                     ProductCode = ProductCodes.BtcJpy,
                     ChildOrderAcceptanceId = acceptanceId,
@@ -1315,7 +1315,7 @@ public sealed class LiveTests
     public async Task SendChildOrders_CancelAllChildOrders_WriteLifecycle()
     {
         var settings = BitflyerLiveTestSettings.Load();
-        var client = BitflyerClientFactory.CreateNativeClient(CreateOptions(settings));
+        var client = BitflyerClientFactory.CreateNativeClientBundle(CreateOptions(settings));
 
         Assert.NotNull(client.Private);
 
@@ -1325,7 +1325,7 @@ public sealed class LiveTests
             throw new InvalidOperationException("BTC_JPY active child orders must be empty before running CancelAllChildOrders live test.");
         }
 
-        var tickerCall = await client.Public.GetTickerCallAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
+        var tickerCall = await client.Public.GetTickerAsync(new GetTickerRequest { ProductCode = ProductCodes.BtcJpy });
         Assert.True(tickerCall.IsSuccess);
         Assert.NotNull(tickerCall.Response);
 
@@ -1342,7 +1342,7 @@ public sealed class LiveTests
                 (OrderSides.Sell, sellPrice),
             })
             {
-                var sendCall = await client.Private!.SendChildOrderCallAsync(new SendChildOrderRequest
+                var sendCall = await client.Private!.SendChildOrderAsync(new SendChildOrderRequest
                 {
                     ProductCode = ProductCodes.BtcJpy,
                     ChildOrderType = ChildOrderTypes.Limit,
@@ -1376,7 +1376,7 @@ public sealed class LiveTests
             Assert.All(createdAcceptanceIds, id =>
                 Assert.Contains(activeOrders!, order => string.Equals(order.ChildOrderAcceptanceId, id, StringComparison.Ordinal)));
 
-            var cancelAllCall = await client.Private!.CancelAllChildOrdersCallAsync(new CancelAllChildOrdersRequest
+            var cancelAllCall = await client.Private!.CancelAllChildOrdersAsync(new CancelAllChildOrdersRequest
             {
                 ProductCode = ProductCodes.BtcJpy,
             });
@@ -1405,7 +1405,7 @@ public sealed class LiveTests
             foreach (var acceptanceId in createdAcceptanceIds.Where(id =>
                          remainingActiveOrders.Any(order => string.Equals(order.ChildOrderAcceptanceId, id, StringComparison.Ordinal))))
             {
-                var cancelCall = await client.Private!.CancelChildOrderCallAsync(new CancelChildOrderRequest
+                var cancelCall = await client.Private!.CancelChildOrderAsync(new CancelChildOrderRequest
                 {
                     ProductCode = ProductCodes.BtcJpy,
                     ChildOrderAcceptanceId = acceptanceId,
@@ -1421,7 +1421,7 @@ public sealed class LiveTests
         return new BitflyerClientOptions
         {
             BaseUri = settings.BaseUri,
-            Credentials = settings.Credentials,
+            ApiCredentialProvider = settings.ApiCredentialProvider,
             EnableProtocolDebugLogging = settings.EnableProtocolDebugLogging,
             ProtocolDebugLogDirectory = settings.ProtocolDebugLogDirectory,
         };
@@ -1431,7 +1431,7 @@ public sealed class LiveTests
         BitflyerNativeBundle client,
         string productCode)
     {
-        var activeOrdersCall = await client.Private!.GetChildOrdersCallAsync(new GetChildOrdersRequest
+        var activeOrdersCall = await client.Private!.GetChildOrdersAsync(new GetChildOrdersRequest
         {
             ProductCode = productCode,
             ChildOrderState = ChildOrderStates.Active,

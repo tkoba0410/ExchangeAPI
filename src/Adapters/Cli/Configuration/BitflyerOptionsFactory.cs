@@ -37,7 +37,7 @@ public static class BitflyerOptionsFactory
         {
             BaseUri = common.BaseUri ?? new Uri("https://api.bitflyer.com"),
             RequestTimeout = common.Timeout,
-            Credentials = credentials,
+            ApiCredentialProvider = credentials,
             UseTickerAliasPath = invocationOptions.HasFlag("use-ticker-alias-path"),
             EnableProtocolDebugLogging = invocationOptions.HasFlag("enable-protocol-debug-log"),
             ProtocolDebugLogDirectory = common.ProtocolDebugLogDirectory ?? Path.Combine("local", "logs", "bitflyer", "protocol"),

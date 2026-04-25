@@ -74,10 +74,10 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
             console.WriteErrorLine($"bitFlyer private tools unavailable: {credentialResolution.ErrorMessage}");
         }
 
-        var bundle = BitflyerClientFactory.CreateNativeClient(
+        var bundle = BitflyerClientFactory.CreateNativeClientBundle(
             new BitflyerClientOptions
             {
-                Credentials = credentialResolution.Credentials,
+                ApiCredentialProvider = credentialResolution.Credentials,
             });
 
         if (bundle.Private is null && privateToolUnavailableReason is null)
@@ -86,7 +86,7 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
                 $"Configure {BitflyerCredentialResolver.AgeIdentityFileEnvName} and {BitflyerCredentialResolver.CredentialsAgeFileEnvName} to enable private tools.";
         }
 
-        var binanceBundle = BinanceClientFactory.CreateNativeClient();
+        var binanceBundle = BinanceClientFactory.CreateNativeClientBundle();
         return new ExchangeApiMcpToolDispatcher(bundle, binanceBundle, privateToolUnavailableReason);
     }
 
@@ -98,67 +98,67 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
         switch (name)
         {
             case "get_market_snapshot":
-            {
-                var request = Deserialize<GetMarketSnapshotRequest>(arguments);
-                var result = await _marketTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result, "get_market_snapshot");
-            }
+                {
+                    var request = Deserialize<GetMarketSnapshotRequest>(arguments);
+                    var result = await _marketTool.ExecuteAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "get_market_snapshot");
+                }
             case "list_markets":
-            {
-                var request = Deserialize<ListMarketsRequest>(arguments);
-                var result = await _listMarketsTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result, "list_markets");
-            }
+                {
+                    var request = Deserialize<ListMarketsRequest>(arguments);
+                    var result = await _listMarketsTool.ExecuteAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "list_markets");
+                }
             case "get_klines":
-            {
-                if (_klinesTool is null)
                 {
-                    throw new InvalidOperationException("Binance public kline tool is not configured.");
-                }
+                    if (_klinesTool is null)
+                    {
+                        throw new InvalidOperationException("Binance public kline tool is not configured.");
+                    }
 
-                var request = Deserialize<GetKlinesRequest>(arguments);
-                var result = await _klinesTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result, "get_klines");
-            }
+                    var request = Deserialize<GetKlinesRequest>(arguments);
+                    var result = await _klinesTool.ExecuteAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "get_klines");
+                }
             case "get_account_snapshot":
-            {
-                if (_accountTool is null)
                 {
-                    return McpToolCallResult.ToolError(
-                        BuildMissingPrivateToolError(),
-                        BuildMeta("get_account_snapshot", content: null));
-                }
+                    if (_accountTool is null)
+                    {
+                        return McpToolCallResult.ToolError(
+                            BuildMissingPrivateToolError(),
+                            BuildMeta("get_account_snapshot", content: null));
+                    }
 
-                var request = Deserialize<GetAccountSnapshotRequest>(arguments);
-                var result = await _accountTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result, "get_account_snapshot");
-            }
+                    var request = Deserialize<GetAccountSnapshotRequest>(arguments);
+                    var result = await _accountTool.ExecuteAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "get_account_snapshot");
+                }
             case "evaluate_order":
-            {
-                if (_evaluateOrderTool is null)
                 {
-                    return McpToolCallResult.ToolError(
-                        BuildMissingPrivateToolError(),
-                        BuildMeta("evaluate_order", content: null));
-                }
+                    if (_evaluateOrderTool is null)
+                    {
+                        return McpToolCallResult.ToolError(
+                            BuildMissingPrivateToolError(),
+                            BuildMeta("evaluate_order", content: null));
+                    }
 
-                var request = Deserialize<EvaluateOrderRequest>(arguments);
-                var result = await _evaluateOrderTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result, "evaluate_order");
-            }
+                    var request = Deserialize<EvaluateOrderRequest>(arguments);
+                    var result = await _evaluateOrderTool.ExecuteAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "evaluate_order");
+                }
             case "evaluate_margin_order":
-            {
-                if (_evaluateMarginOrderTool is null)
                 {
-                    return McpToolCallResult.ToolError(
-                        BuildMissingPrivateToolError(),
-                        BuildMeta("evaluate_margin_order", content: null));
-                }
+                    if (_evaluateMarginOrderTool is null)
+                    {
+                        return McpToolCallResult.ToolError(
+                            BuildMissingPrivateToolError(),
+                            BuildMeta("evaluate_margin_order", content: null));
+                    }
 
-                var request = Deserialize<EvaluateMarginOrderRequest>(arguments);
-                var result = await _evaluateMarginOrderTool.ExecuteAsync(request, cancellationToken);
-                return ToToolCallResult(result, "evaluate_margin_order");
-            }
+                    var request = Deserialize<EvaluateMarginOrderRequest>(arguments);
+                    var result = await _evaluateMarginOrderTool.ExecuteAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "evaluate_margin_order");
+                }
             default:
                 throw new InvalidOperationException($"Unknown tool: {name}");
         }

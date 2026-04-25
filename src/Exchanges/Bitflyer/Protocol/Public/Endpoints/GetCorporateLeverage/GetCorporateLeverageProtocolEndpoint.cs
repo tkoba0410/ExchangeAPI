@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetCorporateL
 
 public interface IGetCorporateLeverageProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         CancellationToken cancellationToken = default);
 }
 
@@ -22,7 +22,7 @@ public sealed class GetCorporateLeverageProtocolEndpoint : IGetCorporateLeverage
         _transport = transport;
     }
 
-    public async Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    public async Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         CancellationToken cancellationToken = default)
     {
         var request = new ProtocolRequest

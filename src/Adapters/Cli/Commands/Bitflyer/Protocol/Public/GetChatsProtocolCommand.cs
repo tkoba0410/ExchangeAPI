@@ -51,8 +51,8 @@ public static class GetChatsProtocolCommand
 
         var typed = (ProtocolQueryValues)request;
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
-        var call = await bundle.Public.GetChatsCallAsync(
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
+        var call = await bundle.Public.GetChatsAsync(
             typed.GetString("from_date"),
             cancellationToken);
         return ExecutionOutcome.FromProtocolCall(Path, call);

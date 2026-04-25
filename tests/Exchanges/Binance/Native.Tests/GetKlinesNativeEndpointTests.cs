@@ -121,7 +121,7 @@ public sealed class GetKlinesNativeEndpointTests
         Assert.Equal(CallErrorKinds.Codec, call.Error!.Kind);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(int statusCode, string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(int statusCode, string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest

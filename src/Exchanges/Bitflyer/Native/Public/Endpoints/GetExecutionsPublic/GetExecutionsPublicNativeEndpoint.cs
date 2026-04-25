@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetExecutionsPu
 
 public interface IGetExecutionsPublicNativeEndpoint
 {
-    Task<Call<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> CallAsync(
+    Task<CallResult<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> CallAsync(
         GetExecutionsPublicRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -21,7 +21,7 @@ public sealed class GetExecutionsPublicNativeEndpoint : IGetExecutionsPublicNati
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> CallAsync(
+    public async Task<CallResult<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> CallAsync(
         GetExecutionsPublicRequest request,
         CancellationToken cancellationToken = default)
     {

@@ -5,7 +5,7 @@ namespace ExchangeApi.Exchanges.Binance.Protocol.Public.Api;
 
 public interface IBinancePublicProtocolApi
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetKlinesCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetKlinesAsync(
         string symbol,
         string interval,
         long? startTime = null,

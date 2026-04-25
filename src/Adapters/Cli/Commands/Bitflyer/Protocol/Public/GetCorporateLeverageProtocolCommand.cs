@@ -46,8 +46,8 @@ public static class GetCorporateLeverageProtocolCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
-        var call = await bundle.Public.GetCorporateLeverageCallAsync(cancellationToken);
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
+        var call = await bundle.Public.GetCorporateLeverageAsync(cancellationToken);
         return ExecutionOutcome.FromProtocolCall(Path, call);
     }
 }

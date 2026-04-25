@@ -22,11 +22,11 @@ public sealed class BitflyerNativeEvaluateOrderGateway : IBitflyerEvaluateOrderG
         _privateApi = privateApi;
     }
 
-    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    public Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return _publicApi.GetTickerCallAsync(
+        return _publicApi.GetTickerAsync(
             new GetTickerRequest
             {
                 ProductCode = symbol,
@@ -34,11 +34,11 @@ public sealed class BitflyerNativeEvaluateOrderGateway : IBitflyerEvaluateOrderG
             cancellationToken);
     }
 
-    public Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+    public Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return _publicApi.GetBoardStateCallAsync(
+        return _publicApi.GetBoardStateAsync(
             new GetBoardStateRequest
             {
                 ProductCode = symbol,
@@ -46,17 +46,17 @@ public sealed class BitflyerNativeEvaluateOrderGateway : IBitflyerEvaluateOrderG
             cancellationToken);
     }
 
-    public Task<Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceCallAsync(
+    public Task<CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceAsync(
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetBalanceCallAsync(new GetBalanceRequest(), cancellationToken);
+        return _privateApi.GetBalanceAsync(new GetBalanceRequest(), cancellationToken);
     }
 
-    public Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+    public Task<CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetChildOrdersCallAsync(
+        return _privateApi.GetChildOrdersAsync(
             new GetChildOrdersRequest
             {
                 ProductCode = symbol,

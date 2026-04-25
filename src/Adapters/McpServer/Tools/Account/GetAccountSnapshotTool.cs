@@ -33,12 +33,12 @@ public sealed class GetAccountSnapshotTool
             return McpToolExecutionResult<GetAccountSnapshotResponse>.Failure(validationError!);
         }
 
-        var balanceTask = _gateway.GetBalanceCallAsync(cancellationToken);
-        var collateralTask = _gateway.GetCollateralCallAsync(cancellationToken);
-        var spotOrdersTask = _gateway.GetActiveChildOrdersCallAsync(SpotProductCode, cancellationToken);
-        var fxOrdersTask = _gateway.GetActiveChildOrdersCallAsync(FxProductCode, cancellationToken);
-        var positionsTask = _gateway.GetPositionsCallAsync(FxProductCode, cancellationToken);
-        var permissionsTask = _gateway.GetPermissionsCallAsync(cancellationToken);
+        var balanceTask = _gateway.GetBalanceAsync(cancellationToken);
+        var collateralTask = _gateway.GetCollateralAsync(cancellationToken);
+        var spotOrdersTask = _gateway.GetActiveChildOrdersAsync(SpotProductCode, cancellationToken);
+        var fxOrdersTask = _gateway.GetActiveChildOrdersAsync(FxProductCode, cancellationToken);
+        var positionsTask = _gateway.GetPositionsAsync(FxProductCode, cancellationToken);
+        var permissionsTask = _gateway.GetPermissionsAsync(cancellationToken);
 
         await Task.WhenAll(balanceTask, collateralTask, spotOrdersTask, fxOrdersTask, positionsTask, permissionsTask);
 

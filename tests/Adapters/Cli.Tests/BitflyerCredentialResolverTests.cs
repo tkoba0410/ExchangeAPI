@@ -16,7 +16,7 @@ public sealed class BitflyerCredentialResolverTests
     }
 
     [Fact]
-    public void Resolve_LoadsCredentialsFromAgeBackedFiles()
+    public async Task Resolve_LoadsCredentialsFromAgeBackedFiles()
     {
         var tempDirectory = Directory.CreateTempSubdirectory();
         try
@@ -40,8 +40,11 @@ public sealed class BitflyerCredentialResolverTests
 
             Assert.False(result.HasFailure);
             Assert.NotNull(result.Credentials);
-            Assert.Equal("age-key", result.Credentials!.ApiKey);
-            Assert.Equal("age-secret", result.Credentials.ApiSecret);
+            await using var session = await result.Credentials!.OpenSessionAsync();
+            Assert.Equal("age-key", session.ApiKey);
+            Assert.Equal(
+                "9e8aea03151a4229aafbadc8aa33f32870ef4d4cf31cc17d47de714b0943e586",
+                session.Sign("payload"));
         }
         finally
         {
@@ -65,7 +68,7 @@ public sealed class BitflyerCredentialResolverTests
     }
 
     [Fact]
-    public void Resolve_FailsWhenCanonicalVenueDoesNotMatch()
+    public async Task Resolve_FailsWhenCanonicalVenueDoesNotMatch()
     {
         var tempDirectory = Directory.CreateTempSubdirectory();
         try
@@ -85,8 +88,12 @@ public sealed class BitflyerCredentialResolverTests
                 environment,
                 new FakeAgeCredentialDecryptor(true, """{"version":1,"venue":"binance","apiKey":"age-key","apiSecret":"age-secret"}"""));
 
-            Assert.True(result.HasFailure);
-            Assert.Contains("venue", result.ErrorMessage);
+            Assert.False(result.HasFailure);
+            Assert.NotNull(result.Credentials);
+
+            var ex = await Assert.ThrowsAsync<ExchangeApi.Primitives.Credentials.ApiCredentialException>(async () =>
+                await result.Credentials!.OpenSessionAsync());
+            Assert.Contains("venue", ex.Message);
         }
         finally
         {
@@ -95,7 +102,7 @@ public sealed class BitflyerCredentialResolverTests
     }
 
     [Fact]
-    public void Resolve_FailsWhenLegacyFormatIsUsed()
+    public async Task Resolve_FailsWhenLegacyFormatIsUsed()
     {
         var tempDirectory = Directory.CreateTempSubdirectory();
         try
@@ -115,8 +122,12 @@ public sealed class BitflyerCredentialResolverTests
                 environment,
                 new FakeAgeCredentialDecryptor(true, """{"bitflyer":{"apiKey":"legacy-key","apiSecret":"legacy-secret"}}"""));
 
-            Assert.True(result.HasFailure);
-            Assert.Contains("version", result.ErrorMessage);
+            Assert.False(result.HasFailure);
+            Assert.NotNull(result.Credentials);
+
+            var ex = await Assert.ThrowsAsync<ExchangeApi.Primitives.Credentials.ApiCredentialException>(async () =>
+                await result.Credentials!.OpenSessionAsync());
+            Assert.Contains("version", ex.Message);
         }
         finally
         {

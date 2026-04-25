@@ -84,8 +84,8 @@ public static class GetFundingRateCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
-        var call = await bundle.Public.GetFundingRateCallAsync((GetFundingRateRequest)request, cancellationToken);
+        using var bundle = BitflyerClientFactory.CreateNativeClientBundle(created.Options);
+        var call = await bundle.Public.GetFundingRateAsync((GetFundingRateRequest)request, cancellationToken);
         return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "public", "get-funding-rate"), call);
     }
 }

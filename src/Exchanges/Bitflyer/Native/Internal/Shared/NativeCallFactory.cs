@@ -5,10 +5,10 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 
 internal static class NativeCallFactory
 {
-    internal static Call<TRequest, TResponse> Success<TRequest, TResponse>(
+    internal static CallResult<TRequest, TResponse> Success<TRequest, TResponse>(
         TRequest request,
         TResponse response,
-        Call<ProtocolRequest, ProtocolResponse> protocolCall,
+        CallResult<ProtocolRequest, ProtocolResponse> protocolCall,
         string scope)
     {
         return CallFactory.Success(
@@ -17,10 +17,10 @@ internal static class NativeCallFactory
             CreateMeta(protocolCall.Request.EndpointId, scope, protocolCall.Request, protocolCall));
     }
 
-    internal static Call<TRequest, TResponse> Failure<TRequest, TResponse>(
+    internal static CallResult<TRequest, TResponse> Failure<TRequest, TResponse>(
         TRequest request,
         CallError error,
-        Call<ProtocolRequest, ProtocolResponse>? protocolCall,
+        CallResult<ProtocolRequest, ProtocolResponse>? protocolCall,
         string endpointId,
         string scope,
         string auth)
@@ -43,7 +43,7 @@ internal static class NativeCallFactory
         string endpointId,
         string scope,
         ProtocolRequest protocolRequest,
-        Call<ProtocolRequest, ProtocolResponse> protocolCall)
+        CallResult<ProtocolRequest, ProtocolResponse> protocolCall)
     {
         return new CallMeta
         {

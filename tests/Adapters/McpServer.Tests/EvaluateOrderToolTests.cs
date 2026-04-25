@@ -1,5 +1,5 @@
-using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Mapping;
+using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Tools.Evaluation;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
@@ -258,7 +258,7 @@ public sealed class EvaluateOrderToolTests
         decimal jpyAvailable = 5000000m,
         decimal btcAvailable = 1m,
         GetBoardStateResponse? boardState = null,
-        Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>? balanceCall = null,
+        CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>? balanceCall = null,
         IReadOnlyList<GetChildOrders.Item>? activeOrders = null)
     {
         return new FakeBitflyerEvaluateOrderGateway
@@ -374,15 +374,15 @@ public sealed class EvaluateOrderToolTests
 
     private sealed class FakeBitflyerEvaluateOrderGateway : IBitflyerEvaluateOrderGateway
     {
-        public required Call<GetTickerRequest, GetTickerResponse> TickerCall { get; init; }
+        public required CallResult<GetTickerRequest, GetTickerResponse> TickerCall { get; init; }
 
-        public required Call<GetBoardStateRequest, GetBoardStateResponse> BoardStateCall { get; init; }
+        public required CallResult<GetBoardStateRequest, GetBoardStateResponse> BoardStateCall { get; init; }
 
-        public required Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>> BalanceCall { get; init; }
+        public required CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>> BalanceCall { get; init; }
 
-        public required Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> ActiveOrdersCall { get; init; }
+        public required CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> ActiveOrdersCall { get; init; }
 
-        public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+        public Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {
@@ -391,7 +391,7 @@ public sealed class EvaluateOrderToolTests
             return Task.FromResult(TickerCall);
         }
 
-        public Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+        public Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {
@@ -400,14 +400,14 @@ public sealed class EvaluateOrderToolTests
             return Task.FromResult(BoardStateCall);
         }
 
-        public Task<Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceCallAsync(
+        public Task<CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceAsync(
             CancellationToken cancellationToken = default)
         {
             _ = cancellationToken;
             return Task.FromResult(BalanceCall);
         }
 
-        public Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+        public Task<CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {

@@ -181,8 +181,8 @@ public sealed class GetAccountSnapshotToolTests
     }
 
     private static FakeBitflyerAccountSnapshotGateway CreateHappyPathGateway(
-        Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>? balanceCall = null,
-        Call<GetPermissionsRequest, IReadOnlyList<string>>? permissionsCall = null,
+        CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>? balanceCall = null,
+        CallResult<GetPermissionsRequest, IReadOnlyList<string>>? permissionsCall = null,
         IReadOnlyList<string>? permissions = null)
     {
         var grantedPermissions = permissions ?? BitflyerAccountReadinessMapper.RequiredPermissions.ToArray();
@@ -227,7 +227,7 @@ public sealed class GetAccountSnapshotToolTests
         };
     }
 
-    private static Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> SuccessOrders(string productCode, int count)
+    private static CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> SuccessOrders(string productCode, int count)
     {
         var items = Enumerable.Range(0, count)
             .Select(index => new GetChildOrders.Item
@@ -277,31 +277,31 @@ public sealed class GetAccountSnapshotToolTests
 
     private sealed class FakeBitflyerAccountSnapshotGateway : IBitflyerAccountSnapshotGateway
     {
-        public required Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>> BalanceCall { get; init; }
+        public required CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>> BalanceCall { get; init; }
 
-        public required Call<GetCollateralRequest, GetCollateralResponse> CollateralCall { get; init; }
+        public required CallResult<GetCollateralRequest, GetCollateralResponse> CollateralCall { get; init; }
 
-        public required Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> SpotOrdersCall { get; init; }
+        public required CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> SpotOrdersCall { get; init; }
 
-        public required Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> FxOrdersCall { get; init; }
+        public required CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> FxOrdersCall { get; init; }
 
-        public required Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>> PositionsCall { get; init; }
+        public required CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>> PositionsCall { get; init; }
 
-        public required Call<GetPermissionsRequest, IReadOnlyList<string>> PermissionsCall { get; init; }
+        public required CallResult<GetPermissionsRequest, IReadOnlyList<string>> PermissionsCall { get; init; }
 
-        public Task<Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceCallAsync(CancellationToken cancellationToken = default)
+        public Task<CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceAsync(CancellationToken cancellationToken = default)
         {
             _ = cancellationToken;
             return Task.FromResult(BalanceCall);
         }
 
-        public Task<Call<GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(CancellationToken cancellationToken = default)
+        public Task<CallResult<GetCollateralRequest, GetCollateralResponse>> GetCollateralAsync(CancellationToken cancellationToken = default)
         {
             _ = cancellationToken;
             return Task.FromResult(CollateralCall);
         }
 
-        public Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+        public Task<CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersAsync(
             string productCode,
             CancellationToken cancellationToken = default)
         {
@@ -309,7 +309,7 @@ public sealed class GetAccountSnapshotToolTests
             return Task.FromResult(productCode == "BTC_JPY" ? SpotOrdersCall : FxOrdersCall);
         }
 
-        public Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsCallAsync(
+        public Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsAsync(
             string productCode,
             CancellationToken cancellationToken = default)
         {
@@ -318,7 +318,7 @@ public sealed class GetAccountSnapshotToolTests
             return Task.FromResult(PositionsCall);
         }
 
-        public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(CancellationToken cancellationToken = default)
+        public Task<CallResult<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsAsync(CancellationToken cancellationToken = default)
         {
             _ = cancellationToken;
             return Task.FromResult(PermissionsCall);

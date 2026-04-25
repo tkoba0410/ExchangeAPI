@@ -46,8 +46,8 @@ public static class GetMarketsProtocolCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
-        var call = await bundle.Public.GetMarketsCallAsync(cancellationToken);
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
+        var call = await bundle.Public.GetMarketsAsync(cancellationToken);
         return ExecutionOutcome.FromProtocolCall(Path, call);
     }
 }

@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 
 public interface IGetTradingCommissionNativeEndpoint
 {
-    Task<Call<GetTradingCommissionRequest, GetTradingCommissionResponse>> CallAsync(
+    Task<CallResult<GetTradingCommissionRequest, GetTradingCommissionResponse>> CallAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetTradingCommissionRequest, GetTradingCommissionResponse>> CallAsync(
+        GetTradingCommissionRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetTradingCommissionNativeEndpoint : IGetTradingCommissionNativeEndpoint
@@ -21,9 +30,25 @@ public sealed class GetTradingCommissionNativeEndpoint : IGetTradingCommissionNa
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetTradingCommissionRequest, GetTradingCommissionResponse>> CallAsync(
+    public Task<CallResult<GetTradingCommissionRequest, GetTradingCommissionResponse>> CallAsync(
         GetTradingCommissionRequest request,
         CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetTradingCommissionRequest, GetTradingCommissionResponse>> CallAsync(
+        GetTradingCommissionRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetTradingCommissionRequest, GetTradingCommissionResponse>> CallAsyncCore(
+        GetTradingCommissionRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var validationError = Validate(request);
         if (validationError is not null)
@@ -37,7 +62,9 @@ public sealed class GetTradingCommissionNativeEndpoint : IGetTradingCommissionNa
                 auth: "KeySecret");
         }
 
-        var protocolCall = await _protocolEndpoint.SendAsync(request.ProductCode, cancellationToken);
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(request.ProductCode, cancellationToken)
+            : _protocolEndpoint.SendAsync(request.ProductCode, credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<GetTradingCommissionRequest, GetTradingCommissionResponse>(

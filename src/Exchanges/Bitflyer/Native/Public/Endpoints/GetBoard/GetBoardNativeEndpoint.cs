@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
 
 public interface IGetBoardNativeEndpoint
 {
-    Task<Call<GetBoardRequest, GetBoardResponse>> CallAsync(
+    Task<CallResult<GetBoardRequest, GetBoardResponse>> CallAsync(
         GetBoardRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -23,7 +23,7 @@ public sealed class GetBoardNativeEndpoint : IGetBoardNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetBoardRequest, GetBoardResponse>> CallAsync(
+    public async Task<CallResult<GetBoardRequest, GetBoardResponse>> CallAsync(
         GetBoardRequest request,
         CancellationToken cancellationToken = default)
     {

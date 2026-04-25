@@ -3,14 +3,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 
 public interface ISendChildOrderNativeEndpoint
 {
-    Task<Call<SendChildOrderRequest, SendChildOrderResponse>> CallAsync(
+    Task<CallResult<SendChildOrderRequest, SendChildOrderResponse>> CallAsync(
         SendChildOrderRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<SendChildOrderRequest, SendChildOrderResponse>> CallAsync(
+        SendChildOrderRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
@@ -22,9 +31,25 @@ public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<SendChildOrderRequest, SendChildOrderResponse>> CallAsync(
+    public Task<CallResult<SendChildOrderRequest, SendChildOrderResponse>> CallAsync(
         SendChildOrderRequest request,
         CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<SendChildOrderRequest, SendChildOrderResponse>> CallAsync(
+        SendChildOrderRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<SendChildOrderRequest, SendChildOrderResponse>> CallAsyncCore(
+        SendChildOrderRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var validationError = Validate(request);
         if (validationError is not null)
@@ -39,7 +64,9 @@ public sealed class SendChildOrderNativeEndpoint : ISendChildOrderNativeEndpoint
         }
 
         var body = BuildBody(request);
-        var protocolCall = await _protocolEndpoint.SendAsync(body, cancellationToken);
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(body, cancellationToken)
+            : _protocolEndpoint.SendAsync(body, credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<SendChildOrderRequest, SendChildOrderResponse>(

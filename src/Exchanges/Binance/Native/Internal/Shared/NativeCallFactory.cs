@@ -5,10 +5,10 @@ namespace ExchangeApi.Exchanges.Binance.Native.Internal.Shared;
 
 internal static class NativeCallFactory
 {
-    internal static Call<TRequest, TResponse> Success<TRequest, TResponse>(
+    internal static CallResult<TRequest, TResponse> Success<TRequest, TResponse>(
         TRequest request,
         TResponse response,
-        Call<ProtocolRequest, ProtocolResponse> protocolCall)
+        CallResult<ProtocolRequest, ProtocolResponse> protocolCall)
     {
         return CallFactory.Success(
             request,
@@ -24,10 +24,10 @@ internal static class NativeCallFactory
             });
     }
 
-    internal static Call<TRequest, TResponse> Failure<TRequest, TResponse>(
+    internal static CallResult<TRequest, TResponse> Failure<TRequest, TResponse>(
         TRequest request,
         CallError error,
-        Call<ProtocolRequest, ProtocolResponse>? protocolCall,
+        CallResult<ProtocolRequest, ProtocolResponse>? protocolCall,
         string endpointId)
     {
         return CallFactory.Failure<TRequest, TResponse>(

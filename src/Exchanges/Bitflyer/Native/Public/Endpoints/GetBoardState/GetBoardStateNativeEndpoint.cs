@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
 
 public interface IGetBoardStateNativeEndpoint
 {
-    Task<Call<GetBoardStateRequest, GetBoardStateResponse>> CallAsync(
+    Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> CallAsync(
         GetBoardStateRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -21,7 +21,7 @@ public sealed class GetBoardStateNativeEndpoint : IGetBoardStateNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetBoardStateRequest, GetBoardStateResponse>> CallAsync(
+    public async Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> CallAsync(
         GetBoardStateRequest request,
         CancellationToken cancellationToken = default)
     {

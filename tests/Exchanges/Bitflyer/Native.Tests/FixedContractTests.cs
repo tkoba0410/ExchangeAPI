@@ -8,22 +8,22 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalanceHistory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBankAccounts;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinIns;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinOuts;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetDeposits;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPermissions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetWithdrawals;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.Withdraw;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoardState;
@@ -36,6 +36,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Units;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests;
@@ -156,7 +157,7 @@ public sealed class FixedContractTests
         AssertEmptyRequest(typeof(GetPermissionsRequest));
         AssertCallMethod(
             typeof(IBitflyerPrivateNativeApi),
-            nameof(IBitflyerPrivateNativeApi.GetPermissionsCallAsync),
+            nameof(IBitflyerPrivateNativeApi.GetPermissionsAsync),
             typeof(GetPermissionsRequest),
             typeof(IReadOnlyList<string>));
 
@@ -203,7 +204,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(WithdrawResponse), nameof(WithdrawResponse.MessageId), typeof(string));
         AssertCallMethod(
             typeof(IBitflyerPrivateNativeApi),
-            nameof(IBitflyerPrivateNativeApi.WithdrawCallAsync),
+            nameof(IBitflyerPrivateNativeApi.WithdrawAsync),
             typeof(WithdrawRequest),
             typeof(WithdrawResponse));
 
@@ -338,7 +339,7 @@ public sealed class FixedContractTests
         AssertJsonProperty(typeof(SendChildOrderResponse), nameof(SendChildOrderResponse.ChildOrderAcceptanceId), typeof(string), "child_order_acceptance_id");
         AssertCallMethod(
             typeof(IBitflyerPrivateNativeApi),
-            nameof(IBitflyerPrivateNativeApi.SendChildOrderCallAsync),
+            nameof(IBitflyerPrivateNativeApi.SendChildOrderAsync),
             typeof(SendChildOrderRequest),
             typeof(SendChildOrderResponse));
 
@@ -349,7 +350,7 @@ public sealed class FixedContractTests
         AssertJsonIgnoreWhenWritingNull(typeof(CancelChildOrderRequest), nameof(CancelChildOrderRequest.ChildOrderAcceptanceId));
         AssertCallMethod(
             typeof(IBitflyerPrivateNativeApi),
-            nameof(IBitflyerPrivateNativeApi.CancelChildOrderCallAsync),
+            nameof(IBitflyerPrivateNativeApi.CancelChildOrderAsync),
             typeof(CancelChildOrderRequest),
             typeof(Unit));
 
@@ -373,7 +374,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(SendParentOrderResponse), nameof(SendParentOrderResponse.ParentOrderAcceptanceId), typeof(string));
         AssertCallMethod(
             typeof(IBitflyerPrivateNativeApi),
-            nameof(IBitflyerPrivateNativeApi.SendParentOrderCallAsync),
+            nameof(IBitflyerPrivateNativeApi.SendParentOrderAsync),
             typeof(SendParentOrderRequest),
             typeof(SendParentOrderResponse));
 
@@ -395,7 +396,7 @@ public sealed class FixedContractTests
         AssertProperty(typeof(GetParentOrderParameter), nameof(GetParentOrderParameter.Offset), typeof(decimal));
         AssertCallMethod(
             typeof(IBitflyerPrivateNativeApi),
-            nameof(IBitflyerPrivateNativeApi.GetParentOrderCallAsync),
+            nameof(IBitflyerPrivateNativeApi.GetParentOrderAsync),
             typeof(GetParentOrderRequest),
             typeof(GetParentOrderResponse));
 
@@ -406,14 +407,14 @@ public sealed class FixedContractTests
         AssertJsonIgnoreWhenWritingNull(typeof(CancelParentOrderRequest), nameof(CancelParentOrderRequest.ParentOrderAcceptanceId));
         AssertCallMethod(
             typeof(IBitflyerPrivateNativeApi),
-            nameof(IBitflyerPrivateNativeApi.CancelParentOrderCallAsync),
+            nameof(IBitflyerPrivateNativeApi.CancelParentOrderAsync),
             typeof(CancelParentOrderRequest),
             typeof(Unit));
 
         AssertJsonProperty(typeof(CancelAllChildOrdersRequest), nameof(CancelAllChildOrdersRequest.ProductCode), typeof(string), "product_code");
         AssertCallMethod(
             typeof(IBitflyerPrivateNativeApi),
-            nameof(IBitflyerPrivateNativeApi.CancelAllChildOrdersCallAsync),
+            nameof(IBitflyerPrivateNativeApi.CancelAllChildOrdersAsync),
             typeof(CancelAllChildOrdersRequest),
             typeof(Unit));
     }
@@ -473,7 +474,11 @@ public sealed class FixedContractTests
 
     private static void AssertCallMethod(Type type, string methodName, Type requestType, Type responseType)
     {
-        var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
+        var method = type
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .SingleOrDefault(method =>
+                string.Equals(method.Name, methodName, StringComparison.Ordinal) &&
+                method.GetParameters().All(parameter => parameter.ParameterType != typeof(IApiCredentialSession)));
         Assert.NotNull(method);
 
         var parameters = method!.GetParameters();
@@ -481,7 +486,7 @@ public sealed class FixedContractTests
         Assert.Equal(requestType, parameters[0].ParameterType);
         Assert.Equal(typeof(CancellationToken), parameters[1].ParameterType);
 
-        var expectedCallType = typeof(Call<,>).MakeGenericType(requestType, responseType);
+        var expectedCallType = typeof(CallResult<,>).MakeGenericType(requestType, responseType);
         var expectedReturnType = typeof(Task<>).MakeGenericType(expectedCallType);
         Assert.Equal(expectedReturnType, method.ReturnType);
     }

@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetWithdrawals;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetWithdrawals;
 
 public interface IGetWithdrawalsNativeEndpoint
 {
-    Task<Call<GetWithdrawalsRequest, IReadOnlyList<GetWithdrawals.Item>>> CallAsync(
+    Task<CallResult<GetWithdrawalsRequest, IReadOnlyList<GetWithdrawals.Item>>> CallAsync(
         GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetWithdrawalsRequest, IReadOnlyList<GetWithdrawals.Item>>> CallAsync(
+        GetWithdrawalsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetWithdrawalsNativeEndpoint : IGetWithdrawalsNativeEndpoint
@@ -21,9 +30,25 @@ public sealed class GetWithdrawalsNativeEndpoint : IGetWithdrawalsNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetWithdrawalsRequest, IReadOnlyList<GetWithdrawals.Item>>> CallAsync(
+    public Task<CallResult<GetWithdrawalsRequest, IReadOnlyList<GetWithdrawals.Item>>> CallAsync(
         GetWithdrawalsRequest request,
         CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetWithdrawalsRequest, IReadOnlyList<GetWithdrawals.Item>>> CallAsync(
+        GetWithdrawalsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetWithdrawalsRequest, IReadOnlyList<GetWithdrawals.Item>>> CallAsyncCore(
+        GetWithdrawalsRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var validationError = Validate(request);
         if (validationError is not null)
@@ -37,12 +62,9 @@ public sealed class GetWithdrawalsNativeEndpoint : IGetWithdrawalsNativeEndpoint
                 auth: "KeySecret");
         }
 
-        var protocolCall = await _protocolEndpoint.SendAsync(
-            request.Count,
-            request.Before,
-            request.After,
-            request.MessageId,
-            cancellationToken);
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(request.Count, request.Before, request.After, request.MessageId, cancellationToken)
+            : _protocolEndpoint.SendAsync(request.Count, request.Before, request.After, request.MessageId, credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<GetWithdrawalsRequest, IReadOnlyList<GetWithdrawals.Item>>(

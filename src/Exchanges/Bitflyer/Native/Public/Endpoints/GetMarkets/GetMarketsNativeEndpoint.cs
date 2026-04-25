@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetMarkets;
 
 public interface IGetMarketsNativeEndpoint
 {
-    Task<Call<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> CallAsync(
+    Task<CallResult<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> CallAsync(
         GetMarketsRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -22,7 +22,7 @@ public sealed class GetMarketsNativeEndpoint : IGetMarketsNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> CallAsync(
+    public async Task<CallResult<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> CallAsync(
         GetMarketsRequest request,
         CancellationToken cancellationToken = default)
     {

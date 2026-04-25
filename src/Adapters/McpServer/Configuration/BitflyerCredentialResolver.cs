@@ -1,61 +1,78 @@
-using ExchangeApi.Exchanges.Bitflyer.Composition.Credentials;
-using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
+using ExchangeApi.Optional.Credentials.AgeFile;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Adapters.McpServer.Configuration;
 
 public static class BitflyerCredentialResolver
 {
-    public const int CanonicalVersion = BitflyerAgeCredentialResolver.CanonicalVersion;
-    public const string CanonicalVenue = BitflyerAgeCredentialResolver.CanonicalVenue;
-    public const string AgeIdentityFileEnvName = BitflyerAgeCredentialResolver.AgeIdentityFileEnvName;
-    public const string CredentialsAgeFileEnvName = BitflyerAgeCredentialResolver.CredentialsAgeFileEnvName;
+    public const int CanonicalVersion = 1;
+    public const string CanonicalVenue = "bitflyer";
+    public const string AgeIdentityFileEnvName = "EXCHANGEAPI_AGE_IDENTITY_FILE_PATH";
+    public const string CredentialsAgeFileEnvName = "EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH";
 
     public static bool HasConfiguredCredentialsSource()
     {
-        return BitflyerAgeCredentialResolver.HasConfiguredCredentialsSource(
-            Environment.GetEnvironmentVariable,
-            File.Exists,
-            AgeProcessCredentialHelper.IsAvailable);
+        var identityFilePath = Environment.GetEnvironmentVariable(AgeIdentityFileEnvName);
+        var credentialsFilePath = Environment.GetEnvironmentVariable(CredentialsAgeFileEnvName);
+        return !string.IsNullOrWhiteSpace(identityFilePath)
+            && !string.IsNullOrWhiteSpace(credentialsFilePath)
+            && File.Exists(identityFilePath)
+            && File.Exists(credentialsFilePath);
     }
 
     public static BitflyerCredentialResolution Resolve()
     {
-        return FromCommonResolution(
-            BitflyerAgeCredentialResolver.Resolve(
-                Environment.GetEnvironmentVariable,
-                File.Exists,
-                AgeProcessCredentialHelper.IsAvailable,
-                AgeProcessCredentialHelper.Decrypt));
-    }
+        var identityFilePath = Environment.GetEnvironmentVariable(AgeIdentityFileEnvName);
+        var credentialsFilePath = Environment.GetEnvironmentVariable(CredentialsAgeFileEnvName);
+        var hasIdentity = !string.IsNullOrWhiteSpace(identityFilePath);
+        var hasCredentialsFile = !string.IsNullOrWhiteSpace(credentialsFilePath);
 
-    private static BitflyerCredentialResolution FromCommonResolution(BitflyerAgeCredentialResolution resolution)
-    {
-        if (resolution.Credentials is not null)
+        if (!hasIdentity && !hasCredentialsFile)
         {
-            return BitflyerCredentialResolution.Success(resolution.Credentials);
+            return BitflyerCredentialResolution.None();
         }
 
-        return resolution.HasFailure
-            ? BitflyerCredentialResolution.Failure(resolution.ErrorMessage!)
-            : BitflyerCredentialResolution.None();
+        if (!hasIdentity || !hasCredentialsFile)
+        {
+            return BitflyerCredentialResolution.Failure(
+                $"{AgeIdentityFileEnvName} and {CredentialsAgeFileEnvName} must both be set to use age-backed credentials.");
+        }
+
+        if (!File.Exists(identityFilePath!))
+        {
+            return BitflyerCredentialResolution.Failure(
+                $"{AgeIdentityFileEnvName} does not exist: {identityFilePath}");
+        }
+
+        if (!File.Exists(credentialsFilePath!))
+        {
+            return BitflyerCredentialResolution.Failure(
+                $"{CredentialsAgeFileEnvName} does not exist: {credentialsFilePath}");
+        }
+
+        return BitflyerCredentialResolution.Success(
+            new BitflyerAgeFileApiCredentialProvider(
+                identityFilePath!,
+                credentialsFilePath!,
+                new AgeCliCredentialFileDecryptor()));
     }
 }
 
 public sealed class BitflyerCredentialResolution
 {
-    private BitflyerCredentialResolution(BitflyerApiCredentials? credentials, string? errorMessage)
+    private BitflyerCredentialResolution(IApiCredentialProvider? credentials, string? errorMessage)
     {
         Credentials = credentials;
         ErrorMessage = errorMessage;
     }
 
-    public BitflyerApiCredentials? Credentials { get; }
+    public IApiCredentialProvider? Credentials { get; }
 
     public string? ErrorMessage { get; }
 
     public bool HasFailure => !string.IsNullOrWhiteSpace(ErrorMessage);
 
-    public static BitflyerCredentialResolution Success(BitflyerApiCredentials credentials)
+    public static BitflyerCredentialResolution Success(IApiCredentialProvider credentials)
     {
         return new BitflyerCredentialResolution(credentials, null);
     }

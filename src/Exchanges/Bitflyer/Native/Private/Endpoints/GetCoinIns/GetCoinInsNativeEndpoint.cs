@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCoinIns;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinIns;
 
 public interface IGetCoinInsNativeEndpoint
 {
-    Task<Call<GetCoinInsRequest, IReadOnlyList<GetCoinIns.Item>>> CallAsync(
+    Task<CallResult<GetCoinInsRequest, IReadOnlyList<GetCoinIns.Item>>> CallAsync(
         GetCoinInsRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetCoinInsRequest, IReadOnlyList<GetCoinIns.Item>>> CallAsync(
+        GetCoinInsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetCoinInsNativeEndpoint : IGetCoinInsNativeEndpoint
@@ -21,9 +30,25 @@ public sealed class GetCoinInsNativeEndpoint : IGetCoinInsNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetCoinInsRequest, IReadOnlyList<GetCoinIns.Item>>> CallAsync(
+    public Task<CallResult<GetCoinInsRequest, IReadOnlyList<GetCoinIns.Item>>> CallAsync(
         GetCoinInsRequest request,
         CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetCoinInsRequest, IReadOnlyList<GetCoinIns.Item>>> CallAsync(
+        GetCoinInsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetCoinInsRequest, IReadOnlyList<GetCoinIns.Item>>> CallAsyncCore(
+        GetCoinInsRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var validationError = Validate(request);
         if (validationError is not null)
@@ -37,7 +62,9 @@ public sealed class GetCoinInsNativeEndpoint : IGetCoinInsNativeEndpoint
                 auth: "KeySecret");
         }
 
-        var protocolCall = await _protocolEndpoint.SendAsync(request.Count, request.Before, request.After, cancellationToken);
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(request.Count, request.Before, request.After, cancellationToken)
+            : _protocolEndpoint.SendAsync(request.Count, request.Before, request.After, credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<GetCoinInsRequest, IReadOnlyList<GetCoinIns.Item>>(

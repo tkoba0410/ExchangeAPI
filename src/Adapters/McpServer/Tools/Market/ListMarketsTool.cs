@@ -1,6 +1,6 @@
+using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
-using ExchangeApi.Adapters.McpServer.Mapping;
 
 namespace ExchangeApi.Adapters.McpServer.Tools.Market;
 

@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetFundingRate;
 
 public interface IGetFundingRateNativeEndpoint
 {
-    Task<Call<GetFundingRateRequest, GetFundingRateResponse>> CallAsync(
+    Task<CallResult<GetFundingRateRequest, GetFundingRateResponse>> CallAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -21,7 +21,7 @@ public sealed class GetFundingRateNativeEndpoint : IGetFundingRateNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetFundingRateRequest, GetFundingRateResponse>> CallAsync(
+    public async Task<CallResult<GetFundingRateRequest, GetFundingRateResponse>> CallAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default)
     {

@@ -2,12 +2,12 @@ namespace ExchangeApi.Primitives.Calls;
 
 public static class CallFactory
 {
-    public static Call<TRequest, TResponse> Success<TRequest, TResponse>(
+    public static CallResult<TRequest, TResponse> Success<TRequest, TResponse>(
         TRequest request,
         TResponse response,
         CallMeta meta)
     {
-        return new Call<TRequest, TResponse>
+        return new CallResult<TRequest, TResponse>
         {
             Request = request,
             Response = response,
@@ -17,12 +17,12 @@ public static class CallFactory
         };
     }
 
-    public static Call<TRequest, TResponse> Failure<TRequest, TResponse>(
+    public static CallResult<TRequest, TResponse> Failure<TRequest, TResponse>(
         TRequest request,
         CallError error,
         CallMeta meta)
     {
-        return new Call<TRequest, TResponse>
+        return new CallResult<TRequest, TResponse>
         {
             Request = request,
             Response = default,

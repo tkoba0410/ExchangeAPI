@@ -33,7 +33,7 @@ public sealed class GetCorporateLeverageNativeEndpointTests
         Assert.Null(call.Response.NextStartDate);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetCorporateLeverage", Method = "GET", Path = "/v1/getcorporateleverage", Query = null, BodyText = null },

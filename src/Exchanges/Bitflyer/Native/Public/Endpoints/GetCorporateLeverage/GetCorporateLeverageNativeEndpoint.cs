@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetCorporateLev
 
 public interface IGetCorporateLeverageNativeEndpoint
 {
-    Task<Call<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> CallAsync(
+    Task<CallResult<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> CallAsync(
         GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -21,7 +21,7 @@ public sealed class GetCorporateLeverageNativeEndpoint : IGetCorporateLeverageNa
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> CallAsync(
+    public async Task<CallResult<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> CallAsync(
         GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default)
     {

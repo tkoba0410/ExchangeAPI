@@ -44,7 +44,7 @@ public sealed class ExecutionOutcome
         };
     }
 
-    public static ExecutionOutcome FromCall<TRequest, TResponse>(CommandPath path, Call<TRequest, TResponse> call)
+    public static ExecutionOutcome FromCall<TRequest, TResponse>(CommandPath path, CallResult<TRequest, TResponse> call)
     {
         if (call.IsSuccess)
         {
@@ -54,7 +54,7 @@ public sealed class ExecutionOutcome
         var summary = $"{path.Identity}: {ClassifyCallFailure(call.Error?.Kind)}";
         var detail = call.Error?.Message;
         var child = call.Meta.Children?
-            .OfType<Call<ProtocolRequest, ProtocolResponse>>()
+            .OfType<CallResult<ProtocolRequest, ProtocolResponse>>()
             .FirstOrDefault();
 
         return new ExecutionOutcome
@@ -69,7 +69,7 @@ public sealed class ExecutionOutcome
         };
     }
 
-    public static ExecutionOutcome FromProtocolCall(CommandPath path, Call<ProtocolRequest, ProtocolResponse> call)
+    public static ExecutionOutcome FromProtocolCall(CommandPath path, CallResult<ProtocolRequest, ProtocolResponse> call)
     {
         if (call.IsSuccess && call.Response is not null)
         {

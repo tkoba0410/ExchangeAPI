@@ -51,7 +51,7 @@ public static class GetDepositsProtocolCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
         if (bundle.Private is null)
         {
             return ExecutionOutcome.InputError(
@@ -60,7 +60,7 @@ public static class GetDepositsProtocolCommand
         }
 
         var typed = (ProtocolQueryValues)request;
-        var call = await bundle.Private.GetDepositsCallAsync(
+        var call = await bundle.Private.GetDepositsAsync(
             typed.GetInt("count"),
             typed.GetLong("before"),
             typed.GetLong("after"),

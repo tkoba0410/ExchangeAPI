@@ -54,10 +54,10 @@ public sealed class EvaluateOrderTool
             return McpToolExecutionResult<EvaluateOrderResponse>.Failure(ruleError!);
         }
 
-        var tickerTask = _gateway.GetTickerCallAsync(normalized.Symbol, cancellationToken);
-        var boardStateTask = _gateway.GetBoardStateCallAsync(normalized.Symbol, cancellationToken);
-        var balanceTask = _gateway.GetBalanceCallAsync(cancellationToken);
-        var activeOrdersTask = _gateway.GetActiveChildOrdersCallAsync(normalized.Symbol, cancellationToken);
+        var tickerTask = _gateway.GetTickerAsync(normalized.Symbol, cancellationToken);
+        var boardStateTask = _gateway.GetBoardStateAsync(normalized.Symbol, cancellationToken);
+        var balanceTask = _gateway.GetBalanceAsync(cancellationToken);
+        var activeOrdersTask = _gateway.GetActiveChildOrdersAsync(normalized.Symbol, cancellationToken);
 
         await Task.WhenAll(tickerTask, boardStateTask, balanceTask, activeOrdersTask);
 

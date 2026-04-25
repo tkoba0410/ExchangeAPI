@@ -10,25 +10,25 @@ namespace ExchangeApi.Adapters.McpServer.Tools.MarginEvaluation;
 
 public interface IBitflyerEvaluateMarginOrderGateway
 {
-    Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+    Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(
+    Task<CallResult<GetCollateralRequest, GetCollateralResponse>> GetCollateralAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsCallAsync(
+    Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+    Task<CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
+    Task<CallResult<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageAsync(
         CancellationToken cancellationToken = default);
 }

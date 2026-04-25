@@ -49,7 +49,7 @@ public static class GetPositionsProtocolCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
         if (bundle.Private is null)
         {
             return ExecutionOutcome.InputError(
@@ -58,7 +58,7 @@ public static class GetPositionsProtocolCommand
         }
 
         var typed = (ProtocolQueryValues)request;
-        var call = await bundle.Private.GetPositionsCallAsync(
+        var call = await bundle.Private.GetPositionsAsync(
             typed.GetString("product_code")!,
             cancellationToken);
         return ExecutionOutcome.FromProtocolCall(Path, call);

@@ -106,8 +106,8 @@ public static class GetExecutionsPublicCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
-        var call = await bundle.Public.GetExecutionsCallAsync((GetExecutionsPublicRequest)request, cancellationToken);
+        using var bundle = BitflyerClientFactory.CreateNativeClientBundle(created.Options);
+        var call = await bundle.Public.GetExecutionsAsync((GetExecutionsPublicRequest)request, cancellationToken);
         return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "public", "get-executions-public"), call);
     }
 

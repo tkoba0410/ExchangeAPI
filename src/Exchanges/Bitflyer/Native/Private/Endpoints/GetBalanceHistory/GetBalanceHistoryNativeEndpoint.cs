@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBalanceHistory;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalanceHistory;
 
 public interface IGetBalanceHistoryNativeEndpoint
 {
-    Task<Call<GetBalanceHistoryRequest, IReadOnlyList<GetBalanceHistory.Item>>> CallAsync(
+    Task<CallResult<GetBalanceHistoryRequest, IReadOnlyList<GetBalanceHistory.Item>>> CallAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetBalanceHistoryRequest, IReadOnlyList<GetBalanceHistory.Item>>> CallAsync(
+        GetBalanceHistoryRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetBalanceHistoryNativeEndpoint : IGetBalanceHistoryNativeEndpoint
@@ -21,9 +30,25 @@ public sealed class GetBalanceHistoryNativeEndpoint : IGetBalanceHistoryNativeEn
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetBalanceHistoryRequest, IReadOnlyList<GetBalanceHistory.Item>>> CallAsync(
+    public Task<CallResult<GetBalanceHistoryRequest, IReadOnlyList<GetBalanceHistory.Item>>> CallAsync(
         GetBalanceHistoryRequest request,
         CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetBalanceHistoryRequest, IReadOnlyList<GetBalanceHistory.Item>>> CallAsync(
+        GetBalanceHistoryRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetBalanceHistoryRequest, IReadOnlyList<GetBalanceHistory.Item>>> CallAsyncCore(
+        GetBalanceHistoryRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var validationError = Validate(request);
         if (validationError is not null)
@@ -37,12 +62,9 @@ public sealed class GetBalanceHistoryNativeEndpoint : IGetBalanceHistoryNativeEn
                 auth: "KeySecret");
         }
 
-        var protocolCall = await _protocolEndpoint.SendAsync(
-            request.CurrencyCode,
-            request.Count,
-            request.Before,
-            request.After,
-            cancellationToken);
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(request.CurrencyCode, request.Count, request.Before, request.After, cancellationToken)
+            : _protocolEndpoint.SendAsync(request.CurrencyCode, request.Count, request.Before, request.After, credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<GetBalanceHistoryRequest, IReadOnlyList<GetBalanceHistory.Item>>(

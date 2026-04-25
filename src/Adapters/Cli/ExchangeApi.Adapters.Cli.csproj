@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="../../Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj" />
     <ProjectReference Include="../../Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj" />
+    <ProjectReference Include="../../Optional/Credentials/ExchangeApi.Optional.Credentials.csproj" />
   </ItemGroup>
 
 </Project>

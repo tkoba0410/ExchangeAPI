@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetAddresses;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
 
 public interface IGetAddressesNativeEndpoint
 {
-    Task<Call<GetAddressesRequest, IReadOnlyList<GetAddresses.Item>>> CallAsync(
+    Task<CallResult<GetAddressesRequest, IReadOnlyList<GetAddresses.Item>>> CallAsync(
         GetAddressesRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetAddressesRequest, IReadOnlyList<GetAddresses.Item>>> CallAsync(
+        GetAddressesRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetAddressesNativeEndpoint : IGetAddressesNativeEndpoint
@@ -21,11 +30,29 @@ public sealed class GetAddressesNativeEndpoint : IGetAddressesNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetAddressesRequest, IReadOnlyList<GetAddresses.Item>>> CallAsync(
+    public Task<CallResult<GetAddressesRequest, IReadOnlyList<GetAddresses.Item>>> CallAsync(
         GetAddressesRequest request,
         CancellationToken cancellationToken = default)
     {
-        var protocolCall = await _protocolEndpoint.SendAsync(cancellationToken);
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetAddressesRequest, IReadOnlyList<GetAddresses.Item>>> CallAsync(
+        GetAddressesRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetAddressesRequest, IReadOnlyList<GetAddresses.Item>>> CallAsyncCore(
+        GetAddressesRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
+    {
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(cancellationToken)
+            : _protocolEndpoint.SendAsync(credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<GetAddressesRequest, IReadOnlyList<GetAddresses.Item>>(

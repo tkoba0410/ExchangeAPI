@@ -56,8 +56,8 @@ public static class GetKlinesProtocolCommand
 
         var typed = (ProtocolQueryValues)request;
 
-        using var bundle = BinanceClientFactory.CreateProtocolClient(created.Options);
-        var call = await bundle.Public.GetKlinesCallAsync(
+        using var bundle = BinanceClientFactory.CreateProtocolClientBundle(created.Options);
+        var call = await bundle.Public.GetKlinesAsync(
             typed.GetString("symbol")!,
             typed.GetString("interval")!,
             typed.GetLong("startTime"),

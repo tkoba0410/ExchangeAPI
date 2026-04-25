@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Binance.Protocol.Public.Endpoints.GetKlines;
 
 public interface IGetKlinesProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string symbol,
         string interval,
         long? startTime = null,
@@ -28,7 +28,7 @@ public sealed class GetKlinesProtocolEndpoint : IGetKlinesProtocolEndpoint
         _transport = transport;
     }
 
-    public async Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    public async Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string symbol,
         string interval,
         long? startTime = null,

@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetDeposits;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetDeposits;
 
 public interface IGetDepositsNativeEndpoint
 {
-    Task<Call<GetDepositsRequest, IReadOnlyList<GetDeposits.Item>>> CallAsync(
+    Task<CallResult<GetDepositsRequest, IReadOnlyList<GetDeposits.Item>>> CallAsync(
         GetDepositsRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetDepositsRequest, IReadOnlyList<GetDeposits.Item>>> CallAsync(
+        GetDepositsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetDepositsNativeEndpoint : IGetDepositsNativeEndpoint
@@ -21,9 +30,25 @@ public sealed class GetDepositsNativeEndpoint : IGetDepositsNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetDepositsRequest, IReadOnlyList<GetDeposits.Item>>> CallAsync(
+    public Task<CallResult<GetDepositsRequest, IReadOnlyList<GetDeposits.Item>>> CallAsync(
         GetDepositsRequest request,
         CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetDepositsRequest, IReadOnlyList<GetDeposits.Item>>> CallAsync(
+        GetDepositsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetDepositsRequest, IReadOnlyList<GetDeposits.Item>>> CallAsyncCore(
+        GetDepositsRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var validationError = Validate(request);
         if (validationError is not null)
@@ -37,7 +62,9 @@ public sealed class GetDepositsNativeEndpoint : IGetDepositsNativeEndpoint
                 auth: "KeySecret");
         }
 
-        var protocolCall = await _protocolEndpoint.SendAsync(request.Count, request.Before, request.After, cancellationToken);
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(request.Count, request.Before, request.After, cancellationToken)
+            : _protocolEndpoint.SendAsync(request.Count, request.Before, request.After, credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<GetDepositsRequest, IReadOnlyList<GetDeposits.Item>>(

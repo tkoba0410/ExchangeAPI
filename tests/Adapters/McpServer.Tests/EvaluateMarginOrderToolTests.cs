@@ -222,7 +222,7 @@ public sealed class EvaluateMarginOrderToolTests
     private static FakeBitflyerEvaluateMarginOrderGateway CreateHappyPathGateway(
         GetBoardStateResponse? boardState = null,
         GetCollateralResponse? collateral = null,
-        Call<GetCollateralRequest, GetCollateralResponse>? collateralCall = null,
+        CallResult<GetCollateralRequest, GetCollateralResponse>? collateralCall = null,
         IReadOnlyList<GetPositions.Item>? positions = null,
         IReadOnlyList<GetChildOrders.Item>? activeOrders = null,
         GetCorporateLeverageResponse? corporateLeverage = null)
@@ -348,19 +348,19 @@ public sealed class EvaluateMarginOrderToolTests
 
     private sealed class FakeBitflyerEvaluateMarginOrderGateway : IBitflyerEvaluateMarginOrderGateway
     {
-        public required Call<GetTickerRequest, GetTickerResponse> TickerCall { get; init; }
+        public required CallResult<GetTickerRequest, GetTickerResponse> TickerCall { get; init; }
 
-        public required Call<GetBoardStateRequest, GetBoardStateResponse> BoardStateCall { get; init; }
+        public required CallResult<GetBoardStateRequest, GetBoardStateResponse> BoardStateCall { get; init; }
 
-        public required Call<GetCollateralRequest, GetCollateralResponse> CollateralCall { get; init; }
+        public required CallResult<GetCollateralRequest, GetCollateralResponse> CollateralCall { get; init; }
 
-        public required Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>> PositionsCall { get; init; }
+        public required CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>> PositionsCall { get; init; }
 
-        public required Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> ActiveOrdersCall { get; init; }
+        public required CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>> ActiveOrdersCall { get; init; }
 
-        public required Call<GetCorporateLeverageRequest, GetCorporateLeverageResponse> CorporateLeverageCall { get; init; }
+        public required CallResult<GetCorporateLeverageRequest, GetCorporateLeverageResponse> CorporateLeverageCall { get; init; }
 
-        public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+        public Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {
@@ -369,7 +369,7 @@ public sealed class EvaluateMarginOrderToolTests
             return Task.FromResult(TickerCall);
         }
 
-        public Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+        public Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {
@@ -378,14 +378,14 @@ public sealed class EvaluateMarginOrderToolTests
             return Task.FromResult(BoardStateCall);
         }
 
-        public Task<Call<GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(
+        public Task<CallResult<GetCollateralRequest, GetCollateralResponse>> GetCollateralAsync(
             CancellationToken cancellationToken = default)
         {
             _ = cancellationToken;
             return Task.FromResult(CollateralCall);
         }
 
-        public Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsCallAsync(
+        public Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {
@@ -394,7 +394,7 @@ public sealed class EvaluateMarginOrderToolTests
             return Task.FromResult(PositionsCall);
         }
 
-        public Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+        public Task<CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {
@@ -403,7 +403,7 @@ public sealed class EvaluateMarginOrderToolTests
             return Task.FromResult(ActiveOrdersCall);
         }
 
-        public Task<Call<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
+        public Task<CallResult<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageAsync(
             CancellationToken cancellationToken = default)
         {
             _ = cancellationToken;

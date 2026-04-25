@@ -1,22 +1,25 @@
-using ExchangeApi.Exchanges.Bitflyer.Composition.Credentials;
-using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
+using ExchangeApi.Optional.Credentials.AgeFile;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
 
 internal static class BitflyerCredentialResolver
 {
-    private const string CredentialsAgeFileEnvName = BitflyerAgeCredentialResolver.CredentialsAgeFileEnvName;
-    private const string AgeIdentityFileEnvName = BitflyerAgeCredentialResolver.AgeIdentityFileEnvName;
+    private const string CredentialsAgeFileEnvName = "EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH";
+    private const string AgeIdentityFileEnvName = "EXCHANGEAPI_AGE_IDENTITY_FILE_PATH";
 
     public static bool HasConfiguredCredentialsSource()
     {
-        return BitflyerAgeCredentialResolver.HasConfiguredCredentialsSource(
-            Environment.GetEnvironmentVariable,
-            File.Exists,
-            AgeProcessCredentialHelper.IsAvailable);
+        var identityFilePath = Environment.GetEnvironmentVariable(AgeIdentityFileEnvName);
+        var credentialsFilePath = Environment.GetEnvironmentVariable(CredentialsAgeFileEnvName);
+        return !string.IsNullOrWhiteSpace(identityFilePath)
+            && !string.IsNullOrWhiteSpace(credentialsFilePath)
+            && File.Exists(identityFilePath)
+            && File.Exists(credentialsFilePath)
+            && TryResolveAgeExecutable(out _);
     }
 
-    public static BitflyerApiCredentials? Load()
+    public static IApiCredentialProvider? Load()
     {
         if (!TryResolveAgeExecutable(out var ageExecutablePath))
         {
@@ -24,27 +27,47 @@ internal static class BitflyerCredentialResolver
                 $"The 'age' executable was not found on PATH. Set {CredentialsAgeFileEnvName}/{AgeIdentityFileEnvName}, or install age.");
         }
 
-        var resolution = BitflyerAgeCredentialResolver.Resolve(
-            Environment.GetEnvironmentVariable,
-            File.Exists,
-            () => true,
-            (identityFilePath, credentialsFilePath) => AgeProcessCredentialHelper.Decrypt(ageExecutablePath, identityFilePath, credentialsFilePath));
+        var identityFilePath = Environment.GetEnvironmentVariable(AgeIdentityFileEnvName);
+        var credentialsFilePath = Environment.GetEnvironmentVariable(CredentialsAgeFileEnvName);
+        var hasIdentity = !string.IsNullOrWhiteSpace(identityFilePath);
+        var hasCredentialsFile = !string.IsNullOrWhiteSpace(credentialsFilePath);
 
-        if (resolution.Credentials is not null)
+        if (!hasIdentity && !hasCredentialsFile)
         {
-            return resolution.Credentials;
+            return null;
         }
 
-        if (resolution.HasFailure)
+        if (!hasIdentity || !hasCredentialsFile)
         {
-            throw new InvalidOperationException(resolution.ErrorMessage);
+            throw new InvalidOperationException(
+                $"{CredentialsAgeFileEnvName} and {AgeIdentityFileEnvName} must both be set.");
         }
 
-        return null;
+        return new BitflyerAgeFileApiCredentialProvider(
+            identityFilePath!,
+            credentialsFilePath!,
+            new AgeCliCredentialFileDecryptor(ageExecutablePath));
     }
 
     private static bool TryResolveAgeExecutable(out string executablePath)
     {
-        return AgeProcessCredentialHelper.TryResolveExecutablePath(out executablePath);
+        executablePath = "age";
+        var pathValue = Environment.GetEnvironmentVariable("PATH");
+        if (string.IsNullOrWhiteSpace(pathValue))
+        {
+            return false;
+        }
+
+        foreach (var directory in pathValue.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var candidate = Path.Combine(directory, "age");
+            if (File.Exists(candidate))
+            {
+                executablePath = candidate;
+                return true;
+            }
+        }
+
+        return false;
     }
 }

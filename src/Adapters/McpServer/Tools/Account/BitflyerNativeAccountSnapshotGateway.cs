@@ -18,23 +18,23 @@ public sealed class BitflyerNativeAccountSnapshotGateway : IBitflyerAccountSnaps
         _privateApi = privateApi;
     }
 
-    public Task<Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceCallAsync(
+    public Task<CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceAsync(
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetBalanceCallAsync(new GetBalanceRequest(), cancellationToken);
+        return _privateApi.GetBalanceAsync(new GetBalanceRequest(), cancellationToken);
     }
 
-    public Task<Call<GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(
+    public Task<CallResult<GetCollateralRequest, GetCollateralResponse>> GetCollateralAsync(
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetCollateralCallAsync(new GetCollateralRequest(), cancellationToken);
+        return _privateApi.GetCollateralAsync(new GetCollateralRequest(), cancellationToken);
     }
 
-    public Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+    public Task<CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetChildOrdersCallAsync(
+        return _privateApi.GetChildOrdersAsync(
             new GetChildOrdersRequest
             {
                 ProductCode = productCode,
@@ -43,11 +43,11 @@ public sealed class BitflyerNativeAccountSnapshotGateway : IBitflyerAccountSnaps
             cancellationToken);
     }
 
-    public Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsCallAsync(
+    public Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetPositionsCallAsync(
+        return _privateApi.GetPositionsAsync(
             new GetPositionsRequest
             {
                 ProductCode = productCode,
@@ -55,9 +55,9 @@ public sealed class BitflyerNativeAccountSnapshotGateway : IBitflyerAccountSnaps
             cancellationToken);
     }
 
-    public Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+    public Task<CallResult<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsAsync(
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetPermissionsCallAsync(new GetPermissionsRequest(), cancellationToken);
+        return _privateApi.GetPermissionsAsync(new GetPermissionsRequest(), cancellationToken);
     }
 }

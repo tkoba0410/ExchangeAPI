@@ -52,7 +52,7 @@ public static class GetWithdrawalsProtocolCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
         if (bundle.Private is null)
         {
             return ExecutionOutcome.InputError(
@@ -61,7 +61,7 @@ public static class GetWithdrawalsProtocolCommand
         }
 
         var typed = (ProtocolQueryValues)request;
-        var call = await bundle.Private.GetWithdrawalsCallAsync(
+        var call = await bundle.Private.GetWithdrawalsAsync(
             typed.GetInt("count"),
             typed.GetLong("before"),
             typed.GetLong("after"),

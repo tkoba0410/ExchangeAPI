@@ -17,8 +17,7 @@ public sealed class BitflyerProtocolTransportTests
             httpClient,
             new Uri("https://api.bitflyer.com"),
             new NoOpProtocolDebugLogger(),
-            apiKey: null,
-            apiSecret: null);
+            apiCredentialProvider: null);
 
         var result = await transport.SendAsync(new ProtocolRequest
         {
@@ -45,8 +44,7 @@ public sealed class BitflyerProtocolTransportTests
             httpClient,
             new Uri("https://api.bitflyer.com"),
             new NoOpProtocolDebugLogger(),
-            apiKey: null,
-            apiSecret: null,
+            apiCredentialProvider: null,
             requestTimeout);
 
         var result = await transport.SendAsync(new ProtocolRequest

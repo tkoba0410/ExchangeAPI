@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoard;
 
 public interface IGetBoardProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         CancellationToken cancellationToken = default);
 }
@@ -23,7 +23,7 @@ public sealed class GetBoardProtocolEndpoint : IGetBoardProtocolEndpoint
         _transport = transport;
     }
 
-    public async Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    public async Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         CancellationToken cancellationToken = default)
     {

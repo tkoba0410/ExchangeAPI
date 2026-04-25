@@ -73,7 +73,7 @@ public static class SendParentOrderCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
+        using var bundle = BitflyerClientFactory.CreateNativeClientBundle(created.Options);
         if (bundle.Private is null)
         {
             return ExecutionOutcome.InputError(
@@ -81,7 +81,7 @@ public static class SendParentOrderCommand
                 BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
-        var call = await bundle.Private.SendParentOrderCallAsync((SendParentOrderRequest)request, cancellationToken);
+        var call = await bundle.Private.SendParentOrderAsync((SendParentOrderRequest)request, cancellationToken);
         return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "private", "send-parent-order"), call);
     }
 }

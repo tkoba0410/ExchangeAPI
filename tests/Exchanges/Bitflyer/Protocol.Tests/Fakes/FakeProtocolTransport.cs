@@ -1,5 +1,6 @@
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Runtime;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Protocol.Tests.Fakes;
@@ -30,5 +31,14 @@ internal sealed class FakeProtocolTransport : IProtocolTransport
         };
 
         return Task.FromResult(result);
+    }
+
+    public Task<ProtocolTransportResult> SendAsync(
+        ProtocolRequest request,
+        ProtocolTransportAuthMode authMode,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return SendAsync(request, authMode, cancellationToken);
     }
 }

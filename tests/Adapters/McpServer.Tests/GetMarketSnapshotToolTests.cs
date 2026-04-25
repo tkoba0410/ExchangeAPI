@@ -185,11 +185,11 @@ public sealed class GetMarketSnapshotToolTests
 
     private sealed class FakeBitflyerMarketSnapshotGateway : IBitflyerMarketSnapshotGateway
     {
-        public Call<GetTickerRequest, GetTickerResponse>? TickerCall { get; init; }
+        public CallResult<GetTickerRequest, GetTickerResponse>? TickerCall { get; init; }
 
-        public Call<GetBoardStateRequest, GetBoardStateResponse>? BoardStateCall { get; init; }
+        public CallResult<GetBoardStateRequest, GetBoardStateResponse>? BoardStateCall { get; init; }
 
-        public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+        public Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {
@@ -199,7 +199,7 @@ public sealed class GetMarketSnapshotToolTests
                 TickerCall ?? throw new InvalidOperationException("TickerCall must be configured."));
         }
 
-        public Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+        public Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {

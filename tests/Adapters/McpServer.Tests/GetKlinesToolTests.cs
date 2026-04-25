@@ -297,9 +297,9 @@ public sealed class GetKlinesToolTests
 
     private sealed class FakeBinanceKlinesGateway : IBinanceKlinesGateway
     {
-        public Call<BinanceGetKlinesRequest, IReadOnlyList<GetKlines.Item>>? KlinesCall { get; init; }
+        public CallResult<BinanceGetKlinesRequest, IReadOnlyList<GetKlines.Item>>? KlinesCall { get; init; }
 
-        public Task<Call<BinanceGetKlinesRequest, IReadOnlyList<GetKlines.Item>>> GetKlinesCallAsync(
+        public Task<CallResult<BinanceGetKlinesRequest, IReadOnlyList<GetKlines.Item>>> GetKlinesAsync(
             BinanceGetKlinesRequest request,
             CancellationToken cancellationToken = default)
         {

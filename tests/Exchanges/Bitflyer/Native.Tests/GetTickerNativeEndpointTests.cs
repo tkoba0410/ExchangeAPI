@@ -71,7 +71,7 @@ public sealed class GetTickerNativeEndpointTests
         Assert.Equal(CallErrorKinds.Codec, call.Error!.Kind);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetTicker", Method = "GET", Path = "/v1/getticker", Query = null, BodyText = null },
@@ -79,7 +79,7 @@ public sealed class GetTickerNativeEndpointTests
             new CallMeta { Layer = CallLayers.Protocol, Component = CallComponents.PublicEndpointModule, EndpointId = "GetTicker", Scope = "Public", Auth = "None" });
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> FailureProtocolCall(int statusCode, string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> FailureProtocolCall(int statusCode, string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetTicker", Method = "GET", Path = "/v1/getticker", Query = null, BodyText = null },

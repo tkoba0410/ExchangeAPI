@@ -1,10 +1,10 @@
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelAllChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
@@ -502,7 +502,7 @@ public sealed class PrivateNativeEndpointTests
         Assert.Contains("product_code", fake.LastBodyJson!, StringComparison.Ordinal);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> Success(string endpointId, string method, string path, string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> Success(string endpointId, string method, string path, string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = endpointId, Method = method, Path = path, Query = null, BodyText = null },

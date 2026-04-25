@@ -248,10 +248,10 @@ safe live verification をまとめて実行する場合は、次を使う。
 bash scripts/run-safe-live-tests.sh
 ```
 
-この script は `EXCHANGEAPI_RUN_LIVE_TESTS=1` を一時設定し、Binance live tests、bitFlyer live tests、MCP server live tests を実行する。
+この script は `EXCHANGEAPI_RUN_LIVE_TESTS=1` を一時設定し、Binance live tests、bitFlyer read live tests、MCP server live tests を実行する。
 credentials は `local/credentials/credential-profile.json` から解決する。API key 読み込みに環境変数は使わない。
 credentials が未設定の場合、bitFlyer private read と MCP private read は skip される。
-write 系 live test は dedicated marker が無い限り実行されない。
+write 系 live test は dedicated marker の有無にかかわらず safe runner から除外する。
 
 ## 8. MCP との関係
 

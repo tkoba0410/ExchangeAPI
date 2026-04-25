@@ -117,6 +117,15 @@ dotnet restore --configfile NuGet.config
 dotnet build
 ```
 
+ExchangeAPI repo 側で local feed と v2 API surface の consumer smoke を確認する場合は、次を実行する。
+
+```bash
+bash scripts/smoke-local-nuget-consumer.sh 2.0.0
+```
+
+この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer.Composition` と `ExchangeApi.Optional.Credentials` を local feed から restore して build する。
+実 API には接続しない。
+
 ## 6. Version 更新ルール
 
 local feed へ再 pack するときは、同じ version を上書きするより version を増やすほうが安全である。

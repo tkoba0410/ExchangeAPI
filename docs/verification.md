@@ -96,6 +96,15 @@ verification 側で決める運用軸:
 - dedicated marker と preflight で実行条件を限定できる
 - 失敗時の影響が局所的で、利用者が許容判断できる
 
+最低条件:
+
+- global live opt-in に加えて endpoint group 専用 marker を要求する
+- 対象 product / symbol を runbook または test code で固定する
+- request は venue の最小数量またはそれに準じる最小影響値を使う
+- cleanup endpoint がある場合は同じ verification 内で cleanup を必ず試みる
+- cleanup failure は silent ignore せず、実行結果と evidence に残す
+- 通常 preflight と `run-safe-live-tests.sh` には含めない
+
 扱い:
 
 - CI 既定実行には含めない
@@ -135,6 +144,8 @@ endpoint ごとの live / manual verification は、次の順で決める。
 6. `dangerous` endpoint は success path の live automation を避け、必要なら negative contract / manual verification に限定する。
 7. 決定した `RiskClass` に応じて test 本体を `tests/` または `verification/` へ置く。
 8. 実行結果、artifact、log、手動確認メモを残す場合は `local/evidence/` 配下の phase 別 directory へ置く。
+
+dangerous endpoint の negative contract は success path と別扱いにする。negative contract は、資産移動や不可逆操作が発生しないことを request 条件で説明でき、dedicated marker と runbook を持つ場合だけ実行してよい。
 
 ## 5. 物理構成
 
@@ -225,7 +236,7 @@ API 契約の正本は endpoint matrix であり、本表は live / manual verif
 | CancelChildOrder | private write, targeted cleanup/action | tolerable | paired with order lifecycle verification |
 | CancelParentOrder | private write, targeted cleanup/action | tolerable | paired with parent order lifecycle verification |
 | CancelAllChildOrders | private write, broad cancellation | dangerous | manual or dedicated marker with strict preflight |
-| Withdraw | private write, asset movement | dangerous | no success live automation; negative contract only if dedicated marker |
+| Withdraw | private write, asset movement | dangerous | no success live automation; wrong-code negative contract only with dedicated marker and runbook |
 
 ### Binance
 

@@ -73,7 +73,15 @@ bash scripts/publish-mcp-local.sh linux-x64 Release
 - `local/publish/cli/linux-x64/exchangeapi`
 - `local/publish/mcp/linux-x64/exchangeapi-mcp`
 
-public release では、必要な RID matrix と checksum を release asset 側で扱う。
+`v2.0.0` 初手の release asset は次に固定する。
+
+- `exchangeapi-linux-x64`
+- `exchangeapi-linux-x64.sha256`
+- `exchangeapi-mcp-linux-x64`
+- `exchangeapi-mcp-linux-x64.sha256`
+
+asset 作成時は、生成された executable を上記 name に rename し、SHA-256 checksum を同じ release に添付する。
+複数 RID matrix、installer、archive format、署名付き binary は post-v2 検討とする。
 
 ## 4. Post Publish Verification
 
@@ -91,9 +99,10 @@ publish 後に確認する。
 
 release 前に確認する。
 
-- `README.md` の公開固定点を `v2.0.0` へ更新するか判断する
-- `docs/distribution.md` の current published baseline を更新する
-- `docs/guides/package-publish.md` の publish 後確認欄に `v2.0.0` 結果を追記する
+- release 前は `README.md` / `docs/distribution.md` / `docs/guides/package-publish.md` の current public baseline を `v1.0.0` のまま維持する
+- GitHub Packages publish、tag 作成、GitHub Release 作成が完了した後、`README.md` の公開固定点を `v2.0.0` へ更新する
+- publish 後に `docs/distribution.md` の current published baseline を `v2.0.0` へ更新する
+- publish 後に `docs/guides/package-publish.md` の publish 後確認欄に `v2.0.0` 結果を追記する
 - `docs/release-notes/v2.0.0.md` が GitHub Release 本文として使える状態である
 - `docs/migration-v2.0.0.md` が v1 利用者向けに読める状態である
 

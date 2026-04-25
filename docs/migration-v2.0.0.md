@@ -157,7 +157,7 @@ using var client = BitflyerClientFactory.CreateNativeClientBundle(
 CLI / MCP / live test で `AgeFile` provider を使う場合は、credential profile を使う。旧 env-based credential path は v2 の canonical 入力にしない。
 
 ```bash
-exchangeapi bitflyer private get-balance --credential-profile local/credentials/credential-profile.json
+exchangeapi bitflyer native private get-balance --credential-profile local/credentials/credential-profile.json
 exchangeapi-mcp --credential-profile local/credentials/credential-profile.json
 ```
 

@@ -1275,13 +1275,15 @@ live test の実行条件と、state を変更する endpoint の safety 要件�
   - `CancelAllChildOrders` は対象 product を固定し、`ACTIVE` child orders が empty の場合のみ実行する
 - matrix 上 `CleanupPolicy = Required` の endpoint は cleanup 手順を同じ test に含める
 - matrix 上 `CleanupPolicy = NotSupported` の endpoint は write live test 対象に含めない
-- ただし cleanup 不可でも、negative status で資産移動が発生しないことが仕様で保証される場合に限り、negative live contract を別扱いで持ってよい
+- cleanup 不可 endpoint の success path は live automation 対象に含めない
+- ただし cleanup 不可でも、negative status で資産移動が発生しないことが request 条件で説明できる場合に限り、negative live contract を success path と別扱いで持ってよい
   - `Withdraw` は wrong-code による negative status を確認対象にできる
   - この場合も native classification は current normative に従う
     - non-success HTTP status は `Http`
     - negative status の観測は child `Protocol` call の body で行う
-- cleanup 不可 endpoint でも、request / response contract、unit test、役割分離済み test、dedicated negative live contract が揃っていれば `Fixed` に上げてよい
-  - `Withdraw` は `200 + message_id` の success contract と wrong-code negative live contract の両方を固定対象にしてよい
+- cleanup 不可 endpoint の `Fixed` 判定は success path live automation を意味しない
+  - request / response contract、unit test、役割分離済み test、dedicated negative live contract が揃っていれば `Fixed` に上げてよい
+  - `Withdraw` は `200 + message_id` の success contract を deterministic contract で固定し、wrong-code negative live contract を別枠で固定対象にしてよい
 - write test は最小数量、最小影響の request を使う
 - `SendChildOrder` のような endpoint は `Protocol` と `Native` の parity 実行で二重送信しない
 - cleanup 用 endpoint がある場合は acceptance id / order id を保持し、後続 cleanup を必ず試みる

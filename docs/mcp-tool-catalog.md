@@ -15,15 +15,15 @@ tool surface は次の 2 層で管理する。
 - `Inspection Read Tools`
   - 開発中確認と運用 inspection のための read-only tool
 
-現行実装で visible なものは下記の `Core Bot Tools` を中心とする。  
-`Inspection Read Tools` は read-only endpoint を段階的に追加してよい。
+現行実装で visible な tool universe は [`2. Visible Tools`](#2-visible-tools) に列挙した 6 tool だけである。
+`Inspection Read Tools` は post-v2 候補であり、実装に入るまでは `tools/list` に出してはならない。
 
 - bitFlyer v1 core bot tool は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order`、`evaluate_margin_order` の 4 つとする
 - 初期 venue scope は bitFlyer を正本とする
 - Binance など他 venue の account / evaluation 展開は、market rule / account / evaluation の導出元が固定できてから行う
 - Binance public market data は例外として、`get_klines` を public read 拡張として追加してよい
 - `list_markets` を market discovery tool として追加してよい
-- `GetCollateralAccounts`、`GetBalanceHistory`、`GetCollateralHistory`、`GetChildOrders` などの read-only capability は inspection read tool 候補として追加してよい
+- `GetCollateralAccounts`、`GetBalanceHistory`、`GetCollateralHistory`、`GetChildOrders` などの read-only capability は inspection read tool 候補として記録するが、v2.0.0 の visible tool には含めない
 
 ### 1.1 bitFlyer v1 support matrix
 
@@ -127,7 +127,8 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 
 補足:
 
-- `tools/list` には current process が実際に実行可能な `Core Bot Tools` と `Inspection Read Tools` を含めてよい
+- v2.0.0 の `tools/list` は上記 6 tool から current process が実際に実行可能なものだけを返す
+- post-v2 で `Inspection Read Tools` を実装した場合は、同じ原則で current process が実際に実行可能な tool だけを返す
 - ただし private credentials を解決できない場合、private inspection read tool は advertise してはならない
 - private credentials の解決失敗は operator に通知してよいが、MCP client へは tool 非公開または structured error として表現する
 
@@ -174,6 +175,9 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `get_klines` は Binance の `timeZone` parameter を v1 では公開せず、UTC 固定で扱う
 
 ## 5. Tool Contracts
+
+本節の `get_market_snapshot`、`list_markets`、`get_klines`、`get_account_snapshot`、`evaluate_order`、`evaluate_margin_order` は v2.0.0 の現行 tool contract である。
+`get_collateral_accounts`、`get_balance_history`、`get_collateral_history`、`get_child_orders`、`get_parent_orders`、`get_private_executions`、`get_positions`、`get_trading_commission` は post-v2 の draft contract であり、実装されるまで現行 visible tool として扱わない。
 
 ### 5.1 `get_market_snapshot`
 
@@ -265,7 +269,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `margin.accounts` は inspection 用の full response ではなく、現在時点の通貨別 collateral 残高を確認するための要約とする
 - `GetCollateralAccounts` の full read capability は inspection tool `get_collateral_accounts` で別に提供してよい
 
-### 5.3.1 `get_collateral_accounts`
+### 5.3.1 `get_collateral_accounts` (post-v2 draft)
 
 目的:
 
@@ -300,7 +304,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `accounts` は `GetCollateralAccounts` を通貨別 map へ正規化したものを正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.2 `get_balance_history`
+### 5.3.2 `get_balance_history` (post-v2 draft)
 
 目的:
 
@@ -352,7 +356,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `items` は `GetBalanceHistory` response を正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.3 `get_collateral_history`
+### 5.3.3 `get_collateral_history` (post-v2 draft)
 
 目的:
 
@@ -397,7 +401,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `items` は `GetCollateralHistory` response を正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.4 `get_child_orders`
+### 5.3.4 `get_child_orders` (post-v2 draft)
 
 目的:
 
@@ -428,7 +432,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - response `items` は `GetChildOrders` response を正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.5 `get_parent_orders`
+### 5.3.5 `get_parent_orders` (post-v2 draft)
 
 目的:
 
@@ -456,7 +460,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - response `items` は `GetParentOrders` response を正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.6 `get_private_executions`
+### 5.3.6 `get_private_executions` (post-v2 draft)
 
 目的:
 
@@ -485,7 +489,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - response `items` は `GetExecutions` response を正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.7 `get_positions`
+### 5.3.7 `get_positions` (post-v2 draft)
 
 目的:
 
@@ -509,7 +513,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - response `items` は `GetPositions` response を正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.8 `get_trading_commission`
+### 5.3.8 `get_trading_commission` (post-v2 draft)
 
 目的:
 

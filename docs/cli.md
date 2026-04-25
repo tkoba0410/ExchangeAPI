@@ -26,7 +26,7 @@ CLI は library surface を terminal 向けに写像する adapter であり、
 - private credentials については、`v2.0.0` で core 正本から `age` 固定の色を外し、auth provider 契約へ責務を寄せる
 - auth provider の具体 shape は `IApiCredentialProvider.OpenSessionAsync(...)` 型を採用するが、通常の CLI 利用では adapter 側が session を隠して扱う想定である
 - credential failure は CLI が利用者へ通知する。通知先は stderr と exit code であり、stdout の JSON 契約を汚してはならない
-- ただし現行 CLI canonical の `v1.x` 契約としては、credentials input は引き続き age-backed source を正本とする
+- 現行 CLI canonical の credentials input は `--credential-profile <path>` または既定 profile path とする。`age-file` は profile が選ぶ provider の 1 つであり、CLI option として age file path を直接受け取らない
 - command identity と CLI surface 自体は `v2.0.0` でも 1:1 に MCP tool 名へ寄せない方針である
 
 ## 2. 責務
@@ -201,6 +201,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
   - `src/Adapters/Cli/Commands/CommandCatalog.cs`
 - 本仕様書は runtime command coverage の全 command identity を重複列挙によって正本化しない
 - 具体的な command identity は runtime registry と test で固定する
+- command identity の機械的正本は runtime registry だが、coverage policy、scope、safety rule、credential rule を変える場合は本書と必要な endpoint matrix を同時に更新しなければならない
 - 現行 coverage は次の範囲に限定する
   - bitFlyer `native public`
     - current library の public native read surface をすべて expose する
@@ -223,6 +224,9 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 ### 4.6 Runtime Coverage の更新規約
 
 - runtime coverage の executable truth は常に runtime registry とする
+- registry へ command を追加する場合、その command が既存 coverage policy 内に収まるかを確認する
+- 既存 coverage policy 外の command を追加する場合、本書の coverage 範囲、safety rule、credential rule、必要なら endpoint matrix を先に更新する
+- test は registry と help / wizard / shell の露出が一致することを固定する
 - runtime coverage を変更する patch は、少なくとも runtime registry と runtime coverage を固定する test を同時に更新しなければならない
 - help、wizard、shell は runtime coverage を独自に保持せず、runtime registry から導出しなければならない
 - 本仕様書と README は runtime coverage の完全列挙を正本として再保持してはならない
@@ -381,10 +385,11 @@ exchangeapi <venue> <surface> <scope> <command> [options]
 ### 7.1 認証
 
 - API key / secret を CLI 引数で受け取ってはならない
-- 現行 CLI 契約で固定する credentials input は credential profile から解決する age-backed source に限定する
+- 現行 CLI 契約で固定する credentials input は credential profile に限定する
   - 明示指定: `--credential-profile <path>`
   - 既定 path: `local/credentials/credential-profile.json`
   - profile 内 path 省略時: `local/credentials/current/age-identity.txt` と `local/credentials/current/<venue>.age`
+  - v2.0.0 の同梱 provider 実装は `age-file` を扱う
 - API key 読み込みに環境変数を使ってはならない
 - canonical credential profile format は次とする
 ```json

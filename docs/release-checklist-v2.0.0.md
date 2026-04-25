@@ -13,6 +13,12 @@ repo root で release preflight を実行する。
 bash scripts/run-v2-release-preflight.sh 2.0.0-local.preflight
 ```
 
+release 前の最終確認では、publish 予定 version と混同しない local suffix を使う。
+
+```bash
+bash scripts/run-v2-release-preflight.sh 2.0.0-local.final
+```
+
 含まれる確認:
 
 - `dotnet build ExchangeApi.slnx`
@@ -28,7 +34,11 @@ safe live verification も含める場合だけ、明示 opt-in する。
 EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-v2-release-preflight.sh 2.0.0-local.preflight
 ```
 
+write live test は release 前の通常手順に含めない。必要な場合は endpoint ごとの risk / runbook に基づき、別判断で実行する。
+
 ## 2. Package Publish
+
+ここから先は release 実行時の作業であり、release 前の最終確認では実行しない。
 
 正式 version で package を生成する。
 
@@ -66,6 +76,8 @@ bash scripts/publish-mcp-local.sh linux-x64 Release
 public release では、必要な RID matrix と checksum を release asset 側で扱う。
 
 ## 4. Post Publish Verification
+
+この節は publish 後に実行する。release 前の最終確認では未完了でよい。
 
 publish 後に確認する。
 

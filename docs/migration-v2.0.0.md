@@ -2,7 +2,7 @@
 
 最終更新: 2026-04-25  
 位置づけ: version 単位文書  
-状態: draft
+状態: release candidate
 
 ## 1. 目的
 
@@ -152,6 +152,13 @@ using var client = BitflyerClientFactory.CreateNativeClientBundle(
     {
         ApiCredentialProvider = credentials,
     });
+```
+
+CLI / MCP / live test で `AgeFile` provider を使う場合は、credential profile を使う。旧 env-based credential path は v2 の canonical 入力にしない。
+
+```bash
+exchangeapi bitflyer private get-balance --credential-profile local/credentials/credential-profile.json
+exchangeapi-mcp --credential-profile local/credentials/credential-profile.json
 ```
 
 高コスト provider を複数 private call で再利用したい場合は、明示 session を使う。

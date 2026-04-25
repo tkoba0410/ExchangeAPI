@@ -137,7 +137,7 @@ sequenceDiagram
     PM-->>PF: CallResult<ProtocolRequest, ProtocolResponse>
     PF-->>NM: protocol call
     NM->>NM: JsonValidation / Conversion / ContractValidation
-    NM-->>NF: Call<GetTickerRequest, GetTickerResponse>
+    NM-->>NF: CallResult<GetTickerRequest, GetTickerResponse>
     NF-->>User: native call
 ```
 

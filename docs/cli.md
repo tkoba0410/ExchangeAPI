@@ -345,7 +345,7 @@ exchangeapi <venue> <surface> <scope> <command> [options]
   - `EndpointId`
   - `Scope`
   - `Auth`
-- protocol envelope は request / response inspection のための stable schema とし、library の `Call<TRequest,TResponse>` をそのまま serialize してはならない
+- protocol envelope は request / response inspection のための stable schema とし、library の `CallResult<TRequest,TResponse>` をそのまま serialize してはならない
 - `protocol` command の success は raw response inspection の成功を意味し、HTTP status の成功を意味しない
 - `protocol` facade が `ProtocolResponse` を返した場合、`Response.StatusCode` が non-success でも CLI は envelope を stdout に出し exit code `0` を返してよい
 - HTTP status に基づく判定が必要な automation は `Response.StatusCode` を明示的に検査しなければならない

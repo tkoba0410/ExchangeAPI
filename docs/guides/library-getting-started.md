@@ -48,9 +48,9 @@ using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
-using var client = BitflyerClientFactory.CreateNativeClient();
+using var client = BitflyerClientFactory.CreateNativeClientBundle();
 
-var call = await client.Public.GetTickerCallAsync(new GetTickerRequest
+var call = await client.Public.GetTickerAsync(new GetTickerRequest
 {
     ProductCode = ProductCodes.BtcJpy,
 });

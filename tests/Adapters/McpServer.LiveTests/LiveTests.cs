@@ -138,6 +138,10 @@ public sealed class LiveTests
         Assert.Contains("get_market_snapshot", toolNames);
         Assert.Contains("list_markets", toolNames);
         Assert.Contains("get_account_snapshot", toolNames);
+        Assert.Contains("get_collateral_accounts", toolNames);
+        Assert.Contains("get_balance_history", toolNames);
+        Assert.Contains("get_collateral_history", toolNames);
+        Assert.Contains("get_child_orders", toolNames);
         Assert.Contains("evaluate_order", toolNames);
         Assert.Contains("evaluate_margin_order", toolNames);
 

@@ -9,6 +9,7 @@
 - 本書の `2.0.0` command 例は `v2.0.0` の publish 手順を示す
 - `v2.0.0` publish 前の確認では、`2.0.0-local.*` のような local package version を使う
 - `v2.0.0` publish 前の最終確認では、publish/tag/release は実行せず、`2.0.0-local.final` などの local version で preflight する
+- `v2.1.0` では `ExchangeApi.Optional.Logging` を optional package publish 対象に含める
 
 ## Scope
 
@@ -29,6 +30,7 @@ CLI / MCP Server は executable であり、release asset 側を正式導線と�
 v2 方針:
 
 - `ExchangeApi.Optional.Credentials` は NuGet publish 対象に含める
+- `ExchangeApi.Optional.Logging` は v2.1.0 以降の NuGet publish 対象に含める
 - optional package は core library の必須依存ではない
 - `age` などの credential storage / decrypt recipe は optional package または adapter executable 側へ寄せる
 
@@ -130,6 +132,11 @@ publish 後は GitHub Packages で package 一覧を確認する。
 - GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer.Composition 2.0.0`
 - GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Binance.Composition 2.0.0`
 - GitHub Packages consumer smoke: `ExchangeApi.Optional.Credentials 2.0.0`
+
+`v2.1.0` では追加で次を確認する:
+
+- GitHub Packages publish: `ExchangeApi.Optional.Logging 2.1.0`
+- local package generation に `ExchangeApi.Optional.Logging` が含まれること
 
 ## Notes
 

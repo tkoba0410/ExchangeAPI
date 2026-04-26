@@ -2,6 +2,7 @@ using System.Text.Json;
 using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
+using ExchangeApi.Adapters.McpServer.Schema.Inspection;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.MarginEvaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
@@ -16,7 +17,7 @@ public sealed class ToolCatalogTests
     {
         var tools = ToolCatalog.All;
 
-        Assert.Equal(6, tools.Count);
+        Assert.Equal(10, tools.Count);
         Assert.Equal("get_market_snapshot", tools[0].Name);
         Assert.Equal(typeof(GetMarketSnapshotRequest), tools[0].RequestType);
         Assert.Equal(typeof(GetMarketSnapshotResponse), tools[0].ResponseType);
@@ -37,16 +38,36 @@ public sealed class ToolCatalogTests
         Assert.Equal(typeof(GetAccountSnapshotResponse), tools[3].ResponseType);
         Assert.NotNull(tools[3].OutputSchemaJson);
         Assert.True(tools[3].RequiresCredentials);
-        Assert.Equal("evaluate_order", tools[4].Name);
-        Assert.Equal(typeof(EvaluateOrderRequest), tools[4].RequestType);
-        Assert.Equal(typeof(EvaluateOrderResponse), tools[4].ResponseType);
+        Assert.Equal("get_collateral_accounts", tools[4].Name);
+        Assert.Equal(typeof(GetCollateralAccountsRequest), tools[4].RequestType);
+        Assert.Equal(typeof(GetCollateralAccountsResponse), tools[4].ResponseType);
         Assert.NotNull(tools[4].OutputSchemaJson);
         Assert.True(tools[4].RequiresCredentials);
-        Assert.Equal("evaluate_margin_order", tools[5].Name);
-        Assert.Equal(typeof(EvaluateMarginOrderRequest), tools[5].RequestType);
-        Assert.Equal(typeof(EvaluateMarginOrderResponse), tools[5].ResponseType);
+        Assert.Equal("get_balance_history", tools[5].Name);
+        Assert.Equal(typeof(GetBalanceHistoryRequest), tools[5].RequestType);
+        Assert.Equal(typeof(GetBalanceHistoryResponse), tools[5].ResponseType);
         Assert.NotNull(tools[5].OutputSchemaJson);
         Assert.True(tools[5].RequiresCredentials);
+        Assert.Equal("get_collateral_history", tools[6].Name);
+        Assert.Equal(typeof(GetCollateralHistoryRequest), tools[6].RequestType);
+        Assert.Equal(typeof(GetCollateralHistoryResponse), tools[6].ResponseType);
+        Assert.NotNull(tools[6].OutputSchemaJson);
+        Assert.True(tools[6].RequiresCredentials);
+        Assert.Equal("get_child_orders", tools[7].Name);
+        Assert.Equal(typeof(GetChildOrdersRequest), tools[7].RequestType);
+        Assert.Equal(typeof(GetChildOrdersResponse), tools[7].ResponseType);
+        Assert.NotNull(tools[7].OutputSchemaJson);
+        Assert.True(tools[7].RequiresCredentials);
+        Assert.Equal("evaluate_order", tools[8].Name);
+        Assert.Equal(typeof(EvaluateOrderRequest), tools[8].RequestType);
+        Assert.Equal(typeof(EvaluateOrderResponse), tools[8].ResponseType);
+        Assert.NotNull(tools[8].OutputSchemaJson);
+        Assert.True(tools[8].RequiresCredentials);
+        Assert.Equal("evaluate_margin_order", tools[9].Name);
+        Assert.Equal(typeof(EvaluateMarginOrderRequest), tools[9].RequestType);
+        Assert.Equal(typeof(EvaluateMarginOrderResponse), tools[9].ResponseType);
+        Assert.NotNull(tools[9].OutputSchemaJson);
+        Assert.True(tools[9].RequiresCredentials);
     }
 
     [Fact]
@@ -107,10 +128,18 @@ public sealed class ToolCatalogTests
     public void PrivateToolInputSchemas_ExposeBitflyerVenueAndDefaultAccountContext()
     {
         using var accountDocument = JsonDocument.Parse(ToolCatalog.GetAccountSnapshot.InputSchemaJson);
+        using var collateralAccountsDocument = JsonDocument.Parse(ToolCatalog.GetCollateralAccounts.InputSchemaJson);
+        using var balanceHistoryDocument = JsonDocument.Parse(ToolCatalog.GetBalanceHistory.InputSchemaJson);
+        using var collateralHistoryDocument = JsonDocument.Parse(ToolCatalog.GetCollateralHistory.InputSchemaJson);
+        using var childOrdersDocument = JsonDocument.Parse(ToolCatalog.GetChildOrders.InputSchemaJson);
         using var evaluateDocument = JsonDocument.Parse(ToolCatalog.EvaluateOrder.InputSchemaJson);
         using var evaluateMarginDocument = JsonDocument.Parse(ToolCatalog.EvaluateMarginOrder.InputSchemaJson);
 
         AssertBitflyerPrivateContextShape(accountDocument.RootElement);
+        AssertBitflyerPrivateContextShape(collateralAccountsDocument.RootElement);
+        AssertBitflyerPrivateContextShape(balanceHistoryDocument.RootElement);
+        AssertBitflyerPrivateContextShape(collateralHistoryDocument.RootElement);
+        AssertBitflyerPrivateContextShape(childOrdersDocument.RootElement);
         AssertBitflyerPrivateContextShape(evaluateDocument.RootElement);
         AssertBitflyerPrivateContextShape(evaluateMarginDocument.RootElement);
     }

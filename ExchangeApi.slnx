@@ -38,6 +38,9 @@
   <Folder Name="/src/Optional/Credentials/">
     <Project Path="src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj" />
   </Folder>
+  <Folder Name="/src/Optional/Logging/">
+    <Project Path="src/Optional/Logging/ExchangeApi.Optional.Logging.csproj" />
+  </Folder>
   <Folder Name="/src/Primitives/">
     <Project Path="src/Primitives/ExchangeApi.Primitives.csproj" />
   </Folder>
@@ -58,6 +61,9 @@
   <Folder Name="/tests/Optional/" />
   <Folder Name="/tests/Optional/Credentials.Tests/">
     <Project Path="tests/Optional/Credentials.Tests/ExchangeApi.Optional.Credentials.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Optional/Logging.Tests/">
+    <Project Path="tests/Optional/Logging.Tests/ExchangeApi.Optional.Logging.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/Exchanges/" />
   <Folder Name="/tests/Exchanges/Binance/" />

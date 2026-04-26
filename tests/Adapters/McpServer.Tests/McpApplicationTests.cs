@@ -45,8 +45,21 @@ public sealed class McpApplicationTests
 
         using var toolsList = JsonDocument.Parse(lines[1]);
         var tools = toolsList.RootElement.GetProperty("result").GetProperty("tools");
-        Assert.Equal(6, tools.GetArrayLength());
-        Assert.Equal(["get_market_snapshot", "list_markets", "get_klines", "get_account_snapshot", "evaluate_order", "evaluate_margin_order"], tools.EnumerateArray().Select(item => item.GetProperty("name").GetString()!).ToArray());
+        Assert.Equal(10, tools.GetArrayLength());
+        Assert.Equal(
+            [
+                "get_market_snapshot",
+                "list_markets",
+                "get_klines",
+                "get_account_snapshot",
+                "get_collateral_accounts",
+                "get_balance_history",
+                "get_collateral_history",
+                "get_child_orders",
+                "evaluate_order",
+                "evaluate_margin_order",
+            ],
+            tools.EnumerateArray().Select(item => item.GetProperty("name").GetString()!).ToArray());
         Assert.Equal("object", tools[0].GetProperty("inputSchema").GetProperty("type").GetString());
         Assert.Equal("object", tools[0].GetProperty("outputSchema").GetProperty("type").GetString());
         Assert.Equal("object", tools[2].GetProperty("inputSchema").GetProperty("oneOf")[0].GetProperty("type").GetString());
@@ -154,6 +167,10 @@ public sealed class McpApplicationTests
         Assert.Contains("list_markets", console.StdErr);
         Assert.Contains("get_klines", console.StdErr);
         Assert.Contains("get_account_snapshot", console.StdErr);
+        Assert.Contains("get_collateral_accounts", console.StdErr);
+        Assert.Contains("get_balance_history", console.StdErr);
+        Assert.Contains("get_collateral_history", console.StdErr);
+        Assert.Contains("get_child_orders", console.StdErr);
         Assert.Contains("evaluate_order", console.StdErr);
         Assert.Contains("evaluate_margin_order", console.StdErr);
         Assert.Contains("--credential-profile", console.StdErr);
@@ -215,6 +232,10 @@ public sealed class McpApplicationTests
                     "list_markets" => McpToolCallResult.Success(new { markets = 2 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.list_markets.v1", DataVersion = "exchangeapi-visible-markets.v1", Degraded = false }),
                     "get_klines" => McpToolCallResult.Success(new { candles = 1 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.get_klines.v1", DataVersion = "binance-kline-support-set.v1", Degraded = false }),
                     "get_account_snapshot" => McpToolCallResult.Success(new { count = 1 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.get_account_snapshot.v1", DataVersion = "bitflyer-private-read.v1", Degraded = false }),
+                    "get_collateral_accounts" => McpToolCallResult.Success(new { accounts = 1 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.get_collateral_accounts.v1", DataVersion = "bitflyer-private-read.v1", Degraded = false }),
+                    "get_balance_history" => McpToolCallResult.Success(new { items = 1 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.get_balance_history.v1", DataVersion = "bitflyer-private-read.v1", Degraded = false }),
+                    "get_collateral_history" => McpToolCallResult.Success(new { items = 1 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.get_collateral_history.v1", DataVersion = "bitflyer-private-read.v1", Degraded = false }),
+                    "get_child_orders" => McpToolCallResult.Success(new { orders = 1 }, new McpToolCallMeta { SchemaVersion = "exchangeapi.mcp.get_child_orders.v1", DataVersion = "bitflyer-private-read.v1", Degraded = false }),
                     "evaluate_order" => McpToolCallResult.ToolError(
                         new McpToolError
                         {

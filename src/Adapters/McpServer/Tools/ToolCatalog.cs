@@ -3,6 +3,7 @@ using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
+using ExchangeApi.Adapters.McpServer.Schema.Inspection;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.MarginEvaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
@@ -22,6 +23,9 @@ public static class ToolCatalog
         """;
 
     private static readonly string AccountSnapshotInputSchema = BuildAccountSnapshotInputSchema();
+    private static readonly string BalanceHistoryInputSchema = BuildBalanceHistoryInputSchema();
+    private static readonly string CollateralHistoryInputSchema = BuildPagedPrivateReadInputSchema();
+    private static readonly string ChildOrdersInputSchema = BuildChildOrdersInputSchema();
 
     private static readonly string KlinesInputSchema = BuildKlinesInputSchema();
     private static readonly string KlinesOutputSchema = BuildKlinesOutputSchema();
@@ -149,6 +153,123 @@ public static class ToolCatalog
             "accountReadiness": { "type": "string" }
           },
           "required": ["permissionModel", "balance", "positions", "openOrdersSummary", "margin", "accountReadiness"],
+          "additionalProperties": false
+        }
+        """;
+
+    private const string CollateralAccountsOutputSchema = """
+        {
+          "type": "object",
+          "properties": {
+            "accounts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "currencyCode": { "type": "string" },
+                  "amount": { "type": "string" }
+                },
+                "required": ["currencyCode", "amount"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["accounts"],
+          "additionalProperties": false
+        }
+        """;
+
+    private const string BalanceHistoryOutputSchema = """
+        {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "tradeDate": { "type": "string" },
+                  "eventDate": { "type": "string" },
+                  "productCode": { "type": ["string", "null"] },
+                  "currencyCode": { "type": "string" },
+                  "tradeType": { "type": "string" },
+                  "price": { "type": "string" },
+                  "amount": { "type": "string" },
+                  "quantity": { "type": "string" },
+                  "commission": { "type": "string" },
+                  "balance": { "type": "string" },
+                  "orderId": { "type": ["string", "null"] }
+                },
+                "required": ["id", "tradeDate", "eventDate", "productCode", "currencyCode", "tradeType", "price", "amount", "quantity", "commission", "balance", "orderId"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["items"],
+          "additionalProperties": false
+        }
+        """;
+
+    private const string CollateralHistoryOutputSchema = """
+        {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "currencyCode": { "type": "string" },
+                  "change": { "type": "string" },
+                  "amount": { "type": "string" },
+                  "reasonCode": { "type": "string" },
+                  "date": { "type": "string" }
+                },
+                "required": ["id", "currencyCode", "change", "amount", "reasonCode", "date"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["items"],
+          "additionalProperties": false
+        }
+        """;
+
+    private const string ChildOrdersOutputSchema = """
+        {
+          "type": "object",
+          "properties": {
+            "orders": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "childOrderId": { "type": "string" },
+                  "productCode": { "type": "string" },
+                  "side": { "type": "string" },
+                  "childOrderType": { "type": "string" },
+                  "price": { "type": "string" },
+                  "averagePrice": { "type": "string" },
+                  "size": { "type": "string" },
+                  "childOrderState": { "type": "string" },
+                  "expireDate": { "type": "string" },
+                  "childOrderDate": { "type": "string" },
+                  "childOrderAcceptanceId": { "type": "string" },
+                  "outstandingSize": { "type": "string" },
+                  "cancelSize": { "type": "string" },
+                  "executedSize": { "type": "string" },
+                  "totalCommission": { "type": "string" },
+                  "timeInForce": { "type": "string" }
+                },
+                "required": ["id", "childOrderId", "productCode", "side", "childOrderType", "price", "averagePrice", "size", "childOrderState", "expireDate", "childOrderDate", "childOrderAcceptanceId", "outstandingSize", "cancelSize", "executedSize", "totalCommission", "timeInForce"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["orders"],
           "additionalProperties": false
         }
         """;
@@ -437,28 +558,96 @@ public static class ToolCatalog
 
     private static string BuildAccountSnapshotInputSchema()
     {
+        return BuildPrivateReadInputSchema([]);
+    }
+
+    private static string BuildBalanceHistoryInputSchema()
+    {
         return SerializeSchema(
+            BuildPrivateReadSchemaObject(
+                new Dictionary<string, object?>
+                {
+                    ["currencyCode"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = new object[] { "string", "null" },
+                    },
+                    ["count"] = new Dictionary<string, object?> { ["type"] = new object[] { "integer", "null" } },
+                    ["before"] = new Dictionary<string, object?> { ["type"] = new object[] { "integer", "null" } },
+                    ["after"] = new Dictionary<string, object?> { ["type"] = new object[] { "integer", "null" } },
+                },
+                ["venue", "accountContext"]));
+    }
+
+    private static string BuildPagedPrivateReadInputSchema()
+    {
+        return BuildPrivateReadInputSchema(
             new Dictionary<string, object?>
             {
-                ["type"] = "object",
-                ["properties"] = new Dictionary<string, object?>
-                {
-                    ["venue"] = new Dictionary<string, object?>
-                    {
-                        ["type"] = "string",
-                        ["description"] = "Venue identifier. v1 requires bitflyer.",
-                        ["enum"] = new[] { McpVenueIds.Bitflyer },
-                    },
-                    ["accountContext"] = new Dictionary<string, object?>
-                    {
-                        ["type"] = "string",
-                        ["description"] = "Account context identifier. v1 requires default.",
-                        ["enum"] = new[] { McpAccountContextIds.Default },
-                    },
-                },
-                ["required"] = new[] { "venue", "accountContext" },
-                ["additionalProperties"] = false,
+                ["count"] = new Dictionary<string, object?> { ["type"] = new object[] { "integer", "null" } },
+                ["before"] = new Dictionary<string, object?> { ["type"] = new object[] { "integer", "null" } },
+                ["after"] = new Dictionary<string, object?> { ["type"] = new object[] { "integer", "null" } },
             });
+    }
+
+    private static string BuildChildOrdersInputSchema()
+    {
+        return SerializeSchema(
+            BuildPrivateReadSchemaObject(
+                new Dictionary<string, object?>
+                {
+                    ["productCode"] = new Dictionary<string, object?> { ["type"] = new object[] { "string", "null" } },
+                    ["count"] = new Dictionary<string, object?> { ["type"] = new object[] { "integer", "null" } },
+                    ["before"] = new Dictionary<string, object?> { ["type"] = new object[] { "integer", "null" } },
+                    ["after"] = new Dictionary<string, object?> { ["type"] = new object[] { "integer", "null" } },
+                    ["childOrderState"] = new Dictionary<string, object?>
+                    {
+                        ["type"] = new object[] { "string", "null" },
+                        ["enum"] = new object?[] { "ACTIVE", "COMPLETED", "CANCELED", "EXPIRED", "REJECTED", null },
+                    },
+                    ["childOrderId"] = new Dictionary<string, object?> { ["type"] = new object[] { "string", "null" } },
+                    ["childOrderAcceptanceId"] = new Dictionary<string, object?> { ["type"] = new object[] { "string", "null" } },
+                    ["parentOrderId"] = new Dictionary<string, object?> { ["type"] = new object[] { "string", "null" } },
+                },
+                ["venue", "accountContext"]));
+    }
+
+    private static string BuildPrivateReadInputSchema(Dictionary<string, object?> extraProperties)
+    {
+        return SerializeSchema(BuildPrivateReadSchemaObject(extraProperties, ["venue", "accountContext"]));
+    }
+
+    private static Dictionary<string, object?> BuildPrivateReadSchemaObject(
+        Dictionary<string, object?> extraProperties,
+        string[] required)
+    {
+        var properties = new Dictionary<string, object?>
+        {
+            ["venue"] = new Dictionary<string, object?>
+            {
+                ["type"] = "string",
+                ["description"] = "Venue identifier. v1 requires bitflyer.",
+                ["enum"] = new[] { McpVenueIds.Bitflyer },
+            },
+            ["accountContext"] = new Dictionary<string, object?>
+            {
+                ["type"] = "string",
+                ["description"] = "Account context identifier. v1 requires default.",
+                ["enum"] = new[] { McpAccountContextIds.Default },
+            },
+        };
+
+        foreach (var property in extraProperties)
+        {
+            properties[property.Key] = property.Value;
+        }
+
+        return new Dictionary<string, object?>
+        {
+            ["type"] = "object",
+            ["properties"] = properties,
+            ["required"] = required,
+            ["additionalProperties"] = false,
+        };
     }
 
     private static string BuildEvaluateOrderInputSchema()
@@ -614,6 +803,50 @@ public static class ToolCatalog
             ReadOnlyHint: true,
             RequiresCredentials: true);
 
+    public static McpToolDefinition GetCollateralAccounts { get; } =
+        new(
+            Name: "get_collateral_accounts",
+            Description: "Read bitFlyer v1 collateral account balances. Read-only. Does not place, cancel, deposit, or withdraw.",
+            RequestType: typeof(GetCollateralAccountsRequest),
+            ResponseType: typeof(GetCollateralAccountsResponse),
+            InputSchemaJson: AccountSnapshotInputSchema,
+            OutputSchemaJson: CollateralAccountsOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: true);
+
+    public static McpToolDefinition GetBalanceHistory { get; } =
+        new(
+            Name: "get_balance_history",
+            Description: "Read bitFlyer v1 balance history with optional pagination. Read-only. Does not place, cancel, deposit, or withdraw.",
+            RequestType: typeof(GetBalanceHistoryRequest),
+            ResponseType: typeof(GetBalanceHistoryResponse),
+            InputSchemaJson: BalanceHistoryInputSchema,
+            OutputSchemaJson: BalanceHistoryOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: true);
+
+    public static McpToolDefinition GetCollateralHistory { get; } =
+        new(
+            Name: "get_collateral_history",
+            Description: "Read bitFlyer v1 collateral history with optional pagination. Read-only. Does not place, cancel, deposit, or withdraw.",
+            RequestType: typeof(GetCollateralHistoryRequest),
+            ResponseType: typeof(GetCollateralHistoryResponse),
+            InputSchemaJson: CollateralHistoryInputSchema,
+            OutputSchemaJson: CollateralHistoryOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: true);
+
+    public static McpToolDefinition GetChildOrders { get; } =
+        new(
+            Name: "get_child_orders",
+            Description: "Read bitFlyer v1 child orders with optional filters. Read-only. Does not place or cancel orders.",
+            RequestType: typeof(GetChildOrdersRequest),
+            ResponseType: typeof(GetChildOrdersResponse),
+            InputSchemaJson: ChildOrdersInputSchema,
+            OutputSchemaJson: ChildOrdersOutputSchema,
+            ReadOnlyHint: true,
+            RequiresCredentials: true);
+
     public static McpToolDefinition EvaluateOrder { get; } =
         new(
             Name: "evaluate_order",
@@ -637,7 +870,18 @@ public static class ToolCatalog
             RequiresCredentials: true);
 
     public static IReadOnlyList<McpToolDefinition> All { get; } =
-        [GetMarketSnapshot, ListMarkets, GetKlines, GetAccountSnapshot, EvaluateOrder, EvaluateMarginOrder];
+        [
+            GetMarketSnapshot,
+            ListMarkets,
+            GetKlines,
+            GetAccountSnapshot,
+            GetCollateralAccounts,
+            GetBalanceHistory,
+            GetCollateralHistory,
+            GetChildOrders,
+            EvaluateOrder,
+            EvaluateMarginOrder,
+        ];
 
     public static IReadOnlyList<McpToolDefinition> PublicOnly { get; } =
         All.Where(tool => !tool.RequiresCredentials).ToArray();

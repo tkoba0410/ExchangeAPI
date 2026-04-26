@@ -80,6 +80,15 @@ dotnet add package ExchangeApi.Optional.Credentials --version 2.0.0
 `ExchangeApi.Optional.Credentials` は、core library の必須依存ではない。  
 平文 provider、age-backed provider などの storage / decrypt recipe が必要な consumer だけが参照する。
 
+secret-safe logging / evidence helper が必要な場合は optional logging package を追加する。
+
+```bash
+dotnet add package ExchangeApi.Optional.Logging --version 2.1.0
+```
+
+`ExchangeApi.Optional.Logging` は、core library の必須依存ではない。
+JSONL writer、redaction helper、evidence directory helper が必要な consumer だけが参照する。
+
 ## 4. 最小利用例
 
 以下は `v2.0.0` の API 名を使う例である。

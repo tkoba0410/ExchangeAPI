@@ -191,6 +191,8 @@ local/evidence/<phase>/<yyyymmdd>-<label>/
 - `notes/` には operator の判断、異常、再現手順、気づきなどを置く
 - `local/evidence/` 配下は repository の正本ではない
 - credentials、署名値、API key / secret を evidence に含めてはならない
+- `ExchangeApi.Optional.Logging` の evidence helper を使う場合も、上記構成と secret-safe 原則を維持する
+- evidence run label は path traversal できないよう sanitize し、同一 run directory がある場合は suffix で衝突回避する
 
 `local/app/` は ExchangeAPI には導入しない。  
 ExchangeAPI は library repo であり、通常実行アプリの I/O 正本を持たないためである。

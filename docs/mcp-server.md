@@ -314,6 +314,7 @@ tool-level error は以下のカテゴリに分類する。
 - `invalid_time_range`
 - `market_unavailable`
 - `account_unavailable`
+- `inspection_read_unavailable`
 - `internal_error`
 
 error 返却形式:
@@ -359,6 +360,7 @@ MCP v1 error boundary:
 - `upstream_error`
   - `GetTicker` / `GetBoardState` / `GetBalance` / `GetCollateral` / `GetChildOrders` / `GetPositions` の transport, http, codec failure
   - `GetKlines` の transport, http, codec failure
+  - `GetCollateralAccounts` / `GetBalanceHistory` / `GetCollateralHistory` / `GetChildOrders` の inspection read failure
   - `GetPermissions` failure は `get_account_snapshot` では degraded success とし、`accountReadiness = unknown` に写像する
 - `domain_error`
   - tool 契約上は support 済みの symbol に対して、required mapping/config が壊れている
@@ -378,6 +380,8 @@ MCP v1 error boundary:
 - transport は初期実装で `stdio` を採用する
 - stdio transport は latest MCP transport に従い、`stdin` / `stdout` で 1 行 1 JSON-RPC message を扱う
 - `stdout` は MCP message 専用とし、ログを書かない
+- v2.1.0 では `get_collateral_accounts`、`get_balance_history`、`get_collateral_history`、`get_child_orders` を read-only inspection tool として追加する
+- MCP は引き続き注文、キャンセル、入金、出金などの state-changing operation を扱わない
 - ログは `stderr` または別ログ出力に限定する
 - 初期 server surface は `initialize`、`ping`、`tools/list`、`tools/call` に限定する
 - `tools/list` は各 tool の `inputSchema` と `outputSchema` を返す

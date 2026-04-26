@@ -641,11 +641,12 @@ debug logging は `Protocol` 層にのみ許可する。
 - raw debug log は `local/logs/<venue>/protocol/` 配下にのみ出力する
 - raw debug log は `.gitignore` 対象とし、repository に commit / push しない
 
-将来方針:
+v2.1.0 方針:
 
 - core は log writer、保存形式、rotation、evidence 化を所有しない方向へ寄せる
 - core が安定して提供すべきものは、`CallResult`, `CallMeta`, `ProtocolRequest`, `ProtocolResponse`, `CallError` などの観測データである
-- JSONL、file log、redaction、local evidence writer、人間向け log は将来 `ExchangeApi.Optional.Logging` へ切り出す候補とする
+- JSONL、file log、redaction、local evidence writer、人間向け log は `ExchangeApi.Optional.Logging` へ置く
+- `ExchangeApi.Optional.Logging` は optional package であり、core / exchange project の必須依存にしない
 - optional logging を導入する場合でも、API key / secret / 認証 header / 署名値を出力してはならない
 
 ## 6. Request / Response 境界
@@ -1309,6 +1310,8 @@ Reserved additive extension:
 
 - file name や artifact 表示を local time 優先にしてよい
 - ただし UTC の canonical timestamp を削除しない
+- `ExchangeApi.Optional.Logging` の evidence directory helper を使って標準構成を生成してよい
+- helper を使う場合でも、credentials、API key、API secret、signature、Authorization header は evidence に含めてはならない
 
 ### 10.4 Artifact Generation Policy
 

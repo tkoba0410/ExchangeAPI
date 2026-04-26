@@ -5,10 +5,12 @@ using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
+using ExchangeApi.Adapters.McpServer.Schema.Inspection;
 using ExchangeApi.Adapters.McpServer.Schema.MarginEvaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 using ExchangeApi.Adapters.McpServer.Tools.Account;
 using ExchangeApi.Adapters.McpServer.Tools.Evaluation;
+using ExchangeApi.Adapters.McpServer.Tools.Inspection;
 using ExchangeApi.Adapters.McpServer.Tools.Klines;
 using ExchangeApi.Adapters.McpServer.Tools.MarginEvaluation;
 using ExchangeApi.Adapters.McpServer.Tools.Market;
@@ -26,6 +28,7 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
     private readonly ListMarketsTool _listMarketsTool;
     private readonly GetKlinesTool? _klinesTool;
     private readonly GetAccountSnapshotTool? _accountTool;
+    private readonly BitflyerInspectionTools? _inspectionTools;
     private readonly EvaluateOrderTool? _evaluateOrderTool;
     private readonly EvaluateMarginOrderTool? _evaluateMarginOrderTool;
     private readonly string? _privateToolUnavailableReason;
@@ -49,6 +52,7 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
         if (bitflyerBundle.Private is not null)
         {
             _accountTool = new GetAccountSnapshotTool(new BitflyerNativeAccountSnapshotGateway(bitflyerBundle.Private));
+            _inspectionTools = new BitflyerInspectionTools(new BitflyerNativeInspectionGateway(bitflyerBundle.Private));
             _evaluateOrderTool = new EvaluateOrderTool(new BitflyerNativeEvaluateOrderGateway(bitflyerBundle.Public, bitflyerBundle.Private));
             _evaluateMarginOrderTool = new EvaluateMarginOrderTool(new BitflyerNativeEvaluateMarginOrderGateway(bitflyerBundle.Public, bitflyerBundle.Private));
         }
@@ -132,6 +136,58 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
                     var result = await _accountTool.ExecuteAsync(request, cancellationToken);
                     return ToToolCallResult(result, "get_account_snapshot");
                 }
+            case "get_collateral_accounts":
+                {
+                    if (_inspectionTools is null)
+                    {
+                        return McpToolCallResult.ToolError(
+                            BuildMissingPrivateToolError(),
+                            BuildMeta("get_collateral_accounts", content: null));
+                    }
+
+                    var request = Deserialize<GetCollateralAccountsRequest>(arguments);
+                    var result = await _inspectionTools.GetCollateralAccountsAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "get_collateral_accounts");
+                }
+            case "get_balance_history":
+                {
+                    if (_inspectionTools is null)
+                    {
+                        return McpToolCallResult.ToolError(
+                            BuildMissingPrivateToolError(),
+                            BuildMeta("get_balance_history", content: null));
+                    }
+
+                    var request = Deserialize<GetBalanceHistoryRequest>(arguments);
+                    var result = await _inspectionTools.GetBalanceHistoryAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "get_balance_history");
+                }
+            case "get_collateral_history":
+                {
+                    if (_inspectionTools is null)
+                    {
+                        return McpToolCallResult.ToolError(
+                            BuildMissingPrivateToolError(),
+                            BuildMeta("get_collateral_history", content: null));
+                    }
+
+                    var request = Deserialize<GetCollateralHistoryRequest>(arguments);
+                    var result = await _inspectionTools.GetCollateralHistoryAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "get_collateral_history");
+                }
+            case "get_child_orders":
+                {
+                    if (_inspectionTools is null)
+                    {
+                        return McpToolCallResult.ToolError(
+                            BuildMissingPrivateToolError(),
+                            BuildMeta("get_child_orders", content: null));
+                    }
+
+                    var request = Deserialize<GetChildOrdersRequest>(arguments);
+                    var result = await _inspectionTools.GetChildOrdersAsync(request, cancellationToken);
+                    return ToToolCallResult(result, "get_child_orders");
+                }
             case "evaluate_order":
                 {
                     if (_evaluateOrderTool is null)
@@ -198,6 +254,10 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
                 "list_markets" => "exchangeapi-visible-markets.v1",
                 "get_klines" => "binance-kline-support-set.v1",
                 "get_account_snapshot" => "bitflyer-private-read.v1",
+                "get_collateral_accounts" => "bitflyer-private-read.v1",
+                "get_balance_history" => "bitflyer-private-read.v1",
+                "get_collateral_history" => "bitflyer-private-read.v1",
+                "get_child_orders" => "bitflyer-private-read.v1",
                 "evaluate_order" => "bitflyer-evaluate-order.v1",
                 "evaluate_margin_order" => "bitflyer-margin-rules.v1",
                 _ => "exchangeapi.mcp.unknown.v1",
@@ -239,6 +299,14 @@ public sealed class ExchangeApiMcpToolDispatcher : IMcpToolDispatcher, IDisposab
         if (_accountTool is not null)
         {
             tools.Add(ToolCatalog.GetAccountSnapshot);
+        }
+
+        if (_inspectionTools is not null)
+        {
+            tools.Add(ToolCatalog.GetCollateralAccounts);
+            tools.Add(ToolCatalog.GetBalanceHistory);
+            tools.Add(ToolCatalog.GetCollateralHistory);
+            tools.Add(ToolCatalog.GetChildOrders);
         }
 
         if (_evaluateOrderTool is not null)

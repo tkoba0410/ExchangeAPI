@@ -19,6 +19,22 @@
 | evidence 自動整理 | 将来候補 | `local/evidence/` 標準構成へ artifact / log / notes を自動配置できるため | まず標準構成だけ固定する |
 | `samples/` directory | 将来候補 | guide 内サンプルが大きくなった場合に、実行可能サンプルとして分離できるため | 早期作成は保守対象を増やす |
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
+| venue 単位 package / project consolidation | v3 候補 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v2.1.0 では扱わず、破壊的変更を許容する v3 の主題候補とする |
+
+## 1.1 v2.1.0 採用項目
+
+`v2.1.0` では次を採用する。
+
+- `ExchangeApi.Optional.Logging`
+- safe redaction
+- evidence directory helper
+- MCP read-only inspection tools
+  - `get_collateral_accounts`
+  - `get_balance_history`
+  - `get_collateral_history`
+  - `get_child_orders`
+
+`Unified`、`ExchangeApi.Optional.Resilience`、credentials provider 拡張、`samples/`、MCP client / human trial CLI、package / project consolidation は `v2.1.0` では扱わない。
 
 ## 2. optional project 候補
 

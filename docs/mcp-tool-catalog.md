@@ -15,15 +15,15 @@ tool surface は次の 2 層で管理する。
 - `Inspection Read Tools`
   - 開発中確認と運用 inspection のための read-only tool
 
-現行実装で visible な tool universe は [`2. Visible Tools`](#2-visible-tools) に列挙した 6 tool だけである。
-`Inspection Read Tools` は post-v2 候補であり、実装に入るまでは `tools/list` に出してはならない。
+現行実装で visible な tool universe は [`2. Visible Tools`](#2-visible-tools) に列挙した tool だけである。
+`Inspection Read Tools` は v2.1.0 から一部実装する。
 
 - bitFlyer v1 core bot tool は `get_market_snapshot`、`get_account_snapshot`、`evaluate_order`、`evaluate_margin_order` の 4 つとする
 - 初期 venue scope は bitFlyer を正本とする
 - Binance など他 venue の account / evaluation 展開は、market rule / account / evaluation の導出元が固定できてから行う
 - Binance public market data は例外として、`get_klines` を public read 拡張として追加してよい
 - `list_markets` を market discovery tool として追加してよい
-- `GetCollateralAccounts`、`GetBalanceHistory`、`GetCollateralHistory`、`GetChildOrders` などの read-only capability は inspection read tool 候補として記録するが、v2.0.0 の visible tool には含めない
+- `GetCollateralAccounts`、`GetBalanceHistory`、`GetCollateralHistory`、`GetChildOrders` は v2.1.0 の inspection read tool として visible surface に含める
 
 ### 1.1 bitFlyer v1 support matrix
 
@@ -116,20 +116,24 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 2. `list_markets`
 3. `get_klines`
 4. `get_account_snapshot`
-5. `evaluate_order`
-6. `evaluate_margin_order`
+5. `get_collateral_accounts`
+6. `get_balance_history`
+7. `get_collateral_history`
+8. `get_child_orders`
+9. `evaluate_order`
+10. `evaluate_margin_order`
 
 補足:
 
-- 上記 6 つが現行実装の visible tool universe である
+- 上記 10 個が現行実装の visible tool universe である
 - `tools/list` は current process が実際に実行可能な visible tool set を返す
-- `get_account_snapshot`、`evaluate_order`、`evaluate_margin_order` は private credentials を解決できない場合、`tools/list` から advertise しない
+- `get_account_snapshot`、`get_collateral_accounts`、`get_balance_history`、`get_collateral_history`、`get_child_orders`、`evaluate_order`、`evaluate_margin_order` は private credentials を解決できない場合、`tools/list` から advertise しない
 - `get_klines` は Binance public client が配線されている場合のみ advertise してよい
 
 補足:
 
-- v2.0.0 の `tools/list` は上記 6 tool から current process が実際に実行可能なものだけを返す
-- post-v2 で `Inspection Read Tools` を実装した場合は、同じ原則で current process が実際に実行可能な tool だけを返す
+- `tools/list` は上記 tool から current process が実際に実行可能なものだけを返す
+- `Inspection Read Tools` も同じ原則で current process が実際に実行可能な tool だけを返す
 - ただし private credentials を解決できない場合、private inspection read tool は advertise してはならない
 - private credentials の解決失敗は operator に通知してよいが、MCP client へは tool 非公開または structured error として表現する
 
@@ -177,8 +181,8 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 
 ## 5. Tool Contracts
 
-本節の `get_market_snapshot`、`list_markets`、`get_klines`、`get_account_snapshot`、`evaluate_order`、`evaluate_margin_order` は v2.0.0 の現行 tool contract である。
-`get_collateral_accounts`、`get_balance_history`、`get_collateral_history`、`get_child_orders`、`get_parent_orders`、`get_private_executions`、`get_positions`、`get_trading_commission` は post-v2 の draft contract であり、実装されるまで現行 visible tool として扱わない。
+本節の `get_market_snapshot`、`list_markets`、`get_klines`、`get_account_snapshot`、`get_collateral_accounts`、`get_balance_history`、`get_collateral_history`、`get_child_orders`、`evaluate_order`、`evaluate_margin_order` は現行 tool contract である。
+`get_parent_orders`、`get_private_executions`、`get_positions`、`get_trading_commission` は post-v2 の draft contract であり、実装されるまで現行 visible tool として扱わない。
 
 ### 5.1 `get_market_snapshot`
 
@@ -266,10 +270,10 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 補足:
 
 - `get_account_snapshot` は bot 向け aggregate tool として、口座の現在状態を要約して返す
-- `GetCollateralAccounts` 由来の通貨別 collateral 残高を `get_account_snapshot` へ吸収するか、inspection tool `get_collateral_accounts` として独立提供するかは post-v2 の裁定事項とする
+- `GetCollateralAccounts` 由来の通貨別 collateral 残高は v2.1.0 では inspection tool `get_collateral_accounts` として独立提供する
 - v2.0.0 の現行 `get_account_snapshot.margin` schema は `derivedAvailable` のみを持つ
 
-### 5.3.1 `get_collateral_accounts` (post-v2 draft)
+### 5.3.1 `get_collateral_accounts`
 
 目的:
 
@@ -288,12 +292,16 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 
 ```json
 {
-  "venue": "bitflyer",
-  "accountContext": "default",
-  "accounts": {
-    "JPY": "5000000",
-    "BTC": "0.1"
-  }
+  "accounts": [
+    {
+      "currencyCode": "JPY",
+      "amount": "5000000"
+    },
+    {
+      "currencyCode": "BTC",
+      "amount": "0.1"
+    }
+  ]
 }
 ```
 
@@ -301,10 +309,10 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 
 - `venue` と `accountContext` は必須
 - v1 では `venue = bitflyer`、`accountContext = default`
-- `accounts` は `GetCollateralAccounts` を通貨別 map へ正規化したものを正本とする
+- `accounts` は `GetCollateralAccounts` response を secret-free な array へ写像したものを正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.2 `get_balance_history` (post-v2 draft)
+### 5.3.2 `get_balance_history`
 
 目的:
 
@@ -327,8 +335,6 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 
 ```json
 {
-  "venue": "bitflyer",
-  "accountContext": "default",
   "items": [
     {
       "id": 1,
@@ -356,7 +362,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `items` は `GetBalanceHistory` response を正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.3 `get_collateral_history` (post-v2 draft)
+### 5.3.3 `get_collateral_history`
 
 目的:
 
@@ -378,8 +384,6 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 
 ```json
 {
-  "venue": "bitflyer",
-  "accountContext": "default",
   "items": [
     {
       "id": 1,
@@ -401,7 +405,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `items` は `GetCollateralHistory` response を正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
-### 5.3.4 `get_child_orders` (post-v2 draft)
+### 5.3.4 `get_child_orders`
 
 目的:
 
@@ -429,7 +433,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `venue` と `accountContext` は必須
 - v1 では `venue = bitflyer`、`accountContext = default`
 - filter input は `GetChildOrders` request contract を正本とする
-- response `items` は `GetChildOrders` response を正本とする
+- response `orders` は `GetChildOrders` response を secret-free な array へ写像したものを正本とする
 - current process が private credentials を解決できない場合、`tools/list` から advertise してはならない
 
 ### 5.3.5 `get_parent_orders` (post-v2 draft)

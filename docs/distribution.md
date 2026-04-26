@@ -44,7 +44,7 @@ bash scripts/pack-local-nuget.sh
 - publish guide:
   - `docs/guides/package-publish.md`
 - current published baseline:
-  - `v2.0.0`
+  - `v2.1.0`
 - current published verification:
   - `ExchangeApi.Exchanges.Bitflyer.Composition v1.0.0` の consumer smoke test を確認済み
   - `ExchangeApi.Exchanges.Binance.Composition v1.0.0` の consumer smoke test を確認済み
@@ -52,6 +52,10 @@ bash scripts/pack-local-nuget.sh
   - `ExchangeApi.Exchanges.Binance.Composition v2.0.0` の GitHub Packages consumer smoke test を確認済み
   - `ExchangeApi.Optional.Credentials v2.0.0` の GitHub Packages consumer smoke test を確認済み
   - `ExchangeApi.Optional.Credentials v2.0.0` の GitHub Packages publish を確認済み
+  - `ExchangeApi.Exchanges.Bitflyer.Composition v2.1.0` の GitHub Packages consumer smoke test を確認済み
+  - `ExchangeApi.Optional.Credentials v2.1.0` の GitHub Packages consumer smoke test を確認済み
+  - `ExchangeApi.Optional.Logging v2.1.0` の GitHub Packages consumer smoke test を確認済み
+  - `ExchangeApi.Optional.Logging v2.1.0` の GitHub Packages publish を確認済み
 
 v2 方針:
 
@@ -133,6 +137,7 @@ CLI / MCP Server は NuGet package ではなく executable artifact として扱
 - `v2.0.0` 初手では各 executable asset と同じ release に SHA-256 checksum を置く
 - checksum asset name は `exchangeapi-linux-x64.sha256` と `exchangeapi-mcp-linux-x64.sha256` とする
 - `v2.0.0` release では上記 4 asset を GitHub Release に添付済み
+- `v2.1.0` release では上記 4 asset を GitHub Release に添付済み
 - v2 初手では executable 配布方式の大規模変更は行わない
 - 複数 RID matrix、installer、archive format、署名付き binary は post-v2 検討とする
 

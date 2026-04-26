@@ -3,6 +3,21 @@
 最終更新: 2026-04-26
 位置づけ: v2.1.0 release checklist
 
+状態: `v2.1.0` released
+
+release 完了日: 2026-04-26
+
+完了済み:
+
+- deterministic tests / local pack / local consumer smoke
+- live tests safe skip without opt-in
+- MCP private read live verification
+- GitHub Packages publish: library / optional packages `2.1.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer.Composition`, `ExchangeApi.Optional.Credentials`, `ExchangeApi.Optional.Logging`
+- tag: `v2.1.0`
+- GitHub Release: `ExchangeAPI v2.1.0`
+- release assets: `exchangeapi-linux-x64`, `exchangeapi-linux-x64.sha256`, `exchangeapi-mcp-linux-x64`, `exchangeapi-mcp-linux-x64.sha256`
+
 ## 1. Scope Confirmation
 
 - [x] `ExchangeApi.Optional.Logging` を追加した
@@ -141,4 +156,13 @@ publish: GITHUB_TOKEN="$(gh auth token)" bash scripts/push-github-packages.sh 2.
 GitHub Packages verification:
   ExchangeApi.Primitives 2.1.0 visible
   ExchangeApi.Optional.Logging 2.1.0 visible
+GitHub Packages consumer smoke:
+  ExchangeApi.Exchanges.Bitflyer.Composition 2.1.0 passed
+  ExchangeApi.Optional.Credentials 2.1.0 passed
+  ExchangeApi.Optional.Logging 2.1.0 passed
+release assets:
+  local/publish/release-assets/v2.1.0/exchangeapi-linux-x64
+  local/publish/release-assets/v2.1.0/exchangeapi-linux-x64.sha256
+  local/publish/release-assets/v2.1.0/exchangeapi-mcp-linux-x64
+  local/publish/release-assets/v2.1.0/exchangeapi-mcp-linux-x64.sha256
 ```

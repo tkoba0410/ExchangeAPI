@@ -6,9 +6,9 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 この `README.md` は入口文書です。  
 文書の主従、正本、履歴の扱いは [`docs/docs-architecture.md`](docs/docs-architecture.md) を参照してください。
 
-現時点の公開固定点は **`v2.0.0`** です。
-`v2.0.0` の release 手順と確認結果は [`docs/release-checklist-v2.0.0.md`](docs/release-checklist-v2.0.0.md) を参照します。
-`stage` 系 tag と `v1.0.0` は履歴として残しますが、現在の安定固定点としては `v2.0.0` を参照します。
+現時点の公開固定点は **`v2.1.0`** です。
+`v2.1.0` の release 手順と確認結果は [`docs/release-checklist-v2.1.0.md`](docs/release-checklist-v2.1.0.md) を参照します。
+`stage` 系 tag、`v1.0.0`、`v2.0.0` は履歴として残しますが、現在の安定固定点としては `v2.1.0` を参照します。
 
 ## Quick Links
 
@@ -24,9 +24,11 @@ ExchangeAPI は、複数の暗号資産取引所 API を扱うための library 
 - `v2.0.0` breaking changes: [`docs/breaking-changes-v2.0.0.md`](docs/breaking-changes-v2.0.0.md)
 - `v2.0.0` migration guide: [`docs/migration-v2.0.0.md`](docs/migration-v2.0.0.md)
 - `v2.0.0` release checklist: [`docs/release-checklist-v2.0.0.md`](docs/release-checklist-v2.0.0.md)
+- `v2.1.0` release checklist: [`docs/release-checklist-v2.1.0.md`](docs/release-checklist-v2.1.0.md)
 - Credentials / auth provider guide: [`docs/guides/credentials-and-auth-provider.md`](docs/guides/credentials-and-auth-provider.md)
 - Release note `v1.0.0`: [`docs/release-notes/v1.0.0.md`](docs/release-notes/v1.0.0.md)
 - Release note `v2.0.0`: [`docs/release-notes/v2.0.0.md`](docs/release-notes/v2.0.0.md)
+- Release note `v2.1.0`: [`docs/release-notes/v2.1.0.md`](docs/release-notes/v2.1.0.md)
 - Distribution guide: [`docs/distribution.md`](docs/distribution.md)
 - Archive guide: [`docs/archive/README.md`](docs/archive/README.md)
 

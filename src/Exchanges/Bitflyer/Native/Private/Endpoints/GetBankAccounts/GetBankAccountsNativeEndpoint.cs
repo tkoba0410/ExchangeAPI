@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBankAccounts;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBankAccounts;
 
 public interface IGetBankAccountsNativeEndpoint
 {
-    Task<Call<GetBankAccountsRequest, IReadOnlyList<GetBankAccounts.Item>>> CallAsync(
+    Task<CallResult<GetBankAccountsRequest, IReadOnlyList<GetBankAccounts.Item>>> CallAsync(
         GetBankAccountsRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetBankAccountsRequest, IReadOnlyList<GetBankAccounts.Item>>> CallAsync(
+        GetBankAccountsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetBankAccountsNativeEndpoint : IGetBankAccountsNativeEndpoint
@@ -21,11 +30,29 @@ public sealed class GetBankAccountsNativeEndpoint : IGetBankAccountsNativeEndpoi
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetBankAccountsRequest, IReadOnlyList<GetBankAccounts.Item>>> CallAsync(
+    public Task<CallResult<GetBankAccountsRequest, IReadOnlyList<GetBankAccounts.Item>>> CallAsync(
         GetBankAccountsRequest request,
         CancellationToken cancellationToken = default)
     {
-        var protocolCall = await _protocolEndpoint.SendAsync(cancellationToken);
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetBankAccountsRequest, IReadOnlyList<GetBankAccounts.Item>>> CallAsync(
+        GetBankAccountsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetBankAccountsRequest, IReadOnlyList<GetBankAccounts.Item>>> CallAsyncCore(
+        GetBankAccountsRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
+    {
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(cancellationToken)
+            : _protocolEndpoint.SendAsync(credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<GetBankAccountsRequest, IReadOnlyList<GetBankAccounts.Item>>(

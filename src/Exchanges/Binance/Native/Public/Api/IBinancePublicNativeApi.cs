@@ -5,7 +5,7 @@ namespace ExchangeApi.Exchanges.Binance.Native.Public.Api;
 
 public interface IBinancePublicNativeApi
 {
-    Task<Call<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> GetKlinesCallAsync(
+    Task<CallResult<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> GetKlinesAsync(
         GetKlinesRequest request,
         CancellationToken cancellationToken = default);
 }

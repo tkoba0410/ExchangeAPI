@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 
 public interface IGetTickerNativeEndpoint
 {
-    Task<Call<GetTickerRequest, GetTickerResponse>> CallAsync(
+    Task<CallResult<GetTickerRequest, GetTickerResponse>> CallAsync(
         GetTickerRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -22,7 +22,7 @@ public sealed class GetTickerNativeEndpoint : IGetTickerNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetTickerRequest, GetTickerResponse>> CallAsync(
+    public async Task<CallResult<GetTickerRequest, GetTickerResponse>> CallAsync(
         GetTickerRequest request,
         CancellationToken cancellationToken = default)
     {

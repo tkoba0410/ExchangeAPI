@@ -51,8 +51,8 @@ public static class GetHealthProtocolCommand
 
         var typed = (ProtocolQueryValues)request;
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
-        var call = await bundle.Public.GetHealthCallAsync(
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
+        var call = await bundle.Public.GetHealthAsync(
             typed.GetString("product_code"),
             cancellationToken);
         return ExecutionOutcome.FromProtocolCall(Path, call);

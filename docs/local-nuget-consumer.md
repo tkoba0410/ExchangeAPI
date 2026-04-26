@@ -4,16 +4,22 @@
 
 外部 consumer 向けの推奨導線は local NuGet feed とする。`ProjectReference` は repo 内開発または近接開発向けであり、外部 consumer の推奨導線ではない。
 
+注記:
+
+- 現在の公開固定点は `v2.0.0` である
+- 本書の package version と API 例は `v2.0.0` の local consumer 導線を示す
+- release 前確認では、`2.0.0-local.*` のような local package version を使ってよい
+
 ## 1. 前提
 
 - ExchangeAPI repository 側で local package を生成済みであること
 - consumer project 側が `net10.0` を target できること
 - local feed は machine-local 用途であり、共有 feed や公開 feed の代替ではない
 
-ExchangeAPI repository 側では、repo root で次を実行する。
+ExchangeAPI repository 側では repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 1.0.0
+bash scripts/pack-local-nuget.sh 2.0.0
 ```
 
 生成先は `local/nuget`。
@@ -44,13 +50,13 @@ path は absolute path を推奨する。
 bitFlyer を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 1.0.0
+dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 2.0.0
 ```
 
 Binance を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 1.0.0
+dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 2.0.0
 ```
 
 より狭い依存だけ欲しい場合は、個別 package を直接参照してよい。
@@ -65,7 +71,18 @@ dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 1.0.0
 - `ExchangeApi.Exchanges.Binance.Native`
 - `ExchangeApi.Exchanges.Binance.Composition`
 
+credential provider 実装が必要な場合は optional package を追加する。
+
+```bash
+dotnet add package ExchangeApi.Optional.Credentials --version 2.0.0
+```
+
+`ExchangeApi.Optional.Credentials` は、core library の必須依存ではない。  
+平文 provider、age-backed provider などの storage / decrypt recipe が必要な consumer だけが参照する。
+
 ## 4. 最小利用例
+
+以下は `v2.0.0` の API 名を使う例である。
 
 consumer app の `Program.cs`:
 
@@ -74,9 +91,9 @@ using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
-using var client = BitflyerClientFactory.CreateNativeClient();
+using var client = BitflyerClientFactory.CreateNativeClientBundle();
 
-var call = await client.Public.GetTickerCallAsync(new GetTickerRequest
+var call = await client.Public.GetTickerAsync(new GetTickerRequest
 {
     ProductCode = ProductCodes.BtcJpy,
 });
@@ -100,6 +117,15 @@ dotnet restore --configfile NuGet.config
 dotnet build
 ```
 
+ExchangeAPI repo 側で local feed と v2 API surface の consumer smoke を確認する場合は、次を実行する。
+
+```bash
+bash scripts/smoke-local-nuget-consumer.sh 2.0.0
+```
+
+この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer.Composition` と `ExchangeApi.Optional.Credentials` を local feed から restore して build する。
+実 API には接続しない。
+
 ## 6. Version 更新ルール
 
 local feed へ再 pack するときは、同じ version を上書きするより version を増やすほうが安全である。
@@ -107,13 +133,13 @@ local feed へ再 pack するときは、同じ version を上書きするより
 推奨:
 
 ```bash
-bash scripts/pack-local-nuget.sh 1.0.1-local.1
+bash scripts/pack-local-nuget.sh 2.0.1-local.1
 ```
 
 その後、consumer repo 側でも package version を更新する。consumer repo は floating version ではなく、明示 version を固定する。
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 1.0.1-local.1
+dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 2.0.1-local.1
 ```
 
 同じ version を再利用すると、consumer 側の global packages cache により古い package が使われ続けることがある。
@@ -125,7 +151,7 @@ dotnet nuget locals global-packages --clear
 
 ## 7. Scope
 
-- bitFlyer は現行 Stage10 の主対象であり、最も広い実装済み surface を持つ
+- bitFlyer は現行 library slice の主対象であり、最も広い実装済み surface を持つ
 - Binance は public `GetKlines` のみをサポートする
 - `Unified` は未実装
 

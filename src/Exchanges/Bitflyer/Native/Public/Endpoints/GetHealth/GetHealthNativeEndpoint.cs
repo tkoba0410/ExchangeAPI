@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetHealth;
 
 public interface IGetHealthNativeEndpoint
 {
-    Task<Call<GetHealthRequest, GetHealthResponse>> CallAsync(
+    Task<CallResult<GetHealthRequest, GetHealthResponse>> CallAsync(
         GetHealthRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -21,7 +21,7 @@ public sealed class GetHealthNativeEndpoint : IGetHealthNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetHealthRequest, GetHealthResponse>> CallAsync(
+    public async Task<CallResult<GetHealthRequest, GetHealthResponse>> CallAsync(
         GetHealthRequest request,
         CancellationToken cancellationToken = default)
     {

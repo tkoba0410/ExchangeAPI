@@ -13,7 +13,7 @@ public static class BinanceClientFactory
     /// </summary>
     /// <param name="options">Optional client options. Null uses defaults.</param>
     /// <returns>A protocol bundle for raw/debug-oriented Binance calls.</returns>
-    public static BinanceProtocolBundle CreateProtocolClient(BinanceClientOptions? options = null)
+    public static BinanceProtocolBundle CreateProtocolClientBundle(BinanceClientOptions? options = null)
     {
         return BinanceBootstrap.CreateProtocolBundle(options);
     }
@@ -24,7 +24,7 @@ public static class BinanceClientFactory
     /// <param name="httpClient">The caller-owned HTTP client.</param>
     /// <param name="options">Optional client options. Null uses defaults.</param>
     /// <returns>A protocol bundle for raw/debug-oriented Binance calls.</returns>
-    public static BinanceProtocolBundle CreateProtocolClient(HttpClient httpClient, BinanceClientOptions? options = null)
+    public static BinanceProtocolBundle CreateProtocolClientBundle(HttpClient httpClient, BinanceClientOptions? options = null)
     {
         return BinanceBootstrap.CreateProtocolBundle(httpClient, options);
     }
@@ -34,7 +34,7 @@ public static class BinanceClientFactory
     /// </summary>
     /// <param name="options">Optional client options. Null uses defaults.</param>
     /// <returns>A native bundle for exchange-native Binance calls.</returns>
-    public static BinanceNativeBundle CreateNativeClient(BinanceClientOptions? options = null)
+    public static BinanceNativeBundle CreateNativeClientBundle(BinanceClientOptions? options = null)
     {
         return BinanceBootstrap.CreateNativeBundle(options);
     }
@@ -45,7 +45,7 @@ public static class BinanceClientFactory
     /// <param name="httpClient">The caller-owned HTTP client.</param>
     /// <param name="options">Optional client options. Null uses defaults.</param>
     /// <returns>A native bundle for exchange-native Binance calls.</returns>
-    public static BinanceNativeBundle CreateNativeClient(HttpClient httpClient, BinanceClientOptions? options = null)
+    public static BinanceNativeBundle CreateNativeClientBundle(HttpClient httpClient, BinanceClientOptions? options = null)
     {
         return BinanceBootstrap.CreateNativeBundle(httpClient, options);
     }

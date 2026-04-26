@@ -16,32 +16,32 @@ public sealed class BitflyerCredentialResolverTests
     }
 
     [Fact]
-    public void Resolve_LoadsCredentialsFromAgeBackedFiles()
+    public async Task Resolve_LoadsCredentialsFromAgeBackedFiles()
     {
         var tempDirectory = Directory.CreateTempSubdirectory();
         try
         {
             var identityFilePath = Path.Combine(tempDirectory.FullName, "age.key");
             var credentialsFilePath = Path.Combine(tempDirectory.FullName, "credentials.enc.json");
+            var profileFilePath = Path.Combine(tempDirectory.FullName, "credential-profile.json");
             File.WriteAllText(identityFilePath, "identity");
             File.WriteAllText(credentialsFilePath, "ciphertext");
-
-            var environment = new FakeEnvironment(new Dictionary<string, string?>
-            {
-                [BitflyerCredentialResolver.AgeIdentityFileEnvName] = identityFilePath,
-                [BitflyerCredentialResolver.CredentialsAgeFileEnvName] = credentialsFilePath,
-            });
+            WriteProfile(profileFilePath, identityFilePath, credentialsFilePath);
 
             var result = BitflyerCredentialResolver.Resolve(
-                environment,
+                new FakeEnvironment(),
+                profileFilePath,
                 new FakeAgeCredentialDecryptor(
                     true,
                     """{"version":1,"venue":"bitflyer","apiKey":"age-key","apiSecret":"age-secret","label":"main-trade","generatedAt":"2026-03-29T10:00:00+09:00","expiresAt":"2026-06-30T00:00:00+09:00","note":"main trading key"}"""));
 
             Assert.False(result.HasFailure);
             Assert.NotNull(result.Credentials);
-            Assert.Equal("age-key", result.Credentials!.ApiKey);
-            Assert.Equal("age-secret", result.Credentials.ApiSecret);
+            await using var session = await result.Credentials!.OpenSessionAsync();
+            Assert.Equal("age-key", session.ApiKey);
+            Assert.Equal(
+                "9e8aea03151a4229aafbadc8aa33f32870ef4d4cf31cc17d47de714b0943e586",
+                session.Sign("payload"));
         }
         finally
         {
@@ -52,41 +52,52 @@ public sealed class BitflyerCredentialResolverTests
     [Fact]
     public void Resolve_FailsWhenAgeSourceIsPartiallyConfigured()
     {
-        var environment = new FakeEnvironment(new Dictionary<string, string?>
+        var tempDirectory = Directory.CreateTempSubdirectory();
+        try
         {
-            [BitflyerCredentialResolver.AgeIdentityFileEnvName] = "/tmp/age.key",
-        });
+            var identityFilePath = Path.Combine(tempDirectory.FullName, "age.key");
+            var profileFilePath = Path.Combine(tempDirectory.FullName, "credential-profile.json");
+            File.WriteAllText(identityFilePath, "identity");
+            WriteProfile(profileFilePath, identityFilePath, credentialsFilePath: null);
 
-        var result = BitflyerCredentialResolver.Resolve(environment, new FakeAgeCredentialDecryptor(false, ""));
+            var result = BitflyerCredentialResolver.Resolve(
+                new FakeEnvironment(),
+                profileFilePath,
+                new FakeAgeCredentialDecryptor(true, ""));
 
-        Assert.True(result.HasFailure);
-        Assert.Contains(BitflyerCredentialResolver.AgeIdentityFileEnvName, result.ErrorMessage);
-        Assert.Contains(BitflyerCredentialResolver.CredentialsAgeFileEnvName, result.ErrorMessage);
+            Assert.True(result.HasFailure);
+            Assert.Contains("credentials file", result.ErrorMessage);
+        }
+        finally
+        {
+            tempDirectory.Delete(recursive: true);
+        }
     }
 
     [Fact]
-    public void Resolve_FailsWhenCanonicalVenueDoesNotMatch()
+    public async Task Resolve_FailsWhenCanonicalVenueDoesNotMatch()
     {
         var tempDirectory = Directory.CreateTempSubdirectory();
         try
         {
             var identityFilePath = Path.Combine(tempDirectory.FullName, "age.key");
             var credentialsFilePath = Path.Combine(tempDirectory.FullName, "credentials.enc.json");
+            var profileFilePath = Path.Combine(tempDirectory.FullName, "credential-profile.json");
             File.WriteAllText(identityFilePath, "identity");
             File.WriteAllText(credentialsFilePath, "ciphertext");
-
-            var environment = new FakeEnvironment(new Dictionary<string, string?>
-            {
-                [BitflyerCredentialResolver.AgeIdentityFileEnvName] = identityFilePath,
-                [BitflyerCredentialResolver.CredentialsAgeFileEnvName] = credentialsFilePath,
-            });
+            WriteProfile(profileFilePath, identityFilePath, credentialsFilePath);
 
             var result = BitflyerCredentialResolver.Resolve(
-                environment,
+                new FakeEnvironment(),
+                profileFilePath,
                 new FakeAgeCredentialDecryptor(true, """{"version":1,"venue":"binance","apiKey":"age-key","apiSecret":"age-secret"}"""));
 
-            Assert.True(result.HasFailure);
-            Assert.Contains("venue", result.ErrorMessage);
+            Assert.False(result.HasFailure);
+            Assert.NotNull(result.Credentials);
+
+            var ex = await Assert.ThrowsAsync<ExchangeApi.Primitives.Credentials.ApiCredentialException>(async () =>
+                await result.Credentials!.OpenSessionAsync());
+            Assert.Contains("venue", ex.Message);
         }
         finally
         {
@@ -95,33 +106,53 @@ public sealed class BitflyerCredentialResolverTests
     }
 
     [Fact]
-    public void Resolve_FailsWhenLegacyFormatIsUsed()
+    public async Task Resolve_FailsWhenLegacyFormatIsUsed()
     {
         var tempDirectory = Directory.CreateTempSubdirectory();
         try
         {
             var identityFilePath = Path.Combine(tempDirectory.FullName, "age.key");
             var credentialsFilePath = Path.Combine(tempDirectory.FullName, "credentials.enc.json");
+            var profileFilePath = Path.Combine(tempDirectory.FullName, "credential-profile.json");
             File.WriteAllText(identityFilePath, "identity");
             File.WriteAllText(credentialsFilePath, "ciphertext");
-
-            var environment = new FakeEnvironment(new Dictionary<string, string?>
-            {
-                [BitflyerCredentialResolver.AgeIdentityFileEnvName] = identityFilePath,
-                [BitflyerCredentialResolver.CredentialsAgeFileEnvName] = credentialsFilePath,
-            });
+            WriteProfile(profileFilePath, identityFilePath, credentialsFilePath);
 
             var result = BitflyerCredentialResolver.Resolve(
-                environment,
+                new FakeEnvironment(),
+                profileFilePath,
                 new FakeAgeCredentialDecryptor(true, """{"bitflyer":{"apiKey":"legacy-key","apiSecret":"legacy-secret"}}"""));
 
-            Assert.True(result.HasFailure);
-            Assert.Contains("version", result.ErrorMessage);
+            Assert.False(result.HasFailure);
+            Assert.NotNull(result.Credentials);
+
+            var ex = await Assert.ThrowsAsync<ExchangeApi.Primitives.Credentials.ApiCredentialException>(async () =>
+                await result.Credentials!.OpenSessionAsync());
+            Assert.Contains("version", ex.Message);
         }
         finally
         {
             tempDirectory.Delete(recursive: true);
         }
+    }
+
+    private static void WriteProfile(string profileFilePath, string identityFilePath, string? credentialsFilePath)
+    {
+        File.WriteAllText(
+            profileFilePath,
+            System.Text.Json.JsonSerializer.Serialize(new
+            {
+                version = 1,
+                credentials = new
+                {
+                    bitflyer = new
+                    {
+                        provider = "age-file",
+                        identityFilePath,
+                        credentialsFilePath,
+                    },
+                },
+            }));
     }
 
     private sealed class FakeAgeCredentialDecryptor : IAgeCredentialDecryptor

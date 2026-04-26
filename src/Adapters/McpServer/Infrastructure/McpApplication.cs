@@ -1,4 +1,5 @@
 using System.Text.Json;
+using ExchangeApi.Adapters.McpServer.Configuration;
 using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Tools;
 
@@ -18,6 +19,7 @@ public sealed class McpApplication
     private readonly IMcpConsole _console;
     private readonly IMcpToolDispatcher? _dispatcher;
     private readonly IReadOnlyList<McpToolDefinition>? _toolOverrides;
+    private string? _credentialProfilePath;
 
     private bool _initialized;
 
@@ -66,6 +68,12 @@ public sealed class McpApplication
             return McpExitCode.Success;
         }
 
+        if (args.Count == 2 && args[0] == "--credential-profile")
+        {
+            _credentialProfilePath = args[1];
+            return await RunStdioAsync(cancellationToken);
+        }
+
         _console.WriteErrorLine($"unknown argument: {string.Join(" ", args)}");
         _console.WriteErrorLine("Use --help to inspect the current MCP tool surface.");
         return McpExitCode.ArgumentError;
@@ -74,7 +82,7 @@ public sealed class McpApplication
     private async Task<int> RunStdioAsync(CancellationToken cancellationToken)
     {
         using var ownedDispatcher = _dispatcher is null
-            ? ExchangeApiMcpToolDispatcher.CreateDefault(_console)
+            ? ExchangeApiMcpToolDispatcher.CreateDefault(_console, _credentialProfilePath)
             : null;
 
         var dispatcher = _dispatcher ?? ownedDispatcher;
@@ -328,6 +336,7 @@ public sealed class McpApplication
     {
         _console.WriteErrorLine("exchangeapi-mcp");
         _console.WriteErrorLine("ExchangeAPI MCP server for bitFlyer v1 and Binance public klines.");
+        _console.WriteErrorLine($"Options: --credential-profile <path> (default: {BitflyerCredentialResolver.DefaultCredentialProfilePath})");
         _console.WriteErrorLine("Current tools:");
 
         foreach (var tool in _toolOverrides ?? _dispatcher?.Tools ?? ToolCatalog.All)

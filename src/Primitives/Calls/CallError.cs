@@ -4,6 +4,9 @@ public sealed class CallError
 {
     public required string Kind { get; init; }
     public required string Message { get; init; }
+    public int? HttpStatusCode { get; init; }
+    public string? VenueErrorCode { get; init; }
+    public string? VenueErrorMessage { get; init; }
 }
 
 public static class CallErrorKinds

@@ -3,19 +3,32 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Runtime;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetParentOrders;
 
 public interface IGetParentOrdersProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         int? count,
         long? before,
         long? after,
         string? parentOrderState,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
+        string? productCode,
+        int? count,
+        long? before,
+        long? after,
+        string? parentOrderState,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return SendAsync(productCode, count, before, after, parentOrderState, cancellationToken);
+    }
 }
 
 public sealed class GetParentOrdersProtocolEndpoint : IGetParentOrdersProtocolEndpoint
@@ -28,13 +41,37 @@ public sealed class GetParentOrdersProtocolEndpoint : IGetParentOrdersProtocolEn
         _transport = transport;
     }
 
-    public async Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         int? count,
         long? before,
         long? after,
         string? parentOrderState,
         CancellationToken cancellationToken = default)
+    {
+        return SendAsyncCore(productCode, count, before, after, parentOrderState, null, cancellationToken);
+    }
+
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
+        string? productCode,
+        int? count,
+        long? before,
+        long? after,
+        string? parentOrderState,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return SendAsyncCore(productCode, count, before, after, parentOrderState, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsyncCore(
+        string? productCode,
+        int? count,
+        long? before,
+        long? after,
+        string? parentOrderState,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var request = new ProtocolRequest
         {
@@ -50,7 +87,9 @@ public sealed class GetParentOrdersProtocolEndpoint : IGetParentOrdersProtocolEn
             BodyText = null,
         };
 
-        var result = await _transport.SendAsync(request, ProtocolTransportAuthMode.KeySecret, cancellationToken);
+        var result = await (credentialSession is null
+            ? _transport.SendAsync(request, ProtocolTransportAuthMode.KeySecret, cancellationToken)
+            : _transport.SendAsync(request, ProtocolTransportAuthMode.KeySecret, credentialSession, cancellationToken));
         return ProtocolCallFactory.ToProtocolCall(
             request,
             result,

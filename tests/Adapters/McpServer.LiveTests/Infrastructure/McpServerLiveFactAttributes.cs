@@ -36,7 +36,7 @@ internal static class McpServerLiveTestPolicy
 
         if (!BitflyerCredentialResolver.HasConfiguredCredentialsSource())
         {
-            return $"Set {BitflyerCredentialResolver.CredentialsAgeFileEnvName} and {BitflyerCredentialResolver.AgeIdentityFileEnvName} to run MCP server private live tests.";
+            return $"Configure {BitflyerCredentialResolver.DefaultCredentialProfilePath} to run MCP server private live tests.";
         }
 
         return null;

@@ -30,7 +30,7 @@ public sealed class GetHealthNativeEndpointTests
         Assert.Equal(HealthStatuses.Normal, call.Response!.Status);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetHealth", Method = "GET", Path = "/v1/gethealth", Query = null, BodyText = null },

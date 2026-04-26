@@ -8,7 +8,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetChats;
 
 public interface IGetChatsNativeEndpoint
 {
-    Task<Call<GetChatsRequest, IReadOnlyList<GetChats.Item>>> CallAsync(
+    Task<CallResult<GetChatsRequest, IReadOnlyList<GetChats.Item>>> CallAsync(
         GetChatsRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -22,7 +22,7 @@ public sealed class GetChatsNativeEndpoint : IGetChatsNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetChatsRequest, IReadOnlyList<GetChats.Item>>> CallAsync(
+    public async Task<CallResult<GetChatsRequest, IReadOnlyList<GetChats.Item>>> CallAsync(
         GetChatsRequest request,
         CancellationToken cancellationToken = default)
     {

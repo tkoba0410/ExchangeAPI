@@ -13,7 +13,7 @@ public sealed class BinancePublicProtocolApi : IBinancePublicProtocolApi
         _getKlines = getKlines;
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetKlinesCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetKlinesAsync(
         string symbol,
         string interval,
         long? startTime = null,

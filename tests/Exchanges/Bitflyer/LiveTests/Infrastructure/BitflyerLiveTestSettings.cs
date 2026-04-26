@@ -1,4 +1,4 @@
-using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Tests.LiveTests.Infrastructure;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
@@ -14,7 +14,7 @@ internal sealed class BitflyerLiveTestSettings
     public bool EnableProtocolDebugLogging { get; private init; }
     public string ProtocolDebugLogDirectory { get; private init; } = LiveTestLocalPolicy.LocalPath("logs", "bitflyer", "live-tests");
     public Uri BaseUri { get; private init; } = new("https://api.bitflyer.com");
-    public BitflyerApiCredentials? Credentials { get; private init; }
+    public IApiCredentialProvider? ApiCredentialProvider { get; private init; }
 
     public static BitflyerLiveTestSettings Load()
     {
@@ -27,7 +27,7 @@ internal sealed class BitflyerLiveTestSettings
             EnableProtocolDebugLogging = true,
             ProtocolDebugLogDirectory = LiveTestLocalPolicy.LocalPath("logs", "bitflyer", "live-tests"),
             BaseUri = new Uri("https://api.bitflyer.com"),
-            Credentials = credentials,
+            ApiCredentialProvider = credentials,
         };
     }
 }

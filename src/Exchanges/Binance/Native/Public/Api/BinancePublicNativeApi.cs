@@ -12,7 +12,7 @@ public sealed class BinancePublicNativeApi : IBinancePublicNativeApi
         _getKlines = getKlines;
     }
 
-    public Task<Call<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> GetKlinesCallAsync(
+    public Task<CallResult<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> GetKlinesAsync(
         GetKlinesRequest request,
         CancellationToken cancellationToken = default)
     {

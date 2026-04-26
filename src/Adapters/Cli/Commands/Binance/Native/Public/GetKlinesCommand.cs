@@ -178,8 +178,8 @@ public static class GetKlinesCommand
             return created.Failure;
         }
 
-        using var bundle = BinanceClientFactory.CreateNativeClient(created.Options);
-        var call = await bundle.Public.GetKlinesCallAsync((GetKlinesRequest)request, cancellationToken);
+        using var bundle = BinanceClientFactory.CreateNativeClientBundle(created.Options);
+        var call = await bundle.Public.GetKlinesAsync((GetKlinesRequest)request, cancellationToken);
         return ExecutionOutcome.FromCall(new CommandPath("binance", "native", "public", "get-klines"), call);
     }
 

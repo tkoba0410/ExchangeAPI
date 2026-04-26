@@ -5,40 +5,40 @@ namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Api;
 
 public interface IBitflyerPublicProtocolApi
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetMarketsCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetMarketsAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetBoardCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetBoardAsync(
         string? productCode,
         CancellationToken cancellationToken = default);
 
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetBoardStateCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetBoardStateAsync(
         string? productCode,
         CancellationToken cancellationToken = default);
 
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetHealthCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetHealthAsync(
         string? productCode,
         CancellationToken cancellationToken = default);
 
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetFundingRateCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetFundingRateAsync(
         string productCode,
         CancellationToken cancellationToken = default);
 
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetCorporateLeverageCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetCorporateLeverageAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetChatsCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetChatsAsync(
         string? fromDate,
         CancellationToken cancellationToken = default);
 
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetExecutionsCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetExecutionsAsync(
         string? productCode,
         int? count,
         long? before,
         long? after,
         CancellationToken cancellationToken = default);
 
-    Task<Call<ProtocolRequest, ProtocolResponse>> GetTickerCallAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> GetTickerAsync(
         string? productCode,
         CancellationToken cancellationToken = default);
 }

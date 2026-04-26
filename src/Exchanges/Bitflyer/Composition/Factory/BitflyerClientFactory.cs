@@ -13,7 +13,7 @@ public static class BitflyerClientFactory
     /// </summary>
     /// <param name="options">Optional client options. Null uses defaults.</param>
     /// <returns>A protocol bundle for raw/debug-oriented bitFlyer calls.</returns>
-    public static BitflyerProtocolBundle CreateProtocolClient(BitflyerClientOptions? options = null)
+    public static BitflyerProtocolBundle CreateProtocolClientBundle(BitflyerClientOptions? options = null)
     {
         return BitflyerBootstrap.CreateProtocolBundle(options);
     }
@@ -24,7 +24,7 @@ public static class BitflyerClientFactory
     /// <param name="httpClient">The caller-owned HTTP client.</param>
     /// <param name="options">Optional client options. Null uses defaults.</param>
     /// <returns>A protocol bundle for raw/debug-oriented bitFlyer calls.</returns>
-    public static BitflyerProtocolBundle CreateProtocolClient(HttpClient httpClient, BitflyerClientOptions? options = null)
+    public static BitflyerProtocolBundle CreateProtocolClientBundle(HttpClient httpClient, BitflyerClientOptions? options = null)
     {
         return BitflyerBootstrap.CreateProtocolBundle(httpClient, options);
     }
@@ -34,7 +34,7 @@ public static class BitflyerClientFactory
     /// </summary>
     /// <param name="options">Optional client options. Null uses defaults.</param>
     /// <returns>A native bundle for exchange-native bitFlyer calls.</returns>
-    public static BitflyerNativeBundle CreateNativeClient(BitflyerClientOptions? options = null)
+    public static BitflyerNativeBundle CreateNativeClientBundle(BitflyerClientOptions? options = null)
     {
         return BitflyerBootstrap.CreateNativeBundle(options);
     }
@@ -45,7 +45,7 @@ public static class BitflyerClientFactory
     /// <param name="httpClient">The caller-owned HTTP client.</param>
     /// <param name="options">Optional client options. Null uses defaults.</param>
     /// <returns>A native bundle for exchange-native bitFlyer calls.</returns>
-    public static BitflyerNativeBundle CreateNativeClient(HttpClient httpClient, BitflyerClientOptions? options = null)
+    public static BitflyerNativeBundle CreateNativeClientBundle(HttpClient httpClient, BitflyerClientOptions? options = null)
     {
         return BitflyerBootstrap.CreateNativeBundle(httpClient, options);
     }

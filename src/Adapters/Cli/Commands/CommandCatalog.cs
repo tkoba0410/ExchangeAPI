@@ -1,5 +1,5 @@
-using ExchangeApi.Adapters.Cli.Commands.Binance.Protocol.Public;
 using ExchangeApi.Adapters.Cli.Commands.Binance.Native.Public;
+using ExchangeApi.Adapters.Cli.Commands.Binance.Protocol.Public;
 using ExchangeApi.Adapters.Cli.Commands.Bitflyer.Native.Private;
 using ExchangeApi.Adapters.Cli.Commands.Bitflyer.Native.Public;
 using ExchangeApi.Adapters.Cli.Commands.Bitflyer.Protocol.Private;

@@ -79,8 +79,8 @@ public static class GetChatsCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
-        var call = await bundle.Public.GetChatsCallAsync((GetChatsRequest)request, cancellationToken);
+        using var bundle = BitflyerClientFactory.CreateNativeClientBundle(created.Options);
+        var call = await bundle.Public.GetChatsAsync((GetChatsRequest)request, cancellationToken);
         return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "public", "get-chats"), call);
     }
 }

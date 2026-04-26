@@ -12,7 +12,7 @@ public sealed class LiveTests
     public async Task GetKlines_ClosedWindowParity()
     {
         var settings = BinanceLiveTestSettings.Load();
-        var client = BinanceClientFactory.CreateNativeClient(settings.ToClientOptions());
+        var client = BinanceClientFactory.CreateNativeClientBundle(settings.ToClientOptions());
         const long oneHourInMilliseconds = 60L * 60L * 1000L;
         var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var currentHourStart = now - (now % oneHourInMilliseconds);
@@ -25,8 +25,8 @@ public sealed class LiveTests
             EndTime = currentHourStart - 1L,
         };
 
-        var nativeCall = await client.Public.GetKlinesCallAsync(request);
-        var protocolCall = await client.Protocol.Public.GetKlinesCallAsync(
+        var nativeCall = await client.Public.GetKlinesAsync(request);
+        var protocolCall = await client.Protocol.Public.GetKlinesAsync(
             BinanceSymbols.BtcJpy,
             BinanceApiStringEnum<BinanceInterval>.Format(BinanceIntervals.Hour1h),
             startTime: request.StartTime,

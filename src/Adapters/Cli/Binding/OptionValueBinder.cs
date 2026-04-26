@@ -1,5 +1,5 @@
-using ExchangeApi.Adapters.Cli.Infrastructure;
 using System.Globalization;
+using ExchangeApi.Adapters.Cli.Infrastructure;
 
 namespace ExchangeApi.Adapters.Cli.Binding;
 

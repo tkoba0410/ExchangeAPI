@@ -51,8 +51,8 @@ public static class GetFundingRateProtocolCommand
 
         var typed = (ProtocolQueryValues)request;
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
-        var call = await bundle.Public.GetFundingRateCallAsync(
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
+        var call = await bundle.Public.GetFundingRateAsync(
             typed.GetString("product_code")!,
             cancellationToken);
         return ExecutionOutcome.FromProtocolCall(Path, call);

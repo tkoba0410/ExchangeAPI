@@ -7,7 +7,7 @@ namespace ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines;
 
 public interface IGetKlinesNativeEndpoint
 {
-    Task<Call<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> CallAsync(
+    Task<CallResult<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> CallAsync(
         GetKlinesRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -21,7 +21,7 @@ public sealed class GetKlinesNativeEndpoint : IGetKlinesNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> CallAsync(
+    public async Task<CallResult<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> CallAsync(
         GetKlinesRequest request,
         CancellationToken cancellationToken = default)
     {

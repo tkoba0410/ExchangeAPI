@@ -1,12 +1,12 @@
-using BinanceGetKlinesRequest = ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines.GetKlinesRequest;
-using BinanceGetKlines = ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines.GetKlines;
 using ExchangeApi.Primitives.Calls;
+using BinanceGetKlines = ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines.GetKlines;
+using BinanceGetKlinesRequest = ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines.GetKlinesRequest;
 
 namespace ExchangeApi.Adapters.McpServer.Tools.Klines;
 
 public interface IBinanceKlinesGateway
 {
-    Task<Call<BinanceGetKlinesRequest, IReadOnlyList<BinanceGetKlines.Item>>> GetKlinesCallAsync(
+    Task<CallResult<BinanceGetKlinesRequest, IReadOnlyList<BinanceGetKlines.Item>>> GetKlinesAsync(
         BinanceGetKlinesRequest request,
         CancellationToken cancellationToken = default);
 }

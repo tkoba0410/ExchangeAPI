@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetParentOrders;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrders;
 
 public interface IGetParentOrdersNativeEndpoint
 {
-    Task<Call<GetParentOrdersRequest, IReadOnlyList<GetParentOrders.Item>>> CallAsync(
+    Task<CallResult<GetParentOrdersRequest, IReadOnlyList<GetParentOrders.Item>>> CallAsync(
         GetParentOrdersRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetParentOrdersRequest, IReadOnlyList<GetParentOrders.Item>>> CallAsync(
+        GetParentOrdersRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetParentOrdersNativeEndpoint : IGetParentOrdersNativeEndpoint
@@ -21,9 +30,25 @@ public sealed class GetParentOrdersNativeEndpoint : IGetParentOrdersNativeEndpoi
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetParentOrdersRequest, IReadOnlyList<GetParentOrders.Item>>> CallAsync(
+    public Task<CallResult<GetParentOrdersRequest, IReadOnlyList<GetParentOrders.Item>>> CallAsync(
         GetParentOrdersRequest request,
         CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetParentOrdersRequest, IReadOnlyList<GetParentOrders.Item>>> CallAsync(
+        GetParentOrdersRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetParentOrdersRequest, IReadOnlyList<GetParentOrders.Item>>> CallAsyncCore(
+        GetParentOrdersRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var validationError = Validate(request);
         if (validationError is not null)
@@ -37,13 +62,12 @@ public sealed class GetParentOrdersNativeEndpoint : IGetParentOrdersNativeEndpoi
                 auth: "KeySecret");
         }
 
-        var protocolCall = await _protocolEndpoint.SendAsync(
-            request.ProductCode,
-            request.Count,
-            request.Before,
-            request.After,
-            request.ParentOrderState is { } parentOrderState ? ApiStringEnum<BitflyerOrderState>.Format(parentOrderState) : null,
-            cancellationToken);
+        var parentOrderStateText = request.ParentOrderState is { } parentOrderState
+            ? ApiStringEnum<BitflyerOrderState>.Format(parentOrderState)
+            : null;
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(request.ProductCode, request.Count, request.Before, request.After, parentOrderStateText, cancellationToken)
+            : _protocolEndpoint.SendAsync(request.ProductCode, request.Count, request.Before, request.After, parentOrderStateText, credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<GetParentOrdersRequest, IReadOnlyList<GetParentOrders.Item>>(

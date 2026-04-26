@@ -53,7 +53,7 @@ public static class GetParentOrdersProtocolCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
         if (bundle.Private is null)
         {
             return ExecutionOutcome.InputError(
@@ -62,7 +62,7 @@ public static class GetParentOrdersProtocolCommand
         }
 
         var typed = (ProtocolQueryValues)request;
-        var call = await bundle.Private.GetParentOrdersCallAsync(
+        var call = await bundle.Private.GetParentOrdersAsync(
             typed.GetString("product_code"),
             typed.GetInt("count"),
             typed.GetLong("before"),

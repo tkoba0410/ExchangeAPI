@@ -3,6 +3,7 @@ using System.Text;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Auth;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Shared;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Runtime;
@@ -12,21 +13,18 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
     private readonly HttpClient _httpClient;
     private readonly Uri _baseUri;
     private readonly IProtocolDebugLogger _debugLogger;
-    private readonly string? _apiKey;
-    private readonly string? _apiSecret;
+    private readonly IApiCredentialProvider? _apiCredentialProvider;
     private readonly TimeSpan? _requestTimeout;
 
     public BitflyerProtocolTransport(
         HttpClient httpClient,
         IProtocolDebugLogger debugLogger,
-        string? apiKey,
-        string? apiSecret)
+        IApiCredentialProvider? apiCredentialProvider)
         : this(
             httpClient,
             httpClient.BaseAddress ?? throw new ArgumentException("HttpClient.BaseAddress is required when using this constructor.", nameof(httpClient)),
             debugLogger,
-            apiKey,
-            apiSecret,
+            apiCredentialProvider,
             null)
     {
     }
@@ -35,8 +33,7 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
         HttpClient httpClient,
         Uri baseUri,
         IProtocolDebugLogger debugLogger,
-        string? apiKey,
-        string? apiSecret,
+        IApiCredentialProvider? apiCredentialProvider,
         TimeSpan? requestTimeout = null)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
@@ -56,8 +53,7 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
         _httpClient = httpClient;
         _baseUri = baseUri;
         _debugLogger = debugLogger;
-        _apiKey = apiKey;
-        _apiSecret = apiSecret;
+        _apiCredentialProvider = apiCredentialProvider;
         _requestTimeout = requestTimeout;
     }
 
@@ -65,6 +61,60 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
         ProtocolRequest request,
         ProtocolTransportAuthMode authMode,
         CancellationToken cancellationToken = default)
+    {
+        if (authMode != ProtocolTransportAuthMode.KeySecret)
+        {
+            return await SendCoreAsync(request, authMode, credentialSession: null, cancellationToken);
+        }
+
+        if (_apiCredentialProvider is null)
+        {
+            return new ProtocolTransportResult
+            {
+                IsSuccess = false,
+                Error = new CallError
+                {
+                    Kind = CallErrorKinds.Transport,
+                    Message = "Private credentials are required.",
+                },
+            };
+        }
+
+        try
+        {
+            await using var credentialSession = await _apiCredentialProvider.OpenSessionAsync(cancellationToken);
+            return await SendCoreAsync(request, authMode, credentialSession, cancellationToken);
+        }
+        catch (ApiCredentialException ex)
+        {
+            return new ProtocolTransportResult
+            {
+                IsSuccess = false,
+                Error = new CallError
+                {
+                    Kind = CallErrorKinds.Transport,
+                    Message = ex.Message,
+                    VenueErrorCode = ex.Kind.ToString(),
+                },
+            };
+        }
+    }
+
+    public Task<ProtocolTransportResult> SendAsync(
+        ProtocolRequest request,
+        ProtocolTransportAuthMode authMode,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(credentialSession);
+        return SendCoreAsync(request, authMode, credentialSession, cancellationToken);
+    }
+
+    private async Task<ProtocolTransportResult> SendCoreAsync(
+        ProtocolRequest request,
+        ProtocolTransportAuthMode authMode,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         using var requestCancellation = RequestCancellationScope.Create(cancellationToken, _requestTimeout);
 
@@ -82,7 +132,7 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
 
             if (authMode == ProtocolTransportAuthMode.KeySecret)
             {
-                if (string.IsNullOrWhiteSpace(_apiKey) || string.IsNullOrWhiteSpace(_apiSecret))
+                if (credentialSession is null)
                 {
                     return new ProtocolTransportResult
                     {
@@ -100,8 +150,7 @@ public sealed class BitflyerProtocolTransport : IProtocolTransport
                     request.Method,
                     pathAndQuery,
                     bodyText,
-                    _apiKey,
-                    _apiSecret);
+                    credentialSession);
             }
 
             using var response = await _httpClient.SendAsync(message, requestCancellation.EffectiveToken);

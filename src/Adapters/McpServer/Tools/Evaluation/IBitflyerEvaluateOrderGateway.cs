@@ -8,18 +8,18 @@ namespace ExchangeApi.Adapters.McpServer.Tools.Evaluation;
 
 public interface IBitflyerEvaluateOrderGateway
 {
-    Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+    Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceCallAsync(
+    Task<CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+    Task<CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 }

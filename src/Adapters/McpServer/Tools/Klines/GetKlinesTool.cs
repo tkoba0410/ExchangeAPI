@@ -4,9 +4,9 @@ using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Exchanges.Binance.Vocabulary;
-using BinanceGetKlinesRequest = ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines.GetKlinesRequest;
-using BinanceGetKlines = ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines.GetKlines;
 using ExchangeApi.Primitives.Calls;
+using BinanceGetKlines = ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines.GetKlines;
+using BinanceGetKlinesRequest = ExchangeApi.Exchanges.Binance.Native.Public.Endpoints.GetKlines.GetKlinesRequest;
 
 namespace ExchangeApi.Adapters.McpServer.Tools.Klines;
 
@@ -45,7 +45,7 @@ public sealed class GetKlinesTool
             Limit = normalized.Limit,
         };
 
-        var call = await _gateway.GetKlinesCallAsync(nativeRequest, cancellationToken);
+        var call = await _gateway.GetKlinesAsync(nativeRequest, cancellationToken);
         if (!call.IsSuccess || call.Response is null)
         {
             return McpToolExecutionResult<GetKlinesResponse>.Failure(

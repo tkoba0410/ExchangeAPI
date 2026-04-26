@@ -34,6 +34,10 @@
   <Folder Name="/src/Exchanges/Bitflyer/Vocabulary/">
     <Project Path="src/Exchanges/Bitflyer/Vocabulary/ExchangeApi.Exchanges.Bitflyer.Vocabulary.csproj" />
   </Folder>
+  <Folder Name="/src/Optional/" />
+  <Folder Name="/src/Optional/Credentials/">
+    <Project Path="src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj" />
+  </Folder>
   <Folder Name="/src/Primitives/">
     <Project Path="src/Primitives/ExchangeApi.Primitives.csproj" />
   </Folder>
@@ -50,6 +54,10 @@
   </Folder>
   <Folder Name="/tests/Primitives.Tests/">
     <Project Path="tests/Primitives.Tests/ExchangeApi.Primitives.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Optional/" />
+  <Folder Name="/tests/Optional/Credentials.Tests/">
+    <Project Path="tests/Optional/Credentials.Tests/ExchangeApi.Optional.Credentials.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/Exchanges/" />
   <Folder Name="/tests/Exchanges/Binance/" />

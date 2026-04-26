@@ -54,8 +54,8 @@ public static class GetExecutionsPublicProtocolCommand
 
         var typed = (ProtocolQueryValues)request;
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
-        var call = await bundle.Public.GetExecutionsCallAsync(
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
+        var call = await bundle.Public.GetExecutionsAsync(
             typed.GetString("product_code"),
             typed.GetInt("count"),
             typed.GetLong("before"),

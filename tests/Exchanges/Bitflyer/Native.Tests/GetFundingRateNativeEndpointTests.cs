@@ -41,7 +41,7 @@ public sealed class GetFundingRateNativeEndpointTests
         Assert.Equal(new DateTimeOffset(2026, 3, 26, 6, 0, 0, TimeSpan.Zero), call.Response!.NextFundingRateSettleDate);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetFundingRate", Method = "GET", Path = "/v1/getfundingrate", Query = null, BodyText = null },

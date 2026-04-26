@@ -24,11 +24,11 @@ public sealed class BitflyerNativeEvaluateMarginOrderGateway : IBitflyerEvaluate
         _privateApi = privateApi;
     }
 
-    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    public Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return _publicApi.GetTickerCallAsync(
+        return _publicApi.GetTickerAsync(
             new GetTickerRequest
             {
                 ProductCode = symbol,
@@ -36,11 +36,11 @@ public sealed class BitflyerNativeEvaluateMarginOrderGateway : IBitflyerEvaluate
             cancellationToken);
     }
 
-    public Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+    public Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return _publicApi.GetBoardStateCallAsync(
+        return _publicApi.GetBoardStateAsync(
             new GetBoardStateRequest
             {
                 ProductCode = symbol,
@@ -48,17 +48,17 @@ public sealed class BitflyerNativeEvaluateMarginOrderGateway : IBitflyerEvaluate
             cancellationToken);
     }
 
-    public Task<Call<GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(
+    public Task<CallResult<GetCollateralRequest, GetCollateralResponse>> GetCollateralAsync(
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetCollateralCallAsync(new GetCollateralRequest(), cancellationToken);
+        return _privateApi.GetCollateralAsync(new GetCollateralRequest(), cancellationToken);
     }
 
-    public Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsCallAsync(
+    public Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetPositionsCallAsync(
+        return _privateApi.GetPositionsAsync(
             new GetPositionsRequest
             {
                 ProductCode = symbol,
@@ -66,11 +66,11 @@ public sealed class BitflyerNativeEvaluateMarginOrderGateway : IBitflyerEvaluate
             cancellationToken);
     }
 
-    public Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+    public Task<CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return _privateApi.GetChildOrdersCallAsync(
+        return _privateApi.GetChildOrdersAsync(
             new GetChildOrdersRequest
             {
                 ProductCode = symbol,
@@ -79,10 +79,10 @@ public sealed class BitflyerNativeEvaluateMarginOrderGateway : IBitflyerEvaluate
             cancellationToken);
     }
 
-    public Task<Call<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
+    public Task<CallResult<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageAsync(
         CancellationToken cancellationToken = default)
     {
-        return _publicApi.GetCorporateLeverageCallAsync(
+        return _publicApi.GetCorporateLeverageAsync(
             new GetCorporateLeverageRequest(),
             cancellationToken);
     }

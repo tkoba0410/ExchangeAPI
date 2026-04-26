@@ -1,15 +1,16 @@
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Runtime;
-using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelAllChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBalance;
-using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateral;
-using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralHistory;
-using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAccounts;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateral;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAccounts;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralHistory;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Protocol.Tests.Fakes;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Protocol.Tests;
@@ -28,6 +29,21 @@ public sealed class PrivateProtocolEndpointTests
         Assert.Equal(ProtocolTransportAuthMode.KeySecret, transport.LastAuthMode);
         Assert.Equal("/v1/me/getbalance", transport.LastRequest!.Path);
         Assert.Null(transport.LastRequest.BodyText);
+    }
+
+    [Fact]
+    public async Task GetBalance_ExplicitSession_UsesProvidedCredentialSession()
+    {
+        var transport = new FakeProtocolTransport();
+        var endpoint = new GetBalanceProtocolEndpoint(transport);
+        await using var credentialSession = new FakeCredentialSession();
+
+        var call = await endpoint.SendAsync(credentialSession);
+
+        Assert.True(call.IsSuccess);
+        Assert.Same(credentialSession, transport.LastCredentialSession);
+        Assert.Equal(ProtocolTransportAuthMode.KeySecret, transport.LastAuthMode);
+        Assert.Equal("/v1/me/getbalance", transport.LastRequest!.Path);
     }
 
     [Fact]
@@ -191,5 +207,20 @@ public sealed class PrivateProtocolEndpointTests
         Assert.Equal(ProtocolTransportAuthMode.KeySecret, transport.LastAuthMode);
         Assert.Equal("/v1/me/cancelallchildorders", transport.LastRequest!.Path);
         Assert.Equal("{\"x\":1}", transport.LastRequest.BodyText);
+    }
+}
+
+internal sealed class FakeCredentialSession : IApiCredentialSession
+{
+    public string ApiKey => "fake-key";
+
+    public string Sign(string payload)
+    {
+        return $"signed:{payload}";
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
     }
 }

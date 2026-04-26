@@ -48,7 +48,7 @@ public sealed class GetMarketsNativeEndpointTests
         Assert.Equal(CallErrorKinds.Codec, call.Error!.Kind);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetMarkets", Method = "GET", Path = "/v1/getmarkets", Query = null, BodyText = null },
@@ -56,7 +56,7 @@ public sealed class GetMarketsNativeEndpointTests
             new CallMeta { Layer = CallLayers.Protocol, Component = CallComponents.PublicEndpointModule, EndpointId = "GetMarkets", Scope = "Public", Auth = "None" });
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> FailureProtocolCall(int statusCode, string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> FailureProtocolCall(int statusCode, string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetMarkets", Method = "GET", Path = "/v1/getmarkets", Query = null, BodyText = null },

@@ -6,7 +6,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Shared;
 
 internal static class ProtocolCallFactory
 {
-    internal static Call<ProtocolRequest, ProtocolResponse> ToProtocolCall(
+    internal static CallResult<ProtocolRequest, ProtocolResponse> ToProtocolCall(
         ProtocolRequest request,
         ProtocolTransportResult result,
         string scope,

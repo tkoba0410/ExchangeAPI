@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 
 public interface IGetPositionsNativeEndpoint
 {
-    Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> CallAsync(
+    Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> CallAsync(
         GetPositionsRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> CallAsync(
+        GetPositionsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetPositionsNativeEndpoint : IGetPositionsNativeEndpoint
@@ -21,9 +30,25 @@ public sealed class GetPositionsNativeEndpoint : IGetPositionsNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> CallAsync(
+    public Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> CallAsync(
         GetPositionsRequest request,
         CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> CallAsync(
+        GetPositionsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> CallAsyncCore(
+        GetPositionsRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var validationError = Validate(request);
         if (validationError is not null)
@@ -37,7 +62,9 @@ public sealed class GetPositionsNativeEndpoint : IGetPositionsNativeEndpoint
                 auth: "KeySecret");
         }
 
-        var protocolCall = await _protocolEndpoint.SendAsync(request.ProductCode, cancellationToken);
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(request.ProductCode, cancellationToken)
+            : _protocolEndpoint.SendAsync(request.ProductCode, credentialSession, cancellationToken));
         if (!protocolCall.IsSuccess)
         {
             return NativeCallFactory.Failure<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>(

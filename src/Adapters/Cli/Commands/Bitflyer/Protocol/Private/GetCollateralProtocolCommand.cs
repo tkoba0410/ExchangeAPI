@@ -46,7 +46,7 @@ public static class GetCollateralProtocolCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
         if (bundle.Private is null)
         {
             return ExecutionOutcome.InputError(
@@ -54,7 +54,7 @@ public static class GetCollateralProtocolCommand
                 BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
-        var call = await bundle.Private.GetCollateralCallAsync(cancellationToken);
+        var call = await bundle.Private.GetCollateralAsync(cancellationToken);
         return ExecutionOutcome.FromProtocolCall(Path, call);
     }
 }

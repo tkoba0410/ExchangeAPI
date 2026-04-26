@@ -1,16 +1,17 @@
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelAllChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Protocol;
 using ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Fakes;
 
@@ -29,6 +30,20 @@ public sealed class PrivateNativeEndpointTests
         Assert.True(call.IsSuccess);
         Assert.Single(call.Response!);
         Assert.Equal("JPY", call.Response![0].CurrencyCode);
+    }
+
+    [Fact]
+    public async Task GetBalance_ExplicitSession_ForwardsCredentialSession()
+    {
+        var body = """[{"currency_code":"JPY","amount":10,"available":5}]""";
+        var protocolEndpoint = new FakeGetBalanceProtocolEndpoint(Success("GetBalance", "GET", "/v1/me/getbalance", body));
+        var endpoint = new GetBalanceNativeEndpoint(protocolEndpoint);
+        await using var credentialSession = new FakeCredentialSession();
+
+        var call = await endpoint.CallAsync(new GetBalanceRequest(), credentialSession);
+
+        Assert.True(call.IsSuccess);
+        Assert.Same(credentialSession, protocolEndpoint.LastCredentialSession);
     }
 
     [Fact]
@@ -502,11 +517,26 @@ public sealed class PrivateNativeEndpointTests
         Assert.Contains("product_code", fake.LastBodyJson!, StringComparison.Ordinal);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> Success(string endpointId, string method, string path, string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> Success(string endpointId, string method, string path, string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = endpointId, Method = method, Path = path, Query = null, BodyText = null },
             new ProtocolResponse { StatusCode = 200, Headers = new Dictionary<string, string[]>(), BodyText = bodyText },
             new CallMeta { Layer = CallLayers.Protocol, Component = CallComponents.PrivateEndpointModule, EndpointId = endpointId, Scope = "Private", Auth = "KeySecret" });
+    }
+}
+
+internal sealed class FakeCredentialSession : IApiCredentialSession
+{
+    public string ApiKey => "fake-key";
+
+    public string Sign(string payload)
+    {
+        return $"signed:{payload}";
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
     }
 }

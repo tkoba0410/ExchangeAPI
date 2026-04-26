@@ -1,50 +1,78 @@
-using ExchangeApi.Exchanges.Bitflyer.Composition.Credentials;
-using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
+using ExchangeApi.Optional.Credentials;
+using ExchangeApi.Optional.Credentials.Profiles;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests.Infrastructure;
 
 internal static class BitflyerCredentialResolver
 {
-    private const string CredentialsAgeFileEnvName = BitflyerAgeCredentialResolver.CredentialsAgeFileEnvName;
-    private const string AgeIdentityFileEnvName = BitflyerAgeCredentialResolver.AgeIdentityFileEnvName;
+    public static readonly string DefaultCredentialProfilePath = CredentialProfileDefaults.DefaultProfilePath;
 
     public static bool HasConfiguredCredentialsSource()
     {
-        return BitflyerAgeCredentialResolver.HasConfiguredCredentialsSource(
-            Environment.GetEnvironmentVariable,
-            File.Exists,
-            AgeProcessCredentialHelper.IsAvailable);
+        var profilePath = CredentialProfileDefaults.ResolveDefaultProfilePath();
+        if (!File.Exists(profilePath) || !TryResolveAgeExecutable(out var ageExecutablePath))
+        {
+            return false;
+        }
+
+        try
+        {
+            var profile = CredentialProfileLoader.Load(profilePath);
+            _ = CredentialProfileProviderFactory.Create(
+                profile,
+                ExchangeVenue.Bitflyer,
+                profilePath,
+                new ExchangeApi.Optional.Credentials.AgeFile.AgeCliCredentialFileDecryptor(ageExecutablePath));
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException or System.Text.Json.JsonException)
+        {
+            return false;
+        }
     }
 
-    public static BitflyerApiCredentials? Load()
+    public static IApiCredentialProvider? Load()
     {
         if (!TryResolveAgeExecutable(out var ageExecutablePath))
         {
             throw new InvalidOperationException(
-                $"The 'age' executable was not found on PATH. Set {CredentialsAgeFileEnvName}/{AgeIdentityFileEnvName}, or install age.");
+                $"The 'age' executable was not found on PATH. Configure {DefaultCredentialProfilePath}, or install age.");
         }
 
-        var resolution = BitflyerAgeCredentialResolver.Resolve(
-            Environment.GetEnvironmentVariable,
-            File.Exists,
-            () => true,
-            (identityFilePath, credentialsFilePath) => AgeProcessCredentialHelper.Decrypt(ageExecutablePath, identityFilePath, credentialsFilePath));
-
-        if (resolution.Credentials is not null)
+        var profilePath = CredentialProfileDefaults.ResolveDefaultProfilePath();
+        if (!File.Exists(profilePath))
         {
-            return resolution.Credentials;
+            return null;
         }
 
-        if (resolution.HasFailure)
-        {
-            throw new InvalidOperationException(resolution.ErrorMessage);
-        }
-
-        return null;
+        var profile = CredentialProfileLoader.Load(profilePath);
+        return CredentialProfileProviderFactory.Create(
+            profile,
+            ExchangeVenue.Bitflyer,
+            profilePath,
+            new ExchangeApi.Optional.Credentials.AgeFile.AgeCliCredentialFileDecryptor(ageExecutablePath));
     }
 
     private static bool TryResolveAgeExecutable(out string executablePath)
     {
-        return AgeProcessCredentialHelper.TryResolveExecutablePath(out executablePath);
+        executablePath = "age";
+        var pathValue = Environment.GetEnvironmentVariable("PATH");
+        if (string.IsNullOrWhiteSpace(pathValue))
+        {
+            return false;
+        }
+
+        foreach (var directory in pathValue.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var candidate = Path.Combine(directory, "age");
+            if (File.Exists(candidate))
+            {
+                executablePath = candidate;
+                return true;
+            }
+        }
+
+        return false;
     }
 }

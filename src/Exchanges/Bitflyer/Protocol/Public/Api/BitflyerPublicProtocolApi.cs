@@ -46,54 +46,54 @@ public sealed class BitflyerPublicProtocolApi : IBitflyerPublicProtocolApi
         _getTicker = getTicker;
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetMarketsCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetMarketsAsync(
         CancellationToken cancellationToken = default)
     {
         return _getMarkets.SendAsync(cancellationToken);
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetBoardCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetBoardAsync(
         string? productCode,
         CancellationToken cancellationToken = default)
     {
         return _getBoard.SendAsync(productCode, cancellationToken);
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetBoardStateCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetBoardStateAsync(
         string? productCode,
         CancellationToken cancellationToken = default)
     {
         return _getBoardState.SendAsync(productCode, cancellationToken);
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetHealthCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetHealthAsync(
         string? productCode,
         CancellationToken cancellationToken = default)
     {
         return _getHealth.SendAsync(productCode, cancellationToken);
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetFundingRateCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetFundingRateAsync(
         string productCode,
         CancellationToken cancellationToken = default)
     {
         return _getFundingRate.SendAsync(productCode, cancellationToken);
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetCorporateLeverageCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetCorporateLeverageAsync(
         CancellationToken cancellationToken = default)
     {
         return _getCorporateLeverage.SendAsync(cancellationToken);
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetChatsCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetChatsAsync(
         string? fromDate,
         CancellationToken cancellationToken = default)
     {
         return _getChats.SendAsync(fromDate, cancellationToken);
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetExecutionsCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetExecutionsAsync(
         string? productCode,
         int? count,
         long? before,
@@ -103,7 +103,7 @@ public sealed class BitflyerPublicProtocolApi : IBitflyerPublicProtocolApi
         return _getExecutions.SendAsync(productCode, count, before, after, cancellationToken);
     }
 
-    public Task<Call<ProtocolRequest, ProtocolResponse>> GetTickerCallAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> GetTickerAsync(
         string? productCode,
         CancellationToken cancellationToken = default)
     {

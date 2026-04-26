@@ -54,12 +54,12 @@ public sealed class EvaluateMarginOrderTool
             return McpToolExecutionResult<EvaluateMarginOrderResponse>.Failure(ruleError!);
         }
 
-        var tickerTask = _gateway.GetTickerCallAsync(normalized.Symbol, cancellationToken);
-        var boardStateTask = _gateway.GetBoardStateCallAsync(normalized.Symbol, cancellationToken);
-        var collateralTask = _gateway.GetCollateralCallAsync(cancellationToken);
-        var positionsTask = _gateway.GetPositionsCallAsync(normalized.Symbol, cancellationToken);
-        var activeOrdersTask = _gateway.GetActiveChildOrdersCallAsync(normalized.Symbol, cancellationToken);
-        var leverageTask = _gateway.GetCorporateLeverageCallAsync(cancellationToken);
+        var tickerTask = _gateway.GetTickerAsync(normalized.Symbol, cancellationToken);
+        var boardStateTask = _gateway.GetBoardStateAsync(normalized.Symbol, cancellationToken);
+        var collateralTask = _gateway.GetCollateralAsync(cancellationToken);
+        var positionsTask = _gateway.GetPositionsAsync(normalized.Symbol, cancellationToken);
+        var activeOrdersTask = _gateway.GetActiveChildOrdersAsync(normalized.Symbol, cancellationToken);
+        var leverageTask = _gateway.GetCorporateLeverageAsync(cancellationToken);
 
         await Task.WhenAll(tickerTask, boardStateTask, collateralTask, positionsTask, activeOrdersTask, leverageTask);
 

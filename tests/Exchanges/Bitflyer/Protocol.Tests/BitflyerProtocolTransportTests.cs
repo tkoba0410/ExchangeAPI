@@ -2,6 +2,7 @@ using System.Net;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Runtime;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Shared;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Protocol.Tests;
@@ -17,8 +18,7 @@ public sealed class BitflyerProtocolTransportTests
             httpClient,
             new Uri("https://api.bitflyer.com"),
             new NoOpProtocolDebugLogger(),
-            apiKey: null,
-            apiSecret: null);
+            apiCredentialProvider: null);
 
         var result = await transport.SendAsync(new ProtocolRequest
         {
@@ -45,8 +45,7 @@ public sealed class BitflyerProtocolTransportTests
             httpClient,
             new Uri("https://api.bitflyer.com"),
             new NoOpProtocolDebugLogger(),
-            apiKey: null,
-            apiSecret: null,
+            apiCredentialProvider: null,
             requestTimeout);
 
         var result = await transport.SendAsync(new ProtocolRequest
@@ -59,6 +58,33 @@ public sealed class BitflyerProtocolTransportTests
         Assert.False(result.IsSuccess);
         Assert.Equal(CallErrorKinds.Transport, result.Error!.Kind);
         Assert.Equal($"Request timed out after {requestTimeout:c}.", result.Error.Message);
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenCredentialProviderFails_ReturnsSanitizedTransportError()
+    {
+        var handler = new RecordingHandler();
+        using var httpClient = new HttpClient(handler);
+        var transport = new BitflyerProtocolTransport(
+            httpClient,
+            new Uri("https://api.bitflyer.com"),
+            new NoOpProtocolDebugLogger(),
+            new FailingCredentialProvider());
+
+        var result = await transport.SendAsync(new ProtocolRequest
+        {
+            EndpointId = "GetBalance",
+            Method = "GET",
+            Path = "/v1/me/getbalance",
+        }, ProtocolTransportAuthMode.KeySecret);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(CallErrorKinds.Transport, result.Error!.Kind);
+        Assert.Equal(nameof(ApiCredentialErrorKind.DecryptFailed), result.Error.VenueErrorCode);
+        Assert.Contains("credential source could not be opened", result.Error.Message);
+        Assert.DoesNotContain("api-key", result.Error.Message, StringComparison.Ordinal);
+        Assert.DoesNotContain("api-secret", result.Error.Message, StringComparison.Ordinal);
+        Assert.Null(handler.LastRequestUri);
     }
 
     private sealed class RecordingHandler : HttpMessageHandler
@@ -83,6 +109,16 @@ public sealed class BitflyerProtocolTransportTests
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
 
             return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+    }
+
+    private sealed class FailingCredentialProvider : IApiCredentialProvider
+    {
+        public ValueTask<IApiCredentialSession> OpenSessionAsync(CancellationToken cancellationToken = default)
+        {
+            throw new ApiCredentialException(
+                ApiCredentialErrorKind.DecryptFailed,
+                "credential source could not be opened");
         }
     }
 }

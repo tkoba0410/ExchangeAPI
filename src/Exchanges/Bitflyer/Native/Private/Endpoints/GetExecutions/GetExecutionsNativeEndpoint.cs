@@ -2,14 +2,23 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 
 public interface IGetExecutionsNativeEndpoint
 {
-    Task<Call<GetExecutionsRequest, IReadOnlyList<GetExecutions.Item>>> CallAsync(
+    Task<CallResult<GetExecutionsRequest, IReadOnlyList<GetExecutions.Item>>> CallAsync(
         GetExecutionsRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<GetExecutionsRequest, IReadOnlyList<GetExecutions.Item>>> CallAsync(
+        GetExecutionsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsync(request, cancellationToken);
+    }
 }
 
 public sealed class GetExecutionsNativeEndpoint : IGetExecutionsNativeEndpoint
@@ -21,9 +30,25 @@ public sealed class GetExecutionsNativeEndpoint : IGetExecutionsNativeEndpoint
         _protocolEndpoint = protocolEndpoint;
     }
 
-    public async Task<Call<GetExecutionsRequest, IReadOnlyList<GetExecutions.Item>>> CallAsync(
+    public Task<CallResult<GetExecutionsRequest, IReadOnlyList<GetExecutions.Item>>> CallAsync(
         GetExecutionsRequest request,
         CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, null, cancellationToken);
+    }
+
+    public Task<CallResult<GetExecutionsRequest, IReadOnlyList<GetExecutions.Item>>> CallAsync(
+        GetExecutionsRequest request,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return CallAsyncCore(request, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<GetExecutionsRequest, IReadOnlyList<GetExecutions.Item>>> CallAsyncCore(
+        GetExecutionsRequest request,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var validationError = Validate(request);
         if (validationError is not null)
@@ -37,14 +62,9 @@ public sealed class GetExecutionsNativeEndpoint : IGetExecutionsNativeEndpoint
                 auth: "KeySecret");
         }
 
-        var protocolCall = await _protocolEndpoint.SendAsync(
-            request.ProductCode,
-            request.Count,
-            request.Before,
-            request.After,
-            request.ChildOrderId,
-            request.ChildOrderAcceptanceId,
-            cancellationToken);
+        var protocolCall = await (credentialSession is null
+            ? _protocolEndpoint.SendAsync(request.ProductCode, request.Count, request.Before, request.After, request.ChildOrderId, request.ChildOrderAcceptanceId, cancellationToken)
+            : _protocolEndpoint.SendAsync(request.ProductCode, request.Count, request.Before, request.After, request.ChildOrderId, request.ChildOrderAcceptanceId, credentialSession, cancellationToken));
 
         if (!protocolCall.IsSuccess)
         {

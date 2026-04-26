@@ -43,7 +43,7 @@ public sealed class GetBoardStateNativeEndpointTests
         Assert.Equal(CallErrorKinds.Codec, call.Error!.Kind);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetBoardState", Method = "GET", Path = "/v1/getboardstate", Query = null, BodyText = null },

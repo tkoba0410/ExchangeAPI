@@ -1,61 +1,112 @@
-using ExchangeApi.Exchanges.Bitflyer.Composition.Credentials;
-using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
+using ExchangeApi.Optional.Credentials;
+using ExchangeApi.Optional.Credentials.AgeFile;
+using ExchangeApi.Optional.Credentials.Profiles;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Adapters.McpServer.Configuration;
 
 public static class BitflyerCredentialResolver
 {
-    public const int CanonicalVersion = BitflyerAgeCredentialResolver.CanonicalVersion;
-    public const string CanonicalVenue = BitflyerAgeCredentialResolver.CanonicalVenue;
-    public const string AgeIdentityFileEnvName = BitflyerAgeCredentialResolver.AgeIdentityFileEnvName;
-    public const string CredentialsAgeFileEnvName = BitflyerAgeCredentialResolver.CredentialsAgeFileEnvName;
+    public const int CanonicalVersion = 1;
+    public const string CanonicalVenue = "bitflyer";
+    public const string CredentialProfileOptionName = "credential-profile";
+    public static readonly string DefaultCredentialProfilePath = CredentialProfileDefaults.DefaultProfilePath;
+    public static readonly string AuthenticationRequirementText =
+        $"--{CredentialProfileOptionName} / {CredentialProfileDefaults.DefaultProfilePath}";
 
     public static bool HasConfiguredCredentialsSource()
     {
-        return BitflyerAgeCredentialResolver.HasConfiguredCredentialsSource(
-            Environment.GetEnvironmentVariable,
-            File.Exists,
-            AgeProcessCredentialHelper.IsAvailable);
+        return HasConfiguredCredentialsSource(null);
+    }
+
+    public static bool HasConfiguredCredentialsSource(string? credentialProfilePath)
+    {
+        var profilePath = ResolveProfilePath(credentialProfilePath);
+        if (!File.Exists(profilePath))
+        {
+            return false;
+        }
+
+        try
+        {
+            var profile = CredentialProfileLoader.Load(profilePath);
+            _ = CredentialProfileProviderFactory.Create(profile, ExchangeVenue.Bitflyer, profilePath);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException or System.Text.Json.JsonException)
+        {
+            return false;
+        }
     }
 
     public static BitflyerCredentialResolution Resolve()
     {
-        return FromCommonResolution(
-            BitflyerAgeCredentialResolver.Resolve(
-                Environment.GetEnvironmentVariable,
-                File.Exists,
-                AgeProcessCredentialHelper.IsAvailable,
-                AgeProcessCredentialHelper.Decrypt));
+        return Resolve(null);
     }
 
-    private static BitflyerCredentialResolution FromCommonResolution(BitflyerAgeCredentialResolution resolution)
+    public static BitflyerCredentialResolution Resolve(string? credentialProfilePath)
     {
-        if (resolution.Credentials is not null)
+        var profilePath = ResolveProfilePath(credentialProfilePath);
+        var explicitProfilePath = !string.IsNullOrWhiteSpace(credentialProfilePath);
+
+        if (!File.Exists(profilePath))
         {
-            return BitflyerCredentialResolution.Success(resolution.Credentials);
+            if (explicitProfilePath)
+            {
+                return BitflyerCredentialResolution.Failure($"Credential profile does not exist: {profilePath}");
+            }
+
+            return BitflyerCredentialResolution.None();
         }
 
-        return resolution.HasFailure
-            ? BitflyerCredentialResolution.Failure(resolution.ErrorMessage!)
-            : BitflyerCredentialResolution.None();
+        if (!CredentialProfileLoader.TryLoad(profilePath, out var profile, out var errorMessage))
+        {
+            return BitflyerCredentialResolution.Failure($"Invalid credential profile: {errorMessage}");
+        }
+
+        try
+        {
+            return BitflyerCredentialResolution.Success(
+                CredentialProfileProviderFactory.Create(
+                    profile!,
+                    ExchangeVenue.Bitflyer,
+                    profilePath,
+                    new AgeCliCredentialFileDecryptor()));
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
+        {
+            return BitflyerCredentialResolution.Failure(ex.Message);
+        }
+    }
+
+    public static string BuildMissingCredentialMessage()
+    {
+        return CredentialProfileDefaults.GetMissingCredentialMessage(ExchangeVenue.Bitflyer);
+    }
+
+    private static string ResolveProfilePath(string? credentialProfilePath)
+    {
+        return string.IsNullOrWhiteSpace(credentialProfilePath)
+            ? CredentialProfileDefaults.ResolveDefaultProfilePath()
+            : credentialProfilePath;
     }
 }
 
 public sealed class BitflyerCredentialResolution
 {
-    private BitflyerCredentialResolution(BitflyerApiCredentials? credentials, string? errorMessage)
+    private BitflyerCredentialResolution(IApiCredentialProvider? credentials, string? errorMessage)
     {
         Credentials = credentials;
         ErrorMessage = errorMessage;
     }
 
-    public BitflyerApiCredentials? Credentials { get; }
+    public IApiCredentialProvider? Credentials { get; }
 
     public string? ErrorMessage { get; }
 
     public bool HasFailure => !string.IsNullOrWhiteSpace(ErrorMessage);
 
-    public static BitflyerCredentialResolution Success(BitflyerApiCredentials credentials)
+    public static BitflyerCredentialResolution Success(IApiCredentialProvider credentials)
     {
         return new BitflyerCredentialResolution(credentials, null);
     }

@@ -3,18 +3,30 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Runtime;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBalanceHistory;
 
 public interface IGetBalanceHistoryProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? currencyCode,
         int? count,
         long? before,
         long? after,
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
+        string? currencyCode,
+        int? count,
+        long? before,
+        long? after,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return SendAsync(currencyCode, count, before, after, cancellationToken);
+    }
 }
 
 public sealed class GetBalanceHistoryProtocolEndpoint : IGetBalanceHistoryProtocolEndpoint
@@ -27,12 +39,34 @@ public sealed class GetBalanceHistoryProtocolEndpoint : IGetBalanceHistoryProtoc
         _transport = transport;
     }
 
-    public async Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? currencyCode,
         int? count,
         long? before,
         long? after,
         CancellationToken cancellationToken = default)
+    {
+        return SendAsyncCore(currencyCode, count, before, after, null, cancellationToken);
+    }
+
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
+        string? currencyCode,
+        int? count,
+        long? before,
+        long? after,
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return SendAsyncCore(currencyCode, count, before, after, credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsyncCore(
+        string? currencyCode,
+        int? count,
+        long? before,
+        long? after,
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var request = new ProtocolRequest
         {
@@ -47,7 +81,9 @@ public sealed class GetBalanceHistoryProtocolEndpoint : IGetBalanceHistoryProtoc
             BodyText = null,
         };
 
-        var result = await _transport.SendAsync(request, ProtocolTransportAuthMode.KeySecret, cancellationToken);
+        var result = await (credentialSession is null
+            ? _transport.SendAsync(request, ProtocolTransportAuthMode.KeySecret, cancellationToken)
+            : _transport.SendAsync(request, ProtocolTransportAuthMode.KeySecret, credentialSession, cancellationToken));
         return ProtocolCallFactory.ToProtocolCall(
             request,
             result,

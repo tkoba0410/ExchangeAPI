@@ -604,12 +604,12 @@ public sealed class AdditionalPrivateNativeEndpointTests
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> Success(string endpointId, string method, string path, string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> Success(string endpointId, string method, string path, string bodyText)
     {
         return ProtocolCall(endpointId, method, path, 200, bodyText);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> ProtocolCall(string endpointId, string method, string path, int statusCode, string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> ProtocolCall(string endpointId, string method, string path, int statusCode, string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = endpointId, Method = method, Path = path, Query = null, BodyText = null },

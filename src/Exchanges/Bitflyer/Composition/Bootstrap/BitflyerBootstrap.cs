@@ -2,19 +2,19 @@ using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Internal.Runtime;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelAllChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetAddresses;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalance;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBalanceHistory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetBankAccounts;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinIns;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCoinOuts;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateral;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralAccounts;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetCollateralHistory;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetDeposits;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetParentOrder;
@@ -23,8 +23,8 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPermissions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.GetWithdrawals;
-using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.Withdraw;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetBoard;
@@ -39,19 +39,19 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Runtime;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Api;
-using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelAllChildOrders;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.CancelParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetAddresses;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBalance;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBalanceHistory;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetBankAccounts;
-using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateral;
-using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralHistory;
-using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAccounts;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCoinIns;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCoinOuts;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateral;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAccounts;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralHistory;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetDeposits;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetExecutions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetParentOrder;
@@ -60,8 +60,8 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPermissions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetPositions;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetTradingCommission;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetWithdrawals;
-using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendChildOrder;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.SendParentOrder;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.Withdraw;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Api;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetBoard;
@@ -120,7 +120,7 @@ internal static class BitflyerBootstrap
             getExecutionsPublic,
             getTicker);
 
-        if (normalizedOptions.Credentials is null)
+        if (normalizedOptions.ApiCredentialProvider is null)
         {
             return new BitflyerProtocolBundle
             {
@@ -249,7 +249,7 @@ internal static class BitflyerBootstrap
             getExecutionsPublicNative,
             getTickerNative);
 
-        if (normalizedOptions.Credentials is null)
+        if (normalizedOptions.ApiCredentialProvider is null)
         {
             var protocolBundle = new BitflyerProtocolBundle
             {
@@ -431,8 +431,7 @@ internal static class BitflyerBootstrap
                 httpClient,
                 options.BaseUri,
                 debugLogger,
-                options.Credentials?.ApiKey,
-                options.Credentials?.ApiSecret,
+                options.ApiCredentialProvider,
                 options.RequestTimeout),
             Lifetime = lifetime,
         };

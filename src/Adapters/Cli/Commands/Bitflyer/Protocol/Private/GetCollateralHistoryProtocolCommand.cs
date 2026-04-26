@@ -51,7 +51,7 @@ public static class GetCollateralHistoryProtocolCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateProtocolClient(created.Options);
+        using var bundle = BitflyerClientFactory.CreateProtocolClientBundle(created.Options);
         if (bundle.Private is null)
         {
             return ExecutionOutcome.InputError(
@@ -60,7 +60,7 @@ public static class GetCollateralHistoryProtocolCommand
         }
 
         var typed = (ProtocolQueryValues)request;
-        var call = await bundle.Private.GetCollateralHistoryCallAsync(
+        var call = await bundle.Private.GetCollateralHistoryAsync(
             typed.GetInt("count"),
             typed.GetLong("before"),
             typed.GetLong("after"),

@@ -78,8 +78,8 @@ public static class GetHealthCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
-        var call = await bundle.Public.GetHealthCallAsync((GetHealthRequest)request, cancellationToken);
+        using var bundle = BitflyerClientFactory.CreateNativeClientBundle(created.Options);
+        var call = await bundle.Public.GetHealthAsync((GetHealthRequest)request, cancellationToken);
         return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "public", "get-health"), call);
     }
 }

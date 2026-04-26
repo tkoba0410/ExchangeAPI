@@ -13,39 +13,39 @@ namespace ExchangeApi.Exchanges.Bitflyer.Native.Public.Api;
 
 public interface IBitflyerPublicNativeApi
 {
-    Task<Call<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> GetMarketsCallAsync(
+    Task<CallResult<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> GetMarketsAsync(
         GetMarketsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
+    Task<CallResult<GetBoardRequest, GetBoardResponse>> GetBoardAsync(
         GetBoardRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+    Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
         GetBoardStateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetHealthRequest, GetHealthResponse>> GetHealthCallAsync(
+    Task<CallResult<GetHealthRequest, GetHealthResponse>> GetHealthAsync(
         GetHealthRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateCallAsync(
+    Task<CallResult<GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
+    Task<CallResult<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageAsync(
         GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetChatsRequest, IReadOnlyList<GetChats.Item>>> GetChatsCallAsync(
+    Task<CallResult<GetChatsRequest, IReadOnlyList<GetChats.Item>>> GetChatsAsync(
         GetChatsRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> GetExecutionsCallAsync(
+    Task<CallResult<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> GetExecutionsAsync(
         GetExecutionsPublicRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
         GetTickerRequest request,
         CancellationToken cancellationToken = default);
 }

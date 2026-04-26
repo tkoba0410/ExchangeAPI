@@ -9,20 +9,20 @@ namespace ExchangeApi.Adapters.McpServer.Tools.Account;
 
 public interface IBitflyerAccountSnapshotGateway
 {
-    Task<Call<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceCallAsync(
+    Task<CallResult<GetBalanceRequest, IReadOnlyList<GetBalance.Item>>> GetBalanceAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetCollateralRequest, GetCollateralResponse>> GetCollateralCallAsync(
+    Task<CallResult<GetCollateralRequest, GetCollateralResponse>> GetCollateralAsync(
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersCallAsync(
+    Task<CallResult<GetChildOrdersRequest, IReadOnlyList<GetChildOrders.Item>>> GetActiveChildOrdersAsync(
         string productCode,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsCallAsync(
+    Task<CallResult<GetPositionsRequest, IReadOnlyList<GetPositions.Item>>> GetPositionsAsync(
         string productCode,
         CancellationToken cancellationToken = default);
 
-    Task<Call<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsCallAsync(
+    Task<CallResult<GetPermissionsRequest, IReadOnlyList<string>>> GetPermissionsAsync(
         CancellationToken cancellationToken = default);
 }

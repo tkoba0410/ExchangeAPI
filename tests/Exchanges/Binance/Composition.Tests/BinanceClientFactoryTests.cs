@@ -1,5 +1,5 @@
-using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using System.Net;
+using ExchangeApi.Exchanges.Binance.Composition.Factory;
 
 namespace ExchangeApi.Tests.Exchanges.Binance.Composition.Tests;
 
@@ -8,7 +8,7 @@ public sealed class BinanceClientFactoryTests
     [Fact]
     public void CreateProtocolClient_HasPublic()
     {
-        var bundle = BinanceClientFactory.CreateProtocolClient();
+        var bundle = BinanceClientFactory.CreateProtocolClientBundle();
 
         Assert.NotNull(bundle.Public);
     }
@@ -16,7 +16,7 @@ public sealed class BinanceClientFactoryTests
     [Fact]
     public void CreateNativeClient_WiresProtocolAndNative()
     {
-        var bundle = BinanceClientFactory.CreateNativeClient();
+        var bundle = BinanceClientFactory.CreateNativeClientBundle();
 
         Assert.NotNull(bundle.Public);
         Assert.NotNull(bundle.Protocol);
@@ -28,7 +28,7 @@ public sealed class BinanceClientFactoryTests
     {
         var handler = new RecordingHandler();
         using var httpClient = new HttpClient(handler);
-        var bundle = BinanceClientFactory.CreateProtocolClient(httpClient);
+        var bundle = BinanceClientFactory.CreateProtocolClientBundle(httpClient);
 
         bundle.Dispose();
         bundle.Dispose();
@@ -44,7 +44,7 @@ public sealed class BinanceClientFactoryTests
     {
         var handler = new RecordingHandler();
         using var httpClient = new HttpClient(handler);
-        var bundle = BinanceClientFactory.CreateNativeClient(httpClient);
+        var bundle = BinanceClientFactory.CreateNativeClientBundle(httpClient);
 
         bundle.Protocol.Dispose();
         bundle.Dispose();

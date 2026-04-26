@@ -14,11 +14,11 @@ public sealed class BitflyerNativeMarketSnapshotGateway : IBitflyerMarketSnapsho
         _publicApi = publicApi;
     }
 
-    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    public Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return _publicApi.GetTickerCallAsync(
+        return _publicApi.GetTickerAsync(
             new GetTickerRequest
             {
                 ProductCode = symbol,
@@ -26,11 +26,11 @@ public sealed class BitflyerNativeMarketSnapshotGateway : IBitflyerMarketSnapsho
             cancellationToken);
     }
 
-    public Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+    public Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return _publicApi.GetBoardStateCallAsync(
+        return _publicApi.GetBoardStateAsync(
             new GetBoardStateRequest
             {
                 ProductCode = symbol,

@@ -17,21 +17,21 @@ public sealed class NativeFacadeTests
 
         var api = new BinancePublicNativeApi(new FakeGetKlinesNativeEndpoint(expected));
 
-        var actual = await api.GetKlinesCallAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h });
+        var actual = await api.GetKlinesAsync(new GetKlinesRequest { Symbol = "BTCJPY", Interval = BinanceIntervals.Hour1h });
 
         Assert.Same(expected, actual);
     }
 
     private sealed class FakeGetKlinesNativeEndpoint : IGetKlinesNativeEndpoint
     {
-        private readonly Call<GetKlinesRequest, IReadOnlyList<GetKlines.Item>> _call;
+        private readonly CallResult<GetKlinesRequest, IReadOnlyList<GetKlines.Item>> _call;
 
-        public FakeGetKlinesNativeEndpoint(Call<GetKlinesRequest, IReadOnlyList<GetKlines.Item>> call)
+        public FakeGetKlinesNativeEndpoint(CallResult<GetKlinesRequest, IReadOnlyList<GetKlines.Item>> call)
         {
             _call = call;
         }
 
-        public Task<Call<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> CallAsync(
+        public Task<CallResult<GetKlinesRequest, IReadOnlyList<GetKlines.Item>>> CallAsync(
             GetKlinesRequest request,
             CancellationToken cancellationToken = default)
         {

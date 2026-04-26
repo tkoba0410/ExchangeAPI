@@ -1,30 +1,35 @@
-# Stage10 Spec（library 設計正本）
+# ExchangeAPI Library Spec
 
-最終更新: 2026-03-24  
-対象ブランチ: `stage10`
+最終更新: 2026-04-23  
+位置づけ: library 共通正本
 
 ## 1. 位置づけ
 
-本書は、Stage10 の設計を既存試作や旧文書の都合から切り離して整理し直した、現行の設計正本である。  
-Stage10 は core library foundation を定義し、Stage11 はその上に CLI / MCP Server などの adapter 層を導入する。  
-本書は `Facade + Endpoint Module` を前提に、今後の実装方針をまっさらな設計として定義する。
+本書は、ExchangeAPI library に共通して適用する設計原則と契約を定義する現行正本である。  
+本書は `Facade + Endpoint Module` を前提に、`Protocol` / `Native` / `Unified` / `Composition` / adapter 境界を定義する。
 
 本書では、以下を明確に分離する。
 
 - 設計正本
-- 実装上の暫定事情
-- 既存コードからの流用可能部品
+- venue ごとの contract ledger
+- adapter 固有契約
+- version 単位の変更文書
 
-本 repository は Stage10 の再構築対象であり、現行ブランチには source / tests / solution 構成が含まれてよい。  
-必要であれば git history から過去実装を参照してよい。  
-ただし、過去実装や現行実装は設計判断の正本ではなく、本書へ寄せるための参考材料として扱う。
+過去 phase の計画文書や draft は [`docs/archive/`](./archive/README.md) に退避し、履歴参照として扱う。  
+version 固有の breaking change や migration は、採用判断を別文書で管理したうえで、本書へ反映する。
+
+注記:
+
+- 現行の正本解釈は stage 名ではなく、文書体系ガイドで定義した `共通正本 / venue 台帳 / adapter 正本 / version 文書` に従う
 
 ### 1.1 文書統治
 
-Stage10 における文書の主従は以下とする。
+現行の文書主従は以下を基本とする。
 
+- [`docs/docs-architecture.md`](./docs-architecture.md)
+  - 文書体系ガイド
 - [`docs/spec.md`](./spec.md)
-  - 設計正本
+  - library 共通正本
   - 層モデル、依存規約、error 契約、test 契約、変更ポリシーを定義する
 - [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md)
   - bitFlyer の endpoint 運用正本
@@ -33,20 +38,32 @@ Stage10 における文書の主従は以下とする。
   - Binance の endpoint 運用正本
   - Binance endpoint ごとの metadata と固定状況を定義する
 - [`docs/cli.md`](./cli.md)
-  - CLI adapter の設計補助文書
+  - CLI adapter 正本
   - library surface の利用方針と CLI 固有契約を定義する
 - [`docs/mcp-server.md`](./mcp-server.md)
-  - MCP Server adapter の設計補助文書
+  - MCP Server adapter 正本
   - `Unified` との関係と tool 公開方針を定義する
+- `docs/release-notes/*`, `docs/breaking-changes-*.md`, `docs/migration-*.md`
+  - version 単位文書
+  - release / migration / breaking changes を記録する
 
-`docs/spec.md` と venue ごとの matrix を Stage10 library の正本とする。  
+`docs/spec.md` と venue ごとの matrix を library の正本とする。  
 `Cli` と `McpServer` は別文書とし、本書では library から見た境界だけを扱う。  
-本 repository では、library 設計の正本を `docs/spec.md` と venue matrix に固定し、削除済み inventory や補助文書を前提にしない。  
-旧 `stage10b.md` は廃止し、現行の設計判断、運用判断、実装判断の根拠に使わない。
+guide、archive、version 文書は正本の補助であり、本書そのものを置き換えない。
+
+### 1.2 Version Baseline
+
+- 本書は `v2.0.0` の library 共通正本として整理する
+- `v2.0.0` の採用判断と移行説明は [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md) と [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md) を参照する
+- `v2.0.0` では、`CallResult`、`*Async(...)`、`Create*ClientBundle(...)`、`CallError` additive detail field、private credentials の責務分離を採用する
+- private credentials は、core 正本から特定の storage / encryption recipe を外し、auth provider 契約へ寄せる
+- auth provider の具体 shape は `OpenSessionAsync(...)` 型を採用し、通常利用では client 側が session を隠して扱う
+- verification は、API 契約分類とは別に `repo/local` 配置と `safe/tolerable/dangerous` の運用分類を導入する
+- endpoint matrix の facade rule と実装 surface の rename は、実装変更と同時に反映する
 
 ## 2. ゴール
 
-- venue ごとの `Protocol` / `Native` client を、同一の Stage10 規約で追加できるようにする
+- venue ごとの `Protocol` / `Native` client を、同一の library 規約で追加できるようにする
 - まず bitFlyer を完成させ、その後に Binance のような追加 venue を同じ型で載せる
 - 公開面は `Facade`、実装単位は `Endpoint Module` とする
 - `Native` を取引所横断正規化層ではなく、exchange-native contract 層として固定する
@@ -108,19 +125,19 @@ sequenceDiagram
     participant RT as Runtime/Transport
     participant BF as Venue API
 
-    User->>NF: GetTickerCallAsync(request)
+    User->>NF: GetTickerAsync(request)
     NF->>NM: forward
     NM->>NM: InputValidation / Encode
-    NM->>PF: GetTickerCallAsync(productCode)
+    NM->>PF: GetTickerAsync(productCode)
     PF->>PM: forward
-    PM->>RT: Send Call<ProtocolRequest, ProtocolResponse>
+    PM->>RT: Send CallResult<ProtocolRequest, ProtocolResponse>
     RT->>BF: HTTP GET /v1/getticker
     BF-->>RT: raw response
     RT-->>PM: ProtocolResponse
-    PM-->>PF: Call<ProtocolRequest, ProtocolResponse>
+    PM-->>PF: CallResult<ProtocolRequest, ProtocolResponse>
     PF-->>NM: protocol call
     NM->>NM: JsonValidation / Conversion / ContractValidation
-    NM-->>NF: Call<GetTickerRequest, GetTickerResponse>
+    NM-->>NF: CallResult<GetTickerRequest, GetTickerResponse>
     NF-->>User: native call
 ```
 
@@ -178,7 +195,7 @@ src/Exchanges/Bitflyer/
 
 追加原則:
 
-- Stage10 の `Protocol` は 1 回の送信実行を正本とする
+- `Protocol` は 1 回の送信実行を正本とする
 - retry / rate limiting / circuit breaker は既定責務に含めない
 - 必要な場合でも `Protocol` の外側、または明示 opt-in の policy として扱う
 
@@ -195,7 +212,7 @@ src/Exchanges/Bitflyer/
 - request encode
 - `Protocol` 呼び出し
 - response の `JsonValidation -> Conversion -> ContractValidation`
-- `Call<TRequest, TResponse>` の組み立て
+- `CallResult<TRequest, TResponse>` の組み立て
 
 責務に含めないもの:
 
@@ -210,7 +227,7 @@ src/Exchanges/Bitflyer/
 ### 3.3 Unified
 
 `Unified` は将来追加する取引所横断抽象化層である。  
-Stage10 では実装対象外とする。
+現時点では実装対象外とする。
 
 定義:
 
@@ -244,7 +261,7 @@ Stage10 では実装対象外とする。
 - external adapter project は `src/Adapters/<AdapterName>/` 配下に置く
 - external adapter test project は `tests/Adapters/<AdapterName>.Tests/` 配下に置く
 - external adapter は複数 venue を束ねる上位 adapter であるため、`src/Exchanges/<Venue>/` 配下に置いてはならない
-- Stage11 の初期 adapter 名は `Cli` と `McpServer` とする
+- 初期 adapter 名は `Cli` と `McpServer` とする
 
 ### 3.5 依存規約
 
@@ -268,20 +285,20 @@ Stage10 では実装対象外とする。
 
 ### 4.1 基本方針
 
-- `Call` を唯一の返却形式とする
+- `CallResult` を唯一の返却形式とする
 - facade は薄い forward に徹する
 - facade は endpoint 固有ロジックを持たない
 - endpoint 固有ロジックは endpoint module に置く
 
 ### 4.2 Client 生成単位
 
-- `CreateProtocolClient(...)`
+- `CreateProtocolClientBundle(...)`
   - `ProtocolBundle` を返す
   - `HttpClient` を受け取らない overload は internal-owned mode とする
   - `HttpClient` を受け取る overload は external-owned mode とする
   - `Public` を必須で持つ
   - 認証付きなら `Private` も持つ
-- `CreateNativeClient(...)`
+- `CreateNativeClientBundle(...)`
   - `NativeBundle` を返す
   - `HttpClient` を受け取らない overload は internal-owned mode とする
   - `HttpClient` を受け取る overload は external-owned mode とする
@@ -294,8 +311,8 @@ Stage10 では実装対象外とする。
 Current normative:
 
 - client bundle は short-lived per-call object ではなく、reuse 前提の long-lived object として扱う
-- `CreateProtocolClient(options)` / `CreateNativeClient(options)` は internal-owned mode とし、transport 実装に必要な `HttpClient` を library 内で生成する
-- `CreateProtocolClient(HttpClient, options)` / `CreateNativeClient(HttpClient, options)` は external-owned mode とする
+- `CreateProtocolClientBundle(options)` / `CreateNativeClientBundle(options)` は internal-owned mode とし、transport 実装に必要な `HttpClient` を library 内で生成する
+- `CreateProtocolClientBundle(HttpClient, options)` / `CreateNativeClientBundle(HttpClient, options)` は external-owned mode とする
 - ownership は必ず二値で定義する
   - internal-owned mode: library が transport 資源を所有する
   - external-owned mode: caller が `HttpClient` を所有する
@@ -331,31 +348,31 @@ Current normative:
 - external-owned mode では library は caller 提供 `HttpClient` の `Timeout` / `BaseAddress` / `DefaultRequestHeaders` を読んだり変更したりしてはならない
 - request URI 解決の正本は ExchangeAPI 側の `BaseUri + path/query` とする
 - caller が external-owned `HttpClient.Timeout` を `RequestTimeout` より短く設定した結果、request が先に失敗する場合、その差異は caller-owned environment の責務とする
-- Stage10 では retry / backoff / circuit breaker を transport option の正本に含めない
-- proxy / handler chain / resilience pipeline は Stage10 の必須正本に含めない
+- retry / backoff / circuit breaker を transport option の正本に含めない
+- proxy / handler chain / resilience pipeline は必須正本に含めない
 
 ### 4.2.3 Facade Method Contract
 
-- facade の主公開面は `*CallAsync(...)` とする
-- `Protocol` facade は `Task<Call<ProtocolRequest, ProtocolResponse>>` を返す
-- `Native` facade は `Task<Call<TRequest, TResponse>>` を返す
-- `Call` を返さない ergonomic wrapper は Stage10 の必須要件に含めない
-- ergonomic wrapper を将来追加する場合でも、`Call` を返す主 API を置き換えてはならない
+- facade の主公開面は `*Async(...)` とする
+- `Protocol` facade は `Task<CallResult<ProtocolRequest, ProtocolResponse>>` を返す
+- `Native` facade は `Task<CallResult<TRequest, TResponse>>` を返す
+- `CallResult` を返さない ergonomic wrapper は必須要件に含めない
+- ergonomic wrapper を将来追加する場合でも、`CallResult` を返す主 API を置き換えてはならない
 - facade の命名例:
-  - `GetMarketsCallAsync(...)`
-  - `GetBoardCallAsync(...)`
-  - `GetExecutionsCallAsync(...)`
-  - `GetTickerCallAsync(...)`
-  - `GetBalanceCallAsync(...)`
-  - `GetCollateralCallAsync(...)`
-  - `GetCollateralAccountsCallAsync(...)`
-  - `GetChildOrdersCallAsync(...)`
-  - `GetExecutionsCallAsync(...)`
-  - `GetCollateralHistoryCallAsync(...)`
-  - `GetPositionsCallAsync(...)`
-  - `SendChildOrderCallAsync(...)`
-  - `CancelChildOrderCallAsync(...)`
-  - `CancelAllChildOrdersCallAsync(...)`
+  - `GetMarketsAsync(...)`
+  - `GetBoardAsync(...)`
+  - `GetExecutionsAsync(...)`
+  - `GetTickerAsync(...)`
+  - `GetBalanceAsync(...)`
+  - `GetCollateralAsync(...)`
+  - `GetCollateralAccountsAsync(...)`
+  - `GetChildOrdersAsync(...)`
+  - `GetExecutionsAsync(...)`
+  - `GetCollateralHistoryAsync(...)`
+  - `GetPositionsAsync(...)`
+  - `SendChildOrderAsync(...)`
+  - `CancelChildOrderAsync(...)`
+  - `CancelAllChildOrdersAsync(...)`
 
 ### 4.2.4 User-Facing Surface Rule
 
@@ -391,7 +408,7 @@ Codex が endpoint module を生成する際の基本契約は以下とする。
 ```csharp
 public interface INativeEndpoint<in TRequest, TResponse>
 {
-    Task<Call<TRequest, TResponse>> CallAsync(
+    Task<CallResult<TRequest, TResponse>> CallAsync(
         TRequest request,
         CancellationToken cancellationToken = default);
 }
@@ -408,7 +425,7 @@ public interface INativeEndpoint<in TRequest, TResponse>
 ```csharp
 public interface IGetTickerProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         CancellationToken cancellationToken = default);
 }
@@ -417,7 +434,7 @@ public interface IGetTickerProtocolEndpoint
 ```csharp
 public interface ISendChildOrderProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string bodyJson,
         CancellationToken cancellationToken = default);
 }
@@ -425,7 +442,7 @@ public interface ISendChildOrderProtocolEndpoint
 
 ### 4.6 Foundation Contracts
 
-Stage10 の基盤契約は `Protocol` 語彙で定義する。
+基盤契約は `Protocol` 語彙で定義する。
 
 - `ProtocolRequest`
   - protocol 層の canonical request snapshot
@@ -434,8 +451,8 @@ Stage10 の基盤契約は `Protocol` 語彙で定義する。
 - `ProtocolResponse`
   - protocol 層の raw response snapshot
   - 少なくとも `StatusCode` / `Headers` / `BodyText` を持つ
-- `Call<TRequest, TResponse>`
-  - Stage10 の唯一の返却契約
+- `CallResult<TRequest, TResponse>`
+  - v2 の唯一の返却契約
 - `CallError`
   - `Transport` / `Http` / `Codec` / `Semantic` / `Mapping` を表す
 - `CallMeta`
@@ -445,7 +462,7 @@ Stage10 の基盤契約は `Protocol` 語彙で定義する。
 
 追加原則:
 
-- `ProtocolRequest` / `ProtocolResponse` は Stage10 の設計正本に属する
+- `ProtocolRequest` / `ProtocolResponse` は library 共通正本に属する
 - lower-level HTTP client や runtime 実装は、必要なら内部で別型を使ってよい
 - ただし facade と endpoint module の公開契約では `ProtocolRequest` / `ProtocolResponse` を正本にする
 
@@ -472,6 +489,9 @@ public sealed class CallError
 {
     public required string Kind { get; init; }
     public required string Message { get; init; }
+    public int? HttpStatusCode { get; init; }
+    public string? VenueErrorCode { get; init; }
+    public string? VenueErrorMessage { get; init; }
 }
 
 public sealed class CallMeta
@@ -488,7 +508,7 @@ public readonly struct Unit
 {
 }
 
-public sealed class Call<TRequest, TResponse>
+public sealed class CallResult<TRequest, TResponse>
 {
     public required TRequest Request { get; init; }
     public required TResponse? Response { get; init; }
@@ -507,12 +527,12 @@ public sealed class Call<TRequest, TResponse>
 
 ## 5. Call と観測語彙
 
-### 5.1 Call
+### 5.1 CallResult
 
-- `Protocol` は `Task<Call<ProtocolRequest, ProtocolResponse>>` を返す
-- `Native` は `Task<Call<TRequest, TResponse>>` を返す
+- `Protocol` は `Task<CallResult<ProtocolRequest, ProtocolResponse>>` を返す
+- `Native` は `Task<CallResult<TRequest, TResponse>>` を返す
 
-`Call` の最低要件:
+`CallResult` の最低要件:
 
 - `Request`
 - `Response`
@@ -534,11 +554,11 @@ public sealed class Call<TRequest, TResponse>
   - `Error != null`
 - `Native` call は対応する `Protocol` call を child call として `Meta` 内に保持する
 - `Protocol` call を持てない `Native` success / failure を作らない
-- facade は `Call` を再構築せず、endpoint module が返した `Call` をそのまま返す
+- facade は `CallResult` を再構築せず、endpoint module が返した `CallResult` をそのまま返す
 
 補足:
 
-- `ProtocolRequest` / `ProtocolResponse` は Stage10 の基盤契約である
+- `ProtocolRequest` / `ProtocolResponse` は library の基盤契約である
 - lower-level transport 実装を再利用する場合でも、設計判断と公開契約は `Protocol` / `Native` 語彙で行う
 
 ### 5.2 CallMeta
@@ -577,20 +597,11 @@ public sealed class Call<TRequest, TResponse>
 
 ### 5.3.1 Error Observation Contract
 
-Current normative:
-
 - venue error body の raw text の正本は `ProtocolResponse.BodyText` とする
 - non-success status の response body を `CallMeta` へ複製してはならない
 - `CallError.Kind` と `CallError.Message` は最小の失敗公開面として維持する
+- `CallError.HttpStatusCode`, `CallError.VenueErrorCode`, `CallError.VenueErrorMessage` は抽出済み narrow detail として保持してよい
 - raw JSON object / loosely typed dictionary / venue 固有 envelope 全体を `CallError` の公開面にしてはならない
-
-Reserved additive extension:
-
-- venue 固有 error code / error message を将来公開する場合、置き場所は `CallMeta` ではなく `CallError` 側の狭い optional field とする
-- 将来追加してよい error detail field は以下のような narrow field に限定する
-  - `HttpStatusCode`
-  - `VenueErrorCode`
-  - `VenueErrorMessage`
 - error detail は観測用 detail であり、`CallError.Kind` の判定結果を上書きしてはならない
 
 ### 5.4 Protocol Debug Logging
@@ -629,6 +640,13 @@ debug logging は `Protocol` 層にのみ許可する。
 
 - raw debug log は `local/logs/<venue>/protocol/` 配下にのみ出力する
 - raw debug log は `.gitignore` 対象とし、repository に commit / push しない
+
+将来方針:
+
+- core は log writer、保存形式、rotation、evidence 化を所有しない方向へ寄せる
+- core が安定して提供すべきものは、`CallResult`, `CallMeta`, `ProtocolRequest`, `ProtocolResponse`, `CallError` などの観測データである
+- JSONL、file log、redaction、local evidence writer、人間向け log は将来 `ExchangeApi.Optional.Logging` へ切り出す候補とする
+- optional logging を導入する場合でも、API key / secret / 認証 header / 署名値を出力してはならない
 
 ## 6. Request / Response 境界
 
@@ -670,7 +688,7 @@ debug logging は `Protocol` 層にのみ許可する。
   - raw shape は読めるが、API contract rule として不正
 - `Mapping`
   - 鏡像 contract を超える明示的 mapping でのみ使う
-  - Stage10 の初期 `Native` endpoint では原則として使わない
+  - 明示的 mapping を持たない `Native` endpoint では原則として使わない
 
 追加原則:
 
@@ -693,7 +711,7 @@ Current normative:
 - success status で response body が success contract に一致しない場合は、失敗種別は decode stage に従って決める
   - shape / required raw field / scalar parse の失敗は `Codec`
   - raw shape は読めるが contract rule violation で失敗する場合は `Semantic`
-- Stage10 は venue 固有 business error taxonomy を `CallError.Kind` に持ち込まない
+- venue 固有 business error taxonomy を `CallError.Kind` に持ち込まない
 
 Reserved additive extension:
 
@@ -701,7 +719,7 @@ Reserved additive extension:
 
 ### 6.4 API Contract Rule と Business Rule
 
-- Stage10 の `Native` が扱うのは API contract rule までとする
+- `Native` が扱うのは API contract rule までとする
 - 例:
   - required field
   - mutually exclusive field
@@ -718,7 +736,7 @@ Reserved additive extension:
   - raw JSON value を native value / candidate へ落とす
 - `ContractValidation`
   - native candidate が API contract として成立するかを検証する
-- `MeaningValidation` という語は Stage10 の正本語彙としては使わない
+- `MeaningValidation` という語は正本語彙としては使わない
 
 ### 6.6 Scalar Contract
 
@@ -737,14 +755,111 @@ bot 運用で重要な scalar の扱いは以下を正本とする。
 - offset なし timestamp の解釈を endpoint contract で固定できない場合、その endpoint は `Fixed` に上げない
 - scalar parse 失敗は `Codec` とする
 - bot 判断に必要な scalar を `double` / `float` へ落とすことを `Native` の正本に含めない
-- human-facing な確認表示は `Native` contract の責務外とし、表示が必要な場合は JST (`+09:00`) with offset を優先する
-- zone 付き表示の例は `2026-03-25T14:32:19.033+09:00` とする
+- human-facing な確認表示は `Native` contract の責務外とし、表示が必要な場合は実行環境の local time with offset を優先する
+- zone 付き表示の例は `2026-03-25T14:32:19.033+09:00` のような offset 付き local timestamp とする
 - 表示都合の timezone 変換 helper は `Primitives` extension として追加してよい
   - `ToUtc()`, `ToUtcString()`, `ToJst()`, `ToJstString()`
 
 ### 6.7 Private Auth / Signing 契約
 
-bitFlyer private endpoint の認証・署名は `Protocol` が担う。
+private endpoint の認証・署名は `Protocol` が担う。  
+ExchangeAPI core は API key / secret の storage / encryption recipe を正本に含めず、credential provider 契約だけを持つ。
+
+共通 credential provider 契約:
+
+```csharp
+public interface IApiCredentialProvider
+{
+    ValueTask<IApiCredentialSession> OpenSessionAsync(
+        CancellationToken cancellationToken = default);
+}
+
+public interface IApiCredentialSession : IAsyncDisposable
+{
+    string ApiKey { get; }
+
+    string Sign(string payload);
+}
+```
+
+共通原則:
+
+- `ApiSecret` は公開 API に出さない
+- `IApiCredentialProvider` は credential source を開き、必要なら復号し、session を返す
+- `IApiCredentialSession` は session 寿命中だけ `ApiKey` と署名機能を提供する
+- `Sign(payload)` の payload は venue ごとの canonical signing payload とする
+- v2 の署名 API は `Sign(string payload)` のみとし、byte sequence overload は持たない
+- provider は venue-specific とし、provider / session に runtime venue selector を持たせない
+- client / adapter は通常利用では session 境界を隠蔽してよい
+- 高コスト provider では、利用者が明示 session を開き、複数 private call の間だけ再利用してよい
+- session は `IAsyncDisposable` であり、dispose は完全なメモリ消去ではなく保持寿命の明示的終了を意味する
+- provider 内部の無制限 cache を正本にしない
+- `BitflyerPlainTextApiCredentialProvider` / `BinancePlainTextApiCredentialProvider` は sample / test / local dev 用として用意してよいが、production 推奨ではない
+- `PlainText` / `AgeFile` provider は core ではなく `ExchangeApi.Optional.Credentials` に置く
+- `ExchangeApi.Optional.Credentials` は `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` に置く
+- optional credentials package は venue `Composition` / `Protocol` / `Native` project に依存しない
+- API key / secret / 署名値は log / exception / result / evidence に露出してはならない
+
+明示 session overload:
+
+```csharp
+Task<CallResult<TRequest, TResponse>> EndpointAsync(
+    TRequest request,
+    IApiCredentialSession credentialSession,
+    CancellationToken cancellationToken = default);
+```
+
+ルール:
+
+- 通常 overload は `IApiCredentialProvider` から session を内部で開閉する
+- 明示 session overload は caller が渡した session を dispose しない
+- 明示 session overload は private endpoint にだけ用意する
+- public endpoint に credential session overload を用意してはならない
+
+credential failure 契約:
+
+- credential source の未設定、復号失敗、format 不正、venue 不一致、key / secret 不正は `OpenSessionAsync(...)` の失敗として扱う
+- credential failure は `ApiCredentialException` と `ApiCredentialErrorKind` で分類可能にする
+- `ApiCredentialErrorKind` は adapter が通知や終了コードへ写像するための安定分類であり、secret storage 実装の詳細を露出するためのものではない
+- exception message / detail は secret-safe でなければならない
+- CLI / MCP / application は credential failure を捕捉し、用途に応じて stderr、structured error、UI notification、operator log へ写像してよい
+- core は通知手段を持たない。通知の責務は adapter / application に置く
+
+最小分類:
+
+- `NotConfigured`
+- `SourceUnavailable`
+- `DecryptFailed`
+- `JsonParseFailed`
+- `MissingRequiredField`
+- `UnsupportedVersion`
+- `VenueMismatch`
+- `InvalidApiKey`
+- `InvalidApiSecret`
+
+分類境界:
+
+- `NotConfigured`: provider に必要な設定値が渡されていない
+- `SourceUnavailable`: 設定値はあるが、credential source に到達できない
+- `DecryptFailed`: credential source は読めたが復号に失敗した
+- `JsonParseFailed`: 復号後 payload を credentials JSON として parse できない
+- `MissingRequiredField`: `version`、`venue`、`apiKey`、`apiSecret` のいずれかが無い
+- `UnsupportedVersion`: `version` が v2 実装の対応範囲外
+- `VenueMismatch`: credentials JSON の `venue` が provider の venue と一致しない
+- `InvalidApiKey`: `apiKey` が empty、whitespace-only、または前後 whitespace を含む
+- `InvalidApiSecret`: `apiSecret` が empty、whitespace-only、または前後 whitespace を含む
+
+credential JSON schema:
+
+- `AgeFile` provider の復号後 JSON は flat object とする
+- required fields は `version`, `venue`, `apiKey`, `apiSecret` とする
+- optional metadata は `label`, `generatedAt`, `expiresAt`, `note` とする
+- `version` は integer `1` のみを受け付ける
+- canonical venue string は `bitflyer` / `binance` とする
+- unknown field は許容する
+- `expiresAt` は v2 では metadata であり、期限 enforcement は行わない
+
+bitFlyer private endpoint 固有の固定事項:
 
 固定事項:
 
@@ -771,14 +886,14 @@ bitFlyer private endpoint の認証・署名は `Protocol` が担う。
 - `Native` response DTO の全 property は、対応する API response JSON field 名を `JsonPropertyName` で明示しなければならない
 - `JsonPropertyName` に指定する名前は、API response JSON に現れる field 名と一致しなければならない
 - response field の required / optional 判定は `JsonPropertyName` の有無ではなく、endpoint contract に従って別に固定する
-- venue API の closed-set string vocabulary は、current phase では venue-local enum へ昇格させる
+- venue API の closed-set string vocabulary は、現行 normative slice では venue-local enum へ昇格させる
 - enum 化しても wire JSON の値は API string value を維持しなければならない
 - enum は cross-venue 共通化せず、対応する `Vocabulary` project に venue-local 型として置く
-- current phase の bitFlyer `Native` では、少なくとも `Side`, `TimeInForce`, `ChildOrderType`, `ConditionType`, `OrderMethod`, `ChildOrderState`, `ParentOrderState`, `HealthStatus`, `TradingState`, `TransferStatus`, `MarketType`, `TradeType`, `AddressType`, `ParentOrderType` を enum 化対象とする
-- `AccountType` と `ReasonCode` は current phase では string のまま維持する
+- 現行 bitFlyer `Native` slice では、少なくとも `Side`, `TimeInForce`, `ChildOrderType`, `ConditionType`, `OrderMethod`, `ChildOrderState`, `ParentOrderState`, `HealthStatus`, `TradingState`, `TransferStatus`, `MarketType`, `TradeType`, `AddressType`, `ParentOrderType` を enum 化対象とする
+- `AccountType` と `ReasonCode` は現行 normative slice では string のまま維持する
 - `ProductCode`, `CurrencyCode`, `Symbol`, `AccountType`, `ReasonCode` のように enum 化しない string vocabulary でも、known values を対応する `Vocabulary` project の `public static class` + `public const string` として持ってよい
 - 上記の known values 定数は convenience 用であり、closed set や exhaustive inventory の正本として扱ってはならない
-- endpoint contract が open set または current phase で string 維持対象の field について、validation の正本を known values 定数へ移してはならない
+- endpoint contract が open set または現行 normative slice で string 維持対象の field について、validation の正本を known values 定数へ移してはならない
 - docs 上の値集合が弱い field は `Unknown` member を持ってよいが、docs で閉集合が確認できる field は raw string 受理へ戻さない
 - raw diagnostics 起源の property は持ち込まない
 
@@ -974,7 +1089,7 @@ src/Exchanges/Bitflyer/Composition/
 
 ### 8.5 Architecture Enforcement
 
-Stage10 の規約は文書だけで終わらせず、arch test で機械検証する前提とする。
+本書の規約は文書だけで終わらせず、arch test で機械検証する前提とする。
 
 検証対象:
 
@@ -997,7 +1112,7 @@ Stage10 の規約は文書だけで終わらせず、arch test で機械検証�
 
 ## 9. endpoint 運用正本
 
-Stage10 の endpoint 運用正本は venue ごとの matrix とする。  
+endpoint 運用正本は venue ごとの matrix とする。  
 現時点の正本は以下。
 
 - [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md)
@@ -1095,58 +1210,11 @@ venue ごとの endpoint matrix は、少なくとも以下の metadata を持�
 - `ExpectedStatus`、`ResponseShape`、`AuthType` の変更は contract change として扱う
 - 互換性判断はコード差分ではなく matrix metadata を基準に行う
 
-## 10. 初期対象 endpoint
+## 10. Verification And Live Test Policy
 
-Stage10 で優先する endpoint:
-
-- `GetMarkets`
-- `GetBoard`
-- `GetExecutionsPublic`
-- `GetTicker`
-- `GetBalance`
-- `GetCollateral`
-- `GetCollateralAccounts`
-- `GetChildOrders`
-- `GetExecutionsPrivate`
-- `GetPositions`
-- `GetCollateralHistory`
-- `GetTradingCommission`
-- `SendChildOrder`
-- `CancelChildOrder`
-- `CancelAllChildOrders`
-
-役割:
-
-- `GetMarkets`
-  - public top-level array response の template
-- `GetBoard`
-  - public object + nested array response の template
-- `GetExecutionsPublic`
-  - public paging/filter array response の template
-- `GetTicker`
-  - public read の template
-- `GetBalance`
-  - private read と top-level array 契約の template
-- `GetCollateral`
-  - private object response の template
-- `GetCollateralAccounts`
-  - private array response の空 request template
-- `GetChildOrders`
-  - optional query と paging/filter を持つ private read endpoint の template
-- `GetExecutionsPrivate`
-  - required query + optional paging/filter を持つ private read endpoint の template
-- `GetPositions`
-  - required query を持つ private read endpoint の template
-- `GetCollateralHistory`
-  - paging only private read endpoint の template
-- `GetTradingCommission`
-  - required query + object response を持つ private read endpoint の template
-- `SendChildOrder`
-  - private write と request encode の template
-- `CancelChildOrder`
-  - 注文 lifecycle 補助 endpoint の template
-- `CancelAllChildOrders`
-  - destructive private write + `Unit` response の template
+本節は、library 共通正本として保持すべき検証契約だけを扱う。  
+過去の初期対象 endpoint、bootstrap、実装順、DoD は [`docs/archive/library-bootstrap-and-history.md`](./archive/library-bootstrap-and-history.md) を参照する。
+endpoint ごとの live / manual verification の危険度分類と配置は [`docs/verification.md`](./verification.md) を正本とする。
 
 ### 10.1 Test 契約
 
@@ -1180,7 +1248,7 @@ Stage10 で優先する endpoint:
   - cleanup を含む
   - 同一 endpoint を `Protocol` と `Native` の parity で二重送信しない
 
-### 10.2 Live Test Opt-In and Write Safety
+### 10.2 Live Test Opt-In And Write Safety
 
 live test の実行条件と、state を変更する endpoint の safety 要件は以下を正本とする。
 
@@ -1189,13 +1257,13 @@ live test の実行条件と、state を変更する endpoint の safety 要件�
   - `local/live-enabled`
 - public read live test は global opt-in だけを要求する
 - private read live test は global opt-in と認証解決可能条件を要求する
-- private credentials は `age` file で供給する
-  - `EXCHANGEAPI_BITFLYER_CREDENTIALS_AGE_FILE_PATH`
-  - `EXCHANGEAPI_AGE_IDENTITY_FILE_PATH`
-  - 2 つの file path はどちらも環境変数で明示指定する
+- private credentials は credential profile から `age` file provider を解決して供給する
+  - 既定 profile path は `local/credentials/credential-profile.json` とする
+  - profile 内 path 省略時は `local/credentials/current/age-identity.txt` と `local/credentials/current/<venue>.age` の symlink convention を使う
+  - CLI / MCP / live test の正本契約では API key 読み込みに環境変数を使わない
   - 復号後 JSON の canonical format は `version`, `venue`, `apiKey`, `apiSecret` を必須とする flat object である
   - `label`, `generatedAt`, `expiresAt`, `note` は optional metadata として持ってよい
-  - account / profile / multi-key selection は current phase では file format に持ち込まず、上層で credentials file path を切り替えて解決する
+  - account / profile / multi-key selection は現行 normative slice では file format に持ち込まず、上層で credentials file path を切り替えて解決する
 - private write live test は global opt-in、認証解決可能条件、local marker file がある場合のみ実行する
   - `local/bitflyer-live-write-enabled`
 - destructive 範囲が広い write live test は dedicated local marker を別に要求する
@@ -1206,14 +1274,16 @@ live test の実行条件と、state を変更する endpoint の safety 要件�
 - destructive 範囲が広い write live test は preflight safety check を持つ
   - `CancelAllChildOrders` は対象 product を固定し、`ACTIVE` child orders が empty の場合のみ実行する
 - matrix 上 `CleanupPolicy = Required` の endpoint は cleanup 手順を同じ test に含める
-- matrix 上 `CleanupPolicy = NotSupported` の endpoint は Stage10 の write live test 対象に含めない
-- ただし cleanup 不可でも、negative status で資産移動が発生しないことが仕様で保証される場合に限り、negative live contract を別扱いで持ってよい
+- matrix 上 `CleanupPolicy = NotSupported` の endpoint は write live test 対象に含めない
+- cleanup 不可 endpoint の success path は live automation 対象に含めない
+- ただし cleanup 不可でも、negative status で資産移動が発生しないことが request 条件で説明できる場合に限り、negative live contract を success path と別扱いで持ってよい
   - `Withdraw` は wrong-code による negative status を確認対象にできる
   - この場合も native classification は current normative に従う
     - non-success HTTP status は `Http`
     - negative status の観測は child `Protocol` call の body で行う
-- cleanup 不可 endpoint でも、request / response contract、unit test、役割分離済み test、dedicated negative live contract が揃っていれば `Fixed` に上げてよい
-  - `Withdraw` は `200 + message_id` の success contract と wrong-code negative live contract の両方を固定対象にしてよい
+- cleanup 不可 endpoint の `Fixed` 判定は success path live automation を意味しない
+  - request / response contract、unit test、役割分離済み test、dedicated negative live contract が揃っていれば `Fixed` に上げてよい
+  - `Withdraw` は `200 + message_id` の success contract を deterministic contract で固定し、wrong-code negative live contract を別枠で固定対象にしてよい
 - write test は最小数量、最小影響の request を使う
 - `SendChildOrder` のような endpoint は `Protocol` と `Native` の parity 実行で二重送信しない
 - cleanup 用 endpoint がある場合は acceptance id / order id を保持し、後続 cleanup を必ず試みる
@@ -1226,22 +1296,24 @@ live test で `Protocol` debug logging を使う場合は、以下を正本と�
 
 Current normative:
 
-- 現行 phase では live test の debug logging は env で切り替えない
+- 現行 normative slice では live test の debug logging は env で切り替えない
 - live test の raw log 出力先は `local/logs/<venue>/live-tests/`
 - raw log は test 実行ごとに local のみへ出力する
 - raw log 自体は repository artifact にしない
+- 実行結果を後から確認する証跡として残す場合は、必要な範囲を `local/evidence/` 配下へ整理する
 - raw log の canonical timestamp は UTC とする
-- raw log は確認性向上のため `TimestampJst` を併記する
-- `TimestampJst` は `+09:00` offset 付きの日本時間とする
+- raw log は確認性向上のため local with offset の timestamp を併記してよい
+- local timestamp は実行環境の local time zone を既定とする
 
 Reserved additive extension:
 
-- file name や artifact 表示を JST 優先にしてよい
+- file name や artifact 表示を local time 優先にしてよい
 - ただし UTC の canonical timestamp を削除しない
 
 ### 10.4 Artifact Generation Policy
 
 repository に残す live artifact は、local raw log から生成した sanitize 済み artifact のみとする。
+local-only の実行証跡は `local/evidence/` 配下へ置き、repository の正本として扱わない。
 
 原則:
 
@@ -1273,189 +1345,7 @@ artifact に含めてはいけない項目:
 - 署名値
 - raw local filesystem path
 
-## 11. 過去実装の扱い
-
-### 11.1 正本にしないもの
-
-- git history 上の file 配置
-- `partial` 前提の facade 実装
-- facade に endpoint 実装を直接生やす構成
-- `Native` の validation 実装を中央集約フォルダ構成の正本として扱うこと
-
-### 11.2 流用してよいもの
-
-- transport
-- signer
-- runtime
-- DTO 契約
-- encoder / converter / validator の中身
-- test assertion
-- live test 基盤
-
-### 11.3 判断原則
-
-- 過去コードの場所ではなく、新しい責務境界を優先する
-- 「そのまま残せるか」ではなく「新しい endpoint module へ安全に移せるか」で流用可否を判断する
-
-## 12. Blank-Slate Bootstrap
-
-blank slate から実装を再開する際は、以下を最初に作る。
-
-```text
-src/Exchanges/Bitflyer/
-  Protocol/
-  Native/
-  Composition/
-  Vocabulary/
-tests/Exchanges/Bitflyer/
-  Protocol.Tests/
-  Native.Tests/
-  Composition.Tests/
-  LiveTests/
-
-src/Exchanges/Binance/
-  Protocol/
-  Native/
-  Composition/
-  Vocabulary/
-tests/Exchanges/Binance/
-  Protocol.Tests/
-  Native.Tests/
-  Composition.Tests/
-  LiveTests/
-```
-
-原則:
-
-- venue ごとに `Protocol` / `Native` / `Composition` の 3 project を作る
-- 次に `Protocol.Tests` / `Native.Tests` / `Composition.Tests` を作る
-- `LiveTests` は read endpoint の parity が通ってから追加する
-- `ExchangeApi.slnx` は上記 project を追加するまで空のままでよい
-
-### 12.1 Bootstrap Manifest
-
-最初に作る project と root namespace は以下で固定する。
-
-```text
-src/Exchanges/Bitflyer/Protocol/ExchangeApi.Exchanges.Bitflyer.Protocol.csproj
-  RootNamespace: ExchangeApi.Exchanges.Bitflyer.Protocol
-
-src/Exchanges/Bitflyer/Native/ExchangeApi.Exchanges.Bitflyer.Native.csproj
-  RootNamespace: ExchangeApi.Exchanges.Bitflyer.Native
-
-src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj
-  RootNamespace: ExchangeApi.Exchanges.Bitflyer.Composition
-
-tests/Exchanges/Bitflyer/Protocol.Tests/ExchangeApi.Exchanges.Bitflyer.Protocol.Tests.csproj
-  RootNamespace: ExchangeApi.Tests.Exchanges.Bitflyer.Protocol.Tests
-
-tests/Exchanges/Bitflyer/Native.Tests/ExchangeApi.Exchanges.Bitflyer.Native.Tests.csproj
-  RootNamespace: ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests
-
-tests/Exchanges/Bitflyer/Composition.Tests/ExchangeApi.Exchanges.Bitflyer.Composition.Tests.csproj
-  RootNamespace: ExchangeApi.Tests.Exchanges.Bitflyer.Composition.Tests
-
-tests/Exchanges/Bitflyer/LiveTests/ExchangeApi.Exchanges.Bitflyer.LiveTests.csproj
-  RootNamespace: ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests
-
-src/Exchanges/Binance/Protocol/ExchangeApi.Exchanges.Binance.Protocol.csproj
-  RootNamespace: ExchangeApi.Exchanges.Binance.Protocol
-
-src/Exchanges/Binance/Native/ExchangeApi.Exchanges.Binance.Native.csproj
-  RootNamespace: ExchangeApi.Exchanges.Binance.Native
-
-src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj
-  RootNamespace: ExchangeApi.Exchanges.Binance.Composition
-
-src/Exchanges/Binance/Vocabulary/ExchangeApi.Exchanges.Binance.Vocabulary.csproj
-  RootNamespace: ExchangeApi.Exchanges.Binance.Vocabulary
-
-tests/Exchanges/Binance/Protocol.Tests/ExchangeApi.Exchanges.Binance.Protocol.Tests.csproj
-  RootNamespace: ExchangeApi.Tests.Exchanges.Binance.Protocol.Tests
-
-tests/Exchanges/Binance/Native.Tests/ExchangeApi.Exchanges.Binance.Native.Tests.csproj
-  RootNamespace: ExchangeApi.Tests.Exchanges.Binance.Native.Tests
-
-tests/Exchanges/Binance/Composition.Tests/ExchangeApi.Exchanges.Binance.Composition.Tests.csproj
-  RootNamespace: ExchangeApi.Tests.Exchanges.Binance.Composition.Tests
-
-tests/Exchanges/Binance/LiveTests/ExchangeApi.Exchanges.Binance.LiveTests.csproj
-  RootNamespace: ExchangeApi.Tests.Exchanges.Binance.LiveTests
-```
-
-project reference の正本:
-
-- `Native` -> `Protocol`
-- `Composition` -> `Protocol`, `Native`
-- `Protocol.Tests` -> `Protocol`
-- `Native.Tests` -> `Native`, `Protocol`
-- `Composition.Tests` -> `Composition`, `Protocol`, `Native`
-- `LiveTests` -> `Composition`, `Protocol`, `Native`
-
-venue-specific `Vocabulary` project を作る場合の正本:
-
-- `Protocol` -> `Vocabulary`
-- `Native` -> `Vocabulary`, `Protocol`
-- `Composition` -> `Vocabulary`, `Protocol`, `Native`
-
-## 13. 実装順
-
-1. 文書を正本として固定する
-2. `Protocol` / `Native` の `GetMarkets` を facade + endpoint module に移す
-3. `GetTicker` を移す
-4. `GetBoard` を移す
-5. `GetExecutionsPublic` を移す
-6. `GetBalance` を移す
-7. `GetCollateral` / `GetCollateralAccounts` を移す
-8. `GetChildOrders` / `GetExecutionsPrivate` / `GetCollateralHistory` を移す
-9. `GetPositions` を移す
-10. `SendChildOrder` / `CancelChildOrder` を移す
-11. `CancelAllChildOrders` を移す
-12. module 集約 object を導入して facade constructor を整理する
-13. `Composition` を更新する
-14. test を facade / endpoint module / composition に役割分離する
-15. `partial` 依存構成と不要 helper を整理する
-
-### 13.1 Codex 実装戦略
-
-Codex は以下の順で実装する。
-
-1. endpoint metadata を確認する
-2. `Protocol` endpoint module を生成する
-3. `Native` DTO を生成する
-4. `Native` endpoint module を生成する
-5. facade forwarding method を生成する
-6. `Composition` で配線する
-7. endpoint test / facade test / composition test を追加する
-
-## 14. DoD
-
-- `Protocol` / `Native` の責務境界が明確
-- facade と endpoint module の役割分担が明確
-- 文書統治が定義され、`docs/spec.md` と matrix の主従が固定されている
-- 依存規約が文書化され、破ってよい場所が `Composition` に限定されている
-- architecture enforcement の対象が明記されている
-- facade の主公開面が `*CallAsync(...)` に固定されている
-- `Call` の最低要件と nested `Protocol` call が定義されている
-- error kind の使い分けが固定されている
-- `Transport` / `Http` / `Codec` / `Semantic` / `Mapping` の境界が定義されている
-- `Protocol` endpoint に共通 interface を置かず、endpoint-specific interface を使う方針が定義されている
-- `Call` の success / failure 不変条件が定義されている
-- `Native` が API contract rule までを扱い、business rule を持たないことが定義されている
-- validation stage 語彙が本書に従っている
-- test の役割分担が固定されている
-- endpoint metadata の必須列が定義されている
-- 公開対象 row に `TBD` を残さない規則が定義されている
-- compatibility / versioning 方針が定義されている
-- write safety 規約が定義されている
-- `Native` が exchange-native contract として定義されている
-- `Unified` の意味同一性ルールが定義されている
-- library と external adapter の境界が定義されている
-- `Unified` を上位層として追加できる
-- endpoint 運用正本が venue ごとの `docs/endpoints-<venue>.md` に固定されている
-- 既存試作は移行材料であって設計正本ではないことが明記されている
-
-## 15. Out of Scope
+## 11. Out of Scope
 
 - 取引所横断 DTO
 - 取引所横断 capability

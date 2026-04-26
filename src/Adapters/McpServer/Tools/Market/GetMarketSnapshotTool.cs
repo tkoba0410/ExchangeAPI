@@ -29,7 +29,7 @@ public sealed class GetMarketSnapshotTool
                     details: new Dictionary<string, string?> { ["symbol"] = symbol }));
         }
 
-        var tickerCall = await _gateway.GetTickerCallAsync(symbol, cancellationToken);
+        var tickerCall = await _gateway.GetTickerAsync(symbol, cancellationToken);
         if (!tickerCall.IsSuccess || tickerCall.Response is null)
         {
             return McpToolExecutionResult<GetMarketSnapshotResponse>.Failure(
@@ -41,7 +41,7 @@ public sealed class GetMarketSnapshotTool
                     error: tickerCall.Error));
         }
 
-        var boardStateCall = await _gateway.GetBoardStateCallAsync(symbol, cancellationToken);
+        var boardStateCall = await _gateway.GetBoardStateAsync(symbol, cancellationToken);
         if (!boardStateCall.IsSuccess || boardStateCall.Response is null)
         {
             return McpToolExecutionResult<GetMarketSnapshotResponse>.Failure(

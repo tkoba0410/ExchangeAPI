@@ -16,7 +16,10 @@ public static class BitflyerOptionsFactory
             return (null, common.Failure);
         }
 
-        var credentialResolution = BitflyerCredentialResolver.Resolve(environment);
+        var credentialResolution = BitflyerCredentialResolver.Resolve(
+            environment,
+            common.CredentialProfilePath,
+            ProcessAgeCredentialDecryptor.Instance);
         if (credentialResolution.HasFailure)
         {
             return (null, ExecutionOutcome.InputError(
@@ -37,7 +40,7 @@ public static class BitflyerOptionsFactory
         {
             BaseUri = common.BaseUri ?? new Uri("https://api.bitflyer.com"),
             RequestTimeout = common.Timeout,
-            Credentials = credentials,
+            ApiCredentialProvider = credentials,
             UseTickerAliasPath = invocationOptions.HasFlag("use-ticker-alias-path"),
             EnableProtocolDebugLogging = invocationOptions.HasFlag("enable-protocol-debug-log"),
             ProtocolDebugLogDirectory = common.ProtocolDebugLogDirectory ?? Path.Combine("local", "logs", "bitflyer", "protocol"),

@@ -106,7 +106,7 @@ public static class GetBalanceHistoryCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
+        using var bundle = BitflyerClientFactory.CreateNativeClientBundle(created.Options);
         if (bundle.Private is null)
         {
             return ExecutionOutcome.InputError(
@@ -114,7 +114,7 @@ public static class GetBalanceHistoryCommand
                 BitflyerCredentialResolver.BuildMissingCredentialMessage());
         }
 
-        var call = await bundle.Private.GetBalanceHistoryCallAsync((GetBalanceHistoryRequest)request, cancellationToken);
+        var call = await bundle.Private.GetBalanceHistoryAsync((GetBalanceHistoryRequest)request, cancellationToken);
         return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "private", "get-balance-history"), call);
     }
 }

@@ -2,14 +2,22 @@ using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Runtime;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Internal.Shared;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Calls;
+using ExchangeApi.Primitives.Credentials;
 using ExchangeApi.Primitives.Protocol;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Private.Endpoints.GetCollateralAccounts;
 
 public interface IGetCollateralAccountsProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         CancellationToken cancellationToken = default);
+
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return SendAsync(cancellationToken);
+    }
 }
 
 public sealed class GetCollateralAccountsProtocolEndpoint : IGetCollateralAccountsProtocolEndpoint
@@ -22,8 +30,22 @@ public sealed class GetCollateralAccountsProtocolEndpoint : IGetCollateralAccoun
         _transport = transport;
     }
 
-    public async Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         CancellationToken cancellationToken = default)
+    {
+        return SendAsyncCore(null, cancellationToken);
+    }
+
+    public Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        return SendAsyncCore(credentialSession, cancellationToken);
+    }
+
+    private async Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsyncCore(
+        IApiCredentialSession? credentialSession,
+        CancellationToken cancellationToken)
     {
         var request = new ProtocolRequest
         {
@@ -34,7 +56,9 @@ public sealed class GetCollateralAccountsProtocolEndpoint : IGetCollateralAccoun
             BodyText = null,
         };
 
-        var result = await _transport.SendAsync(request, ProtocolTransportAuthMode.KeySecret, cancellationToken);
+        var result = await (credentialSession is null
+            ? _transport.SendAsync(request, ProtocolTransportAuthMode.KeySecret, cancellationToken)
+            : _transport.SendAsync(request, ProtocolTransportAuthMode.KeySecret, credentialSession, cancellationToken));
         return ProtocolCallFactory.ToProtocolCall(
             request,
             result,

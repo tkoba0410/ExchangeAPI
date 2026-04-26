@@ -33,7 +33,7 @@ public sealed class FixedContractTests
 
         AssertCallMethod(
             typeof(IBinancePublicNativeApi),
-            nameof(IBinancePublicNativeApi.GetKlinesCallAsync),
+            nameof(IBinancePublicNativeApi.GetKlinesAsync),
             typeof(GetKlinesRequest),
             typeof(IReadOnlyList<GetKlines.Item>));
     }
@@ -86,7 +86,7 @@ public sealed class FixedContractTests
         Assert.Equal(requestType, parameters[0].ParameterType);
         Assert.Equal(typeof(CancellationToken), parameters[1].ParameterType);
 
-        var expectedCallType = typeof(Call<,>).MakeGenericType(requestType, responseType);
+        var expectedCallType = typeof(CallResult<,>).MakeGenericType(requestType, responseType);
         var expectedReturnType = typeof(Task<>).MakeGenericType(expectedCallType);
         Assert.Equal(expectedReturnType, method.ReturnType);
     }

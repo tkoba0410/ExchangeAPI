@@ -56,7 +56,7 @@ public sealed class GetExecutionsPublicNativeEndpointTests
         Assert.Equal(CallErrorKinds.Semantic, call.Error!.Kind);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetExecutionsPublic", Method = "GET", Path = "/v1/getexecutions", Query = null, BodyText = null },

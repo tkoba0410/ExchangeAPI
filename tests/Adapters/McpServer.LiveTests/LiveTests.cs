@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text.Json;
-using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using ExchangeApi.Adapters.McpServer.Infrastructure;
 using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
@@ -8,6 +7,7 @@ using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 using ExchangeApi.Adapters.McpServer.Tools;
+using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
 using ExchangeApi.Tests.Adapters.McpServer.LiveTests.Infrastructure;
@@ -21,8 +21,8 @@ public sealed class LiveTests
     {
         var result = await RunAsync(
             _ => new ExchangeApiMcpToolDispatcher(
-                BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions()),
-                BinanceClientFactory.CreateNativeClient()),
+                BitflyerClientFactory.CreateNativeClientBundle(new BitflyerClientOptions()),
+                BinanceClientFactory.CreateNativeClientBundle()),
             BuildInitializeRequest(1),
             BuildToolsListRequest(2),
             BuildToolCallRequest(3, "get_market_snapshot", new { symbol = "BTC_JPY" }));
@@ -59,8 +59,8 @@ public sealed class LiveTests
     {
         var result = await RunAsync(
             _ => new ExchangeApiMcpToolDispatcher(
-                BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions()),
-                BinanceClientFactory.CreateNativeClient()),
+                BitflyerClientFactory.CreateNativeClientBundle(new BitflyerClientOptions()),
+                BinanceClientFactory.CreateNativeClientBundle()),
             BuildInitializeRequest(1),
             BuildToolsListRequest(2),
             BuildToolCallRequest(
@@ -92,8 +92,8 @@ public sealed class LiveTests
     {
         var result = await RunAsync(
             _ => new ExchangeApiMcpToolDispatcher(
-                BitflyerClientFactory.CreateNativeClient(new BitflyerClientOptions()),
-                BinanceClientFactory.CreateNativeClient()),
+                BitflyerClientFactory.CreateNativeClientBundle(new BitflyerClientOptions()),
+                BinanceClientFactory.CreateNativeClientBundle()),
             BuildInitializeRequest(1),
             BuildToolCallRequest(
                 2,

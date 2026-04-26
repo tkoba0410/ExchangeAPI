@@ -9,7 +9,7 @@ namespace ExchangeApi.Exchanges.Bitflyer.Protocol.Public.Endpoints.GetExecutions
 
 public interface IGetExecutionsPublicProtocolEndpoint
 {
-    Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         int? count,
         long? before,
@@ -27,7 +27,7 @@ public sealed class GetExecutionsPublicProtocolEndpoint : IGetExecutionsPublicPr
         _transport = transport;
     }
 
-    public async Task<Call<ProtocolRequest, ProtocolResponse>> SendAsync(
+    public async Task<CallResult<ProtocolRequest, ProtocolResponse>> SendAsync(
         string? productCode,
         int? count,
         long? before,

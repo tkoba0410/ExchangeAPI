@@ -45,63 +45,63 @@ public sealed class BitflyerPublicNativeApi : IBitflyerPublicNativeApi
         _getTicker = getTicker;
     }
 
-    public Task<Call<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> GetMarketsCallAsync(
+    public Task<CallResult<GetMarketsRequest, IReadOnlyList<GetMarkets.Item>>> GetMarketsAsync(
         GetMarketsRequest request,
         CancellationToken cancellationToken = default)
     {
         return _getMarkets.CallAsync(request, cancellationToken);
     }
 
-    public Task<Call<GetBoardRequest, GetBoardResponse>> GetBoardCallAsync(
+    public Task<CallResult<GetBoardRequest, GetBoardResponse>> GetBoardAsync(
         GetBoardRequest request,
         CancellationToken cancellationToken = default)
     {
         return _getBoard.CallAsync(request, cancellationToken);
     }
 
-    public Task<Call<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateCallAsync(
+    public Task<CallResult<GetBoardStateRequest, GetBoardStateResponse>> GetBoardStateAsync(
         GetBoardStateRequest request,
         CancellationToken cancellationToken = default)
     {
         return _getBoardState.CallAsync(request, cancellationToken);
     }
 
-    public Task<Call<GetHealthRequest, GetHealthResponse>> GetHealthCallAsync(
+    public Task<CallResult<GetHealthRequest, GetHealthResponse>> GetHealthAsync(
         GetHealthRequest request,
         CancellationToken cancellationToken = default)
     {
         return _getHealth.CallAsync(request, cancellationToken);
     }
 
-    public Task<Call<GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateCallAsync(
+    public Task<CallResult<GetFundingRateRequest, GetFundingRateResponse>> GetFundingRateAsync(
         GetFundingRateRequest request,
         CancellationToken cancellationToken = default)
     {
         return _getFundingRate.CallAsync(request, cancellationToken);
     }
 
-    public Task<Call<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageCallAsync(
+    public Task<CallResult<GetCorporateLeverageRequest, GetCorporateLeverageResponse>> GetCorporateLeverageAsync(
         GetCorporateLeverageRequest request,
         CancellationToken cancellationToken = default)
     {
         return _getCorporateLeverage.CallAsync(request, cancellationToken);
     }
 
-    public Task<Call<GetChatsRequest, IReadOnlyList<GetChats.Item>>> GetChatsCallAsync(
+    public Task<CallResult<GetChatsRequest, IReadOnlyList<GetChats.Item>>> GetChatsAsync(
         GetChatsRequest request,
         CancellationToken cancellationToken = default)
     {
         return _getChats.CallAsync(request, cancellationToken);
     }
 
-    public Task<Call<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> GetExecutionsCallAsync(
+    public Task<CallResult<GetExecutionsPublicRequest, IReadOnlyList<GetExecutionsPublic.Item>>> GetExecutionsAsync(
         GetExecutionsPublicRequest request,
         CancellationToken cancellationToken = default)
     {
         return _getExecutions.CallAsync(request, cancellationToken);
     }
 
-    public Task<Call<GetTickerRequest, GetTickerResponse>> GetTickerCallAsync(
+    public Task<CallResult<GetTickerRequest, GetTickerResponse>> GetTickerAsync(
         GetTickerRequest request,
         CancellationToken cancellationToken = default)
     {

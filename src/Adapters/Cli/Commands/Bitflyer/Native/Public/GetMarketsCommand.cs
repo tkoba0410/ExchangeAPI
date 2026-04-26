@@ -63,8 +63,8 @@ public static class GetMarketsCommand
             return created.Failure;
         }
 
-        using var bundle = BitflyerClientFactory.CreateNativeClient(created.Options);
-        var call = await bundle.Public.GetMarketsCallAsync((GetMarketsRequest)request, cancellationToken);
+        using var bundle = BitflyerClientFactory.CreateNativeClientBundle(created.Options);
+        var call = await bundle.Public.GetMarketsAsync((GetMarketsRequest)request, cancellationToken);
         return ExecutionOutcome.FromCall(new CommandPath("bitflyer", "native", "public", "get-markets"), call);
     }
 }

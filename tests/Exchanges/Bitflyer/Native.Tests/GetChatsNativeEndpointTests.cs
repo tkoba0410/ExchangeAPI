@@ -38,7 +38,7 @@ public sealed class GetChatsNativeEndpointTests
         Assert.Equal(new DateTimeOffset(2015, 7, 8, 2, 50, 59, 970, TimeSpan.Zero), call.Response[0].Date);
     }
 
-    private static Call<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
+    private static CallResult<ProtocolRequest, ProtocolResponse> SuccessProtocolCall(string bodyText)
     {
         return CallFactory.Success(
             new ProtocolRequest { EndpointId = "GetChats", Method = "GET", Path = "/v1/getchats", Query = null, BodyText = null },

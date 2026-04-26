@@ -1,6 +1,6 @@
 using System.Text.Json;
-using ExchangeApi.Adapters.Cli.Infrastructure;
 using ExchangeApi.Adapters.Cli.Formatting;
+using ExchangeApi.Adapters.Cli.Infrastructure;
 
 namespace ExchangeApi.Adapters.Cli.Wizard;
 

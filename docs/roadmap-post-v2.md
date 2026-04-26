@@ -36,6 +36,24 @@
 
 `Unified`、`ExchangeApi.Optional.Resilience`、credentials provider 拡張、`samples/`、MCP client / human trial CLI、package / project consolidation は `v2.1.0` では扱わない。
 
+## 1.2 v2.2.0 候補
+
+`v2.2.0` では、`v2.1.0` で追加した logging / evidence / MCP inspection surface を前提に、運用導線と release verification の整理を候補とする。
+
+候補:
+
+- evidence helper integration
+  - manual / live verification から `local/evidence/<phase>/<yyyymmdd>-<label>/` を作成しやすくする
+  - default では evidence / log を作らず、opt-in のみとする
+- release verification script 整理
+  - local package smoke に `ExchangeApi.Optional.Logging` を含める
+  - GitHub Packages consumer smoke の手順を script 化または runbook 化する
+  - release asset 作成手順を script 化する
+- MCP inspection operational runbook
+  - private read inspection tools の live verification を再実行しやすくする
+
+`Unified`、`ExchangeApi.Optional.Resilience`、credentials provider 拡張、full MCP client、write operation の MCP tool、package / project consolidation は `v2.2.0` では扱わない候補とする。
+
 ## 2. optional project 候補
 
 `optional` は、core 正本に入れると責務が太るが、実用上あると便利な具体実装を置く場所とする。

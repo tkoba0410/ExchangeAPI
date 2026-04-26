@@ -46,7 +46,7 @@ bash scripts/pack-local-nuget.sh
 - publish guide:
   - `docs/guides/package-publish.md`
 - current published baseline:
-  - `v2.1.0`
+  - `v2.2.0`
 - current published verification:
   - `ExchangeApi.Exchanges.Bitflyer.Composition v1.0.0` の consumer smoke test を確認済み
   - `ExchangeApi.Exchanges.Binance.Composition v1.0.0` の consumer smoke test を確認済み
@@ -58,6 +58,10 @@ bash scripts/pack-local-nuget.sh
   - `ExchangeApi.Optional.Credentials v2.1.0` の GitHub Packages consumer smoke test を確認済み
   - `ExchangeApi.Optional.Logging v2.1.0` の GitHub Packages consumer smoke test を確認済み
   - `ExchangeApi.Optional.Logging v2.1.0` の GitHub Packages publish を確認済み
+  - `ExchangeApi.Exchanges.Bitflyer.Composition v2.2.0` の GitHub Packages consumer smoke test を確認済み
+  - `ExchangeApi.Optional.Credentials v2.2.0` の GitHub Packages consumer smoke test を確認済み
+  - `ExchangeApi.Optional.Logging v2.2.0` の GitHub Packages consumer smoke test を確認済み
+  - `ExchangeApi.Optional.Logging v2.2.0` の GitHub Packages publish を確認済み
 - v2.2.0 release verification:
   - local consumer smoke は `ExchangeApi.Optional.Logging` を含める
   - GitHub Packages consumer smoke は `scripts/smoke-github-packages-consumer.sh` で確認する
@@ -144,6 +148,7 @@ CLI / MCP Server は NuGet package ではなく executable artifact として扱
 - checksum asset name は `exchangeapi-linux-x64.sha256` と `exchangeapi-mcp-linux-x64.sha256` とする
 - `v2.0.0` release では上記 4 asset を GitHub Release に添付済み
 - `v2.1.0` release では上記 4 asset を GitHub Release に添付済み
+- `v2.2.0` release では上記 4 asset を GitHub Release に添付済み
 - `v2.2.0` では `scripts/create-release-assets.sh` を標準 helper とし、`local/publish/release-assets/v<version>/` に上記 4 asset を生成する
 - v2 初手では executable 配布方式の大規模変更は行わない
 - 複数 RID matrix、installer、archive format、署名付き binary は post-v2 検討とする

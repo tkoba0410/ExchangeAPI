@@ -6,7 +6,7 @@
 
 注記:
 
-- 現在の公開固定点は `v2.1.0` である
+- 現在の公開固定点は `v2.2.0` である
 - 本書の package version と API 例は v2 系の local consumer 導線を示す
 - release 前確認では、`2.2.0-local.*` のような local package version を使ってよい
 

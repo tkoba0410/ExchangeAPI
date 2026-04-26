@@ -5,7 +5,7 @@
 
 注記:
 
-- 現在の公開固定点は `v2.1.0` である
+- 現在の公開固定点は `v2.2.0` である
 - 本書の current command 例は `v2.2.0` の publish 手順を示す
 - `v2.2.0` publish 前の確認では、`2.2.0-local.*` のような local package version を使う
 - `v2.2.0` publish 前の最終確認では、publish/tag/release は実行せず、`2.2.0-local.final` などの local version で preflight する
@@ -175,5 +175,5 @@ token は次の順で取得する。
 ## Notes
 
 - local NuGet feed と GitHub Packages feed を混同しない
-- `stage` 系、`v1.0.0`、`v2.0.0` は履歴であり、package の current public baseline は `v2.1.0`
+- `stage` 系、`v1.0.0`、`v2.0.0`、`v2.1.0` は履歴であり、package の current public baseline は `v2.2.0`
 - nuget.org 公開はこの文書の対象外

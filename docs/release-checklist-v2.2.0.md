@@ -3,7 +3,19 @@
 最終更新: 2026-04-26
 位置づけ: v2.2.0 release checklist
 
-状態: draft
+状態: `v2.2.0` released
+
+release 完了日: 2026-04-26
+
+完了済み:
+
+- deterministic tests / local pack / local consumer smoke
+- live tests safe skip without opt-in
+- GitHub Packages publish: library / optional packages `2.2.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer.Composition`, `ExchangeApi.Optional.Credentials`, `ExchangeApi.Optional.Logging`
+- tag: `v2.2.0`
+- GitHub Release: `ExchangeAPI v2.2.0`
+- release assets: `exchangeapi-linux-x64`, `exchangeapi-linux-x64.sha256`, `exchangeapi-mcp-linux-x64`, `exchangeapi-mcp-linux-x64.sha256`
 
 ## 1. Scope Confirmation
 
@@ -111,21 +123,40 @@ bash scripts/smoke-github-packages-consumer.sh 2.2.0
 
 確認項目:
 
-- [ ] `ExchangeApi.Exchanges.Bitflyer.Composition 2.2.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Credentials 2.2.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Logging 2.2.0` を restore / build / run できる
-- [ ] `BitflyerClientFactory` を参照できる
-- [ ] `PlainTextApiCredentialProviderFactory` を参照できる
-- [ ] `Redactor` を参照できる
-- [ ] secret が `[REDACTED]` になる
-- [ ] token / secret が stdout / stderr に出ない
+- [x] `ExchangeApi.Exchanges.Bitflyer.Composition 2.2.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Credentials 2.2.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Logging 2.2.0` を restore / build / run できる
+- [x] `BitflyerClientFactory` を参照できる
+- [x] `PlainTextApiCredentialProviderFactory` を参照できる
+- [x] `Redactor` を参照できる
+- [x] secret が `[REDACTED]` になる
+- [x] token / secret が stdout / stderr に出ない
 
 ## 9. Release Gate
 
-- [ ] Git working tree が release 前に clean である
+- [x] Git working tree が release 前に clean である
 - [x] generated `.nupkg` は `local/nuget/` 配下にのみ存在し、git 管理対象に含めない
 - [x] generated release assets は `local/publish/` 配下にのみ存在し、git 管理対象に含めない
 - [x] `local/evidence/` の run directory は git 管理対象に含めない
-- [ ] GitHub Packages publish 前に `2.2.0-local.*` で preflight している
-- [ ] GitHub Packages publish 後、対象 package が見える
+- [x] GitHub Packages publish 前に `2.2.0-local.*` で preflight している
+- [x] GitHub Packages publish 後、対象 package が見える
 - [x] v3.0.0 方針が roadmap に残っている
+
+実施結果:
+
+```text
+date: 2026-04-26
+deterministic tests: dotnet test ExchangeApi.slnx --no-restore passed
+local pack: bash scripts/pack-local-nuget.sh 2.2.0-local.checklist passed
+local consumer smoke: bash scripts/smoke-local-nuget-consumer.sh 2.2.0-local.checklist passed
+release asset helper: bash scripts/create-release-assets.sh 2.2.0-local.checklist linux-x64 Release passed
+live tests without opt-in: dotnet test ExchangeApi.LiveTests.slnx --no-restore skipped safely
+package publish: GITHUB_TOKEN="$(gh auth token)" bash scripts/push-github-packages.sh 2.2.0 passed
+GitHub Packages consumer smoke: bash scripts/smoke-github-packages-consumer.sh 2.2.0 passed
+release assets:
+  local/publish/release-assets/v2.2.0/exchangeapi-linux-x64
+  local/publish/release-assets/v2.2.0/exchangeapi-linux-x64.sha256
+  local/publish/release-assets/v2.2.0/exchangeapi-mcp-linux-x64
+  local/publish/release-assets/v2.2.0/exchangeapi-mcp-linux-x64.sha256
+release asset checksum: passed
+```

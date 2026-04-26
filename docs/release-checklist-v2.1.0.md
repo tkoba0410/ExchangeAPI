@@ -125,8 +125,20 @@ secret keyword scan: passed
 
 ## 7. Release Gate
 
-- [ ] Git working tree が release 前に clean である
+- [x] Git working tree が release 前に clean である
 - [x] generated `.nupkg` は `local/nuget/` 配下にのみ存在し、git 管理対象に含めない
 - [x] `local/evidence/` の run directory は git 管理対象に含めない
 - [x] GitHub Packages publish 前に `2.1.0-local.*` で preflight している
-- [ ] GitHub Packages publish 後、`ExchangeApi.Optional.Logging 2.1.0` が見える
+- [x] GitHub Packages publish 後、`ExchangeApi.Optional.Logging 2.1.0` が見える
+
+実施結果:
+
+```text
+date: 2026-04-26
+local pack: bash scripts/pack-local-nuget.sh 2.1.0
+local consumer smoke: bash scripts/smoke-local-nuget-consumer.sh 2.1.0
+publish: GITHUB_TOKEN="$(gh auth token)" bash scripts/push-github-packages.sh 2.1.0
+GitHub Packages verification:
+  ExchangeApi.Primitives 2.1.0 visible
+  ExchangeApi.Optional.Logging 2.1.0 visible
+```

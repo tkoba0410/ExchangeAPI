@@ -1,6 +1,6 @@
 # ExchangeAPI Post-v2 Roadmap
 
-最終更新: 2026-04-26
+最終更新: 2026-04-27
 位置づけ: post-v2 roadmap
 
 本書は、`v2.0.0` には含めないが、`v2.0.0` 以降に検討する候補を記録する。  
@@ -20,6 +20,7 @@
 | `samples/` directory | 将来候補 | guide 内サンプルが大きくなった場合に、実行可能サンプルとして分離できるため | 早期作成は保守対象を増やす |
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
 | venue 単位 package / project consolidation | v3 採用 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v3.0.0 で package consolidation を採用する |
+| venue 追加 | v4 候補 | v3 で整理した venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
 
 ## 1.1 v2.1.0 採用項目
 
@@ -75,6 +76,110 @@
 layer-specific venue package は publish 対象から外す。
 
 詳細は [`docs/plan-v3.0.0.md`](./plan-v3.0.0.md)、[`docs/breaking-changes-v3.0.0.md`](./breaking-changes-v3.0.0.md)、[`docs/migration-v3.0.0.md`](./migration-v3.0.0.md) を参照する。
+
+## 1.5 v3.x / v4 / v5+ ロードマップ
+
+現時点の大きな流れは次を基本とする。
+
+```text
+v3.0.0: package / project consolidation
+v3.1.0: venue onboarding template と追加 venue 準備
+v3.2.0: v4 venue candidate selection / matrix preparation
+v4.0.0: new venue public read MVP
+v4.x: public read coverage expansion
+v5.0.0: Unified public read MVP
+v5.x: Unified expansion
+v6.0.0+: private/account/trading unified capability, only if meaning is defensible
+```
+
+### v3.1.0 候補
+
+v3.1.0 は、新 venue 追加の準備を目的とする。
+
+候補:
+
+- venue onboarding guide
+- venue project / endpoint module checklist
+- endpoint matrix template
+- deterministic test template
+- safe live read verification template
+- package / smoke / docs の再利用性改善
+
+### v3.2.0 候補
+
+v3.2.0 は、v4 で追加する venue の候補選定と事前整理を目的とする。
+
+候補:
+
+- 追加 venue candidate の比較
+- public read MVP に必要な endpoint の棚卸し
+- symbol / product code / timestamp / decimal / nullability の差分調査
+- endpoint matrix へ `UnifiedCandidate` などの判定欄を追加するか検討
+- 追加 venue spike を行う場合も、正式 surface ではなく調査扱いに留める
+
+### v4.0.0 候補
+
+v4.0.0 は、新しい取引所を正式追加するフェーズとする。
+v4 は既存 API の大掃除ではなく、v3 で整理した venue 構造の拡張性を実証する release として扱う。
+
+v4.0.0 venue 追加 MVP:
+
+- `Vocabulary`
+- public read `Protocol`
+- public read `Native`
+- `Composition` factory
+- deterministic tests
+- opt-in live read test
+- endpoint matrix
+- local consumer smoke
+
+private endpoint、order、cancel、withdraw、deposit は v4.0.0 の初期 MVP には含めない。
+
+venue 選定基準:
+
+- public read API が安定している
+- authentication が比較的明確
+- API docs が機械的に読める
+- rate limit / error contract が理解しやすい
+- live verification が safe にできる
+- state-changing endpoint を後回しにできる
+- 日本円ペアや利用想定に合う場合は加点する
+
+### v5.0.0 候補
+
+v5.0.0 は、Unified public read MVP の候補 release とする。
+Unified は、v4 で複数 venue の実装経験を得てから設計する。
+
+v5 Unified MVP に載せやすい候補:
+
+- market list / supported market discovery
+- ticker / price snapshot
+- order book snapshot
+- kline / candle
+- exchange health / market status
+
+v5 でも避ける候補:
+
+- order placement
+- cancel
+- withdraw / deposit
+- margin / collateral
+- account balance の完全統一
+- fee / commission の統一
+
+### v6.0.0+ 候補
+
+v6.0.0 以降は、Unified の private / account / trading capability を検討してよい。
+ただし、利用者意図、前提条件、副作用、結果解釈、主要エラー分類の意味同一性を防御できる場合だけ扱う。
+
+候補:
+
+- private read Unified
+- account snapshot Unified
+- trading capability Unified
+
+これらは venue ごとの差が大きいため、version ありきで採用しない。
+意味同一性を説明できない capability は `Native` に留める。
 
 ## 2. optional project 候補
 

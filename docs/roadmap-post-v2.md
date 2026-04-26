@@ -1,6 +1,6 @@
 # ExchangeAPI Post-v2 Roadmap
 
-最終更新: 2026-04-24  
+最終更新: 2026-04-26
 位置づけ: post-v2 roadmap
 
 本書は、`v2.0.0` には含めないが、`v2.0.0` 以降に検討する候補を記録する。  
@@ -19,7 +19,7 @@
 | evidence 自動整理 | 将来候補 | `local/evidence/` 標準構成へ artifact / log / notes を自動配置できるため | まず標準構成だけ固定する |
 | `samples/` directory | 将来候補 | guide 内サンプルが大きくなった場合に、実行可能サンプルとして分離できるため | 早期作成は保守対象を増やす |
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
-| venue 単位 package / project consolidation | v3 候補 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v2.1.0 では扱わず、破壊的変更を許容する v3 の主題候補とする |
+| venue 単位 package / project consolidation | v3 候補 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v2.2.0 では扱わず、破壊的変更を許容する v3 の主題候補とする |
 
 ## 1.1 v2.1.0 採用項目
 
@@ -36,23 +36,38 @@
 
 `Unified`、`ExchangeApi.Optional.Resilience`、credentials provider 拡張、`samples/`、MCP client / human trial CLI、package / project consolidation は `v2.1.0` では扱わない。
 
-## 1.2 v2.2.0 候補
+## 1.2 v2.2.0 採用範囲
 
-`v2.2.0` では、`v2.1.0` で追加した logging / evidence / MCP inspection surface を前提に、運用導線と release verification の整理を候補とする。
+`v2.2.0` では、`v2.1.0` で追加した logging / evidence / MCP inspection surface を前提に、運用導線と release verification の整理を採用する。
+`v2.2.0` は operational / verification release として扱い、新しい大規模機能や破壊的変更は入れない。
 
-候補:
+採用範囲:
 
 - evidence helper integration
-  - manual / live verification から `local/evidence/<phase>/<yyyymmdd>-<label>/` を作成しやすくする
+  - scripts / verification から `local/evidence/<phase>/<yyyymmdd>-<label>/` を作成しやすくする
   - default では evidence / log を作らず、opt-in のみとする
+  - CLI option は追加しない
 - release verification script 整理
   - local package smoke に `ExchangeApi.Optional.Logging` を含める
-  - GitHub Packages consumer smoke の手順を script 化または runbook 化する
+  - GitHub Packages consumer smoke の手順を script 化する
   - release asset 作成手順を script 化する
 - MCP inspection operational runbook
   - private read inspection tools の live verification を再実行しやすくする
 
-`Unified`、`ExchangeApi.Optional.Resilience`、credentials provider 拡張、full MCP client、write operation の MCP tool、package / project consolidation は `v2.2.0` では扱わない候補とする。
+`Unified`、`ExchangeApi.Optional.Resilience`、credentials provider 拡張、full MCP client、write operation の MCP tool、package / project consolidation は `v2.2.0` では扱わない。
+
+## 1.3 v3.0.0 方針
+
+`v2.2.0` の次は `v3.0.0` を想定する。
+
+`v3.0.0` の主題候補:
+
+- package / project consolidation
+- venue 単位 package 導線の整理
+- package 数と利用者導線の見直し
+
+`v3.0.0` では破壊的変更を許容し、論理性・合理性・可読性を優先する。
+`v2.2.0` では v3 詳細設計までは行わず、候補を本 roadmap に残す。
 
 ## 2. optional project 候補
 

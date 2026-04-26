@@ -21,6 +21,8 @@
 - 外部利用者向けには「何をどう生成するか」を文書で固定する
 - `v2.0.0` では配布方式自体を変更しない
 - v2 の追加機能は、必要に応じて library package 群または executable に含める
+- `v2.2.0` は operational / verification release として扱い、配布方式自体は変更しない
+- generated evidence / logs / release assets は default では作らず、明示 script 実行時のみ `local/` 配下へ作る
 
 ## Artifact Layout
 
@@ -56,6 +58,10 @@ bash scripts/pack-local-nuget.sh
   - `ExchangeApi.Optional.Credentials v2.1.0` の GitHub Packages consumer smoke test を確認済み
   - `ExchangeApi.Optional.Logging v2.1.0` の GitHub Packages consumer smoke test を確認済み
   - `ExchangeApi.Optional.Logging v2.1.0` の GitHub Packages publish を確認済み
+- v2.2.0 release verification:
+  - local consumer smoke は `ExchangeApi.Optional.Logging` を含める
+  - GitHub Packages consumer smoke は `scripts/smoke-github-packages-consumer.sh` で確認する
+  - package / project consolidation は含めない
 
 v2 方針:
 
@@ -97,7 +103,7 @@ v2.1.0 追加対象:
 - `src/Optional/Logging/ExchangeApi.Optional.Logging.csproj` は solution に含める
 - `scripts/pack-local-nuget.sh` は solution pack により `ExchangeApi.Optional.*` を生成対象に含める
 - `scripts/push-github-packages.sh` は `ExchangeApi.Optional.*.<version>.nupkg` を publish 対象に含める
-- package publish guide と local consumer guide は `ExchangeApi.Optional.Credentials` の参照例を含める
+- package publish guide と local consumer guide は `ExchangeApi.Optional.Credentials` と `ExchangeApi.Optional.Logging` の参照例を含める
 
 ### CLI
 
@@ -138,8 +144,28 @@ CLI / MCP Server は NuGet package ではなく executable artifact として扱
 - checksum asset name は `exchangeapi-linux-x64.sha256` と `exchangeapi-mcp-linux-x64.sha256` とする
 - `v2.0.0` release では上記 4 asset を GitHub Release に添付済み
 - `v2.1.0` release では上記 4 asset を GitHub Release に添付済み
+- `v2.2.0` では `scripts/create-release-assets.sh` を標準 helper とし、`local/publish/release-assets/v<version>/` に上記 4 asset を生成する
 - v2 初手では executable 配布方式の大規模変更は行わない
 - 複数 RID matrix、installer、archive format、署名付き binary は post-v2 検討とする
+
+v2.2.0 release asset 生成:
+
+```bash
+bash scripts/create-release-assets.sh 2.2.0 linux-x64 Release
+```
+
+期待 layout:
+
+```text
+local/publish/release-assets/v2.2.0/
+  exchangeapi-linux-x64
+  exchangeapi-linux-x64.sha256
+  exchangeapi-mcp-linux-x64
+  exchangeapi-mcp-linux-x64.sha256
+```
+
+`scripts/create-release-assets.sh` は `scripts/publish-cli-local.sh` と `scripts/publish-mcp-local.sh` を順番に呼ぶ。
+CLI / MCP publish は共有 `bin/obj` を使うため、release asset helper 内では並列実行しない。
 
 ## Git Policy
 
@@ -161,10 +187,13 @@ CLI / MCP Server は NuGet package ではなく executable artifact として扱
 - `docs/local-nuget-consumer.md`
 - `docs/guides/package-publish.md`
 - `docs/release-checklist-v2.0.0.md`
+- `docs/release-checklist-v2.2.0.md`
 - `scripts/pack-local-nuget.sh`
 - `scripts/push-github-packages.sh`
 - `scripts/smoke-local-nuget-consumer.sh`
 - `scripts/publish-cli-local.sh`
 - `scripts/publish-mcp-local.sh`
+- `scripts/create-release-assets.sh`
+- `scripts/smoke-github-packages-consumer.sh`
 - `scripts/run-safe-live-tests.sh`
 - `scripts/run-v2-release-preflight.sh`

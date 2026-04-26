@@ -6,9 +6,9 @@
 
 注記:
 
-- 現在の公開固定点は `v2.0.0` である
-- 本書の package version と API 例は `v2.0.0` の local consumer 導線を示す
-- release 前確認では、`2.0.0-local.*` のような local package version を使ってよい
+- 現在の公開固定点は `v2.1.0` である
+- 本書の package version と API 例は v2 系の local consumer 導線を示す
+- release 前確認では、`2.2.0-local.*` のような local package version を使ってよい
 
 ## 1. 前提
 
@@ -19,7 +19,7 @@
 ExchangeAPI repository 側では repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 2.0.0
+bash scripts/pack-local-nuget.sh 2.2.0-local.checklist
 ```
 
 生成先は `local/nuget`。
@@ -50,13 +50,13 @@ path は absolute path を推奨する。
 bitFlyer を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 2.0.0
+dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 2.2.0-local.checklist
 ```
 
 Binance を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 2.0.0
+dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 2.2.0-local.checklist
 ```
 
 より狭い依存だけ欲しい場合は、個別 package を直接参照してよい。
@@ -74,7 +74,7 @@ dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 2.0.0
 credential provider 実装が必要な場合は optional package を追加する。
 
 ```bash
-dotnet add package ExchangeApi.Optional.Credentials --version 2.0.0
+dotnet add package ExchangeApi.Optional.Credentials --version 2.2.0-local.checklist
 ```
 
 `ExchangeApi.Optional.Credentials` は、core library の必須依存ではない。  
@@ -83,7 +83,7 @@ dotnet add package ExchangeApi.Optional.Credentials --version 2.0.0
 secret-safe logging / evidence helper が必要な場合は optional logging package を追加する。
 
 ```bash
-dotnet add package ExchangeApi.Optional.Logging --version 2.1.0
+dotnet add package ExchangeApi.Optional.Logging --version 2.2.0-local.checklist
 ```
 
 `ExchangeApi.Optional.Logging` は、core library の必須依存ではない。
@@ -91,7 +91,7 @@ JSONL writer、redaction helper、evidence directory helper が必要な consume
 
 ## 4. 最小利用例
 
-以下は `v2.0.0` の API 名を使う例である。
+以下は v2 系の API 名を使う例である。
 
 consumer app の `Program.cs`:
 
@@ -129,11 +129,12 @@ dotnet build
 ExchangeAPI repo 側で local feed と v2 API surface の consumer smoke を確認する場合は、次を実行する。
 
 ```bash
-bash scripts/smoke-local-nuget-consumer.sh 2.0.0
+bash scripts/smoke-local-nuget-consumer.sh 2.2.0-local.checklist
 ```
 
-この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer.Composition` と `ExchangeApi.Optional.Credentials` を local feed から restore して build する。
+この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer.Composition`、`ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging` を local feed から restore して build / run する。
 実 API には接続しない。
+`BitflyerClientFactory`、`PlainTextApiCredentialProviderFactory`、`Redactor` を参照できること、secret value が `[REDACTED]` になること、smoke output が secret-free であることを確認する。
 
 ## 6. Version 更新ルール
 

@@ -6,10 +6,12 @@
 注記:
 
 - 現在の公開固定点は `v2.1.0` である
-- 本書の `2.0.0` command 例は `v2.0.0` の publish 手順を示す
-- `v2.0.0` publish 前の確認では、`2.0.0-local.*` のような local package version を使う
-- `v2.0.0` publish 前の最終確認では、publish/tag/release は実行せず、`2.0.0-local.final` などの local version で preflight する
+- 本書の current command 例は `v2.2.0` の publish 手順を示す
+- `v2.2.0` publish 前の確認では、`2.2.0-local.*` のような local package version を使う
+- `v2.2.0` publish 前の最終確認では、publish/tag/release は実行せず、`2.2.0-local.final` などの local version で preflight する
 - `v2.1.0` では `ExchangeApi.Optional.Logging` を optional package publish 対象に含める
+- `v2.2.0` は operational / verification release として扱い、package / project consolidation は含めない
+- `v2.2.0` publish 後は `scripts/smoke-github-packages-consumer.sh` で consumer smoke を実行する
 
 ## Scope
 
@@ -39,7 +41,7 @@ v2 方針:
 repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 2.0.0
+bash scripts/pack-local-nuget.sh 2.2.0
 ```
 
 生成先:
@@ -49,13 +51,19 @@ bash scripts/pack-local-nuget.sh 2.0.0
 release 前に static test、local pack、local consumer smoke、CLI/MCP executable publish をまとめて確認する場合は、次を使う。
 
 ```bash
-bash scripts/run-v2-release-preflight.sh 2.0.0-local.preflight
+bash scripts/run-v2-release-preflight.sh 2.2.0-local.preflight
 ```
 
 safe live verification まで含める場合だけ、次のように明示 opt-in する。
 
 ```bash
-EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-v2-release-preflight.sh 2.0.0-local.preflight
+EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-v2-release-preflight.sh 2.2.0-local.preflight
+```
+
+v2.2.0 の release asset 生成は次を使う。
+
+```bash
+bash scripts/create-release-assets.sh 2.2.0 linux-x64 Release
 ```
 
 ## 2. GitHub Packages Source
@@ -76,6 +84,7 @@ publish には package write 権限を持つ token が必要。
 - 必要に応じて `repo`
 
 token は repo に保存しない。
+token は stdout / stderr に出さない。
 
 例:
 
@@ -88,13 +97,13 @@ export GITHUB_TOKEN=...
 `dotnet nuget push` を使う。
 
 ```bash
-bash scripts/push-github-packages.sh 2.0.0
+bash scripts/push-github-packages.sh 2.2.0
 ```
 
 script を使わず個別 push したい場合は、`dotnet nuget push` を直接使ってよい。
 
 ```bash
-dotnet nuget push "local/nuget/ExchangeApi.Primitives.2.0.0.nupkg" \
+dotnet nuget push "local/nuget/ExchangeApi.Primitives.2.2.0.nupkg" \
   --source "https://nuget.pkg.github.com/tkoba0410/index.json" \
   --api-key "$GITHUB_TOKEN" \
   --skip-duplicate
@@ -140,6 +149,28 @@ publish 後は GitHub Packages で package 一覧を確認する。
 - GitHub Packages consumer smoke: `ExchangeApi.Optional.Logging 2.1.0`
 - GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer.Composition 2.1.0`
 - GitHub Packages consumer smoke: `ExchangeApi.Optional.Credentials 2.1.0`
+
+`v2.2.0` では追加で次を確認する:
+
+- GitHub Packages publish: `ExchangeApi.Optional.Logging 2.2.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer.Composition 2.2.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Optional.Credentials 2.2.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Optional.Logging 2.2.0`
+- `BitflyerClientFactory`、`PlainTextApiCredentialProviderFactory`、`Redactor` を参照できること
+- secret が `[REDACTED]` になること
+- token、credentials、API key、API secret、signature、Authorization header が stdout / stderr に出ないこと
+
+GitHub Packages consumer smoke:
+
+```bash
+bash scripts/smoke-github-packages-consumer.sh 2.2.0
+```
+
+token は次の順で取得する。
+
+1. `GITHUB_TOKEN`
+2. `GH_TOKEN`
+3. `gh auth token`
 
 ## Notes
 

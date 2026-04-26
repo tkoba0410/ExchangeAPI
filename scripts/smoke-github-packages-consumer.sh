@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-repo_root="$(cd "${script_dir}/.." && pwd)"
-package_version="${1:-2.0.0-local.verify}"
+package_version="${1:?usage: bash scripts/smoke-github-packages-consumer.sh <version>}"
+feed_url="${EXCHANGEAPI_GITHUB_PACKAGES_FEED:-https://nuget.pkg.github.com/tkoba0410/index.json}"
+feed_user="${EXCHANGEAPI_GITHUB_PACKAGES_USER:-tkoba0410}"
 smoke_dir="$(mktemp -d)"
 
 cleanup() {
@@ -12,13 +12,25 @@ cleanup() {
 }
 trap cleanup EXIT
 
+token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
+if [[ -z "${token}" ]]; then
+  if command -v gh >/dev/null 2>&1; then
+    token="$(gh auth token 2>/dev/null || true)"
+  fi
+fi
+
+if [[ -z "${token}" ]]; then
+  echo "GitHub Packages token is required. Set GITHUB_TOKEN/GH_TOKEN or authenticate gh." >&2
+  exit 1
+fi
+
 dotnet new console \
   --framework net10.0 \
-  --name ExchangeApiConsumerSmoke \
-  --output "${smoke_dir}/ExchangeApiConsumerSmoke" \
+  --name ExchangeApiGitHubPackagesSmoke \
+  --output "${smoke_dir}/ExchangeApiGitHubPackagesSmoke" \
   >/dev/null
 
-cd "${smoke_dir}/ExchangeApiConsumerSmoke"
+cd "${smoke_dir}/ExchangeApiGitHubPackagesSmoke"
 
 cat > NuGet.config <<EOF
 <?xml version="1.0" encoding="utf-8"?>
@@ -26,8 +38,14 @@ cat > NuGet.config <<EOF
   <packageSources>
     <clear />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-    <add key="exchangeapi-local" value="${repo_root}/local/nuget" />
+    <add key="github" value="${feed_url}" />
   </packageSources>
+  <packageSourceCredentials>
+    <github>
+      <add key="Username" value="${feed_user}" />
+      <add key="ClearTextPassword" value="${token}" />
+    </github>
+  </packageSourceCredentials>
 </configuration>
 EOF
 
@@ -63,22 +81,22 @@ Console.WriteLine(
     request.ProductCode == ProductCodes.BtcJpy &&
     session.ApiKey == "api-key" &&
     redacted == "apiSecret=[REDACTED] payload=[REDACTED]"
-        ? "consumer-smoke-ok"
-        : "consumer-smoke-ng");
+        ? "github-packages-smoke-ok"
+        : "github-packages-smoke-ng");
 EOF
 
 dotnet restore --configfile NuGet.config >/dev/null
 dotnet build --no-restore >/dev/null
 
 output="$(dotnet run --no-build)"
-if [[ "${output}" != "consumer-smoke-ok" ]]; then
+if [[ "${output}" != "github-packages-smoke-ok" ]]; then
   echo "Unexpected smoke output: ${output}" >&2
   exit 1
 fi
 
-if [[ "${output}" == *"api-key"* || "${output}" == *"api-secret"* || "${output}" == *"secret-value"* ]]; then
+if [[ "${output}" == *"api-key"* || "${output}" == *"api-secret"* || "${output}" == *"secret-value"* || "${output}" == *"${token}"* ]]; then
   echo "Smoke output contained a secret marker" >&2
   exit 1
 fi
 
-echo "consumer smoke passed: ${package_version}"
+echo "GitHub Packages consumer smoke passed: ${package_version}"

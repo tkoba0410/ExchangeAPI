@@ -1,6 +1,6 @@
 # ExchangeAPI Verification Policy
 
-最終更新: 2026-04-24  
+最終更新: 2026-04-26
 位置づけ: verification 正本
 
 本書は、endpoint ごとの API 契約分類をもとに、live / manual verification の扱いを決めるための正本である。
@@ -193,11 +193,46 @@ local/evidence/<phase>/<yyyymmdd>-<label>/
 - credentials、署名値、API key / secret を evidence に含めてはならない
 - `ExchangeApi.Optional.Logging` の evidence helper を使う場合も、上記構成と secret-safe 原則を維持する
 - evidence run label は path traversal できないよう sanitize し、同一 run directory がある場合は suffix で衝突回避する
-- v2.1.0 では CLI / live test へ evidence helper を自動接続しない
-- v2.1.0 の MCP private read inspection live verification を実施する場合は、`local/evidence/local-live/<yyyymmdd>-v2.1.0-mcp-inspection/` を標準証跡先とする
+- v2.2.0 では evidence helper integration を scripts / verification に限定する
+- v2.2.0 では CLI option を追加しない
+- v2.2.0 では default で evidence / log を作らない
+- v2.2.0 の MCP private read inspection live verification を実施する場合は、`local/evidence/local-live/<yyyymmdd>-v2.2.0-mcp-inspection/` を標準証跡先とする
+- v2.2.0 の release evidence を残す場合は [`verification/release-evidence.md`](../verification/release-evidence.md) を参照する
 
 `local/app/` は ExchangeAPI には導入しない。  
 ExchangeAPI は library repo であり、通常実行アプリの I/O 正本を持たないためである。
+
+## 5.1 v2.2.0 Operational Verification
+
+`v2.2.0` は operational / verification release として、release・verification・evidence 運用の再現性を上げる。
+
+対象:
+
+- release verification script 整理
+- local / GitHub Packages consumer smoke
+- release asset helper
+- MCP inspection live verification runbook
+- scripts / verification に限定した evidence helper integration
+
+非対象:
+
+- package / project consolidation
+- public API breaking change
+- CLI evidence option
+- MCP write tool
+- state-changing operation
+
+secret-free rule:
+
+- credentials、API key、API secret、signature、Authorization header は evidence / log / result / exception / stdout / stderr に含めない
+- raw credential profile は evidence へコピーしない
+- evidence helper を使う場合も opt-in の scripts / verification に限定する
+
+MCP inspection live verification:
+
+- runbook は [`verification/mcp-inspection-live.md`](../verification/mcp-inspection-live.md) とする
+- 対象 tools は `get_collateral_accounts`、`get_balance_history`、`get_collateral_history`、`get_child_orders`
+- response shape は `accounts` / `items` / `items` / `orders`
 
 ## 6. 初期 Endpoint Inventory
 

@@ -1,6 +1,6 @@
 # MCP Tool Catalog
 
-最終更新: 2026-04-22  
+最終更新: 2026-04-26
 位置づけ: MCP tool ledger
 
 本書は、MCP Server が公開する tool surface と tool ごとの契約を台帳として管理する。  
@@ -137,6 +137,9 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - ただし private credentials を解決できない場合、private inspection read tool は advertise してはならない
 - private credentials の解決失敗は operator に通知してよいが、MCP client へは tool 非公開または structured error として表現する
 - v2.1.0 の inspection response shape は `accounts` / `items` / `items` / `orders` で固定し、`venue` / `accountContext` は response に含めない
+- v2.2.0 では [`verification/mcp-inspection-live.md`](../verification/mcp-inspection-live.md) を MCP inspection live verification runbook とする
+- v2.2.0 でも state-changing operation は MCP tool surface に追加しない
+- MCP result / error / stdout / stderr に credentials、API key、API secret、signature、Authorization header を含めてはならない
 
 ## 3. Common Rules
 

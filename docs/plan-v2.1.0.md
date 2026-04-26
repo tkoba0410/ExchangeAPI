@@ -29,6 +29,11 @@
 - credentials provider 拡張
 - `samples/` directory
 - MCP client / human trial CLI
+- CLI evidence option
+  - `--evidence-run`
+  - `--evidence-phase`
+- `docs/plan-v3.0.0.md` の追加
+  - v3 package / project consolidation は roadmap の候補記録に留める
 
 ## 3. Logging / Evidence 方針
 
@@ -38,6 +43,8 @@
 - CLI / MCP / live test は必要に応じて optional logging を参照してよい
 - credentials、API key、API secret、signature、Authorization header は log / evidence / exception / result に含めない
 - redaction は logging の後付け安全策ではなく、logging / evidence の前提部品として扱う
+- `v2.1.0` では CLI / live test へ evidence helper を接続しない
+- `v2.1.0` では optional logging の部品提供を release scope とする
 
 ## 4. MCP 方針
 
@@ -46,6 +53,13 @@
 - private read tool は credential profile 方針に従う
 - environment variable で API key / secret を読まない
 - private credentials を解決できない場合、private inspection read tool は `tools/list` に advertise しない
+- response shape は以下で固定する
+  - `get_collateral_accounts`: `accounts` array
+  - `get_balance_history`: `items` array
+  - `get_collateral_history`: `items` array
+  - `get_child_orders`: `orders` array
+- inspection response に `venue` / `accountContext` は含めない
+- MCP private read 4 tools は v2.1.0 release 前に 1 回 live verification することを推奨する
 
 ## 5. 完了条件
 

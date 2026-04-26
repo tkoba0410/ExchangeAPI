@@ -136,6 +136,7 @@ bitFlyer private read endpoint は、`Core Bot Tools` へ吸収するものと�
 - `Inspection Read Tools` も同じ原則で current process が実際に実行可能な tool だけを返す
 - ただし private credentials を解決できない場合、private inspection read tool は advertise してはならない
 - private credentials の解決失敗は operator に通知してよいが、MCP client へは tool 非公開または structured error として表現する
+- v2.1.0 の inspection response shape は `accounts` / `items` / `items` / `orders` で固定し、`venue` / `accountContext` は response に含めない
 
 ## 3. Common Rules
 

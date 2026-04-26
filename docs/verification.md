@@ -193,6 +193,8 @@ local/evidence/<phase>/<yyyymmdd>-<label>/
 - credentials、署名値、API key / secret を evidence に含めてはならない
 - `ExchangeApi.Optional.Logging` の evidence helper を使う場合も、上記構成と secret-safe 原則を維持する
 - evidence run label は path traversal できないよう sanitize し、同一 run directory がある場合は suffix で衝突回避する
+- v2.1.0 では CLI / live test へ evidence helper を自動接続しない
+- v2.1.0 の MCP private read inspection live verification を実施する場合は、`local/evidence/local-live/<yyyymmdd>-v2.1.0-mcp-inspection/` を標準証跡先とする
 
 `local/app/` は ExchangeAPI には導入しない。  
 ExchangeAPI は library repo であり、通常実行アプリの I/O 正本を持たないためである。

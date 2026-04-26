@@ -4,6 +4,7 @@ using ExchangeApi.Adapters.McpServer.Infrastructure;
 using ExchangeApi.Adapters.McpServer.Mapping;
 using ExchangeApi.Adapters.McpServer.Schema.Account;
 using ExchangeApi.Adapters.McpServer.Schema.Evaluation;
+using ExchangeApi.Adapters.McpServer.Schema.Inspection;
 using ExchangeApi.Adapters.McpServer.Schema.Klines;
 using ExchangeApi.Adapters.McpServer.Schema.Market;
 using ExchangeApi.Adapters.McpServer.Tools;
@@ -130,9 +131,45 @@ public sealed class LiveTests
                 {
                     venue = McpVenueIds.Bitflyer,
                     accountContext = McpAccountContextIds.Default,
+                }),
+            BuildToolCallRequest(
+                4,
+                "get_collateral_accounts",
+                new
+                {
+                    venue = McpVenueIds.Bitflyer,
+                    accountContext = McpAccountContextIds.Default,
+                }),
+            BuildToolCallRequest(
+                5,
+                "get_balance_history",
+                new
+                {
+                    venue = McpVenueIds.Bitflyer,
+                    accountContext = McpAccountContextIds.Default,
+                    count = 1,
+                }),
+            BuildToolCallRequest(
+                6,
+                "get_collateral_history",
+                new
+                {
+                    venue = McpVenueIds.Bitflyer,
+                    accountContext = McpAccountContextIds.Default,
+                    count = 1,
+                }),
+            BuildToolCallRequest(
+                7,
+                "get_child_orders",
+                new
+                {
+                    venue = McpVenueIds.Bitflyer,
+                    accountContext = McpAccountContextIds.Default,
+                    productCode = "BTC_JPY",
+                    count = 1,
                 }));
 
-        Assert.Equal(3, result.OutputLines.Count);
+        Assert.Equal(7, result.OutputLines.Count);
 
         var toolNames = ReadToolNames(result.OutputLines[1]);
         Assert.Contains("get_market_snapshot", toolNames);
@@ -153,6 +190,45 @@ public sealed class LiveTests
         Assert.True(decimal.TryParse(snapshot.Margin.DerivedAvailable, CultureInfo.InvariantCulture, out _));
         Assert.True(new[] { "ready", "restricted", "unknown" }.Contains(snapshot.AccountReadiness));
         Assert.All(snapshot.Positions, position => Assert.Equal("FX_BTC_JPY", position.Symbol));
+
+        var collateralAccounts = ReadStructuredContent<GetCollateralAccountsResponse>(result.OutputLines[3], out isError);
+        Assert.False(isError);
+        Assert.NotNull(collateralAccounts.Accounts);
+        Assert.All(collateralAccounts.Accounts, account =>
+        {
+            Assert.False(string.IsNullOrWhiteSpace(account.CurrencyCode));
+            Assert.True(decimal.TryParse(account.Amount, CultureInfo.InvariantCulture, out _));
+        });
+
+        var balanceHistory = ReadStructuredContent<GetBalanceHistoryResponse>(result.OutputLines[4], out isError);
+        Assert.False(isError);
+        Assert.NotNull(balanceHistory.Items);
+        Assert.True(balanceHistory.Items.Count <= 1);
+        Assert.All(balanceHistory.Items, item =>
+        {
+            Assert.False(string.IsNullOrWhiteSpace(item.CurrencyCode));
+            Assert.True(decimal.TryParse(item.Balance, CultureInfo.InvariantCulture, out _));
+        });
+
+        var collateralHistory = ReadStructuredContent<GetCollateralHistoryResponse>(result.OutputLines[5], out isError);
+        Assert.False(isError);
+        Assert.NotNull(collateralHistory.Items);
+        Assert.True(collateralHistory.Items.Count <= 1);
+        Assert.All(collateralHistory.Items, item =>
+        {
+            Assert.False(string.IsNullOrWhiteSpace(item.CurrencyCode));
+            Assert.True(decimal.TryParse(item.Amount, CultureInfo.InvariantCulture, out _));
+        });
+
+        var childOrders = ReadStructuredContent<GetChildOrdersResponse>(result.OutputLines[6], out isError);
+        Assert.False(isError);
+        Assert.NotNull(childOrders.Orders);
+        Assert.True(childOrders.Orders.Count <= 1);
+        Assert.All(childOrders.Orders, order =>
+        {
+            Assert.Equal("BTC_JPY", order.ProductCode);
+            Assert.True(decimal.TryParse(order.Size, CultureInfo.InvariantCulture, out _));
+        });
     }
 
     [McpServerPrivateReadLiveFact]

@@ -19,7 +19,7 @@
 | evidence 自動整理 | 将来候補 | `local/evidence/` 標準構成へ artifact / log / notes を自動配置できるため | まず標準構成だけ固定する |
 | `samples/` directory | 将来候補 | guide 内サンプルが大きくなった場合に、実行可能サンプルとして分離できるため | 早期作成は保守対象を増やす |
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
-| venue 単位 package / project consolidation | v3 候補 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v2.2.0 では扱わず、破壊的変更を許容する v3 の主題候補とする |
+| venue 単位 package / project consolidation | v3 採用 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v3.0.0 で package consolidation を採用する |
 
 ## 1.1 v2.1.0 採用項目
 
@@ -68,6 +68,13 @@
 
 `v3.0.0` では破壊的変更を許容し、論理性・合理性・可読性を優先する。
 `v2.2.0` では v3 詳細設計までは行わず、候補を本 roadmap に残す。
+
+## 1.4 v3.0.0 採用範囲
+
+`v3.0.0` では、venue package を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する。
+layer-specific venue package は publish 対象から外す。
+
+詳細は [`docs/plan-v3.0.0.md`](./plan-v3.0.0.md)、[`docs/breaking-changes-v3.0.0.md`](./breaking-changes-v3.0.0.md)、[`docs/migration-v3.0.0.md`](./migration-v3.0.0.md) を参照する。
 
 ## 2. optional project 候補
 

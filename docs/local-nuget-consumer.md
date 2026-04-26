@@ -7,8 +7,8 @@
 注記:
 
 - 現在の公開固定点は `v2.2.0` である
-- 本書の package version と API 例は v2 系の local consumer 導線を示す
-- release 前確認では、`2.2.0-local.*` のような local package version を使ってよい
+- 本書の package version と API 例は v3 系の local consumer 導線を示す
+- release 前確認では、`3.0.0-local.*` のような local package version を使ってよい
 
 ## 1. 前提
 
@@ -19,7 +19,7 @@
 ExchangeAPI repository 側では repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 2.2.0-local.checklist
+bash scripts/pack-local-nuget.sh 3.0.0-local.consolidation
 ```
 
 生成先は `local/nuget`。
@@ -50,31 +50,26 @@ path は absolute path を推奨する。
 bitFlyer を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 2.2.0-local.checklist
+dotnet add package ExchangeApi.Exchanges.Bitflyer --version 3.0.0-local.consolidation
 ```
 
 Binance を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Binance.Composition --version 2.2.0-local.checklist
+dotnet add package ExchangeApi.Exchanges.Binance --version 3.0.0-local.consolidation
 ```
 
-より狭い依存だけ欲しい場合は、個別 package を直接参照してよい。
+v3.0.0 では、venue layer-specific package は外部 consumer 向け publish 対象にしない。
+layer-specific namespace は aggregate package 内に残るが、package reference は venue 単位にする。
+
+維持する個別 package:
 
 - `ExchangeApi.Primitives`
-- `ExchangeApi.Exchanges.Bitflyer.Vocabulary`
-- `ExchangeApi.Exchanges.Bitflyer.Protocol`
-- `ExchangeApi.Exchanges.Bitflyer.Native`
-- `ExchangeApi.Exchanges.Bitflyer.Composition`
-- `ExchangeApi.Exchanges.Binance.Vocabulary`
-- `ExchangeApi.Exchanges.Binance.Protocol`
-- `ExchangeApi.Exchanges.Binance.Native`
-- `ExchangeApi.Exchanges.Binance.Composition`
 
 credential provider 実装が必要な場合は optional package を追加する。
 
 ```bash
-dotnet add package ExchangeApi.Optional.Credentials --version 2.2.0-local.checklist
+dotnet add package ExchangeApi.Optional.Credentials --version 3.0.0-local.consolidation
 ```
 
 `ExchangeApi.Optional.Credentials` は、core library の必須依存ではない。  
@@ -83,7 +78,7 @@ dotnet add package ExchangeApi.Optional.Credentials --version 2.2.0-local.checkl
 secret-safe logging / evidence helper が必要な場合は optional logging package を追加する。
 
 ```bash
-dotnet add package ExchangeApi.Optional.Logging --version 2.2.0-local.checklist
+dotnet add package ExchangeApi.Optional.Logging --version 3.0.0-local.consolidation
 ```
 
 `ExchangeApi.Optional.Logging` は、core library の必須依存ではない。
@@ -91,7 +86,7 @@ JSONL writer、redaction helper、evidence directory helper が必要な consume
 
 ## 4. 最小利用例
 
-以下は v2 系の API 名を使う例である。
+以下は v3 系の package 導線と既存 API 名を使う例である。
 
 consumer app の `Program.cs`:
 
@@ -129,10 +124,10 @@ dotnet build
 ExchangeAPI repo 側で local feed と v2 API surface の consumer smoke を確認する場合は、次を実行する。
 
 ```bash
-bash scripts/smoke-local-nuget-consumer.sh 2.2.0-local.checklist
+bash scripts/smoke-local-nuget-consumer.sh 3.0.0-local.consolidation
 ```
 
-この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer.Composition`、`ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging` を local feed から restore して build / run する。
+この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer`、`ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging` を local feed から restore して build / run する。
 実 API には接続しない。
 `BitflyerClientFactory`、`PlainTextApiCredentialProviderFactory`、`Redactor` を参照できること、secret value が `[REDACTED]` になること、smoke output が secret-free であることを確認する。
 
@@ -143,13 +138,13 @@ local feed へ再 pack するときは、同じ version を上書きするより
 推奨:
 
 ```bash
-bash scripts/pack-local-nuget.sh 2.0.1-local.1
+bash scripts/pack-local-nuget.sh 3.0.0-local.1
 ```
 
 その後、consumer repo 側でも package version を更新する。consumer repo は floating version ではなく、明示 version を固定する。
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition --version 2.0.1-local.1
+dotnet add package ExchangeApi.Exchanges.Bitflyer --version 3.0.0-local.1
 ```
 
 同じ version を再利用すると、consumer 側の global packages cache により古い package が使われ続けることがある。

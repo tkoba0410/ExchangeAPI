@@ -49,7 +49,7 @@ cat > NuGet.config <<EOF
 </configuration>
 EOF
 
-dotnet add package ExchangeApi.Exchanges.Bitflyer.Composition \
+dotnet add package ExchangeApi.Exchanges.Bitflyer \
   --version "${package_version}" \
   >/dev/null
 

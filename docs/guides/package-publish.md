@@ -6,20 +6,21 @@
 注記:
 
 - 現在の公開固定点は `v2.2.0` である
-- 本書の current command 例は `v2.2.0` の publish 手順を示す
-- `v2.2.0` publish 前の確認では、`2.2.0-local.*` のような local package version を使う
-- `v2.2.0` publish 前の最終確認では、publish/tag/release は実行せず、`2.2.0-local.final` などの local version で preflight する
+- 本書の current command 例は `v3.0.0` の publish 手順を示す
+- `v3.0.0` publish 前の確認では、`3.0.0-local.*` のような local package version を使う
+- `v3.0.0` publish 前の最終確認では、publish/tag/release は実行せず、`3.0.0-local.final` などの local version で preflight する
 - `v2.1.0` では `ExchangeApi.Optional.Logging` を optional package publish 対象に含める
 - `v2.2.0` は operational / verification release として扱い、package / project consolidation は含めない
 - `v2.2.0` publish 後は `scripts/smoke-github-packages-consumer.sh` で consumer smoke を実行する
+- `v3.0.0` では venue package を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する
 
 ## Scope
 
 publish 対象は library package と optional package とする。
 
 - `ExchangeApi.Primitives`
-- `ExchangeApi.Exchanges.Bitflyer.*`
-- `ExchangeApi.Exchanges.Binance.*`
+- `ExchangeApi.Exchanges.Bitflyer`
+- `ExchangeApi.Exchanges.Binance`
 - `ExchangeApi.Optional.*`
 
 次は package publish 対象にしない。
@@ -41,7 +42,7 @@ v2 方針:
 repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 2.2.0
+bash scripts/pack-local-nuget.sh 3.0.0
 ```
 
 生成先:
@@ -51,13 +52,13 @@ bash scripts/pack-local-nuget.sh 2.2.0
 release 前に static test、local pack、local consumer smoke、CLI/MCP executable publish をまとめて確認する場合は、次を使う。
 
 ```bash
-bash scripts/run-v2-release-preflight.sh 2.2.0-local.preflight
+bash scripts/run-v2-release-preflight.sh 3.0.0-local.preflight
 ```
 
 safe live verification まで含める場合だけ、次のように明示 opt-in する。
 
 ```bash
-EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-v2-release-preflight.sh 2.2.0-local.preflight
+EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-v2-release-preflight.sh 3.0.0-local.preflight
 ```
 
 v2.2.0 の release asset 生成は次を使う。
@@ -97,13 +98,13 @@ export GITHUB_TOKEN=...
 `dotnet nuget push` を使う。
 
 ```bash
-bash scripts/push-github-packages.sh 2.2.0
+bash scripts/push-github-packages.sh 3.0.0
 ```
 
 script を使わず個別 push したい場合は、`dotnet nuget push` を直接使ってよい。
 
 ```bash
-dotnet nuget push "local/nuget/ExchangeApi.Primitives.2.2.0.nupkg" \
+dotnet nuget push "local/nuget/ExchangeApi.Primitives.3.0.0.nupkg" \
   --source "https://nuget.pkg.github.com/tkoba0410/index.json" \
   --api-key "$GITHUB_TOKEN" \
   --skip-duplicate
@@ -171,6 +172,13 @@ token は次の順で取得する。
 1. `GITHUB_TOKEN`
 2. `GH_TOKEN`
 3. `gh auth token`
+
+`v3.0.0` では次を確認する:
+
+- GitHub Packages publish: `ExchangeApi.Exchanges.Bitflyer 3.0.0`
+- GitHub Packages publish: `ExchangeApi.Exchanges.Binance 3.0.0`
+- layer-specific venue package が `3.0.0` として publish されていないこと
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer 3.0.0`
 
 ## Notes
 

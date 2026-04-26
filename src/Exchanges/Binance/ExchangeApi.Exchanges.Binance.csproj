@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Description>ExchangeAPI Binance venue package with vocabulary, protocol, native, and composition surfaces.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Primitives/ExchangeApi.Primitives.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Vocabulary/**/*.cs" Exclude="Vocabulary/bin/**;Vocabulary/obj/**" />
+    <Compile Include="Protocol/**/*.cs" Exclude="Protocol/bin/**;Protocol/obj/**" />
+    <Compile Include="Native/**/*.cs" Exclude="Native/bin/**;Native/obj/**" />
+    <Compile Include="Composition/**/*.cs" Exclude="Composition/bin/**;Composition/obj/**" />
+  </ItemGroup>
+
+</Project>

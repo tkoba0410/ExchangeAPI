@@ -22,6 +22,7 @@
 - `v2.0.0` では配布方式自体を変更しない
 - v2 の追加機能は、必要に応じて library package 群または executable に含める
 - `v2.2.0` は operational / verification release として扱い、配布方式自体は変更しない
+- `v3.0.0` では venue package を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する
 - generated evidence / logs / release assets は default では作らず、明示 script 実行時のみ `local/` 配下へ作る
 
 ## Artifact Layout
@@ -67,12 +68,37 @@ bash scripts/pack-local-nuget.sh
   - GitHub Packages consumer smoke は `scripts/smoke-github-packages-consumer.sh` で確認する
   - package / project consolidation は含めない
 
+v3 方針:
+
+- 通常利用者は venue ごとの aggregate package を参照する
+- `ExchangeApi.Exchanges.Bitflyer` は bitFlyer の `Vocabulary` / `Protocol` / `Native` / `Composition` surface を含む
+- `ExchangeApi.Exchanges.Binance` は Binance の `Vocabulary` / `Protocol` / `Native` / `Composition` surface を含む
+- v2 の layer-specific venue package は v3.0.0 では publish 対象にしない
+
 v2 方針:
 
 - `v2.0.0` でも library は NuGet package を正式導線とする
 - 通常利用者は venue ごとの `Composition` package を参照する
 - `Protocol` / `Native` / `Vocabulary` / `Primitives` は、必要に応じて個別参照できる package として維持する
 - `ProjectReference` は repo 内開発または近接開発向けであり、外部 consumer の第一導線にはしない
+
+v3.0.0 package generation:
+
+- generated:
+  - `ExchangeApi.Primitives`
+  - `ExchangeApi.Exchanges.Bitflyer`
+  - `ExchangeApi.Exchanges.Binance`
+  - `ExchangeApi.Optional.Credentials`
+  - `ExchangeApi.Optional.Logging`
+- not generated:
+  - `ExchangeApi.Exchanges.Bitflyer.Vocabulary`
+  - `ExchangeApi.Exchanges.Bitflyer.Protocol`
+  - `ExchangeApi.Exchanges.Bitflyer.Native`
+  - `ExchangeApi.Exchanges.Bitflyer.Composition`
+  - `ExchangeApi.Exchanges.Binance.Vocabulary`
+  - `ExchangeApi.Exchanges.Binance.Protocol`
+  - `ExchangeApi.Exchanges.Binance.Native`
+  - `ExchangeApi.Exchanges.Binance.Composition`
 
 ### Optional Packages
 

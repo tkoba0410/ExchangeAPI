@@ -15,8 +15,8 @@ fi
 shopt -s nullglob
 packages=(
   "${repo_root}/local/nuget/ExchangeApi.Primitives.${package_version}.nupkg"
-  "${repo_root}/local/nuget/ExchangeApi.Exchanges.Bitflyer."*.${package_version}.nupkg
-  "${repo_root}/local/nuget/ExchangeApi.Exchanges.Binance."*.${package_version}.nupkg
+  "${repo_root}/local/nuget/ExchangeApi.Exchanges.Bitflyer.${package_version}.nupkg"
+  "${repo_root}/local/nuget/ExchangeApi.Exchanges.Binance.${package_version}.nupkg"
   "${repo_root}/local/nuget/ExchangeApi.Optional."*.${package_version}.nupkg
 )
 

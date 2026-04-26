@@ -5,54 +5,54 @@
 
 ## 1. Scope Confirmation
 
-- [ ] `ExchangeApi.Optional.Logging` を追加した
-- [ ] safe redaction を追加した
-- [ ] evidence directory helper を追加した
-- [ ] JSONL writer を追加した
-- [ ] MCP read-only inspection tools を追加した
-  - [ ] `get_collateral_accounts`
-  - [ ] `get_balance_history`
-  - [ ] `get_collateral_history`
-  - [ ] `get_child_orders`
-- [ ] package / project consolidation は v2.1.0 に含めていない
-- [ ] `Unified`、`Optional.Resilience`、credentials provider 拡張、samples、MCP client は v2.1.0 に含めていない
-- [ ] CLI evidence option は v2.1.0 に含めていない
-  - [ ] `--evidence-run` を追加していない
-  - [ ] `--evidence-phase` を追加していない
+- [x] `ExchangeApi.Optional.Logging` を追加した
+- [x] safe redaction を追加した
+- [x] evidence directory helper を追加した
+- [x] JSONL writer を追加した
+- [x] MCP read-only inspection tools を追加した
+  - [x] `get_collateral_accounts`
+  - [x] `get_balance_history`
+  - [x] `get_collateral_history`
+  - [x] `get_child_orders`
+- [x] package / project consolidation は v2.1.0 に含めていない
+- [x] `Unified`、`Optional.Resilience`、credentials provider 拡張、samples、MCP client は v2.1.0 に含めていない
+- [x] CLI evidence option は v2.1.0 に含めていない
+  - [x] `--evidence-run` を追加していない
+  - [x] `--evidence-phase` を追加していない
 
 ## 2. Documentation
 
-- [ ] `docs/plan-v2.1.0.md` が v2.1.0 の採用範囲と非対象を固定している
-- [ ] `docs/release-notes/v2.1.0.md` が主な変更点を説明している
-- [ ] `docs/spec.md` が optional logging の位置づけを説明している
-- [ ] `docs/verification.md` が evidence helper 利用時の secret-free 原則を説明している
-- [ ] `docs/mcp-server.md` が v2.1.0 MCP inspection tools と error boundary を説明している
-- [ ] `docs/mcp-tool-catalog.md` が 10 tool の visible surface と response shape を説明している
-- [ ] `docs/distribution.md` / package publish guide / local consumer guide が `ExchangeApi.Optional.Logging` を含めている
+- [x] `docs/plan-v2.1.0.md` が v2.1.0 の採用範囲と非対象を固定している
+- [x] `docs/release-notes/v2.1.0.md` が主な変更点を説明している
+- [x] `docs/spec.md` が optional logging の位置づけを説明している
+- [x] `docs/verification.md` が evidence helper 利用時の secret-free 原則を説明している
+- [x] `docs/mcp-server.md` が v2.1.0 MCP inspection tools と error boundary を説明している
+- [x] `docs/mcp-tool-catalog.md` が 10 tool の visible surface と response shape を説明している
+- [x] `docs/distribution.md` / package publish guide / local consumer guide が `ExchangeApi.Optional.Logging` を含めている
 
 ## 3. Optional.Logging Verification
 
-- [ ] `ExchangeApi.Optional.Logging` が `ExchangeApi.slnx` に含まれている
-- [ ] `ExchangeApi.Optional.Logging` が `ExchangeApi.Primitives` のみを参照している
-- [ ] core / exchange project から `ExchangeApi.Optional.Logging` を参照していない
-- [ ] redaction deterministic tests が通っている
-- [ ] evidence helper deterministic tests が通っている
-- [ ] JSONL writer deterministic tests が通っている
-- [ ] `apiKey` / `apiSecret` / `signature` / `Authorization` / `ACCESS-*` が test fixture 上で redacted される
+- [x] `ExchangeApi.Optional.Logging` が `ExchangeApi.slnx` に含まれている
+- [x] `ExchangeApi.Optional.Logging` が `ExchangeApi.Primitives` のみを参照している
+- [x] core / exchange project から `ExchangeApi.Optional.Logging` を参照していない
+- [x] redaction deterministic tests が通っている
+- [x] evidence helper deterministic tests が通っている
+- [x] JSONL writer deterministic tests が通っている
+- [x] `apiKey` / `apiSecret` / `signature` / `Authorization` / `ACCESS-*` が test fixture 上で redacted される
 
 ## 4. MCP Verification
 
-- [ ] `tools/list` に private credentials 利用時の 4 inspection tools が出る
-- [ ] private credentials がない場合、private inspection tools は advertise されない
-- [ ] MCP inspection schemas と `docs/mcp-tool-catalog.md` が一致している
-- [ ] response shape は現行形で固定する
-  - [ ] `get_collateral_accounts`: `accounts` array
-  - [ ] `get_balance_history`: `items` array
-  - [ ] `get_collateral_history`: `items` array
-  - [ ] `get_child_orders`: `orders` array
-- [ ] inspection response に `venue` / `accountContext` を含めていない
-- [ ] MCP state-changing operation を追加していない
-- [ ] MCP result / error / stderr に API key、secret、signature、Authorization header が含まれない
+- [x] `tools/list` に private credentials 利用時の 4 inspection tools が出る
+- [x] private credentials がない場合、private inspection tools は advertise されない
+- [x] MCP inspection schemas と `docs/mcp-tool-catalog.md` が一致している
+- [x] response shape は現行形で固定する
+  - [x] `get_collateral_accounts`: `accounts` array
+  - [x] `get_balance_history`: `items` array
+  - [x] `get_collateral_history`: `items` array
+  - [x] `get_child_orders`: `orders` array
+- [x] inspection response に `venue` / `accountContext` を含めていない
+- [x] MCP state-changing operation を追加していない
+- [x] MCP result / error / stderr に API key、secret、signature、Authorization header が含まれない
 
 ## 5. Required Local Verification
 
@@ -65,10 +65,10 @@ dotnet test ExchangeApi.LiveTests.slnx --no-restore
 
 確認項目:
 
-- [ ] deterministic tests passed
-- [ ] `ExchangeApi.Optional.Logging.2.1.0-local.checklist.nupkg` が生成される
-- [ ] local consumer smoke passed
-- [ ] live tests は opt-in なしで安全に skip する
+- [x] deterministic tests passed
+- [x] `ExchangeApi.Optional.Logging.2.1.0-local.checklist.nupkg` が生成される
+- [x] local consumer smoke passed
+- [x] live tests は opt-in なしで安全に skip する
 
 ## 6. MCP Private Read Live Verification
 
@@ -105,18 +105,28 @@ local/evidence/local-live/<yyyymmdd>-v2.1.0-mcp-inspection/
   notes/
 ```
 
+実施結果:
+
+```text
+date: 2026-04-26
+command: EXCHANGEAPI_RUN_LIVE_TESTS=1 dotnet test tests/Adapters/McpServer.LiveTests/ExchangeApi.Adapters.McpServer.LiveTests.csproj --no-restore
+result: passed, 5 passed, 0 failed, 0 skipped
+evidence: local/evidence/local-live/20260426-v2.1.0-mcp-inspection/
+secret keyword scan: passed
+```
+
 証跡ルール:
 
-- [ ] API key / secret / signature / Authorization header を含めない
-- [ ] request / response summary は secret-free な structured JSON のみを残す
-- [ ] raw credential profile をコピーしない
-- [ ] stdout / stderr に secret がないことを確認する
-- [ ] 実施できない場合は checklist 上で明示的に deferred とし、理由を残す
+- [x] API key / secret / signature / Authorization header を含めない
+- [x] request / response summary は secret-free な structured JSON のみを残す
+- [x] raw credential profile をコピーしない
+- [x] stdout / stderr に secret がないことを確認する
+- [x] live verification は実施済みのため deferred ではない
 
 ## 7. Release Gate
 
 - [ ] Git working tree が release 前に clean である
-- [ ] generated `.nupkg` は `local/nuget/` 配下にのみ存在し、git 管理対象に含めない
-- [ ] `local/evidence/` の run directory は git 管理対象に含めない
-- [ ] GitHub Packages publish 前に `2.1.0-local.*` で preflight している
+- [x] generated `.nupkg` は `local/nuget/` 配下にのみ存在し、git 管理対象に含めない
+- [x] `local/evidence/` の run directory は git 管理対象に含めない
+- [x] GitHub Packages publish 前に `2.1.0-local.*` で preflight している
 - [ ] GitHub Packages publish 後、`ExchangeApi.Optional.Logging 2.1.0` が見える

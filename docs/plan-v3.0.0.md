@@ -8,13 +8,15 @@
 
 ## 1. 目的
 
-`v3.0.0` では、v2 系で層別に公開していた venue package を、外部 consumer から見て venue 単位 package に整理する。
+`v3.0.0` では、v2 系で層別に公開していた venue package / project を、venue 単位 package / project に整理する。
 
 目的:
 
 - 外部 consumer の第一導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` にする
 - `Vocabulary` / `Protocol` / `Native` / `Composition` の層別 package を公開導線から外す
+- `Vocabulary` / `Protocol` / `Native` / `Composition` の層別 project を削除する
 - package 数を減らし、利用者が選ぶ package 名を venue 単位にする
+- 公開 package 単位と repo 内 project 単位を一致させる
 - namespace / facade / endpoint contract は必要最小限の変更に留める
 
 ## 2. 採用範囲
@@ -50,16 +52,29 @@ v3.0.0 では、次の v2 package を publish 対象から外す。
 - `ExchangeApi.Optional.Credentials`
 - `ExchangeApi.Optional.Logging`
 
-### 2.2 Internal Project Policy
+### 2.2 Project Consolidation
 
-v3.0.0 の初期 consolidation では、内部の層別 project は deterministic tests と adapter 開発の境界として残す。
-ただし層別 project は `IsPackable=false` とし、NuGet package としては公開しない。
+v3.0.0 では、内部の層別 project も削除し、venue ごとに 1 project へ統合する。
+`Protocol` / `Native` / `Composition` / `Vocabulary` は package / project 境界ではなく、folder / namespace / tests 上の設計境界として維持する。
 
-理由:
+削除する project:
 
-- `Protocol` / `Native` / `Composition` の依存方向と tests を一度に崩さない
-- package 導線の整理を先に完了する
-- 物理 project 削減は、test taxonomy と adapter reference 更新を含む別 commit で扱えるようにする
+- `src/Exchanges/Bitflyer/Vocabulary/ExchangeApi.Exchanges.Bitflyer.Vocabulary.csproj`
+- `src/Exchanges/Bitflyer/Protocol/ExchangeApi.Exchanges.Bitflyer.Protocol.csproj`
+- `src/Exchanges/Bitflyer/Native/ExchangeApi.Exchanges.Bitflyer.Native.csproj`
+- `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
+- `src/Exchanges/Binance/Vocabulary/ExchangeApi.Exchanges.Binance.Vocabulary.csproj`
+- `src/Exchanges/Binance/Protocol/ExchangeApi.Exchanges.Binance.Protocol.csproj`
+- `src/Exchanges/Binance/Native/ExchangeApi.Exchanges.Binance.Native.csproj`
+- `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
+
+維持する project:
+
+- `src/Exchanges/Bitflyer/ExchangeApi.Exchanges.Bitflyer.csproj`
+- `src/Exchanges/Binance/ExchangeApi.Exchanges.Binance.csproj`
+
+test project の `Protocol.Tests` / `Native.Tests` / `Composition.Tests` という分類名は、設計境界の test taxonomy として当面維持する。
+これらは package / project 境界ではない。
 
 ## 3. 非対象
 
@@ -80,6 +95,7 @@ v3.0.0 の初期 consolidation では、内部の層別 project は deterministi
 `v3.0.0` の breaking change:
 
 - venue の層別 package は publish 対象ではなくなる
+- venue の層別 project は削除される
 - consumer は `ExchangeApi.Exchanges.Bitflyer.Composition` の代わりに `ExchangeApi.Exchanges.Bitflyer` を参照する
 - consumer は `ExchangeApi.Exchanges.Binance.Composition` の代わりに `ExchangeApi.Exchanges.Binance` を参照する
 
@@ -91,16 +107,19 @@ namespace と public API surface は、初期 slice では互換性を最大限�
 最低限の実行:
 
 ```bash
+dotnet build ExchangeApi.slnx
 dotnet test ExchangeApi.slnx --no-restore
-bash scripts/pack-local-nuget.sh 3.0.0-local.consolidation
-bash scripts/smoke-local-nuget-consumer.sh 3.0.0-local.consolidation
+bash scripts/pack-local-nuget.sh 3.0.0-local.project-consolidation
+bash scripts/smoke-local-nuget-consumer.sh 3.0.0-local.project-consolidation
+dotnet restore ExchangeApi.LiveTests.slnx
 dotnet test ExchangeApi.LiveTests.slnx --no-restore
 ```
 
 確認項目:
 
-- `ExchangeApi.Exchanges.Bitflyer.3.0.0-local.consolidation.nupkg` が生成される
-- `ExchangeApi.Exchanges.Binance.3.0.0-local.consolidation.nupkg` が生成される
+- `ExchangeApi.Exchanges.Bitflyer.3.0.0-local.project-consolidation.nupkg` が生成される
+- `ExchangeApi.Exchanges.Binance.3.0.0-local.project-consolidation.nupkg` が生成される
 - v2 の venue layer package は生成されない
+- venue layer project は solution に含まれない
 - local consumer smoke は venue aggregate package を参照する
 - live tests は opt-in なしで skip する

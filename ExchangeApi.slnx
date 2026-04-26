@@ -11,32 +11,8 @@
   <Folder Name="/src/Exchanges/Binance/">
     <Project Path="src/Exchanges/Binance/ExchangeApi.Exchanges.Binance.csproj" />
   </Folder>
-  <Folder Name="/src/Exchanges/Binance/Composition/">
-    <Project Path="src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj" />
-  </Folder>
-  <Folder Name="/src/Exchanges/Binance/Native/">
-    <Project Path="src/Exchanges/Binance/Native/ExchangeApi.Exchanges.Binance.Native.csproj" />
-  </Folder>
-  <Folder Name="/src/Exchanges/Binance/Protocol/">
-    <Project Path="src/Exchanges/Binance/Protocol/ExchangeApi.Exchanges.Binance.Protocol.csproj" />
-  </Folder>
-  <Folder Name="/src/Exchanges/Binance/Vocabulary/">
-    <Project Path="src/Exchanges/Binance/Vocabulary/ExchangeApi.Exchanges.Binance.Vocabulary.csproj" />
-  </Folder>
   <Folder Name="/src/Exchanges/Bitflyer/">
     <Project Path="src/Exchanges/Bitflyer/ExchangeApi.Exchanges.Bitflyer.csproj" />
-  </Folder>
-  <Folder Name="/src/Exchanges/Bitflyer/Composition/">
-    <Project Path="src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj" />
-  </Folder>
-  <Folder Name="/src/Exchanges/Bitflyer/Native/">
-    <Project Path="src/Exchanges/Bitflyer/Native/ExchangeApi.Exchanges.Bitflyer.Native.csproj" />
-  </Folder>
-  <Folder Name="/src/Exchanges/Bitflyer/Protocol/">
-    <Project Path="src/Exchanges/Bitflyer/Protocol/ExchangeApi.Exchanges.Bitflyer.Protocol.csproj" />
-  </Folder>
-  <Folder Name="/src/Exchanges/Bitflyer/Vocabulary/">
-    <Project Path="src/Exchanges/Bitflyer/Vocabulary/ExchangeApi.Exchanges.Bitflyer.Vocabulary.csproj" />
   </Folder>
   <Folder Name="/src/Optional/" />
   <Folder Name="/src/Optional/Credentials/">

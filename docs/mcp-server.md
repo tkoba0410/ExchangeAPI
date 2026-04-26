@@ -165,9 +165,9 @@ ExchangeAPI Library は以下を所有する。
 ## 6. 依存規約
 
 - 現行契約の依存は `McpServer -> Composition` を基本とする
-- MCP Server は venue ごとの `Composition` project を経由して library を利用する
+- MCP Server は venue aggregate project を経由して library を利用する
 - MCP Server は必要に応じて複数の library call を集約して 1 tool response を構築してよい
-- MCP Server から `Native` / `Protocol` / `Vocabulary` project を直接参照してはならない
+- MCP Server から layer-specific project を直接参照してはならない
 - MCP Server は concrete endpoint / runtime / signer / transport を直接配線しない
 
 ### 6.1 物理配置
@@ -175,9 +175,9 @@ ExchangeAPI Library は以下を所有する。
 - MCP Server project は `src/Adapters/McpServer/ExchangeApi.Adapters.McpServer.csproj` に置く
 - MCP Server test project は `tests/Adapters/McpServer.Tests/ExchangeApi.Adapters.McpServer.Tests.csproj` に置く
 - MCP Server は external adapter であり、`src/Exchanges/<Venue>/` 配下に置いてはならない
-- direct project reference は venue ごとの `Composition` project と optional credentials project に限定する
-  - `src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj`
-  - `src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj`
+- direct project reference は venue aggregate project と optional credentials project に限定する
+  - `src/Exchanges/Bitflyer/ExchangeApi.Exchanges.Bitflyer.csproj`
+  - `src/Exchanges/Binance/ExchangeApi.Exchanges.Binance.csproj`
   - `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj`
 
 推奨フォルダ構成:

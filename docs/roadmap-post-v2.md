@@ -72,8 +72,8 @@
 
 ## 1.4 v3.0.0 採用範囲
 
-`v3.0.0` では、venue package を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する。
-layer-specific venue package は publish 対象から外す。
+`v3.0.0` では、venue package / project を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する。
+layer-specific venue package / project は廃止する。
 
 詳細は [`docs/plan-v3.0.0.md`](./plan-v3.0.0.md)、[`docs/breaking-changes-v3.0.0.md`](./breaking-changes-v3.0.0.md)、[`docs/migration-v3.0.0.md`](./migration-v3.0.0.md) を参照する。
 

@@ -9,11 +9,45 @@ namespace ExchangeApi.Tests.Exchanges.Binance.Architecture.Tests;
 public sealed class BinanceArchitectureTests
 {
     [Fact]
-    public void Protocol_Project_DoesNotReference_Native_Project()
+    public void Venue_Has_Single_Aggregate_Project_With_Primitives_Only()
     {
-        var projectText = File.ReadAllText(Path.Combine(RepoRoot(), "src", "Exchanges", "Binance", "Protocol", "ExchangeApi.Exchanges.Binance.Protocol.csproj"));
+        var venueRoot = Path.Combine(RepoRoot(), "src", "Exchanges", "Binance");
+        var projectFiles = Directory.GetFiles(venueRoot, "*.csproj", SearchOption.AllDirectories);
+        var projectText = File.ReadAllText(Path.Combine(venueRoot, "ExchangeApi.Exchanges.Binance.csproj"));
 
-        Assert.DoesNotContain("ExchangeApi.Exchanges.Binance.Native.csproj", projectText, StringComparison.Ordinal);
+        Assert.Equal([Path.Combine(venueRoot, "ExchangeApi.Exchanges.Binance.csproj")], projectFiles);
+        Assert.Contains("ExchangeApi.Primitives.csproj", projectText, StringComparison.Ordinal);
+        Assert.DoesNotContain("Optional", projectText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Protocol_Source_DoesNotReference_Native_Namespace()
+    {
+        var protocolFiles = Directory.GetFiles(
+            Path.Combine(RepoRoot(), "src", "Exchanges", "Binance", "Protocol"),
+            "*.cs",
+            SearchOption.AllDirectories);
+
+        foreach (var file in protocolFiles)
+        {
+            var text = File.ReadAllText(file);
+            Assert.DoesNotContain("ExchangeApi.Exchanges.Binance.Native", text, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void Native_Source_DoesNotReference_Composition_Namespace()
+    {
+        var nativeFiles = Directory.GetFiles(
+            Path.Combine(RepoRoot(), "src", "Exchanges", "Binance", "Native"),
+            "*.cs",
+            SearchOption.AllDirectories);
+
+        foreach (var file in nativeFiles)
+        {
+            var text = File.ReadAllText(file);
+            Assert.DoesNotContain("ExchangeApi.Exchanges.Binance.Composition", text, StringComparison.Ordinal);
+        }
     }
 
     [Fact]
@@ -52,13 +86,18 @@ public sealed class BinanceArchitectureTests
     [Fact]
     public void Native_Public_Surface_DoesNotExpose_ProtocolResponse_Or_JsonElement()
     {
-        AssertForbiddenTypes(typeof(IBinancePublicNativeApi).Assembly.GetExportedTypes(), typeof(ProtocolResponse), typeof(JsonElement));
+        AssertForbiddenTypes(
+            typeof(IBinancePublicNativeApi).Assembly.GetExportedTypes().Where(static type => type.Namespace?.Contains(".Native.", StringComparison.Ordinal) == true),
+            typeof(ProtocolResponse),
+            typeof(JsonElement));
     }
 
     [Fact]
     public void Protocol_Public_Surface_DoesNotExpose_JsonElement()
     {
-        AssertForbiddenTypes(typeof(IBinancePublicProtocolApi).Assembly.GetExportedTypes(), typeof(JsonElement));
+        AssertForbiddenTypes(
+            typeof(IBinancePublicProtocolApi).Assembly.GetExportedTypes().Where(static type => type.Namespace?.Contains(".Protocol.", StringComparison.Ordinal) == true),
+            typeof(JsonElement));
     }
 
     private static void AssertForbiddenTypes(IEnumerable<Type> types, params Type[] forbiddenTypes)

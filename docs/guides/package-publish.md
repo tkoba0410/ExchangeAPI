@@ -12,7 +12,7 @@
 - `v2.1.0` では `ExchangeApi.Optional.Logging` を optional package publish 対象に含める
 - `v2.2.0` は operational / verification release として扱い、package / project consolidation は含めない
 - `v2.2.0` publish 後は `scripts/smoke-github-packages-consumer.sh` で consumer smoke を実行する
-- `v3.0.0` では venue package を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する
+- `v3.0.0` では venue package / project を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する
 
 ## Scope
 
@@ -52,13 +52,13 @@ bash scripts/pack-local-nuget.sh 3.0.0
 release 前に static test、local pack、local consumer smoke、CLI/MCP executable publish をまとめて確認する場合は、次を使う。
 
 ```bash
-bash scripts/run-v2-release-preflight.sh 3.0.0-local.preflight
+bash scripts/run-release-preflight.sh 3.0.0-local.preflight
 ```
 
 safe live verification まで含める場合だけ、次のように明示 opt-in する。
 
 ```bash
-EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-v2-release-preflight.sh 3.0.0-local.preflight
+EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-release-preflight.sh 3.0.0-local.preflight
 ```
 
 v2.2.0 の release asset 生成は次を使う。

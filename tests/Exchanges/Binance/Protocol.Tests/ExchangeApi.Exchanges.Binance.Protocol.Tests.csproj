@@ -19,9 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Primitives/ExchangeApi.Primitives.csproj" />
-    <ProjectReference Include="../../../../src/Exchanges/Binance/Vocabulary/ExchangeApi.Exchanges.Binance.Vocabulary.csproj" />
-    <ProjectReference Include="../../../../src/Exchanges/Binance/Protocol/ExchangeApi.Exchanges.Binance.Protocol.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Binance/ExchangeApi.Exchanges.Binance.csproj" />
   </ItemGroup>
 
 </Project>

@@ -22,7 +22,7 @@
 - `v2.0.0` では配布方式自体を変更しない
 - v2 の追加機能は、必要に応じて library package 群または executable に含める
 - `v2.2.0` は operational / verification release として扱い、配布方式自体は変更しない
-- `v3.0.0` では venue package を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する
+- `v3.0.0` では venue package / project を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する
 - generated evidence / logs / release assets は default では作らず、明示 script 実行時のみ `local/` 配下へ作る
 
 ## Artifact Layout
@@ -73,7 +73,8 @@ v3 方針:
 - 通常利用者は venue ごとの aggregate package を参照する
 - `ExchangeApi.Exchanges.Bitflyer` は bitFlyer の `Vocabulary` / `Protocol` / `Native` / `Composition` surface を含む
 - `ExchangeApi.Exchanges.Binance` は Binance の `Vocabulary` / `Protocol` / `Native` / `Composition` surface を含む
-- v2 の layer-specific venue package は v3.0.0 では publish 対象にしない
+- v2 の layer-specific venue package / project は v3.0.0 では廃止する
+- `Protocol` / `Native` / `Composition` / `Vocabulary` は folder / namespace / tests 上の設計境界として維持する
 
 v2 方針:
 
@@ -227,4 +228,4 @@ CLI / MCP publish は共有 `bin/obj` を使うため、release asset helper 内
 - `scripts/create-release-assets.sh`
 - `scripts/smoke-github-packages-consumer.sh`
 - `scripts/run-safe-live-tests.sh`
-- `scripts/run-v2-release-preflight.sh`
+- `scripts/run-release-preflight.sh`

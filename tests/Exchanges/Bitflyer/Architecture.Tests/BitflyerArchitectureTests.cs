@@ -9,11 +9,45 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.Architecture.Tests;
 public sealed class BitflyerArchitectureTests
 {
     [Fact]
-    public void Protocol_Project_DoesNotReference_Native_Project()
+    public void Venue_Has_Single_Aggregate_Project_With_Primitives_Only()
     {
-        var projectText = File.ReadAllText(Path.Combine(RepoRoot(), "src", "Exchanges", "Bitflyer", "Protocol", "ExchangeApi.Exchanges.Bitflyer.Protocol.csproj"));
+        var venueRoot = Path.Combine(RepoRoot(), "src", "Exchanges", "Bitflyer");
+        var projectFiles = Directory.GetFiles(venueRoot, "*.csproj", SearchOption.AllDirectories);
+        var projectText = File.ReadAllText(Path.Combine(venueRoot, "ExchangeApi.Exchanges.Bitflyer.csproj"));
 
-        Assert.DoesNotContain("ExchangeApi.Exchanges.Bitflyer.Native.csproj", projectText, StringComparison.Ordinal);
+        Assert.Equal([Path.Combine(venueRoot, "ExchangeApi.Exchanges.Bitflyer.csproj")], projectFiles);
+        Assert.Contains("ExchangeApi.Primitives.csproj", projectText, StringComparison.Ordinal);
+        Assert.DoesNotContain("Optional", projectText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Protocol_Source_DoesNotReference_Native_Namespace()
+    {
+        var protocolFiles = Directory.GetFiles(
+            Path.Combine(RepoRoot(), "src", "Exchanges", "Bitflyer", "Protocol"),
+            "*.cs",
+            SearchOption.AllDirectories);
+
+        foreach (var file in protocolFiles)
+        {
+            var text = File.ReadAllText(file);
+            Assert.DoesNotContain("ExchangeApi.Exchanges.Bitflyer.Native", text, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void Native_Source_DoesNotReference_Composition_Namespace()
+    {
+        var nativeFiles = Directory.GetFiles(
+            Path.Combine(RepoRoot(), "src", "Exchanges", "Bitflyer", "Native"),
+            "*.cs",
+            SearchOption.AllDirectories);
+
+        foreach (var file in nativeFiles)
+        {
+            var text = File.ReadAllText(file);
+            Assert.DoesNotContain("ExchangeApi.Exchanges.Bitflyer.Composition", text, StringComparison.Ordinal);
+        }
     }
 
     [Fact]
@@ -54,13 +88,18 @@ public sealed class BitflyerArchitectureTests
     [Fact]
     public void Native_Public_Surface_DoesNotExpose_ProtocolResponse_Or_JsonElement()
     {
-        AssertForbiddenTypes(typeof(IBitflyerPublicNativeApi).Assembly.GetExportedTypes(), typeof(ProtocolResponse), typeof(JsonElement));
+        AssertForbiddenTypes(
+            typeof(IBitflyerPublicNativeApi).Assembly.GetExportedTypes().Where(static type => type.Namespace?.Contains(".Native.", StringComparison.Ordinal) == true),
+            typeof(ProtocolResponse),
+            typeof(JsonElement));
     }
 
     [Fact]
     public void Protocol_Public_Surface_DoesNotExpose_JsonElement()
     {
-        AssertForbiddenTypes(typeof(IBitflyerPublicProtocolApi).Assembly.GetExportedTypes(), typeof(JsonElement));
+        AssertForbiddenTypes(
+            typeof(IBitflyerPublicProtocolApi).Assembly.GetExportedTypes().Where(static type => type.Namespace?.Contains(".Protocol.", StringComparison.Ordinal) == true),
+            typeof(JsonElement));
     }
 
     private static void AssertForbiddenTypes(IEnumerable<Type> types, params Type[] forbiddenTypes)

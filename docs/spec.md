@@ -1,6 +1,6 @@
 # ExchangeAPI Library Spec
 
-最終更新: 2026-04-23  
+最終更新: 2026-04-27
 位置づけ: library 共通正本
 
 ## 1. 位置づけ
@@ -53,9 +53,11 @@ guide、archive、version 文書は正本の補助であり、本書そのもの
 
 ### 1.2 Version Baseline
 
-- 本書は `v2.0.0` の library 共通正本として整理する
+- 本書は `v3.0.0` の library 共通正本として読む
 - `v2.0.0` の採用判断と移行説明は [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md) と [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md) を参照する
 - `v2.0.0` では、`CallResult`、`*Async(...)`、`Create*ClientBundle(...)`、`CallError` additive detail field、private credentials の責務分離を採用する
+- `v3.0.0` では、venue ごとに 1 project / 1 package へ統合し、`Protocol` / `Native` / `Composition` / `Vocabulary` は folder / namespace / tests 上の設計境界として維持する
+- `v3.0.0` の採用判断と移行説明は [`docs/breaking-changes-v3.0.0.md`](./breaking-changes-v3.0.0.md) と [`docs/migration-v3.0.0.md`](./migration-v3.0.0.md) を参照する
 - private credentials は、core 正本から特定の storage / encryption recipe を外し、auth provider 契約へ寄せる
 - auth provider の具体 shape は `OpenSessionAsync(...)` 型を採用し、通常利用では client 側が session を隠して扱う
 - verification は、API 契約分類とは別に `repo/local` 配置と `safe/tolerable/dangerous` の運用分類を導入する
@@ -145,6 +147,7 @@ sequenceDiagram
 
 ```text
 src/Exchanges/Bitflyer/
+  ExchangeApi.Exchanges.Bitflyer.csproj
   Protocol/
     Public/Api/
     Public/Endpoints/<EndpointName>/
@@ -925,6 +928,28 @@ bitFlyer private endpoint 固有の固定事項:
 
 ## 8. 物理構成
 
+v3.0.0 以降、venue は 1 project / 1 package を基本とする。
+`Protocol` / `Native` / `Composition` / `Vocabulary` は package / project 境界ではなく、folder / namespace / tests 上の設計境界である。
+
+```text
+src/Exchanges/Bitflyer/
+  ExchangeApi.Exchanges.Bitflyer.csproj
+  Vocabulary/
+  Protocol/
+  Native/
+  Composition/
+
+src/Exchanges/Binance/
+  ExchangeApi.Exchanges.Binance.csproj
+  Vocabulary/
+  Protocol/
+  Native/
+  Composition/
+```
+
+venue aggregate project の project reference は `ExchangeApi.Primitives` のみにする。
+optional project は venue aggregate project から参照しない。
+
 ### 8.1 Protocol
 
 ```text
@@ -1106,10 +1131,12 @@ src/Exchanges/Bitflyer/Composition/
 
 - `tests/Exchanges/<Venue>/Architecture.Tests` を追加し、venue ごとに同一規約を機械検証する
 - namespace forbidden dependency
-- project reference forbidden edge
+- aggregate project reference rule
 - public surface forbidden type
 - file placement rule
   を機械検証対象に含めてよい
+
+test project の `Protocol.Tests` / `Native.Tests` / `Composition.Tests` という分類は、設計境界の test taxonomy であり、package / project 境界ではない。
 
 ## 9. endpoint 運用正本
 

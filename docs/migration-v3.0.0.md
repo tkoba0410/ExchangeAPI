@@ -35,7 +35,7 @@ dotnet add package ExchangeApi.Exchanges.Binance --version 3.0.0
 
 ## 2. Source Code
 
-v3.0.0 の初期 consolidation では namespace を維持する。
+v3.0.0 の project/package consolidation では namespace を維持する。
 
 既存の using はそのまま使える。
 
@@ -53,3 +53,25 @@ optional packages は v3.0.0 でも維持する。
 - `ExchangeApi.Optional.Logging`
 
 credentials や logging を使う consumer は、必要に応じて引き続き明示参照する。
+
+## 4. Repository Contributors
+
+repo 内では、venue layer project は削除される。
+
+Before:
+
+```text
+src/Exchanges/Bitflyer/Vocabulary/ExchangeApi.Exchanges.Bitflyer.Vocabulary.csproj
+src/Exchanges/Bitflyer/Protocol/ExchangeApi.Exchanges.Bitflyer.Protocol.csproj
+src/Exchanges/Bitflyer/Native/ExchangeApi.Exchanges.Bitflyer.Native.csproj
+src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj
+```
+
+After:
+
+```text
+src/Exchanges/Bitflyer/ExchangeApi.Exchanges.Bitflyer.csproj
+```
+
+`Protocol` / `Native` / `Composition` / `Vocabulary` folder は維持される。
+test project の `Protocol.Tests` / `Native.Tests` / `Composition.Tests` は、package/project 境界ではなく設計境界の test taxonomy として扱う。

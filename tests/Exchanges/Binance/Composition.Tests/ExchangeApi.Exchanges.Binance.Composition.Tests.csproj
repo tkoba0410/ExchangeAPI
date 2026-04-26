@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Exchanges/Binance/Composition/ExchangeApi.Exchanges.Binance.Composition.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Binance/ExchangeApi.Exchanges.Binance.csproj" />
   </ItemGroup>
 
 </Project>

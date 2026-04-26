@@ -19,7 +19,7 @@
 ExchangeAPI repository 側では repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 3.0.0-local.consolidation
+bash scripts/pack-local-nuget.sh 3.0.0-local.project-consolidation
 ```
 
 生成先は `local/nuget`。
@@ -44,23 +44,24 @@ path は absolute path を推奨する。
 
 ## 3. 追加する Package
 
-通常は `Composition` package を参照する。
-`Composition` package は必要な `Native`、`Protocol`、`Vocabulary`、`Primitives` を dependency として引く。
+通常は venue aggregate package を参照する。
+venue aggregate package は当該 venue の `Native`、`Protocol`、`Vocabulary`、`Composition` surface を含む。
 
 bitFlyer を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer --version 3.0.0-local.consolidation
+dotnet add package ExchangeApi.Exchanges.Bitflyer --version 3.0.0-local.project-consolidation
 ```
 
 Binance を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Binance --version 3.0.0-local.consolidation
+dotnet add package ExchangeApi.Exchanges.Binance --version 3.0.0-local.project-consolidation
 ```
 
 v3.0.0 では、venue layer-specific package は外部 consumer 向け publish 対象にしない。
-layer-specific namespace は aggregate package 内に残るが、package reference は venue 単位にする。
+venue layer-specific project も廃止する。
+layer-specific namespace は aggregate package 内に残るが、package reference と repo 内 project は venue 単位にする。
 
 維持する個別 package:
 
@@ -69,7 +70,7 @@ layer-specific namespace は aggregate package 内に残るが、package referen
 credential provider 実装が必要な場合は optional package を追加する。
 
 ```bash
-dotnet add package ExchangeApi.Optional.Credentials --version 3.0.0-local.consolidation
+dotnet add package ExchangeApi.Optional.Credentials --version 3.0.0-local.project-consolidation
 ```
 
 `ExchangeApi.Optional.Credentials` は、core library の必須依存ではない。  
@@ -78,7 +79,7 @@ dotnet add package ExchangeApi.Optional.Credentials --version 3.0.0-local.consol
 secret-safe logging / evidence helper が必要な場合は optional logging package を追加する。
 
 ```bash
-dotnet add package ExchangeApi.Optional.Logging --version 3.0.0-local.consolidation
+dotnet add package ExchangeApi.Optional.Logging --version 3.0.0-local.project-consolidation
 ```
 
 `ExchangeApi.Optional.Logging` は、core library の必須依存ではない。
@@ -124,7 +125,7 @@ dotnet build
 ExchangeAPI repo 側で local feed と v2 API surface の consumer smoke を確認する場合は、次を実行する。
 
 ```bash
-bash scripts/smoke-local-nuget-consumer.sh 3.0.0-local.consolidation
+bash scripts/smoke-local-nuget-consumer.sh 3.0.0-local.project-consolidation
 ```
 
 この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer`、`ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging` を local feed から restore して build / run する。

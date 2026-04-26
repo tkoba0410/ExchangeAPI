@@ -23,11 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../../src/Primitives/ExchangeApi.Primitives.csproj" />
-    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Vocabulary/ExchangeApi.Exchanges.Bitflyer.Vocabulary.csproj" />
-    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Protocol/ExchangeApi.Exchanges.Bitflyer.Protocol.csproj" />
-    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Native/ExchangeApi.Exchanges.Bitflyer.Native.csproj" />
-    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/Composition/ExchangeApi.Exchanges.Bitflyer.Composition.csproj" />
+    <ProjectReference Include="../../../../src/Exchanges/Bitflyer/ExchangeApi.Exchanges.Bitflyer.csproj" />
     <ProjectReference Include="../../../../src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj" />
   </ItemGroup>
 

@@ -211,6 +211,7 @@ v3.4.0 では扱わない:
 
 v3.5.0 以降は、v3.4.0 の resilience foundation の上に必要な realtime maturity work を積む。
 正式 scope は各 release の plan 文書で固定する。
+v3.5.0 の初期環境整備は [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md) に固定する。
 
 候補:
 

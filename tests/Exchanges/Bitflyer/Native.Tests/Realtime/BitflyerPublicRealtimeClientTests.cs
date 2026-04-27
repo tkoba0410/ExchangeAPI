@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Models;
+using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Public;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
@@ -59,6 +60,55 @@ public sealed class BitflyerPublicRealtimeClientTests
         Assert.Equal("lightning_ticker_BTC_JPY", rejected.Channel);
         Assert.Equal(BitflyerRealtimeErrorKind.MessageDecodeFailed, rejected.ErrorKind);
         Assert.DoesNotContain("BTC_JPY", rejected.Reason, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task SubscribeTickerStreamAsync_ReconnectsAfterStreamEnd()
+    {
+        var firstProtocol = new FakeRealtimeProtocolClient();
+        var secondProtocol = new FakeRealtimeProtocolClient();
+        secondProtocol.EnqueueMessage("lightning_ticker_BTC_JPY", SamplePayloads.Ticker);
+        await using var client = new BitflyerPublicRealtimeClient(
+            firstProtocol,
+            () => secondProtocol,
+            new BitflyerRealtimeResilienceOptions
+            {
+                MaxAttempts = 1,
+                InitialDelay = TimeSpan.Zero,
+                MaxDelay = TimeSpan.Zero,
+            });
+
+        var events = await StreamEventTestExtensions.ReadCountAsync(
+            client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy),
+            5);
+
+        Assert.IsType<BitflyerRealtimeReconnecting<BitflyerRealtimeTickerMessage>>(events[0]);
+        Assert.IsType<BitflyerRealtimeReconnected<BitflyerRealtimeTickerMessage>>(events[1]);
+        Assert.IsType<BitflyerRealtimeResubscribed<BitflyerRealtimeTickerMessage>>(events[2]);
+        Assert.IsType<BitflyerRealtimeContinuityLost<BitflyerRealtimeTickerMessage>>(events[3]);
+        Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeTickerMessage>>(events[4]);
+        Assert.Equal(1, secondProtocol.ConnectCallCount);
+        Assert.Equal(["lightning_ticker_BTC_JPY"], secondProtocol.SubscribedChannels);
+    }
+
+    [Fact]
+    public async Task SubscribeTickerStreamAsync_ReconnectExhaustedThrowsControlledException()
+    {
+        var protocol = new FakeRealtimeProtocolClient();
+        await using var client = new BitflyerPublicRealtimeClient(
+            protocol,
+            protocolFactory: null,
+            new BitflyerRealtimeResilienceOptions
+            {
+                MaxAttempts = 1,
+                InitialDelay = TimeSpan.Zero,
+                MaxDelay = TimeSpan.Zero,
+            });
+
+        var exception = await Assert.ThrowsAnyAsync<BitflyerRealtimeException>(
+            () => client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy).ToListAsync());
+
+        Assert.Equal(BitflyerRealtimeErrorKind.ReconnectExhausted, exception.Kind);
     }
 
     [Fact]
@@ -329,6 +379,19 @@ internal static class StreamEventTestExtensions
         await using var enumerator = source.GetAsyncEnumerator();
         Assert.True(await enumerator.MoveNextAsync());
         return enumerator.Current;
+    }
+
+    internal static async Task<List<T>> ReadCountAsync<T>(IAsyncEnumerable<T> source, int count)
+    {
+        var items = new List<T>();
+        await using var enumerator = source.GetAsyncEnumerator();
+        while (items.Count < count && await enumerator.MoveNextAsync())
+        {
+            items.Add(enumerator.Current);
+        }
+
+        Assert.Equal(count, items.Count);
+        return items;
     }
 }
 

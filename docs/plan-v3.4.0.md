@@ -3,7 +3,7 @@
 最終更新: 2026-04-28
 位置づけ: v3.4.0 実施指示
 
-状態: planning
+状態: implementation
 
 ## 1. 目的
 
@@ -220,6 +220,7 @@ live verification は opt-in only とし、default では接続しない。
 - `Subscribe*StreamAsync` envelope API が追加されている
 - private realtime API は public realtime API と混ざっていない
 - reconnect 後の private auth 再実行順序が deterministic tests で固定されている
+- public reconnect / resubscribe order が deterministic tests で固定されている
 - envelope API で `MessageRejected` が malformed / decode failed message を通知し stream を継続する
 - cancellation が reconnect より優先される
 - auth failure が secret-free controlled exception になる

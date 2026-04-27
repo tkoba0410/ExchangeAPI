@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Models;
+using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Private;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Credentials;
@@ -66,6 +67,46 @@ public sealed class BitflyerPrivateRealtimeClientTests
         Assert.Equal(ProductCodes.BtcJpy, data.Value.ProductCode);
         Assert.Equal("ORDER", data.Value.EventType);
         Assert.Equal(1, protocol.AuthenticateCallCount);
+    }
+
+    [Fact]
+    public async Task SubscribeChildOrderEventsStreamAsync_ReplaysAuthenticationAndSubscriptionAfterReconnect()
+    {
+        var firstProtocol = new FakeRealtimeProtocolClient();
+        var secondProtocol = new FakeRealtimeProtocolClient();
+        secondProtocol.EnqueueMessage("child_order_events", """
+            [
+              {
+                "product_code": "BTC_JPY",
+                "child_order_acceptance_id": "JRF20150101-070921-194057",
+                "event_date": "2015-01-01T07:09:21.9301772Z",
+                "event_type": "ORDER"
+              }
+            ]
+            """);
+        await using var client = new BitflyerPrivateRealtimeClient(
+            firstProtocol,
+            new FakeCredentialProvider(),
+            () => secondProtocol,
+            new BitflyerRealtimeResilienceOptions
+            {
+                MaxAttempts = 1,
+                InitialDelay = TimeSpan.Zero,
+                MaxDelay = TimeSpan.Zero,
+            });
+
+        var events = await StreamEventTestExtensions.ReadCountAsync(
+            client.SubscribeChildOrderEventsStreamAsync(),
+            6);
+
+        Assert.IsType<BitflyerRealtimeReconnecting<BitflyerRealtimeChildOrderEventMessage>>(events[0]);
+        Assert.IsType<BitflyerRealtimeReconnected<BitflyerRealtimeChildOrderEventMessage>>(events[1]);
+        Assert.IsType<BitflyerRealtimeAuthenticationReplayed<BitflyerRealtimeChildOrderEventMessage>>(events[2]);
+        Assert.IsType<BitflyerRealtimeResubscribed<BitflyerRealtimeChildOrderEventMessage>>(events[3]);
+        Assert.IsType<BitflyerRealtimeContinuityLost<BitflyerRealtimeChildOrderEventMessage>>(events[4]);
+        Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeChildOrderEventMessage>>(events[5]);
+        Assert.Equal(1, secondProtocol.AuthenticateCallCount);
+        Assert.Equal([BitflyerRealtimeChannels.ChildOrderEvents()], secondProtocol.SubscribedChannels);
     }
 
     [Fact]

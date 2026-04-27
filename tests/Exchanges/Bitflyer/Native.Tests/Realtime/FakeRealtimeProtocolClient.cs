@@ -12,6 +12,7 @@ internal sealed class FakeRealtimeProtocolClient : IBitflyerPrivateRealtimeProto
 
     public List<string> SubscribedChannels { get; } = [];
     public List<string> UnsubscribedChannels { get; } = [];
+    public int ConnectCallCount { get; private set; }
     public int AuthenticateCallCount { get; private set; }
     public bool Disposed { get; private set; }
 
@@ -28,6 +29,7 @@ internal sealed class FakeRealtimeProtocolClient : IBitflyerPrivateRealtimeProto
 
     public ValueTask ConnectAsync(CancellationToken cancellationToken = default)
     {
+        ConnectCallCount++;
         return ValueTask.CompletedTask;
     }
 

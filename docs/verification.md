@@ -263,6 +263,26 @@ secret-free rule:
 - credentials、API key、API secret、signature、Authorization 相当の値は evidence / log / result / exception / stdout / stderr に含めない
 - evidence を残す場合は `local/evidence/local-live/<yyyymmdd>-v3.2.0-bitflyer-realtime/` を使う
 
+## 5.3 v3.4.0 Realtime Resilience Verification
+
+bitFlyer Realtime resilience は deterministic tests を主 verification とする。
+live verification は opt-in only とし、default では外部接続しない。
+
+deterministic verification:
+
+- envelope stream data event
+- `MessageRejected` event
+- public reconnect / resubscribe order
+- private reconnect / authentication replay / resubscribe order
+- reconnect exhausted controlled exception
+- `BitflyerRealtimeException.Kind`
+
+live verification:
+
+- runbook は [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md) と [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md) を使う
+- evidence を残す場合は `local/evidence/local-live/<yyyymmdd>-v3.4.0-bitflyer-realtime-resilience/` を使う
+- credentials、API key、API secret、signature、Authorization 相当の値は evidence / log / result / exception / stdout / stderr に含めない
+
 ## 6. 初期 Endpoint Inventory
 
 本表は verification 判断の初期台帳である。  

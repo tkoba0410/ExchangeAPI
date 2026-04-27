@@ -407,7 +407,16 @@ Jitter = none
 
 Backoff values are configurable.
 `MaxAttempts = 0` means reconnect disabled.
-Docs should show conservative / interactive / long-running / no reconnect presets, but custom values are allowed.
+Representative presets:
+
+| Preset | MaxAttempts | InitialDelay | MaxDelay | Intended use |
+| --- | ---: | --- | --- | --- |
+| no reconnect | 0 | 1 second | 10 seconds | DTO-like fail-fast operation |
+| interactive | 3 | 1 second | 10 seconds | terminal / short-running tools |
+| conservative | 5 | 2 seconds | 30 seconds | manual monitoring |
+| long-running | 10 | 1 second | 60 seconds | supervised services |
+
+Custom values are allowed when they pass option validation.
 
 Idle timeout:
 
@@ -416,23 +425,24 @@ Idle timeout:
 - valid value is `null` or `> TimeSpan.Zero`
 - timeout is reconnect target
 - reconnect after idle timeout emits `ContinuityLost`
-- docs should show disabled / interactive / monitoring / aggressive presets
+
+Representative presets:
+
+| Preset | IdleTimeout | Intended use |
+| --- | --- | --- |
+| disabled | `null` | default; no local no-message timeout |
+| interactive | 30 seconds | short diagnostic run |
+| monitoring | 60 seconds | supervised public stream |
+| aggressive | 10 seconds | local transport tests / quick failure detection |
 
 Fatal realtime exceptions expose `BitflyerRealtimeErrorKind`.
 Exception messages must be secret-free.
 
 理由:
 
-- reconnect は board delta の連続性と欠落検知を伴う
-- v3.1.0 では接続中に受けた event の typed stream 化を優先する
-- reconnect / backoff / resubscribe は v3.2 以降の候補とする
-
-v3.2.0 hardening:
-
-- typed stream が natural completion / cancellation / decode error で終了する場合、client は対象 channel へ unsubscribe を試みる
-- unsubscribe が失敗した場合でも、元の stream 終了理由を不明瞭にしない
-- cancellation は利用者の終了意図として扱い、retry / reconnect しない
-- reconnect / backoff / resubscribe は board delta の欠落検知と一体で設計する必要があるため、v3.2.0 では実装しない
+- DTO-only API は既存利用者向けに単純な typed stream として維持する
+- envelope API は lifecycle event を混ぜられるため reconnect / resubscribe / continuity loss を明示できる
+- reconnect 後の gap-free continuity は保証しないため、利用者は `ContinuityLost` を見て再同期要否を判断する
 
 ## 11. Testing
 

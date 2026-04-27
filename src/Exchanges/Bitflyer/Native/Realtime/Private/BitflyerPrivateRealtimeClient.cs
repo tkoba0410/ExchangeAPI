@@ -110,11 +110,18 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
         return _protocol.DisposeAsync();
     }
 
-    private async ValueTask TryUnsubscribeAsync(string channel)
+    private ValueTask TryUnsubscribeAsync(string channel)
+    {
+        return TryUnsubscribeAsync(_protocol, channel);
+    }
+
+    private static async ValueTask TryUnsubscribeAsync(
+        IBitflyerRealtimeProtocolClient protocol,
+        string channel)
     {
         try
         {
-            await _protocol.UnsubscribeAsync(channel, CancellationToken.None).ConfigureAwait(false);
+            await protocol.UnsubscribeAsync(channel, CancellationToken.None).ConfigureAwait(false);
         }
         catch (Exception)
         {
@@ -136,47 +143,94 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
             var attempt = 0;
             while (true)
             {
-                await foreach (var message in protocol.ReadMessagesAsync(cancellationToken).ConfigureAwait(false))
+                var pending = new Queue<BitflyerRealtimeStreamEvent<T>>();
+                string? reconnectReason = null;
+                using var readCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                await using var enumerator = protocol.ReadMessagesAsync(readCancellation.Token).GetAsyncEnumerator(readCancellation.Token);
+
+                while (reconnectReason is null)
                 {
-                    if (message.Channel != channel)
+                    StreamReadResult<T> result;
+                    try
                     {
-                        continue;
+                        result = await ReadNextEventAsync(
+                            enumerator,
+                            readCancellation,
+                            channel,
+                            decode,
+                            pending,
+                            cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
+                        yield break;
+                    }
+                    catch (BitflyerRealtimeException exception) when (IsReconnectTarget(exception))
+                    {
+                        reconnectReason = exception.Kind.ToString();
+                        break;
+                    }
+                    catch (BitflyerRealtimeException)
+                    {
+                        throw;
+                    }
+                    catch (Exception exception)
+                    {
+                        reconnectReason = exception.GetType().Name;
+                        break;
                     }
 
-                    var items = DecodeOrReject(message, decode, out var rejected);
-                    foreach (var item in items)
+                    if (result.Completed)
                     {
-                        yield return new BitflyerRealtimeData<T>
-                        {
-                            Channel = channel,
-                            OccurredAt = message.ReceivedAt,
-                            Value = item,
-                        };
+                        reconnectReason = "Realtime stream ended before cancellation.";
+                        break;
                     }
 
-                    if (rejected is not null)
+                    if (result.Event is not null)
                     {
-                        yield return rejected;
+                        yield return result.Event;
                     }
-                }
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    yield break;
                 }
 
                 attempt++;
-                await foreach (var lifecycle in ReconnectAsync<T>(
-                    channel,
-                    "Realtime stream ended before cancellation.",
-                    attempt,
-                    cancellationToken).ConfigureAwait(false))
+                await foreach (var lifecycle in ReconnectAsync<T>(channel, reconnectReason, attempt, cancellationToken)
+                                   .ConfigureAwait(false))
                 {
                     yield return lifecycle;
                 }
 
                 protocol = CreateReconnectProtocol();
-                await protocol.AuthenticateAsync(session, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    await protocol.ConnectAsync(cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
+                {
+                    throw new BitflyerRealtimeResilienceException(
+                        BitflyerRealtimeErrorKind.ReconnectExhausted,
+                        $"Realtime reconnect failed: {exception.GetType().Name}",
+                        exception);
+                }
+
+                yield return new BitflyerRealtimeReconnected<T>
+                {
+                    Channel = channel,
+                    OccurredAt = DateTimeOffset.UtcNow,
+                    Attempt = attempt,
+                };
+
+                try
+                {
+                    await protocol.AuthenticateAsync(session, cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
+                {
+                    throw new BitflyerRealtimeResilienceException(
+                        BitflyerRealtimeErrorKind.AuthenticationFailed,
+                        $"Realtime authentication replay failed: {exception.GetType().Name}",
+                        exception);
+                }
+
                 yield return new BitflyerRealtimeAuthenticationReplayed<T>
                 {
                     Channel = channel,
@@ -184,7 +238,18 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
                     Attempt = attempt,
                 };
 
-                await protocol.SubscribeAsync(channel, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    await protocol.SubscribeAsync(channel, cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
+                {
+                    throw new BitflyerRealtimeResilienceException(
+                        BitflyerRealtimeErrorKind.ResubscribeFailed,
+                        $"Realtime resubscribe failed: {exception.GetType().Name}",
+                        exception);
+                }
+
                 yield return new BitflyerRealtimeResubscribed<T>
                 {
                     Channel = channel,
@@ -203,8 +268,83 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
         }
         finally
         {
-            await TryUnsubscribeAsync(channel).ConfigureAwait(false);
+            await TryUnsubscribeAsync(protocol, channel).ConfigureAwait(false);
         }
+    }
+
+    private async ValueTask<StreamReadResult<T>> ReadNextEventAsync<T>(
+        IAsyncEnumerator<BitflyerRealtimeChannelMessage> enumerator,
+        CancellationTokenSource readCancellation,
+        string channel,
+        Func<BitflyerRealtimeChannelMessage, IReadOnlyList<T>> decode,
+        Queue<BitflyerRealtimeStreamEvent<T>> pending,
+        CancellationToken cancellationToken)
+    {
+        if (pending.TryDequeue(out var pendingEvent))
+        {
+            return new StreamReadResult<T>(pendingEvent, Completed: false);
+        }
+
+        while (await MoveNextWithIdleTimeoutAsync(enumerator, readCancellation, cancellationToken).ConfigureAwait(false))
+        {
+            var message = enumerator.Current;
+            if (message.Channel != channel)
+            {
+                continue;
+            }
+
+            var items = DecodeOrReject(message, decode, out var rejected);
+            foreach (var item in items)
+            {
+                pending.Enqueue(new BitflyerRealtimeData<T>
+                {
+                    Channel = channel,
+                    OccurredAt = message.ReceivedAt,
+                    Value = item,
+                });
+            }
+
+            if (rejected is not null)
+            {
+                pending.Enqueue(rejected);
+            }
+
+            if (pending.TryDequeue(out var nextEvent))
+            {
+                return new StreamReadResult<T>(nextEvent, Completed: false);
+            }
+        }
+
+        return new StreamReadResult<T>(Event: null, Completed: true);
+    }
+
+    private static bool IsReconnectTarget(BitflyerRealtimeException exception)
+    {
+        return exception.Kind is BitflyerRealtimeErrorKind.ConnectionFailed or BitflyerRealtimeErrorKind.TransportFailed;
+    }
+
+    private async ValueTask<bool> MoveNextWithIdleTimeoutAsync(
+        IAsyncEnumerator<BitflyerRealtimeChannelMessage> enumerator,
+        CancellationTokenSource readCancellation,
+        CancellationToken cancellationToken)
+    {
+        if (_resilience.IdleTimeout is not { } idleTimeout)
+        {
+            return await enumerator.MoveNextAsync().ConfigureAwait(false);
+        }
+
+        var moveNextTask = enumerator.MoveNextAsync().AsTask();
+        var delayTask = Task.Delay(idleTimeout, cancellationToken);
+        var completed = await Task.WhenAny(moveNextTask, delayTask).ConfigureAwait(false);
+        if (completed == moveNextTask)
+        {
+            return await moveNextTask.ConfigureAwait(false);
+        }
+
+        await readCancellation.CancelAsync().ConfigureAwait(false);
+        throw new BitflyerRealtimeResilienceException(
+            BitflyerRealtimeErrorKind.TransportFailed,
+            "Realtime idle timeout elapsed.");
     }
 
     private IReadOnlyList<T> DecodeOrReject<T>(
@@ -257,12 +397,6 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
             await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
         }
 
-        yield return new BitflyerRealtimeReconnected<T>
-        {
-            Channel = channel,
-            OccurredAt = DateTimeOffset.UtcNow,
-            Attempt = attempt,
-        };
     }
 
     private IBitflyerPrivateRealtimeProtocolClient CreateReconnectProtocol()
@@ -276,4 +410,8 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
 
         return _protocolFactory();
     }
+
+    private readonly record struct StreamReadResult<T>(
+        BitflyerRealtimeStreamEvent<T>? Event,
+        bool Completed);
 }

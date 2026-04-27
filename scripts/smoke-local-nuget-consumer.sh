@@ -46,6 +46,7 @@ dotnet add package ExchangeApi.Optional.Logging \
 cat > Program.cs <<'EOF'
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Realtime;
+using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Models;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
@@ -58,6 +59,16 @@ await using var realtimeClient = BitflyerRealtimeClientFactory.CreatePublicClien
 var request = new GetTickerRequest { ProductCode = ProductCodes.BtcJpy };
 var provider = PlainTextApiCredentialProviderFactory.Create(ExchangeVenue.Bitflyer, "api-key", "api-secret");
 await using var privateRealtimeClient = BitflyerRealtimeClientFactory.CreatePrivateClient(provider, new SmokeRealtimeTransport());
+var options = new BitflyerRealtimeClientOptions
+{
+    Reconnect = new BitflyerRealtimeReconnectOptions
+    {
+        MaxAttempts = 0,
+        InitialDelay = TimeSpan.Zero,
+        MaxDelay = TimeSpan.Zero,
+    },
+    IdleTimeout = TimeSpan.FromSeconds(30),
+};
 await using var session = await provider.OpenSessionAsync();
 var redactor = new Redactor(new RedactionOptions { SensitiveValues = ["secret-value"] });
 var redacted = redactor.RedactText("apiSecret=api-secret payload=secret-value");
@@ -70,6 +81,9 @@ Console.WriteLine(
     BitflyerRealtimeChannels.Ticker(ProductCodes.BtcJpy) == "lightning_ticker_BTC_JPY" &&
     BitflyerRealtimeChannels.ChildOrderEvents() == "child_order_events" &&
     BitflyerRealtimeChannels.ParentOrderEvents() == "parent_order_events" &&
+    typeof(BitflyerRealtimeStreamEvent<>).Name == "BitflyerRealtimeStreamEvent`1" &&
+    options.Reconnect.MaxAttempts == 0 &&
+    options.IdleTimeout == TimeSpan.FromSeconds(30) &&
     session.ApiKey == "api-key" &&
     redacted == "apiSecret=[REDACTED] payload=[REDACTED]"
         ? "consumer-smoke-ok"

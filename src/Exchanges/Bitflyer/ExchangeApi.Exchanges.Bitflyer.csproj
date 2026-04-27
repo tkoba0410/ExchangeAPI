@@ -15,4 +15,8 @@
     <Compile Remove="**/bin/**;**/obj/**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExchangeApi.Exchanges.Bitflyer.Native.Tests" />
+  </ItemGroup>
+
 </Project>

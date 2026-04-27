@@ -70,7 +70,26 @@ v3.2.0 では board state builder は提供しない。
 - stream 終了時は対象 channel へ best-effort unsubscribe を送る
 - cancellation は利用者の正常終了意図として扱う
 - remote close / invalid JSON は controlled exception として扱う
-- reconnect / backoff / resubscribe は v3.2.0 では実装しない
+- DTO-only stream は lifecycle event を混ぜず、automatic reconnect もしない
+- lifecycle を扱う場合は `Subscribe*StreamAsync(...)` を使う
+
+```csharp
+await foreach (var item in client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy, cancellation.Token))
+{
+    if (item is BitflyerRealtimeData<BitflyerRealtimeTickerMessage> data)
+    {
+        Console.WriteLine(data.Value.Ltp);
+    }
+    else if (item is BitflyerRealtimeContinuityLost<BitflyerRealtimeTickerMessage>)
+    {
+        Console.WriteLine("continuity lost; consider resync");
+    }
+}
+```
+
+`Subscribe*StreamAsync(...)` は reconnect / resubscribe / continuity loss を envelope event として通知する。
+default reconnect は `MaxAttempts = 3`, `InitialDelay = 1 second`, `MaxDelay = 10 seconds`, jitter なしである。
+`BitflyerRealtimeClientOptions.Reconnect` と `IdleTimeout` で変更できる。
 
 ## 6. Private Read
 

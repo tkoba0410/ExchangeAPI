@@ -34,6 +34,8 @@
 - [`docs/guides/cli-getting-started.md`](./guides/cli-getting-started.md)
 - [`docs/guides/mcp-getting-started.md`](./guides/mcp-getting-started.md)
 - [`docs/guides/credentials-and-auth-provider.md`](./guides/credentials-and-auth-provider.md)
+- [`docs/guides/realtime-bitflyer-getting-started.md`](./guides/realtime-bitflyer-getting-started.md)
+  - bitFlyer Realtime API の利用 guide として維持する
 - [`docs/guides/package-publish.md`](./guides/package-publish.md)
 - [`docs/guides/troubleshooting.md`](./guides/troubleshooting.md)
 - [`docs/distribution.md`](./distribution.md)
@@ -48,6 +50,8 @@
   - v3.1.0 release notes として維持する
 - [`docs/plan-v3.2.0.md`](./plan-v3.2.0.md)
   - v3.2.0 planning / release scope 文書として維持する
+- [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md)
+  - bitFlyer Realtime API の opt-in live verification runbook として維持する
 - [`docs/roadmap-post-v2.md`](./roadmap-post-v2.md)
   - `v2.0.0` 以降の検討候補として維持する
 

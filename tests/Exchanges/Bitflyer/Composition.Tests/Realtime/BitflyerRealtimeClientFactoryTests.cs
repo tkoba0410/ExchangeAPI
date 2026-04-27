@@ -21,7 +21,18 @@ public sealed class BitflyerRealtimeClientFactoryTests
         var tickers = await client.SubscribeTickerAsync(ProductCodes.BtcJpy).ToListAsync();
 
         Assert.Equal(new Uri("wss://example.test/json-rpc"), transport.ConnectedEndpoint);
-        Assert.Contains("lightning_ticker_BTC_JPY", transport.SentTexts.Single(), StringComparison.Ordinal);
+        Assert.Collection(
+            transport.SentTexts,
+            subscribe =>
+            {
+                Assert.Contains("\"method\":\"subscribe\"", subscribe, StringComparison.Ordinal);
+                Assert.Contains("lightning_ticker_BTC_JPY", subscribe, StringComparison.Ordinal);
+            },
+            unsubscribe =>
+            {
+                Assert.Contains("\"method\":\"unsubscribe\"", unsubscribe, StringComparison.Ordinal);
+                Assert.Contains("lightning_ticker_BTC_JPY", unsubscribe, StringComparison.Ordinal);
+            });
         Assert.Equal(100.5m, Assert.Single(tickers).Ltp);
     }
 

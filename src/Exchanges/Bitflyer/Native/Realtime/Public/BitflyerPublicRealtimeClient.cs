@@ -22,12 +22,19 @@ public sealed class BitflyerPublicRealtimeClient : IBitflyerPublicRealtimeClient
         var channel = BitflyerRealtimeChannels.Ticker(productCode);
         await _protocol.SubscribeAsync(channel, cancellationToken).ConfigureAwait(false);
 
-        await foreach (var message in _protocol.ReadMessagesAsync(cancellationToken).ConfigureAwait(false))
+        try
         {
-            if (message.Channel == channel)
+            await foreach (var message in _protocol.ReadMessagesAsync(cancellationToken).ConfigureAwait(false))
             {
-                yield return BitflyerRealtimeMessageDecoder.DecodeTicker(message);
+                if (message.Channel == channel)
+                {
+                    yield return BitflyerRealtimeMessageDecoder.DecodeTicker(message);
+                }
             }
+        }
+        finally
+        {
+            await TryUnsubscribeAsync(channel).ConfigureAwait(false);
         }
     }
 
@@ -38,15 +45,22 @@ public sealed class BitflyerPublicRealtimeClient : IBitflyerPublicRealtimeClient
         var channel = BitflyerRealtimeChannels.Executions(productCode);
         await _protocol.SubscribeAsync(channel, cancellationToken).ConfigureAwait(false);
 
-        await foreach (var message in _protocol.ReadMessagesAsync(cancellationToken).ConfigureAwait(false))
+        try
         {
-            if (message.Channel == channel)
+            await foreach (var message in _protocol.ReadMessagesAsync(cancellationToken).ConfigureAwait(false))
             {
-                foreach (var execution in BitflyerRealtimeMessageDecoder.DecodeExecutions(message, productCode))
+                if (message.Channel == channel)
                 {
-                    yield return execution;
+                    foreach (var execution in BitflyerRealtimeMessageDecoder.DecodeExecutions(message, productCode))
+                    {
+                        yield return execution;
+                    }
                 }
             }
+        }
+        finally
+        {
+            await TryUnsubscribeAsync(channel).ConfigureAwait(false);
         }
     }
 
@@ -57,12 +71,19 @@ public sealed class BitflyerPublicRealtimeClient : IBitflyerPublicRealtimeClient
         var channel = BitflyerRealtimeChannels.BoardSnapshot(productCode);
         await _protocol.SubscribeAsync(channel, cancellationToken).ConfigureAwait(false);
 
-        await foreach (var message in _protocol.ReadMessagesAsync(cancellationToken).ConfigureAwait(false))
+        try
         {
-            if (message.Channel == channel)
+            await foreach (var message in _protocol.ReadMessagesAsync(cancellationToken).ConfigureAwait(false))
             {
-                yield return BitflyerRealtimeMessageDecoder.DecodeBoardSnapshot(message, productCode);
+                if (message.Channel == channel)
+                {
+                    yield return BitflyerRealtimeMessageDecoder.DecodeBoardSnapshot(message, productCode);
+                }
             }
+        }
+        finally
+        {
+            await TryUnsubscribeAsync(channel).ConfigureAwait(false);
         }
     }
 
@@ -73,17 +94,35 @@ public sealed class BitflyerPublicRealtimeClient : IBitflyerPublicRealtimeClient
         var channel = BitflyerRealtimeChannels.Board(productCode);
         await _protocol.SubscribeAsync(channel, cancellationToken).ConfigureAwait(false);
 
-        await foreach (var message in _protocol.ReadMessagesAsync(cancellationToken).ConfigureAwait(false))
+        try
         {
-            if (message.Channel == channel)
+            await foreach (var message in _protocol.ReadMessagesAsync(cancellationToken).ConfigureAwait(false))
             {
-                yield return BitflyerRealtimeMessageDecoder.DecodeBoardDelta(message, productCode);
+                if (message.Channel == channel)
+                {
+                    yield return BitflyerRealtimeMessageDecoder.DecodeBoardDelta(message, productCode);
+                }
             }
+        }
+        finally
+        {
+            await TryUnsubscribeAsync(channel).ConfigureAwait(false);
         }
     }
 
     public ValueTask DisposeAsync()
     {
         return _protocol.DisposeAsync();
+    }
+
+    private async ValueTask TryUnsubscribeAsync(string channel)
+    {
+        try
+        {
+            await _protocol.UnsubscribeAsync(channel, CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+        }
     }
 }

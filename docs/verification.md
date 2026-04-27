@@ -234,6 +234,34 @@ MCP inspection live verification:
 - 対象 tools は `get_collateral_accounts`、`get_balance_history`、`get_collateral_history`、`get_child_orders`
 - response shape は `accounts` / `items` / `items` / `orders`
 
+## 5.2 v3.2.0 Realtime Verification
+
+bitFlyer public Realtime API の live verification は opt-in only とする。
+
+対象:
+
+- public realtime read
+- short duration
+- credentials 不要
+
+非対象:
+
+- private realtime
+- auth / credentials
+- state-changing operation
+- reconnect / backoff verification
+- full order book state builder verification
+
+runbook:
+
+- [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md)
+
+secret-free rule:
+
+- public realtime verification では credentials を使わない
+- credentials、API key、API secret、signature、Authorization 相当の値は evidence / log / result / exception / stdout / stderr に含めない
+- evidence を残す場合は `local/evidence/local-live/<yyyymmdd>-v3.2.0-bitflyer-realtime/` を使う
+
 ## 6. 初期 Endpoint Inventory
 
 本表は verification 判断の初期台帳である。  

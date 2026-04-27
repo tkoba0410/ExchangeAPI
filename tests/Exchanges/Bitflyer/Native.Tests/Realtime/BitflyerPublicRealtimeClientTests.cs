@@ -36,6 +36,7 @@ public sealed class BitflyerPublicRealtimeClientTests
         Assert.Equal(DateTimeOffset.Parse("2026-04-27T12:34:56.789Z"), ticker.Timestamp);
         Assert.Equal(123, ticker.TickId);
         Assert.Equal(100.5m, ticker.Ltp);
+        Assert.Equal(["lightning_ticker_BTC_JPY"], protocol.UnsubscribedChannels);
     }
 
     [Fact]
@@ -138,6 +139,25 @@ public sealed class BitflyerPublicRealtimeClientTests
         var tickers = await client.SubscribeTickerAsync(ProductCodes.BtcJpy).ToListAsync();
 
         Assert.Empty(tickers);
+        Assert.Equal(["lightning_ticker_BTC_JPY"], protocol.UnsubscribedChannels);
+    }
+
+    [Fact]
+    public async Task SubscribeBoardDeltasAsync_UnsubscribesWhenDecodeFails()
+    {
+        var protocol = new FakeRealtimeProtocolClient();
+        protocol.EnqueueMessage("lightning_board_BTC_JPY", """[]""");
+        await using var client = new BitflyerPublicRealtimeClient(protocol);
+
+        var exception = await Assert.ThrowsAnyAsync<Exception>(async () =>
+        {
+            await foreach (var _ in client.SubscribeBoardDeltasAsync(ProductCodes.BtcJpy))
+            {
+            }
+        });
+
+        Assert.Contains("must be an object", exception.Message, StringComparison.Ordinal);
+        Assert.Equal(["lightning_board_BTC_JPY"], protocol.UnsubscribedChannels);
     }
 }
 

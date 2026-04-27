@@ -10,6 +10,7 @@ internal sealed class FakeRealtimeProtocolClient : IBitflyerRealtimeProtocolClie
     private readonly ConcurrentQueue<BitflyerRealtimeChannelMessage> _messages = new();
 
     public List<string> SubscribedChannels { get; } = [];
+    public List<string> UnsubscribedChannels { get; } = [];
     public bool Disposed { get; private set; }
 
     public void EnqueueMessage(string channel, string payloadJson, DateTimeOffset? receivedAt = null)
@@ -36,6 +37,7 @@ internal sealed class FakeRealtimeProtocolClient : IBitflyerRealtimeProtocolClie
 
     public ValueTask UnsubscribeAsync(string channel, CancellationToken cancellationToken = default)
     {
+        UnsubscribedChannels.Add(channel);
         return ValueTask.CompletedTask;
     }
 

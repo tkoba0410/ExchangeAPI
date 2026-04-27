@@ -266,13 +266,14 @@ venue-specific DTO:
 
 ## 10. Error / Cancellation / Reconnect
 
-v3.1.0 initial contract:
+current contract:
 
 - cancellation: 正常終了
 - dispose: connection close
 - remote close: controlled exception
 - invalid JSON: controlled exception
 - unknown channel: ignore または controlled diagnostic
+- typed stream 終了時: subscribed channel へ best-effort unsubscribe を送る
 - automatic reconnect: 実装しない
 
 理由:
@@ -280,6 +281,13 @@ v3.1.0 initial contract:
 - reconnect は board delta の連続性と欠落検知を伴う
 - v3.1.0 では接続中に受けた event の typed stream 化を優先する
 - reconnect / backoff / resubscribe は v3.2 以降の候補とする
+
+v3.2.0 hardening:
+
+- typed stream が natural completion / cancellation / decode error で終了する場合、client は対象 channel へ unsubscribe を試みる
+- unsubscribe が失敗した場合でも、元の stream 終了理由を不明瞭にしない
+- cancellation は利用者の終了意図として扱い、retry / reconnect しない
+- reconnect / backoff / resubscribe は board delta の欠落検知と一体で設計する必要があるため、v3.2.0 では実装しない
 
 ## 11. Testing
 
@@ -324,6 +332,36 @@ live verification は opt-in only とする。
 - stdout / stderr / evidence secret-free
 
 default では live connection を行わない。
+
+## 12.1 Private Realtime Design Note
+
+private realtime は v3.2.0 では実装しない。
+v3.3.0 以降で扱う場合は、public realtime とは別 scope として設計する。
+
+検討対象:
+
+- auth payload
+- API key / API secret / signature handling
+- credential session lifetime
+- private channel catalog
+- private event DTO
+- secret-free evidence / log / exception rule
+- reconnect / resubscribe 時の auth 再実行方針
+
+必須条件:
+
+- API key、API secret、signature、Authorization 相当の値を evidence / log / result / exception / stdout / stderr に含めない
+- raw credential profile を evidence にコピーしない
+- private realtime live verification は opt-in only とする
+- state-changing operation は扱わない
+- HTTP private endpoint の credential provider 方針と矛盾させない
+
+v3.2.0 でやらないこと:
+
+- private channel への接続
+- private DTO の公開
+- private realtime factory の公開
+- auth / credentials を使う realtime subscription
 
 ## 13. Future Candidates
 

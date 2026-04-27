@@ -42,10 +42,11 @@ public sealed class BitflyerRealtimeProtocolClientTests
             () => DateTimeOffset.FromUnixTimeMilliseconds(1_775_000_000_123),
             () => "0123456789abcdef");
 
-        await Assert.ThrowsAsync<BitflyerRealtimeAuthenticationException>(async () =>
+        var exception = await Assert.ThrowsAsync<BitflyerRealtimeAuthenticationException>(async () =>
         {
             await client.AuthenticateAsync(new FakeCredentialSession());
         });
+        Assert.Equal(BitflyerRealtimeErrorKind.AuthenticationFailed, exception.Kind);
     }
 
     [Fact]

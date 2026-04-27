@@ -1,3 +1,4 @@
+using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Models;
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Private;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Credentials;
@@ -40,6 +41,31 @@ public sealed class BitflyerPrivateRealtimeClientTests
         Assert.Equal("SELL", item.Side);
         Assert.Equal(500000m, item.Price);
         Assert.Equal(0.12m, item.Size);
+    }
+
+    [Fact]
+    public async Task SubscribeChildOrderEventsStreamAsync_YieldsDataEvent()
+    {
+        var protocol = new FakeRealtimeProtocolClient();
+        protocol.EnqueueMessage("child_order_events", """
+            [
+              {
+                "product_code": "BTC_JPY",
+                "child_order_acceptance_id": "JRF20150101-070921-194057",
+                "event_date": "2015-01-01T07:09:21.9301772Z",
+                "event_type": "ORDER"
+              }
+            ]
+            """);
+        await using var client = new BitflyerPrivateRealtimeClient(protocol, new FakeCredentialProvider());
+
+        var first = await StreamEventTestExtensions.ReadFirstAsync(client.SubscribeChildOrderEventsStreamAsync());
+
+        var data = Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeChildOrderEventMessage>>(first);
+        Assert.Equal("child_order_events", data.Channel);
+        Assert.Equal(ProductCodes.BtcJpy, data.Value.ProductCode);
+        Assert.Equal("ORDER", data.Value.EventType);
+        Assert.Equal(1, protocol.AuthenticateCallCount);
     }
 
     [Fact]

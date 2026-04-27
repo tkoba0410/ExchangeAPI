@@ -1,4 +1,5 @@
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Private;
+using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Public;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
 using ExchangeApi.Primitives.Credentials;
@@ -18,13 +19,11 @@ public static class BitflyerRealtimeClientFactory
     {
         ArgumentNullException.ThrowIfNull(transport);
 
-        var resolved = options ?? new BitflyerRealtimeClientOptions();
-        IBitflyerRealtimeTransport effectiveTransport = resolved.ConnectTimeout is { } timeout
-            ? new TimeoutBitflyerRealtimeTransport(transport, timeout)
-            : transport;
+        var resolved = ResolveOptions(options);
+        IBitflyerRealtimeTransport effectiveTransport = ApplyTimeout(transport, resolved.ConnectTimeout);
 
         var protocol = new BitflyerRealtimeProtocolClient(effectiveTransport, resolved.EndpointUri);
-        return new BitflyerPublicRealtimeClient(protocol);
+        return new BitflyerPublicRealtimeClient(protocol, () => CreateProtocol(new WebSocketBitflyerRealtimeTransport(), resolved), ToResilienceOptions(resolved));
     }
 
     public static IBitflyerPrivateRealtimeClient CreatePrivateClient(
@@ -42,13 +41,81 @@ public static class BitflyerRealtimeClientFactory
         ArgumentNullException.ThrowIfNull(credentialProvider);
         ArgumentNullException.ThrowIfNull(transport);
 
-        var resolved = options ?? new BitflyerRealtimeClientOptions();
-        IBitflyerRealtimeTransport effectiveTransport = resolved.ConnectTimeout is { } timeout
-            ? new TimeoutBitflyerRealtimeTransport(transport, timeout)
-            : transport;
+        var resolved = ResolveOptions(options);
+        IBitflyerRealtimeTransport effectiveTransport = ApplyTimeout(transport, resolved.ConnectTimeout);
 
         var protocol = new BitflyerRealtimeProtocolClient(effectiveTransport, resolved.EndpointUri);
-        return new BitflyerPrivateRealtimeClient(protocol, credentialProvider);
+        return new BitflyerPrivateRealtimeClient(
+            protocol,
+            credentialProvider,
+            () => CreateProtocol(new WebSocketBitflyerRealtimeTransport(), resolved),
+            ToResilienceOptions(resolved));
+    }
+
+    private static BitflyerRealtimeClientOptions ResolveOptions(BitflyerRealtimeClientOptions? options)
+    {
+        var resolved = options ?? new BitflyerRealtimeClientOptions();
+        Validate(resolved);
+        return resolved;
+    }
+
+    private static void Validate(BitflyerRealtimeClientOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(options.EndpointUri);
+        ArgumentNullException.ThrowIfNull(options.Reconnect);
+
+        if (options.ConnectTimeout is { } connectTimeout && connectTimeout <= TimeSpan.Zero)
+        {
+            throw new ArgumentException("ConnectTimeout must be greater than zero when specified.", nameof(options));
+        }
+
+        if (options.IdleTimeout is { } idleTimeout && idleTimeout <= TimeSpan.Zero)
+        {
+            throw new ArgumentException("IdleTimeout must be greater than zero when specified.", nameof(options));
+        }
+
+        if (options.Reconnect.MaxAttempts < 0)
+        {
+            throw new ArgumentException("Reconnect MaxAttempts must be greater than or equal to zero.", nameof(options));
+        }
+
+        if (options.Reconnect.InitialDelay < TimeSpan.Zero)
+        {
+            throw new ArgumentException("Reconnect InitialDelay must be greater than or equal to zero.", nameof(options));
+        }
+
+        if (options.Reconnect.MaxDelay < options.Reconnect.InitialDelay)
+        {
+            throw new ArgumentException("Reconnect MaxDelay must be greater than or equal to InitialDelay.", nameof(options));
+        }
+    }
+
+    private static IBitflyerPrivateRealtimeProtocolClient CreateProtocol(
+        IBitflyerRealtimeTransport transport,
+        BitflyerRealtimeClientOptions options)
+    {
+        return new BitflyerRealtimeProtocolClient(ApplyTimeout(transport, options.ConnectTimeout), options.EndpointUri);
+    }
+
+    private static IBitflyerRealtimeTransport ApplyTimeout(
+        IBitflyerRealtimeTransport transport,
+        TimeSpan? connectTimeout)
+    {
+        return connectTimeout is { } timeout
+            ? new TimeoutBitflyerRealtimeTransport(transport, timeout)
+            : transport;
+    }
+
+    private static BitflyerRealtimeResilienceOptions ToResilienceOptions(BitflyerRealtimeClientOptions options)
+    {
+        return new BitflyerRealtimeResilienceOptions
+        {
+            MaxAttempts = options.Reconnect.MaxAttempts,
+            InitialDelay = options.Reconnect.InitialDelay,
+            MaxDelay = options.Reconnect.MaxDelay,
+            IdleTimeout = options.IdleTimeout,
+        };
     }
 
     private sealed class TimeoutBitflyerRealtimeTransport : IBitflyerRealtimeTransport

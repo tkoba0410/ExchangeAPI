@@ -1,4 +1,6 @@
+using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Models;
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Public;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Realtime;
@@ -27,6 +29,36 @@ public sealed class BitflyerPublicRealtimeClientTests
         Assert.Equal(10000000m, ticker.Ltp);
         Assert.Equal(3456.789m, ticker.Volume);
         Assert.Equal(456.789m, ticker.VolumeByProduct);
+    }
+
+    [Fact]
+    public async Task SubscribeTickerStreamAsync_YieldsDataEvent()
+    {
+        var protocol = new FakeRealtimeProtocolClient();
+        protocol.EnqueueMessage("lightning_ticker_BTC_JPY", SamplePayloads.Ticker);
+        await using var client = new BitflyerPublicRealtimeClient(protocol);
+
+        var first = await StreamEventTestExtensions.ReadFirstAsync(client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy));
+
+        var data = Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeTickerMessage>>(first);
+        Assert.Equal("lightning_ticker_BTC_JPY", data.Channel);
+        Assert.Equal(ProductCodes.BtcJpy, data.Value.ProductCode);
+        Assert.Equal(10000000m, data.Value.Ltp);
+    }
+
+    [Fact]
+    public async Task SubscribeTickerStreamAsync_YieldsMessageRejectedAndContinuesOnDecodeFailure()
+    {
+        var protocol = new FakeRealtimeProtocolClient();
+        protocol.EnqueueMessage("lightning_ticker_BTC_JPY", """{ "product_code": "BTC_JPY" }""");
+        await using var client = new BitflyerPublicRealtimeClient(protocol);
+
+        var first = await StreamEventTestExtensions.ReadFirstAsync(client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy));
+
+        var rejected = Assert.IsType<BitflyerRealtimeMessageRejected<BitflyerRealtimeTickerMessage>>(first);
+        Assert.Equal("lightning_ticker_BTC_JPY", rejected.Channel);
+        Assert.Equal(BitflyerRealtimeErrorKind.MessageDecodeFailed, rejected.ErrorKind);
+        Assert.DoesNotContain("BTC_JPY", rejected.Reason, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -287,6 +319,16 @@ public sealed class BitflyerPublicRealtimeClientTests
 
         Assert.Contains("must be an object", exception.Message, StringComparison.Ordinal);
         Assert.Equal(["lightning_board_BTC_JPY"], protocol.UnsubscribedChannels);
+    }
+}
+
+internal static class StreamEventTestExtensions
+{
+    internal static async Task<T> ReadFirstAsync<T>(IAsyncEnumerable<T> source)
+    {
+        await using var enumerator = source.GetAsyncEnumerator();
+        Assert.True(await enumerator.MoveNextAsync());
+        return enumerator.Current;
     }
 }
 

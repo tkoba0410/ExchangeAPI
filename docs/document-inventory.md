@@ -47,6 +47,8 @@
   - v3.1.0 release gate と preflight checklist として維持する
 - [`docs/release-checklist-v3.2.0.md`](./release-checklist-v3.2.0.md)
   - v3.2.0 release gate と preflight checklist として維持する
+- [`docs/release-checklist-v3.3.0.md`](./release-checklist-v3.3.0.md)
+  - v3.3.0 release gate と preflight checklist として維持する
 - [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md)
 - [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md)
 - [`docs/release-notes/v2.0.0.md`](./release-notes/v2.0.0.md)
@@ -54,6 +56,8 @@
   - v3.1.0 release notes として維持する
 - [`docs/release-notes/v3.2.0.md`](./release-notes/v3.2.0.md)
   - v3.2.0 release notes として維持する
+- [`docs/release-notes/v3.3.0.md`](./release-notes/v3.3.0.md)
+  - v3.3.0 release notes として維持する
 - [`docs/plan-v3.2.0.md`](./plan-v3.2.0.md)
   - v3.2.0 planning / release scope 文書として維持する
 - [`docs/plan-v3.3.0.md`](./plan-v3.3.0.md)

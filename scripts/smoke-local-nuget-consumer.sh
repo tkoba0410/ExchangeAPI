@@ -57,6 +57,7 @@ using var client = BitflyerClientFactory.CreateNativeClientBundle();
 await using var realtimeClient = BitflyerRealtimeClientFactory.CreatePublicClient(new SmokeRealtimeTransport());
 var request = new GetTickerRequest { ProductCode = ProductCodes.BtcJpy };
 var provider = PlainTextApiCredentialProviderFactory.Create(ExchangeVenue.Bitflyer, "api-key", "api-secret");
+await using var privateRealtimeClient = BitflyerRealtimeClientFactory.CreatePrivateClient(provider, new SmokeRealtimeTransport());
 await using var session = await provider.OpenSessionAsync();
 var redactor = new Redactor(new RedactionOptions { SensitiveValues = ["secret-value"] });
 var redacted = redactor.RedactText("apiSecret=api-secret payload=secret-value");
@@ -64,8 +65,11 @@ var redacted = redactor.RedactText("apiSecret=api-secret payload=secret-value");
 Console.WriteLine(
     client.Public is not null &&
     realtimeClient is not null &&
+    privateRealtimeClient is not null &&
     request.ProductCode == ProductCodes.BtcJpy &&
     BitflyerRealtimeChannels.Ticker(ProductCodes.BtcJpy) == "lightning_ticker_BTC_JPY" &&
+    BitflyerRealtimeChannels.ChildOrderEvents() == "child_order_events" &&
+    BitflyerRealtimeChannels.ParentOrderEvents() == "parent_order_events" &&
     session.ApiKey == "api-key" &&
     redacted == "apiSecret=[REDACTED] payload=[REDACTED]"
         ? "consumer-smoke-ok"

@@ -174,3 +174,65 @@ live verification は opt-in only とし、default では接続しない。
 - live tests は opt-in なしで skip する
 - state-changing operation は含まれていない
 - Binance realtime / Unified / Rx / full reconnect は含まれていない
+
+## 10. v3.3.0 Release Close 実施指示
+
+目的:
+
+v3.3.0 は bitFlyer private realtime read MVP release として閉じる。
+v3.3.0 に reconnect / state builder / Rx / Binance realtime / Unified / state-changing operation は含めない。
+
+release 前に行うこと:
+
+1. `docs/release-checklist-v3.3.0.md` を追加する。
+2. `docs/release-notes/v3.3.0.md` を追加する。
+3. local / GitHub Packages consumer smoke が private realtime surface を参照できることを確認する。
+4. `dotnet build ExchangeApi.slnx` を実行する。
+5. `dotnet test ExchangeApi.slnx --no-restore` を実行する。
+6. `bash scripts/pack-local-nuget.sh 3.3.0` を実行する。
+7. `bash scripts/smoke-local-nuget-consumer.sh 3.3.0` を実行する。
+8. `bash scripts/create-release-assets.sh 3.3.0 linux-x64 Release` を実行する。
+9. `dotnet restore ExchangeApi.LiveTests.slnx` を実行する。
+10. `dotnet test ExchangeApi.LiveTests.slnx --no-restore` を実行し、opt-in なしで skip することを確認する。
+
+期待 package:
+
+```text
+ExchangeApi.Exchanges.Binance.3.3.0.nupkg
+ExchangeApi.Exchanges.Bitflyer.3.3.0.nupkg
+ExchangeApi.Optional.Credentials.3.3.0.nupkg
+ExchangeApi.Optional.Logging.3.3.0.nupkg
+ExchangeApi.Primitives.3.3.0.nupkg
+```
+
+生成されてはいけない package:
+
+```text
+ExchangeApi.Exchanges.Bitflyer.Vocabulary.3.3.0.nupkg
+ExchangeApi.Exchanges.Bitflyer.Protocol.3.3.0.nupkg
+ExchangeApi.Exchanges.Bitflyer.Native.3.3.0.nupkg
+ExchangeApi.Exchanges.Bitflyer.Composition.3.3.0.nupkg
+ExchangeApi.Exchanges.Binance.Vocabulary.3.3.0.nupkg
+ExchangeApi.Exchanges.Binance.Protocol.3.3.0.nupkg
+ExchangeApi.Exchanges.Binance.Native.3.3.0.nupkg
+ExchangeApi.Exchanges.Binance.Composition.3.3.0.nupkg
+```
+
+release 手順:
+
+1. release preflight 済み commit を `main` に fast-forward merge する。
+2. `v3.3.0` tag を作成して push する。
+3. `bash scripts/push-github-packages.sh 3.3.0` で GitHub Packages に publish する。
+4. `bash scripts/smoke-github-packages-consumer.sh 3.3.0` を実行する。
+5. GitHub Release `v3.3.0` を作成し、release assets を attach する。
+6. release checklist に preflight / release result を記録する。
+
+完了条件:
+
+- `main` に v3.3.0 commit が入っている
+- `v3.3.0` tag が remote にある
+- GitHub Release が作成されている
+- GitHub Packages consumer smoke が通っている
+- release assets が attach されている
+- live tests は opt-in なしで skip する
+- evidence / logs / stdout / stderr に secret が残らない

@@ -20,6 +20,8 @@
   - bitFlyer venue 台帳として維持する
 - [`docs/realtime-bitflyer.md`](./realtime-bitflyer.md)
   - bitFlyer Realtime API の設計正本として維持する
+- [`docs/venue-onboarding.md`](./venue-onboarding.md)
+  - new venue onboarding guide / checklist / template として維持する
 - [`docs/endpoints-binance.md`](./endpoints-binance.md)
   - Binance venue 台帳として維持する
 - [`docs/cli.md`](./cli.md)

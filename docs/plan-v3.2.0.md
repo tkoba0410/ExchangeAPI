@@ -151,6 +151,12 @@ live verification は opt-in only とし、default では接続しない。
 - bitFlyer Realtime live verification runbook
 - private realtime design note
 - verification 正本への Realtime live verification 方針追記
+- venue onboarding guide
+- endpoint matrix template
+- deterministic test template
+- safe live read verification template
+- package / smoke / release checklist
+- v4 candidate comparison template
 
 検証結果:
 
@@ -163,4 +169,26 @@ dotnet test ExchangeApi.slnx --no-restore passed
 dotnet test ExchangeApi.LiveTests.slnx --no-restore passed; live tests skipped safely without opt-in
 bash scripts/pack-local-nuget.sh 3.2.0-local.check passed
 bash scripts/smoke-local-nuget-consumer.sh 3.2.0-local.check passed
+```
+
+## 10. Venue Onboarding Preparation 結果
+
+追加済み:
+
+- `docs/venue-onboarding.md`
+  - venue onboarding scope / non-scope
+  - v4 candidate evaluation table
+  - endpoint matrix template
+  - project / folder / namespace checklist
+  - implementation checklist
+  - deterministic test template
+  - safe live read verification template
+  - package / smoke / release checklist
+  - v4 candidate comparison template
+
+検証結果:
+
+```text
+git diff --check passed
+dotnet test ExchangeApi.slnx --no-restore passed
 ```

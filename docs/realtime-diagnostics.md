@@ -26,6 +26,7 @@ v3.5.0 は Realtime Diagnostics Foundation release として扱う。
 v3.5.0 で扱う:
 
 - diagnostic event schema
+- public `RealtimeDiagnosticEvent` contract
 - sanitized raw frame logging
 - secret-free realtime evidence layout
 - realtime lifecycle contract table
@@ -61,8 +62,33 @@ v3.5.0 で扱わない:
 ## 4. Diagnostic Event Model
 
 Diagnostic event は、realtime stream lifecycle、message decode、raw frame handling、secret-free logging の状態を表す。
+`RealtimeDiagnosticEvent` は public API として扱う。
 
-候補 API 名:
+目的:
+
+- 利用者が stream lifecycle / diagnostics を structured data として扱えるようにする
+- logging / evidence / replay / monitoring が同じ診断単位を参照できるようにする
+- 将来の venue realtime にも流用できる診断語彙を固定する
+
+一般化する範囲:
+
+- connection lifecycle
+- subscription lifecycle
+- message decode / reject
+- reconnect / resubscribe
+- continuity loss
+- close / failure
+- sanitized raw frame handling
+
+一般化しない範囲:
+
+- ticker / execution / board / order event の market semantics
+- order / account / position state
+- symbol / product code の横断正規化
+- venue 横断 realtime abstraction
+- Unified market data / account / trading model
+
+API shape:
 
 ```csharp
 public sealed record RealtimeDiagnosticEvent
@@ -245,14 +271,12 @@ Live verification:
 
 次の項目は実装前に裁定する。
 
-1. `RealtimeDiagnosticEvent` を public API にするか、bitFlyer-specific stream event の内側に閉じるか。
-2. `EventType` / `Severity` を string にするか enum にするか。
-3. sanitized raw frame logging を core venue package に置くか、`ExchangeApi.Optional.Logging` の extension として置くか。
-4. raw frame の body を常に保存するか、size limit と sampling を持つか。
+1. `EventType` / `Severity` を string にするか enum にするか。
+2. sanitized raw frame logging を core venue package に置くか、`ExchangeApi.Optional.Logging` の extension として置くか。
+3. raw frame の body を常に保存するか、size limit と sampling を持つか。
 
 推奨初期案:
 
-- diagnostic event schema は public contract として固定する。
 - `EventType` / `Severity` は enum ではなく string から開始する。
 - file output は `ExchangeApi.Optional.Logging` 側に寄せ、venue package は event emission までに留める。
 - raw frame body は opt-in かつ size limit 付きで保存する。
@@ -278,3 +302,22 @@ Live verification:
 - DTO-only stream だけにして診断データを外へ出さない案
 - market data stream と diagnostic stream を分ける案
 - callback / sink で diagnostic event を渡す案
+
+### 11.2 Public Diagnostic Event Contract
+
+採用: 案A。
+
+`RealtimeDiagnosticEvent` は public API として扱う。
+ただし、この層で一般化するのは stream lifecycle / diagnostics に限定する。
+
+採用理由:
+
+- bitFlyer 内部に閉じると、診断情報が局所化し、logging / evidence / replay / monitoring から扱いにくくなる
+- public contract にすることで、上位層や optional package が同じ診断単位を参照できる
+- `MessageRejected`、`ContinuityLost`、`Failed` などを利用者が structured data として判断できる
+- 将来の venue realtime にも使えるが、Unified や market semantics の抽象化には踏み込まない
+
+非採用:
+
+- bitFlyer-specific stream event の内側に閉じる案
+- internal logging / evidence 専用の非公開診断モデルに留める案

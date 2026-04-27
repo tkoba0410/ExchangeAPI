@@ -45,13 +45,16 @@ dotnet add package ExchangeApi.Optional.Logging \
 
 cat > Program.cs <<'EOF'
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
+using ExchangeApi.Exchanges.Bitflyer.Composition.Realtime;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
+using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Optional.Credentials;
 using ExchangeApi.Optional.Credentials.PlainText;
 using ExchangeApi.Optional.Logging.Redaction;
 
 using var client = BitflyerClientFactory.CreateNativeClientBundle();
+await using var realtimeClient = BitflyerRealtimeClientFactory.CreatePublicClient(new SmokeRealtimeTransport());
 var request = new GetTickerRequest { ProductCode = ProductCodes.BtcJpy };
 var provider = PlainTextApiCredentialProviderFactory.Create(ExchangeVenue.Bitflyer, "api-key", "api-secret");
 await using var session = await provider.OpenSessionAsync();
@@ -60,11 +63,42 @@ var redacted = redactor.RedactText("apiSecret=api-secret payload=secret-value");
 
 Console.WriteLine(
     client.Public is not null &&
+    realtimeClient is not null &&
     request.ProductCode == ProductCodes.BtcJpy &&
+    BitflyerRealtimeChannels.Ticker(ProductCodes.BtcJpy) == "lightning_ticker_BTC_JPY" &&
     session.ApiKey == "api-key" &&
     redacted == "apiSecret=[REDACTED] payload=[REDACTED]"
         ? "consumer-smoke-ok"
         : "consumer-smoke-ng");
+
+internal sealed class SmokeRealtimeTransport : IBitflyerRealtimeTransport
+{
+    public ValueTask ConnectAsync(Uri endpointUri, CancellationToken cancellationToken = default)
+    {
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask SendTextAsync(string text, CancellationToken cancellationToken = default)
+    {
+        return ValueTask.CompletedTask;
+    }
+
+    public IAsyncEnumerable<string> ReadTextAsync(CancellationToken cancellationToken = default)
+    {
+        return Empty();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+
+    private static async IAsyncEnumerable<string> Empty()
+    {
+        await Task.CompletedTask;
+        yield break;
+    }
+}
 EOF
 
 dotnet restore --configfile NuGet.config >/dev/null

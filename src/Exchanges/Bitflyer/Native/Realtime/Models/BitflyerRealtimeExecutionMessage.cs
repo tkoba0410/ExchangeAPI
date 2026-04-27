@@ -1,0 +1,35 @@
+using System.Text.Json.Serialization;
+using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
+
+namespace ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Models;
+
+public sealed record BitflyerRealtimeExecutionMessage : IProductRealtimeMessage
+{
+    public required string Channel { get; init; }
+
+    [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
+    public required DateTimeOffset ReceivedAt { get; init; }
+    public required string ProductCode { get; init; }
+
+    [JsonPropertyName("id")]
+    public required long Id { get; init; }
+
+    [JsonPropertyName("side")]
+    public required string Side { get; init; }
+
+    [JsonPropertyName("price")]
+    public required decimal Price { get; init; }
+
+    [JsonPropertyName("size")]
+    public required decimal Size { get; init; }
+
+    [JsonPropertyName("exec_date")]
+    [JsonConverter(typeof(BitflyerUtcTimestampJsonConverter))]
+    public required DateTimeOffset ExecDate { get; init; }
+
+    [JsonPropertyName("buy_child_order_acceptance_id")]
+    public required string BuyChildOrderAcceptanceId { get; init; }
+
+    [JsonPropertyName("sell_child_order_acceptance_id")]
+    public required string SellChildOrderAcceptanceId { get; init; }
+}

@@ -52,6 +52,16 @@ lightning_board_snapshot_<product_code>
 lightning_board_<product_code>
 ```
 
+v3.1.0 implementation surface:
+
+- `BitflyerRealtimeClientFactory.CreatePublicClient(...)`
+- `IBitflyerPublicRealtimeClient`
+- `SubscribeTickerAsync(...)`
+- `SubscribeExecutionsAsync(...)`
+- `SubscribeBoardSnapshotsAsync(...)`
+- `SubscribeBoardDeltasAsync(...)`
+- `BitflyerRealtimeChannels`
+
 ## 4. Non-Scope
 
 v3.1.0 では次を扱わない。
@@ -295,6 +305,11 @@ test taxonomy:
 - `tests/Exchanges/Bitflyer/Composition.Tests/Realtime/`
 - `tests/Exchanges/Bitflyer/Architecture.Tests/`
 - `tests/Exchanges/Bitflyer/LiveTests/`
+
+consumer smoke:
+
+- local / GitHub Packages consumer smoke should restore `ExchangeApi.Exchanges.Bitflyer`
+- smoke should verify the Realtime factory and channel vocabulary are visible from the aggregate venue package
 
 ## 12. Live Verification
 

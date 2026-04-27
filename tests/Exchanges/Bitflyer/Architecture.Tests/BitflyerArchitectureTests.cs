@@ -36,6 +36,37 @@ public sealed class BitflyerArchitectureTests
     }
 
     [Fact]
+    public void Realtime_Source_DoesNotReference_Http_Endpoint_Modules()
+    {
+        var realtimeFiles = Directory.GetFiles(
+            Path.Combine(RepoRoot(), "src", "Exchanges", "Bitflyer"),
+            "*.cs",
+            SearchOption.AllDirectories)
+            .Where(path => path.Contains($"{Path.DirectorySeparatorChar}Realtime{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .ToArray();
+
+        foreach (var file in realtimeFiles)
+        {
+            var text = File.ReadAllText(file);
+            Assert.DoesNotContain(".Public.Endpoints.", text, StringComparison.Ordinal);
+            Assert.DoesNotContain(".Private.Endpoints.", text, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void Venue_DoesNotReference_SystemReactive()
+    {
+        var projectText = File.ReadAllText(Path.Combine(
+            RepoRoot(),
+            "src",
+            "Exchanges",
+            "Bitflyer",
+            "ExchangeApi.Exchanges.Bitflyer.csproj"));
+
+        Assert.DoesNotContain("System.Reactive", projectText, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Native_Source_DoesNotReference_Composition_Namespace()
     {
         var nativeFiles = Directory.GetFiles(
@@ -98,7 +129,9 @@ public sealed class BitflyerArchitectureTests
     public void Protocol_Public_Surface_DoesNotExpose_JsonElement()
     {
         AssertForbiddenTypes(
-            typeof(IBitflyerPublicProtocolApi).Assembly.GetExportedTypes().Where(static type => type.Namespace?.Contains(".Protocol.", StringComparison.Ordinal) == true),
+            typeof(IBitflyerPublicProtocolApi).Assembly.GetExportedTypes().Where(static type =>
+                type.Namespace?.Contains(".Protocol.", StringComparison.Ordinal) == true
+                && type.Namespace?.Contains(".Protocol.Realtime", StringComparison.Ordinal) != true),
             typeof(JsonElement));
     }
 

@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Globalization;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Options;
+using ExchangeApi.Exchanges.Bitflyer.Composition.Realtime;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelAllChildOrders;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelChildOrder;
 using ExchangeApi.Exchanges.Bitflyer.Native.Private.Endpoints.CancelParentOrder;
@@ -44,6 +45,27 @@ namespace ExchangeApi.Tests.Exchanges.Bitflyer.LiveTests;
 
 public sealed class LiveTests
 {
+    [BitflyerPublicReadLiveFact]
+    public async Task RealtimeTicker_ReadsPublicTicker()
+    {
+        await using var client = BitflyerRealtimeClientFactory.CreatePublicClient(new BitflyerRealtimeClientOptions
+        {
+            ConnectTimeout = TimeSpan.FromSeconds(10),
+        });
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+        await foreach (var ticker in client.SubscribeTickerAsync(ProductCodes.BtcJpy, timeout.Token))
+        {
+            Assert.Equal(ProductCodes.BtcJpy, ticker.ProductCode);
+            Assert.Equal($"lightning_ticker_{ProductCodes.BtcJpy}", ticker.Channel);
+            Assert.True(ticker.Ltp > 0);
+            Assert.True(ticker.ReceivedAt > DateTimeOffset.MinValue);
+            return;
+        }
+
+        Assert.Fail("No realtime ticker message was received.");
+    }
+
     [BitflyerPublicReadLiveFact]
     public async Task GetMarkets_ReadParity()
     {

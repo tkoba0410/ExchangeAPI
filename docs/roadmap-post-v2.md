@@ -1,6 +1,6 @@
 # ExchangeAPI Post-v2 Roadmap
 
-最終更新: 2026-04-27
+最終更新: 2026-04-28
 位置づけ: post-v2 roadmap
 
 本書は、`v2.0.0` には含めないが、`v2.0.0` 以降に検討する候補を記録する。  
@@ -16,6 +16,7 @@
 | `ExchangeApi.Optional.Configuration` | 将来候補 | env / config binding / provider factory を adapter 間で共通化できるため | adapter 側の重複が見えてから検討する |
 | `ExchangeApi.Optional.Testing` | 将来候補 | live test helper、fake provider、record/replay support を core から外して提供できるため | まず `tests/` と `verification/` 整理を優先 |
 | `ExchangeApi.Optional.Resilience` | 将来候補 | retry / backoff / rate limit / circuit breaker を core 正本に入れずに提供できるため | venue・利用者ごとに要件差が大きい |
+| `ExchangeApi.Optional.Reactive` | 将来候補 | Realtime stream を `IObservable<T>` として扱いたい利用者向けに Rx integration を core から分離して提供できるため | core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する |
 | evidence 自動整理 | 将来候補 | `local/evidence/` 標準構成へ artifact / log / notes を自動配置できるため | まず標準構成だけ固定する |
 | `samples/` directory | 将来候補 | guide 内サンプルが大きくなった場合に、実行可能サンプルとして分離できるため | 早期作成は保守対象を増やす |
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
@@ -169,8 +170,12 @@ v3.3.0 では扱わない:
 - Binance realtime
 - Unified realtime abstraction
 - reconnect / backoff / resubscribe の本格実装
-- Rx dependency
+- Rx dependency の core / venue package 追加
+- `IObservable<T>` public API
 - CLI / MCP 本格 integration
+
+Rx integration は `ExchangeApi.Optional.Reactive` などの optional package 候補として残す。
+導入する場合も、venue DTO と `IAsyncEnumerable<T>` contract を主 API として維持し、Rx は extension / adapter に限定する。
 
 ### v4.0.0 候補
 

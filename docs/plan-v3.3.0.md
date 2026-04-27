@@ -74,6 +74,7 @@ v3.3.0 では次を扱わない。
 - v3.3.0 MVP channel は `child_order_events` / `parent_order_events`
 - public / private realtime client は分ける
 - private live verification は opt-in only
+- Reactive Extensions は v3.3.0 core / venue package には入れず、`ExchangeApi.Optional.Reactive` などの optional package 候補として roadmap に残す
 
 ## 5. API 方針候補
 
@@ -98,6 +99,7 @@ await foreach (var message in client.SubscribeChildOrderEventsAsync(cancellation
 - DTO は bitFlyer venue-specific とする
 - common interface は envelope metadata に限定する
 - `IObservable<T>` は返さない
+- Rx を導入する場合も optional extension / adapter に限定し、主 API は `IAsyncEnumerable<T>` のまま維持する
 
 ## 6. 文書更新候補
 

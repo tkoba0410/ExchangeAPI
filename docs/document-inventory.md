@@ -46,6 +46,8 @@
 - [`docs/release-notes/v2.0.0.md`](./release-notes/v2.0.0.md)
 - [`docs/release-notes/v3.1.0.md`](./release-notes/v3.1.0.md)
   - v3.1.0 release notes として維持する
+- [`docs/plan-v3.2.0.md`](./plan-v3.2.0.md)
+  - v3.2.0 planning / release scope 文書として維持する
 - [`docs/roadmap-post-v2.md`](./roadmap-post-v2.md)
   - `v2.0.0` 以降の検討候補として維持する
 

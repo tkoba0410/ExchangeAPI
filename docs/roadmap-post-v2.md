@@ -124,6 +124,7 @@ v3.1.0 では扱わない:
 ### v3.2.0 候補
 
 v3.2.0 は、Realtime hardening と新 venue 追加準備の候補 release とする。
+詳細な scope は [`docs/plan-v3.2.0.md`](./plan-v3.2.0.md) に固定する。
 
 候補:
 

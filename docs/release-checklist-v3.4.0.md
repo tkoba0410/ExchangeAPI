@@ -3,7 +3,19 @@
 最終更新: 2026-04-28
 位置づけ: v3.4.0 release checklist
 
-状態: local preflight passed
+状態: `v3.4.0` released
+
+release 完了日: 2026-04-28
+
+完了済み:
+
+- deterministic tests / local pack / local consumer smoke
+- live tests safe skip without opt-in
+- GitHub Packages publish: library / optional packages `3.4.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer`, `ExchangeApi.Exchanges.Binance`, `ExchangeApi.Primitives`, `ExchangeApi.Optional.Credentials`, `ExchangeApi.Optional.Logging`
+- tag: `v3.4.0`
+- GitHub Release: `v3.4.0`
+- release assets: `exchangeapi-linux-x64`, `exchangeapi-linux-x64.sha256`, `exchangeapi-mcp-linux-x64`, `exchangeapi-mcp-linux-x64.sha256`
 
 ## 1. Scope Confirmation
 
@@ -60,11 +72,16 @@ dotnet test ExchangeApi.LiveTests.slnx --no-restore
 確認項目:
 
 - [x] deterministic tests passed for local release-candidate version
+- [x] deterministic tests passed for release version
 - [x] package generation passed for `3.4.0-local.preflight`
+- [x] package generation passed for `3.4.0`
 - [x] local consumer smoke passed for `3.4.0-local.preflight`
+- [x] local consumer smoke passed for `3.4.0`
 - [x] local consumer smoke verifies stream envelope / realtime options surface
 - [x] release asset generation passed for `3.4.0-local.preflight`
+- [x] release asset generation passed for `3.4.0`
 - [x] release asset checksums passed for `3.4.0-local.preflight`
+- [x] release asset checksums passed for `3.4.0`
 - [x] live tests skip safely without opt-in
 - [x] stdout / stderr / logs / evidence are secret-free
 
@@ -103,23 +120,23 @@ bash scripts/smoke-github-packages-consumer.sh 3.4.0
 
 確認項目:
 
-- [ ] `ExchangeApi.Exchanges.Bitflyer 3.4.0` を restore / build / run できる
-- [ ] `ExchangeApi.Exchanges.Binance 3.4.0` を restore / build / run できる
-- [ ] `ExchangeApi.Primitives 3.4.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Credentials 3.4.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Logging 3.4.0` を restore / build / run できる
-- [ ] bitFlyer stream envelope / realtime options surface を参照できる
-- [ ] token / secret が stdout / stderr に出ない
+- [x] `ExchangeApi.Exchanges.Bitflyer 3.4.0` を restore / build / run できる
+- [x] `ExchangeApi.Exchanges.Binance 3.4.0` を restore / build / run できる
+- [x] `ExchangeApi.Primitives 3.4.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Credentials 3.4.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Logging 3.4.0` を restore / build / run できる
+- [x] bitFlyer stream envelope / realtime options surface を参照できる
+- [x] token / secret が stdout / stderr に出ない
 
 ## 6. Release Gate
 
-- [ ] Git working tree が release 前に clean である
-- [ ] `main` に `v3.4.0` commit が入っている
-- [ ] `v3.4.0` tag が remote にある
-- [ ] GitHub Release が作成されている
-- [ ] release assets が attach されている
-- [ ] GitHub Packages smoke が通っている
-- [ ] `v3.4.0` に state builder / Rx / Binance realtime / Unified / state-changing operation が含まれていない
+- [x] Git working tree が release 前に clean である
+- [x] `main` に `v3.4.0` commit が入っている
+- [x] `v3.4.0` tag が remote にある
+- [x] GitHub Release が作成されている
+- [x] release assets が attach されている
+- [x] GitHub Packages smoke が通っている
+- [x] `v3.4.0` に state builder / Rx / Binance realtime / Unified / state-changing operation が含まれていない
 
 local preflight result:
 
@@ -151,5 +168,10 @@ release assets:
 release result:
 
 ```text
-pending
+date: 2026-04-28
+main push: passed
+tag push: v3.4.0 passed
+package publish: GITHUB_TOKEN="$(gh auth token)" bash scripts/push-github-packages.sh 3.4.0 passed
+GitHub Packages consumer smoke: bash scripts/smoke-github-packages-consumer.sh 3.4.0 passed
+GitHub Release: https://github.com/tkoba0410/ExchangeAPI/releases/tag/v3.4.0
 ```

@@ -22,7 +22,7 @@
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
 | venue 単位 package / project consolidation | v3 採用 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v3.0.0 で package consolidation を採用する |
 | bitFlyer Realtime API | v3.1 採用候補 | HTTP とは別軸の public market stream を venue-native surface として扱えるため | v3.1.0 は public read MVP に限定する |
-| venue 追加 | v4 候補 | v3 で整理した venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
+| venue 追加 | v5 候補 | v3 / v4 で realtime foundation と exchange state management の基盤を整理した後、venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
 
 ## 1.1 v2.1.0 採用項目
 
@@ -86,19 +86,63 @@ layer-specific venue package / project は廃止する。
 ```text
 v3.0.0: package / project consolidation
 v3.1.0: bitFlyer public realtime read MVP
-v3.2.0: realtime hardening / venue onboarding preparation
+v3.2.0: realtime hardening / realtime foundation preparation
 v3.3.0: bitFlyer private realtime read MVP candidate
 v3.4.0: bitFlyer realtime resilience foundation
-v3.5.0+: bitFlyer realtime maturity track continuation
-v4.0.0: new venue public read MVP
-v4.x: public read coverage expansion
-v5.0.0: Unified public read MVP
-v5.x: Unified expansion
-v6.0.0+: private/account/trading unified capability, only if meaning is defensible
+v3.5.0+: bitFlyer realtime foundation hardening
+v4.0.0: exchange state management foundation
+v4.x: exchange state management applications
+v5.0.0: new venue public read MVP
+v5.x: public read coverage expansion
+v6.0.0+: Unified, only if meaning is defensible
 ```
 
 v3.x は、`v3.0.0` で整理した venue package 構造の上に bitFlyer Realtime API を成熟させる track として扱う。
-新 venue 追加は v4.0.0 へ送り、v3.x では bitFlyer realtime の public / private read、connection lifecycle、safe verification、optional integration の完成度を優先する。
+v4.x は、HTTP / Realtime を問わず取得した event / response から取引所ステートを構築・管理する track として扱う。
+新 venue 追加は v5.0.0 へ送り、Unified は v6.0.0 以降へ送る。
+
+v3 / v4 境界:
+
+```text
+v3:
+  API event / response を安全に取得・記録・再現・検証するための汎用基盤
+
+v4:
+  取得した event / response から取引所ステートを構築・管理するための基盤と応用
+```
+
+v3 系に残すもの:
+
+- realtime transport / subscription lifecycle
+- public / private realtime read
+- DTO-only stream
+- stream envelope
+- reconnect / resubscribe lifecycle
+- `ContinuityLost` / `MessageRejected` などの stream status event
+- diagnostic event schema
+- sanitized raw frame logging
+- stream replay for test / diagnostics
+- fake transport / scenario helper
+- live verification / evidence helper
+- secret-free rule
+
+v4 系へ送るもの:
+
+- realtime-only local state projection
+- HTTP-only state snapshot helper
+- HTTP + realtime state coordination
+- board / account / position / order state helper
+- event history as state
+- state replay / state reconstruction
+- resync policy
+- state invalidation policy
+- state freshness / partial failure contract
+- bot-oriented live state helper
+
+用語の使い分け:
+
+- v3 の replay は、test / diagnostics のために stream event や raw frame を再生することを指す
+- v4 の replay は、取引所ステートを再構築する state replay / state reconstruction を指す
 
 ### v3.1.0 候補
 
@@ -130,27 +174,21 @@ v3.1.0 では扱わない:
 
 ### v3.2.0 候補
 
-v3.2.0 は、Realtime hardening と新 venue 追加準備の候補 release とする。
+v3.2.0 は、Realtime hardening と realtime foundation 整理の候補 release とする。
 詳細な scope は [`docs/plan-v3.2.0.md`](./plan-v3.2.0.md) に固定する。
 
 候補:
 
 - reconnect / backoff
 - resubscribe
-- board state builder
 - Rx optional integration
 - CLI diagnostic command
-- venue onboarding guide
-- venue project / endpoint module checklist
-- endpoint matrix template
 - deterministic test template
 - safe live read verification template
 - package / smoke / docs の再利用性改善
-- 追加 venue candidate の比較
-- public read MVP に必要な endpoint の棚卸し
-- symbol / product code / timestamp / decimal / nullability の差分調査
 - endpoint matrix へ `UnifiedCandidate` などの判定欄を追加するか検討
-- 追加 venue spike を行う場合も、正式 surface ではなく調査扱いに留める
+
+現行の v3 / v4 / v5 境界では、board state builder は v4 系、venue onboarding は v5 系へ送る。
 
 ### v3.3.0 候補
 
@@ -215,15 +253,21 @@ v3.5.0 の初期環境整備は [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md) に固
 
 候補:
 
-- public board snapshot + delta state builder
-- private order event state helper
 - fake transport / replay / sample payload testing helper の optional 化
+- sanitized raw frame logging
+- diagnostic event schema
+- stream replay for test / diagnostics
+- realtime lifecycle contract table
 - `ExchangeApi.Optional.Reactive`
 - `ExchangeApi.Optional.Realtime.Resilience`
-- `ExchangeApi.Optional.Realtime.State`
 
 v3 系で急がないもの:
 
+- realtime-only local state projection
+- HTTP-only state snapshot helper
+- HTTP + realtime state coordination
+- board / account / position / order state helper
+- state replay / state reconstruction
 - Binance realtime
 - venue 横断 realtime abstraction
 - Unified realtime abstraction
@@ -232,10 +276,31 @@ v3 系で急がないもの:
 
 ### v4.0.0 候補
 
-v4.0.0 は、新しい取引所を正式追加するフェーズとする。
-v4 は既存 API の大掃除ではなく、v3 で整理した venue 構造の拡張性を実証する release として扱う。
+v4.0.0 は、exchange state management foundation release 候補とする。
+v4 は既存 API の大掃除ではなく、v3 で整理した realtime foundation と既存 HTTP read surface を使って、取引所ステートを構築・管理するための境界を整理する release として扱う。
 
-v4.0.0 venue 追加 MVP:
+v4.0.0 候補:
+
+- realtime-only local state projection
+- HTTP-only state snapshot helper
+- HTTP + realtime state coordination
+- board / account / position / order state helper
+- event history as state
+- state replay / state reconstruction
+- resync policy
+- state invalidation policy
+- state freshness / partial failure contract
+- bot-oriented live state helper
+
+v4.0.0 では、state-changing operation を追加しない。
+注文、キャンセル、入金、出金などの実行系 operation は別途裁定する。
+
+### v5.0.0 候補
+
+v5.0.0 は、新しい取引所を正式追加するフェーズとする。
+v5 は既存 API の大掃除ではなく、v3 / v4 で整理した venue 構造、realtime foundation、state management 境界の拡張性を実証する release として扱う。
+
+v5.0.0 venue 追加 MVP:
 
 - `Vocabulary`
 - public read `Protocol`
@@ -246,7 +311,7 @@ v4.0.0 venue 追加 MVP:
 - endpoint matrix
 - local consumer smoke
 
-private endpoint、order、cancel、withdraw、deposit は v4.0.0 の初期 MVP には含めない。
+private endpoint、order、cancel、withdraw、deposit は v5.0.0 の初期 MVP には含めない。
 
 venue 選定基準:
 
@@ -258,12 +323,12 @@ venue 選定基準:
 - state-changing endpoint を後回しにできる
 - 日本円ペアや利用想定に合う場合は加点する
 
-### v5.0.0 候補
+### v6.0.0+ 候補
 
-v5.0.0 は、Unified public read MVP の候補 release とする。
-Unified は、v4 で複数 venue の実装経験を得てから設計する。
+v6.0.0 以降は、Unified を検討してよい。
+Unified は、複数 venue の実装経験と state management の境界を得てから設計する。
 
-v5 Unified MVP に載せやすい候補:
+Unified public read MVP に載せやすい候補:
 
 - market list / supported market discovery
 - ticker / price snapshot
@@ -280,10 +345,7 @@ v5 でも避ける候補:
 - account balance の完全統一
 - fee / commission の統一
 
-### v6.0.0+ 候補
-
-v6.0.0 以降は、Unified の private / account / trading capability を検討してよい。
-ただし、利用者意図、前提条件、副作用、結果解釈、主要エラー分類の意味同一性を防御できる場合だけ扱う。
+Unified の private / account / trading capability は、利用者意図、前提条件、副作用、結果解釈、主要エラー分類の意味同一性を防御できる場合だけ扱う。
 
 候補:
 

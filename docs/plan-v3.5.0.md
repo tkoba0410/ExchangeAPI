@@ -1,9 +1,9 @@
-# v3.5.0 Environment Setup 実施指示
+# v3.5.0 Environment Setup / Scope Framing 実施指示
 
 最終更新: 2026-04-28
-位置づけ: v3.5.0 初期環境整備指示
+位置づけ: v3.5.0 初期環境整備 / scope framing 指示
 
-状態: setup complete
+状態: scope framing
 
 ## 1. 目的
 
@@ -49,20 +49,72 @@ v3.5.0 では、v3.4.0 の bitFlyer Realtime resilience foundation の上に、�
 候補は次の通り。
 採用する場合は、実装前に本書と関連 topic doc を更新する。
 
-- public board snapshot + delta state builder
-- private order event state helper
 - fake transport / replay / sample payload testing helper の optional 化
+- sanitized raw frame logging
+- diagnostic event schema
+- stream replay for test / diagnostics
+- realtime lifecycle contract table
 - `ExchangeApi.Optional.Reactive`
 - `ExchangeApi.Optional.Realtime.Resilience`
-- `ExchangeApi.Optional.Realtime.State`
 
 判断基準:
 
 - core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する
 - Rx は採用する場合も optional package に限定する
-- state builder は gap-free continuity を保証できない前提を明示する
+- v3.5.0 では、API event / response を安全に取得・記録・再現・検証するための汎用基盤に限定する
+- 取引所ステート管理に直接関係するものは、基盤であっても v4.0.0 以降へ送る
 - secret-free rule を維持する
 - state-changing operation は v3.5.0 に含めない
+
+## 4.1 v3 / v4 境界
+
+v3 系は Realtime API foundation track とする。
+v4 系は Exchange State Management foundation / application track とする。
+
+境界:
+
+```text
+v3:
+  API event / response を安全に取得・記録・再現・検証するための汎用基盤
+
+v4:
+  取得した event / response から取引所ステートを構築・管理するための基盤と応用
+```
+
+v3 系に残すもの:
+
+- realtime transport / subscription lifecycle
+- public / private realtime read
+- DTO-only stream
+- stream envelope
+- reconnect / resubscribe lifecycle
+- `ContinuityLost` / `MessageRejected` などの stream status event
+- diagnostic event schema
+- sanitized raw frame logging
+- stream replay for test / diagnostics
+- fake transport / scenario helper
+- live verification / evidence helper
+- secret-free rule
+
+v4 系へ送るもの:
+
+- realtime-only local state projection
+- HTTP-only state snapshot helper
+- HTTP + realtime state coordination
+- board / account / position / order state helper
+- event history as state
+- state replay / state reconstruction
+- resync policy
+- state invalidation policy
+- state freshness / partial failure contract
+- bot-oriented live state helper
+
+用語の使い分け:
+
+- v3 の replay は、test / diagnostics のために stream event や raw frame を再生することを指す
+- v4 の replay は、取引所ステートを再構築する state replay / state reconstruction を指す
+
+この境界により、v3.5.0 の詳細 scope を決める前に、state management へ踏み込む候補を v4.0.0 以降へ送る。
 
 ## 5. 環境整備手順
 

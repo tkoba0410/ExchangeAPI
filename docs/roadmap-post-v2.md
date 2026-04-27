@@ -86,6 +86,7 @@ layer-specific venue package / project は廃止する。
 v3.0.0: package / project consolidation
 v3.1.0: bitFlyer public realtime read MVP
 v3.2.0: realtime hardening / venue onboarding preparation
+v3.3.0: bitFlyer private realtime read MVP candidate
 v4.0.0: new venue public read MVP
 v4.x: public read coverage expansion
 v5.0.0: Unified public read MVP
@@ -144,6 +145,32 @@ v3.2.0 は、Realtime hardening と新 venue 追加準備の候補 release と�
 - symbol / product code / timestamp / decimal / nullability の差分調査
 - endpoint matrix へ `UnifiedCandidate` などの判定欄を追加するか検討
 - 追加 venue spike を行う場合も、正式 surface ではなく調査扱いに留める
+
+### v3.3.0 候補
+
+v3.3.0 は、bitFlyer private realtime read MVP の候補 release とする。
+詳細な scope は [`docs/plan-v3.3.0.md`](./plan-v3.3.0.md) に固定する。
+
+候補:
+
+- private realtime auth design
+- credential session を使う realtime auth payload signing
+- private channel catalog の最小固定
+- private event DTO
+- typed stream API
+- deterministic auth request shape tests
+- deterministic private event decode tests
+- opt-in private realtime live verification runbook
+- secret-free evidence / log / stdout / stderr rule
+
+v3.3.0 では扱わない:
+
+- state-changing operation
+- Binance realtime
+- Unified realtime abstraction
+- reconnect / backoff / resubscribe の本格実装
+- Rx dependency
+- CLI / MCP 本格 integration
 
 ### v4.0.0 候補
 

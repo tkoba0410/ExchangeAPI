@@ -1,6 +1,6 @@
 # ExchangeAPI Document Inventory
 
-最終更新: 2026-04-27
+最終更新: 2026-04-28
 位置づけ: 文書棚卸し
 
 本書は、現行リポジトリ内の文書を `keep / rewrite / archive` に分類する。
@@ -62,6 +62,8 @@
   - v3.2.0 planning / release scope 文書として維持する
 - [`docs/plan-v3.3.0.md`](./plan-v3.3.0.md)
   - v3.3.0 planning / release scope 文書として維持する
+- [`docs/plan-v3.4.0.md`](./plan-v3.4.0.md)
+  - v3.4.0 planning / release scope 文書として維持する
 - [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md)
   - bitFlyer Realtime API の opt-in live verification runbook として維持する
 - [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md)

@@ -88,7 +88,8 @@ v3.0.0: package / project consolidation
 v3.1.0: bitFlyer public realtime read MVP
 v3.2.0: realtime hardening / venue onboarding preparation
 v3.3.0: bitFlyer private realtime read MVP candidate
-v3.4.0+: bitFlyer realtime maturity track
+v3.4.0: bitFlyer realtime resilience foundation
+v3.5.0+: bitFlyer realtime maturity track continuation
 v4.0.0: new venue public read MVP
 v4.x: public read coverage expansion
 v5.0.0: Unified public read MVP
@@ -181,20 +182,41 @@ v3.3.0 では扱わない:
 Rx integration は `ExchangeApi.Optional.Reactive` などの optional package 候補として残す。
 導入する場合も、venue DTO と `IAsyncEnumerable<T>` contract を主 API として維持し、Rx は extension / adapter に限定する。
 
-### v3.4.0+ 候補
+### v3.4.0 候補
 
-v3.4.0 以降の v3 系は、bitFlyer Realtime API の maturity track とする。
-正式 scope は各 release の plan 文書で固定する。
+v3.4.0 は、bitFlyer Realtime API の resilience foundation release 候補とする。
+詳細な scope は [`docs/plan-v3.4.0.md`](./plan-v3.4.0.md) に固定する。
 
 候補:
 
 - realtime reconnect / backoff / resubscribe
 - private realtime auth 再実行方針
 - idle timeout / heartbeat
-- public board snapshot + delta state builder
-- private order event state helper
 - fake transport / replay / sample payload testing helper
 - secret-free live verification helper
+
+v3.4.0 では扱わない:
+
+- public board snapshot + delta state builder
+- private order event state helper
+- `ExchangeApi.Optional.Reactive`
+- `ExchangeApi.Optional.Realtime.State`
+- Binance realtime
+- venue 横断 realtime abstraction
+- Unified realtime abstraction
+- state-changing realtime operation
+- core / venue package への Rx dependency 追加
+
+### v3.5.0+ 候補
+
+v3.5.0 以降は、v3.4.0 の resilience foundation の上に必要な realtime maturity work を積む。
+正式 scope は各 release の plan 文書で固定する。
+
+候補:
+
+- public board snapshot + delta state builder
+- private order event state helper
+- fake transport / replay / sample payload testing helper の optional 化
 - `ExchangeApi.Optional.Reactive`
 - `ExchangeApi.Optional.Realtime.Resilience`
 - `ExchangeApi.Optional.Realtime.State`

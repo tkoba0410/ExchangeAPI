@@ -89,7 +89,10 @@ v3.1.0: bitFlyer public realtime read MVP
 v3.2.0: realtime hardening / realtime foundation preparation
 v3.3.0: bitFlyer private realtime read MVP candidate
 v3.4.0: bitFlyer realtime resilience foundation
-v3.5.0+: bitFlyer realtime foundation hardening
+v3.5.0: realtime diagnostics foundation
+v3.6.0: realtime replay / testing foundation
+v3.7.0: realtime optional integration
+v3.8.0: realtime verification / release hardening
 v4.0.0: exchange state management foundation
 v4.x: exchange state management applications
 v5.0.0: new venue public read MVP
@@ -245,21 +248,65 @@ v3.4.0 では扱わない:
 - state-changing realtime operation
 - core / venue package への Rx dependency 追加
 
-### v3.5.0+ 候補
+### v3.5.0 候補
 
-v3.5.0 以降は、v3.4.0 の resilience foundation の上に必要な realtime maturity work を積む。
-正式 scope は各 release の plan 文書で固定する。
+v3.5.0 は、Realtime Diagnostics Foundation release 候補とする。
+目的は、realtime stream で何が起きたかを secret-free に見えるようにすることである。
 v3.5.0 の初期環境整備は [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md) に固定する。
 
 候補:
 
-- fake transport / replay / sample payload testing helper の optional 化
-- sanitized raw frame logging
 - diagnostic event schema
-- stream replay for test / diagnostics
+- sanitized raw frame logging
+- secret-free realtime evidence layout
 - realtime lifecycle contract table
+
+v3.5.0 では、replay や Rx integration へ深く入らない。
+まず「記録する」「説明できる」基盤を優先する。
+
+### v3.6.0 候補
+
+v3.6.0 は、Realtime Replay / Testing Foundation release 候補とする。
+目的は、起きたことを再現できるようにすることである。
+
+候補:
+
+- stream replay for test / diagnostics
+- fake transport / scenario helper
+- sample payload catalog
+- deterministic replay tests
+
+v3.6.0 の replay は、state reconstruction ではなく、stream event / raw frame の test / diagnostics 用 replay に限定する。
+
+### v3.7.0 候補
+
+v3.7.0 は、Realtime Optional Integration release 候補とする。
+目的は、core / venue package を太らせず、利用者が扱いやすい optional integration を提供することである。
+
+候補:
+
 - `ExchangeApi.Optional.Reactive`
 - `ExchangeApi.Optional.Realtime.Resilience`
+- `IAsyncEnumerable<T>` to `IObservable<T>` adapter
+- optional retry / backoff helper
+
+core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する。
+Rx dependency は optional package に限定する。
+
+### v3.8.0 候補
+
+v3.8.0 は、Realtime Verification / Release Hardening release 候補とする。
+目的は、v3 realtime foundation を閉じられる状態にすることである。
+
+候補:
+
+- public / private realtime live verification runbook 強化
+- secret scan 手順
+- release checklist
+- package smoke
+- docs consolidation
+
+v3.8.0 では、v4 の exchange state management へ進む前に、v3 realtime foundation の文書、検証、release 導線を整理する。
 
 v3 系で急がないもの:
 

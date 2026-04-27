@@ -44,29 +44,62 @@ v3.5.0 では、v3.4.0 の bitFlyer Realtime resilience foundation の上に、�
 - state-changing realtime operation
 - core / venue package への Rx dependency 追加
 
-## 4. v3.5.0 Scope 候補
+## 4. v3.5.0 Scope
 
-候補は次の通り。
-採用する場合は、実装前に本書と関連 topic doc を更新する。
+v3.5.0 は、Realtime Diagnostics Foundation release 候補とする。
+目的は、realtime stream で何が起きたかを secret-free に見えるようにすることである。
 
-- fake transport / replay / sample payload testing helper の optional 化
-- sanitized raw frame logging
+v3.5.0 候補:
+
 - diagnostic event schema
-- stream replay for test / diagnostics
+- sanitized raw frame logging
+- secret-free realtime evidence layout
 - realtime lifecycle contract table
-- `ExchangeApi.Optional.Reactive`
-- `ExchangeApi.Optional.Realtime.Resilience`
 
 判断基準:
 
 - core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する
-- Rx は採用する場合も optional package に限定する
+- v3.5.0 では replay や Rx integration へ深く入らない
 - v3.5.0 では、API event / response を安全に取得・記録・再現・検証するための汎用基盤に限定する
 - 取引所ステート管理に直接関係するものは、基盤であっても v4.0.0 以降へ送る
 - secret-free rule を維持する
 - state-changing operation は v3.5.0 に含めない
 
-## 4.1 v3 / v4 境界
+## 4.1 v3.6.0 - v3.8.0 候補
+
+v3.5.0 以降、v4.0.0 未満の段階化は次を基本とする。
+各 release の正式 scope は、対象 release の plan 文書で固定する。
+
+```text
+v3.5.0: realtime diagnostics foundation
+v3.6.0: realtime replay / testing foundation
+v3.7.0: realtime optional integration
+v3.8.0: realtime verification / release hardening
+```
+
+v3.6.0 候補:
+
+- stream replay for test / diagnostics
+- fake transport / scenario helper
+- sample payload catalog
+- deterministic replay tests
+
+v3.7.0 候補:
+
+- `ExchangeApi.Optional.Reactive`
+- `ExchangeApi.Optional.Realtime.Resilience`
+- `IAsyncEnumerable<T>` to `IObservable<T>` adapter
+- optional retry / backoff helper
+
+v3.8.0 候補:
+
+- public / private realtime live verification runbook 強化
+- secret scan 手順
+- release checklist
+- package smoke
+- docs consolidation
+
+## 4.2 v3 / v4 境界
 
 v3 系は Realtime API foundation track とする。
 v4 系は Exchange State Management foundation / application track とする。

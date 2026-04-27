@@ -1,6 +1,6 @@
 # bitFlyer Realtime API
 
-最終更新: 2026-04-27
+最終更新: 2026-04-28
 位置づけ: bitFlyer Realtime API 設計正本
 
 ## 1. 目的
@@ -33,6 +33,7 @@ Realtime API にも同じ境界を適用する。
 ## 3. Scope
 
 v3.1.0 の Realtime MVP は bitFlyer public market realtime read に限定する。
+v3.3.0 では bitFlyer private realtime read MVP を追加する。
 
 採用:
 
@@ -62,14 +63,18 @@ v3.1.0 implementation surface:
 - `SubscribeBoardDeltasAsync(...)`
 - `BitflyerRealtimeChannels`
 
+v3.3.0 private implementation surface:
+
+- `BitflyerRealtimeClientFactory.CreatePrivateClient(...)`
+- `IBitflyerPrivateRealtimeClient`
+- `SubscribeChildOrderEventsAsync(...)`
+- `SubscribeParentOrderEventsAsync(...)`
+
 ## 4. Non-Scope
 
-v3.1.0 では次を扱わない。
+Realtime API では次を扱わない。
 
 - HTTP endpoint contract 変更
-- private realtime
-- auth / credentials for realtime
-- API key / API secret を使う realtime auth
 - order / cancel / deposit / withdraw などの state-changing operation
 - Binance realtime
 - Unified realtime abstraction
@@ -111,12 +116,24 @@ JSON-RPC contract:
 
 - subscribe method は `subscribe`
 - unsubscribe method は `unsubscribe`
+- private auth method は `auth`
 - params は channel name
 - channel message は channel name と raw payload を保持する
+
+private auth contract:
+
+- private channel 購読前に `auth` response を確認する
+- auth params は `api_key`, `timestamp`, `nonce`, `signature`
+- `timestamp` は Unix timestamp millisecond を使う
+- `nonce` は request ごとに 16 byte 以上の random string を使う
+- `signature` は `timestamp` と `nonce` の文字列連結を `IApiCredentialSession.Sign(payload)` で署名した値とする
+- API secret は public API に出さない
+- API key、API secret、signature、Authorization 相当の値は evidence / log / result / exception / stdout / stderr に含めない
 
 ## 6. Channel Catalog
 
 v3.1.0 では public market read channel だけを扱う。
+v3.3.0 では private read channel を追加する。
 
 | Channel Pattern | Scope | Message DTO | Notes |
 | --- | --- | --- | --- |
@@ -124,6 +141,8 @@ v3.1.0 では public market read channel だけを扱う。
 | `lightning_executions_<product_code>` | public market | `BitflyerRealtimeExecutionMessage` | execution event; payload can contain multiple executions |
 | `lightning_board_snapshot_<product_code>` | public market | `BitflyerRealtimeBoardSnapshotMessage` | order book snapshot event |
 | `lightning_board_<product_code>` | public market | `BitflyerRealtimeBoardDeltaMessage` | order book delta event; v3.1.0 does not build full local book state |
+| `child_order_events` | private read | `BitflyerRealtimeChildOrderEventMessage` | order event; payload can contain multiple events |
+| `parent_order_events` | private read | `BitflyerRealtimeParentOrderEventMessage` | parent order event; payload can contain multiple events |
 
 Channel name は利用者に手書きさせない。
 `Vocabulary` に channel name builder を置き、`ProductCodes` と併用できるようにする。
@@ -204,6 +223,19 @@ public interface IBitflyerPublicRealtimeClient : IAsyncDisposable
 }
 ```
 
+Private realtime は public realtime と client を分ける。
+
+```csharp
+public interface IBitflyerPrivateRealtimeClient : IAsyncDisposable
+{
+    IAsyncEnumerable<BitflyerRealtimeChildOrderEventMessage> SubscribeChildOrderEventsAsync(
+        CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<BitflyerRealtimeParentOrderEventMessage> SubscribeParentOrderEventsAsync(
+        CancellationToken cancellationToken = default);
+}
+```
+
 利用例:
 
 ```csharp
@@ -248,6 +280,8 @@ venue-specific DTO:
 - `BitflyerRealtimeBoardSnapshotMessage`
 - `BitflyerRealtimeBoardDeltaMessage`
 - `BitflyerRealtimeBoardLevel`
+- `BitflyerRealtimeChildOrderEventMessage`
+- `BitflyerRealtimeParentOrderEventMessage`
 
 禁止:
 
@@ -304,6 +338,10 @@ deterministic tests:
 - cancellation behavior
 - invalid JSON behavior
 - unknown channel behavior
+- private auth request JSON-RPC shape
+- private auth error behavior
+- child order event decode
+- parent order event decode
 - architecture dependency rule
 
 test taxonomy:
@@ -335,18 +373,24 @@ default では live connection を行わない。
 
 ## 12.1 Private Realtime Design Note
 
-private realtime は v3.2.0 では実装しない。
-v3.3.0 以降で扱う場合は、public realtime とは別 scope として設計する。
+private realtime は v3.3.0 で read-only MVP として扱う。
+public realtime とは別 client / auth scope として設計する。
 
-検討対象:
+採用:
 
-- auth payload
+- `auth` payload
 - API key / API secret / signature handling
 - credential session lifetime
 - private channel catalog
 - private event DTO
 - secret-free evidence / log / exception rule
-- reconnect / resubscribe 時の auth 再実行方針
+
+対象 channel:
+
+```text
+child_order_events
+parent_order_events
+```
 
 必須条件:
 
@@ -356,12 +400,12 @@ v3.3.0 以降で扱う場合は、public realtime とは別 scope として設�
 - state-changing operation は扱わない
 - HTTP private endpoint の credential provider 方針と矛盾させない
 
-v3.2.0 でやらないこと:
+v3.3.0 でやらないこと:
 
-- private channel への接続
-- private DTO の公開
-- private realtime factory の公開
-- auth / credentials を使う realtime subscription
+- private channel への default live 接続
+- order / cancel / deposit / withdraw などの state-changing operation
+- raw credential profile / raw auth payload の evidence 化
+- reconnect / resubscribe 時の auth 再実行方針の本格実装
 
 ## 13. Future Candidates
 

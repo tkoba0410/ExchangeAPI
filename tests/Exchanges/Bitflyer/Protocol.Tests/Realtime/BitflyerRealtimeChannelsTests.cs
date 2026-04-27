@@ -11,6 +11,8 @@ public sealed class BitflyerRealtimeChannelsTests
         Assert.Equal("lightning_executions_BTC_JPY", BitflyerRealtimeChannels.Executions(ProductCodes.BtcJpy));
         Assert.Equal("lightning_board_snapshot_BTC_JPY", BitflyerRealtimeChannels.BoardSnapshot(ProductCodes.BtcJpy));
         Assert.Equal("lightning_board_BTC_JPY", BitflyerRealtimeChannels.Board(ProductCodes.BtcJpy));
+        Assert.Equal("child_order_events", BitflyerRealtimeChannels.ChildOrderEvents());
+        Assert.Equal("parent_order_events", BitflyerRealtimeChannels.ParentOrderEvents());
     }
 
     [Fact]

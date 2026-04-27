@@ -60,6 +60,8 @@
   - v3.3.0 planning / release scope 文書として維持する
 - [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md)
   - bitFlyer Realtime API の opt-in live verification runbook として維持する
+- [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md)
+  - bitFlyer private Realtime API の opt-in live verification runbook として維持する
 - [`docs/roadmap-post-v2.md`](./roadmap-post-v2.md)
   - `v2.0.0` 以降の検討候補として維持する
 

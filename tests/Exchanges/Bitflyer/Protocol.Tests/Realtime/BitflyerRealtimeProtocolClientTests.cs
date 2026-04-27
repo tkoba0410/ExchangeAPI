@@ -1,10 +1,53 @@
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Protocol.Tests.Realtime;
 
 public sealed class BitflyerRealtimeProtocolClientTests
 {
+    [Fact]
+    public async Task AuthenticateAsync_SendsAuthJsonRpcShapeAndUsesTimestampNonceSignature()
+    {
+        var transport = new FakeRealtimeTransport();
+        transport.EnqueueIncoming("""{"jsonrpc":"2.0","id":1,"result":true}""");
+        var timestamp = DateTimeOffset.FromUnixTimeMilliseconds(1_775_000_000_123);
+        await using var client = new BitflyerRealtimeProtocolClient(
+            transport,
+            new Uri("wss://ws.lightstream.bitflyer.com/json-rpc"),
+            () => timestamp,
+            () => "0123456789abcdef");
+
+        await client.AuthenticateAsync(new FakeCredentialSession());
+
+        var root = JsonDocument.Parse(transport.SentTexts.Single()).RootElement;
+        Assert.Equal("2.0", root.GetProperty("jsonrpc").GetString());
+        Assert.Equal(1, root.GetProperty("id").GetInt32());
+        Assert.Equal("auth", root.GetProperty("method").GetString());
+        var parameters = root.GetProperty("params");
+        Assert.Equal("test-api-key", parameters.GetProperty("api_key").GetString());
+        Assert.Equal(1_775_000_000_123, parameters.GetProperty("timestamp").GetInt64());
+        Assert.Equal("0123456789abcdef", parameters.GetProperty("nonce").GetString());
+        Assert.Equal("signed:17750000001230123456789abcdef", parameters.GetProperty("signature").GetString());
+    }
+
+    [Fact]
+    public async Task AuthenticateAsync_ErrorResponseThrowsControlledException()
+    {
+        var transport = new FakeRealtimeTransport();
+        transport.EnqueueIncoming("""{"jsonrpc":"2.0","id":1,"error":{"code":-32000,"message":"auth failed"}}""");
+        await using var client = new BitflyerRealtimeProtocolClient(
+            transport,
+            new Uri("wss://ws.lightstream.bitflyer.com/json-rpc"),
+            () => DateTimeOffset.FromUnixTimeMilliseconds(1_775_000_000_123),
+            () => "0123456789abcdef");
+
+        await Assert.ThrowsAsync<BitflyerRealtimeAuthenticationException>(async () =>
+        {
+            await client.AuthenticateAsync(new FakeCredentialSession());
+        });
+    }
+
     [Fact]
     public async Task SubscribeAsync_SendsSubscribeJsonRpcShape()
     {
@@ -87,6 +130,21 @@ public sealed class BitflyerRealtimeProtocolClientTests
             {
             }
         });
+    }
+}
+
+internal sealed class FakeCredentialSession : IApiCredentialSession
+{
+    public string ApiKey => "test-api-key";
+
+    public string Sign(string payload)
+    {
+        return $"signed:{payload}";
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
     }
 }
 

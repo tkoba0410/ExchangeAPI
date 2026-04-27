@@ -1,9 +1,9 @@
 # bitFlyer Realtime Getting Started
 
-最終更新: 2026-04-27
+最終更新: 2026-04-28
 位置づけ: bitFlyer Realtime API 利用 guide
 
-本書は `ExchangeApi.Exchanges.Bitflyer` package から bitFlyer public Realtime API を使うための最小手順を示す。
+本書は `ExchangeApi.Exchanges.Bitflyer` package から bitFlyer Realtime API を使うための最小手順を示す。
 継続的な設計正本は [`docs/realtime-bitflyer.md`](../realtime-bitflyer.md) とする。
 
 ## 1. Package
@@ -72,9 +72,39 @@ v3.2.0 では board state builder は提供しない。
 - remote close / invalid JSON は controlled exception として扱う
 - reconnect / backoff / resubscribe は v3.2.0 では実装しない
 
-## 6. Credentials
+## 6. Private Read
+
+private realtime read は public realtime とは別 client を使う。
+credential は `IApiCredentialProvider` から開き、API secret は public API に出さない。
+
+```csharp
+using ExchangeApi.Exchanges.Bitflyer.Composition.Realtime;
+using ExchangeApi.Optional.Credentials.PlainText;
+using ExchangeApi.Primitives.Credentials;
+
+var credentialProvider = PlainTextApiCredentialProviderFactory.Create(
+    ExchangeVenue.Bitflyer,
+    apiKey,
+    apiSecret);
+await using var client = BitflyerRealtimeClientFactory.CreatePrivateClient(credentialProvider);
+
+await foreach (var item in client.SubscribeChildOrderEventsAsync(cancellation.Token))
+{
+    Console.WriteLine($"{item.ProductCode} {item.EventType}");
+}
+```
+
+対象 private channel:
+
+- `child_order_events`
+- `parent_order_events`
+
+private realtime は read-only event stream として扱う。
+order / cancel / deposit / withdraw などの state-changing operation は含めない。
+
+## 7. Credentials
 
 public realtime read には credentials は不要である。
 
-v3.2.0 では private realtime は実装しない。
+private realtime read には credentials が必要である。
 API key、API secret、signature、Authorization 相当の値を Realtime evidence / log / result / exception / stdout / stderr に含めてはならない。

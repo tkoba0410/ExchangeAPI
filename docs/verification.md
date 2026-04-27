@@ -198,6 +198,7 @@ local/evidence/<phase>/<yyyymmdd>-<label>/
 - v2.2.0 では default で evidence / log を作らない
 - v2.2.0 の MCP private read inspection live verification を実施する場合は、`local/evidence/local-live/<yyyymmdd>-v2.2.0-mcp-inspection/` を標準証跡先とする
 - v2.2.0 の release evidence を残す場合は [`verification/release-evidence.md`](../verification/release-evidence.md) を参照する
+- v3.3.0 の bitFlyer private realtime live verification を実施する場合は、[`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md) を参照し、`local/evidence/local-live/<yyyymmdd>-v3.3.0-bitflyer-private-realtime/` を標準証跡先とする
 
 `local/app/` は ExchangeAPI には導入しない。  
 ExchangeAPI は library repo であり、通常実行アプリの I/O 正本を持たないためである。

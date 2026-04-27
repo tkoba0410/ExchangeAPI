@@ -95,6 +95,79 @@ internal static class BitflyerRealtimeMessageDecoder
         };
     }
 
+    internal static IReadOnlyList<BitflyerRealtimeChildOrderEventMessage> DecodeChildOrderEvents(
+        BitflyerRealtimeChannelMessage message)
+    {
+        if (message.Message.ValueKind != JsonValueKind.Array)
+        {
+            throw new CodecException("Realtime child order events payload must be an array.");
+        }
+
+        var events = new List<BitflyerRealtimeChildOrderEventMessage>();
+        foreach (var item in message.Message.EnumerateArray())
+        {
+            EnsureObject(item, message.Channel);
+            events.Add(new BitflyerRealtimeChildOrderEventMessage
+            {
+                Channel = message.Channel,
+                ReceivedAt = message.ReceivedAt,
+                ProductCode = JsonValueReader.ReadRequiredString(item, "product_code"),
+                ChildOrderId = JsonValueReader.ReadOptionalString(item, "child_order_id"),
+                ChildOrderAcceptanceId = JsonValueReader.ReadOptionalString(item, "child_order_acceptance_id"),
+                EventDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "event_date"),
+                EventType = JsonValueReader.ReadRequiredString(item, "event_type"),
+                ChildOrderType = JsonValueReader.ReadOptionalString(item, "child_order_type"),
+                ExpireDate = JsonValueReader.ReadOptionalUtcTimestamp(item, "expire_date"),
+                Reason = JsonValueReader.ReadOptionalString(item, "reason"),
+                ExecId = ReadOptionalLong(item, "exec_id"),
+                Side = JsonValueReader.ReadOptionalString(item, "side"),
+                Price = ReadOptionalDecimal(item, "price"),
+                Size = ReadOptionalDecimal(item, "size"),
+                Commission = ReadOptionalDecimal(item, "commission"),
+                Sfd = ReadOptionalDecimal(item, "sfd"),
+                OutstandingSize = ReadOptionalDecimal(item, "outstanding_size"),
+            });
+        }
+
+        return events;
+    }
+
+    internal static IReadOnlyList<BitflyerRealtimeParentOrderEventMessage> DecodeParentOrderEvents(
+        BitflyerRealtimeChannelMessage message)
+    {
+        if (message.Message.ValueKind != JsonValueKind.Array)
+        {
+            throw new CodecException("Realtime parent order events payload must be an array.");
+        }
+
+        var events = new List<BitflyerRealtimeParentOrderEventMessage>();
+        foreach (var item in message.Message.EnumerateArray())
+        {
+            EnsureObject(item, message.Channel);
+            events.Add(new BitflyerRealtimeParentOrderEventMessage
+            {
+                Channel = message.Channel,
+                ReceivedAt = message.ReceivedAt,
+                ProductCode = JsonValueReader.ReadRequiredString(item, "product_code"),
+                ParentOrderId = JsonValueReader.ReadOptionalString(item, "parent_order_id"),
+                ParentOrderAcceptanceId = JsonValueReader.ReadOptionalString(item, "parent_order_acceptance_id"),
+                EventDate = JsonValueReader.ReadRequiredUtcTimestamp(item, "event_date"),
+                EventType = JsonValueReader.ReadRequiredString(item, "event_type"),
+                ParentOrderType = JsonValueReader.ReadOptionalString(item, "parent_order_type"),
+                Reason = JsonValueReader.ReadOptionalString(item, "reason"),
+                ChildOrderType = JsonValueReader.ReadOptionalString(item, "child_order_type"),
+                ParameterIndex = ReadOptionalLong(item, "parameter_index"),
+                ChildOrderAcceptanceId = JsonValueReader.ReadOptionalString(item, "child_order_acceptance_id"),
+                Side = JsonValueReader.ReadOptionalString(item, "side"),
+                Price = ReadOptionalDecimal(item, "price"),
+                Size = ReadOptionalDecimal(item, "size"),
+                ExpireDate = JsonValueReader.ReadOptionalUtcTimestamp(item, "expire_date"),
+            });
+        }
+
+        return events;
+    }
+
     private static IReadOnlyList<BitflyerRealtimeBoardLevel> ReadLevels(JsonElement element, string propertyName)
     {
         if (!element.TryGetProperty(propertyName, out var property) || property.ValueKind != JsonValueKind.Array)
@@ -114,6 +187,36 @@ internal static class BitflyerRealtimeMessageDecoder
         }
 
         return levels;
+    }
+
+    private static decimal? ReadOptionalDecimal(JsonElement element, string propertyName)
+    {
+        if (!element.TryGetProperty(propertyName, out var property) || property.ValueKind == JsonValueKind.Null)
+        {
+            return null;
+        }
+
+        if (property.ValueKind != JsonValueKind.Number || !property.TryGetDecimal(out var value))
+        {
+            throw new CodecException($"Property '{propertyName}' must be a decimal number.");
+        }
+
+        return value;
+    }
+
+    private static long? ReadOptionalLong(JsonElement element, string propertyName)
+    {
+        if (!element.TryGetProperty(propertyName, out var property) || property.ValueKind == JsonValueKind.Null)
+        {
+            return null;
+        }
+
+        if (property.ValueKind != JsonValueKind.Number || !property.TryGetInt64(out var value))
+        {
+            throw new CodecException($"Property '{propertyName}' must be an integer number.");
+        }
+
+        return value;
     }
 
     private static void EnsureObject(JsonElement element, string label)

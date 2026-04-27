@@ -1,5 +1,7 @@
+using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Private;
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Public;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Exchanges.Bitflyer.Composition.Realtime;
 
@@ -23,6 +25,30 @@ public static class BitflyerRealtimeClientFactory
 
         var protocol = new BitflyerRealtimeProtocolClient(effectiveTransport, resolved.EndpointUri);
         return new BitflyerPublicRealtimeClient(protocol);
+    }
+
+    public static IBitflyerPrivateRealtimeClient CreatePrivateClient(
+        IApiCredentialProvider credentialProvider,
+        BitflyerRealtimeClientOptions? options = null)
+    {
+        return CreatePrivateClient(credentialProvider, new WebSocketBitflyerRealtimeTransport(), options);
+    }
+
+    public static IBitflyerPrivateRealtimeClient CreatePrivateClient(
+        IApiCredentialProvider credentialProvider,
+        IBitflyerRealtimeTransport transport,
+        BitflyerRealtimeClientOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(credentialProvider);
+        ArgumentNullException.ThrowIfNull(transport);
+
+        var resolved = options ?? new BitflyerRealtimeClientOptions();
+        IBitflyerRealtimeTransport effectiveTransport = resolved.ConnectTimeout is { } timeout
+            ? new TimeoutBitflyerRealtimeTransport(transport, timeout)
+            : transport;
+
+        var protocol = new BitflyerRealtimeProtocolClient(effectiveTransport, resolved.EndpointUri);
+        return new BitflyerPrivateRealtimeClient(protocol, credentialProvider);
     }
 
     private sealed class TimeoutBitflyerRealtimeTransport : IBitflyerRealtimeTransport

@@ -22,6 +22,16 @@ public static class BitflyerRealtimeChannels
         return Build("lightning_board", productCode);
     }
 
+    public static string ChildOrderEvents()
+    {
+        return "child_order_events";
+    }
+
+    public static string ParentOrderEvents()
+    {
+        return "parent_order_events";
+    }
+
     private static string Build(string prefix, string productCode)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(productCode);

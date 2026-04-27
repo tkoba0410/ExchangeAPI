@@ -1,9 +1,9 @@
 # v3.3.0 bitFlyer Private Realtime Read MVP 実施指示
 
-最終更新: 2026-04-27
+最終更新: 2026-04-28
 位置づけ: v3.3.0 実施指示
 
-状態: planning
+状態: implementation
 
 ## 1. 目的
 
@@ -32,9 +32,8 @@ bitFlyer private realtime read MVP:
 
 - child order events
 - parent order events
-- execution events
 
-正式 channel 名と response shape は bitFlyer documentation / observed payload を確認してから `docs/realtime-bitflyer.md` に固定する。
+正式 channel 名と response shape は `docs/realtime-bitflyer.md` に固定する。
 
 ## 3. 非対象
 
@@ -65,6 +64,16 @@ v3.3.0 では次を扱わない。
 - public realtime client と private realtime client を分ける API shape
 - private live verification の opt-in 条件
 - secret-free scan / evidence rule
+
+裁定済み:
+
+- auth method は JSON-RPC `auth`
+- auth params は `api_key`, `timestamp`, `nonce`, `signature`
+- signature input は `timestamp` と `nonce` の文字列連結
+- signing は `IApiCredentialSession.Sign(payload)` を使う
+- v3.3.0 MVP channel は `child_order_events` / `parent_order_events`
+- public / private realtime client は分ける
+- private live verification は opt-in only
 
 ## 5. API 方針候補
 

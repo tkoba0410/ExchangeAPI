@@ -2,15 +2,17 @@ using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
+using ExchangeApi.Primitives.Credentials;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Realtime;
 
-internal sealed class FakeRealtimeProtocolClient : IBitflyerRealtimeProtocolClient
+internal sealed class FakeRealtimeProtocolClient : IBitflyerPrivateRealtimeProtocolClient
 {
     private readonly ConcurrentQueue<BitflyerRealtimeChannelMessage> _messages = new();
 
     public List<string> SubscribedChannels { get; } = [];
     public List<string> UnsubscribedChannels { get; } = [];
+    public int AuthenticateCallCount { get; private set; }
     public bool Disposed { get; private set; }
 
     public void EnqueueMessage(string channel, string payloadJson, DateTimeOffset? receivedAt = null)
@@ -38,6 +40,14 @@ internal sealed class FakeRealtimeProtocolClient : IBitflyerRealtimeProtocolClie
     public ValueTask UnsubscribeAsync(string channel, CancellationToken cancellationToken = default)
     {
         UnsubscribedChannels.Add(channel);
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask AuthenticateAsync(
+        IApiCredentialSession credentialSession,
+        CancellationToken cancellationToken = default)
+    {
+        AuthenticateCallCount++;
         return ValueTask.CompletedTask;
     }
 

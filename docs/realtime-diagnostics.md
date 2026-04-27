@@ -113,6 +113,27 @@ public sealed record RealtimeDiagnosticEvent
 
 diagnostic event は stream を続けるか終了するかを明確にする。
 
+外部取引所データと内部診断データは、同じ envelope stream 上の別種 event として扱う。
+DTO-only stream は既存どおり維持し、market data だけを簡単に読みたい利用者向けの API とする。
+運用・診断が必要な利用者は envelope stream を使う。
+
+```text
+SubscribeTickerAsync:
+  Ticker
+  Ticker
+
+SubscribeTickerStreamAsync:
+  Connected
+  Subscribed
+  Ticker
+  MessageRejected
+  ContinuityLost
+  Ticker
+```
+
+この設計では、取引所データと診断データを同じ market data として扱わない。
+同じ時系列 stream 上の別種 event として扱い、event kind で明確に区別する。
+
 基本方針:
 
 - malformed JSON、unknown channel、DTO decode failure は `MessageRejected` として扱い、原則 stream を継続する。
@@ -227,13 +248,33 @@ Live verification:
 1. `RealtimeDiagnosticEvent` を public API にするか、bitFlyer-specific stream event の内側に閉じるか。
 2. `EventType` / `Severity` を string にするか enum にするか。
 3. sanitized raw frame logging を core venue package に置くか、`ExchangeApi.Optional.Logging` の extension として置くか。
-4. diagnostic event を existing stream envelope と統合するか、別 stream / callback / sink として扱うか。
-5. raw frame の body を常に保存するか、size limit と sampling を持つか。
+4. raw frame の body を常に保存するか、size limit と sampling を持つか。
 
 推奨初期案:
 
 - diagnostic event schema は public contract として固定する。
 - `EventType` / `Severity` は enum ではなく string から開始する。
 - file output は `ExchangeApi.Optional.Logging` 側に寄せ、venue package は event emission までに留める。
-- existing stream envelope に diagnostic event を流し、別 callback は増やさない。
 - raw frame body は opt-in かつ size limit 付きで保存する。
+
+## 11. Decision Log
+
+### 11.1 Diagnostic Event Stream Placement
+
+採用: 案C。
+
+外部取引所データと内部診断データは、同じ envelope stream に載せる。
+ただし、DTO-only stream は維持する。
+
+採用理由:
+
+- data と diagnostic event の時系列関係を保てる
+- `ContinuityLost` や `MessageRejected` がどの data の前後で起きたか判断しやすい
+- 既存の `Subscribe*StreamAsync` / `BitflyerRealtimeStreamEvent<T>` 方針と整合する
+- 別 stream / callback / sink を増やさずに lifecycle を扱える
+
+非採用:
+
+- DTO-only stream だけにして診断データを外へ出さない案
+- market data stream と diagnostic stream を分ける案
+- callback / sink で diagnostic event を渡す案

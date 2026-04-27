@@ -253,6 +253,7 @@ public interface IBitflyerPrivateRealtimeClient : IAsyncDisposable
 v3.4.0 では lifecycle-aware stream envelope API を追加する。
 既存 `Subscribe*Async` は DTO-only stream として維持し、lifecycle event を混ぜない。
 `Subscribe*StreamAsync` は data と lifecycle event を同じ `IAsyncEnumerable<T>` 上に流す envelope stream とする。
+v3.5.0 の diagnostic event も、この envelope stream 方針に従う。
 
 ```csharp
 public interface IBitflyerPublicRealtimeClient : IAsyncDisposable

@@ -3,7 +3,7 @@
 最終更新: 2026-04-28
 位置づけ: v3.4.0 実施指示
 
-状態: implementation
+状態: release candidate
 
 ## 1. 目的
 

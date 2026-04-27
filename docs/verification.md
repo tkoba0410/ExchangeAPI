@@ -279,6 +279,7 @@ deterministic verification:
 
 live verification:
 
+- resilience runbook は [`verification/bitflyer-realtime-resilience.md`](../verification/bitflyer-realtime-resilience.md) とする
 - runbook は [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md) と [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md) を使う
 - evidence を残す場合は `local/evidence/local-live/<yyyymmdd>-v3.4.0-bitflyer-realtime-resilience/` を使う
 - credentials、API key、API secret、signature、Authorization 相当の値は evidence / log / result / exception / stdout / stderr に含めない

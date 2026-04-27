@@ -39,9 +39,13 @@
 - [`docs/distribution.md`](./distribution.md)
 - [`docs/local-nuget-consumer.md`](./local-nuget-consumer.md)
 - [`docs/release-checklist-v2.0.0.md`](./release-checklist-v2.0.0.md)
+- [`docs/release-checklist-v3.1.0.md`](./release-checklist-v3.1.0.md)
+  - v3.1.0 release gate と preflight checklist として維持する
 - [`docs/breaking-changes-v2.0.0.md`](./breaking-changes-v2.0.0.md)
 - [`docs/migration-v2.0.0.md`](./migration-v2.0.0.md)
 - [`docs/release-notes/v2.0.0.md`](./release-notes/v2.0.0.md)
+- [`docs/release-notes/v3.1.0.md`](./release-notes/v3.1.0.md)
+  - v3.1.0 release notes として維持する
 - [`docs/roadmap-post-v2.md`](./roadmap-post-v2.md)
   - `v2.0.0` 以降の検討候補として維持する
 

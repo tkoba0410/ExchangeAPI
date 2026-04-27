@@ -1,14 +1,17 @@
-# v3.1.0 bitFlyer Realtime API 仕様書整備 実施指示
+# v3.1.0 bitFlyer Realtime API 実施指示
 
 最終更新: 2026-04-27
 位置づけ: v3.1.0 実施指示
 
+状態: implementation complete / release preflight pending
+
 ## 1. 目的
 
-v3.1.0 では bitFlyer Realtime API の public market read MVP を実装する予定である。
-実装に入る前に、Realtime API を HTTP endpoint とは別 transport / interaction model として文書上で固定する。
+v3.1.0 では bitFlyer Realtime API の public market read MVP を実装する。
+Realtime API は HTTP endpoint とは別 transport / interaction model として扱い、bitFlyer venue package `ExchangeApi.Exchanges.Bitflyer` 内に追加する。
 
-本フェーズでは仕様書・計画書の整備だけを行い、Realtime API 実装は行わない。
+本 release では、public market stream の typed read surface、deterministic tests、opt-in live verification を追加する。
+private realtime、Unified、Binance realtime、reconnect / backoff の高度化は扱わない。
 
 ## 2. 文書運用ルール
 
@@ -17,10 +20,10 @@ v3.1.0 では bitFlyer Realtime API の public market read MVP を実装する�
 - 実施指示は本書 `docs/plan-v3.1.0.md` に固定する
 - 継続的な設計正本は `docs/realtime-bitflyer.md` に分離する
 - 将来候補や見送り理由は `docs/roadmap-post-v2.md` に残す
-- `docs/release-notes/v3.1.0.md` は release 時まで作らなくてよい
+- `docs/release-notes/v3.1.0.md` は release preflight 以降に利用者向け結果として更新する
 - 本フェーズで裁定した内容は、後続の実装フェーズでも正本として扱う
 
-## 3. 本フェーズの Scope
+## 3. 仕様書整備 Scope
 
 対象:
 
@@ -30,7 +33,7 @@ v3.1.0 では bitFlyer Realtime API の public market read MVP を実装する�
 - `docs/document-inventory.md` に `docs/realtime-bitflyer.md` を追加する
 - 必要なら `AGENTS.md` の Read First に `docs/realtime-bitflyer.md` を追加する
 
-非対象:
+仕様書整備フェーズの非対象:
 
 - Realtime API のコード実装
 - project / package 構成変更
@@ -43,6 +46,9 @@ v3.1.0 では bitFlyer Realtime API の public market read MVP を実装する�
 - Reactive Extensions dependency
 - full order book state builder
 - automatic reconnect / backoff 実装
+
+仕様書整備フェーズは完了済みである。
+実装は本書の `## 20. Realtime API 実装フェーズ 実施指示` 以降に従って進める。
 
 ## 4. `docs/realtime-bitflyer.md` に書く内容
 
@@ -383,7 +389,7 @@ Read First に追加するか判断する。
 
 ただし、Realtime 作業時に読む文書として追加し、全作業の必読にしすぎないよう記述を簡潔にする。
 
-## 18. Verification
+## 18. 仕様書整備フェーズ Verification
 
 本フェーズでは docs-only なので、最低限:
 
@@ -399,19 +405,19 @@ dotnet test ExchangeApi.slnx --no-restore
 
 ただしコード変更がない場合、`dotnet test` は必須ではない。
 
-## 19. 完了条件
+## 19. 仕様書整備フェーズ完了条件
 
-- `docs/plan-v3.1.0.md` が追加されている
-- `docs/realtime-bitflyer.md` が追加されている
-- `docs/spec.md` に Realtime surface の位置づけが最小追記されている
-- `docs/roadmap-post-v2.md` に v3.1.0 と後段候補が反映されている
-- `docs/document-inventory.md` に `docs/realtime-bitflyer.md` が追加されている
-- 必要なら `AGENTS.md` に `docs/realtime-bitflyer.md` への導線がある
-- Realtime API が HTTP endpoint matrix と分離されている
-- v3.1.0 では public market read MVP に限定されている
-- DTO / interface / Rx / reconnect / private realtime の裁定が文書化されている
-- 実装コード変更は含まれていない
-- `git diff --check` が通る
+- [x] `docs/plan-v3.1.0.md` が追加されている
+- [x] `docs/realtime-bitflyer.md` が追加されている
+- [x] `docs/spec.md` に Realtime surface の位置づけが最小追記されている
+- [x] `docs/roadmap-post-v2.md` に v3.1.0 と後段候補が反映されている
+- [x] `docs/document-inventory.md` に `docs/realtime-bitflyer.md` が追加されている
+- [x] 必要なら `AGENTS.md` に `docs/realtime-bitflyer.md` への導線がある
+- [x] Realtime API が HTTP endpoint matrix と分離されている
+- [x] v3.1.0 では public market read MVP に限定されている
+- [x] DTO / interface / Rx / reconnect / private realtime の裁定が文書化されている
+- [x] 仕様書整備フェーズでは実装コード変更を含めていない
+- [x] `git diff --check` が通る
 
 ## 20. Realtime API 実装フェーズ 実施指示
 
@@ -723,20 +729,77 @@ EXCHANGEAPI_RUN_LIVE_TESTS=1 dotnet test ExchangeApi.LiveTests.slnx --no-restore
 
 ## 31. 実装フェーズ完了条件
 
-- `docs/realtime-bitflyer.md` の scope に沿っている
-- HTTP endpoint contract が変更されていない
-- HTTP endpoint matrix に Realtime channel が追加されていない
-- bitFlyer public realtime typed stream が実装されている
-- ticker / executions / board snapshot / board delta の deterministic tests がある
-- public API は `IAsyncEnumerable<T>` based
-- `IObservable<T>` public API がない
-- `System.Reactive` dependency がない
-- private realtime が実装されていない
-- automatic reconnect が実装されていない
-- full order book state builder が実装されていない
-- CLI / MCP 本格 integration が含まれていない
-- live tests は opt-in なしで skip する
-- deterministic tests が通る
-- package generation が通る
-- local consumer smoke が通る
-- secret-free rule が守られている
+- [x] `docs/realtime-bitflyer.md` の scope に沿っている
+- [x] HTTP endpoint contract が変更されていない
+- [x] HTTP endpoint matrix に Realtime channel が追加されていない
+- [x] bitFlyer public realtime typed stream が実装されている
+- [x] ticker / executions / board snapshot / board delta の deterministic tests がある
+- [x] public API は `IAsyncEnumerable<T>` based
+- [x] `IObservable<T>` public API がない
+- [x] `System.Reactive` dependency がない
+- [x] private realtime が実装されていない
+- [x] automatic reconnect が実装されていない
+- [x] full order book state builder が実装されていない
+- [x] CLI / MCP 本格 integration が含まれていない
+- [x] live tests は opt-in なしで skip する
+- [x] deterministic tests が通る
+- [x] package generation が通る
+- [x] local consumer smoke が通る
+- [x] secret-free rule が守られている
+
+実装結果:
+
+- `BitflyerRealtimeClientFactory.CreatePublicClient(...)`
+- `IBitflyerPublicRealtimeClient`
+- `SubscribeTickerAsync(...)`
+- `SubscribeExecutionsAsync(...)`
+- `SubscribeBoardSnapshotsAsync(...)`
+- `SubscribeBoardDeltasAsync(...)`
+- `BitflyerRealtimeChannels`
+
+検証結果:
+
+```text
+dotnet build ExchangeApi.slnx --no-restore passed
+dotnet test ExchangeApi.slnx --no-restore passed
+bash scripts/pack-local-nuget.sh 3.1.0-local.bitflyer-realtime passed
+bash scripts/smoke-local-nuget-consumer.sh 3.1.0-local.bitflyer-realtime passed
+dotnet restore ExchangeApi.LiveTests.slnx passed
+dotnet test ExchangeApi.LiveTests.slnx --no-restore passed; live tests skipped safely without opt-in
+```
+
+## 32. Release Preflight
+
+release 前に次を実行する。
+
+```bash
+dotnet build ExchangeApi.slnx
+dotnet test ExchangeApi.slnx --no-restore
+
+bash scripts/pack-local-nuget.sh 3.1.0
+
+find local/nuget -maxdepth 1 -name '*3.1.0.nupkg' -printf '%f\n' | sort
+
+bash scripts/smoke-local-nuget-consumer.sh 3.1.0
+
+bash scripts/create-release-assets.sh 3.1.0 linux-x64 Release
+
+dotnet restore ExchangeApi.LiveTests.slnx
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+```
+
+期待 package:
+
+```text
+ExchangeApi.Exchanges.Binance.3.1.0.nupkg
+ExchangeApi.Exchanges.Bitflyer.3.1.0.nupkg
+ExchangeApi.Optional.Credentials.3.1.0.nupkg
+ExchangeApi.Optional.Logging.3.1.0.nupkg
+ExchangeApi.Primitives.3.1.0.nupkg
+```
+
+GitHub Packages publish 後に次を実行する。
+
+```bash
+bash scripts/smoke-github-packages-consumer.sh 3.1.0
+```

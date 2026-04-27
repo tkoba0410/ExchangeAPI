@@ -70,6 +70,18 @@ v3.3.0 private implementation surface:
 - `SubscribeChildOrderEventsAsync(...)`
 - `SubscribeParentOrderEventsAsync(...)`
 
+v3.4.0 stream envelope implementation surface:
+
+- `SubscribeTickerStreamAsync(...)`
+- `SubscribeExecutionsStreamAsync(...)`
+- `SubscribeBoardSnapshotsStreamAsync(...)`
+- `SubscribeBoardDeltasStreamAsync(...)`
+- `SubscribeChildOrderEventsStreamAsync(...)`
+- `SubscribeParentOrderEventsStreamAsync(...)`
+- `BitflyerRealtimeStreamEvent<T>` and concrete lifecycle event types
+- `BitflyerRealtimeReconnectOptions`
+- `BitflyerRealtimeErrorKind`
+
 ## 4. Non-Scope
 
 Realtime API では次を扱わない。
@@ -79,8 +91,6 @@ Realtime API では次を扱わない。
 - Binance realtime
 - Unified realtime abstraction
 - full order book state builder
-- automatic reconnect / backoff
-- resubscribe policy
 - Reactive Extensions / `System.Reactive` dependency
 - `IObservable<T>` public API
 - CLI / MCP の本格 integration
@@ -236,6 +246,27 @@ public interface IBitflyerPrivateRealtimeClient : IAsyncDisposable
 }
 ```
 
+v3.4.0 では lifecycle-aware stream envelope API を追加する。
+既存 `Subscribe*Async` は DTO-only stream として維持し、lifecycle event を混ぜない。
+`Subscribe*StreamAsync` は data と lifecycle event を同じ `IAsyncEnumerable<T>` 上に流す envelope stream とする。
+
+```csharp
+public interface IBitflyerPublicRealtimeClient : IAsyncDisposable
+{
+    IAsyncEnumerable<BitflyerRealtimeStreamEvent<BitflyerRealtimeTickerMessage>> SubscribeTickerStreamAsync(
+        string productCode,
+        CancellationToken cancellationToken = default);
+}
+```
+
+```csharp
+public interface IBitflyerPrivateRealtimeClient : IAsyncDisposable
+{
+    IAsyncEnumerable<BitflyerRealtimeStreamEvent<BitflyerRealtimeChildOrderEventMessage>> SubscribeChildOrderEventsStreamAsync(
+        CancellationToken cancellationToken = default);
+}
+```
+
 利用例:
 
 ```csharp
@@ -253,8 +284,28 @@ await foreach (var ticker in client.SubscribeTickerAsync(ProductCodes.BtcJpy, ca
 - 利用者に channel name を手書きさせない
 - `ProductCodes` を使えるようにする
 - `Subscribe*Async` は `IAsyncEnumerable<T>` を返す
+- `Subscribe*StreamAsync` は `IAsyncEnumerable<BitflyerRealtimeStreamEvent<T>>` を返す
 - `IObservable<T>` は返さない
 - Rx 変換 extension は core package に入れない
+
+## 8.1 Stream Envelope Contract
+
+v3.4.0 の envelope event 型:
+
+- `BitflyerRealtimeData<T>`
+- `BitflyerRealtimeReconnecting<T>`
+- `BitflyerRealtimeReconnected<T>`
+- `BitflyerRealtimeAuthenticationReplayed<T>`
+- `BitflyerRealtimeResubscribed<T>`
+- `BitflyerRealtimeContinuityLost<T>`
+- `BitflyerRealtimeMessageRejected<T>`
+
+`StreamError` event は採用しない。
+recoverable lifecycle は envelope event として流し、fatal error は controlled exception として stream を終了する。
+
+`MessageRejected` は malformed JSON / decode failed message の通知に限定する。
+`MessageRejected` は raw payload、API key、API secret、signature、Authorization 相当値を持たない。
+`MessageRejected` は continuity-impacting event として扱う。
 
 ## 9. DTO Contract
 
@@ -300,7 +351,7 @@ venue-specific DTO:
 
 ## 10. Error / Cancellation / Reconnect
 
-current contract:
+DTO-only stream contract:
 
 - cancellation: 正常終了
 - dispose: connection close
@@ -308,7 +359,67 @@ current contract:
 - invalid JSON: controlled exception
 - unknown channel: ignore または controlled diagnostic
 - typed stream 終了時: subscribed channel へ best-effort unsubscribe を送る
-- automatic reconnect: 実装しない
+- automatic reconnect: disabled
+
+Envelope stream contract:
+
+- reconnect: default enabled
+- reconnect target: remote close / transport exception / idle timeout
+- cancellation / dispose: normal completion
+- non-target channel message: ignore
+- malformed target message: `MessageRejected` event and continue
+- auth failure: controlled exception
+- resubscribe failure: controlled exception
+- reconnect attempts exhausted: controlled exception
+- fatal error after stream end: restart decision belongs to the user
+- gap-free continuity: not guaranteed
+- reconnect / resubscribe after transport interruption emits `ContinuityLost`
+
+Private reconnect order:
+
+```text
+Reconnecting
+Reconnected
+AuthenticationReplayed
+Resubscribed
+ContinuityLost
+Data...
+```
+
+Public reconnect order:
+
+```text
+Reconnecting
+Reconnected
+Resubscribed
+ContinuityLost
+Data...
+```
+
+Backoff default:
+
+```text
+MaxAttempts = 3
+InitialDelay = 1 second
+MaxDelay = 10 seconds
+Jitter = none
+```
+
+Backoff values are configurable.
+`MaxAttempts = 0` means reconnect disabled.
+Docs should show conservative / interactive / long-running / no reconnect presets, but custom values are allowed.
+
+Idle timeout:
+
+- default disabled
+- configured with `TimeSpan? IdleTimeout`
+- valid value is `null` or `> TimeSpan.Zero`
+- timeout is reconnect target
+- reconnect after idle timeout emits `ContinuityLost`
+- docs should show disabled / interactive / monitoring / aggressive presets
+
+Fatal realtime exceptions expose `BitflyerRealtimeErrorKind`.
+Exception messages must be secret-free.
 
 理由:
 
@@ -337,6 +448,11 @@ deterministic tests:
 - board delta decode
 - cancellation behavior
 - invalid JSON behavior
+- stream envelope event behavior
+- `MessageRejected` behavior
+- reconnect / resubscribe event order
+- private auth replay event order
+- error kind behavior
 - unknown channel behavior
 - private auth request JSON-RPC shape
 - private auth error behavior

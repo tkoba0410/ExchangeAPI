@@ -9,8 +9,8 @@
 
 v3.4.0 では、v3.1.0 から v3.3.0 で追加した bitFlyer Realtime API の public / private read surface を前提に、connection lifecycle の再現性と利用時の堅牢性を上げる。
 
-主題は bitFlyer Realtime resilience foundation とする。
-具体的には reconnect / backoff / resubscribe / private auth 再実行 / idle timeout の設計と最小実装を扱う。
+主題は bitFlyer Realtime resilience + stream envelope foundation とする。
+具体的には lifecycle-aware stream envelope API、reconnect / backoff / resubscribe / private auth 再実行 / idle timeout の設計と最小実装を扱う。
 
 v3.4.0 は v3 系の Realtime maturity track の一部であり、新 venue、Unified、state-changing operation は扱わない。
 
@@ -19,6 +19,7 @@ v3.4.0 は v3 系の Realtime maturity track の一部であり、新 venue、Un
 採用候補:
 
 - realtime reconnect policy
+- lifecycle-aware stream envelope API
 - bounded backoff policy
 - reconnect 後の public channel resubscribe
 - reconnect 後の private `auth` 再実行
@@ -33,8 +34,10 @@ API 方針候補:
 
 - 主 API は `IAsyncEnumerable<T>` のまま維持する
 - public / private realtime client は分けたまま維持する
-- resilience は options で opt-in または明示設定にする
-- default behavior を過度に変えない
+- 既存 DTO-only API は維持する
+- DTO-only API は reconnect disabled のまま維持する
+- envelope API は `Subscribe*StreamAsync` suffix を使う
+- envelope API は reconnect default enabled とする
 - reconnect による missed message replay は保証しない
 - private auth 再実行でも API secret / signature を log / exception / result に出さない
 
@@ -45,7 +48,7 @@ public sealed class BitflyerRealtimeClientOptions
 {
     public Uri EndpointUri { get; init; }
     public TimeSpan? ConnectTimeout { get; init; }
-    public BitflyerRealtimeReconnectOptions? Reconnect { get; init; }
+    public BitflyerRealtimeReconnectOptions Reconnect { get; init; }
     public TimeSpan? IdleTimeout { get; init; }
 }
 ```
@@ -60,6 +63,18 @@ public sealed class BitflyerRealtimeReconnectOptions
 ```
 
 上記の exact API は実装前に `docs/realtime-bitflyer.md` で固定する。
+
+stream envelope event:
+
+```text
+Data
+Reconnecting
+Reconnected
+AuthenticationReplayed
+Resubscribed
+ContinuityLost
+MessageRejected
+```
 
 ## 3. 非対象
 
@@ -77,6 +92,7 @@ v3.4.0 では次を扱わない。
 - `System.Reactive` dependency の core / venue package 追加
 - `IObservable<T>` public API
 - `ExchangeApi.Optional.Realtime.State`
+- `StreamError` event
 - credentials provider 拡張
 - CLI / MCP の本格 integration
 - exactly-once delivery guarantee
@@ -98,13 +114,34 @@ v3.4.0 では次を扱わない。
 - board delta stream で reconnect 後に continuity を保証しないことの文書化
 - error / diagnostic message の secret-free rule
 
-初期方針:
+裁定済み:
 
-- reconnect は明示 option で有効化する
+- stream envelope API を採用する
+- 既存 DTO-only API は維持し、obsolete にしない
+- envelope API 名は `Subscribe*StreamAsync` とする
+- DTO-only API は reconnect disabled のまま維持する
+- envelope API は reconnect default enabled とする
+- envelope event 型は具象型とする
+- event 型は `Data`, `Reconnecting`, `Reconnected`, `AuthenticationReplayed`, `Resubscribed`, `ContinuityLost`, `MessageRejected`
+- `StreamError` は採用しない
+- envelope API では malformed / decode failed message を `MessageRejected` event として通知して stream を継続する
+- DTO-only API では malformed / decode error を controlled exception として扱い stream を終了する
+- fatal error 後の restart は利用者判断とする
+- reconnect 対象は remote close / transport exception / idle timeout とする
+- auth failure / resubscribe failure / reconnect exhausted / unrecoverable transport failure は controlled exception とする
+- non-target channel message は ignore する
 - cancellation は常に reconnect より優先する
-- auth failure は原則 retry せず controlled exception とする
-- reconnect 後は auth を確認してから private channel を resubscribe する
+- private reconnect order は `Reconnecting -> Reconnected -> AuthenticationReplayed -> Resubscribed -> ContinuityLost -> Data...` とする
 - board delta の gap-free continuity は保証しない
+- backoff default は `MaxAttempts = 3`, `InitialDelay = 1s`, `MaxDelay = 10s`, jitter なしとする
+- backoff values は options で変更可能とし、docs に conservative / interactive / long-running / no reconnect preset を示す
+- `MaxAttempts = 0` は reconnect disabled とする
+- idle timeout は default disabled とし、`TimeSpan? IdleTimeout` で変更可能とする
+- idle timeout docs に disabled / interactive / monitoring / aggressive preset を示す
+- idle timeout 発生後の reconnect では `ContinuityLost` を通知する
+- `BitflyerRealtimeErrorKind` enum を追加し、`BitflyerRealtimeException` に `Kind` property を持たせる
+- exception message は secret-free human-readable explanation に限定する
+- Rx は v3.4.0 に含めない
 - state builder は v3.5.0 以降候補に残す
 
 ## 5. 文書更新候補
@@ -135,6 +172,9 @@ src/Exchanges/Bitflyer/
 候補:
 
 - reconnect options
+- stream envelope event models
+- `Subscribe*StreamAsync` API
+- `BitflyerRealtimeErrorKind`
 - reconnect-capable protocol wrapper or transport lifecycle helper
 - subscribed channel tracking
 - private auth callback / session handling
@@ -174,11 +214,16 @@ live verification は opt-in only とし、default では接続しない。
 
 - v3.4.0 の scope / non-scope が本書に固定されている
 - `docs/realtime-bitflyer.md` が reconnect / backoff / resubscribe / idle timeout の contract を固定している
+- `docs/realtime-bitflyer.md` が stream envelope API と event 型を固定している
 - public realtime API は `IAsyncEnumerable<T>` のまま維持されている
+- existing DTO-only API は維持されている
+- `Subscribe*StreamAsync` envelope API が追加されている
 - private realtime API は public realtime API と混ざっていない
 - reconnect 後の private auth 再実行順序が deterministic tests で固定されている
+- envelope API で `MessageRejected` が malformed / decode failed message を通知し stream を継続する
 - cancellation が reconnect より優先される
 - auth failure が secret-free controlled exception になる
+- `BitflyerRealtimeException.Kind` が restart 判断に使える
 - API secret / signature / Authorization 相当値が evidence / log / result / exception / stdout / stderr に出ない
 - deterministic tests が通る
 - package generation が通る

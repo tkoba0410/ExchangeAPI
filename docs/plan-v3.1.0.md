@@ -803,3 +803,112 @@ GitHub Packages publish 後に次を実行する。
 ```bash
 bash scripts/smoke-github-packages-consumer.sh 3.1.0
 ```
+
+## 33. Release Close 実施指示
+
+目的:
+v3.1.0 を bitFlyer public Realtime API read MVP release として閉じる。
+release tag は local release preflight 済みの commit に打つ。
+
+前提:
+
+- `codex/v3.1-dev` が release candidate として clean である
+- `docs/release-checklist-v3.1.0.md` の local preflight が通っている
+- release assets が `local/publish/release-assets/v3.1.0/` に生成済みである
+- unrelated change を勝手に revert しない
+
+実行:
+
+```bash
+git checkout codex/v3.1-dev
+git status --short --branch
+
+git checkout main
+git pull --ff-only origin main
+git merge --ff-only codex/v3.1-dev
+
+git tag -a v3.1.0 -m "Release v3.1.0"
+git push origin main
+git push origin v3.1.0
+```
+
+注意:
+
+- fast-forward できない場合は止めて差分を確認する
+- tag は preflight 済み commit に打つ
+- release tag を打った後に package / release note の内容を変更しない
+
+## 34. Package Publish 実施指示
+
+GitHub Packages へ `3.1.0` を publish する。
+
+実行:
+
+```bash
+bash scripts/push-github-packages.sh 3.1.0
+```
+
+確認:
+
+- publish 対象は次の 5 package のみ
+  - `ExchangeApi.Exchanges.Bitflyer`
+  - `ExchangeApi.Exchanges.Binance`
+  - `ExchangeApi.Primitives`
+  - `ExchangeApi.Optional.Credentials`
+  - `ExchangeApi.Optional.Logging`
+- layer-specific venue package は publish されない
+- token / credentials を stdout / stderr に出さない
+
+publish 後 smoke:
+
+```bash
+bash scripts/smoke-github-packages-consumer.sh 3.1.0
+```
+
+## 35. GitHub Release 実施指示
+
+GitHub Release を作成する。
+
+設定:
+
+- tag: `v3.1.0`
+- title: `v3.1.0`
+- release notes: [`docs/release-notes/v3.1.0.md`](./release-notes/v3.1.0.md)
+
+attach する release assets:
+
+```text
+local/publish/release-assets/v3.1.0/exchangeapi-linux-x64
+local/publish/release-assets/v3.1.0/exchangeapi-linux-x64.sha256
+local/publish/release-assets/v3.1.0/exchangeapi-mcp-linux-x64
+local/publish/release-assets/v3.1.0/exchangeapi-mcp-linux-x64.sha256
+```
+
+GitHub CLI を使う場合の例:
+
+```bash
+gh release create v3.1.0 \
+  --title "v3.1.0" \
+  --notes-file docs/release-notes/v3.1.0.md \
+  local/publish/release-assets/v3.1.0/exchangeapi-linux-x64 \
+  local/publish/release-assets/v3.1.0/exchangeapi-linux-x64.sha256 \
+  local/publish/release-assets/v3.1.0/exchangeapi-mcp-linux-x64 \
+  local/publish/release-assets/v3.1.0/exchangeapi-mcp-linux-x64.sha256
+```
+
+## 36. Release Close Confirmation
+
+release 完了後、[`docs/release-checklist-v3.1.0.md`](./release-checklist-v3.1.0.md) を更新する。
+
+完了条件:
+
+- `main` に v3.1.0 commit が入っている
+- `v3.1.0` tag が remote にある
+- GitHub Packages に対象 5 package が publish されている
+- GitHub Packages consumer smoke が通っている
+- GitHub Release が作成されている
+- release assets が attach されている
+- working tree が clean である
+- v3.1.0 に private realtime / Unified / Binance realtime が含まれていない
+
+release 完了後に `v3.2.0` へ進む場合は、新しい `docs/plan-v3.2.0.md` を作成してから着手する。

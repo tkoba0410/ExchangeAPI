@@ -56,6 +56,8 @@ v3.5.0 候補:
 - secret-free realtime evidence layout
 - realtime lifecycle contract table
 
+詳細仕様は [`docs/realtime-diagnostics.md`](./realtime-diagnostics.md) に置く。
+
 判断基準:
 
 - core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する

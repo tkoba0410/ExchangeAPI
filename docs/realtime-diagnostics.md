@@ -1,0 +1,239 @@
+# Realtime Diagnostics
+
+最終更新: 2026-04-28
+位置づけ: Realtime diagnostics 設計正本 draft
+
+## 1. 目的
+
+本書は、Realtime API の diagnostic event、sanitized raw frame logging、secret-free evidence layout、lifecycle contract の設計境界を定義する。
+
+v3.5.0 は Realtime Diagnostics Foundation release として扱う。
+目的は、realtime stream で何が起きたかを secret-free に見えるようにすることである。
+
+本書は bitFlyer Realtime API の上に最初に適用する。
+ただし、内容は将来の venue realtime にも使えるよう、venue-specific DTO や market semantics には踏み込まない。
+
+関連文書:
+
+- [`docs/realtime-bitflyer.md`](./realtime-bitflyer.md)
+- [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md)
+- [`docs/verification.md`](./verification.md)
+- [`verification/bitflyer-realtime-resilience.md`](../verification/bitflyer-realtime-resilience.md)
+- [`verification/release-evidence.md`](../verification/release-evidence.md)
+
+## 2. Scope
+
+v3.5.0 で扱う:
+
+- diagnostic event schema
+- sanitized raw frame logging
+- secret-free realtime evidence layout
+- realtime lifecycle contract table
+- deterministic tests for diagnostic classification and redaction
+- opt-in live verification runbook update
+
+v3.5.0 で扱わない:
+
+- stream replay implementation
+- fake transport / scenario helper の optional package 化
+- `ExchangeApi.Optional.Reactive`
+- `IObservable<T>` public API
+- `ExchangeApi.Optional.Realtime.Resilience`
+- state builder / state projection
+- HTTP + realtime state coordination
+- Binance realtime
+- venue 横断 realtime abstraction
+- Unified realtime abstraction
+- order / cancel / deposit / withdraw などの state-changing operation
+
+## 3. Design Principles
+
+- Realtime diagnostics は、stream の観測と説明のための contract であり、取引所ステート管理ではない。
+- secret-free rule を最優先する。
+- default では file log / evidence を作らない。
+- raw frame logging は opt-in とする。
+- diagnostic event は machine-readable な構造を持つ。
+- diagnostic event は利用者が stream lifecycle を判断するための情報を持つが、reconnect や resubscribe の policy 自体を決めすぎない。
+- venue package の主 API は `IAsyncEnumerable<T>` のまま維持する。
+- Rx dependency は core / venue package に追加しない。
+- diagnostics は public / private realtime の両方に適用できるが、private auth payload や credential を記録しない。
+
+## 4. Diagnostic Event Model
+
+Diagnostic event は、realtime stream lifecycle、message decode、raw frame handling、secret-free logging の状態を表す。
+
+候補 API 名:
+
+```csharp
+public sealed record RealtimeDiagnosticEvent
+{
+    public required string EventType { get; init; }
+    public required DateTimeOffset ObservedAt { get; init; }
+    public string? Venue { get; init; }
+    public string? Channel { get; init; }
+    public string? ProductCode { get; init; }
+    public string? ConnectionId { get; init; }
+    public string? SubscriptionId { get; init; }
+    public string? Severity { get; init; }
+    public string? Reason { get; init; }
+    public string? ErrorKind { get; init; }
+    public IReadOnlyDictionary<string, string>? Attributes { get; init; }
+}
+```
+
+`EventType` 候補:
+
+| EventType | 意味 | Stream 継続 |
+| --- | --- | --- |
+| `Connecting` | WebSocket 接続を開始した | 継続前 |
+| `Connected` | WebSocket 接続が成立した | 継続 |
+| `SubscribeRequested` | subscribe request を送信した | 継続 |
+| `Subscribed` | subscribe が成立した | 継続 |
+| `RawFrameReceived` | raw frame を受信した | 継続 |
+| `RawFrameLogged` | sanitized raw frame を log / evidence へ記録した | 継続 |
+| `MessageDecoded` | payload decode が成功した | 継続 |
+| `MessageRejected` | payload decode / validation が失敗し、message を捨てた | 原則継続 |
+| `ContinuityLost` | reconnect / resubscribe 等により連続性を保証できない | 継続可能 |
+| `Reconnecting` | reconnect を開始した | 継続可能 |
+| `Reconnected` | reconnect が成立した | 継続可能 |
+| `Resubscribed` | reconnect 後の resubscribe が成立した | 継続可能 |
+| `Closed` | stream が正常終了した | 終了 |
+| `Failed` | stream が制御された例外で終了した | 終了 |
+
+`Severity` 候補:
+
+| Severity | 意味 |
+| --- | --- |
+| `Trace` | 通常の低レベル lifecycle |
+| `Info` | 利用者が知ってよい通常状態 |
+| `Warning` | stream は継続できるが注意が必要 |
+| `Error` | stream が終了する、または利用者判断が必要 |
+
+## 5. Stream Continuation Rule
+
+diagnostic event は stream を続けるか終了するかを明確にする。
+
+基本方針:
+
+- malformed JSON、unknown channel、DTO decode failure は `MessageRejected` として扱い、原則 stream を継続する。
+- reconnect / resubscribe 後は、欠落がない前提を置かず `ContinuityLost` を出す。
+- connection close、reconnect exhausted、authentication failure など recovery できない失敗は `Failed` として stream を終了する。
+- cancellation / dispose は `Closed` として正常終了する。
+
+利用者判断:
+
+- `MessageRejected` は「その message は捨てたが、stream は継続している」ことを示す。
+- `ContinuityLost` は「stream は継続可能だが、event の連続性は保証しない」ことを示す。
+- state management 側が必要な場合、`ContinuityLost` を受けて v4 の resync / invalidation policy で処理する。
+
+## 6. Sanitized Raw Frame Logging
+
+raw frame logging は、WebSocket で受信した frame を調査可能な形で残す opt-in 機能である。
+
+記録してよいもの:
+
+- public channel の received raw frame
+- private channel の event payload after redaction
+- channel name
+- received timestamp
+- connection id / subscription id
+- payload byte length
+- decode result
+- diagnostic event id
+
+記録してはいけないもの:
+
+- API key
+- API secret
+- signature
+- Authorization 相当の値
+- private auth request payload
+- raw credential profile
+- credential file path の詳細
+- exception message に混入した secret
+
+redaction rule:
+
+- `api_key`, `apiKey`, `key`, `api_secret`, `apiSecret`, `secret`, `signature`, `Authorization`, `authorization` は `[REDACTED]` に置換する。
+- key 名の大小文字差は redaction 対象にする。
+- redaction 不能な raw frame は記録せず、`RawFrameLoggingSkipped` 相当の diagnostic event を残す。
+
+## 7. Evidence Layout
+
+evidence は opt-in only とする。
+default の library usage、deterministic tests、package smoke では evidence を作らない。
+
+標準配置:
+
+```text
+local/evidence/local-live/<yyyymmdd>-v3.5.0-realtime-diagnostics/
+  runtime/
+    artifacts/
+      diagnostic-events.jsonl
+      sanitized-raw-frames.jsonl
+    logs/
+  notes/
+    summary.md
+```
+
+JSONL は 1 line 1 JSON object とする。
+JSONL writer を使う場合も、secret-free rule を満たす。
+
+`local/evidence/` 配下の run directory は repository の正本ではない。
+commit しない。
+
+## 8. Lifecycle Contract Table
+
+| Scenario | Expected Diagnostic Events | Stream Result |
+| --- | --- | --- |
+| normal public subscribe | `Connecting -> Connected -> SubscribeRequested -> Subscribed -> RawFrameReceived -> MessageDecoded` | data continues |
+| malformed JSON frame | `RawFrameReceived -> MessageRejected` | stream continues |
+| unknown channel frame | `RawFrameReceived -> MessageRejected` | stream continues |
+| DTO decode failure | `RawFrameReceived -> MessageRejected` | stream continues |
+| connection closed then reconnect succeeds | `Reconnecting -> Reconnected -> Resubscribed -> ContinuityLost` | stream continues |
+| reconnect exhausted | `Reconnecting -> Failed` | stream terminates with controlled exception |
+| private auth failure | `Failed` | stream terminates with controlled exception |
+| cancellation requested | `Closed` | normal termination |
+| dispose called | `Closed` | normal termination |
+
+## 9. Verification
+
+Deterministic tests:
+
+- diagnostic event schema can be serialized to JSON
+- lifecycle scenarios emit expected event sequence
+- malformed JSON becomes `MessageRejected`
+- unknown channel becomes `MessageRejected`
+- DTO decode failure becomes `MessageRejected`
+- reconnect / resubscribe emits `ContinuityLost`
+- cancellation / dispose emits `Closed`
+- redaction removes API key / secret / signature / Authorization
+- raw private auth payload is not logged
+- default configuration creates no file log / evidence
+
+Live verification:
+
+- opt-in only
+- short duration
+- public realtime can emit diagnostic events without credentials
+- private realtime can emit diagnostic events without logging auth payload
+- stdout / stderr / logs / evidence are secret-free
+- evidence uses the standard layout
+
+## 10. Open Decisions
+
+次の項目は実装前に裁定する。
+
+1. `RealtimeDiagnosticEvent` を public API にするか、bitFlyer-specific stream event の内側に閉じるか。
+2. `EventType` / `Severity` を string にするか enum にするか。
+3. sanitized raw frame logging を core venue package に置くか、`ExchangeApi.Optional.Logging` の extension として置くか。
+4. diagnostic event を existing stream envelope と統合するか、別 stream / callback / sink として扱うか。
+5. raw frame の body を常に保存するか、size limit と sampling を持つか。
+
+推奨初期案:
+
+- diagnostic event schema は public contract として固定する。
+- `EventType` / `Severity` は enum ではなく string から開始する。
+- file output は `ExchangeApi.Optional.Logging` 側に寄せ、venue package は event emission までに留める。
+- existing stream envelope に diagnostic event を流し、別 callback は増やさない。
+- raw frame body は opt-in かつ size limit 付きで保存する。

@@ -15,6 +15,10 @@ Realtime API は HTTP endpoint とは別 transport / interaction model である
 - [bitFlyer Lightning API Documentation](https://lightning.bitflyer.com/docs/api)
 - [bitFlyer Lightning Realtime API Playground](https://lightning.bitflyer.com/docs/playgroundrealtime?lang=en)
 
+関連文書:
+
+- [`docs/realtime-diagnostics.md`](./realtime-diagnostics.md)
+
 ## 2. Positioning
 
 bitFlyer Realtime API は `ExchangeApi.Exchanges.Bitflyer` package 内に置く。

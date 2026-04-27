@@ -86,6 +86,7 @@
 
 - [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md)
 - [`docs/endpoints-binance.md`](./endpoints-binance.md)
+- [`docs/realtime-diagnostics.md`](./realtime-diagnostics.md)
 - [`docs/cli.md`](./cli.md)
 - [`docs/mcp-server.md`](./mcp-server.md)
 - [`docs/mcp-tool-catalog.md`](./mcp-tool-catalog.md)

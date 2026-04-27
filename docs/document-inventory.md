@@ -1,9 +1,9 @@
 # ExchangeAPI Document Inventory
 
-最終更新: 2026-04-23  
+最終更新: 2026-04-27
 位置づけ: 文書棚卸し
 
-本書は、現行リポジトリ内の文書を `keep / rewrite / archive` に分類する。  
+本書は、現行リポジトリ内の文書を `keep / rewrite / archive` に分類する。
 目的は、今後の再編で何を現行正本セットとして扱い、何を履歴へ退避し、何を再構成対象にするかを明確にすることにある。
 
 ## 1. Keep
@@ -12,6 +12,8 @@
   - 入口文書として維持する
 - [`docs/docs-architecture.md`](./docs-architecture.md)
   - 文書体系ガイドとして維持する
+- [`docs/work-instruction-policy.md`](./work-instruction-policy.md)
+  - 実施指示の保存先と更新規則として維持する
 - [`docs/spec.md`](./spec.md)
   - 共通正本として維持する
 - [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md)

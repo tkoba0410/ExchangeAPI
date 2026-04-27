@@ -1,11 +1,11 @@
 # ExchangeAPI Documentation Architecture
 
-最終更新: 2026-04-22  
+最終更新: 2026-04-27
 位置づけ: 文書体系ガイド
 
 ## 1. 目的
 
-本書は、ExchangeAPI における文書群の役割分担、正本の置き方、更新規則を定義する。  
+本書は、ExchangeAPI における文書群の役割分担、正本の置き方、更新規則を定義する。
 個別の API 仕様や adapter 契約を増やす前に、どの種類の情報をどの文書へ置くかを先に固定する。
 
 目的は次の 3 点である。
@@ -16,7 +16,7 @@
 
 ## 2. 基本方針
 
-- 文書は `入口 / 正本 / 台帳 / ガイド / リリース単位文書 / 計画履歴` に分ける
+- 文書は `入口 / 正本 / 台帳 / ガイド / 実施指示運用 / リリース単位文書 / 計画履歴` に分ける
 - 「設計原則」と「対象一覧」を同じ文書に過剰混載しない
 - version 固有の変更理由は恒久正本へ直接埋め込まず、ledger や migration 文書へ逃がす
 - 正本は実装と test が従う契約だけを持つ
@@ -166,6 +166,30 @@
 
 - version をまたいで維持される恒久原則
 
+### 3.6 実施指示運用
+
+役割:
+
+- チャットで合意した実施指示の保存先と更新規則を定義する
+- release scope、non-scope、完了条件、裁定理由を repository 内で追跡可能にする
+- `docs/plan-vX.Y.Z.md`、topic doc、roadmap、release note の使い分けを固定する
+
+対象:
+
+- [`docs/work-instruction-policy.md`](./work-instruction-policy.md)
+
+置くべき内容:
+
+- 実施指示の保存原則
+- release plan の役割
+- topic doc / roadmap / release note との境界
+- 作業中に裁定が変わった場合の更新先
+
+置くべきでない内容:
+
+- 個別 release の実施指示本文
+- endpoint / adapter / realtime などの exact contract
+
 ## 4. 正本の階層
 
 現行の文書主従は次を基本とする。
@@ -175,20 +199,22 @@
 2. 入口
    - [`README.md`](../README.md)
    - [`docs/document-inventory.md`](./document-inventory.md)
-3. 共通正本
+3. 実施指示運用
+   - [`docs/work-instruction-policy.md`](./work-instruction-policy.md)
+4. 共通正本
    - [`docs/spec.md`](./spec.md)
-4. surface 別正本
+5. surface 別正本
    - [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md)
    - [`docs/endpoints-binance.md`](./endpoints-binance.md)
    - [`docs/cli.md`](./cli.md)
    - [`docs/mcp-server.md`](./mcp-server.md)
    - [`docs/mcp-tool-catalog.md`](./mcp-tool-catalog.md)
    - [`docs/verification.md`](./verification.md)
-5. 利用ガイド
+6. 利用ガイド
    - `docs/guides/*`, `docs/distribution.md`, `docs/local-nuget-consumer.md`
-6. version 単位文書
+7. version 単位文書
    - release note, migration, breaking changes, draft
-7. 計画履歴
+8. 計画履歴
    - `docs/archive/plans/*`
 
 解釈ルール:
@@ -263,7 +289,7 @@
 - migration guide
   - 利用者向け移行手順
 
-`v2.0.0` draft は検討文書であり、単独で現行正本を置き換えない。  
+`v2.0.0` draft は検討文書であり、単独で現行正本を置き換えない。
 採用済みの変更は、最終的に `spec.md`、venue 文書、adapter 文書へ反映して固定する。
 
 ## 8. 当面の整備方針

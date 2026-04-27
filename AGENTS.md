@@ -1,6 +1,6 @@
 # ExchangeAPI Agent Guide
 
-このファイルは、ExchangeAPI で作業するエージェントと開発者向けの作業規約である。  
+このファイルは、ExchangeAPI で作業するエージェントと開発者向けの作業規約である。
 設計正本ではない。判断に迷う場合は、下記の正本文書を優先する。
 
 ## 1. Read First
@@ -9,6 +9,7 @@
 
 - 文書体系: [`docs/docs-architecture.md`](docs/docs-architecture.md)
 - 文書棚卸し: [`docs/document-inventory.md`](docs/document-inventory.md)
+- 実施指示運用: [`docs/work-instruction-policy.md`](docs/work-instruction-policy.md)
 - library 共通正本: [`docs/spec.md`](docs/spec.md)
 - bitFlyer endpoint 正本: [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md)
 - Binance endpoint 正本: [`docs/endpoints-binance.md`](docs/endpoints-binance.md)

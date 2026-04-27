@@ -3,7 +3,7 @@
 最終更新: 2026-04-27
 位置づけ: v3.1.0 release checklist
 
-状態: release preflight pending
+状態: local release preflight passed / release pending
 
 ## 1. Scope Confirmation
 
@@ -70,12 +70,13 @@ dotnet test ExchangeApi.LiveTests.slnx --no-restore
 
 確認項目:
 
-- [ ] deterministic tests passed for release version
-- [ ] package generation passed for `3.1.0`
-- [ ] local consumer smoke passed for `3.1.0`
-- [ ] release asset generation passed for `3.1.0`
-- [ ] live tests skip safely without opt-in
-- [ ] stdout / stderr / logs / evidence are secret-free
+- [x] deterministic tests passed for release version
+- [x] package generation passed for `3.1.0`
+- [x] local consumer smoke passed for `3.1.0`
+- [x] release asset generation passed for `3.1.0`
+- [x] release asset checksums passed for `3.1.0`
+- [x] live tests skip safely without opt-in
+- [x] stdout / stderr / logs / evidence are secret-free
 
 ## 5. Package Expectations
 
@@ -129,3 +130,27 @@ bash scripts/smoke-github-packages-consumer.sh 3.1.0
 - [ ] release assets が attach されている
 - [ ] GitHub Packages smoke が通っている
 - [ ] `v3.1.0` に private realtime / Unified / Binance realtime が含まれていない
+
+local preflight result:
+
+```text
+date: 2026-04-27
+build: dotnet build ExchangeApi.slnx passed
+deterministic tests: dotnet test ExchangeApi.slnx --no-restore passed
+local pack: bash scripts/pack-local-nuget.sh 3.1.0 passed
+local consumer smoke: bash scripts/smoke-local-nuget-consumer.sh 3.1.0 passed
+release asset helper: bash scripts/create-release-assets.sh 3.1.0 linux-x64 Release passed
+release asset checksum: sha256sum -c *.sha256 passed in local/publish/release-assets/v3.1.0
+live tests without opt-in: dotnet test ExchangeApi.LiveTests.slnx --no-restore skipped safely
+packages:
+  ExchangeApi.Exchanges.Binance.3.1.0.nupkg
+  ExchangeApi.Exchanges.Bitflyer.3.1.0.nupkg
+  ExchangeApi.Optional.Credentials.3.1.0.nupkg
+  ExchangeApi.Optional.Logging.3.1.0.nupkg
+  ExchangeApi.Primitives.3.1.0.nupkg
+release assets:
+  local/publish/release-assets/v3.1.0/exchangeapi-linux-x64
+  local/publish/release-assets/v3.1.0/exchangeapi-linux-x64.sha256
+  local/publish/release-assets/v3.1.0/exchangeapi-mcp-linux-x64
+  local/publish/release-assets/v3.1.0/exchangeapi-mcp-linux-x64.sha256
+```

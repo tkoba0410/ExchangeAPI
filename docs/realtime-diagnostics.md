@@ -107,6 +107,39 @@ public sealed record RealtimeDiagnosticEvent
 }
 ```
 
+`EventType` / `Severity` の実体は `string` とする。
+公式値は constants として提供し、利用者が typo を避けやすい形にする。
+
+候補 API 名:
+
+```csharp
+public static class RealtimeDiagnosticEventTypes
+{
+    public const string Connecting = "Connecting";
+    public const string Connected = "Connected";
+    public const string SubscribeRequested = "SubscribeRequested";
+    public const string Subscribed = "Subscribed";
+    public const string RawFrameReceived = "RawFrameReceived";
+    public const string RawFrameLogged = "RawFrameLogged";
+    public const string MessageDecoded = "MessageDecoded";
+    public const string MessageRejected = "MessageRejected";
+    public const string ContinuityLost = "ContinuityLost";
+    public const string Reconnecting = "Reconnecting";
+    public const string Reconnected = "Reconnected";
+    public const string Resubscribed = "Resubscribed";
+    public const string Closed = "Closed";
+    public const string Failed = "Failed";
+}
+
+public static class RealtimeDiagnosticSeverities
+{
+    public const string Trace = "Trace";
+    public const string Info = "Info";
+    public const string Warning = "Warning";
+    public const string Error = "Error";
+}
+```
+
 `EventType` 候補:
 
 | EventType | 意味 | Stream 継続 |
@@ -271,13 +304,11 @@ Live verification:
 
 次の項目は実装前に裁定する。
 
-1. `EventType` / `Severity` を string にするか enum にするか。
-2. sanitized raw frame logging を core venue package に置くか、`ExchangeApi.Optional.Logging` の extension として置くか。
-3. raw frame の body を常に保存するか、size limit と sampling を持つか。
+1. sanitized raw frame logging を core venue package に置くか、`ExchangeApi.Optional.Logging` の extension として置くか。
+2. raw frame の body を常に保存するか、size limit と sampling を持つか。
 
 推奨初期案:
 
-- `EventType` / `Severity` は enum ではなく string から開始する。
 - file output は `ExchangeApi.Optional.Logging` 側に寄せ、venue package は event emission までに留める。
 - raw frame body は opt-in かつ size limit 付きで保存する。
 
@@ -321,3 +352,22 @@ Live verification:
 
 - bitFlyer-specific stream event の内側に閉じる案
 - internal logging / evidence 専用の非公開診断モデルに留める案
+
+### 11.3 Event Type / Severity Representation
+
+採用: 案C。
+
+`EventType` / `Severity` の実体は `string` とする。
+公式値は `RealtimeDiagnosticEventTypes` / `RealtimeDiagnosticSeverities` の constants として提供する。
+
+採用理由:
+
+- v3.5.0 の diagnostics foundation 初期では、enum で閉じすぎない方が変更に強い
+- JSONL / evidence / future replay と自然に接続できる
+- constants を提供することで、利用者の typo と magic string を減らせる
+- 将来 venue-specific diagnostic event を足す余地を残せる
+
+非採用:
+
+- `EventType` / `Severity` を enum にする案
+- constants なしの自由 string だけにする案

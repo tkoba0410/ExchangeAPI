@@ -3,7 +3,19 @@
 最終更新: 2026-04-28
 位置づけ: v3.3.0 release checklist
 
-状態: local preflight passed
+状態: `v3.3.0` released
+
+release 完了日: 2026-04-28
+
+完了済み:
+
+- deterministic tests / local pack / local consumer smoke
+- live tests safe skip without opt-in
+- GitHub Packages publish: library / optional packages `3.3.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer`, `ExchangeApi.Exchanges.Binance`, `ExchangeApi.Primitives`, `ExchangeApi.Optional.Credentials`, `ExchangeApi.Optional.Logging`
+- tag: `v3.3.0`
+- GitHub Release: `v3.3.0`
+- release assets: `exchangeapi-linux-x64`, `exchangeapi-linux-x64.sha256`, `exchangeapi-mcp-linux-x64`, `exchangeapi-mcp-linux-x64.sha256`
 
 ## 1. Scope Confirmation
 
@@ -91,23 +103,23 @@ bash scripts/smoke-github-packages-consumer.sh 3.3.0
 
 確認項目:
 
-- [ ] `ExchangeApi.Exchanges.Bitflyer 3.3.0` を restore / build / run できる
-- [ ] `ExchangeApi.Exchanges.Binance 3.3.0` を restore / build / run できる
-- [ ] `ExchangeApi.Primitives 3.3.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Credentials 3.3.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Logging 3.3.0` を restore / build / run できる
-- [ ] bitFlyer private realtime factory / channel vocabulary を参照できる
-- [ ] token / secret が stdout / stderr に出ない
+- [x] `ExchangeApi.Exchanges.Bitflyer 3.3.0` を restore / build / run できる
+- [x] `ExchangeApi.Exchanges.Binance 3.3.0` を restore / build / run できる
+- [x] `ExchangeApi.Primitives 3.3.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Credentials 3.3.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Logging 3.3.0` を restore / build / run できる
+- [x] bitFlyer private realtime factory / channel vocabulary を参照できる
+- [x] token / secret が stdout / stderr に出ない
 
 ## 6. Release Gate
 
-- [ ] Git working tree が release 前に clean である
-- [ ] `main` に `v3.3.0` commit が入っている
-- [ ] `v3.3.0` tag が remote にある
-- [ ] GitHub Release が作成されている
-- [ ] release assets が attach されている
-- [ ] GitHub Packages smoke が通っている
-- [ ] `v3.3.0` に reconnect / state builder / Rx / Binance realtime / Unified / state-changing operation が含まれていない
+- [x] Git working tree が release 前に clean である
+- [x] `main` に `v3.3.0` commit が入っている
+- [x] `v3.3.0` tag が remote にある
+- [x] GitHub Release が作成されている
+- [x] release assets が attach されている
+- [x] GitHub Packages smoke が通っている
+- [x] `v3.3.0` に reconnect / state builder / Rx / Binance realtime / Unified / state-changing operation が含まれていない
 
 local preflight result:
 
@@ -132,4 +144,15 @@ release assets:
   local/publish/release-assets/v3.3.0/exchangeapi-linux-x64.sha256
   local/publish/release-assets/v3.3.0/exchangeapi-mcp-linux-x64
   local/publish/release-assets/v3.3.0/exchangeapi-mcp-linux-x64.sha256
+```
+
+release result:
+
+```text
+date: 2026-04-28
+main push: passed
+tag push: v3.3.0 passed
+package publish: GITHUB_TOKEN="$(gh auth token)" bash scripts/push-github-packages.sh 3.3.0 passed
+GitHub Packages consumer smoke: bash scripts/smoke-github-packages-consumer.sh 3.3.0 passed
+GitHub Release: https://github.com/tkoba0410/ExchangeAPI/releases/tag/v3.3.0
 ```

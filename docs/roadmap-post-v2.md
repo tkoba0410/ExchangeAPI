@@ -20,6 +20,7 @@
 | `samples/` directory | 将来候補 | guide 内サンプルが大きくなった場合に、実行可能サンプルとして分離できるため | 早期作成は保守対象を増やす |
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
 | venue 単位 package / project consolidation | v3 採用 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v3.0.0 で package consolidation を採用する |
+| bitFlyer Realtime API | v3.1 採用候補 | HTTP とは別軸の public market stream を venue-native surface として扱えるため | v3.1.0 は public read MVP に限定する |
 | venue 追加 | v4 候補 | v3 で整理した venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
 
 ## 1.1 v2.1.0 採用項目
@@ -83,8 +84,8 @@ layer-specific venue package / project は廃止する。
 
 ```text
 v3.0.0: package / project consolidation
-v3.1.0: venue onboarding template と追加 venue 準備
-v3.2.0: v4 venue candidate selection / matrix preparation
+v3.1.0: bitFlyer public realtime read MVP
+v3.2.0: realtime hardening / venue onboarding preparation
 v4.0.0: new venue public read MVP
 v4.x: public read coverage expansion
 v5.0.0: Unified public read MVP
@@ -94,23 +95,49 @@ v6.0.0+: private/account/trading unified capability, only if meaning is defensib
 
 ### v3.1.0 候補
 
-v3.1.0 は、新 venue 追加の準備を目的とする。
+v3.1.0 は、bitFlyer Realtime API の public market read MVP を目的とする。
+Realtime API は HTTP endpoint とは別 transport / interaction model として扱う。
 
 候補:
 
+- `docs/realtime-bitflyer.md` の正本化
+- JSON-RPC 2.0 over WebSocket
+- `IAsyncEnumerable<T>` based typed stream
+- `lightning_ticker_<product_code>`
+- `lightning_executions_<product_code>`
+- `lightning_board_snapshot_<product_code>`
+- `lightning_board_<product_code>`
+- venue-specific DTO
+- opt-in public realtime live verification
+
+v3.1.0 では扱わない:
+
+- private realtime
+- Binance realtime
+- automatic reconnect / backoff
+- full order book state builder
+- Reactive Extensions dependency
+- `IObservable<T>` public API
+- CLI / MCP の本格 integration
+- Unified realtime abstraction
+
+### v3.2.0 候補
+
+v3.2.0 は、Realtime hardening と新 venue 追加準備の候補 release とする。
+
+候補:
+
+- reconnect / backoff
+- resubscribe
+- board state builder
+- Rx optional integration
+- CLI diagnostic command
 - venue onboarding guide
 - venue project / endpoint module checklist
 - endpoint matrix template
 - deterministic test template
 - safe live read verification template
 - package / smoke / docs の再利用性改善
-
-### v3.2.0 候補
-
-v3.2.0 は、v4 で追加する venue の候補選定と事前整理を目的とする。
-
-候補:
-
 - 追加 venue candidate の比較
 - public read MVP に必要な endpoint の棚卸し
 - symbol / product code / timestamp / decimal / nullability の差分調査

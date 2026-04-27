@@ -12,6 +12,7 @@
 - 実施指示運用: [`docs/work-instruction-policy.md`](docs/work-instruction-policy.md)
 - library 共通正本: [`docs/spec.md`](docs/spec.md)
 - bitFlyer endpoint 正本: [`docs/endpoints-bitflyer.md`](docs/endpoints-bitflyer.md)
+- bitFlyer Realtime API 正本: [`docs/realtime-bitflyer.md`](docs/realtime-bitflyer.md)
 - Binance endpoint 正本: [`docs/endpoints-binance.md`](docs/endpoints-binance.md)
 - CLI adapter 正本: [`docs/cli.md`](docs/cli.md)
 - MCP Server adapter 正本: [`docs/mcp-server.md`](docs/mcp-server.md)

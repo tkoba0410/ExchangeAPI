@@ -7,6 +7,7 @@
 
 本書は、ExchangeAPI library に共通して適用する設計原則と契約を定義する現行正本である。  
 本書は `Facade + Endpoint Module` を前提に、`Protocol` / `Native` / `Unified` / `Composition` / adapter 境界を定義する。
+Realtime surface は HTTP endpoint surface とは別 transport / interaction model として扱う。
 
 本書では、以下を明確に分離する。
 
@@ -34,6 +35,9 @@ version 固有の breaking change や migration は、採用判断を別文書�
 - [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md)
   - bitFlyer の endpoint 運用正本
   - bitFlyer endpoint ごとの metadata と固定状況を定義する
+- [`docs/realtime-bitflyer.md`](./realtime-bitflyer.md)
+  - bitFlyer Realtime API の設計正本
+  - HTTP endpoint matrix とは別に connection / subscription / stream contract を定義する
 - [`docs/endpoints-binance.md`](./endpoints-binance.md)
   - Binance の endpoint 運用正本
   - Binance endpoint ごとの metadata と固定状況を定義する
@@ -58,6 +62,8 @@ guide、archive、version 文書は正本の補助であり、本書そのもの
 - `v2.0.0` では、`CallResult`、`*Async(...)`、`Create*ClientBundle(...)`、`CallError` additive detail field、private credentials の責務分離を採用する
 - `v3.0.0` では、venue ごとに 1 project / 1 package へ統合し、`Protocol` / `Native` / `Composition` / `Vocabulary` は folder / namespace / tests 上の設計境界として維持する
 - `v3.0.0` の採用判断と移行説明は [`docs/breaking-changes-v3.0.0.md`](./breaking-changes-v3.0.0.md) と [`docs/migration-v3.0.0.md`](./migration-v3.0.0.md) を参照する
+- `v3.1.0` では、bitFlyer Realtime API を HTTP endpoint とは別軸の public market read surface として設計する
+- bitFlyer Realtime API の設計正本は [`docs/realtime-bitflyer.md`](./realtime-bitflyer.md) とする
 - private credentials は、core 正本から特定の storage / encryption recipe を外し、auth provider 契約へ寄せる
 - auth provider の具体 shape は `OpenSessionAsync(...)` 型を採用し、通常利用では client 側が session を隠して扱う
 - verification は、API 契約分類とは別に `repo/local` 配置と `safe/tolerable/dangerous` の運用分類を導入する
@@ -247,7 +253,30 @@ src/Exchanges/Bitflyer/
 - `Unified` は venue ごとの差分吸収層ではあるが、意味の曖昧化や silent degrade を許容しない
 - `Unified` で未対応の capability を `Native` へ暗黙 fallback してはならない
 
-### 3.4 External Adapters
+### 3.4 Realtime Surface
+
+Realtime surface は HTTP endpoint surface とは別 transport / interaction model である。
+
+Realtime が扱うもの:
+
+- connection
+- subscription
+- stream
+- message decode
+- cancellation / close
+
+Realtime に適用する方針:
+
+- HTTP endpoint matrix に Realtime channel を混ぜない
+- `Protocol` / `Native` / `Composition` / `Vocabulary` の folder / namespace boundary を Realtime にも適用する
+- Realtime は HTTP endpoint module と相互依存しない
+- Realtime の channel catalog、DTO、error / cancellation / reconnect 方針は venue ごとの Realtime 正本に置く
+
+現時点の Realtime 正本:
+
+- [`docs/realtime-bitflyer.md`](./realtime-bitflyer.md)
+
+### 3.5 External Adapters
 
 `Cli` と `McpServer` は本書の主正本対象ではない。  
 それぞれの設計は別文書で定義する。
@@ -266,7 +295,7 @@ src/Exchanges/Bitflyer/
 - external adapter は複数 venue を束ねる上位 adapter であるため、`src/Exchanges/<Venue>/` 配下に置いてはならない
 - 初期 adapter 名は `Cli` と `McpServer` とする
 
-### 3.5 依存規約
+### 3.6 依存規約
 
 依存方向の正本は以下とする。
 

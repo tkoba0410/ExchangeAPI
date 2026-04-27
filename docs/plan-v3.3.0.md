@@ -14,6 +14,9 @@ v3.3.0 では、v3.1.0 / v3.2.0 で整備した bitFlyer Realtime API 基盤を�
 v3.3.0 では、private realtime を read-only event stream として扱う。
 order / cancel / deposit / withdraw など state-changing operation は含めない。
 
+v3 系は、`v3.0.0` で整理した venue package 構造の上に bitFlyer Realtime API を成熟させる track として扱う。
+v3.3.0 はその中で private realtime read MVP を固定する release とし、reconnect / state builder / optional integration は v3.4.0 以降の候補に残す。
+
 ## 2. 採用候補
 
 bitFlyer private realtime read MVP:

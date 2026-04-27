@@ -6,9 +6,9 @@
 
 注記:
 
-- 現在の公開固定点は `v2.2.0` である
+- 現在の公開固定点は `v3.1.0` である
 - 本書の package version と API 例は v3 系の local consumer 導線を示す
-- release 前確認では、`3.0.0-local.*` のような local package version を使ってよい
+- release 前確認では、`3.2.0-local.*` のような local package version を使ってよい
 
 ## 1. 前提
 
@@ -19,7 +19,7 @@
 ExchangeAPI repository 側では repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 3.0.0-local.project-consolidation
+bash scripts/pack-local-nuget.sh 3.2.0-local.check
 ```
 
 生成先は `local/nuget`。
@@ -50,13 +50,13 @@ venue aggregate package は当該 venue の `Native`、`Protocol`、`Vocabulary`
 bitFlyer を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Bitflyer --version 3.0.0-local.project-consolidation
+dotnet add package ExchangeApi.Exchanges.Bitflyer --version 3.2.0-local.check
 ```
 
 Binance を使う場合:
 
 ```bash
-dotnet add package ExchangeApi.Exchanges.Binance --version 3.0.0-local.project-consolidation
+dotnet add package ExchangeApi.Exchanges.Binance --version 3.2.0-local.check
 ```
 
 v3.0.0 では、venue layer-specific package は外部 consumer 向け publish 対象にしない。
@@ -70,7 +70,7 @@ layer-specific namespace は aggregate package 内に残るが、package referen
 credential provider 実装が必要な場合は optional package を追加する。
 
 ```bash
-dotnet add package ExchangeApi.Optional.Credentials --version 3.0.0-local.project-consolidation
+dotnet add package ExchangeApi.Optional.Credentials --version 3.2.0-local.check
 ```
 
 `ExchangeApi.Optional.Credentials` は、core library の必須依存ではない。  
@@ -79,7 +79,7 @@ dotnet add package ExchangeApi.Optional.Credentials --version 3.0.0-local.projec
 secret-safe logging / evidence helper が必要な場合は optional logging package を追加する。
 
 ```bash
-dotnet add package ExchangeApi.Optional.Logging --version 3.0.0-local.project-consolidation
+dotnet add package ExchangeApi.Optional.Logging --version 3.2.0-local.check
 ```
 
 `ExchangeApi.Optional.Logging` は、core library の必須依存ではない。
@@ -125,12 +125,12 @@ dotnet build
 ExchangeAPI repo 側で local feed と v2 API surface の consumer smoke を確認する場合は、次を実行する。
 
 ```bash
-bash scripts/smoke-local-nuget-consumer.sh 3.0.0-local.project-consolidation
+bash scripts/smoke-local-nuget-consumer.sh 3.2.0-local.check
 ```
 
 この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer`、`ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging` を local feed から restore して build / run する。
 実 API には接続しない。
-`BitflyerClientFactory`、`PlainTextApiCredentialProviderFactory`、`Redactor` を参照できること、secret value が `[REDACTED]` になること、smoke output が secret-free であることを確認する。
+`BitflyerClientFactory`、`BitflyerRealtimeClientFactory`、`BitflyerRealtimeChannels`、`PlainTextApiCredentialProviderFactory`、`Redactor` を参照できること、secret value が `[REDACTED]` になること、smoke output が secret-free であることを確認する。
 
 ## 6. Version 更新ルール
 
@@ -158,6 +158,7 @@ dotnet nuget locals global-packages --clear
 ## 7. Scope
 
 - bitFlyer は現行 library slice の主対象であり、最も広い実装済み surface を持つ
+- bitFlyer Realtime API は public read MVP と lifecycle hardening までを含む
 - Binance は public `GetKlines` のみをサポートする
 - `Unified` は未実装
 

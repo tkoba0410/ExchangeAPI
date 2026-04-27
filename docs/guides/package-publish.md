@@ -5,14 +5,15 @@
 
 注記:
 
-- 現在の公開固定点は `v2.2.0` である
-- 本書の current command 例は `v3.0.0` の publish 手順を示す
-- `v3.0.0` publish 前の確認では、`3.0.0-local.*` のような local package version を使う
-- `v3.0.0` publish 前の最終確認では、publish/tag/release は実行せず、`3.0.0-local.final` などの local version で preflight する
+- 現在の公開固定点は `v3.1.0` である
+- 本書の current command 例は `v3.2.0` の publish 手順を示す
+- `v3.2.0` publish 前の確認では、`3.2.0-local.*` のような local package version を使う
+- `v3.2.0` publish 前の最終確認では、publish/tag/release は実行せず、`3.2.0-local.final` などの local version で preflight する
 - `v2.1.0` では `ExchangeApi.Optional.Logging` を optional package publish 対象に含める
 - `v2.2.0` は operational / verification release として扱い、package / project consolidation は含めない
 - `v2.2.0` publish 後は `scripts/smoke-github-packages-consumer.sh` で consumer smoke を実行する
 - `v3.0.0` では venue package / project を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する
+- `v3.2.0` では bitFlyer Realtime lifecycle hardening と venue onboarding preparation を含む
 
 ## Scope
 
@@ -42,7 +43,7 @@ v2 方針:
 repo root で次を実行する。
 
 ```bash
-bash scripts/pack-local-nuget.sh 3.0.0
+bash scripts/pack-local-nuget.sh 3.2.0
 ```
 
 生成先:
@@ -52,13 +53,13 @@ bash scripts/pack-local-nuget.sh 3.0.0
 release 前に static test、local pack、local consumer smoke、CLI/MCP executable publish をまとめて確認する場合は、次を使う。
 
 ```bash
-bash scripts/run-release-preflight.sh 3.0.0-local.preflight
+bash scripts/run-release-preflight.sh 3.2.0-local.preflight
 ```
 
 safe live verification まで含める場合だけ、次のように明示 opt-in する。
 
 ```bash
-EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-release-preflight.sh 3.0.0-local.preflight
+EXCHANGEAPI_RUN_SAFE_LIVE_PREFLIGHT=1 bash scripts/run-release-preflight.sh 3.2.0-local.preflight
 ```
 
 v2.2.0 の release asset 生成は次を使う。
@@ -98,13 +99,13 @@ export GITHUB_TOKEN=...
 `dotnet nuget push` を使う。
 
 ```bash
-bash scripts/push-github-packages.sh 3.0.0
+bash scripts/push-github-packages.sh 3.2.0
 ```
 
 script を使わず個別 push したい場合は、`dotnet nuget push` を直接使ってよい。
 
 ```bash
-dotnet nuget push "local/nuget/ExchangeApi.Primitives.3.0.0.nupkg" \
+dotnet nuget push "local/nuget/ExchangeApi.Primitives.3.2.0.nupkg" \
   --source "https://nuget.pkg.github.com/tkoba0410/index.json" \
   --api-key "$GITHUB_TOKEN" \
   --skip-duplicate
@@ -180,8 +181,19 @@ token は次の順で取得する。
 - layer-specific venue package が `3.0.0` として publish されていないこと
 - GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer 3.0.0`
 
+`v3.2.0` では次を確認する:
+
+- GitHub Packages publish: `ExchangeApi.Exchanges.Bitflyer 3.2.0`
+- GitHub Packages publish: `ExchangeApi.Exchanges.Binance 3.2.0`
+- GitHub Packages publish: `ExchangeApi.Primitives 3.2.0`
+- GitHub Packages publish: `ExchangeApi.Optional.Credentials 3.2.0`
+- GitHub Packages publish: `ExchangeApi.Optional.Logging 3.2.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer 3.2.0`
+- bitFlyer Realtime factory / channel vocabulary を参照できること
+- token、credentials、API key、API secret、signature、Authorization header が stdout / stderr に出ないこと
+
 ## Notes
 
 - local NuGet feed と GitHub Packages feed を混同しない
-- `stage` 系、`v1.0.0`、`v2.0.0`、`v2.1.0` は履歴であり、package の current public baseline は `v2.2.0`
+- `stage` 系、`v1.0.0`、`v2.0.0`、`v2.1.0`、`v2.2.0`、`v3.0.0` は履歴であり、package の current public baseline は `v3.1.0`
 - nuget.org 公開はこの文書の対象外

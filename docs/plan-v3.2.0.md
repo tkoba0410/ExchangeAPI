@@ -157,6 +157,24 @@ live verification は opt-in only とし、default では接続しない。
 - safe live read verification template
 - package / smoke / release checklist
 - v4 candidate comparison template
+- Realtime sample payload tests
+- package publish / local consumer docs v3.2.0 update
+- v3.2.0 release checklist
+- v3.2.0 release notes
+
+release preflight:
+
+```text
+git diff --check passed
+dotnet build ExchangeApi.slnx passed
+dotnet test ExchangeApi.slnx --no-restore passed
+bash scripts/pack-local-nuget.sh 3.2.0 passed
+bash scripts/smoke-local-nuget-consumer.sh 3.2.0 passed
+bash scripts/create-release-assets.sh 3.2.0 linux-x64 Release passed
+sha256sum -c *.sha256 passed in local/publish/release-assets/v3.2.0
+dotnet restore ExchangeApi.LiveTests.slnx passed
+dotnet test ExchangeApi.LiveTests.slnx --no-restore passed; live tests skipped safely without opt-in
+```
 
 検証結果:
 

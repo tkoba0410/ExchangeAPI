@@ -1,6 +1,6 @@
 # ExchangeAPI Post-v2 Roadmap
 
-最終更新: 2026-04-28
+最終更新: 2026-04-29
 位置づけ: post-v2 roadmap
 
 本書は、`v2.0.0` には含めないが、`v2.0.0` 以降に検討する候補を記録する。  
@@ -16,12 +16,12 @@
 | `ExchangeApi.Optional.Configuration` | 将来候補 | env / config binding / provider factory を adapter 間で共通化できるため | adapter 側の重複が見えてから検討する |
 | `ExchangeApi.Optional.Testing` | v3.6 採用 | realtime raw frame replay / decode / diagnostic testing helper を core / venue package から外して提供できるため | simulation / Gateway / Platform / Strategy testing へ拡張しない |
 | `ExchangeApi.Optional.Resilience` | 将来候補 | retry / backoff / rate limit / circuit breaker を core 正本に入れずに提供できるため | venue・利用者ごとに要件差が大きい |
-| `ExchangeApi.Optional.Reactive` | 将来候補 | Realtime stream を `IObservable<T>` として扱いたい利用者向けに Rx integration を core から分離して提供できるため | core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する |
+| `ExchangeApi.Optional.Reactive` | v3.7 採用 | Realtime stream を `IObservable<T>` として扱いたい利用者向けに Rx integration を core から分離して提供できるため | thin generic `ToObservable(...)` adapter に限定し、core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する |
 | evidence 自動整理 | 将来候補 | `local/evidence/` 標準構成へ artifact / log / notes を自動配置できるため | まず標準構成だけ固定する |
 | `samples/` directory | 将来候補 | guide 内サンプルが大きくなった場合に、実行可能サンプルとして分離できるため | 早期作成は保守対象を増やす |
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
 | venue 単位 package / project consolidation | v3 採用 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v3.0.0 で package consolidation を採用する |
-| bitFlyer Realtime API | v3.1 採用候補 | HTTP とは別軸の public market stream を venue-native surface として扱えるため | v3.1.0 は public read MVP に限定する |
+| bitFlyer Realtime API | v3.1 採用 | HTTP とは別軸の public market stream を venue-native surface として扱えるため | v3.x は bitFlyer realtime foundation track として継続する |
 | venue 追加 | v5 候補 | v3 / v4 で realtime foundation と Exchange I/O semantics foundation を整理した後、venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
 
 ## 1.1 v2.1.0 採用項目
@@ -308,7 +308,7 @@ v3.7.0 の実施指示は [`docs/plan-v3.7.0.md`](./plan-v3.7.0.md) に固定す
 - `ExchangeApi.Optional.Reactive`
 - `IAsyncEnumerable<T>` to `IObservable<T>` adapter
 - thin generic `ToObservable(...)`
-- Rx consumer smoke / sample
+- Rx consumer smoke
 - optional package docs
 
 core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する。

@@ -3,7 +3,7 @@
 最終更新: 2026-04-28
 位置づけ: v3.5.0 Realtime Diagnostics Foundation 実施指示
 
-状態: implementation-ready scope
+状態: released
 
 ## 1. 目的
 

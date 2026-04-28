@@ -10,11 +10,11 @@
 
 | 項目 | 状態 | 理由 | 備考 |
 | --- | --- | --- | --- |
-| `ExchangeApi.Optional.Logging` | 保留 | core を薄くし、CLI / MCP / live test / bot / local evidence など用途別に適した log writer を作れるため | `BC-V2-022` として記録済み |
+| `ExchangeApi.Optional.Logging` | v2.1 採用 | core を薄くし、CLI / MCP / live test / bot / local evidence など用途別に適した log writer を作れるため | `BC-V2-022` として記録済み |
 | `Unified` 層の実装 | 将来 | 複数 venue 間で意味同一性を保証できる capability だけを載せるため | まず venue-native surface を安定させる |
 | optional credentials provider 拡張 | 将来 | `age` 以外の env / keychain / external secret manager へ広げられるため | v2 初手は `PlainText` と `AgeFile` を優先 |
 | `ExchangeApi.Optional.Configuration` | 将来候補 | env / config binding / provider factory を adapter 間で共通化できるため | adapter 側の重複が見えてから検討する |
-| `ExchangeApi.Optional.Testing` | 将来候補 | live test helper、fake provider、record/replay support を core から外して提供できるため | まず `tests/` と `verification/` 整理を優先 |
+| `ExchangeApi.Optional.Testing` | v3.6 採用 | realtime raw frame replay / decode / diagnostic testing helper を core / venue package から外して提供できるため | simulation / Gateway / Platform / Strategy testing へ拡張しない |
 | `ExchangeApi.Optional.Resilience` | 将来候補 | retry / backoff / rate limit / circuit breaker を core 正本に入れずに提供できるため | venue・利用者ごとに要件差が大きい |
 | `ExchangeApi.Optional.Reactive` | 将来候補 | Realtime stream を `IObservable<T>` として扱いたい利用者向けに Rx integration を core から分離して提供できるため | core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する |
 | evidence 自動整理 | 将来候補 | `local/evidence/` 標準構成へ artifact / log / notes を自動配置できるため | まず標準構成だけ固定する |
@@ -22,7 +22,7 @@
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
 | venue 単位 package / project consolidation | v3 採用 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v3.0.0 で package consolidation を採用する |
 | bitFlyer Realtime API | v3.1 採用候補 | HTTP とは別軸の public market stream を venue-native surface として扱えるため | v3.1.0 は public read MVP に限定する |
-| venue 追加 | v5 候補 | v3 / v4 で realtime foundation と exchange state management の基盤を整理した後、venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
+| venue 追加 | v5 候補 | v3 / v4 で realtime foundation と Gateway-facing exchange I/O support の基盤を整理した後、venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
 
 ## 1.1 v2.1.0 採用項目
 
@@ -91,17 +91,17 @@ v3.3.0: bitFlyer private realtime read MVP candidate
 v3.4.0: bitFlyer realtime resilience foundation
 v3.5.0: realtime diagnostics foundation
 v3.6.0: realtime replay / testing foundation
-v3.7.0: realtime optional integration
+v3.7.0: realtime optional consumer integration
 v3.8.0: realtime verification / release hardening
-v4.0.0: exchange state management foundation
-v4.x: exchange state management applications
+v4.0.0: Gateway-facing exchange I/O support foundation
+v4.x: exchange observation / Gateway-facing support applications
 v5.0.0: new venue public read MVP
 v5.x: public read coverage expansion
 v6.0.0+: Unified, only if meaning is defensible
 ```
 
 v3.x は、`v3.0.0` で整理した venue package 構造の上に bitFlyer Realtime API を成熟させる track として扱う。
-v4.x は、HTTP / Realtime を問わず取得した event / response から取引所ステートを構築・管理する track として扱う。
+v4.x は、ExecutionGateway が取引所 observation / inquiry を扱いやすくするための stateless exchange I/O support track として扱う。
 新 venue 追加は v5.0.0 へ送り、Unified は v6.0.0 以降へ送る。
 
 責務境界:
@@ -117,7 +117,7 @@ v3:
   API event / response を安全に取得・記録・再現・検証するための汎用基盤
 
 v4:
-  取得した event / response から取引所ステートを構築・管理するための基盤と応用
+  取得した event / response を Gateway / Platform が使いやすい形で観測・照会するための stateless support
 ```
 
 v3 系に残すもの:
@@ -131,22 +131,21 @@ v3 系に残すもの:
 - diagnostic event schema
 - sanitized raw frame logging
 - stream replay for test / diagnostics
-- fake transport / scenario helper
+- fake transport / payload fixture helper
 - live verification / evidence helper
 - secret-free rule
 
 v4 系へ送るもの:
 
-- realtime-only local state projection
-- HTTP-only state snapshot helper
-- HTTP + realtime state coordination
-- board / account / position / order state helper
-- event history as state
-- state replay / state reconstruction
-- resync policy
-- state invalidation policy
-- state freshness / partial failure contract
-- bot-oriented live state helper
+- SymbolSpec / SizeStep / PriceStep / Capability
+- stateless order validation
+- error taxonomy 整理
+- order response / fill observation DTO の整理
+- HTTP + realtime を組み合わせやすい read surface
+- Gateway が inquiry / reconcile しやすい read API 整備
+- secret-free audit / evidence 連携
+- state freshness / partial failure の観測 contract
+- state reconstruction を行う上位層へ渡す observation contract
 
 v4 系でも ExchangeAPI に入れないもの:
 
@@ -160,7 +159,7 @@ v4 系でも ExchangeAPI に入れないもの:
 用語の使い分け:
 
 - v3 の replay は、test / diagnostics のために stream event や raw frame を再生することを指す
-- v4 の replay は、取引所ステートを再構築する state replay / state reconstruction を指す
+- v4 以降の state replay / state reconstruction は、ExchangeAPI 内ではなく Gateway / Platform 側または別建ての上位層で扱う
 
 ### v3.1.0 候補
 
@@ -279,34 +278,41 @@ v3.5.0 の実施指示は [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md)、詳細仕�
 v3.5.0 では、replay や Rx integration へ深く入らない。
 まず「記録する」「説明できる」基盤を優先する。
 
-### v3.6.0 候補
+### v3.6.0 採用範囲
 
-v3.6.0 は、Realtime Replay / Testing Foundation release 候補とする。
-目的は、起きたことを再現できるようにすることである。
+v3.6.0 は、Realtime Replay / Testing Foundation release とする。
+目的は、ExchangeAPI の realtime replay / decode / diagnostic testing を最適化することである。
+v3.6.0 の実施指示は [`docs/plan-v3.6.0.md`](./plan-v3.6.0.md) に固定する。
 
-候補:
+採用範囲:
 
-- stream replay for test / diagnostics
-- fake transport / scenario helper
+- `ExchangeApi.Optional.Testing`
+- raw frame replay for test / diagnostics
+- fake transport / payload fixture helper
 - sample payload catalog
 - deterministic replay tests
 
-v3.6.0 の replay は、state reconstruction ではなく、stream event / raw frame の test / diagnostics 用 replay に限定する。
+v3.6.0 の replay は、state reconstruction ではなく、raw frame の test / diagnostics 用 replay に限定する。
+sample payload catalog は scenario catalog ではない。
+`ExchangeApi.Optional.Testing` は simulation / Gateway / Platform / Strategy testing へ拡張しない。
 
 ### v3.7.0 候補
 
-v3.7.0 は、Realtime Optional Integration release 候補とする。
-目的は、core / venue package を太らせず、利用者が扱いやすい optional integration を提供することである。
+v3.7.0 は、Realtime Optional Consumer Integration release 候補とする。
+目的は、core / venue package を太らせず、利用者が realtime stream を扱いやすくする optional consumer adapter を検討することである。
 
 候補:
 
 - `ExchangeApi.Optional.Reactive`
-- `ExchangeApi.Optional.Realtime.Resilience`
 - `IAsyncEnumerable<T>` to `IObservable<T>` adapter
-- optional retry / backoff helper
+- DTO-only stream / stream envelope の Rx adapter
+- Rx consumer smoke / sample
+- optional package docs
 
 core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する。
 Rx dependency は optional package に限定する。
+v3.7.0 では reconnect / backoff / retry の正本や Gateway / Platform behavior testing は扱わない。
+`ExchangeApi.Optional.Testing` の replay helper と `ExchangeApi.Optional.Reactive` は別責務とし、相互依存を必須にしない。
 
 ### v3.8.0 候補
 
@@ -320,49 +326,56 @@ v3.8.0 は、Realtime Verification / Release Hardening release 候補とする�
 - release checklist
 - package smoke
 - docs consolidation
+- `ExchangeApi.Optional.Testing` / `ExchangeApi.Optional.Reactive` の package smoke 整理
+- realtime live verification / evidence runbook 整理
 
-v3.8.0 では、v4 の exchange state management へ進む前に、v3 realtime foundation の文書、検証、release 導線を整理する。
+v3.8.0 では、v4 の Gateway-facing exchange I/O support へ進む前に、v3 realtime foundation の文書、検証、release 導線を整理する。
 
-v3 系で急がないもの:
+v3 系で急がない ExchangeAPI 拡張:
 
-- realtime-only local state projection
-- HTTP-only state snapshot helper
-- HTTP + realtime state coordination
-- board / account / position / order state helper
-- state replay / state reconstruction
 - Binance realtime
 - venue 横断 realtime abstraction
 - Unified realtime abstraction
 - state-changing realtime operation
 - core / venue package への Rx dependency 追加
 
-### v4.0.0 候補
-
-v4.0.0 は、exchange state management foundation release 候補とする。
-v4 は既存 API の大掃除ではなく、v3 で整理した realtime foundation と既存 HTTP read surface を使って、取引所ステートを構築・管理するための境界を整理する release として扱う。
-ただし、[`docs/execution-boundary-policy.md`](./execution-boundary-policy.md) に従い、ExchangeAPI は stateless exchange I/O library として維持する。
-`clientOrderKey` 正本管理、retry / reconcile、open order tracking、execution state machine、ledger / position / allocation は ExchangeAPI の責務にしない。
-
-v4.0.0 候補:
+ExchangeAPI 内に直接持ち込まないもの:
 
 - realtime-only local state projection
 - HTTP-only state snapshot helper
 - HTTP + realtime state coordination
 - board / account / position / order state helper
-- event history as state
 - state replay / state reconstruction
-- resync policy
-- state invalidation policy
-- state freshness / partial failure contract
-- bot-oriented live state helper
+
+これらは ExecutionGateway / CTradeBot Platform または別建ての上位層で扱い、ExchangeAPI はそのための stateless observation / inquiry surface を提供する。
+
+### v4.0.0 候補
+
+v4.0.0 は、Gateway-facing exchange I/O support foundation release 候補とする。
+v4 は既存 API の大掃除ではなく、v3 で整理した realtime foundation と既存 HTTP read surface を使って、ExecutionGateway が取引所 observation / inquiry を扱いやすくするための stateless support を整理する release として扱う。
+ただし、[`docs/execution-boundary-policy.md`](./execution-boundary-policy.md) に従い、ExchangeAPI は stateless exchange I/O library として維持する。
+`clientOrderKey` 正本管理、retry / reconcile、open order tracking、execution state machine、ledger / position / allocation は ExchangeAPI の責務にしない。
+
+v4.0.0 候補:
+
+- SymbolSpec / SizeStep / PriceStep / Capability
+- stateless order validation
+- error taxonomy 整理
+- order response / fill observation DTO の整理
+- HTTP + realtime を組み合わせやすい read surface
+- Gateway が inquiry / reconcile しやすい read API 整備
+- secret-free audit / evidence 連携
+- state freshness / partial failure の観測 contract
+- state reconstruction を行う上位層へ渡す observation contract
 
 v4.0.0 では、state-changing operation を追加しない。
 注文、キャンセル、入金、出金などの実行系 operation は別途裁定する。
+state reconstruction 自体は ExchangeAPI 内では実装せず、ExecutionGateway / CTradeBot Platform または別建ての上位層で扱う。
 
 ### v5.0.0 候補
 
 v5.0.0 は、新しい取引所を正式追加するフェーズとする。
-v5 は既存 API の大掃除ではなく、v3 / v4 で整理した venue 構造、realtime foundation、state management 境界の拡張性を実証する release として扱う。
+v5 は既存 API の大掃除ではなく、v3 / v4 で整理した venue 構造、realtime foundation、Gateway-facing exchange I/O support 境界の拡張性を実証する release として扱う。
 
 v5.0.0 venue 追加 MVP:
 
@@ -442,10 +455,11 @@ Unified の private / account / trading capability は、利用者意図、前�
   - provider factory
   - adapter-shared config loader
 - `ExchangeApi.Optional.Testing`
-  - live test helper
-  - fake credential provider
-  - record/replay support
-  - sanitized artifact generator
+  - realtime raw frame replay helper
+  - payload fixture helper
+  - decode / diagnostic testing helper
+  - secret-free fixture validation
+  - simulation / Gateway / Platform / Strategy testing は含めない
 - `ExchangeApi.Optional.Resilience`
   - retry policy
   - backoff policy

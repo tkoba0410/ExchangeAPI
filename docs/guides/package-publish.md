@@ -35,6 +35,7 @@ v2 方針:
 
 - `ExchangeApi.Optional.Credentials` は NuGet publish 対象に含める
 - `ExchangeApi.Optional.Logging` は v2.1.0 以降の NuGet publish 対象に含める
+- `ExchangeApi.Optional.Testing` は v3.6.0 以降の NuGet publish 対象に含める
 - optional package は core library の必須依存ではない
 - `age` などの credential storage / decrypt recipe は optional package または adapter executable 側へ寄せる
 
@@ -190,6 +191,13 @@ token は次の順で取得する。
 - GitHub Packages publish: `ExchangeApi.Optional.Logging 3.4.0`
 - GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer 3.4.0`
 - bitFlyer Realtime factory / channel vocabulary / stream envelope API を参照できること
+- token、credentials、API key、API secret、signature、Authorization header が stdout / stderr に出ないこと
+
+`v3.6.0` では次を確認する:
+
+- GitHub Packages publish: `ExchangeApi.Optional.Testing 3.6.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Optional.Testing 3.6.0`
+- `RealtimeReplayFrame` / `BitflyerRealtimeReplayRunner` を参照できること
 - token、credentials、API key、API secret、signature、Authorization header が stdout / stderr に出ないこと
 
 ## Notes

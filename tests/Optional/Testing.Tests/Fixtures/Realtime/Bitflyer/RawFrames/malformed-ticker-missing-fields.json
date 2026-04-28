@@ -1,0 +1,10 @@
+{
+  "jsonrpc": "2.0",
+  "method": "channelMessage",
+  "params": {
+    "channel": "lightning_ticker_BTC_JPY",
+    "message": {
+      "product_code": "BTC_JPY"
+    }
+  }
+}

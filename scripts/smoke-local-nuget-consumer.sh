@@ -43,6 +43,10 @@ dotnet add package ExchangeApi.Optional.Logging \
   --version "${package_version}" \
   >/dev/null
 
+dotnet add package ExchangeApi.Optional.Testing \
+  --version "${package_version}" \
+  >/dev/null
+
 cat > Program.cs <<'EOF'
 using ExchangeApi.Exchanges.Bitflyer.Composition.Factory;
 using ExchangeApi.Exchanges.Bitflyer.Composition.Realtime;
@@ -54,6 +58,7 @@ using ExchangeApi.Optional.Credentials;
 using ExchangeApi.Optional.Credentials.PlainText;
 using ExchangeApi.Optional.Logging.Redaction;
 using ExchangeApi.Optional.Logging.Realtime;
+using ExchangeApi.Optional.Testing.Realtime;
 
 using var client = BitflyerClientFactory.CreateNativeClientBundle();
 await using var realtimeClient = BitflyerRealtimeClientFactory.CreatePublicClient(new SmokeRealtimeTransport());
@@ -92,6 +97,13 @@ var frameLog = frameLogFactory.Create(
     BitflyerRealtimeChannels.Ticker(ProductCodes.BtcJpy),
     DateTimeOffset.UtcNow,
     """{"api_key":"api-key","message":{"ltp":100}}""");
+var replayFrame = RealtimeReplayFrame.Create(
+    BitflyerRealtimeChannels.Ticker(ProductCodes.BtcJpy),
+    """
+    {"jsonrpc":"2.0","method":"channelMessage","params":{"channel":"lightning_ticker_BTC_JPY","message":{"product_code":"BTC_JPY","timestamp":"2026-04-27T12:34:56.789","tick_id":1,"best_bid":99,"best_ask":101,"best_bid_size":1,"best_ask_size":2,"total_bid_depth":3,"total_ask_depth":4,"ltp":100,"volume":5,"volume_by_product":6}}}
+    """,
+    DateTimeOffset.Parse("2026-04-27T12:34:56Z"));
+var replay = await BitflyerRealtimeReplayRunner.ReplayTickerAsync(ProductCodes.BtcJpy, [replayFrame]);
 
 Console.WriteLine(
     client.Public is not null &&
@@ -108,6 +120,9 @@ Console.WriteLine(
     frameLog.BodySkipped == false &&
     frameLog.Body is not null &&
     !frameLog.Body.Contains("api-key", StringComparison.Ordinal) &&
+    replay.IsSuccessful &&
+    replay.Items.Count == 1 &&
+    replay.Items[0].Ltp == 100m &&
     options.Reconnect.MaxAttempts == 0 &&
     options.IdleTimeout == TimeSpan.FromSeconds(30) &&
     session.ApiKey == "api-key" &&

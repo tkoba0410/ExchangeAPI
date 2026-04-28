@@ -1,0 +1,21 @@
+{
+  "jsonrpc": "2.0",
+  "method": "channelMessage",
+  "params": {
+    "channel": "lightning_ticker_BTC_JPY",
+    "message": {
+      "product_code": "BTC_JPY",
+      "timestamp": "2026-04-27T12:34:56.789",
+      "tick_id": 123456789,
+      "best_bid": 9999999.5,
+      "best_ask": 10000000.5,
+      "best_bid_size": 0.12345678,
+      "best_ask_size": 0.87654321,
+      "total_bid_depth": 1234.5678,
+      "total_ask_depth": 2345.6789,
+      "ltp": 10000000,
+      "volume": 3456.789,
+      "volume_by_product": 456.789
+    }
+  }
+}

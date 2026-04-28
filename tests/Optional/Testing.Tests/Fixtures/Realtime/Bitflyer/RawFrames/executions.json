@@ -1,0 +1,27 @@
+{
+  "jsonrpc": "2.0",
+  "method": "channelMessage",
+  "params": {
+    "channel": "lightning_executions_BTC_JPY",
+    "message": [
+      {
+        "id": 987654321,
+        "side": "BUY",
+        "price": 10000001,
+        "size": 0.001,
+        "exec_date": "2026-04-27T12:35:00.123",
+        "buy_child_order_acceptance_id": "JRF20260427-123500-001",
+        "sell_child_order_acceptance_id": "JRF20260427-123500-002"
+      },
+      {
+        "id": 987654322,
+        "side": "SELL",
+        "price": 9999998,
+        "size": 0.0025,
+        "exec_date": "2026-04-27T12:35:01.456",
+        "buy_child_order_acceptance_id": "JRF20260427-123501-001",
+        "sell_child_order_acceptance_id": "JRF20260427-123501-002"
+      }
+    ]
+  }
+}

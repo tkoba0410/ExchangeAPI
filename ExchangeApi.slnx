@@ -21,6 +21,9 @@
   <Folder Name="/src/Optional/Logging/">
     <Project Path="src/Optional/Logging/ExchangeApi.Optional.Logging.csproj" />
   </Folder>
+  <Folder Name="/src/Optional/Testing/">
+    <Project Path="src/Optional/Testing/ExchangeApi.Optional.Testing.csproj" />
+  </Folder>
   <Folder Name="/src/Primitives/">
     <Project Path="src/Primitives/ExchangeApi.Primitives.csproj" />
   </Folder>
@@ -44,6 +47,9 @@
   </Folder>
   <Folder Name="/tests/Optional/Logging.Tests/">
     <Project Path="tests/Optional/Logging.Tests/ExchangeApi.Optional.Logging.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Optional/Testing.Tests/">
+    <Project Path="tests/Optional/Testing.Tests/ExchangeApi.Optional.Testing.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/Exchanges/" />
   <Folder Name="/tests/Exchanges/Binance/" />

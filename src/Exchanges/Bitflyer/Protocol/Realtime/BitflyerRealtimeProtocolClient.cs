@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using ExchangeApi.Primitives.Credentials;
 
@@ -197,6 +198,8 @@ public sealed class BitflyerRealtimeProtocolClient : IBitflyerPrivateRealtimePro
                 Channel = channelProperty.GetString()!,
                 Message = messageProperty.Clone(),
                 ReceivedAt = receivedAt,
+                RawText = text,
+                RawTextLength = Encoding.UTF8.GetByteCount(text),
             };
         }
         catch (JsonException exception)

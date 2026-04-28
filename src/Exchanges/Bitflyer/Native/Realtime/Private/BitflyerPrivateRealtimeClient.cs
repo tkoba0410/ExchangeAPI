@@ -137,6 +137,11 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
         await using var session = await _credentialProvider.OpenSessionAsync(cancellationToken).ConfigureAwait(false);
         await protocol.AuthenticateAsync(session, cancellationToken).ConfigureAwait(false);
         await protocol.SubscribeAsync(channel, cancellationToken).ConfigureAwait(false);
+        yield return Diagnostic<T>(
+            channel,
+            RealtimeDiagnosticEventTypes.Subscribed,
+            RealtimeDiagnosticSeverities.Info,
+            "Subscription accepted.");
 
         try
         {
@@ -212,6 +217,12 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
                         exception);
                 }
 
+                yield return Diagnostic<T>(
+                    channel,
+                    RealtimeDiagnosticEventTypes.Reconnected,
+                    RealtimeDiagnosticSeverities.Info,
+                    "Realtime reconnect succeeded.",
+                    attempt: attempt);
                 yield return new BitflyerRealtimeReconnected<T>
                 {
                     Channel = channel,
@@ -250,6 +261,12 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
                         exception);
                 }
 
+                yield return Diagnostic<T>(
+                    channel,
+                    RealtimeDiagnosticEventTypes.Resubscribed,
+                    RealtimeDiagnosticSeverities.Info,
+                    "Realtime resubscribe succeeded.",
+                    attempt: attempt);
                 yield return new BitflyerRealtimeResubscribed<T>
                 {
                     Channel = channel,
@@ -257,6 +274,12 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
                     Attempt = attempt,
                 };
 
+                yield return Diagnostic<T>(
+                    channel,
+                    RealtimeDiagnosticEventTypes.ContinuityLost,
+                    RealtimeDiagnosticSeverities.Warning,
+                    "Realtime stream reconnected after interruption.",
+                    attempt: attempt);
                 yield return new BitflyerRealtimeContinuityLost<T>
                 {
                     Channel = channel,
@@ -293,9 +316,24 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
                 continue;
             }
 
+            pending.Enqueue(Diagnostic<T>(
+                channel,
+                RealtimeDiagnosticEventTypes.RawFrameReceived,
+                RealtimeDiagnosticSeverities.Trace,
+                "Raw realtime frame received.",
+                new Dictionary<string, string>
+                {
+                    ["payloadLength"] = (message.RawTextLength ?? 0).ToString(),
+                }));
+
             var items = DecodeOrReject(message, decode, out var rejected);
             foreach (var item in items)
             {
+                pending.Enqueue(Diagnostic<T>(
+                    channel,
+                    RealtimeDiagnosticEventTypes.MessageDecoded,
+                    RealtimeDiagnosticSeverities.Trace,
+                    "Realtime message decoded."));
                 pending.Enqueue(new BitflyerRealtimeData<T>
                 {
                     Channel = channel,
@@ -306,6 +344,12 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
 
             if (rejected is not null)
             {
+                pending.Enqueue(Diagnostic<T>(
+                    channel,
+                    RealtimeDiagnosticEventTypes.MessageRejected,
+                    RealtimeDiagnosticSeverities.Warning,
+                    rejected.Reason,
+                    errorKind: rejected.ErrorKind.ToString()));
                 pending.Enqueue(rejected);
             }
 
@@ -383,6 +427,13 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
                 "Realtime reconnect attempts were exhausted.");
         }
 
+        yield return Diagnostic<T>(
+            channel,
+            RealtimeDiagnosticEventTypes.Reconnecting,
+            RealtimeDiagnosticSeverities.Warning,
+            reason,
+            attempt: attempt);
+
         yield return new BitflyerRealtimeReconnecting<T>
         {
             Channel = channel,
@@ -409,6 +460,44 @@ public sealed class BitflyerPrivateRealtimeClient : IBitflyerPrivateRealtimeClie
         }
 
         return _protocolFactory();
+    }
+
+    private static BitflyerRealtimeDiagnostic<T> Diagnostic<T>(
+        string channel,
+        string eventType,
+        string severity,
+        string reason,
+        IReadOnlyDictionary<string, string>? attributes = null,
+        string? errorKind = null,
+        int? attempt = null)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var effectiveAttributes = attributes;
+        if (attempt is not null)
+        {
+            var values = attributes is null
+                ? new Dictionary<string, string>()
+                : new Dictionary<string, string>(attributes);
+            values["attempt"] = attempt.Value.ToString();
+            effectiveAttributes = values;
+        }
+
+        return new BitflyerRealtimeDiagnostic<T>
+        {
+            Channel = channel,
+            OccurredAt = now,
+            Diagnostic = new RealtimeDiagnosticEvent
+            {
+                EventType = eventType,
+                ObservedAt = now,
+                Venue = "bitFlyer",
+                Channel = channel,
+                Severity = severity,
+                Reason = reason,
+                ErrorKind = errorKind,
+                Attributes = effectiveAttributes,
+            },
+        };
     }
 
     private readonly record struct StreamReadResult<T>(

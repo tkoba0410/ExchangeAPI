@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
 using ExchangeApi.Primitives.Credentials;
@@ -24,6 +25,8 @@ internal sealed class FakeRealtimeProtocolClient : IBitflyerPrivateRealtimeProto
             Channel = channel,
             Message = document.RootElement.Clone(),
             ReceivedAt = receivedAt ?? DateTimeOffset.Parse("2026-04-27T00:00:00Z"),
+            RawText = payloadJson,
+            RawTextLength = Encoding.UTF8.GetByteCount(payloadJson),
         });
     }
 

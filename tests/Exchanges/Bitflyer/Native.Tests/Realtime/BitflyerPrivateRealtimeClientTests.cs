@@ -3,6 +3,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Private;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Primitives.Credentials;
+using static ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Realtime.StreamEventTestExtensions;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Realtime;
 
@@ -60,9 +61,14 @@ public sealed class BitflyerPrivateRealtimeClientTests
             """);
         await using var client = new BitflyerPrivateRealtimeClient(protocol, new FakeCredentialProvider());
 
-        var first = await StreamEventTestExtensions.ReadFirstAsync(client.SubscribeChildOrderEventsStreamAsync());
+        var events = await StreamEventTestExtensions.ReadCountAsync(
+            client.SubscribeChildOrderEventsStreamAsync(),
+            4);
 
-        var data = Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeChildOrderEventMessage>>(first);
+        AssertDiagnostic(events[0], RealtimeDiagnosticEventTypes.Subscribed, RealtimeDiagnosticSeverities.Info);
+        AssertDiagnostic(events[1], RealtimeDiagnosticEventTypes.RawFrameReceived, RealtimeDiagnosticSeverities.Trace);
+        AssertDiagnostic(events[2], RealtimeDiagnosticEventTypes.MessageDecoded, RealtimeDiagnosticSeverities.Trace);
+        var data = Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeChildOrderEventMessage>>(events[3]);
         Assert.Equal("child_order_events", data.Channel);
         Assert.Equal(ProductCodes.BtcJpy, data.Value.ProductCode);
         Assert.Equal("ORDER", data.Value.EventType);
@@ -97,14 +103,21 @@ public sealed class BitflyerPrivateRealtimeClientTests
 
         var events = await StreamEventTestExtensions.ReadCountAsync(
             client.SubscribeChildOrderEventsStreamAsync(),
-            6);
+            13);
 
-        Assert.IsType<BitflyerRealtimeReconnecting<BitflyerRealtimeChildOrderEventMessage>>(events[0]);
-        Assert.IsType<BitflyerRealtimeReconnected<BitflyerRealtimeChildOrderEventMessage>>(events[1]);
-        Assert.IsType<BitflyerRealtimeAuthenticationReplayed<BitflyerRealtimeChildOrderEventMessage>>(events[2]);
-        Assert.IsType<BitflyerRealtimeResubscribed<BitflyerRealtimeChildOrderEventMessage>>(events[3]);
-        Assert.IsType<BitflyerRealtimeContinuityLost<BitflyerRealtimeChildOrderEventMessage>>(events[4]);
-        Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeChildOrderEventMessage>>(events[5]);
+        AssertDiagnostic(events[0], RealtimeDiagnosticEventTypes.Subscribed, RealtimeDiagnosticSeverities.Info);
+        AssertDiagnostic(events[1], RealtimeDiagnosticEventTypes.Reconnecting, RealtimeDiagnosticSeverities.Warning);
+        Assert.IsType<BitflyerRealtimeReconnecting<BitflyerRealtimeChildOrderEventMessage>>(events[2]);
+        AssertDiagnostic(events[3], RealtimeDiagnosticEventTypes.Reconnected, RealtimeDiagnosticSeverities.Info);
+        Assert.IsType<BitflyerRealtimeReconnected<BitflyerRealtimeChildOrderEventMessage>>(events[4]);
+        Assert.IsType<BitflyerRealtimeAuthenticationReplayed<BitflyerRealtimeChildOrderEventMessage>>(events[5]);
+        AssertDiagnostic(events[6], RealtimeDiagnosticEventTypes.Resubscribed, RealtimeDiagnosticSeverities.Info);
+        Assert.IsType<BitflyerRealtimeResubscribed<BitflyerRealtimeChildOrderEventMessage>>(events[7]);
+        AssertDiagnostic(events[8], RealtimeDiagnosticEventTypes.ContinuityLost, RealtimeDiagnosticSeverities.Warning);
+        Assert.IsType<BitflyerRealtimeContinuityLost<BitflyerRealtimeChildOrderEventMessage>>(events[9]);
+        AssertDiagnostic(events[10], RealtimeDiagnosticEventTypes.RawFrameReceived, RealtimeDiagnosticSeverities.Trace);
+        AssertDiagnostic(events[11], RealtimeDiagnosticEventTypes.MessageDecoded, RealtimeDiagnosticSeverities.Trace);
+        Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeChildOrderEventMessage>>(events[12]);
         Assert.Equal(1, secondProtocol.AuthenticateCallCount);
         Assert.Equal([BitflyerRealtimeChannels.ChildOrderEvents()], secondProtocol.SubscribedChannels);
     }

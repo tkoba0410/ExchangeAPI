@@ -183,6 +183,54 @@ git diff --check
 
 docs-only のため、文書修正指示の完了確認では `dotnet test` は必須にしない。
 
+## 4.4 実装指示
+
+目的:
+
+- `docs/realtime-diagnostics.md` に従い、v3.5.0 Realtime Diagnostics Foundation を実装する
+- 既存 DTO-only stream は維持する
+- envelope stream に public diagnostic event を追加する
+- default では file log / evidence を作らない
+
+実装 scope:
+
+- `RealtimeDiagnosticEvent`
+- `RealtimeDiagnosticEventTypes`
+- `RealtimeDiagnosticSeverities`
+- `BitflyerRealtimeDiagnostic<T>`
+- lifecycle / message decode / reconnect の diagnostic event emission
+- raw frame metadata の observability source
+- deterministic tests
+
+実装しない:
+
+- file output / evidence writer の venue package 実装
+- HTTP 側 public API / 実装修正
+- stream replay implementation
+- fake transport / scenario helper の optional package 化
+- `ExchangeApi.Optional.Reactive`
+- `IObservable<T>` public API
+- `ExchangeApi.Optional.Realtime.Resilience`
+- state builder / state projection
+- Binance realtime
+- Unified realtime abstraction
+- state-changing operation
+
+実装方針:
+
+- core / venue package は observability event / source emission までを担当する
+- JSONL / file / evidence output は `ExchangeApi.Optional.Logging` 側の責務として残す
+- raw frame body 保存は opt-in + per-frame size limit の契約だけを実装対象にし、file rotation / sampling / channel filtering は扱わない
+- private auth payload は保存対象にしない
+
+verification:
+
+```bash
+dotnet test ExchangeApi.slnx --no-restore --filter Realtime
+dotnet test ExchangeApi.slnx --no-restore --filter Optional.Logging
+git diff --check
+```
+
 ## 5. 環境整備手順
 
 ```bash
@@ -225,4 +273,26 @@ base commit: 131d5771 Record v3.4 release completion
 build: dotnet build ExchangeApi.slnx passed
 deterministic tests: dotnet test ExchangeApi.slnx --no-restore passed
 live tests without opt-in: dotnet test ExchangeApi.LiveTests.slnx --no-restore skipped safely
+```
+
+## 8. Implementation Result
+
+```text
+date: 2026-04-28
+scope: Realtime Diagnostics Foundation
+implementation:
+  - RealtimeDiagnosticEvent public contract added
+  - RealtimeDiagnosticEventTypes / RealtimeDiagnosticSeverities constants added
+  - BitflyerRealtimeDiagnostic<T> envelope event added
+  - public / private bitFlyer realtime stream emits diagnostic events
+  - channel message carries raw frame metadata
+  - Optional.Logging realtime raw frame log record factory added
+  - raw frame body logging defaults to disabled
+  - per-frame maxRawFrameBodyBytes support added
+  - oversized / disabled / redaction-failed body is skipped without truncation
+verification:
+  - dotnet test ExchangeApi.slnx --no-restore --filter "Realtime|Optional.Logging" passed
+  - dotnet test ExchangeApi.slnx --no-restore passed
+  - dotnet test ExchangeApi.LiveTests.slnx --no-restore skipped safely
+  - git diff --check passed
 ```

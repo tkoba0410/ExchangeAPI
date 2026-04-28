@@ -17,6 +17,11 @@ public sealed record BitflyerRealtimeData<T> : BitflyerRealtimeStreamEvent<T>
     public required T Value { get; init; }
 }
 
+public sealed record BitflyerRealtimeDiagnostic<T> : BitflyerRealtimeStreamEvent<T>
+{
+    public required RealtimeDiagnosticEvent Diagnostic { get; init; }
+}
+
 public sealed record BitflyerRealtimeReconnecting<T> : BitflyerRealtimeStreamEvent<T>
 {
     public required int Attempt { get; init; }

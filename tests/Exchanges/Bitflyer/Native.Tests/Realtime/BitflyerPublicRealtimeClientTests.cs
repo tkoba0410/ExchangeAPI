@@ -3,6 +3,7 @@ using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Internal;
 using ExchangeApi.Exchanges.Bitflyer.Native.Realtime.Public;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
+using static ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Realtime.StreamEventTestExtensions;
 
 namespace ExchangeApi.Tests.Exchanges.Bitflyer.Native.Tests.Realtime;
 
@@ -39,9 +40,23 @@ public sealed class BitflyerPublicRealtimeClientTests
         protocol.EnqueueMessage("lightning_ticker_BTC_JPY", SamplePayloads.Ticker);
         await using var client = new BitflyerPublicRealtimeClient(protocol);
 
-        var first = await StreamEventTestExtensions.ReadFirstAsync(client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy));
+        var events = await StreamEventTestExtensions.ReadCountAsync(
+            client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy),
+            4);
 
-        var data = Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeTickerMessage>>(first);
+        AssertDiagnostic(
+            events[0],
+            RealtimeDiagnosticEventTypes.Subscribed,
+            RealtimeDiagnosticSeverities.Info);
+        AssertDiagnostic(
+            events[1],
+            RealtimeDiagnosticEventTypes.RawFrameReceived,
+            RealtimeDiagnosticSeverities.Trace);
+        AssertDiagnostic(
+            events[2],
+            RealtimeDiagnosticEventTypes.MessageDecoded,
+            RealtimeDiagnosticSeverities.Trace);
+        var data = Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeTickerMessage>>(events[3]);
         Assert.Equal("lightning_ticker_BTC_JPY", data.Channel);
         Assert.Equal(ProductCodes.BtcJpy, data.Value.ProductCode);
         Assert.Equal(10000000m, data.Value.Ltp);
@@ -54,9 +69,24 @@ public sealed class BitflyerPublicRealtimeClientTests
         protocol.EnqueueMessage("lightning_ticker_BTC_JPY", """{ "product_code": "BTC_JPY" }""");
         await using var client = new BitflyerPublicRealtimeClient(protocol);
 
-        var first = await StreamEventTestExtensions.ReadFirstAsync(client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy));
+        var events = await StreamEventTestExtensions.ReadCountAsync(
+            client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy),
+            4);
 
-        var rejected = Assert.IsType<BitflyerRealtimeMessageRejected<BitflyerRealtimeTickerMessage>>(first);
+        AssertDiagnostic(
+            events[0],
+            RealtimeDiagnosticEventTypes.Subscribed,
+            RealtimeDiagnosticSeverities.Info);
+        AssertDiagnostic(
+            events[1],
+            RealtimeDiagnosticEventTypes.RawFrameReceived,
+            RealtimeDiagnosticSeverities.Trace);
+        var diagnostic = AssertDiagnostic(
+            events[2],
+            RealtimeDiagnosticEventTypes.MessageRejected,
+            RealtimeDiagnosticSeverities.Warning);
+        Assert.Equal(BitflyerRealtimeErrorKind.MessageDecodeFailed.ToString(), diagnostic.ErrorKind);
+        var rejected = Assert.IsType<BitflyerRealtimeMessageRejected<BitflyerRealtimeTickerMessage>>(events[3]);
         Assert.Equal("lightning_ticker_BTC_JPY", rejected.Channel);
         Assert.Equal(BitflyerRealtimeErrorKind.MessageDecodeFailed, rejected.ErrorKind);
         Assert.DoesNotContain("BTC_JPY", rejected.Reason, StringComparison.Ordinal);
@@ -80,13 +110,20 @@ public sealed class BitflyerPublicRealtimeClientTests
 
         var events = await StreamEventTestExtensions.ReadCountAsync(
             client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy),
-            5);
+            12);
 
-        Assert.IsType<BitflyerRealtimeReconnecting<BitflyerRealtimeTickerMessage>>(events[0]);
-        Assert.IsType<BitflyerRealtimeReconnected<BitflyerRealtimeTickerMessage>>(events[1]);
-        Assert.IsType<BitflyerRealtimeResubscribed<BitflyerRealtimeTickerMessage>>(events[2]);
-        Assert.IsType<BitflyerRealtimeContinuityLost<BitflyerRealtimeTickerMessage>>(events[3]);
-        Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeTickerMessage>>(events[4]);
+        AssertDiagnostic(events[0], RealtimeDiagnosticEventTypes.Subscribed, RealtimeDiagnosticSeverities.Info);
+        AssertDiagnostic(events[1], RealtimeDiagnosticEventTypes.Reconnecting, RealtimeDiagnosticSeverities.Warning);
+        Assert.IsType<BitflyerRealtimeReconnecting<BitflyerRealtimeTickerMessage>>(events[2]);
+        AssertDiagnostic(events[3], RealtimeDiagnosticEventTypes.Reconnected, RealtimeDiagnosticSeverities.Info);
+        Assert.IsType<BitflyerRealtimeReconnected<BitflyerRealtimeTickerMessage>>(events[4]);
+        AssertDiagnostic(events[5], RealtimeDiagnosticEventTypes.Resubscribed, RealtimeDiagnosticSeverities.Info);
+        Assert.IsType<BitflyerRealtimeResubscribed<BitflyerRealtimeTickerMessage>>(events[6]);
+        AssertDiagnostic(events[7], RealtimeDiagnosticEventTypes.ContinuityLost, RealtimeDiagnosticSeverities.Warning);
+        Assert.IsType<BitflyerRealtimeContinuityLost<BitflyerRealtimeTickerMessage>>(events[8]);
+        AssertDiagnostic(events[9], RealtimeDiagnosticEventTypes.RawFrameReceived, RealtimeDiagnosticSeverities.Trace);
+        AssertDiagnostic(events[10], RealtimeDiagnosticEventTypes.MessageDecoded, RealtimeDiagnosticSeverities.Trace);
+        Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeTickerMessage>>(events[11]);
         Assert.Equal(1, secondProtocol.ConnectCallCount);
         Assert.Equal(["lightning_ticker_BTC_JPY"], secondProtocol.SubscribedChannels);
     }
@@ -392,6 +429,19 @@ internal static class StreamEventTestExtensions
 
         Assert.Equal(count, items.Count);
         return items;
+    }
+
+    internal static RealtimeDiagnosticEvent AssertDiagnostic<T>(
+        BitflyerRealtimeStreamEvent<T> streamEvent,
+        string eventType,
+        string severity)
+    {
+        var diagnostic = Assert.IsType<BitflyerRealtimeDiagnostic<T>>(streamEvent);
+        Assert.Equal(eventType, diagnostic.Diagnostic.EventType);
+        Assert.Equal(severity, diagnostic.Diagnostic.Severity);
+        Assert.Equal("bitFlyer", diagnostic.Diagnostic.Venue);
+        Assert.Equal(diagnostic.Channel, diagnostic.Diagnostic.Channel);
+        return diagnostic.Diagnostic;
     }
 }
 

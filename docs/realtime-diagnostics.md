@@ -218,6 +218,25 @@ raw frame logging は、WebSocket で受信した frame を調査可能な形で
 - HTTP 側も同じ責務分離に揃え、HTTP は `CallResult` / `CallMeta` / `CallError` を observability source とする
 - v3.5.0 では HTTP 側の public API / 実装を変更しない
 
+保存単位:
+
+- stream 全体は raw body 保存単位にしない
+- raw frame body の保存単位は received frame とする
+- 1 received frame = 1 JSONL record とする
+- diagnostic event は 1 event = 1 JSONL record とする
+- stream は `ConnectionId` / `SubscriptionId` による関連付け単位とする
+- evidence は run directory 単位で整理する
+
+size limit:
+
+- raw frame body 保存は opt-in only とする
+- `maxRawFrameBodyBytes` を 1 frame body ごとに適用する
+- `maxRawFrameBodyBytes` の初期候補は `65536` bytes とする
+- limit を超えた body は保存しない
+- limit を超えた body は truncate しない
+- body を保存しなかった場合は metadata と skip reason を残す
+- file rotation / sampling / channel filtering は v3.5.0 では扱わない
+
 記録してよいもの:
 
 - public channel の received raw frame
@@ -245,6 +264,7 @@ redaction rule:
 - `api_key`, `apiKey`, `key`, `api_secret`, `apiSecret`, `secret`, `signature`, `Authorization`, `authorization` は `[REDACTED]` に置換する。
 - key 名の大小文字差は redaction 対象にする。
 - redaction 不能な raw frame は記録せず、`RawFrameLoggingSkipped` 相当の diagnostic event を残す。
+- private auth payload、redaction 不能な payload、secret を含む payload は body を保存しない。
 
 ## 7. Evidence Layout
 
@@ -310,13 +330,7 @@ Live verification:
 
 ## 10. Open Decisions
 
-次の項目は実装前に裁定する。
-
-1. raw frame の body を常に保存するか、size limit と sampling を持つか。
-
-推奨初期案:
-
-- raw frame body は opt-in かつ size limit 付きで保存する。
+現時点で v3.5.0 実装前に必須の未裁定項目はない。
 
 ## 11. Decision Log
 
@@ -415,3 +429,37 @@ v3.5.0 での扱い:
 
 - venue package が file output まで持つ案
 - `ExchangeApi.Optional.Logging` が raw frame 取得まで含めて transport 内部へ入る案
+
+### 11.5 Raw Frame Body Save Unit And Limits
+
+採用: B+。
+
+raw frame body は opt-in の場合のみ保存できる。
+保存単位は received frame とし、1 frame = 1 JSONL record とする。
+各 frame body には `maxRawFrameBodyBytes` を適用する。
+
+採用内容:
+
+- stream 全体を raw body 保存単位にしない
+- frame 単位で保存する
+- frame body size limit を持つ
+- limit 超過時は body を保存しない
+- limit 超過時も truncate しない
+- metadata と `RawFrameLoggingSkipped` 相当の diagnostic event を残す
+- private auth payload、redaction 不能な payload、secret を含む payload は保存しない
+- file rotation / sampling / channel filtering は v3.5.0 では扱わない
+
+採用理由:
+
+- Realtime は連続 stream なので、stream 全体保存は巨大化しやすい
+- frame 単位なら `MessageRejected` と該当 frame を対応させやすい
+- per-frame size limit により異常に大きい frame body を保存せずに済む
+- truncate しないことで、壊れた JSON と redaction 不完全のリスクを避けられる
+- sampling / filtering / file rotation を v3.5.0 から外すことで初期実装を抑えられる
+
+非採用:
+
+- raw frame body を一切保存しない案
+- stream 全体を保存単位にする案
+- limit 超過 body を truncate して保存する案
+- v3.5.0 で sampling / filtering / file rotation まで扱う案

@@ -91,8 +91,9 @@ v3.3.0: bitFlyer private realtime read MVP candidate
 v3.4.0: bitFlyer realtime resilience foundation
 v3.5.0: realtime diagnostics foundation
 v3.6.0: realtime replay / testing foundation
-v3.7.0: realtime optional consumer integration
-v3.8.0: realtime verification / release hardening
+v3.7.0: realtime optional reactive integration
+v3.8.0: realtime lifecycle / contract hardening
+v3.9.0: realtime verification / release close
 v4.0.0: Exchange I/O semantics foundation
 v4.x: Exchange I/O semantics applications
 v5.0.0: new venue public read MVP
@@ -298,8 +299,8 @@ sample payload catalog は scenario catalog ではない。
 
 ### v3.7.0 候補
 
-v3.7.0 は、Realtime Optional Consumer Integration release 候補とする。
-目的は、core / venue package を太らせず、利用者が realtime stream を扱いやすくする optional consumer adapter を検討することである。
+v3.7.0 は、Realtime Optional Reactive Integration release 候補とする。
+目的は、core / venue package を太らせず、利用者が realtime stream を Rx で扱える optional consumer adapter を提供することである。
 
 候補:
 
@@ -316,20 +317,39 @@ v3.7.0 では reconnect / backoff / retry の正本や Gateway / Platform behavi
 
 ### v3.8.0 候補
 
-v3.8.0 は、Realtime Verification / Release Hardening release 候補とする。
-目的は、v3 realtime foundation を閉じられる状態にすることである。
+v3.8.0 は、Realtime Lifecycle / Contract Hardening release 候補とする。
+目的は、v3 で実装した realtime API の lifecycle と contract を固定し、利用者が挙動を予測できる状態にすることである。
+
+候補:
+
+- lifecycle event contract
+- stream status event contract
+- malformed payload handling
+- cancellation / completion / fault behavior
+- reconnect / resubscribe contract tests
+- realtime error taxonomy の最小整理
+- sample payload catalog rule
+
+v3.8.0 では、新しい realtime feature を広げず、既存 realtime surface の契約を固める。
+
+### v3.9.0 候補
+
+v3.9.0 は、Realtime Verification / Release Close release 候補とする。
+目的は、v3 realtime foundation を閉じ、v4 の Exchange I/O semantics foundation へ進める状態にすることである。
 
 候補:
 
 - public / private realtime live verification runbook 強化
 - secret scan 手順
 - release checklist
+- release notes
 - package smoke
 - docs consolidation
 - `ExchangeApi.Optional.Testing` / `ExchangeApi.Optional.Reactive` の package smoke 整理
 - realtime live verification / evidence runbook 整理
+- v4 へ渡す項目の明文化
 
-v3.8.0 では、v4 の Exchange I/O semantics foundation へ進む前に、v3 realtime foundation の文書、検証、release 導線を整理する。
+v3.9.0 では、v4 の Exchange I/O semantics foundation へ進む前に、v3 realtime foundation の文書、検証、release 導線を閉じる。
 
 v3 系で急がない ExchangeAPI 拡張:
 

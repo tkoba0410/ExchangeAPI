@@ -297,22 +297,24 @@ v3.6.0 の replay は、state reconstruction ではなく、raw frame の test /
 sample payload catalog は scenario catalog ではない。
 `ExchangeApi.Optional.Testing` は simulation / Gateway / Platform / Strategy testing へ拡張しない。
 
-### v3.7.0 候補
+### v3.7.0 採用範囲
 
-v3.7.0 は、Realtime Optional Reactive Integration release 候補とする。
+v3.7.0 は、Realtime Optional Reactive Integration release とする。
 目的は、core / venue package を太らせず、利用者が realtime stream を Rx で扱える optional consumer adapter を提供することである。
+v3.7.0 の実施指示は [`docs/plan-v3.7.0.md`](./plan-v3.7.0.md) に固定する。
 
-候補:
+採用範囲:
 
 - `ExchangeApi.Optional.Reactive`
 - `IAsyncEnumerable<T>` to `IObservable<T>` adapter
-- DTO-only stream / stream envelope の Rx adapter
+- thin generic `ToObservable(...)`
 - Rx consumer smoke / sample
 - optional package docs
 
 core / venue package の主 API は `IAsyncEnumerable<T>` のまま維持する。
 Rx dependency は optional package に限定する。
 v3.7.0 では reconnect / backoff / retry の正本や Gateway / Platform behavior testing は扱わない。
+venue-specific helper、envelope-specific helper、scheduler / buffer / retry policy は追加しない。
 `ExchangeApi.Optional.Testing` の replay helper と `ExchangeApi.Optional.Reactive` は別責務とし、相互依存を必須にしない。
 
 ### v3.8.0 候補

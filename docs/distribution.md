@@ -117,12 +117,17 @@ v3.6.0 追加対象:
 
 - `ExchangeApi.Optional.Testing`
 
+v3.7.0 追加対象:
+
+- `ExchangeApi.Optional.Reactive`
+
 役割:
 
 - `PlainText` provider など sample / test / local dev 向け実装を提供する
 - `AgeFile` provider など、core から外した credential storage / decrypt recipe を提供する
 - `IApiCredentialProvider` / `IApiCredentialSession` の core 契約を実装する
 - realtime raw frame replay / decode / diagnostic testing helper を提供する
+- `IAsyncEnumerable<T>` から `IObservable<T>` への thin generic adapter を提供する
 
 配布方針:
 
@@ -133,15 +138,18 @@ v3.6.0 追加対象:
 - optional package の生成先は library package と同じ `local/nuget/` とする
 - logging / evidence helper は `ExchangeApi.Optional.Logging` に置き、core library の必須依存にしない
 - replay / testing helper は `ExchangeApi.Optional.Testing` に置き、core / venue package の必須依存にしない
+- reactive helper は `ExchangeApi.Optional.Reactive` に置き、core / venue package の必須依存にしない
+- `System.Reactive` dependency は `ExchangeApi.Optional.Reactive` に限定する
 
 実装状態:
 
 - `src/Optional/Credentials/ExchangeApi.Optional.Credentials.csproj` は solution に含める
 - `src/Optional/Logging/ExchangeApi.Optional.Logging.csproj` は solution に含める
+- `src/Optional/Reactive/ExchangeApi.Optional.Reactive.csproj` は solution に含める
 - `src/Optional/Testing/ExchangeApi.Optional.Testing.csproj` は solution に含める
 - `scripts/pack-local-nuget.sh` は solution pack により `ExchangeApi.Optional.*` を生成対象に含める
 - `scripts/push-github-packages.sh` は `ExchangeApi.Optional.*.<version>.nupkg` を publish 対象に含める
-- package publish guide と local consumer guide は `ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging`、`ExchangeApi.Optional.Testing` の参照例を含める
+- package publish guide と local consumer guide は `ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging`、`ExchangeApi.Optional.Reactive`、`ExchangeApi.Optional.Testing` の参照例を含める
 
 ### CLI
 

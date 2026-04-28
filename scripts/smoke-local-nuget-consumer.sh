@@ -43,6 +43,10 @@ dotnet add package ExchangeApi.Optional.Logging \
   --version "${package_version}" \
   >/dev/null
 
+dotnet add package ExchangeApi.Optional.Reactive \
+  --version "${package_version}" \
+  >/dev/null
+
 dotnet add package ExchangeApi.Optional.Testing \
   --version "${package_version}" \
   >/dev/null
@@ -58,6 +62,7 @@ using ExchangeApi.Optional.Credentials;
 using ExchangeApi.Optional.Credentials.PlainText;
 using ExchangeApi.Optional.Logging.Redaction;
 using ExchangeApi.Optional.Logging.Realtime;
+using ExchangeApi.Optional.Reactive;
 using ExchangeApi.Optional.Testing.Realtime;
 
 using var client = BitflyerClientFactory.CreateNativeClientBundle();
@@ -104,6 +109,9 @@ var replayFrame = RealtimeReplayFrame.Create(
     """,
     DateTimeOffset.Parse("2026-04-27T12:34:56Z"));
 var replay = await BitflyerRealtimeReplayRunner.ReplayTickerAsync(ProductCodes.BtcJpy, [replayFrame]);
+var reactiveObserver = new SmokeObserver<int>();
+using var reactiveSubscription = Numbers().ToObservable().Subscribe(reactiveObserver);
+await reactiveObserver.Terminal.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
 Console.WriteLine(
     client.Public is not null &&
@@ -123,12 +131,21 @@ Console.WriteLine(
     replay.IsSuccessful &&
     replay.Items.Count == 1 &&
     replay.Items[0].Ltp == 100m &&
+    reactiveObserver.Completed &&
+    reactiveObserver.Items.SequenceEqual([1, 2]) &&
     options.Reconnect.MaxAttempts == 0 &&
     options.IdleTimeout == TimeSpan.FromSeconds(30) &&
     session.ApiKey == "api-key" &&
     redacted == "apiSecret=[REDACTED] payload=[REDACTED]"
         ? "consumer-smoke-ok"
         : "consumer-smoke-ng");
+
+static async IAsyncEnumerable<int> Numbers()
+{
+    await Task.Yield();
+    yield return 1;
+    yield return 2;
+}
 
 internal sealed class SmokeRealtimeTransport : IBitflyerRealtimeTransport
 {
@@ -156,6 +173,31 @@ internal sealed class SmokeRealtimeTransport : IBitflyerRealtimeTransport
     {
         await Task.CompletedTask;
         yield break;
+    }
+}
+
+internal sealed class SmokeObserver<T> : IObserver<T>
+{
+    public List<T> Items { get; } = [];
+
+    public bool Completed { get; private set; }
+
+    public TaskCompletionSource Terminal { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    public void OnCompleted()
+    {
+        Completed = true;
+        Terminal.TrySetResult();
+    }
+
+    public void OnError(Exception error)
+    {
+        Terminal.TrySetException(error);
+    }
+
+    public void OnNext(T value)
+    {
+        Items.Add(value);
     }
 }
 EOF

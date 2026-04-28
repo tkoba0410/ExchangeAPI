@@ -14,6 +14,8 @@
 - `v2.2.0` publish 後は `scripts/smoke-github-packages-consumer.sh` で consumer smoke を実行する
 - `v3.0.0` では venue package / project を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に集約する
 - `v3.4.0` では bitFlyer Realtime stream envelope / reconnect / resubscribe foundation を含む
+- `v3.6.0` では `ExchangeApi.Optional.Testing` を optional package publish 対象に含める
+- `v3.7.0` では `ExchangeApi.Optional.Reactive` を optional package publish 対象に含める
 
 ## Scope
 
@@ -36,6 +38,7 @@ v2 方針:
 - `ExchangeApi.Optional.Credentials` は NuGet publish 対象に含める
 - `ExchangeApi.Optional.Logging` は v2.1.0 以降の NuGet publish 対象に含める
 - `ExchangeApi.Optional.Testing` は v3.6.0 以降の NuGet publish 対象に含める
+- `ExchangeApi.Optional.Reactive` は v3.7.0 以降の NuGet publish 対象に含める
 - optional package は core library の必須依存ではない
 - `age` などの credential storage / decrypt recipe は optional package または adapter executable 側へ寄せる
 

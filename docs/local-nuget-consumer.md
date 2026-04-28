@@ -128,9 +128,9 @@ ExchangeAPI repo 側で local feed と v3 API surface の consumer smoke を確�
 bash scripts/smoke-local-nuget-consumer.sh 3.4.0-local.check
 ```
 
-この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer`、`ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging`、`ExchangeApi.Optional.Testing` を local feed から restore して build / run する。
+この smoke は一時 consumer project を作成し、`ExchangeApi.Exchanges.Bitflyer`、`ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging`、`ExchangeApi.Optional.Reactive`、`ExchangeApi.Optional.Testing` を local feed から restore して build / run する。
 実 API には接続しない。
-`BitflyerClientFactory`、`BitflyerRealtimeClientFactory`、`BitflyerRealtimeChannels`、`BitflyerRealtimeStreamEvent<T>`、`BitflyerRealtimeClientOptions`、`PlainTextApiCredentialProviderFactory`、`Redactor`、`RealtimeReplayFrame`、`BitflyerRealtimeReplayRunner` を参照できること、secret value が `[REDACTED]` になること、smoke output が secret-free であることを確認する。
+`BitflyerClientFactory`、`BitflyerRealtimeClientFactory`、`BitflyerRealtimeChannels`、`BitflyerRealtimeStreamEvent<T>`、`BitflyerRealtimeClientOptions`、`PlainTextApiCredentialProviderFactory`、`Redactor`、`ToObservable(...)`、`RealtimeReplayFrame`、`BitflyerRealtimeReplayRunner` を参照できること、secret value が `[REDACTED]` になること、smoke output が secret-free であることを確認する。
 
 ## 6. Version 更新ルール
 

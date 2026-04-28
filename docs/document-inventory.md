@@ -76,6 +76,8 @@
   - v3.4.0 planning / release scope 文書として維持する
 - [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md)
   - v3.5.0 Realtime Diagnostics Foundation 実施指示として維持する
+- [`docs/plan-v3.6.0.md`](./plan-v3.6.0.md)
+  - v3.6.0 Realtime Replay / Testing Foundation 準備指示として維持する
 - [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md)
   - bitFlyer Realtime API の opt-in live verification runbook として維持する
 - [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md)

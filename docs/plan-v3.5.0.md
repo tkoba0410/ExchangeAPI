@@ -327,3 +327,58 @@ bash scripts/run-release-preflight.sh 3.5.0-local.preflight linux-x64
 dotnet test ExchangeApi.LiveTests.slnx --no-restore
 git diff --check
 ```
+
+## 10. Release Close 指示
+
+目的:
+
+`v3.5.0` を Realtime Diagnostics Foundation release として閉じる。
+release close では新機能を追加せず、local preflight 済み commit を `main` に入れ、release version preflight / tag / package publish / GitHub Release / checklist 更新まで行う。
+
+前提:
+
+- `codex/v3.5-dev` が release candidate として clean
+- local preflight が `3.5.0-local.preflight` で通っている
+- `docs/release-checklist-v3.5.0.md` が local preflight result を持っている
+- `docs/release-notes/v3.5.0.md` がある
+- replay / Rx / state management / Binance realtime / Unified / state-changing operation は含めない
+
+release close 手順:
+
+```bash
+git checkout main
+git pull --ff-only origin main
+git merge --ff-only codex/v3.5-dev
+
+dotnet build ExchangeApi.slnx
+dotnet test ExchangeApi.slnx --no-restore
+bash scripts/pack-local-nuget.sh 3.5.0
+bash scripts/smoke-local-nuget-consumer.sh 3.5.0
+bash scripts/create-release-assets.sh 3.5.0 linux-x64 Release
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+
+git tag -a v3.5.0 -m "Release v3.5.0"
+git push origin main
+git push origin v3.5.0
+
+bash scripts/push-github-packages.sh 3.5.0
+bash scripts/smoke-github-packages-consumer.sh 3.5.0
+```
+
+GitHub Release:
+
+- tag: `v3.5.0`
+- title: `v3.5.0`
+- body source: `docs/release-notes/v3.5.0.md`
+- attach:
+  - `local/publish/release-assets/v3.5.0/exchangeapi-linux-x64`
+  - `local/publish/release-assets/v3.5.0/exchangeapi-linux-x64.sha256`
+  - `local/publish/release-assets/v3.5.0/exchangeapi-mcp-linux-x64`
+  - `local/publish/release-assets/v3.5.0/exchangeapi-mcp-linux-x64.sha256`
+
+release 後:
+
+- `docs/release-checklist-v3.5.0.md` の release result を更新する
+- 必要なら `docs/release-notes/v3.5.0.md` の verification summary を実行済み結果に揃える
+- release completion commit を `main` に追加して push する
+- working tree を clean にする

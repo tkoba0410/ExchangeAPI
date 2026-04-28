@@ -88,3 +88,32 @@ git checkout -b codex/v3.6-dev
 - `docs/document-inventory.md` が v3.6 plan を参照している
 - v3.6.0 の詳細 scope は未確定として残っている
 - working tree が clean である
+
+## 8. Execution Boundary Policy 文書化指示
+
+目的:
+
+ExchangeAPI / ExecutionGateway / CTradeBot Platform の責務境界を roadmap と分離した独立文書として固定する。
+v3.x の Realtime API foundation track は変更しない。
+v4.x 以降では、ExchangeAPI に stateful execution boundary を入れず、ExecutionGateway が使いやすい stateless exchange I/O surface を整える方針を明記する。
+
+実施する:
+
+- `docs/execution-boundary-policy.md` を追加する
+- `docs/roadmap-post-v2.md` から `docs/execution-boundary-policy.md` を参照する
+- `docs/document-inventory.md` に `docs/execution-boundary-policy.md` を登録する
+
+実施しない:
+
+- v3.6.0 の実装 scope 確定
+- public API 追加
+- package / project 構成変更
+- ExecutionGateway 実装
+- CTradeBot Platform 実装
+
+完了条件:
+
+- ExchangeAPI / ExecutionGateway / CTradeBot Platform の責務境界が独立文書で読める
+- roadmap が責務境界ポリシーを参照している
+- v3.x track は変更されていない
+- v4.x 以降で ExchangeAPI に置かない stateful execution 責務が明記されている

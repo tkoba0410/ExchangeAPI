@@ -22,6 +22,8 @@
   - bitFlyer Realtime API の設計正本として維持する
 - [`docs/realtime-diagnostics.md`](./realtime-diagnostics.md)
   - Realtime diagnostics の設計正本として維持する
+- [`docs/execution-boundary-policy.md`](./execution-boundary-policy.md)
+  - ExchangeAPI / ExecutionGateway / CTradeBot Platform の責務境界ポリシーとして維持する
 - [`docs/venue-onboarding.md`](./venue-onboarding.md)
   - new venue onboarding guide / checklist / template として維持する
 - [`docs/endpoints-binance.md`](./endpoints-binance.md)

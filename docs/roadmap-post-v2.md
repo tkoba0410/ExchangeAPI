@@ -104,6 +104,12 @@ v3.x は、`v3.0.0` で整理した venue package 構造の上に bitFlyer Realt
 v4.x は、HTTP / Realtime を問わず取得した event / response から取引所ステートを構築・管理する track として扱う。
 新 venue 追加は v5.0.0 へ送り、Unified は v6.0.0 以降へ送る。
 
+責務境界:
+
+ExchangeAPI / ExecutionGateway / CTradeBot Platform の責務境界は [`docs/execution-boundary-policy.md`](./execution-boundary-policy.md) を参照する。
+v3.x の Realtime API foundation track は維持する。
+v4.x 以降では、ExchangeAPI に stateful execution boundary を入れず、ExecutionGateway が使いやすい stateless exchange I/O surface を整える方針を採る。
+
 v3 / v4 境界:
 
 ```text
@@ -141,6 +147,15 @@ v4 系へ送るもの:
 - state invalidation policy
 - state freshness / partial failure contract
 - bot-oriented live state helper
+
+v4 系でも ExchangeAPI に入れないもの:
+
+- `clientOrderKey` 正本管理
+- retry / reconcile の正本
+- open order tracking
+- execution state machine
+- ledger / position / allocation
+- Bot 固有 SAFE MODE 判断
 
 用語の使い分け:
 
@@ -325,6 +340,8 @@ v3 系で急がないもの:
 
 v4.0.0 は、exchange state management foundation release 候補とする。
 v4 は既存 API の大掃除ではなく、v3 で整理した realtime foundation と既存 HTTP read surface を使って、取引所ステートを構築・管理するための境界を整理する release として扱う。
+ただし、[`docs/execution-boundary-policy.md`](./execution-boundary-policy.md) に従い、ExchangeAPI は stateless exchange I/O library として維持する。
+`clientOrderKey` 正本管理、retry / reconcile、open order tracking、execution state machine、ledger / position / allocation は ExchangeAPI の責務にしない。
 
 v4.0.0 候補:
 

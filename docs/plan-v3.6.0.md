@@ -1,4 +1,4 @@
-# v3.6.0 Realtime Replay / Testing Foundation 準備指示
+# v3.6.0 Realtime Replay / Testing Foundation 実施指示
 
 最終更新: 2026-04-28
 位置づけ: v3.6.0 Realtime Replay / Testing Foundation 実施指示
@@ -7,10 +7,11 @@
 
 ## 1. 目的
 
-v3.6.0 は、v3.5.0 で追加した Realtime Diagnostics Foundation の上に、Realtime Replay / Testing Foundation を検討する release として開始する。
+v3.6.0 は、v3.5.0 で追加した Realtime Diagnostics Foundation の上に、Realtime Replay / Testing Foundation を実装する release とする。
 
-この準備指示では、実装 scope をまだ確定しない。
-まず branch と文書の入口を用意し、次に方針を裁定してから v3.6.0 の正式 scope / non-scope / verification / 完了条件を本書へ固定する。
+v3.6.0 の中心は `ExchangeApi.Optional.Testing` MVP である。
+これは ExchangeAPI 層内で閉じる testing utility とし、bitFlyer public realtime raw frame replay / decode / diagnostic testing の最適化に限定する。
+simulation、Gateway / Platform behavior testing、strategy logic testing は含めない。
 
 ## 2. 前提
 
@@ -212,7 +213,7 @@ git checkout -b codex/v3.6-dev
 - `codex/v3.6-dev` が `main` から作成されている
 - `docs/plan-v3.6.0.md` が追加されている
 - `docs/document-inventory.md` が v3.6 plan を参照している
-- v3.6.0 の詳細 scope は未確定として残っている
+- v3.6.0 の詳細 scope は後続の裁定で固定する
 - working tree が clean である
 
 ## 8. Execution Boundary Policy 文書化指示
@@ -387,4 +388,38 @@ ExchangeApi.Optional.Credentials.3.6.0-local.replay-testing.nupkg
 ExchangeApi.Optional.Logging.3.6.0-local.replay-testing.nupkg
 ExchangeApi.Optional.Testing.3.6.0-local.replay-testing.nupkg
 ExchangeApi.Primitives.3.6.0-local.replay-testing.nupkg
+```
+
+## 14. Review 指示
+
+目的:
+
+v3.6.0 実装が、裁定済みの責務境界と scope guard に沿っていることを確認する。
+
+確認する:
+
+- `ExchangeApi.Optional.Testing` の public API が最小である
+- `ExchangeApi.Optional.Testing` が ExchangeAPI 層内で閉じている
+- `ExchangeApi.Optional.Testing` から `ExchangeApi.Optional.Logging` への直接 project reference がない
+- `ExchangeApi.Optional.Testing` に simulation / scenario / Gateway / Platform / Strategy testing API がない
+- sample payload catalog が payload catalog であり、scenario catalog ではない
+- sample payload catalog に credential / signature / auth / account detail が含まれていない
+- local / GitHub Packages consumer smoke が `ExchangeApi.Optional.Testing` を確認している
+
+必要なら修正する:
+
+- scope が広く見える命名や文書
+- missing deterministic tests
+- secret-free fixture validation
+- stale preparation wording
+
+review result:
+
+```text
+public API review: minimal replay frame / runner / result surface only
+dependency review: no ExchangeApi.Optional.Logging reference from ExchangeApi.Optional.Testing
+scope review: no simulation / Gateway / Platform / Strategy testing API in Optional.Testing
+fixture review: sample payload catalog stays under tests/Optional/Testing.Tests/Fixtures/Realtime/Bitflyer/RawFrames
+documentation review: stale preparation wording corrected
+additional test: fixture catalog secret-free validation added
 ```

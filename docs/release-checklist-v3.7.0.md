@@ -3,7 +3,7 @@
 最終更新: 2026-04-29
 位置づけ: v3.7.0 release checklist
 
-状態: release preflight passed / release pending
+状態: v3.7.0 released
 
 ## 1. Scope Confirmation
 
@@ -131,27 +131,27 @@ bash scripts/smoke-github-packages-consumer.sh 3.7.0
 
 確認項目:
 
-- [ ] `ExchangeApi.Exchanges.Bitflyer 3.7.0` を restore / build / run できる
-- [ ] `ExchangeApi.Exchanges.Binance 3.7.0` を restore / build / run できる
-- [ ] `ExchangeApi.Primitives 3.7.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Credentials 3.7.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Logging 3.7.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Reactive 3.7.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Testing 3.7.0` を restore / build / run できる
-- [ ] token / secret が stdout / stderr に出ない
+- [x] `ExchangeApi.Exchanges.Bitflyer 3.7.0` を restore / build / run できる
+- [x] `ExchangeApi.Exchanges.Binance 3.7.0` を restore / build / run できる
+- [x] `ExchangeApi.Primitives 3.7.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Credentials 3.7.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Logging 3.7.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Reactive 3.7.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Testing 3.7.0` を restore / build / run できる
+- [x] token / secret が stdout / stderr に出ない
 
 ## 6. Release Gate
 
-- [ ] Git working tree が release 前に clean である
+- [x] Git working tree が release 前に clean である
 - [x] local preflight が通っている
 - [x] release preflight が通っている
 - [x] live tests が opt-in なしで skip する
-- [ ] `main` に `v3.7.0` commit が入っている
-- [ ] `v3.7.0` tag が remote にある
-- [ ] GitHub Release が作成されている
-- [ ] release assets が attach されている
-- [ ] GitHub Packages smoke が通っている
-- [ ] `v3.7.0` に scheduler / buffer / retry / reconnect / lifecycle hardening / state reconstruction / simulation / Gateway / Platform behavior が含まれていない
+- [x] `main` に `v3.7.0` commit が入っている
+- [x] `v3.7.0` tag が remote にある
+- [x] GitHub Release が作成されている
+- [x] release assets が attach されている
+- [x] GitHub Packages smoke が通っている
+- [x] `v3.7.0` に scheduler / buffer / retry / reconnect / lifecycle hardening / state reconstruction / simulation / Gateway / Platform behavior が含まれていない
 
 local preflight result:
 
@@ -222,5 +222,33 @@ forbidden layer package check:
 release result:
 
 ```text
-pending
+2026-04-29 released
+
+main:
+- 102edc3246ba75464b84f50515496763756eca67
+
+tag:
+- v3.7.0
+
+GitHub Release:
+- https://github.com/tkoba0410/ExchangeAPI/releases/tag/v3.7.0
+
+publish:
+- bash scripts/push-github-packages.sh 3.7.0
+- bash scripts/smoke-github-packages-consumer.sh 3.7.0
+
+published packages:
+- ExchangeApi.Exchanges.Binance.3.7.0
+- ExchangeApi.Exchanges.Bitflyer.3.7.0
+- ExchangeApi.Optional.Credentials.3.7.0
+- ExchangeApi.Optional.Logging.3.7.0
+- ExchangeApi.Optional.Reactive.3.7.0
+- ExchangeApi.Optional.Testing.3.7.0
+- ExchangeApi.Primitives.3.7.0
+
+attached assets:
+- exchangeapi-linux-x64
+- exchangeapi-linux-x64.sha256
+- exchangeapi-mcp-linux-x64
+- exchangeapi-mcp-linux-x64.sha256
 ```

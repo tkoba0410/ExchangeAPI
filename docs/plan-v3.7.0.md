@@ -3,7 +3,7 @@
 最終更新: 2026-04-29
 位置づけ: v3.7.0 Realtime Optional Reactive Integration 実施指示
 
-状態: implementation-ready scope
+状態: close preparation
 
 ## 1. 目的
 
@@ -198,3 +198,73 @@ ExchangeApi.Optional.Reactive.3.7.0-local.reactive.nupkg
 ExchangeApi.Optional.Testing.3.7.0-local.reactive.nupkg
 ExchangeApi.Primitives.3.7.0-local.reactive.nupkg
 ```
+
+## 9. Release Close Preparation 指示
+
+目的:
+
+v3.7.0 を Realtime Optional Reactive Integration release として閉じる。
+v3.7.0 には `ExchangeApi.Optional.Reactive` と thin generic `ToObservable(...)` adapter を含める。
+v3.8.0 以降の lifecycle / contract hardening、release close 整理は含めない。
+
+実施する:
+
+- `docs/release-checklist-v3.7.0.md` を追加する
+- `docs/release-notes/v3.7.0.md` を追加する
+- `docs/document-inventory.md` に v3.7 release checklist / release notes を登録する
+- release-candidate preflight を実行する
+- live tests が opt-in なしで skip することを確認する
+- package generation に `ExchangeApi.Optional.Reactive` が含まれることを確認する
+- `System.Reactive` dependency が `ExchangeApi.Optional.Reactive` に閉じていることを確認する
+- stdout / stderr / logs / evidence に secret が残らないことを確認する
+
+実施しない:
+
+- venue-specific reactive helper
+- envelope-specific helper
+- scheduler overload
+- buffering
+- retry / reconnect / backoff
+- stream health operator
+- lifecycle / contract hardening
+- state reconstruction
+- simulation / Gateway / Platform behavior
+- Binance realtime
+- Unified
+- state-changing operation
+
+release-candidate preflight:
+
+```bash
+bash scripts/run-release-preflight.sh 3.7.0-local.preflight linux-x64
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+git diff --check
+```
+
+release preflight:
+
+```bash
+bash scripts/run-release-preflight.sh 3.7.0 linux-x64
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+git diff --check
+```
+
+release 完了後に実施する:
+
+- `main` に merge する
+- `v3.7.0` tag を作成 / push する
+- `bash scripts/push-github-packages.sh 3.7.0` を実行する
+- `bash scripts/smoke-github-packages-consumer.sh 3.7.0` を実行する
+- GitHub Release `v3.7.0` を作成する
+- release checklist に release result を反映する
+- v3.8.0 preparation に進む
+
+完了条件:
+
+- `docs/release-checklist-v3.7.0.md` が preflight / release gate を持っている
+- `docs/release-notes/v3.7.0.md` が利用者向け変更点を説明している
+- release-candidate preflight が通っている
+- release preflight が通っている
+- live tests が opt-in なしで skip する
+- GitHub Packages smoke が `ExchangeApi.Optional.Reactive` を確認している
+- v3.7.0 に scheduler / buffer / retry / reconnect / lifecycle hardening / state reconstruction / simulation / Gateway / Platform behavior が含まれていない

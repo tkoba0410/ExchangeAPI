@@ -3,7 +3,19 @@
 最終更新: 2026-04-29
 位置づけ: v3.6.0 release checklist
 
-状態: release preflight passed / release pending
+状態: `v3.6.0` released
+
+release 完了日: 2026-04-29
+
+完了済み:
+
+- deterministic tests / local pack / local consumer smoke
+- live tests safe skip without opt-in
+- GitHub Packages publish: library / optional packages `3.6.0`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer`, `ExchangeApi.Exchanges.Binance`, `ExchangeApi.Primitives`, `ExchangeApi.Optional.Credentials`, `ExchangeApi.Optional.Logging`, `ExchangeApi.Optional.Testing`
+- tag: `v3.6.0`
+- GitHub Release: `v3.6.0`
+- release assets: `exchangeapi-linux-x64`, `exchangeapi-linux-x64.sha256`, `exchangeapi-mcp-linux-x64`, `exchangeapi-mcp-linux-x64.sha256`
 
 ## 1. Scope Confirmation
 
@@ -118,26 +130,26 @@ bash scripts/smoke-github-packages-consumer.sh 3.6.0
 
 確認項目:
 
-- [ ] `ExchangeApi.Exchanges.Bitflyer 3.6.0` を restore / build / run できる
-- [ ] `ExchangeApi.Exchanges.Binance 3.6.0` を restore / build / run できる
-- [ ] `ExchangeApi.Primitives 3.6.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Credentials 3.6.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Logging 3.6.0` を restore / build / run できる
-- [ ] `ExchangeApi.Optional.Testing 3.6.0` を restore / build / run できる
-- [ ] token / secret が stdout / stderr に出ない
+- [x] `ExchangeApi.Exchanges.Bitflyer 3.6.0` を restore / build / run できる
+- [x] `ExchangeApi.Exchanges.Binance 3.6.0` を restore / build / run できる
+- [x] `ExchangeApi.Primitives 3.6.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Credentials 3.6.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Logging 3.6.0` を restore / build / run できる
+- [x] `ExchangeApi.Optional.Testing 3.6.0` を restore / build / run できる
+- [x] token / secret が stdout / stderr に出ない
 
 ## 6. Release Gate
 
-- [ ] Git working tree が release 前に clean である
+- [x] Git working tree が release 前に clean である
 - [x] local preflight が通っている
 - [x] release preflight が通っている
 - [x] live tests が opt-in なしで skip する
-- [ ] `main` に `v3.6.0` commit が入っている
-- [ ] `v3.6.0` tag が remote にある
-- [ ] GitHub Release が作成されている
-- [ ] release assets が attach されている
-- [ ] GitHub Packages smoke が通っている
-- [ ] `v3.6.0` に Rx / lifecycle hardening / state reconstruction / simulation / Gateway / Platform / Strategy testing が含まれていない
+- [x] `main` に `v3.6.0` commit が入っている
+- [x] `v3.6.0` tag が remote にある
+- [x] GitHub Release が作成されている
+- [x] release assets が attach されている
+- [x] GitHub Packages smoke が通っている
+- [x] `v3.6.0` に Rx / lifecycle hardening / state reconstruction / simulation / Gateway / Platform / Strategy testing が含まれていない
 
 local preflight result:
 
@@ -202,5 +214,22 @@ release assets:
 release result:
 
 ```text
-pending
+date: 2026-04-29
+main push: passed
+tag push: v3.6.0 passed
+package publish: GITHUB_TOKEN="$(gh auth token)" bash scripts/push-github-packages.sh 3.6.0 passed
+GitHub Packages consumer smoke: bash scripts/smoke-github-packages-consumer.sh 3.6.0 passed
+GitHub Release: https://github.com/tkoba0410/ExchangeAPI/releases/tag/v3.6.0
+packages:
+  ExchangeApi.Exchanges.Binance.3.6.0.nupkg
+  ExchangeApi.Exchanges.Bitflyer.3.6.0.nupkg
+  ExchangeApi.Optional.Credentials.3.6.0.nupkg
+  ExchangeApi.Optional.Logging.3.6.0.nupkg
+  ExchangeApi.Optional.Testing.3.6.0.nupkg
+  ExchangeApi.Primitives.3.6.0.nupkg
+release assets:
+  local/publish/release-assets/v3.6.0/exchangeapi-linux-x64
+  local/publish/release-assets/v3.6.0/exchangeapi-linux-x64.sha256
+  local/publish/release-assets/v3.6.0/exchangeapi-mcp-linux-x64
+  local/publish/release-assets/v3.6.0/exchangeapi-mcp-linux-x64.sha256
 ```

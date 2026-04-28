@@ -296,3 +296,34 @@ verification:
   - dotnet test ExchangeApi.LiveTests.slnx --no-restore skipped safely
   - git diff --check passed
 ```
+
+## 9. Close Preparation 指示
+
+目的:
+
+- v3.5.0 の release close 前に必要な release 文書と local preflight を完了する
+- GitHub Packages publish / GitHub Release / tag 作成の前段までを整える
+
+実施する:
+
+- `docs/release-checklist-v3.5.0.md` を追加する
+- `docs/release-notes/v3.5.0.md` を追加する
+- `docs/document-inventory.md` に v3.5 release 文書を登録する
+- local consumer smoke で realtime diagnostics surface を確認する
+- local release-candidate preflight を実行する
+- live tests が opt-in なしで skip することを確認する
+
+実施しない:
+
+- `main` への merge
+- `v3.5.0` tag 作成
+- GitHub Packages publish
+- GitHub Release 作成
+
+verification:
+
+```bash
+bash scripts/run-release-preflight.sh 3.5.0-local.preflight linux-x64
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+git diff --check
+```

@@ -53,6 +53,7 @@ using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
 using ExchangeApi.Optional.Credentials;
 using ExchangeApi.Optional.Credentials.PlainText;
 using ExchangeApi.Optional.Logging.Redaction;
+using ExchangeApi.Optional.Logging.Realtime;
 
 using var client = BitflyerClientFactory.CreateNativeClientBundle();
 await using var realtimeClient = BitflyerRealtimeClientFactory.CreatePublicClient(new SmokeRealtimeTransport());
@@ -72,6 +73,25 @@ var options = new BitflyerRealtimeClientOptions
 await using var session = await provider.OpenSessionAsync();
 var redactor = new Redactor(new RedactionOptions { SensitiveValues = ["secret-value"] });
 var redacted = redactor.RedactText("apiSecret=api-secret payload=secret-value");
+var diagnostic = new RealtimeDiagnosticEvent
+{
+    EventType = RealtimeDiagnosticEventTypes.MessageRejected,
+    ObservedAt = DateTimeOffset.UtcNow,
+    Venue = "bitFlyer",
+    Channel = BitflyerRealtimeChannels.Ticker(ProductCodes.BtcJpy),
+    Severity = RealtimeDiagnosticSeverities.Warning,
+    Reason = "Smoke",
+};
+var frameLogFactory = new RealtimeRawFrameLogRecordFactory(new RealtimeRawFrameLogOptions
+{
+    IncludeBody = true,
+    MaxRawFrameBodyBytes = 65536,
+});
+var frameLog = frameLogFactory.Create(
+    "bitFlyer",
+    BitflyerRealtimeChannels.Ticker(ProductCodes.BtcJpy),
+    DateTimeOffset.UtcNow,
+    """{"api_key":"api-key","message":{"ltp":100}}""");
 
 Console.WriteLine(
     client.Public is not null &&
@@ -82,6 +102,12 @@ Console.WriteLine(
     BitflyerRealtimeChannels.ChildOrderEvents() == "child_order_events" &&
     BitflyerRealtimeChannels.ParentOrderEvents() == "parent_order_events" &&
     typeof(BitflyerRealtimeStreamEvent<>).Name == "BitflyerRealtimeStreamEvent`1" &&
+    typeof(BitflyerRealtimeDiagnostic<>).Name == "BitflyerRealtimeDiagnostic`1" &&
+    diagnostic.EventType == RealtimeDiagnosticEventTypes.MessageRejected &&
+    diagnostic.Severity == RealtimeDiagnosticSeverities.Warning &&
+    frameLog.BodySkipped == false &&
+    frameLog.Body is not null &&
+    !frameLog.Body.Contains("api-key", StringComparison.Ordinal) &&
     options.Reconnect.MaxAttempts == 0 &&
     options.IdleTimeout == TimeSpan.FromSeconds(30) &&
     session.ApiKey == "api-key" &&

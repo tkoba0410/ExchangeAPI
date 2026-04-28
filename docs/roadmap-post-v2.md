@@ -22,7 +22,7 @@
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
 | venue 単位 package / project consolidation | v3 採用 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v3.0.0 で package consolidation を採用する |
 | bitFlyer Realtime API | v3.1 採用候補 | HTTP とは別軸の public market stream を venue-native surface として扱えるため | v3.1.0 は public read MVP に限定する |
-| venue 追加 | v5 候補 | v3 / v4 で realtime foundation と Gateway-facing exchange I/O support の基盤を整理した後、venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
+| venue 追加 | v5 候補 | v3 / v4 で realtime foundation と Exchange I/O semantics foundation を整理した後、venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
 
 ## 1.1 v2.1.0 採用項目
 
@@ -93,22 +93,22 @@ v3.5.0: realtime diagnostics foundation
 v3.6.0: realtime replay / testing foundation
 v3.7.0: realtime optional consumer integration
 v3.8.0: realtime verification / release hardening
-v4.0.0: Gateway-facing exchange I/O support foundation
-v4.x: exchange observation / Gateway-facing support applications
+v4.0.0: Exchange I/O semantics foundation
+v4.x: Exchange I/O semantics applications
 v5.0.0: new venue public read MVP
 v5.x: public read coverage expansion
 v6.0.0+: Unified, only if meaning is defensible
 ```
 
 v3.x は、`v3.0.0` で整理した venue package 構造の上に bitFlyer Realtime API を成熟させる track として扱う。
-v4.x は、ExecutionGateway が取引所 observation / inquiry を扱いやすくするための stateless exchange I/O support track として扱う。
+v4.x は、取引所 I/O の意味情報、制約、観測情報を reusable に整える Exchange I/O semantics track として扱う。
 新 venue 追加は v5.0.0 へ送り、Unified は v6.0.0 以降へ送る。
 
 責務境界:
 
 ExchangeAPI / ExecutionGateway / CTradeBot Platform の責務境界は [`docs/execution-boundary-policy.md`](./execution-boundary-policy.md) を参照する。
 v3.x の Realtime API foundation track は維持する。
-v4.x 以降では、ExchangeAPI に stateful execution boundary を入れず、ExecutionGateway が使いやすい stateless exchange I/O surface を整える方針を採る。
+v4.x 以降では、ExchangeAPI に stateful execution boundary を入れず、Gateway、CLI、検証ツール、監視ツールなどが再利用できる stateless exchange I/O semantics surface を整える方針を採る。
 
 v3 / v4 境界:
 
@@ -117,7 +117,7 @@ v3:
   API event / response を安全に取得・記録・再現・検証するための汎用基盤
 
 v4:
-  取得した event / response を Gateway / Platform が使いやすい形で観測・照会するための stateless support
+  取得した event / response の意味情報、制約、観測情報を reusable に扱うための stateless semantics support
 ```
 
 v3 系に残すもの:
@@ -142,7 +142,7 @@ v4 系へ送るもの:
 - error taxonomy 整理
 - order response / fill observation DTO の整理
 - HTTP + realtime を組み合わせやすい read surface
-- Gateway が inquiry / reconcile しやすい read API 整備
+- upper layer が inquiry / reconcile しやすい read API 整備
 - secret-free audit / evidence 連携
 - state freshness / partial failure の観測 contract
 - state reconstruction を行う上位層へ渡す observation contract
@@ -329,7 +329,7 @@ v3.8.0 は、Realtime Verification / Release Hardening release 候補とする�
 - `ExchangeApi.Optional.Testing` / `ExchangeApi.Optional.Reactive` の package smoke 整理
 - realtime live verification / evidence runbook 整理
 
-v3.8.0 では、v4 の Gateway-facing exchange I/O support へ進む前に、v3 realtime foundation の文書、検証、release 導線を整理する。
+v3.8.0 では、v4 の Exchange I/O semantics foundation へ進む前に、v3 realtime foundation の文書、検証、release 導線を整理する。
 
 v3 系で急がない ExchangeAPI 拡張:
 
@@ -347,12 +347,12 @@ ExchangeAPI 内に直接持ち込まないもの:
 - board / account / position / order state helper
 - state replay / state reconstruction
 
-これらは ExecutionGateway / CTradeBot Platform または別建ての上位層で扱い、ExchangeAPI はそのための stateless observation / inquiry surface を提供する。
+これらは ExecutionGateway / CTradeBot Platform または別建ての上位層で扱い、ExchangeAPI はそのために再利用できる stateless semantics / observation / inquiry surface を提供する。
 
 ### v4.0.0 候補
 
-v4.0.0 は、Gateway-facing exchange I/O support foundation release 候補とする。
-v4 は既存 API の大掃除ではなく、v3 で整理した realtime foundation と既存 HTTP read surface を使って、ExecutionGateway が取引所 observation / inquiry を扱いやすくするための stateless support を整理する release として扱う。
+v4.0.0 は、Exchange I/O semantics foundation release 候補とする。
+v4 は既存 API の大掃除ではなく、v3 で整理した realtime foundation と既存 HTTP read surface を使って、取引所 I/O の意味情報、制約、観測情報を reusable に整理する release として扱う。
 ただし、[`docs/execution-boundary-policy.md`](./execution-boundary-policy.md) に従い、ExchangeAPI は stateless exchange I/O library として維持する。
 `clientOrderKey` 正本管理、retry / reconcile、open order tracking、execution state machine、ledger / position / allocation は ExchangeAPI の責務にしない。
 
@@ -363,7 +363,7 @@ v4.0.0 候補:
 - error taxonomy 整理
 - order response / fill observation DTO の整理
 - HTTP + realtime を組み合わせやすい read surface
-- Gateway が inquiry / reconcile しやすい read API 整備
+- upper layer が inquiry / reconcile しやすい read API 整備
 - secret-free audit / evidence 連携
 - state freshness / partial failure の観測 contract
 - state reconstruction を行う上位層へ渡す observation contract
@@ -375,7 +375,7 @@ state reconstruction 自体は ExchangeAPI 内では実装せず、ExecutionGate
 ### v5.0.0 候補
 
 v5.0.0 は、新しい取引所を正式追加するフェーズとする。
-v5 は既存 API の大掃除ではなく、v3 / v4 で整理した venue 構造、realtime foundation、Gateway-facing exchange I/O support 境界の拡張性を実証する release として扱う。
+v5 は既存 API の大掃除ではなく、v3 / v4 で整理した venue 構造、realtime foundation、Exchange I/O semantics foundation の拡張性を実証する release として扱う。
 
 v5.0.0 venue 追加 MVP:
 

@@ -1,23 +1,23 @@
-# v3.5.0 Environment Setup / Scope Framing 実施指示
+# v3.5.0 Realtime Diagnostics Foundation 実施指示
 
 最終更新: 2026-04-28
-位置づけ: v3.5.0 初期環境整備 / scope framing 指示
+位置づけ: v3.5.0 Realtime Diagnostics Foundation 実施指示
 
-状態: scope framing
+状態: implementation-ready scope
 
 ## 1. 目的
 
-v3.5.0 では、v3.4.0 の bitFlyer Realtime resilience foundation の上に、次の realtime maturity work を検討・実装する準備を行う。
+v3.5.0 では、v3.4.0 の bitFlyer Realtime resilience foundation の上に、Realtime Diagnostics Foundation を実装する。
+目的は、realtime stream で何が起きたかを secret-free に見えるようにすることである。
 
-本指示では、v3.5.0 の実装 scope をまだ確定しない。
-まず release 後の clean な `main` から `codex/v3.5-dev` を作成し、文書・verification・branch baseline を整える。
+v3.5.0 の詳細仕様は [`docs/realtime-diagnostics.md`](./realtime-diagnostics.md) を正本とする。
 
 ## 2. 前提
 
 - `v3.4.0` は release 済みである
 - `main` は `v3.4.0` release completion commit を含む
 - working tree は clean である
-- `v3.5.0` の正式 scope は別途裁定して本書へ追記する
+- `docs/realtime-diagnostics.md` の `Open Decisions` に必須未裁定項目はない
 
 ## 3. 環境整備 Scope
 
@@ -30,6 +30,8 @@ v3.5.0 では、v3.4.0 の bitFlyer Realtime resilience foundation の上に、�
 - `docs/roadmap-post-v2.md` の v3.5 候補を必要最小限更新する
 - baseline verification を実行する
 - 初期 setup commit を作成して push する
+
+setup は完了済みである。
 
 実施しない:
 
@@ -46,10 +48,10 @@ v3.5.0 では、v3.4.0 の bitFlyer Realtime resilience foundation の上に、�
 
 ## 4. v3.5.0 Scope
 
-v3.5.0 は、Realtime Diagnostics Foundation release 候補とする。
+v3.5.0 は、Realtime Diagnostics Foundation release とする。
 目的は、realtime stream で何が起きたかを secret-free に見えるようにすることである。
 
-v3.5.0 候補:
+v3.5.0 scope:
 
 - diagnostic event schema
 - sanitized raw frame logging
@@ -149,7 +151,37 @@ v4 系へ送るもの:
 - v3 の replay は、test / diagnostics のために stream event や raw frame を再生することを指す
 - v4 の replay は、取引所ステートを再構築する state replay / state reconstruction を指す
 
-この境界により、v3.5.0 の詳細 scope を決める前に、state management へ踏み込む候補を v4.0.0 以降へ送る。
+この境界により、state management へ踏み込む候補は v4.0.0 以降へ送る。
+
+## 4.3 文書修正指示
+
+目的:
+
+- `docs/realtime-diagnostics.md` を draft から v3.5.0 実装前の設計正本へ昇格する
+- `docs/plan-v3.5.0.md` を scope framing から implementation-ready scope へ更新する
+- 文書棚卸しを正本状態に合わせる
+
+更新対象:
+
+- [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md)
+- [`docs/realtime-diagnostics.md`](./realtime-diagnostics.md)
+- [`docs/document-inventory.md`](./document-inventory.md)
+
+反映内容:
+
+- v3.5.0 scope は Realtime Diagnostics Foundation として確定する
+- `docs/realtime-diagnostics.md` は設計正本として扱う
+- `Open Decisions` に必須未裁定項目がないことを明記する
+- HTTP 側は v3.5.0 で public API / 実装を変更しない
+- `replay`、Rx、state management、Binance realtime、Unified、state-changing operation は v3.5.0 に含めない
+
+verification:
+
+```bash
+git diff --check
+```
+
+docs-only のため、文書修正指示の完了確認では `dotnet test` は必須にしない。
 
 ## 5. 環境整備手順
 
@@ -177,6 +209,8 @@ git push -u origin codex/v3.5-dev
 - `docs/plan-v3.5.0.md` が追加されている
 - `docs/document-inventory.md` が v3.5 plan を参照している
 - `docs/roadmap-post-v2.md` が v3.5 候補を保持している
+- `docs/realtime-diagnostics.md` が v3.5.0 Realtime Diagnostics の設計正本として維持されている
+- `docs/realtime-diagnostics.md` の必須未裁定項目がない
 - deterministic tests が通る
 - live tests が opt-in なしで skip する
 - working tree が clean である

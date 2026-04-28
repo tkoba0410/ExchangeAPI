@@ -1,7 +1,7 @@
 # Realtime Diagnostics
 
 最終更新: 2026-04-28
-位置づけ: Realtime diagnostics 設計正本 draft
+位置づけ: Realtime diagnostics 設計正本
 
 ## 1. 目的
 

@@ -248,13 +248,13 @@ v3.4.0 では扱わない:
 - state-changing realtime operation
 - core / venue package への Rx dependency 追加
 
-### v3.5.0 候補
+### v3.5.0 採用範囲
 
-v3.5.0 は、Realtime Diagnostics Foundation release 候補とする。
+v3.5.0 は、Realtime Diagnostics Foundation release とする。
 目的は、realtime stream で何が起きたかを secret-free に見えるようにすることである。
-v3.5.0 の初期環境整備は [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md) に固定する。
+v3.5.0 の実施指示は [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md)、詳細仕様は [`docs/realtime-diagnostics.md`](./realtime-diagnostics.md) に固定する。
 
-候補:
+採用範囲:
 
 - diagnostic event schema
 - sanitized raw frame logging

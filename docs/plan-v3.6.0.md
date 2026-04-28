@@ -1,9 +1,9 @@
 # v3.6.0 Realtime Replay / Testing Foundation 実施指示
 
-最終更新: 2026-04-28
+最終更新: 2026-04-29
 位置づけ: v3.6.0 Realtime Replay / Testing Foundation 実施指示
 
-状態: implementation-ready scope
+状態: close preparation
 
 ## 1. 目的
 
@@ -19,7 +19,7 @@ simulation、Gateway / Platform behavior testing、strategy logic testing は含
 - `main` は `v3.5.0` release completion commit を含む
 - `codex/v3.6-dev` branch は `main` から作成する
 - v3.x は Realtime API foundation track として継続する
-- v4.x は exchange state management foundation / application track として扱う
+- v4.x は Exchange I/O semantics foundation / application track として扱う
 
 ## 3. 初期候補
 
@@ -97,7 +97,7 @@ v3.6.0 の方針決定前でも、次は初期非対象として扱う。
 - v3.5.0 の raw frame logging / diagnostic event foundation と自然につながる
 - typed stream event replay だけでは parser / decoder の検証にならない
 - diagnostic event replay だけでは取引所 payload の decode 検証にならない
-- state reconstruction には踏み込まないため、v4 の exchange state management track との境界を維持できる
+- state reconstruction には踏み込まないため、v4 の Exchange I/O semantics track との境界を維持できる
 - `ExchangeApi.Optional.Testing` を optional package として分離すると、core / venue package を太らせず、testing helper を再利用できる
 - ただし simulation / Gateway / Platform / Strategy testing まで含めると責務が重複し、最適化対象が混ざる
 - sample payload catalog は raw frame replay の deterministic input として必要であり、decode regression / diagnostic regression の保守性を上げる
@@ -423,3 +423,71 @@ fixture review: sample payload catalog stays under tests/Optional/Testing.Tests/
 documentation review: stale preparation wording corrected
 additional test: fixture catalog secret-free validation added
 ```
+
+## 15. Release Close Preparation 指示
+
+目的:
+
+v3.6.0 を Realtime Replay / Testing Foundation release として閉じる。
+v3.6.0 には `ExchangeApi.Optional.Testing` と replay / decode / diagnostic testing helper を含める。
+v3.7.0 以降の `ExchangeApi.Optional.Reactive`、lifecycle / contract hardening、release close 整理は含めない。
+
+実施する:
+
+- `docs/release-checklist-v3.6.0.md` を追加する
+- `docs/release-notes/v3.6.0.md` を追加する
+- `docs/document-inventory.md` に v3.6 release checklist / release notes を登録する
+- release-candidate preflight を実行する
+- live tests が opt-in なしで skip することを確認する
+- package generation に `ExchangeApi.Optional.Testing` が含まれることを確認する
+- layer-specific venue package が生成されないことを確認する
+- stdout / stderr / logs / evidence に secret が残らないことを確認する
+
+実施しない:
+
+- `ExchangeApi.Optional.Reactive`
+- `System.Reactive` dependency
+- `IObservable<T>` public API
+- realtime lifecycle / contract hardening
+- JSONL log replay
+- state reconstruction
+- simulation / Gateway / Platform / Strategy testing
+- Binance realtime
+- Unified
+- state-changing operation
+
+release-candidate preflight:
+
+```bash
+bash scripts/run-release-preflight.sh 3.6.0-local.preflight linux-x64
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+git diff --check
+```
+
+release preflight:
+
+```bash
+bash scripts/run-release-preflight.sh 3.6.0 linux-x64
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+git diff --check
+```
+
+release 完了後に実施する:
+
+- `main` に merge する
+- `v3.6.0` tag を作成 / push する
+- `bash scripts/push-github-packages.sh 3.6.0` を実行する
+- `bash scripts/smoke-github-packages-consumer.sh 3.6.0` を実行する
+- GitHub Release `v3.6.0` を作成する
+- release checklist に release result を反映する
+- v3.7.0 preparation に進む
+
+完了条件:
+
+- `docs/release-checklist-v3.6.0.md` が preflight / release gate を持っている
+- `docs/release-notes/v3.6.0.md` が利用者向け変更点を説明している
+- release-candidate preflight が通っている
+- release preflight が通っている
+- live tests が opt-in なしで skip する
+- GitHub Packages smoke が `ExchangeApi.Optional.Testing` を確認している
+- v3.6.0 に Rx / lifecycle hardening / state reconstruction / simulation / Gateway / Platform / Strategy testing が含まれていない

@@ -673,10 +673,11 @@ debug logging は `Protocol` 層にのみ許可する。
 - raw debug log は `local/logs/<venue>/protocol/` 配下にのみ出力する
 - raw debug log は `.gitignore` 対象とし、repository に commit / push しない
 
-v2.1.0 方針:
+Observability responsibility split:
 
-- core は log writer、保存形式、rotation、evidence 化を所有しない方向へ寄せる
-- core が安定して提供すべきものは、`CallResult`, `CallMeta`, `ProtocolRequest`, `ProtocolResponse`, `CallError` などの観測データである
+- core / venue package は log writer、保存形式、rotation、evidence 化を所有しない
+- HTTP 側で core / venue package が安定して提供すべきものは、`CallResult`, `CallMeta`, `ProtocolRequest`, `ProtocolResponse`, `CallError` などの観測データである
+- Realtime 側で core / venue package が安定して提供すべきものは、`RealtimeDiagnosticEvent` などの lifecycle / diagnostics event である
 - JSONL、file log、redaction、local evidence writer、人間向け log は `ExchangeApi.Optional.Logging` へ置く
 - `ExchangeApi.Optional.Logging` は optional package であり、core / exchange project の必須依存にしない
 - optional logging を導入する場合でも、API key / secret / 認証 header / 署名値を出力してはならない

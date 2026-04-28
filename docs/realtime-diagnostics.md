@@ -210,6 +210,14 @@ SubscribeTickerStreamAsync:
 
 raw frame logging は、WebSocket で受信した frame を調査可能な形で残す opt-in 機能である。
 
+責務分離:
+
+- venue package は diagnostic event emission と sanitized raw frame emission までを担当する
+- venue package は file output、JSONL writer、evidence layout writer、人間向け log writer を持たない
+- file output、JSONL、evidence layout、human-readable log は `ExchangeApi.Optional.Logging` が担当する
+- HTTP 側も同じ責務分離に揃え、HTTP は `CallResult` / `CallMeta` / `CallError` を observability source とする
+- v3.5.0 では HTTP 側の public API / 実装を変更しない
+
 記録してよいもの:
 
 - public channel の received raw frame
@@ -304,12 +312,10 @@ Live verification:
 
 次の項目は実装前に裁定する。
 
-1. sanitized raw frame logging を core venue package に置くか、`ExchangeApi.Optional.Logging` の extension として置くか。
-2. raw frame の body を常に保存するか、size limit と sampling を持つか。
+1. raw frame の body を常に保存するか、size limit と sampling を持つか。
 
 推奨初期案:
 
-- file output は `ExchangeApi.Optional.Logging` 側に寄せ、venue package は event emission までに留める。
 - raw frame body は opt-in かつ size limit 付きで保存する。
 
 ## 11. Decision Log
@@ -371,3 +377,41 @@ Live verification:
 
 - `EventType` / `Severity` を enum にする案
 - constants なしの自由 string だけにする案
+
+### 11.4 Observability Responsibility Split
+
+採用: 案B+。
+
+HTTP / Realtime ともに、core / venue package は observability event / source emission までを担当する。
+file output、JSONL、evidence layout、human-readable log は `ExchangeApi.Optional.Logging` が担当する。
+
+HTTP 側:
+
+- `CallResult`
+- `CallMeta`
+- `CallError`
+- `ProtocolRequest`
+- `ProtocolResponse`
+
+Realtime 側:
+
+- `RealtimeDiagnosticEvent`
+- sanitized raw frame emission
+
+採用理由:
+
+- HTTP と Realtime で observability の責務分離を揃えられる
+- core / venue package に file logging / evidence 管理を持ち込まずに済む
+- `ExchangeApi.Optional.Logging` の既存責務と整合する
+- default では evidence / log を作らない原則を守りやすい
+- secret-free rule を logging / evidence 出力側で一貫して強制しやすい
+
+v3.5.0 での扱い:
+
+- Realtime diagnostics はこの責務分離に従って実装する
+- HTTP 側は文書上の責務分離を明確化するだけで、public API / 実装は変更しない
+
+非採用:
+
+- venue package が file output まで持つ案
+- `ExchangeApi.Optional.Logging` が raw frame 取得まで含めて transport 内部へ入る案

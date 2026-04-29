@@ -3,7 +3,7 @@
 最終更新: 2026-04-29
 位置づけ: v3.8.0 Realtime Foundation Inventory / Minimal Contract Hardening preparation 指示
 
-状態: preparation / scope decision pending
+状態: close preparation passed
 
 ## 1. 目的
 
@@ -43,7 +43,7 @@ v3.8.0 では、棚卸しは v3 realtime foundation 全体に対して行うが�
 - decision / rationale ledger
 - realtime test gap list
 - fixture / replay rule の明文化
-- v4.0 / v4.1 / v5.0 へ送る項目の分類
+- v4.0 / v5.0 / v6.0 へ送る項目の分類
 
 ## 3. 非対象
 
@@ -61,7 +61,9 @@ v3.8.0 では次を扱わない。
 - core / venue package への Rx dependency 追加
 - `ExchangeApi.Optional.Reactive` の public API 拡張
 - `ExchangeApi.Optional.Testing` の simulation / Gateway / Platform / Strategy testing 拡張
-- v4 の Exchange I/O semantics foundation
+- v4 の stable baseline / maintenance / release hardening
+- v5 の Exchange I/O semantics foundation
+- v6 の new venue onboarding
 - SymbolSpec / SizeStep / PriceStep / Capability
 - stateless order validation
 - error taxonomy の大規模再設計
@@ -615,7 +617,7 @@ v3.9 に進める具体条件:
 - test gap list が作成されている
 - v3.8 で直すものが明確である
 - v3.9 close へ送るものが明確である
-- v4.0 / v4.1 / v5.0 へ送るものが明確である
+- v4.0 / v5.0 / v6.0 へ送るものが明確である
 - deterministic tests が通る
 - local package / consumer smoke が通る
 - live tests が opt-in なしで skip する
@@ -630,18 +632,19 @@ v3.9 に送るもの:
 - evidence / secret-free close check
 - v3 realtime docs consolidation
 
-v4+ に送るもの:
+後続 version に送るもの:
 
 - HTTP contract / consumer verification catch-up -> v4.0
-- Exchange I/O semantics foundation -> v4.1
-- new venue onboarding -> v5.0
-- Unified -> v6.0+
+- stable baseline / maintenance / release hardening -> v4.x
+- Exchange I/O semantics foundation -> v5.0
+- new venue onboarding -> v6.0
+- Unified -> v7.0+
 
 理由:
 
 - v3.8.0 は hardening + classification の release であり、すべての gap を潰す release ではない。
 - 分類されていない gap を残さないことで、v3.9.0 の release close を機械的に判断しやすくなる。
-- v4.0 / v4.1 / v5.0 へ送る項目を明確にすることで、v3.8.0 の scope expansion を防げる。
+- v4.0 / v5.0 / v6.0 へ送る項目を明確にすることで、v3.8.0 の scope expansion を防げる。
 
 ## 8. Realtime Foundation Inventory / Gap Classification
 
@@ -659,8 +662,9 @@ v4+ に送るもの:
 | error taxonomy | `BitflyerRealtimeErrorKind` に `Unknown` fallback と主要 kind がある | v3.8で分類 | 追加 kind は棚卸し後に evidence-gated で最小判断 |
 | sample payload / fixture | `tests/Optional/Testing.Tests/Fixtures/Realtime/Bitflyer/RawFrames/` がある | v3.8で分類 | fixture 配置方針と secret-free rule を plan に固定 |
 | HTTP contract / consumer verification | v3 scope 外 | v4+へ送る | v4.0 catch-up inventory に送る |
-| Exchange I/O semantics | v3 scope 外 | v4+へ送る | v4.1 semantics foundation MVP に送る |
-| new venue onboarding | v3 scope 外 | v4+へ送る | v5.0 new venue public read MVP に送る |
+| stable baseline / maintenance / release hardening | v3 scope 外 | v4+へ送る | v4.0 stable baseline inventory に送る |
+| Exchange I/O semantics | v3 scope 外 | v4+へ送る | v5.0 semantics foundation MVP に送る |
+| new venue onboarding | v3 scope 外 | v4+へ送る | v6.0 new venue public read MVP に送る |
 
 Evidence-gated change:
 
@@ -722,3 +726,55 @@ git diff --check
 - local consumer smoke が通る
 - live tests が opt-in なしで skip する
 - v3.8.0 に新 channel / Binance realtime / Unified / state reconstruction / Gateway / Platform behavior が含まれていない
+
+## 11. v3.8.0 Close Preparation 指示
+
+目的:
+
+v3.8.0 を Realtime Foundation Inventory / Minimal Contract Hardening release として閉じる。
+v3.8.0 では、v3.1.0 から v3.7.0 までに入った Realtime foundation の contract / diagnostics / gap classification を固定し、v3.9.0 の realtime verification / release close に渡す。
+
+実施範囲:
+
+- release checklist を追加する
+- release notes を追加する
+- v3.8.0 scope / non-scope / evidence-gated change を最終確認する
+- v4 以降への送り先を現行 roadmap に合わせて確認する
+- release preflight を実行する
+- live tests が opt-in なしで skip することを確認する
+- stdout / stderr / logs / evidence に secret が出ないことを確認する
+
+非対象:
+
+- 新しい realtime channel 追加
+- 追加の public API sugar
+- Binance realtime
+- venue 横断 realtime abstraction
+- Unified
+- state reconstruction
+- Gateway / Platform behavior
+- HTTP contract / consumer verification catch-up
+- v4 stable baseline 作業そのもの
+- v5 Exchange I/O semantics foundation
+- v6 new venue onboarding
+
+実行:
+
+```bash
+bash scripts/run-release-preflight.sh 3.8.0-local.close linux-x64
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+git diff --check
+```
+
+確認:
+
+- deterministic tests passed
+- package generation passed
+- local consumer smoke passed
+- release asset generation passed
+- live tests skip safely without opt-in
+- `NonTargetMessageIgnored` diagnostic behavior が deterministic tests で固定されている
+- `docs/release-checklist-v3.8.0.md` が追加されている
+- `docs/release-notes/v3.8.0.md` が追加されている
+- v3.8.0 に v4 / v5 / v6 の実装を先取りしていない
+- v3.9.0 に渡す内容が明確である

@@ -1,12 +1,13 @@
 # bitFlyer Realtime Resilience Verification
 
-最終更新: 2026-04-28
+最終更新: 2026-04-29
 位置づけ: bitFlyer realtime resilience verification runbook
 
 ## 1. 目的
 
 本書は v3.4.0 bitFlyer realtime resilience foundation の verification 手順を定義する。
 設計正本は [`docs/realtime-bitflyer.md`](../docs/realtime-bitflyer.md) とする。
+Realtime diagnostics / secret-free observability の正本は [`docs/realtime-diagnostics.md`](../docs/realtime-diagnostics.md) とする。
 
 ## 2. 対象
 
@@ -71,7 +72,7 @@ private live には `local/credentials/credential-profile.json` が必要であ�
 evidence を残す場合の標準配置:
 
 ```text
-local/evidence/local-live/<yyyymmdd>-v3.4.0-bitflyer-realtime-resilience/
+local/evidence/local-live/<yyyymmdd>-v3.9.0-bitflyer-realtime-resilience/
   runtime/
     artifacts/
     logs/
@@ -90,7 +91,7 @@ secret-free rule:
 
 ## 6. Release Gate
 
-v3.4.0 release gate:
+v3.9.0 close release gate:
 
 - deterministic realtime tests が通る
 - local consumer smoke が stream envelope / realtime options surface を参照できる

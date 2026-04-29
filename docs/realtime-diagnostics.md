@@ -1,11 +1,13 @@
 # Realtime Diagnostics
 
-最終更新: 2026-04-28
+最終更新: 2026-04-29
 位置づけ: Realtime diagnostics 設計正本
 
 ## 1. 目的
 
-本書は、Realtime API の diagnostic event、sanitized raw frame logging、secret-free evidence layout、lifecycle contract の設計境界を定義する。
+本書は、Realtime API の diagnostic event、sanitized raw frame logging、secret-free evidence layout、diagnostic vocabulary の設計境界を定義する。
+bitFlyer-specific stream / channel / DTO contract は [`docs/realtime-bitflyer.md`](./realtime-bitflyer.md) を正本とする。
+live verification の実行手順は `verification/` 配下の runbook を正本とする。
 
 v3.5.0 は Realtime Diagnostics Foundation release として扱う。
 目的は、realtime stream で何が起きたかを secret-free に見えるようにすることである。
@@ -19,6 +21,8 @@ v3.5.0 は Realtime Diagnostics Foundation release として扱う。
 - [`docs/plan-v3.5.0.md`](./plan-v3.5.0.md)
 - [`docs/verification.md`](./verification.md)
 - [`verification/bitflyer-realtime-resilience.md`](../verification/bitflyer-realtime-resilience.md)
+- [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md)
+- [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md)
 - [`verification/release-evidence.md`](../verification/release-evidence.md)
 
 ## 2. Scope
@@ -29,7 +33,7 @@ v3.5.0 で扱う:
 - public `RealtimeDiagnosticEvent` contract
 - sanitized raw frame logging
 - secret-free realtime evidence layout
-- realtime lifecycle contract table
+- realtime diagnostic lifecycle table
 - deterministic tests for diagnostic classification and redaction
 - opt-in live verification runbook update
 

@@ -1,12 +1,14 @@
 # bitFlyer Private Realtime Live Verification
 
-最終更新: 2026-04-28
+最終更新: 2026-04-29
 位置づけ: bitFlyer private realtime opt-in live verification runbook
 
 ## 1. 目的
 
 本書は v3.3.0 bitFlyer private realtime read MVP の live verification 手順を定義する。
 private realtime は read-only event stream として扱い、order / cancel / deposit / withdraw などの state-changing operation は含めない。
+Realtime API の設計正本は [`docs/realtime-bitflyer.md`](../docs/realtime-bitflyer.md) とする。
+Realtime diagnostics / secret-free observability の正本は [`docs/realtime-diagnostics.md`](../docs/realtime-diagnostics.md) とする。
 
 ## 2. 実行条件
 
@@ -42,7 +44,7 @@ API key has permission to receive order events
 evidence を残す場合の標準配置:
 
 ```text
-local/evidence/local-live/<yyyymmdd>-v3.3.0-bitflyer-private-realtime/
+local/evidence/local-live/<yyyymmdd>-v3.9.0-bitflyer-private-realtime/
   runtime/
     artifacts/
     logs/

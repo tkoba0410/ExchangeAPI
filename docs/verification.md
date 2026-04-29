@@ -1,6 +1,6 @@
 # ExchangeAPI Verification Policy
 
-最終更新: 2026-04-26
+最終更新: 2026-04-29
 位置づけ: verification 正本
 
 本書は、endpoint ごとの API 契約分類をもとに、live / manual verification の扱いを決めるための正本である。
@@ -198,7 +198,8 @@ local/evidence/<phase>/<yyyymmdd>-<label>/
 - v2.2.0 では default で evidence / log を作らない
 - v2.2.0 の MCP private read inspection live verification を実施する場合は、`local/evidence/local-live/<yyyymmdd>-v2.2.0-mcp-inspection/` を標準証跡先とする
 - v2.2.0 の release evidence を残す場合は [`verification/release-evidence.md`](../verification/release-evidence.md) を参照する
-- v3.3.0 の bitFlyer private realtime live verification を実施する場合は、[`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md) を参照し、`local/evidence/local-live/<yyyymmdd>-v3.3.0-bitflyer-private-realtime/` を標準証跡先とする
+- v3.3.0 の bitFlyer private realtime live verification 履歴は [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md) を参照する。v3.9.0 以降の close verification では v3.9.0 用 label を使う
+- v3.9.0 以降の bitFlyer realtime foundation close verification では、public / private / resilience runbook を参照し、必要に応じて `local/evidence/local-live/<yyyymmdd>-v3.9.0-bitflyer-realtime-close/` を標準証跡先とする
 
 `local/app/` は ExchangeAPI には導入しない。  
 ExchangeAPI は library repo であり、通常実行アプリの I/O 正本を持たないためである。
@@ -261,7 +262,7 @@ secret-free rule:
 
 - public realtime verification では credentials を使わない
 - credentials、API key、API secret、signature、Authorization 相当の値は evidence / log / result / exception / stdout / stderr に含めない
-- evidence を残す場合は `local/evidence/local-live/<yyyymmdd>-v3.2.0-bitflyer-realtime/` を使う
+- v3.2.0 当時の evidence label は `local/evidence/local-live/<yyyymmdd>-v3.2.0-bitflyer-realtime/` とする。v3.9.0 以降の close verification では v3.9.0 用 label を使う
 
 ## 5.3 v3.4.0 Realtime Resilience Verification
 
@@ -281,8 +282,50 @@ live verification:
 
 - resilience runbook は [`verification/bitflyer-realtime-resilience.md`](../verification/bitflyer-realtime-resilience.md) とする
 - runbook は [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md) と [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md) を使う
-- evidence を残す場合は `local/evidence/local-live/<yyyymmdd>-v3.4.0-bitflyer-realtime-resilience/` を使う
+- v3.4.0 当時の evidence label は `local/evidence/local-live/<yyyymmdd>-v3.4.0-bitflyer-realtime-resilience/` とする。v3.9.0 以降の close verification では v3.9.0 用 label を使う
 - credentials、API key、API secret、signature、Authorization 相当の値は evidence / log / result / exception / stdout / stderr に含めない
+
+## 5.4 v3.9.0 Realtime Foundation Close Verification
+
+v3.9.0 は Realtime foundation close release として、Realtime API の live verification 手順、secret-free rule、release smoke の整合を確認する。
+新しい realtime feature は追加しない。
+
+正本分担:
+
+- bitFlyer-specific stream / channel / DTO contract は [`docs/realtime-bitflyer.md`](./realtime-bitflyer.md) を参照する
+- diagnostic event vocabulary / raw frame logging / secret-free observability は [`docs/realtime-diagnostics.md`](./realtime-diagnostics.md) を参照する
+- 実行手順は `verification/` 配下の runbook を参照する
+
+runbook:
+
+- [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md)
+- [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md)
+- [`verification/bitflyer-realtime-resilience.md`](../verification/bitflyer-realtime-resilience.md)
+
+release gate:
+
+- deterministic tests を必須とする
+- package generation を必須とする
+- local consumer smoke を必須とする
+- live tests が opt-in なしで skip することを必須とする
+- actual live verification は opt-in の補助確認とし、release gate には必須化しない
+- stdout / stderr / logs / evidence は secret-free とする
+
+evidence を残す場合:
+
+```text
+local/evidence/local-live/<yyyymmdd>-v3.9.0-bitflyer-realtime-close/
+  runtime/
+    artifacts/
+    logs/
+  notes/
+```
+
+secret-free rule:
+
+- credentials、API key、API secret、signature、Authorization 相当値、private auth payload は evidence / log / result / exception / stdout / stderr に含めない
+- raw credential profile は evidence にコピーしない
+- GitHub Packages token は stdout / stderr / logs / evidence に含めない
 
 ## 6. 初期 Endpoint Inventory
 

@@ -1,11 +1,12 @@
 # bitFlyer Realtime API
 
-最終更新: 2026-04-28
+最終更新: 2026-04-29
 位置づけ: bitFlyer Realtime API 設計正本
 
 ## 1. 目的
 
-本書は、bitFlyer Realtime API の設計境界、公開方針、channel contract、test / live verification 方針を定義する。
+本書は、bitFlyer Realtime API の設計境界、公開方針、channel contract、stream contract を定義する。
+live verification の実行手順は `verification/` 配下の runbook を参照する。
 
 Realtime API は HTTP endpoint とは別 transport / interaction model である。
 そのため、HTTP endpoint matrix である [`docs/endpoints-bitflyer.md`](./endpoints-bitflyer.md) には Realtime channel を混ぜない。
@@ -18,6 +19,10 @@ Realtime API は HTTP endpoint とは別 transport / interaction model である
 関連文書:
 
 - [`docs/realtime-diagnostics.md`](./realtime-diagnostics.md)
+- [`docs/verification.md`](./verification.md)
+- [`verification/bitflyer-realtime-live.md`](../verification/bitflyer-realtime-live.md)
+- [`verification/bitflyer-private-realtime-live.md`](../verification/bitflyer-private-realtime-live.md)
+- [`verification/bitflyer-realtime-resilience.md`](../verification/bitflyer-realtime-resilience.md)
 
 ## 2. Positioning
 
@@ -495,13 +500,14 @@ consumer smoke:
 ## 12. Live Verification
 
 live verification は opt-in only とする。
+本書は contract 正本であり、実行手順の正本は `verification/` 配下の runbook とする。
 
 方針:
 
 - public realtime only
 - short duration
 - credentials 不要
-- evidence under `local/evidence/local-live/<yyyymmdd>-v3.1.0-bitflyer-realtime/`
+- evidence under `local/evidence/local-live/<yyyymmdd>-v3.9.0-bitflyer-realtime/` or runbook-specific label
 - stdout / stderr / evidence secret-free
 
 default では live connection を行わない。

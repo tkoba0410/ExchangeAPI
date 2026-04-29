@@ -1,10 +1,11 @@
 # bitFlyer Realtime Live Verification
 
-最終更新: 2026-04-27
+最終更新: 2026-04-29
 位置づけ: bitFlyer Realtime live verification runbook
 
 本書は bitFlyer public Realtime API の opt-in live verification 手順を定義する。
 Realtime API の設計正本は [`docs/realtime-bitflyer.md`](../docs/realtime-bitflyer.md) とする。
+Realtime diagnostics / secret-free observability の正本は [`docs/realtime-diagnostics.md`](../docs/realtime-diagnostics.md) とする。
 
 ## 1. Scope
 
@@ -40,7 +41,7 @@ default では live connection を行わない。
 証跡を残す場合の標準配置:
 
 ```text
-local/evidence/local-live/<yyyymmdd>-v3.2.0-bitflyer-realtime/
+local/evidence/local-live/<yyyymmdd>-v3.9.0-bitflyer-realtime/
   runtime/
     artifacts/
     logs/

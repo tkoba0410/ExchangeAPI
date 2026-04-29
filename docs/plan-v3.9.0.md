@@ -3,7 +3,7 @@
 最終更新: 2026-04-29
 位置づけ: v3.9.0 Realtime Verification / Foundation Close preparation 指示
 
-状態: preparation / scope decision
+状態: preparation / step 1 in progress
 
 ## 1. 目的
 
@@ -95,6 +95,21 @@ v3.9.0 = Realtime Foundation Close
 - `docs/verification.md` は入口と参照先に留める
 - exact realtime contract は `docs/realtime-bitflyer.md` に寄せる
 - diagnostic event vocabulary は `docs/realtime-diagnostics.md` に寄せる
+
+採用:
+
+- 初期方針を採用する。
+- `docs/verification.md` は verification policy / release gate / runbook 参照先に留める。
+- `docs/realtime-bitflyer.md` は bitFlyer stream / channel / DTO contract を保持する。
+- `docs/realtime-diagnostics.md` は diagnostic event vocabulary / raw frame logging / secret-free observability を保持する。
+- public / private / resilience の具体的な live verification 手順は `verification/` 配下の runbook に置く。
+
+反映:
+
+- `docs/realtime-bitflyer.md` の目的と関連文書を v3.9 close 方針に合わせた
+- `docs/realtime-diagnostics.md` の責務を diagnostic vocabulary / observability に寄せた
+- `docs/verification.md` に v3.9 Realtime Foundation Close Verification を追加した
+- public / private / resilience runbook の evidence label を v3.9 close 用に更新した
 
 ### 4.2 Realtime live verification runbook の仕上げ
 

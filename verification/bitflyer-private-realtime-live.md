@@ -23,6 +23,13 @@ credential profile configured at local/credentials/credential-profile.json
 API key has permission to receive order events
 ```
 
+release gate:
+
+- actual private live run は必須にしない
+- opt-in なしで skip することを release gate とする
+- deterministic tests / package smoke を release gate とする
+- credentials 未設定時は safe skip とする
+
 ## 3. 対象
 
 対象 channel:
@@ -61,6 +68,7 @@ local/evidence/local-live/<yyyymmdd>-v3.9.0-bitflyer-private-realtime/
 - raw auth payload
 
 secret scan は stdout / stderr / evidence notes / sanitized artifact を対象に行う。
+credential profile の内容や raw auth payload を evidence にコピーして scan 対象にしてはならない。
 
 ## 5. 実行
 
@@ -75,6 +83,21 @@ live verification:
 ```bash
 EXCHANGEAPI_RUN_LIVE_TESTS=1 dotnet test ExchangeApi.LiveTests.slnx --no-restore --filter PrivateRealtime
 ```
+
+opt-in なしの skip 確認:
+
+```bash
+dotnet test ExchangeApi.LiveTests.slnx --no-restore --filter PrivateRealtime
+```
+
+secret scan example:
+
+```bash
+rg -n "api[_-]?key|api[_-]?secret|signature|authorization|credential|auth" local/evidence/local-live/<yyyymmdd>-v3.9.0-bitflyer-private-realtime
+```
+
+上記は suspicious token の有無を確認する補助である。
+検出された文字列が public documentation text や checklist の語彙だけか、実 secret / auth payload かを確認する。
 
 private realtime は注文イベントが発生しないと payload が届かない場合がある。
 payload が届かない場合でも、auth / subscribe / cancellation / unsubscribe の secret-free 確認を優先する。

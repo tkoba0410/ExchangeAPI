@@ -137,6 +137,20 @@ v3.9.0 = Realtime Foundation Close
 - live verification は opt-in のままにする
 - v3.9 release gate は deterministic / smoke / live skip を必須にし、actual live run は必須にしない
 
+採用:
+
+- 初期方針を採用する。
+- public / private / resilience の actual live run は opt-in 補助確認に留める。
+- v3.9 release gate は deterministic tests、package smoke、live tests の opt-in skip、secret-free rule を必須にする。
+- private realtime は credentials 未設定時 safe skip を許容する。
+- raw credential profile と raw auth payload は evidence にコピーしない。
+
+反映:
+
+- public realtime runbook に opt-in skip 確認と secret scan example を追加した
+- private realtime runbook に credentials 未設定時 safe skip、secret scan、raw auth payload 禁止を明記した
+- resilience runbook に actual live run を release gate に必須化しない方針を明記した
+
 ### 4.3 Package / consumer smoke の仕上げ
 
 対象:

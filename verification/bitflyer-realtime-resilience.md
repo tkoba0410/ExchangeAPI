@@ -52,6 +52,8 @@ dotnet test ExchangeApi.slnx --no-restore --filter Realtime
 
 live verification は opt-in only とする。
 default の test / preflight では live connection しない。
+actual live run は v3.9.0 release gate には必須化しない。
+release gate は deterministic tests、package smoke、live tests の opt-in skip 確認とする。
 
 public live:
 
@@ -66,6 +68,13 @@ EXCHANGEAPI_RUN_LIVE_TESTS=1 dotnet test ExchangeApi.LiveTests.slnx --no-restore
 ```
 
 private live には `local/credentials/credential-profile.json` が必要である。
+
+opt-in なしの skip 確認:
+
+```bash
+dotnet test ExchangeApi.LiveTests.slnx --no-restore --filter Realtime
+dotnet test ExchangeApi.LiveTests.slnx --no-restore --filter PrivateRealtime
+```
 
 ## 5. Evidence
 
@@ -89,6 +98,15 @@ secret-free rule:
 - raw credential profile を evidence にコピーしない
 - raw auth payload を evidence にコピーしない
 
+secret scan example:
+
+```bash
+rg -n "api[_-]?key|api[_-]?secret|signature|authorization|credential|auth" local/evidence/local-live/<yyyymmdd>-v3.9.0-bitflyer-realtime-resilience
+```
+
+上記は suspicious token の有無を確認する補助である。
+検出された文字列が public documentation text や checklist の語彙だけか、実 secret / auth payload かを確認する。
+
 ## 6. Release Gate
 
 v3.9.0 close release gate:
@@ -96,5 +114,6 @@ v3.9.0 close release gate:
 - deterministic realtime tests が通る
 - local consumer smoke が stream envelope / realtime options surface を参照できる
 - live tests は opt-in なしで skip する
+- actual live run は opt-in 補助確認に留める
 - secret-free rule を満たす
 - state-changing operation が増えていない

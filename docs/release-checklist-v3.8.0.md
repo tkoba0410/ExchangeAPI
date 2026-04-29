@@ -3,7 +3,7 @@
 最終更新: 2026-04-29
 位置づけ: v3.8.0 release checklist
 
-状態: close preparation passed
+状態: v3.8.0 released
 
 ## 1. Scope Confirmation
 
@@ -126,9 +126,16 @@ v3.9.0 で扱わない内容:
 
 - [x] Git working tree が close preparation 前に clean である
 - [x] close preflight が通っている
+- [x] release preflight が通っている
 - [x] live tests が opt-in なしで skip する
 - [x] `v3.8.0` の release notes がある
 - [x] `v3.8.0` の release checklist がある
+- [x] `main` に `v3.8.0` commit が入っている
+- [x] `v3.8.0` tag が remote にある
+- [x] GitHub Release が作成されている
+- [x] release assets が attach されている
+- [x] GitHub Packages publish が通っている
+- [x] GitHub Packages consumer smoke が通っている
 - [x] v3.8.0 に新 channel / Binance realtime / Unified / state reconstruction / Gateway / Platform behavior が含まれていない
 
 close preflight result:
@@ -168,4 +175,53 @@ safe live preflight:
 
 live tests:
 - dotnet test ExchangeApi.LiveTests.slnx --no-restore skipped safely without opt-in
+```
+
+release result:
+
+```text
+2026-04-29 released
+
+release commit:
+- f8af354b Add v3.8 release execution instructions
+
+commands:
+- bash scripts/run-release-preflight.sh 3.8.0 linux-x64
+- dotnet test ExchangeApi.LiveTests.slnx --no-restore
+- git diff --check
+- git checkout main
+- git pull --ff-only origin main
+- git merge --ff-only codex/v3.8-dev
+- git tag -a v3.8.0 -m "Release v3.8.0"
+- git push origin main
+- git push origin v3.8.0
+- GITHUB_TOKEN="$(gh auth token)" bash scripts/push-github-packages.sh 3.8.0
+- bash scripts/smoke-github-packages-consumer.sh 3.8.0
+- gh release create v3.8.0 ...
+
+package output:
+- ExchangeApi.Exchanges.Binance.3.8.0.nupkg
+- ExchangeApi.Exchanges.Bitflyer.3.8.0.nupkg
+- ExchangeApi.Optional.Credentials.3.8.0.nupkg
+- ExchangeApi.Optional.Logging.3.8.0.nupkg
+- ExchangeApi.Optional.Reactive.3.8.0.nupkg
+- ExchangeApi.Optional.Testing.3.8.0.nupkg
+- ExchangeApi.Primitives.3.8.0.nupkg
+
+release assets:
+- local/publish/release-assets/v3.8.0/exchangeapi-linux-x64
+- local/publish/release-assets/v3.8.0/exchangeapi-linux-x64.sha256
+- local/publish/release-assets/v3.8.0/exchangeapi-mcp-linux-x64
+- local/publish/release-assets/v3.8.0/exchangeapi-mcp-linux-x64.sha256
+
+checksum verification:
+- exchangeapi-linux-x64: OK
+- exchangeapi-mcp-linux-x64: OK
+
+GitHub Release:
+- https://github.com/tkoba0410/ExchangeAPI/releases/tag/v3.8.0
+
+GitHub Packages:
+- publish passed
+- consumer smoke passed
 ```

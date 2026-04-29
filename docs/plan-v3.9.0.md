@@ -364,3 +364,68 @@ git diff --check
 - live tests が opt-in なしで skip する
 - GitHub Packages consumer smoke が release 後に通る
 - v3.9.0 に新 feature / Binance realtime / Unified / state reconstruction / Gateway / Platform behavior が含まれていない
+
+## 7. v3.9.0 Release Execution 指示
+
+目的:
+
+v3.9.0 を release し、v3 realtime foundation track を閉じる。
+v3.9.0 release commit は close preflight 済みの `codex/v3.9-dev` の先端とする。
+release 後は v4 stable baseline track へ移るため、`codex/v4.0-dev` を作成する。
+
+前提:
+
+- `codex/v3.9-dev` が clean である
+- close preparation が通っている
+- actual release preflight を `3.9.0` で実行する
+- fast-forward できない場合は止めて差分を確認する
+- unrelated change を revert しない
+
+実行:
+
+```bash
+bash scripts/run-release-preflight.sh 3.9.0 linux-x64
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+git diff --check
+
+git checkout main
+git pull --ff-only origin main
+git merge --ff-only codex/v3.9-dev
+git tag -a v3.9.0 -m "Release v3.9.0"
+git push origin main
+git push origin v3.9.0
+
+bash scripts/push-github-packages.sh 3.9.0
+bash scripts/smoke-github-packages-consumer.sh 3.9.0
+```
+
+GitHub Release:
+
+- tag: `v3.9.0`
+- title: `v3.9.0`
+- body: `docs/release-notes/v3.9.0.md`
+- assets:
+  - `local/publish/release-assets/v3.9.0/exchangeapi-linux-x64`
+  - `local/publish/release-assets/v3.9.0/exchangeapi-linux-x64.sha256`
+  - `local/publish/release-assets/v3.9.0/exchangeapi-mcp-linux-x64`
+  - `local/publish/release-assets/v3.9.0/exchangeapi-mcp-linux-x64.sha256`
+
+release 後:
+
+```bash
+git checkout main
+git pull --ff-only origin main
+git checkout -b codex/v4.0-dev
+git push -u origin codex/v4.0-dev
+```
+
+確認:
+
+- main に v3.9.0 commit が入っている
+- remote に `v3.9.0` tag がある
+- GitHub Release が作成されている
+- release assets が attach されている
+- GitHub Packages publish が通っている
+- GitHub Packages consumer smoke が通っている
+- `codex/v4.0-dev` が remote にある
+- v3.9.0 に新 feature / Binance realtime / Unified / state reconstruction / Gateway / Platform behavior が含まれていない

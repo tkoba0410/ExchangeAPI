@@ -3,7 +3,7 @@
 最終更新: 2026-04-29
 位置づけ: v3.9.0 Realtime Verification / Foundation Close preparation 指示
 
-状態: preparation / step 1 in progress
+状態: close preparation passed
 
 ## 1. 目的
 
@@ -228,6 +228,37 @@ v7+ Unified へ送る
 - Realtime foundation だけで完結する文書・runbook・smoke・secret-free の gap は v3.9
 - HTTP や ExchangeAPI 全体の安定板化に関わる gap は v4
 
+採用:
+
+- 初期方針を採用する。
+- v3.9.0 は Realtime foundation close に必要な文書、runbook、package smoke、secret-free evidence、release checklist / release notes を閉じる。
+- HTTP contract / consumer verification catch-up は v4 stable baseline へ送る。
+- Exchange I/O semantics は v5 へ送る。
+- new venue onboarding は v6 へ送る。
+- Unified は v7+ へ送る。
+- state reconstruction / Gateway / Platform behavior は ExchangeAPI に直接持ち込まない。
+
+最終分類:
+
+| 項目 | 分類 | v3.9 action |
+| --- | --- | --- |
+| Realtime 文書の正本分担 | v3.9で閉じる | `docs/realtime-bitflyer.md` / `docs/realtime-diagnostics.md` / `docs/verification.md` の責務を整理 |
+| public realtime live runbook | v3.9で閉じる | opt-in / evidence / secret scan / skip confirmation を明記 |
+| private realtime live runbook | v3.9で閉じる | credentials 条件 / safe skip / raw auth payload 禁止 / secret scan を明記 |
+| realtime resilience runbook | v3.9で閉じる | deterministic gate / opt-in live / secret-free rule を明記 |
+| local consumer smoke | v3.9で閉じる | Bitflyer / Binance / Optional.Credentials / Optional.Logging / Optional.Testing / Optional.Reactive を確認 |
+| GitHub Packages consumer smoke | v3.9で閉じる | local smoke と同じ package set を確認 |
+| secret-free evidence rule | v3.9で閉じる | runbook / checklist / release notes に反映 |
+| release checklist / release notes | v3.9で閉じる | v3.9.0 用文書を追加 |
+| HTTP contract / consumer verification catch-up | v4 stable baselineへ送る | v4.0 inventory / maintenance catch-up で扱う |
+| ExchangeAPI 全体の stable baseline hardening | v4 stable baselineへ送る | v4.x で扱う |
+| Exchange I/O semantics foundation | v5 semanticsへ送る | v5.0 で扱う |
+| SymbolSpec / SizeStep / PriceStep / Capability | v5 semanticsへ送る | v5.0 で扱う |
+| new venue onboarding | v6 new venueへ送る | v6.0 で扱う |
+| Unified | v7+ Unifiedへ送る | 意味同一性を防御できる場合だけ検討 |
+| state reconstruction / state replay | やらない / ExchangeAPI外 | Gateway / Platform または別建て上位層で扱う |
+| Gateway / Platform behavior | やらない / ExchangeAPI外 | ExchangeAPI は stateless adapter として維持 |
+
 ### 4.5 Secret-free / evidence の最終確認
 
 確認:
@@ -248,6 +279,34 @@ v7+ Unified へ送る
 - v3.9 では runbook と release checklist に固定する
 - script 化は、v4 stable baseline の verification hardening 候補に送る
 
+採用:
+
+- 初期方針を採用する。
+- v3.9.0 では secret scan の script 化をしない。
+- secret-free rule は runbook、release checklist、release notes に固定する。
+- automated secret scan / evidence hardening は v4 stable baseline の verification hardening 候補に送る。
+
+v3.9.0 で確認する secret-free 対象:
+
+- stdout
+- stderr
+- local evidence notes
+- sanitized artifact
+- sanitized raw frame log
+- package smoke output
+- GitHub Packages smoke output
+
+含めてはいけないもの:
+
+- API key
+- API secret
+- signature
+- Authorization 相当値
+- private auth payload
+- raw credential profile
+- credential file content
+- GitHub Packages token
+
 ### 4.6 Release checklist / release notes
 
 追加:
@@ -264,6 +323,12 @@ v7+ Unified へ送る
 - verification summary
 - migration impact はなし、または最小
 - secret-free safety note
+
+反映:
+
+- `docs/release-checklist-v3.9.0.md` を追加した
+- `docs/release-notes/v3.9.0.md` を追加した
+- `docs/document-inventory.md` に v3.8 / v3.9 checklist と release notes を追加した
 
 ## 5. Verification
 

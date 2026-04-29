@@ -76,6 +76,14 @@ v3 方針:
 - v2 の layer-specific venue package / project は v3.0.0 では廃止する
 - `Protocol` / `Native` / `Composition` / `Vocabulary` は folder / namespace / tests 上の設計境界として維持する
 
+v3.9.0 release verification:
+
+- local consumer smoke は `ExchangeApi.Exchanges.Bitflyer` と `ExchangeApi.Exchanges.Binance` を含める
+- local consumer smoke は `ExchangeApi.Optional.Credentials`、`ExchangeApi.Optional.Logging`、`ExchangeApi.Optional.Testing`、`ExchangeApi.Optional.Reactive` を含める
+- GitHub Packages consumer smoke も同じ package set を確認する
+- smoke は実 API に接続しない
+- token、credentials、API key、API secret、signature、Authorization 相当値を stdout / stderr に出さない
+
 v2 方針:
 
 - `v2.0.0` でも library は NuGet package を正式導線とする

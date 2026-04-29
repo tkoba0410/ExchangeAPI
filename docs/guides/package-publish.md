@@ -203,6 +203,26 @@ token は次の順で取得する。
 - `RealtimeReplayFrame` / `BitflyerRealtimeReplayRunner` を参照できること
 - token、credentials、API key、API secret、signature、Authorization header が stdout / stderr に出ないこと
 
+`v3.9.0` では次を確認する:
+
+- local consumer smoke: `ExchangeApi.Exchanges.Bitflyer`
+- local consumer smoke: `ExchangeApi.Exchanges.Binance`
+- local consumer smoke: `ExchangeApi.Optional.Credentials`
+- local consumer smoke: `ExchangeApi.Optional.Logging`
+- local consumer smoke: `ExchangeApi.Optional.Testing`
+- local consumer smoke: `ExchangeApi.Optional.Reactive`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Bitflyer`
+- GitHub Packages consumer smoke: `ExchangeApi.Exchanges.Binance`
+- GitHub Packages consumer smoke: `ExchangeApi.Optional.Credentials`
+- GitHub Packages consumer smoke: `ExchangeApi.Optional.Logging`
+- GitHub Packages consumer smoke: `ExchangeApi.Optional.Testing`
+- GitHub Packages consumer smoke: `ExchangeApi.Optional.Reactive`
+- `BitflyerClientFactory` / `BinanceClientFactory` を参照できること
+- bitFlyer Realtime factory / channel vocabulary / stream envelope API を参照できること
+- `RealtimeReplayFrame` / `BitflyerRealtimeReplayRunner` を参照できること
+- `ToObservable(...)` を参照できること
+- token、credentials、API key、API secret、signature、Authorization header が stdout / stderr に出ないこと
+
 ## Notes
 
 - local NuGet feed と GitHub Packages feed を混同しない

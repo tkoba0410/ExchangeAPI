@@ -53,6 +53,10 @@ dotnet add package ExchangeApi.Exchanges.Bitflyer \
   --version "${package_version}" \
   >/dev/null
 
+dotnet add package ExchangeApi.Exchanges.Binance \
+  --version "${package_version}" \
+  >/dev/null
+
 dotnet add package ExchangeApi.Optional.Credentials \
   --version "${package_version}" \
   >/dev/null
@@ -75,6 +79,7 @@ using ExchangeApi.Exchanges.Bitflyer.Composition.Realtime;
 using ExchangeApi.Exchanges.Bitflyer.Native.Public.Endpoints.GetTicker;
 using ExchangeApi.Exchanges.Bitflyer.Protocol.Realtime;
 using ExchangeApi.Exchanges.Bitflyer.Vocabulary;
+using ExchangeApi.Exchanges.Binance.Composition.Factory;
 using ExchangeApi.Optional.Credentials;
 using ExchangeApi.Optional.Credentials.PlainText;
 using ExchangeApi.Optional.Logging.Redaction;
@@ -82,6 +87,7 @@ using ExchangeApi.Optional.Reactive;
 using ExchangeApi.Optional.Testing.Realtime;
 
 using var client = BitflyerClientFactory.CreateNativeClientBundle();
+using var binanceClient = BinanceClientFactory.CreateNativeClientBundle();
 await using var realtimeClient = BitflyerRealtimeClientFactory.CreatePublicClient(new SmokeRealtimeTransport());
 var request = new GetTickerRequest { ProductCode = ProductCodes.BtcJpy };
 var provider = PlainTextApiCredentialProviderFactory.Create(ExchangeVenue.Bitflyer, "api-key", "api-secret");
@@ -102,6 +108,7 @@ await reactiveObserver.Terminal.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
 Console.WriteLine(
     client.Public is not null &&
+    binanceClient.Public is not null &&
     realtimeClient is not null &&
     privateRealtimeClient is not null &&
     request.ProductCode == ProductCodes.BtcJpy &&

@@ -179,6 +179,24 @@ v3.9.0 = Realtime Foundation Close
 - まず現行 smoke script の実態を棚卸しする
 - v3.9 close に必要な不足がある場合だけ最小修正する
 
+採用:
+
+- 初期方針を採用する。
+- consumer smoke は local / GitHub Packages ともに aggregate venue package を確認する。
+- bitFlyer は Realtime foundation surface を持つため、factory / channel vocabulary / stream envelope / replay / reactive adapter を確認する。
+- Binance は v3 package consolidation の aggregate venue package として、`BinanceClientFactory` を restore / build / run で確認する。
+- optional packages は `Credentials` / `Logging` / `Testing` / `Reactive` を確認する。
+- smoke は実 API に接続しない。
+- token、credentials、API key、API secret、signature、Authorization 相当値を stdout / stderr に出さない。
+
+反映:
+
+- local consumer smoke に `ExchangeApi.Exchanges.Binance` と `BinanceClientFactory` 確認を追加した
+- GitHub Packages consumer smoke に `ExchangeApi.Exchanges.Binance` と `BinanceClientFactory` 確認を追加した
+- `docs/local-nuget-consumer.md` に smoke 対象 package / public surface を反映した
+- `docs/distribution.md` に v3.9.0 release verification の package smoke 方針を追加した
+- `docs/guides/package-publish.md` に v3.9.0 の GitHub Packages consumer smoke 確認対象を追加した
+
 ### 4.4 v3 realtime gap の最終分類
 
 分類:

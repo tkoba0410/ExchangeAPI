@@ -32,6 +32,7 @@ public static class RealtimeDiagnosticEventTypes
     public const string RawFrameLoggingSkipped = "RawFrameLoggingSkipped";
     public const string MessageDecoded = "MessageDecoded";
     public const string MessageRejected = "MessageRejected";
+    public const string NonTargetMessageIgnored = "NonTargetMessageIgnored";
     public const string ContinuityLost = "ContinuityLost";
     public const string Reconnecting = "Reconnecting";
     public const string Reconnected = "Reconnected";

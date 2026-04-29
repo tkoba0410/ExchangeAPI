@@ -123,6 +123,7 @@ public static class RealtimeDiagnosticEventTypes
     public const string RawFrameLogged = "RawFrameLogged";
     public const string MessageDecoded = "MessageDecoded";
     public const string MessageRejected = "MessageRejected";
+    public const string NonTargetMessageIgnored = "NonTargetMessageIgnored";
     public const string ContinuityLost = "ContinuityLost";
     public const string Reconnecting = "Reconnecting";
     public const string Reconnected = "Reconnected";
@@ -152,6 +153,7 @@ public static class RealtimeDiagnosticSeverities
 | `RawFrameLogged` | sanitized raw frame を log / evidence へ記録した | 継続 |
 | `MessageDecoded` | payload decode が成功した | 継続 |
 | `MessageRejected` | payload decode / validation が失敗し、message を捨てた | 原則継続 |
+| `NonTargetMessageIgnored` | subscribed target ではない channel message を data として流さなかった | 継続 |
 | `ContinuityLost` | reconnect / resubscribe 等により連続性を保証できない | 継続可能 |
 | `Reconnecting` | reconnect を開始した | 継続可能 |
 | `Reconnected` | reconnect が成立した | 継続可能 |
@@ -195,7 +197,8 @@ SubscribeTickerStreamAsync:
 
 基本方針:
 
-- malformed JSON、unknown channel、DTO decode failure は `MessageRejected` として扱い、原則 stream を継続する。
+- malformed JSON、DTO decode failure は `MessageRejected` として扱い、原則 stream を継続する。
+- unknown / non-target channel は target data として流さず、envelope stream では `NonTargetMessageIgnored` として観測可能にする。
 - reconnect / resubscribe 後は、欠落がない前提を置かず `ContinuityLost` を出す。
 - connection close、reconnect exhausted、authentication failure など recovery できない失敗は `Failed` として stream を終了する。
 - cancellation / dispose は `Closed` として正常終了する。
@@ -296,7 +299,7 @@ commit しない。
 | --- | --- | --- |
 | normal public subscribe | `Connecting -> Connected -> SubscribeRequested -> Subscribed -> RawFrameReceived -> MessageDecoded` | data continues |
 | malformed JSON frame | `RawFrameReceived -> MessageRejected` | stream continues |
-| unknown channel frame | `RawFrameReceived -> MessageRejected` | stream continues |
+| unknown / non-target channel frame | `NonTargetMessageIgnored` | stream continues |
 | DTO decode failure | `RawFrameReceived -> MessageRejected` | stream continues |
 | connection closed then reconnect succeeds | `Reconnecting -> Reconnected -> Resubscribed -> ContinuityLost` | stream continues |
 | reconnect exhausted | `Reconnecting -> Failed` | stream terminates with controlled exception |
@@ -311,7 +314,7 @@ Deterministic tests:
 - diagnostic event schema can be serialized to JSON
 - lifecycle scenarios emit expected event sequence
 - malformed JSON becomes `MessageRejected`
-- unknown channel becomes `MessageRejected`
+- unknown / non-target channel becomes `NonTargetMessageIgnored`
 - DTO decode failure becomes `MessageRejected`
 - reconnect / resubscribe emits `ContinuityLost`
 - cancellation / dispose emits `Closed`

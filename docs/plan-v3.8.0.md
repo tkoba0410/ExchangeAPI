@@ -643,7 +643,49 @@ v4+ に送るもの:
 - 分類されていない gap を残さないことで、v3.9.0 の release close を機械的に判断しやすくなる。
 - v4.0 / v4.1 / v5.0 へ送る項目を明確にすることで、v3.8.0 の scope expansion を防げる。
 
-## 8. Verification 候補
+## 8. Realtime Foundation Inventory / Gap Classification
+
+初回棚卸し結果:
+
+| 項目 | 現状 | 分類 | v3.8 action |
+| --- | --- | --- | --- |
+| bitFlyer stream contract 正本 | `docs/realtime-bitflyer.md` に主要 contract がある | v3.8で直す | 裁定結果に合わせて non-target / unknown channel contract を更新 |
+| diagnostic vocabulary 正本 | `docs/realtime-diagnostics.md` に event vocabulary がある | v3.8で直す | `NonTargetMessageIgnored` を追加し、unknown channel の旧 `MessageRejected` 記述を修正 |
+| DTO-only / envelope 関係 | 実装上は DTO-only と stream API が分離済み | v3.8で直す | plan に envelope 正本 API / DTO-only convenience API を固定 |
+| malformed payload | envelope stream は `MessageRejected` として継続する test がある | v3.8で直す | plan / docs に `MessageRejected` scope と secret-free rule を固定 |
+| non-target / unknown channel | DTO-only ignore test はあるが、envelope diagnostic がなかった | v3.8で直す | `NonTargetMessageIgnored` diagnostic と public / private tests を追加 |
+| cancellation / dispose / remote close | 実装は cancellation normal completion / reconnect target を持つ | v3.8で分類 | 追加 test 要否を継続確認 |
+| reconnect order | public / private reconnect order tests がある | v3.8で直す | plan に recovery success 後 `ContinuityLost` rule を固定 |
+| error taxonomy | `BitflyerRealtimeErrorKind` に `Unknown` fallback と主要 kind がある | v3.8で分類 | 追加 kind は棚卸し後に evidence-gated で最小判断 |
+| sample payload / fixture | `tests/Optional/Testing.Tests/Fixtures/Realtime/Bitflyer/RawFrames/` がある | v3.8で分類 | fixture 配置方針と secret-free rule を plan に固定 |
+| HTTP contract / consumer verification | v3 scope 外 | v4+へ送る | v4.0 catch-up inventory に送る |
+| Exchange I/O semantics | v3 scope 外 | v4+へ送る | v4.1 semantics foundation MVP に送る |
+| new venue onboarding | v3 scope 外 | v4+へ送る | v5.0 new venue public read MVP に送る |
+
+Evidence-gated change:
+
+```text
+Change:
+  NonTargetMessageIgnored diagnostic event type を追加し、public / private envelope stream で
+  non-target / unknown channel message を diagnostic として観測可能にする。
+
+Evidence:
+  v3.8 採用済み裁定 4 で、non-target / unknown channel は target data として流さず、
+  stream fault にもせず、silent recovery を避けるため envelope stream では diagnostic として
+  観測可能にすると決めた。
+  棚卸しの結果、DTO-only ignore test はあったが envelope diagnostic vocabulary / behavior がなかった。
+
+Scope:
+  新しい stream API は追加しない。
+  DTO shape は変更しない。
+  `MessageRejected` は malformed / decode failure に限定する。
+  追加は diagnostic event type と envelope stream diagnostic emission / deterministic tests に限定する。
+
+Verification:
+  dotnet test tests/Exchanges/Bitflyer/Native.Tests/ExchangeApi.Exchanges.Bitflyer.Native.Tests.csproj --no-restore
+```
+
+## 9. Verification 候補
 
 最低限:
 
@@ -667,7 +709,7 @@ git diff --check
 - sample payload catalog validation tests
 - secret-free exception / diagnostic tests
 
-## 9. 完了条件候補
+## 10. 完了条件候補
 
 - `docs/plan-v3.8.0.md` が scope / non-scope / 裁定 / verification を固定している
 - lifecycle / continuation rule の正本が一箇所に整理されている

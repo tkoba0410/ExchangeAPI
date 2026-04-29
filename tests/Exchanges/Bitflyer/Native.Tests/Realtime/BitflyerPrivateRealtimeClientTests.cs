@@ -76,6 +76,47 @@ public sealed class BitflyerPrivateRealtimeClientTests
     }
 
     [Fact]
+    public async Task SubscribeChildOrderEventsStreamAsync_YieldsDiagnosticAndContinuesOnNonTargetChannel()
+    {
+        var protocol = new FakeRealtimeProtocolClient();
+        protocol.EnqueueMessage("parent_order_events", """
+            [
+              {
+                "product_code": "BTC_JPY",
+                "parent_order_id": "JCP20150101-035534-486653",
+                "event_date": "2015-01-01T03:55:34.9730659Z",
+                "event_type": "TRIGGER"
+              }
+            ]
+            """);
+        protocol.EnqueueMessage("child_order_events", """
+            [
+              {
+                "product_code": "BTC_JPY",
+                "child_order_acceptance_id": "JRF20150101-070921-194057",
+                "event_date": "2015-01-01T07:09:21.9301772Z",
+                "event_type": "ORDER"
+              }
+            ]
+            """);
+        await using var client = new BitflyerPrivateRealtimeClient(protocol, new FakeCredentialProvider());
+
+        var events = await StreamEventTestExtensions.ReadCountAsync(
+            client.SubscribeChildOrderEventsStreamAsync(),
+            5);
+
+        AssertDiagnostic(events[0], RealtimeDiagnosticEventTypes.Subscribed, RealtimeDiagnosticSeverities.Info);
+        var ignored = AssertDiagnostic(
+            events[1],
+            RealtimeDiagnosticEventTypes.NonTargetMessageIgnored,
+            RealtimeDiagnosticSeverities.Trace);
+        Assert.Equal("parent_order_events", ignored.Attributes?["receivedChannel"]);
+        AssertDiagnostic(events[2], RealtimeDiagnosticEventTypes.RawFrameReceived, RealtimeDiagnosticSeverities.Trace);
+        AssertDiagnostic(events[3], RealtimeDiagnosticEventTypes.MessageDecoded, RealtimeDiagnosticSeverities.Trace);
+        Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeChildOrderEventMessage>>(events[4]);
+    }
+
+    [Fact]
     public async Task SubscribeChildOrderEventsStreamAsync_ReplaysAuthenticationAndSubscriptionAfterReconnect()
     {
         var firstProtocol = new FakeRealtimeProtocolClient();

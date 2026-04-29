@@ -341,7 +341,21 @@ public sealed class BitflyerPublicRealtimeClient : IBitflyerPublicRealtimeClient
             var message = enumerator.Current;
             if (message.Channel != channel)
             {
-                continue;
+                pending.Enqueue(Diagnostic<T>(
+                    channel,
+                    RealtimeDiagnosticEventTypes.NonTargetMessageIgnored,
+                    RealtimeDiagnosticSeverities.Trace,
+                    "Non-target realtime message ignored.",
+                    new Dictionary<string, string>
+                    {
+                        ["receivedChannel"] = message.Channel,
+                        ["payloadLength"] = (message.RawTextLength ?? 0).ToString(),
+                    }));
+
+                if (pending.TryDequeue(out var ignoredEvent))
+                {
+                    return new StreamReadResult<T>(ignoredEvent, Completed: false);
+                }
             }
 
             pending.Enqueue(Diagnostic<T>(

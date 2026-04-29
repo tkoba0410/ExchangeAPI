@@ -93,6 +93,29 @@ public sealed class BitflyerPublicRealtimeClientTests
     }
 
     [Fact]
+    public async Task SubscribeTickerStreamAsync_YieldsDiagnosticAndContinuesOnNonTargetChannel()
+    {
+        var protocol = new FakeRealtimeProtocolClient();
+        protocol.EnqueueMessage("lightning_board_BTC_JPY", """{"mid_price":100,"bids":[],"asks":[]}""");
+        protocol.EnqueueMessage("lightning_ticker_BTC_JPY", SamplePayloads.Ticker);
+        await using var client = new BitflyerPublicRealtimeClient(protocol);
+
+        var events = await StreamEventTestExtensions.ReadCountAsync(
+            client.SubscribeTickerStreamAsync(ProductCodes.BtcJpy),
+            5);
+
+        AssertDiagnostic(events[0], RealtimeDiagnosticEventTypes.Subscribed, RealtimeDiagnosticSeverities.Info);
+        var ignored = AssertDiagnostic(
+            events[1],
+            RealtimeDiagnosticEventTypes.NonTargetMessageIgnored,
+            RealtimeDiagnosticSeverities.Trace);
+        Assert.Equal("lightning_board_BTC_JPY", ignored.Attributes?["receivedChannel"]);
+        AssertDiagnostic(events[2], RealtimeDiagnosticEventTypes.RawFrameReceived, RealtimeDiagnosticSeverities.Trace);
+        AssertDiagnostic(events[3], RealtimeDiagnosticEventTypes.MessageDecoded, RealtimeDiagnosticSeverities.Trace);
+        Assert.IsType<BitflyerRealtimeData<BitflyerRealtimeTickerMessage>>(events[4]);
+    }
+
+    [Fact]
     public async Task SubscribeTickerStreamAsync_ReconnectsAfterStreamEnd()
     {
         var firstProtocol = new FakeRealtimeProtocolClient();

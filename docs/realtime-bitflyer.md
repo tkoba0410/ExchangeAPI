@@ -312,6 +312,10 @@ recoverable lifecycle は envelope event として流し、fatal error は contr
 `MessageRejected` は raw payload、API key、API secret、signature、Authorization 相当値を持たない。
 `MessageRejected` は continuity-impacting event として扱う。
 
+non-target / unknown channel message は target data として流さず、stream fault にもしない。
+envelope stream では `NonTargetMessageIgnored` diagnostic として観測可能にする。
+DTO-only stream は data-only convenience API であり、non-target / unknown channel を表現しない。
+
 ## 9. DTO Contract
 
 共通 interface は envelope metadata に限定する。
@@ -371,7 +375,7 @@ Envelope stream contract:
 - reconnect: default enabled
 - reconnect target: remote close / transport exception / idle timeout
 - cancellation / dispose: normal completion
-- non-target channel message: ignore
+- non-target channel message: `NonTargetMessageIgnored` diagnostic and continue
 - malformed target message: `MessageRejected` event and continue
 - auth failure: controlled exception
 - resubscribe failure: controlled exception

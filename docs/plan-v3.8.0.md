@@ -1,13 +1,13 @@
-# v3.8.0 Realtime Lifecycle / Contract Hardening 実施指示
+# v3.8.0 Realtime Foundation Inventory / Minimal Contract Hardening 実施指示
 
 最終更新: 2026-04-29
-位置づけ: v3.8.0 Realtime Lifecycle / Contract Hardening preparation 指示
+位置づけ: v3.8.0 Realtime Foundation Inventory / Minimal Contract Hardening preparation 指示
 
 状態: preparation / scope decision pending
 
 ## 1. 目的
 
-v3.8.0 は、v3.1.0 から v3.7.0 までに実装した bitFlyer Realtime API foundation の lifecycle / contract を固める release とする。
+v3.8.0 は、v3.1.0 から v3.7.0 までに実装した bitFlyer Realtime API foundation を棚卸しし、v3 realtime track を閉じるために必要な最小 contract hardening を行う release とする。
 
 目的は、新しい realtime feature を広げることではなく、利用者が次を予測できる状態にすることである。
 
@@ -17,6 +17,13 @@ v3.8.0 は、v3.1.0 から v3.7.0 までに実装した bitFlyer Realtime API fo
 - reconnect / resubscribe 後に何が保証され、何が保証されないか
 - diagnostic event / stream envelope / DTO-only stream の関係
 - sample payload / replay / deterministic tests が何を固定するか
+
+併せて、後続の開発者や自動化エージェントが自律的に仕様確認・差分判断・検証再現を行えるように、decision / rationale、test gap、fixture rule、verification path を明文化する。
+
+これは Codex 自律性向上を含むが、Codex 固有の仕組みにはしない。
+一般化した development autonomy / 開発自律性として扱う。
+
+v3.8.0 では、棚卸しは v3 realtime foundation 全体に対して行うが、修正は v3.7.0 までに入った realtime surface の契約確認に必要な最小範囲へ限定する。
 
 ## 2. 採用予定範囲
 
@@ -33,6 +40,10 @@ v3.8.0 は、v3.1.0 から v3.7.0 までに実装した bitFlyer Realtime API fo
 - sample payload catalog rule の固定
 - `docs/realtime-bitflyer.md` / `docs/realtime-diagnostics.md` / `docs/spec.md` の整合
 - release checklist / release notes の準備
+- decision / rationale ledger
+- realtime test gap list
+- fixture / replay rule の明文化
+- v4.0 / v4.1 / v5.0 へ送る項目の分類
 
 ## 3. 非対象
 
@@ -54,6 +65,10 @@ v3.8.0 では次を扱わない。
 - SymbolSpec / SizeStep / PriceStep / Capability
 - stateless order validation
 - error taxonomy の大規模再設計
+- HTTP contract / consumer verification catch-up
+- CTradeBot 固有導線
+- 自動化エージェント専用 tool / config
+- broader consumer verification framework
 
 ## 4. 作業方針
 
@@ -64,6 +79,16 @@ v3.8.0 では次を扱わない。
 - exact contract は `docs/realtime-bitflyer.md` / `docs/realtime-diagnostics.md` に置く。
 - release scope、非対象、完了条件、裁定理由は本書に置く。
 - `docs/roadmap-post-v2.md` は version placement のみを更新する。
+- development autonomy は scope 拡大の理由にしない。
+- v3.8.0 では Realtime foundation に直接関係しない consumer verification は扱わない。
+
+v3.8.0 に入れてよいものは、次をすべて満たすものに限定する。
+
+1. Realtime foundation に直接関係する
+2. v3.7.0 までに入れた surface の棚卸し・契約固定・検証再現である
+3. docs / tests / scripts / verification の範囲に収まる
+4. public API を原則増やさない
+5. v4 / v5 の設計判断を先取りしない
 
 ## 5. 関連正本
 

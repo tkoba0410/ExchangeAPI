@@ -92,9 +92,10 @@ v3.4.0: bitFlyer realtime resilience foundation
 v3.5.0: realtime diagnostics foundation
 v3.6.0: realtime replay / testing foundation
 v3.7.0: realtime optional reactive integration
-v3.8.0: realtime lifecycle / contract hardening
+v3.8.0: realtime foundation inventory / minimal contract hardening
 v3.9.0: realtime verification / release close
-v4.0.0: Exchange I/O semantics foundation
+v4.0.0: Exchange I/O catch-up inventory / foundation preparation
+v4.1.0: Exchange I/O semantics foundation MVP
 v4.x: Exchange I/O semantics applications
 v5.0.0: new venue public read MVP
 v5.x: public read coverage expansion
@@ -319,11 +320,16 @@ venue-specific helper、envelope-specific helper、scheduler / buffer / retry po
 
 ### v3.8.0 候補
 
-v3.8.0 は、Realtime Lifecycle / Contract Hardening release 候補とする。
-目的は、v3 で実装した realtime API の lifecycle と contract を固定し、利用者が挙動を予測できる状態にすることである。
+v3.8.0 は、Realtime Foundation Inventory / Minimal Contract Hardening release 候補とする。
+目的は、v3.7.0 までに実装した realtime foundation を棚卸しし、v3 realtime track を閉じるために必要な最小 contract hardening を行うことである。
+
+併せて、後続の開発者や自動化エージェントが自律的に仕様確認・差分判断・検証再現を行えるように、decision / rationale、test gap、fixture rule、verification path を明文化する。
+これは Codex 自律性向上を含むが、Codex 固有の仕組みにはしない。
+一般化した development autonomy / 開発自律性として扱う。
 
 候補:
 
+- realtime foundation inventory
 - lifecycle event contract
 - stream status event contract
 - malformed payload handling
@@ -331,8 +337,22 @@ v3.8.0 は、Realtime Lifecycle / Contract Hardening release 候補とする。
 - reconnect / resubscribe contract tests
 - realtime error taxonomy の最小整理
 - sample payload catalog rule
+- decision / rationale ledger
+- realtime test gap list
+- v4.0 / v4.1 / v5.0 へ送る項目の分類
 
-v3.8.0 では、新しい realtime feature を広げず、既存 realtime surface の契約を固める。
+v3.8.0 では、棚卸しは v3 realtime foundation 全体に対して行うが、修正は v3.7.0 までに入った realtime surface の契約確認に必要な最小範囲へ限定する。
+
+v3.8.0 では扱わない:
+
+- HTTP contract / consumer verification catch-up
+- CTradeBot 固有導線
+- Gateway / Platform testing
+- simulation
+- state reconstruction
+- broader consumer verification framework
+- v4 の Exchange I/O semantics foundation
+- v5 の new venue onboarding
 
 ### v3.9.0 候補
 
@@ -373,12 +393,43 @@ ExchangeAPI 内に直接持ち込まないもの:
 
 ### v4.0.0 候補
 
-v4.0.0 は、Exchange I/O semantics foundation release 候補とする。
-v4 は既存 API の大掃除ではなく、v3 で整理した realtime foundation と既存 HTTP read surface を使って、取引所 I/O の意味情報、制約、観測情報を reusable に整理する release として扱う。
+v4.0.0 は、Exchange I/O Catch-up Inventory / Foundation Preparation release 候補とする。
+目的は、v2 HTTP / v3 Realtime で残った contract・verification・consumer usability の不足を棚卸しし、v4.1.0 の Exchange I/O semantics foundation MVP に進む前提を整えることである。
 ただし、[`docs/execution-boundary-policy.md`](./execution-boundary-policy.md) に従い、ExchangeAPI は stateless exchange I/O library として維持する。
 `clientOrderKey` 正本管理、retry / reconcile、open order tracking、execution state machine、ledger / position / allocation は ExchangeAPI の責務にしない。
 
 v4.0.0 候補:
+
+- HTTP contract / consumer verification catch-up
+- Realtime から v4 semantics へ渡す observation gap の確認
+- endpoint matrix / docs / tests / scripts の整合確認
+- package consumer smoke の不足確認
+- secret-free / evidence / verification 運用の不足確認
+- CTradeBot / ExecutionGateway が使う前提の不足整理
+- v4.1.0 に入れるもの、後送するもの、やらないものの分類
+
+v4.0.0 では破壊的変更を許容する。
+ただし目的は catch-up 整合、contract clarity、verification reproducibility、v4.1 readiness に限定する。
+
+v4.0.0 で避ける破壊的変更:
+
+- namespace 全面 rename
+- DTO 全面再設計
+- factory API 大改修
+- Unified 前提の抽象化
+- Gateway / Platform 固有都合の API 変更
+- 新 venue 追加と同時の大規模整理
+
+v4.0.0 では、state-changing operation を追加しない。
+注文、キャンセル、入金、出金などの実行系 operation は別途裁定する。
+state reconstruction 自体は ExchangeAPI 内では実装せず、ExecutionGateway / CTradeBot Platform または別建ての上位層で扱う。
+
+### v4.1.0 候補
+
+v4.1.0 は、Exchange I/O semantics foundation MVP release 候補とする。
+v4.1.0 は、v4.0.0 の catch-up / preparation を前提に、v3 で整理した realtime foundation と既存 HTTP read surface を使って、取引所 I/O の意味情報、制約、観測情報を reusable に整理する release として扱う。
+
+v4.1.0 候補:
 
 - SymbolSpec / SizeStep / PriceStep / Capability
 - stateless order validation
@@ -390,7 +441,7 @@ v4.0.0 候補:
 - state freshness / partial failure の観測 contract
 - state reconstruction を行う上位層へ渡す observation contract
 
-v4.0.0 では、state-changing operation を追加しない。
+v4.1.0 では、state-changing operation を追加しない。
 注文、キャンセル、入金、出金などの実行系 operation は別途裁定する。
 state reconstruction 自体は ExchangeAPI 内では実装せず、ExecutionGateway / CTradeBot Platform または別建ての上位層で扱う。
 

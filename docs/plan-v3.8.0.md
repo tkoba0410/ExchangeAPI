@@ -778,3 +778,67 @@ git diff --check
 - `docs/release-notes/v3.8.0.md` が追加されている
 - v3.8.0 に v4 / v5 / v6 の実装を先取りしていない
 - v3.9.0 に渡す内容が明確である
+
+## 12. v3.8.0 Release Execution 指示
+
+目的:
+
+v3.8.0 を release し、v3.9.0 の作業 branch に移る。
+v3.8.0 release commit は close preflight 済みの `codex/v3.8-dev` の先端とする。
+
+前提:
+
+- `codex/v3.8-dev` が clean である
+- close preparation が通っている
+- actual release preflight を `3.8.0` で実行する
+- fast-forward できない場合は止めて差分を確認する
+- unrelated change を revert しない
+
+実行:
+
+```bash
+bash scripts/run-release-preflight.sh 3.8.0 linux-x64
+dotnet test ExchangeApi.LiveTests.slnx --no-restore
+git diff --check
+
+git checkout main
+git pull --ff-only origin main
+git merge --ff-only codex/v3.8-dev
+git tag -a v3.8.0 -m "Release v3.8.0"
+git push origin main
+git push origin v3.8.0
+
+bash scripts/push-github-packages.sh 3.8.0
+bash scripts/smoke-github-packages-consumer.sh 3.8.0
+```
+
+GitHub Release:
+
+- tag: `v3.8.0`
+- title: `v3.8.0`
+- body: `docs/release-notes/v3.8.0.md`
+- assets:
+  - `local/publish/release-assets/v3.8.0/exchangeapi-linux-x64`
+  - `local/publish/release-assets/v3.8.0/exchangeapi-linux-x64.sha256`
+  - `local/publish/release-assets/v3.8.0/exchangeapi-mcp-linux-x64`
+  - `local/publish/release-assets/v3.8.0/exchangeapi-mcp-linux-x64.sha256`
+
+release 後:
+
+```bash
+git checkout main
+git pull --ff-only origin main
+git checkout -b codex/v3.9-dev
+git push -u origin codex/v3.9-dev
+```
+
+確認:
+
+- main に v3.8.0 commit が入っている
+- remote に `v3.8.0` tag がある
+- GitHub Release が作成されている
+- release assets が attach されている
+- GitHub Packages publish が通っている
+- GitHub Packages consumer smoke が通っている
+- `codex/v3.9-dev` が remote にある
+- v3.8.0 に新 channel / Binance realtime / Unified / state reconstruction / Gateway / Platform behavior が含まれていない

@@ -22,7 +22,7 @@
 | MCP client / human trial CLI | 将来候補 | 人間が MCP server を試す導線を用意できるため | v2 では MCP server 側の read-only surface を優先 |
 | venue 単位 package / project consolidation | v3 採用 | 利用者導線を `ExchangeApi.Exchanges.Bitflyer` / `ExchangeApi.Exchanges.Binance` に整理し、package 数を減らすため | v3.0.0 で package consolidation を採用する |
 | bitFlyer Realtime API | v3.1 採用 | HTTP とは別軸の public market stream を venue-native surface として扱えるため | v3.x は bitFlyer realtime foundation track として継続する |
-| venue 追加 | v5 候補 | v3 / v4 で realtime foundation と Exchange I/O semantics foundation を整理した後、venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
+| venue 追加 | v6 候補 | v3 / v4 / v5 で realtime foundation、stable baseline、Exchange I/O semantics foundation を整理した後、venue 単位 project / package 構造の拡張性を実証するため | まず public read MVP に絞る |
 
 ## 1.1 v2.1.0 採用項目
 
@@ -94,31 +94,37 @@ v3.6.0: realtime replay / testing foundation
 v3.7.0: realtime optional reactive integration
 v3.8.0: realtime foundation inventory / minimal contract hardening
 v3.9.0: realtime verification / release close
-v4.0.0: Exchange I/O catch-up inventory / foundation preparation
-v4.1.0: Exchange I/O semantics foundation MVP
-v4.x: Exchange I/O semantics applications
-v5.0.0: new venue public read MVP
-v5.x: public read coverage expansion
-v6.0.0+: Unified, only if meaning is defensible
+v4.0.0: stable baseline inventory / maintenance catch-up
+v4.x: stable baseline / release hardening
+v5.0.0: Exchange I/O semantics foundation MVP
+v5.x: Exchange I/O semantics applications
+v6.0.0: new venue public read MVP
+v6.x: public read coverage expansion
+v7.0.0+: Unified, only if meaning is defensible
 ```
 
 v3.x は、`v3.0.0` で整理した venue package 構造の上に bitFlyer Realtime API を成熟させる track として扱う。
-v4.x は、取引所 I/O の意味情報、制約、観測情報を reusable に整える Exchange I/O semantics track として扱う。
-新 venue 追加は v5.0.0 へ送り、Unified は v6.0.0 以降へ送る。
+v4.x は、v2 HTTP と v3 Realtime を合わせて ExchangeAPI の一回目の安定板を目指す stable baseline / maintenance / release hardening track として扱う。
+v5.x は、取引所 I/O の意味情報、制約、観測情報を reusable に整える Exchange I/O semantics track として扱う。
+新 venue 追加は v6.0.0 へ送り、Unified は v7.0.0 以降へ送る。
 
 責務境界:
 
 ExchangeAPI / ExecutionGateway / CTradeBot Platform の責務境界は [`docs/execution-boundary-policy.md`](./execution-boundary-policy.md) を参照する。
 v3.x の Realtime API foundation track は維持する。
-v4.x 以降では、ExchangeAPI に stateful execution boundary を入れず、Gateway、CLI、検証ツール、監視ツールなどが再利用できる stateless exchange I/O semantics surface を整える方針を採る。
+v4.x では、ExchangeAPI に stateful execution boundary を入れず、v2 HTTP / v3 Realtime の文書、検証、package、smoke、release 導線を安定板として整える。
+v5.x 以降では、Gateway、CLI、検証ツール、監視ツールなどが再利用できる stateless exchange I/O semantics surface を整える方針を採る。
 
-v3 / v4 境界:
+v3 / v4 / v5 境界:
 
 ```text
 v3:
   API event / response を安全に取得・記録・再現・検証するための汎用基盤
 
 v4:
+  v2 HTTP / v3 Realtime を合わせて一回目の安定板にするための仕上げ、メンテナンス吸収、release hardening
+
+v5:
   取得した event / response の意味情報、制約、観測情報を reusable に扱うための stateless semantics support
 ```
 
@@ -139,6 +145,18 @@ v3 系に残すもの:
 
 v4 系へ送るもの:
 
+- HTTP / Realtime の文書整合
+- endpoint matrix と実装のズレ修正
+- package / local consumer / GitHub Packages smoke の整理
+- release checklist / release notes 整備
+- secret-free evidence / log の再確認
+- deterministic / live skip / smoke の再現性向上
+- 古い文書・古い script 名・古い説明の整理
+- CTradeBot / ExecutionGateway が使う前提の不足棚卸し
+- 安定板化に必要な最小限の API / docs 修正
+
+v5 系へ送るもの:
+
 - SymbolSpec / SizeStep / PriceStep / Capability
 - stateless order validation
 - error taxonomy 整理
@@ -149,7 +167,7 @@ v4 系へ送るもの:
 - state freshness / partial failure の観測 contract
 - state reconstruction を行う上位層へ渡す observation contract
 
-v4 系でも ExchangeAPI に入れないもの:
+v4 系以降でも ExchangeAPI に入れないもの:
 
 - `clientOrderKey` 正本管理
 - retry / reconcile の正本
@@ -161,7 +179,7 @@ v4 系でも ExchangeAPI に入れないもの:
 用語の使い分け:
 
 - v3 の replay は、test / diagnostics のために stream event や raw frame を再生することを指す
-- v4 以降の state replay / state reconstruction は、ExchangeAPI 内ではなく Gateway / Platform 側または別建ての上位層で扱う
+- v5 以降の state replay / state reconstruction は、ExchangeAPI 内ではなく Gateway / Platform 側または別建ての上位層で扱う
 
 ### v3.1.0 候補
 
@@ -207,7 +225,7 @@ v3.2.0 は、Realtime hardening と realtime foundation 整理の候補 release 
 - package / smoke / docs の再利用性改善
 - endpoint matrix へ `UnifiedCandidate` などの判定欄を追加するか検討
 
-現行の v3 / v4 / v5 境界では、board state builder は v4 系、venue onboarding は v5 系へ送る。
+現行の v3 / v4 / v5 / v6 境界では、board state builder は ExchangeAPI 外または v5+ の semantics 検討、venue onboarding は v6 系へ送る。
 
 ### v3.3.0 候補
 
@@ -339,7 +357,7 @@ v3.8.0 は、Realtime Foundation Inventory / Minimal Contract Hardening release 
 - sample payload catalog rule
 - decision / rationale ledger
 - realtime test gap list
-- v4.0 / v4.1 / v5.0 へ送る項目の分類
+- v4.0 / v5.0 / v6.0 へ送る項目の分類
 
 v3.8.0 では、棚卸しは v3 realtime foundation 全体に対して行うが、修正は v3.7.0 までに入った realtime surface の契約確認に必要な最小範囲へ限定する。
 
@@ -351,13 +369,14 @@ v3.8.0 では扱わない:
 - simulation
 - state reconstruction
 - broader consumer verification framework
-- v4 の Exchange I/O semantics foundation
-- v5 の new venue onboarding
+- v4 の stable baseline / maintenance / release hardening
+- v5 の Exchange I/O semantics foundation
+- v6 の new venue onboarding
 
 ### v3.9.0 候補
 
 v3.9.0 は、Realtime Verification / Release Close release 候補とする。
-目的は、v3 realtime foundation を閉じ、v4 の Exchange I/O semantics foundation へ進める状態にすることである。
+目的は、v3 realtime foundation を閉じ、v4 の stable baseline / maintenance / release hardening へ進める状態にすることである。
 
 候補:
 
@@ -371,7 +390,7 @@ v3.9.0 は、Realtime Verification / Release Close release 候補とする。
 - realtime live verification / evidence runbook 整理
 - v4 へ渡す項目の明文化
 
-v3.9.0 では、v4 の Exchange I/O semantics foundation へ進む前に、v3 realtime foundation の文書、検証、release 導線を閉じる。
+v3.9.0 では、v4 の安定板化へ進む前に、v3 realtime foundation の文書、検証、release 導線を閉じる。
 
 v3 系で急がない ExchangeAPI 拡張:
 
@@ -389,27 +408,27 @@ ExchangeAPI 内に直接持ち込まないもの:
 - board / account / position / order state helper
 - state replay / state reconstruction
 
-これらは ExecutionGateway / CTradeBot Platform または別建ての上位層で扱い、ExchangeAPI はそのために再利用できる stateless semantics / observation / inquiry surface を提供する。
+これらは ExecutionGateway / CTradeBot Platform または別建ての上位層で扱い、ExchangeAPI は v5 以降で、そのために再利用できる stateless semantics / observation / inquiry surface を提供する。
 
 ### v4.0.0 候補
 
-v4.0.0 は、Exchange I/O Catch-up Inventory / Foundation Preparation release 候補とする。
-目的は、v2 HTTP / v3 Realtime で残った contract・verification・consumer usability の不足を棚卸しし、v4.1.0 の Exchange I/O semantics foundation MVP に進む前提を整えることである。
+v4.0.0 は、Stable Baseline Inventory / Maintenance Catch-up release 候補とする。
+目的は、v2 HTTP / v3 Realtime で残った contract・verification・consumer usability・release 運用の不足を棚卸しし、ExchangeAPI の一回目の安定板へ進む前提を整えることである。
 ただし、[`docs/execution-boundary-policy.md`](./execution-boundary-policy.md) に従い、ExchangeAPI は stateless exchange I/O library として維持する。
 `clientOrderKey` 正本管理、retry / reconcile、open order tracking、execution state machine、ledger / position / allocation は ExchangeAPI の責務にしない。
 
 v4.0.0 候補:
 
 - HTTP contract / consumer verification catch-up
-- Realtime から v4 semantics へ渡す observation gap の確認
+- Realtime foundation から stable baseline へ渡す gap の確認
 - endpoint matrix / docs / tests / scripts の整合確認
 - package consumer smoke の不足確認
 - secret-free / evidence / verification 運用の不足確認
 - CTradeBot / ExecutionGateway が使う前提の不足整理
-- v4.1.0 に入れるもの、後送するもの、やらないものの分類
+- v4.x で直すもの、v5 へ送るもの、v6 へ送るもの、やらないものの分類
 
 v4.0.0 では破壊的変更を許容する。
-ただし目的は catch-up 整合、contract clarity、verification reproducibility、v4.1 readiness に限定する。
+ただし目的は stable baseline 化、catch-up 整合、contract clarity、verification reproducibility、release hardening に限定する。
 
 v4.0.0 で避ける破壊的変更:
 
@@ -424,12 +443,32 @@ v4.0.0 では、state-changing operation を追加しない。
 注文、キャンセル、入金、出金などの実行系 operation は別途裁定する。
 state reconstruction 自体は ExchangeAPI 内では実装せず、ExecutionGateway / CTradeBot Platform または別建ての上位層で扱う。
 
-### v4.1.0 候補
+### v4.x 候補
 
-v4.1.0 は、Exchange I/O semantics foundation MVP release 候補とする。
-v4.1.0 は、v4.0.0 の catch-up / preparation を前提に、v3 で整理した realtime foundation と既存 HTTP read surface を使って、取引所 I/O の意味情報、制約、観測情報を reusable に整理する release として扱う。
+v4.x は、Stable Baseline / Maintenance / Release Hardening track とする。
+v4.0.0 の棚卸しを前提に、v2 HTTP と v3 Realtime を合わせて ExchangeAPI の一回目の安定板にする。
+後から見つかったメンテナンス項目は、stable baseline 化に必要なものに限り v4.x で吸収してよい。
 
-v4.1.0 候補:
+v4.x 候補:
+
+- HTTP / Realtime の文書整合
+- endpoint matrix と実装のズレ修正
+- deterministic / live skip / smoke の再現性向上
+- package / local consumer / GitHub Packages smoke の整理
+- release checklist / release notes 整備
+- secret-free evidence / log / stdout / stderr の再確認
+- 古い文書・古い script 名・古い説明の整理
+- CTradeBot / ExecutionGateway が使う前提の不足棚卸し
+- 安定板化に必要な最小限の API / docs 修正
+
+v4.x では、Exchange I/O semantics foundation、新 venue、Unified には入らない。
+
+### v5.0.0 候補
+
+v5.0.0 は、Exchange I/O semantics foundation MVP release 候補とする。
+v5.0.0 は、v4 stable baseline を前提に、v3 で整理した realtime foundation と既存 HTTP read surface を使って、取引所 I/O の意味情報、制約、観測情報を reusable に整理する release として扱う。
+
+v5.0.0 候補:
 
 - SymbolSpec / SizeStep / PriceStep / Capability
 - stateless order validation
@@ -441,16 +480,16 @@ v4.1.0 候補:
 - state freshness / partial failure の観測 contract
 - state reconstruction を行う上位層へ渡す observation contract
 
-v4.1.0 では、state-changing operation を追加しない。
+v5.0.0 では、state-changing operation を追加しない。
 注文、キャンセル、入金、出金などの実行系 operation は別途裁定する。
 state reconstruction 自体は ExchangeAPI 内では実装せず、ExecutionGateway / CTradeBot Platform または別建ての上位層で扱う。
 
-### v5.0.0 候補
+### v6.0.0 候補
 
-v5.0.0 は、新しい取引所を正式追加するフェーズとする。
-v5 は既存 API の大掃除ではなく、v3 / v4 で整理した venue 構造、realtime foundation、Exchange I/O semantics foundation の拡張性を実証する release として扱う。
+v6.0.0 は、新しい取引所を正式追加するフェーズとする。
+v6 は既存 API の大掃除ではなく、v3 / v4 / v5 で整理した venue 構造、realtime foundation、stable baseline、Exchange I/O semantics foundation の拡張性を実証する release として扱う。
 
-v5.0.0 venue 追加 MVP:
+v6.0.0 venue 追加 MVP:
 
 - `Vocabulary`
 - public read `Protocol`
@@ -461,7 +500,7 @@ v5.0.0 venue 追加 MVP:
 - endpoint matrix
 - local consumer smoke
 
-private endpoint、order、cancel、withdraw、deposit は v5.0.0 の初期 MVP には含めない。
+private endpoint、order、cancel、withdraw、deposit は v6.0.0 の初期 MVP には含めない。
 
 venue 選定基準:
 
@@ -473,9 +512,9 @@ venue 選定基準:
 - state-changing endpoint を後回しにできる
 - 日本円ペアや利用想定に合う場合は加点する
 
-### v6.0.0+ 候補
+### v7.0.0+ 候補
 
-v6.0.0 以降は、Unified を検討してよい。
+v7.0.0 以降は、Unified を検討してよい。
 Unified は、複数 venue の実装経験と state management の境界を得てから設計する。
 
 Unified public read MVP に載せやすい候補:
@@ -486,7 +525,7 @@ Unified public read MVP に載せやすい候補:
 - kline / candle
 - exchange health / market status
 
-v5 でも避ける候補:
+v6 でも避ける候補:
 
 - order placement
 - cancel

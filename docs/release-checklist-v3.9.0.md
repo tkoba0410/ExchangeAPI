@@ -3,7 +3,7 @@
 最終更新: 2026-04-29
 位置づけ: v3.9.0 release checklist
 
-状態: close preparation passed
+状態: v3.9.0 released
 
 ## 1. Scope Confirmation
 
@@ -180,4 +180,54 @@ live tests:
 
 GitHub Packages smoke script check:
 - verified against published 3.8.0 package set
+```
+
+release result:
+
+```text
+2026-04-29 released
+
+commands:
+- bash scripts/run-release-preflight.sh 3.9.0 linux-x64
+- dotnet test ExchangeApi.LiveTests.slnx --no-restore
+- git diff --check
+- git merge --ff-only codex/v3.9-dev
+- git tag -a v3.9.0 -m "Release v3.9.0"
+- git push origin main
+- git push origin v3.9.0
+- GITHUB_TOKEN="$(gh auth token)" bash scripts/push-github-packages.sh 3.9.0
+- bash scripts/smoke-github-packages-consumer.sh 3.9.0
+- gh release create v3.9.0 ...
+
+package output:
+- ExchangeApi.Exchanges.Binance.3.9.0.nupkg
+- ExchangeApi.Exchanges.Bitflyer.3.9.0.nupkg
+- ExchangeApi.Optional.Credentials.3.9.0.nupkg
+- ExchangeApi.Optional.Logging.3.9.0.nupkg
+- ExchangeApi.Optional.Reactive.3.9.0.nupkg
+- ExchangeApi.Optional.Testing.3.9.0.nupkg
+- ExchangeApi.Primitives.3.9.0.nupkg
+
+release assets:
+- local/publish/release-assets/v3.9.0/exchangeapi-linux-x64
+- local/publish/release-assets/v3.9.0/exchangeapi-linux-x64.sha256
+- local/publish/release-assets/v3.9.0/exchangeapi-mcp-linux-x64
+- local/publish/release-assets/v3.9.0/exchangeapi-mcp-linux-x64.sha256
+
+checksum verification:
+- exchangeapi-linux-x64: OK
+- exchangeapi-mcp-linux-x64: OK
+
+forbidden layer package check:
+- no layer-specific venue package matched v3.9.0
+
+live tests:
+- dotnet test ExchangeApi.LiveTests.slnx --no-restore skipped safely without opt-in
+
+GitHub Packages:
+- publish passed for v3.9.0 package set
+- consumer smoke passed for v3.9.0
+
+GitHub Release:
+- https://github.com/tkoba0410/ExchangeAPI/releases/tag/v3.9.0
 ```
